@@ -61,7 +61,7 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act, ierr(5)
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     character(len=20)                 :: name
     real(psb_spk_), allocatable     :: r(:)
 
@@ -98,8 +98,7 @@ contains
       call psb_gefree(r,desc_a,info)
     case default
       info=psb_err_invalid_istop_
-      ierr(1) = stopc
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,i_err=(/stopc/))
       goto 9999      
     end select
     if (info /= psb_success_) then
@@ -213,7 +212,7 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act, ierr(5)
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     character(len=20)                 :: name
     type(psb_s_vect_type) :: r
 
@@ -250,8 +249,7 @@ contains
       call psb_gefree(r,desc_a,info)
     case default
       info=psb_err_invalid_istop_
-      ierr(1) = stopc
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,i_err=(/stopc/))
       goto 9999      
     end select
     if (info /= psb_success_) then

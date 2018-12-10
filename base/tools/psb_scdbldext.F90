@@ -84,18 +84,20 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   integer(psb_ipk_) ::  i, j, err_act,m,&
        &  lovr, lworks,lworkr, n_row,n_col, n_col_prev, &
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
-  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,&
+  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e, &
        & idx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
-  integer(psb_mpik_) :: icomm, ictxt, me, np, minfo
+  integer(psb_lpk_) :: gidx, lnz
+  integer(psb_mpk_) :: icomm, ictxt, me, np, minfo
 
   integer(psb_ipk_), allocatable :: irow(:), icol(:)
   integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
-  integer(psb_ipk_), allocatable :: halo(:),ovrlap(:),works(:),workr(:),&
+  integer(psb_lpk_), allocatable :: works(:),workr(:)
+  integer(psb_ipk_), allocatable :: halo(:),ovrlap(:),&
        & t_halo_in(:), t_halo_out(:),temp(:),maskr(:)
-  integer(psb_mpik_),allocatable :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
+  integer(psb_mpk_),allocatable :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
@@ -262,13 +264,13 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
         call psb_errpush(info,name,a_err='psb_ensure_size')
         goto 9999
       end if
-      orig_ovr(cntov_o)=proc
-      orig_ovr(cntov_o+1)=1
-      orig_ovr(cntov_o+2)=idx
-      orig_ovr(cntov_o+3)=-1
+      orig_ovr(cntov_o)   = proc
+      orig_ovr(cntov_o+1) = 1
+      orig_ovr(cntov_o+2) = idx
+      orig_ovr(cntov_o+3) = -1
       cntov_o=cntov_o+3
     end Do
-    counter=counter+n_elem_recv+n_elem_send+3
+    counter = counter+n_elem_recv+n_elem_send+3
   end Do
 
 
@@ -319,16 +321,16 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
     n_col_prev = desc_ov%get_local_cols() 
 
     Do While (halo(counter) /= -1)
-      tot_elem=0
-      proc=halo(counter+psb_proc_id_)
-      n_elem_recv=halo(counter+psb_n_elem_recv_)
-      n_elem_send=halo(counter+n_elem_recv+psb_n_elem_send_)
+      tot_elem    = 0
+      proc        = halo(counter+psb_proc_id_)
+      n_elem_recv = halo(counter+psb_n_elem_recv_)
+      n_elem_send = halo(counter+n_elem_recv+psb_n_elem_send_)
       If ((counter+n_elem_recv+n_elem_send) > Size(halo)) then
         info = -1
         call psb_errpush(info,name)
         goto 9999
       end If
-      tot_recv=tot_recv+n_elem_recv
+      tot_recv = tot_recv+n_elem_recv
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
            &  ': tot_recv:',proc,n_elem_recv,tot_recv
@@ -407,6 +409,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
         !
         If (i_ovr <= (novr)) Then
           call a%csget(idx,idx,n_elem,irow,icol,info)
+
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='csget')
@@ -431,8 +434,8 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
 
       if (i_ovr <= novr) then 
         if (tot_elem > 1) then 
-          call psb_msort_unique(works(idxs+1:idxs+tot_elem),i)
-          tot_elem=i
+          call psb_msort_unique(works(idxs+1:idxs+tot_elem),lnz)
+          tot_elem = lnz
         endif
 
         sdsz(proc+1) = tot_elem
@@ -451,8 +454,8 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! accumulated RECV requests, we have an all-to-all to build
       ! matchings SENDs.
       !       
-      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1, &
-           & psb_mpi_def_integer,icomm,minfo)
+      call mpi_alltoall(sdsz,1,psb_mpi_mpk_,rvsz,1, &
+           & psb_mpi_mpk_,icomm,minfo)
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoall')
@@ -487,8 +490,8 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
         lworkr = max(iszr,1)
       end if
 
-      call mpi_alltoallv(works,sdsz,bsdindx,psb_mpi_ipk_integer,&
-           & workr,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+      call mpi_alltoallv(works,sdsz,bsdindx,psb_mpi_lpk_,&
+           & workr,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoallv')
@@ -514,12 +517,13 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       j = 0
       do i=1,iszr
         if (maskr(i) < 0) then 
-          j=j+1
+          j        = j+1
           works(j) = workr(i)
         end if
       end do
       ! Eliminate duplicates from request
-      call psb_msort_unique(works(1:j),iszs)
+      call psb_msort_unique(works(1:j),lnz)
+      iszs = lnz
 
       !
       ! fnd_owner on desc_a because we want the procs who
@@ -536,9 +540,9 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
            & ': Done fnd_owner', desc_ov%indxmap%get_state()
 
       do i=1,iszs
-        idx = works(i)
-        n_col   = desc_ov%get_local_cols()
-        call desc_ov%indxmap%g2l_ins(idx,lidx,info)
+        gidx  = works(i)
+        n_col = desc_ov%get_local_cols()
+        call desc_ov%indxmap%g2l_ins(gidx,lidx,info)
         if (desc_ov%get_local_cols() >  n_col ) then
           !
           ! This is a new index. Assigning a local index as
@@ -640,7 +644,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       goto 9999
     end if
     orig_ovr(cntov_o:cntov_o+counter_o-1) = tmp_ovr_idx(1:counter_o)
-    cntov_o = cntov_o+counter_o-1
+    cntov_o            = cntov_o+counter_o-1
     orig_ovr(cntov_o:) = -1
     call psb_move_alloc(orig_ovr,desc_ov%ovrlap_index,info)
     deallocate(tmp_ovr_idx,stat=info)

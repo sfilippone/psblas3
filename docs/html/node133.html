@@ -72,7 +72,7 @@ err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps
  -->
 
 <IMG
- WIDTH="204" HEIGHT="44" BORDER="0"
+ WIDTH="205" HEIGHT="44" BORDER="0"
  SRC="img163.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{(\Vert A\Vert\Vert x_i\Vert+\Vert b\Vert)} &lt; eps \end{displaymath}">
 </DIV>
@@ -110,7 +110,7 @@ err = \frac{\|r_i\|}{\|r_0\|_2} < eps
  -->
 
 <IMG
- WIDTH="128" HEIGHT="44" BORDER="0"
+ WIDTH="129" HEIGHT="44" BORDER="0"
  SRC="img165.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert r_0\Vert _2} &lt; eps \end{displaymath}">
 </DIV>
@@ -120,14 +120,14 @@ err = \frac{\|r_i\|}{\|r_0\|_2} < eps
 </DL>
 The behaviour is controlled by  the  istop argument (see
 later). In the above formulae, <SPAN CLASS="MATH"><IMG
- WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="18" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img166.png"
  ALT="$x_i$"></SPAN> is the tentative solution and
 <SPAN CLASS="MATH"><IMG
- WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img167.png"
  ALT="$r_i=b-Ax_i$"></SPAN> the corresponding residual at the <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN>-th iteration. 
 
@@ -194,7 +194,7 @@ call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
 <DT><STRONG>a</STRONG></DT>
 <DD>the local portion of global sparse matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$"></SPAN>. 
 <BR>
@@ -271,22 +271,22 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <SPAN CLASS="MATH"><IMG
- WIDTH="99" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="100" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img170.png"
  ALT="$itmax = 1000$"></SPAN>.
 <BR>
 Specified as: an integer variable <SPAN CLASS="MATH"><IMG
- WIDTH="76" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="76" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
  SRC="img171.png"
  ALT="$itmax \ge 1$"></SPAN>.
 </DD>
 <DT><STRONG>itrace</STRONG></DT>
 <DD>If <SPAN CLASS="MATH"><IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="28" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img115.png"
  ALT="$&gt;0$"></SPAN> print out an informational message about
   convergence  every <SPAN CLASS="MATH"><IMG
- WIDTH="45" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="45" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img172.png"
  ALT="$itrace$"></SPAN> iterations.
 <BR>
@@ -306,7 +306,7 @@ Type: <B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Values: <SPAN CLASS="MATH"><IMG
- WIDTH="60" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="59" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
  SRC="img173.png"
  ALT="$irst&gt;0$"></SPAN>. This is employed for the BiCGSTABL or RGMRES
 methods, otherwise it is ignored. 
@@ -363,11 +363,11 @@ Returned  as: a real number.
 </DD>
 <DT><STRONG>cond</STRONG></DT>
 <DD>An estimate of the condition number of matrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$"></SPAN>; only
   available with the <SPAN CLASS="MATH"><IMG
- WIDTH="29" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="29" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
  SRC="img174.png"
  ALT="$CG$"></SPAN> method on real data.
 <BR>

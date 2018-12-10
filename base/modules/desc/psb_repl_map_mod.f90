@@ -58,20 +58,20 @@ module psb_repl_map_mod
     procedure, pass(idxmap)  :: reinit    => repl_reinit
     procedure, nopass        :: get_fmt   => repl_get_fmt
 
-    procedure, pass(idxmap)  :: l2gs1 => repl_l2gs1
-    procedure, pass(idxmap)  :: l2gs2 => repl_l2gs2
-    procedure, pass(idxmap)  :: l2gv1 => repl_l2gv1
-    procedure, pass(idxmap)  :: l2gv2 => repl_l2gv2
+    procedure, pass(idxmap)  :: ll2gs1 => repl_l2gs1
+    procedure, pass(idxmap)  :: ll2gs2 => repl_l2gs2
+    procedure, pass(idxmap)  :: ll2gv1 => repl_l2gv1
+    procedure, pass(idxmap)  :: ll2gv2 => repl_l2gv2
 
-    procedure, pass(idxmap)  :: g2ls1 => repl_g2ls1
-    procedure, pass(idxmap)  :: g2ls2 => repl_g2ls2
-    procedure, pass(idxmap)  :: g2lv1 => repl_g2lv1
-    procedure, pass(idxmap)  :: g2lv2 => repl_g2lv2
+    procedure, pass(idxmap)  :: lg2ls1 => repl_g2ls1
+    procedure, pass(idxmap)  :: lg2ls2 => repl_g2ls2
+    procedure, pass(idxmap)  :: lg2lv1 => repl_g2lv1
+    procedure, pass(idxmap)  :: lg2lv2 => repl_g2lv2
 
-    procedure, pass(idxmap)  :: g2ls1_ins => repl_g2ls1_ins
-    procedure, pass(idxmap)  :: g2ls2_ins => repl_g2ls2_ins
-    procedure, pass(idxmap)  :: g2lv1_ins => repl_g2lv1_ins
-    procedure, pass(idxmap)  :: g2lv2_ins => repl_g2lv2_ins
+    procedure, pass(idxmap)  :: lg2ls1_ins => repl_g2ls1_ins
+    procedure, pass(idxmap)  :: lg2ls2_ins => repl_g2ls2_ins
+    procedure, pass(idxmap)  :: lg2lv1_ins => repl_g2lv1_ins
+    procedure, pass(idxmap)  :: lg2lv2_ins => repl_g2lv2_ins
 
     procedure, pass(idxmap)  :: fnd_owner => repl_fnd_owner
 
@@ -96,7 +96,7 @@ contains
   function repl_sizeof(idxmap) result(val)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = idxmap%psb_indx_map%sizeof()
 
@@ -107,11 +107,11 @@ contains
   subroutine repl_l2gs1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_lpk_) :: idxv(1)
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
@@ -127,13 +127,20 @@ contains
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin
-    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_lpk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
-    idxout = idxin
-    call idxmap%l2gip(idxout,info,mask,owned)
+    integer(psb_lpk_) :: idxv(1)
+    info = 0
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+
+    idxv(1) = idxin
+    call idxmap%l2gip(idxv,info,owned=owned)
+    idxout = idxv(1)
     
   end subroutine repl_l2gs2
 
@@ -141,11 +148,11 @@ contains
   subroutine repl_l2gv1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i
+    integer(psb_lpk_) :: i
     logical :: owned_
     info = 0
 
@@ -191,12 +198,12 @@ contains
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin(:)
-    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_lpk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: is, im
-    integer(psb_ipk_) :: i
+    integer(psb_lpk_) :: is, im
+    integer(psb_lpk_) :: i
     logical :: owned_
     
     info = 0
@@ -247,11 +254,11 @@ contains
   subroutine repl_g2ls1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_lpk_) :: idxv(1)
     info = 0
 
     if (present(mask)) then 
@@ -267,26 +274,35 @@ contains
   subroutine repl_g2ls2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
-    idxout = idxin
-    call idxmap%g2lip(idxout,info,mask,owned)
+    integer(psb_lpk_) :: idxv(1)
+    info = 0
+
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
     
-  end subroutine repl_g2ls2
+    idxv(1) = idxin
+    call idxmap%g2lip(idxv,info,owned=owned)
+    idxout = idxv(1) 
+    
+  end subroutine repl_g2ls2      
+
 
 
   subroutine repl_g2lv1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i, is
+    integer(psb_lpk_) :: i, is
     logical :: owned_
 
     info = 0
@@ -363,13 +379,13 @@ contains
   subroutine repl_g2lv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer(psb_ipk_) :: is, im,i
+    integer(psb_lpk_) :: is, im,i
     logical :: owned_
 
     info = 0
@@ -453,12 +469,13 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
 
-    integer(psb_ipk_) :: idxv(1),lidxv(1)
+    integer(psb_lpk_) :: idxv(1)
+    integer(psb_ipk_) :: lidxv(1)
 
     info = 0
     if (present(mask)) then 
@@ -478,14 +495,27 @@ contains
   subroutine repl_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
-    
-    idxout = idxin
-    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
+    integer(psb_lpk_) :: idxv(1)
+    integer(psb_ipk_) :: lidxv(1)
+
+    info = 0
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+    idxv(1) = idxin
+    if (present(lidx)) then 
+      lidxv(1) = lidx
+      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
+    else
+      call idxmap%g2lip_ins(idxv,info)
+    end if
+    idxout = idxv(1) 
+
     
   end subroutine repl_g2ls2_ins
 
@@ -495,12 +525,12 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: i, is
+    integer(psb_lpk_) :: i, is
 
     info = 0
     is = size(idx)
@@ -579,13 +609,13 @@ contains
   subroutine repl_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: is, im, i
+    integer(psb_lpk_) :: is, im, i
     
 
     info = 0
@@ -669,12 +699,12 @@ contains
   subroutine repl_fnd_owner(idx,iprc,idxmap,info)
     use psb_penv_mod
     implicit none 
-    integer(psb_ipk_), intent(in) :: idx(:)
+    integer(psb_lpk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_repl_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: nv
-    integer(psb_mpik_) :: ictxt, iam, np
+    integer(psb_mpk_) :: ictxt, iam, np
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -695,11 +725,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: nl
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_lpk_), intent(in)  :: nl
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpik_) :: iam, np
+    integer(psb_mpk_) :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -729,7 +759,7 @@ contains
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     
-    integer(psb_mpik_) :: ictxt, iam, np 
+    integer(psb_mpk_) :: ictxt, iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()

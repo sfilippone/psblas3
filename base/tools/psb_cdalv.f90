@@ -57,13 +57,14 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   type(psb_desc_type), intent(out)  :: desc
 
   !locals
-  integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,m,n,itmpov, k,glx,&
+  integer(psb_ipk_) :: counter,j,np,me,loc_row,err,&
+       & loc_col,nprocs,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
-  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_lpk_) :: m,n,i,exch(3)
+  integer(psb_lpk_) :: l_err(5)
   integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
   character(len=20)  :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -82,20 +83,20 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   !... check m and n parameters....
   if (m < 1) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
+    l_err(1) = 1
+    l_err(2) = m
   else if (n < 1) then
     info = psb_err_iarg_neg_
-    int_err(1) = 2
-    int_err(2) = n
+    l_err(1) = 2
+    l_err(2) = n
   else if (size(v)<m) then 
     info = psb_err_iarg_neg_
-    int_err(1) = 2
-    int_err(2) = size(v)
+    l_err(1) = 2
+    l_err(2) = size(v)
   endif
 
   if (info /= psb_success_) then 
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
 
@@ -108,13 +109,13 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
-      int_err(1)=1
-      call psb_errpush(err,name,int_err)
+      l_err(1)=1
+      call psb_errpush(err,name,l_err=l_err)
       goto 9999
     else if (exch(2) /= n) then
       err=550
-      int_err(1)=2
-      call psb_errpush(err,name,int_err)
+      l_err(1)=2
+      call psb_errpush(err,name,l_err=l_err)
       goto 9999
     endif
     call psb_cd_set_large_threshold(exch(3))
@@ -130,7 +131,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
   if ((flag_<0).or.(flag_>1)) then
     info = 6
-    err=info
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -141,8 +141,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   allocate(temp_ovrlap(2),stat=info)
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
-    int_err(1)=2*m+psb_mdata_size_
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
+    l_err(1)=2*m+psb_mdata_size_
+    call psb_errpush(info,name,l_err=l_err,a_err='integer')
     goto 9999
   endif
 
@@ -156,9 +156,9 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
     if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
       info=psb_err_partfunc_wrong_pid_
-      int_err(1)=3
-      int_err(2)=v(i) - flag_
-      int_err(3)=i
+      l_err(1)=3
+      l_err(2)=v(i) - flag_
+      l_err(3)=i
       exit
     end if
 
@@ -167,6 +167,11 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
       counter=counter+1
     end if
   enddo
+  if (info /= psb_success_) then     
+    call psb_errpush(info,name,l_err=l_err)
+    goto 9999
+  endif
+  
   loc_row=counter
 
   !

@@ -12,7 +12,6 @@ lib: based precd krylovd
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)	
 
 
-
 based:
 	cd base && $(MAKE) lib LIBNAME=$(LIBNAME) 
 precd: based

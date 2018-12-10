@@ -61,9 +61,10 @@
 module psb_d_pde3d_mod
 
  
-  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
+  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_lpk_, psb_desc_type,&
        &  psb_dspmat_type, psb_d_vect_type, dzero,&
-       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
+       &  psb_d_base_sparse_mat, psb_d_base_vect_type, &
+       &  psb_i_base_vect_type, psb_l_base_vect_type
 
   interface 
     function d_func_3d(x,y,z) result(val)
@@ -206,15 +207,19 @@ contains
     type(psb_d_coo_sparse_mat)  :: acoo
     type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
-    integer(psb_ipk_) :: npx,npy,npz, npdims(3),iamx,iamy,iamz,mynx,myny,mynz
+    ! Note: integer control variables going directly into an MPI call
+    ! must be 4 bytes, i.e. psb_mpk_
+    integer(psb_mpk_) :: npdims(3), npp, minfo
+    integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -256,7 +261,7 @@ contains
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
     
-    m   = idim*idim*idim
+    m   = (1_psb_lpk_*idim)*idim*idim
     n   = m
     nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
@@ -594,8 +599,8 @@ program psb_d_pde3d
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
-  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
+  integer(psb_epk_) :: amatsize, precsize, descsize, d2size
   real(psb_dpk_)   :: err, eps
 
   ! other variables
@@ -614,10 +619,9 @@ program psb_d_pde3d
     call psb_exit(ictxt)
     stop
   endif
-  if(psb_get_errstatus() /= 0) goto 9999
+  if(psb_errstatus_fatal()) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
-  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !
@@ -628,14 +632,14 @@ program psb_d_pde3d
   !
   !  get parameters
   !
-  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_gen_pde3d(ictxt,idim,a,bv,xxv,desc_a,afmt,info)  
+  call psb_gen_pde3d(ictxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -738,10 +742,10 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart)
     integer(psb_ipk_) :: ictxt
     character(len=*) :: kmethd, ptype, afmt
-    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
+    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst,ipart
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: ip, inp_unit
     character(len=1024)   :: filename
@@ -771,34 +775,45 @@ contains
 
         read(inp_unit,*) idim
         if (ip >= 4) then
+          read(inp_unit,*) ipart
+        else
+          ipart = 3        
+        endif
+        if (ip >= 5) then
           read(inp_unit,*) istopc
         else
           istopc=1        
         endif
-        if (ip >= 5) then
+        if (ip >= 6) then
           read(inp_unit,*) itmax
         else
           itmax=500
         endif
-        if (ip >= 6) then
+        if (ip >= 7) then
           read(inp_unit,*) itrace
         else
           itrace=-1
         endif
-        if (ip >= 7) then
+        if (ip >= 8) then
           read(inp_unit,*) irst
         else
           irst=1
         endif
-        ! broadcast parameters to all processors    
-
 
         write(psb_out_unit,'("Solving matrix       : ell1")')      
         write(psb_out_unit,&
              & '("Grid dimensions      : ",i4," x ",i4," x ",i4)') &
              & idim,idim,idim
         write(psb_out_unit,'("Number of processors : ",i0)')np
-        write(psb_out_unit,'("Data distribution    : BLOCK")')
+        select case(ipart)
+        case(1)
+          write(psb_out_unit,'("Data distribution    : BLOCK")')
+        case(3)
+          write(psb_out_unit,'("Data distribution    : 3D")')
+        case default
+          ipart = 3
+          write(psb_out_unit,'("Unknown data distrbution, defaulting to 3D")')
+        end select
         write(psb_out_unit,'("Preconditioner       : ",a)') ptype
         write(psb_out_unit,'("Iterative method     : ",a)') kmethd
         write(psb_out_unit,'(" ")')
@@ -818,6 +833,7 @@ contains
     call psb_bcast(ictxt,afmt)
     call psb_bcast(ictxt,ptype)
     call psb_bcast(ictxt,idim)
+    call psb_bcast(ictxt,ipart)
     call psb_bcast(ictxt,istopc)
     call psb_bcast(ictxt,itmax)
     call psb_bcast(ictxt,itrace)
@@ -840,6 +856,7 @@ contains
     write(iout,*)'     dim       number of points along each axis'
     write(iout,*)'               the size of the resulting linear '
     write(iout,*)'               system is dim**3'
+    write(iout,*)'     ipart     data partition  1  3      '
     write(iout,*)'     istop     stopping criterion  1, 2  '
     write(iout,*)'     itmax     maximum number of iterations [500] '
     write(iout,*)'     itrace    <=0  (no tracing, default) or '  

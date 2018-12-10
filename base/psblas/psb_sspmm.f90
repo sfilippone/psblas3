@@ -81,9 +81,9 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
-       & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
-       & i, ib, ib1, ip, idx
+       & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, i, ib, ib1, ip, idx, ik
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
   integer(psb_ipk_), parameter               :: nb=4
   real(psb_spk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
   real(psb_spk_), allocatable :: xvsave(:,:)
@@ -93,9 +93,11 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_sspmm'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -132,10 +134,10 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(k)) then     
-    ik = min(k,size(x,2)-ijx+1)
-    ik = min(ik,size(y,2)-ijy+1)
+    lik = min(k,size(x,2)-ijx+1)
+    lik = min(lik,size(y,2)-ijy+1)
   else
-    ik = min(size(x,2)-ijx+1,size(y,2)-ijy+1)
+    lik = min(size(x,2)-ijx+1,size(y,2)-ijy+1)
   endif
 
   if (present(trans)) then     
@@ -205,9 +207,9 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,lik,lldx,ix,ijx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,lik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -224,16 +226,16 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
 
 
     if (doswap_.and.(np>1)) then 
-      ib1=min(nb,ik)
+      ib1=min(nb,lik)
       xp => x(iix:lldx,jjx:jjx+ib1-1)
       if (doswap_)&
            & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & ib1,szero,xp,desc_a,iwork,info)
 
 
-      blk: do i=1, ik, nb
+      blk: do i=1, lik, nb
         ib=ib1
-        ib1 = max(0,min(nb,(ik)-(i-1+ib)))
+        ib1 = max(0,min(nb,(lik)-(i-1+ib)))
         xp => x(iix:lldx,jjx+i-1+ib:jjx+i-1+ib+ib1-1)
         if ((ib1 > 0).and.(doswap_)) &
              & call psi_swapdata(psb_swap_send_,ib1,&
@@ -256,8 +258,8 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
     else
       if (doswap_)&
            & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & ib1,szero,x(:,1:ik),desc_a,iwork,info)
-      if (info == psb_success_) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
+           & ib1,szero,x(:,1:lik),desc_a,iwork,info)
+      if (info == psb_success_) call psb_csmm(alpha,a,x(:,1:lik),beta,y(:,1:lik),info)
     end if
     if(info /= psb_success_) then
       info = psb_err_from_subroutine_non_
@@ -277,9 +279,9 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
 
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,lik,lldx,ix,ijx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(n,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,lik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -300,12 +302,12 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
     ! Why the average? because in this way they will contribute
     ! with a proper scale factor (1/np) to the overall product.
     ! 
-    call psi_ovrl_save(x(:,1:ik),xvsave,desc_a,info)
+    call psi_ovrl_save(x(:,1:lik),xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
-    y(nrow+1:ncol,1:ik)    = szero
+    y(nrow+1:ncol,1:lik)    = szero
 
     if (info == psb_success_) &
-         & call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+         & call psb_csmm(alpha,a,x(:,1:lik),beta,y(:,1:lik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if (info /= psb_success_) then
@@ -316,7 +318,9 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
     if (info == psb_success_) call psi_ovrl_restore(x,xvsave,desc_a,info)
 
-    if (doswap_)then 
+    if (doswap_)then
+      ik = lik ! This should not be an issue, we are expecting the values
+      ! to be small, within IPK
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & ik,sone,y(:,1:ik),desc_a,iwork,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
@@ -428,9 +432,9 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
-       & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
-       & ib, ip, idx
+       & err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, ib, ip, idx, ik
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
   integer(psb_ipk_), parameter           :: nb=4
   real(psb_spk_), pointer :: iwork(:), xp(:), yp(:)
   real(psb_spk_), allocatable :: xvsave(:)  
@@ -440,9 +444,11 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_sspmv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -461,6 +467,7 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
   iy = 1
   jy = 1
   ik = 1
+  lik = 1
   ib = 1
 
   if (present(doswap)) then
@@ -538,9 +545,9 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,lik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,lik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -578,9 +585,9 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,lik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_)&
-         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,lik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -684,9 +691,9 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
-       & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
-       & ib, ip, idx
+       & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter       :: nb=4
   real(psb_spk_), pointer :: iwork(:), xp(:), yp(:)
   real(psb_spk_), allocatable :: xvsave(:)
@@ -696,9 +703,11 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_sspmv'
-  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 

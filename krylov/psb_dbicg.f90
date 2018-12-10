@@ -116,9 +116,9 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: ww, q, r, p,&
        & zt, pt, z, rt, qt
-  integer(psb_ipk_) :: int_err(5)
-  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
        & n_row, n_col, istop_, err_act
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer(psb_ipk_), parameter :: irmax = 8
@@ -168,19 +168,18 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     info=psb_err_invalid_istop_
-    int_err=istop_
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
   endif
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
-  call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')

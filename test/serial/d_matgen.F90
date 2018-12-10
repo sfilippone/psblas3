@@ -381,7 +381,7 @@ program d_matgen
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize
+  integer(psb_epk_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
   type(psb_d_csr_sparse_mat) :: acsr
   type(psb_d_xyz_sparse_mat) :: axyz

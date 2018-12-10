@@ -51,7 +51,7 @@ subroutine psb_loc_to_glob2v(x,y,desc_a,info,iact)
   !...parameters....
   type(psb_desc_type), intent(in)    ::  desc_a
   integer(psb_ipk_), intent(in)                ::  x(:)  
-  integer(psb_ipk_), intent(out)               ::  y(:)  
+  integer(psb_lpk_), intent(out)               ::  y(:)  
   integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
 
@@ -156,7 +156,7 @@ subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
 
   !...parameters....
   type(psb_desc_type), intent(in)    ::  desc_a
-  integer(psb_ipk_), intent(inout)             ::  x(:)  
+  integer(psb_lpk_), intent(inout)             ::  x(:)  
   integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
 
@@ -215,11 +215,12 @@ subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
   integer(psb_ipk_),intent(in)                 ::  x
-  integer(psb_ipk_),intent(out)                ::  y  
+  integer(psb_lpk_),intent(out)                ::  y  
   integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
 
-  integer(psb_ipk_) :: iv1(1), iv2(1)
+  integer(psb_ipk_) :: iv1(1)
+  integer(psb_lpk_) :: iv2(1)
 
   iv1(1) = x
   call psb_loc_to_glob(iv1,iv2,desc_a,info,iact)
@@ -231,10 +232,10 @@ subroutine psb_loc_to_glob1s(x,desc_a,info,iact)
   use psb_tools_mod, psb_protect_name => psb_loc_to_glob1s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
-  integer(psb_ipk_),intent(inout)              ::  x  
+  integer(psb_lpk_),intent(inout)              ::  x  
   integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
-  integer(psb_ipk_) :: iv1(1)
+  integer(psb_lpk_) :: iv1(1)
 
   iv1(1) = x
   call psb_loc_to_glob(iv1,desc_a,info,iact)

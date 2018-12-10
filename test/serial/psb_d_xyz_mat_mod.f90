@@ -137,7 +137,7 @@ module psb_d_xyz_mat_mod
   !| \see psb_base_mat_mod::psb_base_mold
   interface 
     subroutine psb_d_xyz_mold(a,b,info) 
-      import :: psb_ipk_, psb_d_xyz_sparse_mat, psb_d_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_d_xyz_sparse_mat, psb_d_base_sparse_mat, psb_epk_
       class(psb_d_xyz_sparse_mat), intent(in)                  :: a
       class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
       integer(psb_ipk_), intent(out)                           :: info
@@ -531,11 +531,11 @@ contains
   function d_xyz_sizeof(a) result(res)
     implicit none 
     class(psb_d_xyz_sparse_mat), intent(in) :: a
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     res = 8 
     res = res + psb_sizeof_dp  * size(a%val)
-    res = res + psb_sizeof_int * size(a%irp)
-    res = res + psb_sizeof_int * size(a%ja)
+    res = res + psb_sizeof_ip * size(a%irp)
+    res = res + psb_sizeof_ip * size(a%ja)
       
   end function d_xyz_sizeof
 

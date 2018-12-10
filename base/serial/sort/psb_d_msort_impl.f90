@@ -42,7 +42,7 @@
   !
 
   subroutine psb_dmsort_u(x,nout,dir)
-    use psb_d_sort_mod, psb_protect_name => psb_dmsort_u
+    use psb_sort_mod, psb_protect_name => psb_dmsort_u
     use psb_error_mod
     implicit none 
     real(psb_dpk_), intent(inout)           :: x(:) 
@@ -78,7 +78,7 @@
 
 
   function  psb_dbsrch(key,n,v) result(ipos)
-    use psb_d_sort_mod, psb_protect_name => psb_dbsrch
+    use psb_sort_mod, psb_protect_name => psb_dbsrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     real(psb_dpk_) :: key
@@ -115,7 +115,7 @@
   end function psb_dbsrch
 
   function psb_dssrch(key,n,v) result(ipos)
-    use psb_d_sort_mod, psb_protect_name => psb_dssrch
+    use psb_sort_mod, psb_protect_name => psb_dssrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     real(psb_dpk_) :: key
@@ -135,7 +135,7 @@
   end function psb_dssrch
 
   subroutine psb_dmsort(x,ix,dir,flag)
-    use psb_d_sort_mod, psb_protect_name => psb_dmsort
+    use psb_sort_mod, psb_protect_name => psb_dmsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 

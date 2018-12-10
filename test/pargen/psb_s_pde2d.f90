@@ -191,15 +191,19 @@ contains
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
     real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 2D partition
-    integer(psb_ipk_) :: npx,npy,npdims(2),iamx,iamy,mynx,myny
+    ! Note: integer control variables going directly into an MPI call
+    ! must be 4 bytes, i.e. psb_mpk_
+    integer(psb_mpk_) :: npdims(2), npp, minfo
+    integer(psb_ipk_) :: npx,npy,iamx,iamy,mynx,myny
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:)
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_spk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -241,7 +245,7 @@ contains
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
 
-    m   = idim*idim
+    m   = (1_psb_lpk_)*idim*idim
     n   = m
     nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
@@ -554,8 +558,8 @@ program psb_s_pde2d
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
-  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
+  integer(psb_epk_) :: amatsize, precsize, descsize, d2size
   real(psb_spk_)   :: err, eps
 
   ! other variables
@@ -574,7 +578,7 @@ program psb_s_pde2d
     call psb_exit(ictxt)
     stop
   endif
-  if(psb_get_errstatus() /= 0) goto 9999
+  if(psb_errstatus_fatal()) goto 9999
   name='pde2d90'
   call psb_set_errverbosity(itwo)
   !
@@ -587,14 +591,14 @@ program psb_s_pde2d
   !
   !  get parameters
   !
-  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,info)  
+  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -697,10 +701,10 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart)
     integer(psb_ipk_) :: ictxt
     character(len=*) :: kmethd, ptype, afmt
-    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
+    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst,ipart
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: ip, inp_unit
     character(len=1024)   :: filename
@@ -730,21 +734,26 @@ contains
 
         read(inp_unit,*) idim
         if (ip >= 4) then
+          read(inp_unit,*) ipart
+        else
+          ipart = 3        
+        endif
+        if (ip >= 5) then
           read(inp_unit,*) istopc
         else
           istopc=1        
         endif
-        if (ip >= 5) then
+        if (ip >= 6) then
           read(inp_unit,*) itmax
         else
           itmax=500
         endif
-        if (ip >= 6) then
+        if (ip >= 7) then
           read(inp_unit,*) itrace
         else
           itrace=-1
         endif
-        if (ip >= 7) then
+        if (ip >= 8) then
           read(inp_unit,*) irst
         else
           irst=1
@@ -752,8 +761,16 @@ contains
 
         write(psb_out_unit,'("Solving matrix       : ell1")')      
         write(psb_out_unit,'("Grid dimensions      : ",i5," x ",i5)')idim,idim
-        write(psb_out_unit,'("Number of processors : ",i0)')np
-        write(psb_out_unit,'("Data distribution    : BLOCK")')
+        write(psb_out_unit,'("Number of processors : ",i0)') np
+        select case(ipart)
+        case(1)
+          write(psb_out_unit,'("Data distribution    : BLOCK")')
+        case(3)
+          write(psb_out_unit,'("Data distribution    : 2D")')
+        case default
+          ipart = 3
+          write(psb_out_unit,'("Unknown data distrbution, defaulting to 2D")')
+        end select
         write(psb_out_unit,'("Preconditioner       : ",a)') ptype
         write(psb_out_unit,'("Iterative method     : ",a)') kmethd
         write(psb_out_unit,'(" ")')
@@ -773,6 +790,7 @@ contains
     call psb_bcast(ictxt,afmt)
     call psb_bcast(ictxt,ptype)
     call psb_bcast(ictxt,idim)
+    call psb_bcast(ictxt,ipart)
     call psb_bcast(ictxt,istopc)
     call psb_bcast(ictxt,itmax)
     call psb_bcast(ictxt,itrace)
@@ -788,13 +806,14 @@ contains
     integer(psb_ipk_) :: iout
     write(iout,*)'incorrect parameter(s) found'
     write(iout,*)' usage:  pde2d90 methd prec dim &
-         &[istop itmax itrace]'  
+         &[ipart istop itmax itrace]'  
     write(iout,*)' where:'
     write(iout,*)'     methd:    cgstab cgs rgmres bicgstabl' 
     write(iout,*)'     prec :    bjac diag none'
     write(iout,*)'     dim       number of points along each axis'
     write(iout,*)'               the size of the resulting linear '
-    write(iout,*)'               system is dim**3'
+    write(iout,*)'               system is dim**2'
+    write(iout,*)'     ipart     data partition  1  3      '
     write(iout,*)'     istop     stopping criterion  1, 2  '
     write(iout,*)'     itmax     maximum number of iterations [500] '
     write(iout,*)'     itrace    <=0  (no tracing, default) or '  

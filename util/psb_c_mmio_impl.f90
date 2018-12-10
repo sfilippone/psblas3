@@ -461,3 +461,179 @@ subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
   write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine cmm_mat_write
+
+subroutine lcmm_mat_read(a, info, iunit, filename)   
+  use psb_base_mod
+  implicit none
+  type(psb_lcspmat_type), intent(out)  :: a
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
+  character(1024)      :: line
+  integer(psb_lpk_) :: nrow, ncol, nnzero, i,nzr
+  integer(psb_ipk_) :: ircode,infile
+  type(psb_lc_coo_sparse_mat), allocatable :: acoo
+  real(psb_spk_) :: are, aim
+  info = psb_success_
+
+  if (present(filename)) then
+    if (filename == '-') then 
+      infile=5
+    else
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=99
+      endif
+      open(infile,file=filename, status='OLD', err=901, action='READ')
+    endif
+  else 
+    if (present(iunit)) then 
+      infile=iunit
+    else
+      infile=5
+    endif
+  endif
+
+  read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
+
+  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
+    write(psb_err_unit,*) 'READ_MATRIX: input file type not yet supported'
+    info=909
+    return
+  end if
+
+  do 
+    read(infile,fmt='(a)') line
+    if (line(1:1) /= '%')  exit
+  end do
+  read(line,fmt=*) nrow,ncol,nnzero
+
+  allocate(acoo, stat=ircode)
+  if (ircode /= 0)   goto 993    
+  if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'general')) then
+    call acoo%allocate(nrow,ncol,nnzero)
+    do i=1,nnzero
+      read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
+      acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
+    end do
+    call acoo%set_nzeros(nnzero)
+    call acoo%fix(info)
+
+    call a%mv_from(acoo)
+    call a%cscnv(ircode,type='csr')
+
+  else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'symmetric')) then
+    ! we are generally working with non-symmetric matrices, so
+    ! we de-symmetrize what we are about to read
+    call acoo%allocate(nrow,ncol,2*nnzero)
+    do i=1,nnzero
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),are,aim
+      acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
+    end do
+    nzr = nnzero
+    do i=1,nnzero
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        nzr = nzr + 1
+        acoo%val(nzr) = acoo%val(i)
+        acoo%ia(nzr) = acoo%ja(i)
+        acoo%ja(nzr) = acoo%ia(i)
+      end if
+    end do
+    call acoo%set_nzeros(nzr)
+    call acoo%fix(info)
+
+    call a%mv_from(acoo)
+    call a%cscnv(ircode,type='csr')
+
+  else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'hermitian')) then
+    ! we are generally working with non-symmetric matrices, so
+    ! we de-symmetrize what we are about to read
+    call acoo%allocate(nrow,ncol,2*nnzero)
+    do i=1,nnzero
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),are,aim
+      acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
+    end do
+    nzr = nnzero
+    do i=1,nnzero
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        nzr = nzr + 1
+        acoo%val(nzr) = conjg(acoo%val(i))
+        acoo%ia(nzr) = acoo%ja(i)
+        acoo%ja(nzr) = acoo%ia(i)
+      end if
+    end do
+    call acoo%set_nzeros(nzr)
+    call acoo%fix(info)
+
+    call a%mv_from(acoo)
+    call a%cscnv(ircode,type='csr')
+
+  else
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
+    info=904
+  end if
+  if (infile /= 5) close(infile)
+  return 
+
+  ! open failed
+901 info=901
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
+  return
+902 info=902
+  write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
+  return
+905 info=905
+  write(psb_err_unit,*) 'READ_MATRIX: Error at line',i
+  return
+993 info=993
+  write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'
+  return
+end subroutine lcmm_mat_read
+
+
+subroutine lcmm_mat_write(a,mtitle,info,iunit,filename)
+  use psb_base_mod
+  implicit none
+  type(psb_lcspmat_type), intent(in)  :: a
+  integer(psb_ipk_), intent(out)        :: info
+  character(len=*), intent(in) :: mtitle
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  integer(psb_ipk_) :: iout
+
+
+  info = psb_success_
+
+  if (present(filename)) then 
+    if (filename == '-') then 
+      iout=6
+    else
+      if (present(iunit)) then 
+        iout = iunit
+      else
+        iout=99
+      endif
+      open(iout,file=filename, err=901, action='WRITE')
+    endif
+  else 
+    if (present(iunit)) then 
+      iout = iunit   
+    else
+      iout=6
+    endif
+  endif
+
+  call a%print(iout,head=mtitle)
+
+  if (iout /= 6) close(iout)
+
+
+  return
+
+901 continue 
+  info=901
+  write(psb_err_unit,*) 'Error while opening ',filename
+  return
+end subroutine lcmm_mat_write

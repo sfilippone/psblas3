@@ -41,14 +41,15 @@
 !  Addison-Wesley
 !
 subroutine psb_iisort(x,ix,dir,flag)
-  use psb_i_sort_mod, psb_protect_name => psb_iisort
+  use psb_sort_mod, psb_protect_name => psb_iisort
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
+  integer(psb_ipk_) :: dir_, flag_, err_act
+  integer(psb_ipk_) :: n, i
 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
@@ -130,7 +131,7 @@ subroutine psb_iisort(x,ix,dir,flag)
 end subroutine psb_iisort
 
 subroutine psi_iisrx_up(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iisrx_up
+  use psb_sort_mod, psb_protect_name => psi_iisrx_up
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -158,7 +159,7 @@ subroutine psi_iisrx_up(n,x,idx)
 end subroutine psi_iisrx_up
 
 subroutine psi_iisrx_dw(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_iisrx_dw
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -187,7 +188,7 @@ end subroutine psi_iisrx_dw
 
 
 subroutine psi_iisr_up(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iisr_up
+  use psb_sort_mod, psb_protect_name => psi_iisr_up
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -211,7 +212,7 @@ subroutine psi_iisr_up(n,x)
 end subroutine psi_iisr_up
 
 subroutine psi_iisr_dw(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iisr_dw
+  use psb_sort_mod, psb_protect_name => psi_iisr_dw
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -235,7 +236,7 @@ subroutine psi_iisr_dw(n,x)
 end subroutine psi_iisr_dw
 
 subroutine psi_iaisrx_up(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iaisrx_up
+  use psb_sort_mod, psb_protect_name => psi_iaisrx_up
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -263,7 +264,7 @@ subroutine psi_iaisrx_up(n,x,idx)
 end subroutine psi_iaisrx_up
 
 subroutine psi_iaisrx_dw(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iaisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_iaisrx_dw
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -291,7 +292,7 @@ subroutine psi_iaisrx_dw(n,x,idx)
 end subroutine psi_iaisrx_dw
 
 subroutine psi_iaisr_up(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iaisr_up
+  use psb_sort_mod, psb_protect_name => psi_iaisr_up
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -315,7 +316,7 @@ subroutine psi_iaisr_up(n,x)
 end subroutine psi_iaisr_up
 
 subroutine psi_iaisr_dw(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iaisr_dw
+  use psb_sort_mod, psb_protect_name => psi_iaisr_dw
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 

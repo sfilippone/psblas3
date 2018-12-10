@@ -55,7 +55,7 @@ program d_file_spmv
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst, nr
-  integer(psb_long_int_k_) :: amatsize, descsize, annz, nbytes
+  integer(psb_epk_) :: amatsize, descsize, annz, nbytes
   real(psb_dpk_)   :: err, eps,cond
 
   character(len=5)   :: afmt
@@ -263,8 +263,8 @@ program d_file_spmv
     !
     ! This computation is valid for CSR
     !
-    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_int)+&
-         & annz*(psb_sizeof_dp + psb_sizeof_int)
+    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_ip)+&
+         & annz*(psb_sizeof_dp + psb_sizeof_ip)
     bdwdth = times*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth

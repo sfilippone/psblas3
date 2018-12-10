@@ -56,7 +56,8 @@ subroutine psi_bld_tmphalo(desc,info)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
 
-  integer(psb_ipk_),allocatable :: helem(:),hproc(:)
+  integer(psb_lpk_),allocatable :: helem(:)
+  integer(psb_ipk_),allocatable :: hproc(:)
   integer(psb_ipk_),allocatable :: tmphl(:)
 
   integer(psb_ipk_) ::  i,j,np,me,lhalo,nhalo,&

@@ -60,7 +60,7 @@ program psb_cf_sample
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode,&
        & methd, istopc, irst
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize
+  integer(psb_epk_) :: amatsize, precsize, descsize
   real(psb_spk_)   :: err, eps, cond
 
   character(len=5)   :: afmt
@@ -91,7 +91,7 @@ program psb_cf_sample
 
 
   name='psb_cf_sample'
-  if(psb_get_errstatus() /= 0) goto 9999
+  if(psb_errstatus_fatal()) goto 9999
   info=psb_success_
   call psb_set_errverbosity(itwo)
   !

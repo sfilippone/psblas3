@@ -108,13 +108,13 @@ module psb_indx_map_mod
     !> State of the map 
     integer(psb_ipk_) :: state          = psb_desc_null_    
     !> Communication context
-    integer(psb_mpik_) :: ictxt          = -1
+    integer(psb_mpk_) :: ictxt          = -1
     !> MPI communicator
-    integer(psb_mpik_) :: mpic           = -1
+    integer(psb_mpk_) :: mpic           = -1
     !> Number of global rows
-    integer(psb_ipk_) :: global_rows    = -1
+    integer(psb_lpk_) :: global_rows    = -1
     !> Number of global columns
-    integer(psb_ipk_) :: global_cols    = -1
+    integer(psb_lpk_) :: global_cols    = -1
     !> Number of local rows
     integer(psb_ipk_) :: local_rows     = -1
     !> Number of local columns
@@ -141,18 +141,25 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: get_gc    => base_get_gc
     procedure, pass(idxmap)  :: get_lr    => base_get_lr
     procedure, pass(idxmap)  :: get_lc    => base_get_lc
+
+
+    procedure, pass(idxmap)  :: set_gri   => base_set_gri
+    procedure, pass(idxmap)  :: set_gci   => base_set_gci
+    procedure, pass(idxmap)  :: set_grl   => base_set_grl
+    procedure, pass(idxmap)  :: set_gcl   => base_set_gcl
+    generic, public          :: set_gr => set_grl
+    generic, public          :: set_gc => set_gcl
+    
+    procedure, pass(idxmap)  :: set_lr    => base_set_lr
+    procedure, pass(idxmap)  :: set_lc    => base_set_lc
+
+    procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
+    procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
     procedure, pass(idxmap)  :: get_ctxt  => base_get_ctxt
     procedure, pass(idxmap)  :: get_mpic  => base_get_mpic
     procedure, pass(idxmap)  :: sizeof    => base_sizeof
     procedure, pass(idxmap)  :: set_null  => base_set_null
     procedure, nopass        :: row_extendable => base_row_extendable
-
-    procedure, pass(idxmap)  :: set_gr    => base_set_gr
-    procedure, pass(idxmap)  :: set_gc    => base_set_gc
-    procedure, pass(idxmap)  :: set_lr    => base_set_lr
-    procedure, pass(idxmap)  :: set_lc    => base_set_lc
-    procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
-    procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
 
     procedure, nopass        :: get_fmt   => base_get_fmt
 
@@ -161,26 +168,44 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: clone => base_clone
     procedure, pass(idxmap)  :: reinit => base_reinit
 
-    procedure, pass(idxmap)  :: l2gs1  => base_l2gs1
-    procedure, pass(idxmap)  :: l2gs2  => base_l2gs2
-    procedure, pass(idxmap)  :: l2gv1  => base_l2gv1
-    procedure, pass(idxmap)  :: l2gv2  => base_l2gv2
-    generic, public          :: l2g =>   l2gs2, l2gv2
-    generic, public          :: l2gip => l2gs1, l2gv1
+!!$    procedure, pass(idxmap)  :: l2gs1   => base_l2gs1
+!!$    procedure, pass(idxmap)  :: l2gs2   => base_l2gs2
+!!$    procedure, pass(idxmap)  :: l2gv1   => base_l2gv1
+!!$    procedure, pass(idxmap)  :: l2gv2   => base_l2gv2
+    procedure, pass(idxmap)  :: ll2gs1  => base_ll2gs1
+    procedure, pass(idxmap)  :: ll2gs2  => base_ll2gs2
+    procedure, pass(idxmap)  :: ll2gv1  => base_ll2gv1
+    procedure, pass(idxmap)  :: ll2gv2  => base_ll2gv2
+!!$    generic, public          :: l2g =>   l2gs2, l2gv2
+!!$    generic, public          :: l2gip => l2gs1, l2gv1
+    generic, public          :: l2g =>   ll2gs2, ll2gv2
+    generic, public          :: l2gip => ll2gs1, ll2gv1
 
-    procedure, pass(idxmap)  :: g2ls1  => base_g2ls1
-    procedure, pass(idxmap)  :: g2ls2  => base_g2ls2
-    procedure, pass(idxmap)  :: g2lv1  => base_g2lv1
-    procedure, pass(idxmap)  :: g2lv2  => base_g2lv2
-    generic, public          :: g2l =>   g2ls2, g2lv2
-    generic, public          :: g2lip => g2ls1, g2lv1
+!!$    procedure, pass(idxmap)  :: g2ls1   => base_g2ls1
+!!$    procedure, pass(idxmap)  :: g2ls2   => base_g2ls2
+!!$    procedure, pass(idxmap)  :: g2lv1   => base_g2lv1
+!!$    procedure, pass(idxmap)  :: g2lv2   => base_g2lv2
+    procedure, pass(idxmap)  :: lg2ls1  => base_lg2ls1
+    procedure, pass(idxmap)  :: lg2ls2  => base_lg2ls2
+    procedure, pass(idxmap)  :: lg2lv1  => base_lg2lv1
+    procedure, pass(idxmap)  :: lg2lv2  => base_lg2lv2
+!!$    generic, public          :: g2l =>   g2ls2, g2lv2
+!!$    generic, public          :: g2lip => g2ls1, g2lv1
+    generic, public          :: g2l =>   lg2ls2, lg2lv2
+    generic, public          :: g2lip => lg2ls1, lg2lv1
 
-    procedure, pass(idxmap)  :: g2ls1_ins  => base_g2ls1_ins
-    procedure, pass(idxmap)  :: g2ls2_ins  => base_g2ls2_ins
-    procedure, pass(idxmap)  :: g2lv1_ins  => base_g2lv1_ins
-    procedure, pass(idxmap)  :: g2lv2_ins  => base_g2lv2_ins
-    generic, public          :: g2l_ins =>   g2ls2_ins, g2lv2_ins
-    generic, public          :: g2lip_ins => g2ls1_ins, g2lv1_ins
+!!$    procedure, pass(idxmap)  :: g2ls1_ins   => base_g2ls1_ins
+!!$    procedure, pass(idxmap)  :: g2ls2_ins   => base_g2ls2_ins
+!!$    procedure, pass(idxmap)  :: g2lv1_ins   => base_g2lv1_ins
+!!$    procedure, pass(idxmap)  :: g2lv2_ins   => base_g2lv2_ins
+    procedure, pass(idxmap)  :: lg2ls1_ins  => base_lg2ls1_ins
+    procedure, pass(idxmap)  :: lg2ls2_ins  => base_lg2ls2_ins
+    procedure, pass(idxmap)  :: lg2lv1_ins  => base_lg2lv1_ins
+    procedure, pass(idxmap)  :: lg2lv2_ins  => base_lg2lv2_ins
+!!$    generic, public          :: g2l_ins =>   g2ls2_ins, g2lv2_ins
+!!$    generic, public          :: g2lip_ins => g2ls1_ins, g2lv1_ins
+    generic, public          :: g2l_ins =>   lg2ls2_ins, lg2lv2_ins
+    generic, public          :: g2lip_ins => lg2ls1_ins, lg2lv1_ins
 
     procedure, pass(idxmap)  :: fnd_owner => psb_indx_map_fnd_owner
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
@@ -191,13 +216,17 @@ module psb_indx_map_mod
   private :: base_get_state, base_set_state, base_is_repl, base_is_bld,&
        & base_is_upd, base_is_asb, base_is_valid, base_is_ovl,&
        & base_get_gr, base_get_gc, base_get_lr, base_get_lc, base_get_ctxt,&
-       & base_get_mpic, base_sizeof, base_set_null, base_set_gr,&
-       & base_set_gc, base_set_lr, base_set_lc, base_set_ctxt,&
+       & base_get_mpic, base_sizeof, base_set_null, &
+       & base_set_grl, base_set_gcl, &
+       & base_set_lr, base_set_lc, base_set_ctxt,&
        & base_set_mpic, base_get_fmt, base_asb, base_free,&
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
-       & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins,&
-       & base_g2lv2_ins, base_init_vl, base_is_null,&
+       & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins, base_g2lv2_ins, &
+       & base_ll2gs1, base_ll2gs2, base_ll2gv1, base_ll2gv2,&
+       & base_lg2ls1, base_lg2ls2, base_lg2lv1, base_lg2lv2,&
+       & base_lg2ls1_ins, base_lg2ls2_ins, base_lg2lv1_ins,&
+       & base_lg2lv2_ins, base_init_vl, base_is_null,&
        & base_row_extendable, base_clone, base_reinit
   
   !> Function: psb_indx_map_fnd_owner
@@ -220,9 +249,9 @@ module psb_indx_map_mod
 
   interface 
     subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
-      import :: psb_indx_map, psb_ipk_
+      import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
-      integer(psb_ipk_), intent(in) :: idx(:)
+      integer(psb_lpk_), intent(in) :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in) :: idxmap
       integer(psb_ipk_), intent(out) :: info
@@ -255,7 +284,7 @@ contains
   function base_get_gr(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    integer(psb_lpk_) :: val
 
     val = idxmap%global_rows
 
@@ -265,7 +294,7 @@ contains
   function base_get_gc(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    integer(psb_lpk_) :: val
 
     val = idxmap%global_cols
 
@@ -295,7 +324,7 @@ contains
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_mpik_) :: val
+    integer(psb_mpk_) :: val
 
     val = idxmap%ictxt
 
@@ -305,7 +334,7 @@ contains
   function base_get_mpic(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_mpik_) :: val
+    integer(psb_mpk_) :: val
 
     val = idxmap%mpic
 
@@ -323,26 +352,42 @@ contains
   subroutine base_set_ctxt(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: val
+    integer(psb_mpk_), intent(in)  :: val
 
     idxmap%ictxt = val
   end subroutine base_set_ctxt
 
-  subroutine base_set_gr(idxmap,val)
+  subroutine base_set_gri(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  :: val
 
     idxmap%global_rows = val
-  end subroutine base_set_gr
+  end subroutine base_set_gri
 
-  subroutine base_set_gc(idxmap,val)
+  subroutine base_set_gci(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  :: val
 
     idxmap%global_cols = val
-  end subroutine base_set_gc
+  end subroutine base_set_gci
+
+  subroutine base_set_grl(idxmap,val)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)  :: val
+
+    idxmap%global_rows = val
+  end subroutine base_set_grl
+
+  subroutine base_set_gcl(idxmap,val)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)  :: val
+
+    idxmap%global_cols = val
+  end subroutine base_set_gcl
 
   subroutine base_set_lr(idxmap,val)
     implicit none 
@@ -363,7 +408,7 @@ contains
   subroutine base_set_mpic(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: val
+    integer(psb_mpk_), intent(in)  :: val
 
     idxmap%mpic = val
   end subroutine base_set_mpic
@@ -434,9 +479,9 @@ contains
   function base_sizeof(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
 
-    val = 8 * psb_sizeof_int
+    val = 8 * psb_sizeof_ip
   end function base_sizeof
 
 
@@ -541,6 +586,107 @@ contains
 
   end subroutine base_l2gv2
 
+  !> 
+  !! \memberof psb_indx_map
+  !! \brief  Local to global, scalar, in place
+  subroutine base_ll2gs1(idx,idxmap,info,mask,owned)
+    use psb_error_mod 
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_lpk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_ll2g'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+    
+  end subroutine base_ll2gs1
+
+  subroutine base_ll2gs2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_ll2g'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+
+  end subroutine base_ll2gs2
+
+
+  subroutine base_ll2gv1(idx,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_lpk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_ll2g'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+  end subroutine base_ll2gv1
+
+  subroutine base_ll2gv2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_ll2g'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_ll2gv2
+
 
   subroutine base_g2ls1(idx,idxmap,info,mask,owned)
     use psb_error_mod
@@ -644,6 +790,106 @@ contains
 
   end subroutine base_g2lv2
 
+  subroutine base_lg2ls1(idx,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_lpk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2ls1
+
+  subroutine base_lg2ls2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_lpk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2ls2
+
+
+  subroutine base_lg2lv1(idx,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_lpk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2lv1
+
+  subroutine base_lg2lv2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_lpk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2lv2
 
 
   subroutine base_g2ls1_ins(idx,idxmap,info,mask, lidx)
@@ -749,6 +995,108 @@ contains
   end subroutine base_g2lv2_ins
 
 
+  subroutine base_lg2ls1_ins(idx,idxmap,info,mask, lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    integer(psb_ipk_), intent(in), optional :: lidx
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l_ins'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2ls1_ins
+
+  subroutine base_lg2ls2_ins(idxin,idxout,idxmap,info,mask, lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    integer(psb_ipk_), intent(in), optional :: lidx
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l_ins'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2ls2_ins
+
+
+  subroutine base_lg2lv1_ins(idx,idxmap,info,mask, lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l_ins'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2lv1_ins
+
+  subroutine base_lg2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_lg2l_ins'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    call psb_error_handler(err_act)
+    return
+
+  end subroutine base_lg2lv2_ins
+
   subroutine base_asb(idxmap,info)
     use psb_error_mod
     implicit none 
@@ -808,8 +1156,8 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_ipk_), intent(in)  :: vl(:)
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_init_vl'

@@ -79,20 +79,26 @@ defined in the library as follows:
   data; corresponds to a <code>DOUBLE PRECISION</code> declaration and is
   normally 8 bytes;
 </DD>
-<DT><STRONG>psb_ipk_</STRONG></DT>
-<DD>Kind parameter for integer data;
-  with default build options this is a 4 bytes integer, but there is
-  (highly) experimental support for 8-bytes integers;  
-</DD>
-<DT><STRONG>psb_mpik_</STRONG></DT>
+<DT><STRONG>psb_mpk_</STRONG></DT>
 <DD>Kind parameter for 4-bytes integer data, as is
   always used by MPI; 
 </DD>
-<DT><STRONG>psb_long_int_k_</STRONG></DT>
-<DD>Kind parameter for long (8 bytes) integers, 
-  which are always used by the <code>sizeof</code> methods.
+<DT><STRONG>psb_epk_</STRONG></DT>
+<DD>Kind parameter for 8-bytes integer data, as is
+  always used by the <code>sizeof</code> methods;
+</DD>
+<DT><STRONG>psb_ipk_</STRONG></DT>
+<DD>Kind parameter for &ldquo;local&rdquo; integer indices and data;
+  with default build options this is a 4 bytes integer;
+</DD>
+<DT><STRONG>psb_lpk_</STRONG></DT>
+<DD>Kind parameter for &ldquo;global&rdquo; integer indices and data;
+  with default build options this is an 8 bytes integer;
 </DD>
 </DL>
+The integer kinds for local and global indices can be chosen at
+configure time to hold 4 or 8 bytes, with the global indices at least
+as large as the local ones. 
 Together with the classes attributes we also discuss their
 methods.  Most methods detailed here only act on the local variable,
 i.e. their action is purely local and asynchronous unless otherwise

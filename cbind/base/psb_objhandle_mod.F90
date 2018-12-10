@@ -1,12 +1,7 @@
 module psb_objhandle_mod
   use iso_c_binding
-
-#if defined(LONG_INTEGERS)
-  integer, parameter :: psb_c_int = c_int64_t
-#else
-  integer, parameter :: psb_c_int = c_int32_t
-#endif
-
+  use psb_cbind_const_mod
+  
   type, bind(c) :: psb_c_object_type
     type(c_ptr) :: item = c_null_ptr
   end type psb_c_object_type

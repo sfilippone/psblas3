@@ -30,9 +30,9 @@
 !   
 !   
 !
-! File: psi_crea_bnd_elem.f90
+! File: psi_i_crea_bnd_elem.f90
 !
-! Subroutine: psi_crea_bnd_elem
+! Subroutine: psi_i_crea_bnd_elem
 !    Extracts a list of boundary indices. If no boundary is present in 
 !    the distribution the output vector is put in the unallocated state,
 !    otherwise its size is equal to the number of boundary indices on the 
@@ -43,8 +43,8 @@
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 
-subroutine psi_crea_bnd_elem(bndel,desc_a,info)
-  use psi_mod, psb_protect_name => psi_crea_bnd_elem
+subroutine psi_i_crea_bnd_elem(bndel,desc_a,info)
+  use psi_mod, psb_protect_name => psi_i_crea_bnd_elem
   use psb_realloc_mod
   use psb_desc_mod
   use psb_error_mod
@@ -85,28 +85,19 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
 
   call psb_msort_unique(work(1:i),j)
 
-  if (.true.) then 
-    if (j>=0) then 
-      call psb_realloc(j,bndel,info)
-      if (info /= psb_success_) then 
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-        goto 9999      
-      end if
-      bndel(1:j) = work(1:j)
-    else
-      if (allocated(bndel)) then 
-        deallocate(bndel)
-      end if
-    end if
-  else
-    call psb_realloc(j+1,bndel,info)
+
+  if (j>=0) then 
+    call psb_realloc(j,bndel,info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
     bndel(1:j) = work(1:j)
-    bndel(j+1) = -1
-  endif
+  else
+    if (allocated(bndel)) then 
+      deallocate(bndel)
+    end if
+  end if
 
   deallocate(work)
   call psb_erractionrestore(err_act)
@@ -116,4 +107,4 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
 
   return
 
-end subroutine psi_crea_bnd_elem
+end subroutine psi_i_crea_bnd_elem

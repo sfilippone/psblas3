@@ -29,95 +29,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine  psi_sovrl_restrr1(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_sovrl_restrr1
-
-  implicit none
-
-  real(psb_spk_), intent(inout)  :: x(:)
-  real(psb_spk_)                 :: xs(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
-
-  ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
-  character(len=20) :: name, ch_err
-
-  name='psi_sovrl_restrr1'
-  if (psb_get_errstatus() /= 0) return 
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  isz = size(desc_a%ovrlap_elem,1)
-
-  do i=1, isz
-    idx    = desc_a%ovrlap_elem(i,1)
-    x(idx) = xs(i) 
-  end do
-
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ictxt,err_act)
-
-  return
-end subroutine psi_sovrl_restrr1
-
-subroutine  psi_sovrl_restrr2(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_sovrl_restrr2
-
-  implicit none
-
-  real(psb_spk_), intent(inout)  :: x(:,:)
-  real(psb_spk_)                 :: xs(:,:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
-
-  ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
-  character(len=20) :: name, ch_err
-
-  name='psi_sovrl_restrr2'
-  if (psb_get_errstatus() /= 0) return 
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (size(x,2) /= size(xs,2)) then 
-    info = psb_err_internal_error_
-    call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
-    goto 9999
-  endif
-
-
-  isz = size(desc_a%ovrlap_elem,1)
-
-  do i=1, isz
-    idx      = desc_a%ovrlap_elem(i,1)
-    x(idx,:) = xs(i,:) 
-  end do
-
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ictxt,err_act)
-
-  return
-end subroutine psi_sovrl_restrr2
-
 
 subroutine  psi_sovrl_restr_vect(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_sovrl_restr_vect
@@ -135,9 +46,11 @@ subroutine  psi_sovrl_restr_vect(x,xs,desc_a,info)
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_restr_vect'
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -175,9 +88,11 @@ subroutine  psi_sovrl_restr_multivect(x,xs,desc_a,info)
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_restr_mv'
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then

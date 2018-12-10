@@ -33,7 +33,10 @@ module psb_hbio_mod
 
   use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_,&
        & psb_sspmat_type, psb_cspmat_type, &
-       & psb_dspmat_type, psb_zspmat_type
+       & psb_dspmat_type, psb_zspmat_type, &
+       & psb_lsspmat_type, psb_lcspmat_type, &
+       & psb_ldspmat_type, psb_lzspmat_type
+
 
 
   public hb_read, hb_write
@@ -78,6 +81,46 @@ module psb_hbio_mod
       complex(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
       character(len=72), optional, intent(out) :: mtitle
     end subroutine zhb_read
+    subroutine lshb_read(a, iret, iunit, filename,b,g,x,mtitle)   
+      import :: psb_lsspmat_type, psb_spk_, psb_ipk_
+      implicit none
+      type(psb_lsspmat_type), intent(out)     :: a
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      real(psb_spk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
+      character(len=72), optional, intent(out) :: mtitle
+    end subroutine lshb_read
+    subroutine ldhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
+      import :: psb_ldspmat_type, psb_dpk_, psb_ipk_
+      implicit none
+      type(psb_ldspmat_type), intent(out)     :: a
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      real(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
+      character(len=72), optional, intent(out) :: mtitle
+    end subroutine ldhb_read
+    subroutine lchb_read(a, iret, iunit, filename,b,g,x,mtitle)   
+      import :: psb_lcspmat_type, psb_spk_, psb_ipk_
+      implicit none
+      type(psb_lcspmat_type), intent(out)     :: a
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      complex(psb_spk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
+      character(len=72), optional, intent(out) :: mtitle
+    end subroutine lchb_read
+    subroutine lzhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
+      import :: psb_lzspmat_type, psb_dpk_, psb_ipk_
+      implicit none
+      type(psb_lzspmat_type), intent(out)     :: a
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      complex(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
+      character(len=72), optional, intent(out) :: mtitle
+    end subroutine lzhb_read
   end interface
 
   interface hb_write
@@ -125,6 +168,50 @@ module psb_hbio_mod
       character(len=*), optional, intent(in) :: key
       complex(psb_dpk_), optional             :: rhs(:), g(:), x(:)
     end subroutine zhb_write
+    subroutine lshb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
+      import :: psb_lsspmat_type, psb_spk_, psb_ipk_
+      implicit none
+      type(psb_lsspmat_type), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)        :: iret
+      character(len=*), optional, intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      character(len=*), optional, intent(in) :: key
+      real(psb_spk_), optional             :: rhs(:), g(:), x(:)
+    end subroutine lshb_write
+    subroutine ldhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
+      import :: psb_ldspmat_type, psb_dpk_, psb_ipk_
+      implicit none
+      type(psb_ldspmat_type), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)        :: iret
+      character(len=*), optional, intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      character(len=*), optional, intent(in) :: key
+      real(psb_dpk_), optional             :: rhs(:), g(:), x(:)
+    end subroutine ldhb_write
+    subroutine lchb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
+      import :: psb_lcspmat_type, psb_spk_, psb_ipk_
+      implicit none
+      type(psb_lcspmat_type), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)        :: iret
+      character(len=*), optional, intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      character(len=*), optional, intent(in) :: key
+      complex(psb_spk_), optional             :: rhs(:), g(:), x(:)
+    end subroutine lchb_write
+    subroutine lzhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
+      import :: psb_lzspmat_type, psb_dpk_, psb_ipk_
+      implicit none
+      type(psb_lzspmat_type), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)        :: iret
+      character(len=*), optional, intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+      character(len=*), optional, intent(in) :: key
+      complex(psb_dpk_), optional             :: rhs(:), g(:), x(:)
+    end subroutine lzhb_write
   end interface
 
 end module psb_hbio_mod

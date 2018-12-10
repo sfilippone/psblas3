@@ -68,7 +68,7 @@ module psb_serial_mod
     end subroutine psb_d_nspaxpby
   end interface psb_nspaxpby
 
-  interface symbmm
+  interface 
     subroutine symbmm (n, m, l, ia, ja, diaga, &
          & ib, jb, diagb, ic, jc, diagc, index)
       import :: psb_ipk_
@@ -76,6 +76,13 @@ module psb_serial_mod
            & diagc,  index(*)
       integer(psb_ipk_), allocatable :: ic(:),jc(:)
     end subroutine symbmm
+    subroutine lsymbmm (n, m, l, ia, ja, diaga, &
+         & ib, jb, diagb, ic, jc, diagc, index)
+      import :: psb_ipk_, psb_lpk_
+      integer(psb_lpk_) :: n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
+           & diagc,  index(*)
+      integer(psb_lpk_), allocatable :: ic(:),jc(:)
+    end subroutine lsymbmm
   end interface
   
 
@@ -138,7 +145,7 @@ contains
     !     october 31, 1992
     !
     !     .. scalar arguments ..
-    integer(psb_mpik_) :: incx, incy, n
+    integer(psb_mpk_) :: incx, incy, n
     real(psb_spk_)    c
     complex(psb_spk_)   s
     !     ..
@@ -182,7 +189,7 @@ contains
     ! == = ==================================================================
     !
     !     .. local scalars ..
-    integer(psb_mpik_) :: i, ix, iy
+    integer(psb_mpk_) :: i, ix, iy
     complex(psb_spk_)         stemp
     !     ..
     !     .. intrinsic functions ..
@@ -256,7 +263,7 @@ contains
     !     october 31, 1992
     !
     !     .. scalar arguments ..
-    integer(psb_mpik_) :: incx, incy, n
+    integer(psb_mpk_) :: incx, incy, n
     real(psb_dpk_)    c
     complex(psb_dpk_)   s
     !     ..
@@ -300,7 +307,7 @@ contains
     ! == = ==================================================================
     !
     !     .. local scalars ..
-    integer(psb_mpik_) :: i, ix, iy
+    integer(psb_mpk_) :: i, ix, iy
     complex(psb_dpk_)         stemp
     !     ..
     !     .. intrinsic functions ..

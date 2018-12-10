@@ -52,7 +52,7 @@ subroutine FCpsb_errpush(err_c, r_name, i_err)
   character(len=20), intent(in)    ::  r_name
   integer(psb_ipk_) ::  i_err(5)
 
-  call psb_errpush(err_c, r_name, i_err)
+  call psb_errpush(err_c, r_name, i_err=i_err)
   
 end subroutine FCpsb_errpush
 

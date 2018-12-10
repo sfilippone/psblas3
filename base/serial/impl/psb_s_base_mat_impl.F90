@@ -50,8 +50,7 @@ subroutine psb_s_base_cp_to_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -75,8 +74,7 @@ subroutine psb_s_base_cp_from_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(in) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
@@ -101,8 +99,7 @@ subroutine psb_s_base_cp_to_fmt(a,b,info)
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -144,8 +141,7 @@ subroutine psb_s_base_cp_from_fmt(a,b,info)
   class(psb_s_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -190,8 +186,7 @@ subroutine psb_s_base_mv_to_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -228,8 +223,7 @@ subroutine psb_s_base_mv_from_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
@@ -266,8 +260,7 @@ subroutine psb_s_base_mv_to_fmt(a,b,info)
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -297,8 +290,7 @@ subroutine psb_s_base_mv_from_fmt(a,b,info)
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -344,8 +336,7 @@ subroutine psb_s_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='csput'
   logical, parameter :: debug=.false.
 
@@ -372,8 +363,7 @@ subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), intent(in), optional     :: gtl(:)
 
-  integer(psb_ipk_) :: err_act, nzin, nzout
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, nzin, nzout
   character(len=20)  :: name='csput_v'
   integer :: jmin_, jmax_
   logical :: append_, rscale_, cscale_
@@ -423,8 +413,7 @@ subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale,chksz
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -438,8 +427,6 @@ subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   call psb_error_handler(err_act)
 
 end subroutine psb_s_base_csgetrow
-
-
 
 !
 ! Here we have the base implementation of getblk and clip:
@@ -462,10 +449,9 @@ subroutine psb_s_base_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax
   logical, intent(in), optional        :: rscale,cscale,chksz
-  integer(psb_ipk_) :: err_act, nzin, nzout
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, nzin, nzout
   character(len=20)  :: name='csget'
-  integer(psb_ipk_) :: jmin_, jmax_
+  integer(psb_ipk_)  :: jmin_, jmax_
   logical :: append_, rscale_, cscale_
   logical, parameter :: debug=.false.
 
@@ -554,8 +540,7 @@ subroutine psb_s_base_csclip(a,b,info,&
   integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
 
-  integer(psb_ipk_) :: err_act, nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
   character(len=20)  :: name='csget'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
@@ -649,7 +634,6 @@ subroutine psb_s_base_tril(a,l,info,&
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   real(psb_spk_), allocatable    :: val(:)
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
@@ -801,7 +785,6 @@ subroutine psb_s_base_triu(a,u,info,&
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   real(psb_spk_), allocatable    :: val(:)
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
@@ -1000,8 +983,7 @@ subroutine psb_s_base_mold(a,b,info)
   class(psb_s_base_sparse_mat), intent(in)                 :: a
   class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='base_mold'
   logical, parameter :: debug=.false.
 
@@ -1026,7 +1008,6 @@ subroutine psb_s_base_transp_2mat(a,b)
 
   type(psb_s_coo_sparse_mat) :: tmp
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=*), parameter :: name='s_base_transp'
 
   call psb_erractionsave(err_act)
@@ -1041,8 +1022,7 @@ subroutine psb_s_base_transp_2mat(a,b)
     info = psb_err_invalid_dynamic_type_
   end select
   if (info /= psb_success_) then 
-    ierr(1)=ione;
-    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=ierr)
+    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=(/ione/))
     goto 9999
   end if
   call psb_erractionrestore(err_act) 
@@ -1064,7 +1044,6 @@ subroutine psb_s_base_transc_2mat(a,b)
 
   type(psb_s_coo_sparse_mat) :: tmp
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=*), parameter :: name='s_base_transc'
 
   call psb_erractionsave(err_act)
@@ -1079,8 +1058,7 @@ subroutine psb_s_base_transc_2mat(a,b)
     info = psb_err_invalid_dynamic_type_
   end select
   if (info /= psb_success_) then 
-    ierr(1) = ione;
-    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=ierr)
+    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=(/ione/))
     goto 9999
   end if
   call psb_erractionrestore(err_act) 
@@ -1101,7 +1079,6 @@ subroutine psb_s_base_transp_1mat(a)
 
   type(psb_s_coo_sparse_mat) :: tmp
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=*), parameter :: name='s_base_transp'
 
   call psb_erractionsave(err_act)
@@ -1133,7 +1110,6 @@ subroutine psb_s_base_transc_1mat(a)
 
   type(psb_s_coo_sparse_mat) :: tmp
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=*), parameter :: name='s_base_transc'
 
   call psb_erractionsave(err_act)
@@ -1182,8 +1158,7 @@ subroutine psb_s_base_csmm(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_base_csmm'
   logical, parameter :: debug=.false.
 
@@ -1209,8 +1184,7 @@ subroutine psb_s_base_csmv(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_base_csmv'
   logical, parameter :: debug=.false.
 
@@ -1237,8 +1211,7 @@ subroutine psb_s_base_inner_cssm(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_base_inner_cssm'
   logical, parameter :: debug=.false.
 
@@ -1264,8 +1237,7 @@ subroutine psb_s_base_inner_cssv(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_base_inner_cssv'
   logical, parameter :: debug=.false.
 
@@ -1296,7 +1268,6 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   real(psb_spk_), allocatable :: tmp(:,:)
   integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_cssm'
   logical, parameter :: debug=.false.
 
@@ -1313,14 +1284,12 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   nc = min(size(x,2), size(y,2))
   if (size(x,1) < nac) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = nac; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,nac/))
     goto 9999
   end if
   if (size(y,1) < nar) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = nar; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,nar/))
     goto 9999
   end if
 
@@ -1340,8 +1309,7 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
     if (psb_toupper(scale_) == 'R') then 
       if (size(d,1) < nac) then
         info = psb_err_input_asize_small_i_
-        ierr(1) = 9; ierr(2) = nac; 
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,i_err=(/9_psb_ipk_,nac/))
         goto 9999
       end if
 
@@ -1364,8 +1332,7 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
 
       if (size(d,1) < nar) then
         info = psb_err_input_asize_small_i_
-             ierr(1) = 9; ierr(2) = nar; 
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,i_err=(/9_psb_ipk_,nar/))
         goto 9999
       end if
 
@@ -1389,8 +1356,7 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
 
     else
       info = 31
-      ierr(1) = 8; ierr(2) = izero; 
-      call psb_errpush(info,name,i_err=ierr,a_err=scale_)
+      call psb_errpush(info,name,i_err=(/8_psb_ipk_,izero/),a_err=scale_)
       goto 9999
     end if
   else 
@@ -1404,15 +1370,12 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
     goto 9999
   end if
 
-
   call psb_erractionrestore(err_act)
   return
-
 
 9999 call psb_error_handler(err_act)
 
   return
-
 
 end subroutine psb_s_base_cssm
 
@@ -1430,9 +1393,8 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   real(psb_spk_), intent(in), optional :: d(:)
 
   real(psb_spk_), allocatable :: tmp(:)
-  integer(psb_ipk_) :: err_act, nar,nac,nc, i
-  character(len=1) :: scale_
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, nar,nac,nc, i
+  character(len=1)   :: scale_
   character(len=20)  :: name='s_cssm'
   logical, parameter :: debug=.false.
 
@@ -1449,14 +1411,12 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   nc = 1
   if (size(x,1) < nac) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = nac; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,nac/))
     goto 9999
   end if
   if (size(y,1) < nar) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = nar; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,nar/))
     goto 9999
   end if
 
@@ -1476,8 +1436,7 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     if (psb_toupper(scale_) == 'R') then 
       if (size(d,1) < nac) then
         info = psb_err_input_asize_small_i_
-        ierr(1) = 9; ierr(2) = nac; 
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,i_err=(/9_psb_ipk_,nac/))
         goto 9999
       end if
 
@@ -1495,8 +1454,7 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     else if (psb_toupper(scale_) == 'L') then 
       if (size(d,1) < nar) then
         info = psb_err_input_asize_small_i_
-             ierr(1) = 9; ierr(2) = nar; 
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,i_err=(/9_psb_ipk_,nar/))
         goto 9999
       end if
 
@@ -1520,8 +1478,7 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 
     else
       info = 31
-      ierr(1) = 8; ierr(2) = izero; 
-      call psb_errpush(info,name,i_err=ierr,a_err=scale_)
+      call psb_errpush(info,name,i_err=(/8_psb_ipk_,izero/),a_err=scale_)
       goto 9999
     end if
   else 
@@ -1580,8 +1537,7 @@ subroutine psb_s_base_scals(d,a,info)
   real(psb_spk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_scals'
   logical, parameter :: debug=.false.
 
@@ -1607,8 +1563,7 @@ subroutine psb_s_base_scal(d,a,info,side)
   integer(psb_ipk_), intent(out)            :: info
   character, intent(in), optional :: side
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_scal'
   logical, parameter :: debug=.false.
 
@@ -1623,8 +1578,6 @@ subroutine psb_s_base_scal(d,a,info,side)
 
 end subroutine psb_s_base_scal
 
-
-
 function psb_s_base_maxval(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1634,8 +1587,7 @@ function psb_s_base_maxval(a) result(res)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='maxval'
   logical, parameter :: debug=.false.
 
@@ -1662,8 +1614,7 @@ function psb_s_base_csnmi(a) result(res)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='csnmi'
   real(psb_spk_), allocatable  :: vt(:) 
     
@@ -1701,8 +1652,7 @@ function psb_s_base_csnm1(a) result(res)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='csnm1'
   real(psb_spk_), allocatable  :: vt(:) 
     
@@ -1737,8 +1687,7 @@ subroutine psb_s_base_rowsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1760,8 +1709,7 @@ subroutine psb_s_base_arwsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='arwsum'
   logical, parameter :: debug=.false.
 
@@ -1783,8 +1731,7 @@ subroutine psb_s_base_colsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1806,8 +1753,7 @@ subroutine psb_s_base_aclsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
@@ -1822,7 +1768,6 @@ subroutine psb_s_base_aclsum(d,a)
 
 end subroutine psb_s_base_aclsum
 
-
 subroutine psb_s_base_get_diag(a,d,info) 
   use psb_error_mod
   use psb_const_mod
@@ -1833,8 +1778,7 @@ subroutine psb_s_base_get_diag(a,d,info)
   real(psb_spk_), intent(out)     :: d(:)
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
@@ -1900,9 +1844,8 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 
   real(psb_spk_), allocatable :: tmp(:)
   class(psb_s_base_vect_type), allocatable :: tmpv
-  integer(psb_ipk_) :: err_act, nar,nac,nc, i
-  character(len=1) :: scale_
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, nar,nac,nc, i
+  character(len=1)   :: scale_
   character(len=20)  :: name='s_cssm'
   logical, parameter :: debug=.false.
 
@@ -1919,14 +1862,12 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   nc = 1
   if (x%get_nrows() < nac) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = nac; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,nac/))
     goto 9999
   end if
   if (y%get_nrows() < nar) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = nar; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,nar/))
     goto 9999
   end if
 
@@ -1949,8 +1890,7 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     if (psb_toupper(scale_) == 'R') then 
       if (d%get_nrows() < nac) then
         info = psb_err_input_asize_small_i_
-        ierr(1) = 9; ierr(2) = nac; 
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,i_err=(/9_psb_ipk_,nac/))
         goto 9999
       end if
       allocate(tmpv, mold=y,stat=info)
@@ -1968,8 +1908,7 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     else if (psb_toupper(scale_) == 'L') then 
       if (d%get_nrows() < nar) then
         info = psb_err_input_asize_small_i_
-        ierr(1) = 9; ierr(2) = nar; 
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,i_err=(/9_psb_ipk_,nar/))
         goto 9999
       end if
 
@@ -1995,8 +1934,7 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 
     else
       info = 31
-      ierr(1) = 8; ierr(2) = izero; 
-      call psb_errpush(info,name,i_err=ierr,a_err=scale_)
+      call psb_errpush(info,name,i_err=(/8_psb_ipk_,izero/),a_err=scale_)
       goto 9999
     end if
   else 
@@ -2034,8 +1972,7 @@ subroutine psb_s_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_base_inner_vect_sv'
   logical, parameter :: debug=.false.
 
@@ -2059,3 +1996,2039 @@ subroutine psb_s_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   return
 
 end subroutine psb_s_base_inner_vect_sv
+
+
+subroutine psb_s_base_cp_to_lcoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cp_to_lcoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(in) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_lcoo'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+   ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  call a%cp_to_coo(tmp,info)
+  if (info == psb_success_) call tmp%mv_to_lcoo(b,info)
+  
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_cp_to_lcoo
+
+subroutine psb_s_base_cp_from_lcoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cp_from_lcoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_coo_sparse_mat), intent(in) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_coo'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  call tmp%cp_from_lcoo(b,info) 
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_cp_from_lcoo
+
+subroutine psb_s_base_cp_to_lfmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cp_to_lfmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(in) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_lfmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%cp_to_lcoo(b,info)
+  class default
+    call a%cp_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call b%mv_from_coo(lcoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_cp_to_lfmt
+
+subroutine psb_s_base_cp_from_lfmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cp_from_lfmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(in) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_lfmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  !
+  ! Default implementation
+  ! 
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%cp_from_lcoo(b,info)
+  class default
+    call b%cp_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call a%mv_from_coo(icoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_cp_from_lfmt
+
+
+subroutine psb_s_base_mv_to_lcoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mv_to_lcoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_lcoo'
+  logical, parameter :: debug=.false.
+
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_to_lcoo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to coo')
+    goto 9999
+  end if
+
+  call a%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_mv_to_lcoo
+
+subroutine psb_s_base_mv_from_lcoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mv_from_lcoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_lcoo'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_from_lcoo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='from coo')
+    goto 9999
+  end if
+
+  call b%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_mv_from_lcoo
+
+
+subroutine psb_s_base_mv_to_lfmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mv_to_lfmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_lfmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%mv_to_lcoo(b,info)
+  class default
+    call a%mv_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call b%mv_from_coo(lcoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_mv_to_lfmt
+
+subroutine psb_s_base_mv_from_lfmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mv_from_lfmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_lfmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  !
+  ! Default implementation
+  ! 
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%mv_from_lcoo(b,info)
+  class default
+    call b%mv_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call a%mv_from_coo(icoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_base_mv_from_lfmt
+
+!
+!
+! ls implementation
+!
+!
+! == ==================================
+!
+!
+!
+! Data management
+!
+!
+!
+!
+!
+! == ==================================
+
+subroutine psb_ls_base_cp_to_coo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_to_coo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_coo'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_cp_to_coo
+
+subroutine psb_ls_base_cp_from_coo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_from_coo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_coo_sparse_mat), intent(in) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_coo'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_cp_from_coo
+
+
+subroutine psb_ls_base_cp_to_fmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_to_fmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_fmt'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%cp_to_coo(b,info)
+  class default
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_cp_to_fmt
+
+subroutine psb_ls_base_cp_from_fmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_from_fmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(in) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_fmt'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat)  :: tmp
+
+  !
+  ! Default implementation
+  ! 
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%cp_from_coo(b,info)
+  class default
+    call b%cp_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_cp_from_fmt
+
+
+subroutine psb_ls_base_mv_to_coo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_to_coo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_coo'
+  logical, parameter :: debug=.false.
+
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_to_coo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to coo')
+    goto 9999
+  end if
+
+  call a%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_mv_to_coo
+
+subroutine psb_ls_base_mv_from_coo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_from_coo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_coo'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_from_coo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='from coo')
+    goto 9999
+  end if
+
+  call b%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_mv_from_coo
+
+
+subroutine psb_ls_base_mv_to_fmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_to_fmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_fmt'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat)  :: tmp
+
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%mv_to_coo(b,info)
+  class default
+    call a%mv_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+
+  return
+
+end subroutine psb_ls_base_mv_to_fmt
+
+subroutine psb_ls_base_mv_from_fmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_from_fmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_fmt'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat)  :: tmp
+
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  select type(b)
+  type is (psb_ls_coo_sparse_mat)
+    call a%mv_from_coo(b,info)
+  class default
+    call b%mv_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+  return
+
+end subroutine psb_ls_base_mv_from_fmt
+
+subroutine  psb_ls_base_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_clean_zeros
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out)              :: info
+  !
+  type(psb_ls_coo_sparse_mat) :: tmpcoo
+
+  call a%mv_to_coo(tmpcoo,info)
+  if (info == 0) call tmpcoo%clean_zeros(info)  
+  if (info == 0) call a%mv_from_coo(tmpcoo,info)
+  
+end subroutine psb_ls_base_clean_zeros
+
+
+subroutine psb_ls_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csput_a
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  real(psb_spk_), intent(in)      :: val(:)
+  integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: gtl(:)
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='csput'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_csput_a
+
+subroutine psb_ls_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csput_v
+  use psb_s_base_vect_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_vect_type), intent(inout)  :: val
+  class(psb_l_base_vect_type), intent(inout)  :: ia, ja
+  integer(psb_lpk_), intent(in)               :: nz, imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_lpk_), intent(in), optional     :: gtl(:)
+
+  integer(psb_lpk_)  :: nzin, nzout
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='csput_v'
+  integer :: jmin_, jmax_
+  logical :: append_, rscale_, cscale_
+  logical, parameter :: debug=.false.
+  
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  
+  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    if (a%is_dev())   call a%sync()
+    if (val%is_dev()) call val%sync()
+    if (ia%is_dev())  call ia%sync()
+    if (ja%is_dev())  call ja%sync()
+    call a%csput_a(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl)
+  else
+    info = psb_err_invalid_mat_state_
+  endif
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_csput_v
+
+subroutine psb_ls_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csgetrow
+  implicit none
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  integer(psb_lpk_), intent(in)                  :: imin,imax
+  integer(psb_lpk_), intent(out)                 :: nz
+  integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+  real(psb_spk_), allocatable,  intent(inout)    :: val(:)
+  integer(psb_ipk_),intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer(psb_lpk_), intent(in), optional        :: iren(:)
+  integer(psb_lpk_), intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_csgetrow
+
+
+
+!
+! Here we have the base implementation of getblk and clip:
+! this is just based on the getrow.
+! If performance is critical it can be overridden.
+!
+subroutine psb_ls_base_csgetblk(imin,imax,a,b,info,&
+     & jmin,jmax,iren,append,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csgetblk
+  implicit none
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_ls_coo_sparse_mat), intent(inout) :: b
+  integer(psb_lpk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_),intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer(psb_lpk_), intent(in), optional        :: iren(:)
+  integer(psb_lpk_), intent(in), optional        :: jmin,jmax
+  logical, intent(in), optional        :: rscale,cscale
+  integer(psb_ipk_)  :: err_act
+  integer(psb_lpk_)  :: nzin, nzout
+  character(len=20)  :: name='csget'
+  integer(psb_lpk_)  :: jmin_, jmax_
+  logical :: append_, rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(append)) then 
+    append_ = append
+  else
+    append_ = .false.
+  endif
+  if (append_) then 
+    nzin = a%get_nzeros()
+  else
+    nzin = 0
+  endif
+  if (present(rscale)) then 
+    rscale_=rscale
+  else
+    rscale_=.false.
+  end if
+  if (present(cscale)) then 
+    cscale_=cscale
+  else
+    cscale_=.false.
+  end if
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+  
+  if (append_.and.(rscale_.or.cscale_)) then 
+    write(psb_err_unit,*) &
+         & 'ls_csgetblk: WARNING: dubious input: append_ and rscale_|cscale_'
+  end if
+
+  if (rscale_) then 
+    call b%set_nrows(imax-imin+1)
+  else
+    call b%set_nrows(max(min(imax,a%get_nrows()),b%get_nrows()))
+  end if
+
+  if (cscale_) then 
+    call b%set_ncols(jmax_-jmin_+1)
+  else
+    call b%set_ncols(max(min(jmax_,a%get_ncols()),b%get_ncols()))
+  end if
+
+  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
+       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
+       & nzin=nzin, rscale=rscale, cscale=cscale)
+
+  if (info /= psb_success_) goto 9999
+
+  call b%set_nzeros(nzin+nzout)
+  call b%fix(info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_csgetblk
+
+
+subroutine psb_ls_base_csclip(a,b,info,&
+     & imin,imax,jmin,jmax,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csclip
+  implicit none
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_ls_coo_sparse_mat), intent(out) :: b
+  integer(psb_ipk_),intent(out)                  :: info
+  integer(psb_lpk_), intent(in), optional        :: imin,imax,jmin,jmax
+  logical, intent(in), optional        :: rscale,cscale
+
+  integer(psb_lpk_)  :: nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='csget'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  nzin = 0
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = a%get_nrows() ! Should this be imax_ ?? 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = a%get_ncols()  ! Should this be jmax_ ?? 
+  endif
+  call b%allocate(mb,nb)
+  call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
+       & jmin=jmin_, jmax=jmax_, append=.false., &
+       & nzin=nzin, rscale=rscale_, cscale=cscale_)
+  if (info /= psb_success_) goto 9999
+
+  call b%set_nzeros(nzin+nzout)
+  call b%fix(info)
+
+  if (info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_csclip
+
+
+!
+! Here we have the base implementation of tril and triu
+! this is just based on the getrow.
+! If performance is critical it can be overridden.
+!
+subroutine psb_ls_base_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_tril
+  implicit none
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_ls_coo_sparse_mat), intent(out) :: l
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_lpk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_ls_coo_sparse_mat), optional, intent(out) :: u
+  
+  integer(psb_ipk_) :: err_act
+  integer(psb_lpk_) :: nzin, nzout, i, j, k, ibk 
+  integer(psb_lpk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_lpk_), allocatable :: ia(:), ja(:)
+  real(psb_spk_), allocatable    :: val(:)
+  character(len=20)  :: name='tril'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+  integer(psb_lpk_), parameter :: nbk=8
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call psb_realloc(max(mb,nb),ia,info)
+    call psb_realloc(max(mb,nb),ja,info)
+    call psb_realloc(max(mb,nb),val,info)
+    do i=imin_,imax_, nbk
+      ibk = min(nbk,imax_-i+1)
+      call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
+           & jmin=jmin_, jmax=jmax_)
+      do k=1, nzout
+        if ((ja(k)-ia(k))<=diag_) then
+          nzlin = nzlin + 1
+          l%ia(nzlin)  = ia(k)
+          l%ja(nzlin)  = ja(k)
+          l%val(nzlin) = val(k)
+        else
+          nzuin = nzuin + 1
+          u%ia(nzuin)  = ia(k)
+          u%ja(nzuin)  = ja(k)
+          u%val(nzuin) = val(k)
+        end if
+      end do
+    end do
+    
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ >= -1).and.(imin_ == jmin_)) then 
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    do i=imin_,imax_
+      k = min(jmax_,i+diag_)
+      call a%csget(i,i,nzout,l%ia,l%ja,l%val,info,&
+           & jmin=jmin_, jmax=k, append=.true., &
+           & nzin=nzin)
+      if (info /= psb_success_) goto 9999
+      call l%set_nzeros(nzin+nzout)
+      nzin = nzin+nzout 
+    end do
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
+  if (rscale_) &
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ <= 0).and.(imin_ == jmin_)) then 
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_tril
+
+subroutine psb_ls_base_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_triu
+  implicit none
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_ls_coo_sparse_mat), intent(out) :: u
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_lpk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_ls_coo_sparse_mat), optional, intent(out) :: l
+  
+  integer(psb_ipk_) :: err_act
+  integer(psb_lpk_) :: nzin, nzout, i, j, k, ibk
+  integer(psb_lpk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_lpk_), allocatable :: ia(:), ja(:)
+  real(psb_spk_), allocatable    :: val(:)
+  character(len=20)  :: name='triu'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+  integer(psb_lpk_), parameter :: nbk=8
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+  
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call psb_realloc(max(mb,nb),ia,info)
+    call psb_realloc(max(mb,nb),ja,info)
+    call psb_realloc(max(mb,nb),val,info)
+    do i=imin_,imax_, nbk
+      ibk = min(nbk,imax_-i+1)
+      call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
+           & jmin=jmin_, jmax=jmax_)
+      do k=1, nzout
+        if ((ja(k)-ia(k))<diag_) then
+          nzlin = nzlin + 1
+          l%ia(nzlin)  = ia(k)
+          l%ja(nzlin)  = ja(k)
+          l%val(nzlin) = val(k)
+        else
+          nzuin = nzuin + 1
+          u%ia(nzuin)  = ia(k)
+          u%ja(nzuin)  = ja(k)
+          u%val(nzuin) = val(k)
+        end if
+      end do
+    end do
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ <=1).and.(imin_ == jmin_)) then 
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros()       
+    do i=imin_,imax_
+      k = max(jmin_,i+diag_)
+      call a%csget(i,i,nzout,u%ia,u%ja,u%val,info,&
+           & jmin=k, jmax=jmax_, append=.true., &
+           & nzin=nzin)
+      if (info /= psb_success_) goto 9999
+      call u%set_nzeros(nzin+nzout)
+      nzin = nzin+nzout 
+    end do
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
+  if (rscale_) &
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ >= 0).and.(imin_ == jmin_)) then 
+    call u%set_triangle(.true.)
+    call u%set_upper(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_triu
+
+
+
+subroutine psb_ls_base_clone(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_clone
+  use psb_error_mod
+  implicit none 
+  
+  class(psb_ls_base_sparse_mat), intent(inout)              :: a
+  class(psb_ls_base_sparse_mat), allocatable, intent(inout) :: b
+  integer(psb_ipk_), intent(out) :: info 
+
+  info = 0 
+  if (allocated(b)) then
+    call b%free()
+    deallocate(b, stat=info)
+  end if
+  if (info /= 0) then 
+    info = psb_err_alloc_dealloc_
+    return
+  end if
+
+  ! Do not use SOURCE allocation: this makes sure that
+  ! memory allocated elsewhere is treated properly. 
+  allocate(b,mold=a,stat=info)
+  if (info /= psb_success_) info = psb_err_alloc_dealloc_
+  if (info == psb_success_) call b%cp_from_fmt(a, info)    
+    
+end subroutine psb_ls_base_clone
+
+subroutine psb_ls_base_make_nonunit(a)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_make_nonunit
+  use psb_error_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  type(psb_ls_coo_sparse_mat) :: tmp
+  
+  integer(psb_ipk_) :: info
+  integer(psb_lpk_) :: i, j, m, n, nz, mnm
+
+  if (a%is_unit()) then 
+    call a%mv_to_coo(tmp,info) 
+    if (info /= 0) return
+    m = tmp%get_nrows()
+    n = tmp%get_ncols()
+    mnm = min(m,n) 
+    nz = tmp%get_nzeros()
+    call tmp%reallocate(nz+mnm)
+    do i=1, mnm
+      tmp%val(nz+i) = sone
+      tmp%ia(nz+i)  = i
+      tmp%ja(nz+i)  = i
+    end do
+    call tmp%set_nzeros(nz+mnm)
+    call tmp%set_unit(.false.)
+    call tmp%fix(info)
+    if (info /= 0) &
+         & call a%mv_from_coo(tmp,info)
+  end if
+
+end subroutine psb_ls_base_make_nonunit
+
+subroutine psb_ls_base_mold(a,b,info) 
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mold
+  use psb_error_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in)                 :: a
+  class(psb_ls_base_sparse_mat), intent(inout), allocatable :: b
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='base_mold'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_mold
+
+subroutine psb_ls_base_transp_2mat(a,b)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_transp_2mat
+  use psb_error_mod
+  implicit none 
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_lbase_sparse_mat), intent(out)    :: b
+
+  type(psb_ls_coo_sparse_mat) :: tmp
+  integer(psb_ipk_) :: err_act, info
+  character(len=*), parameter :: name='ls_base_transp'
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+  select type(b)
+  class is (psb_ls_base_sparse_mat)
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call tmp%transp()
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  class default
+    info = psb_err_invalid_dynamic_type_
+  end select
+  if (info /= psb_success_) then 
+    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=(/ione/))
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act) 
+
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_transp_2mat
+
+subroutine psb_ls_base_transc_2mat(a,b)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_transc_2mat
+  implicit none 
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_lbase_sparse_mat), intent(out)    :: b
+
+  type(psb_ls_coo_sparse_mat) :: tmp
+  integer(psb_ipk_) :: err_act, info
+  character(len=*), parameter :: name='ls_base_transc'
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+  select type(b)
+  class is (psb_ls_base_sparse_mat)
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call tmp%transc()
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  class default
+    info = psb_err_invalid_dynamic_type_
+  end select
+  if (info /= psb_success_) then 
+    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=(/ione/))
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act) 
+
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine psb_ls_base_transc_2mat
+
+subroutine psb_ls_base_transp_1mat(a)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_transp_1mat
+  use psb_error_mod
+  implicit none 
+
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+
+  type(psb_ls_coo_sparse_mat) :: tmp
+  integer(psb_ipk_) :: err_act, info
+  character(len=*), parameter :: name='ls_base_transp'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  call a%mv_to_coo(tmp,info)
+  if (info == psb_success_) call tmp%transp()
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+
+  if (info /= psb_success_) then 
+    info = psb_err_missing_override_method_ 
+    call psb_errpush(info,name,a_err=a%get_fmt())
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act) 
+
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_transp_1mat
+
+subroutine psb_ls_base_transc_1mat(a)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_transc_1mat
+  implicit none 
+
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+
+  type(psb_ls_coo_sparse_mat) :: tmp
+  integer(psb_ipk_) :: err_act, info
+  character(len=*), parameter :: name='ls_base_transc'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  call a%mv_to_coo(tmp,info)
+  if (info == psb_success_) call tmp%transc()
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+
+  if (info /= psb_success_) then 
+    info = psb_err_missing_override_method_ 
+    call psb_errpush(info,name,a_err=a%get_fmt())
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act) 
+
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_transc_1mat
+
+subroutine psb_ls_base_scals(d,a,info) 
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_scals
+  use psb_error_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  real(psb_spk_), intent(in)      :: d
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='ls_scals'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_scals
+
+subroutine psb_ls_base_scal(d,a,info,side) 
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_scal
+  use psb_error_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  real(psb_spk_), intent(in)      :: d(:)
+  integer(psb_ipk_), intent(out)            :: info
+  character, intent(in), optional :: side
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='ls_scal'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_scal
+
+function psb_ls_base_maxval(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_maxval
+
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='maxval'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  res = szero
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end function psb_ls_base_maxval
+
+function psb_ls_base_csnmi(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csnmi
+
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='csnmi'
+  real(psb_spk_), allocatable  :: vt(:) 
+    
+  logical, parameter :: debug=.false.
+
+
+  call psb_erractionsave(err_act)
+  res = szero
+  call psb_realloc(a%get_nrows(),vt,info) 
+  if (info /= 0) then 
+    info  = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call a%arwsum(vt)
+  res = maxval(vt)  
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_base_csnmi
+
+function psb_ls_base_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csnm1
+
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='csnm1'
+  real(psb_spk_), allocatable  :: vt(:) 
+    
+  logical, parameter :: debug=.false.
+
+
+  call psb_erractionsave(err_act)
+  res = szero
+  call psb_realloc(a%get_ncols(),vt,info) 
+  if (info /= 0) then 
+    info  = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call a%aclsum(vt)
+  res = maxval(vt)  
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_base_csnm1
+
+subroutine psb_ls_base_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_rowsum
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_rowsum
+
+subroutine psb_ls_base_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_arwsum
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_arwsum
+
+subroutine psb_ls_base_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_colsum
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_colsum
+
+subroutine psb_ls_base_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_aclsum
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_aclsum
+
+subroutine psb_ls_base_get_diag(a,d,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_get_diag
+
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)     :: d(:)
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='get_diag'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ls_base_get_diag
+
+
+
+subroutine psb_ls_base_cp_to_icoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_to_icoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_s_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_coo'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+   ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  call a%cp_to_coo(tmp,info)
+  if (info == psb_success_) call tmp%mv_to_icoo(b,info)
+  
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_cp_to_icoo
+
+subroutine psb_ls_base_cp_from_icoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_from_icoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_coo_sparse_mat), intent(in) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_icoo'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+   ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  call tmp%cp_from_icoo(b,info) 
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_cp_from_icoo
+
+
+subroutine psb_ls_base_cp_to_ifmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_to_ifmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(in) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_ifmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  select type(b)
+  type is (psb_s_coo_sparse_mat)
+    call a%cp_to_icoo(b,info)
+  class default
+    call a%cp_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call b%mv_from_coo(icoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_cp_to_ifmt
+
+subroutine psb_ls_base_cp_from_ifmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cp_from_ifmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(in) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_ifmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  !
+  ! Default implementation
+  ! 
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  select type(b)
+  type is (psb_s_coo_sparse_mat)
+    call a%cp_from_icoo(b,info)
+  class default
+    call b%cp_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call a%mv_from_coo(lcoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_cp_from_ifmt
+
+
+subroutine psb_ls_base_mv_to_icoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_to_icoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_icoo'
+  logical, parameter :: debug=.false.
+
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_to_icoo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to coo')
+    goto 9999
+  end if
+
+  call a%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_mv_to_icoo
+
+subroutine psb_ls_base_mv_from_icoo(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_from_icoo
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_icoo'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_from_icoo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='from coo')
+    goto 9999
+  end if
+
+  call b%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_mv_from_icoo
+
+
+subroutine psb_ls_base_mv_to_ifmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_to_ifmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_ifmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  
+  !
+  ! Default implementation
+  ! 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  select type(b)
+  type is (psb_s_coo_sparse_mat)
+    call a%mv_to_icoo(b,info)
+  class default
+    call a%mv_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call b%mv_from_coo(icoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_mv_to_ifmt
+
+subroutine psb_ls_base_mv_from_ifmt(a,b,info)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_mv_from_ifmt
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_ifmt'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat)  :: icoo
+  type(psb_ls_coo_sparse_mat) :: lcoo
+  !
+  ! Default implementation
+  ! 
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  select type(b)
+  type is (psb_s_coo_sparse_mat)
+    call a%mv_from_icoo(b,info)
+  class default
+    call b%mv_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call a%mv_from_coo(lcoo,info)
+  end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_base_mv_from_ifmt
+
+

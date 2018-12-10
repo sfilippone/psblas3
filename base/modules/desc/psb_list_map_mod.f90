@@ -46,9 +46,10 @@ module psb_list_map_mod
   
   type, extends(psb_indx_map) :: psb_list_map
     integer(psb_ipk_) :: pnt_h          = -1 
-    integer(psb_ipk_), allocatable :: loc_to_glob(:), glob_to_loc(:)
+    integer(psb_lpk_), allocatable :: loc_to_glob(:)
+    integer(psb_ipk_), allocatable :: glob_to_loc(:)
   contains
-    procedure, pass(idxmap)  :: init_vl    => list_initvl
+    procedure, pass(idxmap)  :: init_vl    => list_initlvl
 
     procedure, pass(idxmap)  :: sizeof    => list_sizeof
     procedure, pass(idxmap)  :: asb       => list_asb
@@ -58,20 +59,35 @@ module psb_list_map_mod
     procedure, nopass        :: get_fmt   => list_get_fmt
     procedure, nopass        :: row_extendable => list_row_extendable
 
-    procedure, pass(idxmap)  :: l2gs1 => list_l2gs1
-    procedure, pass(idxmap)  :: l2gs2 => list_l2gs2
-    procedure, pass(idxmap)  :: l2gv1 => list_l2gv1
-    procedure, pass(idxmap)  :: l2gv2 => list_l2gv2
+!!$    procedure, pass(idxmap)  :: l2gs1 => list_l2gs1
+!!$    procedure, pass(idxmap)  :: l2gs2 => list_l2gs2
+!!$    procedure, pass(idxmap)  :: l2gv1 => list_l2gv1
+!!$    procedure, pass(idxmap)  :: l2gv2 => list_l2gv2
 
-    procedure, pass(idxmap)  :: g2ls1 => list_g2ls1
-    procedure, pass(idxmap)  :: g2ls2 => list_g2ls2
-    procedure, pass(idxmap)  :: g2lv1 => list_g2lv1
-    procedure, pass(idxmap)  :: g2lv2 => list_g2lv2
+    procedure, pass(idxmap)  :: ll2gs1 => list_ll2gs1
+    procedure, pass(idxmap)  :: ll2gs2 => list_ll2gs2
+    procedure, pass(idxmap)  :: ll2gv1 => list_ll2gv1
+    procedure, pass(idxmap)  :: ll2gv2 => list_ll2gv2
 
-    procedure, pass(idxmap)  :: g2ls1_ins => list_g2ls1_ins
-    procedure, pass(idxmap)  :: g2ls2_ins => list_g2ls2_ins
-    procedure, pass(idxmap)  :: g2lv1_ins => list_g2lv1_ins
-    procedure, pass(idxmap)  :: g2lv2_ins => list_g2lv2_ins
+!!$    procedure, pass(idxmap)  :: g2ls1  => list_g2ls1
+!!$    procedure, pass(idxmap)  :: g2ls2  => list_g2ls2
+!!$    procedure, pass(idxmap)  :: g2lv1  => list_g2lv1
+!!$    procedure, pass(idxmap)  :: g2lv2  => list_g2lv2
+
+    procedure, pass(idxmap)  :: lg2ls1 => list_lg2ls1
+    procedure, pass(idxmap)  :: lg2ls2 => list_lg2ls2
+    procedure, pass(idxmap)  :: lg2lv1 => list_lg2lv1
+    procedure, pass(idxmap)  :: lg2lv2 => list_lg2lv2
+
+!!$    procedure, pass(idxmap)  :: g2ls1_ins => list_g2ls1_ins
+!!$    procedure, pass(idxmap)  :: g2ls2_ins => list_g2ls2_ins
+!!$    procedure, pass(idxmap)  :: g2lv1_ins => list_g2lv1_ins
+!!$    procedure, pass(idxmap)  :: g2lv2_ins => list_g2lv2_ins
+
+    procedure, pass(idxmap)  :: lg2ls1_ins => list_lg2ls1_ins
+    procedure, pass(idxmap)  :: lg2ls2_ins => list_lg2ls2_ins
+    procedure, pass(idxmap)  :: lg2lv1_ins => list_lg2lv1_ins
+    procedure, pass(idxmap)  :: lg2lv2_ins => list_lg2lv2_ins
 
   end type psb_list_map
 
@@ -94,14 +110,14 @@ contains
   function list_sizeof(idxmap) result(val)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = idxmap%psb_indx_map%sizeof()
 
     if (allocated(idxmap%loc_to_glob)) &
-         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_int
+         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_ip
     if (allocated(idxmap%glob_to_loc)) &
-         & val = val + size(idxmap%glob_to_loc)*psb_sizeof_int
+         & val = val + size(idxmap%glob_to_loc)*psb_sizeof_ip
 
   end function list_sizeof
 
@@ -120,14 +136,122 @@ contains
   end subroutine list_free
 
 
-  subroutine list_l2gs1(idx,idxmap,info,mask,owned)
+!!$  subroutine list_l2gs1(idx,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(inout) :: idx
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask
+!!$    logical, intent(in), optional :: owned
+!!$    integer(psb_ipk_) :: idxv(1)
+!!$    info = 0
+!!$    if (present(mask)) then 
+!!$      if (.not.mask) return
+!!$    end if
+!!$
+!!$    idxv(1) = idx
+!!$    call idxmap%l2gip(idxv,info,owned=owned)
+!!$    idx = idxv(1)
+!!$
+!!$  end subroutine list_l2gs1
+!!$
+!!$  subroutine list_l2gs2(idxin,idxout,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(in)    :: idxin
+!!$    integer(psb_ipk_), intent(out)   :: idxout
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask
+!!$    logical, intent(in), optional :: owned
+!!$
+!!$    idxout = idxin
+!!$    call idxmap%l2gip(idxout,info,mask,owned)
+!!$    
+!!$  end subroutine list_l2gs2
+!!$
+!!$
+!!$  subroutine list_l2gv1(idx,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(inout) :: idx(:)
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask(:)
+!!$    logical, intent(in), optional :: owned
+!!$    integer(psb_ipk_) :: i
+!!$    logical :: owned_
+!!$    info = 0
+!!$
+!!$    if (present(mask)) then 
+!!$      if (size(mask) < size(idx)) then 
+!!$        info = -1
+!!$        return
+!!$      end if
+!!$    end if
+!!$    if (present(owned)) then 
+!!$      owned_ = owned
+!!$    else
+!!$      owned_ = .false.
+!!$    end if
+!!$
+!!$    if (present(mask)) then 
+!!$
+!!$      do i=1, size(idx)
+!!$        if (mask(i)) then 
+!!$          if ((1<=idx(i)).and.(idx(i) <= idxmap%get_lr())) then
+!!$            idx(i) = idxmap%loc_to_glob(idx(i))
+!!$          else if ((idxmap%get_lr() < idx(i)).and.(idx(i) <= idxmap%local_cols)&
+!!$               & .and.(.not.owned_)) then
+!!$            idx(i) = idxmap%loc_to_glob(idx(i))
+!!$          else 
+!!$            idx(i) = -1
+!!$          end if
+!!$        end if
+!!$      end do
+!!$
+!!$    else  if (.not.present(mask)) then 
+!!$
+!!$      do i=1, size(idx)
+!!$        if ((1<=idx(i)).and.(idx(i) <= idxmap%get_lr())) then
+!!$          idx(i) = idxmap%loc_to_glob(idx(i))
+!!$        else if ((idxmap%get_lr() < idx(i)).and.(idx(i) <= idxmap%local_cols)&
+!!$             & .and.(.not.owned_)) then
+!!$          idx(i) = idxmap%loc_to_glob(idx(i))
+!!$        else 
+!!$          idx(i) = -1
+!!$        end if
+!!$      end do
+!!$
+!!$    end if
+!!$
+!!$  end subroutine list_l2gv1
+!!$
+!!$  subroutine list_l2gv2(idxin,idxout,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(in)    :: idxin(:)
+!!$    integer(psb_ipk_), intent(out)   :: idxout(:)
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask(:)
+!!$    logical, intent(in), optional :: owned
+!!$    integer(psb_ipk_) :: is, im
+!!$    
+!!$    is = size(idxin)
+!!$    im = min(is,size(idxout))
+!!$    idxout(1:im) = idxin(1:im)
+!!$    call idxmap%l2gip(idxout(1:im),info,mask,owned)
+!!$    if (is > im) info = -3 
+!!$
+!!$  end subroutine list_l2gv2
+!!$
+
+  subroutine list_ll2gs1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_lpk_) :: idxv(1)
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
@@ -137,13 +261,13 @@ contains
     call idxmap%l2gip(idxv,info,owned=owned)
     idx = idxv(1)
 
-  end subroutine list_l2gs1
+  end subroutine list_ll2gs1
 
-  subroutine list_l2gs2(idxin,idxout,idxmap,info,mask,owned)
+  subroutine list_ll2gs2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin
-    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_lpk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
@@ -151,17 +275,17 @@ contains
     idxout = idxin
     call idxmap%l2gip(idxout,info,mask,owned)
     
-  end subroutine list_l2gs2
+  end subroutine list_ll2gs2
 
 
-  subroutine list_l2gv1(idx,idxmap,info,mask,owned)
+  subroutine list_ll2gv1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i
+    integer(psb_lpk_) :: i
     logical :: owned_
     info = 0
 
@@ -207,17 +331,17 @@ contains
 
     end if
 
-  end subroutine list_l2gv1
+  end subroutine list_ll2gv1
 
-  subroutine list_l2gv2(idxin,idxout,idxmap,info,mask,owned)
+  subroutine list_ll2gv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin(:)
-    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_lpk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: is, im
+    integer(psb_lpk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -225,17 +349,139 @@ contains
     call idxmap%l2gip(idxout(1:im),info,mask,owned)
     if (is > im) info = -3 
 
-  end subroutine list_l2gv2
+  end subroutine list_ll2gv2
+
+!!$
+!!$  subroutine list_g2ls1(idx,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(inout) :: idx
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask
+!!$    logical, intent(in), optional :: owned
+!!$    integer(psb_ipk_) :: idxv(1)
+!!$    info = 0
+!!$
+!!$    if (present(mask)) then 
+!!$      if (.not.mask) return
+!!$    end if
+!!$    
+!!$    idxv(1) = idx 
+!!$    call idxmap%g2lip(idxv,info,owned=owned)
+!!$    idx = idxv(1) 
+!!$      
+!!$  end subroutine list_g2ls1
+!!$
+!!$  subroutine list_g2ls2(idxin,idxout,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(in)    :: idxin
+!!$    integer(psb_ipk_), intent(out)   :: idxout
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask
+!!$    logical, intent(in), optional :: owned
+!!$
+!!$    idxout = idxin
+!!$    call idxmap%g2lip(idxout,info,mask,owned)
+!!$    
+!!$  end subroutine list_g2ls2
+!!$
+!!$
+!!$  subroutine list_g2lv1(idx,idxmap,info,mask,owned)
+!!$    use psb_sort_mod
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(inout) :: idx(:)
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask(:)
+!!$    logical, intent(in), optional :: owned
+!!$    integer(psb_ipk_) :: i, is, ix
+!!$    logical :: owned_
+!!$
+!!$    info = 0
+!!$
+!!$    if (present(mask)) then 
+!!$      if (size(mask) < size(idx)) then 
+!!$        info = -1
+!!$        return
+!!$      end if
+!!$    end if
+!!$    if (present(owned)) then 
+!!$      owned_ = owned
+!!$    else
+!!$      owned_ = .false.
+!!$    end if
+!!$
+!!$    is = size(idx)
+!!$
+!!$    if (present(mask)) then 
+!!$      if (idxmap%is_valid()) then 
+!!$        do i=1,is
+!!$          if (mask(i)) then 
+!!$            if ((1 <= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+!!$              ix = idxmap%glob_to_loc(idx(i))
+!!$              if ((ix > idxmap%get_lr()).and.(owned_)) ix = -1
+!!$              idx(i) = ix
+!!$            else 
+!!$              idx(i) = -1
+!!$            end if
+!!$          end if
+!!$        end do
+!!$      else 
+!!$        idx(1:is) = -1
+!!$        info = -1
+!!$      end if
+!!$
+!!$    else  if (.not.present(mask)) then 
+!!$
+!!$      if (idxmap%is_valid()) then 
+!!$        do i=1, is
+!!$          if ((1 <= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+!!$            ix = idxmap%glob_to_loc(idx(i))
+!!$                if ((ix > idxmap%get_lr()).and.(owned_)) ix = -1
+!!$            idx(i) = ix
+!!$          else 
+!!$            idx(i) = -1
+!!$          end if
+!!$        end do
+!!$      else 
+!!$        idx(1:is) = -1
+!!$        info = -1
+!!$      end if
+!!$ 
+!!$    end if
+!!$
+!!$  end subroutine list_g2lv1
+!!$
+!!$  subroutine list_g2lv2(idxin,idxout,idxmap,info,mask,owned)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(in) :: idxmap
+!!$    integer(psb_ipk_), intent(in)    :: idxin(:)
+!!$    integer(psb_ipk_), intent(out)   :: idxout(:)
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask(:)
+!!$    logical, intent(in), optional :: owned
+!!$
+!!$    integer(psb_ipk_) :: is, im
+!!$    
+!!$    is = size(idxin)
+!!$    im = min(is,size(idxout))
+!!$    idxout(1:im) = idxin(1:im)
+!!$    call idxmap%g2lip(idxout(1:im),info,mask,owned)
+!!$    if (is > im) info = -3 
+!!$
+!!$  end subroutine list_g2lv2
 
 
-  subroutine list_g2ls1(idx,idxmap,info,mask,owned)
+
+  subroutine list_lg2ls1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_lpk_) :: idxv(1)
     info = 0
 
     if (present(mask)) then 
@@ -246,32 +492,39 @@ contains
     call idxmap%g2lip(idxv,info,owned=owned)
     idx = idxv(1) 
       
-  end subroutine list_g2ls1
+  end subroutine list_lg2ls1
 
-  subroutine list_g2ls2(idxin,idxout,idxmap,info,mask,owned)
+  subroutine list_lg2ls2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-
-    idxout = idxin
-    call idxmap%g2lip(idxout,info,mask,owned)
+    integer(psb_lpk_) :: idxv(1)
     
-  end subroutine list_g2ls2
+    info = 0
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+
+    idxv = idxin
+    call idxmap%g2lip(idxv,info,owned=owned)
+    idxout = idxv(1)
+    
+  end subroutine list_lg2ls2
 
 
-  subroutine list_g2lv1(idx,idxmap,info,mask,owned)
+  subroutine list_lg2lv1(idx,idxmap,info,mask,owned)
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i, is, ix
+    integer(psb_lpk_) :: i, is, ix
     logical :: owned_
 
     info = 0
@@ -327,40 +580,249 @@ contains
  
     end if
 
-  end subroutine list_g2lv1
+  end subroutine list_lg2lv1
 
-  subroutine list_g2lv2(idxin,idxout,idxmap,info,mask,owned)
+  subroutine list_lg2lv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-
+    integer(psb_lpk_), allocatable :: idxv(:)
     integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip(idxout(1:im),info,mask,owned)
+    allocate(idxv(im),stat=info)
+    if (info /= 0) then
+      info = -5
+      return
+    end if
+    idxv(1:im) = idxin(1:im)
+    call idxmap%g2lip(idxv(1:im),info,mask,owned)
+    idxout(1:im) = idxv(1:im)
     if (is > im) info = -3 
 
-  end subroutine list_g2lv2
+  end subroutine list_lg2lv2
 
 
+!!$  subroutine list_g2ls1_ins(idx,idxmap,info,mask,lidx)
+!!$    use psb_realloc_mod
+!!$    use psb_sort_mod
+!!$    implicit none 
+!!$    class(psb_list_map), intent(inout) :: idxmap
+!!$    integer(psb_ipk_), intent(inout) :: idx
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask
+!!$    integer(psb_ipk_), intent(in), optional :: lidx
+!!$
+!!$    integer(psb_ipk_) :: idxv(1), lidxv(1)
+!!$
+!!$    info = 0
+!!$    if (present(mask)) then 
+!!$      if (.not.mask) return
+!!$    end if
+!!$    idxv(1) = idx
+!!$    if (present(lidx)) then 
+!!$      lidxv(1) = lidx
+!!$      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
+!!$    else
+!!$      call idxmap%g2lip_ins(idxv,info)
+!!$    end if
+!!$
+!!$    idx = idxv(1) 
+!!$
+!!$  end subroutine list_g2ls1_ins
+!!$
+!!$  subroutine list_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(inout) :: idxmap
+!!$    integer(psb_ipk_), intent(in)    :: idxin
+!!$    integer(psb_ipk_), intent(out)   :: idxout
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask
+!!$    integer(psb_ipk_), intent(in), optional :: lidx
+!!$
+!!$    idxout = idxin
+!!$    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
+!!$    
+!!$  end subroutine list_g2ls2_ins
+!!$
+!!$
+!!$  subroutine list_g2lv1_ins(idx,idxmap,info,mask,lidx)
+!!$    use psb_realloc_mod
+!!$    use psb_sort_mod
+!!$    implicit none 
+!!$    class(psb_list_map), intent(inout) :: idxmap
+!!$    integer(psb_ipk_), intent(inout) :: idx(:)
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask(:)
+!!$    integer(psb_ipk_), intent(in), optional :: lidx(:)
+!!$
+!!$    integer(psb_ipk_) :: i, is, ix, lix
+!!$
+!!$    info = 0
+!!$    is = size(idx)
+!!$
+!!$    if (present(mask)) then 
+!!$      if (size(mask) < size(idx)) then 
+!!$        info = -1
+!!$        return
+!!$      end if
+!!$    end if
+!!$    if (present(lidx)) then 
+!!$      if (size(lidx) < size(idx)) then 
+!!$        info = -1
+!!$        return
+!!$      end if
+!!$    end if
+!!$
+!!$
+!!$    if (idxmap%is_asb()) then 
+!!$      ! State is wrong for this one ! 
+!!$      idx = -1
+!!$      info = -1
+!!$
+!!$    else if (idxmap%is_valid()) then 
+!!$
+!!$      if (present(lidx)) then 
+!!$        if (present(mask)) then 
+!!$          do i=1, is
+!!$            if (mask(i)) then 
+!!$              if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+!!$                ix = idxmap%glob_to_loc(idx(i))                
+!!$                if (ix < 0) then 
+!!$                  ix = lidx(i) 
+!!$                  call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+!!$                  if ((ix <= idxmap%local_rows).or.(info /= 0)) then 
+!!$                    info = -4
+!!$                    return
+!!$                  end if
+!!$                  idxmap%local_cols          = max(ix,idxmap%local_cols)
+!!$                  idxmap%loc_to_glob(ix)     = idx(i)
+!!$                  idxmap%glob_to_loc(idx(i)) = ix
+!!$                end if
+!!$                idx(i) = ix
+!!$              else 
+!!$                idx(i) = -1
+!!$              end if
+!!$            end if
+!!$          end do
+!!$
+!!$        else if (.not.present(mask)) then 
+!!$
+!!$          do i=1, is
+!!$            if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+!!$              ix = idxmap%glob_to_loc(idx(i))
+!!$              if (ix < 0) then 
+!!$                ix = lidx(i) 
+!!$                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+!!$                if ((ix <= idxmap%local_rows).or.(info /= 0)) then 
+!!$                  info = -4
+!!$                  return
+!!$                end if
+!!$                idxmap%local_cols          = max(ix,idxmap%local_cols)
+!!$                idxmap%loc_to_glob(ix)     = idx(i)
+!!$                idxmap%glob_to_loc(idx(i)) = ix
+!!$              end if
+!!$              idx(i) = ix
+!!$            else 
+!!$              idx(i) = -1
+!!$            end if
+!!$          end do
+!!$        end if
+!!$
+!!$      else if (.not.present(lidx)) then
+!!$
+!!$        if (present(mask)) then 
+!!$          do i=1, is
+!!$            if (mask(i)) then 
+!!$              if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+!!$                ix = idxmap%glob_to_loc(idx(i))
+!!$                if (ix < 0) then 
+!!$                  ix = idxmap%local_cols + 1
+!!$                  call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+!!$                  if (info /= 0) then 
+!!$                    info = -4
+!!$                    return
+!!$                  end if
+!!$                  idxmap%local_cols      = ix
+!!$                  idxmap%loc_to_glob(ix) = idx(i)
+!!$                  idxmap%glob_to_loc(idx(i)) = ix
+!!$                end if
+!!$                idx(i) = ix
+!!$              else 
+!!$                idx(i) = -1
+!!$              end if
+!!$            end if
+!!$          end do
+!!$
+!!$        else if (.not.present(mask)) then 
+!!$
+!!$          do i=1, is
+!!$            if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+!!$              ix = idxmap%glob_to_loc(idx(i))
+!!$              if (ix < 0) then 
+!!$                ix = idxmap%local_cols + 1
+!!$                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+!!$                if (info /= 0) then 
+!!$                  info = -4
+!!$                  return
+!!$                end if
+!!$                idxmap%local_cols      = ix
+!!$                idxmap%loc_to_glob(ix) = idx(i)
+!!$                idxmap%glob_to_loc(idx(i)) = ix
+!!$              end if
+!!$              idx(i) = ix
+!!$            else 
+!!$              idx(i) = -1
+!!$            end if
+!!$          end do
+!!$        end if
+!!$      end if
+!!$
+!!$    else 
+!!$      idx = -1
+!!$      info = -1
+!!$    end if
+!!$
+!!$  end subroutine list_g2lv1_ins
+!!$
+!!$  subroutine list_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
+!!$    implicit none 
+!!$    class(psb_list_map), intent(inout) :: idxmap
+!!$    integer(psb_ipk_), intent(in)    :: idxin(:)
+!!$    integer(psb_ipk_), intent(out)   :: idxout(:)
+!!$    integer(psb_ipk_), intent(out)   :: info 
+!!$    logical, intent(in), optional :: mask(:)
+!!$    integer(psb_ipk_), intent(in), optional :: lidx(:)
+!!$
+!!$    integer(psb_ipk_) :: is, im
+!!$    
+!!$    is = size(idxin)
+!!$    im = min(is,size(idxout))
+!!$    idxout(1:im) = idxin(1:im)
+!!$    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
+!!$    if (is > im) info = -3 
+!!$
+!!$  end subroutine list_g2lv2_ins
+!!$
 
-  subroutine list_g2ls1_ins(idx,idxmap,info,mask,lidx)
+  
+  subroutine list_lg2ls1_ins(idx,idxmap,info,mask,lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
 
-    integer(psb_ipk_) :: idxv(1), lidxv(1)
+    integer(psb_lpk_) :: idxv(1)
+    integer(psb_ipk_) :: lidxv(1)
 
     info = 0
     if (present(mask)) then 
@@ -376,34 +838,49 @@ contains
 
     idx = idxv(1) 
 
-  end subroutine list_g2ls1_ins
+  end subroutine list_lg2ls1_ins
 
-  subroutine list_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
+  subroutine list_lg2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
 
-    idxout = idxin
-    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
+    integer(psb_lpk_) :: idxv(1)
+    integer(psb_ipk_) :: lidxv(1)
+
+    info = 0
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+    idxv(1) = idxin
+    if (present(lidx)) then 
+      lidxv(1) = lidx
+      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
+    else
+      call idxmap%g2lip_ins(idxv,info)
+    end if
+
+    idxout = idxv(1) 
     
-  end subroutine list_g2ls2_ins
+  end subroutine list_lg2ls2_ins
 
 
-  subroutine list_g2lv1_ins(idx,idxmap,info,mask,lidx)
+  subroutine list_lg2lv1_ins(idx,idxmap,info,mask,lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: i, is, ix, lix
+    integer(psb_ipk_) :: ix, lix
+    integer(psb_lpk_) :: i, is
 
     info = 0
     is = size(idx)
@@ -530,26 +1007,34 @@ contains
       info = -1
     end if
 
-  end subroutine list_g2lv1_ins
+  end subroutine list_lg2lv1_ins
 
-  subroutine list_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
+  subroutine list_lg2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
-
-    integer(psb_ipk_) :: is, im
+    
+    integer(psb_lpk_) :: is, im
+    integer(psb_lpk_), allocatable :: idxv(:)
     
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
+    allocate(idxv(im),stat=info)
+    if (info /= 0) then
+      info = -5
+      return
+    end if
+    
+    idxv(1:im) = idxin(1:im)
+    call idxmap%g2lip_ins(idxv(1:im),info,mask=mask,lidx=lidx)
+    idxout(1:im) = idxv(1:im)
     if (is > im) info = -3 
 
-  end subroutine list_g2lv2_ins
+  end subroutine list_lg2lv2_ins
 
 
 
@@ -559,12 +1044,46 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in) :: ictxt
+    integer(psb_mpk_), intent(in) :: ictxt
     integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) ::  i, ix, nl, n, nrt
-    integer(psb_mpik_) :: iam, np
+    integer(psb_lpk_) :: nl
+    integer(psb_lpk_), allocatable :: lvl(:)
+    integer(psb_mpk_) :: iam, np
+
+    info = 0
+    call psb_info(ictxt,iam,np) 
+    if (np < 0) then 
+      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      info = -1
+      return
+    end if
+
+    nl = size(vl) 
+    allocate(lvl(nl),stat=info)
+    if (info /= 0) then
+      info = -1
+      return
+    end if
+
+    lvl(1:nl) = vl(1:nl)
+    call idxmap%init_vl(ictxt,lvl,info)
+   
+  end subroutine list_initvl
+
+
+  subroutine list_initlvl(idxmap,ictxt,vl,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_list_map), intent(inout) :: idxmap
+    integer(psb_mpk_), intent(in) :: ictxt
+    integer(psb_lpk_), intent(in)  :: vl(:)
+    integer(psb_ipk_), intent(out) :: info
+    !  To be implemented
+    integer(psb_lpk_) ::  i, ix, nl, n, nrt
+    integer(psb_mpk_) :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -615,7 +1134,7 @@ contains
     idxmap%local_cols   = nl
     call idxmap%set_state(psb_desc_bld_)
    
-  end subroutine list_initvl
+  end subroutine list_initlvl
 
 
   subroutine list_asb(idxmap,info)
@@ -628,7 +1147,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
     
     integer(psb_ipk_) :: nhal
-    integer(psb_mpik_) :: ictxt, iam, np 
+    integer(psb_mpk_) :: ictxt, iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()

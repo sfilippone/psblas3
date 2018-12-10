@@ -44,9 +44,9 @@
 !    length_dl(:)  - integer             Items in dependency lists; updated on 
 !                                        exit
 ! 
-subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
+subroutine psi_i_dl_check(dep_list,dl_lda,np,length_dl)
 
-  use psi_mod, psb_protect_name => psi_dl_check
+  use psi_mod, psb_protect_name => psi_i_dl_check
   use psb_const_mod
   use psb_desc_mod
   implicit none
@@ -92,4 +92,4 @@ subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
     enddo outer
   enddo
 
-end subroutine psi_dl_check
+end subroutine psi_i_dl_check

@@ -62,8 +62,9 @@ module psb_c_vect_mod
     procedure, pass(x) :: ins_v    => c_vect_ins_v
     generic, public    :: ins      => ins_v, ins_a
     procedure, pass(x) :: bld_x    => c_vect_bld_x
-    procedure, pass(x) :: bld_n    => c_vect_bld_n
-    generic, public    :: bld      => bld_x, bld_n
+    procedure, pass(x) :: bld_mn   => c_vect_bld_mn
+    procedure, pass(x) :: bld_en   => c_vect_bld_en
+    generic, public    :: bld      => bld_x, bld_mn, bld_en
     procedure, pass(x) :: get_vect => c_vect_get_vect
     procedure, pass(x) :: cnv      => c_vect_cnv
     procedure, pass(x) :: set_scal => c_vect_set_scal
@@ -112,7 +113,8 @@ module psb_c_vect_mod
        & c_vect_all, c_vect_reall, c_vect_zero,  c_vect_asb, &
        & c_vect_gthab, c_vect_gthzv, c_vect_sctb, &
        & c_vect_free, c_vect_ins_a, c_vect_ins_v, c_vect_bld_x, &
-       & c_vect_bld_n, c_vect_get_vect, c_vect_cnv, c_vect_set_scal, &
+       & c_vect_bld_mn, c_vect_bld_en, c_vect_get_vect, &
+       & c_vect_cnv, c_vect_set_scal, &
        & c_vect_set_vect, c_vect_clone, c_vect_sync, c_vect_is_host, &
        & c_vect_is_dev, c_vect_is_sync, c_vect_set_host, &
        & c_vect_set_dev, c_vect_set_sync
@@ -207,8 +209,8 @@ contains
   end subroutine c_vect_bld_x
 
 
-  subroutine c_vect_bld_n(x,n,mold)
-    integer(psb_ipk_), intent(in) :: n
+  subroutine c_vect_bld_mn(x,n,mold)
+    integer(psb_mpk_), intent(in) :: n
     class(psb_c_vect_type), intent(inout) :: x
     class(psb_c_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
@@ -225,7 +227,28 @@ contains
     endif
     if (info == psb_success_) call x%v%bld(n)
 
-  end subroutine c_vect_bld_n
+  end subroutine c_vect_bld_mn
+
+
+  subroutine c_vect_bld_en(x,n,mold)
+    integer(psb_epk_), intent(in) :: n
+    class(psb_c_vect_type), intent(inout) :: x
+    class(psb_c_base_vect_type), intent(in), optional :: mold
+    integer(psb_ipk_) :: info
+
+    info = psb_success_
+
+    if (allocated(x%v)) &
+         & call x%free(info)
+
+    if (present(mold)) then 
+      allocate(x%v,stat=info,mold=mold)
+    else
+      allocate(x%v,stat=info, mold=psb_c_get_base_vect_default())
+    endif
+    if (info == psb_success_) call x%v%bld(n)
+
+  end subroutine c_vect_bld_en
 
   function  c_vect_get_vect(x,n) result(res)
     class(psb_c_vect_type), intent(inout)  :: x
@@ -291,7 +314,7 @@ contains
   function c_vect_sizeof(x) result(res)
     implicit none 
     class(psb_c_vect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%sizeof()
   end function c_vect_sizeof
@@ -1014,7 +1037,7 @@ contains
   function c_vect_sizeof(x) result(res)
     implicit none 
     class(psb_c_multivect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%sizeof()
   end function c_vect_sizeof

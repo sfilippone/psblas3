@@ -95,7 +95,7 @@
 !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
 !
 !
-subroutine psi_desc_index(desc,index_in,dep_list,&
+subroutine psi_i_desc_index(desc,index_in,dep_list,&
      & length_dl,nsnd,nrcv,desc_index,info)
   use psb_desc_mod
   use psb_realloc_mod
@@ -105,7 +105,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   use mpi
 #endif
   use psb_penv_mod
-  use psi_mod, psb_protect_name => psi_desc_index
+  use psi_mod, psb_protect_name => psi_i_desc_index
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -113,7 +113,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
 
   !    ...array parameters.....
   type(psb_desc_type) :: desc
-  integer(psb_ipk_) :: index_in(:),dep_list(:)
+  integer(psb_ipk_) :: index_in(:)
+  integer(psb_ipk_) :: dep_list(:)
   integer(psb_ipk_),allocatable  :: desc_index(:)
   integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
   !    ....local scalars...        
@@ -122,14 +123,14 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   integer(psb_ipk_) :: ictxt
   integer(psb_ipk_), parameter  :: no_comm=-1
   !     ...local arrays..
-  integer(psb_ipk_),allocatable  :: sndbuf(:), rcvbuf(:)
+  integer(psb_lpk_),allocatable  :: sndbuf(:), rcvbuf(:)
 
-  integer(psb_mpik_),allocatable  :: brvindx(:),rvsz(:),&
+  integer(psb_mpk_),allocatable  :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:)
 
   integer(psb_ipk_) :: ihinsz,ntot,k,err_act,nidx,&
        & idxr, idxs, iszs, iszr, nesd, nerv
-  integer(psb_mpik_) :: icomm, minfo
+  integer(psb_mpk_) :: icomm, minfo
 
   logical,parameter :: usempi=.true.
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -182,7 +183,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
   ihinsz=i
-  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  call mpi_alltoall(sdsz,1,psb_mpi_mpk_,rvsz,1,psb_mpi_mpk_,icomm,minfo)
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
@@ -281,8 +282,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     idxr = idxr + rvsz(proc+1)
   end do
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_lpk_,&
+       & rcvbuf,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999
@@ -301,7 +302,6 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     desc_index(i) = nerv
     call desc%indxmap%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
          &  desc_index(i+1:i+nerv),info)
-      
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd
@@ -330,4 +330,4 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   
   return
 
-end subroutine psi_desc_index
+end subroutine psi_i_desc_index

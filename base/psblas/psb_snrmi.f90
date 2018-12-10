@@ -53,14 +53,17 @@ function psb_snrmi(a,desc_a,info,global)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, n, iia, jja, ia, ja, mdim, ndim, m
+       & err_act, iia, jja, mdim, ndim
+  integer(psb_lpk_) :: m, n, ia, ja
   logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_snrmi'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

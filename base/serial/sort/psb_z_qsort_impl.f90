@@ -41,15 +41,15 @@
 !  Addison-Wesley
 !
 subroutine psb_zqsort(x,ix,dir,flag)
-  use psb_z_sort_mod, psb_protect_name => psb_zqsort
+  use psb_sort_mod, psb_protect_name => psb_zqsort
   use psb_error_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
-
+  integer(psb_ipk_) :: dir_, flag_, err_act, i
+  integer(psb_ipk_) :: n
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
@@ -139,7 +139,7 @@ end subroutine psb_zqsort
 
 
 subroutine psi_zlqsrx_up(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zlqsrx_up
+  use psb_sort_mod, psb_protect_name => psi_zlqsrx_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -150,7 +150,8 @@ subroutine psi_zlqsrx_up(n,x,idx)
   !     .. Local Scalars ..
   complex(psb_dpk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -295,7 +296,7 @@ subroutine psi_zlqsrx_up(n,x,idx)
 end subroutine psi_zlqsrx_up
 
 subroutine psi_zlqsrx_dw(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zlqsrx_dw
+  use psb_sort_mod, psb_protect_name => psi_zlqsrx_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -306,7 +307,8 @@ subroutine psi_zlqsrx_dw(n,x,idx)
   !     .. Local Scalars ..
   complex(psb_dpk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -450,7 +452,7 @@ subroutine psi_zlqsrx_dw(n,x,idx)
 end subroutine psi_zlqsrx_dw
 
 subroutine psi_zlqsr_up(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zlqsr_up
+  use psb_sort_mod, psb_protect_name => psi_zlqsr_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -592,7 +594,7 @@ subroutine psi_zlqsr_up(n,x)
 end subroutine psi_zlqsr_up
 
 subroutine psi_zlqsr_dw(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zlqsr_dw
+  use psb_sort_mod, psb_protect_name => psi_zlqsr_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -733,7 +735,7 @@ subroutine psi_zlqsr_dw(n,x)
 end subroutine psi_zlqsr_dw
 
 subroutine psi_zalqsrx_up(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zalqsrx_up
+  use psb_sort_mod, psb_protect_name => psi_zalqsrx_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -744,7 +746,8 @@ subroutine psi_zalqsrx_up(n,x,idx)
   !     .. Local Scalars ..
   complex(psb_dpk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -888,7 +891,7 @@ subroutine psi_zalqsrx_up(n,x,idx)
 end subroutine psi_zalqsrx_up
 
 subroutine psi_zalqsrx_dw(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zalqsrx_dw
+  use psb_sort_mod, psb_protect_name => psi_zalqsrx_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -899,7 +902,8 @@ subroutine psi_zalqsrx_dw(n,x,idx)
   !     .. Local Scalars ..
   complex(psb_dpk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -1043,7 +1047,7 @@ subroutine psi_zalqsrx_dw(n,x,idx)
 end subroutine psi_zalqsrx_dw
 
 subroutine psi_zalqsr_up(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zalqsr_up
+  use psb_sort_mod, psb_protect_name => psi_zalqsr_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -1184,7 +1188,7 @@ subroutine psi_zalqsr_up(n,x)
 end subroutine psi_zalqsr_up
 
 subroutine psi_zalqsr_dw(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zalqsr_dw
+  use psb_sort_mod, psb_protect_name => psi_zalqsr_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -1324,7 +1328,7 @@ subroutine psi_zalqsr_dw(n,x)
 end subroutine psi_zalqsr_dw
 
 subroutine psi_zaqsrx_up(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zaqsrx_up
+  use psb_sort_mod, psb_protect_name => psi_zaqsrx_up
   use psb_error_mod
   implicit none 
 
@@ -1335,7 +1339,8 @@ subroutine psi_zaqsrx_up(n,x,idx)
   real(psb_dpk_) :: piv, xk
   complex(psb_dpk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -1480,7 +1485,7 @@ subroutine psi_zaqsrx_up(n,x,idx)
 end subroutine psi_zaqsrx_up
 
 subroutine psi_zaqsrx_dw(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zaqsrx_dw
+  use psb_sort_mod, psb_protect_name => psi_zaqsrx_dw
   use psb_error_mod
   implicit none 
 
@@ -1491,7 +1496,8 @@ subroutine psi_zaqsrx_dw(n,x,idx)
   real(psb_dpk_) :: piv, xk
   complex(psb_dpk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -1634,7 +1640,7 @@ subroutine psi_zaqsrx_dw(n,x,idx)
 end subroutine psi_zaqsrx_dw
 
 subroutine psi_zaqsr_up(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zaqsr_up
+  use psb_sort_mod, psb_protect_name => psi_zaqsr_up
   use psb_error_mod
   implicit none 
 
@@ -1644,7 +1650,8 @@ subroutine psi_zaqsr_up(n,x)
   real(psb_dpk_) :: piv, xk
   complex(psb_dpk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -1774,7 +1781,7 @@ subroutine psi_zaqsr_up(n,x)
 end subroutine psi_zaqsr_up
 
 subroutine psi_zaqsr_dw(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zaqsr_dw
+  use psb_sort_mod, psb_protect_name => psi_zaqsr_dw
   use psb_error_mod
   implicit none 
 
@@ -1784,7 +1791,8 @@ subroutine psi_zaqsr_dw(n,x)
   real(psb_dpk_) :: piv, xk
   complex(psb_dpk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=24
   integer(psb_ipk_) :: istack(nparms,maxstack)

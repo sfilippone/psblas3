@@ -41,14 +41,15 @@
 !  Addison-Wesley
 !
 subroutine psb_cisort(x,ix,dir,flag)
-  use psb_c_sort_mod, psb_protect_name => psb_cisort
+  use psb_sort_mod, psb_protect_name => psb_cisort
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
+  integer(psb_ipk_) :: dir_, flag_, err_act
+  integer(psb_ipk_) :: n, i
 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
@@ -138,7 +139,7 @@ subroutine psb_cisort(x,ix,dir,flag)
 end subroutine psb_cisort
 
 subroutine psi_clisrx_up(n,x,idx)
-  use psb_c_sort_mod, psb_protect_name => psi_clisrx_up
+  use psb_sort_mod, psb_protect_name => psi_clisrx_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -168,7 +169,7 @@ subroutine psi_clisrx_up(n,x,idx)
 end subroutine psi_clisrx_up
 
 subroutine psi_clisrx_dw(n,x,idx)
-  use psb_c_sort_mod, psb_protect_name => psi_clisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_clisrx_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -197,7 +198,7 @@ subroutine psi_clisrx_dw(n,x,idx)
 end subroutine psi_clisrx_dw
 
 subroutine psi_clisr_up(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_clisr_up
+  use psb_sort_mod, psb_protect_name => psi_clisr_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -222,7 +223,7 @@ subroutine psi_clisr_up(n,x)
 end subroutine psi_clisr_up
 
 subroutine psi_clisr_dw(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_clisr_dw
+  use psb_sort_mod, psb_protect_name => psi_clisr_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
@@ -247,7 +248,7 @@ subroutine psi_clisr_dw(n,x)
 end subroutine psi_clisr_dw
 
 subroutine psi_calisrx_up(n,x,idx)
-  use psb_c_sort_mod, psb_protect_name => psi_calisrx_up
+  use psb_sort_mod, psb_protect_name => psi_calisrx_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -276,7 +277,7 @@ subroutine psi_calisrx_up(n,x,idx)
 end subroutine psi_calisrx_up
 
 subroutine psi_calisrx_dw(n,x,idx)
-  use psb_c_sort_mod, psb_protect_name => psi_calisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_calisrx_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -305,7 +306,7 @@ subroutine psi_calisrx_dw(n,x,idx)
 end subroutine psi_calisrx_dw
 
 subroutine psi_calisr_up(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_calisr_up
+  use psb_sort_mod, psb_protect_name => psi_calisr_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -330,7 +331,7 @@ subroutine psi_calisr_up(n,x)
 end subroutine psi_calisr_up
 
 subroutine psi_calisr_dw(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_calisr_dw
+  use psb_sort_mod, psb_protect_name => psi_calisr_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
@@ -355,7 +356,7 @@ subroutine psi_calisr_dw(n,x)
 end subroutine psi_calisr_dw
 
 subroutine psi_caisrx_up(n,x,idx)
-  use psb_c_sort_mod, psb_protect_name => psi_caisrx_up
+  use psb_sort_mod, psb_protect_name => psi_caisrx_up
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
@@ -383,7 +384,7 @@ subroutine psi_caisrx_up(n,x,idx)
 end subroutine psi_caisrx_up
 
 subroutine psi_caisrx_dw(n,x,idx)
-  use psb_c_sort_mod, psb_protect_name => psi_caisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_caisrx_dw
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
@@ -411,7 +412,7 @@ subroutine psi_caisrx_dw(n,x,idx)
 end subroutine psi_caisrx_dw
 
 subroutine psi_caisr_up(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_caisr_up
+  use psb_sort_mod, psb_protect_name => psi_caisr_up
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
@@ -435,7 +436,7 @@ subroutine psi_caisr_up(n,x)
 end subroutine psi_caisr_up
 
 subroutine psi_caisr_dw(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_caisr_dw
+  use psb_sort_mod, psb_protect_name => psi_caisr_dw
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 

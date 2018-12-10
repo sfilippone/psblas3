@@ -127,11 +127,12 @@ Subroutine psb_scgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_s_vect_type), Pointer  :: ww, q, r, rt0, p, v, &
        & s, t, z, f
 
-  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
        & n_row, n_col, nl, err_act
+  integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   integer(psb_ipk_), Parameter :: irmax = 8
-  integer(psb_ipk_) :: itx, i, istop_,j, k, int_err(5)
+  integer(psb_ipk_) :: itx, i, istop_,j, k
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ictxt, np, me
   real(psb_spk_) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
@@ -198,14 +199,13 @@ Subroutine psb_scgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   endif
   if (nl <=0 ) then 
     info=psb_err_invalid_istop_
-    int_err(1)=nl
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/nl/))
     goto 9999
   endif
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
-  if (info == psb_success_) call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
+  if (info == psb_success_) call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')

@@ -212,7 +212,7 @@ contains
 
   function psb_s_diag_sizeof(prec) result(val)
     class(psb_s_diag_prec_type), intent(in) :: prec
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = psb_sizeof_sp * prec%get_nzeros()
     return
@@ -220,7 +220,7 @@ contains
 
   function psb_s_diag_get_nzeros(prec) result(val)
     class(psb_s_diag_prec_type), intent(in) :: prec
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
 
     val = 0
     if (allocated(prec%dv)) val = val + prec%dv%get_nrows()

@@ -58,7 +58,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   !....locals....
   integer(psb_ipk_) :: i,j,np,me, n_col, kh, nh
   integer(psb_ipk_) :: dectype
-  integer(psb_ipk_) :: ictxt,n_row, int_err(5), err_act
+  integer(psb_ipk_) :: ictxt,n_row, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
 
@@ -84,16 +84,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
 
   if (.not.psb_is_asb_desc(desc_a)) then 
     info = psb_err_invalid_cd_state_
-    int_err(1) = dectype
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/dectype/))
     goto 9999
   endif
 
   if (iperm(1) /= 0) then 
     if (.not.psb_isaperm(n_row,iperm)) then
       info = 610
-      int_err(1) = iperm(1)
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,i_err=(/iperm(1)/))
       goto 9999
     endif
   endif

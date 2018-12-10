@@ -12,7 +12,7 @@ extern "C" {
   psb_i_t       psb_c_zovrl(psb_c_zvector *xh, psb_c_descriptor *cdh);
   psb_i_t       psb_c_zovrl_opt(psb_c_zvector *xh, psb_c_descriptor *cdh,
 				psb_i_t update, psb_i_t mode);
-  psb_i_t       psb_c_zvscatter(psb_i_t ng, psb_z_t *gx, psb_c_zvector *xh, psb_c_descriptor *cdh);
+  psb_i_t       psb_c_zvscatter(psb_l_t ng, psb_z_t *gx, psb_c_zvector *xh, psb_c_descriptor *cdh);
 
   psb_z_t*      psb_c_zvgather(psb_c_zvector *xh, psb_c_descriptor *cdh);
   psb_c_zspmat* psb_c_zspgather(psb_c_zspmat *ah, psb_c_descriptor *cdh);

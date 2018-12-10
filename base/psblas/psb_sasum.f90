@@ -58,14 +58,17 @@ function psb_sasum (x,desc_a, info, jx,global) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, iix, jjx, ix, ijx, m, i, idx, ndm, ldx
+       & err_act, iix, jjx, i, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasum'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
 
   ictxt=desc_a%get_context()
@@ -93,7 +96,7 @@ function psb_sasum (x,desc_a, info, jx,global) result(res)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -145,12 +148,15 @@ function psb_sasum_vect(x, desc_a, info,global) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, imax, i, idx, ndm  
+       & err_act, iix, jjx, imax, i, idx, ndm
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasumv'
-  if (psb_errstatus_fatal()) return 
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -180,7 +186,7 @@ function psb_sasum_vect(x, desc_a, info,global) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-  call psb_chkvect(m,ione,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -279,14 +285,17 @@ function psb_sasumv(x,desc_a, info,global) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, i, idx, ndm, ldx
+       & err_act, iix, jjx, i, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasumv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -309,7 +318,7 @@ function psb_sasumv(x,desc_a, info,global) result(res)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -407,14 +416,17 @@ subroutine psb_sasumvs(res,x,desc_a, info,global)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, jx, m, i, idx, ndm, ldx
+       & err_act, iix, jjx, i, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasumvs'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -437,7 +449,7 @@ subroutine psb_sasumvs(res,x,desc_a, info,global)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

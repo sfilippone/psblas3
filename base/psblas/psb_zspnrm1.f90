@@ -53,7 +53,8 @@ function psb_zspnrm1(a,desc_a,info,global)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, nr,nc,&
-       & err_act, n, iia, jja, ia, ja, mdim, ndim, m
+       & err_act, iia, jja, mdim, ndim
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   logical :: global_
   character(len=20)      :: name, ch_err
   real(psb_dpk_), allocatable :: v(:)

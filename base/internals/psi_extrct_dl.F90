@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
+subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
      & length_dl,np,dl_lda,mode,info)
 
   !    internal routine
@@ -118,7 +118,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   !            desc_str list.
   !   length_dl  integer array(0:np)
   !             length_dl(i) is the length of dep_list(*,i) list
-  use psi_mod, psb_protect_name => psi_extract_dep_list
+  use psi_mod, psb_protect_name => psi_i_extract_dep_list
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -136,7 +136,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: np,dl_lda,mode, info
 
   !     ....array parameters....
-  integer(psb_ipk_) ::  desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
+  integer(psb_ipk_) :: desc_str(*)
+  integer(psb_ipk_) :: dep_list(dl_lda,0:np),length_dl(0:np)
   integer(psb_ipk_), allocatable :: itmp(:)
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)
@@ -145,7 +146,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpik_) :: iictxt, icomm, me, npr, dl_mpi, minfo
+  integer(psb_mpk_) :: iictxt, icomm, me, npr, dl_mpi, minfo
   character  name*20
   name='psi_extrct_dl'
 
@@ -272,8 +273,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
   dl_mpi = dl_lda
-  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_integer,&
-       & dep_list,dl_mpi,psb_mpi_ipk_integer,icomm,minfo)
+  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_,&
+       & dep_list,dl_mpi,psb_mpi_ipk_,icomm,minfo)
   info = minfo
   if (info == 0) deallocate(itmp,stat=info)
   if (info /= psb_success_) then 
@@ -292,4 +293,4 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 
   return
 
-end subroutine psi_extract_dep_list
+end subroutine psi_i_extract_dep_list

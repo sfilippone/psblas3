@@ -60,16 +60,16 @@ subroutine psi_renum_index(iperm,idx,info)
 
 end subroutine psi_renum_index
 
-subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
+subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
-  use psi_mod, psi_protect_name =>  psi_cnv_dsc
+  use psi_mod, psi_protect_name =>  psi_i_cnv_dsc
   use psb_realloc_mod
   implicit none
 
   !     ....scalars parameters....
-  integer(psb_ipk_), intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
+  integer(psb_ipk_), intent(in)      :: halo_in(:), ovrlap_in(:),ext_in(:)
   type(psb_desc_type), intent(inout) :: cdesc
-  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(out)     :: info
   class(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !     ....local scalars....      
@@ -185,11 +185,11 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
   return
 
-end subroutine psi_cnv_dsc
+end subroutine psi_i_cnv_dsc
 
 
-subroutine psi_inner_cnvs(x,hashmask,hashv,glb_lc)
-  use psi_mod, psi_protect_name => psi_inner_cnvs
+subroutine psi_i_inner_cnvs(x,hashmask,hashv,glb_lc)
+  use psi_mod, psi_protect_name => psi_i_inner_cnvs
 
   integer(psb_ipk_), intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
   integer(psb_ipk_), intent(inout) :: x
@@ -231,10 +231,10 @@ subroutine psi_inner_cnvs(x,hashmask,hashv,glb_lc)
   else         
     x = tmp 
   end if
-end subroutine psi_inner_cnvs
+end subroutine psi_i_inner_cnvs
 
-subroutine psi_inner_cnvs2(x,y,hashmask,hashv,glb_lc)
-  use psi_mod, psi_protect_name =>  psi_inner_cnvs2
+subroutine psi_i_inner_cnvs2(x,y,hashmask,hashv,glb_lc)
+  use psi_mod, psi_protect_name =>  psi_i_inner_cnvs2
   integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
   integer(psb_ipk_), intent(in)  :: x
   integer(psb_ipk_), intent(out) :: y
@@ -276,11 +276,11 @@ subroutine psi_inner_cnvs2(x,y,hashmask,hashv,glb_lc)
   else         
     y = tmp 
   end if
-end subroutine psi_inner_cnvs2
+end subroutine psi_i_inner_cnvs2
 
 
-subroutine psi_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask)
-  use psi_mod, psi_protect_name =>  psi_inner_cnv1
+subroutine psi_i_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask)
+  use psi_mod, psi_protect_name =>  psi_i_inner_cnv1
   integer(psb_ipk_), intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
   logical, intent(in), optional    :: mask(:)
   integer(psb_ipk_), intent(inout) :: x(:)
@@ -358,10 +358,10 @@ subroutine psi_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask)
       end if
     end do
   end if
-end subroutine psi_inner_cnv1
+end subroutine psi_i_inner_cnv1
 
-subroutine psi_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask)
-  use psi_mod, psi_protect_name =>  psi_inner_cnv2
+subroutine psi_i_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask)
+  use psi_mod, psi_protect_name =>  psi_i_inner_cnv2
   integer(psb_ipk_), intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
   logical, intent(in),optional  :: mask(:)
   integer(psb_ipk_), intent(in)  :: x(:)
@@ -446,10 +446,10 @@ subroutine psi_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask)
       end if
     end do
   end if
-end subroutine psi_inner_cnv2
+end subroutine psi_i_inner_cnv2
 
-subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
-  use psi_mod, psi_protect_name =>  psi_bld_ovr_mst
+subroutine psi_i_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
+  use psi_mod, psi_protect_name =>  psi_i_bld_ovr_mst
 
   use psb_realloc_mod
   implicit none
@@ -493,5 +493,5 @@ subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
 
   return
 
-end subroutine psi_bld_ovr_mst
+end subroutine psi_i_bld_ovr_mst
 

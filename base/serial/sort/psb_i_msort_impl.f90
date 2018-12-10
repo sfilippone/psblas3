@@ -40,8 +40,8 @@
   !  Data Structures and Algorithms
   !  Addison-Wesley
   !
-  logical function psb_isaperm(n,eip)               
-    use psb_i_sort_mod, psb_protect_name => psb_isaperm
+  logical function psb_iisaperm(n,eip)               
+    use psb_sort_mod, psb_protect_name => psb_iisaperm
     implicit none
 
     integer(psb_ipk_), intent(in) :: n                              
@@ -50,7 +50,7 @@
     integer(psb_ipk_) :: i,j,m, info
 
 
-    psb_isaperm = .true.
+    psb_iisaperm = .true.
     if (n <= 0) return
     allocate(ip(n), stat=info) 
     if (info /= psb_success_) return
@@ -61,7 +61,7 @@
       ip(i) = eip(i)
       if ((ip(i) < 1).or.(ip(i) > n)) then
         write(psb_err_unit,*) 'Out of bounds in isaperm' ,ip(i), n
-        psb_isaperm = .false.
+        psb_iisaperm = .false.
         return
       endif
     enddo
@@ -85,7 +85,7 @@
         enddo
         ip(m) = abs(ip(m))
         if (j /= m) then 
-          psb_isaperm = .false.
+          psb_iisaperm = .false.
           goto 9999
         endif
       end if
@@ -93,11 +93,11 @@
 9999 continue 
 
     return                                                                    
-  end function psb_isaperm
+  end function psb_iisaperm
 
 
   subroutine psb_imsort_u(x,nout,dir)
-    use psb_i_sort_mod, psb_protect_name => psb_imsort_u
+    use psb_sort_mod, psb_protect_name => psb_imsort_u
     use psb_error_mod
     implicit none 
     integer(psb_ipk_), intent(inout)           :: x(:) 
@@ -133,7 +133,7 @@
 
 
   function  psb_ibsrch(key,n,v) result(ipos)
-    use psb_i_sort_mod, psb_protect_name => psb_ibsrch
+    use psb_sort_mod, psb_protect_name => psb_ibsrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     integer(psb_ipk_) :: key
@@ -170,7 +170,7 @@
   end function psb_ibsrch
 
   function psb_issrch(key,n,v) result(ipos)
-    use psb_i_sort_mod, psb_protect_name => psb_issrch
+    use psb_sort_mod, psb_protect_name => psb_issrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     integer(psb_ipk_) :: key
@@ -190,7 +190,7 @@
   end function psb_issrch
 
   subroutine psb_imsort(x,ix,dir,flag)
-    use psb_i_sort_mod, psb_protect_name => psb_imsort
+    use psb_sort_mod, psb_protect_name => psb_imsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 

@@ -74,11 +74,11 @@ x \leftarrow Q x
 where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></STRONG></DT>
 <DD>is the global dense submatrix <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>
 </DD>
@@ -91,7 +91,7 @@ operators <SPAN CLASS="MATH"><IMG
  WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img65.png"
  ALT="$P_a$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img66.png"
  ALT="$P^{T}$"></SPAN>. 
 </DD>
@@ -107,7 +107,7 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -134,7 +134,7 @@ Data types</CAPTION>
 <P>
 <BR>
 <IMG
- WIDTH="576" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="577" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
  SRC="img67.png"
  ALT="\begin{lstlisting}
 call psb_ovrl(x, desc_a, info)
@@ -152,7 +152,7 @@ call psb_ovrl(x, desc_a, info, update=update_type, work=work)
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense matrix <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
@@ -185,13 +185,13 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>update = psb_add_</STRONG></DT>
 <DD>Sum overlap entries, i.e. apply <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img68.png"
  ALT="$P^T$"></SPAN>;
 </DD>
 <DT><STRONG>update = psb_avg_</STRONG></DT>
 <DD>Average overlap entries, i.e. apply <SPAN CLASS="MATH"><IMG
- WIDTH="45" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="44" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
  SRC="img69.png"
  ALT="$P_aP^T$"></SPAN>;
 </DD>
@@ -222,7 +222,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a one dimensional array of the same type of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 
@@ -233,7 +233,7 @@ Specified as: a one dimensional array of the same type of <SPAN CLASS="MATH"><IM
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense result matrix <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
@@ -268,11 +268,11 @@ An integer value; 0 means no error has been detected.
   the descriptor, no operations are performed;
 </LI>
 <LI>The operator <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img66.png"
  ALT="$P^{T}$"></SPAN> performs the reduction sum of overlap
 elements; it is a &ldquo;prolongation&rdquo; operator <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img68.png"
  ALT="$P^T$"></SPAN> that
 replicates overlap elements, accounting for the physical replication
@@ -297,12 +297,12 @@ Sample discretization mesh.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
- WIDTH="533" HEIGHT="453" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="534" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
  SRC="img72.png"
  ALT="\includegraphics[scale=0.65]{figures/try8x8_ov.eps}">
 
 <IMG
- WIDTH="533" HEIGHT="453" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="533" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
  SRC="img71.png"
  ALT="\includegraphics[scale=0.65]{figures/try8x8_ov}">
 
@@ -319,7 +319,7 @@ distribution is such that each process will own 40 entries in the
 index space, with an overlap of 16  entries placed at local indices 25 
 through 40; the halo will run from local index 41 through local index 48.. If process 0 assigns an initial value of 1 to its entries
 in the <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> vector, and process 1 assigns a value of 2, then after a
 call to <code>psb_ovrl</code> with <code>psb_avg_</code> and a call to

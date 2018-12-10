@@ -93,10 +93,10 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
-       & ix, iy, ik, ijx, ijy, i, lld,&
-       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
+       & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
+       & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
   character                :: lscale
   integer(psb_ipk_), parameter  :: nb=4
   complex(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
@@ -105,9 +105,11 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_zspsm'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -137,10 +139,10 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(k)) then
-    ik = min(k,size(x,2)-ijx+1)
-    ik = min(ik,size(y,2)-ijy+1)
+    lik = min(k,size(x,2)-ijx+1)
+    lik = min(lik,size(y,2)-ijy+1)
   else
-    ik = min(size(x,2)-ijx+1,size(y,2)-ijy+1)
+    lik = min(size(x,2)-ijx+1,size(y,2)-ijy+1)
   endif
 
   if (present(choice)) then     
@@ -220,9 +222,9 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,lik,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lik,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -245,6 +247,8 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
+  ik = lik ! This should not be a problem.
+  ! We expect ik to be small, well within IPK
   ! Perform local triangular system solve
   xp => x(iix:lldx,jjx:jjx+ik-1)
   yp => y(iiy:lldy,jjy:jjy+ik-1)
@@ -259,7 +263,6 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ! update overlap elements
   if (choice_ > 0) then
-
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),ik,&
          & zone,yp,desc_a,iwork,info,data=psb_comm_ovr_)
 
@@ -366,9 +369,9 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
-       & ix, iy, ik, jx, jy, i, lld,&
-       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
+       & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
+       & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
 
   character                :: lscale
   integer(psb_ipk_), parameter       :: nb=4
@@ -378,9 +381,11 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_zspsv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -396,9 +401,10 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   ja = 1
   ix = 1
   iy = 1
+  lik = 1
   ik = 1
-  jx= 1
-  jy= 1
+  jx = 1
+  jy = 1
 
   if (present(choice)) then     
     choice_ = choice
@@ -478,9 +484,9 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,lik,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lik,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -571,9 +577,11 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_sspsv'
-  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

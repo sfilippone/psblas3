@@ -31,7 +31,7 @@
 !    
 !
 !
-! File: psi_crea_index.f90
+! File: psi_i_crea_index.f90
 !
 ! Subroutine: psb_crea_index
 !    Converts a list of data exchanges from build format to assembled format. 
@@ -49,12 +49,12 @@
 ! nrcv         - integer               Total receive buffer size    on the calling process
 !
 !  
-subroutine psi_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
+subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   use psb_realloc_mod
   use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
-  use psi_mod, psb_protect_name => psi_crea_index
+  use psi_mod, psb_protect_name => psi_i_crea_index
   implicit none
 
   type(psb_desc_type), intent(in)     :: desc_a
@@ -150,4 +150,4 @@ subroutine psi_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 9999 call psb_error_handler(ictxt,err_act)
 
   return
-end subroutine psi_crea_index
+end subroutine psi_i_crea_index

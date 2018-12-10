@@ -53,15 +53,12 @@ Subroutine psb_ssprn(a, desc_a,info,clear)
   logical, intent(in), optional        :: clear
 
   !locals
-  integer(psb_ipk_) :: ictxt,np,me,err,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: int_err(5)
   character(len=20)   :: name
   logical             :: clear_
 
   info = psb_success_
-  err  = 0
-  int_err(1)=0
   name = 'psb_ssprn'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()

@@ -30,28 +30,13 @@
 !   
 !    
 Module psb_z_tools_mod
-  use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_
-  use psb_z_vect_mod, only : psb_z_base_vect_type, psb_z_vect_type, psb_i_vect_type
-  use psb_z_mat_mod, only : psb_zspmat_type, psb_z_base_sparse_mat
+  use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
+  use psb_z_vect_mod, only : psb_z_base_vect_type, psb_z_vect_type
+  use psb_z_mat_mod, only : psb_zspmat_type, psb_lzspmat_type, psb_z_base_sparse_mat
+  use psb_l_vect_mod, only : psb_l_vect_type
   use psb_z_multivect_mod, only : psb_z_base_multivect_type, psb_z_multivect_type
 
   interface  psb_geall
-    subroutine psb_zalloc(x, desc_a, info, n, lb)
-      import
-      implicit none
-      complex(psb_dpk_), allocatable, intent(out)    :: x(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), optional, intent(in)   :: n, lb
-    end subroutine psb_zalloc
-    subroutine psb_zallocv(x, desc_a,info,n)
-      import
-      implicit none
-      complex(psb_dpk_), allocatable, intent(out)    :: x(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), optional, intent(in)   :: n
-    end subroutine psb_zallocv
     subroutine psb_zalloc_vect(x, desc_a,info,n)
       import
       implicit none
@@ -80,22 +65,6 @@ Module psb_z_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_zasb(x, desc_a, info, scratch)
-      import
-      implicit none
-      type(psb_desc_type), intent(in) ::  desc_a
-      complex(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
-      integer(psb_ipk_), intent(out)            ::  info
-      logical, intent(in), optional        :: scratch
-    end subroutine psb_zasb
-    subroutine psb_zasbv(x, desc_a, info, scratch)
-      import
-      implicit none
-      type(psb_desc_type), intent(in) ::  desc_a
-      complex(psb_dpk_), allocatable, intent(inout)   ::  x(:)
-      integer(psb_ipk_), intent(out)        ::  info
-      logical, intent(in), optional        :: scratch
-    end subroutine psb_zasbv
     subroutine psb_zasb_vect(x, desc_a, info,mold, scratch)
       import
       implicit none
@@ -127,20 +96,6 @@ Module psb_z_tools_mod
   end interface
 
   interface psb_gefree
-    subroutine psb_zfree(x, desc_a, info)
-      import
-      implicit none
-      complex(psb_dpk_),allocatable, intent(inout)        :: x(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psb_zfree
-    subroutine psb_zfreev(x, desc_a, info)
-      import
-      implicit none
-      complex(psb_dpk_),allocatable, intent(inout)        :: x(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psb_zfreev
     subroutine psb_zfree_vect(x, desc_a, info)
       import
       implicit none
@@ -166,37 +121,13 @@ Module psb_z_tools_mod
 
 
   interface psb_geins
-    subroutine psb_zinsi(m,irw,val, x, desc_a,info,dupl,local)
-      import
-      implicit none
-      integer(psb_ipk_), intent(in)              ::  m
-      type(psb_desc_type), intent(in)  ::  desc_a
-      complex(psb_dpk_),intent(inout)      ::  x(:,:)
-      integer(psb_ipk_), intent(in)              ::  irw(:)
-      complex(psb_dpk_), intent(in)  ::  val(:,:)
-      integer(psb_ipk_), intent(out)             ::  info
-      integer(psb_ipk_), optional, intent(in)    ::  dupl
-      logical, intent(in), optional        :: local
-    end subroutine psb_zinsi
-    subroutine psb_zinsvi(m, irw,val, x,desc_a,info,dupl,local)
-      import
-      implicit none
-      integer(psb_ipk_), intent(in)              ::  m
-      type(psb_desc_type), intent(in)  ::  desc_a
-      complex(psb_dpk_),intent(inout)      ::  x(:)
-      integer(psb_ipk_), intent(in)              ::  irw(:)
-      complex(psb_dpk_), intent(in)  ::  val(:)
-      integer(psb_ipk_), intent(out)             ::  info
-      integer(psb_ipk_), optional, intent(in)    ::  dupl
-      logical, intent(in), optional        :: local
-    end subroutine psb_zinsvi
     subroutine psb_zins_vect(m,irw,val,x,desc_a,info,dupl,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_z_vect_type), intent(inout) :: x
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       complex(psb_dpk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -208,7 +139,7 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_z_vect_type), intent(inout) :: x
-      type(psb_i_vect_type), intent(inout)       :: irw
+      type(psb_l_vect_type), intent(inout)       :: irw
       type(psb_z_vect_type), intent(inout)    :: val
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -220,7 +151,7 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_z_vect_type), intent(inout) :: x(:)
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       complex(psb_dpk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -232,7 +163,7 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_z_multivect_type), intent(inout) :: x
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       complex(psb_dpk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -266,6 +197,18 @@ Module psb_z_tools_mod
       character(len=5), optional             :: outfmt 
       integer(psb_ipk_), intent(in), optional          :: data
     end Subroutine psb_zsphalo
+    Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,outfmt,data)
+      import
+      implicit none
+      Type(psb_lzspmat_type),Intent(in)       :: a
+      Type(psb_lzspmat_type),Intent(inout)    :: blk
+      Type(psb_desc_type),Intent(in), target :: desc_a
+      integer(psb_ipk_), intent(out)                   :: info
+      logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional             :: outfmt 
+      integer(psb_ipk_), intent(in), optional          :: data
+    end Subroutine psb_lzsphalo
   end interface
 
 
@@ -310,9 +253,10 @@ Module psb_z_tools_mod
       implicit none
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_zspmat_type), intent(inout) :: a
-      integer(psb_ipk_), intent(in)                  :: nz,ia(:),ja(:)
+      integer(psb_ipk_), intent(in)          :: nz
+      integer(psb_lpk_), intent(in)          :: ia(:),ja(:)
       complex(psb_dpk_), intent(in)      :: val(:)
-      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), intent(out)        :: info
       logical, intent(in), optional        :: rebuild
       logical, intent(in), optional        :: local
     end subroutine psb_zspins
@@ -323,7 +267,7 @@ Module psb_z_tools_mod
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_zspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in)        :: nz
-      type(psb_i_vect_type), intent(inout) :: ia,ja
+      type(psb_l_vect_type), intent(inout) :: ia,ja
       type(psb_z_vect_type), intent(inout) :: val
       integer(psb_ipk_), intent(out)       :: info
       logical, intent(in), optional        :: rebuild
@@ -335,9 +279,10 @@ Module psb_z_tools_mod
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
       type(psb_zspmat_type), intent(inout) :: a
-      integer(psb_ipk_), intent(in)                  :: nz,ia(:),ja(:)
+      integer(psb_ipk_), intent(in)       :: nz
+      integer(psb_lpk_), intent(in)       :: ia(:),ja(:)
       complex(psb_dpk_), intent(in)        :: val(:)
-      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), intent(out)      :: info
     end subroutine psb_zspins_2desc
   end interface
 

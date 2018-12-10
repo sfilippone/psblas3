@@ -35,7 +35,7 @@
 !    Auxiliary module for descriptor: constant values. 
 !
 module psb_desc_const_mod
-  use psb_const_mod, only : psb_ipk_, psb_mpik_
+  use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
   !
   !     Communication, prolongation & restriction
   !
@@ -101,11 +101,11 @@ module psb_desc_const_mod
   !
   ! Constants for hashing into desc%hashv(:) and desc%glb_lc(:,:)
   !
-  integer(psb_ipk_), parameter :: psb_hash_bits=16
-  integer(psb_ipk_), parameter :: psb_max_hash_bits=22
-  integer(psb_ipk_), parameter :: psb_hash_size=2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
+  integer(psb_ipk_), parameter :: psb_hash_bits     = 16
+  integer(psb_ipk_), parameter :: psb_max_hash_bits = 22
+  integer(psb_ipk_), parameter :: psb_hash_size     = 2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
   integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024   
-  integer(psb_ipk_), parameter :: psb_hpnt_nentries_=7
+  integer(psb_ipk_), parameter :: psb_hpnt_nentries_ = 7
 
   !
   !     Constants for desc_a handling
@@ -121,8 +121,8 @@ module psb_desc_const_mod
 
   interface 
     subroutine psb_parts(glob_index,nrow,np,pv,nv)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent (in)  :: glob_index, nrow
+      import :: psb_ipk_, psb_lpk_
+      integer(psb_lpk_), intent (in)  :: glob_index,nrow
       integer(psb_ipk_), intent (in)  :: np
       integer(psb_ipk_), intent (out) :: nv, pv(*)
     end subroutine psb_parts

@@ -6,7 +6,7 @@
 psb_z_t* psb_c_zvgather(psb_c_zvector *xh, psb_c_descriptor *cdh)
 { 
   psb_z_t *temp=NULL;
-  psb_i_t vsize=0; 
+  psb_l_t vsize=0; 
   
   if ((vsize=psb_c_cd_get_global_rows(cdh))<0) 
     return(temp);

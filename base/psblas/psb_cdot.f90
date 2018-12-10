@@ -65,15 +65,18 @@ function psb_cdot_vect(x, y, desc_a,info,global) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
+       & err_act, iix, jjx, iiy, jjy, i, nr
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
   character(len=20)      :: name, ch_err
 
   name='psb_cdot_vect'
   res = czero
-  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
@@ -108,9 +111,9 @@ function psb_cdot_vect(x, y, desc_a,info,global) result(res)
   m = desc_a%get_global_rows()
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -167,16 +170,18 @@ function psb_cdot(x, y,desc_a, info, jx, jy,global)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   complex(psb_spk_)        :: cdotc
   logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_cdot'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
@@ -217,9 +222,9 @@ function psb_cdot(x, y,desc_a, info, jx, jy,global)  result(res)
   lldy = size(y,1)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,lldy,iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -235,7 +240,7 @@ function psb_cdot(x, y,desc_a, info, jx, jy,global)  result(res)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = cdotc(int(nr,kind=psb_mpik_), x(iix:,jjx),1,y(iiy:,jjy),1)
+    res = cdotc(int(nr,kind=psb_mpk_), x(iix:,jjx),1,y(iiy:,jjy),1)
     ! adjust dot_local because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx  = desc_a%ovrlap_elem(i,1)
@@ -315,16 +320,18 @@ function psb_cdotv(x, y,desc_a, info,global)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_) :: ix, jx, iy, jy, m
   logical :: global_
   complex(psb_spk_)         :: cdotc
   character(len=20)        :: name, ch_err
 
   name='psb_cdot'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -349,9 +356,9 @@ function psb_cdotv(x, y,desc_a, info,global)  result(res)
   lldx = size(x,1)
   lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_)&
-       & call psb_chkvect(m,ione,lldy,iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -367,7 +374,7 @@ function psb_cdotv(x, y,desc_a, info,global)  result(res)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = cdotc(int(nr,kind=psb_mpik_), x,1,y,1)
+    res = cdotc(int(nr,kind=psb_mpk_), x,1,y,1)
     ! adjust res because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx  = desc_a%ovrlap_elem(i,1)
@@ -448,16 +455,18 @@ subroutine psb_cdotvs(res, x, y,desc_a, info,global)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m,nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i,nr, lldx, lldy
+  integer(psb_lpk_) :: ix, jx, iy, jy, m
   logical :: global_
   complex(psb_spk_)        :: cdotc
   character(len=20)        :: name, ch_err
 
   name='psb_cdot'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -480,9 +489,9 @@ subroutine psb_cdotvs(res, x, y,desc_a, info,global)
   lldx = size(x,1)
   lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ix,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,lldy,iy,iy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,iy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -498,7 +507,7 @@ subroutine psb_cdotvs(res, x, y,desc_a, info,global)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = cdotc(int(nr,kind=psb_mpik_), x,1,y,1)
+    res = cdotc(int(nr,kind=psb_mpk_), x,1,y,1)
     ! adjust res because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx  = desc_a%ovrlap_elem(i,1)
@@ -579,16 +588,18 @@ subroutine psb_cmdots(res, x, y, desc_a, info,global)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k, nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
   complex(psb_spk_)        :: cdotc
   character(len=20)        :: name, ch_err
 
   name='psb_cmdots'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -612,14 +623,14 @@ subroutine psb_cmdots(res, x, y, desc_a, info,global)
   lldy = size(y,1)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ix,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,lldy,iy,iy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,lone,lldy,iy,iy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -638,7 +649,7 @@ subroutine psb_cmdots(res, x, y, desc_a, info,global)
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
     do j=1,k
-      res(j) = cdotc(int(nr,kind=psb_mpik_),x(1:,j),1,y(1:,j),1)
+      res(j) = cdotc(int(nr,kind=psb_mpk_),x(1:,j),1,y(1:,j),1)
       ! adjust res because overlapped elements are computed more than once
     end do
     do i=1,size(desc_a%ovrlap_elem,1)

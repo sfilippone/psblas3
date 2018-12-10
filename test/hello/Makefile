@@ -1,6 +1,6 @@
-INSTALLDIR=../..
-INCDIR=$(INSTALLDIR)/include
-MODDIR=$(INSTALLDIR)/modules/
+BASEDIR=../..
+INCDIR=$(BASEDIR)/include
+MODDIR=$(BASEDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used

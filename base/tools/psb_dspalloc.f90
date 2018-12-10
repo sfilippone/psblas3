@@ -52,16 +52,17 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   integer(psb_ipk_), optional, intent(in)      :: nnz
 
   !locals
-  integer(psb_ipk_) :: ictxt, dectype
-  integer(psb_ipk_) :: np,me,loc_row,loc_col,&
-       &  length_ia1,length_ia2, err_act,m,n
-  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: ictxt, np, me, err_act
+  integer(psb_ipk_) :: loc_row,loc_col, nnz_, dectype
+  integer(psb_lpk_) :: m, n
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   name = 'psb_dspall'
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -87,26 +88,23 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   if (present(nnz))then 
     if (nnz < 0) then
       info=45
-      int_err(1)=7
-      int_err(2)=nnz
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,i_err=(/7_psb_ipk_,nnz/))
       goto 9999
     endif
-    length_ia1=nnz
-    length_ia2=nnz
+    nnz_ = nnz
   else 
-    length_ia1=max(1,5*loc_row)
+    nnz_ = max(1,5*loc_row)
   endif
 
   if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
+       & write(debug_unit,*) me,' ',trim(name), &
+       & ':allocating size:',loc_row,loc_col,nnz_
   call a%free()
   !....allocate aspk, ia1, ia2.....
-  call a%csall(loc_row,loc_col,info,nz=length_ia1)
+  call a%csall(loc_row,loc_col,info,nz=nnz_)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='sp_all'
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,a_err='sp_all')
     goto 9999
   end if
 

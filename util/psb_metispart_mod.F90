@@ -54,8 +54,9 @@
 !      uses information prepared by the previous two subroutines.
 !
 module psb_metispart_mod
-  use psb_base_mod, only : psb_ipk_, psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, psb_mpik_,&
+  use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
+       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, &
+       & psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
        & psb_s_csr_sparse_mat, psb_d_csr_sparse_mat, &
        & psb_c_csr_sparse_mat, psb_z_csr_sparse_mat
   public part_graph, build_mtpart, distr_mtpart,&
@@ -76,7 +77,7 @@ contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
     implicit none 
-    integer(psb_ipk_), intent(in)  :: global_indx, n
+    integer(psb_lpk_), intent(in)  :: global_indx, n
     integer(psb_ipk_), intent(in)  :: np
     integer(psb_ipk_), intent(out) :: nv
     integer(psb_ipk_), intent(out) :: pv(*)
@@ -101,8 +102,9 @@ contains
     use psb_base_mod
     implicit none 
     integer(psb_ipk_) :: root, ictxt
-    integer(psb_ipk_) :: n, me, np, info
-    
+    integer(psb_ipk_) :: me, np, info
+    integer(psb_lpk_) :: n
+
     call psb_info(ictxt,me,np)
 
     if (.not.((root>=0).and.(root<np))) then 
@@ -325,7 +327,7 @@ contains
     integer(psb_ipk_), allocatable :: irpl(:),jal(:),gvl(:)
     real(psb_spk_),allocatable  :: wgh_(:)
 
-#if defined(HAVE_METIS)
+#if defined(HAVE_METIS) && defined(IPK4)
     interface 
       ! subroutine METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
       !     & wgflag,numflag,nparts,weights,iopt,nedc,part) bind(c)

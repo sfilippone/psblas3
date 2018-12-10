@@ -412,7 +412,7 @@ program pdgenspmv
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, annz, nbytes
+  integer(psb_epk_) :: amatsize, precsize, descsize, d2size, annz, nbytes
   real(psb_dpk_)   :: err, eps
   integer(psb_ipk_), parameter :: times=10
 
@@ -523,8 +523,8 @@ program pdgenspmv
     !
     ! This computation is valid for CSR
     !
-    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_int)+&
-         & annz*(psb_sizeof_dp + psb_sizeof_int)
+    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_ip)+&
+         & annz*(psb_sizeof_dp + psb_sizeof_ip)
     bdwdth = times*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth

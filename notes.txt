@@ -1,0 +1,32 @@
+1. Perhaps we should switch completely to external indices being of
+   kind LPK and internal indices being of type IPK, and the two morph
+   independently in int32/int64 (although admittedly LPK=32 and IPK=64
+   does not  make much sense)
+   
+2. Change sizeof_ constant names accordingly to sizeof_ipk and
+   sizeof_lpk.
+
+3. Should we define a psb_l_vect_type? But then, if I==L how can we
+   distinguish? Answer: if I==L the two vect type are still considered
+   different, even when internally they are the same. 
+
+4. So, let's rewrite under these rules:
+   psb_mpk_: Always 32 bits, used for MPI related stuff.
+   psb_ipk_: Can be 32 or 64 bits, always used for "local" indices and
+   	     sizes
+   psb_lpk_: Can be 32 or 64 bits, always used for "global" indices
+   	     and sizes, must be psb_lpk_ >= psb_ipk_
+   psb_epk_: always 64 bits, used for SIZEOF & friends.    
+
+5. Let's define the SND/RCV/SUM/MAX & friends in terms of M and E, the
+   compiler will remap I and L onto them automatically
+
+6. Similar for sort; except for the inner routines of heap, where we
+   provide heap types I_IDX_HEAP, they have to be written
+   independently beccause the encapsulated types are always
+   different.
+
+7. For communication stuff: let us define psb_i_base_vect and
+   psb_l_base_vect; the communication routines will work in terms of
+   them, then remap onto the array routines, which are going to be
+   written in terms of E and M. 

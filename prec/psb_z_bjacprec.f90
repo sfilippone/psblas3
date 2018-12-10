@@ -188,7 +188,7 @@ contains
 
   function psb_z_bjac_sizeof(prec) result(val)
     class(psb_z_bjac_prec_type), intent(in) :: prec
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = 0
     if (allocated(prec%dv)) then 
@@ -204,7 +204,7 @@ contains
   function psb_z_bjac_get_nzeros(prec) result(val)
 
     class(psb_z_bjac_prec_type), intent(in) :: prec
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = 0
     if (allocated(prec%dv)) then 

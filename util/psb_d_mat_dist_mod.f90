@@ -31,7 +31,8 @@
 !    
 module psb_d_mat_dist_mod
   use psb_base_mod, only :  psb_ipk_, psb_dpk_, psb_desc_type, psb_parts, &
-       & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_vect_type
+       & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_vect_type, &
+       & psb_ldspmat_type
 
   interface psb_matdist
     subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
@@ -91,6 +92,64 @@ module psb_d_mat_dist_mod
       procedure(psb_parts), optional  :: parts
       integer(psb_ipk_), optional     :: v(:)
     end subroutine psb_dmatdist
+    subroutine psb_ldmatdist(a_glob, a, ictxt, desc_a,&
+         & info, parts, v, inroot,fmt,mold)
+      !
+      ! an utility subroutine to distribute a matrix among processors
+      ! according to a user defined data distribution, using
+      ! sparse matrix subroutines.
+      !
+      !  type(psb_ldspmat)                       :: a_glob
+      !     on entry: this contains the global sparse matrix as follows:
+      !
+      !  type(psb_dspmat_type)                            :: a
+      !     on exit : this will contain the local sparse matrix.
+      !
+      !       interface parts
+      !         !   .....user passed subroutine.....
+      !         subroutine parts(global_indx,n,np,pv,nv)
+      !           implicit none
+      !           integer(psb_ipk_), intent(in)  :: global_indx, n, np
+      !           integer(psb_ipk_), intent(out) :: nv
+      !           integer(psb_ipk_), intent(out) :: pv(*)
+      !
+      !       end subroutine parts
+      !       end interface
+      !     on entry:  subroutine providing user defined data distribution.
+      !        for each global_indx the subroutine should return
+      !        the list  pv of all processes owning the row with
+      !        that index; the list will contain nv entries.
+      !        usually nv=1; if nv >1 then we have an overlap in the data
+      !        distribution.
+      !
+      !  integer(psb_ipk_) :: ictxt
+      !     on entry: the PSBLAS parallel environment context.
+      !
+      !  type (desc_type)                  :: desc_a
+      !     on exit : the updated array descriptor
+      !
+      !
+      !  integer(psb_ipk_), optional    :: inroot
+      !     on entry: specifies processor holding a_glob. default: 0
+      !     on exit : unchanged.
+      !
+      import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_desc_type,&
+           & psb_d_base_sparse_mat, psb_d_vect_type, psb_parts, &
+           & psb_ldspmat_type
+      implicit none
+
+      ! parameters
+      type(psb_ldspmat_type)      :: a_glob
+      integer(psb_ipk_) :: ictxt
+      type(psb_dspmat_type)      :: a
+      type(psb_desc_type)        :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      integer(psb_ipk_), optional       :: inroot
+      character(len=*), optional :: fmt
+      class(psb_d_base_sparse_mat), optional :: mold
+      procedure(psb_parts), optional  :: parts
+      integer(psb_ipk_), optional     :: v(:)
+    end subroutine psb_ldmatdist
   end interface
 
 end module psb_d_mat_dist_mod

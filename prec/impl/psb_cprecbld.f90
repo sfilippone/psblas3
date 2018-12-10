@@ -46,19 +46,18 @@ subroutine psb_cprecbld(a,desc_a,p,info,amold,vmold,imold)
   ! Local scalars
   integer(psb_ipk_) :: ictxt, me,np
   integer(psb_ipk_) :: err, n_row, n_col,mglob, err_act
-  integer(psb_ipk_) :: int_err(5)
-
   integer(psb_ipk_),parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   err=0
-  call psb_erractionsave(err_act)
   name = 'psb_precbld'
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   info = psb_success_
-  int_err(1) = 0
   ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)

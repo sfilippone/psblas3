@@ -130,8 +130,9 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type)              :: w, w1, xt
   real(psb_spk_) :: tmp 
   complex(psb_spk_) :: scal, gm, rti, rti1
-  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
-       & n_row, n_col, nl, int_err(5)
+  integer(psb_ipk_) ::litmax, naux, it, k, itrace_,&
+       & n_row, n_col, nl
+  integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_, err_act
@@ -179,9 +180,8 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     info=psb_err_invalid_istop_
-    int_err(1)=istop_
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
   endif
 
@@ -210,19 +210,18 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   endif
   if (nl <=0 ) then 
     info=psb_err_invalid_istop_
-    int_err(1)=nl
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/nl/))
     goto 9999
   endif
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
-  call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')

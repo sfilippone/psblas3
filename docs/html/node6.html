@@ -61,7 +61,7 @@ space to which there corresponds an index space and a matrix sparsity
 pattern. As an example, consider a cell-centered finite-volume
 discretization of  the Navier-Stokes equations on a simulation domain;
 the index space <SPAN CLASS="MATH"><IMG
- WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="45" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"></SPAN> is isomorphic to the set of cell centers,
 whereas the pattern of the associated linear system matrix is
@@ -72,7 +72,7 @@ by the discretization stencil.
 Thus the first order of business is to establish an index space, and
 this is done with a call to  <code>psb_cdall</code> in which we specify the
 size of the index space <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img16.png"
  ALT="$n$"></SPAN> and the allocation of the elements of the
 index space to the various processes making up the MPI (virtual)
@@ -81,22 +81,22 @@ parallel machine.
 <P>
 The index space is partitioned among processes, and this creates a
 mapping from the &ldquo;global&rdquo; numbering <SPAN CLASS="MATH"><IMG
- WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="45" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"></SPAN> to a numbering
 &ldquo;local&rdquo; to each process; each process <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN> will own a certain subset
 <!-- MATH
  $1\dots n_{\hbox{row}_i}$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="77" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="76" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img17.png"
  ALT="$1\dots n_{\hbox{row}_i}$"></SPAN>, each element of which corresponds to a certain
 element of <SPAN CLASS="MATH"><IMG
- WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="45" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"></SPAN>. The user does not set explicitly this mapping;
 when the application needs to indicate to which element of the index
@@ -106,7 +106,7 @@ library will translate into the appropriate &ldquo;local&rdquo; numbering.
 
 <P>
 For  a given index space <SPAN CLASS="MATH"><IMG
- WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="45" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"></SPAN> there are many possible associated
 topologies, i.e. many different discretization stencils; thus the
@@ -115,7 +115,7 @@ defined a sparsity pattern, either explicitly through <code>psb_cdins</code>
 or implicitly through <code>psb_spins</code>. The descriptor is finalized
 with a call to <code>psb_cdasb</code> and a sparse matrix with a call to
 <code>psb_spasb</code>. After <code>psb_cdasb</code> each process <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN> will have
 defined a set of &ldquo;halo&rdquo; (or &ldquo;ghost&rdquo;) indices
@@ -123,16 +123,16 @@ defined a set of &ldquo;halo&rdquo; (or &ldquo;ghost&rdquo;) indices
  $n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="130" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="131" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img18.png"
  ALT="$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$"></SPAN>, denoting elements of the index
 space that are <SPAN  CLASS="textit">not</SPAN> assigned to process <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN>; however the
 variables associated with them are needed to complete computations
 associated with the sparse matrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$"></SPAN>, and thus they have to be
 fetched from (neighbouring) processes. The descriptor of the index
@@ -173,8 +173,8 @@ follows:
 <LI>Call the iterative method of choice, e.g. <code>psb_bicgstab</code>
 </LI>
 </OL>
-This is the structure of the sample program
-<code>test/pargen/psb_d_pde3d.f90</code>. 
+This is the structure of the sample programs in the directory 
+<code>test/pargen/</code>. 
 
 <P>
 For a simulation in which the same discretization mesh is used over

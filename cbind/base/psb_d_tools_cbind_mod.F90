@@ -11,13 +11,13 @@ contains
  function psb_c_dgeall(xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -40,13 +40,13 @@ contains
   function psb_c_dgeasb(xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -70,13 +70,13 @@ contains
   function psb_c_dgefree(xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -102,16 +102,16 @@ contains
  function psb_c_dgeins(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
-    integer(psb_c_int), value :: nz
-    integer(psb_c_int)        :: irw(*)
+    integer(psb_c_ipk) :: res   
+    integer(psb_c_ipk), value :: nz
+    integer(psb_c_lpk)        :: irw(*)
     real(c_double)        :: val(*)
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp
-    integer               :: ixb, info
+    integer(psb_c_ipk)               :: ixb, info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -143,16 +143,16 @@ contains
  function psb_c_dgeins_add(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
-    integer(psb_c_int), value :: nz
-    integer(psb_c_int)        :: irw(*)
+    integer(psb_c_ipk) :: res   
+    integer(psb_c_ipk), value :: nz
+    integer(psb_c_lpk)       :: irw(*)
     real(c_double)        :: val(*)
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp
-    integer               :: ixb, info
+    integer(psb_c_ipk)               :: ixb, info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -183,13 +183,13 @@ contains
  function psb_c_dspall(mh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_dspmat_type), pointer :: ap
-    integer               :: info,n
+    integer(psb_c_ipk)               :: info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -213,13 +213,13 @@ contains
  function psb_c_dspasb(mh,cdh) bind(c) result(res)
    
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_dspmat_type), pointer :: ap
-    integer               :: info,n
+    integer(psb_c_ipk)               :: info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -242,13 +242,13 @@ contains
   function psb_c_dspfree(mh,cdh) bind(c) result(res)
    
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_dspmat_type), pointer :: ap
-    integer               :: info,n
+    integer(psb_c_ipk)               :: info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -277,10 +277,10 @@ contains
     use psb_d_rsb_mat_mod
 #endif
     implicit none 
-    integer(psb_c_int) :: res   
-    integer(psb_c_int), value :: cdh, mh,upd,dupl
+    integer(psb_c_ipk) :: res   
+    integer(psb_c_ipk), value :: cdh, mh,upd,dupl
     character(c_char)     :: afmt(*)
-    integer               :: info,n, fdupl
+    integer(psb_c_ipk)    :: info,n, fdupl
     character(len=5)      :: fafmt
 #ifdef HAVE_LIBRSB
     type(psb_d_rsb_sparse_mat) :: arsb
@@ -313,16 +313,16 @@ contains
  function psb_c_dspins(nz,irw,icl,val,mh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
-    integer(psb_c_int), value :: nz
-    integer(psb_c_int)        :: irw(*), icl(*) 
+    integer(psb_c_ipk) :: res   
+    integer(psb_c_ipk), value :: nz
+    integer(psb_c_lpk)      :: irw(*), icl(*) 
     real(c_double)        :: val(*)
     type(psb_c_dspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_dspmat_type), pointer :: ap
-    integer               :: ixb,info,n
+    integer(psb_c_ipk)               :: ixb,info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -350,14 +350,14 @@ contains
   function psb_c_dsprn(mh,cdh,clear) bind(c) result(res)
 
     implicit none 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     logical(c_bool), value :: clear
     type(psb_c_dspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_dspmat_type), pointer :: ap
-    integer                :: info
+    integer(psb_c_ipk)     :: info
     logical                :: fclear 
 
     res = -1
@@ -382,9 +382,9 @@ contains
 !!$  function psb_c_dspprint(mh) bind(c) result(res)
 !!$
 !!$    implicit none 
-!!$    integer(psb_c_int) :: res   
-!!$    integer(psb_c_int),  value :: mh
-!!$    integer                :: info
+!!$    integer(psb_c_ipk) :: res   
+!!$    integer(psb_c_ipk),  value :: mh
+!!$    integer(psb_c_ipk)         :: info
 !!$
 !!$
 !!$    res = -1

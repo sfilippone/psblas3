@@ -29,12 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
+subroutine psi_i_sort_dl(dep_list,l_dep_list,np,info)
   !
   !     interface between former sort_dep_list subroutine
   !     and new srtlist
   !
-  use psi_mod, psb_protect_name => psi_sort_dl
+  use psi_mod, psb_protect_name => psi_i_sort_dl
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -87,7 +87,7 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
 
   return
 
-end subroutine psi_sort_dl
+end subroutine psi_i_sort_dl
 
 
       

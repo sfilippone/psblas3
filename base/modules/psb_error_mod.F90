@@ -72,7 +72,7 @@ module psb_error_mod
       integer(psb_ipk_), intent(inout) ::  err_act
     end subroutine psb_ser_error_handler
     subroutine psb_par_error_handler(ictxt,err_act)
-      import :: psb_ipk_,psb_mpik_
+      import :: psb_ipk_,psb_mpk_
       integer(psb_ipk_), intent(in) ::  ictxt
       integer(psb_ipk_), intent(in) ::  err_act
     end subroutine psb_par_error_handler
@@ -82,8 +82,8 @@ module psb_error_mod
     subroutine psb_serror()
     end subroutine psb_serror
     subroutine psb_perror(ictxt,abrt)
-      import :: psb_mpik_
-      integer(psb_mpik_), intent(in) ::  ictxt
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in) ::  ictxt
       logical, intent(in), optional  :: abrt
     end subroutine psb_perror
   end interface
@@ -91,19 +91,26 @@ module psb_error_mod
 
   interface psb_error_print_stack
     subroutine psb_par_error_print_stack(ictxt)
-      import :: psb_ipk_,psb_mpik_
-      integer(psb_mpik_), intent(in) ::  ictxt
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in) ::  ictxt
     end subroutine psb_par_error_print_stack
     subroutine psb_ser_error_print_stack()
     end subroutine psb_ser_error_print_stack
   end interface
 
   interface psb_errcomm
-    subroutine psb_errcomm(ictxt, err)
-      import :: psb_mpik_, psb_ipk_
-      integer(psb_mpik_), intent(in)   :: ictxt
+#if defined(IPK8)
+    subroutine psb_errcomm_m(ictxt, err)
+      import :: psb_ipk_, psb_mpk_
+      integer(psb_mpk_), intent(in)   :: ictxt
       integer(psb_ipk_), intent(inout):: err
-    end subroutine psb_errcomm
+    end subroutine psb_errcomm_m
+#endif    
+    subroutine psb_errcomm_i(ictxt, err)
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in)   :: ictxt
+      integer(psb_ipk_), intent(inout):: err
+    end subroutine psb_errcomm_i
   end interface psb_errcomm
 
   interface psb_errpop
@@ -113,15 +120,6 @@ module psb_error_mod
   interface psb_errmsg
     module procedure psb_errmsg, psb_ach_errmsg
   end interface
-
-#if defined(LONG_INTEGERS)
-  interface psb_error
-    module procedure psb_perror_ipk
-  end interface psb_error
-  interface psb_errcomm
-    module procedure psb_errcomm_ipk
-  end interface psb_errcomm
-#endif
 
 
   private
@@ -133,7 +131,7 @@ module psb_error_mod
     !  the name of the routine generating the error
     character(len=20)        ::   routine=''       
     !  array of integer data to complete the error msg   
-    integer(psb_ipk_),dimension(5)     ::   i_err_data=0     
+    integer(psb_epk_),dimension(5)     ::   e_err_data=0     
     !     real(psb_dpk_)(dim=10) ::   r_err_data=0.d0   
     !  array of real data to complete the error msg
     !     complex(dim=10)          ::   c_err_data=0.c0    
@@ -186,22 +184,6 @@ contains
   end function psb_get_global_checks
     
   
-#if defined(LONG_INTEGERS)
-  subroutine psb_errcomm_ipk(ictxt, err)
-    integer(psb_ipk_), intent(in)   :: ictxt
-    integer(psb_ipk_), intent(inout):: err
-    integer(psb_mpik_) :: iictxt
-    iictxt = ictxt
-    call psb_errcomm(iictxt,err)
-  end subroutine psb_errcomm_ipk
-
-  subroutine psb_perror_ipk(ictxt)
-    integer(psb_ipk_), intent(in)   :: ictxt
-    integer(psb_mpik_) :: iictxt
-    iictxt = ictxt
-    call psb_perror(iictxt)
-  end subroutine psb_perror_ipk
-#endif
   ! saves action to support error traceback
   ! also changes error action to "return"
   subroutine psb_erractionsave(err_act)
@@ -352,22 +334,37 @@ contains
   end function psb_errstatus_ok
 
   ! pushes an error on the error stack
-  subroutine psb_stackpush(err_c, r_name, i_err, a_err)
-
+  subroutine psb_stackpush(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
     integer(psb_ipk_), intent(in)              ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
-    integer(psb_ipk_), optional                ::  i_err(5)
+    integer(psb_ipk_), optional      ::  i_err(:)
+    integer(psb_lpk_), optional      ::  l_err(:)
+    integer(psb_mpk_), optional      ::  m_err(:)
+    integer(psb_epk_), optional      ::  e_err(:)
 
     type(psb_errstack_node), pointer     ::  new_node
-
-
+    integer :: isz
+    
     allocate(new_node)
 
     new_node%err_code   = err_c
     new_node%routine    = r_name
-    if(present(i_err)) then
-      new_node%i_err_data = i_err
+    if (present(m_err)) then
+      isz = min(size(new_node%e_err_data),size(m_err))
+      new_node%e_err_data(1:isz) = m_err(1:isz)
+    end if
+    if (present(e_err)) then
+      isz = min(size(new_node%e_err_data),size(e_err))
+      new_node%e_err_data(1:isz) = e_err(1:isz)
+    end if
+    if (present(i_err)) then
+      isz = min(size(new_node%e_err_data),size(i_err))
+      new_node%e_err_data(1:isz) = i_err(1:isz)
+    end if
+    if (present(l_err)) then
+      isz = min(size(new_node%e_err_data),size(l_err))
+      new_node%e_err_data(1:isz) = l_err(1:isz)
     end if
     if(present(a_err)) then 
       new_node%a_err_data = a_err
@@ -380,34 +377,40 @@ contains
   end subroutine psb_stackpush
 
   ! pushes an error on the error stack
-  subroutine psb_errpush(err_c, r_name, i_err, a_err)
+  subroutine psb_errpush(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
 
     integer(psb_ipk_), intent(in)              ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
-    integer(psb_ipk_), optional                ::  i_err(5)
+    integer(psb_ipk_), optional      ::  i_err(:)
+    integer(psb_lpk_), optional      ::  l_err(:)
+    integer(psb_mpk_), optional      ::  m_err(:)
+    integer(psb_epk_), optional      ::  e_err(:)
 
     type(psb_errstack_node), pointer     ::  new_node
 
     call psb_set_errstatus(psb_err_fatal_)
-    call psb_stackpush(err_c, r_name, i_err, a_err)
+    call psb_stackpush(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
 
   end subroutine psb_errpush
 
   ! pushes a warning on the error stack
-  subroutine psb_warning_push(err_c, r_name, i_err, a_err)
+  subroutine psb_warning_push(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
 
-    integer(psb_ipk_), intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)    ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
-    integer(psb_ipk_), optional                ::  i_err(5)
+    integer(psb_ipk_), optional      ::  i_err(:)
+    integer(psb_lpk_), optional      ::  l_err(:)
+    integer(psb_mpk_), optional      ::  m_err(:)
+    integer(psb_epk_), optional      ::  e_err(:)
 
     type(psb_errstack_node), pointer     ::  new_node
 
 
     if (.not.psb_errstatus_fatal())&
          &  call psb_set_errstatus( psb_err_warning_)
-    call psb_stackpush(err_c, r_name, i_err, a_err)
+    call psb_stackpush(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
   end subroutine psb_warning_push
 
 
@@ -417,16 +420,16 @@ contains
     integer(psb_ipk_)        ::  err_c
     character(len=20)        ::  r_name
     character(len=40)        ::  a_e_d
-    integer(psb_ipk_)        ::  i_e_d(5)
+    integer(psb_epk_)        ::  e_e_d(5)
 
     type(psb_errstack_node), pointer     ::  old_node
 
     if (error_stack%n_elems > 0) then 
       err_c      =  error_stack%top%err_code
       r_name     =  error_stack%top%routine
-      i_e_d      =  error_stack%top%i_err_data
+      e_e_d      =  error_stack%top%e_err_data
       a_e_d      =  error_stack%top%a_err_data
-      call psb_errmsg(achmsg,err_c, r_name, i_e_d, a_e_d)
+      call psb_errmsg(achmsg,err_c, r_name, e_e_d, a_e_d)
       old_node   => error_stack%top
       error_stack%top  => old_node%next
       error_stack%n_elems = error_stack%n_elems - 1
@@ -438,19 +441,19 @@ contains
   end subroutine psb_ach_errpop
 
   ! pops an error from the error stack
-  subroutine psb_errpop(err_c, r_name, i_e_d, a_e_d)
+  subroutine psb_errpop(err_c, r_name, e_e_d, a_e_d)
 
     integer(psb_ipk_), intent(out)        ::  err_c
     character(len=20), intent(out)        ::  r_name
     character(len=40), intent(out)        ::  a_e_d
-    integer(psb_ipk_), intent(out)        ::  i_e_d(5)
+    integer(psb_epk_), intent(out)        ::  e_e_d(5)
 
     type(psb_errstack_node), pointer     ::  old_node
 
     if (error_stack%n_elems > 0) then 
       err_c      =  error_stack%top%err_code
       r_name     =  error_stack%top%routine
-      i_e_d      =  error_stack%top%i_err_data
+      e_e_d      =  error_stack%top%e_err_data
       a_e_d      =  error_stack%top%a_err_data
       
       old_node   => error_stack%top
@@ -469,24 +472,24 @@ contains
     integer(psb_ipk_)        ::  err_c
     character(len=20)        ::  r_name
     character(len=40)        ::  a_e_d
-    integer(psb_ipk_)        ::  i_e_d(5)
+    integer(psb_epk_)        ::  e_e_d(5)
 
     
     do while (psb_get_numerr() > 0)
-      call psb_errpop(err_c, r_name, i_e_d, a_e_d)
+      call psb_errpop(err_c, r_name, e_e_d, a_e_d)
     end do
     
   end subroutine psb_clean_errstack
 
   ! prints the error msg associated to a specific error code
-  subroutine psb_ach_errmsg(achmsg,err_c, r_name, i_e_d, a_e_d,me)
+  subroutine psb_ach_errmsg(achmsg,err_c, r_name, e_e_d, a_e_d,me)
 
     character(len=psb_max_errmsg_len_), allocatable, intent(out) :: achmsg(:)
-    integer(psb_ipk_), intent(in)    ::  err_c
-    character(len=20), intent(in)    ::  r_name
-    character(len=40), intent(in)    ::  a_e_d
-    integer(psb_ipk_), intent(in)    ::  i_e_d(5)
-    integer(psb_mpik_), optional     ::  me
+    integer(psb_ipk_), intent(in)   ::  err_c
+    character(len=20), intent(in)   ::  r_name
+    character(len=40), intent(in)   ::  a_e_d
+    integer(psb_epk_), intent(in)   ::  e_e_d(5)
+    integer(psb_mpk_), optional     ::  me
 
     character(len=psb_max_errmsg_len_) :: tmpmsg
   
@@ -511,12 +514,12 @@ contains
     case(psb_err_pivot_too_small_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("pivot too small: ",i0,1x,a)')i_e_d(1),trim(a_e_d)
+      write(achmsg(2),'("pivot too small: ",i0,1x,a)')e_e_d(1),trim(a_e_d)
 
     case(psb_err_invalid_ovr_num_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("Invalid number of ovr:",i0)')i_e_d(1)
+      write(achmsg(2),'("Invalid number of ovr:",i0)')e_e_d(1)
 
     case(psb_err_invalid_input_)
       allocate(achmsg(2)) 
@@ -526,37 +529,37 @@ contains
     case(psb_err_iarg_neg_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("input argument n. ",i0," cannot be less than 0")')i_e_d(1)
-      write(achmsg(3),'("current value is ",i0)')i_e_d(2)
+      write(achmsg(2),'("input argument n. ",i0," cannot be less than 0")')e_e_d(1)
+      write(achmsg(3),'("current value is ",i0)')e_e_d(2)
 
     case(psb_err_iarg_pos_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("input argument n. ",i0," cannot be greater than 0")')i_e_d(1)
-      write(achmsg(3),'("current value is ",i0)')i_e_d(2)
+      write(achmsg(2),'("input argument n. ",i0," cannot be greater than 0")')e_e_d(1)
+      write(achmsg(3),'("current value is ",i0)')e_e_d(2)
 
     case(psb_err_input_value_invalid_i_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("input argument n. ",i0," has an invalid value")')i_e_d(1)
-      write(achmsg(3),'("current value is ",i0)')i_e_d(2)
+      write(achmsg(2),'("input argument n. ",i0," has an invalid value")')e_e_d(1)
+      write(achmsg(3),'("current value is ",i0)')e_e_d(2)
 
     case(psb_err_input_asize_invalid_i_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("Size of input array argument n. ",i0," is invalid.")')i_e_d(1)
-      write(achmsg(3),'("Current value is ",i0)')i_e_d(2)
+      write(achmsg(2),'("Size of input array argument n. ",i0," is invalid.")')e_e_d(1)
+      write(achmsg(3),'("Current value is ",i0)')e_e_d(2)
 
     case(psb_err_input_asize_small_i_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("Size of input array argument n. ",i0," is too small.")')i_e_d(1)
-      write(achmsg(3),'("Current value is ",i0," Should be at least ",i0)') i_e_d(2),i_e_d(3)
+      write(achmsg(2),'("Size of input array argument n. ",i0," is too small.")')e_e_d(1)
+      write(achmsg(3),'("Current value is ",i0," Should be at least ",i0)') e_e_d(2),e_e_d(3)
 
     case(psb_err_iarg_invalid_i_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("input argument n. ",i0," has an invalid value")')i_e_d(1)
+      write(achmsg(2),'("input argument n. ",i0," has an invalid value")')e_e_d(1)
       write(achmsg(3),'("current value is ",a)')a_e_d(2:2)
 
     case(psb_err_iarg_not_gtia_ii_)
@@ -564,37 +567,37 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            & '("input argument n. ",i0," must be equal or greater than input argument n. ",i0)') &
-           & i_e_d(1), i_e_d(3)
+           & e_e_d(1), e_e_d(3)
       write(achmsg(3),'("current values are ",i0," < ",i0)')&
-           & i_e_d(2),i_e_d(5)
+           & e_e_d(2),e_e_d(5)
 
     case(psb_err_iarg_not_gteia_ii_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("input argument n. ",i0," must be greater than or equal to ",i0)')&
-           & i_e_d(1),i_e_d(2)
+           & e_e_d(1),e_e_d(2)
       write(achmsg(3),'("current value is ",i0," < ",i0)')&
-           & i_e_d(3), i_e_d(2)
+           & e_e_d(3), e_e_d(2)
 
     case(psb_err_iarg_invalid_value_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("input argument n. ",i0," in entry # ",i0," has an invalid value")')&
-           & i_e_d(1:2)
+           & e_e_d(1:2)
       write(achmsg(3),'("current value is ",a)')trim(a_e_d)
 
     case(psb_err_asb_nrc_error_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Impossible error in ASB: nrow>ncol,")')
-      write(achmsg(3),'("Actual values are ",i0," > ",i0)')i_e_d(1:2)
+      write(achmsg(3),'("Actual values are ",i0," > ",i0)')e_e_d(1:2)
       !        ... csr format error ...
 
     case(psb_err_iarg2_neg_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("input argument ia2(1) is less than 0")')
-      write(achmsg(3),'("current value is ",i0)')i_e_d(1)
+      write(achmsg(3),'("current value is ",i0)')e_e_d(1)
       !        ... csr format error ...
 
     case(psb_err_ia2_not_increasing_)
@@ -612,7 +615,7 @@ contains
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("indices in ia1 array are not within problem dimension")')
-      write(achmsg(3),'("problem dimension is ",i0)')i_e_d(1)
+      write(achmsg(3),'("problem dimension is ",i0)')e_e_d(1)
 
     case(psb_err_invalid_args_combination_)
       allocate(achmsg(2)) 
@@ -623,15 +626,15 @@ contains
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Invalid process identifier in input array argument n. ",i0,".")')&
-           & i_e_d(1)
-      write(achmsg(3),'("Current value is ",i0)')i_e_d(2)
+           & e_e_d(1)
+      write(achmsg(3),'("Current value is ",i0)')e_e_d(2)
 
     case(psb_err_iarg_n_mbgtian_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("input argument n. ",i0," must be greater than input argument n. ",i0)')&
-           & i_e_d(1:2)
-      write(achmsg(3),'("current values are ",i0," < ",i0)') i_e_d(3:4)
+           & e_e_d(1:2)
+      write(achmsg(3),'("current values are ",i0," < ",i0)') e_e_d(3:4)
 
     case(psb_err_dupl_cd_vl)
       allocate(achmsg(2)) 
@@ -669,14 +672,14 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            &'("indices in input array are not within problem dimension ",2(i0,2x))')&
-           &i_e_d(1:2)
+           &e_e_d(1:2)
 
     case(psb_err_iarray_outside_process_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            &'("indices in input array are not belonging to the calling process ",i0)')&
-           & i_e_d(1)
+           & e_e_d(1)
 
     case(psb_err_forgot_geall_)
       allocate(achmsg(2)) 
@@ -697,31 +700,44 @@ contains
            &'("Something went wrong before this call to ",a,", probably in cdins/spins")')&
            & trim(r_name)
 
+    case(psb_err_bad_int_cnv_)
+      allocate(achmsg(2)) 
+      achmsg(1) = tmpmsg
+      write(achmsg(2),&
+           & '("Bad integer conversion from ",i0,"to ",i0)') &
+           & e_e_d(1),e_e_d(2)
+
+    case(psb_err_mpi_int_ovflw_)
+      allocate(achmsg(2)) 
+      achmsg(1) = tmpmsg
+      write(achmsg(2),&
+           & '("Size argument to MPI overflow.")') 
+
     case(psb_err_iarg_mbeeiarra_i_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            & '("Input argument n. ",i0," must be equal to entry n. ",i0," in array input argument n.",i0)') &
-           & i_e_d(1),i_e_d(4),i_e_d(3)
-      write(achmsg(3),'("Current values are ",i0," != ",i0)')i_e_d(2), i_e_d(5)
+           & e_e_d(1),e_e_d(4),e_e_d(3)
+      write(achmsg(3),'("Current values are ",i0," != ",i0)')e_e_d(2), e_e_d(5)
 
     case(psb_err_mpi_error_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("MPI error:",i0)')i_e_d(1)
+      write(achmsg(2),'("MPI error:",i0)')e_e_d(1)
 
     case(psb_err_parm_differs_among_procs_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
-           &'("Parameter n. ",i0," must be equal on all processes. ",i0)')i_e_d(1)
+           &'("Parameter n. ",i0," must be equal on all processes. ",i0)')e_e_d(1)
 
     case(psb_err_entry_out_of_bounds_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            &'("Entry n. ",i0," out of ",i0," should be between 1 and ",i0," but is ",i0)')&
-           & i_e_d(1),i_e_d(3),i_e_d(4),i_e_d(2)
+           & e_e_d(1),e_e_d(3),e_e_d(4),e_e_d(2)
 
     case(psb_err_inconsistent_index_lists_)
       allocate(achmsg(2)) 
@@ -733,31 +749,31 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            &'("partition function passed as input argument n. ",i0," returns number of processes")')&
-           &i_e_d(1)
+           &e_e_d(1)
       write(achmsg(3),&
            & '("greater than No of grid s processes on global point ",i0,". Actual number of grid s ")')&
-           &i_e_d(4)
-      write(achmsg(4),'("processes is ",i0,", number returned is ",i0)')i_e_d(2),i_e_d(3)
+           &e_e_d(4)
+      write(achmsg(4),'("processes is ",i0,", number returned is ",i0)')e_e_d(2),e_e_d(3)
 
     case(psb_err_partfunc_toofewprocs_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            &'("partition function passed as input argument n. ",i0," returns number of processes")')&
-           &i_e_d(1)
+           &e_e_d(1)
       write(achmsg(3),&
            &'("less or equal to 0 on global point ",i0,". Number returned is ",i0)')&
-           &i_e_d(3),i_e_d(2)
+           &e_e_d(3),e_e_d(2)
 
     case(psb_err_partfunc_wrong_pid_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            &'("partition function passed as input argument n. ",i0," returns wrong processes identifier")')&
-           & i_e_d(1)
+           & e_e_d(1)
       write(achmsg(3),&
            & '("on global point ",i0,". Current value returned is : ",i0)')&
-           & i_e_d(3),i_e_d(2)
+           & e_e_d(3),e_e_d(2)
 
     case(psb_err_no_optional_arg_)
       allocate(achmsg(2)) 
@@ -789,11 +805,11 @@ contains
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("input argument n. ",i0," has a dynamic type not allowed here.")')&
-           & i_e_d(1)
+           & e_e_d(1)
     case(psb_err_rectangular_mat_unsupported_)
       write(achmsg(2),&
            &'("This routine does not support rectangular matrices: ",i0, " /= ",i0)') &
-           & i_e_d(1), i_e_d(2)
+           & e_e_d(1), e_e_d(2)
 
     case(psb_err_invalid_mat_state_)
       allocate(achmsg(2)) 
@@ -927,7 +943,7 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            & '("Decompostion type ",i0," not yet supported.")')&
-           & i_e_d(1)
+           & e_e_d(1)
 
     case(3090)
       allocate(achmsg(2)) 
@@ -941,7 +957,7 @@ contains
            & '("Error on index. Element has not been inserted")')
       write(achmsg(3),&
            & '("local index is: ",i0," and global index is:",i0)')&
-           & i_e_d(1:2)
+           & e_e_d(1:2)
 
     case(psb_err_input_matrix_unassembled_)
       allocate(achmsg(2)) 
@@ -1000,37 +1016,37 @@ contains
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Error ",i0," from call to a subroutine ")')&
-           & i_e_d(1)
+           & e_e_d(1)
 
     case(psb_err_from_subroutine_ai_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Error from call to subroutine ",a," ",i0)')&
-           & trim(a_e_d),i_e_d(1)
+           & trim(a_e_d),e_e_d(1)
 
     case(psb_err_alloc_request_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            & '("Error on allocation request for ",i0," items of type ",a)')&
-           & i_e_d(1),trim(a_e_d)
+           & e_e_d(1),trim(a_e_d)
 
     case(4110)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&
            & '("Error ",i0," from call to an external package in subroutine ",a)')&
-           &i_e_d(1),trim(a_e_d)
+           &e_e_d(1),trim(a_e_d)
 
     case(psb_err_invalid_istop_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("Invalid ISTOP: ",i0)')i_e_d(1)
+      write(achmsg(2),'("Invalid ISTOP: ",i0)')e_e_d(1)
 
     case(5002)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
-      write(achmsg(2),'("Invalid PREC: ",i0)')i_e_d(1)
+      write(achmsg(2),'("Invalid PREC: ",i0)')e_e_d(1)
 
     case(5003)
       allocate(achmsg(2)) 
@@ -1042,7 +1058,7 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),'("unknown error (",i0,") in subroutine ",a)')&
            & err_c,trim(r_name)
-      write(achmsg(3),'(5(i0,2x))') i_e_d
+      write(achmsg(3),'(5(i0,2x))') e_e_d
       write(achmsg(4),'(a)') trim(a_e_d)
 
     end select
@@ -1051,18 +1067,18 @@ contains
 
 
   ! prints the error msg associated to a specific error code
-  subroutine psb_errmsg(iunit, err_c, r_name, i_e_d, a_e_d,me)
+  subroutine psb_errmsg(iunit, err_c, r_name, e_e_d, a_e_d,me)
     integer(psb_ipk_), intent(in)  :: iunit
     integer(psb_ipk_), intent(in)  ::  err_c
     character(len=20), intent(in)  ::  r_name
     character(len=40), intent(in)  ::  a_e_d
-    integer(psb_ipk_), intent(in)  ::  i_e_d(5)
-    integer(psb_mpik_), optional   ::  me
+    integer(psb_epk_), intent(in)  ::  e_e_d(5)
+    integer(psb_mpk_), optional   ::  me
 
     integer(psb_ipk_) :: i
     character(len=psb_max_errmsg_len_), allocatable :: achmsg(:)
 
-    call psb_ach_errmsg(achmsg,err_c, r_name, i_e_d, a_e_d,me)
+    call psb_ach_errmsg(achmsg,err_c, r_name, e_e_d, a_e_d,me)
     
     do i=1,size(achmsg)
       write(iunit,'(a)') trim(achmsg(i))

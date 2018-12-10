@@ -130,7 +130,8 @@ subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type)   ::  r
   
   real(psb_dpk_) :: r_norm, b_norm, a_norm, derr
-  integer(psb_ipk_) :: n_col, mglob, naux, err_act
+  integer(psb_ipk_) :: n_col, naux, err_act
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt
   integer(psb_ipk_) ::  i, j, it, itx, istop_, itmax_, itrace_, nl, m, nrst
@@ -139,7 +140,6 @@ subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
   character(len=*), parameter :: methdname='GCR'
-  integer(psb_ipk_) ::int_err(5)
   info = psb_success_
   name = 'psb_dgcr'
   call psb_erractionsave(err_act)
@@ -176,16 +176,15 @@ subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
   
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     info=psb_err_invalid_istop_
-    int_err(1)=istop_
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
   endif
   
   
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if (info == psb_success_)&
-       & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+       & call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
@@ -218,9 +217,8 @@ subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
   
   if (nl <=0 ) then 
     info=psb_err_invalid_istop_
-    int_err(1)=nl
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/nl/))
     goto 9999
   endif
   

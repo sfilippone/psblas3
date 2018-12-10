@@ -30,9 +30,9 @@
 !   
 !    
 !
-! File: psi_crea_ovr_elem.f90
+! File: psi_i_crea_ovr_elem.f90
 !
-! Subroutine: psi_crea_ovr_elem
+! Subroutine: psi_i_crea_ovr_elem
 !   Creates the overlap_elem list: for each overlap index, store the index and 
 !   the number of processes sharing it (minimum: 2). List is ended by -1.
 !   See also description in base/modules/psb_desc_type.f90
@@ -42,9 +42,9 @@
 !    desc_a   - type(psb_desc_type).       The communication descriptor.        
 !    info     - integer.                   return code.
 ! 
-subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
+subroutine psi_i_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
 
-  use psi_mod, psb_protect_name => psi_crea_ovr_elem
+  use psi_mod, psb_protect_name => psi_i_crea_ovr_elem
   use psb_realloc_mod
   use psb_error_mod
   use psb_penv_mod
@@ -139,4 +139,4 @@ subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
 
   return
 
-end subroutine psi_crea_ovr_elem
+end subroutine psi_i_crea_ovr_elem
