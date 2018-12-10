@@ -104,10 +104,23 @@ module psb_const_mod
   integer(psb_ipk_), save      :: psb_sizeof_sp
   integer(psb_ipk_), save      :: psb_sizeof_dp
   integer(psb_ipk_), save      :: psb_sizeof_i2p
-  integer(psb_ipk_), save      :: psb_sizeof_mp
-  integer(psb_ipk_), save      :: psb_sizeof_ep
-  integer(psb_ipk_), save      :: psb_sizeof_ip
-  integer(psb_ipk_), save      :: psb_sizeof_lp
+  integer(psb_ipk_), save      :: psb_sizeof_mp = 4
+  integer(psb_ipk_), save      :: psb_sizeof_ep = 8
+
+#if defined(IPK4) && defined(LPK4)
+  integer(psb_ipk_), save      :: psb_sizeof_ip = 4
+  integer(psb_ipk_), save      :: psb_sizeof_lp = 4
+#elif  defined(IPK4) && defined(LPK8)
+  integer(psb_ipk_), save      :: psb_sizeof_ip = 4
+  integer(psb_ipk_), save      :: psb_sizeof_lp = 8
+#elif  defined(IPK8) && defined(LPK8)
+  integer(psb_ipk_), save      :: psb_sizeof_ip = 8
+  integer(psb_ipk_), save      :: psb_sizeof_lp = 8
+#elif
+  integer(psb_ipk_), save      :: psb_sizeof_ip = -1
+  integer(psb_ipk_), save      :: psb_sizeof_lp = -1
+#endif
+
   !
   ! Integer type identifiers for MPI operations. 
   !
@@ -123,9 +136,9 @@ module psb_const_mod
   ! 
   ! Version
   !
-  character(len=*), parameter    :: psb_version_string_ = "3.6.0"
+  character(len=*), parameter    :: psb_version_string_ = "3.7.0"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter   :: psb_version_minor_  = 6
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 7
   integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
 
   !
