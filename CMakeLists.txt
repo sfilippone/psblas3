@@ -285,7 +285,7 @@ add_definitions(-DHAVE_LAPACK)
 # Use standardized GNU install directory conventions
 #---------------------------------------------------
 include(GNUInstallDirs)
-set(mod_dir_tail "${${CMAKE_PROJECT_NAME}_dist_string}_${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
+#set(mod_dir_tail "${${CMAKE_PROJECT_NAME}_dist_string}_${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
@@ -372,13 +372,13 @@ include(${CMAKE_CURRENT_LIST_DIR}/base/CMakeLists.txt)
 add_library(base ${base_source_files})
 set_target_properties(base
   PROPERTIES
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_base
   LINKER_LANGUAGE Fortran
   )
 target_include_directories(base PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 if(MPI_FOUND)
   target_link_libraries(base PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
@@ -389,13 +389,13 @@ include(${CMAKE_CURRENT_LIST_DIR}/prec/CMakeLists.txt)
 add_library(prec ${prec_source_files})
 set_target_properties(prec
   PROPERTIES
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_prec
   LINKER_LANGUAGE Fortran
   )
 target_include_directories(prec PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(prec PUBLIC base)
 
@@ -403,13 +403,13 @@ include(${CMAKE_CURRENT_LIST_DIR}/krylov/CMakeLists.txt)
 add_library(krylov ${krylov_source_files})
 set_target_properties(krylov
   PROPERTIES
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_krylov
   LINKER_LANGUAGE Fortran
   )
 target_include_directories(krylov PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(krylov PUBLIC base prec)
 
@@ -417,13 +417,13 @@ include(${CMAKE_CURRENT_LIST_DIR}/util/CMakeLists.txt)
 add_library(util ${util_source_files})
 set_target_properties(util
   PROPERTIES
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_util
   LINKER_LANGUAGE Fortran
   )
 target_include_directories(util PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(util PUBLIC base prec)
 
