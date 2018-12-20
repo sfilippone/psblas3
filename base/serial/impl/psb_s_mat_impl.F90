@@ -661,7 +661,7 @@ end subroutine psb_s_trim
 
 
 
-subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_s_mat_mod, psb_protect_name => psb_s_csput_a
   use psb_s_base_mat_mod
   use psb_error_mod
@@ -670,7 +670,6 @@ subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csput_a'
@@ -685,7 +684,7 @@ subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   endif
 
 
-  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info,gtl) 
+  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info) 
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
@@ -698,7 +697,7 @@ subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 end subroutine psb_s_csput_a
 
-subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_s_mat_mod, psb_protect_name => psb_s_csput_v
   use psb_s_base_mat_mod
   use psb_s_vect_mod, only : psb_s_vect_type
@@ -710,7 +709,6 @@ subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   type(psb_i_vect_type), intent(inout)  :: ia, ja
   integer(psb_ipk_), intent(in)             :: nz, imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csput_v'
@@ -725,7 +723,7 @@ subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   endif
   
   if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
-    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info) 
   else
     info = psb_err_invalid_mat_state_
   endif
@@ -3190,7 +3188,7 @@ end subroutine psb_ls_trim
 
 
 
-subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_s_mat_mod, psb_protect_name => psb_ls_csput_a
   use psb_s_base_mat_mod
   use psb_error_mod
@@ -3199,7 +3197,6 @@ subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_lpk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csput_a'
@@ -3214,7 +3211,7 @@ subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   endif
 
 
-  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info,gtl) 
+  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info) 
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
@@ -3227,7 +3224,7 @@ subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 end subroutine psb_ls_csput_a
 
-subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_s_mat_mod, psb_protect_name => psb_ls_csput_v
   use psb_s_base_mat_mod
   use psb_s_vect_mod, only : psb_s_vect_type
@@ -3239,7 +3236,6 @@ subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   type(psb_l_vect_type), intent(inout)  :: ia, ja
   integer(psb_lpk_), intent(in)             :: nz, imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_lpk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csput_v'
@@ -3254,7 +3250,7 @@ subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   endif
   
   if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
-    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info) 
   else
     info = psb_err_invalid_mat_state_
   endif

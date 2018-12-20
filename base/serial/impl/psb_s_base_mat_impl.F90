@@ -326,7 +326,7 @@ subroutine  psb_s_base_clean_zeros(a, info)
 end subroutine psb_s_base_clean_zeros
 
 
-subroutine psb_s_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_s_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_csput_a
   implicit none 
@@ -334,7 +334,6 @@ subroutine psb_s_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='csput'
@@ -351,7 +350,7 @@ subroutine psb_s_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 end subroutine psb_s_base_csput_a
 
-subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_csput_v
   use psb_s_base_vect_mod
@@ -361,7 +360,6 @@ subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   class(psb_i_base_vect_type), intent(inout)  :: ia, ja
   integer(psb_ipk_), intent(in)               :: nz, imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)              :: info
-  integer(psb_ipk_), intent(in), optional     :: gtl(:)
 
   integer(psb_ipk_)  :: err_act, nzin, nzout
   character(len=20)  :: name='csput_v'
@@ -377,7 +375,7 @@ subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     if (val%is_dev()) call val%sync()
     if (ia%is_dev())  call ia%sync()
     if (ja%is_dev())  call ja%sync()
-    call a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+    call a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info) 
   else
     info = psb_err_invalid_mat_state_
   endif
@@ -2625,7 +2623,7 @@ subroutine  psb_ls_base_clean_zeros(a, info)
 end subroutine psb_ls_base_clean_zeros
 
 
-subroutine psb_ls_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_ls_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csput_a
   implicit none 
@@ -2633,7 +2631,6 @@ subroutine psb_ls_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='csput'
@@ -2650,7 +2647,7 @@ subroutine psb_ls_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 end subroutine psb_ls_base_csput_a
 
-subroutine psb_ls_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_ls_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_csput_v
   use psb_s_base_vect_mod
@@ -2660,7 +2657,6 @@ subroutine psb_ls_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   class(psb_l_base_vect_type), intent(inout)  :: ia, ja
   integer(psb_lpk_), intent(in)               :: nz, imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)              :: info
-  integer(psb_lpk_), intent(in), optional     :: gtl(:)
 
   integer(psb_lpk_)  :: nzin, nzout
   integer(psb_ipk_)  :: err_act
@@ -2677,7 +2673,7 @@ subroutine psb_ls_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     if (val%is_dev()) call val%sync()
     if (ia%is_dev())  call ia%sync()
     if (ja%is_dev())  call ja%sync()
-    call a%csput_a(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl)
+    call a%csput_a(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info)
   else
     info = psb_err_invalid_mat_state_
   endif

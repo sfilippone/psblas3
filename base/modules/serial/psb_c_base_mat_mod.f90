@@ -455,25 +455,23 @@ module psb_c_base_mat_mod
   !!
   !
   interface 
-    subroutine psb_c_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import 
       class(psb_c_base_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_c_base_csput_a
   end interface
   
   interface 
-    subroutine psb_c_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import 
       class(psb_c_base_sparse_mat), intent(inout) :: a
       class(psb_c_base_vect_type), intent(inout)  :: val
       class(psb_i_base_vect_type), intent(inout)  :: ia, ja
       integer(psb_ipk_), intent(in)             :: nz, imin, imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_c_base_csput_v
   end interface
   
@@ -1875,14 +1873,13 @@ module psb_c_base_mat_mod
   !!
   !
   interface 
-    subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import 
       class(psb_c_coo_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_c_coo_csput_a
   end interface
   
@@ -2137,25 +2134,23 @@ module psb_c_base_mat_mod
   !!
   !
   interface 
-    subroutine psb_lc_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_lc_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import 
       class(psb_lc_base_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional   :: gtl(:)
     end subroutine psb_lc_base_csput_a
   end interface
   
   interface 
-    subroutine psb_lc_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_lc_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import 
       class(psb_lc_base_sparse_mat), intent(inout) :: a
       class(psb_c_base_vect_type), intent(inout)  :: val
       class(psb_l_base_vect_type), intent(inout)  :: ia, ja
       integer(psb_lpk_), intent(in)             :: nz, imin, imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional   :: gtl(:)
     end subroutine psb_lc_base_csput_v
   end interface
   
@@ -3345,14 +3340,13 @@ module psb_c_base_mat_mod
   !!
   !
   interface 
-    subroutine psb_lc_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_lc_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import 
       class(psb_lc_coo_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_lpk_), intent(in)             :: nz,ia(:), ja(:),&
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional   :: gtl(:)
     end subroutine psb_lc_coo_csput_a
   end interface
   

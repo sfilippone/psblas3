@@ -598,19 +598,18 @@ module psb_c_mat_mod
   end interface
   
   interface 
-    subroutine psb_c_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_c_csput_a
   end interface
 
   
   interface 
-    subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       use psb_c_vect_mod, only : psb_c_vect_type
       use psb_i_vect_mod, only : psb_i_vect_type
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
@@ -619,7 +618,6 @@ module psb_c_mat_mod
       type(psb_i_vect_type), intent(inout)  :: ia, ja
       integer(psb_ipk_), intent(in)             :: nz, imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_c_csput_v
   end interface
  
@@ -1306,19 +1304,18 @@ module psb_c_mat_mod
   end interface
   
   interface 
-    subroutine psb_lc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_lc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional   :: gtl(:)
     end subroutine psb_lc_csput_a
   end interface
 
   
   interface 
-    subroutine psb_lc_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_lc_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       use psb_c_vect_mod, only : psb_c_vect_type
       use psb_l_vect_mod, only : psb_l_vect_type
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
@@ -1327,7 +1324,6 @@ module psb_c_mat_mod
       type(psb_l_vect_type), intent(inout)  :: ia, ja
       integer(psb_lpk_), intent(in)             :: nz, imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional   :: gtl(:)
     end subroutine psb_lc_csput_v
   end interface
  

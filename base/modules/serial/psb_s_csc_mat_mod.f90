@@ -335,14 +335,13 @@ module psb_s_csc_mat_mod
   !> \memberof psb_s_csc_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csput_a
   interface 
-    subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import
       class(psb_s_csc_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_s_csc_csput_a
   end interface
   
@@ -727,14 +726,13 @@ module psb_s_csc_mat_mod
   !> \memberof psb_ls_csc_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_csput_a
   interface 
-    subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import
       class(psb_ls_csc_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
       integer(psb_lpk_), intent(in)             :: nz,ia(:), ja(:),&
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional   :: gtl(:)
     end subroutine psb_ls_csc_csput_a
   end interface
   

@@ -1880,7 +1880,7 @@ end subroutine psb_s_csc_csgetrow
 
 
 
-subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_realloc_mod
   use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_csput_a
@@ -1890,8 +1890,6 @@ subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: gtl(:)
-
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -1941,7 +1939,7 @@ subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   else  if (a%is_upd()) then 
     call  psb_s_csc_srch_upd(nz,ia,ja,val,a,&
-         & imin,imax,jmin,jmax,info,gtl)
+         & imin,imax,jmin,jmax,info)
 
     if (info < 0) then 
       info = psb_err_internal_error_
@@ -1973,7 +1971,7 @@ subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 contains
 
   subroutine psb_s_csc_srch_upd(nz,ia,ja,val,a,&
-       & imin,imax,jmin,jmax,info,gtl)
+       & imin,imax,jmin,jmax,info)
 
     use psb_const_mod
     use psb_realloc_mod
@@ -1986,9 +1984,8 @@ contains
     integer(psb_ipk_), intent(in) :: ia(:),ja(:)
     real(psb_spk_), intent(in) :: val(:)
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_), intent(in), optional  :: gtl(:)
     integer(psb_ipk_) :: i,ir,ic, ilr, ilc, ip, &
-         & i1,i2,nr,nc,nnz,dupl,ng, nar, nac
+         & i1,i2,nr,nc,nnz,dupl,nar, nac
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20)    :: name='s_csc_srch_upd'
 
@@ -2009,138 +2006,63 @@ contains
     nar = a%get_nrows()
     nac = a%get_ncols()
 
-    if (present(gtl)) then 
-      ng = size(gtl)
+    select case(dupl)
+    case(psb_dupl_ovwrt_,psb_dupl_err_)
+      ! Overwrite.
+      ! Cannot test for error, should have been caught earlier.
 
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
+      ilr = -1 
+      ilc = -1 
+      do i=1, nz
+        ir = ia(i)
+        ic = ja(i) 
 
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic)
-            if ((ic > 0).and.(ic <= nac)) then 
-              i1 = a%icp(ic)
-              i2 = a%icp(ic+1)
-              nr=i2-i1
+        if ((ic > 0).and.(ic <= nac)) then 
+          i1 = a%icp(ic)
+          i2 = a%icp(ic+1)
+          nr=i2-i1
 
-              ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
-              if (ip>0) then 
-                a%val(i1+ip-1) = val(i)
-              else
-                info = max(info,3)
-              end if
-            else
-              info = max(info,2)
-            end if
+          ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
+          if (ip>0) then 
+            a%val(i1+ip-1) = val(i)
           else
-            info = max(info,1)
+            info = max(info,3)
           end if
-        end do
+        else
+          info = max(info,2)
+        end if
 
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic)
-            if ((ic > 0).and.(ic <= nac)) then 
-              i1 = a%icp(ic)
-              i2 = a%icp(ic+1)
-              nr=i2-i1
+      end do
 
-              ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
-              if (ip>0) then 
-                a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-              else
-                info = max(info,3)
-              end if
-            else
-              info = max(info,2)
-            end if
+    case(psb_dupl_add_)
+      ! Add
+      ilr = -1 
+      ilc = -1 
+      do i=1, nz
+        ir = ia(i)
+        ic = ja(i) 
+        if ((ic > 0).and.(ic <= nac)) then 
+          i1 = a%icp(ic)
+          i2 = a%icp(ic+1)
+          nr=i2-i1
+
+          ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
+          if (ip>0) then 
+            a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
           else
-            info = max(info,1)
+            info = max(info,3)
           end if
-        end do
+        else
+          info = max(info,2)
+        end if
+      end do
 
-      case default
-        info = -3
-        if (debug_level >= psb_debug_serial_) &
-             & write(debug_unit,*) trim(name),&
-             & ': Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-
-          if ((ic > 0).and.(ic <= nac)) then 
-            i1 = a%icp(ic)
-            i2 = a%icp(ic+1)
-            nr=i2-i1
-
-            ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
-            if (ip>0) then 
-              a%val(i1+ip-1) = val(i)
-            else
-              info = max(info,3)
-            end if
-          else
-            info = max(info,2)
-          end if
-
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ic > 0).and.(ic <= nac)) then 
-            i1 = a%icp(ic)
-            i2 = a%icp(ic+1)
-            nr=i2-i1
-
-            ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
-            if (ip>0) then 
-              a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-            else
-              info = max(info,3)
-            end if
-          else
-              info = max(info,2)
-          end if
-        end do
-
-      case default
-        info = -3
-        if (debug_level >= psb_debug_serial_) &
-             & write(debug_unit,*) trim(name),&
-             & ': Duplicate handling: ',dupl
-      end select
-
-    end if
+    case default
+      info = -3
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & ': Duplicate handling: ',dupl
+    end select
 
   end subroutine psb_s_csc_srch_upd
 
@@ -3783,7 +3705,7 @@ end subroutine psb_ls_csc_csgetrow
 
 
 
-subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_realloc_mod
   use psb_s_csc_mat_mod, psb_protect_name => psb_ls_csc_csput_a
@@ -3793,7 +3715,6 @@ subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_lpk_), intent(in), optional   :: gtl(:)
 
 
   integer(psb_ipk_) :: err_act, debug_level, debug_unit, ierr(5)
@@ -3843,7 +3764,7 @@ subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   else  if (a%is_upd()) then 
     call  psb_ls_csc_srch_upd(nz,ia,ja,val,a,&
-         & imin,imax,jmin,jmax,info,gtl)
+         & imin,imax,jmin,jmax,info)
 
     if (info < 0) then 
       info = psb_err_internal_error_
@@ -3875,7 +3796,7 @@ subroutine psb_ls_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 contains
 
   subroutine psb_ls_csc_srch_upd(nz,ia,ja,val,a,&
-       & imin,imax,jmin,jmax,info,gtl)
+       & imin,imax,jmin,jmax,info)
 
     use psb_const_mod
     use psb_realloc_mod
@@ -3888,9 +3809,8 @@ contains
     integer(psb_lpk_), intent(in) :: ia(:),ja(:)
     real(psb_spk_), intent(in) :: val(:)
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_lpk_), intent(in), optional  :: gtl(:)
     integer(psb_lpk_) :: i,ir,ic, ilr, ilc, ip, &
-         & i1,i2,nr,nc,nnz,dupl,ng, nar, nac
+         & i1,i2,nr,nc,nnz,dupl,nar, nac
     integer(psb_ipk_) :: debug_level, debug_unit, inr
     character(len=20)    :: name='ls_csc_srch_upd'
 
@@ -3911,138 +3831,63 @@ contains
     nar = a%get_nrows()
     nac = a%get_ncols()
 
-    if (present(gtl)) then 
-      ng = size(gtl)
+    select case(dupl)
+    case(psb_dupl_ovwrt_,psb_dupl_err_)
+      ! Overwrite.
+      ! Cannot test for error, should have been caught earlier.
 
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
+      ilr = -1 
+      ilc = -1 
+      do i=1, nz
+        ir = ia(i)
+        ic = ja(i) 
 
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic)
-            if ((ic > 0).and.(ic <= nac)) then 
-              i1 = a%icp(ic)
-              i2 = a%icp(ic+1)
-              nr  = i2-i1
-              inr = nr
-              ip  = psb_bsrch(ir,inr,a%ia(i1:i2-1))    
-              if (ip>0) then 
-                a%val(i1+ip-1) = val(i)
-              else
-                info = max(info,3)
-              end if
-            else
-              info = max(info,2)
-            end if
+        if ((ic > 0).and.(ic <= nac)) then 
+          i1 = a%icp(ic)
+          i2 = a%icp(ic+1)
+          nr  = i2-i1
+          inr = nr
+          ip  = psb_bsrch(ir,inr,a%ia(i1:i2-1))    
+          if (ip>0) then 
+            a%val(i1+ip-1) = val(i)
           else
-            info = max(info,1)
+            info = max(info,3)
           end if
-        end do
+        else
+          info = max(info,2)
+        end if
 
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic)
-            if ((ic > 0).and.(ic <= nac)) then 
-              i1 = a%icp(ic)
-              i2 = a%icp(ic+1)
-              nr  = i2-i1
-              inr = nr
-              ip  = psb_bsrch(ir,inr,a%ia(i1:i2-1))    
-              if (ip>0) then 
-                a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-              else
-                info = max(info,3)
-              end if
-            else
-              info = max(info,2)
-            end if
+      end do
+
+    case(psb_dupl_add_)
+      ! Add
+      ilr = -1 
+      ilc = -1 
+      do i=1, nz
+        ir = ia(i)
+        ic = ja(i) 
+        if ((ic > 0).and.(ic <= nac)) then 
+          i1 = a%icp(ic)
+          i2 = a%icp(ic+1)
+          nr  = i2-i1
+          inr = nr
+          ip  = psb_bsrch(ir,inr,a%ia(i1:i2-1))    
+          if (ip>0) then 
+            a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
           else
-            info = max(info,1)
+            info = max(info,3)
           end if
-        end do
+        else
+          info = max(info,2)
+        end if
+      end do
 
-      case default
-        info = -3
-        if (debug_level >= psb_debug_serial_) &
-             & write(debug_unit,*) trim(name),&
-             & ': Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-
-          if ((ic > 0).and.(ic <= nac)) then 
-            i1 = a%icp(ic)
-            i2 = a%icp(ic+1)
-            nr  = i2-i1
-            inr = nr
-            ip  = psb_bsrch(ir,inr,a%ia(i1:i2-1))    
-            if (ip>0) then 
-              a%val(i1+ip-1) = val(i)
-            else
-              info = max(info,3)
-            end if
-          else
-            info = max(info,2)
-          end if
-
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ic > 0).and.(ic <= nac)) then 
-            i1 = a%icp(ic)
-            i2 = a%icp(ic+1)
-            nr  = i2-i1
-            inr = nr
-            ip  = psb_bsrch(ir,inr,a%ia(i1:i2-1))    
-            if (ip>0) then 
-              a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-            else
-              info = max(info,3)
-            end if
-          else
-              info = max(info,2)
-          end if
-        end do
-
-      case default
-        info = -3
-        if (debug_level >= psb_debug_serial_) &
-             & write(debug_unit,*) trim(name),&
-             & ': Duplicate handling: ',dupl
-      end select
-
-    end if
+    case default
+      info = -3
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & ': Duplicate handling: ',dupl
+    end select
 
   end subroutine psb_ls_csc_srch_upd
 
