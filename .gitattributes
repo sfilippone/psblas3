@@ -1,3 +1,6 @@
+# Handle eol correctly: Commit unix-style, checkout as native
+* text=auto
+
 # Explicitly declare text files you want to always be normalized and converted
 # to native line endings on checkout.
 *.c text
@@ -18,6 +21,17 @@
 *.gz binary
 *.tgz binary
 *.enc binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.bmp binary
+*.gig binary
+
+# Handle windows specific files correctly
+*.sln eol=crlf
+*.suo eol=crlf
+*.vcxproj eol=crlf
+*.vcxitems eol=crlf
 
 # Prevent dev-ops files from making it into the release archives
 .travis.yml export-ignore
