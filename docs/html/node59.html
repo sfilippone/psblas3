@@ -55,7 +55,7 @@ psb_geasums -- Generalized 1-Norm of Vector</A>
 <P>
 This subroutine computes a series of  1-norms on the columns of
 a  dense matrix  <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>: 
 <BR><P></P>
@@ -67,19 +67,19 @@ res(i) \leftarrow \max_k |x(k,i)|
  -->
 
 <IMG
- WIDTH="147" HEIGHT="36" BORDER="0"
+ WIDTH="148" HEIGHT="36" BORDER="0"
  SRC="img34.png"
  ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 This function computes the 1-norm of a vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
 If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is a real vector 
 it computes 1-norm as:
@@ -99,7 +99,7 @@ res(i) \leftarrow  \|x_i\|
 <BR CLEAR="ALL">
 <P></P>
 else if <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is a complex vector then it computes 1-norm  as:
 <BR><P></P>
@@ -111,7 +111,7 @@ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
  -->
 
 <IMG
- WIDTH="206" HEIGHT="28" BORDER="0"
+ WIDTH="207" HEIGHT="29" BORDER="0"
  SRC="img40.png"
  ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
@@ -133,11 +133,11 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img29.png"
  ALT="$res$"></SPAN></TD>
 <TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -176,7 +176,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 
@@ -209,7 +209,7 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>res</STRONG></DT>
 <DD>contains the 1-norm of (the columns of) <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
