@@ -39,6 +39,7 @@
 !    desc_p        - type(psb_desc_type).  The communication descriptor to be printed.
 !    glob          - logical(otpional).      Wheter to print out global or local data.
 !    short         - logical(optional).      Used to choose a verbose output.
+!    verbosity     - integer(optional)       Choose a verbosity level 
 !
 subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   use psb_base_mod, psb_protect_name => psb_cdprt
@@ -54,6 +55,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   integer(psb_ipk_) :: ictxt, me, np
   integer(psb_ipk_) :: total_snd, total_rcv, total_xhcg, global_halo, global_points
   integer(psb_ipk_) :: local_snd, local_rcv, local_xhcg, local_halo, local_points
+  real(psb_dpk_)    :: av2s, v2s
   
   if (present(glob)) then 
     glob_ = glob
@@ -70,9 +72,10 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   else
     verb_ = 1
   endif
-
+  
   ictxt = desc_p%get_ctxt()
   call psb_info(ictxt, me,np)
+  call psb_min(ictxt,verb_)
   
   !
   ! Level 1: Print global info
@@ -80,16 +83,33 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   global_points = desc_p%get_global_rows()
   local_points  = desc_p%get_local_rows()
   local_halo    = desc_p%get_local_cols() - desc_p%get_local_rows()
+  if (local_halo>0) then
+    v2s = real(local_points,psb_dpk_)/real(local_halo,psb_dpk_)
+  else
+    v2s = 0.0_psb_dpk_
+  end if
+
   global_halo   = local_halo
+  av2s          = v2s
   call psb_sum(ictxt, global_halo)
+  call psb_sum(ictxt, av2s)
+  av2s = av2s / np 
   if (me == psb_root_) then
     write(iout,*) ' Communication descriptor details '
     write(iout,*) '               Descriptor format:       ',desc_p%get_fmt()    
     write(iout,*) ' Global descriptor data: points:',global_points,' halo:',global_halo
     write(iout,*)
+    write(iout,*) ' Average volume to surface ratio :',av2s
+    write(iout,*)
   end if
   call psb_barrier(ictxt)
-  do i=0, np-1
+  
+  if (verb_ <= 1) return
+  
+  !
+  ! Level 2: Statistics at process level
+  !
+    do i=0, np-1
     if (me == i)  then
       write(iout,*) me,': Local descriptor data: points:',local_points,&
            & ' halo:',local_halo
@@ -102,10 +122,6 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
     call psb_barrier(ictxt)
   end do
 
-  
-  !
-  ! Level 2: Statistics at process level
-  !
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_halo'
   do i=0, np-1
     if (me == i)  &
