@@ -55,6 +55,9 @@
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_  DISABLED for this routine.
 !
+#undef  SP_A2AV_MPI
+#undef  SP_A2AV_XI
+#define SP_A2AV_MAT
 Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_csphalo
@@ -79,7 +82,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr,&
-       &     l1, err_act
+       &     l1, err_act, nsnds, nrcvs
   integer(psb_mpik_) :: icomm, minfo
   integer(psb_mpik_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
@@ -177,7 +180,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
-  ! For all rows in the halo descriptor, extract and send/receive.
+  ! For all rows in the halo descriptor, extract the row size
   Do 
     proc=ipdxv(counter)
     if (proc == -1) exit
@@ -195,13 +198,24 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
+  !
+  ! Exchange row sizes, so as to know sends/receives.
+  ! This is different from the halo exchange because the
+  ! size of the rows may vary, as opposed to fixed
+  ! (multi) vector row size. 
+  ! 
   call mpi_alltoall(sdsz,1,psb_mpi_def_integer,& 
        & rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='mpi_alltoall')
     goto 9999
   end if
+  nsnds = count(sdsz /= 0)
+  nrcvs = count(rvsz /= 0)
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Done initial alltoall',nsnds,nrcvs
 
   idxs = 0
   idxr = 0
@@ -223,6 +237,8 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   iszr=sum(rvsz)
   call acoo%reallocate(max(iszr,1))
   if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size()
+  if (debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
   if (info /= psb_success_) then
@@ -271,6 +287,8 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Enddo
   nz = tot_elem
 
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Going for alltoallv',iszs,iszr
   if (rowcnv_) call psb_loc_to_glob(iasnd(1:nz),desc_a,info,iact='I')
   if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
   if (info /= psb_success_) then
@@ -279,19 +297,37 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-
+#if defined(SP_A2AV_MPI)
   call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
        & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
        & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
        & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+#elif defined(SP_A2AV_XI)
+    call c_my_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call i_my_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call i_my_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja,rvsz,brvindx,ictxt,info)
+#elif defined(SP_A2AV_MAT)
+    call c_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ipdxv,ictxt,icomm,info)
+#elif
+    choke on me @!
+#endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='mpi_alltoallv')
     goto 9999
   end if
-
+  
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
   !
   ! Convert into local numbering 
   !
@@ -368,4 +404,184 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   return
 
+#if defined(SP_A2AV_XI) || defined(SP_A2AV_MAT) 
+contains
+
+#if defined(SP_A2AV_MAT) 
+  subroutine c_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & valrcv,iarcv,jarcv,rvsz,brvindx,ipdxv,ictxt,icomm,info)
+
+#ifdef MPI_MOD
+    use mpi
+#endif
+    Implicit None
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+complex(psb_spk_), intent(in)     :: valsnd(:)
+    integer(psb_ipk_), intent(in)  :: iasnd(:), jasnd(:),ipdxv(:)
+complex(psb_spk_), intent(out)    :: valrcv(:)
+    integer(psb_ipk_), intent(out) :: iarcv(:), jarcv(:)
+    integer(psb_mpik_), intent(in)  :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(in) :: icomm
+    integer(psb_ipk_), intent(out) :: info
+    !Local variables
+    integer(psb_ipk_)  :: iam, np, i,j,k, ip, ipx, idx, sz, counter
+    integer(psb_mpik_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+    integer(psb_mpik_), allocatable :: prcid(:), rvhd(:,:)
+
+    call psb_info(ictxt,iam,np)
+    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
+      info = psb_err_internal_error_
+      return
+    end if
+
+    allocate(prcid(np),rvhd(np,3))
+    prcid = -1
+
+
+    counter=1
+    Do 
+      ip=ipdxv(counter)
+      if (ip == -1) exit
+      n_el_recv = ipdxv(counter+psb_n_elem_recv_)
+      counter   = counter+n_el_recv
+      n_el_send = ipdxv(counter+psb_n_elem_send_)
+      call psb_get_rank(prcid(ip+1),ictxt,ip)
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        idx = brvindx(ip+1)
+        p2ptag =  psb_complex_swap_tag
+        call mpi_irecv(valrcv(idx+1:idx+sz),sz,&
+             & psb_mpi_c_spk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,1),iret)
+        p2ptag = psb_int_swap_tag
+        call mpi_irecv(iarcv(idx+1:idx+sz),sz,&
+             & psb_mpi_ipk_integer,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,2),iret)
+        call mpi_irecv(jarcv(idx+1:idx+sz),sz,&
+             & psb_mpi_ipk_integer,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,3),iret)
+      end if
+      counter   = counter+n_el_send+3
+    Enddo
+
+
+    counter=1
+    Do 
+      ip=ipdxv(counter)
+      if (ip == -1) exit
+      n_el_recv = ipdxv(counter+psb_n_elem_recv_)
+      counter   = counter+n_el_recv
+      n_el_send = ipdxv(counter+psb_n_elem_send_)
+      if (prcid(ip+1)<0) call psb_get_rank(prcid(ip+1),ictxt,ip)
+      sz = sdsz(ip+1) 
+      if (sz > 0) then
+        idx = bsdindx(ip+1)
+        p2ptag =  psb_complex_swap_tag
+        call mpi_send(valsnd(idx+1:idx+sz),sz,&
+             & psb_mpi_c_spk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+        p2ptag = psb_int_swap_tag
+        call mpi_send(iasnd(idx+1:idx+sz),sz,&
+             & psb_mpi_ipk_integer,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+        call mpi_send(jasnd(idx+1:idx+sz),sz,&
+             & psb_mpi_ipk_integer,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+      end if
+      counter   = counter+n_el_send+3
+    Enddo
+
+    counter=1
+    Do 
+      ip=ipdxv(counter)
+      if (ip == -1) exit
+      n_el_recv = ipdxv(counter+psb_n_elem_recv_)
+      counter   = counter+n_el_recv
+      n_el_send = ipdxv(counter+psb_n_elem_send_)
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        call mpi_wait(rvhd(ip+1,1),p2pstat,iret)
+        call mpi_wait(rvhd(ip+1,2),p2pstat,iret)
+        call mpi_wait(rvhd(ip+1,3),p2pstat,iret)
+      end if
+      counter   = counter+n_el_send+3
+    Enddo
+
+
+  end subroutine c_coo_my_a2av
+#endif
+#if  defined(SP_A2AV_XI) 
+  subroutine c_my_a2av(valsnd,sdsz,bsdindx,&
+       & valrcv,rvsz,brvindx,ictxt,info)
+    complex(psb_spk_), intent(in)  :: valsnd(:)
+    complex(psb_spk_), intent(out) :: valrcv(:)
+    integer(psb_mpik_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(out) :: info
+
+    integer(psb_ipk_) :: iam, np, i,j,k, ip, ipx, idx, sz
+
+    call psb_info(ictxt,iam,np)
+    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
+      info = psb_err_internal_error_
+      return
+    end if
+
+    do ip = 0, np-1
+      sz = sdsz(ip+1) 
+      if (sz > 0) then
+        idx = bsdindx(ip+1)
+        call psb_snd(ictxt,valsnd(idx+1:idx+sz),ip) 
+      end if
+    end do
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        idx = brvindx(ip+1)
+        call psb_rcv(ictxt,valrcv(idx+1:idx+sz),ip) 
+      end if
+    end do
+    
+  end subroutine c_my_a2av
+
+  subroutine i_my_a2av(valsnd,sdsz,bsdindx,&
+       & valrcv,rvsz,brvindx,ictxt,info)
+    integer(psb_ipk_), intent(in)  :: valsnd(:)
+    integer(psb_ipk_), intent(out) :: valrcv(:)
+    integer(psb_mpik_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(out) :: info
+    
+
+    integer(psb_ipk_) :: iam, np, i,j,k, ip, ipx, idx, sz
+
+    call psb_info(ictxt,iam,np)
+    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
+      info = psb_err_internal_error_
+      return
+    end if
+
+    do ip = 0, np-1
+      sz = sdsz(ip+1) 
+      if (sz > 0) then
+        idx = bsdindx(ip+1) 
+        call psb_snd(ictxt,valsnd(idx+1:idx+sz),ip) 
+      end if
+    end do
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        idx = brvindx(ip+1)
+        call psb_rcv(ictxt,valrcv(idx+1:idx+sz),ip) 
+      end if
+    end do
+    
+  end subroutine i_my_a2av
+#endif
+#endif
 End Subroutine psb_csphalo
