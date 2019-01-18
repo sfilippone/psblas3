@@ -3,6 +3,8 @@
 *.mod
 *~
 
+build
+
 # header files generated
 cbind/*.h
 
