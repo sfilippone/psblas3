@@ -1,7 +1,4 @@
-#if (defined(_WIN32) || defined(WIN32))
-#include "stdafx.h"
-#include <Windows.h>
-#else
+#if !(defined(_WIN32) || defined(WIN32))
 #include <sys/time.h>
 #endif
 #include <stdio.h>
@@ -110,7 +107,7 @@
 double mpi_wtime()
 {
 #if defined(WIN32) || defined(_WIN32)
-  LARGE_INTEGER tim, freq;
+  Int64 tim, freq;
   double seconds;
 
   QueryPerformanceCounter(&tim);
