@@ -1,4 +1,4 @@
-#ifdef WIN32
+#ifdef _WIN32
 #include <time.h>
 #include <windows.h>
 #else
