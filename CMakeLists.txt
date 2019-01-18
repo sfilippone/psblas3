@@ -442,6 +442,8 @@ if(METIS_FOUND)
   message(STATUS ${METIS_INCLUDES})
   target_include_directories(util
     PUBLIC ${METIS_INCLUDES})
+  target_include_directories(util_C
+    PUBLIC ${METIS_INCLUDES})
   target_link_libraries(util
     PUBLIC ${METIS_LIBRARIES})
   target_compile_definitions(util_C
