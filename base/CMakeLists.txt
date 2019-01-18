@@ -103,7 +103,6 @@ modules/comm/psb_s_comm_mod.f90
 modules/comm/psb_s_linmap_mod.f90
 modules/comm/psb_z_comm_mod.f90
 modules/comm/psb_z_linmap_mod.f90
-modules/cutil.c
 modules/desc/psb_desc_const_mod.f90
 modules/desc/psb_desc_mod.F90
 modules/desc/psb_gen_block_map_mod.f90
@@ -402,10 +401,17 @@ tools/psb_zspins.f90
 tools/psb_zspins.f90
 tools/psb_zsprn.f90
 )
-if (SERIAL_MPI)
- set(PSB_base_source_files ${PSB_base_source_files} modules/fakempi.c)
-endif()
-
 foreach(file IN LISTS PSB_base_source_files)
   list(APPEND base_source_files ${CMAKE_CURRENT_LIST_DIR}/${file})
+endforeach()
+
+list(APPEND PSB_base_source_C_files modules/cutil.c)
+if (SERIAL_MPI)
+ list(APPEND PSB_base_source_C_files modules/fakempi.c)
+endif()
+if(WIN32)
+  list(APPEND PSB_base_source_C_files modules/gettimeofday.c)
+endif()
+foreach(file IN LISTS PSB_base_source_C_files)
+  list(APPEND base_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
 endforeach()

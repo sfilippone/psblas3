@@ -1,6 +1,4 @@
 set(PSB_util_source_files
-  metis_int.c
-  psb_amd_order.c
   psb_blockpart_mod.f90
   psb_c_hbio_impl.f90
   psb_c_mat_dist_impl.f90
@@ -33,4 +31,12 @@ set(PSB_util_source_files
   )
 foreach(file IN LISTS PSB_util_source_files)
   list(APPEND util_source_files ${CMAKE_CURRENT_LIST_DIR}/${file})
+endforeach()
+
+set(PSB_util_source_C_files
+  metis_int.c
+  psb_amd_order.c
+  )
+foreach(file IN LISTS PSB_util_source_C_files)
+  list(APPEND util_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
 endforeach()

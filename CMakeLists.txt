@@ -277,9 +277,17 @@ endif()
 #------------------------------
 # Find Linear Algebra Libraries
 #------------------------------
+#set(BLA_STATIC 1)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 add_definitions(-DHAVE_LAPACK)
+
+
+#--------------------------------
+# Find METIS partitioning library
+#--------------------------------
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/FindMETIS.cmake)
+find_package(METIS)
 
 #---------------------------------------------------
 # Use standardized GNU install directory conventions
@@ -336,29 +344,29 @@ install(
 
 
 if(MPI_FOUND)
-#------------------------------------------
-# Add portable unistall command to makefile
-#------------------------------------------
-# Adapted from the CMake Wiki FAQ
-configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
+  #------------------------------------------
+  # Add portable unistall command to makefile
+  #------------------------------------------
+  # Adapted from the CMake Wiki FAQ
+  configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
     @ONLY)
 
-add_custom_target ( uninstall
-  COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
+  add_custom_target ( uninstall
+    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
 
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
-# See JSON-Fortran's CMakeLists.txt file to find out how to get the check target to depend
-# on the test executables
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
+  # See JSON-Fortran's CMakeLists.txt file to find out how to get the check target to depend
+  # on the test executables
 
-#----------------------------------
-# Determine if we're using Open MPI
-#---------------------------------
-execute_process(COMMAND ${MPIEXEC} --version
-  OUTPUT_VARIABLE mpi_version_out)
-if (mpi_version_out MATCHES "[Oo]pen[ -][Mm][Pp][Ii]")
-  message( STATUS "OpenMPI detected")
-  set ( openmpi true )
-endif ()
+  #----------------------------------
+  # Determine if we're using Open MPI
+  #---------------------------------
+  execute_process(COMMAND ${MPIEXEC} --version
+    OUTPUT_VARIABLE mpi_version_out)
+  if (mpi_version_out MATCHES "[Oo]pen[ -][Mm][Pp][Ii]")
+    message( STATUS "OpenMPI detected")
+    set ( openmpi true )
+  endif()
 endif()
 
 #---------------------------------------
@@ -369,7 +377,8 @@ endif()
 # cbind.a, util.a krylov.a prec.a base.a
 
 include(${CMAKE_CURRENT_LIST_DIR}/base/CMakeLists.txt)
-add_library(base ${base_source_files})
+add_library(base_C OBJECT ${base_source_C_files})
+add_library(base ${base_source_files} $<TARGET_OBJECTS:base_C>)
 set_target_properties(base
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
@@ -383,7 +392,9 @@ target_include_directories(base PUBLIC
 if(MPI_FOUND)
   target_link_libraries(base PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
 endif()
-
+target_link_libraries(base
+  PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
+  PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES})
 
 include(${CMAKE_CURRENT_LIST_DIR}/prec/CMakeLists.txt)
 add_library(prec ${prec_source_files})
@@ -414,7 +425,8 @@ target_include_directories(krylov PUBLIC
 target_link_libraries(krylov PUBLIC base prec)
 
 include(${CMAKE_CURRENT_LIST_DIR}/util/CMakeLists.txt)
-add_library(util ${util_source_files})
+add_library(util_C OBJECT ${util_source_C_files})
+add_library(util ${util_source_files} $<TARGET_OBJECTS:util_C>)
 set_target_properties(util
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
@@ -426,7 +438,12 @@ target_include_directories(util PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(util PUBLIC base prec)
-
+if(METIS_FOUND)
+  target_include_directories(util
+    PUBLIC ${METIS_INCLUDES})
+  target_link_libraries(util
+    PUBLIC ${METIS_LIBRARIES})
+endif()
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
