@@ -439,10 +439,15 @@ target_include_directories(util PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(util PUBLIC base prec)
 if(METIS_FOUND)
+  message(STATUS ${METIS_INCLUDES})
   target_include_directories(util
     PUBLIC ${METIS_INCLUDES})
   target_link_libraries(util
     PUBLIC ${METIS_LIBRARIES})
+  target_compile_definitions(util_C
+    PUBLIC HAVE_METIS_)
+  target_compile_definitions(util
+    PUBLIC HAVE_METIS)
 endif()
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
