@@ -107,7 +107,7 @@
 double mpi_wtime()
 {
 #if defined(WIN32) || defined(_WIN32)
-  Int64 tim, freq;
+  __int64 tim, freq;
   double seconds;
 
   QueryPerformanceCounter(&tim);
