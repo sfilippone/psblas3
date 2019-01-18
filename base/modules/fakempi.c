@@ -1,4 +1,6 @@
-#if ! (defined(_WIN32) || defined(WIN32))
+#if (defined(_WIN32) || defined(WIN32))
+#include <Windows.h>
+#else
 #include <sys/time.h>
 #endif
 #include <stdio.h>
@@ -112,7 +114,7 @@ double mpi_wtime()
 
   QueryPerformanceCounter(&tim);
   QeryPerformanceFrequency(&freq);
-  seconds = (double)tim / (double) freq;
+  seconds = (double)tim / (double)freq;
   return(seconds);
 #else
   struct timeval tt;
