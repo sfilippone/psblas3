@@ -1,7 +1,4 @@
-#ifdef _WIN32
-#include <windows.h>
-#include <time.h>
-#else
+#if ! (defined(_WIN32) || defined(WIN32))
 #include <sys/time.h>
 #endif
 #include <stdio.h>

@@ -1,8 +1,4 @@
-#ifdef _WIN32
-#include <windows.h>
-#include <time.h>
-#include "gettimeofday.h"
-#else
+#if ! (defined(_WIN32) || defined(WIN32))
 #include <sys/time.h>
 #endif
 #include <stdio.h>
@@ -110,6 +106,15 @@
 
 double mpi_wtime()
 {
+#if defined(WIN32) || defined(_WIN32)
+  LARGE_INTEGER tim, freq;
+  double seconds;
+
+  QueryPerformanceCounter(&tim);
+  QeryPerformanceFrequency(&freq);
+  seconds = (double)tim / (double) freq;
+  return(seconds);
+#else
   struct timeval tt;
   struct timezone tz;
   double temp;
@@ -120,6 +125,7 @@ double mpi_wtime()
     temp = ((double)tt.tv_sec) + ((double)tt.tv_usec)*1.0e-6;
   }
   return(temp);
+#endif
 }
 
 
