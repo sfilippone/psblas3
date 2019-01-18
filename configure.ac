@@ -677,7 +677,7 @@ dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 PAC_CHECK_METIS
 if test "x$psblas_cv_have_metis" == "xyes" ; then 
    FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES"
+   CDEFINES="-DHAVE_METIS_ -DMETIS_$psblas_cv_metis_version $psblas_cv_metis_includes $CDEFINES"
 fi
 
 PAC_CHECK_AMD

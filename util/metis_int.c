@@ -10,6 +10,7 @@ int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg,
 				int *graphpart)
 {
   int res = -1;
+#if defined(METIS_5) 
   idx_t objval = 0;
   idx_t options[METIS_NOPTIONS];
   //printf("Inside Metis/C interface\n");
@@ -35,6 +36,23 @@ int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg,
   }  else {
     return res;
   }
+#elif defined(METIS_4)
+  idxtype objval = 0;
+  int options[8];
+  //printf("Inside Metis/C interface\n");
+  idxtype ncon=1;
+  int wflag=0;
+  int numflag=1;
+  int ecut;
+  options[0]=0;
+  METIS_PartGraphKway((int *)n,(idxtype *)ixadj,(idxtype *)iadj,
+		      NULL,NULL,&wflag,&numflag,nparts,options,
+		      &ecut,(idxtype *)graphpart);
+  return(0); 
+    
+#elif
+  choke on me!
+#endif
 }
 
 
