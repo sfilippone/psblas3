@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <string.h>
 #ifdef _WIN32
-#include <time.h>
 #include <windows.h>
+#include <time.h>
 #include "gettimeofday.h"
 #else
 #include <sys/time.h>
 #endif
+#include <stdio.h>
+#include <string.h>
 #include "psb_internals.h"
 
 
@@ -108,7 +108,7 @@
 #define mpi_complex        5
 #define mpi_double_complex 6
 
-double mpi_wtime() 
+double mpi_wtime()
 {
   struct timeval tt;
   struct timezone tz;

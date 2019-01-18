@@ -6,11 +6,11 @@
   #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
 
-struct timezone
+typedef struct
 {
   int  tz_minuteswest; /* minutes W of Greenwich */
   int  tz_dsttime;     /* type of dst correction */
-};
+} timezone;
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
