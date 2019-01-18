@@ -212,7 +212,7 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
     end if
   end if
   itx=0
-
+  alpha = dzero
 
   restart: do 
 ! =   

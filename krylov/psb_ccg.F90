@@ -204,7 +204,7 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
     istebz = 0
   end if
   itx=0
-
+  alpha = czero
 
   restart: do 
 ! =   
