@@ -1,4 +1,5 @@
 #if (defined(_WIN32) || defined(WIN32))
+#include "stdafx.h"
 #include <Windows.h>
 #else
 #include <sys/time.h>
