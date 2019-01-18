@@ -341,7 +341,6 @@ subroutine smm_mat_read(a, info, iunit, filename)
     call acoo%fix(info)
 
     call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
 
   else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
     ! we are generally working with non-symmetric matrices, so
@@ -363,7 +362,6 @@ subroutine smm_mat_read(a, info, iunit, filename)
     call acoo%fix(info)
 
     call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
 
   else
     write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
@@ -494,7 +492,6 @@ subroutine lsmm_mat_read(a, info, iunit, filename)
     call acoo%fix(info)
 
     call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
 
   else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
     ! we are generally working with non-symmetric matrices, so
@@ -516,7 +513,6 @@ subroutine lsmm_mat_read(a, info, iunit, filename)
     call acoo%fix(info)
 
     call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
 
   else
     write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
