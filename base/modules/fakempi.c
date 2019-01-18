@@ -1,4 +1,9 @@
+#ifdef WIN32
+#include <time.h>
+#include <windows.h>
+#else
 #include <sys/time.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include "psb_internals.h"

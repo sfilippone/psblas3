@@ -1,4 +1,9 @@
+#ifdef WIN32
+#include <time.h>
+#include <windows.h>
+#else
 #include <sys/time.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include "psb_internals.h"
@@ -15,7 +20,7 @@
 #ifdef UpperUnderscore
 #define psi_c_diffadd   PSI_C_DIFFADD_
 #endif
-#ifdef UpperDoubleUnderscore 
+#ifdef UpperDoubleUnderscore
 #define psi_c_diffadd   PSI_C_DIFFADD__
 #endif
 #ifdef UpperCase
