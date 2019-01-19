@@ -129,7 +129,7 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), Optional, Intent(out)       :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_zkryl_rest_vect
-    Subroutine psb_zkryl_cond_vect(a,prec,b,x,eps,desc_a,info,&
+    recursive Subroutine psb_zkryl_cond_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,istop,cond)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_zspmat_type, psb_zprec_type, psb_z_vect_type

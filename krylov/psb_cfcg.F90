@@ -101,9 +101,9 @@
 !                                            stopped when  |r| <= eps * |b|
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
-! 
 !
-subroutine psb_cfcg_vect(a,prec,b,x,eps,desc_a,info,&
+!
+recursive subroutine psb_cfcg_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,istop,cond)
   use psb_base_mod
   use psb_prec_mod
