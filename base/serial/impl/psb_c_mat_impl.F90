@@ -1201,7 +1201,7 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
 
   call move_alloc(altmp,b%a)
   call b%trim()
-  call b%asb() 
+  call b%set_asb() 
   call psb_erractionrestore(err_act)
   return
 
@@ -1293,8 +1293,8 @@ subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
   end if
 
   call move_alloc(altmp,a%a)
-  call a%set_asb() 
   call a%trim()
+  call a%set_asb() 
   call psb_erractionrestore(err_act)
   return
 
