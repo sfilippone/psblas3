@@ -211,7 +211,7 @@ recursive subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
     end if
   end if
   itx=0
-
+  alpha = szero
 
   restart: do 
 ! =   

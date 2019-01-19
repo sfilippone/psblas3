@@ -365,9 +365,9 @@ contains
 
 !!$        write(*,*) 'Before allocation',nparts
 
-        irpl=irp
-        jal = ja
-        nl = n
+        irpl = irp
+        jal  = ja
+        nl   = n
         nptl = nparts
         wgh_ = -1.0
         if(present(weights)) then

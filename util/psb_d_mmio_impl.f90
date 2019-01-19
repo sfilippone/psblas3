@@ -386,7 +386,6 @@ subroutine dmm_mat_read(a, info, iunit, filename)
   if (info == 0) then
     call acoo%fix(info)
     call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
   end if
 
   if (infile /= 5) close(infile)
