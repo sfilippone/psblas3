@@ -1112,9 +1112,6 @@ subroutine psb_c_b_csclip(a,b,info,&
 
 end subroutine psb_c_b_csclip
 
-
-
-
 subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_error_mod
   use psb_string_mod
@@ -1197,7 +1194,7 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
 
   call move_alloc(altmp,b%a)
   call b%trim()
-  call b%asb() 
+  call b%set_asb() 
   call psb_erractionrestore(err_act)
   return
 
@@ -1207,8 +1204,6 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
   return
 
 end subroutine psb_c_cscnv
-
-
 
 subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
   use psb_error_mod
@@ -1289,8 +1284,8 @@ subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
   end if
 
   call move_alloc(altmp,a%a)
-  call a%set_asb() 
   call a%trim()
+  call a%set_asb() 
   call psb_erractionrestore(err_act)
   return
 
