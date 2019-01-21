@@ -454,8 +454,8 @@ if(WIN32)
   target_link_libraries(util
     PUBLIC psb_util_C)
 else()
-  add_library(util_C OBJECT ${util_source_C_files})
-  add_library(util ${util_source_files} $<TARGET_OBJECTS:util_C>)
+  add_library(psb_util_C OBJECT ${util_source_C_files})
+  add_library(util ${util_source_files} $<TARGET_OBJECTS:psb_util_C>)
 endif()
 set_target_properties(util
   PROPERTIES
@@ -472,11 +472,11 @@ if(METIS_FOUND)
   message(STATUS ${METIS_INCLUDES})
   target_include_directories(util
     PUBLIC ${METIS_INCLUDES})
-  target_include_directories(util_C
+  target_include_directories(psb_util_C
     PUBLIC ${METIS_INCLUDES})
   target_link_libraries(util
     PUBLIC ${METIS_LIBRARIES})
-  target_compile_definitions(util_C
+  target_compile_definitions(psb_util_C
     PUBLIC HAVE_METIS_)
   target_compile_definitions(util
     PUBLIC HAVE_METIS)
