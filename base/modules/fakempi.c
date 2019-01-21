@@ -115,7 +115,7 @@ double mpi_wtime()
   double seconds;
 
   QueryPerformanceCounter(&tim);
-  QeryPerformanceFrequency(&freq);
+  QueryPerformanceFrequency(&freq);
   seconds = (double)(tim.QuadPart) / (double)(freq.QuadPart);
   return(seconds);
 #else

@@ -376,8 +376,9 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
 
 
     ! Then I post all the blocking sends
+#ifndef SERIAL_MPI
     if (usersend)  call mpi_barrier(icomm,iret)
-
+#endif
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -388,16 +389,19 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_double_swap_tag
+#ifndef SERIAL_MPI
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
+#endif
           call mpi_send(rcvbuf(rcv_pt),n*nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
+#ifndef SERIAL_MPI
         end if
-
+#endif
         if(iret /= mpi_success) then
           ierr(1) = iret
           info=psb_err_mpi_error_
@@ -874,8 +878,9 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,&
 
 
     ! Then I post all the blocking sends
+#ifndef SERIAL_MPI
     if (usersend)  call mpi_barrier(icomm,iret)
-
+#endif
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -886,16 +891,19 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,&
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_double_swap_tag
+#ifndef SERIAL_MPI
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag, icomm,iret)
         else
+#endif
           call mpi_send(rcvbuf(rcv_pt),nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag, icomm,iret)
+#ifndef SERIAL_MPI
         end if
-
+#endif
         if(iret /= mpi_success) then
           ierr(1) = iret
           info=psb_err_mpi_error_

@@ -365,8 +365,9 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
 
     ! Then I post all the blocking sends
+#ifndef SERIAL_MPI
     if (usersend)  call mpi_barrier(icomm,iret)
-
+#endif
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -376,17 +377,20 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = psb_double_swap_tag
-      if ((nesd>0).and.(proc_to_comm /= me)) then 
-        if (usersend) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then
+#ifndef SERIAL_MPI
+        if (usersend) then
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
+#endif
           call mpi_send(sndbuf(snd_pt),n*nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,iret)
+#ifndef SERIAL_MPI
         end if
-
+#endif
         if(iret /= mpi_success) then
           ierr(1) = iret
           info=psb_err_mpi_error_
@@ -855,8 +859,9 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
 
 
     ! Then I post all the blocking sends
+#ifndef SERIAL_MPI
     if (usersend)  call mpi_barrier(icomm,iret)
-
+#endif
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -868,16 +873,19 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       p2ptag = psb_double_swap_tag
 
       if ((nesd>0).and.(proc_to_comm /= me)) then 
+#ifndef SERIAL_MPI
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
+#endif
           call mpi_send(sndbuf(snd_pt),nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
+#ifndef SERIAL_MPI
         end if
-
+#endif
         if(iret /= mpi_success) then
           ierr(1) = iret
           info=psb_err_mpi_error_
