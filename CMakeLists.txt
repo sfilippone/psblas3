@@ -84,23 +84,25 @@ else()
   message( FATAL_ERROR "Fortran name mangling suffix, \'${FortranCInterface_GLOBAL__SUFFIX}\', unknown to PSBLAS")
 endif()
 
-#----------------------------------------------
-# Determine system endian-ness and pointer size
-#----------------------------------------------
-include(TestBigEndian)
-TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
-if(IS_BIG_ENDIAN)
-  message( STATUS "System appears to be big endian.")
-else()
-  message( STATUS "System appears to be little endian.")
-  add_definitions(-DLittleEndian)
+if(NOT ${WIN32})
+  #----------------------------------------------
+  # Determine system endian-ness and pointer size
+  #----------------------------------------------
+  include(TestBigEndian)
+  TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+  if(IS_BIG_ENDIAN)
+    message( STATUS "System appears to be big endian.")
+  else()
+    message( STATUS "System appears to be little endian.")
+    add_definitions(-DLittleEndian)
+  endif()
+  include(CheckTypeSize)
+  CHECK_TYPE_SIZE("void *" VOID_P_SIZE LANGUAGE C)
+  if(${VOID_P_SIZE} EQUAL 8)
+    add_definitions(-DPtr64Bits)
+  endif()
+  message(STATUS "Have 64bit pointers")
 endif()
-include(CheckTypeSize)
-CHECK_TYPE_SIZE("void *" VOID_P_SIZE LANGUAGE C)
-if(${VOID_P_SIZE} EQUAL 8)
-  add_definitions(-DPtr64Bits)
-endif()
-message(STATUS "Have 64bit pointers")
 
 #-----------------------------------------
 # Check for some Fortran compiler features
