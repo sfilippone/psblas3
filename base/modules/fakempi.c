@@ -116,7 +116,7 @@ double mpi_wtime()
 
   QueryPerformanceCounter(&tim);
   QeryPerformanceFrequency(&freq);
-  seconds = (double)tim / (double)freq;
+  seconds = (double)(tim.QuadPart) / (double)(freq.QuadPart);
   return(seconds);
 #else
   struct timeval tt;
