@@ -377,8 +377,23 @@ endif()
 # cbind.a, util.a krylov.a prec.a base.a
 
 include(${CMAKE_CURRENT_LIST_DIR}/base/CMakeLists.txt)
-add_library(base_C OBJECT ${base_source_C_files})
-add_library(base ${base_source_files} $<TARGET_OBJECTS:base_C>)
+if(WIN32)
+  add_library(psb_base_C STATIC ${base_source_C_files})
+  target_compile_definitions(psb_base_C
+    PRIVATE -DWIN32 -D_LIB -DWIN64)
+  set_target_properties(psb_base_C
+    PROPERTIES
+    LINKER_LANGUAGE C
+    POSITION_INDEPENDENT_CODE TRUE)
+  target_link_libraries(psb_base_C
+    PUBLIC kernel32 user32 shell32)
+  add_library(base ${base_source_files})
+  target_link_libraries(base
+    PUBLIC psb_base_C)
+else()
+  add_library(base_C OBJECT ${base_source_C_files})
+  add_library(base ${base_source_files} $<TARGET_OBJECTS:base_C>)
+endif()
 set_target_properties(base
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
@@ -425,8 +440,23 @@ target_include_directories(krylov PUBLIC
 target_link_libraries(krylov PUBLIC base prec)
 
 include(${CMAKE_CURRENT_LIST_DIR}/util/CMakeLists.txt)
-add_library(util_C OBJECT ${util_source_C_files})
-add_library(util ${util_source_files} $<TARGET_OBJECTS:util_C>)
+if(WIN32)
+  add_library(psb_util_C STATIC ${util_source_C_files})
+  target_compile_definitions(psb_util_C
+    PRIVATE -DWIN32 -D_LIB -DWIN64)
+  set_target_properties(psb_util_C
+    PROPERTIES
+    LINKER_LANGUAGE C
+    POSITION_INDEPENDENT_CODE TRUE)
+  target_link_libraries(psb_util_C
+    PUBLIC kernel32 user32 shell32)
+  add_library(util ${util_source_files})
+  target_link_libraries(util
+    PUBLIC psb_util_C)
+else()
+  add_library(util_C OBJECT ${util_source_C_files})
+  add_library(util ${util_source_files} $<TARGET_OBJECTS:util_C>)
+endif()
 set_target_properties(util
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}"
