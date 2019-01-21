@@ -5,7 +5,7 @@
 # Set oldest allowable CMake version
 #-----------------------------------
 cmake_minimum_required(VERSION 3.10)
-cmake_policy(VERSION 3.10.0...3.12.4)
+cmake_policy(VERSION 3.11.1...3.13.3)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -70,8 +70,9 @@ endif()
 #------------------------------------
 # Fortran name mangling introspection
 #------------------------------------
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
 include(FortranCInterface)
-string(TOUPPER ${FortranCInterface_GLOBAL__CASE} fc_case)
+CapitalizeString(${FortranCInterface_GLOBAL__CASE} fc_case)
 message(STATUS "Name mangling capitalization: ${fc_case}")
 message(STATUS "Name mangling fortran global suffix underscore: ${FortranCInterface_GLOBAL__SUFFIX}")
 if(FortranCInterface_GLOBAL__SUFFIX STREQUAL "")
