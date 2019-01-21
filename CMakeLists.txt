@@ -441,18 +441,22 @@ target_link_libraries(krylov PUBLIC base prec)
 
 include(${CMAKE_CURRENT_LIST_DIR}/util/CMakeLists.txt)
 if(WIN32)
-  add_library(psb_util_C STATIC ${util_source_C_files})
-  target_compile_definitions(psb_util_C
-    PRIVATE -DWIN32 -D_LIB -DWIN64)
-  set_target_properties(psb_util_C
-    PROPERTIES
-    LINKER_LANGUAGE C
-    POSITION_INDEPENDENT_CODE TRUE)
-  target_link_libraries(psb_util_C
-    PUBLIC kernel32 user32 shell32)
+  if(METIS_FOUND)
+    add_library(psb_util_C STATIC ${util_source_C_files})
+    target_compile_definitions(psb_util_C
+      PRIVATE -DWIN32 -D_LIB -DWIN64)
+    set_target_properties(psb_util_C
+      PROPERTIES
+      LINKER_LANGUAGE C
+      POSITION_INDEPENDENT_CODE TRUE)
+    target_link_libraries(psb_util_C
+      PUBLIC kernel32 user32 shell32)
+  endif()
   add_library(util ${util_source_files})
-  target_link_libraries(util
-    PUBLIC psb_util_C)
+  if(METIS_FOUND)
+    target_link_libraries(util
+      PUBLIC psb_util_C)
+  endif()
 else()
   add_library(psb_util_C OBJECT ${util_source_C_files})
   add_library(util ${util_source_files} $<TARGET_OBJECTS:psb_util_C>)
@@ -489,14 +493,20 @@ install(TARGETS base prec krylov util
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   )
-
-
-
-# set(directory_list base prec krylov util test) # TODO: add cbind
-# foreach(directory ${directory_list})
-#   add_subdirectory("${directory}")
-# endforeach()
-#add_subdirectory(cbind)
+if(WIN32)
+  install(TARGETS psb_base_C
+    EXPORT ${CMAKE_PROJECT_NAME}-targets
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
+  if(METIS_FOUND)
+    install(TARGETS psb_util_C
+      EXPORT ${CMAKE_PROJECT_NAME}-targets
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      )
+  endif()
+endif()
 
 #-----------------
 # Add PSBLAS tests
