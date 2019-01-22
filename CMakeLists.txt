@@ -280,7 +280,7 @@ endif()
 #------------------------------
 # Find Linear Algebra Libraries
 #------------------------------
-#set(BLA_STATIC 1)
+set(BLA_STATIC ON)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 add_definitions(-DHAVE_LAPACK)
