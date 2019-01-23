@@ -149,7 +149,7 @@ subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
           end do
         end do
         do j=i,nr-ma
-          a%irp(ma+i+1) = a%irp(ma+i)
+          a%irp(ma+j+1) = a%irp(ma+j)
         end do
       class default 
 
@@ -159,8 +159,8 @@ subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
 
     else
 
-      do i=ma+2,nr+1
-        a%irp(i) = a%irp(i-1)
+      do j=ma+2,nr+1
+        a%irp(j) = a%irp(j-1)
       end do
 
     end if
@@ -354,7 +354,7 @@ subroutine psb_lcbase_rwextd(nr,a,info,b,rowscale)
           end do
         end do
         do j=i,nr-ma
-          a%irp(ma+i+1) = a%irp(ma+i)
+          a%irp(ma+j+1) = a%irp(ma+j)
         end do
       class default 
 
@@ -364,8 +364,8 @@ subroutine psb_lcbase_rwextd(nr,a,info,b,rowscale)
 
     else
 
-      do i=ma+2,nr+1
-        a%irp(i) = a%irp(i-1)
+      do j=ma+2,nr+1
+        a%irp(j) = a%irp(j-1)
       end do
 
     end if
