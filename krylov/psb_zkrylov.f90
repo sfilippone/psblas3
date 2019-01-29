@@ -99,7 +99,7 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
 
   abstract interface
-    subroutine psb_zkryl_vect(a,prec,b,x,eps,&
+    recursive subroutine psb_zkryl_vect(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_zspmat_type, psb_zprec_type, psb_z_vect_type
@@ -114,7 +114,7 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zkryl_vect
-    Subroutine psb_zkryl_rest_vect(a,prec,b,x,eps,desc_a,info,&
+    recursive Subroutine psb_zkryl_rest_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_zspmat_type, psb_zprec_type, psb_z_vect_type

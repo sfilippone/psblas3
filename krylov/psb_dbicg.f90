@@ -94,7 +94,7 @@
 ! 
 !
 
-subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
+recursive subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod

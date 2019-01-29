@@ -92,7 +92,7 @@
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !
-Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
+recursive Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod

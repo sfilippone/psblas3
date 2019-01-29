@@ -93,7 +93,7 @@
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !
-Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
+recursive Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
   use psb_d_krylov_conv_mod
