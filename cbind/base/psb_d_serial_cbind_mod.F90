@@ -39,13 +39,11 @@ contains
 
     res = -1
 
-    if (c_associated(xh%item)) then
-      res = 0 
+    if (c_associated(xh%item)) then 
       call c_f_pointer(xh%item,vp)
       fv = vp%get_vect()
       sz = size(fv)
       v(1:sz) = fv(1:sz)
-      write(0,*) 'In dvect_f_get_cpy:',v(1),fv(1)
     end if
 
   end function psb_c_dvect_f_get_cpy
