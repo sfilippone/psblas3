@@ -1,12 +1,12 @@
 module psb_s_psblas_cbind_mod
   use iso_c_binding
+  use psb_base_mod
+  use psb_objhandle_mod
+  use psb_base_string_cbind_mod
   
 contains
   
   function psb_c_sgeaxpby(alpha,xh,beta,yh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
@@ -44,9 +44,6 @@ contains
   end function psb_c_sgeaxpby
 
   function psb_c_sgenrm2(xh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     real(c_float) :: res
 
@@ -74,9 +71,6 @@ contains
   end function psb_c_sgenrm2
   
   function psb_c_sgeamax(xh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     real(c_float) :: res
 
@@ -103,9 +97,6 @@ contains
   end function psb_c_sgeamax
   
   function psb_c_sgeasum(xh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     real(c_float) :: res
 
@@ -134,9 +125,6 @@ contains
 
   
   function psb_c_sspnrmi(ah,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     real(c_float) :: res
 
@@ -163,9 +151,6 @@ contains
   end function psb_c_sspnrmi
 
   function psb_c_sgedot(xh,yh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     real(c_float) :: res
 
@@ -197,9 +182,6 @@ contains
 
 
   function psb_c_sspmm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
@@ -242,9 +224,6 @@ contains
 
 
   function psb_c_sspmm_opt(alpha,ah,xh,beta,yh,cdh,trans,doswap) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
@@ -294,9 +273,6 @@ contains
   
 
   function psb_c_sspsm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
