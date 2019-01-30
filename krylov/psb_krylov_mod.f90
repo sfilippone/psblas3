@@ -40,7 +40,7 @@ Module psb_krylov_mod
 
   interface psb_krylov
     
-    Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
+    recursive Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
       use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_sspmat_type, &
@@ -61,7 +61,7 @@ Module psb_krylov_mod
 
     end Subroutine psb_skrylov_vect
 
-    Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
+    recursive Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
       use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_cspmat_type, &
@@ -82,7 +82,7 @@ Module psb_krylov_mod
 
     end Subroutine psb_ckrylov_vect
 
-    Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
+    recursive Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
       use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_dspmat_type, &
@@ -103,7 +103,7 @@ Module psb_krylov_mod
 
     end Subroutine psb_dkrylov_vect
 
-    Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
+    recursive Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
       use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_zspmat_type, &

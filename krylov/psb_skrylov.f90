@@ -78,7 +78,7 @@
 !                                           where r is the (preconditioned, recursive
 !                                           estimate of) residual 
 ! 
-Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
+recursive Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,irst,istop,cond)
 
   use psb_base_mod
