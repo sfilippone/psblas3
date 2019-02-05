@@ -93,11 +93,11 @@ contains
 
   end subroutine log_conv
 
-  subroutine log_end(methdname,me,it,errnum,errden,eps,err,iter)
+  subroutine log_end(methdname,me,it,itrace,errnum,errden,eps,err,iter)
     !use psb_base_mod
     implicit none 
     character(len=*), intent(in) :: methdname
-    integer(psb_ipk_), intent(in)          :: me, it
+    integer(psb_ipk_), intent(in)          :: me, it,itrace
     real(psb_dpk_), intent(in) :: errnum, errden, eps
     real(psb_dpk_), optional, intent(out) :: err
     integer(psb_ipk_), optional, intent(out)  :: iter
@@ -106,24 +106,28 @@ contains
     character(len=*), parameter  :: fmt1='(a,3(2x,es15.9))'
 
     if (errden == dzero) then 
-      if (errnum > eps) then         
-        if (me == 0) then 
-          write(psb_out_unit,fmt) trim(methdname)//' failed to converge to ',eps,&
-               & ' in ',it,' iterations. '
-          write(psb_out_unit,fmt1) 'Last iteration error estimate: ',&
-               & errnum
+      if (errnum > eps) then
+        if (itrace >=0) then           
+          if (me == 0) then 
+            write(psb_out_unit,fmt) trim(methdname)//' failed to converge to ',eps,&
+                 & ' in ',it,' iterations. '
+            write(psb_out_unit,fmt1) 'Last iteration error estimate: ',&
+                 & errnum
+          end if
         end if
       end if
       if (present(err)) err=errnum
     else
-      if (errnum/errden > eps) then         
-        if (me == 0) then 
-          write(psb_out_unit,fmt) trim(methdname)//' failed to converge to ',eps,&
-               & ' in ',it,' iterations. '
-          write(psb_out_unit,fmt1) 'Last iteration error estimate: ',&
-               & errnum/errden
-        end if
-      endif
+      if (errnum/errden > eps) then
+        if (itrace >=0) then 
+          if (me == 0) then 
+            write(psb_out_unit,fmt) trim(methdname)//' failed to converge to ',eps,&
+                 & ' in ',it,' iterations. '
+            write(psb_out_unit,fmt1) 'Last iteration error estimate: ',&
+                 & errnum/errden
+          end if
+        endif
+      end if
       if (present(err)) err=errnum/errden
     end if
     if (present(iter)) iter = it
@@ -142,7 +146,7 @@ contains
     real(psb_dpk_), optional, intent(out) :: err
     integer(psb_ipk_), optional, intent(out)  :: iter
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act, itrace
     real(psb_dpk_)                  :: errnum, errden, eps
     character(len=20)               :: name
 
@@ -154,8 +158,9 @@ contains
 
     errnum = stopdat%values(psb_ik_errnum_) 
     errden = stopdat%values(psb_ik_errden_) 
-    eps    = stopdat%values(psb_ik_eps_) 
-    call log_end(methdname,me,it,errnum,errden,eps,err,iter)
+    eps    = stopdat%values(psb_ik_eps_)
+    itrace = stopdat%controls(psb_ik_trace_)
+    call log_end(methdname,me,it,itrace,errnum,errden,eps,err,iter)
 
   end subroutine psb_d_end_conv
   

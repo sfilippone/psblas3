@@ -477,7 +477,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   if (itrace_ > 0) &
        & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
 
-  call log_end(methdname,me,itx,errnum,errden,deps,err=derr,iter=iter)
+  call log_end(methdname,me,itx,itrace_,errnum,errden,deps,err=derr,iter=iter)
   if (present(err)) err = derr
 
   

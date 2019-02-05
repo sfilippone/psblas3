@@ -88,7 +88,7 @@ y \leftarrow \alpha  A^T x + \beta y
 <A NAME="eq:f90spmm_tra"></A>
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_tra"></A><IMG
- WIDTH="111" HEIGHT="27" BORDER="0"
+ WIDTH="112" HEIGHT="27" BORDER="0"
  SRC="img49.png"
  ALT="\begin{displaymath}
 y \leftarrow \alpha A^T x + \beta y
@@ -122,7 +122,7 @@ y \leftarrow \alpha A^H x + \beta y
 where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></STRONG></DT>
 <DD>is the global dense matrix <SPAN CLASS="MATH"><IMG
@@ -163,13 +163,13 @@ Data types</CAPTION>
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$"></SPAN>, <SPAN CLASS="MATH"><IMG
  WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -213,7 +213,7 @@ call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$"></SPAN>.
 <BR>
@@ -244,7 +244,7 @@ Specified as: an object of type spdata<TT>psb_Tspmat_type</TT>.
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 
@@ -258,7 +258,7 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spmm">12</A>.  The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -299,7 +299,7 @@ Table&nbsp;<A HREF="#tab:f90spmm">12</A>. The rank of <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 </DD>
@@ -336,7 +336,7 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <SPAN CLASS="MATH"><IMG
- WIDTH="78" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="79" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img53.png"
  ALT="$trans = N$"></SPAN>
 <BR>
@@ -354,7 +354,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
