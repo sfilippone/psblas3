@@ -96,10 +96,12 @@ Intent: {\bf in}.\\
 Default: $itmax = 1000$.\\
 Specified as: an integer variable $itmax \ge 1$.
 \item[itrace] If $>0$  print out an informational message about
-  convergence  every $itrace$ iterations.\\ 
+  convergence  every $itrace$ iterations. If $=0$ print a message in
+  case of convergence failure.\\ 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Intent: {\bf in}.\\
+Default: $itrace = -1$.\\
 \item[irst]  An integer specifying the restart parameter.\\
 Scope: {\bf global} \\
 Type: {\bf optional}.\\

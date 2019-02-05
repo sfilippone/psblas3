@@ -152,7 +152,7 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   procedure(psb_skryl_cond_vect) :: psb_scg_vect, psb_sfcg_vect
 
   
-  integer(psb_ipk_) :: ictxt,me,np,err_act
+  integer(psb_ipk_) :: ictxt,me,np,err_act, itrace_
   character(len=20)             :: name
 
   info = psb_success_
@@ -165,38 +165,44 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
   ! Default return for COND
   if (present(cond)) cond = szero
-  
+
+  if (present(itrace)) then
+    itrace_ = itrace
+  else
+    itrace_ = -1
+  end if
+
   select case(psb_toupper(method))
   case('CG') 
     call  psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop,cond)
+         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
   case('FCG') 
     call  psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop,cond)
+         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
   case('GCR') 
     call  psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop)
   case('CGS') 
     call  psb_scgs_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop)
   case('BICG') 
     call  psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop)
   case('BICGSTAB') 
     call  psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop)
   case('RGMRES','GMRES')
     call  psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
+         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
   case('BICGSTABL')
     call  psb_scgstabl_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
+         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
   case default
     if (me == 0) write(psb_err_unit,*) trim(name),&
          & ': Warning: Unknown method  ',method,&
          & ', defaulting to BiCGSTAB'
     call  psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop)
   end select
 
   if(info /= psb_success_) then

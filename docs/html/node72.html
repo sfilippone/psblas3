@@ -90,11 +90,11 @@ Specified as: an integer value.
  $i\in \{1\dots mg\}$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="99" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img86.png"
  ALT="$i\in \{1\dots mg\}$"></SPAN> is allocated
   to process <SPAN CLASS="MATH"><IMG
- WIDTH="38" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img87.png"
  ALT="$vg(i)$"></SPAN>.
 <BR>
@@ -108,7 +108,7 @@ Specified as: an integer array.
 </DD>
 <DT><STRONG>flag</STRONG></DT>
 <DD>Specifies whether entries in <SPAN CLASS="MATH"><IMG
- WIDTH="20" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img88.png"
  ALT="$vg$"></SPAN> are zero- or one-based.
 <BR>
@@ -119,10 +119,10 @@ Type:<B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer value <SPAN CLASS="MATH"><IMG
- WIDTH="27" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img89.png"
  ALT="$0,1$"></SPAN>, default <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img90.png"
  ALT="$0$"></SPAN>.
 
@@ -152,7 +152,7 @@ Specified as: a subroutine.
 <DT><STRONG>vl</STRONG></DT>
 <DD>Data allocation: the set of global indices 
   <SPAN CLASS="MATH"><IMG
- WIDTH="65" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img91.png"
  ALT="$vl(1:nl)$"></SPAN> belonging to the calling process. 
 <BR>
@@ -204,10 +204,10 @@ Specified as: a logical value, default: <code>.false.</code>
 <DT><STRONG>lidx</STRONG></DT>
 <DD>Data allocation: the set of local  indices 
   <SPAN CLASS="MATH"><IMG
- WIDTH="80" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="80" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img92.png"
  ALT="$lidx(1:nl)$"></SPAN> to be assigned to the global indices <SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img93.png"
  ALT="$vl$"></SPAN>. 
 <BR>
@@ -300,10 +300,10 @@ An integer value; 0 means no error has been detected.
  $0\le pv(i) < np$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="106" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="106" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img94.png"
  ALT="$0\le pv(i) &lt; np$"></SPAN>; if <SPAN CLASS="MATH"><IMG
- WIDTH="51" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="51" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img95.png"
  ALT="$nv&gt;1$"></SPAN> we have an index assigned to multiple
     processes, i.e. we have an overlap among the subdomains.
@@ -318,23 +318,23 @@ An integer value; 0 means no error has been detected.
  $i \in \{1\dots mg\}$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="99" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img86.png"
  ALT="$i\in \{1\dots mg\}$"></SPAN> is assigned to process <SPAN CLASS="MATH"><IMG
- WIDTH="38" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img87.png"
  ALT="$vg(i)$"></SPAN>. 
   The vector <code>vg</code> must be identical on all
   calling processes; its entries may have the ranges <SPAN CLASS="MATH"><IMG
- WIDTH="93" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="93" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img96.png"
  ALT="$(0\dots np-1)$"></SPAN>
   or <SPAN CLASS="MATH"><IMG
- WIDTH="66" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img97.png"
  ALT="$(1\dots np)$"></SPAN> according to the value of <code>flag</code>.  
   The size <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img98.png"
  ALT="$mg$"></SPAN> may be  specified via the optional argument <code>mg</code>;
   the default is to use the entire vector <code>vg</code>, thus having
@@ -344,7 +344,7 @@ An integer value; 0 means no error has been detected.
 <DD>In this case we are specifying the list of indices
   <code>vl(1:nl)</code> assigned   to the current process; thus, the global
   problem size <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img98.png"
  ALT="$mg$"></SPAN> is given by 
   the range of the aggregate of the individual vectors <code>vl</code> specified
@@ -353,7 +353,7 @@ An integer value; 0 means no error has been detected.
   <code>vl</code>, thus having   <code>nl=size(vl)</code>.  
   If <code>globalcheck=.true.</code>   the subroutine will check how many
   times  each entry in the global   index   space <SPAN CLASS="MATH"><IMG
- WIDTH="70" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="71" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img99.png"
  ALT="$(1\dots mg)$"></SPAN> is
   specified in the input lists   <code>vl</code>, thus allowing for the
@@ -377,7 +377,7 @@ An integer value; 0 means no error has been detected.
 <DD>If this argument is specified alone (i.e. without <code>vl</code>)
   the  result is  a generalized row-block   distribution in which each
   process <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img100.png"
  ALT="$I$"></SPAN> gets assigned a consecutive   chunk of <SPAN CLASS="MATH"><IMG
  WIDTH="60" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"

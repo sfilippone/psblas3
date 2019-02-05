@@ -65,7 +65,7 @@ loc\_x_i \leftarrow scatter(glob\_x)
  -->
 
 <IMG
- WIDTH="168" HEIGHT="29" BORDER="0"
+ WIDTH="167" HEIGHT="28" BORDER="0"
  SRC="img83.png"
  ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
 </DIV>
@@ -81,7 +81,7 @@ where:
  $glob\_x_{1:m,1:n}$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img75.png"
  ALT="$glob\_x_{1:m,1:n}$"></SPAN>
 </DD>
@@ -91,12 +91,12 @@ where:
  ALT="$loc\_x_i$"></SPAN></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN>.
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="53" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="53" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img84.png"
  ALT="$scatter$"></SPAN></STRONG></DT>
 <DD>is the scatter function.
@@ -113,7 +113,7 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="33" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img78.png"
  ALT="$x_i, y$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -143,7 +143,7 @@ Data types</CAPTION>
 <P>
 <BR>
 <IMG
- WIDTH="539" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="537" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
  SRC="img85.png"
  ALT="\begin{lstlisting}
 call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
@@ -182,7 +182,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <SPAN CLASS="MATH"><IMG
- WIDTH="74" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img80.png"
  ALT="$root=-1$"></SPAN> all
   the processes have a copy of the global vector.
@@ -197,7 +197,7 @@ Specified as: an integer variable <!-- MATH
  $-1\le root\le np-1$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="140" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img81.png"
  ALT="$-1\le root\le np-1$"></SPAN>, default
 <code>psb_root_</code>, i.e. process 0. 
