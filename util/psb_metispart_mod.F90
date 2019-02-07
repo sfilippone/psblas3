@@ -413,12 +413,15 @@ contains
 
   end subroutine build_mtpart
 
-
-  subroutine free_part(info)
+  !
+  ! WARNING: called IRET otherwise Intel compiler complains,
+  ! methinks it's a compiler bug, will need to report. 
+  !
+  subroutine free_part(iret)
     implicit none 
-    integer(psb_ipk_) :: info
-    
-    deallocate(graph_vect,stat=info)
+    integer(psb_ipk_), intent(out) :: iret
+
+    deallocate(graph_vect,stat=iret)
     return
   end subroutine free_part    
 
