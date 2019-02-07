@@ -108,11 +108,16 @@ module psb_gen_block_map_mod
        & block_g2ls1_ins, block_g2ls2_ins, block_g2lv1_ins, block_g2lv2_ins, &
        & block_lg2ls1_ins, block_lg2ls2_ins, block_lg2lv1_ins, block_lg2lv2_ins, &
        & block_clone, block_reinit,&
-       & block_get_fmt, gen_block_search, l_gen_block_search
-
+       & block_get_fmt, i_gen_block_search
+#if defined(IPK4) && defined(LPK8)
+  private ::  l_gen_block_search
+#endif
+  
   interface gen_block_search
+    module procedure i_gen_block_search
+#if defined(IPK4) && defined(LPK8)
     module procedure l_gen_block_search
-!    module procedure gen_block_search, l_gen_block_search
+#endif
   end interface gen_block_search
 
   integer(psb_ipk_), private :: laddsz=500
@@ -2158,7 +2163,7 @@ contains
   ! This is a purely internal version of "binary" search
   ! specialized for gen_block usage.
   !
-  function  gen_block_search(key,n,v) result(ipos)
+  function  i_gen_block_search(key,n,v) result(ipos)
     implicit none
     integer(psb_lpk_) :: key
     integer(psb_ipk_) :: ipos, n
@@ -2197,8 +2202,10 @@ contains
       ipos = ub 
     endif
     return
-  end function gen_block_search
+  end function i_gen_block_search
 
+#if defined(IPK4) && defined(LPK8)
+ 
   function  l_gen_block_search(key,n,v) result(ipos)
     implicit none
     integer(psb_ipk_) :: ipos, n
@@ -2239,5 +2246,5 @@ contains
     endif
     return
   end function l_gen_block_search
-
+#endif
 end module psb_gen_block_map_mod
