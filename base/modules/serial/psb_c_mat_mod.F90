@@ -315,9 +315,9 @@ module psb_c_mat_mod
     procedure, pass(a) :: csgetblk    => psb_lc_csgetblk
     generic, public    :: csget       => csgetptn, csgetrow, csgetblk
 #if defined(IPK4) && defined(LPK8)
-    procedure, pass(a) :: icsgetptn    => psb_lc_icsgetptn
-    procedure, pass(a) :: icsgetrow    => psb_lc_icsgetrow
-    generic, public    :: csget        => icsgetptn, icsgetrow
+!!$    procedure, pass(a) :: icsgetptn    => psb_lc_icsgetptn
+!!$    procedure, pass(a) :: icsgetrow    => psb_lc_icsgetrow
+!!$    generic, public    :: csget        => icsgetptn, icsgetrow
 #endif    
     procedure, pass(a) :: tril        => psb_lc_tril
     procedure, pass(a) :: triu        => psb_lc_triu
@@ -2654,83 +2654,87 @@ contains
   end subroutine psb_lc_clean_zeros
 
 #if defined(IPK4) && defined(LPK8)
-  subroutine psb_lc_icsgetptn(imin,imax,a,nz,ia,ja,info,&
-       & jmin,jmax,iren,append,nzin,rscale,cscale)
-    implicit none 
-    class(psb_lcspmat_type), intent(in) :: a
-    integer(psb_ipk_), intent(in)                  :: imin,imax
-    integer(psb_ipk_), intent(out)                 :: nz
-    integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-    integer(psb_ipk_),intent(out)                  :: info
-    logical, intent(in), optional        :: append
-    integer(psb_ipk_), intent(in), optional        :: iren(:)
-    integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-    logical, intent(in), optional        :: rscale,cscale
-
-    ! Local
-    integer(psb_ipk_), allocatable :: lia(:), lja(:)
-
-    info = psb_success_
-    !
-    ! Note: in principle we could use reallocate on assignment,
-    ! but GCC bug 52162 forces us to take defensive programming.
-    !
-    if (allocated(ia)) then
-      call psb_realloc(size(ia),lia,info)
-      if (info == psb_success_) lia(:) = ia(:)
-    end if
-    if (allocated(ja)) then
-      call psb_realloc(size(ja),lja,info)
-      if (info == psb_success_) lja(:) = ja(:)
-    end if
-    call a%csget(imin,imax,nz,lia,lja,info,&
-       & jmin,jmax,iren,append,nzin,rscale,cscale)
-   
-    call psb_ensure_size(size(lia),ia,info)
-    if (info == psb_success_) ia(:) = lia(:)
-    call psb_ensure_size(size(lja),ja,info)
-    if (info == psb_success_) ja(:) = lja(:)
-    
-  end subroutine psb_lc_icsgetptn
-  
-  subroutine psb_lc_icsgetrow(imin,imax,a,nz,ia,ja,val,info,&
-       & jmin,jmax,iren,append,nzin,rscale,cscale)
-    implicit none 
-    class(psb_lcspmat_type), intent(in) :: a
-    integer(psb_ipk_), intent(in)                  :: imin,imax
-    integer(psb_ipk_), intent(out)                 :: nz
-    integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-    complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
-    integer(psb_ipk_),intent(out)                  :: info
-    logical, intent(in), optional        :: append
-    integer(psb_ipk_), intent(in), optional        :: iren(:)
-    integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-    logical, intent(in), optional        :: rscale,cscale
-    ! Local
-    integer(psb_ipk_), allocatable :: lia(:), lja(:)
-
-    !
-    ! Note: in principle we could use reallocate on assignment,
-    ! but GCC bug 52162 forces us to take defensive programming.
-    !
-    if (allocated(ia)) then
-      call psb_realloc(size(ia),lia,info)
-      if (info == psb_success_) lia(:) = ia(:)
-    end if
-    if (allocated(ja)) then
-      call psb_realloc(size(ja),lja,info)
-      if (info == psb_success_) lja(:) = ja(:)
-    end if
-
-    call a%csget(imin,imax,nz,lia,lja,val,info,&
-       & jmin,jmax,iren,append,nzin,rscale,cscale)
-   
-    call psb_ensure_size(size(lia),ia,info)
-    if (info == psb_success_) ia(:) = lia(:)
-    call psb_ensure_size(size(lja),ja,info)
-    if (info == psb_success_) ja(:) = lja(:)
-        
-  end subroutine psb_lc_icsgetrow
+!!$  subroutine psb_lc_icsgetptn(imin,imax,a,nz,ia,ja,info,&
+!!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
+!!$    implicit none 
+!!$    class(psb_lcspmat_type), intent(in) :: a
+!!$    integer(psb_ipk_), intent(in)                  :: imin,imax
+!!$    integer(psb_ipk_), intent(out)                 :: nz
+!!$    integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+!!$    integer(psb_ipk_),intent(out)                  :: info
+!!$    logical, intent(in), optional        :: append
+!!$    integer(psb_ipk_), intent(in), optional        :: iren(:)
+!!$    integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
+!!$    logical, intent(in), optional        :: rscale,cscale
+!!$
+!!$    ! Local
+!!$    integer(psb_lpk_), allocatable :: lia(:), lja(:)
+!!$    integer(psb_lpk_) :: lnz
+!!$
+!!$    info = psb_success_
+!!$    !
+!!$    ! Note: in principle we could use reallocate on assignment,
+!!$    ! but GCC bug 52162 forces us to take defensive programming.
+!!$    !
+!!$    if (allocated(ia)) then
+!!$      call psb_realloc(size(ia),lia,info)
+!!$      if (info == psb_success_) lia(:) = ia(:)
+!!$    end if
+!!$    if (allocated(ja)) then
+!!$      call psb_realloc(size(ja),lja,info)
+!!$      if (info == psb_success_) lja(:) = ja(:)
+!!$    end if
+!!$    lnz = nz
+!!$    call a%csget(imin,imax,lnz,lia,lja,info,&
+!!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
+!!$    nz = lnz
+!!$    call psb_ensure_size(size(lia),ia,info)
+!!$    if (info == psb_success_) ia(:) = lia(:)
+!!$    call psb_ensure_size(size(lja),ja,info)
+!!$    if (info == psb_success_) ja(:) = lja(:)
+!!$    
+!!$  end subroutine psb_lc_icsgetptn
+!!$  
+!!$  subroutine psb_lc_icsgetrow(imin,imax,a,nz,ia,ja,val,info,&
+!!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
+!!$    implicit none 
+!!$    class(psb_lcspmat_type), intent(in) :: a
+!!$    integer(psb_ipk_), intent(in)                  :: imin,imax
+!!$    integer(psb_ipk_), intent(out)                 :: nz
+!!$    integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+!!$    complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
+!!$    integer(psb_ipk_),intent(out)                  :: info
+!!$    logical, intent(in), optional        :: append
+!!$    integer(psb_ipk_), intent(in), optional        :: iren(:)
+!!$    integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
+!!$    logical, intent(in), optional        :: rscale,cscale
+!!$    ! Local
+!!$    integer(psb_lpk_), allocatable :: lia(:), lja(:), liren(:)
+!!$    integer(psb_lpk_) :: lnz
+!!$
+!!$    !
+!!$    ! Note: in principle we could use reallocate on assignment,
+!!$    ! but GCC bug 52162 forces us to take defensive programming.
+!!$    !
+!!$    if (allocated(ia)) then
+!!$      call psb_realloc(size(ia),lia,info)
+!!$      if (info == psb_success_) lia(:) = ia(:)
+!!$    end if
+!!$    if (allocated(ja)) then
+!!$      call psb_realloc(size(ja),lja,info)
+!!$      if (info == psb_success_) lja(:) = ja(:)
+!!$    end if
+!!$
+!!$    lnz = nz
+!!$    call a%csget(imin,imax,nz,lia,lja,val,info,&
+!!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
+!!$    nz=lnz
+!!$    call psb_ensure_size(size(lia),ia,info)
+!!$    if (info == psb_success_) ia(:) = lia(:)
+!!$    call psb_ensure_size(size(lja),ja,info)
+!!$    if (info == psb_success_) ja(:) = lja(:)
+!!$        
+!!$  end subroutine psb_lc_icsgetrow
 #endif
 
 end module psb_c_mat_mod
