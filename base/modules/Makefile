@@ -212,13 +212,13 @@ serial/psb_l_base_vect_mod.o: serial/psb_i_base_vect_mod.o
 serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o
 serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: auxil/psi_serial_mod.o psb_realloc_mod.o
 serial/psb_s_mat_mod.o: serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_vect_mod.o \
-	 serial/psb_i_vect_mod.o
+	 serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o
 serial/psb_d_mat_mod.o: serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_vect_mod.o \
-	 serial/psb_i_vect_mod.o
+	 serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o
 serial/psb_c_mat_mod.o: serial/psb_c_base_mat_mod.o serial/psb_c_csr_mat_mod.o serial/psb_c_csc_mat_mod.o serial/psb_c_vect_mod.o \
-	 serial/psb_i_vect_mod.o
+	 serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o
 serial/psb_z_mat_mod.o: serial/psb_z_base_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_z_csc_mat_mod.o serial/psb_z_vect_mod.o \
-	 serial/psb_i_vect_mod.o
+	 serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o
 serial/psb_s_csc_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_ls_csr_mat_mod.o: serial/psb_s_base_mat_mod.o 
 serial/psb_d_csc_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_ld_csr_mat_mod.o: serial/psb_d_base_mat_mod.o 
 serial/psb_c_csc_mat_mod.o serial/psb_c_csr_mat_mod.o serial/psb_lc_csr_mat_mod.o: serial/psb_c_base_mat_mod.o 
