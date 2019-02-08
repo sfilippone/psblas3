@@ -154,91 +154,16 @@ contains
     type(psb_dspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-    real(psb_spk_), allocatable :: wgh_(:)
     
 
     select type (aa=>a%a) 
     type is (psb_d_csr_sparse_mat)
-      if (present(weights)) then 
-        if (size(weights)==nparts) then 
-          wgh_ = weights
-        end if
-      end if
-      if (allocated(wgh_)) then 
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
-      else
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
-      end if
+      call d_csr_build_mtpart(aa,nparts,weights)        
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
     end select
 
   end subroutine d_mat_build_mtpart
-
-  
-  subroutine z_mat_build_mtpart(a,nparts,weights)
-    use psb_base_mod
-    implicit none 
-    type(psb_zspmat_type), intent(in) :: a
-    integer(psb_ipk_) :: nparts
-    real(psb_dpk_), optional :: weights(:)
-    real(psb_spk_), allocatable :: wgh_(:)
-    
-
-    select type (aa=>a%a) 
-    type is (psb_z_csr_sparse_mat) 
-      if (present(weights)) then 
-        if (size(weights)==nparts) then 
-          wgh_ = weights
-        end if
-      end if
-      if (allocated(wgh_)) then 
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
-      else
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
-      end if
-    class default
-      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-    end select
-
-  end subroutine z_mat_build_mtpart
-
-  
-  subroutine s_mat_build_mtpart(a,nparts,weights)
-    use psb_base_mod
-    implicit none 
-    type(psb_sspmat_type), intent(in) :: a
-    integer(psb_ipk_) :: nparts
-    real(psb_spk_), optional :: weights(:)
-    
-
-    select type (aa=>a%a) 
-    type is (psb_s_csr_sparse_mat)
-      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,weights)
-    class default
-      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-    end select
-
-  end subroutine s_mat_build_mtpart
-
-  
-  subroutine c_mat_build_mtpart(a,nparts,weights)
-    use psb_base_mod
-    implicit none 
-    type(psb_cspmat_type), intent(in) :: a
-    integer(psb_ipk_) :: nparts
-    real(psb_spk_), optional :: weights(:)
-    
-
-    select type (aa=>a%a) 
-    type is (psb_c_csr_sparse_mat)
-      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,weights)
-    class default
-      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-    end select
-
-  end subroutine c_mat_build_mtpart
-
   
   subroutine d_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
@@ -261,6 +186,23 @@ contains
     end if
 
   end subroutine d_csr_build_mtpart
+  
+  subroutine z_mat_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    implicit none 
+    type(psb_zspmat_type), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_dpk_), optional :: weights(:)
+    
+
+    select type (aa=>a%a) 
+    type is (psb_z_csr_sparse_mat) 
+      call z_csr_build_mtpart(aa,nparts,weights)        
+    class default
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
+    end select
+
+  end subroutine z_mat_build_mtpart
 
   subroutine z_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
@@ -269,7 +211,7 @@ contains
     integer(psb_ipk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
     real(psb_spk_), allocatable :: wgh_(:)
-    
+  
 
     if (present(weights)) then 
       if (size(weights)==nparts) then 
@@ -283,7 +225,52 @@ contains
     end if
 
   end subroutine z_csr_build_mtpart
+  
+  subroutine s_mat_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    implicit none 
+    type(psb_sspmat_type), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
+    
 
+    select type (aa=>a%a) 
+    type is (psb_s_csr_sparse_mat)
+      call s_csr_build_mtpart(aa,nparts,weights)        
+    class default
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
+    end select
+
+  end subroutine s_mat_build_mtpart
+
+  subroutine c_mat_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    implicit none 
+    type(psb_cspmat_type), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
+    
+
+    select type (aa=>a%a) 
+    type is (psb_c_csr_sparse_mat)
+      call c_csr_build_mtpart(aa,nparts,weights)        
+    class default
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
+    end select
+
+  end subroutine c_mat_build_mtpart
+
+  subroutine c_csr_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    implicit none 
+    type(psb_c_csr_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
+    
+    
+    call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
+
+  end subroutine c_csr_build_mtpart
   
   subroutine s_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
@@ -296,21 +283,6 @@ contains
     call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
 
   end subroutine s_csr_build_mtpart
-
-  
-  subroutine c_csr_build_mtpart(a,nparts,weights)
-    use psb_base_mod
-    implicit none 
-    type(psb_c_csr_sparse_mat), intent(in) :: a
-    integer(psb_ipk_) :: nparts
-    real(psb_spk_), optional :: weights(:)
-    
-    
-    call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
-
-  end subroutine c_csr_build_mtpart
-
-
 
   subroutine build_mtpart(n,fida,ja,irp,nparts,weights)
     use psb_base_mod
