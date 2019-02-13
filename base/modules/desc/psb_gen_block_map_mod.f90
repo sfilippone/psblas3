@@ -42,7 +42,22 @@
 !    there will be few processes, compared to indices, so it is possible
 !    to answer the ownership question without resorting to data exchange
 !    (well, the data exchange is needed but only once at initial allocation
-!    time). 
+!    time). These are stored in VNL in a format similar to the pointers
+!    in CSR.
+!
+!    The halo indices may be stored in three different places:
+!    1. map%loc_to_glob(:)
+!       This stores the global indices corresponding to local halo
+!       indices, not the owned indices that can be determined from
+!       min_glob_row and max_glob_row; hence any access into this
+!       vector has to be rescaled by N_ROW.
+!    2. map%srt_g2l(:,:)
+!       This contains in column 1 the same global indices as in loc_to_glob
+!       sorted for quick access, and in column 2 the corresponding local
+!       index; it is set up at assembly time.
+!    3. map%hash
+!       This is used when the map is in the bld state, so that g2l queries can
+!       be answered quickly before the availability of srt_g2l. 
 !
 !
 module psb_gen_block_map_mod
@@ -54,7 +69,7 @@ module psb_gen_block_map_mod
   type, extends(psb_indx_map) :: psb_gen_block_map
     integer(psb_ipk_) :: min_glob_row   = -1
     integer(psb_ipk_) :: max_glob_row   = -1
-    integer(psb_ipk_), allocatable :: loc_to_glob(:), srt_l2g(:,:), vnl(:)
+    integer(psb_ipk_), allocatable :: loc_to_glob(:), srt_g2l(:,:), vnl(:)
     type(psb_hash_type)  :: hash
   contains
 
@@ -107,8 +122,8 @@ contains
     val = val + 2 * psb_sizeof_int
     if (allocated(idxmap%loc_to_glob)) &
          & val = val + size(idxmap%loc_to_glob)*psb_sizeof_int
-    if (allocated(idxmap%srt_l2g)) &
-         & val = val + size(idxmap%srt_l2g)*psb_sizeof_int
+    if (allocated(idxmap%srt_g2l)) &
+         & val = val + size(idxmap%srt_g2l)*psb_sizeof_int
     if (allocated(idxmap%vnl)) &
          & val = val + size(idxmap%vnl)*psb_sizeof_int
     val = val + psb_sizeof(idxmap%hash)
@@ -121,10 +136,10 @@ contains
     integer(psb_ipk_) :: info
     if (allocated(idxmap%loc_to_glob)) &
          & deallocate(idxmap%loc_to_glob)
-    if (allocated(idxmap%srt_l2g)) &
-         & deallocate(idxmap%srt_l2g)
+    if (allocated(idxmap%srt_g2l)) &
+         & deallocate(idxmap%srt_g2l)
 
-    if (allocated(idxmap%srt_l2g)) &
+    if (allocated(idxmap%srt_g2l)) &
          & deallocate(idxmap%vnl)
     call psb_free(idxmap%hash,info)
     call idxmap%psb_indx_map%free()
@@ -365,9 +380,9 @@ contains
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
-              nv  = size(idxmap%srt_l2g,1)
-              idx(i) = psb_ibsrch(idx(i),nv,idxmap%srt_l2g(:,1))
-              if (idx(i) > 0) idx(i) = idxmap%srt_l2g(idx(i),2)+idxmap%local_rows
+              nv  = size(idxmap%srt_g2l,1)
+              idx(i) = psb_ibsrch(idx(i),nv,idxmap%srt_g2l(:,1))
+              if (idx(i) > 0) idx(i) = idxmap%srt_g2l(idx(i),2)+idxmap%local_rows
             else 
               idx(i) = -1
             end if
@@ -402,9 +417,9 @@ contains
             idx(i) = idx(i) - idxmap%min_glob_row + 1
           else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
-            nv  = size(idxmap%srt_l2g,1)
-            idx(i) = psb_ibsrch(idx(i),nv,idxmap%srt_l2g(:,1))
-            if (idx(i) > 0) idx(i) = idxmap%srt_l2g(idx(i),2)+idxmap%local_rows
+            nv  = size(idxmap%srt_g2l,1)
+            idx(i) = psb_ibsrch(idx(i),nv,idxmap%srt_g2l(:,1))
+            if (idx(i) > 0) idx(i) = idxmap%srt_g2l(idx(i),2)+idxmap%local_rows
           else 
             idx(i) = -1
           end if
@@ -476,9 +491,9 @@ contains
               idxout(i) = idxin(i) - idxmap%min_glob_row + 1
             else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
-              nv  = size(idxmap%srt_l2g,1)
-              idxout(i) = psb_ibsrch(idxin(i),nv,idxmap%srt_l2g(:,1))
-              if (idxout(i) > 0) idxout(i) = idxmap%srt_l2g(idxout(i),2)+idxmap%local_rows
+              nv  = size(idxmap%srt_g2l,1)
+              idxout(i) = psb_ibsrch(idxin(i),nv,idxmap%srt_g2l(:,1))
+              if (idxout(i) > 0) idxout(i) = idxmap%srt_g2l(idxout(i),2)+idxmap%local_rows
             else 
               idxout(i) = -1
             end if
@@ -513,9 +528,9 @@ contains
             idxout(i) = idxin(i) - idxmap%min_glob_row + 1
           else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
-            nv  = size(idxmap%srt_l2g,1)
-            idxout(i) = psb_ibsrch(idxin(i),nv,idxmap%srt_l2g(:,1))
-            if (idxout(i) > 0) idxout(i) = idxmap%srt_l2g(idxout(i),2)+idxmap%local_rows
+            nv  = size(idxmap%srt_g2l,1)
+            idxout(i) = psb_ibsrch(idxin(i),nv,idxmap%srt_g2l(:,1))
+            if (idxout(i) > 0) idxout(i) = idxmap%srt_g2l(idxout(i),2)+idxmap%local_rows
           else 
             idxout(i) = -1
           end if
@@ -1097,11 +1112,11 @@ contains
     nhal = idxmap%local_cols-idxmap%local_rows
 
     call psb_realloc(nhal,idxmap%loc_to_glob,info)
-    call psb_realloc(nhal,2,idxmap%srt_l2g,info)
-    idxmap%srt_l2g(1:nhal,1) = idxmap%loc_to_glob(1:nhal)
+    call psb_realloc(nhal,2,idxmap%srt_g2l,info)
+    idxmap%srt_g2l(1:nhal,1) = idxmap%loc_to_glob(1:nhal)
 
-    call psb_msort(idxmap%srt_l2g(:,1),&
-         & ix=idxmap%srt_l2g(:,2),dir=psb_sort_up_)
+    call psb_msort(idxmap%srt_g2l(:,1),&
+         & ix=idxmap%srt_g2l(:,2),dir=psb_sort_up_)
 
     call psb_free(idxmap%hash,info)
     call idxmap%set_state(psb_desc_asb_)
@@ -1153,7 +1168,7 @@ contains
       if (info == psb_success_)&
            &  call psb_safe_ab_cpy(idxmap%vnl,outmap%vnl,info)
       if (info == psb_success_)&
-           &  call psb_safe_ab_cpy(idxmap%srt_l2g,outmap%srt_l2g,info)
+           &  call psb_safe_ab_cpy(idxmap%srt_g2l,outmap%srt_g2l,info)
       if (info == psb_success_)&
            &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
 

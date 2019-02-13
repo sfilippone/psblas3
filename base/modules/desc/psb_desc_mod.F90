@@ -694,7 +694,7 @@ contains
                & ': Warning: trying to get ext_index on a descriptor ',&
                & 'which does not have a base_desc!'
         end if
-        if (.not.psb_is_ovl_desc(desc)) then
+        if (.not.desc%is_ovl()) then
           write(debug_unit,*) trim(name),&
                & ': Warning: trying to get ext_index on a descriptor ',&
                & 'which is not overlap-extended!'
@@ -764,7 +764,7 @@ contains
                & ': Warning: trying to get ext_index on a descriptor ',&
                & 'which does not have a base_desc!'
         end if
-        if (.not.psb_is_ovl_desc(desc)) then
+        if (.not.desc%is_ovl()) then
           write(debug_unit,*) trim(name),&
                & ': Warning: trying to get ext_index on a descriptor ',&
                & 'which is not overlap-extended!'
