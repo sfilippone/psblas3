@@ -79,6 +79,18 @@ module psb_cd_tools_mod
     end subroutine psb_cdcpy
   end interface
 
+  interface psb_cd_renum_block
+    subroutine psb_cd_renum_block(desc_in, desc_out, info)
+      import :: psb_ipk_, psb_desc_type
+
+      implicit none
+      !....parameters...
+
+      type(psb_desc_type), intent(inout) :: desc_in
+      type(psb_desc_type), intent(out)   :: desc_out
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psb_cd_renum_block
+  end interface
 
   interface psb_cdprt
     subroutine psb_cdprt(iout,desc_p,glob,short,verbosity)
