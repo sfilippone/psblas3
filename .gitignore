@@ -8,9 +8,14 @@ cbind/*.h
 
 # Make.inc generated
 /Make.inc
+config.log
+config.status
 
 # generated folder
 include/
+modules/
+docs/src/tmp
+autom4te.cache
 
 # the executable from tests
 runs
