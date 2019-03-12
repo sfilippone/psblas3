@@ -280,7 +280,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
         call psb_errpush(info,name,a_err='psb_sp_getrow')
         goto 9999
       end if
-      tot_elem=tot_elem+n_elem
+      tot_elem=tot_elem+ngtz
     Enddo
     ipx = ipx + 1 
     counter   = counter+n_el_send+3

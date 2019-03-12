@@ -31,7 +31,8 @@
 !    
 !
 ! Subroutine: psb_cd_renum_block
-!   Produces a clone of a descriptor.
+!   Produces a renumbered version of the input descriptor, with
+!   global indices in a BLOCK distribution. 
 ! 
 ! Arguments: 
 !    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
@@ -120,9 +121,23 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
     reflidx(1:n_col) = [(i,i=1,n_col)]
     gidx(1:n_row) = reflidx(1:n_row) + vnl(me)
     call psb_halo(gidx,desc_in,info)
-    if (info == 0) call blck_map%gen_block_map_init(ictxt,vnl(me),info)
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Done halo on gidx ',info
+  
+    if (info == 0) call blck_map%gen_block_map_init(ictxt,n_row,info)
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Done gen_block_map_init ',info,&
+         & blck_map%get_lr(),blck_map%get_lc(),vnl(me)
+    
     if (info == 0) call blck_map%g2l_ins(gidx,lidx,info,lidx=reflidx)
+    if (debug_level >= psb_debug_ext_) then 
+      write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',info,size(gidx),size(lidx),size(reflidx)
+      write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',gidx(:),':',lidx(:),' :',reflidx(:)
+    end if
+      
     if (info == 0) call blck_map%asb(info)
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Done asb ',info
   
     if (info /= psb_success_) then
       info = psb_err_from_subroutine_
