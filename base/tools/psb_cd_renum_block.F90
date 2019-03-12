@@ -31,7 +31,8 @@
 !    
 !
 ! Subroutine: psb_cd_renum_block
-!   Produces a clone of a descriptor.
+!   Produces a renumbered version of the input descriptor, with
+!   global indices in a BLOCK distribution. 
 ! 
 ! Arguments: 
 !    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
