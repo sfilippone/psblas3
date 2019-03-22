@@ -317,7 +317,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 #elif defined(SP_A2AV_MAT)
     call z_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
          & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ipdxv,ictxt,icomm,info)
-#elif
+#else
     choke on me @!
 #endif
   if (info /= psb_success_) then
