@@ -116,7 +116,7 @@ module psb_const_mod
 #elif  defined(IPK8) && defined(LPK8)
   integer(psb_ipk_), save      :: psb_sizeof_ip = 8
   integer(psb_ipk_), save      :: psb_sizeof_lp = 8
-#elif
+#else
   integer(psb_ipk_), save      :: psb_sizeof_ip = -1
   integer(psb_ipk_), save      :: psb_sizeof_lp = -1
 #endif
