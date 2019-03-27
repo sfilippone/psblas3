@@ -3321,6 +3321,34 @@ subroutine psb_c_cp_csr_from_fmt(a,b,info)
   end select
 end subroutine psb_c_cp_csr_from_fmt
 
+subroutine  psb_c_csr_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_clean_zeros
+  implicit none 
+  class(psb_c_csr_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_) :: info
+  !
+  integer(psb_ipk_) :: i, j, k, nr
+  integer(psb_ipk_), allocatable :: ilrp(:) 
+  
+  info = 0 
+  nr   = a%get_nrows()
+  ilrp = a%irp(:) 
+  a%irp(1) = 1
+  j        = a%irp(1) 
+  do i=1, nr
+    do k = ilrp(i), ilrp(i+1) -1
+      if (a%val(k) /= czero) then
+        a%val(j) = a%val(k)
+        a%ja(j)  = a%ja(k)
+        j = j + 1
+      end if
+    end do
+    a%irp(i+1) = j
+  end do
+  call a%trim()
+end subroutine psb_c_csr_clean_zeros
+
 subroutine psb_ccsrspspmm(a,b,c,info)
   use psb_c_mat_mod
   use psb_serial_mod, psb_protect_name => psb_ccsrspspmm
