@@ -2499,7 +2499,8 @@ subroutine  psb_c_csc_clean_zeros(a, info)
   integer(psb_ipk_) :: i, j, k, nc
   integer(psb_ipk_), allocatable :: ilcp(:) 
   
-  info = 0 
+  info = 0
+  call a%sync()
   nc   = a%get_ncols()
   ilcp = a%icp(:) 
   a%icp(1) = 1
@@ -2515,6 +2516,7 @@ subroutine  psb_c_csc_clean_zeros(a, info)
     a%icp(i+1) = j
   end do
   call a%trim()
+  call a%set_host()
 end subroutine psb_c_csc_clean_zeros
 
 

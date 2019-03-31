@@ -3331,7 +3331,8 @@ subroutine  psb_d_csr_clean_zeros(a, info)
   integer(psb_ipk_) :: i, j, k, nr
   integer(psb_ipk_), allocatable :: ilrp(:) 
   
-  info = 0 
+  info = 0
+  call a%sync()
   nr   = a%get_nrows()
   ilrp = a%irp(:) 
   a%irp(1) = 1
@@ -3347,6 +3348,7 @@ subroutine  psb_d_csr_clean_zeros(a, info)
     a%irp(i+1) = j
   end do
   call a%trim()
+  call a%set_host()
 end subroutine psb_d_csr_clean_zeros
 
 subroutine psb_dcsrspspmm(a,b,c,info)
