@@ -87,6 +87,7 @@ module psb_c_csc_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_c_mv_csc_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_c_mv_csc_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_c_mv_csc_from_fmt
+    procedure, pass(a) :: clean_zeros => psb_c_csc_clean_zeros
     procedure, pass(a) :: csput_a      => psb_c_csc_csput_a
     procedure, pass(a) :: get_diag    => psb_c_csc_get_diag
     procedure, pass(a) :: csgetptn    => psb_c_csc_csgetptn
@@ -142,10 +143,11 @@ module psb_c_csc_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_lc_mv_csc_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_lc_mv_csc_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_lc_mv_csc_from_fmt
-    procedure, pass(a) :: csput_a      => psb_lc_csc_csput_a
+    procedure, pass(a) :: clean_zeros => psb_lc_csc_clean_zeros
+    procedure, pass(a) :: csput_a     => psb_lc_csc_csput_a
     procedure, pass(a) :: get_diag    => psb_lc_csc_get_diag
     procedure, pass(a) :: csgetptn    => psb_lc_csc_csgetptn
-    procedure, pass(a) :: csgetrow   => psb_lc_csc_csgetrow
+    procedure, pass(a) :: csgetrow    => psb_lc_csc_csgetrow
     procedure, pass(a) :: get_nz_col  => lc_csc_get_nz_col
     procedure, pass(a) :: reinit      => psb_lc_csc_reinit
     procedure, pass(a) :: trim        => psb_lc_csc_trim
@@ -310,6 +312,20 @@ module psb_c_csc_mat_mod
       integer(psb_ipk_), intent(out)                         :: info
     end subroutine psb_c_mv_csc_from_fmt
   end interface
+  
+  !
+  !> 
+  !! \memberof  psb_c_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_clean_zeros
+  !
+  interface
+    subroutine  psb_c_csc_clean_zeros(a, info)
+      import 
+      class(psb_c_csc_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_c_csc_clean_zeros
+  end interface
+  
   
   !> \memberof psb_c_csc_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_cp_from
@@ -700,6 +716,19 @@ module psb_c_csc_mat_mod
       class(psb_lc_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                         :: info
     end subroutine psb_lc_mv_csc_from_fmt
+  end interface
+  
+  !
+  !> 
+  !! \memberof  psb_lc_csc_sparse_mat
+  !! \see psb_lc_base_mat_mod::psb_lc_base_clean_zeros
+  !
+  interface
+    subroutine  psb_lc_csc_clean_zeros(a, info)
+      import 
+      class(psb_lc_csc_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_lc_csc_clean_zeros
   end interface
   
   !> \memberof psb_lc_csc_sparse_mat

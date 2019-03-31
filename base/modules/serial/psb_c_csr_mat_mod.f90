@@ -1,3 +1,4 @@
+
 !   
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
@@ -90,6 +91,7 @@ module psb_c_csr_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_c_mv_csr_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_c_mv_csr_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_c_mv_csr_from_fmt
+    procedure, pass(a) :: clean_zeros => psb_c_csr_clean_zeros
     procedure, pass(a) :: csput_a     => psb_c_csr_csput_a
     procedure, pass(a) :: get_diag    => psb_c_csr_get_diag
     procedure, pass(a) :: csgetptn    => psb_c_csr_csgetptn
@@ -259,6 +261,18 @@ module psb_c_csr_mat_mod
     end subroutine psb_c_csr_triu
   end interface
   
+  !
+  !> 
+  !! \memberof  psb_c_csr_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_clean_zeros
+  !
+  interface
+    subroutine  psb_c_csr_clean_zeros(a, info)
+      import 
+      class(psb_c_csr_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_c_csr_clean_zeros
+  end interface
   
   !> \memberof psb_c_csr_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_cp_to_coo
@@ -599,6 +613,7 @@ module psb_c_csr_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_lc_mv_csr_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_lc_mv_csr_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_lc_mv_csr_from_fmt
+    procedure, pass(a) :: clean_zeros => psb_lc_csr_clean_zeros
     procedure, pass(a) :: csput_a     => psb_lc_csr_csput_a
     procedure, pass(a) :: get_diag    => psb_lc_csr_get_diag
     procedure, pass(a) :: csgetptn    => psb_lc_csr_csgetptn
@@ -775,7 +790,21 @@ module psb_c_csr_mat_mod
       class(psb_lc_coo_sparse_mat), optional, intent(out) :: l
     end subroutine psb_lc_csr_triu
   end interface
+
+    !
+  !> 
+  !! \memberof  psb_lc_csr_sparse_mat
+  !! \see psb_lc_base_mat_mod::psb_lc_base_clean_zeros
+  !
+  interface
+    subroutine  psb_lc_csr_clean_zeros(a, info)
+      import 
+      class(psb_lc_csr_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_lc_csr_clean_zeros
+  end interface
   
+
   
   !> \memberof psb_lc_csr_sparse_mat
   !! \see psb_lc_base_mat_mod::psb_lc_base_cp_to_coo

@@ -2366,7 +2366,35 @@ subroutine psb_d_mv_csc_from_fmt(a,b,info)
 
 end subroutine psb_d_mv_csc_from_fmt
 
-
+subroutine  psb_d_csc_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_d_csc_mat_mod, psb_protect_name => psb_d_csc_clean_zeros
+  implicit none 
+  class(psb_d_csc_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_) :: info
+  !
+  integer(psb_ipk_) :: i, j, k, nc
+  integer(psb_ipk_), allocatable :: ilcp(:) 
+  
+  info = 0
+  call a%sync()
+  nc   = a%get_ncols()
+  ilcp = a%icp(:) 
+  a%icp(1) = 1
+  j        = a%icp(1) 
+  do i=1, nc
+    do k = ilcp(i), ilcp(i+1) -1
+      if (a%val(k) /= dzero) then
+        a%val(j) = a%val(k)
+        a%ia(j)  = a%ia(k)
+        j = j + 1
+      end if
+    end do
+    a%icp(i+1) = j
+  end do
+  call a%trim()
+  call a%set_host()
+end subroutine psb_d_csc_clean_zeros
 
 subroutine psb_d_cp_csc_from_fmt(a,b,info) 
   use psb_const_mod
@@ -4232,6 +4260,36 @@ subroutine psb_ld_cp_csc_from_fmt(a,b,info)
   call a%set_host()
   
 end subroutine psb_ld_cp_csc_from_fmt
+
+subroutine  psb_ld_csc_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_d_csc_mat_mod, psb_protect_name => psb_ld_csc_clean_zeros
+  implicit none 
+  class(psb_ld_csc_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_) :: info
+  !
+  integer(psb_lpk_) :: i, j, k, nc
+  integer(psb_lpk_), allocatable :: ilcp(:) 
+  
+  info = 0
+  call a%sync()
+  nc   = a%get_ncols()
+  ilcp = a%icp(:) 
+  a%icp(1) = 1
+  j        = a%icp(1) 
+  do i=1, nc
+    do k = ilcp(i), ilcp(i+1) -1
+      if (a%val(k) /= dzero) then
+        a%val(j) = a%val(k)
+        a%ia(j)  = a%ia(k)
+        j = j + 1
+      end if
+    end do
+    a%icp(i+1) = j
+  end do
+  call a%trim()
+  call a%set_host()
+end subroutine psb_ld_csc_clean_zeros
 
 
 subroutine psb_ld_csc_mold(a,b,info) 
