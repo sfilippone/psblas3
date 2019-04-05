@@ -26,21 +26,21 @@ cbindd:
 	cd cbind&& $(MAKE) lib 
 
 install: all
-	$(SHELL) ./mkdir.sh  $(INSTALL_INCLUDEDIR) &&\
+	mkdir -p  $(INSTALL_INCLUDEDIR) &&\
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_INCLUDEDIR)/Make.inc.psblas
-	$(SHELL) ./mkdir.sh  $(INSTALL_LIBDIR) &&\
+	mkdir -p  $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR)
-	$(SHELL) ./mkdir.sh  $(INSTALL_MODULESDIR) && \
+	mkdir -p  $(INSTALL_MODULESDIR) && \
 	   $(INSTALL_DATA) modules/*$(.mod) $(INSTALL_MODULESDIR)
-	$(SHELL) ./mkdir.sh  $(INSTALL_INCLUDEDIR) && \
+	mkdir -p  $(INSTALL_INCLUDEDIR) && \
 	   $(INSTALL_DATA) include/*.h $(INSTALL_INCLUDEDIR)
-	$(SHELL) ./mkdir.sh  $(INSTALL_DOCSDIR) && \
+	mkdir -p  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR)
-	$(SHELL) ./mkdir.sh  $(INSTALL_DOCSDIR) && \
+	mkdir -p  $(INSTALL_DOCSDIR) && \
 	   $(INSTALL_DATA) README.md LICENSE  $(INSTALL_DOCSDIR)
-	$(SHELL) ./mkdir.sh  $(INSTALL_SAMPLESDIR) && \
+	mkdir -p  $(INSTALL_SAMPLESDIR) && \
 	     /bin/cp -fr test/pargen test/fileread test/kernel $(INSTALL_SAMPLESDIR) && \
-	     ./mkdir.sh $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
+	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
 clean: 
 	cd base && $(MAKE) clean
 	cd prec && $(MAKE) clean 
