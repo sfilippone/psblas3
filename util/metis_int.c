@@ -50,7 +50,7 @@ int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg,
 		      &ecut,(idxtype *)graphpart);
   return(0); 
     
-#elif
+#else
   choke on me!
 #endif
 }

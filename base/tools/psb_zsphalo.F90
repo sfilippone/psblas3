@@ -280,7 +280,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
         call psb_errpush(info,name,a_err='psb_sp_getrow')
         goto 9999
       end if
-      tot_elem=tot_elem+n_elem
+      tot_elem=tot_elem+ngtz
     Enddo
     ipx = ipx + 1 
     counter   = counter+n_el_send+3
@@ -317,7 +317,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 #elif defined(SP_A2AV_MAT)
     call z_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
          & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ipdxv,ictxt,icomm,info)
-#elif
+#else
     choke on me @!
 #endif
   if (info /= psb_success_) then
