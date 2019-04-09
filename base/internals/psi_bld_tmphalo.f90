@@ -101,7 +101,8 @@ subroutine psi_bld_tmphalo(desc,info)
   end do
 
   call desc%indxmap%l2gip(helem(1:nh),info)
-  call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
+  if (info == psb_success_) call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
+  if (info == psb_success_) call desc%indxmap%set_halo_owner(hproc,info)
       
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='fnd_owner')

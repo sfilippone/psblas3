@@ -125,6 +125,8 @@ module psb_indx_map_mod
     integer(psb_ipk_), allocatable :: tempvg(:)
     !> Reserved for future use. 
     integer(psb_ipk_), allocatable :: oracle(:,:)
+    !> Halo owners
+    integer(psb_ipk_), allocatable :: halo_owner(:)
 
   contains
 
@@ -182,6 +184,12 @@ module psb_indx_map_mod
     generic, public          :: g2l_ins =>   g2ls2_ins, g2lv2_ins
     generic, public          :: g2lip_ins => g2ls1_ins, g2lv1_ins
 
+    procedure, pass(idxmap)  :: set_halo_owner  => base_set_halo_owner
+    procedure, pass(idxmap)  :: get_halo_owner  => base_get_halo_owner
+    procedure, pass(idxmap)  :: fnd_halo_owner_s => base_fnd_halo_owner_s
+    procedure, pass(idxmap)  :: fnd_halo_owner_v => base_fnd_halo_owner_v
+    generic, public          :: fnd_halo_owner => fnd_halo_owner_s, fnd_halo_owner_v
+    
     procedure, pass(idxmap)  :: fnd_owner => psb_indx_map_fnd_owner
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
     generic, public          :: init      => init_vl
@@ -198,7 +206,9 @@ module psb_indx_map_mod
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
        & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins,&
        & base_g2lv2_ins, base_init_vl, base_is_null,&
-       & base_row_extendable, base_clone, base_reinit
+       & base_row_extendable, base_clone, base_reinit, &
+       & base_set_halo_owner, base_get_halo_owner, &
+       & base_fnd_halo_owner_s, base_fnd_halo_owner_v
   
   !> Function: psb_indx_map_fnd_owner
   !! \memberof psb_indx_map
@@ -874,4 +884,79 @@ contains
     return
   end subroutine base_reinit
 
+
+  subroutine base_set_halo_owner(idxmap,v,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(in)      :: v(:)
+    integer(psb_ipk_), intent(out)     :: info
+    !
+    integer(psb_mpik_) :: me, np
+    integer(psb_ipk_)  :: i, j, nr, nc, nh
+
+    call psb_info(idxmap%ictxt,me,np)
+    ! The idea here is to store only the halo part
+    nr = idxmap%local_rows
+    nc = idxmap%local_cols
+    nh = nc-nr
+    if (size(v) < nh) then
+      write(0,*) 'Error: set_halo_owner small size ',size(v),nh
+    end if
+    idxmap%halo_owner = v(1:min(size(v),nh))
+    
+  end subroutine base_set_halo_owner
+
+  subroutine base_get_halo_owner(idxmap,v,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_ipk_), allocatable, intent(out) :: v(:)
+    integer(psb_ipk_), intent(out)     :: info
+
+    integer(psb_ipk_)  :: nh
+    nh = min(size(v),size(idxmap%halo_owner))
+    v(1:nh) = idxmap%halo_owner(1:nh)
+  end subroutine base_get_halo_owner
+
+  subroutine base_fnd_halo_owner_s(idxmap,xin,xout,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(in)  ::  xin
+    integer(psb_ipk_), intent(out) ::  xout
+    integer(psb_ipk_), intent(out)     :: info
+
+    integer(psb_ipk_)  :: i, j, nr, nc, nh
+    nr = idxmap%local_rows
+    nc = idxmap%local_cols
+    xout = -1
+    if ((nr<xin).and.(xin <= nc)) xout = idxmap%halo_owner(xin-nr)
+    
+  end subroutine base_fnd_halo_owner_s
+
+  subroutine base_fnd_halo_owner_v(idxmap,xin,xout,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(in)  ::  xin(:)
+    integer(psb_ipk_), intent(out) ::  xout(:)
+    integer(psb_ipk_), intent(out)     :: info
+
+    integer(psb_ipk_)  :: i, j, nr, nc, nh, sz
+    nr = idxmap%local_rows
+    nc = idxmap%local_cols
+    sz = min(size(xin),size(xout))
+    xout = -1
+    do i = 1, sz
+      if ((nr<xin(i)).and.(xin(i) <= nc)) xout = idxmap%halo_owner(xin(i)-nr)
+    end do
+    
+  end subroutine base_fnd_halo_owner_v
+
+  
 end module psb_indx_map_mod
