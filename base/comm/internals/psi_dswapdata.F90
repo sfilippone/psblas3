@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,58 +27,58 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! File: psi_dswapdata.F90
 !
 ! Subroutine: psi_dswapdatam
-!   Does the data exchange among processes. Essentially this is doing 
-!   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
-!   it is capable of pruning empty exchanges, which are very likely in out 
-!   application environment. All the variants have the same structure 
+!   Does the data exchange among processes. Essentially this is doing
+!   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but
+!   it is capable of pruning empty exchanges, which are very likely in out
+!   application environment. All the variants have the same structure
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
-!   Basically the operation is as follows: on each process, we identify 
+!   Basically the operation is as follows: on each process, we identify
 !   sections SND(Y) and RCV(Y); then we do a send on (PACK(SND(Y)));
-!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
-!   but only on the elements involved in the UNPACK operation. 
-!   Thus: for halo data exchange, the receive section is confined in the 
-!   halo indices, and BETA=0, whereas for overlap exchange the receive section 
+!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y
+!   but only on the elements involved in the UNPACK operation.
+!   Thus: for halo data exchange, the receive section is confined in the
+!   halo indices, and BETA=0, whereas for overlap exchange the receive section
 !   is scattered in the owned indices, and BETA=1.
-! 
-! Arguments: 
-!    flag     - integer                 Choose the algorithm for data exchange: 
-!                                       this is chosen through bit fields. 
+!
+! Arguments:
+!    flag     - integer                 Choose the algorithm for data exchange:
+!                                       this is chosen through bit fields.
 !                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
 !                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
 !                                        swap_send = iand(flag,psb_swap_send_) /= 0
 !                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
 !                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
-!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in
 !                                                       synchronized pairs
-!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                       if (swap_send .and. swap_recv): use mpi_irecv
 !                                                       and mpi_send
-!                                       if (swap_send): use psb_snd (but need another 
+!                                       if (swap_send): use psb_snd (but need another
 !                                                       call with swap_recv to complete)
-!                                       if (swap_recv): use psb_rcv (completing a 
+!                                       if (swap_recv): use psb_rcv (completing a
 !                                                       previous call with swap_send)
 !
 !
-!    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
-!    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    n        - integer                 Number of columns in Y
+!    beta     - X                       Choose overwrite or sum.
+!    y(:,:)   - X                       The data area
+!    desc_a   - type(psb_desc_type).  The communication descriptor.
+!    work(:)  - X                       Buffer space. If not sufficient, will do
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
 !                                       default psb_comm_halo_
 !                                       psb_comm_halo_    use halo_index
-!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ext_     use ext_index
 !                                       psb_comm_ovrl_    use ovrl_index
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
@@ -89,9 +89,9 @@
 !   Data exchange among processes.
 !
 !   Takes care of Y an exanspulated vector.
-!   
-!   
-! 
+!
+!
+!
 subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_dswapdata_vect
@@ -119,21 +119,37 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
+  logical :: swap_persistent
 
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%get_context()
+
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  ! TODO: get_mpic should be used to get dist_graph_comm, but for now this works
+  swap_persistent = iand(flag,psb_swap_persistent_) /= 0
+  if (swap_persistent) then
+    if (allocated(desc_a%dist_graph_comm)) then
+      ! print *, "desc_a%dist_graph_comm", desc_a%dist_graph_comm
+      icomm = desc_a%dist_graph_comm
+    else
+      print *, "ERROR: desc_a%dist_graph_comm not allocated but swap persistent flag passed"
+      goto 9999
+    end if
+  end if
+
+  call psb_info(ictxt,me,np)
+
+
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_desc(desc_a)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then
     info=psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
@@ -145,8 +161,8 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call desc_a%get_list(data_,d_vidx,totxch,idxr,idxs,info) 
-  if (info /= psb_success_) then 
+  call desc_a%get_list(data_,d_vidx,totxch,idxr,idxs,info)
+  if (info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
@@ -169,13 +185,13 @@ end subroutine psi_dswapdata_vect
 !   Data exchange among processes.
 !
 !   Takes care of Y an exanspulated vector. Relies on the gather/scatter methods
-!   of vectors. 
-!   
+!   of vectors.
+!
 !   The real workhorse: the outer routine will only choose the index list
-!   this one takes the index list and does the actual exchange. 
-!   
-!   
-! 
+!   this one takes the index list and does the actual exchange.
+!
+!
+!
 subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
@@ -206,12 +222,21 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, n
+       & err_act, i, ii, ri, si, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti, n, ierr
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-       & albf,do_send,do_recv
+       & albf,do_send,do_recv, swap_persistent, do_persistent
   logical, parameter :: usersend=.false., debug=.false.
+  integer(psb_ipk_), allocatable :: snd_counts(:), rcv_counts(:), &
+      snd_displs(:), rcv_displs(:), snd_to(:), rcv_from(:), snd_ws(:), rcv_ws(:)
   character(len=20)  :: name
+
+  !remove
+  integer :: status(MPI_STATUS_SIZE), string_len, num_neighbors, snd_count, rcv_count
+  character(len=2*MPI_MAX_ERROR_STRING) :: mpistring
+  logical :: weight
+  !character :: mpistring(16384)
+
 
   info=psb_success_
   name='psi_swap_datav'
@@ -219,7 +244,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   ictxt = iictxt
   icomm = iicomm
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
+  ! print *, me, ": psi_dswapdata.F90:psi_dswap_vidx_vect" ! artless
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -231,18 +257,197 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
   swap_recv = iand(flag,psb_swap_recv_) /= 0
+  swap_persistent = iand(flag,psb_swap_persistent_) /= 0
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
+  do_persistent = swap_persistent
 
   totrcv_ = totrcv * n
   totsnd_ = totsnd * n
   call idx%sync()
 
+
+  ! check do_persistent twice, here and calling psi_dswapdata_vect, redudent but needed for now
+  if (do_persistent) then
+    ! if not allocated, allocate buffers and create request
+    if (.not. allocated(y%sndbuf)) then
+      allocate(y%sndbuf(totsnd))
+      allocate(y%rcvbuf(totrcv))
+      ! allocate(y%sndbuf(4))
+      ! allocate(y%rcvbuf(4))
+      si = 1 ! sndbuf index
+      ri = 1 ! rcvbuf index
+      ! y%sndbuf = 10 + me ! remove this after working
+      y%rcvbuf = -1 ! remove this after working
+
+      ! call MPI_Graph_neighbors_count(icomm, me, num_neighbors, ierr)
+      ! print *, me, "~~~~~ NUM NEIGHBORS = ", num_neighbors
+      call MPI_Dist_graph_neighbors_count(icomm, rcv_count, snd_count, weight, ierr)
+      allocate(rcv_from(rcv_count), rcv_ws(rcv_count), snd_to(snd_count), snd_ws(snd_count))
+      call MPI_Dist_graph_neighbors(icomm, rcv_count, rcv_from, rcv_ws, snd_count, snd_to, &
+          snd_ws, ierr)
+
+      allocate(snd_counts(snd_count), rcv_counts(rcv_count), &
+          snd_displs(snd_count), rcv_displs(rcv_count))
+
+
+      ! old
+      ! allocate(snd_counts(0:np-1), rcv_counts(0:np-1), &
+      !     snd_displs(0:np-1), rcv_displs(0:np-1))
+      snd_counts=0
+      rcv_counts=0
+      snd_displs=0
+      rcv_displs=0
+
+      pnti   = 1
+      snd_pt = 1
+      rcv_pt = 1
+      do i=1, totxch
+        proc_to_comm = idx%v(pnti+psb_proc_id_)
+        nerv = idx%v(pnti+psb_n_elem_recv_)
+        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+        idx_pt = 1+pnti+psb_n_elem_recv_          !
+
+        snd_pt = 1+pnti+nerv+psb_n_elem_send_
+        rcv_pt = 1+pnti+psb_n_elem_recv_
+
+        do ii=1, snd_count
+          if (rcv_from(ii) == proc_to_comm) then
+            rcv_counts(ii) = nerv
+            rcv_counts(ii) = 4
+            rcv_displs(ii) = si - 1
+          end if
+          if (snd_to(ii) == proc_to_comm) then
+            snd_counts(ii) = nesd
+            snd_counts(ii) = 4
+            snd_displs(ii) = si - 1
+          end if
+        end do
+
+        ! prepare sndbuf
+        ! si = si + 1
+        do ii=0,nesd-1
+          ! y%sndbuf(si) = y%v(idx%v(ii+snd_pt))
+          y%sndbuf(si) = me + 10! si
+          si = si + 1
+        end do
+
+        ! subroutine psi_dgthv(n,idx,alpha,x,beta,y)  ! THIS THIS
+        ! y = beta*y(1:n) + alpha*x(idx(1:n))
+        ! print *, y%combuf  , idx // index of y
+        ! print *, "```idx_pt = ", idx_pt, "nesd = ", nesd
+        ! print *, me, ":::::::pnti=", pnti, "proc_to_comm=", proc_to_comm,"nerv=", &
+        !     nerv , "nesd=", nesd, "idx_pt=",idx_pt , "snd_pt=",snd_pt, &
+        !     "rcv_pt=", rcv_pt
+        ! print *, me, ":y%v", y%v
+        pnti   = pnti + nerv + nesd + 3
+
+      end do
+
+      ! code for this in ~/src/psblas/psblas3/base/internals/psi_desc_impl.f90
+      print *, me, ":totxch=", totxch,"totsnd", totsnd, "totrcv", totrcv
+      print *, me, ": rcv_count = ", rcv_count, "snd_count = ", snd_count
+      print *, me, ": rcv_from =", rcv_from, "snd_to =", snd_to
+      print *, me, ":snd_counts", snd_counts, "snd_displs = ",snd_displs, &
+          "rcv_counts", rcv_counts, "rcv_displs",rcv_displs
+
+      allocate(y%init_request)
+      y%init_request = -1
+      call MPIX_Neighbor_alltoallv_init(y%sndbuf, snd_counts, snd_displs, &
+          MPI_DOUBLE_PRECISION, y%rcvbuf, rcv_counts, rcv_displs, &
+          MPI_DOUBLE_PRECISION, icomm, MPI_INFO_NULL, &
+          ! MPI_REAL, y%rcvbuf, rcv_counts, rcv_displs, &
+          ! MPI_REAL, icomm, MPI_INFO_NULL, &
+          y%init_request, ierr)
+
+      if (ierr .ne. 0) then
+        print *, "ERROR: MPIX_Neighbor_alltoallvinit ierr = ", ierr
+        goto 9999
+      end if
+
+      ! print *, me, ":y%init_request = ", y%init_request
+      deallocate(snd_counts, rcv_counts, snd_displs, rcv_displs)
+    else ! send and recv buffers exist, need to pack them
+      print *, "!!!!!!!!!!!!!!!ELSE"
+    end if
+
+    if (me == 3) then
+      ! print *, me,"PRE: y%sndbuf=", y%sndbuf!, "y%rcvbuf=",y%rcvbuf
+    end if
+    ! start communication
+    if (.not. allocated(y%init_request)) then
+      print *, "error: y%init_request should be allocated"
+      goto 9999
+    end if
+    call MPI_Start(y%init_request, ierr)
+    if (ierr .ne. 0) then
+      print *, "ERROR: MPI_Start ierr = ", ierr
+      goto 9999
+    end if
+
+    call MPI_Wait(y%init_request, status, ierr)
+
+    print *, me,": Y%SNDBUF=", y%sndbuf, "Y%RCVBUF=",y%rcvbuf
+    if (status(MPI_ERROR) .ne. 0) then
+      ! print *, me,"ERROR: Y%SNDBUF=", y%sndbuf, "Y%RCVBUF=",y%rcvbuf
+      print *, me, "---ERROR---"
+      print *, "----"
+      ! call MPI_Error_string(status(MPI_ERROR), mpistring, string_len, ierr)
+      ! print *, "MPI_Error_string = ", mpistring(:string_len)
+      print *, "ERROR: rank ",me,"has MPI_Wait status(MPI_ERROR) = ", status(MPI_ERROR)
+      ! goto 9999
+    end if
+
+
+    if (me == 1) then
+      ! print *, me,"POST: y%sndbuf=", y%sndbuf, "y%rcvbuf=",y%rcvbuf
+      ! print *, me,"POST: y%rcvbuf=",y%rcvbuf
+    end if
+    ! print *, me,"POST: y%rcvbuf=",y%rcvbuf(:4)
+  end if
+
+
+      ! Then gather for sending.
+    !
+    ! pnti   = 1
+    ! snd_pt = totrcv_+1
+    ! rcv_pt = 1
+    ! do i=1, totxch
+    !   nerv = idx%v(pnti+psb_n_elem_recv_)
+    !   nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+    !   idx_pt = 1+pnti+nerv+psb_n_elem_send_
+    !   call y%gth(idx_pt,snd_pt,nesd,idx)
+    !   rcv_pt = rcv_pt + n*nerv
+    !   snd_pt = snd_pt + n*nesd
+    !   pnti   = pnti + nerv + nesd + 3
+    ! end do
+
+  ! from later, is this needed??
+  ! pnti   = 1
+  ! snd_pt = 1
+  ! rcv_pt = 1
+  ! do i=1, totxch
+  !   proc_to_comm = idx%v(pnti+psb_proc_id_)
+  !   nerv = idx%v(pnti+psb_n_elem_recv_)
+  !   nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+  !   idx_pt = 1+pnti+psb_n_elem_recv_
+  !   snd_pt = 1+pnti+nerv+psb_n_elem_send_
+  !   rcv_pt = 1+pnti+psb_n_elem_recv_
+
+  !   if (debug) write(0,*)me,' Received from: ',prcid(i),&
+  !        & y%combuf(rcv_pt:rcv_pt+nerv-1)
+  !   call y%sct(rcv_pt,nerv,idx,beta)
+  !   pnti   = pnti + nerv + nesd + 3
+  ! end do
+
+
+
+
   if (debug) write(*,*) me,'Internal buffer'
-  if (do_send) then 
+  if (do_send) then
     if (allocated(y%comid)) then
-      if (any(y%comid /= mpi_request_null)) then 
-        ! 
+      if (any(y%comid /= mpi_request_null)) then
+        !
         ! Unfinished communication? Something is wrong....
         !
         info=psb_err_mpi_error_
@@ -263,8 +468,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
 
       rcv_pt = 1+pnti+psb_n_elem_recv_
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if ((nerv>0).and.(proc_to_comm /= me)) then 
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)
+      if ((nerv>0).and.(proc_to_comm /= me)) then
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_double_swap_tag
         call mpi_irecv(y%combuf(rcv_pt),nerv,&
@@ -276,7 +481,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     if (debug) write(*,*) me,' Gather '
     !
     ! Then gather for sending.
-    !    
+    !
     pnti   = 1
     do i=1, totxch
       nerv = idx%v(pnti+psb_n_elem_recv_)
@@ -289,7 +494,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     end do
 
     !
-    ! Then wait 
+    ! Then wait
     !
     call y%device_wait()
 
@@ -309,7 +514,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
-      if ((nesd>0).and.(proc_to_comm /= me)) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then
         call mpi_isend(y%combuf(snd_pt),nesd,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,y%comid(i,1),iret)
@@ -325,10 +530,10 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     end do
   end if
 
-  if (do_recv) then 
+  if (do_recv) then
     if (debug) write(*,*) me,' do_Recv'
-    if (.not.allocated(y%comid)) then 
-      ! 
+    if (.not.allocated(y%comid)) then
+      !
       ! No matching send? Something is wrong....
       !
       info=psb_err_mpi_error_
@@ -347,8 +552,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
-      if (proc_to_comm /= me)then 
-        if (nesd>0) then 
+      if (proc_to_comm /= me)then
+        if (nesd>0) then
           call mpi_wait(y%comid(i,1),p2pstat,iret)
           if(iret /= mpi_success) then
             info=psb_err_mpi_error_
@@ -356,7 +561,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
             goto 9999
           end if
         end if
-        if (nerv>0) then 
+        if (nerv>0) then
           call mpi_wait(y%comid(i,2),p2pstat,iret)
           if(iret /= mpi_success) then
             info=psb_err_mpi_error_
@@ -364,8 +569,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
             goto 9999
           end if
         end if
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
+      else if (proc_to_comm == me) then
+        if (nesd /= nerv) then
           write(psb_err_unit,*) &
                & 'Fatal error in swapdata: mismatch on self send',&
                & nerv,nesd
@@ -375,7 +580,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       pnti   = pnti + nerv + nesd + 3
     end do
 
-    if (debug) write(*,*) me,' scatter'      
+    if (debug) write(*,*) me,' scatter'
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -388,7 +593,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
       if (debug) write(0,*)me,' Received from: ',prcid(i),&
-           & y%combuf(rcv_pt:rcv_pt+nerv-1)        
+           & y%combuf(rcv_pt:rcv_pt+nerv-1)
       call y%sct(rcv_pt,nerv,idx,beta)
       pnti   = pnti + nerv + nesd + 3
     end do
@@ -405,7 +610,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     if (debug) write(*,*) me,' free buffer'
     call y%maybe_free_buffer(info)
     if (info == 0) call y%free_comid(info)
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
@@ -427,8 +632,8 @@ end subroutine psi_dswap_vidx_vect
 !   Data exchange among processes.
 !
 !   Takes care of Y an encaspulated vector.
-!   
-!   
+!
+!
 subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_dswapdata_multivect
@@ -463,14 +668,15 @@ subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
 
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
+  print *, me, ": psi_dswapdata.F90:psi_dswapdata_multivect"
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_desc(desc_a)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then
     info=psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
@@ -482,8 +688,8 @@ subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call desc_a%get_list(data_,d_vidx,totxch,idxr,idxs,info) 
-  if (info /= psb_success_) then 
+  call desc_a%get_list(data_,d_vidx,totxch,idxr,idxs,info)
+  if (info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
@@ -506,13 +712,13 @@ end subroutine psi_dswapdata_multivect
 !   Data exchange among processes.
 !
 !   Takes care of Y an encapsulated multivector. Relies on the gather/scatter methods
-!   of multivectors. 
-!   
+!   of multivectors.
+!
 !   The real workhorse: the outer routine will only choose the index list
-!   this one takes the index list and does the actual exchange. 
-!   
-!   
-! 
+!   this one takes the index list and does the actual exchange.
+!
+!
+!
 subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
@@ -556,7 +762,8 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   ictxt = iictxt
   icomm = iicomm
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
+  print *, me, ": psi_dswapdata.F90:psi_dswap_vidx_multivect"
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -578,10 +785,10 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   call idx%sync()
 
   if (debug) write(*,*) me,'Internal buffer'
-  if (do_send) then 
-    if (allocated(y%comid)) then 
-      if (any(y%comid /= mpi_request_null)) then 
-        ! 
+  if (do_send) then
+    if (allocated(y%comid)) then
+      if (any(y%comid /= mpi_request_null)) then
+        !
         ! Unfinished communication? Something is wrong....
         !
         info=psb_err_mpi_error_
@@ -602,8 +809,8 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if ((nerv>0).and.(proc_to_comm /= me)) then 
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)
+      if ((nerv>0).and.(proc_to_comm /= me)) then
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_double_swap_tag
         call mpi_irecv(y%combuf(rcv_pt),n*nerv,&
@@ -617,7 +824,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
     if (debug) write(*,*) me,' Gather '
     !
     ! Then gather for sending.
-    !    
+    !
     pnti   = 1
     snd_pt = totrcv_+1
     rcv_pt = 1
@@ -650,7 +857,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
 
-      if ((nesd>0).and.(proc_to_comm /= me)) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then
         call mpi_isend(y%combuf(snd_pt),n*nesd,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,y%comid(i,1),iret)
@@ -667,10 +874,10 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
     end do
   end if
 
-  if (do_recv) then 
+  if (do_recv) then
     if (debug) write(*,*) me,' do_Recv'
-    if (.not.allocated(y%comid)) then 
-      ! 
+    if (.not.allocated(y%comid)) then
+      !
       ! No matching send? Something is wrong....
       !
       info=psb_err_mpi_error_
@@ -688,8 +895,8 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      if (proc_to_comm /= me)then 
-        if (nesd>0) then 
+      if (proc_to_comm /= me)then
+        if (nesd>0) then
           call mpi_wait(y%comid(i,1),p2pstat,iret)
           if(iret /= mpi_success) then
             info=psb_err_mpi_error_
@@ -697,7 +904,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
             goto 9999
           end if
         end if
-        if (nerv>0) then 
+        if (nerv>0) then
           call mpi_wait(y%comid(i,2),p2pstat,iret)
           if(iret /= mpi_success) then
             info=psb_err_mpi_error_
@@ -705,8 +912,8 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
             goto 9999
           end if
         end if
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
+      else if (proc_to_comm == me) then
+        if (nesd /= nerv) then
           write(psb_err_unit,*) &
                & 'Fatal error in swapdata: mismatch on self send',&
                & nerv,nesd
@@ -718,7 +925,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       pnti   = pnti + nerv + nesd + 3
     end do
 
-    if (debug) write(*,*) me,' scatter'      
+    if (debug) write(*,*) me,' scatter'
     pnti   = 1
     snd_pt = totrcv_+1
     rcv_pt = 1
@@ -729,7 +936,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       idx_pt = 1+pnti+psb_n_elem_recv_
 
       if (debug) write(0,*)me,' Received from: ',prcid(i),&
-           & y%combuf(rcv_pt:rcv_pt+n*nerv-1)        
+           & y%combuf(rcv_pt:rcv_pt+n*nerv-1)
       call y%sct(idx_pt,rcv_pt,nerv,idx,beta)
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
@@ -739,7 +946,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
     ! Waited for com, cleanup comid
     !
     y%comid = mpi_request_null
-    
+
     !
     ! Then wait for device
     !
@@ -748,7 +955,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
     if (debug) write(*,*) me,' free buffer'
     call y%free_buffer(info)
     if (info == 0) call y%free_comid(info)
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
@@ -763,4 +970,3 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
 
   return
 end subroutine psi_dswap_vidx_multivect
-
