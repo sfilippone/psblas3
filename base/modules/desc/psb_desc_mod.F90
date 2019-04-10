@@ -1,9 +1,9 @@
-   
+
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 !
 ! package: psb_desc_mod
@@ -45,7 +45,7 @@ module psb_desc_mod
 
   !
   !  type: psb_desc_type
-  !  
+  !
   !  Communication Descriptor data structure.
   !
   !|  type psb_desc_type
@@ -60,13 +60,13 @@ module psb_desc_mod
   !|     type(psb_desc_type), pointer :: base_desc => null()
   !|  end type psb_desc_type
   !
-  !  
-  !  This is the most important data structure: it holds all the data 
-  !  necessary to organize data exchange. The pattern of communication 
-  !  among processes depends not only on the allocation of portions of 
+  !
+  !  This is the most important data structure: it holds all the data
+  !  necessary to organize data exchange. The pattern of communication
+  !  among processes depends not only on the allocation of portions of
   !  the index space to the various processes, but also on the underlying
   !  mesh discretization pattern. Thus building a communication descriptor is
-  !  very much linked to building a sparse matrix (since the matrix sparsity 
+  !  very much linked to building a sparse matrix (since the matrix sparsity
   !  pattern embodies the topology of the discretization graph).
   !
   !  This is a two-level data structure: it combines an INDX_MAP with
@@ -85,47 +85,47 @@ module psb_desc_mod
   !  it is done at build time (for extended-halo cases it can be inferred from
   !  the construction process).
   !  There are multiple ways to represent an INDX_MAP internally, hence it is
-  !  a CLASS variable, which can take different forms, more or less memory hungry. 
+  !  a CLASS variable, which can take different forms, more or less memory hungry.
   !
   !  Guidelines
   !
   !  1. Each global index I is owned by at least one process;
   !
   !  2. On each process, indices from 1 to N_ROW (desc%indxmap%get_lr())
-  !     are locally owned; the value of N_ROW can be determined upon allocation 
+  !     are locally owned; the value of N_ROW can be determined upon allocation
   !     based on the index distribution (see also the interface to CDALL).
   !
   !  3. If a global index is owned by more than one process, we have an OVERLAP
-  !     in which case the sum of all the N_ROW values is greater than the total 
-  !     size of the index space; 
+  !     in which case the sum of all the N_ROW values is greater than the total
+  !     size of the index space;
   !
-  !  4. During the buildup of the descriptor, according to the user specified 
+  !  4. During the buildup of the descriptor, according to the user specified
   !     stencil, we also take notice of indices that are not owned by the current
-  !     process, but whose value is needed to proceed with the computation; these 
+  !     process, but whose value is needed to proceed with the computation; these
   !     form the HALO of the current process. Halo indices are assigned local indices
   !     from N_ROW+1 to N_COL (inclusive).
   !
-  !  5. The upper bound  N_COL moves during the descriptor build process (see CDINS). 
+  !  5. The upper bound  N_COL moves during the descriptor build process (see CDINS).
   !
   !  6. The descriptor also contains the inverse global-to-local mapping.
   !
-  !  7. The data exchange is based on lists of local indices to be exchanged; all the 
+  !  7. The data exchange is based on lists of local indices to be exchanged; all the
   !     lists have the same format, as follows:
-  !     the list is  composed of variable dimension blocks, one for each process to 
-  !     communicate with; each block contains indices of local elements to be 
-  !     exchanged. We do choose the order of communications:  do not change 
-  !     the sequence of blocks unless you know what you're doing, or you'll 
+  !     the list is  composed of variable dimension blocks, one for each process to
+  !     communicate with; each block contains indices of local elements to be
+  !     exchanged. We do choose the order of communications:  do not change
+  !     the sequence of blocks unless you know what you're doing, or you'll
   !     risk a deadlock. NOTE: This is the format when the state is PSB_ASB_.
-  !     See below for BLD. The end-of-list is marked with a -1. 
+  !     See below for BLD. The end-of-list is marked with a -1.
   !
   !|  notation        stored in                   explanation
   !|  --------------- --------------------------- -----------------------------------
-  !|  process_id      index_v(p+proc_id_)      identifier of process with which 
+  !|  process_id      index_v(p+proc_id_)      identifier of process with which
   !|                                                data is  exchanged.
   !|  n_elements_recv index_v(p+n_elem_recv_)  number of elements to receive.
   !|  elements_recv   index_v(p+elem_recv_+i)  indexes of local elements to
   !|                                              receive. these are stored in the
-  !|                                              array from location p+elem_recv_ to
+ !|                                              array from location p+elem_recv_ to
   !|                                              location p+elem_recv_+
   !|                                              index_v(p+n_elem_recv_)-1.
   !|  n_elements_send index_v(p+n_elem_send_)  number of elements to send.
@@ -136,63 +136,63 @@ module psb_desc_mod
   !|                                              index_v(p+n_elem_send_)-1.
   !
   !     This organization is valid for both halo and overlap indices; overlap entries
-  !     need to be updated to ensure that a variable at a given global index 
-  !     (assigned to multiple processes) has the same value. The way to resolve the 
+  !     need to be updated to ensure that a variable at a given global index
+  !     (assigned to multiple processes) has the same value. The way to resolve the
   !     issue is to exchange the data and then sum (or average) the values. See
-  !     psb_ovrl subroutine. 
-  !  
-  !  8. When the descriptor is in the BLD state the INDEX vectors contains only 
+  !     psb_ovrl subroutine.
+  !
+  !  8. When the descriptor is in the BLD state the INDEX vectors contains only
   !     the indices to be received, organized as  a sequence of entries of
   !     the form (proc,N,(lx1,lx2,...,lxn)) with owning process, number of indices
-  !     (most often but not necessarily N=1), list of local indices.  
-  !     This is because we only know the list of halo indices to be received 
-  !     as we go about building the sparse matrix pattern, and we want the build 
-  !     phase to be loosely synchronized. Thus we record the indices we have to ask 
-  !     for, and at the time we call PSB_CDASB we match all the requests to figure 
+  !     (most often but not necessarily N=1), list of local indices.
+  !     This is because we only know the list of halo indices to be received
+  !     as we go about building the sparse matrix pattern, and we want the build
+  !     phase to be loosely synchronized. Thus we record the indices we have to ask
+  !     for, and at the time we call PSB_CDASB we match all the requests to figure
   !     out who should be sending what to whom.
-  !     However this implies that we know who owns the indices; 
-  !     this is actually only true for the OVERLAP list 
+  !     However this implies that we know who owns the indices;
+  !     this is actually only true for the OVERLAP list
   !     that is filled in at CDALL time, and not for the HALO (remember: we do not
-  !     necessarily have the space to encode the owning process index); thus 
-  !     the HALO list is rebuilt during the CDASB process 
-  !     (in the psi_ldsc_pre_halo subroutine). 
-  !  
-  !  9. Yet another twist comes about when building an extended descriptor with 
-  !     the psb_cdbldext subroutine. In this case we are reaching out 
+  !     necessarily have the space to encode the owning process index); thus
+  !     the HALO list is rebuilt during the CDASB process
+  !     (in the psi_ldsc_pre_halo subroutine).
+  !
+  !  9. Yet another twist comes about when building an extended descriptor with
+  !     the psb_cdbldext subroutine. In this case we are reaching out
   !     layer by layer, but we may use the results in two ways:
-  !      i. To build a descriptor with the same "owned" indices, but with an 
-  !         extended halo, with additional layers; in this case the requests 
+  !      i. To build a descriptor with the same "owned" indices, but with an
+  !         extended halo, with additional layers; in this case the requests
   !         go into halo_index;
   !     ii. To build a descriptor suitable for overlapped Schwarz-type computations.
-  !         In this case we end up with more "owned" indices than in the base 
+  !         In this case we end up with more "owned" indices than in the base
   !         descriptor, so that what was a halo index in the base becomes an overlap
-  !         index in the extended descriptor. In this case we build three lists: 
+  !         index in the extended descriptor. In this case we build three lists:
   !         ovrlap_index    the indices that overlap
   !         halo_index      the halo indices (of the extended descriptor)
-  !         ext_index       the indices of elements that need to be gathered to 
-  !                         map the original index space onto the new (overlapped) 
-  !                         index space. 
-  !     So, ext_index has the same format as the others, but is only used in the 
-  !     context of Schwarz-type computations; otherwise it is empty (i.e. 
-  !     it only contains the end-of-list marker -1). 
+  !         ext_index       the indices of elements that need to be gathered to
+  !                         map the original index space onto the new (overlapped)
+  !                         index space.
+  !     So, ext_index has the same format as the others, but is only used in the
+  !     context of Schwarz-type computations; otherwise it is empty (i.e.
+  !     it only contains the end-of-list marker -1).
   !
   ! 10. ovrlap_elem contains a list of overlap indices together with their degree
   !     of overlap, i.e. the number of processes "owning" the, and the "master"
   !     process whose value has to be considered authoritative when the need arises.
-  !     
+  !
   ! 11. ovr_mst_idx is a list defining a retrieve of a copy of the values for
   !     overlap entries from their respecitve "master" processes by means of
   !     an halo exchange call. This is used for those cases where there is
   !     an overlap in the base data distribution.
   !
   ! It is complex, but it does the following:
-  !  1. Allows a purely local matrix/stencil buildup phase, requiring only 
+  !  1. Allows a purely local matrix/stencil buildup phase, requiring only
   !     one synch point at the end (CDASB)
   !  2. Takes shortcuts when the problem size is not too large
-  !  
-  !  3. Supports restriction/prolongation operators with the same routines 
-  !     just choosing (in the swapdata/swaptran internals) on which index list 
-  !     they should work. 
+  !
+  !  3. Supports restriction/prolongation operators with the same routines
+  !     just choosing (in the swapdata/swaptran internals) on which index list
+  !     they should work.
   !
   !
   !
@@ -209,13 +209,14 @@ module psb_desc_mod
     type(psb_i_vect_type)            :: v_halo_index
     type(psb_i_vect_type)            :: v_ext_index
     type(psb_i_vect_type)            :: v_ovrlap_index
-    type(psb_i_vect_type)            :: v_ovr_mst_idx 
+    type(psb_i_vect_type)            :: v_ovr_mst_idx
 
     integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
     integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
     integer(psb_ipk_), allocatable   :: idx_space(:)
+    integer(psb_mpk_), allocatable   :: dist_graph_comm
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
@@ -226,8 +227,8 @@ module psb_desc_mod
     procedure, pass(desc) :: is_repl         => psb_is_repl_desc
     procedure, pass(desc) :: get_mpic        => psb_cd_get_mpic
     procedure, pass(desc) :: get_dectype     => psb_cd_get_dectype
-    procedure, pass(desc) :: get_context     => psb_cd_get_context    
-    procedure, pass(desc) :: get_ctxt        => psb_cd_get_context    
+    procedure, pass(desc) :: get_context     => psb_cd_get_context
+    procedure, pass(desc) :: get_ctxt        => psb_cd_get_context
     procedure, pass(desc) :: get_local_rows  => psb_cd_get_local_rows
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
@@ -250,7 +251,7 @@ module psb_desc_mod
     procedure, pass(desc) :: l2gv1           => cd_l2gv1
     procedure, pass(desc) :: l2gv2           => cd_l2gv2
     generic, public       :: l2g             => l2gs2, l2gv2
-    generic, public       :: l2gip           => l2gs1, l2gv1                            
+    generic, public       :: l2gip           => l2gs1, l2gv1
 
     procedure, pass(desc) :: g2ls1           => cd_g2ls1
     procedure, pass(desc) :: g2ls2           => cd_g2ls2
@@ -265,11 +266,11 @@ module psb_desc_mod
     procedure, pass(desc) :: g2lv2_ins       => cd_g2lv2_ins
     generic, public       :: g2l_ins         => g2ls2_ins, g2lv2_ins
     generic, public       :: g2lip_ins       => g2ls1_ins, g2lv1_ins
-    
+
 
   end type psb_desc_type
 
-      
+
   interface psb_sizeof
     module procedure psb_cd_sizeof
   end interface psb_sizeof
@@ -282,26 +283,26 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
-  interface psb_cd_set_large_threshold    
+  interface psb_cd_set_large_threshold
     module procedure  psb_i_cd_set_large_threshold
   end interface psb_cd_set_large_threshold
 
 #if defined(IPK4) && defined(LPK8)
-  interface psb_cd_set_large_threshold    
+  interface psb_cd_set_large_threshold
     module procedure  psb_l_cd_set_large_threshold
   end interface psb_cd_set_large_threshold
 #endif
-  
+
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
        & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&
        & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins, cd_fnd_owner
 
 
-  integer(psb_lpk_), private, save :: cd_large_threshold=psb_default_large_threshold 
+  integer(psb_lpk_), private, save :: cd_large_threshold=psb_default_large_threshold
 
 
-contains 
+contains
 
   function psb_cd_sizeof(desc)  result(val)
     implicit none
@@ -310,7 +311,7 @@ contains
     class(psb_desc_type), intent(in) :: desc
     integer(psb_epk_) :: val
 
-    val = 0 
+    val = 0
     val = val + psb_sizeof_ip*psb_size(desc%halo_index)
     val = val + psb_sizeof_ip*psb_size(desc%ext_index)
     val = val + psb_sizeof_ip*psb_size(desc%bnd_elem)
@@ -330,25 +331,25 @@ contains
 
 
   subroutine psb_i_cd_set_large_threshold(ith)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ith
-    if (ith > 0) then 
+    if (ith > 0) then
       cd_large_threshold = ith
     end if
   end subroutine psb_i_cd_set_large_threshold
 
   subroutine psb_l_cd_set_large_threshold(ith)
-    implicit none 
+    implicit none
     integer(psb_lpk_), intent(in) :: ith
-    if (ith > 0) then 
+    if (ith > 0) then
       cd_large_threshold = ith
     end if
   end subroutine psb_l_cd_set_large_threshold
 
   function  psb_cd_get_large_threshold() result(val)
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: val
-    val  = cd_large_threshold 
+    val  = cd_large_threshold
   end function psb_cd_get_large_threshold
 
   function  psb_cd_is_large_size(m) result(val)
@@ -358,7 +359,7 @@ contains
     integer(psb_lpk_), intent(in) :: m
     logical :: val
     !locals
-    val = (m > psb_cd_get_large_threshold()) 
+    val = (m > psb_cd_get_large_threshold())
   end function psb_cd_is_large_size
 
   function  psb_cd_choose_large_state(ictxt,m) result(val)
@@ -372,37 +373,37 @@ contains
     integer(psb_ipk_) :: np,me
 
     call psb_info(ictxt, me, np)
-    ! 
+    !
     ! Since the hashed lists take up (somewhat) more than 2*N_COL integers,
-    ! it makes no sense to use them if you don't have at least 
-    ! 3 processes, no matter what the size of the process. 
+    ! it makes no sense to use them if you don't have at least
+    ! 3 processes, no matter what the size of the process.
     !
     val = psb_cd_is_large_size(m) .and. (np > 2)
   end function psb_cd_choose_large_state
 
   subroutine psb_nullify_desc(desc)
-    implicit none 
+    implicit none
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
-    ! Perhaps we should delete this subroutine? 
+    ! Perhaps we should delete this subroutine?
     nullify(desc%base_desc)
 
   end subroutine psb_nullify_desc
 
   subroutine nullify_desc(desc)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
-    ! Perhaps we should delete this subroutine? 
+    ! Perhaps we should delete this subroutine?
     nullify(desc%base_desc)
 
   end subroutine nullify_desc
 
   function psb_is_ok_desc(desc) result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
-    
+    logical                         :: val
+
     val = .false.
     if (allocated(desc%indxmap)) &
          & val = desc%indxmap%is_valid()
@@ -410,10 +411,10 @@ contains
   end function psb_is_ok_desc
 
   function psb_is_valid_desc(desc) result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
-    
+    logical                         :: val
+
     val = .false.
     if (allocated(desc%indxmap)) &
          & val = desc%indxmap%is_valid()
@@ -421,9 +422,9 @@ contains
   end function psb_is_valid_desc
 
   function psb_is_bld_desc(desc) result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
+    logical                         :: val
 
     val = .false.
     if (allocated(desc%indxmap)) &
@@ -432,9 +433,9 @@ contains
   end function psb_is_bld_desc
 
   function psb_is_upd_desc(desc)  result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
+    logical                         :: val
 
     val = .false.
     if (allocated(desc%indxmap)) &
@@ -443,9 +444,9 @@ contains
   end function psb_is_upd_desc
 
   function psb_is_repl_desc(desc) result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
+    logical                         :: val
 
     val = .false.
     if (allocated(desc%indxmap)) &
@@ -454,9 +455,9 @@ contains
   end function psb_is_repl_desc
 
   function psb_is_ovl_desc(desc) result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
+    logical                         :: val
 
     val = .false.
     if (allocated(desc%indxmap)) &
@@ -466,9 +467,9 @@ contains
 
 
   function psb_is_asb_desc(desc) result(val)
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
+    logical                         :: val
 
     val = .false.
     if (allocated(desc%indxmap)) &
@@ -477,11 +478,11 @@ contains
   end function psb_is_asb_desc
 
   function psb_cd_get_local_rows(desc) result(val)
-    implicit none 
-    integer(psb_ipk_) :: val 
+    implicit none
+    integer(psb_ipk_) :: val
     class(psb_desc_type), intent(in) :: desc
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       val = desc%indxmap%get_lr()
     else
       val = -1
@@ -489,11 +490,11 @@ contains
   end function psb_cd_get_local_rows
 
   function psb_cd_get_local_cols(desc) result(val)
-    implicit none 
-    integer(psb_ipk_) :: val 
+    implicit none
+    integer(psb_ipk_) :: val
     class(psb_desc_type), intent(in) :: desc
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       val = desc%indxmap%get_lc()
     else
       val = -1
@@ -501,11 +502,11 @@ contains
   end function psb_cd_get_local_cols
 
   function psb_cd_get_global_rows(desc) result(val)
-    implicit none 
-    integer(psb_lpk_) :: val 
+    implicit none
+    integer(psb_lpk_) :: val
     class(psb_desc_type), intent(in) :: desc
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       val = desc%indxmap%get_gr()
     else
       val = -1
@@ -514,11 +515,11 @@ contains
   end function psb_cd_get_global_rows
 
   function psb_cd_get_global_cols(desc) result(val)
-    implicit none 
-    integer(psb_lpk_) :: val 
+    implicit none
+    integer(psb_lpk_) :: val
     class(psb_desc_type), intent(in) :: desc
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       val = desc%indxmap%get_gc()
     else
       val = -1
@@ -527,19 +528,19 @@ contains
   end function psb_cd_get_global_cols
 
   function psb_cd_get_global_indices(desc,owned) result(val)
-    implicit none 
+    implicit none
     integer(psb_lpk_), allocatable   :: val(:)
     class(psb_desc_type), intent(in) :: desc
     logical, intent(in), optional    :: owned
 
     logical :: owned_
     integer(psb_ipk_) :: i, nr, info
-    
+
     owned_=.true.
     if (present(owned)) owned_=owned
 
-    
-    if (allocated(desc%indxmap)) then 
+
+    if (allocated(desc%indxmap)) then
       if (owned_) then
         nr = desc%get_local_rows()
       else
@@ -559,13 +560,13 @@ contains
 
 
 
-  
+
   function cd_get_fmt(desc) result(val)
-    implicit none 
-    character(len=5) :: val 
+    implicit none
+    character(len=5) :: val
     class(psb_desc_type), intent(in) :: desc
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       val = desc%indxmap%get_fmt()
     else
       val = 'NULL'
@@ -575,11 +576,11 @@ contains
 
   function psb_cd_get_context(desc) result(val)
     use psb_error_mod
-    implicit none 
-    integer(psb_ipk_) :: val 
+    implicit none
+    integer(psb_ipk_) :: val
     class(psb_desc_type), intent(in) :: desc
     if (allocated(desc%indxmap)) then
-      val = desc%indxmap%get_ctxt()    
+      val = desc%indxmap%get_ctxt()
     else
       val = -1
       call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
@@ -589,12 +590,12 @@ contains
 
   function psb_cd_get_dectype(desc) result(val)
     use psb_error_mod
-    implicit none 
-    integer(psb_ipk_) :: val 
+    implicit none
+    integer(psb_ipk_) :: val
     class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then
-      val = desc%indxmap%get_state()    
+      val = desc%indxmap%get_state()
     else
       val = -1
       call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_dectype')
@@ -605,12 +606,12 @@ contains
 
   function psb_cd_get_mpic(desc) result(val)
     use psb_error_mod
-    implicit none 
-    integer(psb_ipk_) :: val 
+    implicit none
+    integer(psb_ipk_) :: val
     class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then
-      val = desc%indxmap%get_mpic()    
+      val = desc%indxmap%get_mpic()
     else
       val = -1
       call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
@@ -622,7 +623,7 @@ contains
 
   subroutine psb_cd_set_ovl_asb(desc,info)
     !
-    ! Change state of a descriptor into ovl_build. 
+    ! Change state of a descriptor into ovl_build.
     implicit none
     type(psb_desc_type), intent(inout) :: desc
     integer(psb_ipk_) :: info
@@ -635,20 +636,20 @@ contains
 
 
   subroutine psb_get_xch_idx(idx,totxch,totsnd,totrcv)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)  :: idx(:)
     integer(psb_ipk_), intent(out) :: totxch,totsnd,totrcv
 
     integer(psb_ipk_) :: ip, nerv, nesd
-    character(len=20), parameter  :: name='psb_get_xch_idx'    
+    character(len=20), parameter  :: name='psb_get_xch_idx'
 
     totxch = 0
     totsnd = 0
     totrcv = 0
     ip     = 1
 
-    do 
-      if (ip > size(idx)) then 
+    do
+      if (ip > size(idx)) then
         write(psb_err_unit,*) trim(name),': Warning: out of size of input vector '
         exit
       end if
@@ -665,12 +666,12 @@ contains
 
 
   subroutine psb_get_v_xch_idx(idx,totxch,totsnd,totrcv)
-    implicit none 
+    implicit none
     class(psb_i_base_vect_type), intent(in)  :: idx
     integer(psb_ipk_), intent(out) :: totxch,totsnd,totrcv
 
     integer(psb_ipk_) :: ip, nerv, nesd
-    character(len=20), parameter  :: name='psb_get_v_xch_idx'    
+    character(len=20), parameter  :: name='psb_get_v_xch_idx'
 
     call psb_get_xch_idx(idx%v,totxch,totsnd,totrcv)
 
@@ -703,12 +704,12 @@ contains
 
     call psb_info(ictxt, me, np)
 
-    select case(data) 
-    case(psb_comm_halo_) 
+    select case(data)
+    case(psb_comm_halo_)
       ipnt   => desc%halo_index
-    case(psb_comm_ovr_) 
+    case(psb_comm_ovr_)
       ipnt   => desc%ovrlap_index
-    case(psb_comm_ext_) 
+    case(psb_comm_ext_)
       ipnt   => desc%ext_index
       if (debug_level >= psb_debug_ext_) then
         if (.not.associated(desc%base_desc)) then
@@ -722,7 +723,7 @@ contains
                & 'which is not overlap-extended!'
         end if
       end if
-    case(psb_comm_mov_) 
+    case(psb_comm_mov_)
       ipnt   => desc%ovr_mst_idx
     case default
       info=psb_err_from_subroutine_
@@ -767,16 +768,16 @@ contains
 
     call psb_info(ictxt, me, np)
 
-    select case(data) 
-    case(psb_comm_halo_) 
+    select case(data)
+    case(psb_comm_halo_)
       ipnt   => desc%v_halo_index%v
       if (.not.allocated(desc%v_halo_index%v)) &
            & info = psb_err_inconsistent_index_lists_
-    case(psb_comm_ovr_) 
+    case(psb_comm_ovr_)
       ipnt   => desc%v_ovrlap_index%v
       if (.not.allocated(desc%v_ovrlap_index%v)) &
            & info = psb_err_inconsistent_index_lists_
-    case(psb_comm_ext_) 
+    case(psb_comm_ext_)
       ipnt   => desc%v_ext_index%v
       if (.not.allocated(desc%v_ext_index%v)) &
            & info = psb_err_inconsistent_index_lists_
@@ -792,11 +793,11 @@ contains
                & 'which is not overlap-extended!'
         end if
       end if
-    case(psb_comm_mov_) 
+    case(psb_comm_mov_)
       ipnt   => desc%v_ovr_mst_idx%v
       if (.not.allocated(desc%v_ovr_mst_idx%v)) &
            & info = psb_err_inconsistent_index_lists_
-      
+
     case default
       info=psb_err_from_subroutine_
     end select
@@ -804,7 +805,7 @@ contains
       call psb_errpush(info,name,a_err='wrong Data selector')
       goto 9999
     end if
-    
+
     call psb_get_v_xch_idx(ipnt,totxch,idxs,idxr)
 
 
@@ -820,8 +821,8 @@ contains
   !
   ! Subroutine: psb_cdfree
   !   Frees a descriptor data structure.
-  ! 
-  ! Arguments: 
+  !
+  ! Arguments:
   !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
   !    info     - integer.                       return code.
   subroutine psb_cdfree(desc,info)
@@ -855,8 +856,8 @@ contains
   !
   ! Subroutine: psb_cdfree
   !   Frees a descriptor data structure.
-  ! 
-  ! Arguments: 
+  !
+  ! Arguments:
   !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
   subroutine psb_cd_destroy(desc)
     !...free descriptor structure...
@@ -878,7 +879,7 @@ contains
 
     if (allocated(desc%ovrlap_index)) &
          & deallocate(desc%ovrlap_index,stat=info)
-    
+
     if (allocated(desc%ovrlap_elem)) &
          & deallocate(desc%ovrlap_elem,stat=info)
     if (allocated(desc%ovr_mst_idx)) &
@@ -889,7 +890,7 @@ contains
     if (allocated(desc%idx_space)) &
          & deallocate(desc%idx_space,stat=info)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%free()
       deallocate(desc%indxmap, stat=info)
     end if
@@ -906,11 +907,11 @@ contains
   !
   ! Subroutine: psb_cdtransfer
   !   Transfers data and allocation from in to out; behaves like MOVE_ALLOC, i.e.
-  !   the IN arg is empty (and deallocated) upon exit. 
+  !   the IN arg is empty (and deallocated) upon exit.
   !
-  ! 
-  ! Arguments: 
-  !    desc  - type(psb_desc_type).         The communication descriptor to be 
+  !
+  ! Arguments:
+  !    desc  - type(psb_desc_type).         The communication descriptor to be
   !                                               transferred.
   !    desc_out - type(psb_desc_type).         The output communication descriptor.
   !    info     - integer.                       Return code.
@@ -933,7 +934,7 @@ contains
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20)   :: name
 
-    if (psb_get_errstatus() /= 0) return 
+    if (psb_get_errstatus() /= 0) return
     info = psb_success_
     call psb_erractionsave(err_act)
     name = 'psb_cdtransfer'
@@ -942,8 +943,8 @@ contains
     !
     ! Note: this  might be called even
     ! when desc is empty.
-    ! 
-    if (desc%is_valid()) then 
+    !
+    if (desc%is_valid()) then
       ictxt = psb_cd_get_context(desc)
       call psb_info(ictxt,me,np)
 
@@ -988,7 +989,7 @@ contains
 
     call psb_erractionrestore(err_act)
     return
-    
+
 
 9999 call psb_error_handler(err_act)
 
@@ -999,9 +1000,9 @@ contains
   ! Subroutine: psb_cd_clone
   !   Copies data and allocation from in to out.
   !
-  ! 
-  ! Arguments: 
-  !    desc  - type(psb_desc_type).         The communication descriptor to be 
+  !
+  ! Arguments:
+  !    desc  - type(psb_desc_type).         The communication descriptor to be
   !                                               transferred.
   !    desc_out - type(psb_desc_type).         The output communication descriptor.
   !    info     - integer.                       Return code.
@@ -1024,15 +1025,15 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    if (psb_get_errstatus() /= 0) return 
+    if (psb_get_errstatus() /= 0) return
     info = psb_success_
     call psb_erractionsave(err_act)
     name = 'psb_cdcpy'
 
-    if (desc%is_valid()) then 
+    if (desc%is_valid()) then
       ictxt = desc%get_context()
 
-      ! check on blacs grid 
+      ! check on blacs grid
       call psb_info(ictxt, me, np)
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),': Entered'
@@ -1062,7 +1063,7 @@ contains
            & call psb_safe_ab_cpy(desc%idx_space,desc_out%idx_space,info)
 !!$      if ((info == psb_success_).and.(allocated(desc%indxmap))) &
 !!$           & call desc%indxmap%clone(desc_out%indxmap,info)
-!!$      associate(indxin => desc%indxmap) 
+!!$      associate(indxin => desc%indxmap)
 !!$        if ((info == psb_success_).and.(allocated(desc%indxmap))) &
 !!$             & call indxin%clone(desc_out%indxmap,info)
 !!$      end associate
@@ -1098,7 +1099,7 @@ contains
 
   end subroutine psb_cd_clone
 
-  
+
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info)
     use psb_error_mod
     use psb_penv_mod
@@ -1144,10 +1145,10 @@ contains
     l_tmp = 3*size(idxlist)
 
     allocate(tmp(l_tmp),stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-      goto 9999      
+      goto 9999
     end if
 
     incnt  = 1
@@ -1183,7 +1184,7 @@ contains
     return
 
   end Subroutine psb_cd_get_recv_idx
-  
+
   Subroutine psb_cd_get_recv_idx_glob(tmp,desc,data,info)
 
     use psb_error_mod
@@ -1231,10 +1232,10 @@ contains
     l_tmp = 3*size(idxlist)
 
     allocate(tmp(l_tmp),stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-      goto 9999      
+      goto 9999
     end if
 
     incnt  = 1
@@ -1254,7 +1255,7 @@ contains
           goto 9999
         end if
         call desc%indxmap%l2g(idx,gidx,info)
-        If (gidx < 0) then 
+        If (gidx < 0) then
           info=-3
           call psb_errpush(info,name)
           goto 9999
@@ -1281,7 +1282,7 @@ contains
   subroutine psb_cd_cnv(desc, mold)
     class(psb_desc_type), intent(inout), target :: desc
     class(psb_i_base_vect_type), intent(in)  :: mold
-    
+
     call desc%v_halo_index%cnv(mold)
     call desc%v_ext_index%cnv(mold)
     call desc%v_ovrlap_index%cnv(mold)
@@ -1291,11 +1292,11 @@ contains
 
 
   subroutine cd_l2gs1(idx,desc,info,mask,owned)
-    use psb_error_mod 
-    implicit none 
+    use psb_error_mod
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_lpk_), intent(inout) :: idx
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: err_act
@@ -1304,12 +1305,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%l2gip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1321,16 +1322,16 @@ contains
 9999 call psb_error_handler(err_act)
 
     return
-  
+
   end subroutine cd_l2gs1
 
   subroutine cd_l2gs2(idxin,idxout,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_ipk_), intent(in)    :: idxin
     integer(psb_lpk_), intent(out)   :: idxout
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
@@ -1341,12 +1342,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%l2g(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1363,10 +1364,10 @@ contains
 
   subroutine cd_l2gv1(idx,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_lpk_), intent(inout) :: idx(:)
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: err_act
@@ -1376,12 +1377,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%l2gip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1397,11 +1398,11 @@ contains
 
   subroutine cd_l2gv2(idxin,idxout,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_ipk_), intent(in)    :: idxin(:)
     integer(psb_lpk_), intent(out)   :: idxout(:)
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: err_act
@@ -1411,12 +1412,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%l2g(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1433,10 +1434,10 @@ contains
 
   subroutine cd_g2ls1(idx,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_lpk_), intent(inout) :: idx
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: err_act
@@ -1446,12 +1447,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2lip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1467,11 +1468,11 @@ contains
 
   subroutine cd_g2ls2(idxin,idxout,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
@@ -1482,12 +1483,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2l(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1504,10 +1505,10 @@ contains
 
   subroutine cd_g2lv1(idx,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_lpk_), intent(inout) :: idx(:)
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: err_act
@@ -1517,12 +1518,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2lip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1538,11 +1539,11 @@ contains
 
   subroutine cd_g2lv2(idxin,idxout,desc,info,mask,owned)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(in) :: desc
     integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
@@ -1554,12 +1555,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2l(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1577,10 +1578,10 @@ contains
 
   subroutine cd_g2ls1_ins(idx,desc,info,mask, lidx)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(inout) :: desc
     integer(psb_lpk_), intent(inout) :: idx
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
     integer(psb_ipk_) :: err_act
@@ -1590,12 +1591,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2lip_ins(idx,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1611,11 +1612,11 @@ contains
 
   subroutine cd_g2ls2_ins(idxin,idxout,desc,info,mask, lidx)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(inout) :: desc
     integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
 
@@ -1627,12 +1628,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2l_ins(idxin,idxout,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1641,7 +1642,7 @@ contains
     return
 
 9999 call psb_error_handler(err_act)
-    
+
     return
 
   end subroutine cd_g2ls2_ins
@@ -1649,10 +1650,10 @@ contains
 
   subroutine cd_g2lv1_ins(idx,desc,info,mask, lidx)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(inout) :: desc
     integer(psb_lpk_), intent(inout) :: idx(:)
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
@@ -1664,12 +1665,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2lip_ins(idx,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1685,11 +1686,11 @@ contains
 
   subroutine cd_g2lv2_ins(idxin,idxout,desc,info,mask,lidx)
     use psb_error_mod
-    implicit none 
+    implicit none
     class(psb_desc_type), intent(inout) :: desc
     integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
-    integer(psb_ipk_), intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
@@ -1701,12 +1702,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%g2l_ins(idxin,idxout,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1715,7 +1716,7 @@ contains
     return
 
 9999 call psb_error_handler(err_act)
-    
+
     return
 
   end subroutine cd_g2lv2_ins
@@ -1723,7 +1724,7 @@ contains
 
   subroutine cd_fnd_owner(idx,iprc,desc,info)
     use psb_error_mod
-    implicit none 
+    implicit none
     integer(psb_lpk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_desc_type), intent(in) :: desc
@@ -1736,12 +1737,12 @@ contains
     info  = psb_success_
     call psb_erractionsave(err_act)
 
-    if (allocated(desc%indxmap)) then 
+    if (allocated(desc%indxmap)) then
       call desc%indxmap%fnd_owner(idx,iprc,info)
     else
       info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
