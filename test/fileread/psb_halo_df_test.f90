@@ -179,7 +179,6 @@ program psb_df_sample
   case('BLOCK')
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
-    print *, "---ARTLESS: after psb_matdist1"
     ! call desc_a%cd_get_list
     ! call desc_a%cd_v_get_list
     ! print *, "desc_a%v_halo_index", desc_a%v_get_list()
@@ -209,32 +208,40 @@ program psb_df_sample
 
   call x_col%zero() ! change to mpi rank? Artless
   !
-  nrow=desc_a%get_local_rows()
-  ncol=desc_a%get_local_cols()
+  nrow=desc_a%get_local_rows() ! number of rows
+  ncol=desc_a%get_local_cols() ! number of columns
   iv = [ (i,i=1,ncol)]
+
 !  call psb_loc_to_glob(iv,desc_a,info) !
   call desc_a%l2gv1(iv,info)
   ! call desc_a%locgv1(iv,info)
 
-  xa = iv ! error
-  xa(nrow+1:ncol) = 0.0
+  ! ---- test where halo regions are set to -1, sending 10+iam
+  xa = iv
+  xa(nrow+1:ncol) = -1
   call x_col%set_vect(xa)
-  call psb_halo(x_col,desc_a,info)
-  xa = x_col%get_vect() ! ha = x_col%get_vect()
+  call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+
+  xa(nrow+1:ncol) = -1
+  call x_col%set_vect(xa)
+  call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+  xa = x_col%get_vect()
+
   do i=nrow+1,ncol
+    ! print *, iam, ": ", xa(i), "::", iv(i)
+    ! write(0,*) 'Mismatch ',i,xa(i),iv(i)
     if (xa(i) /= iv(i)) then ! ha
-      write(0,*) 'Mismatch ',i,xa(i),iv(i) ! ha
+      write(0,*) iam, ': MISMATCH ',i,xa(i),iv(i)
     end if
   end do
 
-  !
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
   call r_col%zero()
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
 
-  ! call psb_halo
+
 
   call psb_amx(ictxt, t2)
 
@@ -246,7 +253,7 @@ program psb_df_sample
 
   !
 
-  ! call prec%init(ictxt,ptype,info)
+  ! call perc%init(ictxt,ptype,info)
 
   ! building the preconditioner
   t1 = psb_wtime()
@@ -332,12 +339,14 @@ program psb_df_sample
 998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))
 
+  ! print *, "* calling free funcs"
   ! call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call prec%free(info)
   call psb_cdfree(desc_a,info)
   call psb_exit(ictxt)
+  print *, "* FIN for", iam
   stop
 
 9999 call psb_error(ictxt)
