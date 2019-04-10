@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,12 +27,12 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 !
 ! package: psb_desc_const_mod
-!    Auxiliary module for descriptor: constant values. 
+!    Auxiliary module for descriptor: constant values.
 !
 module psb_desc_const_mod
   use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
@@ -40,14 +40,15 @@ module psb_desc_const_mod
   !     Communication, prolongation & restriction
   !
   integer(psb_ipk_), parameter :: psb_nohalo_=0,  psb_halo_=1
-  ! For overlap update. 
+  ! For overlap update.
   integer(psb_ipk_), parameter :: psb_none_=0,  psb_sum_=1
   integer(psb_ipk_), parameter :: psb_avg_=2,  psb_square_root_=3
   integer(psb_ipk_), parameter :: psb_setzero_=4
 
-  ! The following are bit fields. 
+  ! The following are bit fields.
   integer(psb_ipk_), parameter :: psb_swap_send_=1, psb_swap_recv_=2
   integer(psb_ipk_), parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
+  integer(psb_ipk_), parameter :: psb_swap_persistent_=16
   ! Choice among lists on which to base data exchange
   integer(psb_ipk_), parameter :: psb_no_comm_=-1
   integer(psb_ipk_), parameter :: psb_comm_halo_=1, psb_comm_ovr_=2
@@ -55,8 +56,8 @@ module psb_desc_const_mod
   ! Types of mapping between descriptors.
   integer(psb_ipk_), parameter :: psb_map_xhal_        = 123
   integer(psb_ipk_), parameter :: psb_map_asov_        = psb_map_xhal_+1
-  integer(psb_ipk_), parameter :: psb_map_aggr_        = psb_map_asov_+1 
-  integer(psb_ipk_), parameter :: psb_map_gen_linear_  = psb_map_aggr_+1 
+  integer(psb_ipk_), parameter :: psb_map_aggr_        = psb_map_asov_+1
+  integer(psb_ipk_), parameter :: psb_map_gen_linear_  = psb_map_aggr_+1
 
   integer(psb_ipk_), parameter :: psb_ovt_xhal_ = psb_map_xhal_, psb_ovt_asov_=psb_map_asov_
   !
@@ -93,7 +94,7 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_desc_ovl_bld_=3399
   integer(psb_ipk_), parameter :: psb_desc_ovl_asb_=psb_desc_ovl_bld_+1
   ! these two are reserved for descriptors which are
-  ! "overlap-extensions" of base descriptors. 
+  ! "overlap-extensions" of base descriptors.
   integer(psb_ipk_), parameter :: psb_cd_ovl_bld_=psb_desc_ovl_bld_
   integer(psb_ipk_), parameter :: psb_cd_ovl_asb_=psb_desc_ovl_asb_
   integer(psb_ipk_), parameter :: psb_desc_normal_=3299
@@ -104,7 +105,7 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_hash_bits     = 16
   integer(psb_ipk_), parameter :: psb_max_hash_bits = 22
   integer(psb_ipk_), parameter :: psb_hash_size     = 2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
-  integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024   
+  integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024
   integer(psb_ipk_), parameter :: psb_hpnt_nentries_ = 7
 
   !
@@ -119,7 +120,7 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_ovrlp_elem_to_=2, psb_ovrlp_elem_=0
   integer(psb_ipk_), parameter :: psb_n_dom_ovr_=1
 
-  interface 
+  interface
     subroutine psb_parts(glob_index,nrow,np,pv,nv)
       import :: psb_ipk_, psb_lpk_
       integer(psb_lpk_), intent (in)  :: glob_index,nrow
@@ -127,5 +128,5 @@ module psb_desc_const_mod
       integer(psb_ipk_), intent (out) :: nv, pv(*)
     end subroutine psb_parts
   end interface
-  
+
 end module psb_desc_const_mod
