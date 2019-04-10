@@ -84,17 +84,14 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   logical, parameter :: debug=.false.
   character(len=20)  :: name
   !     ...Artless
-  integer(psb_ipk_), allocatable  :: iaux(:)
   integer(psb_ipk_) :: proc_to_comm, pnti, nerv, nesd, i, rcv_pt, snd_pt
   integer(psb_ipk_), allocatable, dimension(:) :: prcid, brvidx, rvsz, bsdidx
-  integer(psb_ipk_), allocatable, dimension(:) ::sdsz
-  integer :: comm_size, comm_rank, ierr
-  logical, parameter :: reorder=.FALSE., persistent_mpi=.TRUE.
-  integer :: graph_comm, degree
-  integer(psb_ipk_), allocatable, dimension(:) :: max_degree, src, dest
+  integer(psb_ipk_), allocatable, dimension(:) :: iaux, sdsz
+  integer(psb_ipk_), allocatable, dimension(:) :: max_degree, src_and_dest
   ! to remove: for mpix_init
+  logical, parameter :: reorder=.FALSE., persistent_mpi=.TRUE.
   integer(psb_ipk_), allocatable, dimension(:) :: rcv_buf
-  integer :: buf_size, req
+  integer :: dist_graph_comm, degree, buf_size, req, ierr
   !     ...end Artless
 
 
@@ -199,12 +196,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   if (persistent_mpi) then ! artless: make a proper flag
     allocate(prcid(0:np-1), brvidx(0:np-1), rvsz(0:np-1), bsdidx(0:np-1))
     allocate(sdsz(0:np-1))
-
-    call MPI_Comm_rank(MPI_COMM_WORLD,comm_rank, ierr)
-    call MPI_Comm_size(MPI_COMM_WORLD,comm_size, ierr)
-    allocate(max_degree(comm_size))
-    allocate(max_n_send(comm_size))
-    allocate(max_n_recv(comm_size))
+    allocate(max_degree(np-1)) ! max degree of a node is num ranks - 1
     degree = 0
     pnti   = 1
     snd_pt = 1
@@ -216,7 +208,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
       nerv = iaux(pnti+psb_n_elem_recv_)
       nesd = iaux(pnti+nerv+psb_n_elem_send_)
-      print *, comm_rank, ": nerv", nerv, "nesd", nesd
+      ! print *, me, ": nerv", nerv, "nesd", nesd
 
       call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
 
@@ -232,15 +224,17 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     end do
 
     ! source and destination nodes are the same
-    allocate(src(degree), dest(degree))
-    src = max_degree(1:degree)
-    dest = src
+    allocate(src_and_dest(degree))
+    src_and_dest = max_degree(1:degree)
     ! create graph comm of MPI rank's communication
-    call MPI_Dist_graph_create_adjacent(MPI_COMM_WORLD, degree, src, &
-        MPI_UNWEIGHTED, degree, dest, MPI_UNWEIGHTED, MPI_INFO_NULL, &
-        reorder, graph_comm, ierr)
-    deallocate(src, dest)
+    call MPI_Dist_graph_create_adjacent(MPI_COMM_WORLD, degree, src_and_dest, &
+        MPI_UNWEIGHTED, degree, src_and_dest, MPI_UNWEIGHTED, MPI_INFO_NULL, &
+        reorder, dist_graph_comm, ierr)
+    deallocate(src_and_dest)
 
+    allocate(cdesc%dist_graph_comm, stat=info)
+    cdesc%dist_graph_comm = dist_graph_comm
+    print *, "DIST_GRAPH_COMM CREATED"
     ! TESTING MPIX_INIT HERE, WILL BE MOVED ELSEWHERE
     ! THE SEND BUF, can't I just send iaux?
     ! FOR RECV BUF, best way to figure out how big?
@@ -255,15 +249,15 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     !     req, ierr)
 
     ! print *, "-----------------PRE START---------------"
-    ! print *, comm_rank, ": sends", size(iaux), "to", src
+    ! print *, me, ": sends", size(iaux), "to", src
 
-    ! print *, comm_rank, ": buf_size", buf_size, "size(iaux)", size(iaux), "snd_buf", iaux
+    ! print *, me, ": buf_size", buf_size, "size(iaux)", size(iaux), "snd_buf", iaux
     ! call MPI_Start(req, ierr)
     ! call MPI_Wait(req, MPI_STATUS_IGNORE, ierr)
-    ! print *, comm_rank, ": buf_size", buf_size, "rcv_buf", rcv_buf
+    ! print *, me, ": buf_size", buf_size, "rcv_buf", rcv_buf
 
     ! print *, rank, ": iaux"
-    print *, "====END WAIT===="
+    ! print *, "====END WAIT===="
 
   end if
   ! ARTLESS: end of additions
