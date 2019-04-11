@@ -54,7 +54,6 @@
 !                                       psb_comm_halo_    use halo_index
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_  DISABLED for this routine.
-!
 #undef  SP_A2AV_MPI
 #undef  SP_A2AV_XI
 #define SP_A2AV_MAT
@@ -82,7 +81,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr,&
-       &     l1, err_act, nsnds, nrcvs
+       &     l1, err_act, nsnds, nrcvs, nrg, ncg
   integer(psb_mpik_) :: icomm, minfo
   integer(psb_mpik_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
@@ -189,8 +188,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     n_el_send = ipdxv(counter+psb_n_elem_send_)
     tot_elem = 0
     Do j=0,n_el_send-1
-      idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
+      idx      = ipdxv(counter+psb_elem_send_+j)
+      n_elem   = a%get_nz_row(idx)
       tot_elem = tot_elem+n_elem      
     Enddo
     sdsz(proc+1) = tot_elem
@@ -228,10 +227,10 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     n_el_send = ipdxv(counter+psb_n_elem_send_)
 
     bsdindx(proc+1) = idxs
-    idxs = idxs + sdsz(proc+1)
+    idxs            = idxs + sdsz(proc+1)
     brvindx(proc+1) = idxr
-    idxr = idxr + rvsz(proc+1)
-    counter   = counter+n_el_send+3
+    idxr     = idxr + rvsz(proc+1)
+    counter  = counter+n_el_send+3
   Enddo
 
   iszr=sum(rvsz)
@@ -261,28 +260,33 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   ipx = 1
   counter=1
   idx = 0
-
-  tot_elem=0
+  !
+  ! Make sure to get all columns in csget.
+  ! This is necessary when sphalo is used to compute a transpose,
+  ! as opposed to just gathering halo for spspmm purposes. 
+  !
+  ncg      = huge(ncg)
+  tot_elem = 0
   Do 
-    proc=ipdxv(counter)
+    proc = ipdxv(counter)
     if (proc == -1) exit 
-    n_el_recv=ipdxv(counter+psb_n_elem_recv_)
-    counter=counter+n_el_recv
-    n_el_send=ipdxv(counter+psb_n_elem_send_)
+    n_el_recv = ipdxv(counter+psb_n_elem_recv_)
+    counter   = counter+n_el_recv
+    n_el_send = ipdxv(counter+psb_n_elem_send_)
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
       n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
-           &  append=.true.,nzin=tot_elem)
+           &  append=.true.,nzin=tot_elem,jmax=ncg) 
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_sp_getrow')
         goto 9999
       end if
-      tot_elem=tot_elem+ngtz
+      tot_elem = tot_elem+ngtz
     Enddo
-    ipx = ipx + 1 
+    ipx       = ipx + 1 
     counter   = counter+n_el_send+3
   Enddo
   nz = tot_elem
