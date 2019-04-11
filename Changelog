@@ -1,6 +1,14 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
-2018/11/23: Reimplement hash function.
+2019/01/16: In bldext, implement ALL_TO_ALLV by hand for certain
+	compilers. 
+2018/10/10: New ICTXT argument in prec%init
+2018/07/30: Improved implementations for TRIL/TRIU	
+2018/04/15: Fix internals to have tmp_ovrlap in local indexing. Change
+	default in CDALL with VL to no global checks. 	
+2018/03/22: Fix defaults for matrix/vector internals	
+2018/02/03: Accept 'GMRES' as synonim with 'RGMRES'.	
+2018/11/23: Reimplement hash function. 	
 2018/10/10: new ICTXT argument to prec%init method.
 2018/09/04: Modified vector class get_vect method
 2018/08/10: Optional arguments in GETROW method. 	

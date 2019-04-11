@@ -80,7 +80,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        &     n_el_send,k,n_el_recv,idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr,&
-       &     l1, err_act
+       &     l1, err_act, nsnds, nrcvs, nrg, ncg
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
@@ -187,7 +187,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
-  ! For all rows in the halo descriptor, extract and send/receive.
+  ! For all rows in the halo descriptor, extract the row size
   Do 
     proc=ipdxv(counter)
     if (proc == -1) exit
@@ -196,8 +196,8 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     n_el_send = ipdxv(counter+psb_n_elem_send_)
     tot_elem = 0
     Do j=0,n_el_send-1
-      idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
+      idx      = ipdxv(counter+psb_elem_send_+j)
+      n_elem   = a%get_nz_row(idx)
       tot_elem = tot_elem+n_elem      
     Enddo
     sdsz(proc+1) = tot_elem
@@ -205,6 +205,12 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
+  !
+  ! Exchange row sizes, so as to know sends/receives.
+  ! This is different from the halo exchange because the
+  ! size of the rows may vary, as opposed to fixed
+  ! (multi) vector row size. 
+  ! 
   call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
        & rvsz,1,psb_mpi_mpk_,icomm,minfo)
   if (info /= psb_success_) then
@@ -212,6 +218,10 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     call psb_errpush(info,name,a_err='mpi_alltoall')
     goto 9999
   end if
+  nsnds = count(sdsz /= 0)
+  nrcvs = count(rvsz /= 0)
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Done initial alltoall',nsnds,nrcvs
 
   idxs = 0
   idxr = 0
@@ -224,10 +234,10 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     n_el_send = ipdxv(counter+psb_n_elem_send_)
 
     bsdindx(proc+1) = idxs
-    idxs = idxs + sdsz(proc+1)
+    idxs            = idxs + sdsz(proc+1)
     brvindx(proc+1) = idxr
-    idxr = idxr + rvsz(proc+1)
-    counter   = counter+n_el_send+3
+    idxr     = idxr + rvsz(proc+1)
+    counter  = counter+n_el_send+3
   Enddo
 
   iszr=sum(rvsz)
@@ -237,7 +247,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
   mat_recv = iszr
   iszs=sum(sdsz)
-  if (info == psb_success_) call psb_ensure_size(max(iszs,1),iasnd,info)
+  call psb_ensure_size(max(iszs,1),iasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
 #if defined(IPK4) && defined(LPK8)
@@ -337,29 +347,33 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   ipx = 1
   counter=1
   idx = 0
-
-  tot_elem=0
+  !
+  ! Make sure to get all columns in csget.
+  ! This is necessary when sphalo is used to compute a transpose,
+  ! as opposed to just gathering halo for spspmm purposes. 
+  !
+  ncg      = huge(ncg)
+  tot_elem = 0
   Do 
-    proc=ipdxv(counter)
+    proc = ipdxv(counter)
     if (proc == -1) exit 
-    n_el_recv=ipdxv(counter+psb_n_elem_recv_)
-    counter=counter+n_el_recv
-    n_el_send=ipdxv(counter+psb_n_elem_send_)
+    n_el_recv = ipdxv(counter+psb_n_elem_recv_)
+    counter   = counter+n_el_recv
+    n_el_send = ipdxv(counter+psb_n_elem_send_)
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
       n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
-           &  append=.true.,nzin=tot_elem)
+           &  append=.true.,nzin=tot_elem,jmax=ncg) 
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='psb_sp_getrow'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='psb_sp_getrow')
         goto 9999
       end if
-      tot_elem=tot_elem+n_elem
+      tot_elem = tot_elem+ngtz
     Enddo
-    ipx = ipx + 1 
+    ipx       = ipx + 1 
     counter   = counter+n_el_send+3
   Enddo
   nz = tot_elem
@@ -368,8 +382,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_loc_to_glob'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_loc_to_glob')
     goto 9999
   end if
 
