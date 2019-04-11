@@ -174,7 +174,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
 
-  call acoo%allocate(izero,a%get_ncols(),info)
+  call acoo%allocate(izero,a%get_ncols())
 
 
   call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
@@ -240,11 +240,6 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
-  if (info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='psb_sp_reall')
-    goto 9999
-  end if
   mat_recv = iszr
   iszs=sum(sdsz)
   call psb_ensure_size(max(iszs,1),iasnd,info)
