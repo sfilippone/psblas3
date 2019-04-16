@@ -583,6 +583,7 @@ program psb_s_pde3d
   character(len=20) :: kmethd, ptype
   character(len=5)  :: afmt
   integer(psb_ipk_) :: idim
+  integer(psb_epk_) :: system_size
 
   ! miscellaneous 
   real(psb_spk_), parameter :: one = sone
@@ -696,18 +697,20 @@ program psb_s_pde3d
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = prec%sizeof()
+  system_size = desc_a%get_global_rows()
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Number of processes           : ",i0)')np
+    write(psb_out_unit,'("Number of processes           : ",i12)')np
+    write(psb_out_unit,'("Linear system size            : ",i12)') system_size
     write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
     write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
-    write(psb_out_unit,'("Number of iterations          : ",i0)')iter
+    write(psb_out_unit,'("Number of iterations          : ",i12)')iter
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
-    write(psb_out_unit,'("Info  on exit                 : ",i0)')info
+    write(psb_out_unit,'("Info  on exit                 : ",i12)')info
     write(psb_out_unit,'("Total memory occupation for      A: ",i12)')amatsize
     write(psb_out_unit,'("Total memory occupation for   PREC: ",i12)')precsize    
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
