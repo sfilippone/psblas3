@@ -1,3 +1,8 @@
+! debug out-of-bound
+#define DBG_OOB
+! debug personal
+! #define DBG_PER
+
 !
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
@@ -106,6 +111,7 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
+#include "scorep/SCOREP_User.inc"
 
   integer(psb_ipk_), intent(in)         :: flag
   integer(psb_ipk_), intent(out)        :: info
@@ -222,7 +228,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, ii, ri, si, idx_pt, totsnd_, totrcv_,&
+       & err_act, i, j, ii, ri, si, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n, ierr
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv, swap_persistent, do_persistent
@@ -231,8 +237,13 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 
   !remove
   integer :: status(MPI_STATUS_SIZE)
+  real :: start_t, finish_t
   logical :: weight
-  !character :: mpistring(16384)
+  real(psb_dpk_)           :: tmp
+  ! score-p declaration
+  ! SCOREP_USER_REGION_DEFINE( MPIX_Neighbor_alltoallv_init_region )
+  ! SCOREP_USER_REGION_DEFINE( artless_test )
+
 
   info=psb_success_
   name='psi_swap_datav'
@@ -241,7 +252,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   icomm = iicomm
 
   call psb_info(ictxt,me,np)
-  ! print *, me, ": psi_dswapdata.F90:psi_dswap_vidx_vect" ! artless
+
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -263,29 +274,28 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   call idx%sync()
 
 
-  ! check do_persistent twice, here and calling psi_dswapdata_vect, redudent but needed for now
+  ! TODO check do_persistent twice, here and calling psi_dswapdata_vect,
+  !      redudent but needed for now
   if (do_persistent) then
     ! if not allocated, allocate buffers and create request
     if (.not. allocated(y%p)) then
       allocate(y%p)
-    else
-      print *, "ALLLLLLOOOOCCCCAATTEED"
     end if
     if (.not. allocated(y%p%sndbuf)) then
       allocate(y%p%sndbuf(totsnd), y%p%rcvbuf(totrcv))
       allocate(y%p%rcv_count, y%p%snd_count)
-      si = 1 ! sndbuf index
+#ifdef DBG_OOB ! debug out-of-bound
+      y%p%sndbuf = 0
+      y%p%rcvbuf = me + 10
+#endif
 
+      ! get number of neighbors and graph so we know who to communicate with
       call MPI_Dist_graph_neighbors_count(icomm, y%p%rcv_count, &
           y%p%snd_count, weight, ierr) ! should weight go into psb_d_persis_vect_type??
-
       allocate(y%p%rcv_from(y%p%rcv_count), y%p%rcv_ws(y%p%rcv_count))
       allocate(y%p%snd_to(y%p%snd_count), y%p%snd_ws(y%p%snd_count))
-
       call MPI_Dist_graph_neighbors(icomm, y%p%rcv_count, y%p%rcv_from, &
           y%p%rcv_ws, y%p%snd_count, y%p%snd_to, y%p%snd_ws, ierr)
-
-      ! artless
       allocate(y%p%snd_counts(y%p%snd_count), y%p%rcv_counts(y%p%rcv_count), &
           y%p%snd_displs(y%p%snd_count), y%p%rcv_displs(y%p%rcv_count))
 
@@ -294,6 +304,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       y%p%snd_displs=0
       y%p%rcv_displs=0
 
+      si = 1 ! sndbuf index
+      ri = 1
       pnti   = 1
       snd_pt = 1
       rcv_pt = 1
@@ -301,15 +313,16 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        idx_pt = 1+pnti+psb_n_elem_recv_          !
+        idx_pt = 1+pnti+psb_n_elem_recv_
 
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
 
+        ! array of snd/rcv counts and displacements needed for request creation
         do ii=1, y%p%snd_count
           if (y%p%rcv_from(ii) == proc_to_comm) then
             y%p%rcv_counts(ii) = nerv
-            y%p%rcv_displs(ii) = si - 1
+            y%p%rcv_displs(ii) = ri - 1
           end if
           if (y%p%snd_to(ii) == proc_to_comm) then
             y%p%snd_counts(ii) = nesd
@@ -322,113 +335,141 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
           y%p%sndbuf(si) = y%v(idx%v(ii+snd_pt))
           si = si + 1
         end do
-        pnti   = pnti + nerv + nesd + 3
+        ri = ri + nerv
+        pnti = pnti + nerv + nesd + 3
       end do
 
-      ! code for this in ~/src/psblas/psblas3/base/internals/psi_desc_impl.f90
+#ifdef DBG_PER
       print *, me, ":totxch=", totxch,"totsnd", totsnd, "totrcv", totrcv
       print *, me, ": rcv_count = ", y%p%rcv_count, "snd_count = ", y%p%snd_count
       print *, me, ": y%p%rcv_from =", y%p%rcv_from, "y%p%snd_to =", y%p%snd_to
       print *, me, ":y%p%snd_counts", y%p%snd_counts, "y%p%snd_displs = ",y%p%snd_displs, &
           "y%p%rcv_counts", y%p%rcv_counts, "y%p%rcv_displs",y%p%rcv_displs
-      ! print *, me, ":y%p%sndbuf", y%p%sndbuf
+#endif
+
       allocate(y%p%init_request)
       y%p%init_request = -1
+
+      ! SCOREP_USER_REGION_BEGIN(MPIX_Neighbor_alltoallv_init_region, &
+      ! "MPIX_Neighbor_alltoallv_init", SCOREP_USER_REGION_TYPE_FUNCTION)
+      ! SCOREP_USER_REGION_BEGIN(artless_test, &
+      !     "foo", SCOREP_USER_REGION_TYPE_COMMON)
+      call MPI_Barrier(MPI_COMM_WORLD,ierr)
+      call cpu_time(start_t)
       call MPIX_Neighbor_alltoallv_init(y%p%sndbuf, y%p%snd_counts, y%p%snd_displs, &
           MPI_DOUBLE_PRECISION, y%p%rcvbuf, y%p%rcv_counts, y%p%rcv_displs, &
           MPI_DOUBLE_PRECISION, icomm, MPI_INFO_NULL, &
-          ! MPI_REAL, y%p%rcvbuf, y%p%rcv_counts, y%p%rcv_displs, &
-          ! MPI_REAL, icomm, MPI_INFO_NULL, &
           y%p%init_request, ierr)
+      ! SCOREP_USER_REGION_END(artless_test)
+      ! SCOREP_USER_REGION_END(MPIX_Neighbor_alltoallv_init_region)
+      call cpu_time(finish_t)
+      allocate(y%p%comm_create_time)
+      y%p%comm_create_time = finish_t - start_t
+      ! print *,"cpu time of MPIX_Neighbor_alltoallv_init is", finish_t - start_t
 
       if (ierr .ne. 0) then
         print *, "ERROR: MPIX_Neighbor_alltoallvinit ierr = ", ierr
         goto 9999
       end if
 
-      ! print *, me, ":y%p%init_request = ", y%p%init_request
-      ! deallocate(y%p%snd_counts, y%p%rcv_counts, y%p%snd_displs, y%p%rcv_displs)
+      ! ARTLESS: SENDBUF LOOKS OK HERE!
+      ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+      ! write(*,'(I2 A)', advance='no') me, ": sndbuf = "
+      ! print '(104 F4.0)',  y%p%sndbuf
+      ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+
+#ifdef DBG_PER
+        print* ,me, ": end MPIX_Neighbor_alltoallv_init"
+#endif
+
     else ! send and recv buffers exist, need to pack send buffer
-      ! pnti   = 1
-      ! snd_pt = 1
-      ! rcv_pt = 1
-      ! do i=1, totxch
-      !   proc_to_comm = idx%v(pnti+psb_proc_id_)
-      !   nerv = idx%v(pnti+psb_n_elem_recv_)
-      !   nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      !   idx_pt = 1+pnti+psb_n_elem_recv_          !
+      si = 1 ! sndbuf index
+      pnti   = 1
+      snd_pt = 1
+      rcv_pt = 1
+      do i=1, totxch
+        proc_to_comm = idx%v(pnti+psb_proc_id_)
+        nerv = idx%v(pnti+psb_n_elem_recv_)
+        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+        idx_pt = 1+pnti+psb_n_elem_recv_
 
-      !   snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      !   rcv_pt = 1+pnti+psb_n_elem_recv_
+        snd_pt = 1+pnti+nerv+psb_n_elem_send_
+        rcv_pt = 1+pnti+psb_n_elem_recv_
 
-      !   do ii=1, snd_count
-      !     if (y%p%rcv_from(ii) == proc_to_comm) then
-      !       y%p%rcv_counts(ii) = nerv
-      !       y%p%rcv_displs(ii) = si - 1
-      !     end if
-      !     if (y%p%snd_to(ii) == proc_to_comm) then
-      !       y%p%snd_counts(ii) = nesd
-      !       y%p%snd_displs(ii) = si - 1
-      !     end if
-      !   end do
+        ! pack sndbuf
+        do ii=0,nesd-1
+          y%p%sndbuf(si) = y%v(idx%v(ii+snd_pt))
+          si = si + 1
+        end do
+        pnti   = pnti + nerv + nesd + 3
+      end do
+    end if ! end packing phase
 
-      !   ! pack sndbuf
-      !   do ii=0,nesd-1
-      !     y%p%sndbuf(si) = y%v(idx%v(ii+snd_pt))
-      !     si = si + 1
-      !   end do
-      !   pnti   = pnti + nerv + nesd + 3
-      ! end do
-
-      print *, "!!!!!!!!!!!!!!!ELSE!!!!!!!!!!!!!!!!"
-    end if
-
-    ! start communication
+    ! --- start communication
+#ifdef DBG_PER
     if (.not. allocated(y%p%init_request)) then
       print *, "error: y%p%init_request should be allocated"
       goto 9999
     end if
+#endif
 
     call MPI_Start(y%p%init_request, ierr)
+#ifdef DBG_PER
     if (ierr .ne. 0) then
       print *, "ERROR: rank ",me,"has MPI_Start status(MPI_ERROR) = ", &
           status(MPI_ERROR), "and ierr = ", ierr
       goto 9999
     end if
+#endif
 
     call MPI_Wait(y%p%init_request, status, ierr)
-
+#ifdef DBG_PER
     if (ierr .ne. 0) then
       print *, "ERROR: rank ",me,"has MPI_Wait status(MPI_ERROR) = ", &
           status(MPI_ERROR), "and ierr = ", ierr
       goto 9999
     end if
+#endif
 
-    ! ----scatter----
+    ! write(*,'(I2 A)', advance='no') me, "::::: rcvbuf ="
+    ! print '(104 F4.0)',  y%p%rcvbuf
+    ! ----scatter/unpack buffer----
+#ifdef DBG_PER
+    print*, me, ": begin scatter/unpack buffer"
+#endif
     pnti   = 1
     rcv_pt = 1
     do i=1, totxch
+      ri     = 1
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      idx_pt = 1+pnti+psb_n_elem_recv_          !
+      idx_pt = 1+pnti+psb_n_elem_recv_
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
-      do ii=1, y%p%rcv_count
-        if (proc_to_comm .eq. y%p%rcv_from(ii)) then ! gather from rcvbuf
-          if (nerv .ne. y%p%rcv_counts(ii)) then
-            print *, "Error: dsi_dswapdata.F90:", &
+      do j=1, y%p%rcv_count
+        ! make sure proc_to_comm is the rcv_from(j) so we get the right number
+        ! of receive elements
+        if (proc_to_comm .eq. y%p%rcv_from(j)) then
+          if (nerv .ne. y%p%rcv_counts(j)) then
+            print *, me, ":Error: psi_dswapdata.F90:", &
                 "number of persistent elements received differs from nerv"
             goto 9999
           end if
-          do ri=1,nerv
-            y%v(idx%v(ri+rcv_pt-1)) = y%p%rcvbuf(ri + y%p%rcv_displs(ii))
+
+          do ii=0,nerv-1
+            y%v(idx%v(ii+rcv_pt)) = y%p%rcvbuf(ri + y%p%rcv_displs(j))
+            ri = ri + 1
           end do
         end if
       end do
-      pnti   = pnti + nerv + nesd + 3
+      pnti = pnti + nerv + nesd + 3
     end do
-  end if ! persistent communication is complete
+
+#ifdef DBG_PER
+    print*, me, ": end scatter/unpack buffer"
+#endif
+  end if ! ----- persistent communication is complete -----
 
 
   if (debug) write(*,*) me,'Internal buffer'
