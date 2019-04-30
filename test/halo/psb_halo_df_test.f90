@@ -1,3 +1,4 @@
+
 !
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
@@ -37,6 +38,7 @@ program psb_df_sample
   use psb_krylov_mod
   use psb_util_mod
   use getp
+  use mpi
   implicit none
 
   ! input parameters
@@ -57,7 +59,7 @@ program psb_df_sample
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer(psb_ipk_) :: ictxt, iam, np
+  integer(psb_ipk_) :: ictxt, me, np
 
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode,&
@@ -74,7 +76,7 @@ program psb_df_sample
   ! other variables
   integer(psb_ipk_) :: i,info,j,m_problem, err_act
   integer(psb_ipk_) :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec
+  real(psb_dpk_) :: t1, t2, tprec, t_low, t_high, t_mean, t_sum
   real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv, ncol
   integer(psb_ipk_), allocatable :: ivg(:), perm(:)
@@ -84,11 +86,12 @@ program psb_df_sample
   ! persistant communication
   integer(psb_lpk_), allocatable :: iv(:)
   real(psb_dpk_), allocatable :: xa(:)
+  integer(psb_lpk_) :: num_iterations
 
   call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_info(ictxt,me,np)
 
-  if (iam < 0) then
+  if (me < 0) then
     ! This should not happen, but just in case
     call psb_exit(ictxt)
     stop
@@ -102,7 +105,7 @@ program psb_df_sample
   !
   ! Hello world
   !
-  if (iam == psb_root_) then
+  if (me == psb_root_) then
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
@@ -117,7 +120,7 @@ program psb_df_sample
   ! read the input matrix to be processed and (possibly) the rhs
   nrhs = 1
 
-  if (iam == psb_root_) then
+  if (me == psb_root_) then
     select case(psb_toupper(filefmt))
     case('MM')
       ! For Matrix Market we have an input file for the matrix
@@ -177,7 +180,7 @@ program psb_df_sample
   ! switch over different partition types
   select case(psb_toupper(part))
   case('BLOCK')
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (me == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
     ! call desc_a%cd_get_list
     ! call desc_a%cd_v_get_list
@@ -185,7 +188,7 @@ program psb_df_sample
 
 
   case('GRAPH')
-    if (iam == psb_root_) then
+    if (me == psb_root_) then
       write(psb_out_unit,'("Partition type: graph vector")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
@@ -198,7 +201,7 @@ program psb_df_sample
     call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
 
   case default
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (me == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
 
   end select
@@ -214,60 +217,135 @@ program psb_df_sample
 
 !  call psb_loc_to_glob(iv,desc_a,info) !
   call desc_a%l2gv1(iv,info)
+  xa = iv
   ! call desc_a%locgv1(iv,info)
 
-  ! ---- test where halo regions are set to -1, sending 10+iam
-  xa = iv
-  xa(nrow+1:ncol) = -1
-  call x_col%set_vect(xa)
-  call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+  ! ---- test where halo regions are set to -1, sending 10+me
 
-  xa(nrow+1:ncol) = -1
-  call x_col%set_vect(xa)
-  call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
-  xa = x_col%get_vect()
+  ! xa(nrow+1:ncol) = -1 ! (10 + me) * -1
+  ! ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! ! do i=0,np
+  ! !   if (me .eq. i) then
+  ! !     print *, "======================="
+  ! !     print *, "me = ", me, "iv ="
+  ! !     print '(225 I4)', iv
+  ! !     print *, "-----------------------"
+  ! !   end if
+  ! !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! ! end do
+  ! ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
 
-  do i=nrow+1,ncol
-    ! print *, iam, ": ", xa(i), "::", iv(i)
-    ! write(0,*) 'Mismatch ',i,xa(i),iv(i)
-    if (xa(i) /= iv(i)) then ! ha
-      write(0,*) iam, ': MISMATCH ',i,xa(i),iv(i)
-    end if
+  ! ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! ! do i=0,np
+  ! !   if (me .eq. i) then
+  ! !     print *, "======================="
+  ! !     print *, "me = ", me, "xa ="
+  ! !     print '(225 F4.0)', xa
+  ! !     print *, "-----------------------"
+  ! !   end if
+  ! !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! ! end do
+  ! ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+
+  ! call x_col%set_vect(xa)
+  ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+
+  ! xa = x_col%get_vect()
+  ! do i=nrow+1,ncol
+  !   if (xa(i) /= iv(i)) then ! ha
+  !     write(0,*) me, ': MISMATCH i=',i,"xa(i)=",xa(i),"iv(i)",iv(i)
+  !     ! goto 9999
+  !   end if
+  ! end do
+  num_iterations = ITERATIONS
+  do iter = 1, num_iterations
+    xa = iv
+    xa(nrow+1:ncol) = -1
+    call x_col%set_vect(xa)
+    call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+    xa = x_col%get_vect()
+
+    do i=nrow+1,ncol
+      if (xa(i) /= iv(i)) then ! ha
+        write(0,*) me, ': MISMATCH i=',i,"xa(i)=",xa(i),"iv(i)",iv(i)
+        goto 9999
+      end if
+    end do
   end do
 
-  call psb_geasb(x_col,desc_a,info)
-  call psb_geall(r_col,desc_a,info)
-  call r_col%zero()
-  call psb_geasb(r_col,desc_a,info)
-  t2 = psb_wtime() - t1
+  ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! do i=0,np
+  !   if (me .eq. i) then
+  !     print *, "======================="
+  !     print *, "me = ", me, " xa after halo"
+  !     print '(225 F4.0)', xa
+      ! print *, "me = ", me, " iv after halo"
+      ! print '(225 I4)', iv
+  !     print *, "-----------------------"
+  !   end if
+  !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! end do
+  ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  ! goto 9999
 
 
 
-  call psb_amx(ictxt, t2)
 
-  if (iam == psb_root_) then
-     write(psb_out_unit,'(" ")')
-     write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
-     write(psb_out_unit,'(" ")')
+  call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  call flush(output_unit)
+  call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  if (allocated(x_col%v)) then
+    print *, me, "desc_a%p%comm_create_time = ", x_col%v%p%comm_create_time
+    call MPI_Reduce(x_col%v%p%comm_create_time, t_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    if (me == psb_root_) then
+      open(1,file='halo_persistant_output.txt', status='new')
+
+      write(1,*) "flt     type max_buf[B] visits time[s] time[%] time/visit[us]  region"
+      t_mean = t_sum / np
+      write(1,*) "MPI",  t_sum, "  ", t_mean
+    end if
   end if
+  call flush(output_unit)
+  call MPI_Barrier(MPI_COMM_WORLD, ierr)
+  if (me == psb_root_) then
+    print *, "did halo communication", num_iterations, "times"
+  end if
+
+  ! artless: commenting these because geasb is breaking it for now
+  ! call psb_geasb(x_col,desc_a,info)
+  ! call psb_geall(r_col,desc_a,info)
+  ! call r_col%zero()
+  ! call psb_geasb(r_col,desc_a,info)
+  ! t2 = psb_wtime() - t1
+
+
+  ! call psb_amx(ictxt, t2)
+
+  ! if (me == psb_root_) then
+  !    write(psb_out_unit,'(" ")')
+  !    write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+  !    write(psb_out_unit,'(" ")')
+  ! end if
 
   !
 
   ! call perc%init(ictxt,ptype,info)
 
   ! building the preconditioner
-  t1 = psb_wtime()
+  ! t1 = psb_wtime()
   ! call prec%build(a,desc_a,info)
   ! tprec = psb_wtime()-t1
-  if (info /= psb_success_) then
-     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
-     goto 9999
-  end if
+  ! if (info /= psb_success_) then
+  !    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
+  !    goto 9999
+  ! end if
 
 
   ! call psb_amx(ictxt,tprec)
 
-  ! if(iam == psb_root_) then
+  ! if(me == psb_root_) then
   !    write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
   !    write(psb_out_unit,'(" ")')
   ! end if
@@ -294,7 +372,7 @@ program psb_df_sample
   ! call psb_sum(ictxt,descsize)
   ! call psb_sum(ictxt,precsize)
 
-  ! if (iam == psb_root_) then
+  ! if (me == psb_root_) then
   !   call prec%descr()
   !   write(psb_out_unit,'("Matrix: ",a)')mtrx_file
   !   write(psb_out_unit,'("Computed solution on ",i8," processors")')np
@@ -321,7 +399,7 @@ program psb_df_sample
   !      & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
   ! if (info /= psb_success_) goto 9999
 
-  ! if (iam == psb_root_) then
+  ! if (me == psb_root_) then
   !   write(psb_err_unit,'(" ")')
   !   write(psb_err_unit,'("Saving x on file")')
   !   write(20,*) 'matrix: ',mtrx_file
@@ -346,7 +424,7 @@ program psb_df_sample
   call prec%free(info)
   call psb_cdfree(desc_a,info)
   call psb_exit(ictxt)
-  print *, "* FIN for", iam
+  print *, "* FIN for", me
   stop
 
 9999 call psb_error(ictxt)

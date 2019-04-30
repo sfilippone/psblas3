@@ -1,0 +1,69 @@
+#!/bin/bash
+##
+## MPI submission script for PBS on DELTA
+## --------------------------------------
+#PBS -N umbrella_corp
+#PBS -l select=1:ncpus=16:mpiprocs=16
+##
+## half_hour	-  30 minutes
+## one_hour	-   1 hour
+## half_day	-  12 hours
+## one_day	-  24 hours
+## two_day	-  48 hours
+## five_day	- 120 hours
+## ten_day	- 240 hours (by special arrangement)
+##
+#PBS -q one_hour
+#PBS -m n
+#PBS -M s.rasmussen@cranfield.ac.uk
+##
+## ====================================
+## DO NOT CHANGE THE LINES BETWEEN HERE
+## ====================================
+#PBS -j oe
+#PBS -W sandbox=PRIVATE
+#PBS -k n
+ln -s $PWD $PBS_O_WORKDIR/$PBS_JOBID
+## Change to working directory
+cd $PBS_O_WORKDIR
+rm -f hostfile
+touch hostfile
+cat $PBS_NODEFILE | sort | uniq >> hostfile
+echo "========= PBS_NODEFILE ========="
+# cat $PBS_NODEFILE
+echo "========= hostfile ========="
+cat hostfile
+echo "========= end ========="
+export NPROCS=`wc -l hostfile |gawk '//{print $1}'`
+echo "NPROCS = ${NPROCS}"
+
+## Calculate number of CPUs
+cpus=`cat hostfile | wc -l`
+echo "cpus = ${cpus}"
+## set some MPI tuning parameters to use the correct transport
+export I_MPI_FABRICS=shm:dapl
+export I_MPI_DAPL_UD=enable
+export I_MPI_PLATFORM=bdw
+export I_MPI_ADJUST_ALLREDUCE=5
+## ========
+## AND HERE
+## ========
+##
+module load score-p-5.0-gcc-8.2
+
+ml
+echo $PATH
+which mpirun
+echo "========= START ========="
+timeout 5m cpuburn
+./run_tests.sh
+# echo "mpirun -machinefile hostfile -ppn 1 -np ${cpus} ${PROG} -v"
+# export OMP_NUM_THREADS=16
+# mpirun -machinefile hostfile -ppn 1 -np ${cpus} ${PROG} -v
+echo "========== FIN =========="
+
+## Tidy up the log directory
+## DO NOT CHANGE THE LINE BELOW
+## ============================
+rm $PBS_O_WORKDIR/$PBS_JOBID
+#
