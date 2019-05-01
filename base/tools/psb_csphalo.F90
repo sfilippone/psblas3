@@ -77,11 +77,12 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=5), optional          :: outfmt 
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: np,me,counter,proc,i, &
-       &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
+  integer(psb_ipk_) :: ictxt, np,me
+  integer(psb_ipk_) :: counter,proc,i, &
+       &     n_el_send,k,n_el_recv,idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr,&
-       &     l1, err_act, nsnds, nrcvs, nrg, ncg
+       &     l1, err_act, nsnds, nrcvs, lnr, lnc, lnnz, ncg
   integer(psb_mpik_) :: icomm, minfo
   integer(psb_mpik_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
@@ -100,6 +101,9 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   info=psb_success_
   name='psb_csphalo'
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -173,13 +177,11 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idx = 0
   idxs = 0
   idxr = 0
-
-  call acoo%allocate(izero,a%get_ncols())
-
-
+  
   call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
+  lnr = 0
   Do 
     proc=ipdxv(counter)
     if (proc == -1) exit
@@ -193,7 +195,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
       tot_elem = tot_elem+n_elem      
     Enddo
     sdsz(proc+1) = tot_elem
-    call acoo%set_nrows(acoo%get_nrows() + n_el_recv)
+    lnr = lnr + n_el_recv
     counter   = counter+n_el_send+3
   Enddo
 
@@ -233,15 +235,17 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter  = counter+n_el_send+3
   Enddo
 
-  iszr=sum(rvsz)
-  call acoo%reallocate(max(iszr,1))
+  iszr = sum(rvsz)
+  mat_recv = iszr
+  iszs     = sum(sdsz)
+
+  lnnz = max(iszr,iszs,ione)
+  lnc  = a%get_ncols()
+  call acoo%allocate(lnr,lnc,lnnz)
   if (debug_level >= psb_debug_outer_)&
-       & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size()
-  if (debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
-  mat_recv = iszr
-  iszs=sum(sdsz)
+  
   call psb_ensure_size(max(iszs,1),iasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
