@@ -240,7 +240,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 
   !remove
   integer :: status(MPI_STATUS_SIZE)
-  real(psb_dpk_) :: start_t, finish_t, start_comm_t, end_comm_t
+  real(psb_dpk_) :: start_req_t, finish_req_t, start_comm_t, end_comm_t, &
+      start_t, finish_t
   logical :: weight
   real(psb_dpk_)           :: tmp
   ! score-p declaration
@@ -284,10 +285,12 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     if (.not. allocated(y%p)) then
       allocate(y%p)
     end if
+    start_t = MPI_Wtime()
     if (.not. allocated(y%p%sndbuf)) then
       ! allocate time counters
       allocate(y%p%alltoall_comm_time, y%p%total_time)
       y%p%alltoall_comm_time = 0
+      y%p%total_time = 0
       ! allocate buffers
       allocate(y%p%sndbuf(totsnd), y%p%rcvbuf(totrcv))
       allocate(y%p%rcv_count, y%p%snd_count)
@@ -362,14 +365,14 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       if (swap_persistent) then
         allocate(y%p%init_request)
         y%p%init_request = -1
-        start_t = MPI_Wtime()
+        start_req_t = MPI_Wtime()
         call MPIX_Neighbor_alltoallv_init(y%p%sndbuf, y%p%snd_counts, y%p%snd_displs, &
             MPI_DOUBLE_PRECISION, y%p%rcvbuf, y%p%rcv_counts, y%p%rcv_displs, &
             MPI_DOUBLE_PRECISION, icomm, MPI_INFO_NULL, &
             y%p%init_request, ierr)
-        finish_t = MPI_Wtime()
+        finish_req_t = MPI_Wtime()
         allocate(y%p%request_create_time)
-        y%p%request_create_time = finish_t - start_t
+        y%p%request_create_time = finish_req_t - start_req_t
       end if
       ! ----------------------------
       ! if (ierr .ne. 0) then
@@ -449,6 +452,9 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 #ifdef DBG_PER
     print*, me, ": end scatter/unpack buffer"
 #endif
+    finish_t = MPI_Wtime()
+    y%p%total_time = y%p%total_time + finish_t - start_t
+    ! print *, me,":ARTLESS total_time = ", y%p%total_time
   end if ! ----- persistent communication is complete -----
 
 
