@@ -76,7 +76,7 @@ program psb_df_sample
   ! other variables
   integer(psb_ipk_) :: i,info,j,m_problem, err_act
   integer(psb_ipk_) :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec, t_low, t_high, t_mean, t_sum
+  real(psb_dpk_) :: t1, t2, tprec, t_low, t_high, request_create_mean, request_create_sum
   real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv, ncol
   integer(psb_ipk_), allocatable :: ivg(:), perm(:)
@@ -305,7 +305,7 @@ program psb_df_sample
   if (allocated(x_col%v)) then
 
     ! collect MPIX request initialization time
-    call MPI_Reduce(x_col%v%p%comm_create_time, t_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+    call MPI_Reduce(x_col%v%p%comm_create_time, request_create_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
         psb_root_, MPI_COMM_WORLD, ierr)
     ! collect min, max, and average snd/rcv elements
     tot_snd = sum(x_col%v%p%snd_counts)
@@ -351,17 +351,28 @@ program psb_df_sample
       ! write(1,*) ""
       ! converting microseconds
       write(1,*) "neighbors(ave,min,max) snd/rcv of ave_total, ave_buf, max, min"
-      write(1,*) ave_neighbors,';',min_neighbors,';',max_neighbors,';', &
-          ave_tot_snd,';', ave_tot_rcv,';', &
-          ave_snd_buf,';',ave_rcv_buf,';', &
-          max_snd,';', max_rcv,';', &
-          min_snd,';', min_rcv
+      request_create_mean = (request_create_sum / np) * 1000000
+      request_create_sum  = request_create_sum        * 1000000
 
+      write(1,*) "------"
+      write(1,'(F9.2 A1)',advance='no') request_create_mean, ';'
+      write(1,'(F9.2 A1)',advance='no') request_create_sum,  ';'
+      write(1,'(F9.2 A1)',advance='no') ave_neighbors, ';'
+      write(1,'(I5 A1)'  ,advance='no') min_neighbors, ';'
+      write(1,'(I5 A1)'  ,advance='no') max_neighbors, ';'
+      write(1,'(F9.2 A1)',advance='no') ave_tot_snd, ';'
+      write(1,'(F9.2 A1)',advance='no') ave_tot_rcv, ';'
+      write(1,'(F9.2 A1)',advance='no') ave_snd_buf, ';'
+      write(1,'(F9.2 A1)',advance='no') ave_rcv_buf, ';'
+      write(1,'(I5 A1)',advance='no')   max_snd, ';'
+      write(1,'(I5 A1)',advance='no')   max_rcv, ';'
+      write(1,'(I5 A1)',advance='no')   min_snd, ';'
+      write(1,'(I5 A1)',advance='no')   min_rcv, ';'
 
-      t_mean = (t_sum / np) * 1000000
-      t_sum  = t_sum        * 1000000
-      write(1,'(A40,F10.2,A3,F10.2)') "MPIX_Neighbor_alltoallv_init           ", &
-          t_sum, "   " , t_mean
+      ! write(1,'(F9.2 A1)',advance='no') , ';'
+      ! write(1,'(I5 A1)',advance='no') , ';'
+      write(1,'()')
+
       ! ---- need to write buffer size, min and average and max snd/rcv elements
       ! write(1,())
       ! ---- need to write buffer size, min and average and max neighbors
@@ -373,107 +384,6 @@ program psb_df_sample
     print *, "did halo communication", num_iterations, "times"
   end if
 
-  ! artless: commenting these because geasb is breaking it for now
-  ! call psb_geasb(x_col,desc_a,info)
-  ! call psb_geall(r_col,desc_a,info)
-  ! call r_col%zero()
-  ! call psb_geasb(r_col,desc_a,info)
-  ! t2 = psb_wtime() - t1
-
-
-  ! call psb_amx(ictxt, t2)
-
-  ! if (me == psb_root_) then
-  !    write(psb_out_unit,'(" ")')
-  !    write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
-  !    write(psb_out_unit,'(" ")')
-  ! end if
-
-  !
-
-  ! call perc%init(ictxt,ptype,info)
-
-  ! building the preconditioner
-  ! t1 = psb_wtime()
-  ! call prec%build(a,desc_a,info)
-  ! tprec = psb_wtime()-t1
-  ! if (info /= psb_success_) then
-  !    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
-  !    goto 9999
-  ! end if
-
-
-  ! call psb_amx(ictxt,tprec)
-
-  ! if(me == psb_root_) then
-  !    write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
-  !    write(psb_out_unit,'(" ")')
-  ! end if
-
-  ! cond = dzero
-  ! iparm = 0
-  ! call psb_barrier(ictxt)
-  ! t1 = psb_wtime()
-  ! call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,&
-  !      & itmax=itmax,iter=iter,err=err,itrace=itrace,&
-  !      & istop=istopc,irst=irst,cond=cond)
-  ! call psb_barrier(ictxt)
-  ! t2 = psb_wtime() - t1
-  ! call psb_amx(ictxt,t2)
-  ! call psb_geaxpby(done,b_col,dzero,r_col,desc_a,info)
-  ! call psb_spmm(-done,a,x_col,done,r_col,desc_a,info)
-  ! resmx  = psb_genrm2(r_col,desc_a,info)
-  ! resmxp = psb_geamax(r_col,desc_a,info)
-
-  ! amatsize = a%sizeof()
-  ! descsize = desc_a%sizeof()
-  ! precsize = prec%sizeof()
-  ! call psb_sum(ictxt,amatsize)
-  ! call psb_sum(ictxt,descsize)
-  ! call psb_sum(ictxt,precsize)
-
-  ! if (me == psb_root_) then
-  !   call prec%descr()
-  !   write(psb_out_unit,'("Matrix: ",a)')mtrx_file
-  !   write(psb_out_unit,'("Computed solution on ",i8," processors")')np
-  !   write(psb_out_unit,'("Iterations to convergence: ",i6)')iter
-  !   write(psb_out_unit,'("Error estimate on exit   : ",es12.5)') err
-  !   write(psb_out_unit,'("Time to buil prec.       : ",es12.5)')tprec
-  !   write(psb_out_unit,'("Time to solve system     : ",es12.5)')t2
-  !   write(psb_out_unit,'("Time per iteration       : ",es12.5)')t2/(iter)
-  !   write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
-  !   write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
-  !   write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
-  !   write(psb_out_unit,'("Condition number         : ",es12.5)')cond
-  !   write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
-  !   write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
-  !   write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-  !   write(psb_out_unit,'("Storage format for A              : ",a)')&
-  !        &  a%get_fmt()
-  !   write(psb_out_unit,'("Storage format for DESC_A         : ",a)')&
-  !        &  desc_a%get_fmt()
-  ! end if
-
-  ! call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
-  ! if (info == psb_success_) &
-  !      & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
-  ! if (info /= psb_success_) goto 9999
-
-  ! if (me == psb_root_) then
-  !   write(psb_err_unit,'(" ")')
-  !   write(psb_err_unit,'("Saving x on file")')
-  !   write(20,*) 'matrix: ',mtrx_file
-  !   write(20,*) 'computed solution on ',np,' processors.'
-  !   write(20,*) 'iterations to convergence: ',iter
-  !   write(20,*) 'error estimate (infinity norm) on exit:', &
-  !        & ' ||r||/(||a||||x||+||b||) = ',err
-  !   write(20,'("Residual norm 2          : ",es12.5)')resmx
-  !   write(20,'("Residual norm inf        : ",es12.5)')resmxp
-  !   write(20,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
-  !   do i=1,m_problem
-  !     write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
-  !   enddo
-  ! end if
 998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))
 
