@@ -86,7 +86,13 @@ program psb_df_sample
   ! persistant communication
   integer(psb_lpk_), allocatable :: iv(:)
   real(psb_dpk_), allocatable :: xa(:)
-  integer(psb_lpk_) :: num_iterations
+  integer(psb_ipk_) :: num_iterations, num_neighbors, &
+      min_neighbors, max_neighbors, &
+      sum_neighbors
+  integer(psb_ipk_) :: sum_snd, min_snd, max_snd, num_snd, tot_snd, sum_tot_snd
+  integer(psb_ipk_) :: sum_rcv, min_rcv, max_rcv, num_rcv, tot_rcv, sum_tot_rcv
+  real(psb_spk_)    :: ave_neighbors, ave_snd_buf, ave_rcv_buf, ave_tot_snd, ave_tot_rcv
+  real(psb_spk_)    :: ave_snd, ave_rcv
 
   call psb_init(ictxt)
   call psb_info(ictxt,me,np)
@@ -264,6 +270,7 @@ program psb_df_sample
     xa(nrow+1:ncol) = -1
     call x_col%set_vect(xa)
     call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+
     xa = x_col%get_vect()
 
     do i=nrow+1,ncol
@@ -296,15 +303,68 @@ program psb_df_sample
   call flush(output_unit)
   call MPI_Barrier(MPI_COMM_WORLD, ierr)
   if (allocated(x_col%v)) then
-    print *, me, "desc_a%p%comm_create_time = ", x_col%v%p%comm_create_time
+
+    ! collect MPIX request initialization time
     call MPI_Reduce(x_col%v%p%comm_create_time, t_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
         psb_root_, MPI_COMM_WORLD, ierr)
+    ! collect min, max, and average snd/rcv elements
+    tot_snd = sum(x_col%v%p%snd_counts)
+    call MPI_Reduce(tot_snd, sum_tot_snd, 1, MPI_INTEGER, MPI_SUM, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    ave_tot_snd = sum_tot_snd / np
+    ave_snd = real(tot_snd) / real(x_col%v%p%snd_count)
+    call MPI_Reduce(ave_snd, ave_snd_buf, 1, MPI_REAL, &
+        MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+    ave_snd_buf = ave_snd_buf / np
+    call MPI_Reduce(minval(x_col%v%p%snd_counts), min_snd, 1, MPI_INTEGER, MPI_MIN, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    call MPI_Reduce(maxval(x_col%v%p%snd_counts), max_snd, 1, MPI_INTEGER, MPI_MAX, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    ! collect min, max, and average rcv elements
+    tot_rcv = sum(x_col%v%p%rcv_counts)
+    call MPI_Reduce(tot_rcv, sum_tot_rcv, 1, MPI_INTEGER, MPI_SUM, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    ave_tot_rcv = sum_tot_rcv / np
+    ave_rcv = real(tot_rcv) / real(x_col%v%p%rcv_count)
+    call MPI_Reduce(ave_rcv, ave_rcv_buf, 1, MPI_REAL, &
+        MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+    ave_rcv_buf = ave_rcv_buf / np
+    call MPI_Reduce(minval(x_col%v%p%rcv_counts), min_rcv, 1, MPI_INTEGER, MPI_MIN, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    call MPI_Reduce(maxval(x_col%v%p%rcv_counts), max_rcv, 1, MPI_INTEGER, MPI_MAX, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+
+    ! collect min, max, and average number of neighbors
+    num_neighbors = size(x_col%v%p%snd_to, dim=1)
+    call MPI_Reduce(num_neighbors, sum_neighbors, 1, MPI_INTEGER, MPI_SUM, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    ave_neighbors = REAL(sum_neighbors) / np
+    call MPI_Reduce(num_neighbors, min_neighbors, 1, MPI_INTEGER, MPI_MIN, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+    call MPI_Reduce(num_neighbors, max_neighbors, 1, MPI_INTEGER, MPI_MAX, &
+        psb_root_, MPI_COMM_WORLD, ierr)
+
     if (me == psb_root_) then
       open(1,file='halo_persistant_output.txt', status='new')
 
-      write(1,*) "flt     type max_buf[B] visits time[s] time[%] time/visit[us]  region"
-      t_mean = t_sum / np
-      write(1,*) "MPI",  t_sum, "  ", t_mean
+      ! write(1,*) "flt     type max_buf[B] visits time[s] time[%] time/visit[us]  region"
+      ! write(1,*) ""
+      ! converting microseconds
+      write(1,*) "neighbors(ave,min,max) snd/rcv of ave_total, ave_buf, max, min"
+      write(1,*) ave_neighbors,';',min_neighbors,';',max_neighbors,';', &
+          ave_tot_snd,';', ave_tot_rcv,';', &
+          ave_snd_buf,';',ave_rcv_buf,';', &
+          max_snd,';', max_rcv,';', &
+          min_snd,';', min_rcv
+
+
+      t_mean = (t_sum / np) * 1000000
+      t_sum  = t_sum        * 1000000
+      write(1,'(A40,F10.2,A3,F10.2)') "MPIX_Neighbor_alltoallv_init           ", &
+          t_sum, "   " , t_mean
+      ! ---- need to write buffer size, min and average and max snd/rcv elements
+      ! write(1,())
+      ! ---- need to write buffer size, min and average and max neighbors
     end if
   end if
   call flush(output_unit)
@@ -424,7 +484,9 @@ program psb_df_sample
   call prec%free(info)
   call psb_cdfree(desc_a,info)
   call psb_exit(ictxt)
-  print *, "* FIN for", me
+  if (me .eq. 0) then
+    print *, "--HALO TEST FIN--"
+  end if
   stop
 
 9999 call psb_error(ictxt)

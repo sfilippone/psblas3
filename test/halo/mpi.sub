@@ -13,7 +13,7 @@
 ## five_day	- 120 hours
 ## ten_day	- 240 hours (by special arrangement)
 ##
-#PBS -q one_hour
+#PBS -q half_hour
 #PBS -m n
 #PBS -M s.rasmussen@cranfield.ac.uk
 ##

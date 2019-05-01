@@ -2,7 +2,7 @@ INSTALLDIR=../..
 INCDIR=$(INSTALLDIR)/include/
 MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
-P=16
+P=4
 debug=
 FFLAGS += -cpp -DITERATIONS=$(ITERATIONS)
 FFLAGS += $(debug)
@@ -28,11 +28,13 @@ all: psb_halo_df_test
 psb_halo_df_test: getp.o psb_halo_df_test.o
 	$(scorep_opt) $(FLINK) $(LOPT) $^ -o halo_persistant_$(ITERATIONS)_iter $(PSBLAS_LIB) $(LDLIBS)
 
-psb_halo_df_test1: $(HALOOBJS) psb_halo_df_test1.o
-	$(FLINK) $(debug) $(LOPT) $(HALOOBJS) -o psb_halo_df_test1 $(PSBLAS_LIB) $(LDLIBS)
+halo_test:  getp.o psb_halo_df_test.o
+	$(scorep_opt) $(FLINK) $(LOPT)  $^ -o halo_test $(PSBLAS_LIB) $(LDLIBS)
 
 clean:
-	rm -f *~ *.o psb_halo_df_test1 psb_halo_df_test
+	rm -f *~ *.o psb_halo_df_test1 psb_halo_df_test halo_test \
+	halo_persistant_output.txt \
+	rm -rf test-results/*
 	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(SFOBJS) $(CFOBJS)\
         *$(.mod) $(EXEDIR)/psb_*f_sample
 cleanall: clean
@@ -43,6 +45,9 @@ score:
 
 run: psb_halo_df_test
 	$(scorep_opt) mpirun -np $(P) ./psb_halo_df_test_$(ITERATIONS) matrices/ck104/ck104.inp
+
+r: halo_test
+	$(scorep_opt) mpirun -np $(P) ./halo_test matrices/ck104/ck104.inp
 
 subrun:
 	$(scorep_opt) mpirun -machinefile hostfile -ppn 1 -np $(cpus) ./psb_halo_df_test_$(ITERATIONS) matrices/$(MATRIX)/$(MATRIX).inp
