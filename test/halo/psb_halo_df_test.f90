@@ -92,7 +92,9 @@ program psb_df_sample
   integer(psb_ipk_) :: sum_snd, min_snd, max_snd, num_snd, tot_snd, sum_tot_snd
   integer(psb_ipk_) :: sum_rcv, min_rcv, max_rcv, num_rcv, tot_rcv, sum_tot_rcv
   real(psb_spk_)    :: ave_neighbors, ave_snd_buf, ave_rcv_buf, ave_tot_snd, ave_tot_rcv
+  real(psb_dpk_)    :: alltoall_comm_t, ave_alltoall_comm_t
   real(psb_spk_)    :: ave_snd, ave_rcv
+  integer(psb_ipk_) :: swap_mode
 
   call psb_init(ictxt)
   call psb_info(ictxt,me,np)
@@ -265,11 +267,14 @@ program psb_df_sample
   !   end if
   ! end do
   num_iterations = ITERATIONS
+  swap_mode      = psb_swap_persistent_
+  ! swap_mode      = psb_swap_nonpersistent_
+
   do iter = 1, num_iterations
     xa = iv
     xa(nrow+1:ncol) = -1
     call x_col%set_vect(xa)
-    call psb_halo(x_col,desc_a,info,mode=psb_swap_persistent_)
+    call psb_halo(x_col,desc_a,info,mode=swap_mode)
 
     xa = x_col%get_vect()
 
@@ -296,17 +301,18 @@ program psb_df_sample
   ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
   ! goto 9999
 
-
-
-
   call MPI_Barrier(MPI_COMM_WORLD, ierr)
   call flush(output_unit)
   call MPI_Barrier(MPI_COMM_WORLD, ierr)
   if (allocated(x_col%v)) then
-
-    ! collect MPIX request initialization time
-    call MPI_Reduce(x_col%v%p%comm_create_time, request_create_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
-        psb_root_, MPI_COMM_WORLD, ierr)
+    if (swap_mode .eq. psb_swap_persistent_) then
+      ! collect p and nonp alltoall communication time
+      call MPI_Reduce(x_col%v%p%alltoall_comm_time, alltoall_comm_t, 1, &
+          MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+      ! collect MPIX request initialization time
+      call MPI_Reduce(x_col%v%p%request_create_time, request_create_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+          psb_root_, MPI_COMM_WORLD, ierr)
+    end if
     ! collect min, max, and average snd/rcv elements
     tot_snd = sum(x_col%v%p%snd_counts)
     call MPI_Reduce(tot_snd, sum_tot_snd, 1, MPI_INTEGER, MPI_SUM, &
@@ -350,13 +356,31 @@ program psb_df_sample
       ! write(1,*) "flt     type max_buf[B] visits time[s] time[%] time/visit[us]  region"
       ! write(1,*) ""
       ! converting microseconds
-      write(1,*) "neighbors(ave,min,max) snd/rcv of ave_total, ave_buf, max, min"
-      request_create_mean = (request_create_sum / np) * 1000000
-      request_create_sum  = request_create_sum        * 1000000
 
+
+      ave_alltoall_comm_t = alltoall_comm_t / num_iterations
+      if (swap_mode .eq. psb_swap_persistent_) then
+        request_create_mean = (request_create_sum / np) * 1000000
+        request_create_sum  = request_create_sum        * 1000000
+      else if (swap_mode .eq. psb_swap_nonpersistent_) then
+        request_create_mean = -1.0
+        request_create_sum  = -1.0
+      end if
+
+      ! write(1,*, advance='no') 37 65  73 64
+      write(1,'(A)',advance='no') "np;num_iterations;swap_mode;"
+      write(1,'(A)',advance='no') "alltoall_comm_t;ave_alltoall_comm_t;"
+      write(1,'(A)',advance='no') "request_create_mean; etc etc"
+      write(1,*)
       write(1,*) "------"
+      write(1,'(I5 A1)',advance='no')   np, ';'
+      write(1,'(I6 A1)',advance='no')   num_iterations, ';'
+      write(1,'(I5 A1)'  ,advance='no') swap_mode, ';'
+      write(1,'(F9.2 A1)',advance='no') alltoall_comm_t, ';'
+      write(1,'(F9.2 A1)',advance='no') ave_alltoall_comm_t, ';'
       write(1,'(F9.2 A1)',advance='no') request_create_mean, ';'
       write(1,'(F9.2 A1)',advance='no') request_create_sum,  ';'
+
       write(1,'(F9.2 A1)',advance='no') ave_neighbors, ';'
       write(1,'(I5 A1)'  ,advance='no') min_neighbors, ';'
       write(1,'(I5 A1)'  ,advance='no') max_neighbors, ';'
