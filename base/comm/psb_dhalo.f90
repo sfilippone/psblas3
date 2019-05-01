@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,27 +27,27 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 ! File:  psb_dhalo.f90
 !
 ! Subroutine: psb_dhalom
-!   This subroutine performs the exchange of the halo elements in a 
+!   This subroutine performs the exchange of the halo elements in a
 !    distributed dense matrix between all the processes.
 !
 ! Arguments:
 !   x         -  real,dimension(:,:).          The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
-!   jx        -  integer(optional).            The starting column of the global matrix. 
-!   ik        -  integer(optional).            The number of columns to gather. 
+!   jx        -  integer(optional).            The starting column of the global matrix.
+!   ik        -  integer(optional).            The number of columns to gather.
 !   work      -  real(optional).            Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
 !   data     - integer                 Which index list in desc_a should be used
 !                                      to retrieve rows, default psb_comm_halo_
 !                                       psb_comm_halo_    use halo_index
-!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ext_     use ext_index
 !                                       psb_comm_ovrl_    use ovrl_index
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
@@ -74,6 +74,9 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   character(len=20)         :: name, ch_err
   logical                   :: aliw
 
+  ! print *, "======ARTLESS======"
+  ! print *, "psb_dhalo.f90:78:psb_dhalo_vect"
+
   name='psb_dhalov'
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -83,7 +86,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
 
   ictxt=desc_a%get_context()
 
-  ! check on blacs grid 
+  ! check on blacs grid
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -91,7 +94,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
@@ -104,17 +107,17 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   n = desc_a%get_global_cols()
   nrow = desc_a%get_local_rows()
 
-  if (present(tran)) then     
+  if (present(tran)) then
     tran_ = psb_toupper(tran)
   else
     tran_ = 'N'
   endif
-  if (present(data)) then     
+  if (present(data)) then
     data_ = data
   else
     data_ = psb_comm_halo_
   endif
-  if (present(mode)) then 
+  if (present(mode)) then
     imode = mode
   else
     imode = IOR(psb_swap_send_,psb_swap_recv_)
@@ -166,14 +169,14 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   ! exchange halo elements
   if(tran_ == 'N') then
     call psi_swapdata(imode,dzero,x%v,&
-         & desc_a,iwork,info,data=data_)
+         & desc_a,iwork,info,data=data_)    ! artless: this gets called, desc_a has comm
   else if((tran_ == 'T').or.(tran_ == 'C')) then
     call psi_swaptran(imode,done,x%v,&
          & desc_a,iwork,info)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
-    goto 9999      
+    goto 9999
   end if
 
   if (info /= psb_success_) then
@@ -186,7 +189,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ione*ictxt,err_act)
 
@@ -214,7 +217,7 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
   character                 :: tran_
   character(len=20)         :: name, ch_err
   logical                   :: aliw
-
+  print *, "psb_dhalo.f90:psb_dhalo_multivect" ! artless
   name='psb_dhalov'
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -224,7 +227,7 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
 
   ictxt=desc_a%get_context()
 
-  ! check on blacs grid 
+  ! check on blacs grid
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -232,7 +235,7 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
@@ -245,17 +248,17 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
   n = desc_a%get_global_cols()
   nrow = desc_a%get_local_rows()
 
-  if (present(tran)) then     
+  if (present(tran)) then
     tran_ = psb_toupper(tran)
   else
     tran_ = 'N'
   endif
-  if (present(data)) then     
+  if (present(data)) then
     data_ = data
   else
     data_ = psb_comm_halo_
   endif
-  if (present(mode)) then 
+  if (present(mode)) then
     imode = mode
   else
     imode = IOR(psb_swap_send_,psb_swap_recv_)
@@ -314,7 +317,7 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
-    goto 9999      
+    goto 9999
   end if
 
   if (info /= psb_success_) then
@@ -327,10 +330,9 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 end subroutine psb_dhalo_multivect
-

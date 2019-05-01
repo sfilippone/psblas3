@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,58 +27,58 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! File: psi_dswapdata.F90
 !
 ! Subroutine: psi_dswapdatam
-!   Does the data exchange among processes. Essentially this is doing 
-!   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
-!   it is capable of pruning empty exchanges, which are very likely in out 
-!   application environment. All the variants have the same structure 
+!   Does the data exchange among processes. Essentially this is doing
+!   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but
+!   it is capable of pruning empty exchanges, which are very likely in out
+!   application environment. All the variants have the same structure
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
-!   Basically the operation is as follows: on each process, we identify 
+!   Basically the operation is as follows: on each process, we identify
 !   sections SND(Y) and RCV(Y); then we do a send on (PACK(SND(Y)));
-!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
-!   but only on the elements involved in the UNPACK operation. 
-!   Thus: for halo data exchange, the receive section is confined in the 
-!   halo indices, and BETA=0, whereas for overlap exchange the receive section 
+!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y
+!   but only on the elements involved in the UNPACK operation.
+!   Thus: for halo data exchange, the receive section is confined in the
+!   halo indices, and BETA=0, whereas for overlap exchange the receive section
 !   is scattered in the owned indices, and BETA=1.
-! 
-! Arguments: 
-!    flag     - integer                 Choose the algorithm for data exchange: 
-!                                       this is chosen through bit fields. 
+!
+! Arguments:
+!    flag     - integer                 Choose the algorithm for data exchange:
+!                                       this is chosen through bit fields.
 !                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
 !                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
 !                                        swap_send = iand(flag,psb_swap_send_) /= 0
 !                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
 !                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
-!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in
 !                                                       synchronized pairs
-!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                        if (swap_send .and. swap_recv): use mpi_irecv
 !                                                       and mpi_send
-!                                       if (swap_send): use psb_snd (but need another 
+!                                       if (swap_send): use psb_snd (but need another
 !                                                       call with swap_recv to complete)
-!                                       if (swap_recv): use psb_rcv (completing a 
+!                                       if (swap_recv): use psb_rcv (completing a
 !                                                       previous call with swap_send)
 !
 !
-!    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
-!    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    n        - integer                 Number of columns in Y
+!    beta     - X                       Choose overwrite or sum.
+!    y(:,:)   - X                       The data area
+!    desc_a   - type(psb_desc_type).  The communication descriptor.
+!    work(:)  - X                       Buffer space. If not sufficient, will do
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
 !                                       default psb_comm_halo_
 !                                       psb_comm_halo_    use halo_index
-!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ext_     use ext_index
 !                                       psb_comm_ovrl_    use ovrl_index
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
@@ -108,6 +108,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
+  print *, "psi_dswapdata_a.F90:psi_dswapdatam"
 
   info=psb_success_
   name='psi_swap_data'
@@ -115,14 +116,14 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_desc(desc_a)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then
     info=psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
@@ -134,8 +135,8 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
-  if (info /= psb_success_) then 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info)
+  if (info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
@@ -189,6 +190,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name
+  print *, "psi_dswapdata_a.F90:psi_dswapidxm"
 
   info=psb_success_
   name='psi_swap_data'
@@ -196,7 +198,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   ictxt = iictxt
   icomm = iicomm
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -214,18 +216,18 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   totrcv_ = totrcv * n
   totsnd_ = totsnd * n
 
-  if (swap_mpi) then 
+  if (swap_mpi) then
     allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
          & brvidx(0:np-1), rvhd(0:np-1), sdhd(0:np-1), prcid(0:np-1),&
-         & stat=info)    
+         & stat=info)
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
 
     rvhd(:) = mpi_request_null
-    sdsz(:) = 0 
-    rvsz(:) = 0 
+    sdsz(:) = 0
+    rvsz(:) = 0
 
     ! prepare info for communications
 
@@ -250,7 +252,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
     end do
 
   else
-    allocate(rvhd(totxch),prcid(totxch),stat=info) 
+    allocate(rvhd(totxch),prcid(totxch),stat=info)
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
@@ -324,8 +326,8 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
         if (nesd>0) call psb_snd(ictxt,&
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
+      else if (proc_to_comm == me) then
+        if (nesd /= nerv) then
           write(psb_err_unit,*) &
                & 'Fatal error in swapdata: mismatch on self send',&
                & nerv,nesd
@@ -349,8 +351,8 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if ((nerv>0).and.(proc_to_comm /= me)) then 
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)
+      if ((nerv>0).and.(proc_to_comm /= me)) then
         p2ptag = psb_double_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
              & psb_mpi_r_dpk_,prcid(i),&
@@ -374,8 +376,8 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = psb_double_swap_tag
-      if ((nesd>0).and.(proc_to_comm /= me)) then 
-        if (usersend) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then
+        if (usersend) then
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
@@ -405,7 +407,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = psb_double_swap_tag
-      
+
       if ((proc_to_comm /= me).and.(nerv>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
@@ -413,8 +415,8 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
           call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
+      else if (proc_to_comm == me) then
+        if (nesd /= nerv) then
           write(psb_err_unit,*)&
                & 'Fatal error in swapdata: mismatch on self send', &
                & nerv,nesd
@@ -460,7 +462,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
   end if
 
-  if (do_recv) then 
+  if (do_recv) then
 
     pnti   = 1
     snd_pt = 1
@@ -471,7 +473,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       nesd = idx(pnti+nerv+psb_n_elem_send_)
       idx_pt = 1+pnti+psb_n_elem_recv_
       call psi_sct(nerv,n,idx(idx_pt:idx_pt+nerv-1),&
-           & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)      
+           & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -480,7 +482,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   end if
 
 
-  if (swap_mpi) then 
+  if (swap_mpi) then
     deallocate(sdsz,rvsz,bsdidx,brvidx,rvhd,prcid,sdhd,&
          & stat=info)
   else
@@ -507,52 +509,52 @@ end subroutine psi_dswapidxm
 !
 !
 ! Subroutine: psi_dswapdatav
-!   Does the data exchange among processes. Essentially this is doing 
-!   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
-!   it is capable of pruning empty exchanges, which are very likely in out 
-!   application environment. All the variants have the same structure 
+!   Does the data exchange among processes. Essentially this is doing
+!   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but
+!   it is capable of pruning empty exchanges, which are very likely in out
+!   application environment. All the variants have the same structure
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
-!   Basically the operation is as follows: on each process, we identify 
+!   Basically the operation is as follows: on each process, we identify
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
-!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
-!   but only on the elements involved in the UNPACK operation. 
-!   Thus: for halo data exchange, the receive section is confined in the 
-!   halo indices, and BETA=0, whereas for overlap exchange the receive section 
+!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y
+!   but only on the elements involved in the UNPACK operation.
+!   Thus: for halo data exchange, the receive section is confined in the
+!   halo indices, and BETA=0, whereas for overlap exchange the receive section
 !   is scattered in the owned indices, and BETA=1.
-! 
-! Arguments: 
-!    flag     - integer                 Choose the algorithm for data exchange: 
-!                                       this is chosen through bit fields. 
+!
+! Arguments:
+!    flag     - integer                 Choose the algorithm for data exchange:
+!                                       this is chosen through bit fields.
 !                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
 !                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
 !                                        swap_send = iand(flag,psb_swap_send_) /= 0
 !                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
 !                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
-!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in
 !                                                       synchronized pairs
-!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                       if (swap_send .and. swap_recv): use mpi_irecv
 !                                                       and mpi_send
-!                                       if (swap_send): use psb_snd (but need another 
+!                                       if (swap_send): use psb_snd (but need another
 !                                                       call with swap_recv to complete)
-!                                       if (swap_recv): use psb_rcv (completing a 
+!                                       if (swap_recv): use psb_rcv (completing a
 !                                                       previous call with swap_send)
 !
 !
-!    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:)     - X                       The data area                        
-!    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    n        - integer                 Number of columns in Y
+!    beta     - X                       Choose overwrite or sum.
+!    y(:)     - X                       The data area
+!    desc_a   - type(psb_desc_type).  The communication descriptor.
+!    work(:)  - X                       Buffer space. If not sufficient, will do
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
 !                                       default psb_comm_halo_
 !                                       psb_comm_halo_    use halo_index
-!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ext_     use ext_index
 !                                       psb_comm_ovrl_    use ovrl_index
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
@@ -582,6 +584,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
+  print *, "psi_dswapdata_a.F90:psi_dswapdatav"
 
   info=psb_success_
   name='psi_swap_datav'
@@ -589,14 +592,14 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
 
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_desc(desc_a)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then
     info=psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
@@ -608,8 +611,8 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
-  if (info /= psb_success_) then 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info)
+  if (info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
@@ -629,13 +632,13 @@ end subroutine psi_dswapdatav
 !
 !
 ! Subroutine: psi_dswapdataidxv
-!   Does the data exchange among processes. 
-!   
+!   Does the data exchange among processes.
+!
 !   The real workhorse: the outer routines will only choose the index list
-!   this one takes the index list and does the actual exchange. 
-!   
-!   
-! 
+!   this one takes the index list and does the actual exchange.
+!
+!
+!
 subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
@@ -674,6 +677,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name
+  print *, "psi_dswapdata_a.F90:psi_dswapidxv"
 
   info=psb_success_
   name='psi_swap_datav'
@@ -681,7 +685,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   ictxt = iictxt
   icomm = iicomm
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ictxt,me,np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -699,26 +703,27 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   totrcv_ = totrcv * n
   totsnd_ = totsnd * n
 
-  if (swap_mpi) then 
+  if (swap_mpi) then
     allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
          & brvidx(0:np-1), rvhd(0:np-1), sdhd(0:np-1), prcid(0:np-1),&
-         & stat=info)    
+         & stat=info)
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
 
     rvhd(:) = mpi_request_null
-    sdsz(:) = 0 
-    rvsz(:) = 0 
+    sdsz(:) = 0
+    rvsz(:) = 0
 
     ! prepare info for communications
 
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
-    do i=1, totxch
+    do i=1, totxch  ! artless: this is what i want to do  MPI_V for MPI_COMM_WORLD
       proc_to_comm = idx(pnti+psb_proc_id_)
+
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
       call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
@@ -732,11 +737,11 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
-
+      print *, "---ARTLESS rcv_pt = ", rcv_pt, "snd_pt = ", snd_pt
     end do
 
   else
-    allocate(rvhd(totxch),prcid(totxch),stat=info) 
+    allocate(rvhd(totxch),prcid(totxch),stat=info)
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
@@ -771,8 +776,9 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       idx_pt = 1+pnti+nerv+psb_n_elem_send_
       call psi_gth(nesd,idx(idx_pt:idx_pt+nesd-1),&
            & y,sndbuf(snd_pt:snd_pt+nesd-1))
-      snd_pt = snd_pt + nesd 
+      snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
+
     end do
 
   end if
@@ -811,7 +817,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
         if (nesd>0) call psb_snd(ictxt,&
              & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       else if (proc_to_comm ==  me) then
-        if (nesd /= nerv) then 
+        if (nesd /= nerv) then
           write(psb_err_unit,*) &
                & 'Fatal error in swapdata: mismatch on self send', &
                & nerv,nesd
@@ -835,8 +841,8 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if ((nerv>0).and.(proc_to_comm /= me)) then 
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)
+      if ((nerv>0).and.(proc_to_comm /= me)) then
         p2ptag = psb_double_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
              & psb_mpi_r_dpk_,prcid(i),&
@@ -861,8 +867,8 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
 
       p2ptag = psb_double_swap_tag
 
-      if ((nesd>0).and.(proc_to_comm /= me)) then 
-        if (usersend) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then
+        if (usersend) then
           call mpi_rsend(sndbuf(snd_pt),nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
@@ -898,8 +904,8 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
           call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
+      else if (proc_to_comm == me) then
+        if (nesd /= nerv) then
           write(psb_err_unit,*) &
                & 'Fatal error in swapdata: mismatch on self send', &
                & nerv,nesd
@@ -944,7 +950,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
 
   end if
 
-  if (do_recv) then 
+  if (do_recv) then
 
     pnti   = 1
     snd_pt = 1
@@ -963,7 +969,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
 
   end if
 
-  if (swap_mpi) then 
+  if (swap_mpi) then
     deallocate(sdsz,rvsz,bsdidx,brvidx,rvhd,prcid,sdhd,&
          & stat=info)
   else

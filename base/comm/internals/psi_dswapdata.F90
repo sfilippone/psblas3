@@ -1,5 +1,5 @@
 ! debug out-of-bound
-#define DBG_OOB
+! #define DBG_OOB
 ! debug personal
 ! #define DBG_PER
 
@@ -113,19 +113,19 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
 #endif
 #include "scorep/SCOREP_User.inc"
 
-  integer(psb_ipk_), intent(in)         :: flag
-  integer(psb_ipk_), intent(out)        :: info
-  class(psb_d_base_vect_type) :: y
-  real(psb_dpk_)           :: beta
-  real(psb_dpk_), target   :: work(:)
-  type(psb_desc_type), target  :: desc_a
-  integer(psb_ipk_), optional           :: data
+  integer(psb_ipk_), intent(in)  :: flag
+  integer(psb_ipk_), intent(out) :: info
+  class(psb_d_base_vect_type)    :: y
+  real(psb_dpk_)                 :: beta
+  real(psb_dpk_), target         :: work(:)
+  type(psb_desc_type), target    :: desc_a
+  integer(psb_ipk_), optional    :: data
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
-  logical :: swap_persistent
+  logical :: swap_persistent, swap_nonpersistent, do_alltoallv
 
   info=psb_success_
   name='psi_swap_datav'
@@ -136,7 +136,9 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
   icomm = desc_a%get_mpic()
   ! TODO: get_mpic should be used to get dist_graph_comm, but for now this works
   swap_persistent = iand(flag,psb_swap_persistent_) /= 0
-  if (swap_persistent) then
+  swap_nonpersistent = iand(flag,psb_swap_nonpersistent_) /= 0
+  do_alltoallv = swap_persistent .or. swap_nonpersistent
+  if (do_alltoallv) then
     if (allocated(desc_a%dist_graph_comm)) then
       ! print *, "desc_a%dist_graph_comm", desc_a%dist_graph_comm
       icomm = desc_a%dist_graph_comm
@@ -231,13 +233,14 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
        & err_act, i, j, ii, ri, si, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n, ierr
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-       & albf,do_send,do_recv, swap_persistent, do_persistent
+      & albf,do_send,do_recv, &
+      do_alltoallv, swap_persistent, swap_nonpersistent
   logical, parameter :: usersend=.false., debug=.false.
   character(len=20)  :: name
 
   !remove
   integer :: status(MPI_STATUS_SIZE)
-  real :: start_t, finish_t
+  real(psb_dpk_) :: start_t, finish_t, start_comm_t, end_comm_t
   logical :: weight
   real(psb_dpk_)           :: tmp
   ! score-p declaration
@@ -260,14 +263,15 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   endif
 
   n=1
-  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
-  swap_sync = iand(flag,psb_swap_sync_) /= 0
-  swap_send = iand(flag,psb_swap_send_) /= 0
-  swap_recv = iand(flag,psb_swap_recv_) /= 0
-  swap_persistent = iand(flag,psb_swap_persistent_) /= 0
+  swap_mpi        = iand(flag,psb_swap_mpi_) /= 0
+  swap_sync       = iand(flag,psb_swap_sync_) /= 0
+  swap_send       = iand(flag,psb_swap_send_) /= 0
+  swap_recv       = iand(flag,psb_swap_recv_) /= 0
+  swap_persistent     = iand(flag,psb_swap_persistent_) /= 0
+  swap_nonpersistent  = iand(flag,psb_swap_nonpersistent_) /= 0
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
-  do_persistent = swap_persistent
+  do_alltoallv = swap_persistent .or. swap_nonpersistent
 
   totrcv_ = totrcv * n
   totsnd_ = totsnd * n
@@ -276,19 +280,17 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 
   ! TODO check do_persistent twice, here and calling psi_dswapdata_vect,
   !      redudent but needed for now
-  if (do_persistent) then
-    ! if not allocated, allocate buffers and create request
+  if (do_alltoallv) then
     if (.not. allocated(y%p)) then
       allocate(y%p)
     end if
     if (.not. allocated(y%p%sndbuf)) then
+      ! allocate time counters
+      allocate(y%p%alltoall_comm_time, y%p%total_time)
+      y%p%alltoall_comm_time = 0
+      ! allocate buffers
       allocate(y%p%sndbuf(totsnd), y%p%rcvbuf(totrcv))
       allocate(y%p%rcv_count, y%p%snd_count)
-#ifdef DBG_OOB ! debug out-of-bound
-      y%p%sndbuf = 0
-      y%p%rcvbuf = me + 10
-#endif
-
       ! get number of neighbors and graph so we know who to communicate with
       call MPI_Dist_graph_neighbors_count(icomm, y%p%rcv_count, &
           y%p%snd_count, weight, ierr) ! should weight go into psb_d_persis_vect_type??
@@ -339,49 +341,41 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
         pnti = pnti + nerv + nesd + 3
       end do
 
-#ifdef DBG_PER
-      print *, me, ":totxch=", totxch,"totsnd", totsnd, "totrcv", totrcv
-      print *, me, ": rcv_count = ", y%p%rcv_count, "snd_count = ", y%p%snd_count
-      print *, me, ": y%p%rcv_from =", y%p%rcv_from, "y%p%snd_to =", y%p%snd_to
-      print *, me, ":y%p%snd_counts", y%p%snd_counts, "y%p%snd_displs = ",y%p%snd_displs, &
-          "y%p%rcv_counts", y%p%rcv_counts, "y%p%rcv_displs",y%p%rcv_displs
-#endif
+! #ifdef DBG_PER
+      ! print *, me, ": totxch", totxch,"total to send", totsnd, "total to recv", totrcv
+      ! print *, me, ": rcv_count = ", y%p%rcv_count, "snd_count = ", y%p%snd_count
+      ! print *, me, ":y%p%snd_displs = ",y%p%snd_displs, &
+      !     "y%p%rcv_displs",y%p%rcv_displs
+! #endif
 
-      allocate(y%p%init_request)
-      y%p%init_request = -1
+      ! ----------------------------
+      ! print *, me, ": totsnd=",totsnd ,"y%p%snd_to =", y%p%snd_to, &
+      !     "y%p%snd_counts = ", y%p%snd_counts
+      ! print *, me, ": totrcv=",totrcv,"y%p%rcv_from =", y%p%rcv_from, &
+      !     "y%p%rcv_counts = ", y%p%rcv_counts
+      ! ----------------------------
 
-      ! SCOREP_USER_REGION_BEGIN(MPIX_Neighbor_alltoallv_init_region, &
-      ! "MPIX_Neighbor_alltoallv_init", SCOREP_USER_REGION_TYPE_FUNCTION)
-      ! SCOREP_USER_REGION_BEGIN(artless_test, &
-      !     "foo", SCOREP_USER_REGION_TYPE_COMMON)
-      call MPI_Barrier(MPI_COMM_WORLD,ierr)
-      call cpu_time(start_t)
-      call MPIX_Neighbor_alltoallv_init(y%p%sndbuf, y%p%snd_counts, y%p%snd_displs, &
-          MPI_DOUBLE_PRECISION, y%p%rcvbuf, y%p%rcv_counts, y%p%rcv_displs, &
-          MPI_DOUBLE_PRECISION, icomm, MPI_INFO_NULL, &
-          y%p%init_request, ierr)
-      ! SCOREP_USER_REGION_END(artless_test)
-      ! SCOREP_USER_REGION_END(MPIX_Neighbor_alltoallv_init_region)
-      call cpu_time(finish_t)
-      allocate(y%p%comm_create_time)
-      y%p%comm_create_time = finish_t - start_t
-      ! print *,"cpu time of MPIX_Neighbor_alltoallv_init is", finish_t - start_t
 
-      if (ierr .ne. 0) then
-        print *, "ERROR: MPIX_Neighbor_alltoallvinit ierr = ", ierr
-        goto 9999
+      ! ----------------------------
+      ! Persistant Request Creation
+      ! ----------------------------
+      if (swap_persistent) then
+        allocate(y%p%init_request)
+        y%p%init_request = -1
+        start_t = MPI_Wtime()
+        call MPIX_Neighbor_alltoallv_init(y%p%sndbuf, y%p%snd_counts, y%p%snd_displs, &
+            MPI_DOUBLE_PRECISION, y%p%rcvbuf, y%p%rcv_counts, y%p%rcv_displs, &
+            MPI_DOUBLE_PRECISION, icomm, MPI_INFO_NULL, &
+            y%p%init_request, ierr)
+        finish_t = MPI_Wtime()
+        allocate(y%p%request_create_time)
+        y%p%request_create_time = finish_t - start_t
       end if
-
-      ! ARTLESS: SENDBUF LOOKS OK HERE!
-      ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
-      ! write(*,'(I2 A)', advance='no') me, ": sndbuf = "
-      ! print '(104 F4.0)',  y%p%sndbuf
-      ! call MPI_Barrier(MPI_COMM_WORLD, ierr)
-
-#ifdef DBG_PER
-        print* ,me, ": end MPIX_Neighbor_alltoallv_init"
-#endif
-
+      ! ----------------------------
+      ! if (ierr .ne. 0) then
+      !   print *, "ERROR: MPIX_Neighbor_alltoallvinit ierr = ", ierr
+      !   goto 9999
+      ! end if
     else ! send and recv buffers exist, need to pack send buffer
       si = 1 ! sndbuf index
       pnti   = 1
@@ -405,38 +399,24 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       end do
     end if ! end packing phase
 
-    ! --- start communication
-#ifdef DBG_PER
-    if (.not. allocated(y%p%init_request)) then
-      print *, "error: y%p%init_request should be allocated"
-      goto 9999
+    ! ---- start communication ----
+    start_comm_t = MPI_Wtime()
+    ! ---- if persistant ----
+    if (swap_persistent) then
+      call MPI_Start(y%p%init_request, ierr)
+      call MPI_Wait(y%p%init_request, status, ierr)
     end if
-#endif
 
-    call MPI_Start(y%p%init_request, ierr)
-#ifdef DBG_PER
-    if (ierr .ne. 0) then
-      print *, "ERROR: rank ",me,"has MPI_Start status(MPI_ERROR) = ", &
-          status(MPI_ERROR), "and ierr = ", ierr
-      goto 9999
+    ! ---- if non-persistent ----
+    if (swap_nonpersistent) then
+      call MPI_Neighbor_alltoallv(y%p%sndbuf, y%p%snd_counts, y%p%snd_displs, &
+          MPI_DOUBLE_PRECISION, y%p%rcvbuf, y%p%rcv_counts, y%p%rcv_displs, &
+          MPI_DOUBLE_PRECISION, icomm, ierr)
     end if
-#endif
+    end_comm_t = MPI_Wtime() - start_comm_t
+    y%p%alltoall_comm_time = y%p%alltoall_comm_time + end_comm_t
 
-    call MPI_Wait(y%p%init_request, status, ierr)
-#ifdef DBG_PER
-    if (ierr .ne. 0) then
-      print *, "ERROR: rank ",me,"has MPI_Wait status(MPI_ERROR) = ", &
-          status(MPI_ERROR), "and ierr = ", ierr
-      goto 9999
-    end if
-#endif
-
-    ! write(*,'(I2 A)', advance='no') me, "::::: rcvbuf ="
-    ! print '(104 F4.0)',  y%p%rcvbuf
     ! ----scatter/unpack buffer----
-#ifdef DBG_PER
-    print*, me, ": begin scatter/unpack buffer"
-#endif
     pnti   = 1
     rcv_pt = 1
     do i=1, totxch
