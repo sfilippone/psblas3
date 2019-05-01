@@ -83,7 +83,7 @@ program psb_df_sample
   integer(psb_ipk_), allocatable :: ipv(:)
   character(len=40)  :: fname, fnout
 
-  ! persistant communication
+  ! persistent communication
   integer(psb_lpk_), allocatable :: iv(:)
   real(psb_dpk_), allocatable :: xa(:)
   integer(psb_ipk_) :: num_iterations, num_neighbors, &
@@ -92,9 +92,10 @@ program psb_df_sample
   integer(psb_ipk_) :: sum_snd, min_snd, max_snd, num_snd, tot_snd, sum_tot_snd
   integer(psb_ipk_) :: sum_rcv, min_rcv, max_rcv, num_rcv, tot_rcv, sum_tot_rcv
   real(psb_spk_)    :: ave_neighbors, ave_snd_buf, ave_rcv_buf, ave_tot_snd, ave_tot_rcv
-  real(psb_dpk_)    :: alltoall_comm_t, ave_alltoall_comm_t
+  real(psb_dpk_)    :: alltoall_comm_t, ave_alltoall_comm_t, total_time, ave_time
   real(psb_spk_)    :: ave_snd, ave_rcv
   integer(psb_ipk_) :: swap_mode
+  logical           :: swap_persistent, swap_nonpersistent
 
   call psb_init(ictxt)
   call psb_info(ictxt,me,np)
@@ -269,6 +270,8 @@ program psb_df_sample
   num_iterations = ITERATIONS
   swap_mode      = psb_swap_persistent_
   ! swap_mode      = psb_swap_nonpersistent_
+  swap_persistent     = iand(swap_mode,psb_swap_persistent_) /= 0
+  swap_nonpersistent  = iand(swap_mode,psb_swap_nonpersistent_) /= 0
 
   do iter = 1, num_iterations
     xa = iv
@@ -305,10 +308,16 @@ program psb_df_sample
   call flush(output_unit)
   call MPI_Barrier(MPI_COMM_WORLD, ierr)
   if (allocated(x_col%v)) then
-    if (swap_mode .eq. psb_swap_persistent_) then
-      ! collect p and nonp alltoall communication time
+    call MPI_Reduce(x_col%v%p%total_time, total_time, 1, &
+        MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+
+    if (swap_persistent .or. swap_nonpersistent) then
+          ! collect p and nonp alltoall communication time
+      print *, me, "alltoall_comm_time = ", x_col%v%p%alltoall_comm_time
       call MPI_Reduce(x_col%v%p%alltoall_comm_time, alltoall_comm_t, 1, &
           MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+    end if
+    if (swap_persistent) then
       ! collect MPIX request initialization time
       call MPI_Reduce(x_col%v%p%request_create_time, request_create_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
           psb_root_, MPI_COMM_WORLD, ierr)
@@ -351,24 +360,27 @@ program psb_df_sample
         psb_root_, MPI_COMM_WORLD, ierr)
 
     if (me == psb_root_) then
-      open(1,file='halo_persistant_output.txt', status='new')
+      open(1,file='halo_persistent_output.txt', status='new')
 
       ! write(1,*) "flt     type max_buf[B] visits time[s] time[%] time/visit[us]  region"
       ! write(1,*) ""
       ! converting microseconds
-
-
-      ave_alltoall_comm_t = alltoall_comm_t / num_iterations
-      if (swap_mode .eq. psb_swap_persistent_) then
+      total_time = total_time * 1000000
+      ave_time = total_time / np
+      alltoall_comm_t = alltoall_comm_t * 1000000
+      ave_alltoall_comm_t = alltoall_comm_t / (num_iterations * np)
+      ! print *, "alltoall", alltoall_comm_t, ave_alltoall_comm_t
+      if (swap_persistent) then
         request_create_mean = (request_create_sum / np) * 1000000
         request_create_sum  = request_create_sum        * 1000000
-      else if (swap_mode .eq. psb_swap_nonpersistent_) then
+      else if (swap_nonpersistent) then
         request_create_mean = -1.0
         request_create_sum  = -1.0
       end if
 
       ! write(1,*, advance='no') 37 65  73 64
       write(1,'(A)',advance='no') "np;num_iterations;swap_mode;"
+      write(1,'(A)',advance='no') "total_time;ave_time;"
       write(1,'(A)',advance='no') "alltoall_comm_t;ave_alltoall_comm_t;"
       write(1,'(A)',advance='no') "request_create_mean; etc etc"
       write(1,*)
@@ -376,8 +388,10 @@ program psb_df_sample
       write(1,'(I5 A1)',advance='no')   np, ';'
       write(1,'(I6 A1)',advance='no')   num_iterations, ';'
       write(1,'(I5 A1)'  ,advance='no') swap_mode, ';'
-      write(1,'(F9.2 A1)',advance='no') alltoall_comm_t, ';'
-      write(1,'(F9.2 A1)',advance='no') ave_alltoall_comm_t, ';'
+      write(1,'(F15.4 A1)',advance='no') total_time, ';'
+      write(1,'(F15.4 A1)',advance='no') ave_time, ';'
+      write(1,'(F15.4 A1)',advance='no') alltoall_comm_t, ';'
+      write(1,'(F15.4 A1)',advance='no') ave_alltoall_comm_t, ';'
       write(1,'(F9.2 A1)',advance='no') request_create_mean, ';'
       write(1,'(F9.2 A1)',advance='no') request_create_sum,  ';'
 
