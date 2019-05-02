@@ -89,13 +89,17 @@ program psb_df_sample
   integer(psb_ipk_) :: num_iterations, num_neighbors, &
       min_neighbors, max_neighbors, &
       sum_neighbors
-  integer(psb_ipk_) :: sum_snd, min_snd, max_snd, num_snd, tot_snd, sum_tot_snd
-  integer(psb_ipk_) :: sum_rcv, min_rcv, max_rcv, num_rcv, tot_rcv, sum_tot_rcv
-  real(psb_spk_)    :: ave_neighbors, ave_snd_buf, ave_rcv_buf, ave_tot_snd, ave_tot_rcv
-  real(psb_dpk_)    :: alltoall_comm_t, ave_alltoall_comm_t, total_time, ave_time
-  real(psb_spk_)    :: ave_snd, ave_rcv
-  integer(psb_ipk_) :: swap_mode
-  logical           :: swap_persistent, swap_nonpersistent
+  integer(psb_ipk_)  :: sum_snd, min_snd, max_snd, num_snd, tot_snd, sum_tot_snd
+  integer(psb_ipk_)  :: sum_rcv, min_rcv, max_rcv, num_rcv, tot_rcv, sum_tot_rcv
+  real(psb_spk_)     :: ave_neighbors, ave_snd_buf, ave_rcv_buf, ave_tot_snd, ave_tot_rcv
+  real(psb_dpk_)     :: alltoall_comm_t, ave_alltoall_comm_t, total_time, ave_time
+  real(psb_dpk_)     :: median_comm_t, ave_alltoall_median_comm_t, min_comm_t, max_comm_t, &
+      ave_min_comm_t, ave_max_comm_t, sum_median_comm_t, sum_min_comm_t, sum_max_comm_t, &
+      ave_alltoall_max_comm_t, ave_alltoall_min_comm_t
+  real(psb_spk_)     :: ave_snd, ave_rcv
+  integer(psb_ipk_)  :: swap_mode
+  logical            :: swap_persistent, swap_nonpersistent
+  logical, parameter :: openfile=OPENFILE
 
   call psb_init(ictxt)
   call psb_info(ictxt,me,np)
@@ -268,8 +272,7 @@ program psb_df_sample
   !   end if
   ! end do
   num_iterations = ITERATIONS
-  swap_mode      = psb_swap_persistent_
-  swap_mode      = psb_swap_nonpersistent_
+  swap_mode      = SWAPCHOICE
   swap_persistent     = iand(swap_mode,psb_swap_persistent_) /= 0
   swap_nonpersistent  = iand(swap_mode,psb_swap_nonpersistent_) /= 0
 
@@ -308,12 +311,24 @@ program psb_df_sample
   call flush(output_unit)
   call MPI_Barrier(MPI_COMM_WORLD, ierr)
   if (allocated(x_col%v)) then
+    if (allocated(x_col%v%p)) then
+    ! -- collect times ---
+    ! total time
     call MPI_Reduce(x_col%v%p%total_time, total_time, 1, &
         MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
 
     if (swap_persistent .or. swap_nonpersistent) then
-          ! collect p and nonp alltoall communication time
-      print *, me, "alltoall_comm_time = ", x_col%v%p%alltoall_comm_time
+      ! collect communication times
+      call median(x_col%v%p%alltoall_comm_time_a(1:x_col%v%p%comm_count), &
+          median_comm_t, min_comm_t, max_comm_t)
+
+      call MPI_Reduce(median_comm_t, sum_median_comm_t, 1, &
+          MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+      call MPI_Reduce(min_comm_t, sum_min_comm_t, 1, &
+          MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+      call MPI_Reduce(max_comm_t, sum_max_comm_t, 1, &
+          MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+
       call MPI_Reduce(x_col%v%p%alltoall_comm_time, alltoall_comm_t, 1, &
           MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
     end if
@@ -360,7 +375,37 @@ program psb_df_sample
         psb_root_, MPI_COMM_WORLD, ierr)
 
     if (me == psb_root_) then
-      open(1,file='halo_persistent_output.txt', status='new')
+      if (openfile .and. (np .eq. 2)) then
+        open(1,file='halo_output.txt')
+        write(1,'(A)',advance='no') "partition;"
+        write(1,'(A)',advance='no') "np;"
+        write(1,'(A)',advance='no') "num_iterations;"
+        write(1,'(A)',advance='no') "swap_mode;"
+        write(1,'(A)',advance='no') "total_time;"
+        write(1,'(A)',advance='no') "ave_time;"
+        write(1,'(A)',advance='no') "alltoall_comm_t;"
+        write(1,'(A)',advance='no') "ave_alltoall_comm_t;"
+        write(1,'(A)',advance='no') "ave_alltoall_median_comm_t;"
+        write(1,'(A)',advance='no') "ave_alltoall_max_comm_t;"
+        write(1,'(A)',advance='no') "ave_alltoall_min_comm_t;"
+        write(1,'(A)',advance='no') "request_create_t;"
+        write(1,'(A)',advance='no') "ave_request_create_t;"
+        write(1,'(A)',advance='no') "ave_neighbors;"
+
+        write(1,'(A)',advance='no') "min_neighbors;"
+        write(1,'(A)',advance='no') "max_neighbors;"
+        write(1,'(A)',advance='no') "ave_tot_snd;"
+        write(1,'(A)',advance='no') "ave_tot_rcv;"
+        write(1,'(A)',advance='no') "ave_snd_buf;"
+        write(1,'(A)',advance='no') "ave_rcv_buf;"
+        write(1,'(A)',advance='no') "max_snd;"
+        write(1,'(A)',advance='no') "max_rcv;"
+        write(1,'(A)',advance='no') "min_snd;"
+        write(1,'(A)',advance='yes')"min_rcv;"
+      else
+        open(1,file='halo_output.txt', access='APPEND')
+      end if
+
 
       ! write(1,*) "flt     type max_buf[B] visits time[s] time[%] time/visit[us]  region"
       ! write(1,*) ""
@@ -368,7 +413,14 @@ program psb_df_sample
       total_time = total_time * 1000000
       ave_time = total_time / np
       alltoall_comm_t = alltoall_comm_t * 1000000
-      ave_alltoall_comm_t = alltoall_comm_t / np
+      ave_alltoall_comm_t = alltoall_comm_t / (np * num_iterations)
+      sum_median_comm_t = sum_median_comm_t * 1000000
+      ave_alltoall_median_comm_t = sum_median_comm_t / np
+      sum_max_comm_t = sum_max_comm_t * 1000000
+      ave_alltoall_max_comm_t = sum_max_comm_t / np
+      sum_min_comm_t = sum_min_comm_t * 1000000
+      ave_alltoall_min_comm_t = sum_min_comm_t / np
+
       ! print *, "alltoall", alltoall_comm_t, ave_alltoall_comm_t
       if (swap_persistent) then
         ave_request_create_t = (request_create_t / np) * 1000000
@@ -379,51 +431,32 @@ program psb_df_sample
       end if
 
       ! write(1,*, advance='no') 37 65  73 64
-      write(1,'(A)',advance='no') "np;"
-      write(1,'(A)',advance='no') "num_iterations;"
-      write(1,'(A)',advance='no') "swap_mode;"
-      write(1,'(A)',advance='no') "total_time;"
-      write(1,'(A)',advance='no') "ave_time;"
-      write(1,'(A)',advance='no') "alltoall_comm_t;"
-      write(1,'(A)',advance='no') "ave_alltoall_comm_t;"
-      write(1,'(A)',advance='no') "request_create_t;"
-      write(1,'(A)',advance='no') "ave_request_create_t;"
-      write(1,'(A)',advance='no') "ave_neighbors;"
 
-      write(1,'(A)',advance='no') "min_neighbors;"
-      write(1,'(A)',advance='no') "max_neighbors;"
-      write(1,'(A)',advance='no') "ave_tot_snd;"
-      write(1,'(A)',advance='no') "ave_tot_rcv;"
-      write(1,'(A)',advance='no') "ave_snd_buf;"
-      write(1,'(A)',advance='no') "ave_rcv_buf;"
-      write(1,'(A)',advance='no') "max_snd;"
-      write(1,'(A)',advance='no') "max_rcv;"
-      write(1,'(A)',advance='no') "min_snd;"
-      write(1,'(A)',advance='no') "min_rcv;"
-
-      write(1,*)
-      write(1,*) "------"
+      write(1,'(A5 A1)',advance='no')    psb_toupper(part), ';'
       write(1,'(I5 A1)',advance='no')    np, ';'
       write(1,'(I6 A1)',advance='no')    num_iterations, ';'
       write(1,'(I5 A1)'  ,advance='no')  swap_mode, ';'
-      write(1,'(F15.4 A1)',advance='no') total_time, ';'
-      write(1,'(F15.4 A1)',advance='no') ave_time, ';'
-      write(1,'(F15.4 A1)',advance='no') alltoall_comm_t, ';'
-      write(1,'(F15.4 A1)',advance='no') ave_alltoall_comm_t, ';'
-      write(1,'(F9.2 A1)',advance='no')  request_create_t,  ';'
-      write(1,'(F9.2 A1)',advance='no')  ave_request_create_t, ';'
-      write(1,'(F9.2 A1)',advance='no') ave_neighbors, ';'
+      write(1,'(F20.4 A1)',advance='no') total_time, ';'
+      write(1,'(F20.4 A1)',advance='no') ave_time, ';'
+      write(1,'(F20.4 A1)',advance='no') alltoall_comm_t, ';'
+      write(1,'(F20.4 A1)',advance='no') ave_alltoall_comm_t, ';'
+      write(1,'(F20.4 A1)',advance='no') ave_alltoall_median_comm_t, ';'
+      write(1,'(F20.4 A1)',advance='no') ave_alltoall_max_comm_t, ';'
+      write(1,'(F20.4 A1)',advance='no') ave_alltoall_min_comm_t, ';'
+      write(1,'(F10.2 A1)',advance='no')  request_create_t,  ';'
+      write(1,'(F10.2 A1)',advance='no')  ave_request_create_t, ';'
+      write(1,'(F10.2 A1)',advance='no') ave_neighbors, ';'
 
       write(1,'(I5 A1)'  ,advance='no') min_neighbors, ';'
       write(1,'(I5 A1)'  ,advance='no') max_neighbors, ';'
-      write(1,'(F9.2 A1)',advance='no') ave_tot_snd, ';'
-      write(1,'(F9.2 A1)',advance='no') ave_tot_rcv, ';'
-      write(1,'(F9.2 A1)',advance='no') ave_snd_buf, ';'
-      write(1,'(F9.2 A1)',advance='no') ave_rcv_buf, ';'
-      write(1,'(I5 A1)',advance='no')   max_snd, ';'
-      write(1,'(I5 A1)',advance='no')   max_rcv, ';'
-      write(1,'(I5 A1)',advance='no')   min_snd, ';'
-      write(1,'(I5 A1)',advance='no')   min_rcv, ';'
+      write(1,'(F15.2 A1)',advance='no') ave_tot_snd, ';'
+      write(1,'(F15.2 A1)',advance='no') ave_tot_rcv, ';'
+      write(1,'(F15.2 A1)',advance='no') ave_snd_buf, ';'
+      write(1,'(F15.2 A1)',advance='no') ave_rcv_buf, ';'
+      write(1,'(I7 A1)',advance='no')   max_snd, ';'
+      write(1,'(I7 A1)',advance='no')   max_rcv, ';'
+      write(1,'(I7 A1)',advance='no')   min_snd, ';'
+      write(1,'(I7 A1)',advance='no')   min_rcv, ';'
 
       ! write(1,'(F9.2 A1)',advance='no') , ';'
       ! write(1,'(I5 A1)',advance='no') , ';'
@@ -432,6 +465,7 @@ program psb_df_sample
       ! ---- need to write buffer size, min and average and max snd/rcv elements
       ! write(1,())
       ! ---- need to write buffer size, min and average and max neighbors
+    end if
     end if
   end if
   call flush(output_unit)
@@ -458,4 +492,47 @@ program psb_df_sample
 9999 call psb_error(ictxt)
 
   stop
+
+
+contains
+  subroutine sort(n, a)
+    implicit none
+    integer :: n, i, j
+    real(psb_dpk_) :: a(n), x
+
+    do i = 2, n
+      x = a(i)
+      j = i - 1
+      do while (j >= 1)
+        if (a(j) <= x) exit
+        a(j + 1) = a(j)
+        j = j - 1
+      end do
+      a(j + 1) = x
+    end do
+  end subroutine sort
+
+  subroutine median(a, median_val, min, max)
+    real(psb_dpk_), dimension(:), intent(in) :: a
+    real(psb_dpk_), intent(out) :: median_val, min, max
+
+    integer :: l, u
+    real(psb_dpk_), dimension(size(a,1)) :: ac
+
+    ac = a
+    ! this is not an intrinsic: peek a sort algo from
+    ! Category:Sorting, fixing it to work with real if
+    ! it uses integer instead.
+    l = size(a,1)
+    call sort(l, ac)
+
+    if ( mod(l, 2) == 0 ) then
+      median_val = (ac(l/2+1) + ac(l/2))/2.0
+    else
+      median_val = ac(l/2+1)
+    end if
+    min = ac(1)
+    max = ac(ubound(ac, dim=1))
+    u = ubound(ac, dim=1)
+  end subroutine median
 end program psb_df_sample
