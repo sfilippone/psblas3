@@ -76,7 +76,7 @@ program psb_df_sample
   ! other variables
   integer(psb_ipk_) :: i,info,j,m_problem, err_act
   integer(psb_ipk_) :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec, t_low, t_high, request_create_mean, request_create_sum
+  real(psb_dpk_) :: t1, t2, tprec, t_low, t_high, ave_request_create_t, request_create_t
   real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv, ncol
   integer(psb_ipk_), allocatable :: ivg(:), perm(:)
@@ -269,7 +269,7 @@ program psb_df_sample
   ! end do
   num_iterations = ITERATIONS
   swap_mode      = psb_swap_persistent_
-  ! swap_mode      = psb_swap_nonpersistent_
+  swap_mode      = psb_swap_nonpersistent_
   swap_persistent     = iand(swap_mode,psb_swap_persistent_) /= 0
   swap_nonpersistent  = iand(swap_mode,psb_swap_nonpersistent_) /= 0
 
@@ -319,7 +319,7 @@ program psb_df_sample
     end if
     if (swap_persistent) then
       ! collect MPIX request initialization time
-      call MPI_Reduce(x_col%v%p%request_create_time, request_create_sum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+      call MPI_Reduce(x_col%v%p%request_create_time, request_create_t, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
           psb_root_, MPI_COMM_WORLD, ierr)
     end if
     ! collect min, max, and average snd/rcv elements
@@ -368,34 +368,52 @@ program psb_df_sample
       total_time = total_time * 1000000
       ave_time = total_time / np
       alltoall_comm_t = alltoall_comm_t * 1000000
-      ave_alltoall_comm_t = alltoall_comm_t / (num_iterations * np)
+      ave_alltoall_comm_t = alltoall_comm_t / np
       ! print *, "alltoall", alltoall_comm_t, ave_alltoall_comm_t
       if (swap_persistent) then
-        request_create_mean = (request_create_sum / np) * 1000000
-        request_create_sum  = request_create_sum        * 1000000
+        ave_request_create_t = (request_create_t / np) * 1000000
+        request_create_t  = request_create_t        * 1000000
       else if (swap_nonpersistent) then
-        request_create_mean = -1.0
-        request_create_sum  = -1.0
+        ave_request_create_t = -1.0
+        request_create_t  = -1.0
       end if
 
       ! write(1,*, advance='no') 37 65  73 64
-      write(1,'(A)',advance='no') "np;num_iterations;swap_mode;"
-      write(1,'(A)',advance='no') "total_time;ave_time;"
-      write(1,'(A)',advance='no') "alltoall_comm_t;ave_alltoall_comm_t;"
-      write(1,'(A)',advance='no') "request_create_mean; etc etc"
+      write(1,'(A)',advance='no') "np;"
+      write(1,'(A)',advance='no') "num_iterations;"
+      write(1,'(A)',advance='no') "swap_mode;"
+      write(1,'(A)',advance='no') "total_time;"
+      write(1,'(A)',advance='no') "ave_time;"
+      write(1,'(A)',advance='no') "alltoall_comm_t;"
+      write(1,'(A)',advance='no') "ave_alltoall_comm_t;"
+      write(1,'(A)',advance='no') "request_create_t;"
+      write(1,'(A)',advance='no') "ave_request_create_t;"
+      write(1,'(A)',advance='no') "ave_neighbors;"
+
+      write(1,'(A)',advance='no') "min_neighbors;"
+      write(1,'(A)',advance='no') "max_neighbors;"
+      write(1,'(A)',advance='no') "ave_tot_snd;"
+      write(1,'(A)',advance='no') "ave_tot_rcv;"
+      write(1,'(A)',advance='no') "ave_snd_buf;"
+      write(1,'(A)',advance='no') "ave_rcv_buf;"
+      write(1,'(A)',advance='no') "max_snd;"
+      write(1,'(A)',advance='no') "max_rcv;"
+      write(1,'(A)',advance='no') "min_snd;"
+      write(1,'(A)',advance='no') "min_rcv;"
+
       write(1,*)
       write(1,*) "------"
-      write(1,'(I5 A1)',advance='no')   np, ';'
-      write(1,'(I6 A1)',advance='no')   num_iterations, ';'
-      write(1,'(I5 A1)'  ,advance='no') swap_mode, ';'
+      write(1,'(I5 A1)',advance='no')    np, ';'
+      write(1,'(I6 A1)',advance='no')    num_iterations, ';'
+      write(1,'(I5 A1)'  ,advance='no')  swap_mode, ';'
       write(1,'(F15.4 A1)',advance='no') total_time, ';'
       write(1,'(F15.4 A1)',advance='no') ave_time, ';'
       write(1,'(F15.4 A1)',advance='no') alltoall_comm_t, ';'
       write(1,'(F15.4 A1)',advance='no') ave_alltoall_comm_t, ';'
-      write(1,'(F9.2 A1)',advance='no') request_create_mean, ';'
-      write(1,'(F9.2 A1)',advance='no') request_create_sum,  ';'
-
+      write(1,'(F9.2 A1)',advance='no')  request_create_t,  ';'
+      write(1,'(F9.2 A1)',advance='no')  ave_request_create_t, ';'
       write(1,'(F9.2 A1)',advance='no') ave_neighbors, ';'
+
       write(1,'(I5 A1)'  ,advance='no') min_neighbors, ';'
       write(1,'(I5 A1)'  ,advance='no') max_neighbors, ';'
       write(1,'(F9.2 A1)',advance='no') ave_tot_snd, ';'
