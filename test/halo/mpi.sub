@@ -3,7 +3,7 @@
 ## MPI submission script for PBS on DELTA
 ## --------------------------------------
 #PBS -N umbrella_corp
-#PBS -l select=1:ncpus=16:mpiprocs=16
+#PBS -l select=2:ncpus=16:mpiprocs=16
 ##
 ## half_hour	-  30 minutes
 ## one_hour	-   1 hour
@@ -55,7 +55,7 @@ ml
 echo $PATH
 which mpirun
 echo "========= START ========="
-timeout 5m cpuburn
+# timeout 5m cpuburn
 ./run_tests.sh
 # echo "mpirun -machinefile hostfile -ppn 1 -np ${cpus} ${PROG} -v"
 # export OMP_NUM_THREADS=16

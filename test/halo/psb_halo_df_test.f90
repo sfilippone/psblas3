@@ -92,14 +92,16 @@ program psb_df_sample
   integer(psb_ipk_)  :: sum_snd, min_snd, max_snd, num_snd, tot_snd, sum_tot_snd
   integer(psb_ipk_)  :: sum_rcv, min_rcv, max_rcv, num_rcv, tot_rcv, sum_tot_rcv
   real(psb_spk_)     :: ave_neighbors, ave_snd_buf, ave_rcv_buf, ave_tot_snd, ave_tot_rcv
-  real(psb_dpk_)     :: alltoall_comm_t, ave_alltoall_comm_t, total_time, ave_time
+  real(psb_dpk_)     :: alltoall_comm_t, ave_alltoall_comm_t, total_time, &
+      ave_time_pp, ave_time_pi
   real(psb_dpk_)     :: median_comm_t, ave_alltoall_median_comm_t, min_comm_t, max_comm_t, &
       ave_min_comm_t, ave_max_comm_t, sum_median_comm_t, sum_min_comm_t, sum_max_comm_t, &
       ave_alltoall_max_comm_t, ave_alltoall_min_comm_t
+  real(psb_dpk_)     :: halo_t_start, halo_t_end, ave_halo_t_pi, &
+      sum_halo_t, halo_time
   real(psb_spk_)     :: ave_snd, ave_rcv
   integer(psb_ipk_)  :: swap_mode
-  logical            :: swap_persistent, swap_nonpersistent
-  logical, parameter :: openfile=OPENFILE
+  logical            :: swap_persistent, swap_nonpersistent, file_exists
 
   call psb_init(ictxt)
   call psb_info(ictxt,me,np)
@@ -275,12 +277,17 @@ program psb_df_sample
   swap_mode      = SWAPCHOICE
   swap_persistent     = iand(swap_mode,psb_swap_persistent_) /= 0
   swap_nonpersistent  = iand(swap_mode,psb_swap_nonpersistent_) /= 0
-
+  halo_time = 0
   do iter = 1, num_iterations
     xa = iv
     xa(nrow+1:ncol) = -1
     call x_col%set_vect(xa)
+    call MPI_Barrier(MPI_COMM_WORLD,ierr)
+    halo_t_start = MPI_Wtime()
     call psb_halo(x_col,desc_a,info,mode=swap_mode)
+    halo_t_end = MPI_Wtime() - halo_t_start
+    call MPI_Barrier(MPI_COMM_WORLD,ierr)
+    halo_time = halo_time + halo_t_end
 
     xa = x_col%get_vect()
 
@@ -313,6 +320,10 @@ program psb_df_sample
   if (allocated(x_col%v)) then
     if (allocated(x_col%v%p)) then
     ! -- collect times ---
+    ! halo time
+    call MPI_Reduce(halo_time, sum_halo_t, 1, &
+        MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
+
     ! total time
     call MPI_Reduce(x_col%v%p%total_time, total_time, 1, &
         MPI_DOUBLE_PRECISION, MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
@@ -346,6 +357,7 @@ program psb_df_sample
     call MPI_Reduce(ave_snd, ave_snd_buf, 1, MPI_REAL, &
         MPI_SUM, psb_root_, MPI_COMM_WORLD, ierr)
     ave_snd_buf = ave_snd_buf / np
+    print *, "snd_counts = ", x_col%v%p%snd_counts
     call MPI_Reduce(minval(x_col%v%p%snd_counts), min_snd, 1, MPI_INTEGER, MPI_MIN, &
         psb_root_, MPI_COMM_WORLD, ierr)
     call MPI_Reduce(maxval(x_col%v%p%snd_counts), max_snd, 1, MPI_INTEGER, MPI_MAX, &
@@ -375,14 +387,17 @@ program psb_df_sample
         psb_root_, MPI_COMM_WORLD, ierr)
 
     if (me == psb_root_) then
-      if (openfile .and. (np .eq. 2)) then
+      inquire(file='halo_output.txt', exist=file_exists)
+      if (.not. file_exists) then
         open(1,file='halo_output.txt')
         write(1,'(A)',advance='no') "partition;"
         write(1,'(A)',advance='no') "np;"
         write(1,'(A)',advance='no') "num_iterations;"
         write(1,'(A)',advance='no') "swap_mode;"
-        write(1,'(A)',advance='no') "total_time;"
-        write(1,'(A)',advance='no') "ave_time;"
+        write(1,'(A)',advance='no') "ave_halo_t_pi;"
+        ! write(1,'(A)',advance='no') "total_time;"
+        ! write(1,'(A)',advance='no') "ave_time_pp;"
+        write(1,'(A)',advance='no') "ave_time_pi;"
         write(1,'(A)',advance='no') "alltoall_comm_t;"
         write(1,'(A)',advance='no') "ave_alltoall_comm_t;"
         write(1,'(A)',advance='no') "ave_alltoall_median_comm_t;"
@@ -411,7 +426,10 @@ program psb_df_sample
       ! write(1,*) ""
       ! converting microseconds
       total_time = total_time * 1000000
-      ave_time = total_time / np
+      ave_time_pp = total_time / np
+      ave_time_pi = total_time / (np * num_iterations)
+      sum_halo_t  = sum_halo_t * 1000000
+      ave_halo_t_pi = sum_halo_t / (np * num_iterations)
       alltoall_comm_t = alltoall_comm_t * 1000000
       ave_alltoall_comm_t = alltoall_comm_t / (np * num_iterations)
       sum_median_comm_t = sum_median_comm_t * 1000000
@@ -436,15 +454,17 @@ program psb_df_sample
       write(1,'(I5 A1)',advance='no')    np, ';'
       write(1,'(I6 A1)',advance='no')    num_iterations, ';'
       write(1,'(I5 A1)'  ,advance='no')  swap_mode, ';'
-      write(1,'(F20.4 A1)',advance='no') total_time, ';'
-      write(1,'(F20.4 A1)',advance='no') ave_time, ';'
+      write(1,'(I5 A1)'  ,advance='no')  ave_halo_t_pi, ';'
+      ! write(1,'(F20.4 A1)',advance='no') total_time, ';'
+      ! write(1,'(F20.4 A1)',advance='no') ave_time_pp, ';'
+      write(1,'(F20.4 A1)',advance='no') ave_time_pi, ';'
       write(1,'(F20.4 A1)',advance='no') alltoall_comm_t, ';'
       write(1,'(F20.4 A1)',advance='no') ave_alltoall_comm_t, ';'
       write(1,'(F20.4 A1)',advance='no') ave_alltoall_median_comm_t, ';'
       write(1,'(F20.4 A1)',advance='no') ave_alltoall_max_comm_t, ';'
       write(1,'(F20.4 A1)',advance='no') ave_alltoall_min_comm_t, ';'
-      write(1,'(F10.2 A1)',advance='no')  request_create_t,  ';'
-      write(1,'(F10.2 A1)',advance='no')  ave_request_create_t, ';'
+      write(1,'(F10.2 A1)',advance='no') request_create_t,  ';'
+      write(1,'(F10.2 A1)',advance='no') ave_request_create_t, ';'
       write(1,'(F10.2 A1)',advance='no') ave_neighbors, ';'
 
       write(1,'(I5 A1)'  ,advance='no') min_neighbors, ';'
@@ -456,7 +476,7 @@ program psb_df_sample
       write(1,'(I7 A1)',advance='no')   max_snd, ';'
       write(1,'(I7 A1)',advance='no')   max_rcv, ';'
       write(1,'(I7 A1)',advance='no')   min_snd, ';'
-      write(1,'(I7 A1)',advance='no')   min_rcv, ';'
+      write(1,'(I7 A1)',advance='no')   min_rcv
 
       ! write(1,'(F9.2 A1)',advance='no') , ';'
       ! write(1,'(I5 A1)',advance='no') , ';'
