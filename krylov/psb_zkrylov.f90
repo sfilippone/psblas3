@@ -151,7 +151,7 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   procedure(psb_zkryl_rest_vect) :: psb_zrgmres_vect, psb_zcgstabl_vect, psb_zgcr_vect
   procedure(psb_zkryl_cond_vect) :: psb_zcg_vect, psb_zfcg_vect
 
-  
+  logical           :: do_alloc_wrk
   integer(psb_ipk_) :: ictxt,me,np,err_act, itrace_
   character(len=20)             :: name
 
@@ -171,6 +171,9 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   else
     itrace_ = -1
   end if
+
+  do_alloc_wrk = .not.prec%is_allocated_wrk()
+  if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v,desc=desc_a)
 
   select case(psb_toupper(method))
   case('CG') 
@@ -205,6 +208,8 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,istop=istop)
   end select
 
+  if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)
+  
   if(info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
