@@ -90,6 +90,7 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
+  logical            :: do_alloc_wrk
   character          :: trans_
   character(len=20)  :: name='s_bjac_prec_apply'
   character(len=20)  :: ch_err
@@ -154,55 +155,58 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
     goto 9999      
   end if
 
-  call psb_geasb(wv,desc_data,info,mold=x%v,scratch=.true.) 
-  call psb_geasb(wv1,desc_data,info,mold=x%v,scratch=.true.) 
+  do_alloc_wrk = .not.prec%is_allocated_wrk()
+  if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v)
 
-  select case(prec%iprcparm(psb_f_type_))
-  case(psb_f_ilu_n_) 
+  associate (wv => prec%wrk(1), wv1 => prec%wrk(2))
 
-    select case(trans_)
-    case('N')
-      call psb_spsm(sone,prec%av(psb_l_pr_),x,szero,wv,desc_data,info,&
-           & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_,work=aux)
-      if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),wv,&
-           & beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_, work=aux)
-
-    case('T')
-      call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
-           & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
-      if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
-           & beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
-
-    case('C')
-
-      call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_, work=aux)
-
-      call wv1%mlt(sone,prec%dv,wv,szero,info,conjgx=trans_)
-  
-      if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
-           & beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
-
-    end select
-    if (info /= psb_success_) then 
-      ch_err="psb_spsm"
+    select case(prec%iprcparm(psb_f_type_))
+    case(psb_f_ilu_n_) 
+      
+      select case(trans_)
+      case('N')
+        call psb_spsm(sone,prec%av(psb_l_pr_),x,szero,wv,desc_data,info,&
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_,work=aux)
+        if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),wv,&
+             & beta,y,desc_data,info,&
+             & trans=trans_,scale='U',choice=psb_none_, work=aux)
+        
+      case('T')
+        call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
+             & beta,y,desc_data,info,&
+             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+        
+      case('C')
+        
+        call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
+             & trans=trans_,scale='U',choice=psb_none_, work=aux)
+        
+        call wv1%mlt(sone,prec%dv,wv,szero,info,conjgx=trans_)
+        
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
+             & beta,y,desc_data,info,&
+             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+        
+      end select
+      if (info /= psb_success_) then 
+        ch_err="psb_spsm"
+        goto 9999
+      end if
+      
+      
+    case default
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Invalid factorization')
       goto 9999
-    end if
+    end select
 
-
-  case default
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Invalid factorization')
-    goto 9999
-  end select
-
+  end associate
+  
   call psb_halo(y,desc_data,info,data=psb_comm_mov_)
 
-  call wv%free(info)
-  call wv1%free(info)
+  if (do_alloc_wrk) call prec%free_wrk(info)
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 
     else

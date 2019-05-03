@@ -54,6 +54,9 @@ module psb_z_prec_type
     procedure, pass(prec)               :: build  => psb_zprecbld
     procedure, pass(prec)               :: init   => psb_zprecinit
     procedure, pass(prec)               :: descr  => psb_zfile_prec_descr
+    procedure, pass(prec)               :: allocate_wrk => psb_z_allocate_wrk
+    procedure, pass(prec)               :: free_wrk => psb_z_free_wrk
+    procedure, pass(prec)               :: is_allocated_wrk => psb_z_is_allocated_wrk
   end type psb_zprec_type
 
   interface psb_precfree
@@ -193,6 +196,90 @@ contains
     
   end subroutine psb_z_prec_dump
 
+  subroutine psb_z_allocate_wrk(prec,info,vmold,desc)
+    use psb_base_mod
+    implicit none
+    
+    ! Arguments
+    class(psb_zprec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+    class(psb_z_base_vect_type), intent(in), optional  :: vmold
+    type(psb_desc_type), intent(in), optional :: desc
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act
+    character(len=20)   :: name
+    
+    info=psb_success_
+    name = 'psb_z_allocate_wrk'
+    call psb_erractionsave(err_act)
+    
+    if (psb_get_errstatus().ne.0) goto 9999
+
+    if (.not.allocated(prec%prec)) then 
+      info = -1
+      write(psb_err_unit,*) 'Trying to dump a non-built preconditioner'
+      return
+    end if
+    
+    call prec%prec%allocate_wrk(info,vmold=vmold,desc=desc)
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 call psb_error_handler(err_act)
+    return
+    
+  end subroutine psb_z_allocate_wrk
+
+  subroutine psb_z_free_wrk(prec,info)
+    use psb_base_mod
+    implicit none
+    
+    ! Arguments
+    class(psb_zprec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act
+    character(len=20)   :: name
+    
+    info=psb_success_
+    name = 'psb_z_free_wrk'
+    call psb_erractionsave(err_act)
+    
+    if (psb_get_errstatus().ne.0) goto 9999
+
+    if (.not.allocated(prec%prec)) then 
+      info = -1
+      write(psb_err_unit,*) 'Trying to free a non-built preconditioner'
+      return
+    end if
+    
+    call prec%prec%free_wrk(info)
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 call psb_error_handler(err_act)
+    return
+    
+  end subroutine psb_z_free_wrk
+
+  function psb_z_is_allocated_wrk(prec) result(res)
+    implicit none
+    
+    ! Arguments
+    class(psb_zprec_type), intent(in) :: prec
+    logical :: res
+
+    if (.not.allocated(prec%prec)) then
+      res = .false.
+    else 
+      res = prec%prec%is_allocated_wrk()
+    end if
+    
+  end function psb_z_is_allocated_wrk
 
   subroutine psb_z_precfree(p,info)
     use psb_base_mod

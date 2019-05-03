@@ -61,6 +61,9 @@ module psb_c_base_prec_mod
     generic, public       :: build     => precbld
     generic, public       :: descr     => precdescr
     procedure, pass(prec) :: desc_prefix => psb_c_base_desc_prefix
+    procedure, pass(prec) :: allocate_wrk => psb_c_base_allocate_wrk
+    procedure, pass(prec) :: free_wrk     => psb_c_base_free_wrk
+    procedure, pass(prec) :: is_allocated_wrk => psb_c_base_is_allocated_wrk
     procedure(psb_c_base_precbld), pass(prec), deferred :: precbld    
     procedure(psb_c_base_sizeof), pass(prec), deferred :: sizeof     
     procedure(psb_c_base_precinit), pass(prec), deferred :: precinit   
@@ -258,6 +261,87 @@ contains
 
   end subroutine psb_c_base_precsetc
 
+  subroutine psb_c_base_allocate_wrk(prec,info,vmold,desc)
+    use psb_base_mod
+    implicit none
+    
+    ! Arguments
+    class(psb_c_base_prec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+    class(psb_c_base_vect_type), intent(in), optional  :: vmold
+    type(psb_desc_type), intent(in), optional :: desc
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act
+    character(len=20)   :: name
+    
+    info=psb_success_
+    name = 'psb_c_allocate_wrk'
+    call psb_erractionsave(err_act)
+    
+    if (psb_get_errstatus().ne.0) goto 9999
+
+    !
+    ! Base version does nothing.
+    !
+
+    info = psb_success_ 
+
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 call psb_error_handler(err_act)
+    return
+    
+  end subroutine psb_c_base_allocate_wrk
+
+  subroutine psb_c_base_free_wrk(prec,info)
+    use psb_base_mod
+    implicit none
+    
+    ! Arguments
+    class(psb_c_base_prec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act
+    character(len=20)   :: name
+    
+    info=psb_success_
+    name = 'psb_c_allocate_wrk'
+    call psb_erractionsave(err_act)
+    
+    if (psb_get_errstatus().ne.0) goto 9999
+
+    !
+    ! Base version does nothing.
+    !
+
+    info = psb_success_ 
+
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 call psb_error_handler(err_act)
+    return
+    
+  end subroutine psb_c_base_free_wrk
+
+  function psb_c_base_is_allocated_wrk(prec) result(res)
+    use psb_base_mod
+    implicit none
+    
+    ! Arguments
+    class(psb_c_base_prec_type), intent(in) :: prec
+    logical :: res
+
+    ! In the base version we can say yes, because 
+    ! there is nothing to allocate
+
+    res = .true.
+    
+  end function psb_c_base_is_allocated_wrk
+  
   subroutine psb_c_base_set_ctxt(prec,ictxt)
     implicit none 
     class(psb_c_base_prec_type), intent(inout) :: prec
