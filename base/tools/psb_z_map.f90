@@ -448,8 +448,21 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
     else
       info = psb_err_invalid_ovr_num_
     endif
-    ! For a general linear map ignore iaggr,naggr
-    allocate(this%iaggr(0), this%naggr(0), stat=info) 
+    ! If iaggr/naggr are present, copy them anyway.
+    if (present(iaggr)) then 
+      if (.not.present(naggr)) then 
+        info = 7
+      else
+        allocate(this%iaggr(size(iaggr)),&
+             & this%naggr(size(naggr)), stat=info) 
+        if (info == psb_success_) then 
+          this%iaggr(:) = iaggr(:)
+          this%naggr(:) = naggr(:)
+        end if
+      end if
+    else
+      allocate(this%iaggr(0), this%naggr(0), stat=info) 
+    end if
 
   case default
     write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
