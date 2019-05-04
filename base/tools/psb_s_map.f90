@@ -183,7 +183,7 @@ subroutine psb_s_map_X2Y_vect(alpha,x,beta,y,map,info,work,vtx,vty)
       ptx => xt
       pty => yt
     end if
-    
+
     call psb_geaxpby(sone,x,szero,ptx,map%desc_X,info)
     if (info == psb_success_) call psb_halo(ptx,map%desc_X,info,work=work)
     if (info == psb_success_) call psb_csmm(sone,map%map_X2Y,ptx,szero,pty,info)
@@ -364,7 +364,7 @@ subroutine psb_s_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
       pty => yt
     end if
 
-    call psb_geaxpby(sone,x,szero,ptx,map%desc_X,info)
+    call psb_geaxpby(sone,x,szero,ptx,map%desc_Y,info)
 
     if (info == psb_success_) call psb_halo(ptx,map%desc_Y,info,work=work)
     if (info == psb_success_) call psb_csmm(sone,map%map_Y2X,ptx,szero,pty,info)
@@ -439,17 +439,30 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
   case(psb_map_gen_linear_)    
     
     if (desc_X%is_ok()) then 
-      call psb_cdcpy(desc_X, this%desc_X,info) 
+      call desc_X%clone(this%desc_X,info) 
     else
       info = psb_err_pivot_too_small_
     endif
     if (desc_Y%is_ok()) then 
-      call psb_cdcpy(desc_Y, this%desc_Y,info) 
+      call desc_Y%clone(this%desc_Y,info) 
     else
       info = psb_err_invalid_ovr_num_
     endif
-    ! For a general linear map ignore iaggr,naggr
-    allocate(this%iaggr(0), this%naggr(0), stat=info) 
+    ! If iaggr/naggr are present, copy them anyway.
+    if (present(iaggr)) then 
+      if (.not.present(naggr)) then 
+        info = 7
+      else
+        allocate(this%iaggr(size(iaggr)),&
+             & this%naggr(size(naggr)), stat=info) 
+        if (info == psb_success_) then 
+          this%iaggr(:) = iaggr(:)
+          this%naggr(:) = naggr(:)
+        end if
+      end if
+    else
+      allocate(this%iaggr(0), this%naggr(0), stat=info) 
+    end if
 
   case default
     write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
