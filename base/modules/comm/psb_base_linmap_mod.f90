@@ -33,7 +33,8 @@
 !
 ! package: psb_linmap_type_mod
 !    Defines data types for mapping between vectors belonging
-!    to different spaces.
+!    to different spaces U and V.
+!    As used in MLD2P4, U is the fine space and V is the coarse space.
 !
 module psb_base_linmap_mod
   use psb_const_mod
@@ -43,8 +44,8 @@ module psb_base_linmap_mod
   type psb_base_linmap_type
     integer(psb_ipk_) :: kind
     integer(psb_lpk_), allocatable  :: iaggr(:), naggr(:)
-    type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
-    type(psb_desc_type)   :: desc_X, desc_Y
+    type(psb_desc_type), pointer :: p_desc_U=>null(), p_desc_V=>null()
+    type(psb_desc_type)   :: desc_U, desc_V
   contains
     procedure, pass(map)  :: sizeof   => base_map_sizeof
     procedure, pass(map)  :: is_ok    => base_is_ok
@@ -93,11 +94,11 @@ contains
 
     select case(map%get_kind())
     case (psb_map_aggr_)
-      if (.not.associated(map%p_desc_X)) return
-      if (.not.associated(map%p_desc_Y)) return
-      res = map%p_desc_X%is_ok().and.map%p_desc_Y%is_ok()    
+      if (.not.associated(map%p_desc_U)) return
+      if (.not.associated(map%p_desc_V)) return
+      res = map%p_desc_U%is_ok().and.map%p_desc_V%is_ok()    
     case(psb_map_gen_linear_)    
-      res = map%desc_X%is_ok().and.map%desc_Y%is_ok()    
+      res = map%desc_U%is_ok().and.map%desc_V%is_ok()    
     end select
 
   end function base_is_ok
@@ -111,11 +112,11 @@ contains
 
     select case(map%get_kind())
     case (psb_map_aggr_)
-      if (.not.associated(map%p_desc_X)) return
-      if (.not.associated(map%p_desc_Y)) return
-      res = map%p_desc_X%is_asb().and.map%p_desc_Y%is_asb()    
+      if (.not.associated(map%p_desc_U)) return
+      if (.not.associated(map%p_desc_V)) return
+      res = map%p_desc_U%is_asb().and.map%p_desc_V%is_asb()    
     case(psb_map_gen_linear_)    
-      res = map%desc_X%is_asb().and.map%desc_Y%is_asb()    
+      res = map%desc_U%is_asb().and.map%desc_V%is_asb()    
     end select
 
   end function base_is_asb
@@ -131,8 +132,8 @@ contains
          & val = val + psb_sizeof_lp*size(map%iaggr)
     if (allocated(map%naggr))   &
          & val = val + psb_sizeof_lp*size(map%naggr)
-    val = val + map%desc_X%sizeof()
-    val = val + map%desc_Y%sizeof()
+    val = val + map%desc_U%sizeof()
+    val = val + map%desc_V%sizeof()
 
   end function base_map_sizeof
   
@@ -147,12 +148,12 @@ contains
     mapout%kind = mapin%kind
     call psb_move_alloc(mapin%iaggr,mapout%iaggr,info)
     call psb_move_alloc(mapin%naggr,mapout%naggr,info)
-    mapout%p_desc_X => mapin%p_desc_X 
-    mapin%p_desc_X  => null()
-    mapout%p_desc_Y => mapin%p_desc_Y
-    mapin%p_desc_Y  => null()
-    call psb_move_alloc(mapin%desc_X,mapout%desc_X,info)
-    call psb_move_alloc(mapin%desc_Y,mapout%desc_Y,info)
+    mapout%p_desc_U => mapin%p_desc_U 
+    mapin%p_desc_U  => null()
+    mapout%p_desc_V => mapin%p_desc_V
+    mapin%p_desc_V  => null()
+    call psb_move_alloc(mapin%desc_U,mapout%desc_U,info)
+    call psb_move_alloc(mapin%desc_V,mapout%desc_V,info)
 
   end subroutine psb_base_linmap_transfer
 
@@ -169,10 +170,10 @@ contains
     mapout%kind = map%kind
     call psb_safe_ab_cpy(map%iaggr,mapout%iaggr,info)
     call psb_safe_ab_cpy(map%naggr,mapout%naggr,info)
-    mapout%p_desc_X => map%p_desc_X 
-    mapout%p_desc_Y => map%p_desc_Y
-    call map%desc_X%clone(mapout%desc_X,info)
-    call map%desc_Y%clone(mapout%desc_Y,info)
+    mapout%p_desc_U => map%p_desc_U 
+    mapout%p_desc_V => map%p_desc_V
+    call map%desc_U%clone(mapout%desc_U,info)
+    call map%desc_V%clone(mapout%desc_V,info)
 
   end subroutine base_clone
 
@@ -186,10 +187,10 @@ contains
          & deallocate(map%iaggr,stat=info)
     if (allocated(map%naggr)) &
          & deallocate(map%naggr,stat=info)
-    map%p_desc_X  => null()
-    map%p_desc_Y  => null()
-    if (map%desc_X%is_ok()) call map%desc_X%free(info)
-    if (map%desc_Y%is_ok()) call map%desc_Y%free(info)
+    map%p_desc_U  => null()
+    map%p_desc_V  => null()
+    if (map%desc_U%is_ok()) call map%desc_U%free(info)
+    if (map%desc_V%is_ok()) call map%desc_V%free(info)
 
   end subroutine base_free
   

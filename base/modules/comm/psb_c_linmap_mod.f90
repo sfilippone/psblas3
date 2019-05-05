@@ -44,8 +44,16 @@ module psb_c_linmap_mod
 
 
   type, extends(psb_base_linmap_type) ::  psb_clinmap_type 
-    type(psb_cspmat_type) :: map_X2Y, map_Y2X
+    type(psb_cspmat_type) :: mat_U2V, mat_V2U
   contains
+    procedure, pass(map) :: map_U2V_a  => psb_c_map_U2V_a
+    procedure, pass(map) :: map_U2V_v  => psb_c_map_U2V_v
+    generic, public      :: map_U2V => map_U2V_a, map_U2V_v
+
+    procedure, pass(map) :: map_V2U_a  => psb_c_map_V2U_a
+    procedure, pass(map) :: map_V2U_v  => psb_c_map_V2U_v
+    generic, public      :: map_V2U => map_V2U_a, map_V2U_v
+    
     procedure, pass(map) :: sizeof   => c_map_sizeof
     procedure, pass(map) :: is_asb   => c_is_asb
     procedure, pass(map) :: free     => c_free
@@ -54,52 +62,52 @@ module psb_c_linmap_mod
   end type psb_clinmap_type
 
 
-  interface psb_map_X2Y
-    subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
+  interface psb_map_U2V
+    subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
       import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
-      type(psb_clinmap_type), intent(in) :: map
+      class(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
       complex(psb_spk_), intent(inout)  :: x(:)
       complex(psb_spk_), intent(out)    :: y(:)
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
-    end subroutine psb_c_map_X2Y
-    subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work,vtx,vty)
+    end subroutine psb_c_map_U2V_a
+    subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
       use psb_c_vect_mod, only : psb_c_vect_type
       import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
-      type(psb_clinmap_type), intent(in) :: map
+      class(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
       type(psb_c_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
       type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
-    end subroutine psb_c_map_X2Y_vect
+    end subroutine psb_c_map_U2V_v
   end interface
 
-  interface psb_map_Y2X
-    subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
+  interface psb_map_V2U
+    subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
       import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
-      type(psb_clinmap_type), intent(in) :: map
+      class(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
       complex(psb_spk_), intent(inout)  :: x(:)
       complex(psb_spk_), intent(out)    :: y(:)
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
-    end subroutine psb_c_map_Y2X
-    subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
+    end subroutine psb_c_map_V2U_a
+    subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
       use psb_c_vect_mod, only : psb_c_vect_type
       import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
-      type(psb_clinmap_type), intent(in) :: map
+      class(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
       type(psb_c_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
       type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
-    end subroutine psb_c_map_Y2X_vect
+    end subroutine psb_c_map_V2U_v
   end interface
 
 
@@ -116,13 +124,13 @@ module psb_c_linmap_mod
   end interface
 
   interface psb_linmap
-    function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
+    function psb_c_linmap(map_kind,desc_U, desc_V, mat_U2V, mat_V2U,iaggr,naggr)
       use psb_c_mat_mod, only : psb_cspmat_type
       import :: psb_ipk_, psb_clinmap_type, psb_desc_type, psb_lpk_
       implicit none 
       type(psb_clinmap_type)                  :: psb_c_linmap    
-      type(psb_desc_type), target             :: desc_X, desc_Y
-      type(psb_cspmat_type), intent(inout)    :: map_X2Y, map_Y2X
+      type(psb_desc_type), target             :: desc_U, desc_V
+      type(psb_cspmat_type), intent(inout)    :: mat_U2V, mat_V2U
       integer(psb_ipk_), intent(in)           :: map_kind
       integer(psb_lpk_), intent(in), optional :: iaggr(:), naggr(:)
     end function psb_c_linmap
@@ -142,8 +150,8 @@ contains
     integer(psb_epk_) :: val
 
     val = map%psb_base_linmap_type%sizeof()
-    val = val + map%map_X2Y%sizeof()
-    val = val + map%map_Y2X%sizeof()
+    val = val + map%mat_U2V%sizeof()
+    val = val + map%mat_V2U%sizeof()
 
   end function c_map_sizeof
 
@@ -154,7 +162,7 @@ contains
     logical  :: val
 
     val = map%psb_base_linmap_type%is_asb() .and. &
-         & map%map_X2Y%is_asb() .and.map%map_Y2X%is_asb() 
+         & map%mat_U2V%is_asb() .and.map%mat_V2U%is_asb() 
     
   end function c_is_asb
 
@@ -167,26 +175,27 @@ contains
     class(psb_c_base_sparse_mat), intent(in), optional :: mold
     class(psb_i_base_vect_type), intent(in), optional  :: imold
 
-    if (map%map_X2Y%is_asb())&
-         & call map%map_X2Y%cscnv(info,type=type,mold=mold)
-    if (info == psb_success_ .and.map%map_Y2X%is_asb())&
-         & call map%map_Y2X%cscnv(info,type=type,mold=mold)
+    if (map%mat_U2V%is_asb())&
+         & call map%mat_U2V%cscnv(info,type=type,mold=mold)
+    if (info == psb_success_ .and.map%mat_V2U%is_asb())&
+         & call map%mat_V2U%cscnv(info,type=type,mold=mold)
     if (present(imold)) then 
-      call map%desc_X%cnv(mold=imold)
-      call map%desc_Y%cnv(mold=imold)
+      call map%desc_U%cnv(mold=imold)
+      call map%desc_V%cnv(mold=imold)
     end if
 
   end subroutine psb_c_map_cscnv
 
-  subroutine psb_c_linmap_sub(out_map,map_kind,desc_X, desc_Y,&
-       & map_X2Y, map_Y2X,iaggr,naggr)
+  subroutine psb_c_linmap_sub(out_map,map_kind,desc_U, desc_V,&
+       & mat_U2V, mat_V2U,iaggr,naggr)
+    use psb_c_mat_mod
     implicit none 
     type(psb_clinmap_type), intent(out)     :: out_map    
-    type(psb_desc_type), target             :: desc_X, desc_Y
-    type(psb_cspmat_type), intent(inout)    :: map_X2Y, map_Y2X
+    type(psb_desc_type), target             :: desc_U, desc_V
+    type(psb_cspmat_type), intent(inout)    :: mat_U2V, mat_V2U
     integer(psb_ipk_), intent(in)           :: map_kind
     integer(psb_lpk_), intent(in), optional :: iaggr(:), naggr(:)
-    out_map = psb_linmap(map_kind,desc_X,desc_Y,map_X2Y,map_Y2X,iaggr,naggr)
+    out_map = psb_linmap(map_kind,desc_U,desc_V,mat_U2V,mat_V2U,iaggr,naggr)
   end subroutine psb_c_linmap_sub
 
   subroutine  psb_clinmap_transfer(mapin,mapout,info)
@@ -197,8 +206,8 @@ contains
     
     call psb_move_alloc(mapin%psb_base_linmap_type, &
          & mapout%psb_base_linmap_type,info)
-    call psb_move_alloc(mapin%map_X2Y,mapout%map_X2Y,info)
-    call psb_move_alloc(mapin%map_Y2X,mapout%map_Y2X,info)
+    call psb_move_alloc(mapin%mat_U2V,mapout%mat_U2V,info)
+    call psb_move_alloc(mapin%mat_V2U,mapout%mat_V2U,info)
 
   end subroutine psb_clinmap_transfer
 
@@ -209,8 +218,8 @@ contains
     
     call map%psb_base_linmap_type%free(info)
     
-    call map%map_X2Y%free()
-    call map%map_Y2X%free()
+    call map%mat_U2V%free()
+    call map%mat_V2U%free()
 
   end subroutine c_free
   
@@ -232,8 +241,8 @@ contains
       ! Base clone!    
       if (info == 0) call &
            & map%psb_base_linmap_type%clone(mout%psb_base_linmap_type,info)
-      if (info == 0) call map%map_X2Y%clone(mout%map_X2Y,info)
-      if (info == 0) call map%map_Y2X%clone(mout%map_Y2X,info)
+      if (info == 0) call map%mat_U2V%clone(mout%mat_U2V,info)
+      if (info == 0) call map%mat_V2U%clone(mout%mat_V2U,info)
     class default
       info = psb_err_invalid_dynamic_type_
       info = psb_err_missing_override_method_
