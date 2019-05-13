@@ -15,51 +15,69 @@ def p(data, width=14):
 filename = 'cz308.output'
 filename = 'withmpi-cz40948.output'
 filename = 'tokam_id_16p.output'
+filename = 'tokam_id_all_comm_methods.output'
+filename = '../../unitcube/results/unitcube128.output'
 
 f = pd.read_csv(filename, sep=';')
 
-swap_di = {8:'psblas', 16:'persistent' , 32: 'nonpersistent'}
+swap_di = {8:'isend/irecv', 16:'persistent', 32:'alltoallv', 64:'ialltoallv'}
 f['swap_mode'].replace(swap_di, inplace=True)
 
 
 q = f[['num_iterations','swap_mode','ave_halo_t_pi']]
-q_nonb_p2p = q[q.swap_mode=='psblas']
-q_per_nonb_col = q[q.swap_mode=='persistent']
-q_nonper_nonb_col = q[q.swap_mode=='nonpersistent']
+ni = 100
+q_isend_irecv = q[(q.swap_mode=='isend/irecv') & (q.num_iterations > ni)]
+q_persistent  = q[(q.swap_mode=='persistent')  & (q.num_iterations > ni)]
+q_alltoallv   = q[(q.swap_mode=='alltoallv')   & (q.num_iterations > ni)]
+q_ialltoallv  = q[(q.swap_mode=='ialltoallv')  & (q.num_iterations > ni)]
 
-nonb_p2p_marker        = 'g+-'
-per_nonb_col_marker    = 'rs-'
-nonper_nonb_col_marker = 'bx-'
+isend_irecv_marker    = 'gs-'
+persistent_col_marker = 'mo-'
+alltoallv_marker      = 'b+-'
+ialltoallv_marker     = 'rx-'
+
+isend_irecv_label     = 'Isend/Irecv'
+persistent_col_label  = 'Persistent Neighbor_alltoallv'
+alltoallv_label       = 'Neighbor_alltoallv'
+ialltoallv_label      = 'Ineighbor_alltoallv'
+
+
 
 x_axis_label = 'Number of Halo Communications'
 y_axis_label = 'Time per iteration (microseconds)'
-ave_halo_title     = "Average Halo Time per Communication (1-3000)"
+ave_halo_title     = "Average Halo Time per Communication (200-3000)"
 ave_halo_title_100 = "Average Halo Time per Communication (1-100)"
 
+y_axis_min = 700
 
 # the whole scale
 plt.figure()
-plt.plot(q_nonb_p2p.num_iterations, q_nonb_p2p.ave_halo_t_pi, nonb_p2p_marker, label='Non-blocking Point-to-Point')
-plt.plot(q_per_nonb_col.num_iterations, q_per_nonb_col.ave_halo_t_pi, per_nonb_col_marker, label='Persistent Non-blocking Collective')
-plt.plot(q_nonper_nonb_col.num_iterations, q_nonper_nonb_col.ave_halo_t_pi, nonper_nonb_col_marker, label='Non-persistent Non-Blocking Collective')
+plt.plot(q_isend_irecv.num_iterations, q_isend_irecv.ave_halo_t_pi, isend_irecv_marker, label=isend_irecv_label)
+plt.plot(q_persistent.num_iterations, q_persistent.ave_halo_t_pi, persistent_col_marker, label=persistent_col_label)
+plt.plot(q_alltoallv.num_iterations, q_alltoallv.ave_halo_t_pi, alltoallv_marker, label=alltoallv_label)
+plt.plot(q_ialltoallv.num_iterations, q_ialltoallv.ave_halo_t_pi, ialltoallv_marker, label=ialltoallv_label)
 plt.legend()
 plt.title(ave_halo_title)
 plt.xlabel(x_axis_label)
 plt.ylabel(y_axis_label)
+plt.axis(ymin=y_axis_min, ymax=1000)
 
 # iterations below
 ni = 101
-q_nonb_p2p = q[(q.swap_mode=='psblas') & (q.num_iterations < ni)]
-q_per_nonb_col = q[(q.swap_mode=='persistent') & (q.num_iterations < ni)]
-q_nonper_nonb_col = q[(q.swap_mode=='nonpersistent') & (q.num_iterations < ni)]
+q_isend_irecv = q[(q.swap_mode=='isend/irecv') & (q.num_iterations < ni)]
+q_persistent  = q[(q.swap_mode=='persistent')  & (q.num_iterations < ni)]
+q_alltoallv   = q[(q.swap_mode=='alltoallv')   & (q.num_iterations < ni)]
+q_ialltoallv  = q[(q.swap_mode=='ialltoallv')  & (q.num_iterations < ni)]
 plt.figure()
-plt.plot(q_nonb_p2p.num_iterations, q_nonb_p2p.ave_halo_t_pi, nonb_p2p_marker, label='Non-blocking Point-to-Point')
-plt.plot(q_per_nonb_col.num_iterations, q_per_nonb_col.ave_halo_t_pi, per_nonb_col_marker, label='Persistent Non-blocking Collective')
-plt.plot(q_nonper_nonb_col.num_iterations, q_nonper_nonb_col.ave_halo_t_pi, nonper_nonb_col_marker, label='Non-persistent Non-Blocking Collective')
+plt.plot(q_isend_irecv.num_iterations, q_isend_irecv.ave_halo_t_pi, isend_irecv_marker, label=isend_irecv_label)
+plt.plot(q_persistent.num_iterations, q_persistent.ave_halo_t_pi, persistent_col_marker, label=persistent_col_label)
+plt.plot(q_alltoallv.num_iterations, q_alltoallv.ave_halo_t_pi, alltoallv_marker, label=alltoallv_label)
+plt.plot(q_ialltoallv.num_iterations, q_ialltoallv.ave_halo_t_pi, ialltoallv_marker, label=ialltoallv_label)
 plt.legend()
 plt.title(ave_halo_title_100)
 plt.xlabel(x_axis_label)
 plt.ylabel(y_axis_label)
+plt.axis(ymin=y_axis_min)
 
 plt.show()
 
