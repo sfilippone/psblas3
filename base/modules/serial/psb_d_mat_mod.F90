@@ -194,6 +194,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: cscnv_base  => psb_d_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
     procedure, pass(a) :: clone       => psb_dspmat_clone
+    procedure, pass(a) :: move_alloc  => psb_dspmat_type_move
     !
     ! To/from ld
     !
@@ -370,6 +371,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: cscnv_base  => psb_ld_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
     procedure, pass(a) :: clone       => psb_ldspmat_clone
+    procedure, pass(a) :: move_alloc  => psb_ldspmat_type_move
     !
     ! To/from d
     !
