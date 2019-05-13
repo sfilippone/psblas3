@@ -182,6 +182,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: cscnv_base  => psb_d_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
     procedure, pass(a) :: clone       => psb_dspmat_clone
+    procedure, pass(a) :: move_alloc  => psb_dspmat_type_move
 
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_d_get_diag
