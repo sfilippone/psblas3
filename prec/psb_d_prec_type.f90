@@ -218,7 +218,7 @@ contains
 
     if (.not.allocated(prec%prec)) then 
       info = -1
-      write(psb_err_unit,*) 'Trying to dump a non-built preconditioner'
+      write(psb_err_unit,*) 'Trying to allocate wrk to a non-built preconditioner'
       return
     end if
     
@@ -288,10 +288,12 @@ contains
     integer(psb_ipk_), intent(out)                :: info
     integer(psb_ipk_) :: me, err_act,i
     character(len=20)   :: name
-    if(psb_get_errstatus() /= 0) return 
     info=psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
+    if (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;      goto 9999
+    end if
 
     me=-1
     call p%free(info)
@@ -313,10 +315,12 @@ contains
     integer(psb_ipk_), intent(out)         :: info
     integer(psb_ipk_) :: me, err_act,i
     character(len=20)   :: name
-    if(psb_get_errstatus() /= 0) return 
     info=psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
+    if (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;      goto 9999
+    end if
 
     me=-1
 
