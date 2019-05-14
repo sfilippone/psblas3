@@ -148,9 +148,9 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & ': Calling desccpy'
+       & ': Cloning input desc'
 
-  call psb_cdcpy(desc_a,desc_ov,info)
+  call desc_a%clone(desc_ov,info)
 
   if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_
@@ -176,8 +176,10 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     ! so far: LIST or HASH. Encapsulate choice
     ! in a separate method.
     call psb_cd_switch_ovl_indxmap(desc_ov,info) 
+    if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
+  else
+    call psb_cd_set_bld(desc_ov,info)
   end if
-  if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
   if (info /= 0) goto 9999
 
   If (debug_level >= psb_debug_outer_)then 
@@ -262,13 +264,13 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         call psb_errpush(info,name,a_err='psb_ensure_size')
         goto 9999
       end if
-      orig_ovr(cntov_o)=proc
-      orig_ovr(cntov_o+1)=1
-      orig_ovr(cntov_o+2)=idx
-      orig_ovr(cntov_o+3)=-1
+      orig_ovr(cntov_o)   = proc
+      orig_ovr(cntov_o+1) = 1
+      orig_ovr(cntov_o+2) = idx
+      orig_ovr(cntov_o+3) = -1
       cntov_o=cntov_o+3
     end Do
-    counter=counter+n_elem_recv+n_elem_send+3
+    counter = counter+n_elem_recv+n_elem_send+3
   end Do
 
 
@@ -319,16 +321,16 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     n_col_prev = desc_ov%get_local_cols() 
 
     Do While (halo(counter) /= -1)
-      tot_elem=0
-      proc=halo(counter+psb_proc_id_)
-      n_elem_recv=halo(counter+psb_n_elem_recv_)
-      n_elem_send=halo(counter+n_elem_recv+psb_n_elem_send_)
+      tot_elem    = 0
+      proc        = halo(counter+psb_proc_id_)
+      n_elem_recv = halo(counter+psb_n_elem_recv_)
+      n_elem_send = halo(counter+n_elem_recv+psb_n_elem_send_)
       If ((counter+n_elem_recv+n_elem_send) > Size(halo)) then
         info = -1
         call psb_errpush(info,name)
         goto 9999
       end If
-      tot_recv=tot_recv+n_elem_recv
+      tot_recv = tot_recv+n_elem_recv
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
            &  ': tot_recv:',proc,n_elem_recv,tot_recv
@@ -407,6 +409,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         !
         If (i_ovr <= (novr)) Then
           call a%csget(idx,idx,n_elem,irow,icol,info)
+
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='csget')
@@ -640,7 +643,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       goto 9999
     end if
     orig_ovr(cntov_o:cntov_o+counter_o-1) = tmp_ovr_idx(1:counter_o)
-    cntov_o = cntov_o+counter_o-1
+    cntov_o            = cntov_o+counter_o-1
     orig_ovr(cntov_o:) = -1
     call psb_move_alloc(orig_ovr,desc_ov%ovrlap_index,info)
     deallocate(tmp_ovr_idx,stat=info)
