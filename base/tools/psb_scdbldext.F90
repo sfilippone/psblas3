@@ -152,7 +152,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
        & write(debug_unit,*) me,' ',trim(name),&
        & ': Calling desccpy'
 
-  call psb_cdcpy(desc_a,desc_ov,info)
+  call desc_a%clone(desc_ov,info)
 
   if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_
@@ -178,8 +178,10 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
     ! so far: LIST or HASH. Encapsulate choice
     ! in a separate method.
     call psb_cd_switch_ovl_indxmap(desc_ov,info) 
+    if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
+  else
+    call psb_cd_set_bld(desc_ov,info)
   end if
-  if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
   if (info /= 0) goto 9999
 
   If (debug_level >= psb_debug_outer_)then 
