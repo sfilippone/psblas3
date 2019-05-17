@@ -1030,6 +1030,7 @@ contains
     name = 'psb_cdcpy'
 
     if (desc%is_valid()) then 
+      call desc_out%free(info)
       ictxt = desc%get_context()
 
       ! check on blacs grid 
