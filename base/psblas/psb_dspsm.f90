@@ -222,9 +222,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldx,ix,ijx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,lik,lldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
   if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldy,iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lik,lldy,iy,ijy,desc_a,info,iiy,jjy,check_halo=.true.)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -484,9 +484,9 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldx,ix,jx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,lik,lldx,ix,jx,desc_a,info,iix,jjx,check_halo=.true.)
   if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldy,iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lik,lldy,iy,jy,desc_a,info,iiy,jjy,check_halo=.true.)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
