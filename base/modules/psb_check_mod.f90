@@ -66,7 +66,7 @@ contains
   !  info     - integer.               Return code
   !  iix      - integer(optional).     The local rows starting index of the submatrix.
   !  jjx      - integer(optional).     The local columns starting index of the submatrix.
-  subroutine psb_chkvect( m, n, lldx, ix, jx, desc_dec, info, iix, jjx)
+  subroutine psb_chkvect( m, n, lldx, ix, jx, desc_dec, info, iix, jjx, check_halo)
     use psb_desc_mod
     use psb_const_mod
     use psb_error_mod
@@ -76,17 +76,30 @@ contains
     type(psb_desc_type), intent(in)    ::  desc_dec
     integer(psb_ipk_), intent(out)   ::  info
     integer(psb_ipk_), optional      ::  iix, jjx
+    logical, optional                :: check_halo
 
     !  locals
     integer(psb_ipk_) :: err_act, int_err(5)
+    integer(psb_ipk_) :: nrl, ncl
+    integer(psb_ipk_) :: nrg, ncg 
     character(len=20) :: name
+    logical           :: check_halo_
 
     if(psb_get_errstatus() /= 0) return 
     info=psb_success_
     name='psb_chkvect'
     call psb_erractionsave(err_act)
-
-
+    if (present(check_halo)) then
+      check_halo_ = check_halo
+    else
+      check_halo_ = .false.
+    end if
+    
+    nrl = desc_dec%get_local_rows()
+    ncl = desc_dec%get_local_cols()
+    nrg = desc_dec%get_global_rows()
+    ncg = desc_dec%get_global_cols()
+     
     if (m < 0) then
        info=psb_err_iarg_neg_
        int_err(1) = 1
@@ -100,54 +113,67 @@ contains
        int_err(1) = 4
        int_err(2) = ix
     else if ((jx < 1) .and. (n /= 0)) then
-       info=psb_err_iarg_pos_
-       int_err(1) = 5
-       int_err(2) = jx
-    else if (desc_dec%get_local_cols() < 0) then
-       info=psb_err_iarg_invalid_i_
-       int_err(1) = 6
-       int_err(2) = psb_n_col_ 
-       int_err(3) = desc_dec%get_local_cols()
-    else if (desc_dec%get_local_rows() < 0) then
-       info=psb_err_iarg_invalid_i_
-       int_err(1) = 6
-       int_err(2) = psb_n_row_ 
-       int_err(3) = desc_dec%get_local_cols()
-    else if (lldx < desc_dec%get_local_cols()) then
-       info=psb_err_iarg_not_gtia_ii_
-       int_err(1) = 3
-       int_err(2) = lldx
-       int_err(3) = 6
-       int_err(4) = psb_n_col_
-       int_err(5) = desc_dec%get_local_cols()
-    else if (desc_dec%get_global_cols() < m) then
-       info=psb_err_iarg_not_gteia_ii_
-       int_err(1) = 1
-       int_err(2) = m
-       int_err(3) = 6
-       int_err(4) = psb_n_
-       int_err(5) = desc_dec%get_global_cols()
-    else if (desc_dec%get_global_cols() < ix) then
-       info=psb_err_iarg_not_gteia_ii_
-       int_err(1) = 4
-       int_err(2) = ix
-       int_err(3) = 6
-       int_err(4) = psb_n_
-       int_err(5) = desc_dec%get_global_cols()
-    else if (desc_dec%get_global_rows() < jx) then
-       info=psb_err_iarg_not_gteia_ii_
-       int_err(1) = 5
-       int_err(2) = jx
-       int_err(3) = 6
-       int_err(4) = psb_m_
-       int_err(5) = desc_dec%get_global_rows()
-    else if (desc_dec%get_global_cols() < (ix+m-1)) then
-       info=psb_err_iarg2_neg_
-       int_err(1) = 1
-       int_err(2) = m
-       int_err(3) = 4
-       int_err(4) = ix
-    end if
+      info=psb_err_iarg_pos_
+      int_err(1) = 5
+      int_err(2) = jx
+    else if (ncl < 0) then
+      info=psb_err_iarg_invalid_i_
+      int_err(1) = 6
+      int_err(2) = psb_n_col_ 
+      int_err(3) = ncl
+    else if (nrl < 0) then
+      info=psb_err_iarg_invalid_i_
+      int_err(1) = 6
+      int_err(2) = psb_n_row_ 
+      int_err(3) = nrl
+    else if (ncg < m) then
+      info=psb_err_iarg_not_gteia_ii_
+      int_err(1) = 1
+      int_err(2) = m
+      int_err(3) = 6
+      int_err(4) = psb_n_
+      int_err(5) = ncg
+    else if (ncg < ix) then
+      info=psb_err_iarg_not_gteia_ii_
+      int_err(1) = 4
+      int_err(2) = ix
+      int_err(3) = 6
+      int_err(4) = psb_n_
+      int_err(5) = ncg
+    else if (nrg < jx) then
+      info=psb_err_iarg_not_gteia_ii_
+      int_err(1) = 5
+      int_err(2) = jx
+      int_err(3) = 6
+      int_err(4) = psb_m_
+      int_err(5) = nrg
+    else if (ncg < (ix+m-1)) then
+      info=psb_err_iarg2_neg_
+      int_err(1) = 1
+      int_err(2) = m
+      int_err(3) = 4
+      int_err(4) = ix
+    else
+      if (check_halo_) then
+        if (lldx < ncl) then
+          info=psb_err_iarg_not_gtia_ii_
+          int_err(1) = 3
+          int_err(2) = lldx
+          int_err(3) = 6
+          int_err(4) = psb_n_col_
+          int_err(5) = ncl
+        end if
+      else
+        if (lldx < nrl) then
+          info=psb_err_iarg_not_gtia_ii_
+          int_err(1) = 3
+          int_err(2) = lldx
+          int_err(3) = 6
+          int_err(4) = psb_n_row_
+          int_err(5) = nrl
+        end if
+      end if
+     end if
 
     if (info /= psb_success_) then
        call psb_errpush(info,name,i_err=int_err)
@@ -199,6 +225,8 @@ contains
 
     !  locals
     integer(psb_ipk_) :: err_act, int_err(5)
+    integer(psb_ipk_) :: nrl, ncl
+    integer(psb_ipk_) :: nrg, ncg 
     character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
@@ -206,6 +234,11 @@ contains
     name='psb_chkglobvect'
     call psb_erractionsave(err_act)
 
+    
+    nrl = desc_dec%get_local_rows()
+    ncl = desc_dec%get_local_cols()
+    nrg = desc_dec%get_global_rows()
+    ncg = desc_dec%get_global_cols()
 
     if (m < 0) then
        info=psb_err_iarg_neg_
@@ -223,45 +256,45 @@ contains
        info=psb_err_iarg_pos_
        int_err(1) = 5
        int_err(2) = jx
-    else if (desc_dec%get_local_cols() < 0) then
+    else if (ncl < 0) then
        info=psb_err_iarg_invalid_i_
        int_err(1) = 6
        int_err(2) = psb_n_col_ 
-       int_err(3) = desc_dec%get_local_cols()
-    else if (desc_dec%get_local_rows() < 0) then
+       int_err(3) = ncl
+    else if (nrl < 0) then
        info=psb_err_iarg_invalid_i_
        int_err(1) = 6
        int_err(2) = psb_n_row_ 
-       int_err(3) = desc_dec%get_local_rows()
-    else if (lldx < desc_dec%get_global_rows()) then
+       int_err(3) = nrl
+    else if (lldx < nrg) then
        info=psb_err_iarg_not_gtia_ii_
        int_err(1) = 3
        int_err(2) = lldx
        int_err(3) = 6
        int_err(4) = psb_n_col_
-       int_err(5) = desc_dec%get_global_rows()
-    else if (desc_dec%get_global_cols() < m) then
+       int_err(5) = nrg
+    else if (ncg < m) then
        info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 1
        int_err(2) = m
        int_err(3) = 6
        int_err(4) = psb_n_
-       int_err(5) = desc_dec%get_global_cols()
-    else if (desc_dec%get_global_cols() < ix) then
+       int_err(5) = ncg
+    else if (ncg < ix) then
        info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 4
        int_err(2) = ix
        int_err(3) = 6
        int_err(4) = psb_n_
-       int_err(5) = desc_dec%get_global_cols()
-    else if (desc_dec%get_global_rows() < jx) then
+       int_err(5) = ncg
+    else if (nrg < jx) then
        info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 5
        int_err(2) = jx
        int_err(3) = 6
        int_err(4) = psb_m_
-       int_err(5) = desc_dec%get_global_rows()
-    else if (desc_dec%get_global_cols() < (ix+m-1)) then
+       int_err(5) = nrg
+    else if (ncg < (ix+m-1)) then
        info=psb_err_iarg2_neg_
        int_err(1) = 1
        int_err(2) = m
@@ -318,12 +351,19 @@ contains
 
     !  locals
     integer(psb_ipk_) :: err_act, int_err(5)
+    integer(psb_ipk_) :: nrl, ncl
+    integer(psb_ipk_) :: nrg, ncg 
     character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
     info=psb_success_
     name='psb_chkmat'
     call psb_erractionsave(err_act)
+    
+    nrl = desc_dec%get_local_rows()
+    ncl = desc_dec%get_local_cols()
+    nrg = desc_dec%get_global_rows()
+    ncg = desc_dec%get_global_cols()
 
     if (m < 0) then
       info=psb_err_iarg_neg_
@@ -341,51 +381,51 @@ contains
       info=psb_err_iarg_pos_
       int_err(1) = 5
       int_err(2) = ja
-    else if (desc_dec%get_local_cols() < 0) then
+    else if (ncl < 0) then
       info=psb_err_iarg_invalid_i_
       int_err(1) = 6
       int_err(2) = psb_n_col_ 
-      int_err(3) = desc_dec%get_local_cols()
-    else if (desc_dec%get_local_rows() < 0) then
+      int_err(3) = ncl
+    else if (nrl < 0) then
       info=psb_err_iarg_invalid_i_
       int_err(1) = 6
       int_err(2) = psb_n_row_ 
-      int_err(3) = desc_dec%get_local_rows()
-    else if (desc_dec%get_global_rows() < m) then
+      int_err(3) = nrl
+    else if (nrg < m) then
       info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 1
       int_err(2) = m
       int_err(3) = 5
       int_err(4) = psb_m_
-      int_err(5) = desc_dec%get_global_rows()
-    else if (desc_dec%get_global_rows() < m) then
+      int_err(5) = nrg
+    else if (nrg < m) then
       info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 2
       int_err(2) = n
       int_err(3) = 5
       int_err(4) = psb_m_
-      int_err(5) = desc_dec%get_global_rows()
-    else if (desc_dec%get_global_rows() < ia) then
+      int_err(5) = nrg
+    else if (nrg < ia) then
       info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 3 
       int_err(2) = ia
       int_err(3) = 5
       int_err(4) = psb_m_
-      int_err(5) = desc_dec%get_global_rows()
-    else if (desc_dec%get_global_cols() < ja) then
+      int_err(5) = nrg
+    else if (ncg < ja) then
       info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 4 
       int_err(2) = ja
       int_err(3) = 5
       int_err(4) = psb_n_
-      int_err(5) = desc_dec%get_global_cols()
-    else if (desc_dec%get_global_rows() < (ia+m-1)) then
+      int_err(5) = ncg
+    else if (nrg < (ia+m-1)) then
       info=psb_err_iarg2_neg_
       int_err(1) = 1
       int_err(2) = m
       int_err(3) = 3
       int_err(4) = ia
-    else if (desc_dec%get_global_cols() < (ja+n-1)) then
+    else if (ncg < (ja+n-1)) then
       info=psb_err_iarg2_neg_
       int_err(1) = 2
       int_err(2) = n
@@ -401,12 +441,12 @@ contains
     ! Compute local indices for submatrix starting
     ! at global indices ix and jx
     if(present(iia).and.present(jja)) then
-      if (desc_dec%get_local_rows() > 0) then
+      if (nrl > 0) then
         iia=1
         jja=1
       else
-        iia=desc_dec%get_local_rows()+1
-        jja=desc_dec%get_local_cols()+1
+        iia=nrl+1
+        jja=ncl+1
       end if
     end if
 

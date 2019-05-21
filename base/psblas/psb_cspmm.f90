@@ -205,7 +205,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
     if (info == psb_success_) &
          & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
@@ -277,9 +277,9 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
 
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
     if (info == psb_success_) &
-         & call psb_chkvect(n,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,ijy,desc_a,info,iiy,jjy,check_halo=.true.)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -538,7 +538,7 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx,check_halo=.true.)
     if (info == psb_success_) &
          & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
@@ -578,9 +578,9 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx,check_halo=.true.)
     if (info == psb_success_)&
-         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy,check_halo=.true.)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
