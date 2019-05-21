@@ -1038,14 +1038,8 @@ contains
            & call psb_safe_ab_cpy(desc%lprm,desc_out%lprm,info)
       if (info == psb_success_)&
            & call psb_safe_ab_cpy(desc%idx_space,desc_out%idx_space,info)
-!!$      if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-!!$           & call desc%indxmap%clone(desc_out%indxmap,info)
-!!$      associate(indxin => desc%indxmap) 
-!!$        if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-!!$             & call indxin%clone(desc_out%indxmap,info)
-!!$      end associate
       if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-           & allocate(desc_out%indxmap,source=desc%indxmap,stat=info)
+           & call desc%indxmap%clone(desc_out%indxmap,info)
       if (info == psb_success_) &
            & call desc%v_halo_index%clone(desc_out%v_halo_index,info)
       if (info == psb_success_) &
@@ -1054,8 +1048,6 @@ contains
            & call desc%v_ovrlap_index%clone(desc_out%v_ovrlap_index,info)
       if (info == psb_success_) &
            & call desc%v_ovr_mst_idx%clone(desc_out%v_ovr_mst_idx,info)
-
-
     else
       call desc_out%free(info)
     end if

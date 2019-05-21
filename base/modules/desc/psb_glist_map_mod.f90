@@ -202,8 +202,12 @@ contains
 
     info = psb_success_
     call psb_get_erraction(err_act)
-    if (allocated(outmap)) then 
-      write(0,*) 'Error: should not be allocated on input'
+    if (allocated(outmap)) then
+      call outmap%free() 
+      deallocate(outmap,stat=info)
+    end if
+    if (info /= 0) then 
+      write(0,*) 'Error: could not cleanup output'
       info = -87
       goto 9999
     end if
