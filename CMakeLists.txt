@@ -34,6 +34,13 @@ project(psblas
   VERSION "${PSBLAS_Version}"
   LANGUAGES C Fortran)
 
+#--------------------------------------------------
+# Set option to allow building against OpenCoarrays
+#--------------------------------------------------
+if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+  option(PSBLAS_USE_OpenCoarrays "Build enabling linkage to programs using OpenCoarrays" OFF)
+endif()
+
 #-----------------------------------------------------------------
 # Define a target to create a checksummed & signed release archive
 #-----------------------------------------------------------------
@@ -277,6 +284,14 @@ else()
   set(SERIAL_MPI ON)
 endif()
 
+#-------------------------------------------------------
+# Find and Use OpenCoarrays IFF gfortran AND options set
+#-------------------------------------------------------
+
+if("${PSBLAS_USE_OpenCoarrays}" AND CMAKE_Fortran_COMPILER_ID MATCHES GNU)
+  find_package(OpenCoarrays)
+endif()
+
 #------------------------------
 # Find Linear Algebra Libraries
 #------------------------------
@@ -347,25 +362,24 @@ install(
     "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
 )
 
+#------------------------------------------
+# Add portable unistall command to makefile
+#------------------------------------------
+# Adapted from the CMake Wiki FAQ
+configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
+  @ONLY)
 
+add_custom_target ( uninstall
+  COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
+
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
+# See JSON-Fortran's CMakeLists.txt file to find out how to get the check target to depend
+# on the test executables
+
+#----------------------------------
+# Determine if we're using Open MPI
+#---------------------------------
 if(MPI_FOUND)
-  #------------------------------------------
-  # Add portable unistall command to makefile
-  #------------------------------------------
-  # Adapted from the CMake Wiki FAQ
-  configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
-    @ONLY)
-
-  add_custom_target ( uninstall
-    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
-
-  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
-  # See JSON-Fortran's CMakeLists.txt file to find out how to get the check target to depend
-  # on the test executables
-
-  #----------------------------------
-  # Determine if we're using Open MPI
-  #---------------------------------
   execute_process(COMMAND ${MPIEXEC} --version
     OUTPUT_VARIABLE mpi_version_out)
   if (mpi_version_out MATCHES "[Oo]pen[ -][Mm][Pp][Ii]")
@@ -409,9 +423,6 @@ set_target_properties(base
 target_include_directories(base PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-if(MPI_FOUND)
-  target_link_libraries(base PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
-endif()
 target_link_libraries(base
   PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES})
@@ -489,6 +500,18 @@ if(METIS_FOUND)
     PUBLIC HAVE_METIS_)
   target_compile_definitions(util
     PUBLIC HAVE_METIS)
+endif()
+
+if(MPI_FOUND)
+  foreach(lib base prec krylov util)
+    target_link_libraries(${lib} PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+  endforeach()
+endif()
+
+if(OpenCoarrays_FOUND)
+  foreach(lib base prec krylov util)
+    target_link_libraries(${lib} PUBLIC OpenCoarrays::caf_mpi_static)
+  endforeach()
 endif()
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
