@@ -1029,8 +1029,8 @@ contains
     call psb_erractionsave(err_act)
     name = 'psb_cdcpy'
 
-    if (desc%is_valid()) then 
-      call desc_out%free(info)
+    call desc_out%free(info)
+    if ((info == psb_success_).and.desc%is_valid()) then 
       ictxt = desc%get_context()
 
       ! check on blacs grid 
@@ -1061,14 +1061,8 @@ contains
            & call psb_safe_ab_cpy(desc%lprm,desc_out%lprm,info)
       if (info == psb_success_)&
            & call psb_safe_ab_cpy(desc%idx_space,desc_out%idx_space,info)
-!!$      if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-!!$           & call desc%indxmap%clone(desc_out%indxmap,info)
-!!$      associate(indxin => desc%indxmap) 
-!!$        if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-!!$             & call indxin%clone(desc_out%indxmap,info)
-!!$      end associate
       if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-           & allocate(desc_out%indxmap,source=desc%indxmap,stat=info)
+           & call desc%indxmap%clone(desc_out%indxmap,info)
       if (info == psb_success_) &
            & call desc%v_halo_index%clone(desc_out%v_halo_index,info)
       if (info == psb_success_) &
@@ -1078,9 +1072,6 @@ contains
       if (info == psb_success_) &
            & call desc%v_ovr_mst_idx%clone(desc_out%v_ovr_mst_idx,info)
 
-
-    else
-      call desc_out%free(info)
     end if
     if (info /= psb_success_) then
       info = psb_err_from_subroutine_
