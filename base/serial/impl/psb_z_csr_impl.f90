@@ -3360,7 +3360,7 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   class(psb_z_csr_sparse_mat), intent(in) :: a,b
   type(psb_z_csr_sparse_mat), intent(out)  :: c
   integer(psb_ipk_), intent(out)                     :: info
-  integer(psb_ipk_) :: nze, ma,na,mb,nb, nzc, nza, nzb, nze, nzeb
+  integer(psb_ipk_) :: ma,na,mb,nb, nzc, nza, nzb, nze, nzeb
   character(len=20) :: name
   integer(psb_ipk_) :: err_act
   name='psb_csrspspmm'
