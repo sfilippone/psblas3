@@ -3391,8 +3391,8 @@ subroutine psb_scsrspspmm(a,b,c,info)
   ma = max(na,1)
   mb = max(mb,1)
   nb = max(nb,1)
-  nze = ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) )
-  nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
+  nze = max(1,ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) ))
+  nzeb = max(1,(((nza+na-1)/na)*((nzb+nb-1)/nb))*nb)
   nzc = min(nzc, nze+nzeb)
   call c%allocate(ma,nb,nzc)
 
