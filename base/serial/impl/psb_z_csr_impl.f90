@@ -3360,7 +3360,7 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   class(psb_z_csr_sparse_mat), intent(in) :: a,b
   type(psb_z_csr_sparse_mat), intent(out)  :: c
   integer(psb_ipk_), intent(out)                     :: info
-  integer(psb_ipk_) :: ma,na,mb,nb, nzc, nza, nzb, nze, nzeb
+  integer(psb_ipk_) :: ma,na,mb,nb, nzc, nza, nzb
   character(len=20) :: name
   integer(psb_ipk_) :: err_act
   name='psb_csrspspmm'
@@ -3387,13 +3387,6 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   nzc = 2*(nza+nzb)
-  ma = max(ma,1)
-  ma = max(na,1)
-  mb = max(mb,1)
-  nb = max(nb,1)
-  nze = max(1,ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) ))
-  nzeb = max(1,(((nza+na-1)/na)*((nzb+nb-1)/nb))*nb)
-  nzc = min(nzc, nze+nzeb)
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
