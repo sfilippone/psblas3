@@ -67,7 +67,7 @@ subroutine  psb_shalo_vect(x,desc_a,info,work,tran,mode,data)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, iix, jjx, &
-       & nrow, ncol, lldx, imode, err, liwork,data_
+       & nrow, ncol, lldx, imode, liwork,data_
   integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_spk_),pointer :: iwork(:)
   character                 :: tran_
@@ -200,7 +200,7 @@ subroutine  psb_shalo_multivect(x,desc_a,info,work,tran,mode,data)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, iix, jjx, &
-       & nrow, ncol, lldx, imode, err, liwork,data_
+       & nrow, ncol, lldx, imode, liwork,data_
   integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_spk_),pointer :: iwork(:)
   character                 :: tran_

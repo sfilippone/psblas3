@@ -78,7 +78,7 @@ subroutine  psb_movrlm(x,desc_a,info,jx,ik,work,update,mode)
   ! locals
   integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, iix, jjx, nrow, ncol, k, maxk, update_,&
-       & mode_, err, liwork, ldx
+       & mode_, liwork, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_mpk_),pointer :: iwork(:), xp(:,:)
   logical                  :: do_swap
@@ -266,7 +266,7 @@ subroutine  psb_movrlv(x,desc_a,info,work,update,mode)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, iix, jjx, nrow, ncol, &
-       & k, update_, mode_, err, liwork, ldx
+       & k, update_, mode_, liwork, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_mpk_),pointer :: iwork(:)
   logical                  :: do_swap

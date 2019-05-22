@@ -76,7 +76,7 @@ subroutine  psb_sovrl_vect(x,desc_a,info,work,update,mode)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
-       & nrow, ncol, imode, err,liwork_, data_, update_, mode
+       & nrow, ncol, ldx, liwork, data_, update_, mode_
   integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_spk_),pointer :: iwork(:)
   logical                  :: do_swap
@@ -194,7 +194,7 @@ subroutine  psb_sovrl_multivect(x,desc_a,info,work,update,mode)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
-       & nrow, ncol, ldx, imode, err,liwork_, data_, update_, mode
+       & nrow, ncol, ldx, liwork, data_, update_, mode_
   integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_spk_),pointer :: iwork(:)
   logical                  :: do_swap

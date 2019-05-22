@@ -67,7 +67,7 @@ subroutine  psb_ehalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   ! locals
   integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, iix, jjx, k, maxk, nrow, imode, i,&
-       & err, liwork,data_, ldx
+       & liwork,data_, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_epk_),pointer :: iwork(:), xp(:,:)
   character                :: tran_
@@ -267,7 +267,7 @@ subroutine  psb_ehalov(x,desc_a,info,work,tran,mode,data)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me
-  integer(psb_ipk_) :: err_act, ldx, iix, jjx, nrow, imode, err, liwork,data_
+  integer(psb_ipk_) :: err_act, ldx, iix, jjx, nrow, imode, liwork,data_
   integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_epk_),pointer :: iwork(:)
   character                :: tran_
