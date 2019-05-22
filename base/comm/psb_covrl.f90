@@ -139,19 +139,10 @@ subroutine  psb_covrlm(x,desc_a,info,jx,ik,work,update,mode)
   ! check vector correctness
   call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   ! check for presence/size of a work area
   liwork=ncol
@@ -327,12 +318,11 @@ subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
 
   if (iix /= 1) then
     info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+    call psb_errpush(info,name)    
   end if
+  
+  if(info /= 0) goto 9999
 
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   ! check for presence/size of a work area
   liwork=ncol
@@ -420,13 +410,12 @@ subroutine  psb_covrl_vect(x,desc_a,info,work,update,mode)
   endif
 
   ix = 1
-  ijx = 1
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
   nrow = desc_a%get_local_rows()
   ncol = desc_a%get_local_cols()
-
+  ldx = x%get_nrows()
   k = 1
 
   if (present(update)) then 
@@ -443,21 +432,13 @@ subroutine  psb_covrl_vect(x,desc_a,info,work,update,mode)
   do_swap = (mode_ /= 0)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+
+  if ((info == 0).and.(ldx<ncol)) call x%reall(ncol,info)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_;     ch_err='psb_reall'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   ! check for presence/size of a work area
   liwork=ncol
@@ -551,6 +532,7 @@ subroutine  psb_covrl_multivect(x,desc_a,info,work,update,mode)
   n = desc_a%get_global_cols()
   nrow = desc_a%get_local_rows()
   ncol = desc_a%get_local_cols()
+  ldx = x%get_nrows()
 
   k = 1
 
@@ -568,21 +550,13 @@ subroutine  psb_covrl_multivect(x,desc_a,info,work,update,mode)
   do_swap = (mode_ /= 0)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if (ldx < ncol) call x%reall(ncol,x%get_ncols(),info)
+  
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='psb_reall'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   ! check for presence/size of a work area
   liwork=ncol

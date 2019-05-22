@@ -129,21 +129,12 @@ subroutine  psb_zhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   endif
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   liwork=nrow
   if (present(work)) then
@@ -319,21 +310,12 @@ subroutine  psb_zhalov(x,desc_a,info,work,tran,mode,data)
   endif
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   liwork=nrow
   if (present(work)) then
@@ -406,8 +388,8 @@ subroutine  psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
-       & err, liwork,data_
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, lldx, &
+       & imode, err, liwork,data_
   complex(psb_dpk_),pointer :: iwork(:)
   character                 :: tran_
   character(len=20)         :: name, ch_err
@@ -435,11 +417,12 @@ subroutine  psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
   endif
 
   ix = 1
-  ijx = 1
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
   nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
 
   if (present(tran)) then     
     tran_ = psb_toupper(tran)
@@ -457,22 +440,13 @@ subroutine  psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
     imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
-  ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
+
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='reall'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   liwork=nrow
   if (present(work)) then
@@ -545,7 +519,7 @@ subroutine  psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol,lldx,imode,&
        & err, liwork,data_
   complex(psb_dpk_),pointer :: iwork(:)
   character                 :: tran_
@@ -579,6 +553,8 @@ subroutine  psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
   nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
 
   if (present(tran)) then     
     tran_ = psb_toupper(tran)
@@ -596,22 +572,13 @@ subroutine  psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
     imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
-  ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if (lldx < ncol) call x%reall(ncol,x%get_ncols(),info)
+  
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_;    ch_err='psb_reall'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   liwork=nrow
   if (present(work)) then
