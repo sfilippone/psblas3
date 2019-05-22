@@ -3264,7 +3264,7 @@ subroutine psb_dcsrspspmm(a,b,c,info)
   class(psb_d_csr_sparse_mat), intent(in) :: a,b
   type(psb_d_csr_sparse_mat), intent(out)  :: c
   integer(psb_ipk_), intent(out)                     :: info
-  integer(psb_ipk_) :: nze, ma,na,mb,nb, nzc, nza, nzb,nzeb
+  integer(psb_ipk_) :: ma,na,mb,nb, nzc, nza, nzb
   character(len=20) :: name
   integer(psb_ipk_) :: err_act
   name='psb_csrspspmm'
@@ -3287,13 +3287,10 @@ subroutine psb_dcsrspspmm(a,b,c,info)
     goto 9999
   endif
 
+  ! Estimate number of nonzeros on output.
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   nzc = 2*(nza+nzb)
-  nze = ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) )
-  nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
-  ! Estimate number of nonzeros on output.
-  ! Turns out this is often a large  overestimate.
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
@@ -5393,7 +5390,7 @@ subroutine psb_ldcsrspspmm(a,b,c,info)
   class(psb_ld_csr_sparse_mat), intent(in) :: a,b
   type(psb_ld_csr_sparse_mat), intent(out)  :: c
   integer(psb_ipk_), intent(out)                     :: info
-  integer(psb_lpk_) :: nze, ma,na,mb,nb, nzc, nza, nzb,nzeb
+  integer(psb_lpk_) :: ma,na,mb,nb, nzc, nza, nzb
   character(len=20) :: name
   integer(psb_ipk_) :: err_act
   name='psb_csrspspmm'
@@ -5419,10 +5416,6 @@ subroutine psb_ldcsrspspmm(a,b,c,info)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   nzc = 2*(nza+nzb)
-  nze = ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) )
-  nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
-  ! Estimate number of nonzeros on output.
-  ! Turns out this is often a large  overestimate.
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
