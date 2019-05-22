@@ -100,8 +100,7 @@ contains
     ncl = desc_dec%get_local_cols()
     nrg = desc_dec%get_global_rows()
     ncg = desc_dec%get_global_cols()
-    
-    
+     
     if (m < 0) then
        info=psb_err_iarg_neg_
        int_err(1) = 1

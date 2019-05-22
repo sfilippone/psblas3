@@ -132,21 +132,12 @@ subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   endif
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   liwork=nrow
   if (present(work)) then
@@ -324,21 +315,12 @@ subroutine  psb_chalov(x,desc_a,info,work,tran,mode,data)
   endif
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
+    info=psb_err_from_subroutine_ ;    ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  err=info
-  call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
 
   liwork=nrow
   if (present(work)) then
