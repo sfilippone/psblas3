@@ -243,7 +243,7 @@ contains
       f_ => d_null_func_3d
     end if
 
-    deltah   = done/(idim+2)
+    deltah   = done/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = (2*done)* deltah
 

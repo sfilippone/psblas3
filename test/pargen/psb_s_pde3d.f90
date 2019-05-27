@@ -243,7 +243,7 @@ contains
       f_ => s_null_func_3d
     end if
 
-    deltah   = sone/(idim+2)
+    deltah   = sone/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = (2*sone)* deltah
 
