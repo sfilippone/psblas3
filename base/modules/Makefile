@@ -10,7 +10,7 @@ UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod
 	serial/psb_serial_mod.o \
 	tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o tools/psb_s_tools_mod.o  tools/psb_d_tools_mod.o\
 	tools/psb_c_tools_mod.o  tools/psb_z_tools_mod.o  tools/psb_tools_mod.o \
-	psb_penv_mod.o $(COMMINT) psb_error_impl.o \
+	psb_penv_mod.o $(COMMINT) psb_error_impl.o  psb_timers_mod.o \
 	comm/psb_base_linmap_mod.o comm/psb_linmap_mod.o \
 	comm/psb_s_linmap_mod.o comm/psb_d_linmap_mod.o comm/psb_c_linmap_mod.o comm/psb_z_linmap_mod.o \
 	comm/psb_comm_mod.o comm/psb_i_comm_mod.o comm/psb_s_comm_mod.o comm/psb_d_comm_mod.o\
@@ -152,6 +152,7 @@ psblas/psb_z_psblas_mod.o: serial/psb_z_vect_mod.o serial/psb_z_mat_mod.o
 psblas/psb_psblas_mod.o: psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o  psblas/psb_d_psblas_mod.o psblas/psb_z_psblas_mod.o
 psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o psblas/psb_z_psblas_mod.o: serial/psb_mat_mod.o desc/psb_desc_mod.o
 
+psb_timers_mod.o: psb_penv_mod.o psb_const_mod.o psb_realloc_mod.o psb_error_mod.o
 
 psb_base_mod.o: $(MODULES)
 

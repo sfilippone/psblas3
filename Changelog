@@ -1,5 +1,12 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2019/05/27: Fix matrix generation.	
+2019/05/20: Change checks on vectors	
+2019/05/05: Reworked linmap internals	
+2019/04/15: Improved sphalo and test programs printout	
+2019/04/09: bump version to 3.6.1
+2019/04/09: new fnd_owner_halo method
+2019/03/31: New RENUM_BLK descriptor method	
 2019/01/16: In bldext, implement ALL_TO_ALLV by hand for certain
 	compilers. 
 2018/10/10: New ICTXT argument in prec%init

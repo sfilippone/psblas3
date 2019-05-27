@@ -418,7 +418,7 @@ CONTAINS
     !-----------------------------------------------------
     SZ=SIZE(NACUM)
     IF(SZ < IDPTH) THEN
-       write(psb_out_unit,*) 'GPS_SETUP: on fly reallocation of NACUM'
+       write(psb_out_unit,*) 'GPS_SETUP: on the fly reallocation of NACUM'
        CALL REALLOC(NACUM,SZ,IDPTH) 
     END IF
     !-----------------------------------------------------
@@ -502,12 +502,12 @@ CONTAINS
        !-----------------------------------------------------
        SZ=SIZE(NHIGH)
        IF(SZ < IDPTH) THEN
-          write(psb_out_unit,*) 'GPS_PIKLVL: on fly reallocation of NHIGH'
+          write(psb_out_unit,*) 'GPS_PIKLVL: on the fly reallocation of NHIGH'
           CALL REALLOC(NHIGH,SZ,IDPTH) 
        END IF
        SZ=SIZE(NLOW)
        IF(SZ < IDPTH) THEN
-          write(psb_out_unit,*) 'GPS_PIKLVL: on fly reallocation of NLOW'
+          write(psb_out_unit,*) 'GPS_PIKLVL: on the fly reallocation of NLOW'
           CALL REALLOC(NLOW,SZ,IDPTH) 
        END IF
        !-----------------------------------------------------
@@ -656,7 +656,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XC+XA
     IF(SZ1 < SZ2) THEN
-       write(psb_out_unit,*) 'GPS_NUMBER - Check #1: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #1: on the fly reallocation of STKC'
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
     END IF
@@ -668,7 +668,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XC
     IF(SZ1 < SZ2) THEN
-       write(psb_out_unit,*) 'GPS_NUMBER - Check #2: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #2: on the fly reallocation of STKC'
        SZ2=SZ2+INIT
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
@@ -681,7 +681,7 @@ CONTAINS
     SZ1=SIZE(STKD)
     SZ2=XD+XB
     IF(SZ1 < SZ2) THEN
-       write(psb_out_unit,*) 'GPS_NUMBER - Check #3: on fly reallocation of STKD'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #3: on the fly reallocation of STKD'
        CALL REALLOC(AUX,SZ1,SZ2)
        STKD => AUX
     END IF
@@ -693,7 +693,7 @@ CONTAINS
     SZ1=SIZE(STKD)
     SZ2=XD
     IF(SZ1 < SZ2) THEN
-       write(psb_out_unit,*) 'GPS_NUMBER - Check #4: on fly reallocation of STKD'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #4: on the fly reallocation of STKD'
        SZ2=SZ2+INIT
        CALL REALLOC(AUX,SZ1,SZ2)
        STKD => AUX
@@ -722,7 +722,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XC
     IF(SZ1 < SZ2) THEN
-       write(psb_out_unit,*) 'GPS_NUMBER - Check #5: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #5: on the fly reallocation of STKC'
        SZ2=SZ2+INIT
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
@@ -737,7 +737,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XD
     IF(SZ1 < SZ2) THEN
-       write(psb_out_unit,*) 'GPS_NUMBER - Check #6: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #6: on the fly reallocation of STKC'
        SZ2=SZ2+INIT
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
@@ -760,7 +760,7 @@ CONTAINS
   ! ---------------------------------------------------------
   SUBROUTINE REALLOC(VET,SZ1,SZ2)
     use psb_base_mod  
-    ! PERFORM ON FLY REALLOCATION OF POINTER VET INCREASING
+    ! PERFORM ON THE FLY REALLOCATION OF POINTER VET INCREASING
     ! ITS SIZE FROM SZ1 TO SZ2
     IMPLICIT NONE
     integer(psb_ipk_),allocatable  :: VET(:)
