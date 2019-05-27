@@ -1,6 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
-2019/05/27: Fix matrix generation.	
+2019/05/27: Fix matrix generation.
+2019/05/26: New timer facility (undocumented).	
 2019/05/20: Change checks on vectors	
 2019/05/05: Reworked linmap internals	
 2019/04/15: Improved sphalo and test programs printout	
