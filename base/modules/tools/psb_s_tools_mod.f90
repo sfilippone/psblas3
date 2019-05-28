@@ -260,6 +260,28 @@ Module psb_s_tools_mod
       logical, intent(in), optional        :: rebuild
       logical, intent(in), optional        :: local
     end subroutine psb_sspins
+    subroutine psb_sspins_csr_lirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+      import
+      implicit none
+      type(psb_desc_type), intent(inout)     :: desc_a
+      type(psb_sspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)          :: nr
+      integer(psb_lpk_), intent(in)          :: irw,irp(:),ja(:)
+      real(psb_spk_), intent(in)            :: val(:)
+      integer(psb_ipk_), intent(out)         :: info
+      logical, intent(in), optional         :: rebuild, local
+    end subroutine psb_sspins_csr_lirp
+    subroutine psb_sspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+      import
+      implicit none
+      type(psb_desc_type), intent(inout)     :: desc_a
+      type(psb_sspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)          :: nr,irp(:)
+      integer(psb_lpk_), intent(in)          :: irw,ja(:)
+      real(psb_spk_), intent(in)            :: val(:)
+      integer(psb_ipk_), intent(out)         :: info
+      logical, intent(in), optional         :: rebuild, local
+    end subroutine psb_sspins_csr_iirp
     subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       use psb_i_vect_mod, only : psb_i_vect_type
       import

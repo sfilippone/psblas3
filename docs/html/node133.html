@@ -73,7 +73,7 @@ err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps
 
 <IMG
  WIDTH="204" HEIGHT="44" BORDER="0"
- SRC="img163.png"
+ SRC="img168.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{(\Vert A\Vert\Vert x_i\Vert+\Vert b\Vert)} &lt; eps \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -92,7 +92,7 @@ err = \frac{\|r_i\|}{\|b\|_2} < eps
 
 <IMG
  WIDTH="121" HEIGHT="44" BORDER="0"
- SRC="img164.png"
+ SRC="img169.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert b\Vert _2} &lt; eps \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -111,7 +111,7 @@ err = \frac{\|r_i\|}{\|r_0\|_2} < eps
 
 <IMG
  WIDTH="128" HEIGHT="44" BORDER="0"
- SRC="img165.png"
+ SRC="img170.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert r_0\Vert _2} &lt; eps \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -121,11 +121,11 @@ err = \frac{\|r_i\|}{\|r_0\|_2} < eps
 The behaviour is controlled by  the  istop argument (see
 later). In the above formulae, <SPAN CLASS="MATH"><IMG
  WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img166.png"
+ SRC="img171.png"
  ALT="$x_i$"></SPAN> is the tentative solution and
 <SPAN CLASS="MATH"><IMG
  WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img167.png"
+ SRC="img172.png"
  ALT="$r_i=b-Ax_i$"></SPAN> the corresponding residual at the <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
@@ -135,7 +135,7 @@ later). In the above formulae, <SPAN CLASS="MATH"><IMG
 <BR>
 <IMG
  WIDTH="482" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="img168.png"
+ SRC="img173.png"
  ALT="\begin{lstlisting}
 call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
 &amp; itmax,iter,err,itrace,irst,istop,cond)
@@ -169,7 +169,7 @@ call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
 </DD>
 <DT><STRONG>FCG:</STRONG></DT>
 <DD>the Flexible Conjugate Gradient method<A NAME="tex2html32"
-  HREF="footnode.html#foot8281"><SUP><SPAN CLASS="arabic">5</SPAN></SUP></A>;
+  HREF="footnode.html#foot8318"><SUP><SPAN CLASS="arabic">5</SPAN></SUP></A>;
 
 <P>
 </DD>
@@ -272,25 +272,25 @@ Intent: <B>in</B>.
 <BR>
 Default: <SPAN CLASS="MATH"><IMG
  WIDTH="99" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img170.png"
+ SRC="img175.png"
  ALT="$itmax = 1000$"></SPAN>.
 <BR>
 Specified as: an integer variable <SPAN CLASS="MATH"><IMG
  WIDTH="76" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img171.png"
+ SRC="img176.png"
  ALT="$itmax \ge 1$"></SPAN>.
 </DD>
 <DT><STRONG>itrace</STRONG></DT>
 <DD>If <SPAN CLASS="MATH"><IMG
  WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img115.png"
+ SRC="img120.png"
  ALT="$&gt;0$"></SPAN> print out an informational message about
   convergence  every <SPAN CLASS="MATH"><IMG
  WIDTH="45" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img172.png"
+ SRC="img177.png"
  ALT="$itrace$"></SPAN> iterations. If <SPAN CLASS="MATH"><IMG
  WIDTH="29" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img173.png"
+ SRC="img178.png"
  ALT="$=0$"></SPAN> print a message in
   case of convergence failure.
 <BR>
@@ -302,7 +302,7 @@ Intent: <B>in</B>.
 <BR>
 Default: <SPAN CLASS="MATH"><IMG
  WIDTH="87" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img174.png"
+ SRC="img179.png"
  ALT="$itrace = -1$"></SPAN>.
 <BR></DD>
 <DT><STRONG>irst</STRONG></DT>
@@ -316,7 +316,7 @@ Intent: <B>in</B>.
 <BR>
 Values: <SPAN CLASS="MATH"><IMG
  WIDTH="60" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img175.png"
+ SRC="img180.png"
  ALT="$irst&gt;0$"></SPAN>. This is employed for the BiCGSTABL or RGMRES
 methods, otherwise it is ignored. 
 
@@ -377,7 +377,7 @@ Returned  as: a real number.
  ALT="$A$"></SPAN>; only
   available with the <SPAN CLASS="MATH"><IMG
  WIDTH="29" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img176.png"
+ SRC="img181.png"
  ALT="$CG$"></SPAN> method on real data.
 <BR>
 Scope: <B>global</B> 

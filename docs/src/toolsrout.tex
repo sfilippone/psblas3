@@ -596,33 +596,49 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spins %%
 %
-\clearpage\subsection*{psb\_spins --- Insert a cloud of elements into a sparse
+\clearpage\subsection*{psb\_spins --- Insert a set of coefficients into a sparse
   matrix}
 \addcontentsline{toc}{subsection}{psb\_spins}
 
 \begin{verbatim}
 call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
+call psb_spins(nr, irw, irp, ja, val, a, desc_a, info [,local])
 \end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
-\item[nz] the number of elements to be inserted.\\
+\item[nz] the number of coefficients to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer scalar.
-\item[ia] the row indices of the elements to be inserted.\\
+\item[nr] the number of rows to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer scalar.
+\item[irw] the first  row to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer scalar.
+\item[ia] the row indices of the coefficients to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array of size $nz$.
-\item[ja] the column indices of the elements to be inserted.\\
+\item[irp] the row pointers of the coefficients to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of size $nr+1$.
+\item[ja] the column indices of the coefficients to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array of size $nz$.
-\item[val] the elements to be inserted.\\
+\item[val] the coefficients to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
@@ -651,7 +667,7 @@ Specified as: a variable of type \descdata.\\
 
 \begin{description}
 \item[\bf On Return]
-\item[a] the matrix into which elements will be inserted.\\
+\item[a] the matrix into which coefficients will be inserted.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
 Intent: {\bf inout}.\\
@@ -680,15 +696,20 @@ An integer value; 0 means no error has been detected.
   pattern; each sparse matrix entry implicitly defines a graph edge,
   that is passed to the descriptor routine for the appropriate
   processing;
-\item The coefficients to be inserted are represented by the ordered
-  triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$; these triples
-  should belong to the current process, i.e. $ia(i)$ should be one of
-  the local indices, but are otherwise arbitrary;
-\item There is no
-  requirement that a given row must be passed in its entirety to a
-  single call to this routine: the buildup of a row may be split into
-  as many calls as desired;
-\item Coefficients from different rows   may also be mixed up freely
+\item The input data can be passed in either COO or CSR formats;
+\item In COO format the coefficients to be inserted are represented by
+  the ordered   triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$;
+  these triples  should belong to the current process, i.e. $ia(i)$
+  should be one of  the local indices, but are otherwise arbitrary;
+\item In CSR format the coefficients to be inserted for each input row $i=1,nr$
+  are represented by the ordered triples $(i+irw-1),ja(j),val(j)$, for
+  $j=irp(i),\dots,irp(i+1)-1$; 
+  these triples  should belong to the current process, i.e. $i+irw-1$
+  should be one of  the local indices, but are otherwise arbitrary;  
+\item There is no   requirement that a given row must be passed in its
+  entirety to a   single call to this routine: the buildup of a row
+  may be split into   as many calls as desired (even in the CSR format); 
+\item Coefficients from different rows may also be mixed up freely
   in a single call, according to the application needs; 
 \item Any coefficients from matrix rows not owned by the calling
   process are silently ignored;
