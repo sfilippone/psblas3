@@ -260,11 +260,11 @@ Module psb_d_tools_mod
       implicit none
       Type(psb_dspmat_type),Intent(in)       :: a
       Type(psb_dspmat_type),Intent(inout)    :: blk
-      Type(psb_desc_type),Intent(in), target :: desc_a
-      integer(psb_ipk_), intent(out)                   :: info
-      logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
-      character(len=5), optional             :: outfmt 
-      integer(psb_ipk_), intent(in), optional          :: data
+      Type(psb_desc_type),Intent(in), target  :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      logical, optional, intent(in)           :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional              :: outfmt 
+      integer(psb_ipk_), intent(in), optional :: data
     end Subroutine psb_dsphalo
   end interface
 
@@ -316,6 +316,16 @@ Module psb_d_tools_mod
       logical, intent(in), optional        :: rebuild
       logical, intent(in), optional        :: local
     end subroutine psb_dspins
+    subroutine psb_dspins_csr(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+      import
+      implicit none
+      type(psb_desc_type), intent(inout)     :: desc_a
+      type(psb_dspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)          :: nr,irw,irp(:),ja(:)
+      real(psb_dpk_), intent(in)            :: val(:)
+      integer(psb_ipk_), intent(out)         :: info
+      logical, intent(in), optional         :: rebuild, local
+    end subroutine psb_dspins_csr    
     subroutine psb_dspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       use psb_i_vect_mod, only : psb_i_vect_type
       import

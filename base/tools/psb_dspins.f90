@@ -200,6 +200,105 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
 end subroutine psb_dspins
 
+subroutine psb_dspins_csr(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+  use psb_base_mod, psb_protect_name => psb_dspins_csr
+  use psi_mod
+  implicit none
+
+  !....parameters...
+  type(psb_desc_type), intent(inout)     :: desc_a
+  type(psb_dspmat_type), intent(inout) :: a
+  integer(psb_ipk_), intent(in)          :: nr,irw,irp(:),ja(:)
+  real(psb_dpk_), intent(in)            :: val(:)
+  integer(psb_ipk_), intent(out)         :: info
+  logical, intent(in), optional         :: rebuild, local
+  !locals.....
+
+  integer(psb_ipk_) :: nrow, err_act, ncol, spstate, nz, i, ir, j
+  integer(psb_ipk_) :: ictxt,np,me
+  logical, parameter     :: debug=.false.
+  integer(psb_ipk_), parameter     :: relocsz=200
+  logical                :: rebuild_, local_
+  integer(psb_ipk_), allocatable   :: ia(:)
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name
+
+  info = psb_success_
+  name = 'psb_dspins_csr'
+  call psb_erractionsave(err_act)
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+
+  if (nr < 0) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (size(irp) < nr+1) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  nz = irp(nr+1) - 1
+  
+  if (size(ja) < nz) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (size(val) < nz) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if ((nr == 0).or.(nz == 0)) return
+
+  if (present(rebuild)) then 
+    rebuild_ = rebuild
+  else
+    rebuild_ = .false.
+  endif
+
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
+
+  allocate(ia(nz),stat=info)
+  if (info /= psb_success_) then
+    ierr(1) = info
+    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+         & a_err='allocate',i_err=ierr)
+    goto 9999
+  end if
+
+  do i = 1, nr
+    ir = i-1+irw
+    do j=irp(i),irp(i+1)-1
+      ia(j) = ir
+    end do
+  end do
+  
+  call psb_spins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
+  if (info /= psb_success_) then
+    ierr(1) = info
+    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+         & a_err='spins_coo',i_err=ierr)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_dspins_csr
+
+
 
 subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_base_mod, psb_protect_name => psb_dspins_2desc

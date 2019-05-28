@@ -70,7 +70,7 @@ call psb_hsort(x,ix,dir,flag)
 <P>
 These  serial routines sort a sequence <SPAN CLASS="MATH"><IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img118.png"
+ SRC="img123.png"
  ALT="$X$"></SPAN> into ascending or
 descending  order. The argument meaning is identical for the three
 calls; the only difference is the algorithm used to accomplish the
@@ -96,7 +96,7 @@ Type:<B>optional</B>.
 <BR>
 Specified as: an integer array of (at least) the same size as <SPAN CLASS="MATH"><IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img118.png"
+ SRC="img123.png"
  ALT="$X$"></SPAN>.
 </DD>
 <DT><STRONG>dir</STRONG></DT>
@@ -120,7 +120,7 @@ default <code>psb_lsort_up_</code>.
 <DT><STRONG>flag</STRONG></DT>
 <DD>Whether to keep the original values in <SPAN CLASS="MATH"><IMG
  WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img119.png"
+ SRC="img124.png"
  ALT="$IX$"></SPAN>.
 <BR>
 Type:<B>optional</B>.
@@ -182,10 +182,10 @@ position as the corresponding entries in <SPAN CLASS="MATH"><IMG
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img120.png"
+ SRC="img125.png"
  ALT="$flag = psb\_sort\_ovw\_idx\_$"></SPAN> then the entries in <SPAN CLASS="MATH"><IMG
  WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img121.png"
+ SRC="img126.png"
  ALT="$ix(1:n)$"></SPAN>
   where <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
@@ -199,7 +199,7 @@ position as the corresponding entries in <SPAN CLASS="MATH"><IMG
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img122.png"
+ SRC="img127.png"
  ALT="$ix(i) \leftarrow
 i$"></SPAN>; thus, upon return from the subroutine, for each
   index <SPAN CLASS="MATH"><IMG
@@ -207,10 +207,10 @@ i$"></SPAN>; thus, upon return from the subroutine, for each
  SRC="img4.png"
  ALT="$i$"></SPAN> we have in <SPAN CLASS="MATH"><IMG
  WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img123.png"
+ SRC="img128.png"
  ALT="$ix(i)$"></SPAN> the position that the item <SPAN CLASS="MATH"><IMG
  WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img124.png"
+ SRC="img129.png"
  ALT="$x(i)$"></SPAN>
   occupied in the original data sequence;
 </LI>
@@ -219,16 +219,16 @@ i$"></SPAN>; thus, upon return from the subroutine, for each
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img125.png"
+ SRC="img130.png"
  ALT="$flag = psb\_sort\_keep\_idx\_$"></SPAN> the routine will assume that
   the entries in <SPAN CLASS="MATH"><IMG
  WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img126.png"
+ SRC="img131.png"
  ALT="$ix(:)$"></SPAN> have already been initialized by the user;
 </LI>
 <LI>The three sorting algorithms have a similar <SPAN CLASS="MATH"><IMG
  WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img127.png"
+ SRC="img132.png"
  ALT="$O(n \log n)$"></SPAN> expected
   running time; in the average case quicksort will be the
   fastest and merge-sort the slowest. However note that:
@@ -236,7 +236,7 @@ i$"></SPAN>; thus, upon return from the subroutine, for each
 <OL>
 <LI>The worst case running time for quicksort is <SPAN CLASS="MATH"><IMG
  WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="img128.png"
+ SRC="img133.png"
  ALT="$O(n^2)$"></SPAN>; the algorithm
   implemented here follows the well-known median-of-three heuristics,
   but the worst case may still apply;
@@ -244,7 +244,7 @@ i$"></SPAN>; thus, upon return from the subroutine, for each
 <LI>The worst case running time for merge-sort and heap-sort is
   <SPAN CLASS="MATH"><IMG
  WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img127.png"
+ SRC="img132.png"
  ALT="$O(n \log n)$"></SPAN> as the average case;
 </LI>
 <LI>The merge-sort algorithm is implemented to take advantage of 

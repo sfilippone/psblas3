@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_spins -- Insert a cloud of elements into a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_spins -- Insert a cloud of elements into a sparse matrix">
+<TITLE>psb_spins -- Insert a set of coefficients into a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spins -- Insert a set of coefficients into a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -49,13 +49,14 @@
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00078000000000000000">
-psb_spins -- Insert a cloud of elements into a sparse
+psb_spins -- Insert a set of coefficients into a sparse
   matrix</A>
 </H2>
 
 <P>
 <PRE>
 call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
+call psb_spins(nr, irw, irp, ja, val, a, desc_a, info [,local])
 </PRE>
 
 <P>
@@ -67,7 +68,29 @@ call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
 <DD>
 </DD>
 <DT><STRONG>nz</STRONG></DT>
-<DD>the number of elements to be inserted.
+<DD>the number of coefficients to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer scalar.
+</DD>
+<DT><STRONG>nr</STRONG></DT>
+<DD>the number of rows to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer scalar.
+</DD>
+<DT><STRONG>irw</STRONG></DT>
+<DD>the first  row to be inserted.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -78,7 +101,7 @@ Intent: <B>in</B>.
 Specified as: an integer scalar.
 </DD>
 <DT><STRONG>ia</STRONG></DT>
-<DD>the row indices of the elements to be inserted.
+<DD>the row indices of the coefficients to be inserted.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -91,8 +114,19 @@ Specified as: an integer array of size <SPAN CLASS="MATH"><IMG
  SRC="img105.png"
  ALT="$nz$"></SPAN>.
 </DD>
+<DT><STRONG>irp</STRONG></DT>
+<DD>the row pointers of the coefficients to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array of size <SPAN CLASS="MATH"></SPAN>.
+</DD>
 <DT><STRONG>ja</STRONG></DT>
-<DD>the column indices of the elements to be inserted.
+<DD>the column indices of the coefficients to be inserted.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -106,7 +140,7 @@ Specified as: an integer array of size <SPAN CLASS="MATH"><IMG
  ALT="$nz$"></SPAN>.
 </DD>
 <DT><STRONG>val</STRONG></DT>
-<DD>the elements to be inserted.
+<DD>the coefficients to be inserted.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -120,7 +154,7 @@ Specified as: an array of size <SPAN CLASS="MATH"><IMG
  ALT="$nz$"></SPAN>. Must be of the same type and kind
 of the coefficients  of the sparse matrix <SPAN CLASS="MATH"><IMG
  WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img108.png"
+ SRC="img109.png"
  ALT="$a$"></SPAN>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -154,7 +188,7 @@ Specified as: a logical value; default: <code>.false.</code>.
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the matrix into which elements will be inserted.
+<DD>the matrix into which coefficients will be inserted.
 <BR>
 Scope:<B>local</B>
 <BR>
@@ -205,29 +239,42 @@ An integer value; 0 means no error has been detected.
   that is passed to the descriptor routine for the appropriate
   processing;
 </LI>
-<LI>The coefficients to be inserted are represented by the ordered
-  triples <!-- MATH
+<LI>The input data can be passed in either COO or CSR formats;
+</LI>
+<LI>In COO format the coefficients to be inserted are represented by
+  the ordered   triples <!-- MATH
  $ia(i),ja(i),val(i)$
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="124" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img109.png"
+ SRC="img110.png"
  ALT="$ia(i),ja(i),val(i)$"></SPAN>, for <SPAN CLASS="MATH"><IMG
  WIDTH="91" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img110.png"
- ALT="$i=1,\dots,nz$"></SPAN>; these triples
-  should belong to the current process, i.e. <SPAN CLASS="MATH"><IMG
+ SRC="img111.png"
+ ALT="$i=1,\dots,nz$"></SPAN>;
+  these triples  should belong to the current process, i.e. <SPAN CLASS="MATH"><IMG
  WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img103.png"
- ALT="$ia(i)$"></SPAN> should be one of
-  the local indices, but are otherwise arbitrary;
+ ALT="$ia(i)$"></SPAN>
+  should be one of  the local indices, but are otherwise arbitrary;
 </LI>
-<LI>There is no
-  requirement that a given row must be passed in its entirety to a
-  single call to this routine: the buildup of a row may be split into
-  as many calls as desired;
+<LI>In CSR format the coefficients to be inserted for each input row <SPAN CLASS="MATH"></SPAN>
+  are represented by the ordered triples <!-- MATH
+ $(i+irw-1),ja(j),val(j)$
+ -->
+<SPAN CLASS="MATH"></SPAN>, for
+  <!-- MATH
+ $j=irp(i),\dots,irp(i+1)-1$
+ -->
+<SPAN CLASS="MATH"></SPAN>; 
+  these triples  should belong to the current process, i.e. <SPAN CLASS="MATH"></SPAN>
+  should be one of  the local indices, but are otherwise arbitrary;  
 </LI>
-<LI>Coefficients from different rows   may also be mixed up freely
+<LI>There is no   requirement that a given row must be passed in its
+  entirety to a   single call to this routine: the buildup of a row
+  may be split into   as many calls as desired (even in the CSR format); 
+</LI>
+<LI>Coefficients from different rows may also be mixed up freely
   in a single call, according to the application needs; 
 </LI>
 <LI>Any coefficients from matrix rows not owned by the calling
