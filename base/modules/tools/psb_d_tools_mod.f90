@@ -316,7 +316,7 @@ Module psb_d_tools_mod
       logical, intent(in), optional        :: rebuild
       logical, intent(in), optional        :: local
     end subroutine psb_dspins
-    subroutine psb_dspins_csr(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+    subroutine psb_dspins_csr(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
       import
       implicit none
       type(psb_desc_type), intent(inout)     :: desc_a

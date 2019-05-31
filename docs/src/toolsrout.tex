@@ -602,7 +602,7 @@ An integer value; 0 means no error has been detected.
 
 \begin{verbatim}
 call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
-call psb_spins(nr, irw, irp, ja, val, a, desc_a, info [,local])
+call psb_spins(nr, irp, ja, val, irw, a, desc_a, info [,local])
 \end{verbatim}
 
 \begin{description}
@@ -614,11 +614,6 @@ Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer scalar.
 \item[nr] the number of rows to be inserted.\\
-Scope:{\bf local}.\\
-Type:{\bf required}.\\
-Intent: {\bf in}.\\
-Specified as: an integer scalar.
-\item[irw] the first  row to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
@@ -644,6 +639,11 @@ Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an array of size $nz$. Must be of the same type and kind
 of the coefficients  of the sparse matrix $a$.
+\item[irw] the row index displacement.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer scalar.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local}. \\
 Type: {\bf required}.\\

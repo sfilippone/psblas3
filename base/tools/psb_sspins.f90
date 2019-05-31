@@ -200,7 +200,7 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
 end subroutine psb_sspins
 
-subroutine psb_sspins_csr(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+subroutine psb_sspins_csr(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_sspins_csr
   use psi_mod
   implicit none
@@ -297,8 +297,6 @@ subroutine psb_sspins_csr(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
   return
 
 end subroutine psb_sspins_csr
-
-
 
 subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_base_mod, psb_protect_name => psb_sspins_2desc

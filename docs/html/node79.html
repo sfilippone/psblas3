@@ -56,7 +56,7 @@ psb_spins -- Insert a set of coefficients into a sparse
 <P>
 <PRE>
 call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
-call psb_spins(nr, irw, irp, ja, val, a, desc_a, info [,local])
+call psb_spins(nr, irp, ja, val, irw, a, desc_a, info [,local])
 </PRE>
 
 <P>
@@ -80,17 +80,6 @@ Specified as: an integer scalar.
 </DD>
 <DT><STRONG>nr</STRONG></DT>
 <DD>the number of rows to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer scalar.
-</DD>
-<DT><STRONG>irw</STRONG></DT>
-<DD>the first  row to be inserted.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -156,6 +145,17 @@ of the coefficients  of the sparse matrix <SPAN CLASS="MATH"><IMG
  WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img109.png"
  ALT="$a$"></SPAN>.
+</DD>
+<DT><STRONG>irw</STRONG></DT>
+<DD>the row index displacement.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer scalar.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>The communication descriptor.
