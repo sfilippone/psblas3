@@ -32,7 +32,7 @@
 Module psb_z_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_
   use psb_z_vect_mod, only : psb_z_base_vect_type, psb_z_vect_type, psb_i_vect_type
-  use psb_z_mat_mod, only : psb_zspmat_type, psb_z_base_sparse_mat
+  use psb_z_mat_mod, only : psb_zspmat_type, psb_z_base_sparse_mat, psb_z_csr_sparse_mat
   use psb_z_multivect_mod, only : psb_z_base_multivect_type, psb_z_multivect_type
 
   interface  psb_geall
@@ -266,6 +266,17 @@ Module psb_z_tools_mod
       character(len=5), optional              :: outfmt 
       integer(psb_ipk_), intent(in), optional :: data
     end Subroutine psb_zsphalo
+    Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,data)
+      import
+      implicit none
+      Type(psb_z_csr_sparse_mat),Intent(in)       :: a
+      Type(psb_z_csr_sparse_mat),Intent(inout)    :: blk
+      Type(psb_desc_type),Intent(in), target  :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      logical, optional, intent(in)           :: rowcnv,colcnv,rowscale,colscale
+      integer(psb_ipk_), intent(in), optional :: data
+    end Subroutine psb_z_csr_halo
   end interface
 
 
