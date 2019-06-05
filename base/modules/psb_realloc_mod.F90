@@ -1561,7 +1561,7 @@ Contains
     if (debug) write(psb_err_unit,*) 'reallocate I',len
     if (psb_get_errstatus() /= 0) then 
       if (debug) write(psb_err_unit,*) 'reallocate errstatus /= 0'
-      info=psb_err_from_subroutine_
+      err=psb_err_from_subroutine_
       goto 9999
     end if
 
