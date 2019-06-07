@@ -81,7 +81,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   if (desc_in%is_ovl()) then
     write(0,*) 'Warning: descriptor with overlap, not going to clone into BLOCK'
   else
-    select type (desc_in%indxmap)
+    select type (idmapin => desc_in%indxmap)
       class is (psb_gen_block_map)
         call psb_erractionrestore(err_act)
         return
