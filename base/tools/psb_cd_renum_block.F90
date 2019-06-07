@@ -51,7 +51,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
 
   !locals
   type(psb_gen_block_map), allocatable :: blck_map
-  integer(psb_ipk_), allocatable :: lidx(:),gidx(:),reflidx(:),vnl(:)
+  integer(psb_ipk_), allocatable :: lidx(:),gidx(:),reflidx(:),vnl(:),hproc(:)
   integer(psb_ipk_) :: i,n_row, n_col, n_glob_row, n_glob_col
   integer(psb_ipk_) :: np,me,ictxt, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -109,7 +109,8 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
       do i=1,np
         vnl(i) = vnl(i-1)+vnl(i)
       end do
-      allocate(lidx(n_col),reflidx(n_col),gidx(n_col),stat=info)
+      allocate(lidx(n_col),reflidx(n_col),gidx(n_col),&
+           & stat=info)
       if (info /= 0) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info,name)
@@ -140,6 +141,9 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
         write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',info,size(gidx),size(lidx),size(reflidx)
         write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',gidx(:),':',lidx(:),' :',reflidx(:)
       end if
+      
+      if (info == psb_success_) call desc_in%indxmap%fnd_owner(gidx(n_row+1:n_col),hproc,info)
+      if (info == psb_success_) call blck_map%set_halo_owner(hproc,info)      
 
       if (info == 0) call blck_map%asb(info)
       if (debug_level >= psb_debug_ext_) &
