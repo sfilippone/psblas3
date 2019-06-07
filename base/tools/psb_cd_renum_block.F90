@@ -56,7 +56,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   integer(psb_ipk_) :: np,me,ictxt, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
-  
+
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -81,72 +81,79 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   if (desc_in%is_ovl()) then
     write(0,*) 'Warning: descriptor with overlap, not going to clone into BLOCK'
   else
-    !
-    ! Ok, convert into a GEN BLOCK. 
-    !
-    allocate(psb_gen_block_map :: blck_map, stat=info) 
-    if (info == 0) allocate(vnl(0:np),stat=info)
-    if (info /= 0) then
-      info = psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    n_row = desc_in%get_local_rows()
-    n_col = desc_in%get_local_cols()
-    n_glob_row = desc_in%get_global_rows()
-    n_glob_col = desc_in%get_global_cols()
-    vnl = 0
-    vnl(me) = n_row
-    call psb_sum(ictxt,vnl)
-    vnl(1:np) = vnl(0:np-1)
-    vnl(0) = 0
-    do i=1,np
-      vnl(i) = vnl(i-1)+vnl(i)
-    end do
-    allocate(lidx(n_col),reflidx(n_col),gidx(n_col),stat=info)
-    if (info /= 0) then
-      info = psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    !
-    ! A GEN_BLOCK distribution would just assign indices 1:N_R0
-    ! to process 0, N_R0+1:N_R0+N_R1 to process 1 and so on;
-    ! once these are set you can get the others by invoking
-    ! HALO on the old descriptor, then put the map into the new
-    ! one. Halo lists are stored in local indices, so they will
-    ! continue to work since local indices stay the same, it's
-    ! only the global indices that were reshuffled.
-    !
-    reflidx(1:n_col) = [(i,i=1,n_col)]
-    gidx(1:n_row) = reflidx(1:n_row) + vnl(me)
-    call psb_halo(gidx,desc_in,info)
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Done halo on gidx ',info
-  
-    if (info == 0) call blck_map%gen_block_map_init(ictxt,n_row,info)
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Done gen_block_map_init ',info,&
-         & blck_map%get_lr(),blck_map%get_lc(),vnl(me)
-    
-    if (info == 0) call blck_map%g2l_ins(gidx,lidx,info,lidx=reflidx)
-    if (debug_level >= psb_debug_ext_) then 
-      write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',info,size(gidx),size(lidx),size(reflidx)
-      write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',gidx(:),':',lidx(:),' :',reflidx(:)
-    end if
-      
-    if (info == 0) call blck_map%asb(info)
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Done asb ',info
-  
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    call move_alloc(blck_map,desc_out%indxmap)
+    select type (desc_in%indxmap)
+      class is (psb_gen_block_map)
+        call psb_erractionrestore(err_act)
+        return
+
+      class default
+        !
+        ! Ok, convert into a GEN BLOCK. 
+        !
+      allocate(psb_gen_block_map :: blck_map, stat=info) 
+      if (info == 0) allocate(vnl(0:np),stat=info)
+      if (info /= 0) then
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      n_row = desc_in%get_local_rows()
+      n_col = desc_in%get_local_cols()
+      n_glob_row = desc_in%get_global_rows()
+      n_glob_col = desc_in%get_global_cols()
+      vnl = 0
+      vnl(me) = n_row
+      call psb_sum(ictxt,vnl)
+      vnl(1:np) = vnl(0:np-1)
+      vnl(0) = 0
+      do i=1,np
+        vnl(i) = vnl(i-1)+vnl(i)
+      end do
+      allocate(lidx(n_col),reflidx(n_col),gidx(n_col),stat=info)
+      if (info /= 0) then
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      !
+      ! A GEN_BLOCK distribution would just assign indices 1:N_R0
+      ! to process 0, N_R0+1:N_R0+N_R1 to process 1 and so on;
+      ! once these are set you can get the others by invoking
+      ! HALO on the old descriptor, then put the map into the new
+      ! one. Halo lists are stored in local indices, so they will
+      ! continue to work since local indices stay the same, it's
+      ! only the global indices that were reshuffled.
+      !
+      reflidx(1:n_col) = [(i,i=1,n_col)]
+      gidx(1:n_row) = reflidx(1:n_row) + vnl(me)
+      call psb_halo(gidx,desc_in,info)
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),': Done halo on gidx ',info
+
+      if (info == 0) call blck_map%gen_block_map_init(ictxt,n_row,info)
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),': Done gen_block_map_init ',info,&
+           & blck_map%get_lr(),blck_map%get_lc(),vnl(me)
+
+      if (info == 0) call blck_map%g2l_ins(gidx,lidx,info,lidx=reflidx)
+      if (debug_level >= psb_debug_ext_) then 
+        write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',info,size(gidx),size(lidx),size(reflidx)
+        write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',gidx(:),':',lidx(:),' :',reflidx(:)
+      end if
+
+      if (info == 0) call blck_map%asb(info)
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),': Done asb ',info
+
+      if (info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      call move_alloc(blck_map,desc_out%indxmap)
+    end select
   end if
-  
+
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_
     call psb_errpush(info,name)
