@@ -1971,6 +1971,83 @@ subroutine psb_s_csmv_vect(alpha,a,x,beta,y,info,trans)
 end subroutine psb_s_csmv_vect
 
 
+subroutine psb_s_trmv(alpha,a,x,beta,y,info,uplo,diag) 
+  use psb_error_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_trmv
+  implicit none 
+  class(psb_sspmat_type), intent(in) :: a
+  real(psb_spk_), intent(in)    :: alpha, beta, x(:)
+  real(psb_spk_), intent(inout) :: y(:)
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in) :: uplo,diag
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='psb_trmv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%trmm(alpha,x,beta,y,info,uplo,diag) 
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_trmv
+
+subroutine psb_s_trmv_vect(alpha,a,x,beta,y,info,uplo,diag) 
+  use psb_error_mod
+  use psb_s_vect_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_trmv_vect
+  implicit none 
+  class(psb_sspmat_type), intent(in)   :: a
+  real(psb_spk_), intent(in)        :: alpha, beta
+  type(psb_s_vect_type), intent(inout) :: x
+  type(psb_s_vect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(out)                 :: info
+  character, optional, intent(in)      :: uplo,diag 
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='psb_trmv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call a%a%trmm(alpha,x%v,beta,y%v,info,uplo,diag) 
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_trmv_vect
+
 
 subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
   use psb_error_mod

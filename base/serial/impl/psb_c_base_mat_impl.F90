@@ -1227,6 +1227,33 @@ subroutine psb_c_base_csmv(alpha,a,x,beta,y,info,trans)
 end subroutine psb_c_base_csmv
 
 
+subroutine psb_c_base_trmv(alpha,a,x,beta,y,info,uplo,diag) 
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_trmv
+  use psb_error_mod
+  implicit none 
+  class(psb_c_base_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
+  complex(psb_spk_), intent(inout) :: y(:)
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in) :: uplo, diag
+
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='c_base_trmv'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+
+end subroutine psb_c_base_trmv
+
 subroutine psb_c_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_inner_cssm
   use psb_error_mod
@@ -1884,6 +1911,26 @@ subroutine psb_c_base_vect_mv(alpha,a,x,beta,y,info,trans)
   call a%spmm(alpha,x%v,beta,y%v,info,trans)
   call y%set_host()
 end subroutine psb_c_base_vect_mv
+
+subroutine psb_c_base_trvect_mv(alpha,a,x,beta,y,info,uplo,diag) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_trvect_mv
+  implicit none 
+  class(psb_c_base_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(in)       :: alpha, beta
+  class(psb_c_base_vect_type), intent(inout) :: x
+  class(psb_c_base_vect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(out)             :: info
+  character, optional, intent(in)  :: uplo, diag
+
+  ! For the time being we just throw everything back
+  ! onto the normal routines. 
+  call x%sync()
+  call y%sync()
+  call a%trmm(alpha,x%v,beta,y%v,info,uplo,diag)
+  call y%set_host()
+end subroutine psb_c_base_trvect_mv
 
 subroutine psb_c_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_vect_cssv

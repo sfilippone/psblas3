@@ -95,6 +95,9 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: csmv        => psb_c_base_csmv
     procedure, pass(a) :: csmm        => psb_c_base_csmm
     generic, public    :: spmm        => csmm, csmv, vect_mv
+    procedure, pass(a) :: trvect_mv   => psb_c_base_trvect_mv
+    procedure, pass(a) :: trmv        => psb_c_base_trmv
+    generic, public    :: trmm        => trmv, trvect_mv
     procedure, pass(a) :: in_vect_sv  => psb_c_base_inner_vect_sv
     procedure, pass(a) :: inner_cssv  => psb_c_base_inner_cssv    
     procedure, pass(a) :: inner_cssm  => psb_c_base_inner_cssm
@@ -869,6 +872,64 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)  :: trans
     end subroutine psb_c_base_vect_mv
+  end interface
+
+  
+  !> Function  trmv:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Product of a subtriangle by a dense rank 1 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(UPLO(A))*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:)   the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:)   the input/output dense Y
+  !! \param info   return code
+  !! \param uplo   [L] Whether to use LOW(A) (L), or UP(A) (U)
+  !! \param diag   [D] Diagonal: use D(A) (D), zeros (Z), or unit (U)
+  !!
+  !
+  interface 
+    subroutine psb_c_base_trmv(alpha,a,x,beta,y,info,uplo,diag)
+      import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_
+      class(psb_c_base_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
+      complex(psb_spk_), intent(inout) :: y(:)
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in) :: uplo, diag
+    end subroutine psb_c_base_trmv
+  end interface
+  
+  !> Function  trvect_mv:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Product of a subtriangle by a dense rank 1 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(UPLO(A))*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:)   the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:)   the input/output dense Y
+  !! \param info   return code
+  !! \param uplo    [L] Whether to use LOW(A) (L), or UP(A) (U)
+  !! \param diag   [D] Diagonal: use D(A) (D), zeros (Z), or unit (U)
+  !!
+  !
+  interface 
+    subroutine psb_c_base_trvect_mv(alpha,a,x,beta,y,info,uplo,diag) 
+      import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type
+      class(psb_c_base_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(in)       :: alpha, beta
+      class(psb_c_base_vect_type), intent(inout) :: x
+      class(psb_c_base_vect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)             :: info
+      character, optional, intent(in) :: uplo, diag
+    end subroutine psb_c_base_trvect_mv
   end interface
   
   !

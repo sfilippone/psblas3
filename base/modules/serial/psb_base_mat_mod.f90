@@ -143,6 +143,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_dupl    => psb_base_get_dupl
     procedure, nopass  :: get_fmt     => psb_base_get_fmt
     procedure, nopass  :: has_update  => psb_base_has_update
+    procedure, nopass  :: has_xt_tri  => psb_base_has_xt_tri
     procedure, pass(a) :: is_null     => psb_base_is_null
     procedure, pass(a) :: is_bld      => psb_base_is_bld
     procedure, pass(a) :: is_upd      => psb_base_is_upd
@@ -717,6 +718,17 @@ contains
     logical :: res
     res = a%repeatable_updates
   end function psb_base_is_repeatable_updates
+
+  !
+  !  has_xt_tri: does the current type support
+  !    extended triangle operations?  
+  !  
+  function psb_base_has_xt_tri() result(res)
+    implicit none 
+    logical :: res
+    
+    res = .false.    
+  end function psb_base_has_xt_tri
 
   
   !

@@ -116,6 +116,8 @@ module psb_c_mat_mod
     procedure, pass(a) :: set_triangle => psb_c_set_triangle
     procedure, pass(a) :: set_unit     => psb_c_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_c_set_repeatable_updates
+    procedure, pass(a) :: has_xt_tri   => psb_c_has_xt_tri
+
 
     ! Memory/data management 
     procedure, pass(a) :: csall       => psb_c_csall
@@ -197,6 +199,9 @@ module psb_c_mat_mod
     procedure, pass(a) :: csmv     => psb_c_csmv
     procedure, pass(a) :: csmm     => psb_c_csmm
     generic, public    :: spmm     => csmm, csmv, csmv_v
+    procedure, pass(a) :: trmv_v   => psb_c_trmv_vect
+    procedure, pass(a) :: trmv     => psb_c_trmv
+    generic, public    :: trmm     => trmv, trmv_v   
     procedure, pass(a) :: scals    => psb_c_scals
     procedure, pass(a) :: scalv    => psb_c_scal
     generic, public    :: scal     => scals, scalv
@@ -758,6 +763,30 @@ module psb_c_mat_mod
       character, optional, intent(in)      :: trans
     end subroutine psb_c_csmv_vect
   end interface
+
+  interface psb_trmm
+    subroutine psb_c_trmv(alpha,a,x,beta,y,info,uplo,diag)
+      use psb_c_vect_mod, only : psb_c_vect_type
+      import :: psb_ipk_, psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
+      complex(psb_spk_), intent(inout) :: y(:)
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in) :: uplo, diag
+    end subroutine psb_c_trmv
+    subroutine psb_c_trmv_vect(alpha,a,x,beta,y,info,uplo,diag) 
+      use psb_c_vect_mod, only : psb_c_vect_type
+      import :: psb_ipk_, psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      complex(psb_spk_), intent(in)       :: alpha, beta
+      class(psb_c_vect_type), intent(inout) :: x
+      class(psb_c_vect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)             :: info
+      character, optional, intent(in) :: uplo, diag
+    end subroutine psb_c_trmv_vect
+  end interface
+
+
   
   interface psb_cssm
     subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
@@ -1243,6 +1272,18 @@ contains
     
   end subroutine psb_c_set_repeatable_updates
 
+  function psb_c_has_xt_tri(a) result(res)
+    implicit none 
+    class(psb_cspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%has_xt_tri()
+    else
+      res = .false.
+    end if
+
+  end function psb_c_has_xt_tri
 
   function psb_c_get_nzeros(a) result(res)
     implicit none 
