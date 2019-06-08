@@ -267,15 +267,16 @@ Module psb_s_tools_mod
       integer(psb_ipk_), intent(in), optional :: data
     end Subroutine psb_ssphalo
     Subroutine psb_s_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
-         & rowscale,colscale,data)
+         & rowscale,colscale,data,outcol_glob,col_desc)
       import
       implicit none
       Type(psb_s_csr_sparse_mat),Intent(in)       :: a
       Type(psb_s_csr_sparse_mat),Intent(inout)    :: blk
       Type(psb_desc_type),Intent(in), target  :: desc_a
       integer(psb_ipk_), intent(out)          :: info
-      logical, optional, intent(in)           :: rowcnv,colcnv,rowscale,colscale
+      logical, optional, intent(in)           :: rowcnv,colcnv,rowscale,colscale,outcol_glob
       integer(psb_ipk_), intent(in), optional :: data
+      type(psb_desc_type),Intent(in), optional, target :: col_desc
     end Subroutine psb_s_csr_halo
   end interface
 

@@ -591,7 +591,7 @@ End Subroutine psb_zsphalo
 
 
 Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
-     &  rowscale,colscale,data)
+     &  rowscale,colscale,data,outcol_glob,col_desc)
   use psb_base_mod, psb_protect_name => psb_z_csr_halo
 
 #ifdef MPI_MOD
@@ -602,12 +602,13 @@ Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   include 'mpif.h'
 #endif
 
-  Type(psb_z_csr_sparse_mat),Intent(in)    :: a
-  Type(psb_z_csr_sparse_mat),Intent(inout) :: blk
-  Type(psb_desc_type),Intent(in), target :: desc_a
+  type(psb_z_csr_sparse_mat),Intent(in)    :: a
+  type(psb_z_csr_sparse_mat),Intent(inout) :: blk
+  type(psb_desc_type),intent(in), target :: desc_a
   integer(psb_ipk_), intent(out)                :: info
-  logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
+  logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale,outcol_glob
   integer(psb_ipk_), intent(in), optional       :: data
+  type(psb_desc_type),Intent(in), optional, target :: col_desc
   !     ...local scalars....
   integer(psb_ipk_) :: ictxt, np,me
   integer(psb_ipk_) :: counter,proc,i, &
@@ -624,14 +625,15 @@ Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_ipk_), pointer  :: idxv(:)
   class(psb_i_base_vect_type), pointer :: pdxv
   integer(psb_ipk_), allocatable :: ipdxv(:)
-  logical           :: rowcnv_,colcnv_,rowscale_,colscale_
+  logical           :: rowcnv_,colcnv_,rowscale_,colscale_,outcol_glob_
+  Type(psb_desc_type), pointer :: col_desc_
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
-  name='psb_zsphalo'
+  name='psb_z_csr_sphalo'
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
@@ -672,6 +674,16 @@ Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   else
     data_ = psb_comm_halo_
   endif
+  if (present(outcol_glob)) then 
+    outcol_glob_ = outcol_glob
+  else
+    outcol_glob_ = .false.
+  endif
+  if (present(col_desc)) then
+    col_desc_ => col_desc
+  else
+    col_desc_ => desc_a
+  end if
 
   Allocate(brvindx(np+1),&
        & rvsz(np),sdsz(np),bsdindx(np+1), acoo,stat=info)
@@ -817,7 +829,7 @@ Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Going for alltoallv',iszs,iszr
   if (rowcnv_) call psb_loc_to_glob(iasnd(1:nz),desc_a,info,iact='I')
-  if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
+  if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),col_desc_,info,iact='I')
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_loc_to_glob')
@@ -859,7 +871,11 @@ Subroutine psb_z_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   ! Convert into local numbering 
   !
   if (rowcnv_) call psb_glob_to_loc(acoo%ia(1:iszr),desc_a,info,iact='I')
-  if (colcnv_) call psb_glob_to_loc(acoo%ja(1:iszr),desc_a,info,iact='I')
+  !
+  ! This seems to be the correct output condition
+  !
+  if (colcnv_.and.(.not.outcol_glob_)) &
+       & call psb_glob_to_loc(acoo%ja(1:iszr),col_desc_,info,iact='I')
 
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
