@@ -596,8 +596,120 @@ module psb_z_csr_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_z_csr_scals
   end interface
-  
 
+  type, extends(psb_z_csr_sparse_mat) :: psb_z_csrd_sparse_mat
+
+    !> Pointers to diagonal entries
+    integer(psb_ipk_), allocatable :: diagp(:)
+
+  contains
+    procedure, nopass  :: get_fmt     => z_csrd_get_fmt
+    procedure, pass(a) :: sizeof      => z_csrd_sizeof
+    procedure, pass(a) :: inner_cssm  => psb_z_csrd_cssm
+    procedure, pass(a) :: inner_cssv  => psb_z_csrd_cssv
+    procedure, pass(a) :: trmv        => psb_z_csrd_trmv
+    !procedure, pass(a) :: reallocate_nz => psb_z_csrd_reallocate_nz
+    !procedure, pass(a) :: allocate_mnnz => psb_z_csrd_allocate_mnnz
+!!$    procedure, pass(a) :: cp_to_coo   => psb_z_cp_csrd_to_coo
+    procedure, pass(a) :: cp_from_coo => psb_z_cp_csrd_from_coo
+!!$    procedure, pass(a) :: cp_to_fmt   => psb_z_cp_csrd_to_fmt
+!!$    procedure, pass(a) :: cp_from_fmt => psb_z_cp_csrd_from_fmt
+!!$    procedure, pass(a) :: mv_to_coo   => psb_z_mv_csrd_to_coo
+!!$    procedure, pass(a) :: mv_from_coo => psb_z_mv_csrd_from_coo
+!!$    procedure, pass(a) :: mv_to_fmt   => psb_z_mv_csrd_to_fmt
+!!$    procedure, pass(a) :: mv_from_fmt => psb_z_mv_csrd_from_fmt
+    procedure, pass(a) :: clean_zeros => psb_z_csrd_clean_zeros
+    procedure, pass(a) :: get_diag    => psb_z_csrd_get_diag
+    !procedure, pass(a) :: reinit      => psb_z_csrd_reinit
+    procedure, pass(a) :: trim        => psb_z_csrd_trim
+    procedure, pass(a) :: free        => z_csrd_free
+    procedure, pass(a) :: mold        => psb_z_csrd_mold
+
+  end type psb_z_csrd_sparse_mat
+
+  interface 
+    subroutine  psb_z_csrd_clean_zeros(a, info)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psb_z_csrd_clean_zeros
+  end interface
+
+  interface
+    subroutine psb_z_csrd_get_diag(a,d,info)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(out)     :: d(:)
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_z_csrd_get_diag
+  end interface
+
+  interface 
+    subroutine psb_z_cp_csrd_from_coo(a,b,info)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_z_coo_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(inout) :: a
+      class(psb_z_coo_sparse_mat), intent(in)    :: b
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine psb_z_cp_csrd_from_coo
+  end interface
+
+  interface
+    subroutine  psb_z_csrd_trim(a)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(inout) :: a
+    end subroutine psb_z_csrd_trim
+  end interface
+  
+  interface 
+    subroutine psb_z_csrd_mold(a,b,info)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_z_base_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(in)                  :: a
+      class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
+      integer(psb_ipk_), intent(out)                    :: info
+    end subroutine psb_z_csrd_mold
+  end interface
+  
+  interface 
+    subroutine psb_z_csrd_trmv(alpha,a,x,beta,y,info,uplo,diag)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
+      complex(psb_dpk_), intent(inout) :: y(:)
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in) :: uplo, diag
+    end subroutine psb_z_csrd_trmv
+  end interface
+
+  interface 
+    subroutine psb_z_csrd_cssm(alpha,a,x,beta,y,info,trans)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_dpk_      
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+      complex(psb_dpk_), intent(inout)       :: y(:,:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in)     :: trans
+    end subroutine psb_z_csrd_cssm
+  end interface
+  
+  interface 
+    subroutine psb_z_csrd_cssv(alpha,a,x,beta,y,info,trans)
+      import :: psb_ipk_, psb_z_csrd_sparse_mat, psb_dpk_
+      implicit none 
+      class(psb_z_csrd_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+      complex(psb_dpk_), intent(inout)       :: y(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in)     :: trans
+    end subroutine psb_z_csrd_cssv
+  end interface
+  
 
 contains 
 
@@ -715,6 +827,50 @@ contains
     return
 
   end subroutine z_csr_free
+
+
+  ! == ===================================
+  !
+  !
+  !
+  ! CSRD specific versions
+  !
+  !
+  !
+  !
+  !
+  ! == ===================================  
+  
+  function z_csrd_sizeof(a) result(res)
+    implicit none 
+    class(psb_z_csrd_sparse_mat), intent(in) :: a
+    integer(psb_long_int_k_) :: res
+    res = 8 
+    res = res + (2*psb_sizeof_dp)  * psb_size(a%val)
+    res = res + psb_sizeof_int * psb_size(a%irp)
+    res = res + psb_sizeof_int * psb_size(a%ja)
+    res = res + psb_sizeof_int * psb_size(a%diagp)
+      
+  end function z_csrd_sizeof
+
+  function z_csrd_get_fmt() result(res)
+    implicit none 
+    character(len=5) :: res
+    res = 'CSRD'
+  end function z_csrd_get_fmt
+  
+
+  subroutine  z_csrd_free(a) 
+    implicit none 
+
+    class(psb_z_csrd_sparse_mat), intent(inout) :: a
+
+    if (allocated(a%diagp)) deallocate(a%diagp)
+    call a%psb_z_csr_sparse_mat%free()
+    
+    return
+
+  end subroutine z_csrd_free
 
 
 end module psb_z_csr_mat_mod

@@ -1184,17 +1184,28 @@ subroutine psb_z_base_csmm(alpha,a,x,beta,y,info,trans)
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='z_base_csmm'
+  integer(psb_ipk_) :: j,nc
+  character(len=20)  :: name='z_base_csmm'  
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  ! This is the base version. 
+  ! It's a very inefficient implementation,
+  ! but it's only a fallback, if multivectors
+  ! are important you are supposed to implement it
+  ! explicitly in the derived class. 
+  info = psb_success_
+  nc   = min(size(x,2),size(y,2))
+  do j=1,nc
+    call a%spmm(alpha,x(j,:),beta,y(:,j),info,trans)
+    if (info /= psb_success_) goto 9999
+  end do  
 
-  call psb_error_handler(err_act)
+  call psb_erractionrestore(err_act)
+
+  return
+
+9999 call psb_error_handler(err_act)
 
 end subroutine psb_z_base_csmm
 
@@ -1266,17 +1277,29 @@ subroutine psb_z_base_inner_cssm(alpha,a,x,beta,y,info,trans)
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_) :: j, nc 
   character(len=20)  :: name='z_base_inner_cssm'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  ! This is the base version. 
+  ! It's a very inefficient implementation,
+  ! but it's only a fallback, if multivectors
+  ! are important you are supposed to implement it
+  ! explicitly in the derived class. 
+  info = psb_success_
+  nc   = min(size(x,2),size(y,2))
+  do j=1,nc
+    call a%spsm(alpha,x(j,:),beta,y(:,j),info,trans)
+    if (info /= psb_success_) goto 9999
+  end do  
 
-  call psb_error_handler(err_act)
+  call psb_erractionrestore(err_act)
+
+  return
+
+9999 call psb_error_handler(err_act)
+
 
 end subroutine psb_z_base_inner_cssm
 
