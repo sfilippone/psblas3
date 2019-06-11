@@ -1129,17 +1129,29 @@ if test $pac_blas_ok = no; then
 
 fi
 if test $pac_blas_ok = no; then
-	AC_LANG([C])
+    AC_LANG([C])
+    if test "x$psblas_have_openmp" == "xyes";
+    then 
+	AC_CHECK_LIB(tatlas, ATL_xerbla,
+	[AC_LANG([Fortran])
+	 AC_CHECK_LIB(tatlas, sgemm,
+	[AC_LANG([C])
+	 AC_CHECK_LIB(tatlas, cblas_dgemm,
+	   [pac_blas_ok=yes
+	    BLAS_LIBS="-ltatlas $BLAS_LIBDIR"],
+		[], [-ltatlas])],
+	[], [-ltatlas])])
+    else
 	AC_CHECK_LIB(satlas, ATL_xerbla,
-		[AC_LANG([Fortran])
-		 AC_CHECK_LIB(satlas, sgemm,
-		[AC_LANG([C])
-		 AC_CHECK_LIB(satlas, cblas_dgemm,
-			[pac_blas_ok=yes
-			 BLAS_LIBS="-lsatlas $BLAS_LIBDIR"],
-			[], [-lsatlas])],
-			[], [-lsatlas])])
-
+	[AC_LANG([Fortran])
+	 AC_CHECK_LIB(satlas, sgemm,
+	[AC_LANG([C])
+	 AC_CHECK_LIB(satlas, cblas_dgemm,
+	   [pac_blas_ok=yes
+	    BLAS_LIBS="-lsatlas $BLAS_LIBDIR"],
+		[], [-lsatlas])],
+	[], [-lsatlas])])
+    fi
 fi
 
 # BLAS in PhiPACK libraries? (requires generic BLAS lib, too)
@@ -1833,3 +1845,35 @@ CPPFLAGS="$SAVE_CPPFLAGS";
 ])dnl 
 
 
+dnl @synopsis PAC_OPENMP()
+dnl 
+dnl Check for OpenMP flags for C and Fortran compilers
+dnl
+dnl
+dnl
+dnl
+dnl 
+AC_DEFUN(PAC_CHECK_OPENMP,
+[AC_ARG_WITH(openmp,AC_HELP_STRING([--with-openmp], [search for openmp flags]),
+             [psblas_search_openmp="yes"],
+             [psblas_search_openmp="no"])
+ AC_MSG_NOTICE([Search for openmp $psblas_search_openmp])			
+ AC_MSG_CHECKING([for OPENMP flags])	
+ psblas_have_openmp="no";
+ AC_LANG([C])
+ AC_OPENMP
+ if test "x$OPENMP_CFLAGS" != "x"; then
+    psblas_have_openmp="yes";
+    psblas_openmp_cflags="$OPENMP_CFLAGS";    
+ fi
+ AC_LANG([Fortran])
+ AC_OPENMP
+ if test "x$OPENMP_FCFLAGS" != "x"; then
+    psblas_have_openmp="yes";
+    psblas_openmp_fcflags="$OPENMP_FCFLAGS";
+ fi
+ AC_MSG_RESULT($psblas_have_openmp)
+]) dnl					   
+	      
+  
+  

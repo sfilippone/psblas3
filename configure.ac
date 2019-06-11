@@ -608,6 +608,16 @@ fi
 # This should be portable
 AR="${AR} -cur"
 
+##########################################################################
+# Check for OpenMP before BLAS, to pick thread-safe BLAS if appropriate
+#########################################################################
+
+PAC_CHECK_OPENMP
+if test "x$psblas_have_openmp" == "xyes"; then
+   CCOPT="$CCOPT $psblas_openmp_cflags";
+   FCOPT="$FCOPT $psblas_openmp_fcflags";
+   FLINKFLAGS="$psblas_openmp_fcflags";
+fi
 
 ###############################################################################
 #		BLAS  library presence checks
@@ -719,6 +729,7 @@ AC_SUBST(MPICC)
 AC_SUBST(FCOPT)
 AC_SUBST(CCOPT)
 AC_SUBST(EXTRA_OPT)
+AC_SUBST(FLINKFLAGS)
 AC_SUBST(FAKEMPI)
 AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)

@@ -6,7 +6,7 @@ include $(INCDIR)/Make.inc.psblas
 # Libraries used
 LIBDIR=$(INSTALLDIR)/lib
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
-LDLIBS=$(PSBLDLIBS)
+LDLIBS=$(PSBLDLIBS) $(FLINKFLAGS)
 #
 # Compilers and such
 #
