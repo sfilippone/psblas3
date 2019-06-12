@@ -142,7 +142,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
         write(debug_unit,*) me,' ',trim(name),': Done g2l_ins ',gidx(:),':',lidx(:),' :',reflidx(:)
       end if
       
-      if (info == psb_success_) call desc_in%indxmap%fnd_owner(gidx(n_row+1:n_col),hproc,info)
+      if (info == psb_success_) call blck_map%indxmap%fnd_owner(gidx(n_row+1:n_col),hproc,info)
       if (info == psb_success_) call blck_map%set_halo_owner(hproc,info)      
 
       if (info == 0) call blck_map%asb(info)
