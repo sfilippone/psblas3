@@ -30,7 +30,7 @@
 !   
 !    
 ! File:  psb_cspgather.f90
-subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc,desc_c)
   use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
@@ -43,14 +43,17 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  type(psb_cspmat_type), intent(inout) :: loca
-  type(psb_cspmat_type), intent(inout) :: globa
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: root, dupl
-  logical, intent(in), optional   :: keepnum,keeploc
-
-  type(psb_c_coo_sparse_mat)      :: loc_coo, glob_coo
+  type(psb_cspmat_type), intent(inout)  :: loca
+  type(psb_cspmat_type), intent(inout)  :: globa
+  type(psb_desc_type), intent(in), target :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+  integer(psb_ipk_), intent(in), optional :: root, dupl
+  logical, intent(in), optional           :: keepnum,keeploc
+  type(psb_desc_type), intent(in), optional, target :: desc_c
+  !
+  type(psb_c_coo_sparse_mat)   :: loc_coo, glob_coo
+  type(psb_desc_type), pointer   :: p_desc_c
+  
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
@@ -80,11 +83,17 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   else
     keeploc_ = .true.
   end if
+  if (present(desc_c)) then
+    p_desc_c => desc_c
+  else
+    p_desc_c => desc_a
+  end if
+    
   call globa%free()
 
   if (keepnum_) then 
     nrg = desc_a%get_global_rows()
-    ncg = desc_a%get_global_rows()
+    ncg = p_desc_c%get_global_cols()
 
     allocate(nzbr(np), idisp(np),stat=info)
     if (info /= psb_success_) then 
@@ -102,7 +111,7 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     end if
     nzl = loc_coo%get_nzeros()
     call psb_loc_to_glob(loc_coo%ia(1:nzl),desc_a,info,iact='I')
-    call psb_loc_to_glob(loc_coo%ja(1:nzl),desc_a,info,iact='I')
+    call psb_loc_to_glob(loc_coo%ja(1:nzl),p_desc_c,info,iact='I')
     nzbr(:) = 0
     nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))

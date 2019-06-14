@@ -151,15 +151,16 @@ module psb_d_comm_mod
   end interface psb_scatter
 
   interface psb_gather
-    subroutine psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+    subroutine psb_dsp_allgather(globa, loca, desc_a, info, root,dupl,keepnum,keeploc,desc_c)
       import
       implicit none
-      type(psb_dspmat_type), intent(inout) :: loca
-      type(psb_dspmat_type), intent(out)   :: globa
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: root,dupl
-      logical, intent(in), optional   :: keepnum,keeploc
+      type(psb_dspmat_type), intent(inout)  :: loca
+      type(psb_dspmat_type), intent(out)    :: globa
+      type(psb_desc_type), intent(in), target :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: root,dupl
+      logical, intent(in), optional           :: keepnum,keeploc
+      type(psb_desc_type), intent(in), optional, target :: desc_c
     end subroutine psb_dsp_allgather
     subroutine psb_dgatherm(globx, locx, desc_a, info, root)
       import
