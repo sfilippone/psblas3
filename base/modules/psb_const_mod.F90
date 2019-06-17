@@ -154,10 +154,10 @@ module psb_const_mod
   ! Duplicate coefficients handling
   ! These are usually set while calling spcnv as one of its
   ! optional arugments.
-  integer(psb_ipk_), parameter :: psb_dupl_ovwrt_ = 0
-  integer(psb_ipk_), parameter :: psb_dupl_add_   = 1
+  integer(psb_ipk_), parameter :: psb_dupl_add_   = 0
+  integer(psb_ipk_), parameter :: psb_dupl_ovwrt_ = 1
   integer(psb_ipk_), parameter :: psb_dupl_err_   = 2
-  integer(psb_ipk_), parameter :: psb_dupl_def_   = psb_dupl_ovwrt_
+  integer(psb_ipk_), parameter :: psb_dupl_def_   = psb_dupl_add_
   ! Matrix update mode
   integer(psb_ipk_), parameter :: psb_upd_srch_   = 98764
   integer(psb_ipk_), parameter :: psb_upd_perm_   = 98765
