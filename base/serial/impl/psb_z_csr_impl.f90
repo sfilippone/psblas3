@@ -3384,7 +3384,7 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   ! Estimate number of nonzeros on output.
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = 2*(nza+nzb)
+  nzc = int(1.25*(nza+nzb))
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
