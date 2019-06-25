@@ -565,7 +565,7 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   character                :: lscale
   integer(psb_ipk_), parameter       :: nb=4
-  complex(psb_dpk_),pointer :: iwork(:), xp(:), yp(:)
+  complex(psb_dpk_)          :: iwork(1)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -636,32 +636,10 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
-  iwork => null()
-  ! check for presence/size of a work area
-  liwork= 2*ncol
-
-  if (present(work)) then     
-    if (size(work) >= liwork) then 
-      aliw =.false.
-    else 
-      aliw=.true.
-    endif
-  else
-    aliw=.true.
-  end if
-
-  if (aliw) then 
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  else
-    iwork => work
-  endif
-
+  ! With encapsulated vectors the inner routines
+  ! do not need the work area, hence liwork is
+  ! a simple array with 1 entry to keep the interface
+  ! happy. Might remove it entirely in the future. 
   iwork(1)=0.d0
 
   ! Perform local triangular system solve
@@ -682,15 +660,12 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
          & zone,y%v,desc_a,iwork,info,data=psb_comm_ovr_)
 
-
     if (info == psb_success_) call psi_ovrl_upd(y%v,desc_a,choice_,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
       goto 9999
     end if
   end if
-
-  if (aliw) deallocate(iwork)
 
   call psb_erractionrestore(err_act)
   return  
