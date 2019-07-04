@@ -2570,8 +2570,7 @@ subroutine  psb_s_csc_reallocate_nz(nz,a)
 
   call psb_realloc(max(nz,ione),a%ia,info)
   if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(max(nz,a%get_nrows()+1,&
-       & a%get_ncols()+1), a%icp,info)
+  if (info == psb_success_) call psb_realloc(a%get_ncols()+1, a%icp,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999

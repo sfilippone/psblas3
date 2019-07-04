@@ -1710,8 +1710,7 @@ subroutine  psb_d_csr_reallocate_nz(nz,a)
 
   call psb_realloc(max(nz,ione),a%ja,info)
   if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(&
-       & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
+  if (info == psb_success_) call psb_realloc(a%get_nrows()+1,a%irp,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
@@ -2978,7 +2977,7 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
     call psb_safe_ab_cpy(b%ia,itemp,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
-    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    if (info == psb_success_) call psb_realloc(nr+1,a%irp,info)
     
   endif
 
