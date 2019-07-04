@@ -127,17 +127,19 @@ contains
     end if
       
     if (global_) then
-      allocate(ptimers(timer_entries_,size(timers,2)),stat=info)
-      if (info /= 0) then
-        write(0,*) 'Error while trying to allocate temporary ',info
-        call psb_abort(ictxt)
-      end if
-      ptimers = timers
-      call psb_max(ictxt,ptimers)
-      if (me == psb_root_) then
-        do i=idxmin_, idxmax_
-          call print_timer(me, ptimers(:,i), timers_descr(i), iout)
-        end do
+      if (allocated(timers)) then 
+        allocate(ptimers(timer_entries_,size(timers,2)),stat=info)
+        if (info /= 0) then
+          write(0,*) 'Error while trying to allocate temporary ',info
+          call psb_abort(ictxt)
+        end if
+        ptimers = timers
+        call psb_max(ictxt,ptimers)
+        if (me == psb_root_) then
+          do i=idxmin_, idxmax_
+            call print_timer(me, ptimers(:,i), timers_descr(i), iout)
+          end do
+        end if
       end if
     else
       if ((proc_ == -1).or.(me==proc_)) then
