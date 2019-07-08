@@ -3416,21 +3416,26 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   dupl_ = dupl
 
 
-
-  allocate(iaux(max(nr,nc,nzin)+2),stat=info) 
+  allocate(iaux(nzin+2),stat=info) 
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  allocate(ias(nzin),jas(nzin),vs(nzin),ix2(max(nr,nc,nzin)+2), stat=info)
-  use_buffers = (info == 0)
   
   select case(idir_) 
 
   case(psb_row_major_) 
     !  Row major order
+
+    if (nr <= nzin) then
+      ! Avoid strange situations with large indices
+      allocate(ias(nzin),jas(nzin),vs(nzin),ix2(nzin+2), stat=info)
+      use_buffers = (info == 0)
+    else
+      use_buffers = .false.
+    end if
+    
     if (use_buffers) then 
       if (.not.(  (ia(1) < 1).or.(ia(1)> nr)) ) then 
         iaux(:) = 0
@@ -3751,6 +3756,14 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
 
   case(psb_col_major_) 
+
+    if (nc <= nzin) then
+      ! Avoid strange situations with large indices
+      allocate(ias(nzin),jas(nzin),vs(nzin),ix2(nzin+2), stat=info)
+      use_buffers = (info == 0)
+    else
+      use_buffers = .false.
+    end if
 
     if (use_buffers) then 
       iaux(:) = 0

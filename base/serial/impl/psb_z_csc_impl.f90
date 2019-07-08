@@ -2298,7 +2298,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
   call move_alloc(b%ja,itemp)
   call move_alloc(b%ia,a%ia)
   call move_alloc(b%val,a%val)
-  call psb_realloc(nc+1,a%icp,info)
+  call psb_realloc(max(nr+1,nc+1),a%icp,info)
   call b%free()
 
   a%icp(:) = 0

@@ -999,6 +999,8 @@ contains
 
 end subroutine psb_d_csr_cssv
 
+
+
 subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psb_string_mod
@@ -2960,7 +2962,7 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
     call move_alloc(tmp%ia,itemp)
     call move_alloc(tmp%ja,a%ja)
     call move_alloc(tmp%val,a%val)
-    call psb_realloc(nr+1,a%irp,info)
+    call psb_realloc(max(nr+1,nc+1),a%irp,info)
     call tmp%free()
 
   else
@@ -3129,7 +3131,7 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
-  call psb_realloc(nr+1,a%irp,info)
+  call psb_realloc(max(nr+1,nc+1),a%irp,info)
   call b%free()
 
 
@@ -3384,7 +3386,7 @@ subroutine psb_dcsrspspmm(a,b,c,info)
   ! Estimate number of nonzeros on output.
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = int(1.25*(nza+nzb))
+  nzc = 2*(nza+nzb)
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
