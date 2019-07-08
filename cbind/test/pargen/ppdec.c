@@ -131,7 +131,7 @@ int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor
 
   info = 0;
   psb_c_info(ictxt,&iam,&np);
-  deltah = (double) 1.0/(idim+2);
+  deltah = (double) 1.0/(idim+1);
   sqdeltah = deltah*deltah;
   deltah2  = 2.0* deltah;
   psb_c_set_index_base(0);
