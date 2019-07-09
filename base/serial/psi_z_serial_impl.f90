@@ -476,6 +476,7 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   if (alpha.eq.zzero) then 
     if (beta.eq.zzero) then 
       do j=1, n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = zzero
         enddo
@@ -487,12 +488,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-zone) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = - y(i,j)
         enddo
       enddo
     else  
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) =  beta*y(i,j)
         enddo
@@ -503,12 +506,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.zzero) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = x(i,j)
         enddo
       enddo
     else if (beta.eq.zone) then
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = x(i,j) + y(i,j)
         enddo
@@ -516,12 +521,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-zone) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = x(i,j) - y(i,j)
         enddo
       enddo
     else  
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = x(i,j) + beta*y(i,j)
         enddo
@@ -532,12 +539,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.zzero) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = -x(i,j)
         enddo
       enddo
     else if (beta.eq.zone) then
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = -x(i,j) + y(i,j)
         enddo
@@ -545,12 +554,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-zone) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = -x(i,j) - y(i,j)
         enddo
       enddo
     else  
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = -x(i,j) + beta*y(i,j)
         enddo
@@ -561,12 +572,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.zzero) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
     else if (beta.eq.zone) then
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
@@ -574,12 +587,14 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-zone) then 
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = alpha*x(i,j) - y(i,j)
         enddo
       enddo
     else  
       do j=1,n 
+        !$omp parallel do private(i) shared(j)
         do i=1,m 
           y(i,j) = alpha*x(i,j) + beta*y(i,j)
         enddo

@@ -255,6 +255,7 @@ subroutine psb_c_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   end if
 
   call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=cone)
+  !$omp parallel do private(i)
   do i=1,nrow
     if (prec%d(i) == dzero) then
       prec%d(i) = cone

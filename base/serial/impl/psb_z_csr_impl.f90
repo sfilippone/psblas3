@@ -131,10 +131,12 @@ contains
 
     if (alpha == zzero) then
       if (beta == zzero) then
+        !$omp parallel do private(i)
         do i = 1, m
           y(i) = zzero
         enddo
       else
+        !$omp parallel do private(i)
         do  i = 1, m
           y(i) = beta*y(i)
         end do
@@ -148,6 +150,7 @@ contains
       if (beta == zzero) then 
 
         if (alpha == zone) then 
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -158,6 +161,7 @@ contains
 
         else if (alpha == -zone) then 
 
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -168,6 +172,7 @@ contains
 
         else 
 
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -181,7 +186,8 @@ contains
 
       else if (beta == zone) then 
 
-        if (alpha == zone) then 
+        if (alpha == zone) then
+          !$omp parallel do private(i,j,acc)          
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -192,7 +198,8 @@ contains
 
         else if (alpha == -zone) then 
 
-          do i=1,m 
+          !$omp parallel do private(i,j,acc)
+          do i=1,m            
             acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
@@ -200,8 +207,9 @@ contains
             y(i) = y(i) -acc
           end do
 
-        else 
-
+        else
+          
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -214,7 +222,8 @@ contains
 
       else if (beta == -zone) then 
 
-        if (alpha == zone) then 
+        if (alpha == zone) then
+          !$omp parallel do private(i,j,acc)          
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -224,7 +233,7 @@ contains
           end do
 
         else if (alpha == -zone) then 
-
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -234,7 +243,7 @@ contains
           end do
 
         else 
-
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -247,7 +256,8 @@ contains
 
       else 
 
-        if (alpha == zone) then 
+        if (alpha == zone) then
+          !$omp parallel do private(i,j,acc)          
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -257,7 +267,7 @@ contains
           end do
 
         else if (alpha == -zone) then 
-
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1
@@ -267,7 +277,7 @@ contains
           end do
 
         else 
-
+          !$omp parallel do private(i,j,acc)
           do i=1,m 
             acc  = zzero
             do j=irp(i), irp(i+1)-1

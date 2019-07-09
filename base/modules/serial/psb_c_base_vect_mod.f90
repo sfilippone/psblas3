@@ -964,6 +964,7 @@ contains
     info = 0
     if (y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
+    !$omp parallel do private(i)    
     do i=1, n 
       y%v(i) = y%v(i)*x(i)
     end do
@@ -1001,6 +1002,7 @@ contains
       if (beta == cone) then 
         return 
       else
+        !$omp parallel do private(i) shared(beta)   
         do i=1, n
           z%v(i) = beta*z%v(i)
         end do
@@ -1008,42 +1010,51 @@ contains
     else
       if (alpha == cone) then 
         if (beta == czero) then 
+          !$omp parallel do private(i)    
           do i=1, n 
             z%v(i) = y(i)*x(i)
           end do
         else if (beta == cone) then 
+          !$omp parallel do private(i)    
           do i=1, n 
             z%v(i) = z%v(i) + y(i)*x(i)
           end do
-        else 
+        else
+          !$omp parallel do private(i)  shared(beta)
           do i=1, n 
             z%v(i) = beta*z%v(i) + y(i)*x(i)
           end do
         end if
       else if (alpha == -cone) then 
         if (beta == czero) then 
+          !$omp parallel do private(i)    
           do i=1, n 
             z%v(i) = -y(i)*x(i)
           end do
         else if (beta == cone) then 
+          !$omp parallel do private(i)    
           do i=1, n 
             z%v(i) = z%v(i) - y(i)*x(i)
           end do
         else 
+          !$omp parallel do private(i)  shared(beta)
           do i=1, n 
             z%v(i) = beta*z%v(i) - y(i)*x(i)
           end do
         end if
       else
         if (beta == czero) then 
+          !$omp parallel do private(i) shared(alpha)   
           do i=1, n 
             z%v(i) = alpha*y(i)*x(i)
           end do
-        else if (beta == cone) then 
+        else if (beta == cone) then
+          !$omp parallel do private(i) shared(alpha)             
           do i=1, n 
             z%v(i) = z%v(i) + alpha*y(i)*x(i)
           end do
-        else 
+        else
+          !$omp parallel do private(i) shared(alpha,beta)             
           do i=1, n 
             z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
           end do
@@ -1143,8 +1154,10 @@ contains
     class(psb_c_base_vect_type), intent(inout)  :: x
     complex(psb_spk_), intent (in)       :: alpha
     
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
+      !$OMP parallel workshare      
       x%v = alpha*x%v
+      !$OMP end parallel workshare      
       call x%set_host()
     end if
 
@@ -1181,8 +1194,9 @@ contains
     real(psb_spk_)                :: res
     
     if (x%is_dev()) call x%sync()
+    !$OMP parallel workshare    
     res =  maxval(abs(x%v(1:n)))
-
+    !$OMP end parallel workshare      
   end function c_base_amax
 
   !
@@ -1197,8 +1211,9 @@ contains
     real(psb_spk_)                :: res
     
     if (x%is_dev()) call x%sync()
+    !$OMP parallel workshare
     res =  sum(abs(x%v(1:n)))
-
+    !$OMP end parallel workshare      
   end function c_base_asum
   
   
