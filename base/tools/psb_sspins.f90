@@ -191,7 +191,7 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
 end subroutine psb_sspins
 
-subroutine psb_sspins_csr_lirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+subroutine psb_sspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_sspins_csr_lirp
   use psi_mod
   implicit none
