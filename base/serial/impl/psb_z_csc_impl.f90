@@ -2220,7 +2220,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
   call move_alloc(b%ja,itemp)
   call move_alloc(b%ia,a%ia)
   call move_alloc(b%val,a%val)
-  call psb_realloc(max(nr+1,nc+1),a%icp,info)
+  call psb_realloc(nc+1,a%icp,info)
   call b%free()
 
   a%icp(:) = 0
@@ -2489,8 +2489,7 @@ subroutine  psb_z_csc_reallocate_nz(nz,a)
 
   call psb_realloc(max(nz,ione),a%ia,info)
   if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(max(nz,a%get_nrows()+1,&
-       & a%get_ncols()+1), a%icp,info)
+  if (info == psb_success_) call psb_realloc(a%get_ncols()+1, a%icp,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
@@ -4071,7 +4070,7 @@ subroutine psb_lz_mv_csc_from_coo(a,b,info)
   call move_alloc(b%ja,itemp)
   call move_alloc(b%ia,a%ia)
   call move_alloc(b%val,a%val)
-  call psb_realloc(max(nr+1,nc+1),a%icp,info)
+  call psb_realloc(nc+1,a%icp,info)
   call b%free()
 
   a%icp(:) = 0
@@ -4340,8 +4339,7 @@ subroutine  psb_lz_csc_reallocate_nz(nz,a)
 
   call psb_realloc(max(nz,ione),a%ia,info)
   if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(max(nz,a%get_nrows()+1,&
-       & a%get_ncols()+1), a%icp,info)
+  if (info == psb_success_) call psb_realloc(a%get_ncols()+1, a%icp,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999

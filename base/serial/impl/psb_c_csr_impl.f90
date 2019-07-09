@@ -1708,8 +1708,7 @@ subroutine  psb_c_csr_reallocate_nz(nz,a)
 
   call psb_realloc(max(nz,ione),a%ja,info)
   if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(&
-       & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
+  if (info == psb_success_) call psb_realloc(a%get_nrows()+1,a%irp,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
@@ -2866,7 +2865,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
     call move_alloc(tmp%ia,itemp)
     call move_alloc(tmp%ja,a%ja)
     call move_alloc(tmp%val,a%val)
-    call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    call psb_realloc(nr+1,a%irp,info)
     call tmp%free()
 
   else
@@ -2884,7 +2883,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
     call psb_safe_ab_cpy(b%ia,itemp,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
-    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    if (info == psb_success_) call psb_realloc(nr+1,a%irp,info)
     
   endif
 
@@ -3035,7 +3034,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
-  call psb_realloc(max(nr+1,nc+1),a%irp,info)
+  call psb_realloc(nr+1,a%irp,info)
   call b%free()
 
 
@@ -3831,8 +3830,7 @@ subroutine  psb_lc_csr_reallocate_nz(nz,a)
 
   call psb_realloc(max(nz,ione),a%ja,info)
   if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(&
-       & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
+  if (info == psb_success_) call psb_realloc(a%get_nrows()+1,a%irp,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
@@ -4991,7 +4989,7 @@ subroutine psb_lc_cp_csr_from_coo(a,b,info)
     call move_alloc(tmp%ia,itemp)
     call move_alloc(tmp%ja,a%ja)
     call move_alloc(tmp%val,a%val)
-    call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    call psb_realloc(nr+1,a%irp,info)
     call tmp%free()
 
   else
@@ -5009,7 +5007,7 @@ subroutine psb_lc_cp_csr_from_coo(a,b,info)
     call psb_safe_ab_cpy(b%ia,itemp,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
-    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    if (info == psb_success_) call psb_realloc(nr+1,a%irp,info)
     
   endif
 
@@ -5160,7 +5158,7 @@ subroutine psb_lc_mv_csr_from_coo(a,b,info)
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
-  call psb_realloc(max(nr+1,nc+1),a%irp,info)
+  call psb_realloc(nr+1,a%irp,info)
   call b%free()
 
 
