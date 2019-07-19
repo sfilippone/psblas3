@@ -624,6 +624,7 @@ module psb_c_csr_mat_mod
     procedure, pass(a) :: trim        => psb_c_csrd_trim
     procedure, pass(a) :: free        => c_csrd_free
     procedure, pass(a) :: mold        => psb_c_csrd_mold
+    procedure, nopass  :: has_xt_tri  => c_csrd_has_xt_tri
 
   end type psb_c_csrd_sparse_mat
 
@@ -871,6 +872,17 @@ contains
     return
 
   end subroutine c_csrd_free
+
+  !
+  !  has_xt_tri: does the current type support
+  !    extended triangle operations?  
+  !  
+  function c_csrd_has_xt_tri() result(res)
+    implicit none 
+    logical :: res
+    
+    res = .true.    
+  end function c_csrd_has_xt_tri
 
 
 end module psb_c_csr_mat_mod
