@@ -57,7 +57,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
-  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_mpik_) :: ictxt,np,me, root_
   integer(psb_mpik_) :: icomm, minfo, ndx
   integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
@@ -87,6 +87,11 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     p_desc_c => desc_c
   else
     p_desc_c => desc_a
+  end if
+  if (present(root)) then
+    root_ = root
+  else
+    root_ = -1 
   end if
     
   call globa%free()
