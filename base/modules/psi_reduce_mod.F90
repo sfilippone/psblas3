@@ -182,6 +182,14 @@ module psi_reduce_mod
   end interface
 #endif
 
+  interface psb_scan_sum
+    module procedure psb_iscan_sums
+  end interface psb_scan_sum
+
+  interface psb_exscan_sum
+    module procedure psb_iexscan_sums
+  end interface psb_exscan_sum
+
 
 contains 
 
@@ -5586,4 +5594,59 @@ contains
   end subroutine psb_d_nrm2v_ic
 
 #endif
+
+
+  ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  !  SCAN
+  !
+  ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  subroutine psb_iscan_sums(ictxt,dat)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_) :: dat_
+    integer(psb_mpik_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call mpi_scan(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,ictxt,info)
+    dat = dat_
+#endif    
+  end subroutine psb_iscan_sums
+
+
+  subroutine psb_iexscan_sums(ictxt,dat)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_) :: dat_
+    integer(psb_mpik_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call mpi_scan(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,ictxt,info)
+    dat = dat_
+#else
+    dat = 0
+#endif    
+  end subroutine psb_iexscan_sums
+
 end module psi_reduce_mod
