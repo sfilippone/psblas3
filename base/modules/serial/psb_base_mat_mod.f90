@@ -116,6 +116,8 @@ module psb_base_mat_mod
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
     integer(psb_ipk_), private     :: duplicate 
+    !> Is the matrix  symmetric? (must also be square)
+    logical, private     :: symmetric
     !> Is the matrix triangular? (must also be square)
     logical, private     :: triangle
     !> Is the matrix upper or lower? (only if  triangular)
@@ -152,6 +154,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_upper    => psb_base_is_upper
     procedure, pass(a) :: is_lower    => psb_base_is_lower
     procedure, pass(a) :: is_triangle => psb_base_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_base_is_symmetric
     procedure, pass(a) :: is_unit     => psb_base_is_unit
     procedure, pass(a) :: is_by_rows  => psb_base_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_base_is_by_cols
@@ -174,6 +177,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_upper    => psb_base_set_upper
     procedure, pass(a) :: set_lower    => psb_base_set_lower
     procedure, pass(a) :: set_triangle => psb_base_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_base_set_symmetric
     procedure, pass(a) :: set_unit     => psb_base_set_unit
 
     procedure, pass(a) :: set_repeatable_updates     => psb_base_set_repeatable_updates
@@ -586,6 +590,18 @@ contains
     end if
   end subroutine psb_base_set_triangle
 
+  subroutine psb_base_set_symmetric(a,val) 
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%symmetric = val
+    else
+      a%symmetric = .true.
+    end if
+  end subroutine psb_base_set_symmetric
+
   subroutine psb_base_set_unit(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
@@ -641,6 +657,13 @@ contains
     res = a%triangle
   end function psb_base_is_triangle
 
+  function psb_base_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = a%symmetric
+  end function psb_base_is_symmetric
+
   function psb_base_is_unit(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -652,14 +675,14 @@ contains
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = a%upper
+    res = a%upper .and. a%triangle
   end function psb_base_is_upper
 
   function psb_base_is_lower(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = .not.a%upper
+    res = (.not.a%upper) .and. a%triangle
   end function psb_base_is_lower
 
   function psb_base_is_null(a) result(res)
