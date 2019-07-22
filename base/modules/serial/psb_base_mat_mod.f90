@@ -770,6 +770,7 @@ contains
     b%state     = a%state
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
+    b%symmetric = a%symmetric
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
@@ -789,6 +790,7 @@ contains
     b%state     = a%state
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
+    b%symmetric = a%symmetric
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
@@ -808,6 +810,7 @@ contains
     a%state     = a%state
     a%duplicate = a%duplicate
     a%triangle  = a%triangle
+    a%symmetric = a%symmetric
     a%unitd     = a%unitd
     a%upper     = .not.a%upper
     a%sorted    = .false.
