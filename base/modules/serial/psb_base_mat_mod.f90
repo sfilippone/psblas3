@@ -125,6 +125,8 @@ module psb_base_mat_mod
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
     integer(psb_ipk_), private     :: duplicate 
+    !> Is the matrix  symmetric? (must also be square)
+    logical, private     :: symmetric
     !> Is the matrix triangular? (must also be square)
     logical, private     :: triangle
     !> Is the matrix upper or lower? (only if  triangular)
@@ -152,6 +154,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_dupl    => psb_base_get_dupl
     procedure, nopass  :: get_fmt     => psb_base_get_fmt
     procedure, nopass  :: has_update  => psb_base_has_update
+    procedure, nopass  :: has_xt_tri  => psb_base_has_xt_tri
     procedure, pass(a) :: is_null     => psb_base_is_null
     procedure, pass(a) :: is_bld      => psb_base_is_bld
     procedure, pass(a) :: is_upd      => psb_base_is_upd
@@ -160,6 +163,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_upper    => psb_base_is_upper
     procedure, pass(a) :: is_lower    => psb_base_is_lower
     procedure, pass(a) :: is_triangle => psb_base_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_base_is_symmetric
     procedure, pass(a) :: is_unit     => psb_base_is_unit
     procedure, pass(a) :: is_by_rows  => psb_base_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_base_is_by_cols
@@ -182,6 +186,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_upper    => psb_base_set_upper
     procedure, pass(a) :: set_lower    => psb_base_set_lower
     procedure, pass(a) :: set_triangle => psb_base_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_base_set_symmetric
     procedure, pass(a) :: set_unit     => psb_base_set_unit
 
     procedure, pass(a) :: set_repeatable_updates     => psb_base_set_repeatable_updates
@@ -495,6 +500,8 @@ module psb_base_mat_mod
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
     integer(psb_ipk_), private     :: duplicate 
+    !> Is the matrix  symmetric? (must also be square)
+    logical, private     :: symmetric
     !> Is the matrix triangular? (must also be square)
     logical, private     :: triangle
     !> Is the matrix upper or lower? (only if  triangular)
@@ -522,6 +529,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_dupl    => psb_lbase_get_dupl
     procedure, nopass  :: get_fmt     => psb_lbase_get_fmt
     procedure, nopass  :: has_update  => psb_lbase_has_update
+    procedure, nopass  :: has_xt_tri  => psb_lbase_has_xt_tri
     procedure, pass(a) :: is_null     => psb_lbase_is_null
     procedure, pass(a) :: is_bld      => psb_lbase_is_bld
     procedure, pass(a) :: is_upd      => psb_lbase_is_upd
@@ -530,6 +538,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_upper    => psb_lbase_is_upper
     procedure, pass(a) :: is_lower    => psb_lbase_is_lower
     procedure, pass(a) :: is_triangle => psb_lbase_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_lbase_is_symmetric
     procedure, pass(a) :: is_unit     => psb_lbase_is_unit
     procedure, pass(a) :: is_by_rows  => psb_lbase_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_lbase_is_by_cols
@@ -552,6 +561,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_upper    => psb_lbase_set_upper
     procedure, pass(a) :: set_lower    => psb_lbase_set_lower
     procedure, pass(a) :: set_triangle => psb_lbase_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_lbase_set_symmetric
     procedure, pass(a) :: set_unit     => psb_lbase_set_unit
 
     procedure, pass(a) :: set_repeatable_updates     => psb_lbase_set_repeatable_updates
@@ -968,6 +978,18 @@ contains
     end if
   end subroutine psb_base_set_triangle
 
+  subroutine psb_base_set_symmetric(a,val) 
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%symmetric = val
+    else
+      a%symmetric = .true.
+    end if
+  end subroutine psb_base_set_symmetric
+
   subroutine psb_base_set_unit(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
@@ -1023,6 +1045,13 @@ contains
     res = a%triangle
   end function psb_base_is_triangle
 
+  function psb_base_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = a%symmetric
+  end function psb_base_is_symmetric
+
   function psb_base_is_unit(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -1034,14 +1063,14 @@ contains
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = a%upper
+    res = a%upper .and. a%triangle
   end function psb_base_is_upper
 
   function psb_base_is_lower(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = .not.a%upper
+    res = (.not.a%upper) .and. a%triangle
   end function psb_base_is_lower
 
   function psb_base_is_null(a) result(res)
@@ -1101,6 +1130,17 @@ contains
     res = a%repeatable_updates
   end function psb_base_is_repeatable_updates
 
+  !
+  !  has_xt_tri: does the current type support
+  !    extended triangle operations?  
+  !  
+  function psb_base_has_xt_tri() result(res)
+    implicit none 
+    logical :: res
+    
+    res = .false.    
+  end function psb_base_has_xt_tri
+
   
   !
   !  TRANSP: note sorted=.false.
@@ -1118,6 +1158,7 @@ contains
     b%state     = a%state
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
+    b%symmetric = a%symmetric
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
@@ -1137,6 +1178,7 @@ contains
     b%state     = a%state
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
+    b%symmetric = a%symmetric
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
@@ -1429,6 +1471,18 @@ contains
     end if
   end subroutine psb_lbase_set_triangle
 
+  subroutine psb_lbase_set_symmetric(a,val) 
+    implicit none 
+    class(psb_lbase_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%symmetric = val
+    else
+      a%symmetric = .true.
+    end if
+  end subroutine psb_lbase_set_symmetric
+
   subroutine psb_lbase_set_unit(a,val) 
     implicit none 
     class(psb_lbase_sparse_mat), intent(inout) :: a
@@ -1477,12 +1531,30 @@ contains
     end if
   end subroutine psb_lbase_set_repeatable_updates
 
+  !
+  !  has_xt_tri: does the current type support
+  !    extended triangle operations?  
+  !  
+  function psb_lbase_has_xt_tri() result(res)
+    implicit none 
+    logical :: res
+    
+    res = .false.    
+  end function psb_lbase_has_xt_tri
+
   function psb_lbase_is_triangle(a) result(res)
     implicit none 
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%triangle
   end function psb_lbase_is_triangle
+
+  function psb_lbase_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_lbase_sparse_mat), intent(in) :: a
+    logical :: res
+    res = a%symmetric
+  end function psb_lbase_is_symmetric
 
   function psb_lbase_is_unit(a) result(res)
     implicit none 
@@ -1495,14 +1567,14 @@ contains
     implicit none 
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
-    res = a%upper
+    res = a%upper .and. a%triangle
   end function psb_lbase_is_upper
 
   function psb_lbase_is_lower(a) result(res)
     implicit none 
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
-    res = .not.a%upper
+    res = (.not.a%upper) .and. a%triangle
   end function psb_lbase_is_lower
 
   function psb_lbase_is_null(a) result(res)
