@@ -63,7 +63,8 @@ module psb_timers_mod
   type(psb_string_item), allocatable :: timers_descr(:)
   logical                         :: wanted(timer_entries_)
   type(psb_string_item)           :: entries_descr(timer_entries_)
-
+  save  :: nsamples, timers, timers_descr, wanted, entries_descr
+  
   interface psb_realloc
     module procedure psb_string_item_realloc
   end interface psb_realloc
