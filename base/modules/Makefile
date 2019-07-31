@@ -38,7 +38,7 @@ UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_m
 	tools/psb_s_tools_a_mod.o tools/psb_d_tools_a_mod.o\
 	tools/psb_c_tools_a_mod.o tools/psb_z_tools_a_mod.o \
 	tools/psb_tools_mod.o \
-	psb_penv_mod.o $(COMMINT) psb_error_impl.o \
+	psb_penv_mod.o $(COMMINT) psb_error_impl.o  psb_timers_mod.o \
 	comm/psb_base_linmap_mod.o comm/psb_linmap_mod.o \
 	comm/psb_s_linmap_mod.o comm/psb_d_linmap_mod.o \
 	comm/psb_c_linmap_mod.o comm/psb_z_linmap_mod.o \
@@ -237,6 +237,8 @@ serial/psb_vect_mod.o: serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o serial/ps
 
 error.o psb_realloc_mod.o: psb_error_mod.o 
 psb_error_impl.o: psb_penv_mod.o
+psb_timers_mod.o: psb_penv_mod.o psb_const_mod.o psb_realloc_mod.o psb_error_mod.o
+
 psb_spmat_type.o: auxil/psb_string_mod.o auxil/psb_sort_mod.o
 
 desc/psb_desc_mod.o: psb_penv_mod.o psb_realloc_mod.o\
