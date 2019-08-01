@@ -41,7 +41,7 @@
 !    ictxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
-subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
+subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
@@ -53,7 +53,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   integer(psb_lpk_), intent(in)               :: v(:)
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
-  logical, intent(in), optional     :: globalcheck
+  logical, intent(in), optional     :: globalcheck,usehash
   integer(psb_ipk_), intent(in), optional     :: idx(:)
 
   !locals
@@ -70,7 +70,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   integer(psb_mpk_)  :: iictxt
   real(psb_dpk_)     :: t0, t1, t2, t3, t4, t5 
   logical            :: do_timings=.false.
-  logical            :: check_, islarge
+  logical            :: check_, islarge, usehash_
   character(len=20)  :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -99,6 +99,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     check_ = globalcheck
   else
     check_ = .false.
+  end if
+  if (present(usehash)) then 
+    usehash_ = usehash
+  else
+    usehash_ = .false.
   end if
 
   n = m
@@ -374,7 +379,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   if (np == 1) then 
     allocate(psb_repl_map :: desc%indxmap, stat=info)
   else
-    if (islarge) then 
+    if (islarge.or.usehash_) then 
       allocate(psb_hash_map :: desc%indxmap, stat=info)
     else
       allocate(psb_list_map :: desc%indxmap, stat=info)

@@ -1,4 +1,4 @@
-subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx)
+subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalcheck,lidx,usehash)
   use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
@@ -11,11 +11,11 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   integer(psb_lpk_), intent(in)       :: mg,ng, vl(:)
   integer(psb_ipk_), intent(in)       :: ictxt, vg(:), lidx(:),nl
   integer(psb_ipk_), intent(in)       :: flag
-  logical, intent(in)               :: repl, globalcheck
+  logical, intent(in)               :: repl, globalcheck,usehash
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
 
-  optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx
+  optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx, usehash
 
   interface 
     subroutine psb_cdals(m, n, parts, ictxt, desc, info)
@@ -33,14 +33,14 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
       integer(psb_ipk_), intent(out)              :: info
       Type(psb_desc_type), intent(out)  :: desc
     end subroutine psb_cdalv
-    subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
+    subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx, usehash)
       use psb_desc_mod
       implicit None
       integer(psb_ipk_), intent(in)               :: ictxt
       integer(psb_lpk_), intent(in)               :: v(:)
       integer(psb_ipk_), intent(out)              :: info
       type(psb_desc_type), intent(out)  :: desc
-      logical, intent(in), optional     :: globalcheck
+      logical, intent(in), optional     :: globalcheck, usehash
       integer(psb_ipk_), intent(in), optional     :: idx(:)
     end subroutine psb_cd_inloc
     subroutine psb_cdrep(m, ictxt, desc,info)
@@ -52,12 +52,14 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     end subroutine psb_cdrep
   end interface
   character(len=20)   :: name
-  integer(psb_ipk_) :: err_act, flag_, i, me, np, nlp, nnv, lr
-  integer(psb_lpk_) :: n_
-  integer(psb_ipk_), allocatable :: itmpsz(:) 
+  integer(psb_ipk_) :: err_act, flag_, i, me, np, nnv, lr
+  integer(psb_lpk_) :: n_, nlp
+  logical            :: usehash_
+  integer(psb_ipk_), allocatable :: itmpv(:)
+  integer(psb_lpk_), allocatable :: lvl(:)
   integer(psb_mpk_) :: iictxt
- 
-  
+
+
 
   if (psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -134,34 +136,47 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     call psb_cd_inloc(vl(1:nnv),ictxt,desc,info, globalcheck=globalcheck,idx=lidx)
 
   else if (present(nl)) then 
-    
 
-    if (np == 1) then 
-      allocate(psb_repl_map      :: desc%indxmap, stat=info)
+    if (present(usehash)) then
+      usehash_ = usehash
     else
-      allocate(psb_gen_block_map :: desc%indxmap, stat=info)
+      usehash_ = .false.
     end if
-    if (info == psb_success_) then 
-      select type(aa => desc%indxmap) 
-      type is (psb_repl_map)
-        n_ = nl
-        call aa%repl_map_init(iictxt,n_,info)
-      type is (psb_gen_block_map) 
-        call aa%gen_block_map_init(iictxt,nl,info)
-      class default 
-        ! This cannot happen 
-        info = psb_err_internal_error_
-        goto 9999
-      end select
+
+    if (usehash_) then
+      nlp = nl
+      call psb_exscan_sum(ictxt,nlp)
+      lvl = [ (i,i=1,nl) ] + nlp
+      call psb_cd_inloc(lvl(1:nl),ictxt,desc,info, globalcheck=.false.)
+
+    else
+      if (np == 1) then 
+        allocate(psb_repl_map      :: desc%indxmap, stat=info)
+      else
+        allocate(psb_gen_block_map :: desc%indxmap, stat=info)
+      end if
+      if (info == psb_success_) then 
+        select type(aa => desc%indxmap) 
+        type is (psb_repl_map)
+          n_ = nl
+          call aa%repl_map_init(iictxt,n_,info)
+        type is (psb_gen_block_map) 
+          call aa%gen_block_map_init(iictxt,nl,info)
+          class default 
+            ! This cannot happen 
+          info = psb_err_internal_error_
+          goto 9999
+        end select
+      end if
     end if
-    
-    call psb_realloc(1,itmpsz, info)
+
+    call psb_realloc(1,itmpv, info)
     if (info /= 0) then 
       write(0,*) 'Error reallocating itmspz'
       goto 9999
     end if
-    itmpsz(:) = -1
-    call psi_bld_tmpovrl(itmpsz,desc,info)
+    itmpv(:) = -1
+    call psi_bld_tmpovrl(itmpv,desc,info)
 
   endif
 
