@@ -52,7 +52,17 @@ module psi_c_collective_mod
   interface psb_bcast
     module procedure psb_cbcasts, psb_cbcastv, psb_cbcastm, &
          & psb_cbcasts_ec, psb_cbcastv_ec, psb_cbcastm_ec
-  end interface
+  end interface psb_bcast
+
+  interface psb_scan_sum
+    module procedure psb_cscan_sums
+  end interface psb_scan_sum
+
+  interface psb_exscan_sum
+    module procedure psb_cexscan_sums
+  end interface psb_exscan_sum
+
+
 
 
 contains 
@@ -738,6 +748,60 @@ contains
       call psb_bcast(ictxt_,dat)
     end if
   end subroutine psb_cbcastm_ec
+
+
+  ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  !  SCAN
+  !
+  ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  subroutine psb_cscan_sums(ictxt,dat)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat
+    complex(psb_spk_) :: dat_
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call mpi_scan(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,ictxt,info)
+    dat = dat_
+#endif    
+  end subroutine psb_cscan_sums
+
+
+  subroutine psb_cexscan_sums(ictxt,dat)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat
+    complex(psb_spk_) :: dat_
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call mpi_scan(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,ictxt,info)
+    dat = dat_
+#else
+    dat = 0
+#endif    
+  end subroutine psb_cexscan_sums
 
 
   
