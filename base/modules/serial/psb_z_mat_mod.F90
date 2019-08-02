@@ -104,6 +104,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: is_upper    => psb_z_is_upper
     procedure, pass(a) :: is_lower    => psb_z_is_lower
     procedure, pass(a) :: is_triangle => psb_z_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_z_is_symmetric
     procedure, pass(a) :: is_unit     => psb_z_is_unit
     procedure, pass(a) :: is_repeatable_updates => psb_z_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_z_get_fmt
@@ -121,6 +122,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: set_upper    => psb_z_set_upper
     procedure, pass(a) :: set_lower    => psb_z_set_lower
     procedure, pass(a) :: set_triangle => psb_z_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_z_set_symmetric
     procedure, pass(a) :: set_unit     => psb_z_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_z_set_repeatable_updates
 
@@ -284,6 +286,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: is_upper    => psb_lz_is_upper
     procedure, pass(a) :: is_lower    => psb_lz_is_lower
     procedure, pass(a) :: is_triangle => psb_lz_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_lz_is_symmetric
     procedure, pass(a) :: is_unit     => psb_lz_is_unit
     procedure, pass(a) :: is_repeatable_updates => psb_lz_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_lz_get_fmt
@@ -301,6 +304,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: set_upper    => psb_lz_set_upper
     procedure, pass(a) :: set_lower    => psb_lz_set_lower
     procedure, pass(a) :: set_triangle => psb_lz_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_lz_set_symmetric
     procedure, pass(a) :: set_unit     => psb_lz_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_lz_set_repeatable_updates
 
@@ -509,6 +513,14 @@ module psb_z_mat_mod
     end subroutine psb_z_set_triangle
   end interface
   
+  interface 
+    subroutine psb_z_set_symmetric(a,val) 
+      import :: psb_ipk_, psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
+      logical, intent(in), optional :: val
+    end subroutine psb_z_set_symmetric
+  end interface
+    
   interface 
     subroutine psb_z_set_unit(a,val) 
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type
@@ -1216,6 +1228,14 @@ module psb_z_mat_mod
   end interface
   
   interface 
+    subroutine psb_lz_set_symmetric(a,val) 
+      import :: psb_ipk_, psb_lzspmat_type
+      class(psb_lzspmat_type), intent(inout) :: a
+      logical, intent(in), optional :: val
+    end subroutine psb_lz_set_symmetric
+  end interface
+    
+  interface 
     subroutine psb_lz_set_unit(a,val) 
       import :: psb_ipk_, psb_lpk_, psb_lzspmat_type
       class(psb_lzspmat_type), intent(inout) :: a
@@ -1873,6 +1893,19 @@ contains
 
   end function psb_z_is_triangle
 
+  function psb_z_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_zspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_symmetric()
+    else
+      res = .false.
+    end if
+
+  end function psb_z_is_symmetric
+
   function psb_z_is_unit(a) result(res)
     implicit none 
     class(psb_zspmat_type), intent(in) :: a
@@ -2369,6 +2402,20 @@ contains
     end if
 
   end function psb_lz_is_triangle
+
+
+  function psb_lz_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_lzspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_symmetric()
+    else
+      res = .false.
+    end if
+
+  end function psb_lz_is_symmetric
 
   function psb_lz_is_unit(a) result(res)
     implicit none 

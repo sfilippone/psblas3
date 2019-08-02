@@ -326,6 +326,34 @@ subroutine psb_s_set_triangle(a,val)
 
 end subroutine psb_s_set_triangle
 
+subroutine psb_s_set_symmetric(a,val) 
+  use psb_s_mat_mod, psb_protect_name => psb_s_set_symmetric
+  use psb_error_mod
+  implicit none 
+  class(psb_sspmat_type), intent(inout) :: a
+  logical, intent(in), optional :: val
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='get_nzeros'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%set_symmetric(val)
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_set_symmetric
 
 subroutine psb_s_set_unit(a,val) 
   use psb_s_mat_mod, psb_protect_name => psb_s_set_unit
@@ -2848,6 +2876,34 @@ subroutine psb_ls_set_triangle(a,val)
 
 end subroutine psb_ls_set_triangle
 
+subroutine psb_ls_set_symmetric(a,val) 
+  use psb_s_mat_mod, psb_protect_name => psb_ls_set_symmetric
+  use psb_error_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(inout) :: a
+  logical, intent(in), optional :: val
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='get_nzeros'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%set_symmetric(val)
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_set_symmetric
 
 subroutine psb_ls_set_unit(a,val) 
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_unit

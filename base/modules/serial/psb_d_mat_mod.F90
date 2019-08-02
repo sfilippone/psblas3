@@ -104,6 +104,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: is_upper    => psb_d_is_upper
     procedure, pass(a) :: is_lower    => psb_d_is_lower
     procedure, pass(a) :: is_triangle => psb_d_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_d_is_symmetric
     procedure, pass(a) :: is_unit     => psb_d_is_unit
     procedure, pass(a) :: is_repeatable_updates => psb_d_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_d_get_fmt
@@ -121,6 +122,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: set_upper    => psb_d_set_upper
     procedure, pass(a) :: set_lower    => psb_d_set_lower
     procedure, pass(a) :: set_triangle => psb_d_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_d_set_symmetric
     procedure, pass(a) :: set_unit     => psb_d_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_d_set_repeatable_updates
 
@@ -284,6 +286,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: is_upper    => psb_ld_is_upper
     procedure, pass(a) :: is_lower    => psb_ld_is_lower
     procedure, pass(a) :: is_triangle => psb_ld_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_ld_is_symmetric
     procedure, pass(a) :: is_unit     => psb_ld_is_unit
     procedure, pass(a) :: is_repeatable_updates => psb_ld_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_ld_get_fmt
@@ -301,6 +304,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: set_upper    => psb_ld_set_upper
     procedure, pass(a) :: set_lower    => psb_ld_set_lower
     procedure, pass(a) :: set_triangle => psb_ld_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_ld_set_symmetric
     procedure, pass(a) :: set_unit     => psb_ld_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_ld_set_repeatable_updates
 
@@ -509,6 +513,14 @@ module psb_d_mat_mod
     end subroutine psb_d_set_triangle
   end interface
   
+  interface 
+    subroutine psb_d_set_symmetric(a,val) 
+      import :: psb_ipk_, psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
+      logical, intent(in), optional :: val
+    end subroutine psb_d_set_symmetric
+  end interface
+    
   interface 
     subroutine psb_d_set_unit(a,val) 
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type
@@ -1216,6 +1228,14 @@ module psb_d_mat_mod
   end interface
   
   interface 
+    subroutine psb_ld_set_symmetric(a,val) 
+      import :: psb_ipk_, psb_ldspmat_type
+      class(psb_ldspmat_type), intent(inout) :: a
+      logical, intent(in), optional :: val
+    end subroutine psb_ld_set_symmetric
+  end interface
+    
+  interface 
     subroutine psb_ld_set_unit(a,val) 
       import :: psb_ipk_, psb_lpk_, psb_ldspmat_type
       class(psb_ldspmat_type), intent(inout) :: a
@@ -1873,6 +1893,19 @@ contains
 
   end function psb_d_is_triangle
 
+  function psb_d_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_dspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_symmetric()
+    else
+      res = .false.
+    end if
+
+  end function psb_d_is_symmetric
+
   function psb_d_is_unit(a) result(res)
     implicit none 
     class(psb_dspmat_type), intent(in) :: a
@@ -2369,6 +2402,20 @@ contains
     end if
 
   end function psb_ld_is_triangle
+
+
+  function psb_ld_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_ldspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_symmetric()
+    else
+      res = .false.
+    end if
+
+  end function psb_ld_is_symmetric
 
   function psb_ld_is_unit(a) result(res)
     implicit none 
