@@ -306,7 +306,7 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
   call psb_end_conv(methdname,itx ,desc_a,stopdat,info,derr,iter)
   if (present(err)) err = derr
-
+  return
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.psb_act_abort_) then
