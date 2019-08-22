@@ -50,7 +50,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
   character(len=20)  :: name
   integer(psb_ipk_)  :: err_act, n_, flag_, i, me, np, nlp, nnv, lr
   logical            :: usehash_
-  integer(psb_ipk_), allocatable :: itmpsz(:) 
+  integer(psb_ipk_), allocatable :: itmpv(:), lvl(:) 
   integer(psb_mpik_) :: iictxt
  
   
@@ -136,35 +136,40 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
     else
       usehash_ = .false.
     end if
-    if (usehash_) then
-      write(0,*) 'Fix usehash_ implementationt '
-    end if
 
-    if (np == 1) then 
-      allocate(psb_repl_map      :: desc%indxmap, stat=info)
+    if (usehash_) then
+      nlp = nl
+      call psb_exscan_sum(ictxt,nlp)
+      lvl = [ (i,i=1,nl) ] + nlp
+      call psb_cd_inloc(lvl(1:nl),ictxt,desc,info, globalcheck=.false.)
+    
     else
-      allocate(psb_gen_block_map :: desc%indxmap, stat=info)
-    end if
-    if (info == psb_success_) then 
-      select type(aa => desc%indxmap) 
-      type is (psb_repl_map) 
-        call aa%repl_map_init(iictxt,nl,info)
-      type is (psb_gen_block_map) 
-        call aa%gen_block_map_init(iictxt,nl,info)
-      class default 
-        ! This cannot happen 
-        info = psb_err_internal_error_
-        goto 9999
-      end select
+      if (np == 1) then 
+        allocate(psb_repl_map      :: desc%indxmap, stat=info)
+      else
+        allocate(psb_gen_block_map :: desc%indxmap, stat=info)
+      end if
+      if (info == psb_success_) then 
+        select type(aa => desc%indxmap) 
+        type is (psb_repl_map) 
+          call aa%repl_map_init(iictxt,nl,info)
+        type is (psb_gen_block_map) 
+          call aa%gen_block_map_init(iictxt,nl,info)
+        class default 
+          ! This cannot happen 
+          info = psb_err_internal_error_
+          goto 9999
+        end select
+      end if
     end if
     
-    call psb_realloc(1,itmpsz, info)
+    call psb_realloc(1,itmpv, info)
     if (info /= 0) then 
       write(0,*) 'Error reallocating itmspz'
       goto 9999
     end if
-    itmpsz(:) = -1
-    call psi_bld_tmpovrl(itmpsz,desc,info)
+    itmpv(:) = -1
+    call psi_bld_tmpovrl(itmpv,desc,info)
 
   endif
 

@@ -81,42 +81,44 @@ module psb_c_mat_mod
 
   contains
     ! Getters
-    procedure, pass(a) :: get_nrows   => psb_c_get_nrows
-    procedure, pass(a) :: get_ncols   => psb_c_get_ncols
-    procedure, pass(a) :: get_nzeros  => psb_c_get_nzeros
-    procedure, pass(a) :: get_nz_row  => psb_c_get_nz_row
-    procedure, pass(a) :: get_size    => psb_c_get_size
-    procedure, pass(a) :: get_dupl    => psb_c_get_dupl
-    procedure, pass(a) :: is_null     => psb_c_is_null
-    procedure, pass(a) :: is_bld      => psb_c_is_bld
-    procedure, pass(a) :: is_upd      => psb_c_is_upd
-    procedure, pass(a) :: is_asb      => psb_c_is_asb
-    procedure, pass(a) :: is_sorted   => psb_c_is_sorted
-    procedure, pass(a) :: is_by_rows  => psb_c_is_by_rows
-    procedure, pass(a) :: is_by_cols  => psb_c_is_by_cols
-    procedure, pass(a) :: is_upper    => psb_c_is_upper
-    procedure, pass(a) :: is_lower    => psb_c_is_lower
-    procedure, pass(a) :: is_triangle => psb_c_is_triangle
+    procedure, pass(a) :: get_nrows    => psb_c_get_nrows
+    procedure, pass(a) :: get_ncols    => psb_c_get_ncols
+    procedure, pass(a) :: get_nzeros   => psb_c_get_nzeros
+    procedure, pass(a) :: get_nz_row   => psb_c_get_nz_row
+    procedure, pass(a) :: get_size     => psb_c_get_size
+    procedure, pass(a) :: get_dupl     => psb_c_get_dupl
+    procedure, pass(a) :: is_null      => psb_c_is_null
+    procedure, pass(a) :: is_bld       => psb_c_is_bld
+    procedure, pass(a) :: is_upd       => psb_c_is_upd
+    procedure, pass(a) :: is_asb       => psb_c_is_asb
+    procedure, pass(a) :: is_sorted    => psb_c_is_sorted
+    procedure, pass(a) :: is_by_rows   => psb_c_is_by_rows
+    procedure, pass(a) :: is_by_cols   => psb_c_is_by_cols
+    procedure, pass(a) :: is_upper     => psb_c_is_upper
+    procedure, pass(a) :: is_lower     => psb_c_is_lower
+    procedure, pass(a) :: is_triangle  => psb_c_is_triangle
+    procedure, pass(a) :: is_symmetric => psb_c_is_symmetric
     procedure, pass(a) :: is_unit     => psb_c_is_unit
     procedure, pass(a) :: is_repeatable_updates => psb_c_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_c_get_fmt
     procedure, pass(a) :: sizeof      => psb_c_sizeof
 
     ! Setters
-    procedure, pass(a) :: set_nrows    => psb_c_set_nrows
-    procedure, pass(a) :: set_ncols    => psb_c_set_ncols
-    procedure, pass(a) :: set_dupl     => psb_c_set_dupl
-    procedure, pass(a) :: set_null     => psb_c_set_null
-    procedure, pass(a) :: set_bld      => psb_c_set_bld
-    procedure, pass(a) :: set_upd      => psb_c_set_upd
-    procedure, pass(a) :: set_asb      => psb_c_set_asb
-    procedure, pass(a) :: set_sorted   => psb_c_set_sorted
-    procedure, pass(a) :: set_upper    => psb_c_set_upper
-    procedure, pass(a) :: set_lower    => psb_c_set_lower
-    procedure, pass(a) :: set_triangle => psb_c_set_triangle
-    procedure, pass(a) :: set_unit     => psb_c_set_unit
+    procedure, pass(a) :: set_nrows     => psb_c_set_nrows
+    procedure, pass(a) :: set_ncols     => psb_c_set_ncols
+    procedure, pass(a) :: set_dupl      => psb_c_set_dupl
+    procedure, pass(a) :: set_null      => psb_c_set_null
+    procedure, pass(a) :: set_bld       => psb_c_set_bld
+    procedure, pass(a) :: set_upd       => psb_c_set_upd
+    procedure, pass(a) :: set_asb       => psb_c_set_asb
+    procedure, pass(a) :: set_sorted    => psb_c_set_sorted
+    procedure, pass(a) :: set_upper     => psb_c_set_upper
+    procedure, pass(a) :: set_lower     => psb_c_set_lower
+    procedure, pass(a) :: set_triangle  => psb_c_set_triangle
+    procedure, pass(a) :: set_symmetric => psb_c_set_symmetric
+    procedure, pass(a) :: set_unit      => psb_c_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_c_set_repeatable_updates
-    procedure, pass(a) :: has_xt_tri   => psb_c_has_xt_tri
+    procedure, pass(a) :: has_xt_tri    => psb_c_has_xt_tri
 
 
     ! Memory/data management 
@@ -320,6 +322,14 @@ module psb_c_mat_mod
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_triangle
+  end interface
+  
+  interface 
+    subroutine psb_c_set_symmetric(a,val) 
+      import :: psb_ipk_, psb_cspmat_type
+      class(psb_cspmat_type), intent(inout) :: a
+      logical, intent(in), optional :: val
+    end subroutine psb_c_set_symmetric
   end interface
   
   interface 
@@ -1036,6 +1046,19 @@ contains
     end if
 
   end function psb_c_is_triangle
+
+  function psb_c_is_symmetric(a) result(res)
+    implicit none 
+    class(psb_cspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_symmetric()
+    else
+      res = .false.
+    end if
+
+  end function psb_c_is_symmetric
 
   function psb_c_is_unit(a) result(res)
     implicit none 
