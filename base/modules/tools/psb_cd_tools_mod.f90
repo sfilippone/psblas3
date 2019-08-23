@@ -179,7 +179,6 @@ module psb_cd_tools_mod
       integer(psb_ipk_), intent(out)      :: info
       type(psb_desc_type), intent(out)    :: desc      
       optional :: mg, ng, parts, vg, vl, flag, nl, repl, globalcheck, lidx, usehash
-
     end subroutine psb_cdall
     
   end interface
