@@ -64,7 +64,7 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
   map_kind = map%get_kind()
 
   select case(map_kind)
-  case(psb_map_aggr_)
+  case(psb_map_dec_aggr_)
 
     ictxt = map%p_desc_V%get_context()
     nr2   = map%p_desc_V%get_global_rows()
@@ -104,7 +104,7 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
-         & map_kind, psb_map_aggr_, psb_map_gen_linear_
+         & map_kind, psb_map_dec_aggr_, psb_map_gen_linear_
     info = 1
     return 
   end select
@@ -138,7 +138,7 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
   map_kind = map%get_kind()
 
   select case(map_kind)
-  case(psb_map_aggr_)
+  case(psb_map_dec_aggr_)
 
     ictxt = map%p_desc_V%get_context()
     call psb_info(ictxt,iam,np)
@@ -205,7 +205,7 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
    
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
-         & map_kind, psb_map_aggr_, psb_map_gen_linear_
+         & map_kind, psb_map_dec_aggr_, psb_map_gen_linear_
     info = 1
     return 
   end select
@@ -246,7 +246,7 @@ subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
   map_kind = map%get_kind()
 
   select case(map_kind)
-  case(psb_map_aggr_)
+  case(psb_map_dec_aggr_)
 
     ictxt = map%p_desc_U%get_context()
     nr2   = map%p_desc_U%get_global_rows()
@@ -319,7 +319,7 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
   map_kind = map%get_kind()
 
   select case(map_kind)
-  case(psb_map_aggr_)
+  case(psb_map_dec_aggr_)
 
     ictxt = map%p_desc_U%get_context()
     call psb_info(ictxt,iam,np)
@@ -408,7 +408,7 @@ function psb_c_linmap(map_kind,desc_U, desc_V, mat_U2V, mat_V2U,iaggr,naggr) &
 
   info = psb_success_
   select case(map_kind) 
-  case (psb_map_aggr_)
+  case (psb_map_dec_aggr_)
     ! OK
     
     if (psb_is_ok_desc(desc_U)) then 
