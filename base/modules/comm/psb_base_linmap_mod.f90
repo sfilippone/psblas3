@@ -47,13 +47,15 @@ module psb_base_linmap_mod
     type(psb_desc_type), pointer :: p_desc_U=>null(), p_desc_V=>null()
     type(psb_desc_type)   :: desc_U, desc_V
   contains
-    procedure, pass(map)  :: sizeof   => base_map_sizeof
-    procedure, pass(map)  :: is_ok    => base_is_ok
-    procedure, pass(map)  :: is_asb   => base_is_asb
-    procedure, pass(map)  :: get_kind => base_get_kind
-    procedure, pass(map)  :: set_kind => base_set_kind
-    procedure, pass(map)  :: free     => base_free
-    procedure, pass(map)  :: clone    => base_clone
+    procedure, pass(map)  :: sizeof        => base_map_sizeof
+    procedure, pass(map)  :: is_ok         => base_is_ok
+    procedure, pass(map)  :: is_asb        => base_is_asb
+    procedure, pass(map)  :: get_kind      => base_get_kind
+    procedure, pass(map)  :: set_kind      => base_set_kind
+    procedure, pass(map)  :: is_dec_aggr   => base_is_dec_aggr
+    procedure, pass(map)  :: is_gen_linear => base_is_gen_linear
+    procedure, pass(map)  :: free          => base_free
+    procedure, pass(map)  :: clone         => base_clone
   end type psb_base_linmap_type
 
 
@@ -62,7 +64,8 @@ module psb_base_linmap_mod
   end interface
 
   private :: base_map_sizeof, base_is_ok, base_is_asb,&
-       & base_get_kind, base_set_kind, base_free, base_clone
+       & base_get_kind, base_set_kind, base_free, base_clone,&
+       & base_is_dec_aggr, base_is_gen_linear
 
 contains
 
@@ -93,7 +96,7 @@ contains
     res = .false.
 
     select case(map%get_kind())
-    case (psb_map_aggr_)
+    case (psb_map_dec_aggr_)
       if (.not.associated(map%p_desc_U)) return
       if (.not.associated(map%p_desc_V)) return
       res = map%p_desc_U%is_ok().and.map%p_desc_V%is_ok()    
@@ -111,7 +114,7 @@ contains
     res = .false.
 
     select case(map%get_kind())
-    case (psb_map_aggr_)
+    case (psb_map_dec_aggr_)
       if (.not.associated(map%p_desc_U)) return
       if (.not.associated(map%p_desc_V)) return
       res = map%p_desc_U%is_asb().and.map%p_desc_V%is_asb()    
@@ -120,6 +123,24 @@ contains
     end select
 
   end function base_is_asb
+
+  function base_is_dec_aggr(map) result(res)
+    use psb_desc_mod
+    implicit none 
+    class(psb_base_linmap_type), intent(in) :: map
+    logical  :: res
+
+    res = (map%get_kind() == psb_map_dec_aggr_)
+  end function base_is_dec_aggr
+
+  function base_is_gen_linear(map) result(res)
+    use psb_desc_mod
+    implicit none 
+    class(psb_base_linmap_type), intent(in) :: map
+    logical  :: res
+
+    res = (map%get_kind() == psb_map_gen_linear_)
+  end function base_is_gen_linear
 
   function base_map_sizeof(map) result(val)
     use psb_desc_mod

@@ -55,8 +55,8 @@ module psb_desc_const_mod
   ! Types of mapping between descriptors.
   integer(psb_ipk_), parameter :: psb_map_xhal_        = 123
   integer(psb_ipk_), parameter :: psb_map_asov_        = psb_map_xhal_+1
-  integer(psb_ipk_), parameter :: psb_map_aggr_        = psb_map_asov_+1 
-  integer(psb_ipk_), parameter :: psb_map_gen_linear_  = psb_map_aggr_+1 
+  integer(psb_ipk_), parameter :: psb_map_dec_aggr_    = psb_map_asov_+1 
+  integer(psb_ipk_), parameter :: psb_map_gen_linear_  = psb_map_dec_aggr_+1 
 
   integer(psb_ipk_), parameter :: psb_ovt_xhal_ = psb_map_xhal_, psb_ovt_asov_=psb_map_asov_
   !
