@@ -63,7 +63,8 @@ module psb_timers_mod
   type(psb_string_item), allocatable :: timers_descr(:)
   logical                         :: wanted(timer_entries_)
   type(psb_string_item)           :: entries_descr(timer_entries_)
-
+  save  :: nsamples, timers, timers_descr, wanted, entries_descr
+  
   interface psb_realloc
     module procedure psb_string_item_realloc
   end interface psb_realloc
@@ -127,17 +128,19 @@ contains
     end if
       
     if (global_) then
-      allocate(ptimers(timer_entries_,size(timers,2)),stat=info)
-      if (info /= 0) then
-        write(0,*) 'Error while trying to allocate temporary ',info
-        call psb_abort(ictxt)
-      end if
-      ptimers = timers
-      call psb_max(ictxt,ptimers)
-      if (me == psb_root_) then
-        do i=idxmin_, idxmax_
-          call print_timer(me, ptimers(:,i), timers_descr(i), iout)
-        end do
+      if (allocated(timers)) then 
+        allocate(ptimers(timer_entries_,size(timers,2)),stat=info)
+        if (info /= 0) then
+          write(0,*) 'Error while trying to allocate temporary ',info
+          call psb_abort(ictxt)
+        end if
+        ptimers = timers
+        call psb_max(ictxt,ptimers)
+        if (me == psb_root_) then
+          do i=idxmin_, idxmax_
+            call print_timer(me, ptimers(:,i), timers_descr(i), iout)
+          end do
+        end if
       end if
     else
       if ((proc_ == -1).or.(me==proc_)) then

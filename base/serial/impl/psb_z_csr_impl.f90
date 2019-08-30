@@ -3470,3 +3470,1014 @@ contains
   end subroutine csr_spspmm
 
 end subroutine psb_zcsrspspmm
+
+
+! == ===================================
+!
+!
+!
+! CSRD specific versions
+!
+!
+!
+!
+!
+! == ===================================  
+  
+subroutine  psb_z_csrd_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_clean_zeros
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out) :: info
+  !
+  integer(psb_ipk_) :: i, j, k, nr
+  integer(psb_ipk_), allocatable :: ilrp(:) 
+  
+  info = 0
+  call a%sync()
+  nr   = a%get_nrows()
+  ilrp = a%irp(:) 
+  a%irp(1) = 1
+  j        = a%irp(1) 
+  do i=1, nr
+    a%diagp(i) = 0 
+    do k = ilrp(i), ilrp(i+1) -1
+      if ((a%ja(j)==i).or.(a%val(k) /= zzero)) then
+        a%val(j) = a%val(k)
+        a%ja(j)  = a%ja(k)
+        if (a%ja(j) == i) a%diagp(i) = j
+        j = j + 1
+      end if
+    end do
+    a%irp(i+1) = j
+  end do
+  call a%trim()
+  call a%set_host()
+end subroutine psb_z_csrd_clean_zeros
+
+
+subroutine psb_z_csrd_get_diag(a,d,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_get_diag
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)     :: d(:)
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_) :: err_act, mnm, i, j, k
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='get_diag'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  mnm = min(a%get_nrows(),a%get_ncols())
+  if (size(d) < mnm) then 
+    info=psb_err_input_asize_invalid_i_
+    ierr(1) = 2; ierr(2) = size(d); 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+
+  if (a%is_unit()) then 
+    d(1:mnm) = zone
+  else
+    do i=1, mnm
+      if (a%diagp(i) >0) d(i) = a%val(a%diagp(i))
+    end do
+  end if
+  do i=mnm+1,size(d) 
+    d(i) = zzero
+  end do
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_z_csrd_get_diag
+
+subroutine psb_z_cp_csrd_from_coo(a,b,info) 
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_z_base_mat_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_cp_csrd_from_coo
+  implicit none 
+
+  class(psb_z_csrd_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(in)    :: b
+  integer(psb_ipk_), intent(out)               :: info
+
+  type(psb_z_coo_sparse_mat)   :: tmp
+  integer(psb_ipk_), allocatable :: itemp(:)
+  !locals
+  logical           :: nodiag
+  integer(psb_ipk_) :: nza, nzt, nr, nc, i,j,k,ip,irw, err_act, ncl
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
+  character(len=20)   :: name='z_cp_csrd_from_coo'
+
+  info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+
+  call a%psb_z_csr_sparse_mat%cp_from_coo(b,info)
+
+  if (info /= 0) return
+  nr = a%get_nrows()
+  call psb_realloc(nr,a%diagp,info)
+  if (info /= 0) return
+  !
+  call srch_diag(a,nodiag)
+  if (nodiag) then
+    !
+    ! This means at least one of the rows does not
+    ! have a diagonal entry. Add explicit zeros and fix. 
+    !
+    call a%cp_to_coo(tmp,info)
+    nzt = tmp%get_nzeros()
+    call tmp%reallocate(nzt+nr)
+    do k=1,nr
+      tmp%ia(nzt+k)  = k
+      tmp%ja(nzt+k)  = k
+      tmp%val(nzt+k) = zzero
+    end do
+    call tmp%set_nzeros(nzt+nr)
+    call tmp%fix(info)
+    call a%mv_from_coo(tmp,info)
+    call srch_diag(a,nodiag)
+    ! At this point, nodiag should not happen
+    if (nodiag) then
+      write(0,*) 'Nodiag here?'
+      info = -1
+    end if
+  end if
+
+contains
+  subroutine srch_diag(a,nodiag)    
+    implicit none
+    class(psb_z_csrd_sparse_mat), intent(inout) :: a
+    logical, intent(out) :: nodiag
+    integer(psb_ipk_) :: nr, i,j,k
+
+    nr = a%get_nrows()    
+    nodiag = .false.
+    outer: do i=1, nr
+      a%diagp(i) = -1
+      inner: do k=a%irp(i),a%irp(i+1)-1
+        if (a%ja(k) == i) then
+          a%diagp(i) = k
+          exit inner
+        end if
+      end do inner
+      if (a%diagp(i) < 1) then
+        nodiag = .true.
+        exit outer
+      end if
+    end do outer
+    return 
+  end subroutine srch_diag
+end subroutine psb_z_cp_csrd_from_coo
+
+subroutine  psb_z_csrd_trim(a)
+  use psb_realloc_mod
+  use psb_error_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_trim
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_) :: err_act, info, nz, m 
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='trim'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  call a%psb_z_csr_sparse_mat%trim()
+  m   = a%get_nrows()
+  call psb_realloc(m,a%diagp,info)
+
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_csrd_trim
+
+
+subroutine psb_z_csrd_mold(a,b,info) 
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_mold
+  use psb_error_mod
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(in)                  :: a
+  class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='csrd_mold'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  
+  info = 0 
+  if (allocated(b)) then 
+    call b%free()
+    deallocate(b,stat=info)
+  end if
+  if (info == 0) allocate(psb_z_csrd_sparse_mat :: b, stat=info)
+
+  if (info /= 0) then 
+    info = psb_err_alloc_dealloc_ 
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_z_csrd_mold
+
+subroutine psb_z_csrd_trmv(alpha,a,x,beta,y,info,uplo,diag) 
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_trmv
+  use psb_error_mod
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
+  complex(psb_dpk_), intent(inout) :: y(:)
+  integer(psb_ipk_), intent(out)  :: info
+  character, optional, intent(in) :: uplo, diag
+
+  integer(psb_ipk_) :: i, m, n 
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20) :: name='z_csrd_trmv'
+  character         :: uplo_, diag_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (a%is_dev())   call a%sync()
+
+  if (present(uplo)) then
+    uplo_ = uplo
+  else
+    uplo_ = 'L'
+  end if
+  if (present(diag)) then
+    diag_ = diag
+  else
+    diag_ = 'D'
+  end if
+
+  if (.not.a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  n = a%get_ncols()
+  m = a%get_nrows()
+
+  if (size(x,1)<n) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = size(x); ierr(3) = n; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+  if (size(y,1)<m) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = size(y); ierr(3) =m; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+  if (alpha == zzero) then
+    if (beta == zzero) then
+      do i = 1, m
+        y(i) = zzero
+      enddo
+    else
+      do  i = 1, m
+        y(i) = beta*y(i)
+      end do
+    endif
+    return
+  end if
+
+  call psb_z_csrd_trmv_inner(m,n, &
+       & alpha,a%diagp,a%irp,a%ja,a%val,&
+       & x,beta,y,info,uplo_,diag_) 
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='inner_trmv')
+    goto 9999
+  end if
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+  
+  subroutine psb_z_csrd_trmv_inner(m,n,alpha,diagp,irp,ja,val,&
+       & x,beta,y,info,uplo,diag)
+    use psb_string_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)   :: m,n,diagp(*),irp(*),ja(*)
+    complex(psb_dpk_), intent(in)     :: alpha, beta, x(*),val(*)
+    complex(psb_dpk_), intent(inout)  :: y(*)
+    character, intent(in)           :: uplo, diag
+    integer(psb_ipk_), intent(out)  :: info
+    !
+    integer(psb_ipk_) :: i,j,k, ir, jc
+    complex(psb_dpk_) :: acc
+
+    info = 0 
+    select case(psb_toupper(uplo))
+    case('L')
+      !
+      ! Use the lower triangle
+      ! 
+      select case(psb_toupper(diag))
+      case('D')
+        ! Use the matrix diagonal entries
+        if (beta == zzero) then           
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = zzero
+              do j=irp(i), diagp(i)
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc
+            end do
+          else 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc
+            end do
+          end if
+        else
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = zzero
+              do j=irp(i), diagp(i)
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc + beta*y(i)
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc + beta*y(i)
+            end do
+          else 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc + beta*y(i)
+            end do
+          end if
+        end if
+        
+      case('U')
+        ! Assume unit diagonal
+        if (beta == zzero) then           
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = x(i)
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = x(i)
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc
+            end do
+          else 
+            do i=1,m 
+              acc  = x(i)
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc
+            end do
+          end if
+        else
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = x(i)
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc + beta*y(i)
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = x(i)
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc + beta*y(i)
+            end do
+          else 
+            do i=1,m 
+              acc  = x(i)
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc + beta*y(i)
+            end do
+          end if
+        end if
+
+      case('Z')
+        ! Assume zero diagonal
+        if (beta == zzero) then           
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = zzero
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc
+            end do
+          else 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc
+            end do
+          end if
+        else
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = zzero
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc + beta*y(i)
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc + beta*y(i)
+            end do
+          else 
+            do i=1,m 
+              acc  = zzero
+              do j=irp(i), diagp(i)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc + beta*y(i)
+            end do
+          end if
+        end if
+        
+      case default
+        info = -2
+      end select
+
+    case('U')
+      !
+      ! Use the upper triangle
+      ! 
+      select case(psb_toupper(diag))
+      case('D')
+        ! Use the matrix diagonal entries
+        if (beta == zzero) then           
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = val(diagp(i))*x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = val(diagp(i))*x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc
+            end do
+          else 
+            do i=1,m 
+              acc  = val(diagp(i))*x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc
+            end do
+          end if
+        else
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = val(diagp(i))*x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc + beta*y(i)
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = val(diagp(i))*x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc + beta*y(i)
+            end do
+          else 
+            do i=1,m 
+              acc  = val(diagp(i))*x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc + beta*y(i)
+            end do
+          end if
+        end if        
+
+      case('U')
+        ! Assume unit diagonal
+        if (beta == zzero) then           
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc
+            end do
+          else 
+            do i=1,m 
+              acc  = x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc
+            end do
+          end if
+        else
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc + beta*y(i)
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc + beta*y(i)
+            end do
+          else 
+            do i=1,m 
+              acc  = x(i)
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc + beta*y(i)
+            end do
+          end if
+        end if        
+      case('Z')
+        ! Assume zero diagonal
+        if (beta == zzero) then           
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = zzero
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = zzero
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc
+            end do
+          else 
+            do i=1,m 
+              acc  = zzero
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc
+            end do
+          end if
+        else
+          if (alpha == zone) then 
+            do i=1, m 
+              acc  = zzero
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = acc + beta*y(i)
+            end do
+          else if (alpha == -zone) then 
+            do i=1,m 
+              acc  = zzero
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = -acc + beta*y(i)
+            end do
+          else 
+            do i=1,m 
+              acc  = zzero
+              do j=diagp(i)+1, irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))          
+              enddo
+              y(i) = alpha*acc + beta*y(i)
+            end do
+          end if
+        end if        
+        
+      case default
+        info = -2
+      end select
+      
+    case default
+      info = -1
+    end select
+  end subroutine psb_z_csrd_trmv_inner
+
+end subroutine psb_z_csrd_trmv
+
+
+subroutine psb_z_csrd_cssm(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
+  use psb_string_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_cssm
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_dpk_), intent(inout)       :: y(:,:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in)     :: trans
+
+
+  integer(psb_ipk_) :: jc, nc
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='z_csrd_cssm'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  nc  = min(size(x,2) , size(y,2)) 
+
+  do jc = 1, nc
+    call a%inner_cssv(alpha,x(:,jc),beta,y(:,jc),info,trans)
+    if (info /= 0) exit
+  end do
+  
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='inner_trmv')
+    goto 9999
+  end if
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine psb_z_csrd_cssm
+
+
+subroutine psb_z_csrd_cssv(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
+  use psb_string_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csrd_cssv
+  implicit none 
+  class(psb_z_csrd_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+  complex(psb_dpk_), intent(inout)       :: y(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in)     :: trans
+
+  character :: trans_
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: tmp(:)
+  logical   :: tra,ctra
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='z_csrd_cssv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+  if (present(trans)) then
+    trans_ = trans
+  else
+    trans_ = 'N'
+  end if
+  if (.not.a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
+  m = a%get_nrows()
+
+  if (.not. (a%is_triangle())) then 
+    !info = psb_err_invalid_mat_state_
+    !call psb_errpush(info,name)
+    !goto 9999
+    !
+    ! The whole point of CSRD is to fake a triangle
+    ! "on the fly" (this is really for the sake of
+    ! saving memory in Gauss-Seidel lower/upper).
+    ! 
+    !
+  end if
+
+  if (size(x)<m) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = m; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+  if (size(y)<m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+  
+  if (alpha == zzero) then
+    if (beta == zzero) then
+      do i = 1, m
+        y(i) = zzero
+      enddo
+    else
+      do  i = 1, m
+        y(i) = beta*y(i)
+      end do
+    endif
+    return
+  end if
+
+  if (beta == zzero) then 
+
+    call inner_csrdsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+         & a%diagp,a%irp,a%ja,a%val,x,y) 
+    if (alpha == zone) then 
+      ! do nothing
+    else if (alpha == -zone) then 
+      do  i = 1, m
+        y(i) = -y(i)
+      end do
+    else
+      do  i = 1, m
+        y(i) = alpha*y(i)
+      end do
+    end if
+  else 
+    allocate(tmp(m), stat=info) 
+    if (info /= psb_success_) then 
+      return
+    end if
+
+    call inner_csrdsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+         & a%diagp,a%irp,a%ja,a%val,x,tmp) 
+
+    call psb_geaxpby(m,alpha,tmp,beta,y,info)
+
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains 
+
+  subroutine inner_csrdsv(tra,ctra,lower,unit,n,diagp,irp,ja,val,x,y) 
+    implicit none 
+    logical, intent(in)            :: tra,ctra,lower,unit  
+    integer(psb_ipk_), intent(in)  :: diagp(*), irp(*), ja(*),n
+    complex(psb_dpk_), intent(in)  :: val(*)
+    complex(psb_dpk_), intent(in)  :: x(*)
+    complex(psb_dpk_), intent(out) :: y(*)
+
+    integer(psb_ipk_) :: i,j,k,m, ir, jc
+    complex(psb_dpk_) :: acc
+
+    if ((.not.tra).and.(.not.ctra)) then 
+
+      if (lower) then 
+        if (unit) then 
+          do i=1, n
+            acc = zzero 
+            do j=irp(i), diagp(i)-1
+              acc = acc + val(j)*y(ja(j))
+            end do
+            y(i) = x(i) - acc
+          end do
+        else if (.not.unit) then 
+          do i=1, n
+            acc = zzero 
+            do j=irp(i), diagp(i)-1
+              acc = acc + val(j)*y(ja(j))
+            end do
+            y(i) = (x(i) - acc)/val(diagp(i))
+          end do
+        end if
+        
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=n, 1, -1 
+            acc = zzero 
+            do j=diagp(i)+1, irp(i+1)-1
+              acc = acc + val(j)*y(ja(j))
+            end do
+            y(i) = x(i) - acc
+          end do
+        else if (.not.unit) then 
+          do i=n, 1, -1 
+            acc = zzero 
+            do j=diagp(i)+1, irp(i+1)-1
+              acc = acc + val(j)*y(ja(j))
+            end do
+            y(i) = (x(i) - acc)/val(diagp(i))
+          end do
+        end if
+
+      end if
+
+    else if (tra) then 
+
+      do i=1, n
+        y(i) = x(i)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          do i=n, 1, -1
+            acc = y(i) 
+            do j=irp(i), diagp(i)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=n, 1, -1
+            y(i) = y(i)/val(diagp(i))
+            acc  = y(i) 
+            do j=irp(i), diagp(i)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
+            end do
+          end do
+        end if
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, n
+            acc  = y(i) 
+            do j=diagp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, n
+            y(i) = y(i)/val(diagp(i))
+            acc  = y(i) 
+            do j=diagp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
+            end do
+          end do
+        end if
+
+      end if
+
+    else if (ctra) then 
+
+      do i=1, n
+        y(i) = x(i)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          do i=n, 1, -1
+            acc = y(i) 
+            do j=irp(i), diagp(i)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - conjg(val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=n, 1, -1
+            y(i) = y(i)/val(diagp(i))
+            acc  = y(i) 
+            do j=irp(i), diagp(i)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - conjg(val(j))*acc 
+            end do
+          end do
+        end if
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, n
+            acc  = y(i) 
+            do j=diagp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - conjg(val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, n
+            y(i) = y(i)/val(diagp(i))
+            acc  = y(i) 
+            do j=diagp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - conjg(val(j))*acc 
+            end do
+          end do
+        end if
+
+      end if
+    end if
+  end subroutine inner_csrdsv
+
+end subroutine psb_z_csrd_cssv
