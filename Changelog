@@ -1,5 +1,11 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2019/07/20: New SCAN collective; improve handling of SYMmetric	
+2019/07/08: Fix memory usage in conversions to/from coo	
+2019/07/01: Timer facility 	
+2019/06/25: Fix memory footprint in spspmm and other borderline cases	
+2019/06/17: Make ADD default assembly action.	
+2019/05/30: new insertion routines in CSR mode	
 2019/05/27: Fix matrix generation.
 2019/05/26: New timer facility (undocumented).	
 2019/05/20: Change checks on vectors	
