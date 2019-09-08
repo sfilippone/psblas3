@@ -32,7 +32,7 @@
 Module psb_z_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
   use psb_z_vect_mod, only : psb_z_base_vect_type, psb_z_vect_type
-  use psb_z_mat_mod, only : psb_zspmat_type, psb_lzspmat_type, psb_z_base_sparse_mat
+  use psb_z_mat_mod, only : psb_zspmat_type, psb_lzspmat_type, psb_z_base_sparse_mat, psb_lz_csr_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_z_multivect_mod, only : psb_z_base_multivect_type, psb_z_multivect_type
 
@@ -319,5 +319,19 @@ Module psb_z_tools_mod
       logical, intent(in), optional        :: clear
     end subroutine psb_zsprn
   end interface
+
+  interface psb_par_spspmm
+    subroutine psb_lz_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
+      import :: psb_lz_csr_sparse_mat, psb_desc_type, psb_ipk_
+      Implicit None
+      type(psb_lz_csr_sparse_mat),intent(in)    :: acsr
+      type(psb_lz_csr_sparse_mat),intent(inout) :: bcsr
+      type(psb_lz_csr_sparse_mat),intent(out)   :: ccsr      
+      type(psb_desc_type),intent(in)           :: desc_a
+      type(psb_desc_type),intent(inout)        :: desc_c
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in), optional  :: data
+    End Subroutine psb_lz_par_csr_spspmm
+  end interface psb_par_spspmm
   
 end module psb_z_tools_mod

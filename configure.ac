@@ -479,11 +479,6 @@ dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
  fi
 fi
 
-dnl PAC_ARG_LONG_INTEGERS
-dnl if test x"$pac_cv_long_integers" == x"yes" ; then
-dnl   FDEFINES="$psblas_cv_define_prepend-DLONG_INTEGERS $FDEFINES";
-dnl   CDEFINES="-DLONG_INTEGERS_ $CDEFINES";	
-dnl fi
 PAC_ARG_WITH_IPK
 PAC_ARG_WITH_LPK
 # Defaults for IPK/LPK
