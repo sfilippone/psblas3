@@ -33,20 +33,20 @@
 module psb_cbind_const_mod
   use iso_c_binding 
   
-  integer, parameter :: psb_c_mpk = c_int32_t
+  integer, parameter :: psb_c_mpk_ = c_int32_t
 #if defined(IPK4) &&  defined(LPK4)
-  integer, parameter :: psb_c_ipk = c_int32_t
-  integer, parameter :: psb_c_lpk = c_int32_t
+  integer, parameter :: psb_c_ipk_ = c_int32_t
+  integer, parameter :: psb_c_lpk_ = c_int32_t
 #elif defined(IPK4) &&  defined(LPK8)
-  integer, parameter :: psb_c_ipk = c_int32_t
-  integer, parameter :: psb_c_lpk = c_int64_t
+  integer, parameter :: psb_c_ipk_ = c_int32_t
+  integer, parameter :: psb_c_lpk_ = c_int64_t
 #elif defined(IPK8) &&  defined(LPK8)
-  integer, parameter :: psb_c_ipk = c_int64_t
-  integer, parameter :: psb_c_lpk = c_int64_t
+  integer, parameter :: psb_c_ipk_ = c_int64_t
+  integer, parameter :: psb_c_lpk_ = c_int64_t
 #else
-  integer, parameter :: psb_c_ipk = -1
-  integer, parameter :: psb_c_lpk = -1
+  integer, parameter :: psb_c_ipk_ = -1
+  integer, parameter :: psb_c_lpk_ = -1
 #endif
-  integer, parameter :: psb_c_epk = c_int64_t
+  integer, parameter :: psb_c_epk_ = c_int64_t
 
 end module psb_cbind_const_mod
