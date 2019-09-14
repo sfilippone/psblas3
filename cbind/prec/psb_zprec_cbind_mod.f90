@@ -18,13 +18,13 @@ contains
     use psb_prec_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk)          :: res
-    integer(psb_c_ipk), value :: ictxt   
+    integer(psb_c_ipk_)          :: res
+    integer(psb_c_ipk_), value :: ictxt   
 
     type(psb_c_zprec) :: ph
     character(c_char)       :: ptype(*)
     type(psb_zprec_type), pointer :: precp
-    integer(psb_c_ipk)              :: info
+    integer(psb_c_ipk_)              :: info
     character(len=80)       :: fptype
 
     res = -1
@@ -53,7 +53,7 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
     type(psb_c_zspmat) :: ah
     type(psb_c_zprec) :: ph
     type(psb_c_descriptor) :: cdh
@@ -61,7 +61,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
     type(psb_zprec_type), pointer :: precp
-    integer(psb_c_ipk)              :: info
+    integer(psb_c_ipk_)              :: info
 
     res = -1
 !!$    write(*,*) 'Entry:   ', psb_c_cd_get_local_rows(cdh)
@@ -95,10 +95,10 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
     type(psb_c_zprec) :: ph
     type(psb_zprec_type), pointer :: precp
-    integer(psb_c_ipk)              :: info
+    integer(psb_c_ipk_)              :: info
 
     res = -1
     if (c_associated(ph%item)) then 

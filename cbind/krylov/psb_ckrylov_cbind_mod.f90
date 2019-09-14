@@ -13,7 +13,7 @@ contains
     use psb_prec_cbind_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk)      :: res
+    integer(psb_c_ipk_)      :: res
     type(psb_c_cspmat)    :: ah
     type(psb_c_descriptor)  :: cdh
     type(psb_c_cprec)     :: ph
@@ -38,14 +38,14 @@ contains
     use psb_prec_cbind_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk)      :: res
+    integer(psb_c_ipk_)      :: res
     type(psb_c_cspmat)    :: ah
     type(psb_c_descriptor)  :: cdh
     type(psb_c_cprec)       :: ph
     type(psb_c_cvector)     :: bh,xh
-    integer(psb_c_ipk), value :: itmax,itrace,irst,istop
+    integer(psb_c_ipk_), value :: itmax,itrace,irst,istop
     real(c_double), value :: eps
-    integer(psb_c_ipk)    :: iter
+    integer(psb_c_ipk_)    :: iter
     real(c_double)        :: err
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
@@ -54,7 +54,7 @@ contains
     type(psb_cprec_type), pointer  :: precp
     type(psb_c_vect_type), pointer :: xp, bp
 
-    integer(psb_c_ipk)  :: info,fitmax,fitrace,first,fistop,fiter
+    integer(psb_c_ipk_)  :: info,fitmax,fitrace,first,fistop,fiter
     character(len=20)   :: fmethd
     real(psb_spk_)       :: feps,ferr
 

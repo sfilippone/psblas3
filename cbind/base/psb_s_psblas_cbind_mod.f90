@@ -8,7 +8,7 @@ contains
   
   function psb_c_sgeaxpby(alpha,xh,beta,yh,cdh) bind(c) result(res)
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     type(psb_c_svector) :: xh,yh
     type(psb_c_descriptor) :: cdh
@@ -16,7 +16,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
-    integer(psb_c_ipk)          :: info
+    integer(psb_c_ipk_)          :: info
     
 
     res = -1
@@ -51,7 +51,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp
-    integer(psb_c_ipk)               :: info
+    integer(psb_c_ipk_)               :: info
 
     res = -1.0
 
@@ -78,7 +78,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp
-    integer(psb_c_ipk)          :: info
+    integer(psb_c_ipk_)          :: info
 
     res = -1.0
     if (c_associated(cdh%item)) then 
@@ -104,7 +104,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer   :: descp
     type(psb_s_vect_type), pointer :: xp
-    integer(psb_c_ipk)          :: info
+    integer(psb_c_ipk_)          :: info
 
     res = -1.0
 
@@ -132,7 +132,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_sspmat_type), pointer :: ap
-    integer(psb_c_ipk)              ::  info
+    integer(psb_c_ipk_)              ::  info
 
     res = -1.0
     if (c_associated(cdh%item)) then 
@@ -158,7 +158,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
-    integer(psb_c_ipk)               :: info
+    integer(psb_c_ipk_)               :: info
 
     res = -1.0
     if (c_associated(cdh%item)) then 
@@ -183,7 +183,7 @@ contains
 
   function psb_c_sspmm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     type(psb_c_sspmat) :: ah
     type(psb_c_svector) :: xh,yh
@@ -192,7 +192,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
     type(psb_sspmat_type), pointer :: ap
-    integer(psb_c_ipk)               :: info
+    integer(psb_c_ipk_)               :: info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -225,7 +225,7 @@ contains
 
   function psb_c_sspmm_opt(alpha,ah,xh,beta,yh,cdh,trans,doswap) bind(c) result(res)
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     type(psb_c_sspmat) :: ah
     type(psb_c_svector) :: xh,yh
@@ -239,7 +239,7 @@ contains
     type(psb_sspmat_type), pointer :: ap
     character :: ftrans
     logical   :: fdoswap
-    integer(psb_c_ipk)   :: info
+    integer(psb_c_ipk_)   :: info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -274,7 +274,7 @@ contains
 
   function psb_c_sspsm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     type(psb_c_sspmat) :: ah
     type(psb_c_svector) :: xh,yh
@@ -283,7 +283,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
     type(psb_sspmat_type), pointer :: ap
-    integer(psb_c_ipk)               :: info
+    integer(psb_c_ipk_)               :: info
 
     res = -1
     if (c_associated(cdh%item)) then 

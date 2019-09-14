@@ -11,11 +11,11 @@ contains
   function psb_c_svect_get_nrows(xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_ipk) :: res   
+    integer(psb_c_ipk_) :: res   
     type(psb_c_svector) :: xh
 
     type(psb_s_vect_type), pointer :: vp
-    integer(psb_c_ipk)               :: info
+    integer(psb_c_ipk_)               :: info
 
     res = -1
 
@@ -29,13 +29,13 @@ contains
   function psb_c_svect_f_get_cpy(v,xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_ipk)    :: res   
+    integer(psb_c_ipk_)    :: res   
     real(c_float)    :: v(*)
     type(psb_c_svector) :: xh
     
     type(psb_s_vect_type), pointer :: vp
     real(psb_spk_), allocatable :: fv(:)
-    integer(psb_c_ipk)           :: info, sz
+    integer(psb_c_ipk_)           :: info, sz
 
     res = -1
 
@@ -52,11 +52,11 @@ contains
   function psb_c_svect_zero(xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_ipk)    :: res   
+    integer(psb_c_ipk_)    :: res   
     type(psb_c_svector) :: xh
     
     type(psb_s_vect_type), pointer :: vp
-    integer(psb_c_ipk)               :: info
+    integer(psb_c_ipk_)               :: info
 
     res = -1
 
@@ -73,11 +73,11 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     type(psb_c_sspmat) :: mh
     type(psb_sspmat_type), pointer :: ap
-    integer(psb_c_ipk)               ::  info
+    integer(psb_c_ipk_)               ::  info
 
     res = 0
     if (c_associated(mh%item)) then 
@@ -96,11 +96,11 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     type(psb_c_sspmat) :: mh
     type(psb_sspmat_type), pointer :: ap
-    integer(psb_c_ipk)               ::  info
+    integer(psb_c_ipk_)               ::  info
 
     res = 0
     if (c_associated(mh%item)) then 
@@ -119,12 +119,12 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk_) :: res
 
     character(c_char)        :: name(*)
     type(psb_c_sspmat) :: mh
     type(psb_sspmat_type), pointer :: ap
-    integer(psb_c_ipk)      ::  info
+    integer(psb_c_ipk_)      ::  info
     character(1024)         :: fname
 
     res = 0
