@@ -70,26 +70,26 @@ module psb_hash_mod
   interface psb_hashval
 #if defined(IPK4)     
     function  psb_c_hashval_32(key) bind(c) result(res)
-      import psb_c_ipk
+      import psb_c_ipk_
       implicit none 
-      integer(psb_c_ipk), value :: key
-      integer(psb_c_ipk)        :: res
+      integer(psb_c_ipk_), value :: key
+      integer(psb_c_ipk_)        :: res
     end function psb_c_hashval_32
 #endif
 #if defined(IPK4) &&  defined(LPK8)
     function  psb_c_hashval_64_32(key) bind(c) result(res)
-      import psb_c_ipk, psb_c_lpk
+      import psb_c_ipk_, psb_c_lpk_
       implicit none 
-      integer(psb_c_lpk), value :: key
-      integer(psb_c_ipk)        :: res
+      integer(psb_c_lpk_), value :: key
+      integer(psb_c_ipk_)        :: res
     end function psb_c_hashval_64_32
 #endif
 #if defined(IPK8)     
     function  psb_c_hashval_64(key) bind(c) result(res)
-      import psb_c_ipk
+      import psb_c_ipk_
       implicit none 
-      integer(psb_c_ipk), value :: key
-      integer(psb_c_ipk)        :: res
+      integer(psb_c_ipk_), value :: key
+      integer(psb_c_ipk_)        :: res
     end function psb_c_hashval_64
 #endif
   end interface psb_hashval
