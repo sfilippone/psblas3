@@ -584,7 +584,7 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
   subroutine psi_mamx_op(inv, outv,len,type) 
-    integer(psb_mpk_) :: inv(*),outv(*)
+    integer(psb_mpk_) :: inv(len), outv(len)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
 
@@ -594,7 +594,7 @@ contains
   end subroutine psi_mamx_op
 
   subroutine psi_mamn_op(inv, outv,len,type) 
-    integer(psb_mpk_) :: inv(*),outv(*)
+    integer(psb_mpk_) :: inv(len), outv(len)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
 
@@ -604,7 +604,7 @@ contains
   end subroutine psi_mamn_op
 
   subroutine psi_eamx_op(inv, outv,len,type) 
-    integer(psb_epk_) :: inv(*),outv(*)
+    integer(psb_epk_) :: inv(len), outv(len)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
 
@@ -614,7 +614,7 @@ contains
   end subroutine psi_eamx_op
 
   subroutine psi_eamn_op(inv, outv,len,type) 
-    integer(psb_epk_) :: inv(*),outv(*)
+    integer(psb_epk_) :: inv(len), outv(len)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
 
