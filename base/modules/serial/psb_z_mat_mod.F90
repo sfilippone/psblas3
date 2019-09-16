@@ -370,6 +370,9 @@ module psb_z_mat_mod
     generic, public    :: cp_from     => cp_from_b
     procedure, pass(a) :: cp_to_b     => psb_lz_cp_to
     generic, public    :: cp_to       => cp_to_b
+    procedure, pass(a) :: clip_d_ip   => psb_lz_clip_d_ip
+    procedure, pass(a) :: clip_d      => psb_lz_clip_d
+    generic, public    :: clip_diag   => clip_d_ip, clip_d
     procedure, pass(a) :: cscnv_np    => psb_lz_cscnv
     procedure, pass(a) :: cscnv_ip    => psb_lz_cscnv_ip
     procedure, pass(a) :: cscnv_base  => psb_lz_cscnv_base
@@ -1550,6 +1553,28 @@ module psb_z_mat_mod
       integer(psb_ipk_), intent(out)                   :: info
       integer(psb_ipk_),optional, intent(in)           :: dupl
     end subroutine psb_lz_cscnv_base
+  end interface
+  
+  
+  !
+  ! Produce a version of the matrix with diagonal cut
+  ! out; passes through a COO buffer. 
+  !
+  interface 
+    subroutine psb_lz_clip_d(a,b,info)
+      import :: psb_ipk_, psb_lpk_, psb_lzspmat_type
+      class(psb_lzspmat_type), intent(in)    :: a
+      class(psb_lzspmat_type), intent(inout) :: b
+      integer(psb_ipk_),intent(out)                  :: info
+    end subroutine psb_lz_clip_d
+  end interface
+  
+  interface 
+    subroutine psb_lz_clip_d_ip(a,info)
+      import :: psb_ipk_, psb_lpk_, psb_lzspmat_type
+      class(psb_lzspmat_type), intent(inout) :: a
+      integer(psb_ipk_),intent(out)                  :: info
+    end subroutine psb_lz_clip_d_ip
   end interface
   
   

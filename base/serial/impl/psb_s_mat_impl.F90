@@ -3933,123 +3933,123 @@ end subroutine psb_ls_cscnv_base
 
 
 
-!!$subroutine psb_ls_clip_d(a,b,info)
-!!$  ! Output is always in  COO format 
-!!$  use psb_error_mod
-!!$  use psb_const_mod
-!!$  use psb_s_base_mat_mod
-!!$  use psb_s_mat_mod, psb_protect_name => psb_ls_clip_d
-!!$  implicit none
-!!$
-!!$  class(psb_lsspmat_type), intent(in)    :: a
-!!$  class(psb_lsspmat_type), intent(inout) :: b
-!!$  integer(psb_ipk_),intent(out)                  :: info
-!!$
-!!$  integer(psb_ipk_) :: err_act
-!!$  character(len=20)  :: name='clip_diag'
-!!$  logical, parameter :: debug=.false.
-!!$  type(psb_ls_coo_sparse_mat), allocatable  :: acoo
-!!$  integer(psb_lpk_) :: i, j, nz
-!!$
-!!$  info = psb_success_
-!!$  call psb_erractionsave(err_act)
-!!$  if (a%is_null()) then 
-!!$    info = psb_err_invalid_mat_state_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  endif
-!!$
-!!$  allocate(acoo,stat=info)    
-!!$  if (info == psb_success_) call a%a%cp_to_coo(acoo,info)
-!!$  if (info /= psb_success_) then 
-!!$    info = psb_err_alloc_dealloc_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  endif
-!!$
-!!$  nz = acoo%get_nzeros()
-!!$  j = 0
-!!$  do i=1, nz
-!!$    if (acoo%ia(i) /= acoo%ja(i)) then 
-!!$      j = j + 1 
-!!$      acoo%ia(j)  = acoo%ia(i)
-!!$      acoo%ja(j)  = acoo%ja(i)
-!!$      acoo%val(j) = acoo%val(i)
-!!$    end if
-!!$  end do
-!!$  call acoo%set_nzeros(j)
-!!$  call acoo%trim()
-!!$  call b%mv_from(acoo)
-!!$
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$
-!!$9999 call psb_error_handler(err_act)
-!!$
-!!$  return
-!!$
-!!$end subroutine psb_ls_clip_d
-!!$
-!!$
-!!$
-!!$subroutine psb_ls_clip_d_ip(a,info)
-!!$  ! Output is always in  COO format 
-!!$  use psb_error_mod
-!!$  use psb_const_mod
-!!$  use psb_s_base_mat_mod
-!!$  use psb_s_mat_mod, psb_protect_name => psb_ls_clip_d_ip
-!!$  implicit none
-!!$
-!!$  class(psb_lsspmat_type), intent(inout) :: a
-!!$  integer(psb_ipk_),intent(out)                  :: info
-!!$
-!!$  integer(psb_ipk_) :: err_act
-!!$  character(len=20)  :: name='clip_diag'
-!!$  logical, parameter :: debug=.false.
-!!$  type(psb_ls_coo_sparse_mat), allocatable  :: acoo
-!!$  integer(psb_lpk_) :: i, j, nz
-!!$
-!!$  info = psb_success_
-!!$  call psb_erractionsave(err_act)
-!!$  if (a%is_null()) then 
-!!$    info = psb_err_invalid_mat_state_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  endif
-!!$
-!!$  allocate(acoo,stat=info)    
-!!$  if (info == psb_success_) call a%a%mv_to_coo(acoo,info)
-!!$  if (info /= psb_success_) then
-!!$    info = psb_err_alloc_dealloc_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  endif
-!!$
-!!$  nz = acoo%get_nzeros()
-!!$  j = 0
-!!$  do i=1, nz
-!!$    if (acoo%ia(i) /= acoo%ja(i)) then 
-!!$      j = j + 1 
-!!$      acoo%ia(j)  = acoo%ia(i)
-!!$      acoo%ja(j)  = acoo%ja(i)
-!!$      acoo%val(j) = acoo%val(i)
-!!$    end if
-!!$  end do
-!!$  call acoo%set_nzeros(j)
-!!$  call acoo%trim()
-!!$  call a%mv_from(acoo)
-!!$
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$
-!!$9999 call psb_error_handler(err_act)
-!!$
-!!$  return
-!!$
-!!$end subroutine psb_ls_clip_d_ip
-!!$
+subroutine psb_ls_clip_d(a,b,info)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_clip_d
+  implicit none
+
+  class(psb_lsspmat_type), intent(in)    :: a
+  class(psb_lsspmat_type), intent(inout) :: b
+  integer(psb_ipk_),intent(out)                  :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='clip_diag'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat), allocatable  :: acoo
+  integer(psb_lpk_) :: i, j, nz
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(acoo,stat=info)    
+  if (info == psb_success_) call a%a%cp_to_coo(acoo,info)
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  nz = acoo%get_nzeros()
+  j = 0
+  do i=1, nz
+    if (acoo%ia(i) /= acoo%ja(i)) then 
+      j = j + 1 
+      acoo%ia(j)  = acoo%ia(i)
+      acoo%ja(j)  = acoo%ja(i)
+      acoo%val(j) = acoo%val(i)
+    end if
+  end do
+  call acoo%set_nzeros(j)
+  call acoo%trim()
+  call b%mv_from(acoo)
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_clip_d
+
+
+
+subroutine psb_ls_clip_d_ip(a,info)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_clip_d_ip
+  implicit none
+
+  class(psb_lsspmat_type), intent(inout) :: a
+  integer(psb_ipk_),intent(out)                  :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='clip_diag'
+  logical, parameter :: debug=.false.
+  type(psb_ls_coo_sparse_mat), allocatable  :: acoo
+  integer(psb_lpk_) :: i, j, nz
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(acoo,stat=info)    
+  if (info == psb_success_) call a%a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  nz = acoo%get_nzeros()
+  j = 0
+  do i=1, nz
+    if (acoo%ia(i) /= acoo%ja(i)) then 
+      j = j + 1 
+      acoo%ia(j)  = acoo%ia(i)
+      acoo%ja(j)  = acoo%ja(i)
+      acoo%val(j) = acoo%val(i)
+    end if
+  end do
+  call acoo%set_nzeros(j)
+  call acoo%trim()
+  call a%mv_from(acoo)
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_clip_d_ip
+
 
 subroutine psb_ls_mv_from(a,b)
   use psb_error_mod
