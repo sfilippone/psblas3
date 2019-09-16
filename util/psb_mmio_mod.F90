@@ -32,7 +32,7 @@
 module psb_mmio_mod
 
 
-  use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_,&
+  use psb_base_mod, only :  psb_ipk_, psb_lpk_, psb_spk_, psb_dpk_,&
        & psb_sspmat_type, psb_cspmat_type, &
        & psb_dspmat_type, psb_zspmat_type, &
        & psb_lsspmat_type, psb_lcspmat_type, &
@@ -125,6 +125,22 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet2_read
+    subroutine mm_lvet_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_, psb_lpk_
+      implicit none
+      integer(psb_lpk_), allocatable, intent(out)  :: b(:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvet_read
+    subroutine mm_lvet2_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_, psb_lpk_
+      implicit none
+      integer(psb_lpk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvet2_read
   end interface
 
 
@@ -228,6 +244,24 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet1_write
+    subroutine mm_lvet2_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_, psb_lpk_
+      implicit none
+      integer(psb_lpk_), intent(in)  :: b(:,:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvet2_write
+    subroutine mm_lvet1_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_, psb_lpk_
+      implicit none
+      integer(psb_lpk_), intent(in)  :: b(:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvet1_write
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)

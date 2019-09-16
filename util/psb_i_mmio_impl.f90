@@ -284,3 +284,256 @@ subroutine mm_ivet1_write(b, header, info, iunit, filename)
 
 end subroutine mm_ivet1_write
 
+
+
+subroutine mm_lvet_read(b, info, iunit, filename)   
+  use psb_base_mod
+  implicit none
+  integer(psb_lpk_), allocatable, intent(out)  :: b(:)
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, infile
+  character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+       & line*1024
+
+  info = psb_success_
+  if (present(filename)) then
+    if (filename == '-') then 
+      infile=5
+    else
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=99
+      endif
+      open(infile,file=filename, status='OLD', err=901, action='READ')
+    endif
+  else 
+    if (present(iunit)) then 
+      infile=iunit
+    else
+      infile=5
+    endif
+  endif
+
+  read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+
+  if ( (object /= 'matrix').or.(fmt /= 'array')) then
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
+    info = -3
+    return
+  end if
+
+  do 
+    read(infile,fmt='(a)') line
+    if (line(1:1) /= '%')  exit
+  end do
+
+  read(line,fmt=*)nrow,ncol
+
+  if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+    allocate(b(nrow),stat = ircode)
+    if (ircode /= 0)   goto 993
+    do i=1,nrow
+      read(infile,fmt=*,end=902) b(i)
+    end do
+
+  end if      ! read right hand sides
+  if (infile /= 5) close(infile)
+
+  return 
+  ! open failed
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
+       & infile,' for input'
+  info = -1
+  return
+
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
+       & ' during input'
+  info = -2
+  return
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
+  info = -3
+  return
+end subroutine mm_lvet_read
+
+subroutine mm_lvet2_read(b, info, iunit, filename)   
+  use psb_base_mod
+  implicit none
+  integer(psb_lpk_), allocatable, intent(out)  :: b(:,:)
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, infile
+  character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+       & line*1024
+
+  info = psb_success_
+  if (present(filename)) then
+    if (filename == '-') then 
+      infile=5
+    else
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=99
+      endif
+      open(infile,file=filename, status='OLD', err=901, action='READ')
+    endif
+  else 
+    if (present(iunit)) then 
+      infile=iunit
+    else
+      infile=5
+    endif
+  endif
+
+  read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+
+  if ( (object /= 'matrix').or.(fmt /= 'array')) then
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
+    info = -3
+    return
+  end if
+
+  do 
+    read(infile,fmt='(a)') line
+    if (line(1:1) /= '%')  exit
+  end do
+
+  read(line,fmt=*)nrow,ncol
+  
+  if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+    allocate(b(nrow,ncol),stat = ircode)
+    if (ircode /= 0)   goto 993
+    read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
+
+  end if      ! read right hand sides
+  if (infile /= 5) close(infile)
+
+  return 
+  ! open failed
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
+       & infile,' for input'
+  info = -1
+  return
+
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
+       & ' during input'
+  info = -2
+  return
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
+  info = -3
+  return
+end subroutine mm_lvet2_read
+
+subroutine mm_lvet2_write(b, header, info, iunit, filename)   
+  use psb_base_mod
+  implicit none
+  integer(psb_lpk_), intent(in)  :: b(:,:)
+  character(len=*), intent(in) :: header
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+
+  character(len=80)                 :: frmtv 
+
+  info = psb_success_
+  if (present(filename)) then
+    if (filename == '-') then 
+      outfile=6
+    else
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=99
+      endif
+      open(outfile,file=filename, err=901, action='WRITE')
+    endif
+  else 
+    if (present(iunit)) then 
+      outfile=iunit
+    else
+      outfile=6
+    endif
+  endif
+
+  write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+  write(outfile,'(a)') '% '//trim(header)
+  write(outfile,'(a)') '% '
+  nrow = size(b,1) 
+  ncol = size(b,2) 
+  write(outfile,*) nrow, ncol
+
+  write(outfile,fmt='(I24,1x)') ((b(i,j), i=1,nrow),j=1,ncol)
+
+  if (outfile /= 6) close(outfile)
+
+  return 
+  ! open failed
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
+       & outfile,' for output'
+  info = -1
+  return
+
+end subroutine mm_lvet2_write
+
+subroutine mm_lvet1_write(b, header, info, iunit, filename)   
+  use psb_base_mod
+  implicit none
+  integer(psb_lpk_), intent(in)  :: b(:)
+  character(len=*), intent(in) :: header
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+
+  character(len=80)                 :: frmtv 
+
+  info = psb_success_
+  if (present(filename)) then
+    if (filename == '-') then 
+      outfile=6
+    else
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=99
+      endif
+      open(outfile,file=filename, err=901, action='WRITE')
+    endif
+  else 
+    if (present(iunit)) then 
+      outfile=iunit
+    else
+      outfile=6
+    endif
+  endif
+
+  write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+  write(outfile,'(a)') '% '//trim(header)
+  write(outfile,'(a)') '% '
+  nrow = size(b,1) 
+  ncol = 1
+  write(outfile,*) nrow,ncol
+
+  write(frmtv,'(a,i0,a)') '(',ncol,'(i24,1x))'
+
+  do i=1,size(b,1) 
+    write(outfile,frmtv) b(i)
+  end do
+
+  if (outfile /= 6) close(outfile)
+
+  return 
+  ! open failed
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
+       & outfile,' for output'
+  info = -1
+  return
+
+end subroutine mm_lvet1_write
+
+
