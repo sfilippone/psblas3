@@ -549,8 +549,17 @@ module psb_base_mat_mod
     ! Setters 
     !
     ! == = =================================
-    procedure, pass(a) :: set_nrows    => psb_lbase_set_nrows
-    procedure, pass(a) :: set_ncols    => psb_lbase_set_ncols
+    procedure, pass(a) :: set_lnrows    => psb_lbase_set_lnrows
+    procedure, pass(a) :: set_lncols    => psb_lbase_set_lncols
+#if defined(IPK4) && defined(LPK8)     
+    procedure, pass(a) :: set_inrows    => psb_lbase_set_inrows
+    procedure, pass(a) :: set_incols    => psb_lbase_set_incols
+    generic, public    :: set_nrows     => set_lnrows, set_inrows
+    generic, public    :: set_ncols     => set_lncols, set_incols
+#else
+    generic, public    :: set_nrows     => set_lnrows
+    generic, public    :: set_ncols     => set_lncols
+#endif    
     procedure, pass(a) :: set_dupl     => psb_lbase_set_dupl
     procedure, pass(a) :: set_state    => psb_lbase_set_state
     procedure, pass(a) :: set_null     => psb_lbase_set_null
@@ -1389,20 +1398,37 @@ contains
     res = a%n
   end function psb_lbase_get_ncols
 
-  subroutine  psb_lbase_set_nrows(m,a) 
+  subroutine  psb_lbase_set_lnrows(m,a) 
     implicit none 
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: m
     a%m = m
-  end subroutine psb_lbase_set_nrows
+  end subroutine psb_lbase_set_lnrows
 
-  subroutine  psb_lbase_set_ncols(n,a) 
+  subroutine  psb_lbase_set_lncols(n,a) 
     implicit none 
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: n
     a%n = n
-  end subroutine psb_lbase_set_ncols
-  
+  end subroutine psb_lbase_set_lncols
+
+#if defined(IPK4) && defined(LPK8)      
+  subroutine  psb_lbase_set_inrows(m,a) 
+    implicit none 
+    class(psb_lbase_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_), intent(in) :: m
+    ! This cannot overflow, since ipk_ <= lpk_
+    a%m = m
+  end subroutine psb_lbase_set_inrows
+
+  subroutine  psb_lbase_set_incols(n,a) 
+    implicit none 
+    class(psb_lbase_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_), intent(in) :: n
+    ! This cannot overflow, since ipk_ <= lpk_
+    a%n = n
+  end subroutine psb_lbase_set_incols
+#endif  
 
   subroutine  psb_lbase_set_state(n,a) 
     implicit none 

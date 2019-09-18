@@ -293,8 +293,18 @@ module psb_s_mat_mod
     procedure, pass(a) :: sizeof      => psb_ls_sizeof
 
     ! Setters
-    procedure, pass(a) :: set_nrows    => psb_ls_set_nrows
-    procedure, pass(a) :: set_ncols    => psb_ls_set_ncols
+    procedure, pass(a) :: set_lnrows   => psb_ls_set_lnrows
+    procedure, pass(a) :: set_lncols   => psb_ls_set_lncols
+#if defined(IPK4) && defined(LPK8)        
+    procedure, pass(a) :: set_inrows   => psb_ls_set_inrows
+    procedure, pass(a) :: set_incols   => psb_ls_set_incols
+    generic, public    :: set_nrows   => set_inrows, set_lnrows
+    generic, public    :: set_ncols   => set_incols, set_lncols
+#else
+    generic, public    :: set_nrows   => set_lnrows
+    generic, public    :: set_ncols   => set_lncols
+#endif
+    
     procedure, pass(a) :: set_dupl     => psb_ls_set_dupl
     procedure, pass(a) :: set_null     => psb_ls_set_null
     procedure, pass(a) :: set_bld      => psb_ls_set_bld
@@ -1163,19 +1173,33 @@ module psb_s_mat_mod
 
 
   interface 
-    subroutine  psb_ls_set_nrows(m,a) 
+    subroutine  psb_ls_set_lnrows(m,a) 
       import :: psb_ipk_, psb_lpk_, psb_lsspmat_type
       class(psb_lsspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: m
-    end subroutine psb_ls_set_nrows
+    end subroutine psb_ls_set_lnrows
+#if defined(IPK4) && defined(LPK8)
+    subroutine  psb_ls_set_inrows(m,a) 
+      import :: psb_ipk_, psb_lpk_, psb_lsspmat_type
+      class(psb_lsspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in) :: m
+    end subroutine psb_ls_set_inrows
+#endif
   end interface
   
   interface 
-    subroutine psb_ls_set_ncols(n,a) 
+    subroutine psb_ls_set_lncols(n,a) 
       import :: psb_ipk_, psb_lpk_, psb_lsspmat_type
       class(psb_lsspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: n
-    end subroutine psb_ls_set_ncols
+    end subroutine psb_ls_set_lncols
+#if defined(IPK4) && defined(LPK8)   
+    subroutine psb_ls_set_incols(n,a) 
+      import :: psb_ipk_, psb_lpk_, psb_lsspmat_type
+      class(psb_lsspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine psb_ls_set_incols
+#endif
   end interface
   
   interface 

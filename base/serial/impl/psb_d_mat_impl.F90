@@ -2603,8 +2603,8 @@ end subroutine psb_d_cp_to_l
 !
 
 
-subroutine  psb_ld_set_nrows(m,a) 
-  use psb_d_mat_mod, psb_protect_name => psb_ld_set_nrows
+subroutine  psb_ld_set_lnrows(m,a) 
+  use psb_d_mat_mod, psb_protect_name => psb_ld_set_lnrows
   use psb_error_mod
   implicit none 
   class(psb_ldspmat_type), intent(inout) :: a
@@ -2629,11 +2629,40 @@ subroutine  psb_ld_set_nrows(m,a)
 
   return
 
-end subroutine psb_ld_set_nrows
+end subroutine psb_ld_set_lnrows
 
+#if defined(IPK4) && defined(LPK8)
+subroutine  psb_ld_set_inrows(m,a) 
+  use psb_d_mat_mod, psb_protect_name => psb_ld_set_inrows
+  use psb_error_mod
+  implicit none 
+  class(psb_ldspmat_type), intent(inout) :: a
+  integer(psb_ipk_), intent(in) :: m
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='set_nrows'
+  logical, parameter :: debug=.false.
 
-subroutine  psb_ld_set_ncols(n,a) 
-  use psb_d_mat_mod, psb_protect_name => psb_ld_set_ncols
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%set_nrows(m)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_set_inrows
+#endif
+
+subroutine  psb_ld_set_lncols(n,a) 
+  use psb_d_mat_mod, psb_protect_name => psb_ld_set_lncols
   use psb_error_mod
   implicit none 
   class(psb_ldspmat_type), intent(inout) :: a
@@ -2657,9 +2686,37 @@ subroutine  psb_ld_set_ncols(n,a)
 
   return
 
-end subroutine psb_ld_set_ncols
+end subroutine psb_ld_set_lncols
 
+#if defined(IPK4) && defined(LPK8)
+subroutine  psb_ld_set_incols(n,a) 
+  use psb_d_mat_mod, psb_protect_name => psb_ld_set_incols
+  use psb_error_mod
+  implicit none 
+  class(psb_ldspmat_type), intent(inout) :: a
+  integer(psb_ipk_), intent(in) :: n
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='get_nzeros'
+  logical, parameter :: debug=.false.
 
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%set_ncols(n)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_set_incols
+#endif
 
 !
 !  Valid values for DUPL: 
