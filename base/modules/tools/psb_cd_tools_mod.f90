@@ -122,6 +122,24 @@ module psb_cd_tools_mod
       logical, optional, target, intent(in)      :: mask(:)
       integer(psb_ipk_), intent(in), optional    :: lidx(:)
     end subroutine psb_cdinsc
+    subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
+      import :: psb_ipk_, psb_lpk_, psb_desc_type
+      type(psb_desc_type), intent(inout) :: desc_a
+      integer(psb_lpk_), intent(in)                :: nz
+      integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
+    end subroutine psb_lcdinsrc
+    subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
+      import :: psb_ipk_, psb_lpk_, psb_desc_type
+      type(psb_desc_type), intent(inout)         :: desc
+      integer(psb_lpk_), intent(in)              :: nz
+      integer(psb_lpk_), intent(in)              :: ja(:)
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(out)   :: jla(:)
+      logical, optional, target, intent(in)      :: mask(:)
+      integer(psb_ipk_), intent(in), optional    :: lidx(:)
+    end subroutine psb_lcdinsc
   end interface
 
   interface psb_cdbldext

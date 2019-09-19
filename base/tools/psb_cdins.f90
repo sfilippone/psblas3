@@ -56,6 +56,23 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
+
+  integer(psb_lpk_) :: lnz
+  lnz = nz
+  call psb_cdins(lnz,ia,ja,desc_a,info,ila,jla)
+end subroutine psb_cdinsrc
+  
+subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
+  use psb_base_mod, psb_protect_name => psb_lcdinsrc
+  use psi_mod
+  implicit none
+
+  !....PARAMETERS...
+  Type(psb_desc_type), intent(inout) :: desc_a
+  integer(psb_lpk_), intent(in)                :: nz
+  integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
   !LOCALS.....
 
   integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
@@ -146,7 +163,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
 
   return
 
-end subroutine psb_cdinsrc
+end subroutine psb_lcdinsrc
 
 !
 ! Subroutine: psb_cdinsc
@@ -171,6 +188,26 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout)       :: desc
   integer(psb_ipk_), intent(in)            :: nz
+  integer(psb_lpk_), intent(in)            :: ja(:)
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), optional, intent(out) :: jla(:)
+  logical, optional, target, intent(in)    :: mask(:) 
+  integer(psb_ipk_), intent(in), optional  :: lidx(:)
+
+  integer(psb_lpk_) :: lnz
+
+  lnz = nz
+  call psb_cdins(lnz,ja,desc,info,jla,mask,lidx)
+end subroutine psb_cdinsc
+
+subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
+  use psb_base_mod, psb_protect_name => psb_lcdinsc
+  use psi_mod
+  implicit none
+
+  !....PARAMETERS...
+  Type(psb_desc_type), intent(inout)       :: desc
+  integer(psb_lpk_), intent(in)            :: nz
   integer(psb_lpk_), intent(in)            :: ja(:)
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), optional, intent(out) :: jla(:)
@@ -263,5 +300,5 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
 
   return
 
-end subroutine psb_cdinsc
+end subroutine psb_lcdinsc
 
