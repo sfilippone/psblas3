@@ -394,7 +394,14 @@ module psb_z_base_mat_mod
     !
     ! This is COO specific
     !
-    procedure, pass(a) :: set_nzeros   => lz_coo_set_nzeros
+#if defined(IPK4) && defined(LPK8)
+    procedure, pass(a) :: iset_nzeros   => lz_coo_iset_nzeros
+    procedure, pass(a) :: lset_nzeros   => lz_coo_lset_nzeros
+    generic, public    :: set_nzeros    => iset_nzeros, lset_nzeros
+#else
+    procedure, pass(a) :: iset_nzeros   => lz_coo_iset_nzeros
+    generic, public    :: set_nzeros    => iset_nzeros
+#endif
     
     !
     ! Transpose methods. These are the base of all
@@ -407,10 +414,12 @@ module psb_z_base_mat_mod
     
   end type psb_lz_coo_sparse_mat
   
-  private :: lz_coo_get_nzeros, lz_coo_set_nzeros, &
+  private :: lz_coo_get_nzeros, lz_coo_iset_nzeros, &
        & lz_coo_get_fmt,  lz_coo_free, lz_coo_sizeof, &
        & lz_coo_transp_1mat, lz_coo_transc_1mat
-  
+#if defined(IPK4) && defined(LPK8)
+  private :: lz_coo_lset_nzeros
+#endif
   
   ! == =================
   !
@@ -3755,14 +3764,25 @@ contains
   !
   ! == ==================================
   
-  subroutine  lz_coo_set_nzeros(nz,a)
+  subroutine  lz_coo_iset_nzeros(nz,a)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: nz
+    class(psb_lz_coo_sparse_mat), intent(inout) :: a
+    
+    a%nnz = nz
+    
+  end subroutine lz_coo_iset_nzeros
+
+#if defined(IPK4) && defined(LPK8)
+  subroutine  lz_coo_lset_nzeros(nz,a)
     implicit none 
     integer(psb_lpk_), intent(in) :: nz
     class(psb_lz_coo_sparse_mat), intent(inout) :: a
     
     a%nnz = nz
     
-  end subroutine lz_coo_set_nzeros
+  end subroutine lz_coo_lset_nzeros
+#endif
   
   function lz_coo_get_sort_status(a) result(res)
     implicit none 
