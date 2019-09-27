@@ -844,8 +844,6 @@ contains
     implicit none 
     class(psb_repl_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, nr,nc,k, nl
-    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
     character(len=20)  :: name='repl_reinit'
     logical, parameter :: debug=.false.
 

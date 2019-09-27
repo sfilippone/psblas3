@@ -2135,9 +2135,11 @@ contains
     implicit none 
     class(psb_gen_block_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt
+    integer(psb_ipk_) :: err_act, ictxt
+    integer(psb_ipk_) :: k, nr, nc
+    integer(psb_lpk_) :: lk
     integer(psb_ipk_), allocatable :: lidx(:)
-    integer(psb_lpk_), allocatable :: idx(:)
+    integer(psb_lpk_), allocatable :: gidx(:)
     character(len=20)  :: name='block_reinit'
     logical, parameter :: debug=.false.
 
@@ -2148,8 +2150,8 @@ contains
     nc = idxmap%get_lc()
     if (nc>nr) then 
       lidx = (/(k,k=nr+1,nc)/)
-      idx  = (/(k,k=nr+1,nc)/)
-      call idxmap%l2gip(idx,info)
+      gidx = (/(lk,lk=nr+1,nc)/)
+      call idxmap%l2gip(gidx,info)
     end if
     if (info /= 0) &
          & write(0,*) 'From l2gip',info
@@ -2160,7 +2162,7 @@ contains
          & write(0,*) 'From hash_init',info
     call idxmap%set_state(psb_desc_bld_)
     if (nc>nr) then 
-      call idxmap%g2lip_ins(idx,info,lidx=lidx)
+      call idxmap%g2lip_ins(gidx,info,lidx=lidx)
     end if
 
       

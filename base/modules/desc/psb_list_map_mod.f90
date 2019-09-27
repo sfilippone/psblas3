@@ -1234,8 +1234,6 @@ contains
     implicit none 
     class(psb_list_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, nr,nc,k, nl
-    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
     character(len=20)  :: name='list_reinit'
     logical, parameter :: debug=.false.
 

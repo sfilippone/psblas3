@@ -1532,10 +1532,11 @@ contains
     class(psb_hash_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act, nr,nc,k, nl
+    integer(psb_lpk_) :: lk
     integer(psb_lpk_) :: ntot
     integer(psb_mpk_) :: ictxt, me, np
     integer(psb_ipk_), allocatable :: lidx(:)
-    integer(psb_lpk_), allocatable :: idx(:)
+    integer(psb_lpk_), allocatable :: gidx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.
 
@@ -1548,13 +1549,13 @@ contains
 
 
     lidx = (/(k,k=1,nc)/)
-    idx  = (/(k,k=1,nc)/)
-    call idxmap%l2gip(idx,info)
+    gidx = (/(lk,lk=1,nc)/)
+    call idxmap%l2gip(gidx,info)
 
     call idxmap%free()
-    call hash_init_vlu(idxmap,ictxt,ntot,nr,idx(1:nr),info) 
+    call hash_init_vlu(idxmap,ictxt,ntot,nr,gidx(1:nr),info) 
     if (nc>nr) then 
-      call idxmap%g2lip_ins(idx(nr+1:nc),info,lidx=lidx(nr+1:nc))
+      call idxmap%g2lip_ins(gidx(nr+1:nc),info,lidx=lidx(nr+1:nc))
     end if
 
 
