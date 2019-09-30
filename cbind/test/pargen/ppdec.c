@@ -133,7 +133,7 @@ psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
 
   info = 0;
   psb_c_info(ictxt,&iam,&np);
-  deltah = (double) 1.0/(idim+2);
+  deltah = (double) 1.0/(idim+1);
   sqdeltah = deltah*deltah;
   deltah2  = 2.0* deltah;
   psb_c_set_index_base(0);
