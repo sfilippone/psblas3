@@ -1200,8 +1200,8 @@ contains
 
     select type (outmap)
     type is (psb_list_map) 
+      call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
       if (info == psb_success_) then 
-        outmap%psb_indx_map = idxmap%psb_indx_map
         outmap%pnt_h        = idxmap%pnt_h
       end if
       if (info == psb_success_)&

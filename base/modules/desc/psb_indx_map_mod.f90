@@ -168,6 +168,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: asb   => base_asb
     procedure, pass(idxmap)  :: free  => base_free
     procedure, pass(idxmap)  :: clone => base_clone
+    procedure, pass(idxmap)  :: cpy   => base_cpy
     procedure, pass(idxmap)  :: reinit => base_reinit
 
 !!$    procedure, pass(idxmap)  :: l2gs1   => base_l2gs1
@@ -235,7 +236,7 @@ module psb_indx_map_mod
        & base_lg2ls1, base_lg2ls2, base_lg2lv1, base_lg2lv2,&
        & base_lg2ls1_ins, base_lg2ls2_ins, base_lg2lv1_ins,&
        & base_lg2lv2_ins, base_init_vl, base_is_null,&
-       & base_row_extendable, base_clone, base_reinit, &
+       & base_row_extendable, base_clone, base_cpy, base_reinit, &
        & base_set_halo_owner, base_get_halo_owner, &
        & base_fnd_halo_owner_s, base_fnd_halo_owner_v
   
@@ -1207,6 +1208,51 @@ contains
     call psb_error_handler(err_act)
     return
   end subroutine base_clone
+
+  !
+  ! This is a kludge because we defined the outmap
+  ! in base_clone to be allocatable intent(out).
+  ! Should be revisited. 
+  !
+  subroutine base_cpy(idxmap,outmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    class(psb_indx_map), intent(out)   :: outmap
+    integer(psb_ipk_), intent(out)     :: info
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_clone'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+
+    call psb_get_erraction(err_act)
+
+    outmap%state       = idxmap%state      
+    outmap%ictxt       = idxmap%ictxt      
+    outmap%mpic        = idxmap%mpic       
+    outmap%global_rows = idxmap%global_rows
+    outmap%global_cols = idxmap%global_cols
+    outmap%local_rows  = idxmap%local_rows 
+    outmap%local_cols  = idxmap%local_cols 
+    outmap%parts       => idxmap%parts 
+    if (info == psb_success_)&
+         &  call psb_safe_ab_cpy(idxmap%tempvg,outmap%tempvg,info)
+    if (info == psb_success_)&
+         &  call psb_safe_ab_cpy(idxmap%oracle,outmap%oracle,info)
+    if (info == psb_success_)&
+         &  call psb_safe_ab_cpy(idxmap%halo_owner,outmap%halo_owner,info)
+    
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+9999 call psb_error_handler(err_act)
+
+    return
+  end subroutine base_cpy
 
 
   subroutine base_reinit(idxmap,info)

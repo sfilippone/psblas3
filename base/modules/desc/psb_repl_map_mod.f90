@@ -818,7 +818,7 @@ contains
 
     select type (outmap)
     type is (psb_repl_map) 
-        outmap%psb_indx_map = idxmap%psb_indx_map
+      call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
     class default
       ! This should be impossible 
       info = -1

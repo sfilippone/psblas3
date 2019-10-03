@@ -224,10 +224,8 @@ contains
     select type (outmap)
     type is (psb_glist_map) 
 
-      if (info == psb_success_) then 
-        outmap%psb_indx_map = idxmap%psb_indx_map
-        outmap%pnt_h        = idxmap%pnt_h
-      end if
+      call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
+      if (info == psb_success_)  outmap%pnt_h = idxmap%pnt_h
       if (info == psb_success_)&
            &  call psb_safe_ab_cpy(idxmap%loc_to_glob,outmap%loc_to_glob,info)
       if (info == psb_success_)&

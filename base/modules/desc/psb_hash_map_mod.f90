@@ -1465,8 +1465,8 @@ contains
 
     select type (outmap)
     type is (psb_hash_map) 
+      call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
       if (info == psb_success_) then 
-        outmap%psb_indx_map = idxmap%psb_indx_map
         outmap%hashvsize    = idxmap%hashvsize
         outmap%hashvmask    = idxmap%hashvmask
       end if

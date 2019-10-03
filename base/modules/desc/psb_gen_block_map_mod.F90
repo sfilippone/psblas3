@@ -2094,8 +2094,8 @@ contains
 
     select type (outmap)
     type is (psb_gen_block_map) 
+      call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
       if (info == psb_success_) then 
-        outmap%psb_indx_map = idxmap%psb_indx_map
         outmap%min_glob_row = idxmap%min_glob_row
         outmap%max_glob_row = idxmap%max_glob_row
       end if
