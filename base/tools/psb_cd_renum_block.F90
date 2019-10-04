@@ -126,6 +126,8 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
     if (info == 0) call blck_map%gen_block_map_init(ictxt,n_row,info)
     if (info == 0) call blck_map%g2l_ins(gidx,lidx,info,lidx=reflidx)
     if (info == 0) call blck_map%asb(info)
+    if (info == 0) call &
+         & psb_safe_ab_cpy(desc_in%indxmap%halo_owner,blck_map%halo_owner,info)
   
     if (info /= psb_success_) then
       info = psb_err_from_subroutine_

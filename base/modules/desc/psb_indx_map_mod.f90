@@ -1328,7 +1328,17 @@ contains
     nr = idxmap%local_rows
     nc = idxmap%local_cols
     xout = -1
-    if ((nr<xin).and.(xin <= nc)) xout = idxmap%halo_owner(xin-nr)
+    if (.not.allocated(idxmap%halo_owner)) then
+      !write(0,*) 'Halo_owner not allocated!', nr, nc, xin
+      return
+    end if
+    if ((nr<xin).and.(xin <= nc)) then
+      if (size(idxmap%halo_owner)<(xin-nr)) then
+        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
+        return
+      end if
+      xout = idxmap%halo_owner(xin-nr)
+    end if
     
   end subroutine base_fnd_halo_owner_s
 
