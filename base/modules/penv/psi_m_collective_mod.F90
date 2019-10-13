@@ -65,11 +65,11 @@ module psi_m_collective_mod
   end interface psb_bcast
 
   interface psb_scan_sum
-    module procedure psb_mscan_sums
+    module procedure psb_mscan_sums, psb_mscan_sumv
   end interface psb_scan_sum
 
   interface psb_exscan_sum
-    module procedure psb_mexscan_sums
+    module procedure psb_mexscan_sums, psb_mexscan_sumv
   end interface psb_exscan_sum
 
 
@@ -1164,13 +1164,65 @@ contains
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-    call mpi_scan(dat,dat_,1,psb_mpi_mpk_,mpi_sum,ictxt,info)
+    call mpi_exscan(dat,dat_,1,psb_mpi_mpk_,mpi_sum,ictxt,info)
     dat = dat_
 #else
-    dat = 0
+    dat = mzero
 #endif    
   end subroutine psb_mexscan_sums
 
+  subroutine psb_mscan_sumv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    integer(psb_mpk_), intent(inout)  :: dat(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
 
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call psb_realloc(size(dat),dat_,iinfo)
+    dat_ = dat
+    if (iinfo == psb_success_) &
+         & call mpi_scan(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,ictxt,info)
+#endif
+  end subroutine psb_mscan_sumv
+
+  subroutine psb_mexscan_sumv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    integer(psb_mpk_), intent(inout)  :: dat(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call psb_realloc(size(dat),dat_,iinfo)
+    dat_ = dat
+    if (iinfo == psb_success_) &
+         & call mpi_exscan(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,ictxt,info)
+#else
+    dat = mzero
+#endif
+  end subroutine psb_mexscan_sumv
   
 end module psi_m_collective_mod
