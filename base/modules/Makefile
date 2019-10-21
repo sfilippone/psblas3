@@ -26,7 +26,7 @@ COMMINT=penv/psi_comm_buffers_mod.o penv/psi_penv_mod.o \
 UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
         desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o desc/psb_hashval.o \
-	desc/psb_desc_mod.o auxil/psb_sort_mod.o \
+	desc/psb_desc_mod.o desc/psb_indx_map_fnd_owner.o auxil/psb_sort_mod.o \
 	serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o \
 	serial/psb_serial_mod.o \
@@ -245,6 +245,8 @@ desc/psb_desc_mod.o: psb_penv_mod.o psb_realloc_mod.o\
 	  desc/psb_hash_mod.o desc/psb_hash_map_mod.o desc/psb_list_map_mod.o \
 	  desc/psb_repl_map_mod.o desc/psb_gen_block_map_mod.o desc/psb_desc_const_mod.o\
 	  desc/psb_indx_map_mod.o serial/psb_i_vect_mod.o
+
+desc/psb_indx_map_fnd_owner.o: desc/psb_desc_mod.o serial/psb_serial_mod.o
 
 psi_i_mod.o: desc/psb_desc_mod.o serial/psb_i_vect_mod.o comm/psi_e_comm_a_mod.o \
 	comm/psi_m_comm_a_mod.o comm/psi_i_comm_v_mod.o

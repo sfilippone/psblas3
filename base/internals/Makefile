@@ -5,8 +5,7 @@ FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
 	psi_bld_tmphalo.o psi_sort_dl.o \
         psi_desc_impl.o psi_list_search.o psi_srtlist.o 
 
-MPFOBJS = psi_desc_index.o psi_extrct_dl.o \
-	psi_fnd_owner.o psb_indx_map_fnd_owner.o
+MPFOBJS = psi_desc_index.o psi_extrct_dl.o psi_fnd_owner.o
 
 LIBDIR=..
 INCDIR=..
