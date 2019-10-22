@@ -127,7 +127,9 @@ module psb_indx_map_mod
     integer(psb_ipk_), allocatable :: oracle(:,:)
     !> Halo owners
     integer(psb_ipk_), allocatable :: halo_owner(:)
-
+    !> Adjacency list for processes
+    integer(psb_ipk_), allocatable :: p_adjncy(:)
+    
   contains
 
     procedure, pass(idxmap)  :: get_state => base_get_state
