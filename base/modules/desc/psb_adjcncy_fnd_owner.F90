@@ -45,13 +45,13 @@
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
 ! 
-subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
+subroutine psb_adjcncy_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psb_indx_map_mod, psb_protect_name => psb_indx_map_fnd_owner
+  use psb_indx_map_mod, psb_protect_name => psb_adjcncy_fnd_owner
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -66,10 +66,10 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), intent(out) :: info
 
 
-!!$  integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
-  integer(psb_ipk_), allocatable :: hhidx(:)
-!!$  integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
-!!$       & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
+  integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
+  integer(psb_ipk_), allocatable :: helem(:), hhidx(:)
+  integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
+       & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
        & last_ih, last_j, nv
@@ -113,57 +113,12 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
+  
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=idxmap%get_fmt())
+  goto 9999
 
-  if (associated(idxmap%parts)) then 
-    ! Use function shortcut
-!!$    write(0,*) me,trim(name),' indxmap%parts shortcut'
-    Allocate(hhidx(np), stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
-      goto 9999      
-    end if
-    do i=1, nv
-      call idxmap%parts(idx(i),mglob,np,hhidx,nresp)
-      if (nresp > 0) then
-        iprc(i) = hhidx(1)
-      else
-        iprc(i) = -1 
-      end if
-    end do
-
-  else if (allocated(idxmap%tempvg)) then 
-!!$    write(0,*) me,trim(name),' indxmap%tempvg shortcut'
-    ! Use temporary vector 
-    do i=1, nv 
-      iprc(i) = idxmap%tempvg(idx(i))
-    end do
-
-  else
-
-    if (.true.) then 
-
-      call psb_a2a_fnd_owner(idx,iprc,idxmap,info)
-
-    else
-      call psb_adjcncy_fnd_owner(idx,iprc,idxmap,info)
-
-    end if
-
-  end if
-  if (gettime) then 
-    call psb_barrier(ictxt)
-    t1 = psb_wtime()
-    t1 = t1 -t0 - tamx - tidx   
-    call psb_amx(ictxt,tamx)
-    call psb_amx(ictxt,tidx)
-    call psb_amx(ictxt,t1)
-    if (me == psb_root_) then 
-      write(psb_out_unit,'(" fnd_owner  idx time  : ",es10.4)') tidx
-      write(psb_out_unit,'(" fnd_owner  amx time  : ",es10.4)') tamx
-      write(psb_out_unit,'(" fnd_owner remainedr  : ",es10.4)') t1 
-    endif
-  end if
-
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -171,4 +126,4 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   return
 
-end subroutine psb_indx_map_fnd_owner
+end subroutine psb_adjcncy_fnd_owner

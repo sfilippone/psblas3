@@ -128,7 +128,7 @@ module psb_indx_map_mod
     !> Halo owners
     integer(psb_ipk_), allocatable :: halo_owner(:)
     !> Adjacency list for processes
-    integer(psb_ipk_), allocatable :: p_adjncy(:)
+    integer(psb_ipk_), allocatable :: p_adjcncy(:)
     
   contains
 
@@ -269,6 +269,28 @@ module psb_indx_map_mod
       class(psb_indx_map), intent(in) :: idxmap
       integer(psb_ipk_), intent(out) :: info
     end subroutine psb_indx_map_fnd_owner
+  end interface
+
+  interface 
+    subroutine psb_a2a_fnd_owner(idx,iprc,idxmap,info)
+      import :: psb_indx_map, psb_ipk_, psb_lpk_
+      implicit none 
+      integer(psb_lpk_), intent(in) :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+      class(psb_indx_map), intent(in) :: idxmap
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_a2a_fnd_owner
+  end interface
+
+  interface 
+    subroutine psb_adjcncy_fnd_owner(idx,iprc,idxmap,info)
+      import :: psb_indx_map, psb_ipk_, psb_lpk_
+      implicit none 
+      integer(psb_lpk_), intent(in) :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+      class(psb_indx_map), intent(in) :: idxmap
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_adjcncy_fnd_owner
   end interface
 
 contains
@@ -1246,6 +1268,8 @@ contains
          &  call psb_safe_ab_cpy(idxmap%oracle,outmap%oracle,info)
     if (info == psb_success_)&
          &  call psb_safe_ab_cpy(idxmap%halo_owner,outmap%halo_owner,info)
+    if (info == psb_success_)&
+         &  call psb_safe_ab_cpy(idxmap%p_adjcncy,outmap%p_adjcncy,info)
     
     if (info /= 0) goto 9999
 
