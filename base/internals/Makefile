@@ -3,10 +3,10 @@ include ../../Make.inc
 FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
         psi_crea_ovr_elem.o psi_bld_tmpovrl.o psi_dl_check.o \
 	psi_bld_tmphalo.o psi_sort_dl.o \
-	psb_indx_map_fnd_owner.o \
+	psi_indx_map_fnd_owner.o \
         psi_desc_impl.o psi_list_search.o psi_srtlist.o 
 
-MPFOBJS = psi_desc_index.o psi_extrct_dl.o psi_fnd_owner.o psb_a2a_fnd_owner.o psb_adjcncy_fnd_owner.o
+MPFOBJS = psi_desc_index.o psi_extrct_dl.o psi_fnd_owner.o psi_a2a_fnd_owner.o psi_adjcncy_fnd_owner.o
 
 LIBDIR=..
 INCDIR=..

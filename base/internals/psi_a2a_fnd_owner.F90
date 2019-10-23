@@ -45,13 +45,13 @@
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
 ! 
-subroutine psb_a2a_fnd_owner(idx,iprc,idxmap,info)
+subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psb_indx_map_mod, psb_protect_name => psb_a2a_fnd_owner
+  use psb_indx_map_mod, psb_protect_name => psi_a2a_fnd_owner
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -296,4 +296,4 @@ subroutine psb_a2a_fnd_owner(idx,iprc,idxmap,info)
 
   return
 
-end subroutine psb_a2a_fnd_owner
+end subroutine psi_a2a_fnd_owner

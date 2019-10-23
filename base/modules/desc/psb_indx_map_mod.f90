@@ -218,7 +218,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: fnd_halo_owner_v => base_fnd_halo_owner_v
     generic, public          :: fnd_halo_owner => fnd_halo_owner_s, fnd_halo_owner_v
     
-    procedure, pass(idxmap)  :: fnd_owner => psb_indx_map_fnd_owner
+    procedure, pass(idxmap)  :: fnd_owner => psi_indx_map_fnd_owner
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
     generic, public          :: init      => init_vl
 
@@ -242,7 +242,7 @@ module psb_indx_map_mod
        & base_set_halo_owner, base_get_halo_owner, &
        & base_fnd_halo_owner_s, base_fnd_halo_owner_v
   
-  !> Function: psb_indx_map_fnd_owner
+  !> Function: psi_indx_map_fnd_owner
   !! \memberof psb_indx_map
   !! \brief  Find the process owning indices
   !!
@@ -261,36 +261,36 @@ module psb_indx_map_mod
   !!
 
   interface 
-    subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in) :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in) :: idxmap
       integer(psb_ipk_), intent(out) :: info
-    end subroutine psb_indx_map_fnd_owner
+    end subroutine psi_indx_map_fnd_owner
   end interface
 
   interface 
-    subroutine psb_a2a_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in) :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in) :: idxmap
       integer(psb_ipk_), intent(out) :: info
-    end subroutine psb_a2a_fnd_owner
+    end subroutine psi_a2a_fnd_owner
   end interface
 
   interface 
-    subroutine psb_adjcncy_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_adjcncy_fnd_owner(idx,iprc,idxmap,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in) :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in) :: idxmap
       integer(psb_ipk_), intent(out) :: info
-    end subroutine psb_adjcncy_fnd_owner
+    end subroutine psi_adjcncy_fnd_owner
   end interface
 
 contains
