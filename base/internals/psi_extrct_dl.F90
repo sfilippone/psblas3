@@ -138,9 +138,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   !     ....array parameters....
   integer(psb_ipk_) :: desc_str(*)
   integer(psb_ipk_) :: dep_list(dl_lda,0:np),length_dl(0:np)
-  integer(psb_ipk_), allocatable :: itmp(:)
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_), allocatable :: itmp(:)
 
   !     .....local scalars...
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
@@ -210,7 +210,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       endif
       i=i+desc_str(i+1)+2
     enddo
+    
   else if (is_upd) then
+
     do while (desc_str(i) /= -1)
       if (debug_level >= psb_debug_inner_) &
            & write(debug_unit,*) me,' ',trim(name),': looping ',i,desc_str(i)
