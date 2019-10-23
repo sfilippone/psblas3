@@ -85,17 +85,6 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     goto 9999
   endif
 
-  ! allocate dependency list
-  ! This should be computed more efficiently to save space when
-  ! the number of processors becomes very high
-!!$  dl_lda=np+1
-!!$
-!!$  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
-!!$  if (info /= psb_success_) then 
-!!$    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-!!$    goto 9999      
-!!$  end if
-
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
   if (debug_level >= psb_debug_inner_) &
@@ -117,7 +106,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
 
-  call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
+  call psi_dl_check(dep_list,dl_lda,np,length_dl)
 
   ! ....now i can sort dependency lists.
   call psi_sort_dl(dep_list,length_dl,np,info)
