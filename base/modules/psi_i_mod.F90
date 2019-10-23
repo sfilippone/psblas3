@@ -115,15 +115,15 @@ module psi_i_mod
 
   interface psi_extract_dep_list
     subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
-         & length_dl,np,dl_lda,mode,info)
+         & length_dl,dl_lda,mode,info)
       import
       implicit none 
-      logical :: is_bld, is_upd
-      integer(psb_ipk_) :: ictxt
-      integer(psb_ipk_) :: dl_lda,mode
-      integer(psb_ipk_) :: desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
-      integer(psb_ipk_) :: np
-      integer(psb_ipk_) :: info
+      logical,  intent(in)           :: is_bld, is_upd
+      integer(psb_ipk_), intent(in)  :: ictxt,mode
+      integer(psb_ipk_), intent(out) :: dl_lda
+      integer(psb_ipk_), intent(in)  :: desc_str(*)
+      integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:),length_dl(:)
+      integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_extract_dep_list
   end interface
 

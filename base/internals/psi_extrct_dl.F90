@@ -30,7 +30,7 @@
 !   
 !    
 subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
-     & length_dl,np,dl_lda,mode,info)
+     & length_dl,dl_lda,mode,info)
 
   !    internal routine
   !    == = ============= 
@@ -131,13 +131,12 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   include 'mpif.h'
 #endif
   !     ....scalar parameters...
-  logical :: is_bld, is_upd
-  integer(psb_ipk_) :: ictxt
-  integer(psb_ipk_) :: np,dl_lda,mode, info
-
-  !     ....array parameters....
-  integer(psb_ipk_) :: desc_str(*)
-  integer(psb_ipk_) :: dep_list(dl_lda,0:np),length_dl(0:np)
+  logical,  intent(in)           :: is_bld, is_upd
+  integer(psb_ipk_), intent(in)  :: ictxt,mode
+  integer(psb_ipk_), intent(out) :: dl_lda
+  integer(psb_ipk_), intent(in)  :: desc_str(*)
+  integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:),length_dl(:)
+  integer(psb_ipk_), intent(out) :: info
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)
   integer(psb_ipk_), allocatable :: itmp(:)
@@ -146,7 +145,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt, icomm, me, npr, dl_mpi, minfo
+  integer(psb_mpk_) :: iictxt, icomm, me, np, dl_mpi, minfo
   character  name*20
   name='psi_extrct_dl'
 
@@ -156,7 +155,14 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   iictxt = ictxt 
   info = psb_success_
 
-  call psb_info(iictxt,me,npr)
+  call psb_info(iictxt,me,np)
+  dl_lda=np+1
+  allocate(dep_list(dl_lda,0:np),length_dl(0:np),stat=info)
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   do i=0,np 
     length_dl(i) = 0
   enddo
@@ -176,7 +182,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       if ((desc_str(i+1) /= 0).or.(desc_str(i+2) /= 0)) then
         !           ..if number of element to be exchanged !=0
         proc=desc_str(i)
-        if ((proc < 0).or.(proc >= npr)) then
+        if ((proc < 0).or.(proc >= np)) then
           if (debug_level >= psb_debug_inner_)&
                & write(debug_unit,*) me,' ',trim(name),': error ',i,desc_str(i)
           info = 9999

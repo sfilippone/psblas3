@@ -88,13 +88,13 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   ! allocate dependency list
   ! This should be computed more efficiently to save space when
   ! the number of processors becomes very high
-  dl_lda=np+1
-
-  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
+!!$  dl_lda=np+1
+!!$
+!!$  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
+!!$  if (info /= psb_success_) then 
+!!$    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+!!$    goto 9999      
+!!$  end if
 
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
@@ -104,7 +104,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 
   call psi_extract_dep_list(ictxt,&
        & desc_a%is_bld(), desc_a%is_upd(),&
-       & index_in, dep_list,length_dl,np,max(1,dl_lda),mode,info)
+       & index_in, dep_list,length_dl,dl_lda,mode,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
     goto 9999

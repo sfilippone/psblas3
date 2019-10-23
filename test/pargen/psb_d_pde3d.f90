@@ -235,8 +235,8 @@ contains
     call psb_erractionsave(err_act)
 
     call psb_info(ictxt, iam, np)
-
-
+    call psb_cd_set_large_threshold(1000)
+    
     if (present(f)) then 
       f_ => f
     else
