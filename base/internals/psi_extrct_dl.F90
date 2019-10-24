@@ -204,10 +204,6 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list > dl_lda) then
-            info = psb_err_alloc_dealloc_
-            goto 9999
-          endif
           itmp(pointer_dep_list)=proc
           pointer_dep_list=pointer_dep_list+1
         endif
@@ -237,18 +233,10 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
           enddo
           if (j == pointer_dep_list) then
             !                 ...if not found.....
-            if (pointer_dep_list > dl_lda) then
-              info = psb_err_alloc_dealloc_
-              goto 9999
-            endif
             itmp(pointer_dep_list)=proc
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list > dl_lda) then
-            info = psb_err_alloc_dealloc_
-            goto 9999
-          endif
           itmp(pointer_dep_list)=proc
           pointer_dep_list=pointer_dep_list+1
         endif
@@ -263,7 +251,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   length_dl(me)=pointer_dep_list-1
   dl_lda = max(length_dl(me),1)
   call psb_max(iictxt, dl_lda)
-
+  dl_lda = min(2*dl_lda,np+1)
   allocate(dep_list(dl_lda,0:np),stat=info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
