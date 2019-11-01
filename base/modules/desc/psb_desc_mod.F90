@@ -233,6 +233,9 @@ module psb_desc_mod
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
     procedure, pass(desc) :: get_global_indices => psb_cd_get_global_indices
+    procedure, pass(desc) :: get_p_adjcncy   => cd_get_p_adjcncy
+    procedure, pass(desc) :: set_p_adjcncy   => cd_set_p_adjcncy
+    procedure, pass(desc) :: xtnd_p_adjcncy  => cd_xtnd_p_adjcncy    
     procedure, pass(desc) :: a_get_list      => psb_cd_get_list
     procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
     generic, public       :: get_list => a_get_list, v_get_list
@@ -557,9 +560,7 @@ contains
 
   end function psb_cd_get_global_indices
 
-
-
-  
+ 
   function cd_get_fmt(desc) result(val)
     implicit none 
     character(len=5) :: val 
@@ -620,6 +621,35 @@ contains
   end function psb_cd_get_mpic
 
 
+  function cd_get_p_adjcncy(desc) result(val)
+    implicit none 
+    integer(psb_ipk_), allocatable   :: val(:)
+    class(psb_desc_type), intent(in) :: desc
+
+    if (allocated(desc%indxmap)) then 
+      val = desc%indxmap%get_p_adjcncy()
+    endif
+
+  end function cd_get_p_adjcncy
+
+  subroutine cd_set_p_adjcncy(desc,val)
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)  :: val(:)
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%xtnd_p_adjcncy(val)
+    endif
+  end subroutine cd_set_p_adjcncy
+
+  subroutine cd_xtnd_p_adjcncy(desc,val)
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)  :: val(:)
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%xtnd_p_adjcncy(val)
+    endif
+  end subroutine cd_xtnd_p_adjcncy
+  
   subroutine psb_cd_set_ovl_asb(desc,info)
     !
     ! Change state of a descriptor into ovl_build. 

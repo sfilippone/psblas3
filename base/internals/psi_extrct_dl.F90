@@ -251,6 +251,13 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   length_dl(me)=pointer_dep_list-1
   dl_lda = max(length_dl(me),1)
   call psb_max(iictxt, dl_lda)
+  !
+  ! This doubling of DL_LDA is not 100% safe,
+  ! but should work most of the time.
+  ! Will need to be improved later, perhaps move
+  ! from a 2D allocation (ellpack style) to
+  ! a 1D allocation (csr like). 
+  !
   dl_lda = min(2*dl_lda,np+1)
   allocate(dep_list(dl_lda,0:np),stat=info)
   if (info /= psb_success_) then 
