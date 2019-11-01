@@ -144,8 +144,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
       !
       ! Choose a sample, should it be done in this simplistic way? 
       !
-      call psi_get_sample(idx,tidx,tsmpl,n_samples,k)      
+      write(0,*) me,' Into first sampling ',n_samples
+      call psi_get_sample(idx,iprc,tidx,tsmpl,n_samples,k)      
       n_samples = min(k,n_samples)
+      write(0,*) me,' From first sampling ',n_samples
       ! 
       ! 2. Do a search on all processes; this is supposed to find
       !    the owning process for all inputs;
@@ -174,8 +176,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
       !    (will not be exact since nadj varies with process)
       ! 
       n_samples = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-      call psi_get_sample(idx,tidx,tsmpl,n_samples,k)      
+      write(0,*) me,' Into second sampling ',n_samples
+      call psi_get_sample(idx,iprc,tidx,tsmpl,n_samples,k)      
       n_samples = min(k,n_samples)
+      write(0,*) me,' From second sampling ',n_samples
       call psi_adjcncy_fnd_owner(tidx(1:n_samples),tprc,ladj(1:nadj),idxmap,info)
       call psi_cpy_out(iprc,tprc,tsmpl,n_samples,k)      
       n_answers = n_answers + k
@@ -195,10 +199,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   return
 
 contains
-  subroutine psi_get_sample(idx,tidx,tsmpl,ns_in,ns_out)      
+  subroutine psi_get_sample(idx,iprc,tidx,tsmpl,ns_in,ns_out)      
     implicit none
     integer(psb_lpk_), intent(in)  :: idx(:)
-    integer(psb_ipk_), intent(in)  :: ns_in
+    integer(psb_ipk_), intent(in)  :: ns_in, iprc(:)
     integer(psb_lpk_), intent(out) :: tidx(:)
     integer(psb_ipk_), intent(out) :: tsmpl(:), ns_out
     !
