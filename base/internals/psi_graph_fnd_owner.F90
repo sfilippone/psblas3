@@ -60,27 +60,27 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_lpk_), intent(in) :: idx(:)
+  integer(psb_lpk_), intent(in)      :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  class(psb_indx_map), intent(in) :: idxmap
-  integer(psb_ipk_), intent(out) :: info
+  class(psb_indx_map), intent(inout) :: idxmap
+  integer(psb_ipk_), intent(out)     :: info
 
 
-  integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
-  integer(psb_ipk_), allocatable :: helem(:), hhidx(:)
+  integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:), tidx(:)
+  integer(psb_ipk_), allocatable :: helem(:), hhidx(:), tprc(:), tsmpl(:), ladj(:)  
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
-       & last_ih, last_j, nv
+       & last_ih, last_j, nv, n_answers, n_rest, n_samples, locr_max, nrest_max, nadj, maxspace
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
-  real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
+  real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psb_indx_map_fnd_owner'
+  name = 'psi_graph_fnd_owner'
   call psb_erractionsave(err_act)
 
   ictxt   = idxmap%get_ctxt()
@@ -88,7 +88,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt = ictxt 
+  iictxt  = ictxt 
 
   call psb_info(ictxt, me, np)
 
@@ -103,22 +103,90 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
 
-  if (gettime) then 
-    t0 = psb_wtime()
-  end if
+  locr_max = n_row
+  call psb_max(ictxt,locr_max)
+  !
+  ! Choice of maxspace should be adjusted to account for a default
+  ! "sensible" size and/or a user-specified value 
+  maxspace = 2*locr_max
 
   nv = size(idx)
   call psb_realloc(nv,iprc,info)
+  if (info == psb_success_) call psb_realloc(nv,tidx,info)
+  if (info == psb_success_) call psb_realloc(nv,tprc,info)
+  if (info == psb_success_) call psb_realloc(nv,tsmpl,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
-  
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=idxmap%get_fmt())
-  goto 9999
+  iprc(:) = -1
+  n_answers = 0
+  if (.true.) then 
+    !
+    ! Start from the adjacncy list
+    !
+    ! Skip for the time being
 
-  
+    n_rest    = nv - n_answers
+    nrest_max = n_rest
+    call psb_max(ictxt,nrest_max)
+    fnd_owner_loop: do while (nrest_max>0)
+      !
+      ! The basic idea of this loop is to alternate between
+      ! searching through all processes and searching
+      ! in the neighbourood.
+      !
+      ! 1. Select a sample to be sent to all processes; sample
+      !    size is such that the total size is <= maxspace
+      !    
+      if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
+      n_samples = min(n_rest,max(1,(maxspace+np-1)/np))
+      !
+      ! Choose a sample, should it be done in this simplistic way? 
+      !
+      call psi_get_sample(idx,tidx,tsmpl,n_samples,k)      
+      n_samples = min(k,n_samples)
+      ! 
+      ! 2. Do a search on all processes; this is supposed to find
+      !    the owning process for all inputs;
+      !    
+      call psi_a2a_fnd_owner(tidx(1:n_samples),tprc,idxmap,info)
+      call psi_cpy_out(iprc,tprc,tsmpl,n_samples,k)      
+      if (k /= n_samples) then 
+        write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',k,n_samples
+      end if
+      n_answers = n_answers + k
+      n_rest    = nv - n_answers
+      !
+      ! 3. Extract the resulting adjacency list and add it to the
+      !    indxmap;
+      !
+      ladj = tprc(1:n_samples)
+      call psb_msort_unique(ladj,nadj)
+      !
+      ! NOTE: should symmetrize the list...
+      ! 
+      call idxmap%xtnd_p_adjcncy(ladj(1:nadj)) 
+
+      !
+      ! 4. Extract a sample and do a neighbourhood search so that the total
+      !    size is <= maxspace
+      !    (will not be exact since nadj varies with process)
+      ! 
+      n_samples = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+      call psi_get_sample(idx,tidx,tsmpl,n_samples,k)      
+      n_samples = min(k,n_samples)
+      call psi_adjcncy_fnd_owner(tidx(1:n_samples),tprc,ladj(1:nadj),idxmap,info)
+      call psi_cpy_out(iprc,tprc,tsmpl,n_samples,k)      
+      n_answers = n_answers + k
+      n_rest    = nv - n_answers
+      nrest_max = n_rest
+      call psb_max(ictxt,nrest_max)
+    end do fnd_owner_loop
+
+  else
+    call psi_a2a_fnd_owner(idx,iprc,idxmap,info)
+  end if
   call psb_erractionrestore(err_act)
   return
 
@@ -126,4 +194,47 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
 
   return
 
+contains
+  subroutine psi_get_sample(idx,tidx,tsmpl,ns_in,ns_out)      
+    implicit none
+    integer(psb_lpk_), intent(in)  :: idx(:)
+    integer(psb_ipk_), intent(in)  :: ns_in
+    integer(psb_lpk_), intent(out) :: tidx(:)
+    integer(psb_ipk_), intent(out) :: tsmpl(:), ns_out
+    !
+    integer(psb_ipk_) :: j, nv 
+
+    nv = size(idx)
+    !
+    ! Choose a sample, should it be done in this simplistic way? 
+    !
+    ns_out = 0
+    do j=1, nv
+      if (iprc(j) == -1) then
+        ns_out = ns_out + 1
+        tsmpl(ns_out) = j
+        tidx(ns_out)  = idx(j)
+      end if
+      if (ns_out >= ns_in) exit
+    end do
+  end subroutine psi_get_sample
+
+  subroutine psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)      
+    implicit none
+    integer(psb_ipk_), intent(out) :: iprc(:)
+    integer(psb_ipk_), intent(in)  :: ns_in
+    integer(psb_ipk_), intent(in)  :: tprc(:), tsmpl(:)
+    integer(psb_ipk_), intent(out) :: ns_out
+
+    integer(psb_ipk_) :: j
+    
+    ns_out = 0 
+    do j=1, ns_in
+      if (tprc(j) /= -1) then
+        ns_out = ns_out + 1
+        iprc(tsmpl(j)) = tprc(j)
+      end if
+    end do
+  end subroutine psi_cpy_out
+  
 end subroutine psi_graph_fnd_owner

@@ -131,11 +131,11 @@ module psi_i_mod
     subroutine psi_i_fnd_owner(nv,idx,iprc,desc,info)
       import
       implicit none       
-      integer(psb_ipk_), intent(in) :: nv
-      integer(psb_ipk_), intent(in) ::  idx(:)
+      integer(psb_ipk_), intent(in)      :: nv
+      integer(psb_ipk_), intent(in)      ::  idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-      type(psb_desc_type), intent(in) :: desc
-      integer(psb_ipk_), intent(out) :: info
+      type(psb_desc_type), intent(inout) :: desc
+      integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_i_fnd_owner
   end interface psi_fnd_owner
 

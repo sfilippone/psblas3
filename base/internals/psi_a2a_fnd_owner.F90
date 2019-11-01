@@ -60,10 +60,10 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_lpk_), intent(in) :: idx(:)
+  integer(psb_lpk_), intent(in)   :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   class(psb_indx_map), intent(in) :: idxmap
-  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_), intent(out)  :: info
 
 
   integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
@@ -80,7 +80,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psb_indx_map_fnd_owner'
+  name = 'psi_a2a_fnd_owner'
   call psb_erractionsave(err_act)
 
   ictxt   = idxmap%get_ctxt()

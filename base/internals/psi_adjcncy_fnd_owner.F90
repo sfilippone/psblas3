@@ -45,7 +45,7 @@
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
 ! 
-subroutine psi_adjcncy_fnd_owner(idx,iprc,idxmap,info)
+subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -60,10 +60,11 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,idxmap,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_lpk_), intent(in) :: idx(:)
+  integer(psb_lpk_), intent(in)   :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+  integer(psb_ipk_), intent(in)   :: ladj(:)
   class(psb_indx_map), intent(in) :: idxmap
-  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_), intent(out)  :: info
 
 
   integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
@@ -80,7 +81,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,idxmap,info)
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psb_indx_map_fnd_owner'
+  name = 'psi_adjcncy_fnd_owner'
   call psb_erractionsave(err_act)
 
   ictxt   = idxmap%get_ctxt()
@@ -113,11 +114,10 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,idxmap,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
+  !write(0,*) me,name,' Going through ',nv,size(ladj)
   
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=idxmap%get_fmt())
-  goto 9999
-
+  call psi_a2a_fnd_owner(idx,iprc,idxmap,info)
+  if (info /= psb_success_) goto 9999
   
   call psb_erractionrestore(err_act)
   return

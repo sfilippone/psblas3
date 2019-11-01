@@ -1746,10 +1746,10 @@ contains
   subroutine cd_fnd_owner(idx,iprc,desc,info)
     use psb_error_mod
     implicit none 
-    integer(psb_lpk_), intent(in) :: idx(:)
+    integer(psb_lpk_), intent(in)       :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(out) :: info
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(out)      :: info
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='cd_fnd_owner'
     logical, parameter :: debug=.false.

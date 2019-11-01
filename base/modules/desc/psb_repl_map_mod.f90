@@ -699,10 +699,10 @@ contains
   subroutine repl_fnd_owner(idx,iprc,idxmap,info)
     use psb_penv_mod
     implicit none 
-    integer(psb_lpk_), intent(in) :: idx(:)
+    integer(psb_lpk_), intent(in)      :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_repl_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(out) :: info
+    class(psb_repl_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(out)     :: info
     integer(psb_ipk_) :: nv
     integer(psb_mpk_) :: ictxt, iam, np
     

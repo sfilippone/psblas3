@@ -154,10 +154,10 @@ contains
     use psb_penv_mod
     use psb_sort_mod
     implicit none 
-    integer(psb_lpk_), intent(in) :: idx(:)
+    integer(psb_lpk_), intent(in)       :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_glist_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(out) :: info
+    class(psb_glist_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(out)      :: info
     integer(psb_mpk_) :: ictxt, iam, np
     integer(psb_lpk_) :: nv, i, ngp
     
