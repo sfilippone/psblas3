@@ -299,6 +299,17 @@ module psb_indx_map_mod
     end subroutine psi_adjcncy_fnd_owner
   end interface
 
+  interface 
+    subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
+      import :: psb_indx_map, psb_ipk_, psb_lpk_
+      implicit none 
+      integer(psb_lpk_), intent(in) :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+      class(psb_indx_map), intent(in) :: idxmap
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psi_graph_fnd_owner
+  end interface
+
 contains
 
 
