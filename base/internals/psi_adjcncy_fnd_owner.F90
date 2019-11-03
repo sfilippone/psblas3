@@ -36,16 +36,8 @@
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                 Number of indices required on  the calling
-!                                       process 
-!    idx(:)   - integer                 Required indices on the calling process.
-!                                       Note: the indices should be unique!
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
-!                                       indices
-!    desc_a   - type(psb_desc_type).    The communication descriptor.        
-!    info     - integer.                return code.
 ! 
-subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
+subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -61,21 +53,21 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)   :: idx(:)
-  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  integer(psb_ipk_), intent(in)   :: ladj(:)
+  integer(psb_ipk_), allocatable, intent(out)   :: iprc(:)
+  integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
   class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out)  :: info
 
 
   integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), rmtidx(:)
-  integer(psb_ipk_), allocatable :: tproc(:), lclidx(:)
+  integer(psb_ipk_), allocatable :: tproc(:), lclidx(:), ladj(:) 
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
-       & last_ih, last_j, nv
+       & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me, nresp
+  integer(psb_ipk_) :: ictxt,np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
@@ -108,14 +100,15 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
     t0 = psb_wtime()
   end if
 
-  nv = size(idx)
-  call psb_realloc(nv,iprc,info)
+  nadj = size(adj)
+  nidx = size(idx)
+  call psb_realloc(nidx,iprc,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
   iprc = -1
-  ! write(0,*) me,name,' Going through ',nv,size(ladj)
+  ! write(0,*) me,name,' Going through ',nidx,nadj
 
   Allocate(hidx(0:np),hsz(np),&
        & sdsz(0:np-1),sdidx(0:np-1),&
@@ -125,35 +118,37 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
   ! First, send sizes according to adjcncy list
   !
   sdsz = 0 
-  do j=1, size(ladj)
-    sdsz(ladj(j)) = nv
+  do j=1, nadj
+    sdsz(adj(j)) = nidx
   end do
-  !write(0,*)me,' Check on sizes into a2a:',ladj(:),size(ladj),':',sdsz(:)
+  !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
   
   call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
        & rvsz,1,psb_mpi_mpk_,icomm,minfo)
+  nrecv = 0 
   hidx(0)   = 0
   do i=0, np-1
+    if (rvsz(i)>0) nrecv = nrecv + 1 
     hidx(i+1) = hidx(i) + rvsz(i)
   end do
   hsize = hidx(np)
-  write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
+  ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
   !
   ! Second, allocate buffers and exchange data
   !
-  Allocate(rmtidx(hsize),lclidx(hsize),tproc(max(hsize,nv)),stat=info)
+  Allocate(rmtidx(hsize),lclidx(hsize),tproc(max(hsize,nidx)),stat=info)
   
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
-  do j=1, size(ladj)
-    write(0,*) me, ' First send to ',ladj(j),nv
-    if (nv > 0) call psb_snd(ictxt,idx(1:nv),ladj(j))
+  do j=1, nadj
+    !write(0,*) me, ' First send to ',adj(j),nidx
+    if (nidx > 0) call psb_snd(ictxt,idx(1:nidx),adj(j))
   end do
   do i = 0, np-1
     if (rvsz(i)>0) then
-      write(0,*) me, ' First receive from ',i,rvsz(i)           
+      ! write(0,*) me, ' First receive from ',i,rvsz(i)           
       call psb_rcv(ictxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
     end if
   end do
@@ -172,7 +167,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
   !
   do i = 0, np-1
     if (rvsz(i)>0) then
-      write(0,*) me, ' Second send to ',i,rvsz(i)
+      !write(0,*) me, ' Second send to ',i,rvsz(i)
       call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
     end if
   end do
@@ -180,11 +175,26 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,ladj,idxmap,info)
   ! Fifth: receive and combine. MAX works because default
   ! answer is -1. Reuse tproc
   !
-  do j = 1, size(ladj)
-    write(0,*) me, ' Second receive from ',ladj(j), nv          
-    if (nv > 0) call psb_rcv(ictxt,tproc(1:nv),ladj(j))
-    iprc(1:nv) = max(iprc(1:nv), tproc(1:nv))
+  do j = 1, nadj
+    !write(0,*) me, ' Second receive from ',adj(j), nidx          
+    if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
+    iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
   end do
+
+  !
+  !  Now fix adj to be symmetric
+  !
+  call psb_realloc(nadj+nrecv,ladj,info)
+  ladj(1:nadj) = adj(1:nadj)
+  do i=0, np-1
+    if (rvsz(i)>0) then
+      nadj  = nadj + 1 
+      ladj(nadj+1:nadj+nrecv) = i
+    end if
+  end do
+  call psb_msort_unique(ladj,nadj)
+  call psb_realloc(nadj,adj,info)
+  adj(1:nadj) = ladj(1:nadj) 
   
   call psb_erractionrestore(err_act)
   return

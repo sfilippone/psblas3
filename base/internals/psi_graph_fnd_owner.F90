@@ -71,8 +71,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
-       & last_ih, last_j, nv, n_answers, n_rest, n_samples, locr_max, nrest_max, nadj, maxspace
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, nsampl_out,&
+       & last_ih, last_j, nv, n_answers, n_rest, nsampl_in, locr_max, nrest_max, nadj, maxspace
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
@@ -136,53 +136,59 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
       ! searching through all processes and searching
       ! in the neighbourood.
       !
-      ! 1. Select a sample to be sent to all processes; sample
-      !    size is such that the total size is <= maxspace
+      ! 1. Select a sample such that the total size is <= maxspace
+      !    sample query is then sent to all processes
       !    
       if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
-      n_samples = min(n_rest,max(1,(maxspace+np-1)/np))
+      nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
       !
-      ! Choose a sample, should it be done in this simplistic way? 
+      ! Choose a sample, should it be done in this simplistic way?
+      ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
       !
-      write(0,*) me,' Into first sampling ',n_samples
-      call psi_get_sample(idx,iprc,tidx,tsmpl,n_samples,k)      
-      n_samples = min(k,n_samples)
-      write(0,*) me,' From first sampling ',n_samples
+      write(0,*) me,' Into first sampling ',nsampl_in
+      call psi_get_sample(idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
+      nsampl_in = min(nsampl_out,nsampl_in)
+      write(0,*) me,' From first sampling ',nsampl_in
       ! 
       ! 2. Do a search on all processes; this is supposed to find
       !    the owning process for all inputs;
       !    
-      call psi_a2a_fnd_owner(tidx(1:n_samples),tprc,idxmap,info)
-      call psi_cpy_out(iprc,tprc,tsmpl,n_samples,k)      
-      if (k /= n_samples) then 
-        write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',k,n_samples
+      call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info)
+      call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
+      if (nsampl_out /= nsampl_in) then 
+        write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',nsampl_out,nsampl_in
       end if
-      n_answers = n_answers + k
+      n_answers = n_answers + nsampl_out
       n_rest    = nv - n_answers
       !
       ! 3. Extract the resulting adjacency list and add it to the
       !    indxmap;
       !
-      ladj = tprc(1:n_samples)
+      ladj = tprc(1:nsampl_in)
       call psb_msort_unique(ladj,nadj)
+      call psb_realloc(nadj,ladj,info)
+      
       !
-      ! NOTE: should symmetrize the list...
-      ! 
-      call idxmap%xtnd_p_adjcncy(ladj(1:nadj)) 
-
-      !
-      ! 4. Extract a sample and do a neighbourhood search so that the total
-      !    size is <= maxspace
+      ! 4. Extract again a sample and do a neighbourhood search
+      !    so that the total size is <= maxspace
       !    (will not be exact since nadj varies with process)
       ! 
-      n_samples = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-      write(0,*) me,' Into second sampling ',n_samples
-      call psi_get_sample(idx,iprc,tidx,tsmpl,n_samples,k)      
-      n_samples = min(k,n_samples)
-      write(0,*) me,' From second sampling ',n_samples
-      call psi_adjcncy_fnd_owner(tidx(1:n_samples),tprc,ladj(1:nadj),idxmap,info)
-      call psi_cpy_out(iprc,tprc,tsmpl,n_samples,k)      
-      n_answers = n_answers + k
+      nsampl_in = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+      write(0,*) me,' Into second sampling ',nsampl_in
+      call psi_get_sample(idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
+      nsampl_in = min(nsampl_out,nsampl_in)
+      write(0,*) me,' From second sampling ',nsampl_in
+      !
+      ! NOTE: the obvious place to symmetrize ladj is inside
+      ! adjcncy_fnd_owner since there we have the
+      ! data exchange.
+      ! Hence, the call to idxmap%xtnd only after this one. 
+      ! 
+      call psi_adjcncy_fnd_owner(tidx(1:nsampl_in),tprc,ladj,idxmap,info)
+      call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
+      call idxmap%xtnd_p_adjcncy(ladj) 
+
+      n_answers = n_answers + nsampl_out
       n_rest    = nv - n_answers
       nrest_max = n_rest
       call psb_max(ictxt,nrest_max)
