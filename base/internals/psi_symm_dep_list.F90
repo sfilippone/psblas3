@@ -114,7 +114,7 @@ subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
   end select
 
 
-  if (flag_ == psi_symm_norv_) then 
+  if (flag_ == psi_symm_flag_norv_) then 
   
   ! write(0,*) me,name,' Going through ',nidx,nadj
 
@@ -123,8 +123,8 @@ subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
     ! First, send sizes according to adjcncy list
     !
     sdsz = 0 
-    do j=1, nadj
-      sdsz(adj(j)) = 1
+    do i=1, nadj
+      sdsz(adj(i)) = 1
     end do
     !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
     
