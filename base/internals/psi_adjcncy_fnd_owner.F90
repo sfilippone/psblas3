@@ -125,10 +125,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   
   call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
        & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-  nrecv = 0 
   hidx(0)   = 0
   do i=0, np-1
-    if (rvsz(i)>0) nrecv = nrecv + 1 
     hidx(i+1) = hidx(i) + rvsz(i)
   end do
   hsize = hidx(np)
@@ -184,17 +182,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   !
   !  Now fix adj to be symmetric
   !
-  call psb_realloc(nadj+nrecv,ladj,info)
-  ladj(1:nadj) = adj(1:nadj)
-  do i=0, np-1
-    if (rvsz(i)>0) then
-      nadj  = nadj + 1 
-      ladj(nadj+1:nadj+nrecv) = i
-    end if
-  end do
-  call psb_msort_unique(ladj,nadj)
-  call psb_realloc(nadj,adj,info)
-  adj(1:nadj) = ladj(1:nadj) 
+  call psi_symm_dep_list(rvsz,adj,idxmap,info,flag=psi_symm_flag_inrv_)
+  if (info /= 0) goto 9999
   
   call psb_erractionrestore(err_act)
   return
