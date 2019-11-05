@@ -71,8 +71,9 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, nsampl_out,&
-       & last_ih, last_j, nv, n_answers, n_rest, nsampl_in, locr_max, nrest_max, nadj, maxspace
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j,ipnt, nsampl_out,&
+       & last_ih, last_j, nv, n_answers, n_rest, nsampl_in, locr_max, &
+       & nrest_max, nadj, maxspace, mxnsin
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
@@ -103,12 +104,20 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
 
-  locr_max = n_row
-  call psb_max(ictxt,locr_max)
   !
   ! Choice of maxspace should be adjusted to account for a default
-  ! "sensible" size and/or a user-specified value 
-  maxspace = 2*locr_max
+  ! "sensible" size and/or a user-specified value
+  !
+  block
+    integer(psb_ipk_), parameter :: nt=4
+    integer(psb_ipk_) :: v(2)
+    v(1) = n_row
+    v(2) = psb_cd_get_maxspace()
+    call psb_max(ictxt,v)
+    locr_max = v(1)
+    maxspace = min(nt*locr_max,v(2))
+    maxspace = max(maxspace,np)
+  end block
 
   nv = size(idx)
   call psb_realloc(nv,iprc,info)
@@ -139,16 +148,17 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
       ! 1. Select a sample such that the total size is <= maxspace
       !    sample query is then sent to all processes
       !    
-      if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
+      ! if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
       nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
       !
       ! Choose a sample, should it be done in this simplistic way?
       ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
       !
-      write(0,*) me,' Into first sampling ',nsampl_in
-      call psi_get_sample(idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
+      ipnt = 1
+!!$      write(0,*) me,' Into first sampling ',nsampl_in
+      call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
       nsampl_in = min(nsampl_out,nsampl_in)
-      write(0,*) me,' From first sampling ',nsampl_in
+!!$      write(0,*) me,' From first sampling ',nsampl_in
       ! 
       ! 2. Do a search on all processes; this is supposed to find
       !    the owning process for all inputs;
@@ -172,23 +182,27 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
       ! 4. Extract again a sample and do a neighbourhood search
       !    so that the total size is <= maxspace
       !    (will not be exact since nadj varies with process)
-      ! 
-      nsampl_in = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-      write(0,*) me,' Into second sampling ',nsampl_in
-      call psi_get_sample(idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
-      nsampl_in = min(nsampl_out,nsampl_in)
-      write(0,*) me,' From second sampling ',nsampl_in
+      !    Need to set up a proper loop here to have a complete
+      !    sweep over the input vector. 
       !
-      ! NOTE: the obvious place to symmetrize ladj is inside
-      ! adjcncy_fnd_owner since there we have the
-      ! data exchange.
-      ! Hence, the call to idxmap%xtnd only after this one. 
-      ! 
-      call psi_adjcncy_fnd_owner(tidx(1:nsampl_in),tprc,ladj,idxmap,info)
-      call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
+!!$      write(0,*) me,' After a2a ',n_rest
+      nsampl_in = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+      mxnsin = nsampl_in
+      call psb_max(ictxt,mxnsin)
+!!$      write(0,*) me, ' mxnsin ',mxnsin
+      if (.false.) then 
+        write(0,*) me,' Into second sampling ',nsampl_in
+        call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
+        nsampl_in = min(nsampl_out,nsampl_in)
+        write(0,*) me,' From second sampling ',nsampl_in
+        call psi_adjcncy_fnd_owner(tidx(1:nsampl_in),tprc,ladj,idxmap,info)
+        call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)
+        n_answers = n_answers + nsampl_out
+      else
+        if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
+      end if
       call idxmap%xtnd_p_adjcncy(ladj) 
 
-      n_answers = n_answers + nsampl_out
       n_rest    = nv - n_answers
       nrest_max = n_rest
       call psb_max(ictxt,nrest_max)
@@ -205,28 +219,40 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   return
 
 contains
-  subroutine psi_get_sample(idx,iprc,tidx,tsmpl,ns_in,ns_out)      
+
+  subroutine psi_get_sample(ipntidx,idx,iprc,tidx,tsmpl,ns_in,ns_out)      
     implicit none
-    integer(psb_lpk_), intent(in)  :: idx(:)
-    integer(psb_ipk_), intent(in)  :: ns_in, iprc(:)
-    integer(psb_lpk_), intent(out) :: tidx(:)
-    integer(psb_ipk_), intent(out) :: tsmpl(:), ns_out
+    integer(psb_ipk_), intent(inout) :: ipntidx
+    integer(psb_lpk_), intent(in)    :: idx(:)
+    integer(psb_ipk_), intent(in)    :: ns_in, iprc(:)
+    integer(psb_lpk_), intent(out)   :: tidx(:)
+    integer(psb_ipk_), intent(out)   :: tsmpl(:), ns_out
     !
-    integer(psb_ipk_) :: j, nv 
+    integer(psb_ipk_) :: nv, ns
 
     nv = size(idx)
     !
     ! Choose a sample, should it be done in this simplistic way? 
     !
+    ns = ns_in
+    !
+    ! ns_in == 0 means that on the outside we figure there's
+    ! nothing left, but we are here because we have to synchronize.
+    ! Make sure we sweep through the entire vector immediately
+    ! 
+    if (ns == 0) ns = nv
     ns_out = 0
-    do j=1, nv
-      if (iprc(j) == -1) then
-        ns_out = ns_out + 1
-        tsmpl(ns_out) = j
-        tidx(ns_out)  = idx(j)
+    
+    do while (ipntidx<= nv)
+      if (iprc(ipntidx) == -1) then
+        ns_out        = ns_out + 1
+        tsmpl(ns_out) = ipntidx
+        tidx(ns_out)  = idx(ipntidx)
       end if
-      if (ns_out >= ns_in) exit
+      ipntidx = ipntidx + 1
+      if (ns_out >= ns) exit
     end do
+    
   end subroutine psi_get_sample
 
   subroutine psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)      
@@ -246,5 +272,42 @@ contains
       end if
     end do
   end subroutine psi_cpy_out
+
+  subroutine psi_adj_fnd_sweep(idx,iprc,adj,idxmap,n_samples,n_answers)      
+    implicit none
+    integer(psb_lpk_), intent(in)    :: idx(:)
+    integer(psb_ipk_), intent(in)    :: n_samples
+    integer(psb_ipk_), intent(inout) :: iprc(:), n_answers
+    integer(psb_ipk_), intent(in)    :: adj(:)
+    class(psb_indx_map), intent(inout) :: idxmap
+    !
+    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, ictxt, me, np, isw
+    integer(psb_lpk_), allocatable    :: tidx(:)
+    integer(psb_ipk_), allocatable    :: tsmpl(:)
+
+    ictxt   = idxmap%get_ctxt()
+    call psb_info(ictxt,me,np)
+    call psb_realloc(n_samples,tidx,info)
+    call psb_realloc(n_samples,tsmpl,info)
+    ipnt = 1
+    isw  = 1
+    do
+      !write(0,*) me,' Into  sampling ',n_samples
+      call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,n_samples,ns_out)      
+      ns_in = min(n_samples,ns_out)
+      !write(0,*) me,' From second sampling ',ns_out
+      call psi_adjcncy_fnd_owner(tidx(1:ns_in),tprc,ladj,idxmap,info)
+      call psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)
+      write(0,*) me,' Sweep ',isw,' answers:',ns_out
+      n_answers = n_answers + ns_out
+      n_rem = size(idx)-ipnt
+      call psb_max(ictxt,n_rem)
+      write(0,*) me,' Sweep ',isw,n_rem, ipnt, n_samples
+      if (n_rem <= 0) exit
+      isw = isw + 1 
+    end do
+    
+    
+  end subroutine psi_adj_fnd_sweep
   
 end subroutine psi_graph_fnd_owner

@@ -317,10 +317,10 @@ module psb_indx_map_mod
     subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
       import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_
       implicit none 
-      integer(psb_mpk_), intent(inout)   :: rvsz(:)
-      integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-      class(psb_indx_map), intent(in)    :: idxmap
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_mpk_), intent(inout) :: rvsz(:)
+      integer(psb_ipk_), intent(in)    :: adj(:)
+      class(psb_indx_map), intent(in)  :: idxmap
+      integer(psb_ipk_), intent(out)   :: info
       integer(psb_ipk_), intent(in), optional :: flag
     end subroutine psi_symm_dep_list
   end interface

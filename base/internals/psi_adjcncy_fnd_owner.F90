@@ -53,16 +53,16 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)   :: idx(:)
-  integer(psb_ipk_), allocatable, intent(out)   :: iprc(:)
-  integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
+  integer(psb_ipk_), allocatable, intent(out) :: iprc(:)
+  integer(psb_ipk_), intent(in)   :: adj(:)
   class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out)  :: info
 
 
-  integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), rmtidx(:)
-  integer(psb_ipk_), allocatable :: tproc(:), lclidx(:), ladj(:) 
+  integer(psb_lpk_), allocatable :: rmtidx(:)
+  integer(psb_ipk_), allocatable :: tproc(:), lclidx(:)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
-       & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
+       & sdsz(:), rvsz(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
        & last_ih, last_j, nidx, nrecv, nadj
@@ -111,9 +111,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   ! write(0,*) me,name,' Going through ',nidx,nadj
 
   Allocate(hidx(0:np),hsz(np),&
-       & sdsz(0:np-1),sdidx(0:np-1),&
-       & rvsz(0:np-1),rvidx(0:np-1),&
-       & stat=info)
+       & sdsz(0:np-1),rvsz(0:np-1),stat=info)
   !
   ! First, send sizes according to adjcncy list
   !
@@ -125,7 +123,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   
   call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
        & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-  hidx(0)   = 0
+  hidx(0) = 0
   do i=0, np-1
     hidx(i+1) = hidx(i) + rvsz(i)
   end do
@@ -178,12 +176,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
     iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
   end do
-
-  !
-  !  Now fix adj to be symmetric
-  !
-  call psi_symm_dep_list(rvsz,adj,idxmap,info,flag=psi_symm_flag_inrv_)
-  if (info /= 0) goto 9999
   
   call psb_erractionrestore(err_act)
   return

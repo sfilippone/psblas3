@@ -236,6 +236,7 @@ contains
 
     call psb_info(ictxt, iam, np)
     call psb_cd_set_large_threshold(1000)
+    call psb_cd_set_maxspace(-1)
     
     if (present(f)) then 
       f_ => f

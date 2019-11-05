@@ -285,6 +285,14 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
+  interface psb_cd_set_maxspace
+    module procedure  psb_cd_set_maxspace
+  end interface psb_cd_set_maxspace
+
+  interface psb_cd_get_maxspace
+    module procedure  psb_cd_get_maxspace
+  end interface psb_cd_get_maxspace
+
   interface psb_cd_set_large_threshold    
     module procedure  psb_i_cd_set_large_threshold
   end interface psb_cd_set_large_threshold
@@ -301,7 +309,8 @@ module psb_desc_mod
        & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins, cd_fnd_owner
 
 
-  integer(psb_lpk_), private, save :: cd_large_threshold=psb_default_large_threshold 
+  integer(psb_lpk_), private, save :: cd_large_threshold = psb_default_large_threshold
+  integer(psb_ipk_), private, save :: cd_maxspace        = 1000*1000
 
 
 contains 
@@ -350,10 +359,25 @@ contains
 
   function  psb_cd_get_large_threshold() result(val)
     implicit none 
-    integer(psb_ipk_) :: val
+    integer(psb_lpk_) :: val
     val  = cd_large_threshold 
   end function psb_cd_get_large_threshold
 
+
+  subroutine psb_cd_set_maxspace(ith)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
+    if (ith > 0) then 
+      cd_maxspace = ith
+    end if
+  end subroutine psb_cd_set_maxspace
+
+  function  psb_cd_get_maxspace() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = cd_maxspace
+  end function psb_cd_get_maxspace
+  
   function  psb_cd_is_large_size(m) result(val)
     use psb_penv_mod
 
