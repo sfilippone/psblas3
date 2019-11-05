@@ -51,7 +51,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psb_indx_map_mod, psb_protect_name => psi_graph_fnd_owner
+  use psb_desc_mod, psb_protect_name => psi_graph_fnd_owner
 #ifdef MPI_MOD
   use mpi
 #endif
