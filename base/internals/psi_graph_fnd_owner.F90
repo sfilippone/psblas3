@@ -130,87 +130,73 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   end if
   iprc(:) = -1
   n_answers = 0
-  if (.true.) then 
+  !
+  ! Start from the adjacncy list
+  !
+  ! Skip for the time being
+
+  n_rest    = nv - n_answers
+  nrest_max = n_rest
+  call psb_max(ictxt,nrest_max)
+  fnd_owner_loop: do while (nrest_max>0)
     !
-    ! Start from the adjacncy list
+    ! The basic idea of this loop is to alternate between
+    ! searching through all processes and searching
+    ! in the neighbourood.
     !
-    ! Skip for the time being
+    ! 1. Select a sample such that the total size is <= maxspace
+    !    sample query is then sent to all processes
+    !    
+    ! if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
+    nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
+    !
+    ! Choose a sample, should it be done in this simplistic way?
+    ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
+    !
+    ipnt = 1
+!!$      write(0,*) me,' Into first sampling ',nsampl_in
+    call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
+    nsampl_in = min(nsampl_out,nsampl_in)
+!!$      write(0,*) me,' From first sampling ',nsampl_in
+    ! 
+    ! 2. Do a search on all processes; this is supposed to find
+    !    the owning process for all inputs;
+    !    
+    call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info)
+    call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
+    if (nsampl_out /= nsampl_in) then 
+      write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',nsampl_out,nsampl_in
+    end if
+    n_answers = n_answers + nsampl_out
+    n_rest    = nv - n_answers
+    !
+    ! 3. Extract the resulting adjacency list and add it to the
+    !    indxmap;
+    !
+    ladj = tprc(1:nsampl_in)
+    call psb_msort_unique(ladj,nadj)
+    call psb_realloc(nadj,ladj,info)
+
+    !
+    ! 4. Extract again a sample and do a neighbourhood search
+    !    so that the total size is <= maxspace
+    !    (will not be exact since nadj varies with process)
+    !    Need to set up a proper loop here to have a complete
+    !    sweep over the input vector. Done inside adj_fnd_sweep. 
+    !
+!!$      write(0,*) me,' After a2a ',n_rest
+    nsampl_in = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+    mxnsin = nsampl_in
+    call psb_max(ictxt,mxnsin)
+!!$      write(0,*) me, ' mxnsin ',mxnsin
+    if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
+    call idxmap%xtnd_p_adjcncy(ladj) 
 
     n_rest    = nv - n_answers
     nrest_max = n_rest
     call psb_max(ictxt,nrest_max)
-    fnd_owner_loop: do while (nrest_max>0)
-      !
-      ! The basic idea of this loop is to alternate between
-      ! searching through all processes and searching
-      ! in the neighbourood.
-      !
-      ! 1. Select a sample such that the total size is <= maxspace
-      !    sample query is then sent to all processes
-      !    
-      ! if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
-      nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
-      !
-      ! Choose a sample, should it be done in this simplistic way?
-      ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
-      !
-      ipnt = 1
-!!$      write(0,*) me,' Into first sampling ',nsampl_in
-      call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
-      nsampl_in = min(nsampl_out,nsampl_in)
-!!$      write(0,*) me,' From first sampling ',nsampl_in
-      ! 
-      ! 2. Do a search on all processes; this is supposed to find
-      !    the owning process for all inputs;
-      !    
-      call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info)
-      call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
-      if (nsampl_out /= nsampl_in) then 
-        write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',nsampl_out,nsampl_in
-      end if
-      n_answers = n_answers + nsampl_out
-      n_rest    = nv - n_answers
-      !
-      ! 3. Extract the resulting adjacency list and add it to the
-      !    indxmap;
-      !
-      ladj = tprc(1:nsampl_in)
-      call psb_msort_unique(ladj,nadj)
-      call psb_realloc(nadj,ladj,info)
-      
-      !
-      ! 4. Extract again a sample and do a neighbourhood search
-      !    so that the total size is <= maxspace
-      !    (will not be exact since nadj varies with process)
-      !    Need to set up a proper loop here to have a complete
-      !    sweep over the input vector. 
-      !
-!!$      write(0,*) me,' After a2a ',n_rest
-      nsampl_in = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-      mxnsin = nsampl_in
-      call psb_max(ictxt,mxnsin)
-!!$      write(0,*) me, ' mxnsin ',mxnsin
-      if (.false.) then 
-        write(0,*) me,' Into second sampling ',nsampl_in
-        call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out)      
-        nsampl_in = min(nsampl_out,nsampl_in)
-        write(0,*) me,' From second sampling ',nsampl_in
-        call psi_adjcncy_fnd_owner(tidx(1:nsampl_in),tprc,ladj,idxmap,info)
-        call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)
-        n_answers = n_answers + nsampl_out
-      else
-        if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
-      end if
-      call idxmap%xtnd_p_adjcncy(ladj) 
+  end do fnd_owner_loop
 
-      n_rest    = nv - n_answers
-      nrest_max = n_rest
-      call psb_max(ictxt,nrest_max)
-    end do fnd_owner_loop
-
-  else
-    call psi_a2a_fnd_owner(idx,iprc,idxmap,info)
-  end if
   call psb_erractionrestore(err_act)
   return
 
@@ -242,7 +228,7 @@ contains
     ! 
     if (ns == 0) ns = nv
     ns_out = 0
-    
+
     do while (ipntidx<= nv)
       if (iprc(ipntidx) == -1) then
         ns_out        = ns_out + 1
@@ -252,7 +238,7 @@ contains
       ipntidx = ipntidx + 1
       if (ns_out >= ns) exit
     end do
-    
+
   end subroutine psi_get_sample
 
   subroutine psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)      
@@ -263,7 +249,7 @@ contains
     integer(psb_ipk_), intent(out) :: ns_out
 
     integer(psb_ipk_) :: j
-    
+
     ns_out = 0 
     do j=1, ns_in
       if (tprc(j) /= -1) then
@@ -306,8 +292,8 @@ contains
       if (n_rem <= 0) exit
       isw = isw + 1 
     end do
-    
-    
+
+
   end subroutine psi_adj_fnd_sweep
-  
+
 end subroutine psi_graph_fnd_owner
