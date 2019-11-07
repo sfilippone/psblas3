@@ -381,7 +381,7 @@ contains
         ! 
         integer(psb_mpk_), allocatable :: neighbours(:)
         integer(psb_mpk_) :: cnt
-        logical, parameter :: debug_adj=.true.
+        logical, parameter :: debug_adj=.false.
         if (debug_adj.and.(np > 1)) then 
           cnt = 0
           allocate(neighbours(np))
@@ -396,6 +396,18 @@ contains
           if (iamz < npz-1) then
             cnt = cnt + 1 
             call ijk2idx(neighbours(cnt),iamx,iamy,iamz+1,npx,npy,npz,base=0)
+          end if
+          if (iamx >0) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx-1,iamy,iamz,npx,npy,npz,base=0)
+          end if
+          if (iamy >0) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx,iamy-1,iamz,npx,npy,npz,base=0)
+          end if
+          if (iamz >0) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx,iamy,iamz-1,npx,npy,npz,base=0)
           end if
           call psb_realloc(cnt, neighbours,info)
           call desc_a%set_p_adjcncy(neighbours)
