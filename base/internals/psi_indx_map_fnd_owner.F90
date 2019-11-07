@@ -134,15 +134,7 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   else
 
-    if (.false.) then 
-      
-      call psi_a2a_fnd_owner(idx,iprc,idxmap,info)
-
-    else
-      
-      call psi_graph_fnd_owner(idx,iprc,idxmap,info)
-
-    end if
+    call psi_graph_fnd_owner(idx,iprc,idxmap,info)
 
   end if
   

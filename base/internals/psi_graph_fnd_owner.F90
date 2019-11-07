@@ -76,7 +76,9 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
        & nrest_max, nadj, maxspace, mxnsin
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
-  logical, parameter  :: gettime=.false.
+  integer(psb_ipk_), parameter :: nt=4
+  integer(psb_ipk_) :: tmpv(2)
+  logical, parameter  :: gettime=.false., trace=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name
 
@@ -108,17 +110,16 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   ! Choice of maxspace should be adjusted to account for a default
   ! "sensible" size and/or a user-specified value
   !
-  block
-    integer(psb_ipk_), parameter :: nt=4
-    integer(psb_ipk_) :: v(2)
-    v(1) = n_row
-    v(2) = psb_cd_get_maxspace()
-    call psb_max(ictxt,v)
-    locr_max = v(1)
-    maxspace = min(nt*locr_max,v(2))
-    maxspace = max(maxspace,np)
-  end block
-
+  tmpv(1) = n_row
+  tmpv(2) = psb_cd_get_maxspace()
+  call psb_max(ictxt,tmpv)
+  locr_max = tmpv(1)
+  maxspace = min(nt*locr_max,tmpv(2))
+  maxspace = max(maxspace,np)
+  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',maxspace
+  !
+  !
+  !
   nv = size(idx)
   call psb_realloc(nv,iprc,info)
   if (info == psb_success_) call psb_realloc(nv,tidx,info)
@@ -133,11 +134,31 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   !
   ! Start from the adjacncy list
   !
-  ! Skip for the time being
-
+  call psb_safe_ab_cpy(idxmap%p_adjcncy,ladj,info)
+  nadj = psb_size(ladj)
+  ! This makes ladj allocated with size 0 just in case 
+  call psb_realloc(nadj,ladj,info)
   n_rest    = nv - n_answers
   nrest_max = n_rest
-  call psb_max(ictxt,nrest_max)
+
+  tmpv(1) = nadj
+  tmpv(2) = nrest_max
+  call psb_max(ictxt,tmpv)
+  if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
+    !
+    ! Do a preliminary run on the user-defined adjacency lists
+    !
+    if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology'
+    nsampl_in = min(n_rest,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+    call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
+    call idxmap%xtnd_p_adjcncy(ladj) 
+    n_rest    = nv - n_answers
+    nrest_max = n_rest
+    call psb_max(ictxt,nrest_max)
+    if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nrest_max
+  end if
+
+    
   fnd_owner_loop: do while (nrest_max>0)
     !
     ! The basic idea of this loop is to alternate between
@@ -147,7 +168,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! 1. Select a sample such that the total size is <= maxspace
     !    sample query is then sent to all processes
     !    
-    ! if (me == 0) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
+    ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
     nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
     !
     ! Choose a sample, should it be done in this simplistic way?
@@ -195,6 +216,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     n_rest    = nv - n_answers
     nrest_max = n_rest
     call psb_max(ictxt,nrest_max)
+    if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nrest_max
   end do fnd_owner_loop
 
   call psb_erractionrestore(err_act)
@@ -284,11 +306,11 @@ contains
       !write(0,*) me,' From second sampling ',ns_out
       call psi_adjcncy_fnd_owner(tidx(1:ns_in),tprc,ladj,idxmap,info)
       call psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)
-      write(0,*) me,' Sweep ',isw,' answers:',ns_out
+      !write(0,*) me,' Sweep ',isw,' answers:',ns_out
       n_answers = n_answers + ns_out
       n_rem = size(idx)-ipnt
       call psb_max(ictxt,n_rem)
-      write(0,*) me,' Sweep ',isw,n_rem, ipnt, n_samples
+      !write(0,*) me,' Sweep ',isw,n_rem, ipnt, n_samples
       if (n_rem <= 0) exit
       isw = isw + 1 
     end do
