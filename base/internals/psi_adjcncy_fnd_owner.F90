@@ -143,7 +143,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     ! Second, allocate buffers and exchange data
     !
-    Allocate(rmtidx(hsize),lclidx(hsize),tproc(max(hsize,nidx)),stat=info)
+    Allocate(rmtidx(hsize),lclidx(max(hsize,nidx*nadj)),tproc(max(hsize,nidx)),stat=info)
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
