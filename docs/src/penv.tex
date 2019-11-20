@@ -157,7 +157,7 @@ Specified as: a logical  variable, default value: true.
 \addcontentsline{toc}{subsection}{psb\_get\_mpicomm}
 
 \begin{verbatim}
-call psb_get_mpicomm(icontxt, icomm)
+icomm = psb_get_mpicomm(icontxt)
 \end{verbatim}
 
 This subroutine returns the MPI communicator associated with a PSBLAS context
@@ -174,7 +174,7 @@ Specified as: an integer variable.
 
 \begin{description}
 \item[\bf On Return]
-\item[icomm] The MPI communicator associated with the  PSBLAS virtual parallel machine.\\
+\item[Function value] The MPI communicator associated with the  PSBLAS virtual parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
 Intent: {\bf out}.\\
@@ -185,7 +185,7 @@ Intent: {\bf out}.\\
 \addcontentsline{toc}{subsection}{psb\_get\_rank}
 
 \begin{verbatim}
-call psb_get_rank(rank, icontxt, id)
+rank = psb_get_rank(icontxt, id)
 \end{verbatim}
 
 This subroutine returns the MPI rank of the  PSBLAS process $id$
@@ -207,7 +207,7 @@ Specified as: an integer value. $0 \le id \le np-1$\
 
 \begin{description}
 \item[\bf On Return]
-\item[rank] The MPI rank associated with the  PSBLAS process $id$.\\
+\item[Funciton value] The MPI rank associated with the  PSBLAS process $id$.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf out}.\\

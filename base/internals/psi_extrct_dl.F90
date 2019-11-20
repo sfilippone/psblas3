@@ -265,7 +265,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   if (err /= 0) goto 9999
 
   call psb_sum(iictxt,length_dl(0:np))
-  call psb_get_mpicomm(iictxt,icomm )
+  icomm = psb_get_mpicomm(iictxt)
   allocate(itmp(dl_lda),stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_

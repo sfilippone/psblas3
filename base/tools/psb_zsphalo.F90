@@ -1208,7 +1208,7 @@ contains
       n_el_recv = ipdxv(counter+psb_n_elem_recv_)
       counter   = counter+n_el_recv
       n_el_send = ipdxv(counter+psb_n_elem_send_)
-      call psb_get_rank(prcid(ip+1),ictxt,ip)
+      prcid(ip+1) = psb_get_rank(ictxt,ip)
       sz = rvsz(ip+1) 
       if (sz > 0) then
         idx = brvindx(ip+1)
@@ -1235,7 +1235,7 @@ contains
       n_el_recv = ipdxv(counter+psb_n_elem_recv_)
       counter   = counter+n_el_recv
       n_el_send = ipdxv(counter+psb_n_elem_send_)
-      if (prcid(ip+1)<0) call psb_get_rank(prcid(ip+1),ictxt,ip)
+      if (prcid(ip+1)<0) prcid(ip+1) = psb_get_rank(ictxt,ip)
       sz = sdsz(ip+1) 
       if (sz > 0) then
         idx = bsdindx(ip+1)

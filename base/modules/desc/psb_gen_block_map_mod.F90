@@ -2005,7 +2005,7 @@ contains
     idxmap%local_cols   = nl
     idxmap%ictxt        = ictxt
     idxmap%state        = psb_desc_bld_
-    call psb_get_mpicomm(ictxt,idxmap%mpic)
+    idxmap%mpic         =  psb_get_mpicomm(ictxt)
     idxmap%min_glob_row = vnl(iam)+1
     idxmap%max_glob_row = vnl(iam+1) 
     call move_alloc(vnl,idxmap%vnl)
