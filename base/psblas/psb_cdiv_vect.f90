@@ -103,3 +103,77 @@ subroutine psb_cdiv_vect(x,y,desc_a,info)
   return
 
 end subroutine psb_cdiv_vect
+
+subroutine psb_cdiv_vect_check(x,y,desc_a,info,flag)
+  use psb_base_mod, psb_protect_name => psb_cdiv_vect_check
+  implicit none
+  type(psb_c_vect_type), intent (inout) :: x
+  type(psb_c_vect_type), intent (inout) :: y
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  logical, intent(in)                   :: flag
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_c_div_vect_check'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,y%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call x%div(y,info,flag)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_cdiv_vect_check

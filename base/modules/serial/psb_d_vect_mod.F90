@@ -95,8 +95,10 @@ module psb_d_vect_mod
     generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
          & mlt_v_2, mlt_av, mlt_va
     procedure, pass(x) :: div_v    => d_vect_div_v
+    procedure, pass(x) :: div_v_check => d_vect_div_v_check
     procedure, pass(z) :: div_a2   => d_vect_div_a2
-    generic, public    :: div      => div_v, div_a2
+    procedure, pass(z) :: div_a2_check => d_vect_div_a2_check
+    generic, public    :: div      => div_v, div_v_check, div_a2, div_a2_check
     procedure, pass(x) :: scal     => d_vect_scal
     procedure, pass(x) :: absval1  => d_vect_absval1
     procedure, pass(x) :: absval2  => d_vect_absval2
@@ -744,6 +746,21 @@ contains
 
   end subroutine d_vect_div_v
 
+  subroutine d_vect_div_v_check(x, y, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v)) &
+         & call x%v%div(y%v,info,flag)
+
+  end subroutine d_vect_div_v_check
+
   subroutine d_vect_div_a2(x, y, z, info)
     use psi_serial_mod
     implicit none
@@ -758,6 +775,22 @@ contains
          & call z%v%div(x,y,info)
 
   end subroutine d_vect_div_a2
+
+  subroutine d_vect_div_a2_check(x, y, z, info,flag)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(in) :: x(:)
+    real(psb_dpk_), intent(in)    :: y(:)
+    class(psb_d_vect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (allocated(z%v)) &
+         & call z%v%div(x,y,info,flag)
+
+  end subroutine d_vect_div_a2_check
 
   subroutine d_vect_scal(alpha, x)
     use psi_serial_mod

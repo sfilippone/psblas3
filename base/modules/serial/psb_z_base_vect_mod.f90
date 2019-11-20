@@ -166,9 +166,11 @@ module psb_z_base_vect_mod
     !
     ! Vector-Vector operations
     !
-    procedure, pass(x) :: div_v    => z_base_div_v
-    procedure, pass(z) :: div_a2   => z_base_div_a2
-    generic, public    :: div      => div_v, div_a2
+    procedure, pass(x) :: div_v         => z_base_div_v
+    procedure, pass(x) :: div_v_check   => z_base_div_v_check
+    procedure, pass(z) :: div_a2        => z_base_div_a2
+    procedure, pass(z) :: div_a2_check  => z_base_div_a2_check
+    generic, public    :: div           => div_v, div_v_check, div_a2, div_a2_check
     !
     ! Scaling and norms
     !
@@ -1205,10 +1207,32 @@ contains
 
   end subroutine z_base_div_v
   !
+  !> Function  base_div_v_check
+  !! \memberof  psb_z_base_vect_type
+  !! \brief Vector entry-by-entry divide  by a vector x=x/y
+  !! \param y The array to be divided by
+  !! \param info   return code
+  !!
+  subroutine z_base_div_v_check(x, y, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_z_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call x%div(x%v,y%v,info,flag)
+
+
+  end subroutine z_base_div_v_check
+  !
   !> Function  base_div_a2
   !! \memberof  psb_z_base_vect_type
   !! \brief Entry-by-entry divide  between normal array x=x/y
-  !! \param x(:) The array to be multiplied by
+  !! \param y(:) The array to be divided by
   !! \param info   return code
   !!
   subroutine z_base_div_a2(x, y, z, info)
@@ -1229,7 +1253,43 @@ contains
     end do
 
   end subroutine z_base_div_a2
+  !
+  !> Function  base_div_a2_check
+  !! \memberof  psb_z_base_vect_type
+  !! \brief Entry-by-entry divide  between normal array x=x/y and check if y(i)
+  !! is different from zero
+  !! \param y(:) The array to be dived by
+  !! \param info   return code
+  !!
+  subroutine z_base_div_a2_check(x, y, z, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_z_base_vect_type), intent(inout)  :: z
+    complex(psb_dpk_), intent(in) :: x(:)
+    complex(psb_dpk_), intent(in)    :: y(:)
+    integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in)              :: flag
+    integer(psb_ipk_) :: i, n
 
+    if (flag .eqv. .false.) then
+      call z_base_div_a2(x, y, z, info)
+    else
+      info = 0
+      if (z%is_dev()) call z%sync()
+
+      n = min(size(y), size(x))
+      do i=1, n
+        if (y(i) /= 0) then
+          z%v(i) = x(i)/y(i)
+        else
+          info = 1
+          exit
+        end if
+      end do
+    end if
+
+
+  end subroutine z_base_div_a2_check
 
 
   !
