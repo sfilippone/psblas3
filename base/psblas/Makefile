@@ -9,7 +9,8 @@ OBJS= psb_ddot.o psb_damax.o psb_dasum.o psb_daxpby.o\
 	psb_saxpby.o psb_sdot.o  psb_sasum.o psb_samax.o\
 	psb_snrm2.o psb_snrmi.o  psb_sspmm.o psb_sspsm.o\
 	psb_camax.o psb_casum.o psb_caxpby.o psb_cdot.o \
-	psb_cnrm2.o psb_cnrmi.o psb_cspmm.o psb_cspsm.o
+	psb_cnrm2.o psb_cnrmi.o psb_cspmm.o psb_cspsm.o \
+	psb_cmlt_vect.o psb_dmlt_vect.o psb_zmlt_vect.o psb_smlt_vect.o
 
 
 LIBDIR=..

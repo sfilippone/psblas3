@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 module psb_z_psblas_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_
   use psb_z_vect_mod, only : psb_z_vect_type
@@ -44,7 +44,7 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)       :: info
       logical, intent(in), optional        :: global
     end function psb_zdot_vect
-    function psb_zdotv(x, y, desc_a,info,global) 
+    function psb_zdotv(x, y, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                :: psb_zdotv
@@ -53,7 +53,7 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
       logical, intent(in), optional      :: global
     end function psb_zdotv
-    function psb_zdot(x, y, desc_a, info, jx, jy,global) 
+    function psb_zdot(x, y, desc_a, info, jx, jy,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                :: psb_zdot
@@ -69,7 +69,7 @@ module psb_z_psblas_mod
   interface psb_gedots
     subroutine  psb_zdotvs(res,x, y, desc_a, info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_z_vect_type, psb_zspmat_type 
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_), intent(out)      :: res
       complex(psb_dpk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
@@ -78,7 +78,7 @@ module psb_z_psblas_mod
     end subroutine psb_zdotvs
     subroutine  psb_zmdots(res,x, y, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_z_vect_type, psb_zspmat_type 
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_), intent(out)      :: res(:)
       complex(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
@@ -155,10 +155,10 @@ module psb_z_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_zamax, psb_zamaxv, psb_zamax_vect
-  end interface 
+  end interface
   interface psb_normi
     procedure psb_zamax, psb_zamaxv, psb_zamax_vect
-  end interface 
+  end interface
 #endif
 
   interface psb_geamaxs
@@ -238,10 +238,10 @@ module psb_z_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_zasum, psb_zasumv, psb_zasum_vect
-  end interface 
+  end interface
   interface psb_norm1
     procedure psb_zasum, psb_zasumv, psb_zasum_vect
-  end interface 
+  end interface
 #endif
 
   interface psb_genrm2
@@ -278,7 +278,7 @@ module psb_z_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_znrm2, psb_znrm2v, psb_znrm2_vect
-  end interface 
+  end interface
 #endif
 
   interface psb_genrm2s
@@ -309,7 +309,7 @@ module psb_z_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_znrmi
-  end interface 
+  end interface
 #endif
 
   interface psb_spnrm1
@@ -323,11 +323,11 @@ module psb_z_psblas_mod
       logical, intent(in), optional        :: global
     end function psb_zspnrm1
   end interface
-  
+
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_zspnrm1
-  end interface 
+  end interface
 #endif
 
   interface psb_spmm
@@ -378,7 +378,7 @@ module psb_z_psblas_mod
 
   interface psb_spsm
     subroutine psb_zspsm(alpha, t, x, beta, y,&
-         & desc_a, info, trans, scale, choice,& 
+         & desc_a, info, trans, scale, choice,&
          & diag, n, jx, jy, work)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
@@ -395,7 +395,7 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_zspsm
     subroutine psb_zspsv(alpha, t, x, beta, y,&
-         & desc_a, info, trans, scale, choice,& 
+         & desc_a, info, trans, scale, choice,&
          & diag, work)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
@@ -411,7 +411,7 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_zspsv
     subroutine psb_zspsv_vect(alpha, t, x, beta, y,&
-         & desc_a, info, trans, scale, choice,& 
+         & desc_a, info, trans, scale, choice,&
          & diag, work)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
@@ -426,6 +426,17 @@ module psb_z_psblas_mod
       complex(psb_dpk_), optional, intent(inout), target :: work(:)
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_zspsv_vect
+  end interface
+
+  interface psb_gemlt
+    subroutine psb_zmlt_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_z_vect_type
+      type(psb_z_vect_type), intent (inout) :: x
+      type(psb_z_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_zmlt_vect
   end interface
 
 end module psb_z_psblas_mod
