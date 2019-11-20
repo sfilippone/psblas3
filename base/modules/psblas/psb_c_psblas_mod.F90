@@ -439,4 +439,15 @@ module psb_c_psblas_mod
     end subroutine psb_cmlt_vect
   end interface
 
+  interface psb_gediv
+    subroutine psb_cdiv_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cdiv_vect
+  end interface
+
 end module psb_c_psblas_mod

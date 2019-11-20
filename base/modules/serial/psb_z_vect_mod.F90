@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,15 +27,15 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! package: psb_z_vect_mod
 !
 ! This module contains the definition of the psb_z_vect type which
 ! is the outer container for dense vectors.
 ! Therefore all methods simply invoke the corresponding methods of the
-! inner component. 
+! inner component.
 !
 module psb_z_vect_mod
 
@@ -43,7 +43,7 @@ module psb_z_vect_mod
   use psb_i_vect_mod
 
   type psb_z_vect_type
-    class(psb_z_base_vect_type), allocatable :: v 
+    class(psb_z_base_vect_type), allocatable :: v
   contains
     procedure, pass(x) :: get_nrows => z_vect_get_nrows
     procedure, pass(x) :: sizeof   => z_vect_sizeof
@@ -94,13 +94,16 @@ module psb_z_vect_mod
     procedure, pass(z) :: mlt_av   => z_vect_mlt_av
     generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
          & mlt_v_2, mlt_av, mlt_va
+    procedure, pass(x) :: div_v    => z_vect_div_v
+    procedure, pass(z) :: div_a2   => z_vect_div_a2
+    generic, public    :: div      => div_v, div_a2
     procedure, pass(x) :: scal     => z_vect_scal
     procedure, pass(x) :: absval1  => z_vect_absval1
     procedure, pass(x) :: absval2  => z_vect_absval2
     generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2     => z_vect_nrm2
     procedure, pass(x) :: amax     => z_vect_amax
-    procedure, pass(x) :: asum     => z_vect_asum                  
+    procedure, pass(x) :: asum     => z_vect_asum
   end type psb_z_vect_type
 
   public  :: psb_z_vect
@@ -122,7 +125,7 @@ module psb_z_vect_mod
   private ::  z_vect_dot_v, z_vect_dot_a, z_vect_axpby_v, z_vect_axpby_a, &
        & z_vect_mlt_v, z_vect_mlt_a, z_vect_mlt_a_2, z_vect_mlt_v_2, &
        & z_vect_mlt_va, z_vect_mlt_av, z_vect_scal, z_vect_absval1, &
-       & z_vect_absval2, z_vect_nrm2, z_vect_amax, z_vect_asum                  
+       & z_vect_absval2, z_vect_nrm2, z_vect_amax, z_vect_asum
 
 
 
@@ -141,11 +144,11 @@ module psb_z_vect_mod
 contains
 
 
-  subroutine  psb_z_set_vect_default(v) 
-    implicit none 
+  subroutine  psb_z_set_vect_default(v)
+    implicit none
     class(psb_z_base_vect_type), intent(in) :: v
 
-    if (allocated(psb_z_base_vect_default)) then 
+    if (allocated(psb_z_base_vect_default)) then
       deallocate(psb_z_base_vect_default)
     end if
     allocate(psb_z_base_vect_default, mold=v)
@@ -153,7 +156,7 @@ contains
   end subroutine psb_z_set_vect_default
 
   function psb_z_get_vect_default(v) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(in) :: v
     class(psb_z_base_vect_type), pointer :: res
 
@@ -163,10 +166,10 @@ contains
 
 
   function psb_z_get_base_vect_default() result(res)
-    implicit none 
+    implicit none
     class(psb_z_base_vect_type), pointer :: res
 
-    if (.not.allocated(psb_z_base_vect_default)) then 
+    if (.not.allocated(psb_z_base_vect_default)) then
       allocate(psb_z_base_vect_type :: psb_z_base_vect_default)
     end if
 
@@ -176,14 +179,14 @@ contains
 
 
   subroutine z_vect_clone(x,y,info)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_vect_type), intent(inout) :: y
     integer(psb_ipk_), intent(out)        :: info
 
     info = psb_success_
     call y%free(info)
-    if ((info==0).and.allocated(x%v)) then 
+    if ((info==0).and.allocated(x%v)) then
       call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine z_vect_clone
@@ -198,7 +201,7 @@ contains
     if (allocated(x%v)) &
          & call x%free(info)
 
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_z_get_base_vect_default())
@@ -220,7 +223,7 @@ contains
     if (allocated(x%v)) &
          & call x%free(info)
 
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_z_get_base_vect_default())
@@ -241,7 +244,7 @@ contains
     if (allocated(x%v)) &
          & call x%free(info)
 
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_z_get_base_vect_default())
@@ -304,7 +307,7 @@ contains
   end function size_const
 
   function z_vect_get_nrows(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(in) :: x
     integer(psb_ipk_) :: res
     res = 0
@@ -312,7 +315,7 @@ contains
   end function z_vect_get_nrows
 
   function z_vect_sizeof(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(in) :: x
     integer(psb_epk_) :: res
     res = 0
@@ -320,7 +323,7 @@ contains
   end function z_vect_sizeof
 
   function z_vect_get_fmt(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(in) :: x
     character(len=5) :: res
     res = 'NULL'
@@ -329,7 +332,7 @@ contains
 
   subroutine z_vect_all(n, x, info, mold)
 
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)           :: n
     class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
@@ -338,12 +341,12 @@ contains
     if (allocated(x%v)) &
          & call x%free(info)
 
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(psb_z_base_vect_type :: x%v,stat=info)
     endif
-    if (info == 0) then 
+    if (info == 0) then
       call x%v%all(n,info)
     else
       info = psb_err_alloc_dealloc_
@@ -353,12 +356,12 @@ contains
 
   subroutine z_vect_reall(n, x, info)
 
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)         :: n
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
 
-    info = 0 
+    info = 0
     if (.not.allocated(x%v)) &
          & call x%all(n,info)
     if (info == 0) &
@@ -368,7 +371,7 @@ contains
 
   subroutine z_vect_zero(x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout)    :: x
 
     if (allocated(x%v)) call x%v%zero()
@@ -378,7 +381,7 @@ contains
   subroutine z_vect_asb(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)              :: n
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
@@ -424,12 +427,12 @@ contains
   subroutine z_vect_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
 
     info = 0
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       call x%v%free(info)
       if (info == 0) deallocate(x%v,stat=info)
     end if
@@ -438,7 +441,7 @@ contains
 
   subroutine z_vect_ins_a(n,irl,val,dupl,x,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl
     integer(psb_ipk_), intent(in)               :: irl(:)
@@ -448,7 +451,7 @@ contains
     integer(psb_ipk_) :: i
 
     info = 0
-    if (.not.allocated(x%v)) then 
+    if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
       return
     end if
@@ -459,7 +462,7 @@ contains
 
   subroutine z_vect_ins_v(n,irl,val,dupl,x,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl
     class(psb_i_vect_type), intent(inout)       :: irl
@@ -469,7 +472,7 @@ contains
     integer(psb_ipk_) :: i
 
     info = 0
-    if (.not.(allocated(x%v).and.allocated(irl%v).and.allocated(val%v))) then 
+    if (.not.(allocated(x%v).and.allocated(irl%v).and.allocated(val%v))) then
       info = psb_err_invalid_vect_state_
       return
     end if
@@ -487,12 +490,12 @@ contains
     integer(psb_ipk_) :: info
 
     info = psb_success_
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(tmp,stat=info,mold=mold)
     else
       allocate(tmp,stat=info,mold=psb_z_get_base_vect_default())
     end if
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       call x%v%sync()
       if (info == psb_success_) call tmp%bld(x%v%v)
       call x%v%free(info)
@@ -503,7 +506,7 @@ contains
 
 
   subroutine z_vect_sync(x)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
 
     if (allocated(x%v)) &
@@ -512,7 +515,7 @@ contains
   end subroutine z_vect_sync
 
   subroutine z_vect_set_sync(x)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
 
     if (allocated(x%v)) &
@@ -521,7 +524,7 @@ contains
   end subroutine z_vect_set_sync
 
   subroutine z_vect_set_host(x)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
 
     if (allocated(x%v)) &
@@ -530,7 +533,7 @@ contains
   end subroutine z_vect_set_host
 
   subroutine z_vect_set_dev(x)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
 
     if (allocated(x%v)) &
@@ -539,7 +542,7 @@ contains
   end subroutine z_vect_set_dev
 
   function z_vect_is_sync(x) result(res)
-    implicit none 
+    implicit none
     logical :: res
     class(psb_z_vect_type), intent(inout) :: x
 
@@ -550,7 +553,7 @@ contains
   end function z_vect_is_sync
 
   function z_vect_is_host(x) result(res)
-    implicit none 
+    implicit none
     logical :: res
     class(psb_z_vect_type), intent(inout) :: x
 
@@ -561,11 +564,11 @@ contains
   end function z_vect_is_host
 
   function z_vect_is_dev(x) result(res)
-    implicit none 
+    implicit none
     logical :: res
     class(psb_z_vect_type), intent(inout) :: x
 
-    res = .false. 
+    res = .false.
     if (allocated(x%v)) &
          & res =  x%v%is_dev()
 
@@ -573,7 +576,7 @@ contains
 
 
   function z_vect_dot_v(n,x,y) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x, y
     integer(psb_ipk_), intent(in)           :: n
     complex(psb_dpk_)                :: res
@@ -585,7 +588,7 @@ contains
   end function z_vect_dot_v
 
   function z_vect_dot_a(n,x,y) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
     complex(psb_dpk_), intent(in)    :: y(:)
     integer(psb_ipk_), intent(in)           :: n
@@ -599,14 +602,14 @@ contains
 
   subroutine z_vect_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)               :: m
     class(psb_z_vect_type), intent(inout)  :: x
     class(psb_z_vect_type), intent(inout)  :: y
     complex(psb_dpk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
-    if (allocated(x%v).and.allocated(y%v)) then 
+    if (allocated(x%v).and.allocated(y%v)) then
       call y%v%axpby(m,alpha,x%v,beta,info)
     else
       info = psb_err_invalid_vect_state_
@@ -616,7 +619,7 @@ contains
 
   subroutine z_vect_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)               :: m
     complex(psb_dpk_), intent(in)        :: x(:)
     class(psb_z_vect_type), intent(inout)  :: y
@@ -631,10 +634,10 @@ contains
 
   subroutine z_vect_mlt_v(x, y, info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout)  :: x
     class(psb_z_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
     info = 0
@@ -645,7 +648,7 @@ contains
 
   subroutine z_vect_mlt_a(x, y, info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     complex(psb_dpk_), intent(in)        :: x(:)
     class(psb_z_vect_type), intent(inout)  :: y
     integer(psb_ipk_), intent(out)              :: info
@@ -661,7 +664,7 @@ contains
 
   subroutine z_vect_mlt_a_2(alpha,x,y,beta,z,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     complex(psb_dpk_), intent(in)         :: alpha,beta
     complex(psb_dpk_), intent(in)         :: y(:)
     complex(psb_dpk_), intent(in)         :: x(:)
@@ -669,7 +672,7 @@ contains
     integer(psb_ipk_), intent(out)                  :: info
     integer(psb_ipk_) :: i, n
 
-    info = 0    
+    info = 0
     if (allocated(z%v)) &
          & call z%v%mlt(alpha,x,y,beta,info)
 
@@ -677,12 +680,12 @@ contains
 
   subroutine z_vect_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
     use psi_serial_mod
-    implicit none 
+    implicit none
     complex(psb_dpk_), intent(in)          :: alpha,beta
     class(psb_z_vect_type), intent(inout)  :: x
     class(psb_z_vect_type), intent(inout)  :: y
     class(psb_z_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)                   :: info    
+    integer(psb_ipk_), intent(out)                   :: info
     character(len=1), intent(in), optional :: conjgx, conjgy
 
     integer(psb_ipk_) :: i, n
@@ -696,12 +699,12 @@ contains
 
   subroutine z_vect_mlt_av(alpha,x,y,beta,z,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     complex(psb_dpk_), intent(in)        :: alpha,beta
     complex(psb_dpk_), intent(in)        :: x(:)
     class(psb_z_vect_type), intent(inout)  :: y
     class(psb_z_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
     info = 0
@@ -712,12 +715,12 @@ contains
 
   subroutine z_vect_mlt_va(alpha,x,y,beta,z,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     complex(psb_dpk_), intent(in)        :: alpha,beta
     complex(psb_dpk_), intent(in)        :: y(:)
     class(psb_z_vect_type), intent(inout)  :: x
     class(psb_z_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
     info = 0
@@ -727,9 +730,38 @@ contains
 
   end subroutine z_vect_mlt_va
 
+  subroutine z_vect_div_v(x, y, info)
+    use psi_serial_mod
+    implicit none
+    class(psb_z_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v)) &
+         & call x%v%div(y%v,info)
+
+  end subroutine z_vect_div_v
+
+  subroutine z_vect_div_a2(x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    complex(psb_dpk_), intent(in) :: x(:)
+    complex(psb_dpk_), intent(in)    :: y(:)
+    class(psb_z_vect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (allocated(z%v)) &
+         & call z%v%div(x,y,info)
+
+  end subroutine z_vect_div_a2
+
   subroutine z_vect_scal(alpha, x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent (in)       :: alpha
 
@@ -749,19 +781,19 @@ contains
     class(psb_z_vect_type), intent(inout)  :: x
     class(psb_z_vect_type), intent(inout)  :: y
 
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       if (.not.allocated(y%v))  call y%bld(psb_size(x%v%v))
       call x%v%absval(y%v)
     end if
   end subroutine z_vect_absval2
 
   function z_vect_nrm2(n,x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
 
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       res = x%v%nrm2(n)
     else
       res = dzero
@@ -770,12 +802,12 @@ contains
   end function z_vect_nrm2
 
   function z_vect_amax(n,x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
 
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       res = x%v%amax(n)
     else
       res = dzero
@@ -784,12 +816,12 @@ contains
   end function z_vect_amax
 
   function z_vect_asum(n,x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
 
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       res = x%v%asum(n)
     else
       res = dzero
@@ -812,7 +844,7 @@ module psb_z_multivect_mod
   !private
 
   type psb_z_multivect_type
-    class(psb_z_base_multivect_type), allocatable :: v 
+    class(psb_z_base_multivect_type), allocatable :: v
   contains
     procedure, pass(x) :: get_nrows => z_vect_get_nrows
     procedure, pass(x) :: get_ncols => z_vect_get_ncols
@@ -886,11 +918,11 @@ module psb_z_multivect_mod
 contains
 
 
-  subroutine  psb_z_set_multivect_default(v) 
-    implicit none 
+  subroutine  psb_z_set_multivect_default(v)
+    implicit none
     class(psb_z_base_multivect_type), intent(in) :: v
 
-    if (allocated(psb_z_base_multivect_default)) then 
+    if (allocated(psb_z_base_multivect_default)) then
       deallocate(psb_z_base_multivect_default)
     end if
     allocate(psb_z_base_multivect_default, mold=v)
@@ -898,7 +930,7 @@ contains
   end subroutine psb_z_set_multivect_default
 
   function psb_z_get_multivect_default(v) result(res)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(in) :: v
     class(psb_z_base_multivect_type), pointer :: res
 
@@ -908,10 +940,10 @@ contains
 
 
   function psb_z_get_base_multivect_default() result(res)
-    implicit none 
+    implicit none
     class(psb_z_base_multivect_type), pointer :: res
 
-    if (.not.allocated(psb_z_base_multivect_default)) then 
+    if (.not.allocated(psb_z_base_multivect_default)) then
       allocate(psb_z_base_multivect_type :: psb_z_base_multivect_default)
     end if
 
@@ -921,14 +953,14 @@ contains
 
 
   subroutine z_vect_clone(x,y,info)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(inout) :: x
     class(psb_z_multivect_type), intent(inout) :: y
     integer(psb_ipk_), intent(out)        :: info
 
     info = psb_success_
     call y%free(info)
-    if ((info==0).and.allocated(x%v)) then 
+    if ((info==0).and.allocated(x%v)) then
       call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine z_vect_clone
@@ -941,7 +973,7 @@ contains
     class(psb_z_base_multivect_type), pointer :: mld
 
     info = psb_success_
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_z_get_base_multivect_default())
@@ -959,7 +991,7 @@ contains
     integer(psb_ipk_) :: info
 
     info = psb_success_
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_z_get_base_multivect_default())
@@ -1019,7 +1051,7 @@ contains
   end function size_const
 
   function z_vect_get_nrows(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(in) :: x
     integer(psb_ipk_)  :: res
     res = 0
@@ -1027,7 +1059,7 @@ contains
   end function z_vect_get_nrows
 
   function z_vect_get_ncols(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
     res = 0
@@ -1035,7 +1067,7 @@ contains
   end function z_vect_get_ncols
 
   function z_vect_sizeof(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(in) :: x
     integer(psb_epk_) :: res
     res = 0
@@ -1043,7 +1075,7 @@ contains
   end function z_vect_sizeof
 
   function z_vect_get_fmt(x) result(res)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(in) :: x
     character(len=5) :: res
     res = 'NULL'
@@ -1052,18 +1084,18 @@ contains
 
   subroutine z_vect_all(m,n, x, info, mold)
 
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)       :: m,n
     class(psb_z_multivect_type), intent(out) :: x
     class(psb_z_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
 
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(psb_z_base_multivect_type :: x%v,stat=info)
     endif
-    if (info == 0) then 
+    if (info == 0) then
       call x%v%all(m,n,info)
     else
       info = psb_err_alloc_dealloc_
@@ -1073,12 +1105,12 @@ contains
 
   subroutine z_vect_reall(m,n, x, info)
 
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)         :: m,n
     class(psb_z_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
 
-    info = 0 
+    info = 0
     if (.not.allocated(x%v)) &
          & call x%all(m,n,info)
     if (info == 0) &
@@ -1088,7 +1120,7 @@ contains
 
   subroutine z_vect_zero(x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(inout)    :: x
 
     if (allocated(x%v)) call x%v%zero()
@@ -1098,7 +1130,7 @@ contains
   subroutine z_vect_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)              :: m,n
     class(psb_z_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
@@ -1109,7 +1141,7 @@ contains
   end subroutine z_vect_asb
 
   subroutine z_vect_sync(x)
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(inout) :: x
 
     if (allocated(x%v)) &
@@ -1177,12 +1209,12 @@ contains
   subroutine z_vect_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
 
     info = 0
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       call x%v%free(info)
       if (info == 0) deallocate(x%v,stat=info)
     end if
@@ -1191,7 +1223,7 @@ contains
 
   subroutine z_vect_ins(n,irl,val,dupl,x,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_z_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl
     integer(psb_ipk_), intent(in)               :: irl(:)
@@ -1201,7 +1233,7 @@ contains
     integer(psb_ipk_) :: i
 
     info = 0
-    if (.not.allocated(x%v)) then 
+    if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
       return
     end if
@@ -1217,12 +1249,12 @@ contains
     class(psb_z_base_multivect_type), allocatable :: tmp
     integer(psb_ipk_) :: info
 
-    if (present(mold)) then 
+    if (present(mold)) then
       allocate(tmp,stat=info,mold=mold)
     else
       allocate(tmp,stat=info, mold=psb_z_get_base_multivect_default())
-    endif    
-    if (allocated(x%v)) then 
+    endif
+    if (allocated(x%v)) then
       call x%v%sync()
       if (info == psb_success_) call tmp%bld(x%v%v)
       call x%v%free(info)
@@ -1232,7 +1264,7 @@ contains
 
 
 !!$  function z_vect_dot_v(n,x,y) result(res)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout) :: x, y
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    complex(psb_dpk_)                :: res
@@ -1244,28 +1276,28 @@ contains
 !!$  end function z_vect_dot_v
 !!$
 !!$  function z_vect_dot_a(n,x,y) result(res)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout) :: x
 !!$    complex(psb_dpk_), intent(in)    :: y(:)
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    complex(psb_dpk_)                :: res
-!!$    
+!!$
 !!$    res = zzero
 !!$    if (allocated(x%v)) &
 !!$         & res = x%v%dot(n,y)
-!!$    
+!!$
 !!$  end function z_vect_dot_a
-!!$    
+!!$
 !!$  subroutine z_vect_axpby_v(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    integer(psb_ipk_), intent(in)               :: m
 !!$    class(psb_z_multivect_type), intent(inout)  :: x
 !!$    class(psb_z_multivect_type), intent(inout)  :: y
 !!$    complex(psb_dpk_), intent (in)       :: alpha, beta
 !!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    if (allocated(x%v).and.allocated(y%v)) then 
+!!$
+!!$    if (allocated(x%v).and.allocated(y%v)) then
 !!$      call y%v%axpby(m,alpha,x%v,beta,info)
 !!$    else
 !!$      info = psb_err_invalid_vect_state_
@@ -1275,25 +1307,25 @@ contains
 !!$
 !!$  subroutine z_vect_axpby_a(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    integer(psb_ipk_), intent(in)               :: m
 !!$    complex(psb_dpk_), intent(in)        :: x(:)
 !!$    class(psb_z_multivect_type), intent(inout)  :: y
 !!$    complex(psb_dpk_), intent (in)       :: alpha, beta
 !!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
+!!$
 !!$    if (allocated(y%v)) &
 !!$         & call y%v%axpby(m,alpha,x,beta,info)
-!!$    
+!!$
 !!$  end subroutine z_vect_axpby_a
 !!$
-!!$    
+!!$
 !!$  subroutine z_vect_mlt_v(x, y, info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout)  :: x
 !!$    class(psb_z_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info    
+!!$    integer(psb_ipk_), intent(out)              :: info
 !!$    integer(psb_ipk_) :: i, n
 !!$
 !!$    info = 0
@@ -1304,7 +1336,7 @@ contains
 !!$
 !!$  subroutine z_vect_mlt_a(x, y, info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    complex(psb_dpk_), intent(in)        :: x(:)
 !!$    class(psb_z_multivect_type), intent(inout)  :: y
 !!$    integer(psb_ipk_), intent(out)              :: info
@@ -1314,13 +1346,13 @@ contains
 !!$    info = 0
 !!$    if (allocated(y%v)) &
 !!$         & call y%v%mlt(x,info)
-!!$    
+!!$
 !!$  end subroutine z_vect_mlt_a
 !!$
 !!$
 !!$  subroutine z_vect_mlt_a_2(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    complex(psb_dpk_), intent(in)         :: alpha,beta
 !!$    complex(psb_dpk_), intent(in)         :: y(:)
 !!$    complex(psb_dpk_), intent(in)         :: x(:)
@@ -1328,20 +1360,20 @@ contains
 !!$    integer(psb_ipk_), intent(out)                  :: info
 !!$    integer(psb_ipk_) :: i, n
 !!$
-!!$    info = 0    
+!!$    info = 0
 !!$    if (allocated(z%v)) &
 !!$         & call z%v%mlt(alpha,x,y,beta,info)
-!!$    
+!!$
 !!$  end subroutine z_vect_mlt_a_2
 !!$
 !!$  subroutine z_vect_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    complex(psb_dpk_), intent(in)          :: alpha,beta
 !!$    class(psb_z_multivect_type), intent(inout)  :: x
 !!$    class(psb_z_multivect_type), intent(inout)  :: y
 !!$    class(psb_z_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)                   :: info    
+!!$    integer(psb_ipk_), intent(out)                   :: info
 !!$    character(len=1), intent(in), optional :: conjgx, conjgy
 !!$
 !!$    integer(psb_ipk_) :: i, n
@@ -1355,12 +1387,12 @@ contains
 !!$
 !!$  subroutine z_vect_mlt_av(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    complex(psb_dpk_), intent(in)        :: alpha,beta
 !!$    complex(psb_dpk_), intent(in)        :: x(:)
 !!$    class(psb_z_multivect_type), intent(inout)  :: y
 !!$    class(psb_z_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
+!!$    integer(psb_ipk_), intent(out)              :: info
 !!$    integer(psb_ipk_) :: i, n
 !!$
 !!$    info = 0
@@ -1371,16 +1403,16 @@ contains
 !!$
 !!$  subroutine z_vect_mlt_va(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    complex(psb_dpk_), intent(in)        :: alpha,beta
 !!$    complex(psb_dpk_), intent(in)        :: y(:)
 !!$    class(psb_z_multivect_type), intent(inout)  :: x
 !!$    class(psb_z_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
+!!$    integer(psb_ipk_), intent(out)              :: info
 !!$    integer(psb_ipk_) :: i, n
 !!$
 !!$    info = 0
-!!$    
+!!$
 !!$    if (allocated(z%v).and.allocated(x%v)) &
 !!$         & call z%v%mlt(alpha,x%v,y,beta,info)
 !!$
@@ -1388,36 +1420,36 @@ contains
 !!$
 !!$  subroutine z_vect_scal(alpha, x)
 !!$    use psi_serial_mod
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout)  :: x
 !!$    complex(psb_dpk_), intent (in)       :: alpha
-!!$    
+!!$
 !!$    if (allocated(x%v)) call x%v%scal(alpha)
 !!$
 !!$  end subroutine z_vect_scal
 !!$
 !!$
 !!$  function z_vect_nrm2(n,x) result(res)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    real(psb_dpk_)                :: res
-!!$    
-!!$    if (allocated(x%v)) then 
+!!$
+!!$    if (allocated(x%v)) then
 !!$      res = x%v%nrm2(n)
 !!$    else
 !!$      res = dzero
 !!$    end if
 !!$
 !!$  end function z_vect_nrm2
-!!$  
+!!$
 !!$  function z_vect_amax(n,x) result(res)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    real(psb_dpk_)                :: res
 !!$
-!!$    if (allocated(x%v)) then 
+!!$    if (allocated(x%v)) then
 !!$      res = x%v%amax(n)
 !!$    else
 !!$      res = dzero
@@ -1426,12 +1458,12 @@ contains
 !!$  end function z_vect_amax
 !!$
 !!$  function z_vect_asum(n,x) result(res)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_z_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    real(psb_dpk_)                :: res
 !!$
-!!$    if (allocated(x%v)) then 
+!!$    if (allocated(x%v)) then
 !!$      res = x%v%asum(n)
 !!$    else
 !!$      res = dzero

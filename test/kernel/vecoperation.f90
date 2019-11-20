@@ -55,6 +55,7 @@ program vecoperation
   integer(psb_lpk_), allocatable     :: myidx(:)
   real(psb_dpk_)    :: zt(1), dotresult, norm2, norm1, norminf
   character(len=20) :: name,ch_err,readinput
+  real(psb_dpk_), allocatable :: vx(:), vy(:)
 
   info=psb_success_
 
@@ -139,6 +140,12 @@ program vecoperation
   t2 = psb_wtime() - t1
 
   if (iam == psb_root_) write(psb_out_unit,'("Overall vector creation time : ",es12.5)')t2
+  if (iam == psb_root_) then
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vy = y%get_vect()
+    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+  end if
 
   !
   ! Vector operations
@@ -150,7 +157,32 @@ program vecoperation
   norminf = psb_normi(x,desc_a,info)
   if (iam == psb_root_) write(psb_out_unit,'("\|x\|_inf : ",es12.5," \|x\|_1 :",es12.5," \|x\|_2",es12.5)')norminf,norm1,norm2
   call psb_geaxpby(1.0_psb_dpk_, x, 1.0_psb_dpk_, y, desc_a, info)  ! \alpha x + \beta y
+
+  if (iam == psb_root_) then
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vy = y%get_vect()
+    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+  end if
+
   call psb_gemlt(x,y,desc_a,info)
+
+  if (iam == psb_root_) then
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vy = y%get_vect()
+    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+  end if
+
+  call psb_gediv(x,y,desc_a,info)
+
+  if (iam == psb_root_) then
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vy = y%get_vect()
+    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+  end if
+
 
 
 
