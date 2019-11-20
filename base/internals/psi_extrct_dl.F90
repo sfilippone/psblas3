@@ -145,7 +145,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt, icomm, me, np,  minfo
+  integer(psb_mpk_) :: iictxt, icomm, me, np,  dl_mpi,  minfo
   character  name*20
   name='psi_extrct_dl'
 
@@ -266,16 +266,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   end if
 
   call psb_sum(iictxt,length_dl(0:np))
-  icomm = psb_get_mpicomm(iictxt)
-  allocate(itmp(dl_lda),stat=info)
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_dealloc_
-    goto 9999
-  endif
-  itmp(1:dl_lda) = dep_list(1:dl_lda,me)
-  dl_mpi = dl_lda
-  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_,&
-       & dep_list,dl_mpi,psb_mpi_ipk_,icomm,minfo)
+  icomm =  psb_get_mpicomm(iictxt)
+  call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
+       & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
   info = minfo
   if (info == 0) deallocate(itmp,stat=info)
   if (info /= psb_success_) then 
