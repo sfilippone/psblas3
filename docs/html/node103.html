@@ -54,7 +54,7 @@ psb_get_mpicomm -- Get the MPI communicator</A>
 
 <P>
 <PRE>
-call psb_get_mpicomm(icontxt, icomm)
+icomm = psb_get_mpicomm(icontxt)
 </PRE>
 
 <P>
@@ -85,7 +85,7 @@ Specified as: an integer variable.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icomm</STRONG></DT>
+<DT><STRONG>Function value</STRONG></DT>
 <DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>global</B>.

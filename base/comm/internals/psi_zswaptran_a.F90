@@ -241,7 +241,7 @@ subroutine psi_ztranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
+      prcid(proc_to_comm) = psb_get_rank(ictxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = n*nerv
@@ -359,7 +359,7 @@ subroutine psi_ztranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_dcomplex_swap_tag
         call mpi_irecv(sndbuf(snd_pt),n*nesd,&
@@ -734,7 +734,7 @@ subroutine psi_ztranidxv(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
+      prcid(proc_to_comm) = psb_get_rank(ictxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = nerv
@@ -852,7 +852,7 @@ subroutine psi_ztranidxv(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_dcomplex_swap_tag
         call mpi_irecv(sndbuf(snd_pt),nesd,&

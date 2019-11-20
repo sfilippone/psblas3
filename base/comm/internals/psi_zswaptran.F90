@@ -269,7 +269,7 @@ subroutine psi_ztran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         call mpi_irecv(y%combuf(snd_pt),nesd,&
@@ -616,7 +616,7 @@ subroutine psi_ztran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),snd_pt
         call mpi_irecv(y%combuf(snd_pt),n*nesd,&

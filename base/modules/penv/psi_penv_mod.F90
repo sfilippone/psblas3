@@ -563,17 +563,17 @@ contains
   end subroutine psb_info_mpik
 
 
-  subroutine psb_get_mpicomm(ictxt,comm)
+  function psb_get_mpicomm(ictxt) result(comm)
     integer(psb_mpk_) :: ictxt, comm
 
     comm = ictxt
-  end subroutine psb_get_mpicomm
+  end function psb_get_mpicomm
 
-  subroutine psb_get_rank(rank,ictxt,id)
+  function psb_get_rank(ictxt,id) result(rank)
     integer(psb_mpk_) :: rank,ictxt,id
 
     rank = id
-  end subroutine psb_get_rank
+  end function psb_get_rank
 
 
   ! !!!!!!!!!!!!!!!!!!!!!!
