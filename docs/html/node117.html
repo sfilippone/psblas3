@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>Error handling</TITLE>
-<META NAME="description" CONTENT="Error handling">
+<TITLE>psb_nrm2 -- Global 2-norm reduction</TITLE>
+<META NAME="description" CONTENT="psb_nrm2 -- Global 2-norm reduction">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -15,326 +15,194 @@
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node118.html">
-<LINK REL="previous" HREF="node99.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node116.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node118.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1719"
+<A NAME="tex2html1730"
   HREF="node118.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1715"
-  HREF="userhtml.html">
+<A NAME="tex2html1726"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1709"
+<A NAME="tex2html1720"
   HREF="node116.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1717"
+<A NAME="tex2html1728"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1720"
-  HREF="node118.html">Utilities</A>
-<B> Up:</B> <A NAME="tex2html1716"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1710"
-  HREF="node116.html">psb_rcv   Receive</A>
- &nbsp; <B>  <A NAME="tex2html1718"
+<B> Next:</B> <A NAME="tex2html1731"
+  HREF="node118.html">psb_snd   Send</A>
+<B> Up:</B> <A NAME="tex2html1727"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1721"
+  HREF="node116.html">psb_amn   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1729"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00090000000000000000">
-Error handling</A>
-</H1>
+<H2><A NAME="SECTION000815000000000000000">
+psb_nrm2 -- Global 2-norm reduction</A>
+</H2>
 
 <P>
-The PSBLAS library error handling policy has been completely rewritten
-in version 2.0. The idea behind the design of this new error handling
-strategy is to keep error messages on a stack allowing the user to
-trace back up to the point where the first error message has been
-generated. Every routine in the PSBLAS-2.0 library has, as last
-non-optional argument, an integer <code>info</code> variable; whenever,
-inside the routine, an error is detected, this variable is set to a
-value corresponding to a specific error code. Then this error code is
-also pushed on the error stack and then either control is returned to
-the caller routine or the execution is aborted, depending on the users
-choice. At the time when the execution is aborted, an error message is
-printed on standard output with a level of verbosity than can be
-chosen by the user. If the execution is not aborted, then, the caller
-routine checks the value returned in the <code>info</code> variable and, if
-not zero, an error condition is raised. This process continues on all the
-levels of nested calls until the level where the user decides to abort
-the program execution.
+<PRE>
+call psb_nrm2(icontxt, dat, root)
+</PRE>
 
 <P>
-Figure&nbsp;<A HREF="#fig:routerr">9</A> shows the layout of a generic <code>psb_foo</code>
-routine with respect to the PSBLAS-2.0 error handling policy. It is
-possible to see how, whenever an error condition is detected, the
-<code>info</code> variable is set to the corresponding error code which is,
-then, pushed on top of the stack by means of the
-<code>psb_errpush</code>. An error condition may be directly detected inside
-a routine or indirectly checking the error code returned returned by a
-called routine. Whenever an error is encountered, after it has been
-pushed on stack, the program execution skips to a point where the
-error condition is handled; the error condition is handled either by
-returning control to the caller routine or by calling the
-<code>psb\_error</code> routine which prints the content of the error stack
-and aborts the program execution, according to the choice made by the
-user with <code>psb_set_erraction</code>. The default is to print the error
-and terminate the program, but the user may choose to handle the error
-explicitly. 
-
-<P>
-
-<DIV ALIGN="CENTER"><A NAME="fig:routerr"></A><A NAME="7481"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 9:</STRONG>
-The layout of a generic <TT>psb_foo</TT>
-  routine with respect to PSBLAS-2.0 error handling policy.</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
- SRC="img153.png"
- ALT="\fbox{\TheSbox}"></SPAN>
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-
-<P>
-Figure&nbsp;<A HREF="#fig:errormsg">10</A> reports a sample error message generated by
-the PSBLAS-2.0 library. This error has been generated by the fact that
-the user has chosen the invalid &ldquo;FOO&rdquo; storage format to represent
-the sparse matrix. From this error message it is possible to see that
-the error has been detected inside the <code>psb_cest</code> subroutine
-called by <code>psb_spasb</code> ... by process 0 (i.e. the root process).
-
-<P>
-
-<DIV ALIGN="CENTER"><A NAME="fig:errormsg"></A><A NAME="7482"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 10:</STRONG>
-A sample PSBLAS-2.0 error
-    message. Process 0 detected an error condition inside the  psb_cest subroutine</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
- SRC="img153.png"
- ALT="\fbox{\TheSbox}"></SPAN>
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-
-<P>
-ifstarsubroutinesubroutinepsb_errpushPushes an error code onto the error
-  stack
-
-<P>
-<BR>
-<IMG
- WIDTH="423" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img155.png"
- ALT="\begin{lstlisting}
-call psb_errpush(err_c, r_name, i_err, a_err)
-\end{lstlisting}">
-<BR>
-
-<P>
+This subroutine implements a 2-norm value reduction 
+operation based on the underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>err_c</STRONG></DT>
-<DD>the error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer.
-</DD>
-<DT><STRONG>r_name</STRONG></DT>
-<DD>the soutine where the error has been caught.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a string.
-<BR></DD>
-<DT><STRONG>i_err</STRONG></DT>
-<DD>addional info for error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Specified as: an integer array
-<BR></DD>
-<DT><STRONG>a_err</STRONG></DT>
-<DD>addional info for error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Specified as: a string.
-<BR></DD>
-</DL>
-
-<P>
-ifstarsubroutinesubroutinepsb_errorPrints the error stack content and aborts
-  execution
-
-<P>
-<BR>
-<IMG
- WIDTH="213" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img156.png"
- ALT="\begin{lstlisting}
-call psb_error(icontxt)
-\end{lstlisting}">
-<BR>
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context.
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>global</B>.
 <BR>
-Type: <B>optional</B>
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer.
+Specified as: an integer variable.
 </DD>
+<DT><STRONG>dat</STRONG></DT>
+<DD>The local contribution to the global minimum.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a real variable, which may be a
+scalar, or a rank 1 array.  Kind, rank and size must agree on all processes.
+</DD>
+<DT><STRONG>root</STRONG></DT>
+<DD>Process to hold the final value, or <SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img88.png"
+ ALT="$-1$"></SPAN> to make it available
+  on all processes.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value <!-- MATH
+ $-1<= root <= np-1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="165" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img147.png"
+ ALT="$-1&lt;= root &lt;= np-1$"></SPAN>, default -1. 
+<BR></DD>
 </DL>
-
-<P>
-ifstarsubroutinesubroutinepsb_set_errverbositySets the verbosity of error
-  messages.
-
-<P>
-<BR>
-<IMG
- WIDTH="261" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img157.png"
- ALT="\begin{lstlisting}
-call psb_set_errverbosity(v)
-\end{lstlisting}">
-<BR>
 
 <P>
 <DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>v</STRONG></DT>
-<DD>the verbosity level
+<DT><STRONG>dat</STRONG></DT>
+<DD>On destination process(es), the result of the 2-norm reduction.
 <BR>
-Scope: <B>global</B>
+Scope: <B>global</B>.
 <BR>
-Type: <B>required</B>
+Type: <B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: an integer.
+Specified as: a real variable, which may be a
+scalar, or a rank 1 array. 
+<BR>
+Kind, rank and size must agree on all processes.
 </DD>
 </DL>
 
 <P>
-ifstarsubroutinesubroutinepsb_set_erractionSet the type of action to be
-  taken  upon error condition.
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
 
-<P>
-<BR>
+<OL>
+<LI>This reduction is appropriate to compute the results of multiple
+  (local) NRM2 operations at the same time. 
+</LI>
+<LI>Denoting by <SPAN CLASS="MATH"><IMG
+ WIDTH="32" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img148.png"
+ ALT="$dat_i$"></SPAN> the value of the variable <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img149.png"
+ ALT="$dat$"></SPAN> on process
+  <SPAN CLASS="MATH"><IMG
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$"></SPAN>, the output <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img29.png"
+ ALT="$res$"></SPAN> is equivalent to the computation of
+  <BR><P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+res = \sqrt{\sum_i dat_i^2},
+\end{displaymath}
+ -->
+
 <IMG
- WIDTH="289" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img158.png"
- ALT="\begin{lstlisting}
-call psb_set_erraction(err_act)
-\end{lstlisting}">
-<BR>
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>err_act</STRONG></DT>
-<DD>the type of action.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer. Possible values: <code>psb_act_ret</code>,
-<code>psb_act_abort</code>. 
-</DD>
-</DL>
+ WIDTH="119" HEIGHT="55" BORDER="0"
+ SRC="img150.png"
+ ALT="\begin{displaymath}res = \sqrt{\sum_i dat_i^2},\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+with care taken to avoid unnecessary overflow.
+</LI>
+<LI>The <code>dat</code> argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+</LI>
+</OL>
 
 <P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1719"
+<A NAME="tex2html1730"
   HREF="node118.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1715"
-  HREF="userhtml.html">
+<A NAME="tex2html1726"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1709"
+<A NAME="tex2html1720"
   HREF="node116.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1717"
+<A NAME="tex2html1728"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1720"
-  HREF="node118.html">Utilities</A>
-<B> Up:</B> <A NAME="tex2html1716"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1710"
-  HREF="node116.html">psb_rcv   Receive</A>
- &nbsp; <B>  <A NAME="tex2html1718"
+<B> Next:</B> <A NAME="tex2html1731"
+  HREF="node118.html">psb_snd   Send</A>
+<B> Up:</B> <A NAME="tex2html1727"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1721"
+  HREF="node116.html">psb_amn   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1729"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

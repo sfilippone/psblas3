@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
-<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
+<TITLE>psb_owned_index -- </TITLE>
+<META NAME="description" CONTENT="psb_owned_index -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,46 +16,45 @@
 
 <LINK REL="next" HREF="node95.html">
 <LINK REL="previous" HREF="node93.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node95.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1430"
+<A NAME="tex2html1439"
   HREF="node95.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1426"
-  HREF="node71.html">
+<A NAME="tex2html1435"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1420"
+<A NAME="tex2html1429"
   HREF="node93.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1428"
+<A NAME="tex2html1437"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1431"
-  HREF="node95.html">psb_get_overlap   Extract</A>
-<B> Up:</B> <A NAME="tex2html1427"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1421"
-  HREF="node93.html">psb_local_index</A>
- &nbsp; <B>  <A NAME="tex2html1429"
+<B> Next:</B> <A NAME="tex2html1440"
+  HREF="node95.html">psb_is_local</A>
+<B> Up:</B> <A NAME="tex2html1436"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1430"
+  HREF="node93.html">psb_is_owned</A>
+ &nbsp; <B>  <A NAME="tex2html1438"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000723000000000000000">
-psb_get_boundary -- Extract list of boundary
-  elements</A>
+<H2><A NAME="SECTION000720000000000000000">
+psb_owned_index  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_boundary(bndel, desc, info)
+call psb_owned_index(y, x, desc_a, info)
 </PRE>
 
 <P>
@@ -66,7 +65,18 @@ call psb_get_boundary(bndel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer indices.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in, inout</B>.
+<BR>
+Specified as: a scalar or a rank one integer array.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -77,6 +87,17 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
+<DT><STRONG>iact</STRONG></DT>
+<DD>specifies action to be taken in case of range errors. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
+<code>A</code>bort, default <code>I</code>gnore.
+</DD>
 </DL>
 
 <P>
@@ -84,19 +105,20 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>bndel</STRONG></DT>
-<DD>The list of boundary elements on the calling process, in
-  local numbering.
-<BR>
+<DT><STRONG>y</STRONG></DT>
+<DD>A logical mask which is true for all corresponding entries of
+  <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> that are owned by the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
-<BR></DD>
+Specified as: a scalar or rank one logical array.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -114,12 +136,9 @@ An integer value; 0 means no error has been detected.
 <BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>If there are no boundary elements (i.e., if the local part of
-  the connectivity graph is self-contained) the output vector is set
-  to the &ldquo;not allocated&rdquo; state. 
-</LI>
-<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
-  number of boundary elements. 
+<LI>This routine returns a <code>.true.</code> value for those indices
+  that are strictly owned by the current process, excluding the halo
+  indices
 </LI>
 </OL>
 

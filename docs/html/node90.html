@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_is_owned -- </TITLE>
-<META NAME="description" CONTENT="psb_is_owned -- ">
+<TITLE>psb_gelp -- Applies a left permutation to a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_gelp -- Applies a left permutation to a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,45 +16,46 @@
 
 <LINK REL="next" HREF="node91.html">
 <LINK REL="previous" HREF="node89.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node91.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1382"
+<A NAME="tex2html1391"
   HREF="node91.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1378"
-  HREF="node71.html">
+<A NAME="tex2html1387"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1372"
+<A NAME="tex2html1381"
   HREF="node89.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1380"
+<A NAME="tex2html1389"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1383"
-  HREF="node91.html">psb_owned_index</A>
-<B> Up:</B> <A NAME="tex2html1379"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1373"
-  HREF="node89.html">psb_loc_to_glob   Local</A>
- &nbsp; <B>  <A NAME="tex2html1381"
+<B> Next:</B> <A NAME="tex2html1392"
+  HREF="node91.html">psb_glob_to_loc   Global</A>
+<B> Up:</B> <A NAME="tex2html1388"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1382"
+  HREF="node89.html">psb_gefree   Frees</A>
+ &nbsp; <B>  <A NAME="tex2html1390"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000719000000000000000">
-psb_is_owned  -- </A>
+<H2><A NAME="SECTION000716000000000000000">
+psb_gelp -- Applies a left permutation to a dense
+  matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_is_owned(x, desc_a)
+call psb_gelp(trans, iperm, x, info)
 </PRE>
 
 <P>
@@ -65,8 +66,14 @@ call psb_is_owned(x, desc_a)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>Integer index.
+<DT><STRONG>trans</STRONG></DT>
+<DD>A character that specifies whether to permute <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN> or <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img125.png"
+ ALT="$A^T$"></SPAN>.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -74,19 +81,36 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a scalar integer.
+Specified as: a single character with value 'N' for <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN> or 'T' for <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img125.png"
+ ALT="$A^T$"></SPAN>.
 <BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>iperm</STRONG></DT>
+<DD>An integer array containing permutation information.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
+Specified as: an integer one-dimensional array.
+<BR></DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be permuted.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a one or two dimensional array.
+<BR></DD>
 </DL>
 
 <P>
@@ -94,29 +118,18 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>A logical mask which is true if 
-  <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> is  owned by the current process
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
 Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
 Intent: <B>out</B>.
-<BR></DD>
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
 </DL>
-
-<P>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>This routine returns a <code>.true.</code> value for an index
-  that is strictly owned by the current process, excluding the halo
-  indices
-</LI>
-</OL>
 
 <P>
 <BR><HR>

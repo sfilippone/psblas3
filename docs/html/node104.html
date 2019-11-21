@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
-<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
+<TITLE>psb_info -- Return information about PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_info -- Return information about PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,52 +16,51 @@
 
 <LINK REL="next" HREF="node105.html">
 <LINK REL="previous" HREF="node103.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node105.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1565"
+<A NAME="tex2html1574"
   HREF="node105.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1561"
-  HREF="node99.html">
+<A NAME="tex2html1570"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1555"
+<A NAME="tex2html1564"
   HREF="node103.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1563"
+<A NAME="tex2html1572"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1566"
-  HREF="node105.html">psb_wtime   Wall</A>
-<B> Up:</B> <A NAME="tex2html1562"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1556"
-  HREF="node103.html">psb_get_mpicomm   Get</A>
- &nbsp; <B>  <A NAME="tex2html1564"
+<B> Next:</B> <A NAME="tex2html1575"
+  HREF="node105.html">psb_exit   Exit</A>
+<B> Up:</B> <A NAME="tex2html1571"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1565"
+  HREF="node103.html">psb_init   Initializes</A>
+ &nbsp; <B>  <A NAME="tex2html1573"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00085000000000000000">
-psb_get_rank -- Get the MPI rank</A>
+<H2><A NAME="SECTION00082000000000000000">
+psb_info -- Return information about  PSBLAS parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_rank(rank, icontxt, id)
+call psb_info(icontxt, iam, np)
 </PRE>
 
 <P>
-This subroutine returns the MPI rank of the  PSBLAS process <SPAN CLASS="MATH"><IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img138.png"
- ALT="$id$"></SPAN>
+This subroutine returns information about  the PSBLAS parallel environment, defining
+a virtual parallel machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -81,22 +80,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>id</STRONG></DT>
-<DD>Identifier of a   process in the PSBLAS virtual parallel machine.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. <!-- MATH
- $0 \le id \le np-1$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="113" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img139.png"
- ALT="$0 \le id \le np-1$"></SPAN> </DD>
 </DL>
 
 <P>
@@ -104,19 +87,57 @@ Specified as: an integer value. <!-- MATH
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>rank</STRONG></DT>
-<DD>The MPI rank associated with the  PSBLAS process <SPAN CLASS="MATH"><IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img138.png"
- ALT="$id$"></SPAN>.
+<DT><STRONG>iam</STRONG></DT>
+<DD>Identifier of current  process in the PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>local</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
 Intent: <B>out</B>.
-<BR></DD>
+<BR>
+Specified as: an integer value. <!-- MATH
+ $-1 \le iam \le np-1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="139" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img141.png"
+ ALT="$-1 \le iam \le np-1$"></SPAN> </DD>
+<DT><STRONG>np</STRONG></DT>
+<DD>Number of processes in the PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer variable.  </DD>
 </DL>
+
+<P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>For processes in the virtual parallel machine  the identifier
+  will satisfy <!-- MATH
+ $0 \le iam \le np-1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="127" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img142.png"
+ ALT="$0 \le iam \le np-1$"></SPAN>;
+</LI>
+<LI>If the user has requested on <code>psb_init</code> a number of
+  processes less than the total available in the parallel execution
+  environment, the remaining processes will have on return <SPAN CLASS="MATH"><IMG
+ WIDTH="73" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img143.png"
+ ALT="$iam=-1$"></SPAN>;
+  the only call involving <code>icontxt</code> that any such process may
+  execute is  to <code>psb_exit</code>. 
+</LI>
+</OL>
 
 <P>
 <BR><HR>

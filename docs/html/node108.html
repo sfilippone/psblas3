@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_bcast -- Broadcast data</TITLE>
-<META NAME="description" CONTENT="psb_bcast -- Broadcast data">
+<TITLE>psb_wtime -- Wall clock timing</TITLE>
+<META NAME="description" CONTENT="psb_wtime -- Wall clock timing">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,116 +16,61 @@
 
 <LINK REL="next" HREF="node109.html">
 <LINK REL="previous" HREF="node107.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node109.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1613"
+<A NAME="tex2html1622"
   HREF="node109.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1609"
-  HREF="node99.html">
+<A NAME="tex2html1618"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1603"
+<A NAME="tex2html1612"
   HREF="node107.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1611"
+<A NAME="tex2html1620"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1614"
-  HREF="node109.html">psb_sum   Global</A>
-<B> Up:</B> <A NAME="tex2html1610"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1604"
-  HREF="node107.html">psb_abort   Abort</A>
- &nbsp; <B>  <A NAME="tex2html1612"
+<B> Next:</B> <A NAME="tex2html1623"
+  HREF="node109.html">psb_barrier   Sinchronization</A>
+<B> Up:</B> <A NAME="tex2html1619"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1613"
+  HREF="node107.html">psb_get_rank   Get</A>
+ &nbsp; <B>  <A NAME="tex2html1621"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00089000000000000000">
-psb_bcast -- Broadcast data</A>
+<H2><A NAME="SECTION00086000000000000000">
+psb_wtime -- Wall clock timing</A>
 </H2>
 
 <P>
 <PRE>
-call psb_bcast(icontxt, dat, root)
+time = psb_wtime()
 </PRE>
 
 <P>
-This subroutine implements a broadcast operation based on the
-underlying communication library. 
+This function returns a wall clock timer. The resolution of the timer
+is dependent on the underlying parallel environment implementation.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Exit </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>the elapsed time in seconds.
 <BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable.
-</DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On the root process, the data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical variable,
-which may be a scalar or rank 1 array.  Type, kind, rank and size must agree on all processes.
-</DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Root process holding data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <!-- MATH
- $0<= root <= np-1$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="153" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img140.png"
- ALT="$0&lt;= root &lt;= np-1$"></SPAN>, default 0  </DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On processes other than  root, the data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind, rank and size must agree on all processes.
+Returned  as: a  <code>real(psb_dpk_)</code>  variable.
 </DD>
 </DL>
 

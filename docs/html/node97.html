@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_sizeof -- Memory occupation</TITLE>
-<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
+<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
+<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,50 +16,46 @@
 
 <LINK REL="next" HREF="node98.html">
 <LINK REL="previous" HREF="node96.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node98.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1466"
+<A NAME="tex2html1475"
   HREF="node98.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1462"
-  HREF="node71.html">
+<A NAME="tex2html1471"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1456"
+<A NAME="tex2html1465"
   HREF="node96.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1464"
+<A NAME="tex2html1473"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1467"
-  HREF="node98.html">Sorting utilities</A>
-<B> Up:</B> <A NAME="tex2html1463"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1457"
-  HREF="node96.html">psb_sp_getrow   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1465"
+<B> Next:</B> <A NAME="tex2html1476"
+  HREF="node98.html">psb_get_overlap   Extract</A>
+<B> Up:</B> <A NAME="tex2html1472"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1466"
+  HREF="node96.html">psb_local_index</A>
+ &nbsp; <B>  <A NAME="tex2html1474"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000726000000000000000">
-psb_sizeof -- Memory occupation</A>
+<H2><A NAME="SECTION000723000000000000000">
+psb_get_boundary -- Extract list of boundary
+  elements</A>
 </H2>
 
 <P>
-This function computes the memory occupation of a PSBLAS object.
-
-<P>
 <PRE>
-isz = psb_sizeof(a)
-isz = psb_sizeof(desc_a)
-isz = psb_sizeof(prec)
+call psb_get_boundary(bndel, desc, info)
 </PRE>
 
 <P>
@@ -70,53 +66,62 @@ isz = psb_sizeof(prec)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-<SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN>. 
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>Communication descriptor.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
+</DL>
+
+<P>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation of the object specified in
-  the calling sequence, in bytes.
+<DT><STRONG>bndel</STRONG></DT>
+<DD>The list of boundary elements on the calling process, in
+  local numbering.
 <BR>
 Scope: <B>local</B> 
 <BR>
-Returned  as: an <code>integer(psb_long_int_k_)</code> number.
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.
+<BR></DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+
+<P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>If there are no boundary elements (i.e., if the local part of
+  the connectivity graph is self-contained) the output vector is set
+  to the &ldquo;not allocated&rdquo; state. 
+</LI>
+<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
+  number of boundary elements. 
+</LI>
+</OL>
 
 <P>
 <BR><HR>

@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html935"
+<A NAME="tex2html944"
   HREF="node56.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html931"
+<A NAME="tex2html940"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html925"
+<A NAME="tex2html934"
   HREF="node54.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html933"
+<A NAME="tex2html942"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html936"
+<B> Next:</B> <A NAME="tex2html945"
   HREF="node56.html">psb_normi   Infinity-Norm</A>
-<B> Up:</B> <A NAME="tex2html932"
+<B> Up:</B> <A NAME="tex2html941"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html926"
+<B> Previous:</B> <A NAME="tex2html935"
   HREF="node54.html">psb_gedot   Dot</A>
- &nbsp; <B>  <A NAME="tex2html934"
+ &nbsp; <B>  <A NAME="tex2html943"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -55,10 +55,10 @@ psb_gedots -- Generalized Dot Product</A>
 <P>
 This subroutine computes a series of  dot products among the columns of
 two dense matrices  <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>: 
 <BR><P></P>
@@ -70,7 +70,7 @@ res(i) \leftarrow x(:,i)^T y(:,i)
  -->
 
 <IMG
- WIDTH="150" HEIGHT="28" BORDER="0"
+ WIDTH="150" HEIGHT="29" BORDER="0"
  SRC="img28.png"
  ALT="\begin{displaymath}res(i) \leftarrow x(:,i)^T y(:,i)\end{displaymath}">
 </DIV>
@@ -78,17 +78,17 @@ res(i) \leftarrow x(:,i)^T y(:,i)
 <P></P>
 If the matrices are complex, then the
 usual convention applies, i.e. the conjugate transpose of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is
 used. If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> are of rank one, then <SPAN CLASS="MATH"><IMG
- WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img29.png"
  ALT="$res$"></SPAN> is a scalar, else it
 is a rank one array. 
@@ -98,7 +98,7 @@ is a rank one array.
 call psb_gedots(res, x, y, desc_a, info)
 </PRE>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2025"></A>
+<DIV ALIGN="CENTER"><A NAME="2132"></A>
 <TABLE>
 <CAPTION><STRONG>Table 3:</STRONG>
 Data types</CAPTION>
@@ -106,13 +106,13 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img29.png"
  ALT="$res$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -147,7 +147,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 <BR>
@@ -160,17 +160,17 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 </DD>
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 <BR>
@@ -183,10 +183,10 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 </DD>
@@ -206,10 +206,10 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>res</STRONG></DT>
 <DD>is the dot product of vectors <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>.
 <BR>
@@ -237,26 +237,26 @@ An integer value; 0 means no error has been detected.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html935"
+<A NAME="tex2html944"
   HREF="node56.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html931"
+<A NAME="tex2html940"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html925"
+<A NAME="tex2html934"
   HREF="node54.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html933"
+<A NAME="tex2html942"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html936"
+<B> Next:</B> <A NAME="tex2html945"
   HREF="node56.html">psb_normi   Infinity-Norm</A>
-<B> Up:</B> <A NAME="tex2html932"
+<B> Up:</B> <A NAME="tex2html941"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html926"
+<B> Previous:</B> <A NAME="tex2html935"
   HREF="node54.html">psb_gedot   Dot</A>
- &nbsp; <B>  <A NAME="tex2html934"
+ &nbsp; <B>  <A NAME="tex2html943"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

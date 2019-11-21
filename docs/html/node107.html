@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_abort -- Abort a computation</TITLE>
-<META NAME="description" CONTENT="psb_abort -- Abort a computation">
+<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
+<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,49 +16,52 @@
 
 <LINK REL="next" HREF="node108.html">
 <LINK REL="previous" HREF="node106.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node108.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1601"
+<A NAME="tex2html1610"
   HREF="node108.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1597"
-  HREF="node99.html">
+<A NAME="tex2html1606"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1591"
+<A NAME="tex2html1600"
   HREF="node106.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1599"
+<A NAME="tex2html1608"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1602"
-  HREF="node108.html">psb_bcast   Broadcast</A>
-<B> Up:</B> <A NAME="tex2html1598"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1592"
-  HREF="node106.html">psb_barrier   Sinchronization</A>
- &nbsp; <B>  <A NAME="tex2html1600"
+<B> Next:</B> <A NAME="tex2html1611"
+  HREF="node108.html">psb_wtime   Wall</A>
+<B> Up:</B> <A NAME="tex2html1607"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1601"
+  HREF="node106.html">psb_get_mpicomm   Get</A>
+ &nbsp; <B>  <A NAME="tex2html1609"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00088000000000000000">
-psb_abort -- Abort a computation</A>
+<H2><A NAME="SECTION00085000000000000000">
+psb_get_rank -- Get the MPI rank</A>
 </H2>
 
 <P>
 <PRE>
-call psb_abort(icontxt)
+call psb_get_rank(rank, icontxt, id)
 </PRE>
 
 <P>
-This subroutine aborts computation on the parallel virtual machine. 
+This subroutine returns the MPI rank of the  PSBLAS process <SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img144.png"
+ ALT="$id$"></SPAN>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -78,6 +81,41 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
+<DT><STRONG>id</STRONG></DT>
+<DD>Identifier of a   process in the PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value. <!-- MATH
+ $0 \le id \le np-1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="113" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img145.png"
+ ALT="$0 \le id \le np-1$"></SPAN> </DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>rank</STRONG></DT>
+<DD>The MPI rank associated with the  PSBLAS process <SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img144.png"
+ ALT="$id$"></SPAN>.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
 </DL>
 
 <P>

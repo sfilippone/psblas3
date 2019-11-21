@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_wtime -- Wall clock timing</TITLE>
-<META NAME="description" CONTENT="psb_wtime -- Wall clock timing">
+<TITLE>psb_exit -- Exit from PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_exit -- Exit from PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,66 +16,134 @@
 
 <LINK REL="next" HREF="node106.html">
 <LINK REL="previous" HREF="node104.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node106.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1577"
+<A NAME="tex2html1586"
   HREF="node106.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1573"
-  HREF="node99.html">
+<A NAME="tex2html1582"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1567"
+<A NAME="tex2html1576"
   HREF="node104.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1575"
+<A NAME="tex2html1584"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1578"
-  HREF="node106.html">psb_barrier   Sinchronization</A>
-<B> Up:</B> <A NAME="tex2html1574"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1568"
-  HREF="node104.html">psb_get_rank   Get</A>
- &nbsp; <B>  <A NAME="tex2html1576"
+<B> Next:</B> <A NAME="tex2html1587"
+  HREF="node106.html">psb_get_mpicomm   Get</A>
+<B> Up:</B> <A NAME="tex2html1583"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1577"
+  HREF="node104.html">psb_info   Return</A>
+ &nbsp; <B>  <A NAME="tex2html1585"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00086000000000000000">
-psb_wtime -- Wall clock timing</A>
+<H2><A NAME="SECTION00083000000000000000">
+psb_exit -- Exit from  PSBLAS parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-time = psb_wtime()
+call psb_exit(icontxt)
+call psb_exit(icontxt,close)
 </PRE>
 
 <P>
-This function returns a wall clock timer. The resolution of the timer
-is dependent on the underlying parallel environment implementation.
+This subroutine exits from the  PSBLAS parallel virtual  machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
-<DT><STRONG><B>On Exit </B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>the elapsed time in seconds.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Returned  as: a  <code>real(psb_dpk_)</code>  variable.
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable.
+</DD>
+<DT><STRONG>close</STRONG></DT>
+<DD>Whether to close all data structures related to the
+  virtual parallel machine, besides those associated with icontxt.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical  variable, default value: true.
 </DD>
 </DL>
 
 <P>
-<BR><HR>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>This routine may be called even if a previous call to
+  <code>psb_info</code> has returned with <SPAN CLASS="MATH"><IMG
+ WIDTH="73" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img143.png"
+ ALT="$iam=-1$"></SPAN>; indeed, it it is the only
+  routine that may be called with argument <code>icontxt</code> in this
+  situation.
+</LI>
+<LI>A call to this routine with <code>close=.true.</code> implies a call
+  to <code>MPI_Finalize</code>, after which no parallel routine may be called.
+</LI>
+<LI>If the user whishes to use multiple communication contexts in the
+  same program, or to enter and exit multiple times into the parallel
+  environment, this routine may be called to 
+  selectively close the contexts with <code>close=.false.</code>, while on
+  the last call it should be called with <code>close=.true.</code> to
+  shutdown in a clean way the entire parallel environment.
+</LI>
+</OL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1586"
+  HREF="node106.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1582"
+  HREF="node102.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1576"
+  HREF="node104.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1584"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1587"
+  HREF="node106.html">psb_get_mpicomm   Get</A>
+<B> Up:</B> <A NAME="tex2html1583"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1577"
+  HREF="node104.html">psb_info   Return</A>
+ &nbsp; <B>  <A NAME="tex2html1585"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

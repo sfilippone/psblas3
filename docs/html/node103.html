@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
-<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
+<TITLE>psb_init -- Initializes PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_init -- Initializes PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,67 +16,97 @@
 
 <LINK REL="next" HREF="node104.html">
 <LINK REL="previous" HREF="node102.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node104.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1553"
+<A NAME="tex2html1562"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1549"
-  HREF="node99.html">
+<A NAME="tex2html1558"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1543"
+<A NAME="tex2html1552"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1551"
+<A NAME="tex2html1560"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1554"
-  HREF="node104.html">psb_get_rank   Get</A>
-<B> Up:</B> <A NAME="tex2html1550"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1544"
-  HREF="node102.html">psb_exit   Exit</A>
- &nbsp; <B>  <A NAME="tex2html1552"
+<B> Next:</B> <A NAME="tex2html1563"
+  HREF="node104.html">psb_info   Return</A>
+<B> Up:</B> <A NAME="tex2html1559"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1553"
+  HREF="node102.html">Parallel environment routines</A>
+ &nbsp; <B>  <A NAME="tex2html1561"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00084000000000000000">
-psb_get_mpicomm -- Get the MPI communicator</A>
+<H2><A NAME="SECTION00081000000000000000">
+psb_init -- Initializes PSBLAS parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_mpicomm(icontxt, icomm)
+call psb_init(icontxt, np, basectxt, ids)
 </PRE>
 
 <P>
-This subroutine returns the MPI communicator associated with a PSBLAS context
+This subroutine initializes the PSBLAS parallel environment, defining
+a virtual parallel machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
+<DT><STRONG>np</STRONG></DT>
+<DD>Number of processes in the PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>global</B>.
 <BR>
-Type: <B>required</B>.
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer variable.
+Specified as: an integer value.  Default: use all available processes.
+</DD>
+<DT><STRONG>basectxt</STRONG></DT>
+<DD>the initial communication context. The new context
+  will be defined from the processes participating in the initial one.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.  Default: use MPI_COMM_WORLD.
+</DD>
+<DT><STRONG>ids</STRONG></DT>
+<DD>Identities of the processes to use for the new context; the
+  argument is ignored when <code>np</code> is not specified. This allows the
+  processes in the new environment to be in an order different from the
+  original one.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array.  Default: use the indices <SPAN CLASS="MATH"><IMG
+ WIDTH="93" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$(0\dots np-1)$"></SPAN>.  
 </DD>
 </DL>
 
@@ -85,19 +115,63 @@ Specified as: an integer variable.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icomm</STRONG></DT>
-<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine. Note that this is always a duplicate of
+  <code>basectxt</code>, so that library communications are completely
+  separated from other communication operations.
 <BR>
 Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
 Intent: <B>out</B>.
-<BR></DD>
+<BR>
+Specified as: an integer variable.
+</DD>
 </DL>
 
 <P>
-<BR><HR>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>A call to this routine must precede any other PSBLAS call. 
+</LI>
+<LI>It is an error to specify a value for <SPAN CLASS="MATH"><IMG
+ WIDTH="21" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img140.png"
+ ALT="$np$"></SPAN> greater than the
+  number of processes available in the underlying base parallel
+  environment. 
+</LI>
+</OL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1562"
+  HREF="node104.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1558"
+  HREF="node102.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1552"
+  HREF="node102.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1560"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1563"
+  HREF="node104.html">psb_info   Return</A>
+<B> Up:</B> <A NAME="tex2html1559"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1553"
+  HREF="node102.html">Parallel environment routines</A>
+ &nbsp; <B>  <A NAME="tex2html1561"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

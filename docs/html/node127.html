@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>build -- Builds a preconditioner</TITLE>
-<META NAME="description" CONTENT="build -- Builds a preconditioner">
+<TITLE>mm_array_write -- Write a dense array from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_array_write -- Write a dense array from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,120 +14,83 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node128.html">
 <LINK REL="previous" HREF="node126.html">
-<LINK REL="up" HREF="node125.html">
+<LINK REL="up" HREF="node121.html">
 <LINK REL="next" HREF="node128.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1849"
+<A NAME="tex2html1852"
   HREF="node128.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1845"
-  HREF="node125.html">
+<A NAME="tex2html1848"
+  HREF="node121.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1839"
+<A NAME="tex2html1844"
   HREF="node126.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1847"
+<A NAME="tex2html1850"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1850"
-  HREF="node128.html">apply   Preconditioner</A>
-<B> Up:</B> <A NAME="tex2html1846"
-  HREF="node125.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1840"
-  HREF="node126.html">init   Initialize</A>
- &nbsp; <B>  <A NAME="tex2html1848"
+<B> Next:</B> <A NAME="tex2html1853"
+  HREF="node128.html">Preconditioner routines</A>
+<B> Up:</B> <A NAME="tex2html1849"
+  HREF="node121.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1845"
+  HREF="node126.html">mm_mat_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1851"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000112000000000000000">
-build -- Builds a preconditioner</A>
+<H2><A NAME="SECTION000106000000000000000">
+mm_array_write --  Write a dense array from a
+  file in the MatrixMarket format</A>
 </H2>
 
 <P>
-<PRE>
-call prec%build(a, desc_a, info[,amold,vmold,imold])
-</PRE>
+<BR>
+<IMG
+ WIDTH="423" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img170.png"
+ ALT="\begin{lstlisting}
+call mm_array_write(b, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the system sparse matrix.
-Scope: <B>local</B> 
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
-Intent: <B>in</B>, target.
+An  array of type real or complex, rank 1 or 2; will be written.. </DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written.
 <BR>
-Specified as: a sparse matrix data structure spdata<TT>psb_Tspmat_type</TT>.
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
 <BR>
-Scope: <B>local</B> 
+Type:<B>optional</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an already initialized precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor. 
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>, target.
-<BR>
-Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>amold</STRONG></DT>
-<DD>The desired dynamic type for the internal matrix storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from spbasedata<TT>psb_T_base_sparse_mat</TT>. 
-</DD>
-<DT><STRONG>vmold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>. 
-</DD>
-<DT><STRONG>imold</STRONG></DT>
-<DD>The desired dynamic type for the internal integer vector storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from (integer) vbasedata<TT>psb_T_base_vect_type</TT>. 
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
 </DD>
 </DL>
 
@@ -136,59 +99,17 @@ Specified as: an object of a class derived from (integer) vbasedata<TT>psb_T_bas
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>info</STRONG></DT>
+<DT><STRONG>iret</STRONG></DT>
 <DD>Error code.
 <BR>
-Scope: <B>local</B> 
-<BR>
 Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
 <BR>
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-The <code>amold</code>, <code>vmold</code> and <code>imold</code>  arguments may be
-employed to interface with special devices, such as GPUs and other
-accelerators. 
 
 <P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1849"
-  HREF="node128.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1845"
-  HREF="node125.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1839"
-  HREF="node126.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1847"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1850"
-  HREF="node128.html">apply   Preconditioner</A>
-<B> Up:</B> <A NAME="tex2html1846"
-  HREF="node125.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1840"
-  HREF="node126.html">init   Initialize</A>
- &nbsp; <B>  <A NAME="tex2html1848"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html242"
+<A NAME="tex2html248"
   HREF="node5.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html238"
+<A NAME="tex2html244"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html232"
+<A NAME="tex2html238"
   HREF="node3.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html240"
+<A NAME="tex2html246"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html243"
+<B> Next:</B> <A NAME="tex2html249"
   HREF="node5.html">Library contents</A>
-<B> Up:</B> <A NAME="tex2html239"
+<B> Up:</B> <A NAME="tex2html245"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html233"
+<B> Previous:</B> <A NAME="tex2html239"
   HREF="node3.html">General overview</A>
- &nbsp; <B>  <A NAME="tex2html241"
+ &nbsp; <B>  <A NAME="tex2html247"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -62,21 +62,21 @@ PDE.
 Each point of the discretization mesh will have (at least) one
 associated equation/variable, and therefore one index. We say that
 point  <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN> <EM>depends</EM> on point <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="11" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
  SRC="img5.png"
  ALT="$j$"></SPAN> if the  equation for a
 variable associated with <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN> contains a term in <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="11" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
  SRC="img5.png"
  ALT="$j$"></SPAN>,  or equivalently
 if <SPAN CLASS="MATH"><IMG
- WIDTH="52" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="53" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img6.png"
  ALT="$a_{ij} \ne0$"></SPAN>.  
 After the partition of the discretization mesh into <EM>sub-domains</EM>
@@ -123,25 +123,25 @@ Overlap points do not usually exist in the basic data
 distributions; however they are a feature of Domain Decomposition
 Schwarz preconditioners which are the subject of related research
 work&nbsp;[<A
- HREF="node134.html#2007c">4</A>,<A
- HREF="node134.html#2007d">3</A>].
+ HREF="node137.html#2007c">4</A>,<A
+ HREF="node137.html#2007d">3</A>].
 
 <P>
 We denote the sets of  internal, boundary and halo points for a given
 subdomain  by <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img7.png"
  ALT="$\cal I$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
  SRC="img8.png"
  ALT="$\cal B$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="17" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
  SRC="img9.png"
  ALT="$\cal H$"></SPAN>.
 Each subdomain is assigned to one process; each process usually
 owns one subdomain, although the user may choose to assign more than
 one subdomain to a process.  If each process <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN> owns one
 subdomain, the number of rows in the local sparse matrix is
@@ -149,7 +149,7 @@ subdomain, the number of rows in the local sparse matrix is
  $|{\cal I}_i| + |{\cal B}_i|$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="71" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
  SRC="img10.png"
  ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$"></SPAN>, and the number of local columns
 (i.e. those for which there exists at least one non-zero entry in the
@@ -157,7 +157,7 @@ local rows)  is <!-- MATH
  $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="118" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
  SRC="img11.png"
  ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert +\vert{\cal H}_i\vert$"></SPAN>.
 
@@ -170,7 +170,7 @@ Point classfication.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
- WIDTH="318" HEIGHT="283" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="318" HEIGHT="285" ALIGN="BOTTOM" BORDER="0"
  SRC="img13.png"
  ALT="\includegraphics[scale=0.65]{figures/points.eps}">
 <!-- MATH
@@ -195,26 +195,26 @@ points in the literature.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html242"
+<A NAME="tex2html248"
   HREF="node5.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html238"
+<A NAME="tex2html244"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html232"
+<A NAME="tex2html238"
   HREF="node3.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html240"
+<A NAME="tex2html246"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html243"
+<B> Next:</B> <A NAME="tex2html249"
   HREF="node5.html">Library contents</A>
-<B> Up:</B> <A NAME="tex2html239"
+<B> Up:</B> <A NAME="tex2html245"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html233"
+<B> Previous:</B> <A NAME="tex2html239"
   HREF="node3.html">General overview</A>
- &nbsp; <B>  <A NAME="tex2html241"
+ &nbsp; <B>  <A NAME="tex2html247"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

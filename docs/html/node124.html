@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>mm_array_write -- Write a dense array from a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_array_write -- Write a dense array from a file in the MatrixMarket format">
+<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,51 +14,52 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node125.html">
 <LINK REL="previous" HREF="node123.html">
-<LINK REL="up" HREF="node118.html">
+<LINK REL="up" HREF="node121.html">
 <LINK REL="next" HREF="node125.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1807"
+<A NAME="tex2html1818"
   HREF="node125.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1803"
-  HREF="node118.html">
+<A NAME="tex2html1814"
+  HREF="node121.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1799"
+<A NAME="tex2html1808"
   HREF="node123.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1805"
+<A NAME="tex2html1816"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1808"
-  HREF="node125.html">Preconditioner routines</A>
-<B> Up:</B> <A NAME="tex2html1804"
-  HREF="node118.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1800"
-  HREF="node123.html">mm_mat_write   Write</A>
- &nbsp; <B>  <A NAME="tex2html1806"
+<B> Next:</B> <A NAME="tex2html1819"
+  HREF="node125.html">mm_array_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1815"
+  HREF="node121.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1809"
+  HREF="node123.html">hb_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1817"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000106000000000000000">
-mm_array_write --  Write a dense array from a
+<H2><A NAME="SECTION000103000000000000000">
+mm_mat_read -- Read a sparse matrix from a
   file in the MatrixMarket format</A>
 </H2>
 
 <P>
 <BR>
 <IMG
- WIDTH="423" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img164.png"
+ WIDTH="396" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img167.png"
  ALT="\begin{lstlisting}
-call mm_array_write(b, iret, iunit, filename)
+call mm_mat_read(a, iret, iunit, filename)
 \end{lstlisting}">
 <BR>
 
@@ -70,14 +71,8 @@ call mm_array_write(b, iret, iunit, filename)
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side(s).
-<BR>
-Type: <B>required</B> 
-<BR>
-An  array of type real or complex, rank 1 or 2; will be written.. </DD>
 <DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written.
+<DD>The name of the file to be read.
 <BR>
 Type:<B>optional</B>.
 <BR>
@@ -98,6 +93,13 @@ Specified as: an integer value. Only meaningful if filename is not <code>-</code
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
 <DT><STRONG>iret</STRONG></DT>
 <DD>Error code.

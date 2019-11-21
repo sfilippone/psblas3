@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>Bibliography</TITLE>
-<META NAME="description" CONTENT="Bibliography">
+<TITLE>free -- Free a preconditioner</TITLE>
+<META NAME="description" CONTENT="free -- Free a preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,164 +14,91 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node135.html">
-<LINK REL="previous" HREF="node132.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node133.html">
+<LINK REL="up" HREF="node128.html">
 <LINK REL="next" HREF="node135.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1930"
+<A NAME="tex2html1940"
   HREF="node135.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1926"
-  HREF="userhtml.html">
+<A NAME="tex2html1936"
+  HREF="node128.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1920"
+<A NAME="tex2html1932"
   HREF="node133.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1928"
+<A NAME="tex2html1938"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1931"
-  HREF="node135.html">About this document ...</A>
-<B> Up:</B> <A NAME="tex2html1927"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1921"
-  HREF="node133.html">psb_krylov   Krylov</A>
- &nbsp; <B>  <A NAME="tex2html1929"
+<B> Next:</B> <A NAME="tex2html1941"
+  HREF="node135.html">Iterative Methods</A>
+<B> Up:</B> <A NAME="tex2html1937"
+  HREF="node128.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1933"
+  HREF="node133.html">clone   clone</A>
+ &nbsp; <B>  <A NAME="tex2html1939"
   HREF="node1.html">Contents</A></B> 
-<BR><BR></DIV>
+<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
- 
-<H2><A NAME="SECTION000130000000000000000">
-Bibliography</A>
-</H2><DL COMPACT><DD><P></P><DT><A NAME="DesPat:11">1</A>
-<DD>
- D.&nbsp;Barbieri, V.&nbsp;Cardellini, S.&nbsp;Filippone and D.&nbsp;Rouson
-<EM>Design Patterns for Scientific Computations on Sparse Matrices</EM>,
- HPSS 2011, Algorithms and Programming Tools for Next-Generation High-Performance Scientific Software, Bordeaux, Sep. 2011
+
+<H2><A NAME="SECTION000116000000000000000">
+free -- Free a  preconditioner</A>
+</H2>
 
 <P>
-<P></P><DT><A NAME="PARA04FOREST">2</A>
+<PRE>
+call prec%free(info)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
-G.&nbsp;Bella, S.&nbsp;Filippone, A.&nbsp;De Maio and M.&nbsp;Testa,
-<EM>A Simulation Model for Forest Fires</EM>,
-in J.&nbsp;Dongarra, K.&nbsp;Madsen, J.&nbsp;Wasniewski, editors,
-Proceedings of PARA&nbsp;04 Workshop on State of the Art
-in Scientific Computing, pp.&nbsp;546-553, Lecture Notes in Computer Science,
-Springer, 2005.
-<P></P><DT><A NAME="2007d">3</A>
-<DD> A. Buttari, D. di Serafino, P. D'Ambra, S. Filippone,<BR>
-2LEV-D2P4: a package of high-performance preconditioners,<BR>
-Applicable Algebra in Engineering, Communications and Computing, 
-Volume 18, Number 3, May, 2007, pp.  223-239
-<P></P><DT><A NAME="2007c">4</A>
-<DD>  P. D'Ambra, S. Filippone,  D. Di Serafino<BR>
-On the Development of PSBLAS-based Parallel Two-level Schwarz Preconditioners
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
 <BR>
-Applied Numerical Mathematics, Elsevier Science, 
-Volume 57, Issues 11-12, November-December 2007, Pages 1181-1196.
-
-<P>
-<P></P><DT><A NAME="BLAS2">5</A>
-<DD>
- Dongarra, J. J.,  DuCroz, J.,  Hammarling, S. and Hanson, R.,
-An Extended Set of Fortran Basic Linear Algebra Subprograms,
-ACM Trans. Math. Softw. vol.&nbsp;14, 1-17, 1988.
-<P></P><DT><A NAME="BLAS3">6</A>
-<DD>
-  Dongarra, J., DuCroz, J., Hammarling, S. and Duff, I.,
-A  Set of level 3 Basic Linear Algebra Subprograms,
-ACM Trans. Math. Softw. vol.&nbsp;16, 1-17, 1990.
-<P></P><DT><A NAME="BLACS">7</A>
-<DD>
-J.&nbsp;J.&nbsp;Dongarra and R.&nbsp;C.&nbsp;Whaley,
-<EM>A User's Guide to the BLACS v.&nbsp;1.1</EM>,
-Lapack Working Note 94, Tech. Rep. UT-CS-95-281, University of
-Tennessee, March 1995 (updated May 1997).
-<P></P><DT><A NAME="sblas97">8</A>
-<DD>
-I.&nbsp;Duff, M.&nbsp;Marrone, G.&nbsp;Radicati and C.&nbsp;Vittoli,
-<EM>Level 3 Basic Linear Algebra Subprograms for Sparse Matrices: 
-a User Level Interface</EM>,
-ACM Transactions on Mathematical Software, 23(3), pp.&nbsp;379-401, 1997.
-<P></P><DT><A NAME="sblas02">9</A>
-<DD>
-I.&nbsp;Duff, M.&nbsp;Heroux and R.&nbsp;Pozo,
-<EM>An Overview of the Sparse Basic Linear
-Algebra Subprograms: the New Standard from the BLAS Technical Forum</EM>,
-ACM Transactions on Mathematical Software, 28(2), pp.&nbsp;239-267, 2002.
-<P></P><DT><A NAME="PSBLAS">10</A>
-<DD>
-S.&nbsp;Filippone and M.&nbsp;Colajanni, 
-<EM>PSBLAS: A Library for Parallel Linear Algebra
-Computation on Sparse Matrices</EM>,
+Scope: <B>local</B>.
 <BR>
-ACM Transactions on Mathematical Software, 26(4), pp.&nbsp;527-550, 2000.
-<P></P><DT><A NAME="Sparse03">11</A>
-<DD>
-S.&nbsp;Filippone and A.&nbsp;Buttari, 
-<EM>Object-Oriented Techniques for Sparse Matrix Computations in Fortran 2003</EM>,
+Type: <B>required</B>
 <BR>
-ACM Transactions on Mathematical Software, 38(4), 2012.
-<P></P><DT><A NAME="KIVA3PSBLAS">12</A>
-<DD>
-S.&nbsp;Filippone, P.&nbsp;D'Ambra, M.&nbsp;Colajanni,
-<EM>Using a Parallel Library of Sparse Linear Algebra in a Fluid Dynamics 
-Applications Code on Linux Clusters</EM>,
-in G.&nbsp;Joubert, A.&nbsp;Murli, F.&nbsp;Peters, M.&nbsp;Vanneschi, editors,
-Parallel Computing - Advances &amp; Current Issues,
-pp.&nbsp;441-448, Imperial College Press, 2002. 
-<P></P><DT><A NAME="DesignPatterns">13</A>
-<DD>
- Gamma, E.,  Helm, R.,  Johnson, R.,  and  Vlissides,
-  J. 1995.
- <EM>Design Patterns: Elements of Reusable Object-Oriented Software</EM>.
- Addison-Wesley.
-
-<P>
-<P></P><DT><A NAME="METIS">14</A>
-<DD>
-Karypis, G. and Kumar, V.,
-<EM>METIS: Unstructured Graph Partitioning and Sparse Matrix
-  Ordering System</EM>.
-Minneapolis, MN 55455: University of Minnesota, Department of
-  Computer Science, 1995. 
-Internet Address: <code>http://www.cs.umn.edu/~karypis</code>.
-<P></P><DT><A NAME="BLAS1">15</A>
-<DD>
-Lawson, C.,  Hanson, R., Kincaid, D. and Krogh, F.,
-   Basic Linear Algebra Subprograms for Fortran usage,
-ACM Trans. Math. Softw. vol.&nbsp;5, 38-329, 1979.
-
-<P>
-<P></P><DT><A NAME="machiels">16</A>
-<DD>
-Machiels, L. and Deville, M.
-<EM>Fortran 90: An entry to object-oriented programming for the solution
-  of partial differential equations.</EM>
-ACM Trans. Math. Softw. vol.&nbsp;23, 32-49.
-<P></P><DT><A NAME="metcalf">17</A>
-<DD>
-Metcalf, M., Reid, J. and Cohen, M.
-<EM>Fortran 95/2003 explained.</EM>
-Oxford University Press, 2004.
-<P></P><DT><A NAME="RouXiaXu:11">18</A>
-<DD>
-Rouson, D.W.I., Xia, J., Xu, X.: Scientific Software Design: The
-  Object-Oriented Way. Cambridge University Press (2011)
-
-<P>
-<P></P><DT><A NAME="MPI1">19</A>
-<DD>
-M.&nbsp;Snir, S.&nbsp;Otto, S.&nbsp;Huss-Lederman, D.&nbsp;Walker and J.&nbsp;Dongarra,
-<EM>MPI: The Complete Reference. Volume 1 - The MPI Core</EM>, second edition,
-MIT Press, 1998.
+Intent: <B>inout</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG><B>On Exit</B></STRONG></DT>
+<DD><P>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Error code: if no error, 0 is returned.
+</DD>
 </DL>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+Releases all internal storage.
 
 <P>
 <BR><HR>

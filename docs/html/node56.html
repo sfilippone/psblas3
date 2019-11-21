@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html947"
+<A NAME="tex2html956"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html943"
+<A NAME="tex2html952"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html937"
+<A NAME="tex2html946"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html945"
+<A NAME="tex2html954"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html948"
+<B> Next:</B> <A NAME="tex2html957"
   HREF="node57.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html944"
+<B> Up:</B> <A NAME="tex2html953"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html938"
+<B> Previous:</B> <A NAME="tex2html947"
   HREF="node55.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html946"
+ &nbsp; <B>  <A NAME="tex2html955"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -55,12 +55,12 @@ psb_normi -- Infinity-Norm of Vector</A>
 <P>
 This function computes 
  the infinity-norm of a vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
 If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is a real  vector
 it computes infinity norm as:
@@ -73,14 +73,14 @@ amax \leftarrow \max_i |x_i|
  -->
 
 <IMG
- WIDTH="118" HEIGHT="36" BORDER="0"
+ WIDTH="119" HEIGHT="36" BORDER="0"
  SRC="img30.png"
  ALT="\begin{displaymath}amax \leftarrow \max_i \vert x_i\vert\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is a complex vector then it computes the infinity-norm  as:
 <BR><P></P>
@@ -92,7 +92,7 @@ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}
  -->
 
 <IMG
- WIDTH="232" HEIGHT="36" BORDER="0"
+ WIDTH="233" HEIGHT="36" BORDER="0"
  SRC="img31.png"
  ALT="\begin{displaymath}amax \leftarrow \max_i {(\vert re(x_i)\vert + \vert im(x_i)\vert)}\end{displaymath}">
 </DIV>
@@ -107,7 +107,7 @@ psb_normi(x, desc_a, info [,global])
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2026"></A>
+<DIV ALIGN="CENTER"><A NAME="2133"></A>
 <TABLE>
 <CAPTION><STRONG>Table 4:</STRONG>
 Data types</CAPTION>
@@ -115,11 +115,11 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="44" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img32.png"
  ALT="$amax$"></SPAN></TD>
 <TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
@@ -158,7 +158,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 
@@ -205,7 +205,7 @@ Default: <code>global=.true.</code>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
 <DD>is the infinity norm of vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
@@ -238,7 +238,7 @@ An integer value; 0 means no error has been detected.
   by using the following scheme:
   <BR>
 <IMG
- WIDTH="480" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="481" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
  SRC="img33.png"
  ALT="\begin{lstlisting}
 vres(1) = psb_geamax(x1,desc_a,info,global=.false.)
@@ -256,26 +256,26 @@ In this way the global communication, which for small sizes is a
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html947"
+<A NAME="tex2html956"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html943"
+<A NAME="tex2html952"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html937"
+<A NAME="tex2html946"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html945"
+<A NAME="tex2html954"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html948"
+<B> Next:</B> <A NAME="tex2html957"
   HREF="node57.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html944"
+<B> Up:</B> <A NAME="tex2html953"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html938"
+<B> Previous:</B> <A NAME="tex2html947"
   HREF="node55.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html946"
+ &nbsp; <B>  <A NAME="tex2html955"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>descr -- Prints a description of current preconditioner</TITLE>
-<META NAME="description" CONTENT="descr -- Prints a description of current preconditioner">
+<TITLE>init -- Initialize a preconditioner</TITLE>
+<META NAME="description" CONTENT="init -- Initialize a preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,47 +16,45 @@
 
 <LINK REL="next" HREF="node130.html">
 <LINK REL="previous" HREF="node128.html">
-<LINK REL="up" HREF="node125.html">
+<LINK REL="up" HREF="node128.html">
 <LINK REL="next" HREF="node130.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1873"
+<A NAME="tex2html1882"
   HREF="node130.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1869"
-  HREF="node125.html">
+<A NAME="tex2html1878"
+  HREF="node128.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1863"
+<A NAME="tex2html1872"
   HREF="node128.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1871"
+<A NAME="tex2html1880"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1874"
-  HREF="node130.html">clone   clone</A>
-<B> Up:</B> <A NAME="tex2html1870"
-  HREF="node125.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1864"
-  HREF="node128.html">apply   Preconditioner</A>
- &nbsp; <B>  <A NAME="tex2html1872"
+<B> Next:</B> <A NAME="tex2html1883"
+  HREF="node130.html">build   Builds</A>
+<B> Up:</B> <A NAME="tex2html1879"
+  HREF="node128.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1873"
+  HREF="node128.html">Preconditioner routines</A>
+ &nbsp; <B>  <A NAME="tex2html1881"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000114000000000000000">
-descr -- Prints a description of current
-  preconditioner</A>
+<H2><A NAME="SECTION000111000000000000000">
+init -- Initialize a  preconditioner</A>
 </H2>
 
 <P>
 <PRE>
-call prec%descr()
-call prec%descr(iout, root)
+call prec%init(icontxt,ptype, info)
 </PRE>
 
 <P>
@@ -67,43 +65,81 @@ call prec%descr(iout, root)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-Scope: <B>local</B> 
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context.
+<BR>
+Scope:<B>global</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.
+</DD>
+<DT><STRONG>ptype</STRONG></DT>
+<DD>the type of preconditioner. 
+Scope: <B>global</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
+Specified as: a character string, see usage notes.
+</DD>
+<DT><STRONG><B>On Exit</B></STRONG></DT>
+<DD><P>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
 Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>iout</STRONG></DT>
-<DD>output unit.
-Scope: <B>local</B> 
+<DT><STRONG>info</STRONG></DT>
+<DD>Scope: <B>global</B> 
 <BR>
-Type: <B>optional</B>
+Type: <B>required</B>
 <BR>
-Intent: <B>in</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: an integer number. Default: default output unit.
+Error code: if no error, 0 is returned.
 </DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Process from which to print
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer number between 0 and <SPAN CLASS="MATH"><IMG
- WIDTH="49" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img167.png"
- ALT="$np-1$"></SPAN>, in which case
-the specified process will print the description, or <SPAN CLASS="MATH"><IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img82.png"
- ALT="$-1$"></SPAN>, in which case
-all processes will print. Default: 0. 
+</DL>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+Legal inputs to this subroutine are interpreted depending on the
+<SPAN CLASS="MATH"><IMG
+ WIDTH="41" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img171.png"
+ ALT="$ptype$"></SPAN> string as follows<A NAME="tex2html34"
+  HREF="footnode.html#foot8228"><SUP><SPAN CLASS="arabic">4</SPAN></SUP></A>:
+<DL>
+<DT><STRONG>NONE</STRONG></DT>
+<DD>No preconditioning, i.e. the preconditioner is just a copy
+  operator.
+</DD>
+<DT><STRONG>DIAG</STRONG></DT>
+<DD>Diagonal scaling; each entry of the input vector is
+  multiplied by the reciprocal of the sum of the absolute values of
+  the coefficients in the corresponding row of matrix  <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>;
+</DD>
+<DT><STRONG>BJAC</STRONG></DT>
+<DD>Precondition by a  factorization of the
+  block-diagonal of matrix <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>, where block boundaries are determined
+  by the data allocation boundaries for each process; requires no
+  communication. Only the incomplete factorization <SPAN CLASS="MATH"><IMG
+ WIDTH="56" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img172.png"
+ ALT="$ILU(0)$"></SPAN> is
+  currently implemented.  
 </DD>
 </DL>
 

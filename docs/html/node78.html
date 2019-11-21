@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_spall -- Allocates a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_spall -- Allocates a sparse matrix">
+<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,56 +16,56 @@
 
 <LINK REL="next" HREF="node79.html">
 <LINK REL="previous" HREF="node77.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node79.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1238"
+<A NAME="tex2html1247"
   HREF="node79.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1234"
-  HREF="node71.html">
+<A NAME="tex2html1243"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1228"
+<A NAME="tex2html1237"
   HREF="node77.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1236"
+<A NAME="tex2html1245"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1239"
-  HREF="node79.html">psb_spins   Insert</A>
-<B> Up:</B> <A NAME="tex2html1235"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1229"
-  HREF="node77.html">psb_cdbldext   Build</A>
- &nbsp; <B>  <A NAME="tex2html1237"
+<B> Next:</B> <A NAME="tex2html1248"
+  HREF="node79.html">psb_cdfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1244"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1238"
+  HREF="node77.html">psb_cdasb   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html1246"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00077000000000000000">
-psb_spall -- Allocates a sparse matrix</A>
+<H2><A NAME="SECTION00074000000000000000">
+psb_cdcpy -- Copies a communication descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_spall(a, desc_a, info, nnz)
+call psb_cdcpy(desc_in, desc_out, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
+<DT><STRONG>desc_in</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -75,18 +75,8 @@ Type:<B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>nnz</STRONG></DT>
-<DD>An estimate of the number of nonzeroes in the local
-  part of the assembled matrix.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. 
+
+<P>
 </DD>
 </DL>
 
@@ -95,16 +85,16 @@ Specified as: an integer value.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix to be allocated.
+<DT><STRONG>desc_out</STRONG></DT>
+<DD>the communication descriptor copy.
 <BR>
-Scope:<B>local</B>
+Scope:<B>local</B>.
 <BR>
-Type:<B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -118,23 +108,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>On exit from this routine the sparse matrix  is in the build
-  state.
-</LI>
-<LI>The descriptor may be in either the build or assembled state.
-</LI>
-<LI>Providing a good estimate for the number of nonzeroes <SPAN CLASS="MATH"><IMG
- WIDTH="32" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img107.png"
- ALT="$nnz$"></SPAN> in
-  the assembled matrix may substantially improve performance in the
-  matrix build phase, as it will reduce or eliminate the need for
-  (potentially multiple) data reallocations. 
-</LI>
-</OL>
 
 <P>
 <BR><HR>

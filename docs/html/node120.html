@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format</TITLE>
-<META NAME="description" CONTENT="hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format">
+<TITLE>Error handling</TITLE>
+<META NAME="description" CONTENT="Error handling">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -15,51 +15,143 @@
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node121.html">
-<LINK REL="previous" HREF="node119.html">
-<LINK REL="up" HREF="node118.html">
+<LINK REL="previous" HREF="node102.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node121.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1761"
+<A NAME="tex2html1764"
   HREF="node121.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1757"
-  HREF="node118.html">
+<A NAME="tex2html1760"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1751"
+<A NAME="tex2html1754"
   HREF="node119.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1759"
+<A NAME="tex2html1762"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1762"
-  HREF="node121.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1758"
-  HREF="node118.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1752"
-  HREF="node119.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1760"
+<B> Next:</B> <A NAME="tex2html1765"
+  HREF="node121.html">Utilities</A>
+<B> Up:</B> <A NAME="tex2html1761"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1755"
+  HREF="node119.html">psb_rcv   Receive</A>
+ &nbsp; <B>  <A NAME="tex2html1763"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000102000000000000000">
-hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
-</H2>
+<H1><A NAME="SECTION00090000000000000000">
+Error handling</A>
+</H1>
+
+<P>
+The PSBLAS library error handling policy has been completely rewritten
+in version 2.0. The idea behind the design of this new error handling
+strategy is to keep error messages on a stack allowing the user to
+trace back up to the point where the first error message has been
+generated. Every routine in the PSBLAS-2.0 library has, as last
+non-optional argument, an integer <code>info</code> variable; whenever,
+inside the routine, an error is detected, this variable is set to a
+value corresponding to a specific error code. Then this error code is
+also pushed on the error stack and then either control is returned to
+the caller routine or the execution is aborted, depending on the users
+choice. At the time when the execution is aborted, an error message is
+printed on standard output with a level of verbosity than can be
+chosen by the user. If the execution is not aborted, then, the caller
+routine checks the value returned in the <code>info</code> variable and, if
+not zero, an error condition is raised. This process continues on all the
+levels of nested calls until the level where the user decides to abort
+the program execution.
+
+<P>
+Figure&nbsp;<A HREF="#fig:routerr">9</A> shows the layout of a generic <code>psb_foo</code>
+routine with respect to the PSBLAS-2.0 error handling policy. It is
+possible to see how, whenever an error condition is detected, the
+<code>info</code> variable is set to the corresponding error code which is,
+then, pushed on top of the stack by means of the
+<code>psb_errpush</code>. An error condition may be directly detected inside
+a routine or indirectly checking the error code returned returned by a
+called routine. Whenever an error is encountered, after it has been
+pushed on stack, the program execution skips to a point where the
+error condition is handled; the error condition is handled either by
+returning control to the caller routine or by calling the
+<code>psb\_error</code> routine which prints the content of the error stack
+and aborts the program execution, according to the choice made by the
+user with <code>psb_set_erraction</code>. The default is to print the error
+and terminate the program, but the user may choose to handle the error
+explicitly. 
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:routerr"></A><A NAME="7846"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 9:</STRONG>
+The layout of a generic <TT>psb_foo</TT>
+  routine with respect to PSBLAS-2.0 error handling policy.</CAPTION>
+<TR><TD>
+<BR>
+   
+  <DIV ALIGN="CENTER">
+<!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
+ SRC="img159.png"
+ ALT="\fbox{\TheSbox}"></SPAN>
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+Figure&nbsp;<A HREF="#fig:errormsg">10</A> reports a sample error message generated by
+the PSBLAS-2.0 library. This error has been generated by the fact that
+the user has chosen the invalid &ldquo;FOO&rdquo; storage format to represent
+the sparse matrix. From this error message it is possible to see that
+the error has been detected inside the <code>psb_cest</code> subroutine
+called by <code>psb_spasb</code> ... by process 0 (i.e. the root process).
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:errormsg"></A><A NAME="7847"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 10:</STRONG>
+A sample PSBLAS-2.0 error
+    message. Process 0 detected an error condition inside the  psb_cest subroutine</CAPTION>
+<TR><TD>
+<BR>
+   
+  <DIV ALIGN="CENTER">
+<!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
+ SRC="img159.png"
+ ALT="\fbox{\TheSbox}"></SPAN>
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+ifstarsubroutinesubroutinepsb_errpushPushes an error code onto the error
+  stack
 
 <P>
 <BR>
 <IMG
- WIDTH="537" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img160.png"
+ WIDTH="424" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img161.png"
  ALT="\begin{lstlisting}
-call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
+call psb_errpush(err_c, r_name, i_err, a_err)
 \end{lstlisting}">
 <BR>
 
@@ -68,72 +160,154 @@ call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix to be written.
+<DT><STRONG>err_c</STRONG></DT>
+<DD>the error code
 <BR>
-Type:<B>required</B>.
+Scope: <B>local</B> 
 <BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side.
+<DT><STRONG>r_name</STRONG></DT>
+<DD>the soutine where the error has been caught.
 <BR>
-Type: <B>Optional</B> 
+Scope: <B>local</B> 
 <BR>
-An  array of type real or complex, rank 1 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side. 
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a string.
+<BR></DD>
+<DT><STRONG>i_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: an integer array
+<BR></DD>
+<DT><STRONG>a_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: a string.
+<BR></DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinepsb_errorPrints the error stack content and aborts
+  execution
+
+<P>
+<BR>
+<IMG
+ WIDTH="213" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img162.png"
+ ALT="\begin{lstlisting}
+call psb_error(icontxt)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
 </DD>
-<DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written to.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default output unit  6 (i.e. standard output
-in Unix jargon) is used. Default: <code>-</code>. 
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>iunit</STRONG></DT>
-<DD>The Fortran file unit number.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context.
 <BR>
-Type:<B>optional</B>.
+Scope: <B>global</B> 
 <BR>
-Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
-</DD>
-<DT><STRONG>key</STRONG></DT>
-<DD>Matrix key.
+Type: <B>optional</B>
 <BR>
-Type: <B>Optional</B> 
+Intent: <B>in</B>.
 <BR>
-A charachter variable of length 8 holding the
-matrix key as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
-<DT><STRONG>mtitle</STRONG></DT>
-<DD>Matrix title.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 72 holding the
-matrix title as specified by the Harwell-Boeing format and to be
-written to file.
+Specified as: an integer.
 </DD>
 </DL>
 
 <P>
+ifstarsubroutinesubroutinepsb_set_errverbositySets the verbosity of error
+  messages.
+
+<P>
+<BR>
+<IMG
+ WIDTH="262" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img163.png"
+ ALT="\begin{lstlisting}
+call psb_set_errverbosity(v)
+\end{lstlisting}">
+<BR>
+
+<P>
 <DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>iret</STRONG></DT>
-<DD>Error code.
+<DT><STRONG>v</STRONG></DT>
+<DD>the verbosity level
 <BR>
-Type: <B>required</B> 
+Scope: <B>global</B>
 <BR>
-An integer value; 0 means no error has been detected. 
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinepsb_set_erractionSet the type of action to be
+  taken  upon error condition.
+
+<P>
+<BR>
+<IMG
+ WIDTH="290" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img164.png"
+ ALT="\begin{lstlisting}
+call psb_set_erraction(err_act)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>err_act</STRONG></DT>
+<DD>the type of action.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer. Possible values: <code>psb_act_ret</code>,
+<code>psb_act_abort</code>. 
 </DD>
 </DL>
 
@@ -141,26 +315,26 @@ An integer value; 0 means no error has been detected.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1761"
+<A NAME="tex2html1764"
   HREF="node121.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1757"
-  HREF="node118.html">
+<A NAME="tex2html1760"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1751"
+<A NAME="tex2html1754"
   HREF="node119.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1759"
+<A NAME="tex2html1762"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1762"
-  HREF="node121.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1758"
-  HREF="node118.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1752"
-  HREF="node119.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1760"
+<B> Next:</B> <A NAME="tex2html1765"
+  HREF="node121.html">Utilities</A>
+<B> Up:</B> <A NAME="tex2html1761"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1755"
+  HREF="node119.html">psb_rcv   Receive</A>
+ &nbsp; <B>  <A NAME="tex2html1763"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

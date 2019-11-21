@@ -1244,8 +1244,219 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       VECTOR VECTOR OPERATIONS 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\clearpage\subsection*{psb\_gemlt --- Entrywise Product}
+\addcontentsline{toc}{subsection}{psb\_gemlt}
+
+This function computes the entrywise product between two vectors $x$ and
+$y$
+\[dot \leftarrow x(i) y(i).\]
+
+\begin{verbatim}
+psb_gemlt(x, y, desc_a, info)
+\end{verbatim}
+%% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{ll}
+			\hline
+			$dot$, $x$, $y$ & {\bf Function}\\
+			\hline
+			Short Precision Real & psb\_gemlt \\
+			Long Precision Real & psb\_gemlt \\
+			Short Precision Complex & psb\_gemlt \\	
+			Long Precision Complex & psb\_gemlt \\	
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Data types\label{tab:f90mlt}}
+\end{table}
+
+\begin{description}
+	\item[Type:] Synchronous.
+	\item[\bf On Entry]
+	\item[x] the local portion of global dense vector
+	$x$.\\
+	%%  This function computes the location of the first element of
+	%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf in}.\\
+	Specified as:  an object of type \vdata\ 
+	containing numbers of type specified in
+	Table~\ref{tab:f90dot}.
+	\item[y] the local portion of global dense vector
+	$y$. \\
+	%% This function computes the location of the first element of
+	%% local subarray used, based on $iy, jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf in}.\\
+	Specified as:  an object of type \vdata\ 
+	containing numbers of type specified in
+	Table~\ref{tab:f90dot}.
+	\item[desc\_a] contains data structures for communications.\\
+	Scope: {\bf local} \\
+	Type: {\bf required}\\
+	Intent: {\bf in}.\\
+	Specified as: an object of type \descdata.
+	\item[\bf On Return] 
+	\item[y] the local portion of result submatrix $y$.\\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf inout}.\\
+	Specified as: an object of type \vdata\ containing numbers of the type
+	indicated in Table~\ref{tab:f90mlt}.
+	\item[info] Error code.\\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf out}.\\
+	An integer value; 0 means no error has been detected. 
+\end{description}
+
+\clearpage\subsection*{psb\_gediv --- Entrywise Division}
+\addcontentsline{toc}{subsection}{psb\_gediv}
+
+This function computes the entrywise division between two vectors $x$ and
+$y$
+\[/ \leftarrow x(i)/y(i).\]
+
+\begin{verbatim}
+psb_gediv(x, y, desc_a, info, [flag)
+\end{verbatim}
+%% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{ll}
+			\hline
+			$/$, $x$, $y$ & {\bf Function}\\
+			\hline
+			Short Precision Real & psb\_gediv \\
+			Long Precision Real & psb\_gediv \\
+			Short Precision Complex & psb\_gediv \\	
+			Long Precision Complex & psb\_gediv \\	
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Data types\label{tab:f90div}}
+\end{table}
+
+\begin{description}
+	\item[Type:] Synchronous.
+	\item[\bf On Entry]
+	\item[x] the local portion of global dense vector
+	$x$.\\
+	%%  This function computes the location of the first element of
+	%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf in}.\\
+	Specified as:  an object of type \vdata\ 
+	containing numbers of type specified in
+	Table~\ref{tab:f90dot}.
+	\item[y] the local portion of global dense vector
+	$y$. \\
+	%% This function computes the location of the first element of
+	%% local subarray used, based on $iy, jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf in}.\\
+	Specified as:  an object of type \vdata\ 
+	containing numbers of type specified in
+	Table~\ref{tab:f90dot}.
+	\item[desc\_a] contains data structures for communications.\\
+	Scope: {\bf local} \\
+	Type: {\bf required}\\
+	Intent: {\bf in}.\\
+	Specified as: an object of type \descdata.
+	\item[flag] check if any of the $y(i) = 0$, and in case returns error halting the computation.\\
+	Scope: {\bf local} \\
+	Type: {\bf optional}
+	Intent: {\bf in}.\\
+	Specified as: the logical value \verb|flag=.true.|
+	\item[\bf On Return] 
+	\item[x] the local portion of result submatrix $x$.\\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf inout}.\\
+	Specified as: an object of type \vdata\ containing numbers of the type
+	indicated in Table~\ref{tab:f90mlt}.
+	\item[info] Error code.\\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf out}.\\
+	An integer value; 0 means no error has been detected. 
+\end{description}
+
+\clearpage\subsection*{psb\_geinv --- Entrywise Inversion}
+\addcontentsline{toc}{subsection}{psb\_geinv}
+
+This function computes the entrywise inverse of a vector $x$ and puts it into
+$y$
+\[/ \leftarrow 1/x(i).\]
+
+\begin{verbatim}
+psb_geinv(x, y, desc_a, info, [flag)
+\end{verbatim}
+%% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{ll}
+			\hline
+			$/$, $x$, $y$ & {\bf Function}\\
+			\hline
+			Short Precision Real & psb\_geinv \\
+			Long Precision Real & psb\_geinv \\
+			Short Precision Complex & psb\_geinv \\	
+			Long Precision Complex & psb\_geinv \\	
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Data types\label{tab:f90inv}}
+\end{table}
+
+\begin{description}
+	\item[Type:] Synchronous.
+	\item[\bf On Entry]
+	\item[x] the local portion of global dense vector
+	$x$.\\
+	%%  This function computes the location of the first element of
+	%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf in}.\\
+	Specified as:  an object of type \vdata\ 
+	containing numbers of type specified in
+	Table~\ref{tab:f90dot}.
+	\item[desc\_a] contains data structures for communications.\\
+	Scope: {\bf local} \\
+	Type: {\bf required}\\
+	Intent: {\bf in}.\\
+	Specified as: an object of type \descdata.
+	\item[flag] check if any of the $x(i) = 0$, and in case returns error halting the computation.\\
+	Scope: {\bf local} \\
+	Type: {\bf optional}
+	Intent: {\bf in}.\\
+	Specified as: the logical value \verb|flag=.true.|
+	\item[\bf On Return] 
+	\item[y] the local portion of result submatrix $x$.\\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf out}.\\
+	Specified as: an object of type \vdata\ containing numbers of the type
+	indicated in Table~\ref{tab:f90inv}.
+	\item[info] Error code.\\
+	Scope: {\bf local} \\
+	Type: {\bf required} \\
+	Intent: {\bf out}.\\
+	An integer value; 0 means no error has been detected. 
+\end{description}
 
 %%% Local Variables: 
 %%% mode: latex

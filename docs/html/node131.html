@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>free -- Free a preconditioner</TITLE>
-<META NAME="description" CONTENT="free -- Free a preconditioner">
+<TITLE>apply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="apply -- Preconditioner application routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,91 +14,137 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node132.html">
 <LINK REL="previous" HREF="node130.html">
-<LINK REL="up" HREF="node125.html">
+<LINK REL="up" HREF="node128.html">
 <LINK REL="next" HREF="node132.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1895"
+<A NAME="tex2html1906"
   HREF="node132.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1891"
-  HREF="node125.html">
+<A NAME="tex2html1902"
+  HREF="node128.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1887"
+<A NAME="tex2html1896"
   HREF="node130.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1893"
+<A NAME="tex2html1904"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1896"
-  HREF="node132.html">Iterative Methods</A>
-<B> Up:</B> <A NAME="tex2html1892"
-  HREF="node125.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1888"
-  HREF="node130.html">clone   clone</A>
- &nbsp; <B>  <A NAME="tex2html1894"
+<B> Next:</B> <A NAME="tex2html1907"
+  HREF="node132.html">descr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1903"
+  HREF="node128.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1897"
+  HREF="node130.html">build   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1905"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000116000000000000000">
-free -- Free a  preconditioner</A>
+<H2><A NAME="SECTION000113000000000000000">
+apply -- Preconditioner application
+  routine</A>
 </H2>
 
 <P>
 <PRE>
-call prec%free(info)
+call prec%apply(x,y,desc_a,info,trans,work)
+call prec%apply(x,desc_a,info,trans)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>prec</STRONG></DT>
 <DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Scope: <B>local</B>.
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>the source vector.
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>. 
 </DD>
-<DT><STRONG><B>On Exit</B></STRONG></DT>
-<DD><P>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the problem communication descriptor.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
+<DT><STRONG>trans</STRONG></DT>
+<DD>Scope:  
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>an optional work space
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>the destination vector.
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
-<DD>Scope: <B>global</B> 
+<DD>Error code.
 <BR>
-Type: <B>required</B>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
 <BR>
 Intent: <B>out</B>.
 <BR>
-Error code: if no error, 0 is returned.
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-Releases all internal storage.
 
 <P>
 <BR><HR>

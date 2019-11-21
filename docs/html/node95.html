@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
-<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
+<TITLE>psb_is_local -- </TITLE>
+<META NAME="description" CONTENT="psb_is_local -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,46 +16,45 @@
 
 <LINK REL="next" HREF="node96.html">
 <LINK REL="previous" HREF="node94.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node96.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1442"
+<A NAME="tex2html1451"
   HREF="node96.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1438"
-  HREF="node71.html">
+<A NAME="tex2html1447"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1432"
+<A NAME="tex2html1441"
   HREF="node94.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1440"
+<A NAME="tex2html1449"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1443"
-  HREF="node96.html">psb_sp_getrow   Extract</A>
-<B> Up:</B> <A NAME="tex2html1439"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1433"
-  HREF="node94.html">psb_get_boundary   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1441"
+<B> Next:</B> <A NAME="tex2html1452"
+  HREF="node96.html">psb_local_index</A>
+<B> Up:</B> <A NAME="tex2html1448"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1442"
+  HREF="node94.html">psb_owned_index</A>
+ &nbsp; <B>  <A NAME="tex2html1450"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000724000000000000000">
-psb_get_overlap -- Extract list of overlap
-  elements</A>
+<H2><A NAME="SECTION000721000000000000000">
+psb_is_local  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_overlap(ovrel, desc, info)
+call psb_is_local(x, desc_a)
 </PRE>
 
 <P>
@@ -66,7 +65,18 @@ call psb_get_overlap(ovrel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer index.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a scalar integer.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -84,41 +94,27 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ovrel</STRONG></DT>
-<DD>The list of overlap elements on the calling process, in
-  local numbering.
-<BR>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A logical mask which is true if 
+  <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> is  local to the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
-<BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
 <BR></DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
 </DL>
 
 <P>
 <BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>If there are no overlap elements the output vector is set
-  to the &ldquo;not allocated&rdquo; state.  
-</LI>
-<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
-  number of overlap elements. 
+<LI>This routine returns a <code>.true.</code> value for an index
+  that is local to the current process, including the halo
+  indices
 </LI>
 </OL>
 
