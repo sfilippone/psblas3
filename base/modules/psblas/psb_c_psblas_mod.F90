@@ -459,4 +459,24 @@ module psb_c_psblas_mod
     end subroutine psb_cdiv_vect_check
   end interface
 
+  interface psb_geinv
+    subroutine psb_cinv_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cinv_vect
+    subroutine psb_cinv_vect_check(x,y,desc_a,info,flag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in)                   :: flag
+    end subroutine psb_cinv_vect_check
+  end interface
+
 end module psb_c_psblas_mod

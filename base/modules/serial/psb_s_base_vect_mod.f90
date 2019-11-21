@@ -171,6 +171,11 @@ module psb_s_base_vect_mod
     procedure, pass(z) :: div_a2        => s_base_div_a2
     procedure, pass(z) :: div_a2_check  => s_base_div_a2_check
     generic, public    :: div           => div_v, div_v_check, div_a2, div_a2_check
+    procedure, pass(y) :: inv_v    => s_base_inv_v
+    procedure, pass(y) :: inv_v_check => s_base_inv_v_check
+    procedure, pass(y) :: inv_a2   => s_base_inv_a2
+    procedure, pass(y) :: inv_a2_check => s_base_inv_a2_check
+    generic, public    :: inv      => inv_v, inv_v_check, inv_a2, inv_a2_check
     !
     ! Scaling and norms
     !
@@ -1290,6 +1295,112 @@ contains
 
 
   end subroutine s_base_div_a2_check
+  !
+  !> Function  base_inv_v
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Compute the entry-by-entry inverse of x and put it in y
+  !! \param x The vector to be inverted
+  !! \param y The vector containing the inverted vector
+  !! \param info return code
+  subroutine s_base_inv_v(x, y, info)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (y%is_dev()) call y%sync()
+    call y%inv(x%v,info)
+
+
+  end subroutine s_base_inv_v
+  !
+  !> Function  base_inv_v_check
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Compute the entry-by-entry inverse of x and put it in y, with 0 check
+  !! \param x The vector to be inverted
+  !! \param y The vector containing the inverted vector
+  !! \param info return code
+  !! \param flag if true does the check, otherwise call base_inv_v
+  subroutine s_base_inv_v_check(x, y, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (y%is_dev()) call y%sync()
+    call y%inv(x%v,info,flag)
+
+
+  end subroutine s_base_inv_v_check
+  !
+  !> Function  base_inv_a2
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Compute the entry-by-entry inverse of x and put it in y,
+  !! \param x(:) The array to be inverted
+  !! \param y The vector containing the inverted vector
+  !! \param info return code
+  !
+  subroutine s_base_inv_a2(x, y, info)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    real(psb_spk_), intent(in) :: x(:)
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (y%is_dev()) call y%sync()
+
+    n = size(x)
+    do i=1, n
+      y%v(i) = 1_psb_spk_/x(i)
+    end do
+
+  end subroutine s_base_inv_a2
+  !
+  !> Function  base_inv_a2_check
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Compute the entry-by-entry inverse of x and put it in y, with 0 check
+  !! \param x(:) The array to be inverted
+  !! \param y The vector containing the inverted vector
+  !! \param info return code
+  !! \param flag if true does the check, otherwise call base_inv_v
+  !
+  subroutine s_base_inv_a2_check(x, y, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    real(psb_spk_), intent(inout) :: x(:)
+    integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in)              :: flag
+    integer(psb_ipk_) :: i, n
+
+    if (flag .eqv. .false.) then
+      call s_base_inv_a2(x, y, info)
+    else
+      info = 0
+      if (y%is_dev()) call y%sync()
+
+      n = size(x)
+      do i=1, n
+        if (x(i) /= 0) then
+          y%v(i) = 1_psb_spk_/x(i)
+        else
+          info = 1
+          exit
+        end if
+      end do
+    end if
+
+
+  end subroutine s_base_inv_a2_check
 
 
   !

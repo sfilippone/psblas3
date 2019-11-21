@@ -99,6 +99,11 @@ module psb_d_vect_mod
     procedure, pass(z) :: div_a2   => d_vect_div_a2
     procedure, pass(z) :: div_a2_check => d_vect_div_a2_check
     generic, public    :: div      => div_v, div_v_check, div_a2, div_a2_check
+    procedure, pass(y) :: inv_v    => d_vect_inv_v
+    procedure, pass(y) :: inv_v_check => d_vect_inv_v_check
+    procedure, pass(y) :: inv_a2   => d_vect_inv_a2
+    procedure, pass(y) :: inv_a2_check => d_vect_inv_a2_check
+    generic, public    :: inv      => inv_v, inv_v_check, inv_a2, inv_a2_check
     procedure, pass(x) :: scal     => d_vect_scal
     procedure, pass(x) :: absval1  => d_vect_absval1
     procedure, pass(x) :: absval2  => d_vect_absval2
@@ -791,6 +796,64 @@ contains
          & call z%v%div(x,y,info,flag)
 
   end subroutine d_vect_div_a2_check
+
+  subroutine d_vect_inv_v(x, y, info)
+    use psi_serial_mod
+    implicit none
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v)) &
+         & call y%v%inv(x%v,info)
+
+  end subroutine d_vect_inv_v
+
+  subroutine d_vect_inv_v_check(x, y, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v)) &
+         & call y%v%inv(x%v,info,flag)
+
+  end subroutine d_vect_inv_v_check
+
+  subroutine d_vect_inv_a2(x, y, info)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(inout) :: x(:)
+    class(psb_d_vect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (allocated(y%v)) &
+         & call y%v%inv(x,info)
+
+  end subroutine d_vect_inv_a2
+
+  subroutine d_vect_inv_a2_check(x, y, info,flag)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(inout) :: x(:)
+    class(psb_d_vect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (allocated(y%v)) &
+         & call y%v%inv(x,info,flag)
+
+  end subroutine d_vect_inv_a2_check
 
   subroutine d_vect_scal(alpha, x)
     use psi_serial_mod

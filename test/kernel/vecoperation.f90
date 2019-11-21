@@ -46,7 +46,7 @@ program vecoperation
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! vector
-  type(psb_d_vect_type)  :: x,y
+  type(psb_d_vect_type)  :: x,y,z
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
   ! other variables
@@ -55,7 +55,7 @@ program vecoperation
   integer(psb_lpk_), allocatable     :: myidx(:)
   real(psb_dpk_)    :: zt(1), dotresult, norm2, norm1, norminf
   character(len=20) :: name,ch_err,readinput
-  real(psb_dpk_), allocatable :: vx(:), vy(:)
+  real(psb_dpk_), allocatable :: vx(:), vy(:), vz(:)
 
   info=psb_success_
 
@@ -113,6 +113,7 @@ program vecoperation
   ! Allocate memory
   call psb_geall(x,desc_a,info)
   call psb_geall(y,desc_a,info)
+  call psb_geall(z,desc_a,info)
   ! Put entries into the vectors
   do ii=1,nlr
     zt(1) = 1.0
@@ -159,6 +160,7 @@ program vecoperation
   call psb_geaxpby(1.0_psb_dpk_, x, 1.0_psb_dpk_, y, desc_a, info)  ! \alpha x + \beta y
 
   if (iam == psb_root_) then
+    write(psb_out_unit,'("axpby : x + y")')
     vx = x%get_vect()
     write(psb_out_unit,'("x = ",es12.1)')vx(:)
     vy = y%get_vect()
@@ -168,6 +170,7 @@ program vecoperation
   call psb_gemlt(x,y,desc_a,info)
 
   if (iam == psb_root_) then
+    write(psb_out_unit,'("mlt : y = x*y ")')
     vx = x%get_vect()
     write(psb_out_unit,'("x = ",es12.1)')vx(:)
     vy = y%get_vect()
@@ -177,14 +180,22 @@ program vecoperation
   call psb_gediv(x,y,desc_a,info)
 
   if (iam == psb_root_) then
+    write(psb_out_unit,'("div : x = x/y")')
     vx = x%get_vect()
     write(psb_out_unit,'("x = ",es12.1)')vx(:)
     vy = y%get_vect()
     write(psb_out_unit,'("y = ",es12.1)')vy(:)
   end if
 
+  call psb_geinv(x,z,desc_a,info)
 
-
+  if (iam == psb_root_) then
+    write(psb_out_unit,'("inv : z = 1/x")')
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vz = z%get_vect()
+    write(psb_out_unit,'("z = ",es12.1)')vy(:)
+  end if
 
   !
   !  cleanup storage and exit
