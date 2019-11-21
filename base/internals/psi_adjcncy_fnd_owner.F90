@@ -61,7 +61,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
 
   integer(psb_lpk_), allocatable :: rmtidx(:)
   integer(psb_ipk_), allocatable :: tproc(:), lclidx(:)
-  integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
+  integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
        & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
   integer(psb_mpk_) :: prc, p2ptag, iret
   integer(psb_mpk_) :: icomm, minfo, iictxt
@@ -69,7 +69,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
        & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me
-  logical, parameter  :: gettime=.false., new_impl=.true.
+  logical, parameter  :: gettime=.false., new_impl=.true., a2av_impl=.true., debug=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
@@ -111,18 +111,19 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   iprc = -1
   ! write(0,*) me,name,' Going through ',nidx,nadj
 
-  if (new_impl) then
+  if (a2av_impl) then
     !
     ! First simple minded version with auxiliary arrays
     ! dimensioned on NP.
-    ! Could it be improved with a loop based on the maximum length
-    ! of adj(:) ???
+    ! Do the exchange with an alltoallv
+    ! 
     !    
-    Allocate(hidx(0:np),hsz(np),sdsz(0:np-1),rvsz(0:np-1),&
-         & sdhd(0:np-1), rvhd(0:np-1), p2pstat(mpi_status_size,0:np-1),&
-         & stat=info)
-    sdhd(:) = mpi_request_null
-    rvhd(:) = mpi_request_null
+    Allocate(hidx(0:np),hsz(np),sdsz(0:np-1),rvsz(0:np-1), &
+         & sdidx(0:np),rvidx(0:np),stat=info)
+    !
+    ! Same send buffer for everybody
+    !
+    sdidx(:) = 0
     !
     ! First, send sizes according to adjcncy list
     !
@@ -134,11 +135,11 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
 
     call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
          & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-    hidx(0) = 0
+    rvidx(0) = 0
     do i=0, np-1
-      hidx(i+1) = hidx(i) + rvsz(i)
+      rvidx(i+1) = rvidx(i) + rvsz(i)
     end do
-    hsize = hidx(np)
+    hsize = rvidx(np)
     ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
     !
     ! Second, allocate buffers and exchange data
@@ -149,154 +150,227 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
-    do i = 0, np-1
-      if (rvsz(i)>0) then
-        ! write(0,*) me, ' First receive from ',i,rvsz(i)
-        prc = psb_get_rank(ictxt,i)        
-        p2ptag = psb_long_swap_tag
-        !write(0,*) me, ' Posting first receive from ',i,rvsz(i),prc           
-        call mpi_irecv(rmtidx(hidx(i)+1),rvsz(i),&
-             & psb_mpi_lpk_,prc,&
-             & p2ptag, icomm,rvhd(i),iret)
+
+    call mpi_alltoallv(idx,sdsz,sdidx,psb_mpi_lpk_,&
+         & rmtidx,rvsz,rvidx,psb_mpi_lpk_,icomm,iret)
+
+    !
+    ! Third, compute local answers
+    !
+    call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
+    do i=1, hsize
+      tproc(i) = -1
+      if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
+    end do
+
+    !
+    ! Fourth, exchange the answers 
+    !
+    ! Adjust sdidx for receive in lclidx array (reused)
+    do i=0,np-1
+      sdidx(i+1) = sdidx(i) + sdsz(i)
+    end do
+    call mpi_alltoallv(tproc,rvsz,rvidx,psb_mpi_ipk_,&
+         & lclidx,sdsz,sdidx,psb_mpi_ipk_,icomm,iret)
+
+    do i=0, np-1
+      if (sdsz(i)>0) then
+        iprc(1:nidx) = max(iprc(1:nidx), lclidx(sdidx(i)+1:sdidx(i)+sdsz(i)))
       end if
     end do
-    do j=1, nadj
-      if (nidx > 0) then
-        !call psb_snd(ictxt,idx(1:nidx),adj(j))
-        prc = psb_get_rank(ictxt,adj(j))        
-        p2ptag = psb_long_swap_tag
-        !write(0,*) me, ' First send to ',adj(j),nidx, prc
-        call mpi_send(idx,nidx,&
-             & psb_mpi_lpk_,prc,&
-             & p2ptag, icomm,iret)
+
+    if (debug) write(0,*) me,' End of adjcncy_fnd ',iprc(1:nidx)    
+  else
+    if (new_impl) then
+      !
+      ! First simple minded version with auxiliary arrays
+      ! dimensioned on NP.
+      ! Could it be improved with a loop based on the maximum length
+      ! of adj(:) ???
+      !    
+      Allocate(hidx(0:np),hsz(np),sdsz(0:np-1),rvsz(0:np-1),&
+           & sdhd(0:np-1), rvhd(0:np-1), p2pstat(mpi_status_size,0:np-1),&
+           & stat=info)
+      sdhd(:) = mpi_request_null
+      rvhd(:) = mpi_request_null
+      !
+      ! First, send sizes according to adjcncy list
+      !
+      sdsz = 0 
+      do j=1, nadj
+        sdsz(adj(j)) = nidx
+      end do
+      !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
+
+      call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
+           & rvsz,1,psb_mpi_mpk_,icomm,minfo)
+      hidx(0) = 0
+      do i=0, np-1
+        hidx(i+1) = hidx(i) + rvsz(i)
+      end do
+      hsize = hidx(np)
+      ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
+      !
+      ! Second, allocate buffers and exchange data
+      !
+      Allocate(rmtidx(hsize),lclidx(max(hsize,nidx*nadj)),tproc(max(hsize,nidx)),stat=info)
+
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
       end if
-    end do
+      do i = 0, np-1
+        if (rvsz(i)>0) then
+          ! write(0,*) me, ' First receive from ',i,rvsz(i)
+          prc = psb_get_rank(ictxt,i)        
+          p2ptag = psb_long_swap_tag
+          !write(0,*) me, ' Posting first receive from ',i,rvsz(i),prc           
+          call mpi_irecv(rmtidx(hidx(i)+1),rvsz(i),&
+               & psb_mpi_lpk_,prc,&
+               & p2ptag, icomm,rvhd(i),iret)
+        end if
+      end do
+      do j=1, nadj
+        if (nidx > 0) then
+          !call psb_snd(ictxt,idx(1:nidx),adj(j))
+          prc = psb_get_rank(ictxt,adj(j))        
+          p2ptag = psb_long_swap_tag
+          !write(0,*) me, ' First send to ',adj(j),nidx, prc
+          call mpi_send(idx,nidx,&
+               & psb_mpi_lpk_,prc,&
+               & p2ptag, icomm,iret)
+        end if
+      end do
 !!$    do i = 0, np-1
 !!$      if (rvsz(i)>0) then
 !!$        ! write(0,*) me, ' First receive from ',i,rvsz(i)           
 !!$        call psb_rcv(ictxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
 !!$      end if
 !!$    end do
-    call mpi_waitall(np,rvhd,p2pstat,iret)
-    
-    !
-    ! Third, compute local answers
-    !
-    call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
-    do i=1, hsize
-      tproc(i) = -1
-      if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
-    end do
-    !
-    ! At this point we can reuse lclidx to receive messages
-    !
-    rvhd(:) = mpi_request_null
-    do j=1, nadj
-      !write(0,*) me, ' First send to ',adj(j),nidx
-      if (nidx > 0) then
-        !call psb_snd(ictxt,idx(1:nidx),adj(j))
-        prc = psb_get_rank(ictxt,adj(j))        
-        p2ptag = psb_int_swap_tag
-        !write(0,*) me, ' Posting second receive from ',adj(j),nidx, prc
-        call mpi_irecv(lclidx((j-1)*nidx+1),nidx, &
-             & psb_mpi_ipk_,prc,&
-             & p2ptag, icomm,rvhd(j),iret)
+      call mpi_waitall(np,rvhd,p2pstat,iret)
+
+      !
+      ! Third, compute local answers
+      !
+      call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
+      do i=1, hsize
+        tproc(i) = -1
+        if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
+      end do
+      !
+      ! At this point we can reuse lclidx to receive messages
+      !
+      rvhd(:) = mpi_request_null
+      do j=1, nadj
+        !write(0,*) me, ' First send to ',adj(j),nidx
+        if (nidx > 0) then
+          !call psb_snd(ictxt,idx(1:nidx),adj(j))
+          prc = psb_get_rank(ictxt,adj(j))        
+          p2ptag = psb_int_swap_tag
+          !write(0,*) me, ' Posting second receive from ',adj(j),nidx, prc
+          call mpi_irecv(lclidx((j-1)*nidx+1),nidx, &
+               & psb_mpi_ipk_,prc,&
+               & p2ptag, icomm,rvhd(j),iret)
+        end if
+      end do
+
+      !
+      ! Fourth, send data back; 
+      !
+      do i = 0, np-1
+        if (rvsz(i)>0) then
+          !call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
+          prc = psb_get_rank(ictxt,i)        
+          p2ptag = psb_int_swap_tag
+          !write(0,*) me, ' Second send to ',i,rvsz(i), prc
+          call mpi_send(tproc(hidx(i)+1),rvsz(i),&
+               & psb_mpi_ipk_,prc,&
+               & p2ptag, icomm,iret)
+        end if
+      end do
+      !
+      ! Fifth: receive and combine. MAX works because default
+      ! answer is -1. 
+      !
+      call mpi_waitall(np,rvhd,p2pstat,iret)    
+      do j = 1, nadj
+        !write(0,*) me, ' Second receive from ',adj(j), nidx          
+        !if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
+        iprc(1:nidx) = max(iprc(1:nidx), lclidx((j-1)*nidx+1:(j-1)*nidx+nidx))
+      end do
+      if (debug) write(0,*) me,' End of adjcncy_fnd ',iprc(1:nidx)
+
+    else
+
+      Allocate(hidx(0:np),hsz(np),&
+           & sdsz(0:np-1),rvsz(0:np-1),stat=info)
+      !
+      ! First, send sizes according to adjcncy list
+      !
+      sdsz = 0 
+      do j=1, nadj
+        sdsz(adj(j)) = nidx
+      end do
+      !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
+
+      call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
+           & rvsz,1,psb_mpi_mpk_,icomm,minfo)
+      hidx(0) = 0
+      do i=0, np-1
+        hidx(i+1) = hidx(i) + rvsz(i)
+      end do
+      hsize = hidx(np)
+      ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
+      !
+      ! Second, allocate buffers and exchange data
+      !
+      Allocate(rmtidx(hsize),lclidx(hsize),tproc(max(hsize,nidx)),stat=info)
+
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
       end if
-    end do
-    
-    !
-    ! Fourth, send data back; 
-    !
-    do i = 0, np-1
-      if (rvsz(i)>0) then
-        !call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
-        prc = psb_get_rank(ictxt,i)        
-        p2ptag = psb_int_swap_tag
-        !write(0,*) me, ' Second send to ',i,rvsz(i), prc
-        call mpi_send(tproc(hidx(i)+1),rvsz(i),&
-             & psb_mpi_ipk_,prc,&
-             & p2ptag, icomm,iret)
-      end if
-    end do
-    !
-    ! Fifth: receive and combine. MAX works because default
-    ! answer is -1. 
-    !
-    call mpi_waitall(np,rvhd,p2pstat,iret)    
-    do j = 1, nadj
-      !write(0,*) me, ' Second receive from ',adj(j), nidx          
-      !if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
-      iprc(1:nidx) = max(iprc(1:nidx), lclidx((j-1)*nidx+1:(j-1)*nidx+nidx))
-    end do
+      do j=1, nadj
+        !write(0,*) me, ' First send to ',adj(j),nidx
+        if (nidx > 0) call psb_snd(ictxt,idx(1:nidx),adj(j))
+      end do
+      do i = 0, np-1
+        if (rvsz(i)>0) then
+          ! write(0,*) me, ' First receive from ',i,rvsz(i)           
+          call psb_rcv(ictxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
+        end if
+      end do
 
-  else
-    Allocate(hidx(0:np),hsz(np),&
-         & sdsz(0:np-1),rvsz(0:np-1),stat=info)
-    !
-    ! First, send sizes according to adjcncy list
-    !
-    sdsz = 0 
-    do j=1, nadj
-      sdsz(adj(j)) = nidx
-    end do
-    !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
+      !
+      ! Third, compute local answers
+      !
+      call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
+      do i=1, hsize
+        tproc(i) = -1
+        if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
+      end do
 
-    call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
-         & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-    hidx(0) = 0
-    do i=0, np-1
-      hidx(i+1) = hidx(i) + rvsz(i)
-    end do
-    hsize = hidx(np)
-    ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
-    !
-    ! Second, allocate buffers and exchange data
-    !
-    Allocate(rmtidx(hsize),lclidx(hsize),tproc(max(hsize,nidx)),stat=info)
-
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-      goto 9999      
+      !
+      ! Fourth, send data back; 
+      !
+      do i = 0, np-1
+        if (rvsz(i)>0) then
+          !write(0,*) me, ' Second send to ',i,rvsz(i)
+          call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
+        end if
+      end do
+      !
+      ! Fifth: receive and combine. MAX works because default
+      ! answer is -1. Reuse tproc
+      !
+      do j = 1, nadj
+        !write(0,*) me, ' Second receive from ',adj(j), nidx          
+        if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
+        iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
+      end do
     end if
-    do j=1, nadj
-      !write(0,*) me, ' First send to ',adj(j),nidx
-      if (nidx > 0) call psb_snd(ictxt,idx(1:nidx),adj(j))
-    end do
-    do i = 0, np-1
-      if (rvsz(i)>0) then
-        ! write(0,*) me, ' First receive from ',i,rvsz(i)           
-        call psb_rcv(ictxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
-      end if
-    end do
-
-    !
-    ! Third, compute local answers
-    !
-    call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
-    do i=1, hsize
-      tproc(i) = -1
-      if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
-    end do
-
-    !
-    ! Fourth, send data back; 
-    !
-    do i = 0, np-1
-      if (rvsz(i)>0) then
-        !write(0,*) me, ' Second send to ',i,rvsz(i)
-        call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
-      end if
-    end do
-    !
-    ! Fifth: receive and combine. MAX works because default
-    ! answer is -1. Reuse tproc
-    !
-    do j = 1, nadj
-      !write(0,*) me, ' Second receive from ',adj(j), nidx          
-      if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
-      iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
-    end do
   end if
+  
   call psb_erractionrestore(err_act)
   return
 
