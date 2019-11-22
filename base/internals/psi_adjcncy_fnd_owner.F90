@@ -69,7 +69,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
        & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me
-  logical, parameter  :: gettime=.false., new_impl=.true., a2av_impl=.true., debug=.false.
+  logical, parameter  :: gettime=.false., new_impl=.true.
+  logical, parameter  :: a2av_impl=.true., debug=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
