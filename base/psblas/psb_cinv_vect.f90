@@ -92,7 +92,7 @@ subroutine psb_cinv_vect(x,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call y%div(x,info)
+    call y%inv(x,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -166,7 +166,7 @@ subroutine psb_cinv_vect_check(x,y,desc_a,info,flag)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call y%div(x,info,flag)
+    call y%inv(x,info,flag)
   end if
 
   call psb_erractionrestore(err_act)
