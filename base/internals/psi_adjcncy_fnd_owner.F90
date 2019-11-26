@@ -145,7 +145,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     ! Second, allocate buffers and exchange data
     !
-    Allocate(rmtidx(hsize),lclidx(max(hsize,nidx*nadj)),tproc(max(hsize,nidx)),stat=info)
+    Allocate(rmtidx(hsize),lclidx(max(hsize,nidx*nadj)),&
+         & tproc(max(hsize,nidx)),stat=info)
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -167,7 +168,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     ! Fourth, exchange the answers 
     !
-    ! Adjust sdidx for receive in lclidx array (reused)
+    ! Adjust sdidx for reuse in receiving lclidx array 
     do i=0,np-1
       sdidx(i+1) = sdidx(i) + sdsz(i)
     end do
@@ -176,6 +177,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
 
     do i=0, np-1
       if (sdsz(i)>0) then
+        ! Must be nidx == sdsz(i) 
         iprc(1:nidx) = max(iprc(1:nidx), lclidx(sdidx(i)+1:sdidx(i)+sdsz(i)))
       end if
     end do
