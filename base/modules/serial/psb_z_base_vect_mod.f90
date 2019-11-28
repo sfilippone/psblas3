@@ -187,6 +187,7 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: amax     => z_base_amax
     procedure, pass(x) :: asum     => z_base_asum
 
+
   end type psb_z_base_vect_type
 
   public  :: psb_z_base_vect
@@ -1401,8 +1402,6 @@ contains
 
 
   end subroutine z_base_inv_a2_check
-
-
   !
   ! Simple scaling
   !

@@ -56,6 +56,7 @@ program vecoperation
   real(psb_dpk_)    :: zt(1), dotresult, norm2, norm1, norminf
   character(len=20) :: name,ch_err,readinput
   real(psb_dpk_), allocatable :: vx(:), vy(:), vz(:)
+  real(psb_dpk_) :: c
 
   info=psb_success_
 
@@ -194,7 +195,18 @@ program vecoperation
     vx = x%get_vect()
     write(psb_out_unit,'("x = ",es12.1)')vx(:)
     vz = z%get_vect()
-    write(psb_out_unit,'("z = ",es12.1)')vy(:)
+    write(psb_out_unit,'("z = ",es12.1)')vz(:)
+  end if
+
+  c = 1.0/2.0;
+  call psb_gecmp(x,c,z,desc_a,info);
+
+  if (iam == psb_root_) then
+    write(psb_out_unit,'("|z(i)| >=",es12.1)')c
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vz = z%get_vect()
+    write(psb_out_unit,'("z = ",es12.1)')vz(:)
   end if
 
   !

@@ -135,6 +135,11 @@ module psb_c_vect_mod
        & c_vect_absval2, c_vect_nrm2, c_vect_amax, c_vect_asum
 
 
+!  @NOTCPLXS@
+!  @NOTINTS@
+!  private :: c_vect_cmp_a2, c_vect_cmp_v2
+!  @NOTINTE@
+!  @NOTCPLXE@
 
   class(psb_c_base_vect_type), allocatable, target,&
        & save, private :: psb_c_base_vect_default
@@ -854,6 +859,7 @@ contains
          & call y%v%inv(x,info,flag)
 
   end subroutine c_vect_inv_a2_check
+
 
   subroutine c_vect_scal(alpha, x)
     use psi_serial_mod

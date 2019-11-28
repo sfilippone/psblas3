@@ -98,6 +98,11 @@ module psb_i_vect_mod
        & i_vect_set_dev, i_vect_set_sync
 
 
+!  @NOTCPLXS@
+!  @NOTINTS@
+!  private :: i_vect_cmp_a2, i_vect_cmp_v2
+!  @NOTINTE@
+!  @NOTCPLXE@
 
   class(psb_i_base_vect_type), allocatable, target,&
        & save, private :: psb_i_base_vect_default

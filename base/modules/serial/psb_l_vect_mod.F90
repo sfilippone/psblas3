@@ -99,6 +99,11 @@ module psb_l_vect_mod
        & l_vect_set_dev, l_vect_set_sync
 
 
+!  @NOTCPLXS@
+!  @NOTINTS@
+!  private :: l_vect_cmp_a2, l_vect_cmp_v2
+!  @NOTINTE@
+!  @NOTCPLXE@
 
   class(psb_l_base_vect_type), allocatable, target,&
        & save, private :: psb_l_base_vect_default

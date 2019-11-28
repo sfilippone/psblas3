@@ -111,6 +111,9 @@ module psb_s_vect_mod
     procedure, pass(x) :: nrm2     => s_vect_nrm2
     procedure, pass(x) :: amax     => s_vect_amax
     procedure, pass(x) :: asum     => s_vect_asum
+    procedure, pass(z) :: cmp_a2   => s_vect_cmp_a2
+    procedure, pass(z) :: cmp_v2   => s_vect_cmp_v2
+    generic, public    :: cmp      => cmp_a2, cmp_v2
   end type psb_s_vect_type
 
   public  :: psb_s_vect
@@ -135,6 +138,11 @@ module psb_s_vect_mod
        & s_vect_absval2, s_vect_nrm2, s_vect_amax, s_vect_asum
 
 
+!  @NOTCPLXS@
+!  @NOTINTS@
+!  private :: s_vect_cmp_a2, s_vect_cmp_v2
+!  @NOTINTE@
+!  @NOTCPLXE@
 
   class(psb_s_base_vect_type), allocatable, target,&
        & save, private :: psb_s_base_vect_default
@@ -854,6 +862,34 @@ contains
          & call y%v%inv(x,info,flag)
 
   end subroutine s_vect_inv_a2_check
+
+  subroutine s_vect_cmp_a2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(in)              :: c
+    real(psb_spk_), intent(inout)           :: x(:)
+    class(psb_s_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(z%v)) &
+         & call z%cmp(x,c,info)
+
+  end subroutine s_vect_cmp_a2
+
+  subroutine s_vect_cmp_v2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(in)              :: c
+    class(psb_s_vect_type), intent(inout)  :: x
+    class(psb_s_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(x%v).and.allocated(z%v)) &
+         & call z%v%cmp(x%v,c,info)
+
+  end subroutine s_vect_cmp_v2
 
   subroutine s_vect_scal(alpha, x)
     use psi_serial_mod

@@ -135,6 +135,11 @@ module psb_z_vect_mod
        & z_vect_absval2, z_vect_nrm2, z_vect_amax, z_vect_asum
 
 
+!  @NOTCPLXS@
+!  @NOTINTS@
+!  private :: z_vect_cmp_a2, z_vect_cmp_v2
+!  @NOTINTE@
+!  @NOTCPLXE@
 
   class(psb_z_base_vect_type), allocatable, target,&
        & save, private :: psb_z_base_vect_default
@@ -854,6 +859,7 @@ contains
          & call y%v%inv(x,info,flag)
 
   end subroutine z_vect_inv_a2_check
+
 
   subroutine z_vect_scal(alpha, x)
     use psi_serial_mod
