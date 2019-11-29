@@ -671,7 +671,7 @@ contains
     implicit none 
     integer(psb_ipk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_repl_map), intent(in) :: idxmap
+    class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: nv
     integer(psb_mpik_) :: ictxt, iam, np

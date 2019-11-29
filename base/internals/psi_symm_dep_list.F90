@@ -36,22 +36,14 @@
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                 Number of indices required on  the calling
-!                                       process 
-!    idx(:)   - integer                 Required indices on the calling process.
-!                                       Note: the indices should be unique!
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
-!                                       indices
-!    desc_a   - type(psb_desc_type).    The communication descriptor.        
-!    info     - integer.                return code.
 ! 
-subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
+subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psb_indx_map_mod, psb_protect_name => psb_indx_map_fnd_owner
+  use psb_indx_map_mod, psb_protect_name => psi_symm_dep_list
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -60,23 +52,24 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_ipk_), intent(in) :: idx(:)
-  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  class(psb_indx_map), intent(inout) :: idxmap
-  integer(psb_ipk_), intent(out) :: info
-
-
-  integer(psb_ipk_), allocatable :: hhidx(:)
+  integer(psb_mpik_), intent(inout)   :: rvsz(0:)
+  integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
+  class(psb_indx_map), intent(in) :: idxmap
+  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), intent(in), optional :: flag
+  
+  !
+  integer(psb_ipk_), allocatable :: ladj(:) 
+  integer(psb_mpik_), allocatable :: sdsz(:)
   integer(psb_mpik_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,hsize,ip,isz,k,j,&
-       & last_ih, last_j, nv, mglob
-  integer(psb_ipk_) :: ictxt,np,me, nresp
-  logical, parameter  :: gettime=.false.
-  real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,&
+       & last_ih, last_j, nidx, nrecv, nadj, flag_
+  integer(psb_ipk_) :: mglob, ih
+  integer(psb_ipk_) :: ictxt,np,me
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psb_indx_map_fnd_owner'
+  name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
   ictxt   = idxmap%get_ctxt()
@@ -99,62 +92,66 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
 
-  if (gettime) then 
-    t0 = psb_wtime()
-  end if
 
-  nv = size(idx)
-  call psb_realloc(nv,iprc,info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
+  nadj = size(adj)
+  if (size(rvsz)<np) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid rvsz')
     goto 9999      
   end if
 
-  if (associated(idxmap%parts)) then 
-    ! Use function shortcut
-!!$    write(0,*) me,trim(name),' indxmap%parts shortcut'
-    Allocate(hhidx(np), stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
-      goto 9999      
-    end if
-    do i=1, nv
-      call idxmap%parts(idx(i),mglob,np,hhidx,nresp)
-      if (nresp > 0) then
-        iprc(i) = hhidx(1)
-      else
-        iprc(i) = -1 
-      end if
-    end do
-
-  else if (allocated(idxmap%tempvg)) then 
-!!$    write(0,*) me,trim(name),' indxmap%tempvg shortcut'
-    ! Use temporary vector 
-    do i=1, nv 
-      iprc(i) = idxmap%tempvg(idx(i))
-    end do
-
+  if (present(flag)) then
+    flag_ = flag
   else
-
-
-    call psi_graph_fnd_owner(idx,iprc,idxmap,info)
-
+    flag_ = psi_symm_flag_norv_
   end if
 
-  if (gettime) then 
-    call psb_barrier(ictxt)
-    t1 = psb_wtime()
-    t1 = t1 -t0 - tamx - tidx   
-    call psb_amx(ictxt,tamx)
-    call psb_amx(ictxt,tidx)
-    call psb_amx(ictxt,t1)
-    if (me == psb_root_) then 
-      write(psb_out_unit,'(" fnd_owner  idx time  : ",es10.4)') tidx
-      write(psb_out_unit,'(" fnd_owner  amx time  : ",es10.4)') tamx
-      write(psb_out_unit,'(" fnd_owner remainedr  : ",es10.4)') t1 
-    endif
+  select case(flag_)
+  case(psi_symm_flag_norv_, psi_symm_flag_inrv_)
+    ! Ok, keep going
+  case default
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid flag')
+    goto 9999      
+  end select
+
+
+  if (flag_ == psi_symm_flag_norv_) then 
+  
+  ! write(0,*) me,name,' Going through ',nidx,nadj
+
+    Allocate(sdsz(0:np-1), stat=info)
+    !
+    ! First, send sizes according to adjcncy list
+    !
+    sdsz = 0 
+    do i=1, nadj
+      sdsz(adj(i)) = 1
+    end do
+    !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
+    
+    call mpi_alltoall(sdsz,1,psb_mpi_def_integer,&
+         & rvsz,1,psb_mpi_def_integer,icomm,minfo)
   end if
 
+  nrecv = 0 
+  do ip=0, np-1
+    if (rvsz(ip) > 0) nrecv = nrecv + 1
+  end do
+
+  !
+  !  Now fix adj to be symmetric
+  !
+  call psb_realloc(nadj+nrecv,ladj,info)
+  ladj(1:nadj) = adj(1:nadj)
+  do ip=0, np-1
+    if (rvsz(ip)>0) then
+      nadj  = nadj + 1 
+      ladj(nadj+1:nadj+nrecv) = ip
+    end if
+  end do
+  call psb_msort_unique(ladj,nadj)
+  call psb_realloc(nadj,adj,info)
+  adj(1:nadj) = ladj(1:nadj) 
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -162,4 +159,4 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   return
 
-end subroutine psb_indx_map_fnd_owner
+end subroutine psi_symm_dep_list

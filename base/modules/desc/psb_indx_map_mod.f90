@@ -127,7 +127,9 @@ module psb_indx_map_mod
     integer(psb_ipk_), allocatable :: oracle(:,:)
     !> Halo owners
     integer(psb_ipk_), allocatable :: halo_owner(:)
-
+    !> Adjacency list for processes
+    integer(psb_ipk_), allocatable :: p_adjcncy(:)
+    
   contains
 
     procedure, pass(idxmap)  :: get_state => base_get_state
@@ -148,6 +150,11 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: sizeof    => base_sizeof
     procedure, pass(idxmap)  :: set_null  => base_set_null
     procedure, nopass        :: row_extendable => base_row_extendable
+
+    procedure, pass(idxmap)  :: get_p_adjcncy  => base_get_p_adjcncy
+    procedure, pass(idxmap)  :: set_p_adjcncy   => base_set_p_adjcncy
+    procedure, pass(idxmap)  :: xtnd_p_adjcncy  => base_xtnd_p_adjcncy
+    
 
     procedure, pass(idxmap)  :: set_gr    => base_set_gr
     procedure, pass(idxmap)  :: set_gc    => base_set_gc
@@ -234,11 +241,60 @@ module psb_indx_map_mod
       implicit none 
       integer(psb_ipk_), intent(in) :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-      class(psb_indx_map), intent(in) :: idxmap
+      class(psb_indx_map), intent(inout) :: idxmap
       integer(psb_ipk_), intent(out) :: info
     end subroutine psb_indx_map_fnd_owner
   end interface
 
+
+  interface 
+    subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
+      import :: psb_indx_map, psb_ipk_
+      implicit none 
+      integer(psb_ipk_), intent(in)      :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+      class(psb_indx_map), intent(in)    :: idxmap
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_a2a_fnd_owner
+  end interface
+
+  interface 
+    subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
+      import :: psb_indx_map, psb_ipk_
+      implicit none 
+      integer(psb_ipk_), intent(in)   :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out)   ::  iprc(:)
+      integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
+      class(psb_indx_map), intent(in) :: idxmap
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_adjcncy_fnd_owner
+  end interface
+
+  interface 
+    subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
+      import :: psb_indx_map, psb_ipk_
+      implicit none 
+      integer(psb_ipk_), intent(in)      :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+      class(psb_indx_map), intent(inout) :: idxmap
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_graph_fnd_owner
+  end interface
+
+  integer, parameter :: psi_symm_flag_norv_ = 0
+  integer, parameter :: psi_symm_flag_inrv_ = 1
+  interface 
+    subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
+      import :: psb_indx_map, psb_ipk_, psb_mpik_
+      implicit none 
+      integer(psb_mpik_), intent(inout) :: rvsz(:)
+      integer(psb_ipk_), intent(in)    :: adj(:)
+      class(psb_indx_map), intent(in)  :: idxmap
+      integer(psb_ipk_), intent(out)   :: info
+      integer(psb_ipk_), intent(in), optional :: flag
+    end subroutine psi_symm_dep_list
+  end interface
+ 
 contains
 
 
@@ -301,6 +357,16 @@ contains
 
   end function base_get_lc
 
+  function base_get_p_adjcncy(idxmap) result(val)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    integer(psb_ipk_), allocatable  :: val(:)
+    integer(psb_ipk_) :: info
+
+    call psb_safe_ab_cpy(idxmap%p_adjcncy,val,info)
+
+  end function base_get_p_adjcncy
 
   function base_get_ctxt(idxmap) result(val)
     implicit none 
@@ -370,6 +436,36 @@ contains
     idxmap%local_cols = val
   end subroutine base_set_lc
 
+
+  subroutine base_set_p_adjcncy(idxmap,val)
+    use psb_realloc_mod
+    use psb_sort_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(in)  :: val(:)
+
+    call idxmap%xtnd_p_adjcncy(val)
+
+  end subroutine base_set_p_adjcncy
+  
+  subroutine base_xtnd_p_adjcncy(idxmap,val)
+    use psb_realloc_mod
+    use psb_sort_mod
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(in)  :: val(:)
+    integer(psb_ipk_) :: info, nv, nx
+    
+    nv = size(val)
+    nx = psb_size(idxmap%p_adjcncy)
+    call psb_realloc(nv+nx,idxmap%p_adjcncy,info)
+    idxmap%p_adjcncy(nx+1:nx+nv) = val(1:nv)
+    nx = size(idxmap%p_adjcncy)
+    call psb_msort_unique(idxmap%p_adjcncy,nx,dir=psb_sort_up_)
+    call psb_realloc(nx,idxmap%p_adjcncy,info)
+
+  end subroutine base_xtnd_p_adjcncy
+ 
   subroutine base_set_mpic(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap

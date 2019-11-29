@@ -155,7 +155,7 @@ contains
     implicit none 
     integer(psb_ipk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_glist_map), intent(in) :: idxmap
+    class(psb_glist_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_mpik_) :: ictxt, iam, np
     integer(psb_ipk_) :: nv, i, ngp
