@@ -235,7 +235,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       end do
       do j=1, nadj
         if (nidx > 0) then
-          !call psb_snd(ictxt,idx(1:nidx),adj(j))
           prc = psb_get_rank(ictxt,adj(j))        
           p2ptag = psb_long_swap_tag
           !write(0,*) me, ' First send to ',adj(j),nidx, prc
@@ -244,12 +243,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
                & p2ptag, icomm,iret)
         end if
       end do
-!!$    do i = 0, np-1
-!!$      if (rvsz(i)>0) then
-!!$        ! write(0,*) me, ' First receive from ',i,rvsz(i)           
-!!$        call psb_rcv(ictxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
-!!$      end if
-!!$    end do
       call mpi_waitall(np,rvhd,p2pstat,iret)
 
       !
@@ -267,7 +260,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       do j=1, nadj
         !write(0,*) me, ' First send to ',adj(j),nidx
         if (nidx > 0) then
-          !call psb_snd(ictxt,idx(1:nidx),adj(j))
           prc = psb_get_rank(ictxt,adj(j))        
           p2ptag = psb_int_swap_tag
           !write(0,*) me, ' Posting second receive from ',adj(j),nidx, prc
@@ -282,7 +274,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       !
       do i = 0, np-1
         if (rvsz(i)>0) then
-          !call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
           prc = psb_get_rank(ictxt,i)        
           p2ptag = psb_int_swap_tag
           !write(0,*) me, ' Second send to ',i,rvsz(i), prc
@@ -297,8 +288,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       !
       call mpi_waitall(np,rvhd,p2pstat,iret)    
       do j = 1, nadj
-        !write(0,*) me, ' Second receive from ',adj(j), nidx          
-        !if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
         iprc(1:nidx) = max(iprc(1:nidx), lclidx((j-1)*nidx+1:(j-1)*nidx+nidx))
       end do
       if (debug) write(0,*) me,' End of adjcncy_fnd ',iprc(1:nidx)

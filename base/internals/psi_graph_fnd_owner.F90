@@ -69,8 +69,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_lpk_), allocatable :: tidx(:)
   integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:), ladj(:)  
   integer(psb_mpk_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j,ipnt, nsampl_out,&
-       & last_ih, last_j, nv, n_answers, n_rest, nsampl_in, locr_max, &
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j,ipnt, nsampl_out,&
+       & nv, n_answers, n_rest, nsampl_in, locr_max, &
        & nrest_max, nadj, maxspace, mxnsin
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
