@@ -1027,12 +1027,17 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Invalid ISTOP: ",i0)')i_e_d(1)
 
-    case(5002)
+    case(psb_err_invalid_irst_)
+      allocate(achmsg(2)) 
+      achmsg(1) = tmpmsg
+      write(achmsg(2),'("Invalid IRST: ",i0)')i_e_d(1)
+
+    case(psb_err_invalid_preci_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Invalid PREC: ",i0)')i_e_d(1)
 
-    case(5003)
+    case(psb_err_invalid_preca_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Invalid PREC: ",a3)')a_e_d(1:3)

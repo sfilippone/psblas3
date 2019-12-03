@@ -209,7 +209,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
          & ' not present: irst: ',irst,nl
   endif
   if (nl <=0 ) then 
-    info=psb_err_invalid_istop_
+    info=psb_err_invalid_irst_
     int_err(1)=nl
     err=info
     call psb_errpush(info,name,i_err=int_err)

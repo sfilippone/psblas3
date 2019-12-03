@@ -211,7 +211,8 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)
   
   if(info /= psb_success_) then
-    call psb_errpush(info,name)
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err=trim(method))
     goto 9999
   end if
 
