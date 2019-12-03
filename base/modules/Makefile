@@ -112,7 +112,7 @@ psi_z_mod.o: desc/psb_desc_mod.o serial/psb_z_vect_mod.o
 psi_mod.o: psb_penv_mod.o desc/psb_desc_mod.o aux/psi_serial_mod.o serial/psb_serial_mod.o\
 	psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o
 
-desc/psb_indx_map_mod.o: desc/psb_desc_const_mod.o psb_error_mod.o psb_penv_mod.o
+desc/psb_indx_map_mod.o: desc/psb_desc_const_mod.o psb_error_mod.o psb_penv_mod.o  aux/psb_sort_mod.o
 desc/psb_hash_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o desc/psb_gen_block_map_mod.o:\
     desc/psb_indx_map_mod.o desc/psb_desc_const_mod.o  \
     aux/psb_sort_mod.o psb_penv_mod.o 
