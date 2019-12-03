@@ -233,6 +233,9 @@ module psb_desc_mod
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
     procedure, pass(desc) :: get_global_indices => psb_cd_get_global_indices
+    procedure, pass(desc) :: get_p_adjcncy   => cd_get_p_adjcncy
+    procedure, pass(desc) :: set_p_adjcncy   => cd_set_p_adjcncy
+    procedure, pass(desc) :: xtnd_p_adjcncy  => cd_xtnd_p_adjcncy    
     procedure, pass(desc) :: a_get_list      => psb_cd_get_list
     procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
     generic, public       :: get_list => a_get_list, v_get_list
@@ -278,6 +281,15 @@ module psb_desc_mod
     module procedure psb_cdtransfer
   end interface psb_move_alloc
 
+
+  interface psb_cd_set_maxspace
+    module procedure  psb_cd_set_maxspace
+  end interface psb_cd_set_maxspace
+
+  interface psb_cd_get_maxspace
+    module procedure  psb_cd_get_maxspace
+  end interface psb_cd_get_maxspace
+
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
        & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&
@@ -285,6 +297,7 @@ module psb_desc_mod
 
 
   integer(psb_ipk_), private, save :: cd_large_threshold=psb_default_large_threshold 
+  integer(psb_ipk_), private, save :: cd_maxspace        = 1000*1000
 
 
 contains 
@@ -329,6 +342,21 @@ contains
     val  = cd_large_threshold 
   end function psb_cd_get_large_threshold
 
+
+  subroutine psb_cd_set_maxspace(ith)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
+    if (ith > 0) then 
+      cd_maxspace = ith
+    end if
+  end subroutine psb_cd_set_maxspace
+
+  function  psb_cd_get_maxspace() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = cd_maxspace
+  end function psb_cd_get_maxspace
+  
   function  psb_cd_is_large_size(m) result(val)
     use psb_penv_mod
 
@@ -598,6 +626,35 @@ contains
   end function psb_cd_get_mpic
 
 
+  function cd_get_p_adjcncy(desc) result(val)
+    implicit none 
+    integer(psb_ipk_), allocatable   :: val(:)
+    class(psb_desc_type), intent(in) :: desc
+
+    if (allocated(desc%indxmap)) then 
+      val = desc%indxmap%get_p_adjcncy()
+    endif
+
+  end function cd_get_p_adjcncy
+
+  subroutine cd_set_p_adjcncy(desc,val)
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)  :: val(:)
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%xtnd_p_adjcncy(val)
+    endif
+  end subroutine cd_set_p_adjcncy
+
+  subroutine cd_xtnd_p_adjcncy(desc,val)
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)  :: val(:)
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%xtnd_p_adjcncy(val)
+    endif
+  end subroutine cd_xtnd_p_adjcncy
+  
   subroutine psb_cd_set_ovl_asb(desc,info)
     !
     ! Change state of a descriptor into ovl_build. 
@@ -1603,7 +1660,7 @@ contains
     implicit none 
     integer(psb_ipk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(inout) :: desc
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='cd_fnd_owner'

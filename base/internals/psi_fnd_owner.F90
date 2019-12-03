@@ -65,7 +65,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   integer(psb_ipk_), intent(in) :: nv
   integer(psb_ipk_), intent(in) :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  type(psb_desc_type), intent(in) :: desc
+  type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
 
 
