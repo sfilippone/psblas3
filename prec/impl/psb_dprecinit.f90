@@ -65,7 +65,7 @@ subroutine psb_dprecinit(ictxt,p,ptype,info)
     
   case default
     write(psb_err_unit,*) 'Unknown preconditioner type request "',ptype,'"'
-    info = psb_err_pivot_too_small_
+    info = psb_err_invalid_preca_
     
   end select
   if (info == psb_success_)  call p%prec%precinit(info)
