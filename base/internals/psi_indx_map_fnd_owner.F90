@@ -40,20 +40,18 @@
 !                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for
-!                                       the corresponding
+!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
 ! 
-subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
-  use psb_desc_mod
+subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psi_mod, psb_protect_name => psi_fnd_owner
+  use psb_indx_map_mod, psb_protect_name => psi_indx_map_fnd_owner
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -62,34 +60,30 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_ipk_), intent(in)      :: nv
   integer(psb_lpk_), intent(in)      :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  type(psb_desc_type), intent(inout) :: desc
+  class(psb_indx_map), intent(inout) :: idxmap
   integer(psb_ipk_), intent(out)     :: info
 
 
-  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
-       & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
-
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
-       & last_ih, last_j
-  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_), allocatable :: hhidx(:)
+  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_ipk_) :: i, err_act, hsize, nv
+  integer(psb_lpk_) :: mglob
+  integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psi_fnd_owner'
+  name = 'psb_indx_map_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = desc%get_context()
-  icomm   = desc%get_mpic()
-  n_row   = desc%get_local_rows()
-  n_col   = desc%get_local_cols()
+  ictxt   = idxmap%get_ctxt()
+  icomm   = idxmap%get_mpic()
+  mglob   = idxmap%get_gr()
+  iictxt = ictxt 
 
-
-  ! check on blacs grid 
   call psb_info(ictxt, me, np)
 
   if (np == -1) then
@@ -98,23 +92,66 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     goto 9999
   endif
 
-  if (nv < 0 ) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (.not.(desc%is_ok())) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid desc')
+  if (.not.(idxmap%is_valid())) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid idxmap')
     goto 9999      
   end if
 
-  call desc%fnd_owner(idx(1:nv),iprc,info)
-  
+  if (gettime) then 
+    t0 = psb_wtime()
+  end if
+
+  nv = size(idx)
+  call psb_realloc(nv,iprc,info)
   if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='desc%fnd_owner') 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
+
+  if (associated(idxmap%parts)) then 
+    ! Use function shortcut
+!!$    write(0,*) me,trim(name),' indxmap%parts shortcut'
+    Allocate(hhidx(np), stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
+      goto 9999      
+    end if
+    do i=1, nv
+      call idxmap%parts(idx(i),mglob,np,hhidx,nresp)
+      if (nresp > 0) then
+        iprc(i) = hhidx(1)
+      else
+        iprc(i) = -1 
+      end if
+    end do
+
+  else if (allocated(idxmap%tempvg)) then 
+!!$    write(0,*) me,trim(name),' indxmap%tempvg shortcut'
+    ! Use temporary vector 
+    do i=1, nv 
+      iprc(i) = idxmap%tempvg(idx(i))
+    end do
+
+  else
+
+    call psi_graph_fnd_owner(idx,iprc,idxmap,info)
+
+  end if
+  
+  if (gettime) then 
+    call psb_barrier(ictxt)
+    t1 = psb_wtime()
+    t1 = t1 -t0 - tamx - tidx   
+    call psb_amx(ictxt,tamx)
+    call psb_amx(ictxt,tidx)
+    call psb_amx(ictxt,t1)
+    if (me == psb_root_) then 
+      write(psb_out_unit,'(" fnd_owner  idx time  : ",es10.4)') tidx
+      write(psb_out_unit,'(" fnd_owner  amx time  : ",es10.4)') tamx
+      write(psb_out_unit,'(" fnd_owner remainedr  : ",es10.4)') t1 
+    endif
+  end if
+
   call psb_erractionrestore(err_act)
   return
 
@@ -122,4 +159,4 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   return
 
-end subroutine psi_fnd_owner
+end subroutine psi_indx_map_fnd_owner

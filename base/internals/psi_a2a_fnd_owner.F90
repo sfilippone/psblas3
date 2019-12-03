@@ -40,20 +40,18 @@
 !                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for
-!                                       the corresponding
+!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
 ! 
-subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
-  use psb_desc_mod
+subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psi_mod, psb_protect_name => psi_fnd_owner
+  use psb_indx_map_mod, psb_protect_name => psi_a2a_fnd_owner
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -62,34 +60,31 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_ipk_), intent(in)      :: nv
-  integer(psb_lpk_), intent(in)      :: idx(:)
+  integer(psb_lpk_), intent(in)   :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  type(psb_desc_type), intent(inout) :: desc
-  integer(psb_ipk_), intent(out)     :: info
+  class(psb_indx_map), intent(in) :: idxmap
+  integer(psb_ipk_), intent(out)  :: info
 
 
-  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
-       & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
-
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
-       & last_ih, last_j
-  integer(psb_ipk_) :: ictxt,np,me
-  logical, parameter  :: gettime=.false.
+  integer(psb_ipk_), allocatable :: tmpadj(:)
+  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,nv
+  integer(psb_lpk_) :: mglob, ih
+  integer(psb_ipk_) :: ictxt,np,me, nresp
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psi_fnd_owner'
+  name = 'psi_a2a_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = desc%get_context()
-  icomm   = desc%get_mpic()
-  n_row   = desc%get_local_rows()
-  n_col   = desc%get_local_cols()
+  ictxt   = idxmap%get_ctxt()
+  icomm   = idxmap%get_mpic()
+  mglob   = idxmap%get_gr()
+  n_row   = idxmap%get_lr()
+  n_col   = idxmap%get_lc()
+  iictxt = ictxt 
 
-
-  ! check on blacs grid 
   call psb_info(ictxt, me, np)
 
   if (np == -1) then
@@ -98,23 +93,21 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     goto 9999
   endif
 
-  if (nv < 0 ) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (.not.(desc%is_ok())) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid desc')
+  if (.not.(idxmap%is_valid())) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid idxmap')
     goto 9999      
   end if
 
-  call desc%fnd_owner(idx(1:nv),iprc,info)
-  
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='desc%fnd_owner') 
-    goto 9999      
-  end if
+  !
+  ! Reuse the other version by tricking it with an adjcncy list
+  ! that contains everybody but ME. 
+  !
+  nv = size(idx)
+  call psb_realloc(np-1,tmpadj,info)
+  tmpadj(1:me) = [(i,i=0,me-1)]
+  tmpadj(me+1:np-1) = [(i,i=me+1,np-1)]
+  call  psi_adjcncy_fnd_owner(idx,iprc,tmpadj,idxmap,info)
+
   call psb_erractionrestore(err_act)
   return
 
@@ -122,4 +115,4 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   return
 
-end subroutine psi_fnd_owner
+end subroutine psi_a2a_fnd_owner

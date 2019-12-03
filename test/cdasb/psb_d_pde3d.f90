@@ -237,7 +237,7 @@ contains
 
     call psb_info(ictxt, iam, np)
     call psb_cd_set_large_threshold(1000)
-    call psb_cd_set_maxspace(-1)
+    call psb_cd_set_maxspace(10000)
     
     if (present(f)) then 
       f_ => f
@@ -259,10 +259,10 @@ contains
     else
       partition_ = 3
     end if
-    
+
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
-    
+
     m   = (1_psb_lpk_*idim)*idim*idim
     n   = m
     nnz = ((n*7)/(np))
@@ -301,7 +301,7 @@ contains
 
     case(2)
       ! A  partition  defined by the user through IV
-      
+
       if (present(iv)) then 
         if (size(iv) /= m) then
           write(psb_err_unit,*) iam, 'Initialization error: wrong IV size',size(iv),m
@@ -374,7 +374,7 @@ contains
       ! 
       call psb_cdall(ictxt,desc_a,info,vl=myidx)
 
-      
+
       block
         !
         ! Test adjcncy methods 
@@ -424,7 +424,7 @@ contains
       return
     end select
 
-    
+
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
@@ -695,73 +695,6 @@ program psb_d_pde3d
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-  !
-  !  prepare the preconditioner.
-  !  
-  if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
-  call prec%init(ictxt,ptype,info)
-
-  call psb_barrier(ictxt)
-  t1 = psb_wtime()
-  call prec%build(a,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_precbld'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  tprec = psb_wtime()-t1
-
-  call psb_amx(ictxt,tprec)
-
-  if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
-  if (iam == psb_root_) write(psb_out_unit,'(" ")')
-  call prec%descr()
-  !
-  ! iterative method parameters 
-  !
-  if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
-  call psb_barrier(ictxt)
-  t1 = psb_wtime()  
-  eps   = 1.d-6
-  call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
-
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='solver routine'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  call psb_barrier(ictxt)
-  t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
-  amatsize = a%sizeof()
-  descsize = desc_a%sizeof()
-  precsize = prec%sizeof()
-  system_size = desc_a%get_global_rows()
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
-  call psb_sum(ictxt,precsize)
-
-  if (iam == psb_root_) then
-    write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Number of processes           : ",i12)')np
-    write(psb_out_unit,'("Linear system size            : ",i12)') system_size
-    write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
-    write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
-    write(psb_out_unit,'("Number of iterations          : ",i12)')iter
-    write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
-    write(psb_out_unit,'("Info  on exit                 : ",i12)')info
-    write(psb_out_unit,'("Total memory occupation for      A: ",i12)')amatsize
-    write(psb_out_unit,'("Total memory occupation for   PREC: ",i12)')precsize    
-    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
-    write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
-  end if
-
 
   !  
   !  cleanup storage and exit
@@ -769,7 +702,6 @@ program psb_d_pde3d
   call psb_gefree(bv,desc_a,info)
   call psb_gefree(xxv,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call prec%free(info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_

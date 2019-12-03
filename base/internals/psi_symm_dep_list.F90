@@ -36,24 +36,14 @@
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                 Number of indices required on  the calling
-!                                       process 
-!    idx(:)   - integer                 Required indices on the calling process.
-!                                       Note: the indices should be unique!
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for
-!                                       the corresponding
-!                                       indices
-!    desc_a   - type(psb_desc_type).    The communication descriptor.        
-!    info     - integer.                return code.
 ! 
-subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
-  use psb_desc_mod
+subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psi_mod, psb_protect_name => psi_fnd_owner
+  use psb_indx_map_mod, psb_protect_name => psi_symm_dep_list
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -62,34 +52,33 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_ipk_), intent(in)      :: nv
-  integer(psb_lpk_), intent(in)      :: idx(:)
-  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  type(psb_desc_type), intent(inout) :: desc
+  integer(psb_mpk_), intent(inout)   :: rvsz(0:)
+  integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
+  class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out)     :: info
-
-
-  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
-       & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
-
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
-       & last_ih, last_j
+  integer(psb_ipk_), intent(in), optional :: flag
+  
+  !
+  integer(psb_ipk_), allocatable :: ladj(:) 
+  integer(psb_mpk_), allocatable :: sdsz(:)
+  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,&
+       & last_ih, last_j, nidx, nrecv, nadj, flag_
+  integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me
-  logical, parameter  :: gettime=.false.
-  real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
   info = psb_success_
-  name = 'psi_fnd_owner'
+  name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
-  ictxt   = desc%get_context()
-  icomm   = desc%get_mpic()
-  n_row   = desc%get_local_rows()
-  n_col   = desc%get_local_cols()
+  ictxt   = idxmap%get_ctxt()
+  icomm   = idxmap%get_mpic()
+  mglob   = idxmap%get_gr()
+  n_row   = idxmap%get_lr()
+  n_col   = idxmap%get_lc()
+  iictxt = ictxt 
 
-
-  ! check on blacs grid 
   call psb_info(ictxt, me, np)
 
   if (np == -1) then
@@ -98,23 +87,71 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     goto 9999
   endif
 
-  if (nv < 0 ) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (.not.(desc%is_ok())) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid desc')
+  if (.not.(idxmap%is_valid())) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid idxmap')
     goto 9999      
   end if
 
-  call desc%fnd_owner(idx(1:nv),iprc,info)
+
+  nadj = size(adj)
+  if (size(rvsz)<np) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid rvsz')
+    goto 9999      
+  end if
+
+  if (present(flag)) then
+    flag_ = flag
+  else
+    flag_ = psi_symm_flag_norv_
+  end if
+
+  select case(flag_)
+  case(psi_symm_flag_norv_, psi_symm_flag_inrv_)
+    ! Ok, keep going
+  case default
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid flag')
+    goto 9999      
+  end select
+
+
+  if (flag_ == psi_symm_flag_norv_) then 
   
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='desc%fnd_owner') 
-    goto 9999      
+  ! write(0,*) me,name,' Going through ',nidx,nadj
+
+    Allocate(sdsz(0:np-1), stat=info)
+    !
+    ! First, send sizes according to adjcncy list
+    !
+    sdsz = 0 
+    do i=1, nadj
+      sdsz(adj(i)) = 1
+    end do
+    !write(0,*)me,' Check on sizes into a2a:',adj(:),nadj,':',sdsz(:)
+    
+    call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
+         & rvsz,1,psb_mpi_mpk_,icomm,minfo)
   end if
+
+  nrecv = 0 
+  do ip=0, np-1
+    if (rvsz(ip) > 0) nrecv = nrecv + 1
+  end do
+
+  !
+  !  Now fix adj to be symmetric
+  !
+  call psb_realloc(nadj+nrecv,ladj,info)
+  ladj(1:nadj) = adj(1:nadj)
+  do ip=0, np-1
+    if (rvsz(ip)>0) then
+      nadj  = nadj + 1 
+      ladj(nadj+1:nadj+nrecv) = ip
+    end if
+  end do
+  call psb_msort_unique(ladj,nadj)
+  call psb_realloc(nadj,adj,info)
+  adj(1:nadj) = ladj(1:nadj) 
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -122,4 +159,4 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   return
 
-end subroutine psi_fnd_owner
+end subroutine psi_symm_dep_list
