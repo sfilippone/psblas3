@@ -79,7 +79,7 @@ subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
           ! ...add proc to proc2 s dep_list.....',proc,proc2
           length_dl(proc2)     = length_dl(proc2)+1
           if (length_dl(proc2) > size(dep_list,1)) then
-            write(psb_err_unit,*)'error in crea_halo', proc2,proc,&
+            write(psb_err_unit,*)'error in dl_check', proc2,proc,&
                  & length_dl(proc2),'>',size(dep_list,1)
           endif
           dep_list(length_dl(proc2),proc2) = proc

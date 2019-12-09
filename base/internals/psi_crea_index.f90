@@ -99,9 +99,6 @@ subroutine psi_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     goto 9999
   end if
 
-  if (debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
-       &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
   ! ...now process root contains dependence list of all processes...
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
