@@ -283,17 +283,23 @@ module psb_indx_map_mod
 
   integer, parameter :: psi_symm_flag_norv_ = 0
   integer, parameter :: psi_symm_flag_inrv_ = 1
-  interface 
-    subroutine psi_symm_dep_list(rvsz,adj,idxmap,info,flag)
+  interface psi_symm_dep_list
+    subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
       import :: psb_indx_map, psb_ipk_, psb_mpik_
       implicit none 
       integer(psb_mpik_), intent(inout) :: rvsz(:)
-      integer(psb_ipk_), intent(in)    :: adj(:)
-      class(psb_indx_map), intent(in)  :: idxmap
+      integer(psb_ipk_), allocatable, intent(inout) :: adj(:)      
+      integer(psb_ipk_), intent(in)    :: ictxt
       integer(psb_ipk_), intent(out)   :: info
-      integer(psb_ipk_), intent(in), optional :: flag
-    end subroutine psi_symm_dep_list
-  end interface
+    end subroutine psi_symm_dep_list_inrv
+    subroutine psi_symm_dep_list_norv(adj,ictxt,info)
+      import :: psb_indx_map, psb_ipk_, psb_mpik_
+      implicit none 
+      integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
+      integer(psb_ipk_), intent(in)    :: ictxt
+      integer(psb_ipk_), intent(out)   :: info
+    end subroutine psi_symm_dep_list_norv
+  end interface psi_symm_dep_list
  
 contains
 
