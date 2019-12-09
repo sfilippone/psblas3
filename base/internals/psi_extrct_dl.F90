@@ -207,10 +207,6 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list > dl_lda) then
-            info = psb_err_alloc_dealloc_
-            goto 9999
-          endif
           itmp(pointer_dep_list)=proc
           pointer_dep_list=pointer_dep_list+1
         endif
@@ -240,18 +236,10 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
           enddo
           if (j == pointer_dep_list) then
             !                 ...if not found.....
-            if (pointer_dep_list > dl_lda) then
-              info = psb_err_alloc_dealloc_
-              goto 9999
-            endif
             itmp(pointer_dep_list)=proc
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list > dl_lda) then
-            info = psb_err_alloc_dealloc_
-            goto 9999
-          endif
           itmp(pointer_dep_list)=proc
           pointer_dep_list=pointer_dep_list+1
         endif
