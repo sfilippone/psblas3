@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
-<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
+<TITLE>psb_get_mpi_rank -- Get the MPI rank</TITLE>
+<META NAME="description" CONTENT="psb_get_mpi_rank -- Get the MPI rank">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -41,7 +41,7 @@
 <B> Up:</B> <A NAME="tex2html1562"
   HREF="node99.html">Parallel environment routines</A>
 <B> Previous:</B> <A NAME="tex2html1556"
-  HREF="node103.html">psb_get_mpicomm   Get</A>
+  HREF="node103.html">psb_get_mpi_comm   Get</A>
  &nbsp; <B>  <A NAME="tex2html1564"
   HREF="node1.html">Contents</A></B> 
 <BR>
@@ -49,16 +49,16 @@
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00085000000000000000">
-psb_get_rank -- Get the MPI rank</A>
+psb_get_mpi_rank -- Get the MPI rank</A>
 </H2>
 
 <P>
 <PRE>
-rank = psb_get_rank(icontxt, id)
+rank = psb_get_mpi_rank(icontxt, id)
 </PRE>
 
 <P>
-This subroutine returns the MPI rank of the  PSBLAS process <SPAN CLASS="MATH"><IMG
+This function returns the MPI rank of the  PSBLAS process <SPAN CLASS="MATH"><IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img138.png"
  ALT="$id$"></SPAN>
@@ -117,6 +117,11 @@ Type: <B>required</B>.
 Intent: <B>out</B>.
 <BR></DD>
 </DL>
+
+<P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+The subroutine version <code>psb_get_rank</code> is still available but is
+deprecated. 
 
 <P>
 <BR><HR>

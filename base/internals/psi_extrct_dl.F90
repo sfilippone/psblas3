@@ -266,7 +266,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
     end if
 
     call psb_sum(iictxt,length_dl(0:np))
-    icomm = psb_get_mpicomm(iictxt)
+    icomm = psb_get_mpi_comm(iictxt)
     call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
          & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
     info = minfo  
@@ -288,7 +288,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
         goto 9999      
       end if
       call psb_sum(iictxt,length_dl(0:np))
-      icomm = psb_get_mpicomm(iictxt)
+      icomm = psb_get_mpi_comm(iictxt)
       call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
            & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
       info = minfo  

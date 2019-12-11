@@ -263,7 +263,7 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
 
       rcv_pt = 1+pnti+psb_n_elem_recv_
-      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_int_swap_tag
@@ -602,7 +602,7 @@ subroutine psi_iswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_int_swap_tag
