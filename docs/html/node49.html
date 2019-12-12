@@ -3,8 +3,10 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>clone -- Clone current object</TITLE>
-<META NAME="description" CONTENT="clone -- Clone current object">
+<TITLE>sizeof -- Get memory occupation in bytes
+of a dense vector</TITLE>
+<META NAME="description" CONTENT="sizeof -- Get memory occupation in bytes
+of a dense vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,45 +16,48 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node50.html">
 <LINK REL="previous" HREF="node48.html">
-<LINK REL="up" HREF="node43.html">
+<LINK REL="up" HREF="node46.html">
 <LINK REL="next" HREF="node50.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html852"
+<A NAME="tex2html863"
   HREF="node50.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html848"
-  HREF="node43.html">
+<A NAME="tex2html859"
+  HREF="node46.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html844"
+<A NAME="tex2html853"
   HREF="node48.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html850"
+<A NAME="tex2html861"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html853"
-  HREF="node50.html">Preconditioner data structure</A>
-<B> Up:</B> <A NAME="tex2html849"
-  HREF="node43.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html845"
-  HREF="node48.html">get_vect   Get</A>
- &nbsp; <B>  <A NAME="tex2html851"
+<B> Next:</B> <A NAME="tex2html864"
+  HREF="node50.html">set   Set</A>
+<B> Up:</B> <A NAME="tex2html860"
+  HREF="node46.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html854"
+  HREF="node48.html">get_nrows   Get</A>
+ &nbsp; <B>  <A NAME="tex2html862"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043600000000000000">
-clone -- Clone current object</A>
+<H3><A NAME="SECTION00043300000000000000">
+sizeof  -- Get memory occupation in bytes
+of  a dense vector</A>
 </H3>
 
+<P>
 <PRE>
-call  x%clone(y,info)
+memory_size = v%sizeof()
 </PRE>
 
 <P>
@@ -63,10 +68,10 @@ call  x%clone(y,info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the dense vector.
+<DT><STRONG>v</STRONG></DT>
+<DD>the dense vector
 <BR>
-Scope: <B>local</B>.
+Scope: <B>local</B>
 <BR></DD>
 </DL>
 
@@ -75,11 +80,8 @@ Scope: <B>local</B>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The memory occupation in bytes.
 </DD>
 </DL>
 

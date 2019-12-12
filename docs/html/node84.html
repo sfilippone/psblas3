@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_geins -- Dense matrix insertion routine</TITLE>
-<META NAME="description" CONTENT="psb_geins -- Dense matrix insertion routine">
+<TITLE>psb_spfree -- Frees a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spfree -- Frees a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,101 +16,65 @@
 
 <LINK REL="next" HREF="node85.html">
 <LINK REL="previous" HREF="node83.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node85.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1310"
+<A NAME="tex2html1319"
   HREF="node85.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1306"
-  HREF="node71.html">
+<A NAME="tex2html1315"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1300"
+<A NAME="tex2html1309"
   HREF="node83.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1308"
+<A NAME="tex2html1317"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1311"
-  HREF="node85.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html1307"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1301"
-  HREF="node83.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1309"
+<B> Next:</B> <A NAME="tex2html1320"
+  HREF="node85.html">psb_sprn   Reinit</A>
+<B> Up:</B> <A NAME="tex2html1316"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1310"
+  HREF="node83.html">psb_spasb   Sparse</A>
+ &nbsp; <B>  <A NAME="tex2html1318"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000713000000000000000">
-psb_geins -- Dense matrix insertion routine</A>
+<H2><A NAME="SECTION000710000000000000000">
+psb_spfree -- Frees a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
+call psb_spfree(a, desc_a, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>m</STRONG></DT>
-<DD>Number of rows in <SPAN CLASS="MATH"><IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img117.png"
- ALT="$val$"></SPAN> to be inserted.
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be freed.
 <BR>
-Scope:<B>local</B>.
+Scope:<B>local</B>
 <BR>
-Type:<B>required</B>.
+Type:<B>required</B>
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>irw</STRONG></DT>
-<DD>Indices of the rows to be inserted. Specifically, row <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$"></SPAN>
-  of <SPAN CLASS="MATH"><IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img117.png"
- ALT="$val$"></SPAN> will be inserted into the local row corresponding to the
-  global row index <SPAN CLASS="MATH"><IMG
- WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img118.png"
- ALT="$irw(i)$"></SPAN>.
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the dense submatrix to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank 1 or 2  array.
-Specified as: an integer value.
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -123,30 +87,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>dupl</STRONG></DT>
-<DD>How to handle duplicate coefficients.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
-<code>psb_dupl_add_</code>.
-</DD>
-<DT><STRONG>local</STRONG></DT>
-<DD>Whether the entries in the index vector <code>irw</code>,
-   are already in local  numbering. 
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: a logical value; default: <code>.false.</code>.
-
-<P>
-</DD>
 </DL>
 
 <P>
@@ -154,18 +94,6 @@ Specified as: a logical value; default: <code>.false.</code>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the output dense matrix.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>, of
-type real, complex or integer.
-<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -180,42 +108,7 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>Dense vectors/matrices do not have an associated state;
-</LI>
-<LI>Duplicate entries are either overwritten or added, there is no
-  provision for raising an error condition. 
-</LI>
-</OL>
-
-<P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1310"
-  HREF="node85.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1306"
-  HREF="node71.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1300"
-  HREF="node83.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1308"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1311"
-  HREF="node85.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html1307"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1301"
-  HREF="node83.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1309"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

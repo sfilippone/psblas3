@@ -3,10 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>sizeof -- Get memory occupation in bytes
-of a sparse matrix</TITLE>
-<META NAME="description" CONTENT="sizeof -- Get memory occupation in bytes
-of a sparse matrix">
+<TITLE>get_ncols -- Get number of columns in a sparse matrix</TITLE>
+<META NAME="description" CONTENT="get_ncols -- Get number of columns in a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,46 +16,46 @@ of a sparse matrix">
 
 <LINK REL="next" HREF="node30.html">
 <LINK REL="previous" HREF="node28.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node30.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html610"
+<A NAME="tex2html619"
   HREF="node30.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html606"
-  HREF="node23.html">
+<A NAME="tex2html615"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html600"
+<A NAME="tex2html609"
   HREF="node28.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html608"
+<A NAME="tex2html617"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html611"
-  HREF="node30.html">get_fmt   Short</A>
-<B> Up:</B> <A NAME="tex2html607"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html601"
-  HREF="node28.html">get_size   Get</A>
- &nbsp; <B>  <A NAME="tex2html609"
+<B> Next:</B> <A NAME="tex2html620"
+  HREF="node30.html">get_nnzeros   Get</A>
+<B> Up:</B> <A NAME="tex2html616"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html610"
+  HREF="node28.html">get_nrows   Get</A>
+ &nbsp; <B>  <A NAME="tex2html618"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042600000000000000">
-sizeof  -- Get memory occupation in bytes
-of  a sparse matrix</A>
+<H3><A NAME="SECTION00042300000000000000">
+get_ncols -- Get number of  columns in a  sparse
+  matrix</A>
 </H3>
 
 <P>
 <PRE>
-memory_size = a%sizeof()
+nc = a%get_ncols()
 </PRE>
 
 <P>
@@ -81,7 +79,7 @@ Scope: <B>local</B>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation in bytes.
+<DD>The number of  columns  of sparse matrix <code>a</code>.
 </DD>
 </DL>
 

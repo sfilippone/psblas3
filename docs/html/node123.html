@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format">
+<TITLE>hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format</TITLE>
+<META NAME="description" CONTENT="hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,52 +16,54 @@
 
 <LINK REL="next" HREF="node124.html">
 <LINK REL="previous" HREF="node122.html">
-<LINK REL="up" HREF="node118.html">
+<LINK REL="up" HREF="node121.html">
 <LINK REL="next" HREF="node124.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1797"
+<A NAME="tex2html1806"
   HREF="node124.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1793"
-  HREF="node118.html">
+<A NAME="tex2html1802"
+  HREF="node121.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1787"
+<A NAME="tex2html1796"
   HREF="node122.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1795"
+<A NAME="tex2html1804"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1798"
-  HREF="node124.html">mm_array_write   Write</A>
-<B> Up:</B> <A NAME="tex2html1794"
-  HREF="node118.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1788"
-  HREF="node122.html">mm_array_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1796"
+<B> Next:</B> <A NAME="tex2html1807"
+  HREF="node124.html">mm_mat_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1803"
+  HREF="node121.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1797"
+  HREF="node122.html">hb_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1805"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000105000000000000000">
-mm_mat_write -- Write a sparse matrix to a
-  file in the MatrixMarket format</A>
+<H2><A NAME="SECTION000102000000000000000">
+hb_write -- Write a sparse matrix to a  file
+  in the Harwell-Boeing format</A>
 </H2>
 
 <P>
 <BR>
 <IMG
- WIDTH="480" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img163.png"
+ WIDTH="538" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img160.png"
  ALT="\begin{lstlisting}
-call mm_mat_write(a, mtitle, iret, iunit, filename)
+call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
 \end{lstlisting}">
 <BR>
+
+<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -76,13 +78,14 @@ Type:<B>required</B>.
 <BR>
 Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
-<DT><STRONG>mtitle</STRONG></DT>
-<DD>Matrix title.
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side.
 <BR>
-Type: <B>required</B> 
+Type: <B>Optional</B> 
 <BR>
-A charachter variable holding a descriptive title for the matrix to be
- written to file.
+An  array of type real or complex, rank 1 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side. 
 </DD>
 <DT><STRONG>filename</STRONG></DT>
 <DD>The name of the file to be written to.
@@ -99,6 +102,24 @@ in Unix jargon) is used. Default: <code>-</code>.
 Type:<B>optional</B>.
 <BR>
 Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+<DT><STRONG>key</STRONG></DT>
+<DD>Matrix key.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+A charachter variable of length 8 holding the
+matrix key as specified by the Harwell-Boeing format and to be
+written to file.
+</DD>
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+A charachter variable of length 72 holding the
+matrix title as specified by the Harwell-Boeing format and to be
+written to file.
 </DD>
 </DL>
 
@@ -117,7 +138,31 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BR><HR>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1806"
+  HREF="node124.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1802"
+  HREF="node121.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1796"
+  HREF="node122.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1804"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1807"
+  HREF="node124.html">mm_mat_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1803"
+  HREF="node121.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1797"
+  HREF="node122.html">hb_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1805"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>get_size -- Get maximum number of nonzero elements in a sparse matrix</TITLE>
-<META NAME="description" CONTENT="get_size -- Get maximum number of nonzero elements in a sparse matrix">
+<TITLE>get_nrows -- Get number of rows in a sparse matrix</TITLE>
+<META NAME="description" CONTENT="get_nrows -- Get number of rows in a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,46 +16,45 @@
 
 <LINK REL="next" HREF="node29.html">
 <LINK REL="previous" HREF="node27.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node29.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html598"
+<A NAME="tex2html607"
   HREF="node29.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html594"
-  HREF="node23.html">
+<A NAME="tex2html603"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html588"
+<A NAME="tex2html597"
   HREF="node27.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html596"
+<A NAME="tex2html605"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html599"
-  HREF="node29.html">sizeof   Get</A>
-<B> Up:</B> <A NAME="tex2html595"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html589"
-  HREF="node27.html">get_nnzeros   Get</A>
- &nbsp; <B>  <A NAME="tex2html597"
+<B> Next:</B> <A NAME="tex2html608"
+  HREF="node29.html">get_ncols   Get</A>
+<B> Up:</B> <A NAME="tex2html604"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html598"
+  HREF="node27.html">Sparse Matrix Methods</A>
+ &nbsp; <B>  <A NAME="tex2html606"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042500000000000000">
-get_size  -- Get maximum number of nonzero elements
-  in a sparse matrix</A>
+<H3><A NAME="SECTION00042200000000000000">
+get_nrows -- Get number of  rows in a sparse  matrix</A>
 </H3>
 
 <P>
 <PRE>
-maxnz = a%get_size()
+nr = a%get_nrows()
 </PRE>
 
 <P>
@@ -79,8 +78,7 @@ Scope: <B>local</B>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The maximum number of nonzero elements that can
-  be stored in sparse matrix <code>a</code> using its current memory allocation.
+<DD>The number of  rows  of sparse matrix <code>a</code>.
 </DD>
 </DL>
 

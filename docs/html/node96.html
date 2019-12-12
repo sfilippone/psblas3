@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_sp_getrow -- Extract row(s) from a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_sp_getrow -- Extract row(s) from a sparse matrix">
+<TITLE>psb_local_index -- </TITLE>
+<META NAME="description" CONTENT="psb_local_index -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,47 +16,45 @@
 
 <LINK REL="next" HREF="node97.html">
 <LINK REL="previous" HREF="node95.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node97.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1454"
+<A NAME="tex2html1463"
   HREF="node97.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1450"
-  HREF="node71.html">
+<A NAME="tex2html1459"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1444"
+<A NAME="tex2html1453"
   HREF="node95.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1452"
+<A NAME="tex2html1461"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1455"
-  HREF="node97.html">psb_sizeof   Memory</A>
-<B> Up:</B> <A NAME="tex2html1451"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1445"
-  HREF="node95.html">psb_get_overlap   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1453"
+<B> Next:</B> <A NAME="tex2html1464"
+  HREF="node97.html">psb_get_boundary   Extract</A>
+<B> Up:</B> <A NAME="tex2html1460"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1454"
+  HREF="node95.html">psb_is_local</A>
+ &nbsp; <B>  <A NAME="tex2html1462"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000725000000000000000">
-psb_sp_getrow -- Extract row(s) from a sparse
-  matrix</A>
+<H2><A NAME="SECTION000722000000000000000">
+psb_local_index  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_sp_getrow(row, a, nz, ia, ja, val, info, &amp;
-              &amp; append, nzin, lrw)
+call psb_local_index(y, x, desc_a, info)
 </PRE>
 
 <P>
@@ -67,75 +65,38 @@ call psb_sp_getrow(row, a, nz, ia, ja, val, info, &amp;
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>row</STRONG></DT>
-<DD>The (first) row to be extracted.
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer indices.
 <BR>
-Scope:<B>local</B>
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>
+Type: <B>required</B>
+<BR>
+Intent: <B>in, inout</B>.
+<BR>
+Specified as: a scalar or a rank one integer array.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer <SPAN CLASS="MATH"><IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img120.png"
- ALT="$&gt;0$"></SPAN>.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix from  which to get rows.
+<DT><STRONG>iact</STRONG></DT>
+<DD>specifies action to be taken in case of range errors. 
+Scope: <B>global</B> 
 <BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>append</STRONG></DT>
-<DD>Whether to append or overwrite existing output.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>optional</B>
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a logical value default: false (overwrite).
-</DD>
-<DT><STRONG>nzin</STRONG></DT>
-<DD>Input size to be appended to.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer <SPAN CLASS="MATH"><IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img120.png"
- ALT="$&gt;0$"></SPAN>. When append is true, specifies how many
-entries in the output vectors are already filled. 
-</DD>
-<DT><STRONG>lrw</STRONG></DT>
-<DD>The last  row to be extracted.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer <SPAN CLASS="MATH"><IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img120.png"
- ALT="$&gt;0$"></SPAN>, default: <SPAN CLASS="MATH"><IMG
- WIDTH="31" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img121.png"
- ALT="$row$"></SPAN>.
-
-<P>
+Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
+<code>A</code>bort, default <code>I</code>gnore.
 </DD>
 </DL>
 
@@ -144,49 +105,19 @@ Specified as: an integer <SPAN CLASS="MATH"><IMG
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of elements returned by this call.
+<DT><STRONG>y</STRONG></DT>
+<DD>A logical mask which is true for all corresponding entries of
+  <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> that are local to  the current process
+Scope: <B>local</B> 
 <BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Returned  as: an integer scalar.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the row indices.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer array with the <code>ALLOCATABLE</code> attribute.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the column indices of the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer array with the <code>ALLOCATABLE</code> attribute.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a real  array with the <code>ALLOCATABLE</code> attribute.
+Specified as: a scalar or rank one logical array.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -205,52 +136,14 @@ An integer value; 0 means no error has been detected.
 <BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>The output <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN> is always the size of the output generated by
-  the current call; thus, if <code>append=.true.</code>, the total output
-  size will be <SPAN CLASS="MATH"><IMG
- WIDTH="74" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img122.png"
- ALT="$nzin+nz$"></SPAN>, with the newly extracted coefficients stored in
-  entries <code>nzin+1:nzin+nz</code> of the array arguments;
-</LI>
-<LI>When <code>append=.true.</code>  the output arrays are reallocated as
-  necessary;
-</LI>
-<LI>The row and column indices are returned in the local numbering
-  scheme; if the global numbering is desired, the user may employ the
-  <code>psb_loc_to_glob</code> routine on the output.
+<LI>This routine returns a <code>.true.</code> value for those indices
+  that are local to  the current process, including the halo
+  indices.
 </LI>
 </OL>
 
 <P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1454"
-  HREF="node97.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1450"
-  HREF="node71.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1444"
-  HREF="node95.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1452"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1455"
-  HREF="node97.html">psb_sizeof   Memory</A>
-<B> Up:</B> <A NAME="tex2html1451"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1445"
-  HREF="node95.html">psb_get_overlap   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1453"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

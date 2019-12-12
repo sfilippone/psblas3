@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>Named Constants</TITLE>
-<META NAME="description" CONTENT="Named Constants">
+<TITLE>get_p_adjcncy -- Get process adjacency list</TITLE>
+<META NAME="description" CONTENT="get_p_adjcncy -- Get process adjacency list">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,6 +14,7 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node23.html">
 <LINK REL="previous" HREF="node21.html">
 <LINK REL="up" HREF="node10.html">
 <LINK REL="next" HREF="node23.html">
@@ -22,70 +23,52 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html507"
+<A NAME="tex2html518"
   HREF="node23.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html503"
+<A NAME="tex2html514"
   HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html499"
+<A NAME="tex2html508"
   HREF="node21.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html505"
+<A NAME="tex2html516"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html508"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Up:</B> <A NAME="tex2html504"
+<B> Next:</B> <A NAME="tex2html519"
+  HREF="node23.html">set_p_adjcncy   Set</A>
+<B> Up:</B> <A NAME="tex2html515"
   HREF="node10.html">Descriptor data structure</A>
-<B> Previous:</B> <A NAME="tex2html500"
+<B> Previous:</B> <A NAME="tex2html509"
   HREF="node21.html">psb_cd_set_large_threshold   Set</A>
- &nbsp; <B>  <A NAME="tex2html506"
+ &nbsp; <B>  <A NAME="tex2html517"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000411200000000000000"></A>
-<A NAME="sec:cd_constants"></A>
-<BR>
-Named Constants
+<H3><A NAME="SECTION000411200000000000000">
+get_p_adjcncy -- Get process adjacency list</A>
 </H3>
+
+<P>
+<PRE>
+list =  desc%get_p_adjcncy()
+</PRE>
+
+<P>
 <DL>
-<DT><STRONG>psb_none_</STRONG></DT>
-<DD>Generic no-op;
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
 </DD>
-<DT><STRONG>psb_root_</STRONG></DT>
-<DD>Default root process for broadcast and scatter operations;
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_nohalo_</STRONG></DT>
-<DD>Do not fetch halo elements;
-</DD>
-<DT><STRONG>psb_halo_</STRONG></DT>
-<DD>Fetch halo elements from neighbouring processes;
-</DD>
-<DT><STRONG>psb_sum_</STRONG></DT>
-<DD>Sum overlapped elements
-</DD>
-<DT><STRONG>psb_avg_</STRONG></DT>
-<DD>Average overlapped elements
-</DD>
-<DT><STRONG>psb_comm_halo_</STRONG></DT>
-<DD>Exchange data based on the <code>halo_index</code>
-  list;
-</DD>
-<DT><STRONG>psb_comm_ext_</STRONG></DT>
-<DD>Exchange data based on the <code>ext_index</code>
-  list;
-</DD>
-<DT><STRONG>psb_comm_ovr_</STRONG></DT>
-<DD>Exchange data based on the <code>ovrlap_index</code>
-  list;
-</DD>
-<DT><STRONG>psb_comm_mov_</STRONG></DT>
-<DD>Exchange data based on the <code>ovr_mst_idx</code>
-  list;
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The current list of adjacent processes,
+  i.e. processes with which the current one has to exchange halo
+  data. 
 
 <P>
 </DD>

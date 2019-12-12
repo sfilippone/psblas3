@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_spsm -- Triangular System Solve</TITLE>
-<META NAME="description" CONTENT="psb_spsm -- Triangular System Solve">
+<TITLE>psb_norm1 -- 1-Norm of Sparse Matrix</TITLE>
+<META NAME="description" CONTENT="psb_norm1 -- 1-Norm of Sparse Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,160 +14,105 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node66.html">
 <LINK REL="previous" HREF="node64.html">
-<LINK REL="up" HREF="node52.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node66.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1053"
+<A NAME="tex2html1064"
   HREF="node66.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1049"
-  HREF="node52.html">
+<A NAME="tex2html1060"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1045"
+<A NAME="tex2html1054"
   HREF="node64.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1051"
+<A NAME="tex2html1062"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1054"
-  HREF="node66.html">Communication routines</A>
-<B> Up:</B> <A NAME="tex2html1050"
-  HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html1046"
-  HREF="node64.html">psb_spmm   Sparse</A>
- &nbsp; <B>  <A NAME="tex2html1052"
+<B> Next:</B> <A NAME="tex2html1065"
+  HREF="node66.html">psb_normi   Infinity</A>
+<B> Up:</B> <A NAME="tex2html1061"
+  HREF="node55.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html1055"
+  HREF="node64.html">psb_genrm2s   Generalized</A>
+ &nbsp; <B>  <A NAME="tex2html1063"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000513000000000000000">
-psb_spsm -- Triangular System Solve</A>
+<H2><A NAME="SECTION000510000000000000000">
+psb_norm1 -- 1-Norm of Sparse Matrix</A>
 </H2>
 
 <P>
-This subroutine computes the Triangular System Solve:
-
+This function computes the 1-norm of a matrix <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>:
+<BR>
 <P>
-<P></P>
+<BR><P></P>
 <DIV ALIGN="CENTER" CLASS="mathdisplay">
 <!-- MATH
- \begin{eqnarray*}
-y &\leftarrow& \alpha  T^{-1}  x + \beta y\\
-y &\leftarrow& \alpha D  T^{-1}  x + \beta y\\
-y &\leftarrow& \alpha  T^{-1}  D x + \beta y\\
-y &\leftarrow& \alpha  T^{-T}  x + \beta y\\
-y &\leftarrow& \alpha D  T^{-T}  x + \beta y\\
-y &\leftarrow& \alpha  T^{-T}  D x + \beta y\\
-y &\leftarrow& \alpha  T^{-H}  x + \beta y\\
-y &\leftarrow& \alpha D  T^{-H}  x + \beta y\\
-y &\leftarrow& \alpha  T^{-H}  D x + \beta y\\
-\end{eqnarray*}
+ \begin{displaymath}
+nrm1 \leftarrow \|A\|_1
+\end{displaymath}
  -->
-<IMG
- WIDTH="160" HEIGHT="239" BORDER="0"
- SRC="img54.png"
- ALT="\begin{eqnarray*}
-y &amp;\leftarrow&amp; \alpha T^{-1} x + \beta y\\
-y &amp;\leftarrow&amp; \al...
-...-H} x + \beta y\\
-y &amp;\leftarrow&amp; \alpha T^{-H} D x + \beta y\\
-\end{eqnarray*}"></DIV>
-<BR CLEAR="ALL"><P></P>
-<BR CLEAR="ALL"><P></P>
 
-<P>
+<IMG
+ WIDTH="98" HEIGHT="29" BORDER="0"
+ SRC="img46.png"
+ ALT="\begin{displaymath}nrm1 \leftarrow \Vert A\Vert _1 \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
 where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN></STRONG></DT>
-<DD>is the global dense matrix <SPAN CLASS="MATH"><IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img51.png"
- ALT="$x_{:, :}$"></SPAN>
-</DD>
-<DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN></STRONG></DT>
-<DD>is the global dense matrix <SPAN CLASS="MATH"><IMG
- WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img52.png"
- ALT="$y_{:, :}$"></SPAN>
-</DD>
-<DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img55.png"
- ALT="$T$"></SPAN></STRONG></DT>
-<DD>is the global sparse block triangular submatrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img55.png"
- ALT="$T$"></SPAN>
-</DD>
-<DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img56.png"
- ALT="$D$"></SPAN></STRONG></DT>
-<DD>is the scaling diagonal matrix.
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN></STRONG></DT>
+<DD>represents the global matrix <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>
 </DD>
 </DL>
 
 <P>
-<PRE>
-call psb_spsm(alpha, t, x, beta, y, desc_a, info)
-call psb_spsm(alpha, t, x, beta, y, desc_a, info,&amp;
-             &amp; trans, unit, choice, diag, work)
-</PRE> 
-
-<P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2035"></A>
+<DIV ALIGN="CENTER"><A NAME="2111"></A>
 <TABLE>
-<CAPTION><STRONG>Table 13:</STRONG>
+<CAPTION><STRONG>Table 10:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img55.png"
- ALT="$T$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img56.png"
- ALT="$D$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img22.png"
- ALT="$\alpha$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img23.png"
- ALT="$\beta$"></SPAN></TD>
-<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN></TD>
+<TD ALIGN="LEFT"><B>Function</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_spsm</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_spsm</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spsm</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spsm</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -177,6 +122,12 @@ Data types</CAPTION>
 <BR>
 
 <P>
+<PRE>
+psb_spnrm1(A, desc_a, info)
+psb_norm1(A, desc_a, info)
+</PRE>
+
+<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -184,27 +135,12 @@ Data types</CAPTION>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>alpha</STRONG></DT>
-<DD>the scalar <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img22.png"
- ALT="$\alpha$"></SPAN>.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in
-Table&nbsp;<A HREF="#tab:f90spsm">13</A>.
-</DD>
-<DT><STRONG>t</STRONG></DT>
-<DD>the global portion of the sparse matrix
+<DT><STRONG>a</STRONG></DT>
+<DD>the local  portion of the global sparse matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img55.png"
- ALT="$T$"></SPAN>.  
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>. 
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -212,70 +148,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an object type specified in
-&#167;&nbsp;<A HREF="node9.html#sec:datastruct">3</A>.
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN>. 
-
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90spsm">13</A>.  The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN>. 
-</DD>
-<DT><STRONG>beta</STRONG></DT>
-<DD>the scalar <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img23.png"
- ALT="$\beta$"></SPAN>.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90spsm">13</A>.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of global dense matrix
-<SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN>. 
-
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90spsm">13</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN>. 
+Specified as: an object of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -288,142 +161,18 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>trans</STRONG></DT>
-<DD>specify with <EM>unitd</EM> the operation to perform.
-<DL>
-<DT><STRONG>trans = 'N'</STRONG></DT>
-<DD>the operation is with no transposed matrix
-</DD>
-<DT><STRONG>trans = 'T'</STRONG></DT>
-<DD>the operation is with transposed matrix.
-</DD>
-<DT><STRONG>trans = 'C'</STRONG></DT>
-<DD>the operation is with conjugate transposed matrix.
-</DD>
-</DL>
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: <SPAN CLASS="MATH"><IMG
- WIDTH="79" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img53.png"
- ALT="$trans = N$"></SPAN>
-<BR>
-Specified as: a character variable.
-</DD>
-<DT><STRONG>unitd</STRONG></DT>
-<DD>specify with <EM>trans</EM> the operation to perform.
-<DL>
-<DT><STRONG>unitd = 'U'</STRONG></DT>
-<DD>the operation is with no scaling
-</DD>
-<DT><STRONG>unitd = 'L'</STRONG></DT>
-<DD>the operation is with left scaling
-</DD>
-<DT><STRONG>unitd = 'R'</STRONG></DT>
-<DD>the operation is with right scaling.
-</DD>
-</DL>
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: <SPAN CLASS="MATH"><IMG
- WIDTH="76" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img57.png"
- ALT="$unitd = U$"></SPAN>
-<BR>
-Specified as: a character variable.
-</DD>
-<DT><STRONG>choice</STRONG></DT>
-<DD>specifies the update of overlap elements to be performed
-  on exit:
-<DL>
-<DT></DT>
-<DD><code>psb_none_</code>
-</DD>
-<DT></DT>
-<DD><code>psb_sum_</code>
-</DD>
-<DT></DT>
-<DD><code>psb_avg_</code>
-</DD>
-<DT></DT>
-<DD><code>psb_square_root_</code>
-</DD>
-</DL>
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: <code>psb_avg_</code>
-<BR>
-Specified as: an integer variable.
-</DD>
-<DT><STRONG>diag</STRONG></DT>
-<DD>the diagonal scaling matrix.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: <!-- MATH
- $diag(1) = 1 (no scaling)$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="164" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img58.png"
- ALT="$diag(1) = 1 (no scaling)$"></SPAN>
-<BR>
-Specified as: a rank one  array containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:f90spsm">13</A>.
-</DD>
-<DT><STRONG>work</STRONG></DT>
-<DD>a work array. 
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one array of the same type of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> with the
-TARGET attribute. 
-
-<P>
-</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of global dense matrix
-<SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN>. 
-
+<DT><STRONG>Function value</STRONG></DT>
+<DD>is the 1-norm of sparse submatrix <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>.
 <BR>
-Scope: <B>local</B> 
+Scope: <B>global</B> 
 <BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an array of rank one or two
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90spsm">13</A>.
+Specified as: a long precision real number.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -439,31 +188,7 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1053"
-  HREF="node66.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1049"
-  HREF="node52.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1045"
-  HREF="node64.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1051"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1054"
-  HREF="node66.html">Communication routines</A>
-<B> Up:</B> <A NAME="tex2html1050"
-  HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html1046"
-  HREF="node64.html">psb_spmm   Sparse</A>
- &nbsp; <B>  <A NAME="tex2html1052"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

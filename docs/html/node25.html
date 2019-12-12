@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>get_nrows -- Get number of rows in a sparse matrix</TITLE>
-<META NAME="description" CONTENT="get_nrows -- Get number of rows in a sparse matrix">
+<TITLE>Named Constants</TITLE>
+<META NAME="description" CONTENT="Named Constants">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,71 +14,80 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node26.html">
 <LINK REL="previous" HREF="node24.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node10.html">
 <LINK REL="next" HREF="node26.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html562"
+<A NAME="tex2html552"
   HREF="node26.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html558"
-  HREF="node23.html">
+<A NAME="tex2html548"
+  HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html552"
+<A NAME="tex2html544"
   HREF="node24.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html560"
+<A NAME="tex2html550"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html563"
-  HREF="node26.html">get_ncols   Get</A>
-<B> Up:</B> <A NAME="tex2html559"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html553"
-  HREF="node24.html">Sparse Matrix Methods</A>
- &nbsp; <B>  <A NAME="tex2html561"
+<B> Next:</B> <A NAME="tex2html553"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Up:</B> <A NAME="tex2html549"
+  HREF="node10.html">Descriptor data structure</A>
+<B> Previous:</B> <A NAME="tex2html545"
+  HREF="node24.html">fnd_owner   Find</A>
+ &nbsp; <B>  <A NAME="tex2html551"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042200000000000000">
-get_nrows -- Get number of  rows in a sparse  matrix</A>
-</H3>
-
-<P>
-<PRE>
-nr = a%get_nrows()
-</PRE>
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix
+<H3><A NAME="SECTION000411500000000000000"></A>
+<A NAME="sec:cd_constants"></A>
 <BR>
-Scope: <B>local</B>
-<BR></DD>
-</DL>
+Named Constants
+</H3>
+<DL>
+<DT><STRONG>psb_none_</STRONG></DT>
+<DD>Generic no-op;
+</DD>
+<DT><STRONG>psb_root_</STRONG></DT>
+<DD>Default root process for broadcast and scatter operations;
+</DD>
+<DT><STRONG>psb_nohalo_</STRONG></DT>
+<DD>Do not fetch halo elements;
+</DD>
+<DT><STRONG>psb_halo_</STRONG></DT>
+<DD>Fetch halo elements from neighbouring processes;
+</DD>
+<DT><STRONG>psb_sum_</STRONG></DT>
+<DD>Sum overlapped elements
+</DD>
+<DT><STRONG>psb_avg_</STRONG></DT>
+<DD>Average overlapped elements
+</DD>
+<DT><STRONG>psb_comm_halo_</STRONG></DT>
+<DD>Exchange data based on the <code>halo_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_ext_</STRONG></DT>
+<DD>Exchange data based on the <code>ext_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_ovr_</STRONG></DT>
+<DD>Exchange data based on the <code>ovrlap_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_mov_</STRONG></DT>
+<DD>Exchange data based on the <code>ovr_mst_idx</code>
+  list;
 
 <P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of  rows  of sparse matrix <code>a</code>.
 </DD>
 </DL>
 

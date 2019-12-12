@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>clean_zeros -- Eliminate zero coefficients</TITLE>
-<META NAME="description" CONTENT="clean_zeros -- Eliminate zero coefficients">
+<TITLE>is_lower, is_upper, is_triangle, is_unit -- Format check</TITLE>
+<META NAME="description" CONTENT="is_lower, is_upper, is_triangle, is_unit -- Format check">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,50 +16,50 @@
 
 <LINK REL="next" HREF="node36.html">
 <LINK REL="previous" HREF="node34.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node36.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html682"
+<A NAME="tex2html691"
   HREF="node36.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html678"
-  HREF="node23.html">
+<A NAME="tex2html687"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html672"
+<A NAME="tex2html681"
   HREF="node34.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html680"
+<A NAME="tex2html689"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html683"
-  HREF="node36.html">get_diag   Get</A>
-<B> Up:</B> <A NAME="tex2html679"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html673"
-  HREF="node34.html">csclip   Reduce</A>
- &nbsp; <B>  <A NAME="tex2html681"
+<B> Next:</B> <A NAME="tex2html692"
+  HREF="node36.html">cscnv   Convert</A>
+<B> Up:</B> <A NAME="tex2html688"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html682"
+  HREF="node34.html">is_bld, is_upd, is_asb </A>
+ &nbsp; <B>  <A NAME="tex2html690"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421200000000000000">
-clean_zeros -- Eliminate zero coefficients</A>
+<H3><A NAME="SECTION00042900000000000000">
+is_lower, is_upper, is_triangle, is_unit  --
+  Format  check</A>
 </H3>
 
-<PRE>
-    call a%clean_zeros(info)
-</PRE>
-
 <P>
-Eliminates zero coefficients in the input matrix. Note that depending
-on the internal storage format, there may still be some amount of
-zero padding in the output.
+<PRE>
+if (a%is_triangle()) then 
+if (a%is_upper()) then 
+if (a%is_lower()) then 
+if (a%is_unit()) then 
+</PRE>
 
 <P>
 <DL>
@@ -70,24 +70,22 @@ zero padding in the output.
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix.
+<DD>the sparse matrix
 <BR>
-A variable of type <code>psb_Tspmat_type</code>.
-<BR>
-Scope: <B>local</B>.
+Scope: <B>local</B>
 <BR></DD>
 </DL>
+
+<P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>The matrix  <code>a</code> without zero coefficients.
-<BR>
-A variable of type <code>psb_Tspmat_type</code>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A <code>logical</code> value indicating whether the
+  matrix is triangular; if <code>is_triangle()</code> returns <code>.true.</code>
+  check also if it is lower, upper and with a unit (i.e. assumed)
+  diagonal. 
 </DD>
 </DL>
 

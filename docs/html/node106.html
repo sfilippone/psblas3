@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
+<TITLE>psb_get_mpi_comm -- Get the MPI communicator</TITLE>
+<META NAME="description" CONTENT="psb_get_mpi_comm -- Get the MPI communicator">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,54 +16,52 @@
 
 <LINK REL="next" HREF="node107.html">
 <LINK REL="previous" HREF="node105.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node107.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1589"
+<A NAME="tex2html1598"
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1585"
-  HREF="node99.html">
+<A NAME="tex2html1594"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1579"
+<A NAME="tex2html1588"
   HREF="node105.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1587"
+<A NAME="tex2html1596"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1590"
-  HREF="node107.html">psb_abort   Abort</A>
-<B> Up:</B> <A NAME="tex2html1586"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1580"
-  HREF="node105.html">psb_wtime   Wall</A>
- &nbsp; <B>  <A NAME="tex2html1588"
+<B> Next:</B> <A NAME="tex2html1599"
+  HREF="node107.html">psb_get_mpi_rank   Get</A>
+<B> Up:</B> <A NAME="tex2html1595"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1589"
+  HREF="node105.html">psb_exit   Exit</A>
+ &nbsp; <B>  <A NAME="tex2html1597"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00087000000000000000">
-psb_barrier -- Sinchronization point  parallel
-  environment</A>
+<H2><A NAME="SECTION00084000000000000000">
+psb_get_mpi_comm -- Get the MPI communicator</A>
 </H2>
 
 <P>
 <PRE>
-call psb_barrier(icontxt)
+icomm = psb_get_mpi_comm(icontxt)
 </PRE>
 
 <P>
-This subroutine acts as an explicit synchronization point for  the  PSBLAS
-parallel virtual  machine. 
+This function returns the MPI communicator associated with a PSBLAS context
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -81,6 +79,27 @@ Intent: <B>in</B>.
 Specified as: an integer variable.
 </DD>
 </DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
+</DL>
+
+<P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+The subroutine version <code>psb_get_mpicomm</code> is still available but
+is deprecated. 
 
 <P>
 <BR><HR>

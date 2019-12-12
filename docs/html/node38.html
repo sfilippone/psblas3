@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>tril -- Return the lower triangle</TITLE>
-<META NAME="description" CONTENT="tril -- Return the lower triangle">
+<TITLE>clean_zeros -- Eliminate zero coefficients</TITLE>
+<META NAME="description" CONTENT="clean_zeros -- Eliminate zero coefficients">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,52 +16,52 @@
 
 <LINK REL="next" HREF="node39.html">
 <LINK REL="previous" HREF="node37.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node39.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html718"
+<A NAME="tex2html727"
   HREF="node39.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html714"
-  HREF="node23.html">
+<A NAME="tex2html723"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html708"
+<A NAME="tex2html717"
   HREF="node37.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html716"
+<A NAME="tex2html725"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html719"
-  HREF="node39.html">triu   Return</A>
-<B> Up:</B> <A NAME="tex2html715"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html709"
-  HREF="node37.html">clip_diag   Cut</A>
- &nbsp; <B>  <A NAME="tex2html717"
+<B> Next:</B> <A NAME="tex2html728"
+  HREF="node39.html">get_diag   Get</A>
+<B> Up:</B> <A NAME="tex2html724"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html718"
+  HREF="node37.html">csclip   Reduce</A>
+ &nbsp; <B>  <A NAME="tex2html726"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421500000000000000">
-tril -- Return the lower triangle</A>
+<H3><A NAME="SECTION000421200000000000000">
+clean_zeros -- Eliminate zero coefficients</A>
 </H3>
 
 <PRE>
-    call a%tril(l,info[,&amp;
-       &amp; diag,imin,imax,jmin,jmax,rscale,cscale,u])
+    call a%clean_zeros(info)
 </PRE>
 
 <P>
-Returns the lower triangular part of submatrix
-<code>A(imin:imax,jmin:jmax)</code>, optionally rescaling row/col indices to
-the range <code>1:imax-imin+1,1:jmax-jmin+1</code> and returing the
-complementary upper triangle. 
+Eliminates zero coefficients in the input matrix. Note that depending
+on the internal storage format, there may still be some amount of
+zero padding in the output.
+
+<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -76,32 +76,13 @@ A variable of type <code>psb_Tspmat_type</code>.
 <BR>
 Scope: <B>local</B>.
 <BR></DD>
-<DT><STRONG>diag</STRONG></DT>
-<DD>Include diagonals up to this one; <code>diag=1</code> means the
-  first superdiagonal, <code>diag=-1</code> means the first subdiagonal. 
-Default 0.
-</DD>
-<DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
-<DD>Minimum and maximum row and column indices.
-<BR>
-Type: optional.
-</DD>
-<DT><STRONG>rscale,cscale</STRONG></DT>
-<DD>Whether to rescale row/column indices.
-Type: optional.
-</DD>
 </DL>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>l</STRONG></DT>
-<DD>A copy  of the lower triangle of <code>a</code>.
-<BR>
-A variable of type <code>psb_Tspmat_type</code>.
-</DD>
-<DT><STRONG>u</STRONG></DT>
-<DD>(optional) A copy  of the upper triangle of <code>a</code>.
+<DT><STRONG>a</STRONG></DT>
+<DD>The matrix  <code>a</code> without zero coefficients.
 <BR>
 A variable of type <code>psb_Tspmat_type</code>.
 </DD>

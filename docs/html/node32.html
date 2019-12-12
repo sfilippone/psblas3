@@ -3,8 +3,10 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>is_lower, is_upper, is_triangle, is_unit -- Format check</TITLE>
-<META NAME="description" CONTENT="is_lower, is_upper, is_triangle, is_unit -- Format check">
+<TITLE>sizeof -- Get memory occupation in bytes
+of a sparse matrix</TITLE>
+<META NAME="description" CONTENT="sizeof -- Get memory occupation in bytes
+of a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,49 +18,46 @@
 
 <LINK REL="next" HREF="node33.html">
 <LINK REL="previous" HREF="node31.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node33.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html646"
+<A NAME="tex2html655"
   HREF="node33.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html642"
-  HREF="node23.html">
+<A NAME="tex2html651"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html636"
+<A NAME="tex2html645"
   HREF="node31.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html644"
+<A NAME="tex2html653"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html647"
-  HREF="node33.html">cscnv   Convert</A>
-<B> Up:</B> <A NAME="tex2html643"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html637"
-  HREF="node31.html">is_bld, is_upd, is_asb </A>
- &nbsp; <B>  <A NAME="tex2html645"
+<B> Next:</B> <A NAME="tex2html656"
+  HREF="node33.html">get_fmt   Short</A>
+<B> Up:</B> <A NAME="tex2html652"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html646"
+  HREF="node31.html">get_size   Get</A>
+ &nbsp; <B>  <A NAME="tex2html654"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042900000000000000">
-is_lower, is_upper, is_triangle, is_unit  --
-  Format  check</A>
+<H3><A NAME="SECTION00042600000000000000">
+sizeof  -- Get memory occupation in bytes
+of  a sparse matrix</A>
 </H3>
 
 <P>
 <PRE>
-if (a%is_triangle()) then 
-if (a%is_upper()) then 
-if (a%is_lower()) then 
-if (a%is_unit()) then 
+memory_size = a%sizeof()
 </PRE>
 
 <P>
@@ -82,10 +81,7 @@ Scope: <B>local</B>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>A <code>logical</code> value indicating whether the
-  matrix is triangular; if <code>is_triangle()</code> returns <code>.true.</code>
-  check also if it is lower, upper and with a unit (i.e. assumed)
-  diagonal. 
+<DD>The memory occupation in bytes.
 </DD>
 </DL>
 

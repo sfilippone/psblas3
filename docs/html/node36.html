@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>get_diag -- Get main diagonal</TITLE>
-<META NAME="description" CONTENT="get_diag -- Get main diagonal">
+<TITLE>cscnv -- Convert to a different storage format</TITLE>
+<META NAME="description" CONTENT="cscnv -- Convert to a different storage format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,48 +16,49 @@
 
 <LINK REL="next" HREF="node37.html">
 <LINK REL="previous" HREF="node35.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node37.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html694"
+<A NAME="tex2html703"
   HREF="node37.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html690"
-  HREF="node23.html">
+<A NAME="tex2html699"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html684"
+<A NAME="tex2html693"
   HREF="node35.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html692"
+<A NAME="tex2html701"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html695"
-  HREF="node37.html">clip_diag   Cut</A>
-<B> Up:</B> <A NAME="tex2html691"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html685"
-  HREF="node35.html">clean_zeros   Eliminate</A>
- &nbsp; <B>  <A NAME="tex2html693"
+<B> Next:</B> <A NAME="tex2html704"
+  HREF="node37.html">csclip   Reduce</A>
+<B> Up:</B> <A NAME="tex2html700"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html694"
+  HREF="node35.html">is_lower, is_upper, is_triangle, is_unit</A>
+ &nbsp; <B>  <A NAME="tex2html702"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421300000000000000">
-get_diag -- Get main diagonal</A>
+<H3><A NAME="SECTION000421000000000000000">
+cscnv -- Convert to a different storage format</A>
 </H3>
 
+<P>
 <PRE>
-    call a%get_diag(d,info)
+call  a%cscnv(b,info [, type, mold, dupl])
+call  a%cscnv(info [, type, mold, dupl])
 </PRE>
 
 <P>
-Returns a copy of  the main diagonal.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -72,20 +73,39 @@ A variable of type <code>psb_Tspmat_type</code>.
 <BR>
 Scope: <B>local</B>.
 <BR></DD>
+<DT><STRONG>type</STRONG></DT>
+<DD>a string requesting a new format.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting a new format.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>dupl</STRONG></DT>
+<DD>an integer value specifing how to handle duplicates (see
+  Named Constants below)
+</DD>
 </DL>
+
+<P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>d</STRONG></DT>
-<DD>A copy  of the main diagonal.
+<DT><STRONG>b,a</STRONG></DT>
+<DD>A copy  of <code>a</code> with a new storage format.
 <BR>
-A one-dimensional array of the appropriate type.
+A variable of type <code>psb_Tspmat_type</code>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Return code. 
 </DD>
 </DL>
+The <code>mold</code>  arguments may be
+employed to interface with special devices, such as GPUs and other
+accelerators. 
 
 <P>
 <BR><HR>

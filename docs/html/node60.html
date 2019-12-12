@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_norm2 -- 2-Norm of Vector</TITLE>
-<META NAME="description" CONTENT="psb_norm2 -- 2-Norm of Vector">
+<TITLE>psb_geamaxs -- Generalized Infinity Norm</TITLE>
+<META NAME="description" CONTENT="psb_geamaxs -- Generalized Infinity Norm">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,122 +16,103 @@
 
 <LINK REL="next" HREF="node61.html">
 <LINK REL="previous" HREF="node59.html">
-<LINK REL="up" HREF="node52.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node61.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html995"
+<A NAME="tex2html1004"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html991"
-  HREF="node52.html">
+<A NAME="tex2html1000"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html985"
+<A NAME="tex2html994"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html993"
+<A NAME="tex2html1002"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html996"
-  HREF="node61.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html992"
-  HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html986"
-  HREF="node59.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html994"
+<B> Next:</B> <A NAME="tex2html1005"
+  HREF="node61.html">psb_norm1   1-Norm</A>
+<B> Up:</B> <A NAME="tex2html1001"
+  HREF="node55.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html995"
+  HREF="node59.html">psb_normi   Infinity-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html1003"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00058000000000000000">
-psb_norm2 -- 2-Norm of Vector</A>
+<H2><A NAME="SECTION00055000000000000000">
+psb_geamaxs -- Generalized Infinity Norm</A>
 </H2>
 
 <P>
-This function computes the 2-norm of a vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+This subroutine computes a series of  infinity norms on the columns of
+a  dense matrix  <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"></SPAN>.
-<BR>
-If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> is a  real  vector
-it computes 2-norm as:
+ ALT="$x$"></SPAN>: 
 <BR><P></P>
 <DIV ALIGN="CENTER" CLASS="mathdisplay">
 <!-- MATH
  \begin{displaymath}
-nrm2 \leftarrow \sqrt{x^T x}
+res(i) \leftarrow \max_k |x(k,i)|
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="106" HEIGHT="24" BORDER="0"
- SRC="img41.png"
- ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^T x}\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-else if <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> is a complex vector then it computes 2-norm  as:
-<BR><P></P>
-<DIV ALIGN="CENTER" CLASS="mathdisplay">
-<!-- MATH
- \begin{displaymath}
-nrm2 \leftarrow \sqrt{x^H x}
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="108" HEIGHT="24" BORDER="0"
- SRC="img42.png"
- ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^H x}\end{displaymath}">
+ WIDTH="148" HEIGHT="36" BORDER="0"
+ SRC="img34.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 
 <P>
+<PRE>
+call psb_geamaxs(res, x, desc_a, info)
+</PRE>
+
+<P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2030"></A>
+<DIV ALIGN="CENTER"><A NAME="2106"></A>
 <TABLE>
-<CAPTION><STRONG>Table 8:</STRONG>
+<CAPTION><STRONG>Table 5:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="44" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img43.png"
- ALT="$nrm2$"></SPAN></TD>
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img29.png"
+ ALT="$res$"></SPAN></TD>
 <TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
 <TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
 <TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
 <TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
 <TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -139,12 +120,6 @@ Data types</CAPTION>
 </TABLE>
 </DIV><P></P>
 <BR>
-
-<P>
-<PRE>
-psb_genrm2(x, desc_a, info [,global])
-psb_norm2(x, desc_a, info [,global])
-</PRE>
 
 <P>
 <DL>
@@ -157,9 +132,9 @@ psb_norm2(x, desc_a, info [,global])
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"></SPAN>.
+ ALT="$x$"></SPAN>. 
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -167,9 +142,9 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90nrm2">8</A>.
+Table&nbsp;<A HREF="#tab:f90mamax">5</A>. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -182,37 +157,20 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>global</STRONG></DT>
-<DD>Specifies whether the computation should include the
-  global reduction across all processes.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a logical scalar.
-Default: <code>global=.true.</code>
-<BR>
-
-<P>
-</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function Value</STRONG></DT>
-<DD>is the 2-norm of vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+<DT><STRONG>res</STRONG></DT>
+<DD>is the infinity norm of the columns of <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
-Scope: <B>global</B> unless the optional variable
-<code>global=.false.</code> has been specified
+Scope: <B>global</B> 
 <BR>
-Type: <B>required</B> 
+Intent: <B>out</B>.
 <BR>
-Specified as: a long precision real number.
+Specified as: a number or a rank-one array  of long precision real numbers. 
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -228,54 +186,29 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>The computation of a global result requires a global
-  communication, which entails a significant overhead. It may be
-  necessary and/or advisable to compute multiple norms at the same 
-  time; in this case, it is possible to improve the runtime efficiency
-  by using the following scheme:
-  <BR>
-<IMG
- WIDTH="480" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
- SRC="img44.png"
- ALT="\begin{lstlisting}
-vres(1) = psb_genrm2(x1,desc_a,info,global=.false.)
-vres(2)...
-...x3,desc_a,info,global=.false.)
-call psb_nrm2(ictxt,vres(1:3))
-\end{lstlisting}">
-<BR>
-In this way the global communication, which for small sizes is a
-  latency-bound operation, is invoked only once.
-</LI>
-</OL>
-
-<P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html995"
+<A NAME="tex2html1004"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html991"
-  HREF="node52.html">
+<A NAME="tex2html1000"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html985"
+<A NAME="tex2html994"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html993"
+<A NAME="tex2html1002"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html996"
-  HREF="node61.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html992"
-  HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html986"
-  HREF="node59.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html994"
+<B> Next:</B> <A NAME="tex2html1005"
+  HREF="node61.html">psb_norm1   1-Norm</A>
+<B> Up:</B> <A NAME="tex2html1001"
+  HREF="node55.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html995"
+  HREF="node59.html">psb_normi   Infinity-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html1003"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

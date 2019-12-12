@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdbldext -- Build an extended communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdbldext -- Build an extended communication descriptor">
+<TITLE>psb_cdasb -- Communication descriptor assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_cdasb -- Communication descriptor assembly routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,68 +16,55 @@
 
 <LINK REL="next" HREF="node78.html">
 <LINK REL="previous" HREF="node76.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node78.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1226"
+<A NAME="tex2html1235"
   HREF="node78.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1222"
-  HREF="node71.html">
+<A NAME="tex2html1231"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1216"
+<A NAME="tex2html1225"
   HREF="node76.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1224"
+<A NAME="tex2html1233"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1227"
-  HREF="node78.html">psb_spall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html1223"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1217"
-  HREF="node76.html">psb_cdfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1225"
+<B> Next:</B> <A NAME="tex2html1236"
+  HREF="node78.html">psb_cdcpy   Copies</A>
+<B> Up:</B> <A NAME="tex2html1232"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1226"
+  HREF="node76.html">psb_cdins   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html1234"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00076000000000000000">
-psb_cdbldext -- Build an extended  communication
-  descriptor</A>
+<H2><A NAME="SECTION00073000000000000000">
+psb_cdasb -- Communication descriptor assembly
+  routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
+call psb_cdasb(desc_a, info [, mold])
 </PRE>
 
 <P>
-This subroutine builds an extended communication descriptor, based on
-the input descriptor <code>desc_a</code> and on the stencil specified
-through the input sparse matrix <code>a</code>. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data type.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -86,37 +73,20 @@ Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>nl</STRONG></DT>
-<DD>the number of additional layers desired.
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal index storage.
 <BR>
-Scope:<B>global</B>.
+Scope: <B>local</B>.
 <BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <SPAN CLASS="MATH"><IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img106.png"
- ALT="$nl\ge 0$"></SPAN>. 
-</DD>
-<DT><STRONG>extype</STRONG></DT>
-<DD>the kind of estension required.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional </B>.
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value
-<code>psb_ovt_xhal_</code>, <code>psb_ovt_asov_</code>, default: <code>psb_ovt_xhal_</code>
-
-<P>
+Specified as: a object of type derived from (integer) vbasedata<TT>psb_T_base_vect_type</TT>.
 </DD>
 </DL>
 
@@ -125,8 +95,8 @@ Specified as: an integer value
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_out</STRONG></DT>
-<DD>the extended communication descriptor.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -148,49 +118,47 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 <BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>Specifying <code>psb_ovt_xhal_</code> for the <code>extype</code> argument
-  the user will obtain a descriptor for a domain partition in which
-  the additional layers are fetched as part of an (extended) halo;
-  however the index-to-process mapping is identical to that of the
-  base descriptor;
-</LI>
-<LI>Specifying <code>psb_ovt_asov_</code> for the <code>extype</code> argument
-  the user will obtain a descriptor with an overlapped decomposition:
-  the additional layer is aggregated to  the local subdomain (and thus
-  is an overlap), and a new halo extending beyond the last additional
-  layer is formed. 
+<LI>On exit from this routine the descriptor is in the assembled
+  state. 
 </LI>
 </OL>
+This call will set up all the necessary information for the halo data
+exchanges. In doing so, the library will need to identify the set of
+processes owning the halo indices through the use of the
+<code>desc%fnd_owner()</code>  method; the owning processes are the
+topological neighbours of the calling process. If the user has some
+background information on the processes that are neighbours of the
+current one, it is possible to specify explicitly the list of adjacent
+processes with a call to  <code>desc%set_p_adjcncy(list)</code>; this will
+speed up the subsequent call to  <code>psb_cdasb</code>. 
 
 <P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1226"
+<A NAME="tex2html1235"
   HREF="node78.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1222"
-  HREF="node71.html">
+<A NAME="tex2html1231"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1216"
+<A NAME="tex2html1225"
   HREF="node76.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1224"
+<A NAME="tex2html1233"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1227"
-  HREF="node78.html">psb_spall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html1223"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1217"
-  HREF="node76.html">psb_cdfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1225"
+<B> Next:</B> <A NAME="tex2html1236"
+  HREF="node78.html">psb_cdcpy   Copies</A>
+<B> Up:</B> <A NAME="tex2html1232"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1226"
+  HREF="node76.html">psb_cdins   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html1234"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

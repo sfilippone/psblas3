@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
-<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
+<TITLE>psb_scatter -- Scatter Global Dense Matrix</TITLE>
+<META NAME="description" CONTENT="psb_scatter -- Scatter Global Dense Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,162 +14,224 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node74.html">
 <LINK REL="previous" HREF="node72.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node69.html">
 <LINK REL="next" HREF="node74.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1178"
+<A NAME="tex2html1160"
   HREF="node74.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1174"
-  HREF="node71.html">
+<A NAME="tex2html1156"
+  HREF="node69.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1168"
+<A NAME="tex2html1152"
   HREF="node72.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1176"
+<A NAME="tex2html1158"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1179"
-  HREF="node74.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html1175"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1169"
-  HREF="node72.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1177"
+<B> Next:</B> <A NAME="tex2html1161"
+  HREF="node74.html">Data management routines</A>
+<B> Up:</B> <A NAME="tex2html1157"
+  HREF="node69.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html1153"
+  HREF="node72.html">psb_gather   Gather</A>
+ &nbsp; <B>  <A NAME="tex2html1159"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00072000000000000000">
-psb_cdins -- Communication descriptor insert
-  routine</A>
+<H2><A NAME="SECTION00064000000000000000">
+psb_scatter -- Scatter Global Dense Matrix</A>
 </H2>
 
 <P>
-<PRE>
-call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
-call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
-</PRE>
+These subroutines scatters the portions of global dense matrix owned
+by a process to all the processes in the processes grid.
 
 <P>
-This subroutine examines the edges of the graph associated with the
-discretization mesh (and isomorphic to the sparsity pattern of a
-linear system coefficient matrix), storing them as necessary into the
-communication descriptor. In the first form the edges are specified as
-pairs of indices <SPAN CLASS="MATH"><IMG
- WIDTH="76" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img102.png"
- ALT="$ia(i),ja(i)$"></SPAN>; the starting index <SPAN CLASS="MATH"><IMG
- WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img103.png"
- ALT="$ia(i)$"></SPAN> should
-belong to the current process. 
-In the second form only the remote indices <SPAN CLASS="MATH"><IMG
- WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img104.png"
- ALT="$ja(i)$"></SPAN> are specified. 
+<BR><P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+loc\_x_i \leftarrow scatter(glob\_x)
+\end{displaymath}
+ -->
 
-<P>
+<IMG
+ WIDTH="168" HEIGHT="29" BORDER="0"
+ SRC="img83.png"
+ ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+where:
 <DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DT><STRONG><SPAN CLASS="MATH"><IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
+ ALT="$glob\_x$"></SPAN></STRONG></DT>
+<DD>is the global matrix <!-- MATH
+ $glob\_x_{1:m,1:n}$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
+ ALT="$glob\_x_{1:m,1:n}$"></SPAN>
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
+<DT><STRONG><SPAN CLASS="MATH"><IMG
+ WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.png"
+ ALT="$loc\_x_i$"></SPAN></STRONG></DT>
+<DD>is the local portion of global dense matrix on
+process <SPAN CLASS="MATH"><IMG
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$"></SPAN>.
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of points being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the indices of the starting vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the indices of the end vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
-</DD>
-<DT><STRONG>mask</STRONG></DT>
-<DD>Mask entries in <code>ja</code>, they are inserted only when the
-  corresponding <code>mask</code> entries are <code>.true.</code>
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a logical  array of length <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>, default <code>.true.</code>.
-</DD>
-<DT><STRONG>lidx</STRONG></DT>
-<DD>User defined local indices for <code>ja</code>.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
+<DT><STRONG><SPAN CLASS="MATH"><IMG
+ WIDTH="53" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img84.png"
+ ALT="$scatter$"></SPAN></STRONG></DT>
+<DD>is the scatter function.
 </DD>
 </DL>
 
 <P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="3554"></A>
+<TABLE>
+<CAPTION><STRONG>Table 17:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
+ WIDTH="34" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$x_i, y$"></SPAN></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Integer</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+<BR>
+<IMG
+ WIDTH="539" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img85.png"
+ ALT="\begin{lstlisting}
+call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
+\end{lstlisting}">
+<BR>
+
+<P>
 <DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>glob_x</STRONG></DT>
+<DD>The array that must be scattered into local pieces.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a rank one or two array.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>root</STRONG></DT>
+<DD>The process that holds the global copy. If <SPAN CLASS="MATH"><IMG
+ WIDTH="74" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img80.png"
+ ALT="$root=-1$"></SPAN> all
+  the processes have a copy of the global vector.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable <!-- MATH
+ $-1\le root\le np-1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="140" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.png"
+ ALT="$-1\le root\le np-1$"></SPAN>, default
+<code>psb_root_</code>, i.e. process 0. 
+</DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when loc_x is of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the updated communication descriptor.
+<DT><STRONG>loc_x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<SPAN CLASS="MATH"><IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
+ ALT="$glob\_x$"></SPAN>. 
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: a rank one or two ALLOCATABLE array  or an object of type vdata<TT>psb_T_vect_type</TT> containing numbers of the type
+indicated in Table&nbsp;<A HREF="#tab:scatter">17</A>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -182,76 +244,32 @@ Intent: <B>out</B>.
 <BR>
 An integer value; 0 means no error has been detected. 
 </DD>
-<DT><STRONG>ila</STRONG></DT>
-<DD>the local indices of the starting vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: an integer array of length <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
-</DD>
-<DT><STRONG>jla</STRONG></DT>
-<DD>the local indices of the end vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: an integer array of length <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
-
-<P>
-</DD>
 </DL>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>This routine may only be called if the descriptor is in the
-  build state;
-</LI>
-<LI>This routine automatically ignores edges that do not
-insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process.
-</LI>
-<LI>The second form of this routine will be useful when dealing with
-  user-specified index mappings; see also&nbsp;<A HREF="node7.html#sec:usermaps">2.3.1</A>.
-</LI>
-</OL>
 
 <P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1178"
+<A NAME="tex2html1160"
   HREF="node74.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1174"
-  HREF="node71.html">
+<A NAME="tex2html1156"
+  HREF="node69.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1168"
+<A NAME="tex2html1152"
   HREF="node72.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1176"
+<A NAME="tex2html1158"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1179"
-  HREF="node74.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html1175"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1169"
-  HREF="node72.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1177"
+<B> Next:</B> <A NAME="tex2html1161"
+  HREF="node74.html">Data management routines</A>
+<B> Up:</B> <A NAME="tex2html1157"
+  HREF="node69.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html1153"
+  HREF="node72.html">psb_gather   Gather</A>
+ &nbsp; <B>  <A NAME="tex2html1159"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

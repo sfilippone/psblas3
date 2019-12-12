@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_amx -- Global maximum absolute value</TITLE>
-<META NAME="description" CONTENT="psb_amx -- Global maximum absolute value">
+<TITLE>psb_sum -- Global sum</TITLE>
+<META NAME="description" CONTENT="psb_sum -- Global sum">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,50 +16,50 @@
 
 <LINK REL="next" HREF="node113.html">
 <LINK REL="previous" HREF="node111.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node102.html">
 <LINK REL="next" HREF="node113.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1661"
+<A NAME="tex2html1670"
   HREF="node113.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1657"
-  HREF="node99.html">
+<A NAME="tex2html1666"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1651"
+<A NAME="tex2html1660"
   HREF="node111.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1659"
+<A NAME="tex2html1668"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1662"
-  HREF="node113.html">psb_amn   Global</A>
-<B> Up:</B> <A NAME="tex2html1658"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1652"
-  HREF="node111.html">psb_min   Global</A>
- &nbsp; <B>  <A NAME="tex2html1660"
+<B> Next:</B> <A NAME="tex2html1671"
+  HREF="node113.html">psb_max   Global</A>
+<B> Up:</B> <A NAME="tex2html1667"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1661"
+  HREF="node111.html">psb_bcast   Broadcast</A>
+ &nbsp; <B>  <A NAME="tex2html1669"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000813000000000000000">
-psb_amx -- Global maximum absolute value</A>
+<H2><A NAME="SECTION000810000000000000000">
+psb_sum -- Global sum</A>
 </H2>
 
 <P>
 <PRE>
-call psb_amx(icontxt, dat, root)
+call psb_sum(icontxt, dat, root)
 </PRE>
 
 <P>
-This subroutine implements a maximum absolute value reduction
-operation based on the underlying communication library. 
+This subroutine implements a sum reduction  operation based on the
+underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -80,9 +80,9 @@ Intent: <B>in</B>.
 Specified as: an integer variable.
 </DD>
 <DT><STRONG>dat</STRONG></DT>
-<DD>The local contribution to the global maximum.
+<DD>The local contribution to the global sum.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
@@ -92,8 +92,8 @@ Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
 </DD>
 <DT><STRONG>root</STRONG></DT>
-<DD>Process to hold the final value, or <SPAN CLASS="MATH"><IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+<DD>Process to hold the final sum, or <SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img82.png"
  ALT="$-1$"></SPAN> to make it available
   on all processes.
@@ -108,10 +108,9 @@ Specified as: an integer value <!-- MATH
  $-1<= root <= np-1$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="165" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img141.png"
- ALT="$-1&lt;= root &lt;= np-1$"></SPAN>, default -1. 
-<BR></DD>
+ ALT="$-1&lt;= root &lt;= np-1$"></SPAN>, default -1.  </DD>
 </DL>
 
 <P>
@@ -120,7 +119,7 @@ Specified as: an integer value <!-- MATH
 <DD>
 </DD>
 <DT><STRONG>dat</STRONG></DT>
-<DD>On destination process(es), the result of the maximum operation.
+<DD>On destination process(es), the result of the sum operation.
 <BR>
 Scope: <B>global</B>.
 <BR>
@@ -129,7 +128,9 @@ Type: <B>required</B>.
 Intent: <B>inout</B>.
 <BR>
 Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
+scalar, or a rank 1 or 2 array. 
+<BR>
+Type, kind, rank and size must agree on all processes.
 </DD>
 </DL>
 
@@ -149,26 +150,26 @@ scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all pro
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1661"
+<A NAME="tex2html1670"
   HREF="node113.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1657"
-  HREF="node99.html">
+<A NAME="tex2html1666"
+  HREF="node102.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1651"
+<A NAME="tex2html1660"
   HREF="node111.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1659"
+<A NAME="tex2html1668"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1662"
-  HREF="node113.html">psb_amn   Global</A>
-<B> Up:</B> <A NAME="tex2html1658"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1652"
-  HREF="node111.html">psb_min   Global</A>
- &nbsp; <B>  <A NAME="tex2html1660"
+<B> Next:</B> <A NAME="tex2html1671"
+  HREF="node113.html">psb_max   Global</A>
+<B> Up:</B> <A NAME="tex2html1667"
+  HREF="node102.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1661"
+  HREF="node111.html">psb_bcast   Broadcast</A>
+ &nbsp; <B>  <A NAME="tex2html1669"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>Sorting utilities -- </TITLE>
-<META NAME="description" CONTENT="Sorting utilities -- ">
+<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
+<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,121 +14,68 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node99.html">
 <LINK REL="previous" HREF="node97.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node99.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1476"
+<A NAME="tex2html1487"
   HREF="node99.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1472"
-  HREF="node71.html">
+<A NAME="tex2html1483"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1468"
+<A NAME="tex2html1477"
   HREF="node97.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1474"
+<A NAME="tex2html1485"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1477"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Up:</B> <A NAME="tex2html1473"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1469"
-  HREF="node97.html">psb_sizeof   Memory</A>
- &nbsp; <B>  <A NAME="tex2html1475"
+<B> Next:</B> <A NAME="tex2html1488"
+  HREF="node99.html">psb_sp_getrow   Extract</A>
+<B> Up:</B> <A NAME="tex2html1484"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1478"
+  HREF="node97.html">psb_get_boundary   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1486"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000727000000000000000">
-Sorting utilities -- </A>
+<H2><A NAME="SECTION000724000000000000000">
+psb_get_overlap -- Extract list of overlap
+  elements</A>
 </H2>
 
 <P>
-<BIG CLASS="LARGE"><B>psb_msort -- Sorting by the Merge-sort
-  algorithm</B></BIG>
-
-<P>
-<BIG CLASS="LARGE"><B>psb_qsort -- Sorting by the Quicksort
-  algorithm</B></BIG>
-
-<P>
-<BIG CLASS="LARGE"><B>psb_hsort -- Sorting by the Heapsort  algorithm</B></BIG>
 <PRE>
-call psb_msort(x,ix,dir,flag)
-call psb_qsort(x,ix,dir,flag)
-call psb_hsort(x,ix,dir,flag)
+call psb_get_overlap(ovrel, desc, info)
 </PRE>
 
 <P>
-These  serial routines sort a sequence <SPAN CLASS="MATH"><IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img123.png"
- ALT="$X$"></SPAN> into ascending or
-descending  order. The argument meaning is identical for the three
-calls; the only difference is the algorithm used to accomplish the
-task (see Usage Notes below). 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The sequence to be sorted.
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Specified as: an integer, real or complex  array of rank 1.
-</DD>
-<DT><STRONG>ix</STRONG></DT>
-<DD>A vector of indices.
+Intent: <B>in</B>.
 <BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: an integer array of (at least) the same size as <SPAN CLASS="MATH"><IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img123.png"
- ALT="$X$"></SPAN>.
-</DD>
-<DT><STRONG>dir</STRONG></DT>
-<DD>The desired ordering.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: an integer value: <DL>
-<DT><STRONG>Integer and real data:</STRONG></DT>
-<DD><code>psb_sort_up_</code>,
-<code>psb_sort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
-default <code>psb_sort_up_</code>. 
-</DD>
-<DT><STRONG>Complex data:</STRONG></DT>
-<DD><code>psb_lsort_up_</code>,
-<code>psb_lsort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
-default <code>psb_lsort_up_</code>. 
-</DD>
-</DL>
-</DD>
-<DT><STRONG>flag</STRONG></DT>
-<DD>Whether to keep the original values in <SPAN CLASS="MATH"><IMG
- WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img124.png"
- ALT="$IX$"></SPAN>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: an integer value <code>psb_sort_ovw_idx_</code> or
-<code>psb_sort_keep_idx_</code>; default <code>psb_sort_ovw_idx_</code>.
-
-<P>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 </DL>
 
@@ -137,155 +84,46 @@ Specified as: an integer value <code>psb_sort_ovw_idx_</code> or
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The sequence of values, in the chosen ordering.
+<DT><STRONG>ovrel</STRONG></DT>
+<DD>The list of overlap elements on the calling process, in
+  local numbering.
 <BR>
-Type:<B>required</B>.
+Scope: <B>local</B> 
 <BR>
-Specified as: an integer, real or complex array of rank 1.
-</DD>
-<DT><STRONG>ix</STRONG></DT>
-<DD>A vector of indices.
+Type: <B>required</B>
 <BR>
-Type: <B>Optional</B> 
+Intent: <B>out</B>.
 <BR>
-An integer array of rank 1, whose entries are moved to the same
-position as the corresponding entries in <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN>.
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.
+<BR></DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 
 <P>
 <BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>For integer or real data the sorting can be performed in the up/down direction, on the
-  natural or absolute values;
+<LI>If there are no overlap elements the output vector is set
+  to the &ldquo;not allocated&rdquo; state.  
 </LI>
-<LI>For  complex data the sorting can  be done in a lexicographic
-  order (i.e.: sort on the real part with ties broken according to
-  the imaginary part) or on the absolute values; 
-</LI>
-<LI>The routines return the items in the chosen ordering; the
-  output difference is the handling of  ties (i.e. items with an
-  equal   value) in the original input. With the merge-sort algorithm
-  ties are   preserved in the same relative order as they had in the
-  original   sequence,  while this is not guaranteed for quicksort or
-  heapsort; 
-</LI>
-<LI>If <!-- MATH
- $flag = psb\_sort\_ovw\_idx\_$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img125.png"
- ALT="$flag = psb\_sort\_ovw\_idx\_$"></SPAN> then the entries in <SPAN CLASS="MATH"><IMG
- WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img126.png"
- ALT="$ix(1:n)$"></SPAN>
-  where <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img16.png"
- ALT="$n$"></SPAN> is the size of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> are initialized to <!-- MATH
- $ix(i) \leftarrow
-  i$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img127.png"
- ALT="$ix(i) \leftarrow
-i$"></SPAN>; thus, upon return from the subroutine, for each
-  index <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$"></SPAN> we have in <SPAN CLASS="MATH"><IMG
- WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img128.png"
- ALT="$ix(i)$"></SPAN> the position that the item <SPAN CLASS="MATH"><IMG
- WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img129.png"
- ALT="$x(i)$"></SPAN>
-  occupied in the original data sequence;
-</LI>
-<LI>If <!-- MATH
- $flag = psb\_sort\_keep\_idx\_$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img130.png"
- ALT="$flag = psb\_sort\_keep\_idx\_$"></SPAN> the routine will assume that
-  the entries in <SPAN CLASS="MATH"><IMG
- WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img131.png"
- ALT="$ix(:)$"></SPAN> have already been initialized by the user;
-</LI>
-<LI>The three sorting algorithms have a similar <SPAN CLASS="MATH"><IMG
- WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img132.png"
- ALT="$O(n \log n)$"></SPAN> expected
-  running time; in the average case quicksort will be the
-  fastest and merge-sort the slowest. However note that:
-
-<OL>
-<LI>The worst case running time for quicksort is <SPAN CLASS="MATH"><IMG
- WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="img133.png"
- ALT="$O(n^2)$"></SPAN>; the algorithm
-  implemented here follows the well-known median-of-three heuristics,
-  but the worst case may still apply;
-</LI>
-<LI>The worst case running time for merge-sort and heap-sort is
-  <SPAN CLASS="MATH"><IMG
- WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img132.png"
- ALT="$O(n \log n)$"></SPAN> as the average case;
-</LI>
-<LI>The merge-sort algorithm is implemented to take advantage of 
-  subsequences that may be already in the desired ordering prior to
-  the subroutine call; this situation is relatively common when
-  dealing with groups of indices of sparse matrix entries, thus
-  merge-sort is the preferred  choice when a sorting is needed
-  by other routines in the library. 
-</LI>
-</OL>
+<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
+  number of overlap elements. 
 </LI>
 </OL>
 
 <P>
-
-<P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1476"
-  HREF="node99.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1472"
-  HREF="node71.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1468"
-  HREF="node97.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1474"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1477"
-  HREF="node99.html">Parallel environment routines</A>
-<B> Up:</B> <A NAME="tex2html1473"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1469"
-  HREF="node97.html">psb_sizeof   Memory</A>
- &nbsp; <B>  <A NAME="tex2html1475"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_spins -- Insert a set of coefficients into a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_spins -- Insert a set of coefficients into a sparse matrix">
+<TITLE>psb_cdfree -- Frees a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdfree -- Frees a communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,169 +16,65 @@
 
 <LINK REL="next" HREF="node80.html">
 <LINK REL="previous" HREF="node78.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node80.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1250"
+<A NAME="tex2html1259"
   HREF="node80.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1246"
-  HREF="node71.html">
+<A NAME="tex2html1255"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1240"
+<A NAME="tex2html1249"
   HREF="node78.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1248"
+<A NAME="tex2html1257"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1251"
-  HREF="node80.html">psb_spasb   Sparse</A>
-<B> Up:</B> <A NAME="tex2html1247"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1241"
-  HREF="node78.html">psb_spall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1249"
+<B> Next:</B> <A NAME="tex2html1260"
+  HREF="node80.html">psb_cdbldext   Build</A>
+<B> Up:</B> <A NAME="tex2html1256"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1250"
+  HREF="node78.html">psb_cdcpy   Copies</A>
+ &nbsp; <B>  <A NAME="tex2html1258"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00078000000000000000">
-psb_spins -- Insert a set of coefficients into a sparse
-  matrix</A>
+<H2><A NAME="SECTION00075000000000000000">
+psb_cdfree -- Frees a communication descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
-call psb_spins(nr, irw, irp, ja, val, a, desc_a, info [,local])
+call psb_cdfree(desc_a, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of coefficients to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer scalar.
-</DD>
-<DT><STRONG>nr</STRONG></DT>
-<DD>the number of rows to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer scalar.
-</DD>
-<DT><STRONG>irw</STRONG></DT>
-<DD>the first  row to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer scalar.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the row indices of the coefficients to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of size <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
-</DD>
-<DT><STRONG>irp</STRONG></DT>
-<DD>the row pointers of the coefficients to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of size <SPAN CLASS="MATH"></SPAN>.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the column indices of the coefficients to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of size <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the coefficients to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an array of size <SPAN CLASS="MATH"><IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$nz$"></SPAN>. Must be of the same type and kind
-of the coefficients  of the sparse matrix <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img109.png"
- ALT="$a$"></SPAN>.
-</DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
+<DD>the communication descriptor to be freed.
 <BR>
-Scope: <B>local</B>. 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>.
+Type:<B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
-<DT><STRONG>local</STRONG></DT>
-<DD>Whether the entries in the indices vectors <code>ia</code>,
-  <code>ja</code> are already in local  numbering. 
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: a logical value; default: <code>.false.</code>.
-
-<P>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 </DL>
 
@@ -187,28 +83,6 @@ Specified as: a logical value; default: <code>.false.</code>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix into which coefficients will be inserted.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
-<BR>
-Scope: <B>local</B>. 
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -223,98 +97,7 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>On entry to this routine the descriptor may be in either the
-  build or assembled state.
-</LI>
-<LI>On entry to this routine the sparse matrix may be in either the
-  build or update state. 
-</LI>
-<LI>If the descriptor is in the build state, then the sparse matrix
-  must also be in the build state; the action of the routine is to
-  (implicitly) call <code>psb_cdins</code> to add entries to the sparsity
-  pattern; each sparse matrix entry implicitly defines a graph edge,
-  that is passed to the descriptor routine for the appropriate
-  processing;
-</LI>
-<LI>The input data can be passed in either COO or CSR formats;
-</LI>
-<LI>In COO format the coefficients to be inserted are represented by
-  the ordered   triples <!-- MATH
- $ia(i),ja(i),val(i)$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="124" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img110.png"
- ALT="$ia(i),ja(i),val(i)$"></SPAN>, for <SPAN CLASS="MATH"><IMG
- WIDTH="91" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img111.png"
- ALT="$i=1,\dots,nz$"></SPAN>;
-  these triples  should belong to the current process, i.e. <SPAN CLASS="MATH"><IMG
- WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img103.png"
- ALT="$ia(i)$"></SPAN>
-  should be one of  the local indices, but are otherwise arbitrary;
-</LI>
-<LI>In CSR format the coefficients to be inserted for each input row <SPAN CLASS="MATH"></SPAN>
-  are represented by the ordered triples <!-- MATH
- $(i+irw-1),ja(j),val(j)$
- -->
-<SPAN CLASS="MATH"></SPAN>, for
-  <!-- MATH
- $j=irp(i),\dots,irp(i+1)-1$
- -->
-<SPAN CLASS="MATH"></SPAN>; 
-  these triples  should belong to the current process, i.e. <SPAN CLASS="MATH"></SPAN>
-  should be one of  the local indices, but are otherwise arbitrary;  
-</LI>
-<LI>There is no   requirement that a given row must be passed in its
-  entirety to a   single call to this routine: the buildup of a row
-  may be split into   as many calls as desired (even in the CSR format); 
-</LI>
-<LI>Coefficients from different rows may also be mixed up freely
-  in a single call, according to the application needs; 
-</LI>
-<LI>Any coefficients from matrix rows not owned by the calling
-  process are silently ignored;
-</LI>
-<LI>If the descriptor is in the assembled state, then any entries in
-  the sparse matrix that would generate additional communication
-  requirements are  ignored; 
-</LI>
-<LI>If the matrix is in the update state, any entries in positions
-  that were not present in the original matrix are ignored. 
-</LI>
-</OL>
-
-<P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1250"
-  HREF="node80.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1246"
-  HREF="node71.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1240"
-  HREF="node78.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1248"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1251"
-  HREF="node80.html">psb_spasb   Sparse</A>
-<B> Up:</B> <A NAME="tex2html1247"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1241"
-  HREF="node78.html">psb_spall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1249"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

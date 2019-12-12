@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_set_mat_default -- Set default storage format</TITLE>
-<META NAME="description" CONTENT="psb_set_mat_default -- Set default storage format">
+<TITLE>clip_diag -- Cut out main diagonal</TITLE>
+<META NAME="description" CONTENT="clip_diag -- Cut out main diagonal">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,48 +16,48 @@
 
 <LINK REL="next" HREF="node41.html">
 <LINK REL="previous" HREF="node39.html">
-<LINK REL="up" HREF="node23.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node41.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html742"
+<A NAME="tex2html751"
   HREF="node41.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html738"
-  HREF="node23.html">
+<A NAME="tex2html747"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html732"
+<A NAME="tex2html741"
   HREF="node39.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html740"
+<A NAME="tex2html749"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html743"
-  HREF="node41.html">clone   Clone</A>
-<B> Up:</B> <A NAME="tex2html739"
-  HREF="node23.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html733"
-  HREF="node39.html">triu   Return</A>
- &nbsp; <B>  <A NAME="tex2html741"
+<B> Next:</B> <A NAME="tex2html752"
+  HREF="node41.html">tril   Return</A>
+<B> Up:</B> <A NAME="tex2html748"
+  HREF="node26.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html742"
+  HREF="node39.html">get_diag   Get</A>
+ &nbsp; <B>  <A NAME="tex2html750"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421700000000000000">
-psb_set_mat_default -- Set default  storage format</A>
+<H3><A NAME="SECTION000421400000000000000">
+clip_diag -- Cut out main diagonal</A>
 </H3>
 
-<P>
 <PRE>
-call  psb_set_mat_default(a)
+    call a%clip_diag(b,info)
 </PRE>
 
 <P>
+Returns a copy of <code>a</code> without the main diagonal.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -66,10 +66,24 @@ call  psb_set_mat_default(a)
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting
-  a new default storage format.
+<DD>the sparse matrix.
 <BR>
-Type: required.
+A variable of type <code>psb_Tspmat_type</code>.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>A copy  of  <code>a</code> without the main diagonal.
+<BR>
+A variable of type <code>psb_Tspmat_type</code>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 

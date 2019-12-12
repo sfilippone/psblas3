@@ -334,8 +334,15 @@ An integer value; 0 means no error has been detected.
 \item On exit from this routine the descriptor is in the assembled
   state. 
 \end{enumerate}
-
-
+This call will set up all the necessary information for the halo data
+exchanges. In doing so, the library will need to identify the set of
+processes owning the halo indices through the use of the
+\verb|desc%fnd_owner()|  method; the owning processes are the
+topological neighbours of the calling process. If the user has some
+background information on the processes that are neighbours of the
+current one, it is possible to specify explicitly the list of adjacent
+processes with a call to  \verb|desc%set_p_adjcncy(list)|; this will
+speed up the subsequent call to  \verb|psb_cdasb|. 
 
 %
 %%   psb_cdcpy %%

@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_glob_to_loc -- Global to local indices convertion</TITLE>
-<META NAME="description" CONTENT="psb_glob_to_loc -- Global to local indices convertion">
+<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,101 +16,80 @@
 
 <LINK REL="next" HREF="node89.html">
 <LINK REL="previous" HREF="node87.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node74.html">
 <LINK REL="next" HREF="node89.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1358"
+<A NAME="tex2html1367"
   HREF="node89.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1354"
-  HREF="node71.html">
+<A NAME="tex2html1363"
+  HREF="node74.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1348"
+<A NAME="tex2html1357"
   HREF="node87.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1356"
+<A NAME="tex2html1365"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1359"
-  HREF="node89.html">psb_loc_to_glob   Local</A>
-<B> Up:</B> <A NAME="tex2html1355"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1349"
-  HREF="node87.html">psb_gelp   Applies</A>
- &nbsp; <B>  <A NAME="tex2html1357"
+<B> Next:</B> <A NAME="tex2html1368"
+  HREF="node89.html">psb_gefree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1364"
+  HREF="node74.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1358"
+  HREF="node87.html">psb_geins   Dense</A>
+ &nbsp; <B>  <A NAME="tex2html1366"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000717000000000000000">
-psb_glob_to_loc -- Global to local indices
-  convertion</A>
+<H2><A NAME="SECTION000714000000000000000">
+psb_geasb -- Assembly a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
-call psb_glob_to_loc(x, desc_a, info, iact,owned)
+call psb_geasb(x, desc_a, info, mold)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>An integer vector of indices to be converted.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>The communication descriptor.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in, inout</B>.
+Intent: <B>in</B>.
 <BR>
-Specified as: a rank one integer array.
+Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B>.
 <BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>iact</STRONG></DT>
-<DD>specifies action to be taken in case of range errors. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
-<code>A</code>bort, default <code>I</code>gnore.
-</DD>
-<DT><STRONG>owned</STRONG></DT>
-<DD>Specfies valid range of input 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-If true, then only indices strictly owned by the current process are
-considered valid, if false then halo indices are also
-accepted. Default: false. 
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> is of type vdata<TT>psb_T_vect_type</TT>.
 </DD>
 </DL>
 
@@ -120,43 +99,17 @@ accepted. Default: false.
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN> is not present,
-  then <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN> is overwritten with the translated integer indices. 
-Scope: <B>global</B> 
+<DD>The dense matrix to be assembled.
+<BR>
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one integer array.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN> is  present,
-  then <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"></SPAN> is overwritten with the translated integer indices, and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></SPAN>
-  is left unchanged. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: a rank one integer array.
-</DD>
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
+<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -169,45 +122,7 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-
-<OL>
-<LI>If an input index is out of range, then the corresponding output
-  index is set to a negative number;
-</LI>
-<LI>The default <code>I</code>gnore means that the negative output is the
-  only action taken on an out-of-range input.
-</LI>
-</OL>
-
-<P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1358"
-  HREF="node89.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1354"
-  HREF="node71.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1348"
-  HREF="node87.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1356"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1359"
-  HREF="node89.html">psb_loc_to_glob   Local</A>
-<B> Up:</B> <A NAME="tex2html1355"
-  HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1349"
-  HREF="node87.html">psb_gelp   Applies</A>
- &nbsp; <B>  <A NAME="tex2html1357"
-  HREF="node1.html">Contents</A></B> </DIV>
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

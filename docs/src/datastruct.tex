@@ -306,7 +306,7 @@ Type: {\bf optional}; default: \verb|.true.|.\\
 \begin{description}
 \item[\bf On Return]
 \item[Function value] The global indices, returned as an allocatable
-  integer array of rank 1. 
+  integer array of kind \verb|psb_lpk_|  and rank 1. 
 \end{description}
 
 
@@ -369,7 +369,7 @@ call  desc%cnv(mold)
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
-\item[mold] the desred integer storage format.\\
+\item[mold] the desired integer storage format.\\
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
@@ -420,6 +420,76 @@ call to \verb|psb_cdall| is executed, therefore changing the threshold
 has no effect on communication descriptors that have already been
 initialized. Moreover the threshold must have the same value on all
 processes. 
+
+
+\subsubsection*{get\_p\_adjcncy --- Get process adjacency list}
+\addcontentsline{toc}{paragraph}{get\_p\_adjcncy}
+
+\begin{verbatim}
+list =  desc%get_p_adjcncy()
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Return]
+\item[Function value] The current list of adjacent processes,
+  i.e. processes with which the current one has to exchange halo
+  data. 
+
+\end{description}
+
+\subsubsection*{set\_p\_adjcncy --- Set process adjacency list}
+\addcontentsline{toc}{paragraph}{set\_p\_adjcncy}
+
+\begin{verbatim}
+call desc%set_p_adjcncy(list)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[list] the list of adjacent processes.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a one-dimensional array of integers of kind \verb|psb_ipk_|. 
+\end{description}
+Note: this method can be called after a call  to \verb|psb_cdall| and
+before a call to \verb|psb_cdasb|. The user is specifying here some
+knowledge about which processes are topological neighbours of the
+current process. The availability of this information may speed up the
+execution of the assembly call \verb|psb_cdasb|. 
+
+
+\subsubsection*{fnd\_owner --- Find the owner process of a set of indices}
+\addcontentsline{toc}{paragraph}{fnd\_owner}
+
+\begin{verbatim}
+call desc%fnd_owner(idx,iprc,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[idx] the list of global indices for which we need the owning processes.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a one-dimensional array of integers of kind \verb|psb_lpk_|. 
+\item[\bf On Return]
+\item[iprc] the list of processes owning the indices in \verb|idx|.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an allocatable one-dimensional array of integers of kind \verb|psb_ipk_|. 
+\end{description}
+Note: this method may or may not actually require communications, depending on
+the exact internal data storage; given that the choice of storage may
+be altered by runtime parameters, it is necessary for safety that this
+method is called by all processes. 
+
+
+
 
 \subsubsection{Named Constants}
 \label{sec:cd_constants}

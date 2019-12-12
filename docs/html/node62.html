@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>psb_norm1 -- 1-Norm of Sparse Matrix</TITLE>
-<META NAME="description" CONTENT="psb_norm1 -- 1-Norm of Sparse Matrix">
+<TITLE>psb_geasums -- Generalized 1-Norm of Vector</TITLE>
+<META NAME="description" CONTENT="psb_geasums -- Generalized 1-Norm of Vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,103 +16,147 @@
 
 <LINK REL="next" HREF="node63.html">
 <LINK REL="previous" HREF="node61.html">
-<LINK REL="up" HREF="node52.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node63.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1019"
+<A NAME="tex2html1028"
   HREF="node63.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1015"
-  HREF="node52.html">
+<A NAME="tex2html1024"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1009"
+<A NAME="tex2html1018"
   HREF="node61.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1017"
+<A NAME="tex2html1026"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1020"
-  HREF="node63.html">psb_normi   Infinity</A>
-<B> Up:</B> <A NAME="tex2html1016"
-  HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html1010"
-  HREF="node61.html">psb_genrm2s   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html1018"
+<B> Next:</B> <A NAME="tex2html1029"
+  HREF="node63.html">psb_norm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html1025"
+  HREF="node55.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html1019"
+  HREF="node61.html">psb_norm1   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html1027"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000510000000000000000">
-psb_norm1 -- 1-Norm of Sparse Matrix</A>
+<H2><A NAME="SECTION00057000000000000000">
+psb_geasums -- Generalized 1-Norm of Vector</A>
 </H2>
 
 <P>
-This function computes the 1-norm of a matrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN>:
-<BR>
-<P>
+This subroutine computes a series of  1-norms on the columns of
+a  dense matrix  <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN>: 
 <BR><P></P>
 <DIV ALIGN="CENTER" CLASS="mathdisplay">
 <!-- MATH
  \begin{displaymath}
-nrm1 \leftarrow \|A\|_1
+res(i) \leftarrow \max_k |x(k,i)|
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="97" HEIGHT="28" BORDER="0"
- SRC="img46.png"
- ALT="\begin{displaymath}nrm1 \leftarrow \Vert A\Vert _1 \end{displaymath}">
+ WIDTH="148" HEIGHT="36" BORDER="0"
+ SRC="img34.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
-where:
-<DL>
-<DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN></STRONG></DT>
-<DD>represents the global matrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN>
-</DD>
-</DL>
+This function computes the 1-norm of a vector <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN>.
+<BR>
+If <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> is a real vector 
+it computes 1-norm as:
+<BR><P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow  \|x_i\|
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="93" HEIGHT="29" BORDER="0"
+ SRC="img39.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert x_i\Vert\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+else if <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> is a complex vector then it computes 1-norm  as:
+<BR><P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="207" HEIGHT="29" BORDER="0"
+ SRC="img40.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+
+<P>
+<PRE>
+call psb_geasums(res, x, desc_a, info)
+</PRE>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2032"></A>
+<DIV ALIGN="CENTER"><A NAME="2108"></A>
 <TABLE>
-<CAPTION><STRONG>Table 10:</STRONG>
+<CAPTION><STRONG>Table 7:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img29.png"
+ ALT="$res$"></SPAN></TD>
+<TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_spnrm1</TD>
+<TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_spnrm1</TD>
+<TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
-<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spnrm1</TD>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
-<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spnrm1</TD>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -122,12 +166,6 @@ Data types</CAPTION>
 <BR>
 
 <P>
-<PRE>
-psb_spnrm1(A, desc_a, info)
-psb_norm1(A, desc_a, info)
-</PRE>
-
-<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -135,20 +173,23 @@ psb_norm1(A, desc_a, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the local  portion of the global sparse matrix
+<DT><STRONG>x</STRONG></DT>
+<DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN>. 
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN>. 
+
 <BR>
 Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an object of type spdata<TT>psb_Tspmat_type</TT>.
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90asums">7</A>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -160,19 +201,24 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
+
+<P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>is the 1-norm of sparse submatrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"></SPAN>.
+<DT><STRONG>res</STRONG></DT>
+<DD>contains the 1-norm of (the columns of) <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN>.
 <BR>
 Scope: <B>global</B> 
 <BR>
-Specified as: a long precision real number.
+Intent: <B>out</B>.
+<BR>
+Short as: a long precision real  number.
+Specified as: a long precision real  number.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -188,7 +234,31 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BR><HR>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1028"
+  HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1024"
+  HREF="node55.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1018"
+  HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1026"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1029"
+  HREF="node63.html">psb_norm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html1025"
+  HREF="node55.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html1019"
+  HREF="node61.html">psb_norm1   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html1027"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

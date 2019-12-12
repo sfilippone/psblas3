@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>get_vect -- Get a copy of the vector contents</TITLE>
-<META NAME="description" CONTENT="get_vect -- Get a copy of the vector contents">
+<TITLE>get_nrows -- Get number of rows in a dense vector</TITLE>
+<META NAME="description" CONTENT="get_nrows -- Get number of rows in a dense vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,45 +16,45 @@
 
 <LINK REL="next" HREF="node49.html">
 <LINK REL="previous" HREF="node47.html">
-<LINK REL="up" HREF="node43.html">
+<LINK REL="up" HREF="node46.html">
 <LINK REL="next" HREF="node49.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html842"
+<A NAME="tex2html851"
   HREF="node49.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html838"
-  HREF="node43.html">
+<A NAME="tex2html847"
+  HREF="node46.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html832"
+<A NAME="tex2html841"
   HREF="node47.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html840"
+<A NAME="tex2html849"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html843"
-  HREF="node49.html">clone   Clone</A>
-<B> Up:</B> <A NAME="tex2html839"
-  HREF="node43.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html833"
-  HREF="node47.html">set   Set</A>
- &nbsp; <B>  <A NAME="tex2html841"
+<B> Next:</B> <A NAME="tex2html852"
+  HREF="node49.html">sizeof   Get</A>
+<B> Up:</B> <A NAME="tex2html848"
+  HREF="node46.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html842"
+  HREF="node47.html">Vector Methods</A>
+ &nbsp; <B>  <A NAME="tex2html850"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043500000000000000">
-get_vect  -- Get a copy of the vector contents</A>
+<H3><A NAME="SECTION00043200000000000000">
+get_nrows -- Get number of  rows in a dense vector</A>
 </H3>
 
 <P>
 <PRE>
-extv = v%get_vect([n])
+nr = v%get_nrows()
 </PRE>
 
 <P>
@@ -70,15 +70,6 @@ extv = v%get_vect([n])
 <BR>
 Scope: <B>local</B>
 <BR></DD>
-<DT><STRONG>n</STRONG></DT>
-<DD>Size to be returned
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>; default: entire vector.
-<BR>
-<P>
-</DD>
 </DL>
 
 <P>
@@ -87,20 +78,7 @@ Type: <B>optional</B>; default: entire vector.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>An allocatable array holding a copy of the dense
-  vector contents. If the argument <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img16.png"
- ALT="$n$"></SPAN> is specified, the size of the
-  returned array equals the minimum between <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img16.png"
- ALT="$n$"></SPAN> and the internal size
-  of the vector, or 0 if <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img16.png"
- ALT="$n$"></SPAN> is negative; otherwise, the size of the
-  array is the same as the internal size of the vector.
+<DD>The number of  rows  of dense vector <code>v</code>.
 </DD>
 </DL>
 
