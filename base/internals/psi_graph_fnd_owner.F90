@@ -51,6 +51,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
+  use psb_timers_mod
   use psb_desc_mod, psb_protect_name => psi_graph_fnd_owner
 #ifdef MPI_MOD
   use mpi
@@ -76,7 +77,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_) :: ictxt,np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
   integer(psb_ipk_) :: tmpv(2)
-  logical, parameter  :: gettime=.false., trace=.false.
+  logical, parameter  :: do_timings=.false., trace=.false.
+  integer(psb_ipk_), save  :: idx_sweep0=-1, idx_loop_a2a=-1, idx_loop_neigh=-1
   real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name
 
@@ -90,6 +92,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
   iictxt  = ictxt 
+  if ((do_timings).and.(idx_sweep0==-1))       &
+       & idx_sweep0 = psb_get_timer_idx("GRPH_FND_OWN: Outer sweep")
+  if ((do_timings).and.(idx_loop_a2a==-1))       &
+       & idx_loop_a2a = psb_get_timer_idx("GRPH_FND_OWN: Loop a2a")
+  if ((do_timings).and.(idx_loop_neigh==-1))       &
+       & idx_loop_neigh = psb_get_timer_idx("GRPH_FND_OWN: Loop neigh")
+
 
   call psb_info(ictxt, me, np)
 
@@ -142,6 +151,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   tmpv(1) = nadj
   tmpv(2) = nrest_max
   call psb_max(ictxt,tmpv)
+  if (do_timings) call psb_tic(idx_sweep0)
   if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
     !
     ! Do a preliminary run on the user-defined adjacency lists
@@ -155,9 +165,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     call psb_max(ictxt,nrest_max)
     if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nrest_max
   end if
-
+  if (do_timings) call psb_toc(idx_sweep0)
     
   fnd_owner_loop: do while (nrest_max>0)
+  if (do_timings) call psb_tic(idx_loop_a2a)    
     !
     ! The basic idea of this loop is to alternate between
     ! searching through all processes and searching
@@ -195,7 +206,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ladj = tprc(1:nsampl_in)
     call psb_msort_unique(ladj,nadj)
     call psb_realloc(nadj,ladj,info)
-
+    if (do_timings) call psb_toc(idx_loop_a2a)
+    if (do_timings) call psb_tic(idx_loop_neigh)    
     !
     ! 4. Extract again a sample and do a neighbourhood search
     !    so that the total size is <= maxspace
@@ -215,6 +227,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     nrest_max = n_rest
     call psb_max(ictxt,nrest_max)
     if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nrest_max
+    if (do_timings) call psb_toc(idx_loop_neigh)    
   end do fnd_owner_loop
 
   call psb_erractionrestore(err_act)
