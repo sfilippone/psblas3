@@ -310,7 +310,7 @@ module psb_desc_mod
 
 
   integer(psb_lpk_), private, save :: cd_large_threshold = psb_default_large_threshold
-  integer(psb_ipk_), private, save :: cd_maxspace        = 1000*1000
+  integer(psb_ipk_), private, save :: cd_maxspace        = -1
 
 
 contains 
