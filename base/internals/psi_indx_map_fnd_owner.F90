@@ -30,20 +30,26 @@
 !   
 !   
 !
-! File: psi_fnd_owner.f90
+! File: psi_indx_map_fnd_owner.f90
 !
-! Subroutine: psi_fnd_owner
+! Subroutine: psi_indx_map_fnd_owner
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                 Number of indices required on  the calling
-!                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
 !    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
-!    desc_a   - type(psb_desc_type).    The communication descriptor.        
+!    idxmap   - class(psb_indx_map).    The index map
 !    info     - integer.                return code.
+!
+!  This is the default implementation of the FND_OWNER method.
+!  If a particular index map class has additional information, it can override it
+!  (see e.g. the GEN_BLOCK_MAP class).
+!
+!  1. Check if IDXM%PARTS is available, and use it; or
+!  2. Check if TEMPVG(:) is allocated, and use it; or
+!  3. Call the general method PSI_GRAPH_FND_OWNER. 
 ! 
 subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
