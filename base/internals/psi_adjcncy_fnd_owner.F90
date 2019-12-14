@@ -50,7 +50,8 @@
 ! be topological neighbours of the current one. Each process will send to all 
 ! of its neighbours the list of indices for which it is trying to find the
 ! owner, prepare its own answers, and collect answers from others.
-! There are 
+! There are three possibile implementations: using mpi_alltoallv, using mpi_isend/irecv,
+! using psb_snd/psb_rcv. The default is mpi_alltoallv.
 ! 
 subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   use psb_serial_mod
@@ -204,6 +205,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     end do
 
     if (debug) write(0,*) me,' End of adjcncy_fnd ',iprc(1:nidx)    
+
   else if (mpi_irecv_impl) then
     !
     ! First simple minded version with auxiliary arrays
