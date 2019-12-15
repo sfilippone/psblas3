@@ -32,17 +32,15 @@
 !
 ! File: psb_callc.f90
 !
-! Function: psb_calloc
-!    Allocates dense matrix for PSBLAS routines. 
+! Function: psb_calloc_vect
+!    Allocates dense vector for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.
 ! 
 ! Arguments: 
-!    x      - the matrix to be allocated.
+!    x      - the vector to be allocated.
 !    desc_a - the communication descriptor.
 !    info   - Return code
-!    n      - optional number of columns.
-!    lb     - optional lower bound on column indices
-subroutine psb_calloc_vect(x, desc_a,info,n)
+subroutine psb_calloc_vect(x, desc_a,info)
   use psb_base_mod, psb_protect_name => psb_calloc_vect
   use psi_mod
   implicit none
@@ -51,7 +49,6 @@ subroutine psb_calloc_vect(x, desc_a,info,n)
   type(psb_c_vect_type), intent(out)  :: x
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_),intent(out)             :: info
-  integer(psb_ipk_), optional, intent(in)   :: n
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
@@ -113,6 +110,16 @@ subroutine psb_calloc_vect(x, desc_a,info,n)
   return
 
 end subroutine psb_calloc_vect
+! Function: psb_calloc_vect_r2
+!    Allocates a vector of dense vectors for PSBLAS routines. 
+!    The descriptor may be in either the build or assembled state.
+! 
+! Arguments: 
+!    x      - the vector to be allocated.
+!    desc_a - the communication descriptor.
+!    info   - Return code
+!    n      - optional number of columns.
+!    lb     - optional lower bound on column indices
 
 subroutine psb_calloc_vect_r2(x, desc_a,info,n,lb)
   use psb_base_mod, psb_protect_name => psb_calloc_vect_r2
