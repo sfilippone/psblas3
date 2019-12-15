@@ -32,14 +32,15 @@
 ! File: psb_cnrmi.f90
 !
 ! Function: psb_cnrmi
-!    Forms the infinity norm of a sparse matrix,                           
+!    Computes the infinity norm of a sparse matrix,                           
 !
-!    nrmi := max_i(abs(sum(A(i,:))))                                              
+!    nrmi := max_i(sum(abs(A(i,:))))                                              
 !
 ! Arguments:
 !    a      -  type(psb_cspmat_type).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
 function psb_cnrmi(a,desc_a,info,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_cnrmi

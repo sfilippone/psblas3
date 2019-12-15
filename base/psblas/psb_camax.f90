@@ -32,7 +32,7 @@
 ! File: psb_camax.f90
 !
 ! Function: psb_camax
-!    Searches the absolute max of X.
+!    Computes the maximum absolute value of X
 !
 !    normi := max(abs(sub(X)(i))  
 !
@@ -164,7 +164,7 @@ end function psb_camax
 !!$
 !
 ! Function: psb_camaxv
-!    Searches the absolute max of X.
+!    Computes the maximum absolute value  of X.
 !
 !    normi := max(abs(X(i))  
 !
@@ -252,6 +252,17 @@ function psb_camaxv (x,desc_a, info,global) result(res)
   return
 end function psb_camaxv
 
+!
+! Function: psb_camax_vect
+!    Computes the maximum absolute value  of X.
+!
+!    normi := max(abs(X(i))  
+!
+! Arguments:
+!    x      - type(psb_c_vect_type) The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!
 
 function psb_camax_vect(x, desc_a, info,global) result(res)
   use psb_penv_mod
@@ -374,17 +385,16 @@ end function psb_camax_vect
 !!$  
 !
 ! Subroutine: psb_camaxvs
-!    Searches the absolute max of X.
+!    Computes the maximum absolute value of X, subroutine version
 !
 !    normi := max(abs(sub(X)(i))  
 !
-!    where sub( X ) denotes X(1:N,JX:).
+!    where sub( X ) denotes X(1:N).
 !
 ! Arguments:
 !    res    -  real                 The result.
-!    x(:,:) -  complex              The input vector.
+!    x(:)   -  complex              The input vector.
 !    desc_a -  type(psb_desc_type). The communication descriptor.
-!    info   -  integer.             Return code
 !    jx     -  integer(optional).   The column offset.
 !
 subroutine psb_camaxvs(res,x,desc_a, info,global)

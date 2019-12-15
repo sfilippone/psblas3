@@ -28,8 +28,13 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
+!
+! Subroutine: psi_iovrl_restr
+!   These subroutines restore the overlap region of a vector; they are  used
+!   for the transpose  matrix-vector product when there is a nonempty overlap.
+!                                              
 !    
-
+!    
 subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_iovrl_restr_vect
   use psb_i_base_vect_mod

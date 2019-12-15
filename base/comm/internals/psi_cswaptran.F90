@@ -32,8 +32,8 @@
 !
 ! File: psi_cswaptran.F90
 !
-! Subroutine: psi_cswaptranm
-!   Does the data exchange among processes. This is similar to Xswapdata, but
+! Subroutine: psi_cswaptran_vect
+!   Implements the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
 !   for doing the product of a sparse matrix by a vector. 
@@ -47,12 +47,16 @@
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
-!   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
-!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
-!   but only on the elements involved in the UNPACK operation. 
+!   sections SND(Y) and RCV(Y); then we do a SEND(PACK(GTH(SND(Y))));
+!   then we receive, and we do an update with Y = SCT(RCV(Y)) + BETA * Y 
+!   but only on the elements involved in the SCT operation. 
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
+!   This version works on encapsulated vectors, and uses their methods to do  GTH and SCT,
+!   so that special versions (i.e. GPU vectors can override them 
+! 
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -73,10 +77,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
-!    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    beta     - complex                  Choose overwrite or sum. 
+!    y        - type(psb_c_vect_type) The data area                        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
+!    work(:)  - complex                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -86,13 +90,6 @@
 !                                       psb_comm_ovrl_    use ovrl_index
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
-!
-!
-! Subroutine: psi_cswaptran_vect
-!   Data exchange among processes.
-!
-!   Takes care of Y an exanspulated vector.
-!   
 !   
 subroutine psi_cswaptran_vect(flag,beta,y,desc_a,work,info,data)
 
@@ -171,7 +168,7 @@ end subroutine psi_cswaptran_vect
 ! Subroutine: psi_ctran_vidx_vect
 !   Data exchange among processes.
 !
-!   Takes care of Y an exanspulated vector. Relies on the gather/scatter methods
+!   Takes care of Y an encapsulated vector. Relies on the gather/scatter methods
 !   of vectors. 
 !   
 !   The real workhorse: the outer routine will only choose the index list
@@ -436,10 +433,10 @@ end subroutine psi_ctran_vidx_vect
 !
 !
 !
-! Subroutine: psi_cswaptran_vect
+! Subroutine: psi_cswaptran_multivect
 !   Data exchange among processes.
 !
-!   Takes care of Y an encaspulated vector.
+!   Takes care of Y an encaspulated multivector.
 !   
 !   
 subroutine psi_cswaptran_multivect(flag,beta,y,desc_a,work,info,data)

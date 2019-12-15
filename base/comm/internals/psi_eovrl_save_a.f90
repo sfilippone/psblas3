@@ -28,8 +28,12 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-!    
-
+!
+!
+! Subroutine: psi_eovrl_save
+!   These subroutines save the overlap region of a vector; they are used
+!   for the transpose  matrix-vector product when there is a nonempty overlap.
+!                                              
 subroutine  psi_eovrl_saver1(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_eovrl_saver1
 

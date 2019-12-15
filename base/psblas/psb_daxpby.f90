@@ -31,6 +31,23 @@
 !    
 ! File: psb_daxpby.f90
 
+!
+! Subroutine: psb_daxpby_vect
+!    Adds one distributed vector to another,
+!
+!    Y := beta * Y + alpha * X
+!
+! Arguments:
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x      - type(psb_d_vect_type) The input vector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y      - type(psb_d_vect_type)  The input/output vector Y
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
+!  Note: from a functional point of view, X is input, but here
+!        it's declared INOUT because of the sync() methods. 
+!
 subroutine psb_daxpby_vect(alpha, x, beta, y,&
      & desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_vect
@@ -269,7 +286,7 @@ end subroutine psb_daxpby
 !!$  
 !
 ! Subroutine: psb_daxpbyv
-!    Adds one distributed matrix to another,
+!    Adds one distributed vector to another,
 !
 !    Y := beta * Y + alpha * X
 !

@@ -33,7 +33,7 @@
 !
 ! Subroutine: psb_escatterm
 !   This subroutine scatters a global matrix locally owned by one process
-!   into pieces that are local to alle the processes.
+!   into pieces that are local to all the processes.
 !
 ! Arguments:
 !   globx     -  integer,dimension(:,:).       The global matrix to scatter.
@@ -278,7 +278,7 @@ end subroutine psb_escatterm
 
 ! Subroutine: psb_escatterv
 !   This subroutine scatters a global vector locally owned by one process
-!   into pieces that are local to alle the processes.
+!   into pieces that are local to all the processes.
 !
 ! Arguments:
 !   globx     -  integer,dimension(:).         The global vector to scatter.

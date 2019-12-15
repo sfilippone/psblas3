@@ -31,7 +31,7 @@
 !  
 !
 ! Function: psb_camax_s
-!    Searches the absolute max of X.
+!    Computes the max absolute value of X.
 !
 !    normi := max(abs(X(i))  
 !

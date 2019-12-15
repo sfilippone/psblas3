@@ -33,9 +33,9 @@
 ! File: psi_zswapdata.F90
 !
 ! Subroutine: psi_zswapdatam
-!   Does the data exchange among processes. Essentially this is doing 
+!   Implements the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
-!   it is capable of pruning empty exchanges, which are very likely in out 
+!   it is capable of pruning empty exchanges, which are very likely in our
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
@@ -49,6 +49,7 @@
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -69,10 +70,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
+!    beta     - complex                  Choose overwrite or sum. 
+!    y(:,:)   - complex                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - complex                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -507,7 +508,7 @@ end subroutine psi_zswapidxm
 !
 !
 ! Subroutine: psi_zswapdatav
-!   Does the data exchange among processes. Essentially this is doing 
+!   Implements the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
@@ -523,6 +524,7 @@ end subroutine psi_zswapidxm
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -543,10 +545,10 @@ end subroutine psi_zswapidxm
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:)     - X                       The data area                        
+!    beta     - complex                  Choose overwrite or sum. 
+!    y(:)     - complex                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - complex                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data

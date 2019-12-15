@@ -33,7 +33,7 @@
 ! File: psi_sswaptran.F90
 !
 ! Subroutine: psi_sswaptranm
-!   Does the data exchange among processes. This is similar to Xswapdata, but
+!   Implements the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
 !   for doing the product of a sparse matrix by a vector. 
@@ -53,6 +53,7 @@
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -73,10 +74,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y(:,:)   - real                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -516,7 +517,7 @@ end subroutine psi_stranidxm
 !
 !
 ! Subroutine: psi_sswaptranv
-!   Does the data exchange among processes. This is similar to Xswapdata, but
+!   Implements the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
 !   for doing the product of a sparse matrix by a vector. 
@@ -536,6 +537,7 @@ end subroutine psi_stranidxm
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -556,10 +558,10 @@ end subroutine psi_stranidxm
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:)     - X                       The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y(:)     - real                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
