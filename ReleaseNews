@@ -1,5 +1,21 @@
 WHAT'S NEW
 
+Version 3.7.0
+   1. Major change at API level: integer kinds reorganization.
+      Local indices are now of kind PSB_IPK_, whereas global indices
+      are  of kind PSB_LPK_; at configure time it is possible to
+      choose them independently to be PSB_MPK_ (4 bytes) or PSB_EPK_
+      (8 bytes), with the constraint that LPK is always at least as
+      large as IPK.
+   2. The internals have also been reorganized heavily, with a much
+      more coherent design and split of functionalities into source
+      files. 
+
+
+Version 3.6.1
+   1. Multiple improvements to CDASB.
+   2. Some additional methods required by the latest versions of MLD
+
 
 Version 3.5.
    1. New Krylov methods methods  FCG and GCR are now available.
@@ -86,29 +102,9 @@ The solution: either take out the -g option, or, if you really need to
 debug, edit Make.inc to force -DMPI_H in place of -DMPI_MOD. 
 
 
-
-The PSBLAS team. 
-
 RELATED SOFTWARE
 
 If you are looking for more sophisticated preconditioners, you may be
 interested in the package  MLD2P4 from http://github.com/sfilippone/mld2p4-2
-
-
-Contact: https://github.com/sfilippone/psblas3
-
-Contributors 
-Salvatore  Filippone 
-Alfredo    Buttari
-Soren 	   Rasmussen
-Ambra	   Abdullahi Hassan
-Pasqua	   D'Ambra
-Daniela    di Serafino
-Michele    Martone
-Michele    Colajanni
-Fabio      Cerioni
-Stefano    Maiolatesi
-Dario      Pascucci
-
 
 
