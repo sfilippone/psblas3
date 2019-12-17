@@ -135,6 +135,19 @@ function psb_casum (x,desc_a, info, jx,global) result(res)
   return
 end function psb_casum
 
+! Function: psb_casum_vect
+!    Computes norm1 of X
+!
+!    norm1 := sum(sub( X )(i))
+!
+!    where sub( X ) denotes X(1:N,JX:).
+!
+! Arguments:
+!    x      - type(psb_c_vect_type) The input vector.
+!    desc_a -  type(psb_desc_type).   The communication descriptor.
+!    info   -  integer.               Return code
+!    jx     -  integer(optional).     The column offset.
+!
 
 function psb_casum_vect(x, desc_a, info,global) result(res)
   use psb_base_mod, psb_protect_name => psb_casum_vect

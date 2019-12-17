@@ -33,7 +33,7 @@
 !
 ! Subroutine: psb_mscatterm
 !   This subroutine scatters a global matrix locally owned by one process
-!   into pieces that are local to alle the processes.
+!   into pieces that are local to all the processes.
 !
 ! Arguments:
 !   globx     -  integer,dimension(:,:).       The global matrix to scatter.
@@ -107,8 +107,8 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-  call psb_get_mpicomm(ictxt,icomm)
-  call psb_get_rank(myrank,ictxt,me)
+  icomm  = psb_get_mpi_comm(ictxt)
+  myrank = psb_get_mpi_rank(ictxt,me)
 
   if  (iroot==-1) then
     lda_globx = size(globx, 1)
@@ -159,7 +159,7 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
     end do
   else
     
-    call psb_get_rank(rootrank,ictxt,iroot)
+    rootrank = psb_get_mpi_rank(ictxt,iroot)
     !
     ! This is potentially unsafe when IPK=8
     ! But then, IPK=8 is highly experimental anyway.
@@ -278,7 +278,7 @@ end subroutine psb_mscatterm
 
 ! Subroutine: psb_mscatterv
 !   This subroutine scatters a global vector locally owned by one process
-!   into pieces that are local to alle the processes.
+!   into pieces that are local to all the processes.
 !
 ! Arguments:
 !   globx     -  integer,dimension(:).         The global vector to scatter.
@@ -347,8 +347,8 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
      iroot = psb_root_
   end if
   
-  call psb_get_mpicomm(ictxt,icomm)
-  call psb_get_rank(myrank,ictxt,iam)
+  icomm  = psb_get_mpi_comm(ictxt)
+  myrank = psb_get_mpi_rank(ictxt,iam)
 
   iglobx = 1
   jglobx = 1
@@ -394,7 +394,7 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
       locx(i)=globx(ltg(i))
     end do
   else
-    call psb_get_rank(rootrank,ictxt,iroot)
+    rootrank = psb_get_mpi_rank(ictxt,iroot)
     !
     ! This is potentially unsafe when IPK=8
     ! But then, IPK=8 is highly experimental anyway.

@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_gediv &#8212; Entrywise Division</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1309--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu27.html" >next</a>] [<a 
+href="userhtmlsu23.html" >prev</a>] [<a 
+href="userhtmlsu23.html#tailuserhtmlsu23.html" >prev-tail</a>] [<a 
+href="userhtmlsu21.html#tailuserhtmlsu24.html">tail</a>] [<a 
+href="userhtmlsu12.html#userhtmlsu26.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">4.15   </span> <a 
+ id="x33-700004.15"></a>psb_gediv &#8212; Entrywise Division</h4>
+<!--l. 1311--><p class="noindent" >This function computes the entrywise division between two vectors <span 
+class="cmmi-10">x </span>and
+<span 
+class="cmmi-10">y</span>
+   <center class="math-display" >
+<img 
+src="userhtml23x.png" alt="&#x2215; &#x2190; x(i)&#x2215;y(i).
+" class="math-display" ></center>
+<!--l. 1313--><p class="nopar" >
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-54">
+psb_gediv(x,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info,&#x00A0;[flag)
+</div>
+<!--l. 1317--><p class="nopar" > <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 1319--><p class="indent" >   <a 
+ id="x33-7000115"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 1320--><p class="noindent" >
+<div class="tabular"> <table id="TBL-15" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-15-1g"><col 
+id="TBL-15-1"><col 
+id="TBL-15-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-15-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-15-1-1"  
+class="td11"><span 
+class="cmmi-10">&#x2215;</span>, <span 
+class="cmmi-10">x</span>, <span 
+class="cmmi-10">y                    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-15-1-2"  
+class="td11"><span 
+class="cmbx-10">Function</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-15-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-15-2-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-15-2-2"  
+class="td11">psb_gediv</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-15-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-15-3-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-15-3-2"  
+class="td11">psb_gediv</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-15-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-15-4-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-15-4-2"  
+class="td11">psb_gediv</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-15-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-15-5-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-15-5-2"  
+class="td11">psb_gediv</td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-15-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-15-6-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;15: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x33-7000115 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">the local portion of global dense vector <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of
+     type specified in Table&#x00A0;<a 
+href="userhtmlsu11.html#x20-570012">2<!--tex4ht:ref: tab:f90dot --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of global dense vector <span 
+class="cmmi-10">y</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of
+     type specified in Table&#x00A0;<a 
+href="userhtmlsu11.html#x20-570012">2<!--tex4ht:ref: tab:f90dot --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">flag</span> </dt><dd 
+class="description">check  if  any  of  the  <span 
+class="cmmi-10">y</span>(<span 
+class="cmmi-10">i</span>)  =  0,  and  in  case  returns  error  halting  the
+     computation.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional </span>Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: the logical value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">flag=.true.</span></span></span>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">the local portion of result submatrix <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of
+     the type indicated in Table&#x00A0;<a 
+href="userhtmlsu23.html#x32-6900114">14<!--tex4ht:ref: tab:f90mlt --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1382--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu27.html" >next</a>] [<a 
+href="userhtmlsu23.html" >prev</a>] [<a 
+href="userhtmlsu23.html#tailuserhtmlsu23.html" >prev-tail</a>] [<a 
+href="userhtmlsu24.html" >front</a>] [<a 
+href="userhtmlsu12.html#userhtmlsu26.html" >up</a>] </p></div>
+<!--l. 1382--><p class="indent" >   <a 
+ id="tailuserhtmlsu24.html"></a>  
+</body></html> 

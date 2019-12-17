@@ -37,13 +37,12 @@ Module psb_z_tools_mod
   use psb_z_multivect_mod, only : psb_z_base_multivect_type, psb_z_multivect_type
 
   interface  psb_geall
-    subroutine psb_zalloc_vect(x, desc_a,info,n)
+    subroutine psb_zalloc_vect(x, desc_a,info)
       import
       implicit none
       type(psb_z_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_zalloc_vect
     subroutine psb_zalloc_vect_r2(x, desc_a,info,n,lb)
       import

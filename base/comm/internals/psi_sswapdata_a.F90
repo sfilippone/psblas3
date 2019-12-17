@@ -33,9 +33,9 @@
 ! File: psi_sswapdata.F90
 !
 ! Subroutine: psi_sswapdatam
-!   Does the data exchange among processes. Essentially this is doing 
+!   Implements the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
-!   it is capable of pruning empty exchanges, which are very likely in out 
+!   it is capable of pruning empty exchanges, which are very likely in our
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
@@ -49,6 +49,7 @@
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -69,10 +70,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y(:,:)   - real                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -236,7 +237,7 @@ subroutine psi_sswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
+      prcid(proc_to_comm) = psb_get_mpi_rank(ictxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = n*nerv
@@ -349,7 +350,7 @@ subroutine psi_sswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_real_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
@@ -507,7 +508,7 @@ end subroutine psi_sswapidxm
 !
 !
 ! Subroutine: psi_sswapdatav
-!   Does the data exchange among processes. Essentially this is doing 
+!   Implements the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
@@ -523,6 +524,7 @@ end subroutine psi_sswapidxm
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -543,10 +545,10 @@ end subroutine psi_sswapidxm
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:)     - X                       The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y(:)     - real                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -721,7 +723,7 @@ subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
+      prcid(proc_to_comm) = psb_get_mpi_rank(ictxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = nerv
@@ -835,7 +837,7 @@ subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_real_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&

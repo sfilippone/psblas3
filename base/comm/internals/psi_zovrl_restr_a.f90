@@ -28,6 +28,11 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
+!
+! Subroutine: psi_zovrl_restr
+!   These subroutines restore the overlap region of a vector; they are  used
+!   for the transpose  matrix-vector product when there is a nonempty overlap.
+!                                              
 !    
 subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_zovrl_restrr1

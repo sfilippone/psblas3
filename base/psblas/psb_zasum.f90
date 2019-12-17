@@ -135,6 +135,19 @@ function psb_zasum (x,desc_a, info, jx,global) result(res)
   return
 end function psb_zasum
 
+! Function: psb_zasum_vect
+!    Computes norm1 of X
+!
+!    norm1 := sum(sub( X )(i))
+!
+!    where sub( X ) denotes X(1:N,JX:).
+!
+! Arguments:
+!    x      - type(psb_z_vect_type) The input vector.
+!    desc_a -  type(psb_desc_type).   The communication descriptor.
+!    info   -  integer.               Return code
+!    jx     -  integer(optional).     The column offset.
+!
 
 function psb_zasum_vect(x, desc_a, info,global) result(res)
   use psb_base_mod, psb_protect_name => psb_zasum_vect

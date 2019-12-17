@@ -32,9 +32,9 @@
 ! File: psb_cnrm2.f90
 !
 ! Function: psb_cnrm2
-!    Forms the norm2 of a distributed vector,
+!    Computes the norm2 of a distributed vector,
 !
-!    norm2 := sqrt ( sub( X )**T * sub( X ) )
+!    norm2 := sqrt ( sub( X )**C * sub( X ) )
 !
 !    where sub( X ) denotes X(:,JX).
 !
@@ -43,6 +43,7 @@
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
 !    jx     -  integer(optional).   The column offset for sub( X ).
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
 function psb_cnrm2(x, desc_a, info, jx,global)  result(res)
   use psb_desc_mod
@@ -170,14 +171,15 @@ end function psb_cnrm2
 !!$
 !
 ! Function: psb_cnrm2
-!    Forms the norm2 of a distributed vector,
+!    Computes the norm2 of a distributed vector,
 !
-!    norm2 := sqrt ( X**T * X)
+!    norm2 := sqrt ( X**C * X)
 !
 ! Arguments:
 !    x(:)   -  complex               The input vector containing the entries of X.
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
 function psb_cnrm2v(x, desc_a, info,global)  result(res)
   use psb_desc_mod
@@ -263,7 +265,17 @@ function psb_cnrm2v(x, desc_a, info,global)  result(res)
 end function psb_cnrm2v
 
 
-
+! Function: psb_cnrm2_vect
+!    Computes the norm2 of a distributed vector,
+!
+!    norm2 := sqrt ( X**C * X)
+!
+! Arguments:
+!    x      -  type(psb_c_vect_type) The input vector containing the entries of X.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
+!
 function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
   use psb_desc_mod
   use psb_check_mod
@@ -344,7 +356,7 @@ function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
         res = res - sqrt(cone - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
-    else 	    
+  else 	    
     res = szero
   end if
 
@@ -392,15 +404,16 @@ end function psb_cnrm2_vect
 !!$
 !
 ! Subroutine: psb_cnrm2vs
-!    Forms the norm2 of a distributed vector,
+!    Computes the norm2 of a distributed vector, subroutine version
 !
-!    norm2 := sqrt ( X**T * X)
+!    norm2 := sqrt ( X**C * X)
 !
 ! Arguments:
 !    res    -  real                  The result.
 !    x(:)   -  complex               The input vector containing the entries of X.
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
 subroutine psb_cnrm2vs(res, x, desc_a, info,global)
   use psb_desc_mod

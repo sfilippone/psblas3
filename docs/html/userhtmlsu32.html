@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_cdasb &#8212; Communication descriptor assembly routine</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 294--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu36.html" >next</a>] [<a 
+href="userhtmlsu31.html" >prev</a>] [<a 
+href="userhtmlsu31.html#tailuserhtmlsu31.html" >prev-tail</a>] [<a 
+href="userhtmlse6.html#tailuserhtmlsu32.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu35.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.3   </span> <a 
+ id="x43-800006.3"></a>psb_cdasb &#8212; Communication descriptor assembly routine</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-59">
+call&#x00A0;psb_cdasb(desc_a,&#x00A0;info&#x00A0;[,&#x00A0;mold])
+</div>
+<!--l. 298--><p class="nopar" >
+<!--l. 300--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">The desired dynamic type for the internal index storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified     as:     a     object     of     type     derived     from     (integer)
+     <a 
+ id="vbasedata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 315--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 329--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x43-80002x1">On exit from this routine the descriptor is in the assembled state.</li></ol>
+                                                                  
+
+                                                                  
+<!--l. 334--><p class="noindent" >This call will set up all the necessary information for the halo data exchanges. In doing
+so, the library will need to identify the set of processes owning the halo indices
+through the use of the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">desc%fnd_owner()</span></span></span> method; the owning processes
+are the topological neighbours of the calling process. If the user has some
+background information on the processes that are neighbours of the current one,
+it is possible to specify explicitly the list of adjacent processes with a call
+to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">desc%set_p_adjcncy(list)</span></span></span>; this will speed up the subsequent call to
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span>.
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 347--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu36.html" >next</a>] [<a 
+href="userhtmlsu31.html" >prev</a>] [<a 
+href="userhtmlsu31.html#tailuserhtmlsu31.html" >prev-tail</a>] [<a 
+href="userhtmlsu32.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu35.html" >up</a>] </p></div>
+<!--l. 347--><p class="indent" >   <a 
+ id="tailuserhtmlsu32.html"></a>  
+</body></html> 

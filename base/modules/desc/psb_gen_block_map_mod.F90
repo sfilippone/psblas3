@@ -1934,10 +1934,10 @@ contains
   subroutine block_fnd_owner(idx,iprc,idxmap,info)
     use psb_penv_mod
     implicit none 
-    integer(psb_lpk_), intent(in) :: idx(:)
+    integer(psb_lpk_), intent(in)           :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_gen_block_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(out) :: info
+    class(psb_gen_block_map), intent(inout) :: idxmap
+    integer(psb_ipk_), intent(out)          :: info
     integer(psb_ipk_) :: ictxt, iam, np, nv, ip, i
     integer(psb_lpk_) :: tidx
     
@@ -2005,7 +2005,7 @@ contains
     idxmap%local_cols   = nl
     idxmap%ictxt        = ictxt
     idxmap%state        = psb_desc_bld_
-    call psb_get_mpicomm(ictxt,idxmap%mpic)
+    idxmap%mpic         = psb_get_mpi_comm(ictxt)
     idxmap%min_glob_row = vnl(iam)+1
     idxmap%max_glob_row = vnl(iam+1) 
     call move_alloc(vnl,idxmap%vnl)

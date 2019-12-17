@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_exit &#8212; Exit from PSBLAS parallel environment</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 112--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu63.html" >next</a>] [<a 
+href="userhtmlsu58.html" >prev</a>] [<a 
+href="userhtmlsu58.html#tailuserhtmlsu58.html" >prev-tail</a>] [<a 
+href="userhtmlse7.html#tailuserhtmlsu59.html">tail</a>] [<a 
+href="userhtmlsu59.html#userhtmlsu62.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">7.3   </span> <a 
+ id="x71-1080007.3"></a>psb_exit &#8212; Exit from PSBLAS parallel environment</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-86">
+call&#x00A0;psb_exit(icontxt)
+&#x00A0;<br />call&#x00A0;psb_exit(icontxt,close)
+</div>
+<!--l. 117--><p class="nopar" >
+<!--l. 119--><p class="indent" >   This subroutine exits from the PSBLAS parallel virtual machine.
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">close</span> </dt><dd 
+class="description">Whether  to  close  all  data  structures  related  to  the  virtual  parallel
+     machine, besides those associated with icontxt.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical variable, default value: true.</dd></dl>
+<!--l. 137--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x71-108002x1">This routine may be called even if a previous call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_info</span></span></span> has returned
+     with <span 
+class="cmmi-10">iam </span>= <span 
+class="cmsy-10">-</span>1; indeed, it it is the only routine that may be called with
+     argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">icontxt</span></span></span> in this situation.
+     </li>
+     <li 
+  class="enumerate" id="x71-108004x2">A call to this routine with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">close=.true.</span></span></span> implies a call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">MPI_Finalize</span></span></span>,
+     after which no parallel routine may be called.
+     </li>
+     <li 
+  class="enumerate" id="x71-108006x3">If  the  user  whishes  to  use  multiple  communication  contexts  in  the
+     same  program,  or  to  enter  and  exit  multiple  times  into  the  parallel
+     environment, this routine may be called to selectively close the contexts
+     with  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">close=.false.</span></span></span>,  while  on  the  last  call  it  should  be  called  with
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">close=.true.</span></span></span> to shutdown in a clean way the entire parallel environment.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 154--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu63.html" >next</a>] [<a 
+href="userhtmlsu58.html" >prev</a>] [<a 
+href="userhtmlsu58.html#tailuserhtmlsu58.html" >prev-tail</a>] [<a 
+href="userhtmlsu59.html" >front</a>] [<a 
+href="userhtmlsu59.html#userhtmlsu62.html" >up</a>] </p></div>
+<!--l. 154--><p class="indent" >   <a 
+ id="tailuserhtmlsu59.html"></a>  
+</body></html> 

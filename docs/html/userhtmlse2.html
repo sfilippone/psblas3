@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>General overview</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 72--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu7.html" >next</a>] [<a 
+href="userhtmlse1.html" >prev</a>] [<a 
+href="userhtmlse1.html#tailuserhtmlse1.html" >prev-tail</a>] [<a 
+href="#tailuserhtmlse2.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse2.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x4-30002"></a>General overview</h3>
+<!--l. 74--><p class="noindent" >The PSBLAS library is designed to handle the implementation of iterative solvers for
+sparse linear systems on distributed memory parallel computers. The system
+coefficient matrix <span 
+class="cmmi-10">A </span>must be square; it may be real or complex, nonsymmetric, and
+its sparsity pattern needs not to be symmetric. The serial computation parts are
+based on the serial sparse BLAS, so that any extension made to the data structures
+of the serial kernels is available to the parallel version. The overall design and
+parallelization strategy have been influenced by the structure of the ScaLAPACK
+parallel library. The layered structure of the PSBLAS library is shown in figure&#x00A0;<a 
+href="#x4-30011">1<!--tex4ht:ref: fig:psblas --></a>;
+lower layers of the library indicate an encapsulation relationship with upper
+layers. The ongoing discussion focuses on the Fortran&#x00A0;2003 layer immediately
+below the application layer. The serial parts of the computation on each
+process are executed through calls to the serial sparse BLAS subroutines. In a
+similar way, the inter-process message exchanges are encapsulated in an
+applicaiton layer that has been strongly inspired by the Basic Linear Algebra
+Communication Subroutines (BLACS) library&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XBLACS">7</a>]</span>. Usually there is no need to deal
+directly with MPI; however, in some cases, MPI routines are used directly
+to improve efficiency. For further details on our communication layer see
+Sec.&#x00A0;<a 
+href="userhtmlse7.html#x68-1050007">7<!--tex4ht:ref: sec:parenv --></a>.
+<!--l. 101--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x4-30011"></a>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 102--><p class="noindent" >
+<!--l. 104--><p class="noindent" ><img 
+src="figures/psblas.png" alt="PIC"  
+></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;1: </span><span  
+class="content">PSBLAS library components hierarchy.</span></div><!--tex4ht:label?: x4-30011 -->
+                                                                  
+
+                                                                  
+<!--l. 110--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 113--><p class="indent" >   The type of linear system matrices that we address typically arise in
+the numerical solution of PDEs; in such a context, it is necessary to pay
+special attention to the structure of the problem from which the application
+originates. The nonzero pattern of a matrix arising from the discretization of a
+PDE is influenced by various factors, such as the shape of the domain, the
+discretization strategy, and the equation/unknown ordering. The matrix itself can be
+interpreted as the adjacency matrix of the graph associated with the discretization
+mesh.
+<!--l. 124--><p class="indent" >   The distribution of the coefficient matrix for the linear system is based on the
+&#8220;owner computes&#8221; rule: the variable associated to each mesh point is assigned to a
+process that will own the corresponding row in the coefficient matrix and will
+carry out all related computations. This allocation strategy is equivalent to a
+partition of the discretization mesh into <span 
+class="cmti-10">sub-domains</span>. Our library supports any
+distribution that keeps together the coefficients of each matrix row; there are no
+other constraints on the variable assignment. This choice is consistent with
+simple data distributions such as <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">CYCLIC(N)</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">BLOCK</span></span></span>, as well as completely
+arbitrary assignments of equation indices to processes. In particular it is
+consistent with the usage of graph partitioning tools commonly available in
+the literature, e.g. METIS&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XMETIS">14</a>]</span>. Dense vectors conform to sparse matrices,
+that is, the entries of a vector follow the same distribution of the matrix
+rows.
+<!--l. 146--><p class="indent" >   We assume that the sparse matrix is built in parallel, where each process generates
+its own portion. We never require that the entire matrix be available on a single
+node. However, it is possible to hold the entire matrix in one process and distribute it
+explicitly<span class="footnote-mark"><a 
+href="userhtml5.html#fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x4-3002f1"></a> ,
+even though the resulting memory bottleneck would make this option unattractive in
+most cases.
+   <div class="subsectionTOCS">
+   &#x00A0;<span class="subsectionToc" >2.1 <a 
+href="userhtmlsu1.html#x6-40002.1">Basic Nomenclature</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.2 <a 
+href="userhtmlsu2.html#x8-50002.2">Library contents</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.3 <a 
+href="userhtmlsu3.html#x9-60002.3">Application structure</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >2.3.1 <a 
+href="userhtmlsu3.html#x9-70002.3.1">User-defined index mappings</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.4 <a 
+href="userhtmlsu4.html#x11-80002.4">Programming model</a></span>
+   </div>
+
+
+
+                                                                  
+
+                                                                  
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu7.html" >next</a>] [<a 
+href="userhtmlse1.html" >prev</a>] [<a 
+href="userhtmlse1.html#tailuserhtmlse1.html" >prev-tail</a>] [<a 
+href="userhtmlse2.html" >front</a>] [<a 
+href="userhtml.html#userhtmlse2.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >   <a 
+ id="tailuserhtmlse2.html"></a>  
+</body></html> 

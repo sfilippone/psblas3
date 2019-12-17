@@ -62,11 +62,11 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_ipk_), intent(in) :: nv
-  integer(psb_lpk_), intent(in) :: idx(:)
+  integer(psb_ipk_), intent(in)      :: nv
+  integer(psb_lpk_), intent(in)      :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  type(psb_desc_type), intent(in) :: desc
-  integer(psb_ipk_), intent(out) :: info
+  type(psb_desc_type), intent(inout) :: desc
+  integer(psb_ipk_), intent(out)     :: info
 
 
   integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&

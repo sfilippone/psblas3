@@ -29,17 +29,17 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! Subroutine: psb_zinsvi
-!    Insert dense submatrix to dense matrix. Note: the row indices in IRW 
+! Subroutine: psb_zins_vect
+!    Insert entries into a dense  vector. Note: the row indices in IRW 
 !    are assumed to be in global numbering and are converted on the fly. 
 !    Row indices not belonging to the current process are silently discarded.
 ! 
 ! Arguments: 
 !    m       - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
-!    irw(:)  - integer          Row indices of rows of val (global numbering)
-!    val(:)  - complex               The source dense submatrix.  
-!    x(:)    - complex               The destination dense matrix.  
+!    irw(:)  - integer(psb_lpk_) Row indices of rows of val (global numbering)
+!    val(:)  - complex               The source vector
+!    x       - type(psb_z_vect_type) The destination vector
 !    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
 !    dupl    - integer               What to do with duplicates: 
@@ -49,10 +49,6 @@ subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zins_vect
   use psi_mod
   implicit none
-
-  ! m rows number of submatrix belonging to val to be inserted
-  ! ix  x global-row corresponding to position at which val submatrix
-  !     must be inserted
 
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
@@ -155,6 +151,23 @@ subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl,local)
 
 end subroutine psb_zins_vect
 
+! Subroutine: psb_zins_vect_v
+!    Insert entries into a vector from another encapsulated vector.
+!    Note: the row indices in IRW 
+!    are assumed to be in global numbering and are converted on the fly. 
+!    Row indices not belonging to the current process are silently discarded.
+! 
+! Arguments: 
+!    m       - integer.        Number of rows of submatrix belonging to 
+!                              val to be inserted.
+!    irw     - type(psb_l_vect_type) Row indices of rows of val (global numbering)
+!    val     - type(psb_z_vect_type) The source vector
+!    x       - type(psb_z_vect_type) The destination vector
+!    desc_a  - type(psb_desc_type).         The communication descriptor.
+!    info    - integer.                       return code
+!    dupl    - integer               What to do with duplicates: 
+!                                     psb_dupl_ovwrt_    overwrite
+!                                     psb_dupl_add_      add         
 subroutine psb_zins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zins_vect_v
   use psi_mod
@@ -329,7 +342,6 @@ subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   mglob    = desc_a%get_global_rows()
 
 
-
   n = min(size(x),size(val,2))
   allocate(irl(m),stat=info) 
   if (info /= psb_success_) then 
@@ -374,8 +386,6 @@ subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   return
 
 end subroutine psb_zins_vect_r2
-
-
 
 subroutine psb_zins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zins_multivect

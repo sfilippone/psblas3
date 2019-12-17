@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Error handling</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu80.html" >next</a>] [<a 
+href="userhtmlse7.html" >prev</a>] [<a 
+href="userhtmlse7.html#tailuserhtmlse7.html" >prev-tail</a>] [<a 
+href="userhtmlsu71.html#tailuserhtmlse8.html">tail</a>] [<a 
+href="userhtml.html#userhtmlsu76.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">8   </span> <a 
+ id="x86-1230008"></a>Error handling</h3>
+<!--l. 5--><p class="noindent" >The PSBLAS library error handling policy has been completely rewritten in version
+2.0. The idea behind the design of this new error handling strategy is to keep error
+messages on a stack allowing the user to trace back up to the point where the first
+error message has been generated. Every routine in the PSBLAS-2.0 library has, as
+last non-optional argument, an integer <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">info</span></span></span> variable; whenever, inside the routine, an
+error is detected, this variable is set to a value corresponding to a specific
+error code. Then this error code is also pushed on the error stack and then
+either control is returned to the caller routine or the execution is aborted,
+depending on the users choice. At the time when the execution is aborted,
+an error message is printed on standard output with a level of verbosity
+than can be chosen by the user. If the execution is not aborted, then, the
+caller routine checks the value returned in the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">info</span></span></span> variable and, if not
+zero, an error condition is raised. This process continues on all the levels of
+nested calls until the level where the user decides to abort the program
+execution.
+<!--l. 23--><p class="indent" >   Figure&#x00A0;<a 
+href="#x86-1230259">9<!--tex4ht:ref: fig:routerr --></a> shows the layout of a generic <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_foo</span></span></span> routine with respect to the
+PSBLAS-2.0 error handling policy. It is possible to see how, whenever an error
+condition is detected, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">info</span></span></span> variable is set to the corresponding error code which
+is, then, pushed on top of the stack by means of the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_errpush</span></span></span>. An error condition
+may be directly detected inside a routine or indirectly checking the error code
+returned returned by a called routine. Whenever an error is encountered, after it has
+been pushed on stack, the program execution skips to a point where the error
+condition is handled; the error condition is handled either by returning control to the
+caller routine or by calling the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb\_error</span></span></span> routine which prints the content of
+the error stack and aborts the program execution, according to the choice
+made by the user with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_set_erraction</span></span></span>. The default is to print the error
+and terminate the program, but the user may choose to handle the error
+explicitly.
+<!--l. 40--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x86-1230259"></a>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 73--><p class="noindent" >
+<div class="fbox"><div class="minipage"><!--l. 44-->
+<div class="lstlisting" id="listing-9"><span class="label"><a 
+ id="x86-123001r1"></a></span><span 
+class="cmbx-9">subroutine</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_foo</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">some</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">args</span><span 
+class="cmr-9">,</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">info</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123002r2"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">...</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123003r3"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">if</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">error</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">detected</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">then</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123004r4"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">info</span><span 
+class="cmr-9">=</span><span 
+class="cmr-9">errcode1</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123005r5"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">call</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_errpush</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">&#8217;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_foo</span><span 
+class="cmr-9">&#8217;</span><span 
+class="cmr-9">,</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">errcode1</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123006r6"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">goto</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">9999</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123007r7"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">end</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">if</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123008r8"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">...</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123009r9"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">call</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_bar</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">some</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">args</span><span 
+class="cmr-9">,</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">info</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123010r10"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">if</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">info</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">.</span><span 
+class="cmbx-9">ne</span><span 
+class="cmr-9">.</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">zero</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">then</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123011r11"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">info</span><span 
+class="cmr-9">=</span><span 
+class="cmr-9">errcode2</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123012r12"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">call</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_errpush</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">&#8217;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_foo</span><span 
+class="cmr-9">&#8217;</span><span 
+class="cmr-9">,</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">errcode2</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123013r13"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">goto</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">9999</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123014r14"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">end</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">if</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123015r15"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">...</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123016r16"></a></span><span 
+class="cmr-9">9999</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">continue</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123017r17"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">if</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">err</span><span 
+class="cmr-9">_act</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">.</span><span 
+class="cmbx-9">eq</span><span 
+class="cmr-9">.</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">act</span><span 
+class="cmr-9">_abort</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">then</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123018r18"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">call</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_error</span><span 
+class="cmr-9">(</span><span 
+class="cmr-9">icontxt</span><span 
+class="cmr-9">)</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123019r19"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">return</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123020r20"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">else</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123021r21"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">return</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123022r22"></a></span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">end</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">if</span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123023r23"></a></span><span 
+class="cmr-9">&#x00A0;</span><br /><span class="label"><a 
+ id="x86-123024r24"></a></span><span 
+class="cmbx-9">end</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmbx-9">subroutine</span><span 
+class="cmr-9">&#x00A0;</span><span 
+class="cmr-9">psb</span><span 
+class="cmr-9">_foo</span>
+</div>                                                              </div> </div>
+</div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;9: </span><span  
+class="content">The layout of a generic <span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_foo </span>routine with respect to PSBLAS-2.0
+error handling policy.</span></div><!--tex4ht:label?: x86-1230259 -->
+                                                                  
+
+                                                                  
+<!--l. 78--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 83--><p class="indent" >   Figure&#x00A0;<a 
+href="#x86-12302610">10<!--tex4ht:ref: fig:errormsg --></a> reports a sample error message generated by the PSBLAS-2.0
+library. This error has been generated by the fact that the user has chosen the
+invalid &#8220;FOO&#8221; storage format to represent the sparse matrix. From this
+error message it is possible to see that the error has been detected inside
+the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cest</span></span></span> subroutine called by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spasb</span></span></span> ... by process 0 (i.e. the root
+process).
+<!--l. 91--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x86-12302610"></a>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 113--><p class="noindent" >
+<div class="fbox"><div class="minipage"><div class="verbatim" id="verbatim-101">
+==========================================================
+&#x00A0;<br />Process:&#x00A0;0.&#x00A0;&#x00A0;PSBLAS&#x00A0;Error&#x00A0;(4010)&#x00A0;in&#x00A0;subroutine:&#x00A0;df_sample
+&#x00A0;<br />Error&#x00A0;from&#x00A0;call&#x00A0;to&#x00A0;subroutine&#x00A0;mat&#x00A0;dist
+&#x00A0;<br />==========================================================
+&#x00A0;<br />Process:&#x00A0;0.&#x00A0;&#x00A0;PSBLAS&#x00A0;Error&#x00A0;(4010)&#x00A0;in&#x00A0;subroutine:&#x00A0;mat_distv
+&#x00A0;<br />Error&#x00A0;from&#x00A0;call&#x00A0;to&#x00A0;subroutine&#x00A0;psb_spasb
+&#x00A0;<br />==========================================================
+&#x00A0;<br />Process:&#x00A0;0.&#x00A0;&#x00A0;PSBLAS&#x00A0;Error&#x00A0;(4010)&#x00A0;in&#x00A0;subroutine:&#x00A0;psb_spasb
+&#x00A0;<br />Error&#x00A0;from&#x00A0;call&#x00A0;to&#x00A0;subroutine&#x00A0;psb_cest
+&#x00A0;<br />==========================================================
+&#x00A0;<br />Process:&#x00A0;0.&#x00A0;&#x00A0;PSBLAS&#x00A0;Error&#x00A0;(136)&#x00A0;in&#x00A0;subroutine:&#x00A0;psb_cest
+&#x00A0;<br />Format&#x00A0;FOO&#x00A0;is&#x00A0;unknown
+&#x00A0;<br />==========================================================
+&#x00A0;<br />Aborting...
+</div>
+<!--l. 109--><p class="nopar" >                                                              </div> </div>
+</div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;10: </span><span  
+class="content">A sample PSBLAS-2.0 error message. Process 0 detected an error
+condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x86-12302610 -->
+                                                                  
+
+                                                                  
+<!--l. 119--><p class="indent" >   </div><hr class="endfigure">
+                                                                  
+
+                                                                  
+   <div class="subsectionTOCS">
+   &#x00A0;<span class="subsectionToc" >8.1 <a 
+href="userhtmlsu74.html#x87-1240008.1">psb_errpush</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.2 <a 
+href="userhtmlsu75.html#x88-1250008.2">psb_error</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.3 <a 
+href="userhtmlsu76.html#x89-1260008.3">psb_set_errverbosity</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.4 <a 
+href="userhtmlsu77.html#x90-1270008.4">psb_set_erraction</a></span>
+   </div>
+
+
+
+                                                                  
+
+                                                                  
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu80.html" >next</a>] [<a 
+href="userhtmlse7.html" >prev</a>] [<a 
+href="userhtmlse7.html#tailuserhtmlse7.html" >prev-tail</a>] [<a 
+href="userhtmlse8.html" >front</a>] [<a 
+href="userhtml.html#userhtmlsu76.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >   <a 
+ id="tailuserhtmlse8.html"></a>  
+</body></html> 

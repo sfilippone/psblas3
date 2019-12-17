@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_get_boundary &#8212; Extract list of boundary elements</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1509--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu56.html" >next</a>] [<a 
+href="userhtmlsu51.html" >prev</a>] [<a 
+href="userhtmlsu51.html#tailuserhtmlsu51.html" >prev-tail</a>] [<a 
+href="userhtmlsu49.html#tailuserhtmlsu52.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu55.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.23   </span> <a 
+ id="x63-1000006.23"></a>psb_get_boundary &#8212; Extract list of boundary elements</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-79">
+call&#x00A0;psb_get_boundary(bndel,&#x00A0;desc,&#x00A0;info)
+</div>
+<!--l. 1514--><p class="nopar" >
+<!--l. 1516--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 1526--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">bndel</span> </dt><dd 
+class="description">The list of boundary elements on the calling process, in local numbering.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one array with the ALLOCATABLE attribute, of type
+     integer.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1542--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x63-100002x1">If there are no boundary elements (i.e., if the local part of the connectivity
+     graph is self-contained) the output vector is set to the &#8220;not allocated&#8221;
+     state.
+     </li>
+     <li 
+  class="enumerate" id="x63-100004x2">Otherwise  the  size  of  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bndel</span></span></span> will  be  exactly  equal  to  the  number  of
+     boundary elements.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1551--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu56.html" >next</a>] [<a 
+href="userhtmlsu51.html" >prev</a>] [<a 
+href="userhtmlsu51.html#tailuserhtmlsu51.html" >prev-tail</a>] [<a 
+href="userhtmlsu52.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu55.html" >up</a>] </p></div>
+<!--l. 1551--><p class="indent" >   <a 
+ id="tailuserhtmlsu52.html"></a>  
+</body></html> 

@@ -309,5 +309,8 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_alloc_request_=4025
   integer(psb_ipk_), parameter, public :: psb_err_from_subroutine_non_=4011
   integer(psb_ipk_), parameter, public :: psb_err_invalid_istop_=5001
+  integer(psb_ipk_), parameter, public :: psb_err_invalid_irst_ =5002
+  integer(psb_ipk_), parameter, public :: psb_err_invalid_preci_=5003
+  integer(psb_ipk_), parameter, public :: psb_err_invalid_preca_=5004
 
 end module psb_const_mod

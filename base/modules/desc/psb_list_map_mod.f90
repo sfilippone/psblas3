@@ -1117,9 +1117,9 @@ contains
       return
     end if
 
-    idxmap%ictxt        = ictxt
-    idxmap%state        = psb_desc_bld_
-    call psb_get_mpicomm(ictxt,idxmap%mpic)
+    idxmap%ictxt = ictxt
+    idxmap%state = psb_desc_bld_
+    idxmap%mpic  = psb_get_mpi_comm(ictxt)
     do i=1, n
       idxmap%glob_to_loc(i) = -1
     end do

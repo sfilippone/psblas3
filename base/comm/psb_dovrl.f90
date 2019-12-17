@@ -32,12 +32,12 @@
 !
 ! File:  psb_dovrl.f90
 !
-! Subroutine: psb_dovrlm
+! Subroutine: psb_dovrl_vect
 !   This subroutine performs the exchange of the overlap elements in a 
-!    distributed dense matrix between all the processes.
+!    distributed dense vector between all the processes.
 !
 ! Arguments:
-!   x(:,:)      -  real                   The local part of the dense matrix.
+!   x           -  type(psb_d_vect_type)  The local part of the vector
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
 !   jx          -  integer(optional).        The starting column of the global matrix
@@ -180,7 +180,38 @@ subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
     return
 end subroutine psb_dovrl_vect
 
-
+!
+! Subroutine: psb_dovrl_multivect
+!   This subroutine performs the exchange of the overlap elements in a 
+!    distributed multivector between all the processes.
+!
+! Arguments:
+!   x           -  type(psb_d_vect_type)  The local part of the multivector
+!   desc_a      -  type(psb_desc_type).    The communication descriptor.
+!   info        -  integer.                  Return code.
+!   jx          -  integer(optional).        The starting column of the global matrix
+!   ik          -  integer(optional).        The number of columns to gather. 
+!   work        -  real(optional).           A work area.
+!   update      -  integer(optional).        Type of update:
+!                                            psb_none_   do nothing
+!                                            psb_sum_    sum of overlaps
+!                                            psb_avg_    average of overlaps
+!   mode        -  integer(optional).        Choose the algorithm for data exchange: 
+!                                       this is chosen through bit fields. 
+!                                       - swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                       - swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                       - swap_send = iand(flag,psb_swap_send_) /= 0
+!                                       - swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       - if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       - if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                                       synchronized pairs
+!                                       - if (swap_send .and. swap_recv): use mpi_irecv 
+!                                                       and mpi_send
+!                                       - if (swap_send): use psb_snd (but need another 
+!                                                       call with swap_recv to complete)
+!                                       - if (swap_recv): use psb_rcv (completing a 
+!                                                       previous call with swap_send)
+!
 subroutine  psb_dovrl_multivect(x,desc_a,info,work,update,mode)
   use psb_base_mod, psb_protect_name => psb_dovrl_multivect
   use psi_mod

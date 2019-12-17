@@ -30,7 +30,7 @@
 !   
 !    
 subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
-     & length_dl,np,dl_lda,mode,info)
+     & length_dl,dl_lda,mode,info)
 
   !    internal routine
   !    == = ============= 
@@ -126,27 +126,28 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   use psb_const_mod
   use psb_error_mod
   use psb_desc_mod
+  use psb_sort_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
 #endif
   !     ....scalar parameters...
-  logical :: is_bld, is_upd
-  integer(psb_ipk_) :: ictxt
-  integer(psb_ipk_) :: np,dl_lda,mode, info
-
-  !     ....array parameters....
-  integer(psb_ipk_) :: desc_str(*)
-  integer(psb_ipk_) :: dep_list(dl_lda,0:np),length_dl(0:np)
-  integer(psb_ipk_), allocatable :: itmp(:)
+  logical,  intent(in)           :: is_bld, is_upd
+  integer(psb_ipk_), intent(in)  :: ictxt,mode
+  integer(psb_ipk_), intent(out) :: dl_lda
+  integer(psb_ipk_), intent(in)  :: desc_str(*)
+  integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:),length_dl(:)
+  integer(psb_ipk_), intent(out) :: info
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_), allocatable :: itmp(:)
 
   !     .....local scalars...
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt, icomm, me, npr, dl_mpi, minfo
+  integer(psb_mpk_) :: iictxt, icomm, me, np, minfo
+  logical, parameter :: dist_symm_list=.false., print_dl=.false.
   character  name*20
   name='psi_extrct_dl'
 
@@ -156,9 +157,15 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   iictxt = ictxt 
   info = psb_success_
 
-  call psb_info(iictxt,me,npr)
+  call psb_info(iictxt,me,np)
+  allocate(itmp(2*np+1),length_dl(0:np),stat=info)
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
+    goto 9999
+  end if
   do i=0,np 
     length_dl(i) = 0
+    itmp(i+1)    = -1
   enddo
   i=1
   if (debug_level >= psb_debug_inner_)&
@@ -176,41 +183,39 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       if ((desc_str(i+1) /= 0).or.(desc_str(i+2) /= 0)) then
         !           ..if number of element to be exchanged !=0
         proc=desc_str(i)
-        if ((proc < 0).or.(proc >= npr)) then
+        if ((proc < 0).or.(proc >= np)) then
           if (debug_level >= psb_debug_inner_)&
                & write(debug_unit,*) me,' ',trim(name),': error ',i,desc_str(i)
           info = 9999
           int_err(1) = i
           int_err(2) = desc_str(i)
-          goto 998
+          goto 9999
         endif
         !            if((me == 1).and.(proc == 3))write(psb_err_unit,*)'found 3'
         if (mode == 1) then
           !              ...search if already exist proc 
-          !                 in dep_list(*,me)...  
+          !                 in itmp(*)...  
           j=1
           do while ((j < pointer_dep_list).and.&
-               & (dep_list(j,me) /= proc))
+               & (itmp(j) /= proc))
             j=j+1
           enddo
 
           if (j == pointer_dep_list) then
             !                 ...if not found.....
-            dep_list(pointer_dep_list,me)=proc
+            itmp(pointer_dep_list)=proc
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list > dl_lda) then
-            info = psb_err_alloc_dealloc_
-            goto 998
-          endif
-          dep_list(pointer_dep_list,me)=proc
+          itmp(pointer_dep_list)=proc
           pointer_dep_list=pointer_dep_list+1
         endif
       endif
       i=i+desc_str(i+1)+2
     enddo
+
   else if (is_upd) then
+
     do while (desc_str(i) /= -1)
       if (debug_level >= psb_debug_inner_) &
            & write(debug_unit,*) me,' ',trim(name),': looping ',i,desc_str(i)
@@ -226,24 +231,16 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
           !              ...search if already exist proc....                 
           j=1
           do while ((j < pointer_dep_list).and.&
-               & (dep_list(j,me) /= proc))
+               & (itmp(j) /= proc))
             j=j+1
           enddo
           if (j == pointer_dep_list) then
             !                 ...if not found.....
-            if (pointer_dep_list > dl_lda) then
-              info = psb_err_alloc_dealloc_
-              goto 998
-            endif
-            dep_list(pointer_dep_list,me)=proc
+            itmp(pointer_dep_list)=proc
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list > dl_lda) then
-            info = psb_err_alloc_dealloc_
-            goto 998
-          endif
-          dep_list(pointer_dep_list,me)=proc
+          itmp(pointer_dep_list)=proc
           pointer_dep_list=pointer_dep_list+1
         endif
       endif
@@ -255,32 +252,116 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   endif
 
   length_dl(me)=pointer_dep_list-1
+  if (dist_symm_list) then 
+    call psb_realloc(length_dl(me),itmp,info)
+    call psi_symm_dep_list(itmp,ictxt,info)       
+    dl_lda = max(size(itmp),1)
+    call psb_max(iictxt, dl_lda)
+    call psb_realloc(dl_lda,itmp,info)
+    !  dl_lda = min(np,2*dl_lda)
+    allocate(dep_list(dl_lda,0:np),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
 
-  !     ... check for errors...
-998 continue 
-  if (debug_level >= psb_debug_inner_)&
-       & write(debug_unit,*) me,' ',trim(name),': info ',info
-  err = info
+    call psb_sum(iictxt,length_dl(0:np))
+    icomm = psb_get_mpi_comm(iictxt)
+    call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
+         & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
+    info = minfo  
+    if (info == 0) deallocate(itmp,stat=info)
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_dealloc_
+      goto 9999
+    endif
+  else
+    block
+      integer(psb_ipk_), allocatable :: list1(:,:), ldl2(:), list2(:,:)
+      integer(psb_ipk_) :: i,j,ip,dlsym, ldu, mdl, l1, l2
 
-  if (err /= 0) goto 9999
-
-  call psb_sum(iictxt,length_dl(0:np))
-  call psb_get_mpicomm(iictxt,icomm )
-  allocate(itmp(dl_lda),stat=info)
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_dealloc_
-    goto 9999
+      dl_lda = max(length_dl(me),1)
+      call psb_max(iictxt, dl_lda)
+      allocate(dep_list(dl_lda,0:np),stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
+      end if
+      call psb_sum(iictxt,length_dl(0:np))
+      icomm = psb_get_mpi_comm(iictxt)
+      call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
+           & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
+      info = minfo  
+      if (info /= psb_success_) then 
+        info=psb_err_alloc_dealloc_
+        goto 9999
+      endif
+      allocate(ldl2(0:np),stat=info)
+      ldl2 = 0 
+      do j=0, np-1
+        do i=1,length_dl(j)
+          ip = dep_list(i,j)
+          ldl2(ip) = ldl2(ip) + 1
+        end do
+      end do
+      dlsym = maxval(ldl2)
+      allocate(list2(dlsym,0:np),stat=info)
+      call move_alloc(dep_list,list1)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
+      end if
+      ldl2 = 0 
+      do j=0, np-1
+        do i=1,length_dl(j)
+          ip       = list1(i,j)
+          ldl2(ip) = ldl2(ip) + 1
+          list2(ldl2(ip),ip) = j
+        end do
+      end do
+      mdl = 0 
+      do j = 0, np-1
+        l1 = length_dl(j)
+        l2 = ldl2(j) 
+        itmp(1:l1)       = list1(1:l1,j)
+        itmp(l1+1:l1+l2) = list2(1:l2,j)
+        ldu = l1 + l2
+        !if (me == 0) write(0,*) 'Iter ',j,':',l1,l2,':',itmp(1:l1),':',itmp(l1+1:l1+l2)
+        call psb_msort_unique(itmp(1:l1+l2),ldu)
+        mdl = max(mdl, ldu)
+        !if (me == 0) write(0,*) 'Iter ',j,':',ldu,':',itmp(1:ldu)
+      end do
+      dl_lda = mdl
+      allocate(dep_list(dl_lda,0:np),stat=info)
+      dep_list = -1
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
+      end if
+      do j = 0, np-1
+        l1 = length_dl(j)
+        l2 = ldl2(j) 
+        itmp(1:l1)       = list1(1:l1,j)
+        itmp(l1+1:l1+l2) = list2(1:l2,j)
+        ldu = l1 + l2 
+        call psb_msort_unique(itmp(1:l1+l2),ldu)
+        length_dl(j) = ldu
+        dep_list(1:ldu,j) = itmp(1:ldu)
+      end do
+      
+    end block
   endif
-  itmp(1:dl_lda) = dep_list(1:dl_lda,me)
-  dl_mpi = dl_lda
-  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_,&
-       & dep_list,dl_mpi,psb_mpi_ipk_,icomm,minfo)
-  info = minfo
-  if (info == 0) deallocate(itmp,stat=info)
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_dealloc_
-    goto 9999
-  endif
+  if (print_dl) then
+    if (me == 0) then
+      write(0,*) ' Dep_list '
+      do i=0,np-1
+        j = length_dl(i) 
+        write(0,*) 'Proc ',i,':',dep_list(1:j,i)
+      end do
+      flush(0)
+    end if
+    call psb_barrier(ictxt)
+  end if
 
   call psb_erractionrestore(err_act)
   return

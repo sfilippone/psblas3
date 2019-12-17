@@ -31,9 +31,9 @@
 !  
 !
 ! Function: psb_dasum_s
-!    Searches the absolute max of X.
+!    Computes the sum of  absolute values of X.
 !
-!    normi := max(abs(X(i))  
+!    asum := sum(abs(X(:))  
 !
 ! Arguments:
 !    n      - integer  size of X

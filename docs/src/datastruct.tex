@@ -182,8 +182,7 @@ state, which can take the following values:
 
 \subsubsection{Descriptor Methods} 
 
-\subsubsection*{get\_local\_rows --- Get number of local rows}
-\addcontentsline{toc}{paragraph}{get\_local\_rows}
+\subsubsection{get\_local\_rows --- Get number of local rows}
 
 \begin{verbatim}
 nr = desc%get_local_rows()
@@ -208,8 +207,7 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsection*{get\_local\_cols --- Get number of local cols}
-\addcontentsline{toc}{paragraph}{get\_local\_cols}
+\subsubsection{get\_local\_cols --- Get number of local cols}
 
 \begin{verbatim}
 nc = desc%get_local_cols()
@@ -235,8 +233,7 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsection*{get\_global\_rows --- Get number of global rows}
-\addcontentsline{toc}{paragraph}{get\_global\_rows}
+\subsubsection{get\_global\_rows --- Get number of global rows}
 
 \begin{verbatim}
 nr = desc%get_global_rows()
@@ -258,8 +255,7 @@ Scope: {\bf local}.\\
   global index space. 
 \end{description}
 
-\subsubsection*{get\_global\_cols --- Get number of global cols}
-\addcontentsline{toc}{paragraph}{get\_global\_cols}
+\subsubsection{get\_global\_cols --- Get number of global cols}
 
 \begin{verbatim}
 nr = desc%get_global_cols()
@@ -282,8 +278,7 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsection*{get\_global\_indices --- Get vector of global indices}
-\addcontentsline{toc}{paragraph}{get\_global\_indices}
+\subsubsection{get\_global\_indices --- Get vector of global indices}
 
 \begin{verbatim}
 myidx = desc%get_global_indices([owned])
@@ -306,13 +301,12 @@ Type: {\bf optional}; default: \verb|.true.|.\\
 \begin{description}
 \item[\bf On Return]
 \item[Function value] The global indices, returned as an allocatable
-  integer array of rank 1. 
+  integer array of kind \verb|psb_lpk_|  and rank 1. 
 \end{description}
 
 
 
-\subsubsection*{get\_context --- Get communication context}
-\addcontentsline{toc}{paragraph}{get\_context}
+\subsubsection{get\_context --- Get communication context}
 
 \begin{verbatim}
 ictxt = desc%get_context()
@@ -333,8 +327,7 @@ Scope: {\bf local}.\\
 \item[Function value] The communication context.
 \end{description}
 
-\subsubsection*{Clone --- clone current object}
-\addcontentsline{toc}{paragraph}{Clone}
+\subsubsection{Clone --- clone current object}
 
 \begin{verbatim}
 call  desc%clone(descout,info)
@@ -357,8 +350,7 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsection*{CNV --- convert internal storage format}
-\addcontentsline{toc}{paragraph}{CNV}
+\subsubsection{CNV --- convert internal storage format}
 
 \begin{verbatim}
 call  desc%cnv(mold)
@@ -369,7 +361,7 @@ call  desc%cnv(mold)
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
-\item[mold] the desred integer storage format.\\
+\item[mold] the desired integer storage format.\\
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
@@ -381,9 +373,8 @@ accelerators.
 
 
 
-\subsubsection*{psb\_cd\_get\_large\_threshold --- Get threshold for
+\subsubsection{psb\_cd\_get\_large\_threshold --- Get threshold for
   index mapping switch}
-\addcontentsline{toc}{paragraph}{psb\_cd\_get\_large\_threshold}
 
 \begin{verbatim}
 ith = psb_cd_get_large_threshold()
@@ -398,9 +389,9 @@ ith = psb_cd_get_large_threshold()
 
 
 
-\subsubsection*{psb\_cd\_set\_large\_threshold --- Set threshold for
+\subsubsection{psb\_cd\_set\_large\_threshold --- Set threshold for
   index mapping switch}
-\addcontentsline{toc}{paragraph}{psb\_cd\_set\_large\_threshold}
+%\addcontentsline{toc}{paragraph}{psb\_cd\_set\_large\_threshold}
 
 \begin{verbatim}
 call psb_cd_set_large_threshold(ith)
@@ -420,6 +411,76 @@ call to \verb|psb_cdall| is executed, therefore changing the threshold
 has no effect on communication descriptors that have already been
 initialized. Moreover the threshold must have the same value on all
 processes. 
+
+
+\subsubsection{get\_p\_adjcncy --- Get process adjacency list}
+%\addcontentsline{toc}{paragraph}{get\_p\_adjcncy}
+
+\begin{verbatim}
+list =  desc%get_p_adjcncy()
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Return]
+\item[Function value] The current list of adjacent processes,
+  i.e. processes with which the current one has to exchange halo
+  data. 
+
+\end{description}
+
+\subsubsection{set\_p\_adjcncy --- Set process adjacency list}
+%\addcontentsline{toc}{paragraph}{set\_p\_adjcncy}
+
+\begin{verbatim}
+call desc%set_p_adjcncy(list)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[list] the list of adjacent processes.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a one-dimensional array of integers of kind \verb|psb_ipk_|. 
+\end{description}
+Note: this method can be called after a call  to \verb|psb_cdall| and
+before a call to \verb|psb_cdasb|. The user is specifying here some
+knowledge about which processes are topological neighbours of the
+current process. The availability of this information may speed up the
+execution of the assembly call \verb|psb_cdasb|. 
+
+
+\subsubsection{fnd\_owner --- Find the owner process of a set of indices}
+%\addcontentsline{toc}{paragraph}{fnd\_owner}
+
+\begin{verbatim}
+call desc%fnd_owner(idx,iprc,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[idx] the list of global indices for which we need the owning processes.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a one-dimensional array of integers of kind \verb|psb_lpk_|. 
+\item[\bf On Return]
+\item[iprc] the list of processes owning the indices in \verb|idx|.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an allocatable one-dimensional array of integers of kind \verb|psb_ipk_|. 
+\end{description}
+Note: this method may or may not actually require communications, depending on
+the exact internal data storage; given that the choice of storage may
+be altered by runtime parameters, it is necessary for safety that this
+method is called by all processes. 
+
+
+
 
 \subsubsection{Named Constants}
 \label{sec:cd_constants}
@@ -521,8 +582,8 @@ variants are obtained by conversion to/from it.
 
 \subsubsection{Sparse Matrix Methods}
 
-\subsubsection*{get\_nrows --- Get number of  rows in a sparse  matrix}
-\addcontentsline{toc}{paragraph}{get\_nrows}
+\subsubsection{get\_nrows --- Get number of  rows in a sparse  matrix}
+%\addcontentsline{toc}{paragraph}{get\_nrows}
 
 \begin{verbatim}
 nr = a%get_nrows()
@@ -544,9 +605,9 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsection*{get\_ncols --- Get number of  columns in a  sparse
+\subsubsection{get\_ncols --- Get number of  columns in a  sparse
   matrix}
-\addcontentsline{toc}{paragraph}{get\_ncols}
+%\addcontentsline{toc}{paragraph}{get\_ncols}
 
 \begin{verbatim}
 nc = a%get_ncols()
@@ -568,9 +629,9 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsection*{get\_nnzeros --- Get number of nonzero elements
+\subsubsection{get\_nnzeros --- Get number of nonzero elements
   in a sparse matrix}
-\addcontentsline{toc}{paragraph}{get\_nnzeros}
+%\addcontentsline{toc}{paragraph}{get\_nnzeros}
 
 \begin{verbatim}
 nz = a%get_nnzeros()
@@ -598,9 +659,9 @@ Scope: {\bf local}\\
   value for the same matrix may be different for different storage choices.
 \end{enumerate}
 
-\subsubsection*{get\_size  --- Get maximum number of nonzero elements
+\subsubsection{get\_size  --- Get maximum number of nonzero elements
   in a sparse matrix}
-\addcontentsline{toc}{paragraph}{get\_size }
+%\addcontentsline{toc}{paragraph}{get\_size }
 
 \begin{verbatim}
 maxnz = a%get_size()
@@ -622,9 +683,9 @@ Scope: {\bf local}\\
   be stored in sparse matrix \verb|a| using its current memory allocation.
 \end{description}
 
-\subsubsection*{sizeof  --- Get memory occupation in bytes
+\subsubsection{sizeof  --- Get memory occupation in bytes
 of  a sparse matrix}
-\addcontentsline{toc}{paragraph}{sizeof }
+%\addcontentsline{toc}{paragraph}{sizeof }
 
 \begin{verbatim}
 memory_size = a%sizeof()
@@ -646,8 +707,8 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsection*{get\_fmt  --- Short description of the dynamic type}
-\addcontentsline{toc}{paragraph}{get\_fmt }
+\subsubsection{get\_fmt  --- Short description of the dynamic type}
+%\addcontentsline{toc}{paragraph}{get\_fmt }
 
 \begin{verbatim}
 write(*,*) a%get_fmt()
@@ -670,8 +731,8 @@ Scope: {\bf local}\\
   \verb|CSR| and \verb|CSC|. 
 \end{description}
 
-\subsubsection*{is\_bld, is\_upd, is\_asb  --- Status check}
-\addcontentsline{toc}{paragraph}{is\_bld, is\_upd, is\_asb }
+\subsubsection{is\_bld, is\_upd, is\_asb  --- Status check}
+%\addcontentsline{toc}{paragraph}{is\_bld, is\_upd, is\_asb }
 
 \begin{verbatim}
 if (a%is_bld()) then 
@@ -695,9 +756,9 @@ Scope: {\bf local}\\
   matrix is in the Build, Update or Assembled state, respectively. 
 \end{description}
 
-\subsubsection*{is\_lower, is\_upper, is\_triangle, is\_unit  ---
+\subsubsection{is\_lower, is\_upper, is\_triangle, is\_unit  ---
   Format  check}
-\addcontentsline{toc}{paragraph}{is\_lower, is\_upper, is\_triangle, is\_unit}
+%\addcontentsline{toc}{paragraph}{is\_lower, is\_upper, is\_triangle, is\_unit}
 
 \begin{verbatim}
 if (a%is_triangle()) then 
@@ -725,8 +786,8 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsection*{cscnv --- Convert to a different storage format}
-\addcontentsline{toc}{paragraph}{cscnv}
+\subsubsection{cscnv --- Convert to a different storage format}
+%\addcontentsline{toc}{paragraph}{cscnv}
 
 \begin{verbatim}
 call  a%cscnv(b,info [, type, mold, dupl])
@@ -758,8 +819,8 @@ employed to interface with special devices, such as GPUs and other
 accelerators. 
 
 
-\subsubsection*{csclip --- Reduce to a submatrix}
-\addcontentsline{toc}{paragraph}{csclip}
+\subsubsection{csclip --- Reduce to a submatrix}
+%\addcontentsline{toc}{paragraph}{csclip}
 \begin{verbatim}
     call a%csclip(b,info[,&
        & imin,imax,jmin,jmax,rscale,cscale])
@@ -786,8 +847,8 @@ A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
-\subsubsection*{clean\_zeros --- Eliminate zero coefficients}
-\addcontentsline{toc}{paragraph}{clean\_zeros}
+\subsubsection{clean\_zeros --- Eliminate zero coefficients}
+%\addcontentsline{toc}{paragraph}{clean\_zeros}
 \begin{verbatim}
     call a%clean_zeros(info)
 \end{verbatim}
@@ -810,8 +871,8 @@ A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
-\subsubsection*{get\_diag --- Get main diagonal}
-\addcontentsline{toc}{paragraph}{get\_diag}
+\subsubsection{get\_diag --- Get main diagonal}
+%\addcontentsline{toc}{paragraph}{get\_diag}
 \begin{verbatim}
     call a%get_diag(d,info)
 \end{verbatim}
@@ -832,8 +893,8 @@ A one-dimensional array of the appropriate type.
 \end{description}
 
 
-\subsubsection*{clip\_diag --- Cut out main diagonal}
-\addcontentsline{toc}{paragraph}{clip\_diag}
+\subsubsection{clip\_diag --- Cut out main diagonal}
+%\addcontentsline{toc}{paragraph}{clip\_diag}
 \begin{verbatim}
     call a%clip_diag(b,info)
 \end{verbatim}
@@ -854,8 +915,8 @@ A variable of type \verb|psb_Tspmat_type|.
 \end{description}
 
 
-\subsubsection*{tril --- Return the lower triangle}
-\addcontentsline{toc}{paragraph}{tril}
+\subsubsection{tril --- Return the lower triangle}
+%\addcontentsline{toc}{paragraph}{tril}
 \begin{verbatim}
     call a%tril(l,info[,&
        & diag,imin,imax,jmin,jmax,rscale,cscale,u])
@@ -888,8 +949,8 @@ A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
-\subsubsection*{triu --- Return the upper triangle}
-\addcontentsline{toc}{paragraph}{triu}
+\subsubsection{triu --- Return the upper triangle}
+%\addcontentsline{toc}{paragraph}{triu}
 \begin{verbatim}
     call a%triu(u,info[,&
        & diag,imin,imax,jmin,jmax,rscale,cscale,l])
@@ -925,8 +986,8 @@ A variable of type \verb|psb_Tspmat_type|.
 
 
 
-\subsubsection*{psb\_set\_mat\_default --- Set default  storage format}
-\addcontentsline{toc}{paragraph}{psb\_set\_mat\_default}
+\subsubsection{psb\_set\_mat\_default --- Set default  storage format}
+%\addcontentsline{toc}{paragraph}{psb\_set\_mat\_default}
 
 
 \begin{verbatim}
@@ -945,8 +1006,8 @@ Type: required.
 
 
 
-\subsubsection*{clone --- Clone current object}
-\addcontentsline{toc}{paragraph}{clone}
+\subsubsection{clone --- Clone current object}
+%\addcontentsline{toc}{paragraph}{clone}
 
 \begin{verbatim}
 call  a%clone(b,info)
@@ -1042,8 +1103,8 @@ private memory.
 \end{figure}
 
 \subsubsection{Vector Methods}
-\subsubsection*{get\_nrows --- Get number of  rows in a dense vector}
-\addcontentsline{toc}{paragraph}{get\_nrows}
+\subsubsection{get\_nrows --- Get number of  rows in a dense vector}
+%\addcontentsline{toc}{paragraph}{get\_nrows}
 
 \begin{verbatim}
 nr = v%get_nrows()
@@ -1065,9 +1126,9 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsection*{sizeof  --- Get memory occupation in bytes
+\subsubsection{sizeof  --- Get memory occupation in bytes
 of  a dense vector}
-\addcontentsline{toc}{paragraph}{sizeof }
+%\addcontentsline{toc}{paragraph}{sizeof }
 
 \begin{verbatim}
 memory_size = v%sizeof()
@@ -1089,8 +1150,8 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsection*{set  --- Set contents of the vector}
-\addcontentsline{toc}{paragraph}{set }
+\subsubsection{set  --- Set contents of the vector}
+%\addcontentsline{toc}{paragraph}{set }
 
 \begin{verbatim}
  call  v%set(alpha[,first,last])
@@ -1127,8 +1188,8 @@ constant having the appropriate type and kind.
 Scope: {\bf local}\\
 \end{description}
 
-\subsubsection*{get\_vect  --- Get a copy of the vector contents}
-\addcontentsline{toc}{paragraph}{get\_vect }
+\subsubsection{get\_vect  --- Get a copy of the vector contents}
+%\addcontentsline{toc}{paragraph}{get\_vect }
 
 \begin{verbatim}
 extv = v%get_vect([n])
@@ -1157,8 +1218,8 @@ Type: {\bf optional}; default: entire vector.\\
   array is the same as the internal size of the vector.
 \end{description}
 
-\subsubsection*{clone --- Clone current object}
-\addcontentsline{toc}{paragraph}{clone}
+\subsubsection{clone --- Clone current object}
+%\addcontentsline{toc}{paragraph}{clone}
 \begin{verbatim}
 call  x%clone(y,info)
 \end{verbatim}
