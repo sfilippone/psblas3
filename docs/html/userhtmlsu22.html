@@ -1,0 +1,400 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_spsm &#8212; Triangular System Solve</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1072--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse5.html" >next</a>] [<a 
+href="userhtmlsu21.html" >prev</a>] [<a 
+href="userhtmlsu21.html#tailuserhtmlsu21.html" >prev-tail</a>] [<a 
+href="userhtmlsu19.html#tailuserhtmlsu22.html">tail</a>] [<a 
+href="userhtmlsu12.html#userhtmlsu25.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">4.13   </span> <a 
+ id="x31-680004.13"></a>psb_spsm &#8212; Triangular System Solve</h4>
+<!--l. 1074--><p class="noindent" >This subroutine computes the Triangular System Solve:
+<!--l. 1076--><p class="indent" >   <div class="eqnarray">
+   <center class="math-display" >
+<img 
+src="userhtml21x.png" alt="y  &#x2190;   &#x03B1;T- 1x + &#x03B2;y
+           -1
+y  &#x2190;   &#x03B1;DT   x +&#x03B2;y
+y  &#x2190;   &#x03B1;T- 1Dx  +&#x03B2;y
+y  &#x2190;   &#x03B1;T- Tx+ &#x03B2;y
+y  &#x2190;   &#x03B1;DT -Tx + &#x03B2;y
+         - T
+y  &#x2190;   &#x03B1;T   Dx + &#x03B2;y
+y  &#x2190;   &#x03B1;T- Hx +&#x03B2;y
+y  &#x2190;   &#x03B1;DT -Hx + &#x03B2;y
+y  &#x2190;   &#x03B1;T- HDx + &#x03B2;y
+" class="math-display" ></center>
+</div>
+<!--l. 1089--><p class="indent" >   where:
+     <dl class="description"><dt class="description">
+<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">is the global dense matrix <span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">:</span><span 
+class="cmmi-7">,</span><span 
+class="cmr-7">:</span></sub>
+     </dd><dt class="description">
+<span 
+class="cmmi-10">y</span> </dt><dd 
+class="description">is the global dense matrix <span 
+class="cmmi-10">y</span><sub><span 
+class="cmr-7">:</span><span 
+class="cmmi-7">,</span><span 
+class="cmr-7">:</span></sub>
+     </dd><dt class="description">
+<span 
+class="cmmi-10">T</span> </dt><dd 
+class="description">is the global sparse block triangular submatrix <span 
+class="cmmi-10">T</span>
+     </dd><dt class="description">
+<span 
+class="cmmi-10">D</span> </dt><dd 
+class="description">is the scaling diagonal matrix.</dd></dl>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-52">
+call&#x00A0;psb_spsm(alpha,&#x00A0;t,&#x00A0;x,&#x00A0;beta,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info)
+&#x00A0;<br />call&#x00A0;psb_spsm(alpha,&#x00A0;t,&#x00A0;x,&#x00A0;beta,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info,&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;trans,&#x00A0;unit,&#x00A0;choice,&#x00A0;diag,&#x00A0;work)
+</div>
+<!--l. 1101--><p class="nopar" >
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 1103--><p class="indent" >   <a 
+ id="x31-6800213"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 1104--><p class="noindent" >
+<div class="tabular"> <table id="TBL-13" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-13-1g"><col 
+id="TBL-13-1"><col 
+id="TBL-13-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-13-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-13-1-1"  
+class="td11"><span 
+class="cmmi-10">T</span>, <span 
+class="cmmi-10">x</span>, <span 
+class="cmmi-10">y</span>, <span 
+class="cmmi-10">D</span>, <span 
+class="cmmi-10">&#x03B1;</span>, <span 
+class="cmmi-10">&#x03B2;         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-13-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-13-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-13-2-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-13-2-2"  
+class="td11">psb_spsm    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-13-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-13-3-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-13-3-2"  
+class="td11">psb_spsm    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-13-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-13-4-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-13-4-2"  
+class="td11">psb_spsm    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-13-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-13-5-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-13-5-2"  
+class="td11">psb_spsm    </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-13-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-13-6-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;13: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x31-6800213 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">alpha</span> </dt><dd 
+class="description">the scalar <span 
+class="cmmi-10">&#x03B1;</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="#x31-6800213">13<!--tex4ht:ref: tab:f90spsm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">t</span> </dt><dd 
+class="description">the global portion of the sparse matrix <span 
+class="cmmi-10">T</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object type specified in <span 
+class="cmsy-10">§</span>&#x00A0;<a 
+href="userhtmlse3.html#x12-90003">3<!--tex4ht:ref: sec:datastruct --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">the local portion of global dense matrix <span 
+class="cmmi-10">x</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
+href="#x31-6800213">13<!--tex4ht:ref: tab:f90spsm --></a>. The
+     rank of <span 
+class="cmmi-10">x </span>must be the same of <span 
+class="cmmi-10">y</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">beta</span> </dt><dd 
+class="description">the scalar <span 
+class="cmmi-10">&#x03B2;</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="#x31-6800213">13<!--tex4ht:ref: tab:f90spsm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of global dense matrix <span 
+class="cmmi-10">y</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
+href="#x31-6800213">13<!--tex4ht:ref: tab:f90spsm --></a>. The
+     rank of <span 
+class="cmmi-10">y </span>must be the same of <span 
+class="cmmi-10">x</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">trans</span> </dt><dd 
+class="description">specify with <span 
+class="cmti-10">unitd </span>the operation to perform.
+         <dl class="description"><dt class="description">
+     <span 
+class="cmbx-10">trans = &#8217;N&#8217;</span> </dt><dd 
+class="description">the operation is with no transposed matrix
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">trans = &#8217;T&#8217;</span> </dt><dd 
+class="description">the operation is with transposed matrix.
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">trans = &#8217;C&#8217;</span> </dt><dd 
+class="description">the operation is with conjugate transposed matrix.</dd></dl>
+     <!--l. 1173--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">trans </span>= <span 
+class="cmmi-10">N</span><br 
+class="newline" />Specified as: a character variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">unitd</span> </dt><dd 
+class="description">specify with <span 
+class="cmti-10">trans </span>the operation to perform.
+         <dl class="description"><dt class="description">
+     <span 
+class="cmbx-10">unitd = &#8217;U&#8217;</span> </dt><dd 
+class="description">the operation is with no scaling
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">unitd = &#8217;L&#8217;</span> </dt><dd 
+class="description">the operation is with left scaling
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">unitd = &#8217;R&#8217;</span> </dt><dd 
+class="description">the operation is with right scaling.</dd></dl>
+     <!--l. 1184--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">unitd </span>= <span 
+class="cmmi-10">U</span><br 
+class="newline" />Specified as: a character variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">choice</span> </dt><dd 
+class="description">specifies the update of overlap elements to be performed on exit:
+         <dl class="description"><dt class="description">
+      </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_none_</span></span></span>
+         </dd><dt class="description">
+      </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sum_</span></span></span>
+         </dd><dt class="description">
+      </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_avg_</span></span></span>
+         </dd><dt class="description">
+      </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_square_root_</span></span></span></dd></dl>
+     <!--l. 1197--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_avg_</span></span></span><br 
+class="newline" />Specified as: an integer variable.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">diag</span> </dt><dd 
+class="description">the diagonal scaling matrix.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">diag</span>(1) = 1(<span 
+class="cmmi-10">noscaling</span>)<br 
+class="newline" />Specified as: a rank one array containing numbers of the type indicated in
+     Table&#x00A0;<a 
+href="#x31-6800213">13<!--tex4ht:ref: tab:f90spsm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">work</span> </dt><dd 
+class="description">a work array. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array of the same type of <span 
+class="cmmi-10">x </span>with the TARGET
+     attribute.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of global dense matrix <span 
+class="cmmi-10">y</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an array of rank one or two containing numbers of type specified
+     in Table&#x00A0;<a 
+href="#x31-6800213">13<!--tex4ht:ref: tab:f90spsm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1241--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse5.html" >next</a>] [<a 
+href="userhtmlsu21.html" >prev</a>] [<a 
+href="userhtmlsu21.html#tailuserhtmlsu21.html" >prev-tail</a>] [<a 
+href="userhtmlsu22.html" >front</a>] [<a 
+href="userhtmlsu12.html#userhtmlsu25.html" >up</a>] </p></div>
+<!--l. 1241--><p class="indent" >   <a 
+ id="tailuserhtmlsu22.html"></a>  
+</body></html> 

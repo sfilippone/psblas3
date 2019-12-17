@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_max &#8212; Global maximum</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 379--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu71.html" >next</a>] [<a 
+href="userhtmlsu66.html" >prev</a>] [<a 
+href="userhtmlsu66.html#tailuserhtmlsu66.html" >prev-tail</a>] [<a 
+href="userhtmlsu64.html#tailuserhtmlsu67.html">tail</a>] [<a 
+href="userhtmlsu59.html#userhtmlsu70.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">7.11   </span> <a 
+ id="x79-1160007.11"></a>psb_max &#8212; Global maximum</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-94">
+call&#x00A0;psb_max(icontxt,&#x00A0;dat,&#x00A0;root)
+</div>
+<!--l. 383--><p class="nopar" >
+<!--l. 385--><p class="indent" >   This subroutine implements a maximum valuereduction operation based on the
+underlying communication library.
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">dat</span> </dt><dd 
+class="description">The local contribution to the global maximum.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an integer or real variable, which may be a scalar, or a rank
+     1 or 2 array. &#x00A0;Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">root</span> </dt><dd 
+class="description">Process to hold the final maximum, or <span 
+class="cmsy-10">-</span>1 to make it available on all
+     processes.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="cmsy-10">-</span>1 <span 
+class="cmmi-10">&#x003C;</span>= <span 
+class="cmmi-10">root &#x003C;</span>= <span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1, default -1. <br 
+class="newline" /></dd></dl>
+<!--l. 412--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">dat</span> </dt><dd 
+class="description">On destination process(es), the result of the maximum operation.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer or real variable, which may be a scalar, or a rank
+     1 or 2 array. &#x00A0;Type, kind, rank and size must agree on all processes.</dd></dl>
+<!--l. 424--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+                                                                  
+
+                                                                  
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x79-116002x1">The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+     <li 
+  class="enumerate" id="x79-116004x2">The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument may also be a long integer scalar.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 432--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu71.html" >next</a>] [<a 
+href="userhtmlsu66.html" >prev</a>] [<a 
+href="userhtmlsu66.html#tailuserhtmlsu66.html" >prev-tail</a>] [<a 
+href="userhtmlsu67.html" >front</a>] [<a 
+href="userhtmlsu59.html#userhtmlsu70.html" >up</a>] </p></div>
+<!--l. 432--><p class="indent" >   <a 
+ id="tailuserhtmlsu67.html"></a>  
+</body></html> 

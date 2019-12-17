@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_cdins &#8212; Communication descriptor insert routine</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 199--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu35.html" >next</a>] [<a 
+href="userhtmlsu30.html" >prev</a>] [<a 
+href="userhtmlsu30.html#tailuserhtmlsu30.html" >prev-tail</a>] [<a 
+href="userhtmlsu29.html#tailuserhtmlsu31.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu34.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.2   </span> <a 
+ id="x42-790006.2"></a>psb_cdins &#8212; Communication descriptor insert routine</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-58">
+call&#x00A0;psb_cdins(nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,ila,jla])
+&#x00A0;<br />call&#x00A0;psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
+</div>
+<!--l. 204--><p class="nopar" >
+<!--l. 206--><p class="indent" >   This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a linear system
+coefficient matrix), storing them as necessary into the communication descriptor. In
+the first form the edges are specified as pairs of indices <span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,ja</span>(<span 
+class="cmmi-10">i</span>); the starting index
+<span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>) should belong to the current process. In the second form only the remote indices
+<span 
+class="cmmi-10">ja</span>(<span 
+class="cmmi-10">i</span>) are specified.
+<!--l. 214--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">nz</span> </dt><dd 
+class="description">the number of points being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ia</span> </dt><dd 
+class="description">the indices of the starting vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ja</span> </dt><dd 
+class="description">the indices of the end vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mask</span> </dt><dd 
+class="description">Mask entries in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span>, they are inserted only when the corresponding <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mask</span></span></span>
+     entries are <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span><br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical array of length <span 
+class="cmmi-10">nz</span>, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span>.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">lidx</span> </dt><dd 
+class="description">User defined local indices for <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.</dd></dl>
+<!--l. 253--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">the updated communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ila</span> </dt><dd 
+class="description">the local indices of the starting vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">jla</span> </dt><dd 
+class="description">the local indices of the end vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd></dl>
+<!--l. 277--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x42-79002x1">This routine may only be called if the descriptor is in the build state;
+     </li>
+     <li 
+  class="enumerate" id="x42-79004x2">This routine automatically ignores edges that do not insist on the current
+     process, i.e. edges for which neither the starting nor the end vertex belong
+     to the current process.
+     </li>
+     <li 
+  class="enumerate" id="x42-79006x3">The  second  form  of  this  routine  will  be  useful  when  dealing  with
+     user-specified index mappings; see also&#x00A0;<a 
+href="userhtmlsu3.html#x9-70002.3.1">2.3.1<!--tex4ht:ref: sec:usermaps --></a>.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 293--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu35.html" >next</a>] [<a 
+href="userhtmlsu30.html" >prev</a>] [<a 
+href="userhtmlsu30.html#tailuserhtmlsu30.html" >prev-tail</a>] [<a 
+href="userhtmlsu31.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu34.html" >up</a>] </p></div>
+<!--l. 293--><p class="indent" >   <a 
+ id="tailuserhtmlsu31.html"></a>  
+</body></html> 

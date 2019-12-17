@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_rcv &#8212; Receive data</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 702--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu72.html" >prev</a>] [<a 
+href="userhtmlsu72.html#tailuserhtmlsu72.html" >prev-tail</a>] [<a 
+href="userhtmlsu70.html#tailuserhtmlsu73.html">tail</a>] [<a 
+href="userhtmlsu59.html#userhtmlsu75.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">7.17   </span> <a 
+ id="x85-1220007.17"></a>psb_rcv &#8212; Receive data</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-100">
+call&#x00A0;psb_rcv(icontxt,&#x00A0;dat,&#x00A0;src,&#x00A0;m)
+</div>
+<!--l. 706--><p class="nopar" >
+<!--l. 708--><p class="indent" >   This subroutine receives a packet of data to a destination.
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous: see usage notes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">src</span> </dt><dd 
+class="description">Source process.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="cmmi-10">&#x003C;</span>= <span 
+class="cmmi-10">src &#x003C;</span>= <span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1. <br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">m</span> </dt><dd 
+class="description">Number of rows.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="cmmi-10">&#x003C;</span>= <span 
+class="cmmi-10">m &#x003C;</span>= <span 
+class="cmmi-10">size</span>(<span 
+class="cmmi-10">dat,</span>1). <br 
+class="newline" />When  <span 
+class="cmmi-10">dat </span>is  a  rank  2  array,  specifies  the  number  of  rows  to  be  sent
+     independently of the leading dimension <span 
+class="cmmi-10">size</span>(<span 
+class="cmmi-10">dat,</span>1); must have the same
+     value on sending and receiving processes.</dd></dl>
+<!--l. 734--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">dat</span> </dt><dd 
+class="description">The data to be received.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array, or a character or logical scalar. &#x00A0;Type, kind and
+     rank must agree on sender and receiver process; if <span 
+class="cmmi-10">m </span>is not specified, size
+     must agree as well.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 746--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x85-122002x1">This subroutine implies a synchronization, but only between the calling
+     process and the source process <span 
+class="cmmi-10">src</span>.</li></ol>
+                                                                  
+
+                                                                  
+   <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu72.html" >prev</a>] [<a 
+href="userhtmlsu72.html#tailuserhtmlsu72.html" >prev-tail</a>] [<a 
+href="userhtmlsu73.html" >front</a>] [<a 
+href="userhtmlsu59.html#userhtmlsu75.html" >up</a>] </p></div>
+<!--l. 3--><p class="indent" >   <a 
+ id="tailuserhtmlsu73.html"></a>  
+</body></html> 

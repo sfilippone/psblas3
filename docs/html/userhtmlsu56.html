@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Sorting utilities &#8212; </title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1728--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu55.html" >prev</a>] [<a 
+href="userhtmlsu55.html#tailuserhtmlsu55.html" >prev-tail</a>] [<a 
+href="userhtmlsu53.html#tailuserhtmlsu56.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu58.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.27   </span> <a 
+ id="x67-1040006.27"></a>Sorting utilities &#8212; </h4>
+<!--l. 1731--><p class="noindent" ><span 
+class="cmbx-12">psb</span><span 
+class="cmbx-12">_msort &#8212; Sorting by the Merge-sort algorithm</span>
+<!--l. 1734--><p class="noindent" ><span 
+class="cmbx-12">psb</span><span 
+class="cmbx-12">_qsort &#8212; Sorting by the Quicksort algorithm</span>
+<!--l. 1737--><p class="noindent" ><span 
+class="cmbx-12">psb</span><span 
+class="cmbx-12">_hsort &#8212; Sorting by the Heapsort algorithm</span>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-83">
+call&#x00A0;psb_msort(x,ix,dir,flag)
+&#x00A0;<br />call&#x00A0;psb_qsort(x,ix,dir,flag)
+&#x00A0;<br />call&#x00A0;psb_hsort(x,ix,dir,flag)
+</div>
+<!--l. 1742--><p class="nopar" >
+<!--l. 1744--><p class="indent" >   These serial routines sort a sequence <span 
+class="cmmi-10">X </span>into ascending or descending order. The
+argument meaning is identical for the three calls; the only difference is the algorithm
+used to accomplish the task (see Usage Notes below).
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">The sequence to be sorted.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: an integer, real or complex array of rank 1.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ix</span> </dt><dd 
+class="description">A vector of indices.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer array of (at least) the same size as <span 
+class="cmmi-10">X</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">dir</span> </dt><dd 
+class="description">The desired ordering.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value:
+         <dl class="description"><dt class="description">
+     <span 
+class="cmbx-10">Integer and real data:</span> </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_up_</span></span></span>,                   <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_down_</span></span></span>,
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_up_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_down_</span></span></span>; default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_up_</span></span></span>.
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">Complex data:</span> </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lsort_up_</span></span></span>,   <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lsort_down_</span></span></span>,   <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_up_</span></span></span>,
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_down_</span></span></span>; default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lsort_up_</span></span></span>.</dd></dl>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">flag</span> </dt><dd 
+class="description">Whether to keep the original values in <span 
+class="cmmi-10">IX</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_ovw_idx_</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_keep_idx_</span></span></span>;
+     default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_ovw_idx_</span></span></span>.
+     </dd></dl>
+<!--l. 1774--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">The sequence of values, in the chosen ordering.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: an integer, real or complex array of rank 1.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ix</span> </dt><dd 
+class="description">A vector of indices.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />An integer array of rank 1, whose entries are moved to the same position
+     as the corresponding entries in <span 
+class="cmmi-10">x</span>.</dd></dl>
+<!--l. 1785--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x67-104002x1">For integer or real data the sorting can be performed in the up/down
+     direction, on the natural or absolute values;
+     </li>
+     <li 
+  class="enumerate" id="x67-104004x2">For complex data the sorting can be done in a lexicographic order (i.e.:
+     sort on the real part with ties broken according to the imaginary part) or
+     on the absolute values;
+     </li>
+     <li 
+  class="enumerate" id="x67-104006x3">The routines return the items in the chosen ordering; the output difference
+     is the handling of ties (i.e. items with an equal value) in the original input.
+     With the merge-sort algorithm ties are preserved in the same relative
+     order as they had in the original sequence, while this is not guaranteed for
+     quicksort or heapsort;
+     </li>
+     <li 
+  class="enumerate" id="x67-104008x4">If <span 
+class="cmmi-10">flag </span>= <span 
+class="cmmi-10">psb</span>_<span 
+class="cmmi-10">sort</span>_<span 
+class="cmmi-10">ovw</span>_<span 
+class="cmmi-10">idx</span>_ then the entries in <span 
+class="cmmi-10">ix</span>(1 : <span 
+class="cmmi-10">n</span>) where <span 
+class="cmmi-10">n </span>is the size
+     of <span 
+class="cmmi-10">x </span>are initialized to <span 
+class="cmmi-10">ix</span>(<span 
+class="cmmi-10">i</span>) <span 
+class="cmsy-10">&#x2190; </span><span 
+class="cmmi-10">i</span>; thus, upon return from the subroutine,
+     for each index <span 
+class="cmmi-10">i </span>we have in <span 
+class="cmmi-10">ix</span>(<span 
+class="cmmi-10">i</span>) the position that the item <span 
+class="cmmi-10">x</span>(<span 
+class="cmmi-10">i</span>) occupied
+     in the original data sequence;
+     </li>
+     <li 
+  class="enumerate" id="x67-104010x5">If <span 
+class="cmmi-10">flag </span>= <span 
+class="cmmi-10">psb</span>_<span 
+class="cmmi-10">sort</span>_<span 
+class="cmmi-10">keep</span>_<span 
+class="cmmi-10">idx</span>_ the routine will assume that the entries in
+     <span 
+class="cmmi-10">ix</span>(:) have already been initialized by the user;
+     </li>
+     <li 
+  class="enumerate" id="x67-104012x6">The three sorting algorithms have a similar <span 
+class="cmmi-10">O</span>(<span 
+class="cmmi-10">n</span>log <span 
+class="cmmi-10">n</span>) expected running time;
+     in the average case quicksort will be the fastest and merge-sort the slowest.
+     However note that:
+         <ol  class="enumerate2" >
+         <li 
+  class="enumerate" id="x67-104014x1">The worst case running time for quicksort is <span 
+class="cmmi-10">O</span>(<span 
+class="cmmi-10">n</span><sup><span 
+class="cmr-7">2</span></sup>); the algorithm
+         implemented here follows the well-known median-of-three heuristics,
+         but the worst case may still apply;
+         </li>
+         <li 
+  class="enumerate" id="x67-104016x2">The  worst  case  running  time  for  merge-sort  and  heap-sort  is
+         <span 
+class="cmmi-10">O</span>(<span 
+class="cmmi-10">n</span>log <span 
+class="cmmi-10">n</span>) as the average case;
+                                                                  
+
+                                                                  
+         </li>
+         <li 
+  class="enumerate" id="x67-104018x3">The  merge-sort  algorithm  is  implemented  to  take  advantage  of
+         subsequences that may be already in the desired ordering prior to
+         the subroutine call; this situation is relatively common when dealing
+         with groups of indices of sparse matrix entries, thus merge-sort is the
+         preferred choice when a sorting is needed by other routines in the
+         library.</li></ol>
+     </li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu55.html" >prev</a>] [<a 
+href="userhtmlsu55.html#tailuserhtmlsu55.html" >prev-tail</a>] [<a 
+href="userhtmlsu56.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu58.html" >up</a>] </p></div>
+<!--l. 3--><p class="indent" >   <a 
+ id="tailuserhtmlsu56.html"></a>  
+</body></html> 

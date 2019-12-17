@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_gemlt &#8212; Entrywise Product</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1241--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu26.html" >next</a>] [<a 
+href="userhtmlsu22.html" >prev</a>] [<a 
+href="userhtmlsu22.html#tailuserhtmlsu22.html" >prev-tail</a>] [<a 
+href="userhtmlsu20.html#tailuserhtmlsu23.html">tail</a>] [<a 
+href="userhtmlsu12.html#userhtmlse5.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">4.14   </span> <a 
+ id="x32-690004.14"></a>psb_gemlt &#8212; Entrywise Product</h4>
+<!--l. 1243--><p class="noindent" >This function computes the entrywise product between two vectors <span 
+class="cmmi-10">x </span>and
+<span 
+class="cmmi-10">y</span>
+   <center class="math-display" >
+<img 
+src="userhtml22x.png" alt="dot &#x2190; x(i)y(i).
+" class="math-display" ></center>
+<!--l. 1245--><p class="nopar" >
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-53">
+psb_gemlt(x,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info)
+</div>
+<!--l. 1249--><p class="nopar" > <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 1251--><p class="indent" >   <a 
+ id="x32-6900114"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 1252--><p class="noindent" >
+<div class="tabular"> <table id="TBL-14" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-14-1g"><col 
+id="TBL-14-1"><col 
+id="TBL-14-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-14-1-1"  
+class="td11"><span 
+class="cmmi-10">dot</span>, <span 
+class="cmmi-10">x</span>, <span 
+class="cmmi-10">y                  </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-14-1-2"  
+class="td11"><span 
+class="cmbx-10">Function</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-14-2-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-14-2-2"  
+class="td11">psb_gemlt</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-14-3-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-14-3-2"  
+class="td11">psb_gemlt</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-14-4-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-14-4-2"  
+class="td11">psb_gemlt</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-14-5-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-14-5-2"  
+class="td11">psb_gemlt</td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-14-6-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;14: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x32-6900114 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">the local portion of global dense vector <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of
+     type specified in Table&#x00A0;<a 
+href="userhtmlsu11.html#x20-570012">2<!--tex4ht:ref: tab:f90dot --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of global dense vector <span 
+class="cmmi-10">y</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of
+     type specified in Table&#x00A0;<a 
+href="userhtmlsu11.html#x20-570012">2<!--tex4ht:ref: tab:f90dot --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of result submatrix <span 
+class="cmmi-10">y</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of
+     the type indicated in Table&#x00A0;<a 
+href="#x32-6900114">14<!--tex4ht:ref: tab:f90mlt --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1309--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu26.html" >next</a>] [<a 
+href="userhtmlsu22.html" >prev</a>] [<a 
+href="userhtmlsu22.html#tailuserhtmlsu22.html" >prev-tail</a>] [<a 
+href="userhtmlsu23.html" >front</a>] [<a 
+href="userhtmlsu12.html#userhtmlse5.html" >up</a>] </p></div>
+<!--l. 1309--><p class="indent" >   <a 
+ id="tailuserhtmlsu23.html"></a>  
+</body></html> 

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Data management routines</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu59.html" >next</a>] [<a 
+href="userhtmlse5.html" >prev</a>] [<a 
+href="userhtmlse5.html#tailuserhtmlse5.html" >prev-tail</a>] [<a 
+href="userhtmlsu27.html#tailuserhtmlse6.html">tail</a>] [<a 
+href="userhtml.html#userhtmlsu32.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
+ id="x40-770006"></a>Data management routines</h3>
+<!--l. 8--><p class="noindent" >
+   <div class="subsectionTOCS">
+   &#x00A0;<span class="subsectionToc" >6.1 <a 
+href="userhtmlsu30.html#x41-780006.1">psb_cdall &#8212; Allocates a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.2 <a 
+href="userhtmlsu31.html#x42-790006.2">psb_cdins &#8212; Communication descriptor insert routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.3 <a 
+href="userhtmlsu32.html#x43-800006.3">psb_cdasb &#8212; Communication descriptor assembly routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.4 <a 
+href="userhtmlsu33.html#x44-810006.4">psb_cdcpy &#8212; Copies a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.5 <a 
+href="userhtmlsu34.html#x45-820006.5">psb_cdfree &#8212; Frees a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.6 <a 
+href="userhtmlsu35.html#x46-830006.6">psb_cdbldext &#8212; Build an extended communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.7 <a 
+href="userhtmlsu36.html#x47-840006.7">psb_spall &#8212; Allocates a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.8 <a 
+href="userhtmlsu37.html#x48-850006.8">psb_spins &#8212; Insert a set of coefficients into a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.9 <a 
+href="userhtmlsu38.html#x49-860006.9">psb_spasb &#8212; Sparse matrix assembly routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.10 <a 
+href="userhtmlsu39.html#x50-870006.10">psb_spfree &#8212; Frees a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.11 <a 
+href="userhtmlsu40.html#x51-880006.11">psb_sprn &#8212; Reinit sparse matrix structure for psblas routines.</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.12 <a 
+href="userhtmlsu41.html#x52-890006.12">psb_geall &#8212; Allocates a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.13 <a 
+href="userhtmlsu42.html#x53-900006.13">psb_geins &#8212; Dense matrix insertion routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.14 <a 
+href="userhtmlsu43.html#x54-910006.14">psb_geasb &#8212; Assembly a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.15 <a 
+href="userhtmlsu44.html#x55-920006.15">psb_gefree &#8212; Frees a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.16 <a 
+href="userhtmlsu45.html#x56-930006.16">psb_gelp &#8212; Applies a left permutation to a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.17 <a 
+href="userhtmlsu46.html#x57-940006.17">psb_glob_to_loc &#8212; Global to local indices convertion</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.18 <a 
+href="userhtmlsu47.html#x58-950006.18">psb_loc_to_glob &#8212; Local to global indices conversion</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.19 <a 
+href="userhtmlsu48.html#x59-960006.19">psb_is_owned &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.20 <a 
+href="userhtmlsu49.html#x60-970006.20">psb_owned_index &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.21 <a 
+href="userhtmlsu50.html#x61-980006.21">psb_is_local &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.22 <a 
+href="userhtmlsu51.html#x62-990006.22">psb_local_index &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.23 <a 
+href="userhtmlsu52.html#x63-1000006.23">psb_get_boundary &#8212; Extract list of boundary elements</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.24 <a 
+href="userhtmlsu53.html#x64-1010006.24">psb_get_overlap &#8212; Extract list of overlap elements</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.25 <a 
+href="userhtmlsu54.html#x65-1020006.25">psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.26 <a 
+href="userhtmlsu55.html#x66-1030006.26">psb_sizeof &#8212; Memory occupation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.27 <a 
+href="userhtmlsu56.html#x67-1040006.27">Sorting utilities &#8212; </a></span>
+   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                  
+
+                                                                  
+   <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu59.html" >next</a>] [<a 
+href="userhtmlse5.html" >prev</a>] [<a 
+href="userhtmlse5.html#tailuserhtmlse5.html" >prev-tail</a>] [<a 
+href="userhtmlse6.html" >front</a>] [<a 
+href="userhtml.html#userhtmlsu32.html" >up</a>] </p></div>
+<!--l. 3--><p class="indent" >   <a 
+ id="tailuserhtmlse6.html"></a>  
+</body></html> 

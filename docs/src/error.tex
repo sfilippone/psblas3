@@ -119,8 +119,9 @@ Aborting...
 \end{figure}
 
 
-\clearpage\subroutine{psb\_errpush}{Pushes an error code onto the error
+\clearpage\subsection{psb\_errpush}{Pushes an error code onto the error
   stack}
+
 
 \begin{lstlisting}
 call psb_errpush(err_c, r_name, i_err, a_err)
@@ -149,7 +150,7 @@ Type: {\bf optional}\\
 Specified as: a string.\\
 \end{description}
 
-\clearpage\subroutine{psb\_error}{Prints the error stack content and aborts
+\clearpage\subsection{psb\_error}{Prints the error stack content and aborts
   execution}
 
 \begin{lstlisting}
@@ -168,8 +169,9 @@ Specified as: an integer.
 
 
 
-\clearpage\subroutine{psb\_set\_errverbosity}{Sets the verbosity of error
-  messages.}
+\clearpage\subsection{psb\_set\_errverbosity}{Sets the verbosity of error
+  messages}
+
 
 \begin{lstlisting}
 call psb_set_errverbosity(v)
@@ -185,9 +187,8 @@ Intent: {\bf in}.\\
 Specified as: an integer.
 \end{description}
 
-\clearpage\subroutine{psb\_set\_erraction}{Set the type of action to be
-  taken  upon error condition.}
-
+\clearpage\subsection{psb\_set\_erraction}{Set the type of action to be
+  taken  upon error condition}
 
 \begin{lstlisting}
 call psb_set_erraction(err_act)
@@ -204,27 +205,6 @@ Specified as: an integer. Possible values: \verb|psb_act_ret|,
 \verb|psb_act_abort|. 
 \end{description}
 
-
-
-%% \clearpage\subroutine{psb\_errcomm}{Error communication routine}
-
-%% \begin{lstlisting}
-%% call psb_errcomm(icontxt, err)
-%% \end{lstlisting}
-
-%% \begin{description}
-%% \item[\bf On Entry]
-%% \item[icontxt] the communication context.\\
-%% Scope: {\bf global} \\
-%% Type: {\bf required}\\
-%% Intent: {\bf in}.\\
-%% Specified as: an integer.
-%% \item[err] the error code to be communicated\\
-%% Scope: {\bf global} \\
-%% Type: {\bf required}\\
-%% Intent: {\bf inout}.\\
-%% Specified as: an integer.\\
-%% \end{description}
 
 %%% Local Variables: 
 %%% mode: latex

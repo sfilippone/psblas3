@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_gelp &#8212; Applies a left permutation to a dense matrix</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1156--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu49.html" >next</a>] [<a 
+href="userhtmlsu44.html" >prev</a>] [<a 
+href="userhtmlsu44.html#tailuserhtmlsu44.html" >prev-tail</a>] [<a 
+href="userhtmlsu42.html#tailuserhtmlsu45.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu48.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.16   </span> <a 
+ id="x56-930006.16"></a>psb_gelp &#8212; Applies a left permutation to a dense matrix</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-72">
+call&#x00A0;psb_gelp(trans,&#x00A0;iperm,&#x00A0;x,&#x00A0;info)
+</div>
+<!--l. 1161--><p class="nopar" >
+<!--l. 1163--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">trans</span> </dt><dd 
+class="description">A character that specifies whether to permute <span 
+class="cmmi-10">A </span>or <span 
+class="cmmi-10">A</span><sup><span 
+class="cmmi-7">T</span></sup>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a single character with value &#8217;N&#8217; for <span 
+class="cmmi-10">A </span>or &#8217;T&#8217; for <span 
+class="cmmi-10">A</span><sup><span 
+class="cmmi-7">T</span></sup>.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">iperm</span> </dt><dd 
+class="description">An integer array containing permutation information.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer one-dimensional array.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">The dense matrix to be permuted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a one or two dimensional array.<br 
+class="newline" /></dd></dl>
+<!--l. 1183--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1196--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu49.html" >next</a>] [<a 
+href="userhtmlsu44.html" >prev</a>] [<a 
+href="userhtmlsu44.html#tailuserhtmlsu44.html" >prev-tail</a>] [<a 
+href="userhtmlsu45.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu48.html" >up</a>] </p></div>
+<!--l. 1196--><p class="indent" >   <a 
+ id="tailuserhtmlsu45.html"></a>  
+</body></html> 

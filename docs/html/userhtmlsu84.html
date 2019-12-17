@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>init &#8212; Initialize a preconditioner</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 26--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu89.html" >next</a>] [<a 
+href="userhtmlsu82.html#tailuserhtmlsu84.html">tail</a>] [<a 
+href="userhtmlsu86.html#userhtmlsu87.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">10.1   </span> <a 
+ id="x99-13600010.1"></a>init &#8212; Initialize a preconditioner</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-102">
+call&#x00A0;prec%init(icontxt,ptype,&#x00A0;info)
+</div>
+<!--l. 30--><p class="nopar" >
+<!--l. 32--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ptype</span> </dt><dd 
+class="description">the type of preconditioner. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character string, see usage notes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Exit</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlsu8.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Error code: if no error, 0 is returned.</dd></dl>
+<!--l. 66--><p class="noindent" ><span 
+class="cmbx-12">Notes </span>Legal inputs to this subroutine are interpreted depending on the <span 
+class="cmmi-10">ptype </span>string as
+follows<span class="footnote-mark"><a 
+href="userhtml100.html#fn4x0"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x99-136001f4"></a> :
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">NONE</span> </dt><dd 
+class="description">No preconditioning, i.e. the preconditioner is just a copy operator.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">DIAG</span> </dt><dd 
+class="description">Diagonal scaling; each entry of the input vector is multiplied by the
+     reciprocal  of  the  sum  of  the  absolute  values  of  the  coefficients  in  the
+     corresponding row of matrix <span 
+class="cmmi-10">A</span>;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">BJAC</span> </dt><dd 
+class="description">Precondition  by  a  factorization  of  the  block-diagonal  of  matrix  <span 
+class="cmmi-10">A</span>,
+     where block boundaries are determined by the data allocation boundaries
+     for  each  process;  requires  no  communication.  Only  the  incomplete
+     factorization <span 
+class="cmmi-10">ILU</span>(0) is currently implemented.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 87--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu89.html" >next</a>] [<a 
+href="userhtmlsu84.html" >front</a>] [<a 
+href="userhtmlsu86.html#userhtmlsu87.html" >up</a>] </p></div>
+<!--l. 87--><p class="indent" >   <a 
+ id="tailuserhtmlsu84.html"></a>  
+</body></html> 

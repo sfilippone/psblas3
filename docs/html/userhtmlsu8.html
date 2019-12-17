@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Preconditioner data structure</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1244--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu11.html" >next</a>] [<a 
+href="userhtmlsu7.html" >prev</a>] [<a 
+href="userhtmlsu7.html#tailuserhtmlsu7.html" >prev-tail</a>] [<a 
+href="userhtmlsu5.html#tailuserhtmlsu8.html">tail</a>] [<a 
+href="userhtmlsu7.html#userhtmlsu10.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">3.4   </span> <a 
+ id="x16-530003.4"></a>Preconditioner data structure</h4>
+<!--l. 1246--><p class="noindent" >Our base library offers support for simple well known preconditioners like Diagonal
+Scaling or Block Jacobi with incomplete factorization ILU(0).
+<!--l. 1250--><p class="indent" >   A preconditioner is held in the <a 
+ id="precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a> data structure reported in
+figure&#x00A0;<a 
+href="#x16-530016">6<!--tex4ht:ref: fig:prectype --></a>. The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_prec_type</span></span></span> data type may contain a simple preconditioning matrix
+with the associated communication descriptor.The internal preconditioner is
+allocated appropriately with the dynamic type corresponding to the desired
+preconditioner. <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x16-530016"></a>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 1271--><p class="noindent" >
+<div class="minipage"><div class="verbatim" id="verbatim-39">
+&#x00A0;<br />&#x00A0;&#x00A0;type&#x00A0;psb_Tprec_type
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_prec_type),&#x00A0;allocatable&#x00A0;::&#x00A0;prec
+&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_Tprec_type
+&#x00A0;<br />
+</div>
+<!--l. 1279--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;6: </span><span  
+class="content">The PSBLAS defined data type that contains a preconditioner.</span></div><!--tex4ht:label?: x16-530016 -->
+                                                                  
+
+                                                                  
+<!--l. 1288--><p class="indent" >   </div><hr class="endfigure">
+                                                                  
+
+                                                                  
+   <!--l. 1312--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu11.html" >next</a>] [<a 
+href="userhtmlsu7.html" >prev</a>] [<a 
+href="userhtmlsu7.html#tailuserhtmlsu7.html" >prev-tail</a>] [<a 
+href="userhtmlsu8.html" >front</a>] [<a 
+href="userhtmlsu7.html#userhtmlsu10.html" >up</a>] </p></div>
+<!--l. 1312--><p class="indent" >   <a 
+ id="tailuserhtmlsu8.html"></a>  
+</body></html> 

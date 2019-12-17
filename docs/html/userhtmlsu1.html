@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Basic Nomenclature</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 155--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu4.html" >next</a>] [<a 
+href="#tailuserhtmlsu1.html">tail</a>] [<a 
+href="userhtmlse2.html#userhtmlsu2.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">2.1   </span> <a 
+ id="x6-40002.1"></a>Basic Nomenclature</h4>
+<!--l. 158--><p class="noindent" >Our computational model implies that the data allocation on the parallel distributed
+memory machine is guided by the structure of the physical model, and specifically by
+the discretization mesh of the PDE.
+<!--l. 163--><p class="indent" >   Each point of the discretization mesh will have (at least) one associated
+equation/variable, and therefore one index. We say that point <span 
+class="cmmi-10">i </span><span 
+class="cmti-10">depends </span>on point <span 
+class="cmmi-10">j </span>if
+the equation for a variable associated with <span 
+class="cmmi-10">i </span>contains a term in <span 
+class="cmmi-10">j</span>, or equivalently if
+                                                                  
+
+                                                                  
+<span 
+class="cmmi-10">a</span><sub><span 
+class="cmmi-7">ij</span></sub><span 
+class="cmmi-10">&#x2260;</span>0. After the partition of the discretization mesh into <span 
+class="cmti-10">sub-domains </span>assigned
+to the parallel processes, we classify the points of a given sub-domain as
+following.
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Internal.</span> </dt><dd 
+class="description">An internal point of a given domain <span 
+class="cmti-10">depends </span>only on points of the
+     same domain. If all points of a domain are assigned to one process, then
+     a  computational  step  (e.g.,  a  matrix-vector  product)  of  the  equations
+     associated  with  the  internal  points  requires  no  data  items  from  other
+     domains and no communications.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Boundary.</span> </dt><dd 
+class="description">A point of a given domain is a boundary point if it <span 
+class="cmti-10">depends </span>on
+     points belonging to other domains.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Halo.</span> </dt><dd 
+class="description">A halo point for a given domain is a point belonging to another domain
+     such that there is a boundary point which <span 
+class="cmti-10">depends </span>on it. Whenever performing
+     a computational step, such as a matrix-vector product, the values associated
+     with halo points are requested from other domains. A boundary point of a
+     given domain is usually a halo point for some other domain<span class="footnote-mark"><a 
+href="userhtml7.html#fn2x0"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x6-4001f2"></a> ;
+     therefore the cardinality of the boundary points set denotes the amount
+     of data sent to other domains.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Overlap.</span> </dt><dd 
+class="description">An overlap point is a boundary point assigned to multiple domains.
+     Any operation that involves an overlap point has to be replicated for each
+     assignment.</dd></dl>
+<!--l. 202--><p class="noindent" >Overlap points do not usually exist in the basic data distributions; however they are a
+feature of Domain Decomposition Schwarz preconditioners which are the subject of
+related research work&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#X2007c">4</a>,&#x00A0;<a 
+href="userhtmlli2.html#X2007d">3</a>]</span>.
+<!--l. 207--><p class="indent" >   We denote the sets of internal, boundary and halo points for a given subdomain
+by <span 
+class="cmsy-10"><img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span>, <span 
+class="cmsy-10"><img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /> </span>and <span 
+class="cmsy-10"><img 
+src="cmsy10-48.png" alt="H" class="10x-x-48" /></span>. Each subdomain is assigned to one process; each process usually owns
+one subdomain, although the user may choose to assign more than one subdomain to
+a process. If each process <span 
+class="cmmi-10">i </span>owns one subdomain, the number of rows in
+the local sparse matrix is <span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>, and the number of local columns (i.e.
+those for which there exists at least one non-zero entry in the local rows) is
+<span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-48.png" alt="H" class="10x-x-48" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>.
+<!--l. 217--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x6-40022"></a>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 218--><p class="noindent" >
+<!--l. 221--><p class="noindent" ><img 
+src="figures/points.png" alt="PIC"  
+></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;2: </span><span  
+class="content">Point classfication.</span></div><!--tex4ht:label?: x6-40022 -->
+                                                                  
+
+                                                                  
+<!--l. 227--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 229--><p class="indent" >   This classification of mesh points guides the naming scheme that we adopted in
+the library internals and in the data structures. We explicitly note that &#8220;Halo&#8221; points
+are also often called &#8220;ghost&#8221; points in the literature.
+                                                                  
+
+                                                                  
+   <!--l. 236--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu4.html" >next</a>] [<a 
+href="userhtmlsu1.html" >front</a>] [<a 
+href="userhtmlse2.html#userhtmlsu2.html" >up</a>] </p></div>
+<!--l. 236--><p class="indent" >   <a 
+ id="tailuserhtmlsu1.html"></a>  
+</body></html> 
