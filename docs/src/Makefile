@@ -141,7 +141,7 @@ GXS      = $(join $(BASEFILE),.gxs)
 GLX      = $(join $(BASEFILE),.glx)
 TARGETPDF= ../psblas-3.7.pdf
 BASEHTML = $(patsubst %.tex,%,$(HTMLFILE))
-HTML     = $(join $(HTMLFILE),.html)
+HTML     = $(join $(BASEHTML),.html)
 HTMLDIR  = ../html
 HTMLFLAGS = -noaddress
 HTMLFLAGS = "html,3"
@@ -341,7 +341,7 @@ define ltx2html-cpy
   @echo "----- latex -------------------------------------------------------"
   @echo -n "Starting: "; date
   @echo
-  cd tmp; (cp *.css *.html *.png ../$(HTMLDIR)); (cp $(HTMLFILE) ../$(HTMLDIR)/index.html)
+  cd tmp; (cp *.css *.html *.png ../$(HTMLDIR)); (cp $(HTML) ../$(HTMLDIR)/index.html)
 endef
 
 #----------------------------------------------------------------------------
