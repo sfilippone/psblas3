@@ -1,5 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2019/12/18: New internals and algorithms for FND_OWNER, faster and less
+	memory hungry.	
 2019/07/20: New SCAN collective; improve handling of SYMmetric	
 2019/07/08: Fix memory usage in conversions to/from coo	
 2019/07/01: Timer facility 	
