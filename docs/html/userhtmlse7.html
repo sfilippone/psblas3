@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Parallel environment routines</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 2--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu73.html" >next</a>] [<a 
+href="userhtmlse6.html" >prev</a>] [<a 
+href="userhtmlse6.html#tailuserhtmlse6.html" >prev-tail</a>] [<a 
+href="userhtmlsu51.html#tailuserhtmlse7.html">tail</a>] [<a 
+href="userhtml.html#userhtmlsu56.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">7   </span> <a 
+ id="x65-990007"></a>Parallel environment routines</h3>
+                                                                  
+
+                                                                  
+   <div class="subsectionTOCS">
+   &#x00A0;<span class="subsectionToc" >7.1 <a 
+href="userhtmlsu54.html#x66-1000007.1">psb_init &#8212; Initializes PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.2 <a 
+href="userhtmlsu55.html#x67-1010007.2">psb_info &#8212; Return information about PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.3 <a 
+href="userhtmlsu56.html#x68-1020007.3">psb_exit &#8212; Exit from PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.4 <a 
+href="userhtmlsu57.html#x69-1030007.4">psb_get_mpicomm &#8212; Get the MPI communicator</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.5 <a 
+href="userhtmlsu58.html#x70-1040007.5">psb_get_rank &#8212; Get the MPI rank</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.6 <a 
+href="userhtmlsu59.html#x71-1050007.6">psb_wtime &#8212; Wall clock timing</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.7 <a 
+href="userhtmlsu60.html#x72-1060007.7">psb_barrier &#8212; Sinchronization point parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.8 <a 
+href="userhtmlsu61.html#x73-1070007.8">psb_abort &#8212; Abort a computation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.9 <a 
+href="userhtmlsu62.html#x74-1080007.9">psb_bcast &#8212; Broadcast data</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.10 <a 
+href="userhtmlsu63.html#x75-1090007.10">psb_sum &#8212; Global sum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.11 <a 
+href="userhtmlsu64.html#x76-1100007.11">psb_max &#8212; Global maximum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.12 <a 
+href="userhtmlsu65.html#x77-1110007.12">psb_min &#8212; Global minimum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.13 <a 
+href="userhtmlsu66.html#x78-1120007.13">psb_amx &#8212; Global maximum absolute value</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.14 <a 
+href="userhtmlsu67.html#x79-1130007.14">psb_amn &#8212; Global minimum absolute value</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.15 <a 
+href="userhtmlsu68.html#x80-1140007.15">psb_nrm2 &#8212; Global 2-norm reduction</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.16 <a 
+href="userhtmlsu69.html#x81-1150007.16">psb_snd &#8212; Send data</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.17 <a 
+href="userhtmlsu70.html#x82-1160007.17">psb_rcv &#8212; Receive data</a></span>
+   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                  
+
+                                                                  
+   <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu73.html" >next</a>] [<a 
+href="userhtmlse6.html" >prev</a>] [<a 
+href="userhtmlse6.html#tailuserhtmlse6.html" >prev-tail</a>] [<a 
+href="userhtmlse7.html" >front</a>] [<a 
+href="userhtml.html#userhtmlsu56.html" >up</a>] </p></div>
+<!--l. 3--><p class="indent" >   <a 
+ id="tailuserhtmlse7.html"></a>  
+</body></html> 

@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_get_rank &#8212; Get the MPI rank</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 180--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu62.html" >next</a>] [<a 
+href="userhtmlsu57.html" >prev</a>] [<a 
+href="userhtmlsu57.html#tailuserhtmlsu57.html" >prev-tail</a>] [<a 
+href="userhtmlsu55.html#tailuserhtmlsu58.html">tail</a>] [<a 
+href="userhtmlsu56.html#userhtmlsu61.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">7.5   </span> <a 
+ id="x70-1040007.5"></a>psb_get_rank &#8212; Get the MPI rank</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-82">
+call&#x00A0;psb_get_rank(rank,&#x00A0;icontxt,&#x00A0;id)
+</div>
+<!--l. 184--><p class="nopar" >
+<!--l. 186--><p class="indent" >   This subroutine returns the MPI rank of the PSBLAS process <span 
+class="cmmi-10">id</span>
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">id</span> </dt><dd 
+class="description">Identifier of a process in the PSBLAS virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. 0 <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">id </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1&#x00A0;</dd></dl>
+<!--l. 203--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">rank</span> </dt><dd 
+class="description">The MPI rank associated with the PSBLAS process <span 
+class="cmmi-10">id</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" /></dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 214--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu62.html" >next</a>] [<a 
+href="userhtmlsu57.html" >prev</a>] [<a 
+href="userhtmlsu57.html#tailuserhtmlsu57.html" >prev-tail</a>] [<a 
+href="userhtmlsu58.html" >front</a>] [<a 
+href="userhtmlsu56.html#userhtmlsu61.html" >up</a>] </p></div>
+<!--l. 214--><p class="indent" >   <a 
+ id="tailuserhtmlsu58.html"></a>  
+</body></html> 

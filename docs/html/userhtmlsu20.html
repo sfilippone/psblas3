@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_normi &#8212; Infinity Norm of Sparse Matrix</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 856--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu23.html" >next</a>] [<a 
+href="userhtmlsu19.html" >prev</a>] [<a 
+href="userhtmlsu19.html#tailuserhtmlsu19.html" >prev-tail</a>] [<a 
+href="userhtmlsu17.html#tailuserhtmlsu20.html">tail</a>] [<a 
+href="userhtmlsu12.html#userhtmlse5.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">4.11   </span> <a 
+ id="x29-630004.11"></a>psb_normi &#8212; Infinity Norm of Sparse Matrix</h4>
+<!--l. 858--><p class="noindent" >This function computes the infinity-norm of a matrix <span 
+class="cmmi-10">A</span>:<br 
+class="newline" />
+   <center class="par-math-display" >
+<img 
+src="userhtml19x.png" alt="nrmi &#x2190;  &#x2225;A&#x2225;&#x221E;
+" class="par-math-display" ></center>
+<!--l. 860--><p class="nopar" > where:
+     <dl class="description"><dt class="description">
+<span 
+class="cmmi-10">A</span> </dt><dd 
+class="description">represents the global matrix <span 
+class="cmmi-10">A</span></dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 866--><p class="indent" >   <a 
+ id="x29-6300111"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 867--><p class="noindent" >
+<div class="tabular"> <table id="TBL-11" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-11-1g"><col 
+id="TBL-11-1"><col 
+id="TBL-11-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-11-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-11-1-1"  
+class="td11"><span 
+class="cmmi-10">A                         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-11-1-2"  
+class="td11"><span 
+class="cmbx-10">Function  </span></td></tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-11-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-11-2-1"  
+class="td11">Short Precision Real </td><td  style="white-space:nowrap; text-align:left;" id="TBL-11-2-2"  
+class="td11">psb_spnrmi</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-11-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-11-3-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-11-3-2"  
+class="td11">psb_spnrmi</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-11-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-11-4-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-11-4-2"  
+class="td11">psb_spnrmi</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-11-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-11-5-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-11-5-2"  
+class="td11">psb_spnrmi</td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-11-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-11-6-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;11: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x29-6300111 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-47">
+psb_spnrmi(A,&#x00A0;desc_a,&#x00A0;info)
+&#x00A0;<br />psb_normi(A,&#x00A0;desc_a,&#x00A0;info)
+</div>
+<!--l. 885--><p class="nopar" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">the local portion of the global sparse matrix <span 
+class="cmmi-10">A</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu6.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">is the infinity-norm of sparse submatrix <span 
+class="cmmi-10">A</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Specified as: a long precision real number.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 920--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu23.html" >next</a>] [<a 
+href="userhtmlsu19.html" >prev</a>] [<a 
+href="userhtmlsu19.html#tailuserhtmlsu19.html" >prev-tail</a>] [<a 
+href="userhtmlsu20.html" >front</a>] [<a 
+href="userhtmlsu12.html#userhtmlse5.html" >up</a>] </p></div>
+<!--l. 920--><p class="indent" >   <a 
+ id="tailuserhtmlsu20.html"></a>  
+</body></html> 

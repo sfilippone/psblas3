@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_spmm &#8212; Sparse Matrix by Dense Matrix Product</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 921--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu24.html" >next</a>] [<a 
+href="userhtmlsu20.html" >prev</a>] [<a 
+href="userhtmlsu20.html#tailuserhtmlsu20.html" >prev-tail</a>] [<a 
+href="userhtmlsu18.html#tailuserhtmlsu21.html">tail</a>] [<a 
+href="userhtmlsu12.html#userhtmlsu23.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">4.12   </span> <a 
+ id="x30-640004.12"></a>psb_spmm &#8212; Sparse Matrix by Dense Matrix Product</h4>
+<!--l. 923--><p class="noindent" >This subroutine computes the Sparse Matrix by Dense Matrix Product:
+   <table 
+class="equation"><tr><td>
+   <center class="math-display" >
+<img 
+src="userhtml20x.png" alt="y &#x2190; &#x03B1;Ax + &#x03B2;y
+" class="math-display" ><a 
+ id="x30-64001r1"></a></center></td><td class="equation-label">(1)</td></tr></table>
+<!--l. 928--><p class="nopar" >
+   <table 
+class="equation"><tr><td>
+   <center class="math-display" >
+<img 
+src="userhtml21x.png" alt="y &#x2190; &#x03B1;AT x+ &#x03B2;y
+" class="math-display" ><a 
+ id="x30-64002r2"></a></center></td><td class="equation-label">(2)</td></tr></table>
+<!--l. 932--><p class="nopar" >
+   <table 
+class="equation"><tr><td>
+   <center class="math-display" >
+<img 
+src="userhtml22x.png" alt="      H
+y &#x2190; &#x03B1;A  x+ &#x03B2;y
+                                                                  
+
+                                                                  
+" class="math-display" ><a 
+ id="x30-64003r3"></a></center></td><td class="equation-label">(3)</td></tr></table>
+<!--l. 936--><p class="nopar" >
+<!--l. 938--><p class="indent" >   where:
+     <dl class="description"><dt class="description">
+<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">is the global dense matrix <span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">:</span><span 
+class="cmmi-7">,</span><span 
+class="cmr-7">:</span></sub>
+     </dd><dt class="description">
+<span 
+class="cmmi-10">y</span> </dt><dd 
+class="description">is the global dense matrix <span 
+class="cmmi-10">y</span><sub><span 
+class="cmr-7">:</span><span 
+class="cmmi-7">,</span><span 
+class="cmr-7">:</span></sub>
+     </dd><dt class="description">
+<span 
+class="cmmi-10">A</span> </dt><dd 
+class="description">is the global sparse matrix <span 
+class="cmmi-10">A</span></dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 945--><p class="indent" >   <a 
+ id="x30-6400412"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 946--><p class="noindent" >
+<div class="tabular"> <table id="TBL-12" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-12-1g"><col 
+id="TBL-12-1"><col 
+id="TBL-12-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-12-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-12-1-1"  
+class="td11"><span 
+class="cmmi-10">A</span>, <span 
+class="cmmi-10">x</span>, <span 
+class="cmmi-10">y</span>, <span 
+class="cmmi-10">&#x03B1;</span>, <span 
+class="cmmi-10">&#x03B2;             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-12-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-12-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-12-2-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-12-2-2"  
+class="td11">psb_spmm   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-12-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-12-3-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-12-3-2"  
+class="td11">psb_spmm   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-12-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-12-4-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-12-4-2"  
+class="td11">psb_spmm   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-12-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-12-5-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-12-5-2"  
+class="td11">psb_spmm   </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-12-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-12-6-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;12: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x30-6400412 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-48">
+call&#x00A0;psb_spmm(alpha,&#x00A0;a,&#x00A0;x,&#x00A0;beta,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info)
+&#x00A0;<br />call&#x00A0;psb_spmm(alpha,&#x00A0;a,&#x00A0;x,&#x00A0;beta,&#x00A0;y,desc_a,&#x00A0;info,&#x00A0;&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;trans,&#x00A0;work)
+</div>
+<!--l. 965--><p class="nopar" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">alpha</span> </dt><dd 
+class="description">the scalar <span 
+class="cmmi-10">&#x03B1;</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="#x30-6400412">12<!--tex4ht:ref: tab:f90spmm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">the local portion of the sparse matrix <span 
+class="cmmi-10">A</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu6.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">the local portion of global dense matrix <span 
+class="cmmi-10">x</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
+href="#x30-6400412">12<!--tex4ht:ref: tab:f90spmm --></a>. The
+     rank of <span 
+class="cmmi-10">x </span>must be the same of <span 
+class="cmmi-10">y</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">beta</span> </dt><dd 
+class="description">the scalar <span 
+class="cmmi-10">&#x03B2;</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="#x30-6400412">12<!--tex4ht:ref: tab:f90spmm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of global dense matrix <span 
+class="cmmi-10">y</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
+href="#x30-6400412">12<!--tex4ht:ref: tab:f90spmm --></a>. The
+     rank of <span 
+class="cmmi-10">y </span>must be the same of <span 
+class="cmmi-10">x</span>.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">trans</span> </dt><dd 
+class="description">indicates what kind of operation to perform.
+         <dl class="description"><dt class="description">
+     <span 
+class="cmbx-10">trans = N</span> </dt><dd 
+class="description">the operation is specified by equation <a 
+href="#x30-64001r1">1<!--tex4ht:ref: eq:f90spmm_no_tra --></a>
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">trans = T</span> </dt><dd 
+class="description">the operation is specified by equation <a 
+href="#x30-64002r2">2<!--tex4ht:ref: eq:f90spmm_tra --></a>
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">trans = C</span> </dt><dd 
+class="description">the operation is specified by equation <a 
+href="#x30-64003r3">3<!--tex4ht:ref: eq:f90spmm_con --></a></dd></dl>
+     <!--l. 1020--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">trans </span>= <span 
+class="cmmi-10">N</span><br 
+class="newline" />Specified as: a character variable.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">work</span> </dt><dd 
+class="description">work array.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array of the same type of <span 
+class="cmmi-10">x </span>and <span 
+class="cmmi-10">y </span>with the TARGET
+     attribute.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">the local portion of result matrix <span 
+class="cmmi-10">y</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an array of rank one or two containing numbers of type specified
+     in Table&#x00A0;<a 
+href="#x30-6400412">12<!--tex4ht:ref: tab:f90spmm --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1072--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu24.html" >next</a>] [<a 
+href="userhtmlsu20.html" >prev</a>] [<a 
+href="userhtmlsu20.html#tailuserhtmlsu20.html" >prev-tail</a>] [<a 
+href="userhtmlsu21.html" >front</a>] [<a 
+href="userhtmlsu12.html#userhtmlsu23.html" >up</a>] </p></div>
+<!--l. 1072--><p class="indent" >   <a 
+ id="tailuserhtmlsu21.html"></a>  
+</body></html> 

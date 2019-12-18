@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Library contents</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 236--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse3.html" >next</a>] [<a 
+href="userhtmlsu1.html" >prev</a>] [<a 
+href="userhtmlsu1.html#tailuserhtmlsu1.html" >prev-tail</a>] [<a 
+href="userhtmlsu1.html#tailuserhtmlsu2.html">tail</a>] [<a 
+href="userhtmlse2.html#userhtmlsu4.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">2.2   </span> <a 
+ id="x8-50002.2"></a>Library contents</h4>
+<!--l. 238--><p class="noindent" >The PSBLAS library consists of various classes of subroutines:
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Computational routines</span> </dt><dd 
+class="description">comprising:
+         <ul class="itemize1">
+         <li class="itemize">Sparse matrix by dense matrix product;
+         </li>
+         <li class="itemize">Sparse triangular systems solution for block diagonal matrices;
+         </li>
+         <li class="itemize">Vector and matrix norms;
+         </li>
+         <li class="itemize">Dense matrix sums;
+         </li>
+         <li class="itemize">Dot products.</li></ul>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Communication routines</span> </dt><dd 
+class="description">handling halo and overlap communications;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Data management and auxiliary routines</span> </dt><dd 
+class="description">including:
+         <ul class="itemize1">
+         <li class="itemize">Parallel environment management
+         </li>
+         <li class="itemize">Communication descriptors allocation;
+         </li>
+         <li class="itemize">Dense and sparse matrix allocation;
+         </li>
+         <li class="itemize">Dense and sparse matrix build and update;
+         </li>
+         <li class="itemize">Sparse matrix and data distribution preprocessing.</li></ul>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Preconditioner routines</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Iterative methods</span> </dt><dd 
+class="description">a subset of Krylov subspace iterative methods</dd></dl>
+<!--l. 263--><p class="noindent" >The following naming scheme has been adopted for all the symbols internally defined in
+the PSBLAS software package:
+     <ul class="itemize1">
+     <li class="itemize">all symbols (i.e. subroutine names, data types...) are prefixed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_</span></span></span>
+                                                                  
+
+                                                                  
+     </li>
+     <li class="itemize">all data type names are suffixed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">_type</span></span></span>
+     </li>
+     <li class="itemize">all constants are suffixed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">_</span></span></span>
+     </li>
+     <li class="itemize">all top-level subroutine names follow the rule <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_xxname</span></span></span> where <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">xx</span></span></span> can be
+     either:
+         <ul class="itemize2">
+         <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ge</span></span></span>: the routine is related to dense data,
+         </li>
+         <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">sp</span></span></span>: the routine is related to sparse data,
+         </li>
+         <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">cd</span></span></span>: the routine is related to communication descriptor (see&#x00A0;<a 
+href="userhtmlse3.html#x12-90003">3<!--tex4ht:ref: sec:datastruct --></a>).</li></ul>
+     <!--l. 278--><p class="noindent" >For example the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span> perform the same
+     action (see&#x00A0;<a 
+href="userhtmlse6.html#x37-710006">6<!--tex4ht:ref: sec:toolsrout --></a>) on dense matrices, sparse matrices and communication
+     descriptors respectively. Interface overloading allows the usage of the same
+     subroutine names for both real and complex data.</li></ul>
+<!--l. 285--><p class="noindent" >In the description of the subroutines, arguments or argument entries are classified
+as:
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">global</span> </dt><dd 
+class="description">For  input  arguments,  the  value  must  be  the  same  on  all  processes
+     participating in the subroutine call; for output arguments the value is
+     guaranteed to be the same.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">local</span> </dt><dd 
+class="description">Each process has its own value(s) independently.</dd></dl>
+<!--l. 293--><p class="noindent" >To finish our general description, we define a version string with the constant
+   <center class="math-display" >
+<img 
+src="userhtml2x.png" alt="psb_version_string_
+" class="math-display" ></center>
+<!--l. 295--><p class="nopar" > whose current value is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">3.4.0</span></span></span>
+                                                                  
+
+                                                                  
+   <!--l. 298--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse3.html" >next</a>] [<a 
+href="userhtmlsu1.html" >prev</a>] [<a 
+href="userhtmlsu1.html#tailuserhtmlsu1.html" >prev-tail</a>] [<a 
+href="userhtmlsu2.html" >front</a>] [<a 
+href="userhtmlse2.html#userhtmlsu4.html" >up</a>] </p></div>
+<!--l. 298--><p class="indent" >   <a 
+ id="tailuserhtmlsu2.html"></a>  
+</body></html> 

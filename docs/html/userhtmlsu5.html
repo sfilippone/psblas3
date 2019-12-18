@@ -1,0 +1,697 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Descriptor data structure</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 44--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu9.html" >next</a>] [<a 
+href="#tailuserhtmlsu5.html">tail</a>] [<a 
+href="userhtmlsu7.html#userhtmlsu8.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x13-100003.1"></a>Descriptor data structure</h4>
+<!--l. 46--><p class="noindent" >All the general matrix informations and elements to be exchanged among processes
+are stored within a data structure of the type <a 
+ id="descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>. Every structure of this
+type is associated with a discretization pattern and enables data communications and
+other operations that are necessary for implementing the various algorithms of
+interest to us.
+                                                                  
+
+                                                                  
+<!--l. 53--><p class="indent" >   The data structure itself <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_desc_type</span></span></span> can be treated as an opaque object
+handled via the tools routines of Sec.&#x00A0;<a 
+href="userhtmlse6.html#x37-710006">6<!--tex4ht:ref: sec:toolsrout --></a> or the query routines detailed below;
+nevertheless we include here a description for the curious reader.
+<!--l. 59--><p class="indent" >   First we describe the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_indx_map</span></span></span> type. This is a data structure that keeps
+track of a certain number of basic issues such as:
+     <ul class="itemize1">
+     <li class="itemize">The value of the communication/MPI context;
+     </li>
+     <li class="itemize">The number of indices in the index space, i.e. global number of rows and
+     columns of a sparse matrix;
+     </li>
+     <li class="itemize">The local set of indices, including:
+         <ul class="itemize2">
+         <li class="itemize">The number of local indices (and local rows);
+         </li>
+         <li class="itemize">The number of halo indices (and therefore local columns);
+         </li>
+         <li class="itemize">The global indices corresponding to the local ones.</li></ul>
+     </li></ul>
+<!--l. 73--><p class="noindent" >There are many different schemes for storing these data; therefore there are a number of
+types extending the base one, and the descriptor structure holds a polymorphic
+object whose dynamic type can be any of the extended types. The methods
+associated with this data type answer the following queries:
+     <ul class="itemize1">
+     <li class="itemize">For a given set of local indices, find the corresponding indices in the global
+     numbering;
+     </li>
+     <li class="itemize">For a given set of global indices, find the corresponding indices in the local
+     numbering, if any, or return an invalid
+     </li>
+     <li class="itemize">Add a global index to the set of halo indices;
+     </li>
+     <li class="itemize">Find the process owner of each member of a set of global indices.</li></ul>
+<!--l. 88--><p class="noindent" >All methods but the last are purely local; the last method potentially requires
+communication among processes, and thus is a synchronous method. The
+choice of a specific dynamic type for the index map is made at the time the
+descriptor is initially allocated, according to the mode of initialization (see
+also&#x00A0;<a 
+href="userhtmlse6.html#x37-710006">6<!--tex4ht:ref: sec:toolsrout --></a>).
+<!--l. 94--><p class="indent" >   The descriptor contents are as follows:
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">indxmap</span> </dt><dd 
+class="description">A  polymorphic  variable  of  a  type  that  is  any  extension  of  the
+     indx_map type described above. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">halo</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">A list of the halo and boundary elements for the current process to be
+     exchanged with other processes; for each processes with which it is necessary to
+     communicate:
+         <ol  class="enumerate1" >
+         <li 
+  class="enumerate" id="x13-10002x1">Process identifier;
+         </li>
+         <li 
+  class="enumerate" id="x13-10004x2">Number of points to be received;
+         </li>
+         <li 
+  class="enumerate" id="x13-10006x3">Indices of points to be received;
+         </li>
+         <li 
+  class="enumerate" id="x13-10008x4">Number of points to be sent;
+         </li>
+         <li 
+  class="enumerate" id="x13-10010x5">Indices of points to be sent;</li></ol>
+     <!--l. 110--><p class="noindent" >Specified as: a vector of integer type, see&#x00A0;<a 
+href="userhtmlsu7.html#x15-430003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ext</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">A list of element indices to be exchanged to implement the mapping
+     between a base descriptor and a descriptor with overlap. <br 
+class="newline" />Specified as: a vector of integer type, see&#x00A0;<a 
+href="userhtmlsu7.html#x15-430003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ovrlap</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">A list of the overlap elements for the current process, organized in
+     groups like the previous vector:
+         <ol  class="enumerate1" >
+         <li 
+  class="enumerate" id="x13-10012x1">Process identifier;
+         </li>
+         <li 
+  class="enumerate" id="x13-10014x2">Number of points to be received;
+         </li>
+         <li 
+  class="enumerate" id="x13-10016x3">Indices of points to be received;
+         </li>
+         <li 
+  class="enumerate" id="x13-10018x4">Number of points to be sent;
+         </li>
+         <li 
+  class="enumerate" id="x13-10020x5">Indices of points to be sent;</li></ol>
+     <!--l. 126--><p class="noindent" >Specified as: a vector of integer type, see&#x00A0;<a 
+href="userhtmlsu7.html#x15-430003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ovr</span><span 
+class="cmbx-10">_mst</span><span 
+class="cmbx-10">_idx</span> </dt><dd 
+class="description">A list to retrieve the value of each overlap element from the respective
+     master process.<br 
+class="newline" />Specified as: a vector of integer type, see&#x00A0;<a 
+href="userhtmlsu7.html#x15-430003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ovrlap</span><span 
+class="cmbx-10">_elem</span> </dt><dd 
+class="description">For all overlap points belonging to th ecurrent process:
+         <ol  class="enumerate1" >
+         <li 
+  class="enumerate" id="x13-10022x1">Overlap point index;
+                                                                  
+
+                                                                  
+         </li>
+         <li 
+  class="enumerate" id="x13-10024x2">Number of processes sharing that overlap points;
+         </li>
+         <li 
+  class="enumerate" id="x13-10026x3">Index of a &#8220;master&#8221; process:</li></ol>
+     <!--l. 137--><p class="noindent" >Specified as: an allocatable integer array of rank two.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">bnd</span><span 
+class="cmbx-10">_elem</span> </dt><dd 
+class="description">A list of all boundary points, i.e. points that have a connection with
+     other processes.</dd></dl>
+<!--l. 141--><p class="noindent" >The Fortran&#x00A0;2003 declaration for <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_desc_type</span></span></span> structures is as follows: <hr class="figure"><div class="figure" 
+><a 
+ id="x13-100273"></a>
+<div class="center" 
+>
+<!--l. 145--><p class="noindent" >
+<div class="minipage"><div class="verbatim" id="verbatim-1">
+type&#x00A0;psb_desc_type
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_indx_map),&#x00A0;allocatable&#x00A0;::&#x00A0;indxmap
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_halo_index
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ext_index
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovrlap_index
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovr_mst_idx
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;ovrlap_elem(:,:)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;bnd_elem(:)
+&#x00A0;<br />end&#x00A0;type&#x00A0;psb_desc_type
+</div>
+<!--l. 157--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;3: </span><span  
+class="content">The PSBLAS defined data type that contains the communication
+descriptor.</span></div><!--tex4ht:label?: x13-100273 -->
+<!--l. 167--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 168--><p class="indent" >   A communication descriptor associated with a sparse matrix has a state, which
+can take the following values:
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Build:</span> </dt><dd 
+class="description">State entered after the first allocation, and before the first assembly; in
+     this state it is possible to add communication requirements among different
+     processes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Assembled:</span> </dt><dd 
+class="description">State  entered  after  the  assembly;  computations  using  the
+     associated sparse matrix, such as matrix-vector products, are only possible
+     in this state.</dd></dl>
+<!--l. 179--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.1   </span> <a 
+ id="x13-110003.1.1"></a>Descriptor Methods</h5>
+                                                                  
+
+                                                                  
+<!--l. 181--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.2   </span> <a 
+ id="x13-120003.1.2"></a>get_local_rows &#8212; Get number of local rows</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-2">
+nr&#x00A0;=&#x00A0;desc%get_local_rows()
+</div>
+<!--l. 185--><p class="nopar" >
+<!--l. 187--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 197--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The number of local rows, i.e. the number of rows owned by
+     the current process; as explained in&#x00A0;<a 
+href="userhtmlse1.html#x3-20001">1<!--tex4ht:ref: sec:intro --></a>, it is equal to <span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>+<span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>. The returned
+     value is specific to the calling process.</dd></dl>
+<!--l. 206--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.3   </span> <a 
+ id="x13-130003.1.3"></a>get_local_cols &#8212; Get number of local cols</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-3">
+nc&#x00A0;=&#x00A0;desc%get_local_cols()
+</div>
+<!--l. 210--><p class="nopar" >
+<!--l. 212--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 222--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The number of local cols, i.e. the number of indices used by
+     the current process, including both local and halo indices; as explained
+     in&#x00A0;<a 
+href="userhtmlse1.html#x3-20001">1<!--tex4ht:ref: sec:intro --></a>, it is equal to <span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-48.png" alt="H" class="10x-x-48" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>. The returned value is specific to the
+     calling process.</dd></dl>
+<!--l. 232--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.4   </span> <a 
+ id="x13-140003.1.4"></a>get_global_rows &#8212; Get number of global rows</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-4">
+nr&#x00A0;=&#x00A0;desc%get_global_rows()
+</div>
+<!--l. 236--><p class="nopar" >
+<!--l. 238--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 248--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The number of global rows, i.e. the size of the global index
+     space.</dd></dl>
+<!--l. 254--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.5   </span> <a 
+ id="x13-150003.1.5"></a>get_global_cols &#8212; Get number of global cols</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-5">
+nr&#x00A0;=&#x00A0;desc%get_global_cols()
+</div>
+<!--l. 258--><p class="nopar" >
+<!--l. 260--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 270--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The number of global cols; usually this is equal to the number
+     of global rows.</dd></dl>
+<!--l. 277--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.6   </span> <a 
+ id="x13-160003.1.6"></a>get_global_indices &#8212; Get vector of global indices</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-6">
+myidx&#x00A0;=&#x00A0;desc%get_global_indices([owned])
+</div>
+<!--l. 281--><p class="nopar" >
+<!--l. 283--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">owned</span> </dt><dd 
+class="description">Choose if you only want owned indices (<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">owned=.true.</span></span></span>) or also halo
+     indices (<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">owned=.false.</span></span></span>). Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>; default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span>.<br 
+class="newline" /></dd></dl>
+<!--l. 297--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The global indices, returned as an allocatable integer array of
+     rank 1.</dd></dl>
+<!--l. 305--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.7   </span> <a 
+ id="x13-170003.1.7"></a>get_context &#8212; Get communication context</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-7">
+ictxt&#x00A0;=&#x00A0;desc%get_context()
+</div>
+<!--l. 309--><p class="nopar" >
+<!--l. 311--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 321--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The communication context.</dd></dl>
+<!--l. 326--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.8   </span> <a 
+ id="x13-180003.1.8"></a>Clone &#8212; clone current object</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-8">
+call&#x00A0;&#x00A0;desc%clone(descout,info)
+</div>
+<!--l. 330--><p class="nopar" >
+<!--l. 332--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 342--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">descout</span> </dt><dd 
+class="description">A copy of the input object.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Return code.</dd></dl>
+<!--l. 349--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.9   </span> <a 
+ id="x13-190003.1.9"></a>CNV &#8212; convert internal storage format</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-9">
+call&#x00A0;&#x00A0;desc%cnv(mold)
+</div>
+<!--l. 353--><p class="nopar" >
+<!--l. 355--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">the desred integer storage format.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Specified     as:     a     object     of     type     derived     from     (integer)
+     <a 
+ id="vbasedata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 366--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mold</span></span></span> arguments may be employed to interface with special devices, such as GPUs
+and other accelerators.
+<!--l. 373--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.10   </span> <a 
+ id="x13-200003.1.10"></a>psb_cd_get_large_threshold &#8212; Get threshold for index mapping
+switch</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-10">
+ith&#x00A0;=&#x00A0;psb_cd_get_large_threshold()
+</div>
+<!--l. 377--><p class="nopar" >
+<!--l. 379--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The current value for the size threshold.
+     </dd></dl>
+<!--l. 389--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.11   </span> <a 
+ id="x13-210003.1.11"></a>psb_cd_set_large_threshold &#8212; Set threshold for index mapping
+switch</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-11">
+call&#x00A0;psb_cd_set_large_threshold(ith)
+</div>
+<!--l. 393--><p class="nopar" >
+<!--l. 395--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ith</span> </dt><dd 
+class="description">the new threshold for communication descriptors.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value greater than zero.</dd></dl>
+<!--l. 404--><p class="noindent" >Note: the threshold value is only queried by the library at the time a call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdall</span></span></span>
+is executed, therefore changing the threshold has no effect on communication
+descriptors that have already been initialized. Moreover the threshold must have the
+same value on all processes.
+<!--l. 410--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.12   </span> <a 
+ id="x13-220003.1.12"></a>Named Constants</h5>
+<!--l. 412--><p class="noindent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_none</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Generic no-op;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_root</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Default root process for broadcast and scatter operations;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_nohalo</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Do not fetch halo elements;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_halo</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Fetch halo elements from neighbouring processes;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_sum</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Sum overlapped elements
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_avg</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Average overlapped elements
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_halo</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Exchange data based on the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">halo_index</span></span></span> list;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_ext</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Exchange data based on the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ext_index</span></span></span> list;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_ovr</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Exchange data based on the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ovrlap_index</span></span></span> list;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_mov</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Exchange data based on the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ovr_mst_idx</span></span></span> list;
+     </dd></dl>
+                                                                  
+
+                                                                  
+   <!--l. 445--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu9.html" >next</a>] [<a 
+href="userhtmlsu5.html" >front</a>] [<a 
+href="userhtmlsu7.html#userhtmlsu8.html" >up</a>] </p></div>
+<!--l. 445--><p class="indent" >   <a 
+ id="tailuserhtmlsu5.html"></a>   
+</body></html> 

@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title></title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+<!--l. 89--><p class="noindent" ><span 
+class="cmbx-12x-x-144">PSBLAS</span><br 
+class="newline" /> <span 
+class="cmbx-12x-x-144">User&#8217;s and Reference Guide</span><br 
+class="newline" /> <span 
+class="cmti-12">A reference guide for the Parallel Sparse BLAS library</span><br 
+class="newline" /> <span 
+class="cmbx-10">Salvatore Filippone</span><br 
+class="newline" /><span 
+class="cmbx-10">Alfredo Buttari  </span><br 
+class="newline" />Software version: 3.6.1<br 
+class="newline" />May 31st, 2019
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <div class="tableofcontents">
+   <span class="likesectionToc" ><a 
+href="userhtmlli1.html#x2-1000" id="QQ2-2-1">Contents</a></span>
+<br />   <span class="sectionToc" >1 <a 
+href="userhtmlse1.html#x3-20001" id="QQ2-3-2">Introduction</a></span>
+<br />   <span class="sectionToc" >2 <a 
+href="userhtmlse2.html#x4-30002" id="QQ2-4-3">General overview</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.1 <a 
+href="userhtmlsu1.html#x6-40002.1" id="QQ2-6-5">Basic Nomenclature</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.2 <a 
+href="userhtmlsu2.html#x8-50002.2" id="QQ2-8-7">Library contents</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.3 <a 
+href="userhtmlsu3.html#x9-60002.3" id="QQ2-9-8">Application structure</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.4 <a 
+href="userhtmlsu4.html#x11-80002.4" id="QQ2-11-10">Programming model</a></span>
+<br />   <span class="sectionToc" >3 <a 
+href="userhtmlse3.html#x12-90003" id="QQ2-12-11">Data Structures and Classes</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.1 <a 
+href="userhtmlsu5.html#x13-100003.1" id="QQ2-13-12">Descriptor data structure</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.2 <a 
+href="userhtmlsu6.html#x14-230003.2" id="QQ2-14-26">Sparse Matrix class</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.3 <a 
+href="userhtmlsu7.html#x15-430003.3" id="QQ2-15-47">Dense Vector Data Structure</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.4 <a 
+href="userhtmlsu8.html#x16-500003.4" id="QQ2-16-55">Preconditioner data structure</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.5 <a 
+href="userhtmlsu9.html#x17-510003.5" id="QQ2-17-57">Heap data structure</a></span>
+<br />   <span class="sectionToc" >4 <a 
+href="userhtmlse4.html#x18-520004" id="QQ2-18-58">Computational routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.1 <a 
+href="userhtmlsu10.html#x19-530004.1" id="QQ2-19-59">psb_geaxpby &#8212; General Dense Matrix Sum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.2 <a 
+href="userhtmlsu11.html#x20-540004.2" id="QQ2-20-61">psb_gedot &#8212; Dot Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.3 <a 
+href="userhtmlsu12.html#x21-550004.3" id="QQ2-21-63">psb_gedots &#8212; Generalized Dot Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.4 <a 
+href="userhtmlsu13.html#x22-560004.4" id="QQ2-22-65">psb_normi &#8212; Infinity-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.5 <a 
+href="userhtmlsu14.html#x23-570004.5" id="QQ2-23-67">psb_geamaxs &#8212; Generalized Infinity Norm</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.6 <a 
+href="userhtmlsu15.html#x24-580004.6" id="QQ2-24-69">psb_norm1 &#8212; 1-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.7 <a 
+href="userhtmlsu16.html#x25-590004.7" id="QQ2-25-71">psb_geasums &#8212; Generalized 1-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.8 <a 
+href="userhtmlsu17.html#x26-600004.8" id="QQ2-26-73">psb_norm2 &#8212; 2-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.9 <a 
+href="userhtmlsu18.html#x27-610004.9" id="QQ2-27-75">psb_genrm2s &#8212; Generalized 2-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.10 <a 
+href="userhtmlsu19.html#x28-620004.10" id="QQ2-28-77">psb_norm1 &#8212; 1-Norm of Sparse Matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.11 <a 
+href="userhtmlsu20.html#x29-630004.11" id="QQ2-29-79">psb_normi &#8212; Infinity Norm of Sparse Matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.12 <a 
+href="userhtmlsu21.html#x30-640004.12" id="QQ2-30-81">psb_spmm &#8212; Sparse Matrix by Dense Matrix Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.13 <a 
+href="userhtmlsu22.html#x31-650004.13" id="QQ2-31-83">psb_spsm &#8212; Triangular System Solve</a></span>
+<br />   <span class="sectionToc" >5 <a 
+href="userhtmlse5.html#x32-660005" id="QQ2-32-85">Communication routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.1 <a 
+href="userhtmlsu23.html#x33-670005.1" id="QQ2-33-86">psb_halo &#8212; Halo Data Communication</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.2 <a 
+href="userhtmlsu24.html#x34-680005.2" id="QQ2-34-89">psb_ovrl &#8212; Overlap Update</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.3 <a 
+href="userhtmlsu25.html#x35-690005.3" id="QQ2-35-92">psb_gather &#8212; Gather Global Dense Matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.4 <a 
+href="userhtmlsu26.html#x36-700005.4" id="QQ2-36-94">psb_scatter &#8212; Scatter Global Dense Matrix</a></span>
+<br />   <span class="sectionToc" >6 <a 
+href="userhtmlse6.html#x37-710006" id="QQ2-37-96">Data management routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.1 <a 
+href="userhtmlsu27.html#x38-720006.1" id="QQ2-38-97">psb_cdall &#8212; Allocates a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.2 <a 
+href="userhtmlsu28.html#x39-730006.2" id="QQ2-39-98">psb_cdins &#8212; Communication descriptor insert routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.3 <a 
+href="userhtmlsu29.html#x40-740006.3" id="QQ2-40-99">psb_cdasb &#8212; Communication descriptor assembly routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.4 <a 
+href="userhtmlsu30.html#x41-750006.4" id="QQ2-41-100">psb_cdcpy &#8212; Copies a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.5 <a 
+href="userhtmlsu31.html#x42-760006.5" id="QQ2-42-101">psb_cdfree &#8212; Frees a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.6 <a 
+href="userhtmlsu32.html#x43-770006.6" id="QQ2-43-102">psb_cdbldext &#8212; Build an extended communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.7 <a 
+href="userhtmlsu33.html#x44-780006.7" id="QQ2-44-103">psb_spall &#8212; Allocates a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.8 <a 
+href="userhtmlsu34.html#x45-790006.8" id="QQ2-45-104">psb_spins &#8212; Insert a set of coefficients into a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.9 <a 
+href="userhtmlsu35.html#x46-800006.9" id="QQ2-46-105">psb_spasb &#8212; Sparse matrix assembly routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.10 <a 
+href="userhtmlsu36.html#x47-810006.10" id="QQ2-47-106">psb_spfree &#8212; Frees a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.11 <a 
+href="userhtmlsu37.html#x48-820006.11" id="QQ2-48-107">psb_sprn &#8212; Reinit sparse matrix structure for psblas routines.</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.12 <a 
+href="userhtmlsu38.html#x49-830006.12" id="QQ2-49-108">psb_geall &#8212; Allocates a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.13 <a 
+href="userhtmlsu39.html#x50-840006.13" id="QQ2-50-109">psb_geins &#8212; Dense matrix insertion routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.14 <a 
+href="userhtmlsu40.html#x51-850006.14" id="QQ2-51-110">psb_geasb &#8212; Assembly a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.15 <a 
+href="userhtmlsu41.html#x52-860006.15" id="QQ2-52-111">psb_gefree &#8212; Frees a dense matrix</a></span>
+                                                                  
+
+                                                                  
+<br />   &#x00A0;<span class="subsectionToc" >6.16 <a 
+href="userhtmlsu42.html#x53-870006.16" id="QQ2-53-112">psb_gelp &#8212; Applies a left permutation to a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.17 <a 
+href="userhtmlsu43.html#x54-880006.17" id="QQ2-54-113">psb_glob_to_loc &#8212; Global to local indices convertion</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.18 <a 
+href="userhtmlsu44.html#x55-890006.18" id="QQ2-55-114">psb_loc_to_glob &#8212; Local to global indices conversion</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.19 <a 
+href="userhtmlsu45.html#x56-900006.19" id="QQ2-56-115">psb_is_owned &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.20 <a 
+href="userhtmlsu46.html#x57-910006.20" id="QQ2-57-116">psb_owned_index &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.21 <a 
+href="userhtmlsu47.html#x58-920006.21" id="QQ2-58-117">psb_is_local &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.22 <a 
+href="userhtmlsu48.html#x59-930006.22" id="QQ2-59-118">psb_local_index &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.23 <a 
+href="userhtmlsu49.html#x60-940006.23" id="QQ2-60-119">psb_get_boundary &#8212; Extract list of boundary elements</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.24 <a 
+href="userhtmlsu50.html#x61-950006.24" id="QQ2-61-120">psb_get_overlap &#8212; Extract list of overlap elements</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.25 <a 
+href="userhtmlsu51.html#x62-960006.25" id="QQ2-62-121">psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.26 <a 
+href="userhtmlsu52.html#x63-970006.26" id="QQ2-63-122">psb_sizeof &#8212; Memory occupation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.27 <a 
+href="userhtmlsu53.html#x64-980006.27" id="QQ2-64-123">Sorting utilities &#8212; </a></span>
+<br />   <span class="sectionToc" >7 <a 
+href="userhtmlse7.html#x65-990007" id="QQ2-65-124">Parallel environment routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.1 <a 
+href="userhtmlsu54.html#x66-1000007.1" id="QQ2-66-125">psb_init &#8212; Initializes PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.2 <a 
+href="userhtmlsu55.html#x67-1010007.2" id="QQ2-67-126">psb_info &#8212; Return information about PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.3 <a 
+href="userhtmlsu56.html#x68-1020007.3" id="QQ2-68-127">psb_exit &#8212; Exit from PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.4 <a 
+href="userhtmlsu57.html#x69-1030007.4" id="QQ2-69-128">psb_get_mpicomm &#8212; Get the MPI communicator</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.5 <a 
+href="userhtmlsu58.html#x70-1040007.5" id="QQ2-70-129">psb_get_rank &#8212; Get the MPI rank</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.6 <a 
+href="userhtmlsu59.html#x71-1050007.6" id="QQ2-71-130">psb_wtime &#8212; Wall clock timing</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.7 <a 
+href="userhtmlsu60.html#x72-1060007.7" id="QQ2-72-131">psb_barrier &#8212; Sinchronization point parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.8 <a 
+href="userhtmlsu61.html#x73-1070007.8" id="QQ2-73-132">psb_abort &#8212; Abort a computation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.9 <a 
+href="userhtmlsu62.html#x74-1080007.9" id="QQ2-74-133">psb_bcast &#8212; Broadcast data</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.10 <a 
+href="userhtmlsu63.html#x75-1090007.10" id="QQ2-75-134">psb_sum &#8212; Global sum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.11 <a 
+href="userhtmlsu64.html#x76-1100007.11" id="QQ2-76-135">psb_max &#8212; Global maximum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.12 <a 
+href="userhtmlsu65.html#x77-1110007.12" id="QQ2-77-136">psb_min &#8212; Global minimum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.13 <a 
+href="userhtmlsu66.html#x78-1120007.13" id="QQ2-78-137">psb_amx &#8212; Global maximum absolute value</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.14 <a 
+href="userhtmlsu67.html#x79-1130007.14" id="QQ2-79-138">psb_amn &#8212; Global minimum absolute value</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.15 <a 
+href="userhtmlsu68.html#x80-1140007.15" id="QQ2-80-139">psb_nrm2 &#8212; Global 2-norm reduction</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.16 <a 
+href="userhtmlsu69.html#x81-1150007.16" id="QQ2-81-140">psb_snd &#8212; Send data</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.17 <a 
+href="userhtmlsu70.html#x82-1160007.17" id="QQ2-82-141">psb_rcv &#8212; Receive data</a></span>
+<br />   <span class="sectionToc" >8 <a 
+href="userhtmlse8.html#x83-1170008" id="QQ2-83-142">Error handling</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.1 <a 
+href="userhtmlsu71.html#x84-1180008.1" id="QQ2-84-145">psb_errpush &#8212; Pushes an error code onto the error stack</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.2 <a 
+href="userhtmlsu72.html#x85-1190008.2" id="QQ2-85-146">psb_error &#8212; Prints the error stack content and aborts execution</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.3 <a 
+href="userhtmlsu73.html#x86-1200008.3" id="QQ2-86-147">psb_set_errverbosity &#8212; Sets the verbosity of error messages</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.4 <a 
+href="userhtmlsu74.html#x87-1210008.4" id="QQ2-87-148">psb_set_erraction &#8212; Set the type of action to be taken upon error condition</a></span>
+<br />   <span class="sectionToc" >9 <a 
+href="userhtmlse9.html#x88-1220009" id="QQ2-88-149">Utilities</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.1 <a 
+href="userhtmlsu75.html#x89-1230009.1" id="QQ2-89-150"> hb_read &#8212; Read a sparse matrix from a file in the Harwell&#8211;Boeing format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.2 <a 
+href="userhtmlsu76.html#x90-1240009.2" id="QQ2-90-151">hb_write &#8212; Write a sparse matrix to a file in the Harwell&#8211;Boeing format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.3 <a 
+href="userhtmlsu77.html#x91-1250009.3" id="QQ2-91-152">mm_mat_read &#8212; Read a sparse matrix from a file in the MatrixMarket format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.4 <a 
+href="userhtmlsu78.html#x92-1260009.4" id="QQ2-92-153">mm_array_read &#8212; Read a dense array from a file in the MatrixMarket format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.5 <a 
+href="userhtmlsu79.html#x93-1270009.5" id="QQ2-93-154">mm_mat_write &#8212; Write a sparse matrix to a file in the MatrixMarket format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.6 <a 
+href="userhtmlsu80.html#x94-1280009.6" id="QQ2-94-155">mm_array_write &#8212; Write a dense array from a file in the MatrixMarket format</a></span>
+<br />   <span class="sectionToc" >10 <a 
+href="userhtmlse10.html#x95-12900010" id="QQ2-95-156">Preconditioner routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.1 <a 
+href="userhtmlsu81.html#x96-13000010.1" id="QQ2-96-157">init &#8212; Initialize a preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.2 <a 
+href="userhtmlsu82.html#x98-13100010.2" id="QQ2-98-158">build &#8212; Builds a preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.3 <a 
+href="userhtmlsu83.html#x99-13200010.3" id="QQ2-99-159">apply &#8212; Preconditioner application routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.4 <a 
+href="userhtmlsu84.html#x100-13300010.4" id="QQ2-100-160">descr &#8212; Prints a description of current preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.5 <a 
+href="userhtmlsu85.html#x101-13400010.5" id="QQ2-101-161">clone &#8212; clone current preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.6 <a 
+href="userhtmlsu86.html#x102-13500010.6" id="QQ2-102-162">free &#8212; Free a preconditioner</a></span>
+<br />   <span class="sectionToc" >11 <a 
+href="userhtmlse11.html#x103-13600011" id="QQ2-103-163">Iterative Methods</a></span>
+                                                                  
+
+                                                                  
+<br />   &#x00A0;<span class="subsectionToc" >11.1 <a 
+href="userhtmlsu87.html#x104-13700011.1" id="QQ2-104-164">psb_krylov &#8212; Krylov Methods Driver Routine</a></span>
+<br />   <span class="likesectionToc" ><a 
+href="userhtmlli2.html#x106-13800011.1" id="QQ2-106-165">References</a></span>
+   </div>
+
+
+
+
+
+
+
+
+
+
+
+ 
+</body></html> 
+
+                                                                  
+
+

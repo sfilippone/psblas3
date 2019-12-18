@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_gather &#8212; Gather Global Dense Matrix</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 355--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu28.html" >next</a>] [<a 
+href="userhtmlsu24.html" >prev</a>] [<a 
+href="userhtmlsu24.html#tailuserhtmlsu24.html" >prev-tail</a>] [<a 
+href="userhtmlse5.html#tailuserhtmlsu25.html">tail</a>] [<a 
+href="userhtmlsu25.html#userhtmlsu27.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x35-690005.3"></a>psb_gather &#8212; Gather Global Dense Matrix</h4>
+<!--l. 357--><p class="noindent" >These subroutines collect the portions of global dense matrix distributed over all
+process into one single array stored on one process.
+   <center class="par-math-display" >
+<img 
+src="userhtml28x.png" alt="glob-x &#x2190; collect(loc-xi)
+" class="par-math-display" ></center>
+<!--l. 361--><p class="nopar" > where:
+     <dl class="description"><dt class="description">
+<span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">is the global submatrix <span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">1:</span><span 
+class="cmmi-7">m,</span><span 
+class="cmr-7">1:</span><span 
+class="cmmi-7">n</span></sub>
+     </dd><dt class="description">
+<span 
+class="cmmi-10">loc</span>_<span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub> </dt><dd 
+class="description">is the local portion of global dense matrix on process <span 
+class="cmmi-10">i</span>.
+     </dd><dt class="description">
+<span 
+class="cmmi-10">collect</span> </dt><dd 
+class="description">is the collect function.</dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 370--><p class="indent" >   <a 
+ id="x35-6900116"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 371--><p class="noindent" >
+<div class="tabular"> <table id="TBL-18" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-18-1g"><col 
+id="TBL-18-1"><col 
+id="TBL-18-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-1-1"  
+class="td11"><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,y                      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-18-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-2-1"  
+class="td11">Integer                       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-18-2-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-3-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-18-3-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-4-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-18-4-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-5-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-18-5-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-6-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-18-6-2"  
+class="td11">psb_gather  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-18-7-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;16: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x35-6900116 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+   <!--l. 387-->
+   <div class="lstlisting" id="listing-7"><span class="label"><a 
+ id="x35-69002r1"></a></span><span 
+class="cmbx-10">call</span>&#x00A0;psb_gather(glob_x,&#x00A0;loc_x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;root)&#x00A0;<br /><span class="label"><a 
+ id="x35-69003r2"></a></span><span 
+class="cmbx-10">call</span>&#x00A0;psb_gather(glob_x,&#x00A0;loc_x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;root)
+   
+   </div>
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">loc</span><span 
+class="cmbx-10">_x</span> </dt><dd 
+class="description">the local portion of global dense matrix <span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;indicated in Table&#x00A0;<a 
+href="#x35-6900116">16<!--tex4ht:ref: tab:gather --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">root</span> </dt><dd 
+class="description">The process that holds the global copy. If <span 
+class="cmmi-10">root </span>= <span 
+class="cmsy-10">-</span>1 all the processes will
+     have a copy of the global vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">root </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1, default <span 
+class="cmsy-10">-</span>1.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">glob</span><span 
+class="cmbx-10">_x</span> </dt><dd 
+class="description">The array where the local parts must be gathered.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one or two array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 456--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu28.html" >next</a>] [<a 
+href="userhtmlsu24.html" >prev</a>] [<a 
+href="userhtmlsu24.html#tailuserhtmlsu24.html" >prev-tail</a>] [<a 
+href="userhtmlsu25.html" >front</a>] [<a 
+href="userhtmlsu25.html#userhtmlsu27.html" >up</a>] </p></div>
+<!--l. 456--><p class="indent" >   <a 
+ id="tailuserhtmlsu25.html"></a>  
+</body></html> 

@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_glob_to_loc &#8212; Global to local indices convertion</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1184--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu47.html" >next</a>] [<a 
+href="userhtmlsu42.html" >prev</a>] [<a 
+href="userhtmlsu42.html#tailuserhtmlsu42.html" >prev-tail</a>] [<a 
+href="userhtmlsu40.html#tailuserhtmlsu43.html">tail</a>] [<a 
+href="userhtmlsu29.html#userhtmlsu46.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.17   </span> <a 
+ id="x54-880006.17"></a>psb_glob_to_loc &#8212; Global to local indices convertion</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-67">
+call&#x00A0;psb_glob_to_loc(x,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info,&#x00A0;iact,owned)
+&#x00A0;<br />call&#x00A0;psb_glob_to_loc(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;iact,owned)
+</div>
+<!--l. 1189--><p class="nopar" >
+<!--l. 1191--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">An integer vector of indices to be converted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in, inout</span>.<br 
+class="newline" />Specified as: a rank one integer array.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">iact</span> </dt><dd 
+class="description">specifies action to be taken in case of range errors. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">owned</span> </dt><dd 
+class="description">Specfies valid range of input Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />If  true,  then  only  indices  strictly  owned  by  the  current  process  are
+     considered valid, if false then halo indices are also accepted. Default: false.</dd></dl>
+<!--l. 1219--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">If <span 
+class="cmmi-10">y </span>is not present, then <span 
+class="cmmi-10">x </span>is overwritten with the translated integer indices.
+     Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one integer array.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">If <span 
+class="cmmi-10">y </span>is present, then <span 
+class="cmmi-10">y </span>is overwritten with the translated integer indices, and
+     <span 
+class="cmmi-10">x </span>is left unchanged. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one integer array.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1241--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x54-88002x1">If an input index is out of range, then the corresponding output index is
+     set to a negative number;
+     </li>
+     <li 
+  class="enumerate" id="x54-88004x2">The default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore means that the negative output is the only action
+     taken on an out-of-range input.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1250--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu47.html" >next</a>] [<a 
+href="userhtmlsu42.html" >prev</a>] [<a 
+href="userhtmlsu42.html#tailuserhtmlsu42.html" >prev-tail</a>] [<a 
+href="userhtmlsu43.html" >front</a>] [<a 
+href="userhtmlsu29.html#userhtmlsu46.html" >up</a>] </p></div>
+<!--l. 1250--><p class="indent" >   <a 
+ id="tailuserhtmlsu43.html"></a>  
+</body></html> 

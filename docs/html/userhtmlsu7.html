@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Dense Vector Data Structure</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 959--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu10.html" >next</a>] [<a 
+href="userhtmlsu6.html" >prev</a>] [<a 
+href="userhtmlsu6.html#tailuserhtmlsu6.html" >prev-tail</a>] [<a 
+href="userhtmlse3.html#tailuserhtmlsu7.html">tail</a>] [<a 
+href="userhtmlsu7.html#userhtmlse4.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
+ id="x15-430003.3"></a>Dense Vector Data Structure</h4>
+<!--l. 961--><p class="noindent" >The <a 
+ id="vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a> data structure encapsulates the dense vectors in a way similar
+to sparse matrices, i.e. including a base type <a 
+ id="vbasedata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>. The user will
+not, in general, access the vector components directly, but rather via the routines of
+sec.&#x00A0;<a 
+href="userhtmlse6.html#x37-710006">6<!--tex4ht:ref: sec:toolsrout --></a>. Among other simple things, we define here an extraction method that
+can be used to get a full copy of the part of the vector stored on the local
+process.
+<!--l. 971--><p class="indent" >   The type declaration is shown in figure&#x00A0;<a 
+href="#x15-430015">5<!--tex4ht:ref: fig:vectype --></a> where <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">T</span></span></span> is a placeholder for the data
+type and precision variants
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">I</span> </dt><dd 
+class="description">Integer;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">S</span> </dt><dd 
+class="description">Single precision real;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">D</span> </dt><dd 
+class="description">Double precision real;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">C</span> </dt><dd 
+class="description">Single precision complex;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Z</span> </dt><dd 
+class="description">Double precision complex.</dd></dl>
+<!--l. 981--><p class="noindent" >The actual data is contained in the polymorphic component <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">v%v</span></span></span>; the separation between
+the application and the actual data is essential for cases where it is necessary to link
+to data storage made available elsewhere outside the direct control of the
+compiler/application, e.g. data stored in a graphics accelerator&#8217;s private memory.
+<hr class="figure"><div class="figure" 
+><a 
+ id="x15-430015"></a>
+<div class="center" 
+>
+<!--l. 989--><p class="noindent" >
+<div class="minipage"><div class="verbatim" id="verbatim-30">
+&#x00A0;&#x00A0;type&#x00A0;psb_T_base_vect_type
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;TYPE(KIND_),&#x00A0;allocatable&#x00A0;::&#x00A0;v(:)
+&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_T_base_vect_type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;type&#x00A0;psb_T_vect_type
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_vect_type),&#x00A0;allocatable&#x00A0;::&#x00A0;v
+&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_T_vect_type
+&#x00A0;<br />
+</div>
+<!--l. 1000--><p class="nopar" ></div></div>
+                                                                  
+
+                                                                  
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;5: </span><span  
+class="content"> The PSBLAS defined data type that contains a dense vector.</span></div><!--tex4ht:label?: x15-430015 -->
+<!--l. 1011--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 1013--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.1   </span> <a 
+ id="x15-440003.3.1"></a>Vector Methods</h5>
+<!--l. 1014--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.2   </span> <a 
+ id="x15-450003.3.2"></a>get_nrows &#8212; Get number of rows in a dense vector</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-31">
+nr&#x00A0;=&#x00A0;v%get_nrows()
+</div>
+<!--l. 1018--><p class="nopar" >
+<!--l. 1020--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 1030--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The number of rows of dense vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">v</span></span></span>.</dd></dl>
+<!--l. 1037--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.3   </span> <a 
+ id="x15-460003.3.3"></a>sizeof &#8212; Get memory occupation in bytes of a dense vector</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-32">
+memory_size&#x00A0;=&#x00A0;v%sizeof()
+</div>
+<!--l. 1041--><p class="nopar" >
+<!--l. 1043--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 1053--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">The memory occupation in bytes.</dd></dl>
+<!--l. 1059--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.4   </span> <a 
+ id="x15-470003.3.4"></a>set &#8212; Set contents of the vector</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-33">
+&#x00A0;call&#x00A0;&#x00A0;v%set(alpha[,first,last])
+&#x00A0;<br />&#x00A0;call&#x00A0;&#x00A0;v%set(vect[,first,last])
+&#x00A0;<br />&#x00A0;call&#x00A0;&#x00A0;v%zero()
+</div>
+<!--l. 1065--><p class="nopar" >
+<!--l. 1067--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">alpha</span> </dt><dd 
+class="description">A scalar value. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="userhtmlsu10.html#x19-530011">1<!--tex4ht:ref: tab:f90axpby --></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">first,last</span> </dt><dd 
+class="description">Boundaries for setting in the vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integers.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">vect</span> </dt><dd 
+class="description">An array <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="userhtmlsu10.html#x19-530011">1<!--tex4ht:ref: tab:f90axpby --></a>.</dd></dl>
+<!--l. 1086--><p class="noindent" >Note that a call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">v%zero()</span></span></span> is provided as a shorthand, but is equivalent to a call
+to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">v%set(zero)</span></span></span> with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">zero</span></span></span> constant having the appropriate type and
+kind.
+<!--l. 1090--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">the dense vector, with updated entries<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1096--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.5   </span> <a 
+ id="x15-480003.3.5"></a>get_vect &#8212; Get a copy of the vector contents</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-34">
+extv&#x00A0;=&#x00A0;v%get_vect([n])
+</div>
+<!--l. 1100--><p class="nopar" >
+<!--l. 1102--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">n</span> </dt><dd 
+class="description">Size to be returned<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>; default: entire vector.<br 
+class="newline" />
+     </dd></dl>
+<!--l. 1116--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">An  allocatable  array  holding  a  copy  of  the  dense  vector
+     contents. If the argument <span 
+class="cmmi-10">n </span>is specified, the size of the returned array
+     equals the minimum between <span 
+class="cmmi-10">n </span>and the internal size of the vector, or 0 if
+     <span 
+class="cmmi-10">n </span>is negative; otherwise, the size of the array is the same as the internal
+     size of the vector.</dd></dl>
+<!--l. 1125--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.6   </span> <a 
+ id="x15-490003.3.6"></a>clone &#8212; Clone current object</h5>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-35">
+call&#x00A0;&#x00A0;x%clone(y,info)
+</div>
+<!--l. 1128--><p class="nopar" >
+<!--l. 1130--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">the dense vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 1140--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">A copy of the input object.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Return code.</dd></dl>
+                                                                  
+
+                                                                  
+   <!--l. 1147--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu10.html" >next</a>] [<a 
+href="userhtmlsu6.html" >prev</a>] [<a 
+href="userhtmlsu6.html#tailuserhtmlsu6.html" >prev-tail</a>] [<a 
+href="userhtmlsu7.html" >front</a>] [<a 
+href="userhtmlsu7.html#userhtmlse4.html" >up</a>] </p></div>
+<!--l. 1147--><p class="indent" >   <a 
+ id="tailuserhtmlsu7.html"></a>   
+</body></html> 

@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title> hb_read &#8212; Read a sparse matrix from a file in the Harwell&#8211;Boeing
+format</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 13--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu79.html" >next</a>] [<a 
+href="userhtmlsu73.html#tailuserhtmlsu75.html">tail</a>] [<a 
+href="userhtmlsu77.html#userhtmlsu78.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">9.1   </span> <a 
+ id="x89-1230009.1"></a> hb_read &#8212; Read a sparse matrix from a file in the Harwell&#8211;Boeing
+format</h4>
+   <!--l. 16-->
+   <div class="lstlisting" id="listing-14"><span class="label"><a 
+ id="x89-123001r1"></a></span><span 
+class="cmbx-10">call</span>&#x00A0;hb_read(a,&#x00A0;iret,&#x00A0;iunit,&#x00A0;filename,&#x00A0;b,&#x00A0;mtitle)
+   
+   </div>
+<!--l. 20--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">The name of the file to be read.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default input unit 5 (i.e. standard input in Unix jargon) is
+     used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+<!--l. 33--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">the sparse matrix read from file.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu6.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">Rigth hand side(s).<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />An array of type real or complex, rank 2 and having the ALLOCATABLE
+     attribute; will be allocated and filled in if the input file contains a right
+     hand side, otherwise will be left in the UNALLOCATED state.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mtitle</span> </dt><dd 
+class="description">Matrix title.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />A charachter variable of length 72 holding a copy of the matrix title as
+     specified by the Harwell-Boeing format and contained in the input file.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 55--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu79.html" >next</a>] [<a 
+href="userhtmlsu75.html" >front</a>] [<a 
+href="userhtmlsu77.html#userhtmlsu78.html" >up</a>] </p></div>
+<!--l. 55--><p class="indent" >   <a 
+ id="tailuserhtmlsu75.html"></a>  
+</body></html> 

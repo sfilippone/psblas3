@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Data Structures and Classes</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu12.html" >next</a>] [<a 
+href="userhtmlse2.html" >prev</a>] [<a 
+href="userhtmlse2.html#tailuserhtmlse2.html" >prev-tail</a>] [<a 
+href="userhtmlsu3.html#tailuserhtmlse3.html">tail</a>] [<a 
+href="userhtml.html#userhtmlsu7.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x12-90003"></a>Data Structures and Classes</h3>
+<!--l. 5--><p class="noindent" >In this chapter we illustrate the data structures used for definition of routines
+interfaces. They include data structures for sparse matrices, communication
+descriptors and preconditioners.
+<!--l. 11--><p class="indent" >   All the data types and the basic subroutine interfaces related to descriptors and
+sparse matrices are defined in the module <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_base_mod</span></span></span>; this will have to be
+included by every user subroutine that makes use of the library. The preconditioners
+are defined in the module <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_prec_mod</span></span></span>
+<!--l. 17--><p class="indent" >   Integer, real and complex data types are parametrized with a kind type defined in
+the library as follows:
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_spk</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Kind  parameter  for  short  precision  real  and  complex  data;
+     corresponds to a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">REAL</span></span></span> declaration and is normally 4 bytes;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_dpk</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Kind  parameter  for  long  precision  real  and  complex  data;
+     corresponds to a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">DOUBLE</span><span 
+class="cmtt-10">&#x00A0;PRECISION</span></span></span> declaration and is normally 8 bytes;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_ipk</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Kind parameter for integer data; with default build options this is
+     a 4 bytes integer, but there is (highly) experimental support for 8-bytes
+     integers;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_mpik</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Kind parameter for 4-bytes integer data, as is always used by MPI;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_long</span><span 
+class="cmbx-10">_int</span><span 
+class="cmbx-10">_k</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">Kind parameter for long (8 bytes) integers, which are always
+     used by the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">sizeof</span></span></span> methods.</dd></dl>
+<!--l. 34--><p class="noindent" >Together with the classes attributes we also discuss their methods. Most methods
+detailed here only act on the local variable, i.e. their action is purely local and
+asynchronous unless otherwise stated. The list of methods here is not completely
+exhaustive; many methods, especially those that alter the contents of the various
+objects, are usually not needed by the end-user, and therefore are described in the
+developer&#8217;s documentation.
+<!--l. 44--><p class="noindent" >
+   <div class="subsectionTOCS">
+   &#x00A0;<span class="subsectionToc" >3.1 <a 
+href="userhtmlsu5.html#x13-100003.1">Descriptor data structure</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.1 <a 
+href="userhtmlsu5.html#x13-110003.1.1">Descriptor Methods</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.2 <a 
+href="userhtmlsu5.html#x13-120003.1.2">get_local_rows &#8212; Get number of local rows</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.3 <a 
+href="userhtmlsu5.html#x13-130003.1.3">get_local_cols &#8212; Get number of local cols</a></span>
+                                                                  
+
+                                                                  
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.4 <a 
+href="userhtmlsu5.html#x13-140003.1.4">get_global_rows &#8212; Get number of global rows</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.5 <a 
+href="userhtmlsu5.html#x13-150003.1.5">get_global_cols &#8212; Get number of global cols</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.6 <a 
+href="userhtmlsu5.html#x13-160003.1.6">get_global_indices &#8212; Get vector of global indices</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.7 <a 
+href="userhtmlsu5.html#x13-170003.1.7">get_context &#8212; Get communication context</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.8 <a 
+href="userhtmlsu5.html#x13-180003.1.8">Clone &#8212; clone current object</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.9 <a 
+href="userhtmlsu5.html#x13-190003.1.9">CNV &#8212; convert internal storage format</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.10 <a 
+href="userhtmlsu5.html#x13-200003.1.10">psb_cd_get_large_threshold &#8212; Get threshold for index mapping switch</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.11 <a 
+href="userhtmlsu5.html#x13-210003.1.11">psb_cd_set_large_threshold &#8212; Set threshold for index mapping switch</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.12 <a 
+href="userhtmlsu5.html#x13-220003.1.12">Named Constants</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.2 <a 
+href="userhtmlsu6.html#x14-230003.2">Sparse Matrix class</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.1 <a 
+href="userhtmlsu6.html#x14-240003.2.1">Sparse Matrix Methods</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.2 <a 
+href="userhtmlsu6.html#x14-250003.2.2">get_nrows &#8212; Get number of rows in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.3 <a 
+href="userhtmlsu6.html#x14-260003.2.3">get_ncols &#8212; Get number of columns in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.4 <a 
+href="userhtmlsu6.html#x14-270003.2.4">get_nnzeros &#8212; Get number of nonzero elements in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.5 <a 
+href="userhtmlsu6.html#x14-280003.2.5">get_size &#8212; Get maximum number of nonzero elements in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.6 <a 
+href="userhtmlsu6.html#x14-290003.2.6">sizeof &#8212; Get memory occupation in bytes of a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.7 <a 
+href="userhtmlsu6.html#x14-300003.2.7">get_fmt &#8212; Short description of the dynamic type</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.8 <a 
+href="userhtmlsu6.html#x14-310003.2.8">is_bld, is_upd, is_asb &#8212; Status check</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.9 <a 
+href="userhtmlsu6.html#x14-320003.2.9">is_lower, is_upper, is_triangle, is_unit &#8212; Format check</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.10 <a 
+href="userhtmlsu6.html#x14-330003.2.10">cscnv &#8212; Convert to a different storage format</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.11 <a 
+href="userhtmlsu6.html#x14-340003.2.11">csclip &#8212; Reduce to a submatrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.12 <a 
+href="userhtmlsu6.html#x14-350003.2.12">clean_zeros &#8212; Eliminate zero coefficients</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.13 <a 
+href="userhtmlsu6.html#x14-360003.2.13">get_diag &#8212; Get main diagonal</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.14 <a 
+href="userhtmlsu6.html#x14-370003.2.14">clip_diag &#8212; Cut out main diagonal</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.15 <a 
+href="userhtmlsu6.html#x14-380003.2.15">tril &#8212; Return the lower triangle</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.16 <a 
+href="userhtmlsu6.html#x14-390003.2.16">triu &#8212; Return the upper triangle</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.17 <a 
+href="userhtmlsu6.html#x14-400003.2.17">psb_set_mat_default &#8212; Set default storage format</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.18 <a 
+href="userhtmlsu6.html#x14-410003.2.18">clone &#8212; Clone current object</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.19 <a 
+href="userhtmlsu6.html#x14-420003.2.19">Named Constants</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.3 <a 
+href="userhtmlsu7.html#x15-430003.3">Dense Vector Data Structure</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.1 <a 
+href="userhtmlsu7.html#x15-440003.3.1">Vector Methods</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.2 <a 
+href="userhtmlsu7.html#x15-450003.3.2">get_nrows &#8212; Get number of rows in a dense vector</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.3 <a 
+href="userhtmlsu7.html#x15-460003.3.3">sizeof &#8212; Get memory occupation in bytes of a dense vector</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.4 <a 
+href="userhtmlsu7.html#x15-470003.3.4">set &#8212; Set contents of the vector</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.5 <a 
+href="userhtmlsu7.html#x15-480003.3.5">get_vect &#8212; Get a copy of the vector contents</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.6 <a 
+href="userhtmlsu7.html#x15-490003.3.6">clone &#8212; Clone current object</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.4 <a 
+href="userhtmlsu8.html#x16-500003.4">Preconditioner data structure</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.5 <a 
+href="userhtmlsu9.html#x17-510003.5">Heap data structure</a></span>
+   </div>
+
+
+
+
+                                                                  
+
+                                                                  
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu12.html" >next</a>] [<a 
+href="userhtmlse2.html" >prev</a>] [<a 
+href="userhtmlse2.html#tailuserhtmlse2.html" >prev-tail</a>] [<a 
+href="userhtmlse3.html" >front</a>] [<a 
+href="userhtml.html#userhtmlsu7.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >   <a 
+ id="tailuserhtmlse3.html"></a>  
+</body></html> 

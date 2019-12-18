@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>mm_array_read &#8212; Read a dense array from a file in the MatrixMarket
+format</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 140--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu81.html" >next</a>] [<a 
+href="userhtmlsu77.html" >prev</a>] [<a 
+href="userhtmlsu77.html#tailuserhtmlsu77.html" >prev-tail</a>] [<a 
+href="userhtmlsu75.html#tailuserhtmlsu78.html">tail</a>] [<a 
+href="userhtmlsu77.html#userhtmlse10.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">9.4   </span> <a 
+ id="x92-1260009.4"></a>mm_array_read &#8212; Read a dense array from a file in the MatrixMarket
+format</h4>
+   <!--l. 142-->
+   <div class="lstlisting" id="listing-17"><span class="label"><a 
+ id="x92-126001r1"></a></span><span 
+class="cmbx-10">call</span>&#x00A0;mm_array_read(b,&#x00A0;iret,&#x00A0;iunit,&#x00A0;filename)
+   
+   </div>
+<!--l. 146--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">The name of the file to be read.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default input unit 5 (i.e. standard input in Unix jargon) is
+     used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+<!--l. 159--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">Rigth hand side(s).<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An  array  of  type  real  or  complex,  rank  1  or  2  and  having  the
+     ALLOCATABLE attribute; will be allocated and filled in if the input file
+     contains a right hand side, otherwise will be left in the UNALLOCATED
+     state.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 173--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu81.html" >next</a>] [<a 
+href="userhtmlsu77.html" >prev</a>] [<a 
+href="userhtmlsu77.html#tailuserhtmlsu77.html" >prev-tail</a>] [<a 
+href="userhtmlsu78.html" >front</a>] [<a 
+href="userhtmlsu77.html#userhtmlse10.html" >up</a>] </p></div>
+<!--l. 173--><p class="indent" >   <a 
+ id="tailuserhtmlsu78.html"></a>  
+</body></html> 

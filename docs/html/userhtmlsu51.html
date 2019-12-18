@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1575--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu54.html" >next</a>] [<a 
+href="userhtmlsu50.html" >prev</a>] [<a 
+href="userhtmlsu50.html#tailuserhtmlsu50.html" >prev-tail</a>] [<a 
+href="userhtmlsu48.html#tailuserhtmlsu51.html">tail</a>] [<a 
+href="userhtmlsu29.html#userhtmlse7.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.25   </span> <a 
+ id="x62-960006.25"></a>psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-75">
+call&#x00A0;psb_sp_getrow(row,&#x00A0;a,&#x00A0;nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;val,&#x00A0;info,&#x00A0;&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;append,&#x00A0;nzin,&#x00A0;lrw)
+</div>
+<!--l. 1580--><p class="nopar" >
+<!--l. 1582--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">row</span> </dt><dd 
+class="description">The (first) row to be extracted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer <span 
+class="cmmi-10">&#x003E; </span>0.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">the matrix from which to get rows.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu6.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">append</span> </dt><dd 
+class="description">Whether to append or overwrite existing output.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical value default: false (overwrite).
+     </dd><dt class="description">
+<span 
+class="cmbx-10">nzin</span> </dt><dd 
+class="description">Input size to be appended to.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer <span 
+class="cmmi-10">&#x003E; </span>0. When append is true, specifies how many
+     entries in the output vectors are already filled.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">lrw</span> </dt><dd 
+class="description">The last row to be extracted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer <span 
+class="cmmi-10">&#x003E; </span>0, default: <span 
+class="cmmi-10">row</span>.
+     </dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1622--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">nz</span> </dt><dd 
+class="description">the number of elements returned by this call.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Returned as: an integer scalar.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ia</span> </dt><dd 
+class="description">the row indices.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an integer array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ja</span> </dt><dd 
+class="description">the column indices of the elements to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an integer array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">val</span> </dt><dd 
+class="description">the elements to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a real array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1651--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x62-96002x1">The output <span 
+class="cmmi-10">nz </span>is always the size of the output generated by the current
+     call; thus, if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">append=.true.</span></span></span>, the total output size will be <span 
+class="cmmi-10">nzin </span>+ <span 
+class="cmmi-10">nz</span>, with
+     the newly extracted coefficients stored in entries <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nzin+1:nzin+nz</span></span></span> of the
+     array arguments;
+     </li>
+     <li 
+  class="enumerate" id="x62-96004x2">When <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">append=.true.</span></span></span> the output arrays are reallocated as necessary;
+     </li>
+     <li 
+  class="enumerate" id="x62-96006x3">The  row  and  column  indices  are  returned  in  the  local  numbering
+     scheme;  if  the  global  numbering  is  desired,  the  user  may  employ  the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_loc_to_glob</span></span></span> routine on the output.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1667--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu54.html" >next</a>] [<a 
+href="userhtmlsu50.html" >prev</a>] [<a 
+href="userhtmlsu50.html#tailuserhtmlsu50.html" >prev-tail</a>] [<a 
+href="userhtmlsu51.html" >front</a>] [<a 
+href="userhtmlsu29.html#userhtmlse7.html" >up</a>] </p></div>
+<!--l. 1667--><p class="indent" >   <a 
+ id="tailuserhtmlsu51.html"></a>  
+</body></html> 

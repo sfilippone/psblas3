@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_init &#8212; Initializes PSBLAS parallel environment</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 6--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu58.html" >next</a>] [<a 
+href="userhtmlsu52.html#tailuserhtmlsu54.html">tail</a>] [<a 
+href="userhtmlsu56.html#userhtmlsu57.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">7.1   </span> <a 
+ id="x66-1000007.1"></a>psb_init &#8212; Initializes PSBLAS parallel environment</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-78">
+call&#x00A0;psb_init(icontxt,&#x00A0;np,&#x00A0;basectxt,&#x00A0;ids)
+</div>
+<!--l. 10--><p class="nopar" >
+<!--l. 12--><p class="indent" >   This subroutine initializes the PSBLAS parallel environment, defining a virtual
+parallel machine.
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">np</span> </dt><dd 
+class="description">Number of processes in the PSBLAS virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. &#x00A0;Default: use all available processes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">basectxt</span> </dt><dd 
+class="description">the initial communication context. The new context will be defined
+     from the processes participating in the initial one.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. &#x00A0;Default: use MPI_COMM_WORLD.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ids</span> </dt><dd 
+class="description">Identities  of  the  processes  to  use  for  the  new  context;  the  argument  is
+     ignored when <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">np</span></span></span> is not specified. This allows the processes in the new
+     environment to be in an order different from the original one.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array. &#x00A0;Default: use the indices (0<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1).</dd></dl>
+<!--l. 41--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context identifying the virtual parallel machine.
+     Note  that  this  is  always  a  duplicate  of  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">basectxt</span></span></span>,  so  that  library
+     communications  are  completely  separated  from  other  communication
+     operations.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: an integer variable.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 54--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x66-100002x1">A call to this routine must precede any other PSBLAS call.
+     </li>
+     <li 
+  class="enumerate" id="x66-100004x2">It is an error to specify a value for <span 
+class="cmmi-10">np </span>greater than the number of processes
+     available in the underlying base parallel environment.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 63--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu58.html" >next</a>] [<a 
+href="userhtmlsu54.html" >front</a>] [<a 
+href="userhtmlsu56.html#userhtmlsu57.html" >up</a>] </p></div>
+<!--l. 63--><p class="indent" >   <a 
+ id="tailuserhtmlsu54.html"></a>  
+</body></html> 

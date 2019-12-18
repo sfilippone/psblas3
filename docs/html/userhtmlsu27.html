@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_cdall &#8212; Allocates a communication descriptor</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 8--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu31.html" >next</a>] [<a 
+href="userhtmlsu25.html#tailuserhtmlsu27.html">tail</a>] [<a 
+href="userhtmlsu29.html#userhtmlsu30.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.1   </span> <a 
+ id="x38-720006.1"></a>psb_cdall &#8212; Allocates a communication descriptor</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-50">
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,parts=parts)
+&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vg=vg,[mg=mg,flag=flag])
+&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
+&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,nl=nl)
+&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,repl=.true.)
+</div>
+<!--l. 16--><p class="nopar" >
+<!--l. 18--><p class="indent" >   This subroutine initializes the communication descriptor associated with an index
+space. One of the optional arguments <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">repl</span></span></span> must be specified,
+thereby choosing the specific initialization strategy.
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">the communication context.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">vg</span> </dt><dd 
+class="description">Data allocation: each index <span 
+class="cmmi-10">i </span><span 
+class="cmsy-10">&#x2208;{</span>1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">mg</span><span 
+class="cmsy-10">} </span>is allocated to process <span 
+class="cmmi-10">vg</span>(<span 
+class="cmmi-10">i</span>).<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">flag</span> </dt><dd 
+class="description">Specifies whether entries in <span 
+class="cmmi-10">vg </span>are zero- or one-based.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value 0<span 
+class="cmmi-10">,</span>1, default 0.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mg</span> </dt><dd 
+class="description">the (global) number of rows of the problem.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. It is required if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">repl</span></span></span> is specified,
+     it is optional if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span> is specified.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">parts</span> </dt><dd 
+class="description">the subroutine that defines the partitioning scheme.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a subroutine.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">vl</span> </dt><dd 
+class="description">Data allocation: the set of global indices <span 
+class="cmmi-10">vl</span>(1 : <span 
+class="cmmi-10">nl</span>) belonging to the calling
+     process. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">nl</span> </dt><dd 
+class="description">Data allocation: in a generalized block-row distribution the number of indices
+     belonging to the current process. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. May be specified together with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">repl</span> </dt><dd 
+class="description">Data allocation: build a replicated index space (i.e. all processes own all
+     indices).<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: the logical value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">globalcheck</span> </dt><dd 
+class="description">Data allocation: do global checks on the local index lists <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span><br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical value, default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.false.</span></span></span>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">lidx</span> </dt><dd 
+class="description">Data allocation: the set of local indices <span 
+class="cmmi-10">lidx</span>(1 : <span 
+class="cmmi-10">nl</span>) to be assigned to the
+     global indices <span 
+class="cmmi-10">vl</span>. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.</dd></dl>
+<!--l. 86--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 100--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x38-72002x1">One of the optional arguments <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">repl</span></span></span> must be specified,
+     thereby choosing the initialization strategy as follows:
+         <dl class="description"><dt class="description">
+     <span 
+class="cmbx-10">parts</span> </dt><dd 
+class="description">In this case we have a subroutine specifying the mapping between global
+         indices and process/local index pairs. If this optional argument is
+         specified, then it is mandatory to specify the argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mg</span></span></span> as well. The
+         subroutine must conform to the following interface:
+                                                                  
+
+                                                                  
+         <div class="verbatim" id="verbatim-51">
+         &#x00A0;&#x00A0;interface
+         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;subroutine&#x00A0;psb_parts(glob_index,mg,np,pv,nv)
+         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(in)&#x00A0;&#x00A0;::&#x00A0;glob_index,np,mg
+         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(out)&#x00A0;::&#x00A0;nv,&#x00A0;pv(*)
+         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;subroutine&#x00A0;psb_parts
+         &#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;interface
+</div>
+         <!--l. 118--><p class="nopar" > The input arguments are:
+             <dl class="description"><dt class="description">
+         <span 
+class="cmbx-10">glob</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">The global index to be mapped;
+             </dd><dt class="description">
+         <span 
+class="cmbx-10">np</span> </dt><dd 
+class="description">The number of processes in the mapping;
+             </dd><dt class="description">
+         <span 
+class="cmbx-10">mg</span> </dt><dd 
+class="description">The total number of global rows in the mapping;</dd></dl>
+         <!--l. 125--><p class="noindent" >The output arguments are:
+             <dl class="description"><dt class="description">
+         <span 
+class="cmbx-10">nv</span> </dt><dd 
+class="description">The number of entries in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">pv</span></span></span>;
+             </dd><dt class="description">
+         <span 
+class="cmbx-10">pv</span> </dt><dd 
+class="description">A vector containing the indices of the processes to which the
+             global index should be assigend; each entry must satisfy 0  <span 
+class="cmsy-10">&#x2264;</span>
+             <span 
+class="cmmi-10">pv</span>(<span 
+class="cmmi-10">i</span>) <span 
+class="cmmi-10">&#x003C; np</span>; if <span 
+class="cmmi-10">nv &#x003E; </span>1 we have an index assigned to multiple
+             processes, i.e. we have an overlap among the subdomains.</dd></dl>
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">vg</span> </dt><dd 
+class="description">In this case the association between an index and a process is specified via
+         an integer vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg(1:mg)</span></span></span>; each index <span 
+class="cmmi-10">i </span><span 
+class="cmsy-10">&#x2208;{</span>1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">mg</span><span 
+class="cmsy-10">} </span>is assigned to process
+         <span 
+class="cmmi-10">vg</span>(<span 
+class="cmmi-10">i</span>). The vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span> must be identical on all calling processes; its
+         entries may have the ranges (0<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1) or (1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">np</span>) according to the
+         value of <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">flag</span></span></span>. The size <span 
+class="cmmi-10">mg </span>may be specified via the optional
+         argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mg</span></span></span>; the default is to use the entire vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>, thus having
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mg=size(vg)</span></span></span>.
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">vl</span> </dt><dd 
+class="description">In this case we are specifying the list of indices <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl(1:nl)</span></span></span> assigned to the
+         current process; thus, the global problem size <span 
+class="cmmi-10">mg </span>is given by the range of
+         the aggregate of the individual vectors <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> specified in the calling
+         processes. The size may be specified via the optional argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span>; the
+         default is to use the entire vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>, thus having <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl=size(vl)</span></span></span>. If
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.true.</span></span></span> the subroutine will check how many times each
+         entry in the global index space (1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">mg</span>) is specified in the input lists <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>,
+         thus allowing for the presence of overlap in the input, and checking for
+         &#8220;orphan&#8221; indices. If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.false.</span></span></span>, the subroutine will not
+         check for overlap, and may be significantly faster, but the user is
+         implicitly guaranteeing that there are neither orphan nor overlap
+         indices.
+                                                                  
+
+                                                                  
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">lidx</span> </dt><dd 
+class="description">The optional argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx</span></span></span> is available for those cases in which the user
+         has already established a global-to-local mapping; if it is specified, each
+         index in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl(i)</span></span></span> will be mapped to the corresponding local index <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx(i)</span></span></span>.
+         When specifying the argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx</span></span></span> the user would also likely employ
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx</span></span></span> in calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">local</span></span></span> in calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span> and
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span>; see also sec.&#x00A0;<a 
+href="userhtmlsu3.html#x9-70002.3.1">2.3.1<!--tex4ht:ref: sec:usermaps --></a>.
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">nl</span> </dt><dd 
+class="description">If this argument is specified alone (i.e. without <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>) the result is a
+         generalized row-block distribution in which each process <span 
+class="cmmi-10">I </span>gets assigned a
+         consecutive chunk of <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">I</span></sub> = <span 
+class="cmmi-10">nl </span>global indices.
+         </dd><dt class="description">
+     <span 
+class="cmbx-10">repl</span> </dt><dd 
+class="description">This arguments specifies to replicate all indices on all processes. This is a
+         special purpose data allocation that is useful in the construction of some
+         multilevel preconditioners.</dd></dl>
+     </li>
+     <li 
+  class="enumerate" id="x38-72004x2">On exit from this routine the descriptor is in the build state.
+     </li>
+     <li 
+  class="enumerate" id="x38-72006x3">Calling the routine with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span> implies that every process will scan the
+     entire index space to figure out the local indices.
+     </li>
+     <li 
+  class="enumerate" id="x38-72008x4">Overlapped indices are possible with both <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> invocations.
+     </li>
+     <li 
+  class="enumerate" id="x38-72010x5">When the subroutine is invoked with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> in conjunction with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.true.</span></span></span>,
+     it will perform a scan of the index space to search for overlap or orphan
+     indices.
+     </li>
+     <li 
+  class="enumerate" id="x38-72012x6">When the subroutine is invoked with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> in conjunction with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.false.</span></span></span>,
+     no index space scan will take place. Thus it is the responsibility of the user to
+     make sure that the indices specified in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> have neither orphans nor overlaps; if
+     this assumption fails, results will be unpredictable.
+     </li>
+     <li 
+  class="enumerate" id="x38-72014x7">Orphan and overlap indices are impossible by construction when the subroutine
+     is invoked with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span> (alone), or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 198--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu31.html" >next</a>] [<a 
+href="userhtmlsu27.html" >front</a>] [<a 
+href="userhtmlsu29.html#userhtmlsu30.html" >up</a>] </p></div>
+<!--l. 198--><p class="indent" >   <a 
+ id="tailuserhtmlsu27.html"></a>  
+</body></html> 

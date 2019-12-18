@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_geall &#8212; Allocates a dense matrix</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 948--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu42.html" >next</a>] [<a 
+href="userhtmlsu37.html" >prev</a>] [<a 
+href="userhtmlsu37.html#tailuserhtmlsu37.html" >prev-tail</a>] [<a 
+href="userhtmlsu35.html#tailuserhtmlsu38.html">tail</a>] [<a 
+href="userhtmlsu29.html#userhtmlsu41.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.12   </span> <a 
+ id="x49-830006.12"></a>psb_geall &#8212; Allocates a dense matrix</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-62">
+call&#x00A0;psb_geall(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;n,&#x00A0;lb)
+</div>
+<!--l. 952--><p class="nopar" >
+<!--l. 954--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">n</span> </dt><dd 
+class="description">The number of columns of the dense matrix to be allocated.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: Integer scalar, default 1. It is not a valid argument if <span 
+class="cmmi-10">x </span>is a
+     rank-1 array.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">lb</span> </dt><dd 
+class="description">The lower bound for the column index range of the dense matrix to be
+     allocated.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: Integer scalar, default 1. It is not a valid argument if <span 
+class="cmmi-10">x </span>is a
+     rank-1 array.</dd></dl>
+<!--l. 976--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">The dense matrix to be allocated.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one or two array with the ALLOCATABLE attribute
+     or an object of type <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real, complex or integer.<br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 995--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu42.html" >next</a>] [<a 
+href="userhtmlsu37.html" >prev</a>] [<a 
+href="userhtmlsu37.html#tailuserhtmlsu37.html" >prev-tail</a>] [<a 
+href="userhtmlsu38.html" >front</a>] [<a 
+href="userhtmlsu29.html#userhtmlsu41.html" >up</a>] </p></div>
+<!--l. 995--><p class="indent" >   <a 
+ id="tailuserhtmlsu38.html"></a>  
+</body></html> 
