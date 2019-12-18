@@ -2,9 +2,8 @@
 \section{Parallel environment routines}
 \label{sec:parenv}
 
-\clearpage\subsection*{psb\_init --- Initializes PSBLAS parallel
+\clearpage\subsection{psb\_init --- Initializes PSBLAS parallel
   environment}
-\addcontentsline{toc}{subsection}{psb\_init}
 
 \begin{verbatim}
 call psb_init(icontxt, np, basectxt, ids)
@@ -61,9 +60,8 @@ Specified as: an integer variable.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_info --- Return information about  PSBLAS parallel
+\clearpage\subsection{psb\_info --- Return information about  PSBLAS parallel
   environment}
-\addcontentsline{toc}{subsection}{psb\_info}
 
 \begin{verbatim}
 call psb_info(icontxt, iam, np)
@@ -109,9 +107,8 @@ Specified as: an integer variable. \
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_exit --- Exit from  PSBLAS parallel
+\clearpage\subsection{psb\_exit --- Exit from  PSBLAS parallel
   environment}
-\addcontentsline{toc}{subsection}{psb\_exit}
 
 \begin{verbatim}
 call psb_exit(icontxt)
@@ -153,8 +150,7 @@ Specified as: a logical  variable, default value: true.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_get\_mpicomm --- Get the MPI communicator}
-\addcontentsline{toc}{subsection}{psb\_get\_mpicomm}
+\clearpage\subsection{psb\_get\_mpicomm --- Get the MPI communicator}
 
 \begin{verbatim}
 call psb_get_mpicomm(icontxt, icomm)
@@ -181,8 +177,7 @@ Intent: {\bf out}.\\
 \end{description}
 
 
-\clearpage\subsection*{psb\_get\_rank --- Get the MPI rank}
-\addcontentsline{toc}{subsection}{psb\_get\_rank}
+\clearpage\subsection{psb\_get\_rank --- Get the MPI rank}
 
 \begin{verbatim}
 call psb_get_rank(rank, icontxt, id)
@@ -216,8 +211,7 @@ Intent: {\bf out}.\\
 
 
 
-\clearpage\subsection*{psb\_wtime --- Wall clock timing}
-\addcontentsline{toc}{subsection}{psb\_wtime}
+\clearpage\subsection{psb\_wtime --- Wall clock timing}
 
 \begin{verbatim}
 time = psb_wtime()
@@ -233,9 +227,8 @@ Returned  as: a  \verb|real(psb_dpk_)|  variable.
 \end{description}
 
 
-\clearpage\subsection*{psb\_barrier --- Sinchronization point  parallel
+\clearpage\subsection{psb\_barrier --- Sinchronization point  parallel
   environment}
-\addcontentsline{toc}{subsection}{psb\_barrier}
 
 \begin{verbatim}
 call psb_barrier(icontxt)
@@ -255,8 +248,7 @@ Specified as: an integer variable.
 \end{description}
 
 
-\clearpage\subsection*{psb\_abort --- Abort a computation}
-\addcontentsline{toc}{subsection}{psb\_abort}
+\clearpage\subsection{psb\_abort --- Abort a computation}
 
 \begin{verbatim}
 call psb_abort(icontxt)
@@ -278,8 +270,7 @@ Specified as: an integer variable.
 
 
 
-\clearpage\subsection*{psb\_bcast --- Broadcast data}
-\addcontentsline{toc}{subsection}{psb\_bcast}
+\clearpage\subsection{psb\_bcast --- Broadcast data}
 
 \begin{verbatim}
 call psb_bcast(icontxt, dat, root)
@@ -324,8 +315,7 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\clearpage\subsection*{psb\_sum --- Global sum}
-\addcontentsline{toc}{subsection}{psb\_sum}
+\clearpage\subsection{psb\_sum --- Global sum}
 
 \begin{verbatim}
 call psb_sum(icontxt, dat, root)
@@ -379,8 +369,7 @@ Type, kind, rank and size must agree on all processes.
 
 
 
-\clearpage\subsection*{psb\_max --- Global maximum}
-\addcontentsline{toc}{subsection}{psb\_max}
+\clearpage\subsection{psb\_max --- Global maximum}
 
 \begin{verbatim}
 call psb_max(icontxt, dat, root)
@@ -433,8 +422,7 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_min --- Global minimum}
-\addcontentsline{toc}{subsection}{psb\_min}
+\clearpage\subsection{psb\_min --- Global minimum}
 
 \begin{verbatim}
 call psb_min(icontxt, dat, root)
@@ -487,8 +475,7 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_amx --- Global maximum absolute value}
-\addcontentsline{toc}{subsection}{psb\_amx}
+\clearpage\subsection{psb\_amx --- Global maximum absolute value}
 
 \begin{verbatim}
 call psb_amx(icontxt, dat, root)
@@ -541,8 +528,7 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_amn --- Global minimum absolute value}
-\addcontentsline{toc}{subsection}{psb\_amn}
+\clearpage\subsection{psb\_amn --- Global minimum absolute value}
 
 \begin{verbatim}
 call psb_amn(icontxt, dat, root)
@@ -595,8 +581,7 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_nrm2 --- Global 2-norm reduction}
-\addcontentsline{toc}{subsection}{psb\_nrm2}
+\clearpage\subsection{psb\_nrm2 --- Global 2-norm reduction}
 
 \begin{verbatim}
 call psb_nrm2(icontxt, dat, root)
@@ -656,8 +641,7 @@ Kind, rank and size must agree on all processes.
 
 
 
-\clearpage\subsection*{psb\_snd --- Send data}
-\addcontentsline{toc}{subsection}{psb\_snd}
+\clearpage\subsection{psb\_snd --- Send data}
 
 \begin{verbatim}
 call psb_snd(icontxt, dat, dst, m)
@@ -708,8 +692,7 @@ same value on sending and receiving processes.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_rcv --- Receive data}
-\addcontentsline{toc}{subsection}{psb\_rcv}
+\clearpage\subsection{psb\_rcv --- Receive data}
 
 \begin{verbatim}
 call psb_rcv(icontxt, dat, src, m)

@@ -5,8 +5,7 @@
 %
 %%   psb_cdall %%
 %
-\subsection*{psb\_cdall --- Allocates a communication descriptor}
-\addcontentsline{toc}{subsection}{psb\_cdall}
+\subsection{psb\_cdall --- Allocates a communication descriptor}
 
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
@@ -196,9 +195,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdins %%
 %
-\clearpage\subsection*{psb\_cdins --- Communication descriptor insert
+\clearpage\subsection{psb\_cdins --- Communication descriptor insert
   routine}
-\addcontentsline{toc}{subsection}{psb\_cdins}
 
 \begin{verbatim}
 call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
@@ -292,9 +290,8 @@ nor the end vertex belong to the current process.
 %
 %%   psb_cdasb %%
 %
-\clearpage\subsection*{psb\_cdasb --- Communication descriptor assembly
+\clearpage\subsection{psb\_cdasb --- Communication descriptor assembly
   routine}
-\addcontentsline{toc}{subsection}{psb\_cdasb}
 
 \begin{verbatim}
 call psb_cdasb(desc_a, info [, mold])
@@ -340,8 +337,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdcpy %%
 %
-\clearpage\subsection*{psb\_cdcpy --- Copies a communication descriptor}
-\addcontentsline{toc}{subsection}{psb\_cdcpy}
+\clearpage\subsection{psb\_cdcpy --- Copies a communication descriptor}
 
 \begin{verbatim}
 call psb_cdcpy(desc_in, desc_out, info)
@@ -376,8 +372,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdfree %%
 %
-\clearpage\subsection*{psb\_cdfree --- Frees a communication descriptor}
-\addcontentsline{toc}{subsection}{psb\_cdfree}
+\clearpage\subsection{psb\_cdfree --- Frees a communication descriptor}
 
 \begin{verbatim}
 call psb_cdfree(desc_a, info)
@@ -407,9 +402,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdcpy %%
 %
-\clearpage\subsection*{psb\_cdbldext --- Build an extended  communication
+\clearpage\subsection{psb\_cdbldext --- Build an extended  communication
   descriptor}
-\addcontentsline{toc}{subsection}{psb\_cdbldext}
 
 \begin{verbatim}
 call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
@@ -477,9 +471,8 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_cdren %%
 %% %
-%% \subsection*{psb\_cdren --- Applies a renumeration to a
+%% \subsection{psb\_cdren --- Applies a renumeration to a
 %% communication descriptor}
-%% \addcontentsline{toc}{subsection}{psb\_cdren}
 
 %% \syntax{call psb\_cdren}{trans, iperm, desc\_a, info}
 
@@ -514,8 +507,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_descprt %%
 %
-%% \subsection*{psb\_cdprt --- Prints a descriptor}
-%%\addcontentsline{toc}{subsection}{psb\_cdprt}
+%% \subsection{psb\_cdprt --- Prints a descriptor}
 
 %% \syntax{call psb\_cdprt}{iout, desc\_a, glob, short}
 
@@ -544,8 +536,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spalloc %%
 %
-\clearpage\subsection*{psb\_spall --- Allocates a sparse matrix}
-\addcontentsline{toc}{subsection}{psb\_spall}
+\clearpage\subsection{psb\_spall --- Allocates a sparse matrix}
 
 \begin{verbatim}
 call psb_spall(a, desc_a, info, nnz)
@@ -596,9 +587,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spins %%
 %
-\clearpage\subsection*{psb\_spins --- Insert a set of coefficients into a sparse
+\clearpage\subsection{psb\_spins --- Insert a set of coefficients into a sparse
   matrix}
-\addcontentsline{toc}{subsection}{psb\_spins}
 
 \begin{verbatim}
 call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
@@ -723,8 +713,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spasb %%
 %
-\clearpage\subsection*{psb\_spasb --- Sparse matrix assembly routine}
-\addcontentsline{toc}{subsection}{psb\_spasb}
+\clearpage\subsection{psb\_spasb --- Sparse matrix assembly routine}
 
 \begin{verbatim}
 call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
@@ -798,9 +787,8 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_spcnv %%
 %% %
-%% \subsection*{psb\_spcnv --- Converts a sparse matrix storage
+%% \subsection{psb\_spcnv --- Converts a sparse matrix storage
 %% format}
-%%\addcontentsline{toc}{subsection}{psb\_spcnv}
 
 %% \syntax{call psb\_spcnv}{a, b, desc\_a, info}
 
@@ -833,8 +821,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spfree %%
 %
-\clearpage\subsection*{psb\_spfree --- Frees a sparse matrix}
-\addcontentsline{toc}{subsection}{psb\_spfree}
+\clearpage\subsection{psb\_spfree --- Frees a sparse matrix}
 
 \begin{verbatim}
 call psb_spfree(a, desc_a, info)
@@ -870,9 +857,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_sprn %%
 %
-\clearpage\subsection*{psb\_sprn --- Reinit sparse matrix structure for psblas
+\clearpage\subsection{psb\_sprn --- Reinit sparse matrix structure for psblas
   routines.}
-\addcontentsline{toc}{subsection}{psb\_sprn}
 
 \begin{verbatim}
 call psb_sprn(a, decsc_a, info, clear)
@@ -914,8 +900,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spupdate %%
 %
-%% \subsection*{psb\_spupdate --- Updates a sparse matrix.}
-%%\addcontentsline{toc}{subsection}{psb\_spupdate}
+%% \subsection{psb\_spupdate --- Updates a sparse matrix.}
 
 %% \syntax{call psb\_spupdate}{a, ia, ja, blck, desc\_a, info, ix, jx, updflag}
 
@@ -929,9 +914,8 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_csrp %%
 %% %
-%% \subsection*{psb\_csrp --- Applies a right permutation to a sparse
+%% \subsection{psb\_csrp --- Applies a right permutation to a sparse
 %% matrix}
-%%\addcontentsline{toc}{subsection}{psb\_csrp}
 
 %% \syntax{call psb\_csrp}{trans, iperm, a, info}
 
@@ -961,8 +945,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_alloc %%
 %
-\clearpage\subsection*{psb\_geall --- Allocates a dense matrix}
-\addcontentsline{toc}{subsection}{psb\_geall}
+\clearpage\subsection{psb\_geall --- Allocates a dense matrix}
 
 \begin{verbatim}
 call psb_geall(x, desc_a, info, n, lb)
@@ -1009,8 +992,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_ins %%
 %
-\clearpage\subsection*{psb\_geins --- Dense matrix insertion routine}
-\addcontentsline{toc}{subsection}{psb\_geins}
+\clearpage\subsection{psb\_geins --- Dense matrix insertion routine}
 
 \begin{verbatim}
 call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
@@ -1082,8 +1064,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_asb %%
 %
-\clearpage\subsection*{psb\_geasb --- Assembly a dense matrix}
-\addcontentsline{toc}{subsection}{psb\_geasb}
+\clearpage\subsection{psb\_geasb --- Assembly a dense matrix}
 
 \begin{verbatim}
 call psb_geasb(x, desc_a, info, mold)
@@ -1122,8 +1103,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_free %%
 %
-\clearpage\subsection*{psb\_gefree --- Frees a dense matrix}
-\addcontentsline{toc}{subsection}{psb\_gefree}
+\clearpage\subsection{psb\_gefree --- Frees a dense matrix}
 
 \begin{verbatim}
 call psb_gefree(x, desc_a, info)
@@ -1160,9 +1140,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_gelp %%
 %
-\clearpage\subsection*{psb\_gelp --- Applies a left permutation to a dense
+\clearpage\subsection{psb\_gelp --- Applies a left permutation to a dense
   matrix}
-\addcontentsline{toc}{subsection}{psb\_gelp}
 
 \begin{verbatim}
 call psb_gelp(trans, iperm, x, info)
@@ -1201,9 +1180,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_glob_to_loc %%
 %
-\clearpage\subsection*{psb\_glob\_to\_loc --- Global to local indices
+\clearpage\subsection{psb\_glob\_to\_loc --- Global to local indices
   convertion}
-\addcontentsline{toc}{subsection}{psb\_glob\_to\_loc}
 
 \begin{verbatim}
 call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
@@ -1269,9 +1247,8 @@ An integer value; 0 means no error has been detected.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_loc\_to\_glob --- Local to global indices
+\clearpage\subsection{psb\_loc\_to\_glob --- Local to global indices
   conversion}
-\addcontentsline{toc}{subsection}{psb\_loc\_to\_glob}
 
 \begin{verbatim}
 call psb_loc_to_glob(x, y, desc_a, info, iact)
@@ -1326,8 +1303,7 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_loc_to_glob %%
 %
-\clearpage\subsection*{psb\_is\_owned  --- }
-\addcontentsline{toc}{subsection}{psb\_is\_owned }
+\clearpage\subsection{psb\_is\_owned  --- }
 
 \begin{verbatim}
 call psb_is_owned(x, desc_a)
@@ -1366,8 +1342,7 @@ Intent: {\bf out}.\\
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_owned\_index  --- }
-\addcontentsline{toc}{subsection}{psb\_owned\_index }
+\clearpage\subsection{psb\_owned\_index  --- }
 
 \begin{verbatim}
 call psb_owned_index(y, x, desc_a, info)
@@ -1418,8 +1393,7 @@ An integer value; 0 means no error has been detected.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_is\_local  --- }
-\addcontentsline{toc}{subsection}{psb\_is\_local }
+\clearpage\subsection{psb\_is\_local  --- }
 
 \begin{verbatim}
 call psb_is_local(x, desc_a)
@@ -1457,8 +1431,7 @@ Intent: {\bf out}.\\
   indices
 \end{enumerate}
 
-\clearpage\subsection*{psb\_local\_index  --- }
-\addcontentsline{toc}{subsection}{psb\_local\_index }
+\clearpage\subsection{psb\_local\_index  --- }
 
 \begin{verbatim}
 call psb_local_index(y, x, desc_a, info)
@@ -1513,9 +1486,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_ins %%
 %
-\clearpage\subsection*{psb\_get\_boundary --- Extract list of boundary
+\clearpage\subsection{psb\_get\_boundary --- Extract list of boundary
   elements}
-\addcontentsline{toc}{subsection}{psb\_get\_boundary}
 
 \begin{verbatim}
 call psb_get_boundary(bndel, desc, info)
@@ -1556,9 +1528,8 @@ An integer value; 0 means no error has been detected.
   number of boundary elements. 
 \end{enumerate}
 
-\clearpage\subsection*{psb\_get\_overlap --- Extract list of overlap
+\clearpage\subsection{psb\_get\_overlap --- Extract list of overlap
   elements}
-\addcontentsline{toc}{subsection}{psb\_get\_overlap}
 
 \begin{verbatim}
 call psb_get_overlap(ovrel, desc, info)
@@ -1600,9 +1571,8 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{psb\_sp\_getrow --- Extract row(s) from a sparse
+\clearpage\subsection{psb\_sp\_getrow --- Extract row(s) from a sparse
   matrix}
-\addcontentsline{toc}{subsection}{psb\_sp\_getrow}
 
 \begin{verbatim}
 call psb_sp_getrow(row, a, nz, ia, ja, val, info, &
@@ -1694,8 +1664,7 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{psb\_sizeof --- Memory occupation}
-\addcontentsline{toc}{subsection}{psb\_sizeof}
+\clearpage\subsection{psb\_sizeof --- Memory occupation}
 
 This function computes the memory occupation of a PSBLAS object.
 
@@ -1733,8 +1702,7 @@ Returned  as: an \verb|integer(psb_long_int_k_)| number.
 \end{description}
 
 
-\clearpage\subsection*{Sorting utilities --- }
-\addcontentsline{toc}{subsection}{Sorting utilities}
+\clearpage\subsection{Sorting utilities --- }
 
 {\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort
   algorithm}

@@ -24,8 +24,7 @@ backward compatibility
 
 
 
-\clearpage\subsection*{init --- Initialize a  preconditioner}
-\addcontentsline{toc}{subsection}{prec\%init}
+\clearpage\subsection{init --- Initialize a  preconditioner}
 
 \begin{verbatim}
 call prec%init(icontxt,ptype, info)
@@ -86,8 +85,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \end{description}
 
 
-\clearpage\subsection*{build --- Builds a preconditioner}
-\addcontentsline{toc}{subsection}{prec\%build}
+\clearpage\subsection{build --- Builds a preconditioner}
 
 \begin{verbatim}
 call prec%build(a, desc_a, info[,amold,vmold,imold])
@@ -152,9 +150,8 @@ accelerators.
 
 
 
-\clearpage\subsection*{apply --- Preconditioner application
+\clearpage\subsection{apply --- Preconditioner application
   routine}
-\addcontentsline{toc}{subsection}{prec\%apply}
 
 \begin{verbatim}
 call prec%apply(x,y,desc_a,info,trans,work)
@@ -207,9 +204,8 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{descr --- Prints a description of current
+\clearpage\subsection{descr --- Prints a description of current
   preconditioner}
-\addcontentsline{toc}{subsection}{prec\%descr}
 
 \begin{verbatim}
 call prec%descr()
@@ -240,9 +236,8 @@ all processes will print. Default: 0.
 
 
 
-\clearpage\subsection*{clone --- clone  current
+\clearpage\subsection{clone --- clone  current
   preconditioner}
-\addcontentsline{toc}{subsection}{clone}
 \begin{verbatim}
 call  prec%clone(precout,info)
 \end{verbatim}
@@ -264,8 +259,7 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\clearpage\subsection*{free --- Free a  preconditioner}
-\addcontentsline{toc}{subsection}{prec\%free}
+\clearpage\subsection{free --- Free a  preconditioner}
 
 \begin{verbatim}
 call prec%free(info)
