@@ -150,13 +150,13 @@ Specified as: a logical  variable, default value: true.
 \end{enumerate}
 
 
-\clearpage\subsection{psb\_get\_mpicomm --- Get the MPI communicator}
+\clearpage\subsection{psb\_get\_mpi\_comm --- Get the MPI communicator}
 
 \begin{verbatim}
-call psb_get_mpicomm(icontxt, icomm)
+ icomm= psb_get_mpicomm(icontxt)
 \end{verbatim}
 
-This subroutine returns the MPI communicator associated with a PSBLAS context
+This function returns the MPI communicator associated with a PSBLAS context
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]
@@ -170,20 +170,17 @@ Specified as: an integer variable.
 
 \begin{description}
 \item[\bf On Return]
-\item[icomm] The MPI communicator associated with the  PSBLAS virtual parallel machine.\\
-Scope: {\bf global}.\\
-Type: {\bf required}.\\
-Intent: {\bf out}.\\
+\item[function value] The MPI communicator associated with the  PSBLAS virtual parallel machine.\\
 \end{description}
 
 
-\clearpage\subsection{psb\_get\_rank --- Get the MPI rank}
+\clearpage\subsection{psb\_get\_mpi\_rank --- Get the MPI rank}
 
 \begin{verbatim}
-call psb_get_rank(rank, icontxt, id)
+rank = psb_get_mpi_rank(icontxt, id)
 \end{verbatim}
 
-This subroutine returns the MPI rank of the  PSBLAS process $id$
+This function returns the MPI rank of the  PSBLAS process $id$
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]
@@ -202,10 +199,7 @@ Specified as: an integer value. $0 \le id \le np-1$\
 
 \begin{description}
 \item[\bf On Return]
-\item[rank] The MPI rank associated with the  PSBLAS process $id$.\\
-Scope: {\bf local}.\\
-Type: {\bf required}.\\
-Intent: {\bf out}.\\
+\item[function value] The MPI rank associated with the  PSBLAS process $id$.\\
 \end{description}
 
 
