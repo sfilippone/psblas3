@@ -80,7 +80,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   dectype = desc%get_dectype()
   n_row   = desc%get_local_rows()
   n_col   = desc%get_local_cols()
-  call psb_get_mpicomm(ictxt,icomm )
+  icomm   = psb_get_mpi_comm(ictxt)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)

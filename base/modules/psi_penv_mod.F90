@@ -556,14 +556,27 @@ contains
   subroutine psb_get_mpicomm(ictxt,comm)
     integer(psb_mpik_) :: ictxt, comm
 
-    comm = ictxt
+    comm = psb_get_mpi_comm(ictxt)
   end subroutine psb_get_mpicomm
 
   subroutine psb_get_rank(rank,ictxt,id)
     integer(psb_mpik_) :: rank,ictxt,id
 
-    rank = id
+    rank = psb_get_mpi_rank(ictxt,id)
   end subroutine psb_get_rank
+
+
+  function  psb_get_mpi_comm(ictxt) result(comm)
+    integer(psb_mpik_) :: ictxt, comm
+
+    comm = ictxt
+  end function psb_get_mpi_comm
+
+  function psb_get_mpi_rank(ictxt,id) result(rank)
+    integer(psb_mpik_) :: rank,ictxt,id
+    
+    rank = id
+  end function psb_get_mpi_rank
 
 
   ! !!!!!!!!!!!!!!!!!!!!!!
