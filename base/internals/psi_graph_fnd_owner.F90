@@ -107,7 +107,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_) :: ictxt,np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
   integer(psb_ipk_) :: tmpv(4)
-  logical, parameter  :: do_timings=.false., trace=.false.
+  logical, parameter  :: do_timings=.true., trace=.false.
   integer(psb_ipk_), save  :: idx_sweep0=-1, idx_loop_a2a=-1, idx_loop_neigh=-1
   real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name
@@ -198,7 +198,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   if (do_timings) call psb_toc(idx_sweep0)
     
   fnd_owner_loop: do while (nrest_max>0)
-  if (do_timings) call psb_tic(idx_loop_a2a)    
+    if (do_timings) call psb_tic(idx_loop_a2a)    
     !
     ! The basic idea of this loop is to alternate between
     ! searching through all processes and searching
@@ -209,6 +209,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !    
     ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
     nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
+    !nsampl_in = min(n_rest,32)
     !
     ! Choose a sample, should it be done in this simplistic way?
     ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out

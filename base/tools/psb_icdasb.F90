@@ -65,6 +65,10 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row
   integer(psb_mpk_) ::  np,me, icomm, ictxt
   logical             :: ext_hv_
+  logical, parameter  :: do_timings=.false.
+  integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
+  integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
+  integer(psb_ipk_), save  :: idx_total=-1
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -81,7 +85,22 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   n_row   = desc%get_local_rows()
   n_col   = desc%get_local_cols()
   icomm   = desc%get_mpic()
+  if ((do_timings).and.(idx_total==-1))       &
+       & idx_total = psb_get_timer_idx("ICDASB: total ")
+  if ((do_timings).and.(idx_phase1==-1))       &
+       & idx_phase1 = psb_get_timer_idx("ICDASB: phase1 ")
+  if ((do_timings).and.(idx_phase2==-1))       &
+       & idx_phase2 = psb_get_timer_idx("ICDASB: phase2")
+  if ((do_timings).and.(idx_phase3==-1))       &
+       & idx_phase3 = psb_get_timer_idx("ICDASB: phase3")
+!!$  if ((do_timings).and.(idx_phase11==-1))       &
+!!$       & idx_phase11 = psb_get_timer_idx("ICDASB: phase11 ")
+!!$  if ((do_timings).and.(idx_phase12==-1))       &
+!!$       & idx_phase12 = psb_get_timer_idx("ICDASB: phase12")
+!!$  if ((do_timings).and.(idx_phase13==-1))       &
+!!$       & idx_phase13 = psb_get_timer_idx("ICDASB: phase13")
 
+  call psb_tic(idx_total)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -115,6 +134,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
        & write(debug_unit, *) me,' ',trim(name),': start'
 
   if (allocated(desc%indxmap)) then 
+    if (do_timings) call psb_tic(idx_phase1)    
     if (.not.ext_hv_) then 
       call psi_bld_tmphalo(desc,info)
       if (info /= psb_success_) then
@@ -122,7 +142,8 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
         goto 9999
       end if
     end if
-
+    if (do_timings) call psb_toc(idx_phase1)
+    if (do_timings) call psb_tic(idx_phase2)    
     ! Take out the lists for ovrlap, halo and ext...
     call psb_move_alloc(desc%ovrlap_index,ovrlap_index,info)
     call psb_move_alloc(desc%halo_index,halo_index,info)
@@ -144,6 +165,8 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
       call psb_errpush(info,name)
       goto 9999
     end if
+    if (do_timings) call psb_toc(idx_phase2)
+    if (do_timings) call psb_tic(idx_phase3)    
 
     call desc%indxmap%asb(info)
     if (info == psb_success_) then 
@@ -154,14 +177,14 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
       write(0,*) 'Error from internal indxmap asb ',info
       info = psb_success_
     end if
-
+    if (do_timings) call psb_toc(idx_phase3)    
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  
+  call psb_toc(idx_total)  
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Done'
 

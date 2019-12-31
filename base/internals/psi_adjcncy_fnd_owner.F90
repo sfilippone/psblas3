@@ -59,6 +59,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
+  use psb_timers_mod
   use psb_indx_map_mod, psb_protect_name => psi_adjcncy_fnd_owner
 #ifdef MPI_MOD
   use mpi
@@ -85,10 +86,11 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
        & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me
-  logical, parameter  :: gettime=.false., debug=.false.
-  logical, parameter  :: a2av_impl=.true.
-  logical, parameter  :: mpi_irecv_impl=.false.
-  logical, parameter  :: psb_rcv_impl=.false.
+  logical, parameter  :: gettime=.true., debug=.false.
+  integer(psb_mpk_)   :: xchg_alg 
+  logical, parameter  :: do_timings=.false.
+  integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
+  integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
@@ -102,6 +104,19 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
   iictxt = ictxt 
+  if ((do_timings).and.(idx_phase1==-1))       &
+       & idx_phase1 = psb_get_timer_idx("ADJ_FND_OWN: phase1 ")
+  if ((do_timings).and.(idx_phase2==-1))       &
+       & idx_phase2 = psb_get_timer_idx("ADJ_FND_OWN: phase2")
+  if ((do_timings).and.(idx_phase3==-1))       &
+       & idx_phase3 = psb_get_timer_idx("ADJ_FND_OWN: phase3")
+  if ((do_timings).and.(idx_phase11==-1))       &
+       & idx_phase11 = psb_get_timer_idx("ADJ_FND_OWN: phase11 ")
+  if ((do_timings).and.(idx_phase12==-1))       &
+       & idx_phase12 = psb_get_timer_idx("ADJ_FND_OWN: phase12")
+  if ((do_timings).and.(idx_phase13==-1))       &
+       & idx_phase13 = psb_get_timer_idx("ADJ_FND_OWN: phase13")
+
 
   call psb_info(ictxt, me, np)
 
@@ -129,8 +144,11 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   end if
   iprc = -1
   ! write(0,*) me,name,' Going through ',nidx,nadj
+  xchg_alg = psi_get_adj_alg()
+  select case(xchg_alg)
+  case(psi_adj_fnd_a2av_) 
+    if (do_timings) call psb_tic(idx_phase1)
 
-  if (a2av_impl) then
     !
     ! First simple minded version with auxiliary arrays
     ! dimensioned on NP.
@@ -146,6 +164,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     ! First, send sizes according to adjcncy list
     !
+    if (do_timings) call psb_tic(idx_phase11)
     sdsz = 0 
     do j=1, nadj
       sdsz(adj(j)) = nidx
@@ -154,15 +173,20 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
 
     call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
          & rvsz,1,psb_mpi_mpk_,icomm,minfo)
+    if (do_timings) call psb_toc(idx_phase11)
+    if (do_timings) call psb_tic(idx_phase12)
     rvidx(0) = 0
     do i=0, np-1
       rvidx(i+1) = rvidx(i) + rvsz(i)
     end do
     hsize = rvidx(np)
+    
     ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
     !
     ! Second, allocate buffers and exchange data
     !
+    if (do_timings) call psb_toc(idx_phase12)
+    if (do_timings) call psb_tic(idx_phase13)
     Allocate(rmtidx(hsize),lclidx(max(hsize,nidx*nadj)),&
          & tproc(max(hsize,nidx)),stat=info)
 
@@ -173,7 +197,9 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
 
     call mpi_alltoallv(idx,sdsz,sdidx,psb_mpi_lpk_,&
          & rmtidx,rvsz,rvidx,psb_mpi_lpk_,icomm,iret)
-
+    if (do_timings) call psb_toc(idx_phase13)
+    if (do_timings) call psb_toc(idx_phase1)
+    if (do_timings) call psb_tic(idx_phase2)
     !
     ! Third, compute local answers
     !
@@ -182,6 +208,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       tproc(i) = -1
       if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
     end do
+    if (do_timings) call psb_toc(idx_phase2)
+    if (do_timings) call psb_tic(idx_phase3)
 
     !
     ! Fourth, exchange the answers 
@@ -203,10 +231,13 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
         iprc(1:nidx) = max(iprc(1:nidx), lclidx(sdidx(i)+1:sdidx(i)+sdsz(i)))
       end if
     end do
+    if (do_timings) call psb_toc(idx_phase3)
 
     if (debug) write(0,*) me,' End of adjcncy_fnd ',iprc(1:nidx)    
 
-  else if (mpi_irecv_impl) then
+  case(psi_adj_fnd_irecv_)
+    
+    if (do_timings) call psb_tic(idx_phase1)
     !
     ! First simple minded version with auxiliary arrays
     ! dimensioned on NP.
@@ -216,6 +247,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     Allocate(hidx(0:np),hsz(np),sdsz(0:np-1),rvsz(0:np-1),&
          & sdhd(0:np-1), rvhd(0:np-1), p2pstat(mpi_status_size,0:np-1),&
          & stat=info)
+    if (do_timings) call psb_tic(idx_phase11)
     sdhd(:) = mpi_request_null
     rvhd(:) = mpi_request_null
     !
@@ -255,6 +287,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
              & p2ptag, icomm,rvhd(i),iret)
       end if
     end do
+    if (do_timings) call psb_toc(idx_phase11)
+    if (do_timings) call psb_tic(idx_phase12)    
     do j=1, nadj
       if (nidx > 0) then
         prc = psb_get_mpi_rank(ictxt,adj(j))        
@@ -265,7 +299,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
              & p2ptag, icomm,iret)
       end if
     end do
+    if (do_timings) call psb_toc(idx_phase12)
+    if (do_timings) call psb_tic(idx_phase13)
     call mpi_waitall(np,rvhd,p2pstat,iret)
+    if (do_timings) call psb_toc(idx_phase13)
+    if (do_timings) call psb_toc(idx_phase1)
+    if (do_timings) call psb_tic(idx_phase2)
 
     !
     ! Third, compute local answers
@@ -275,6 +314,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       tproc(i) = -1
       if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
     end do
+    if (do_timings) call psb_toc(idx_phase2)
+    if (do_timings) call psb_tic(idx_phase3)
     !
     ! At this point we can reuse lclidx to receive messages
     !
@@ -312,9 +353,10 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     do j = 1, nadj
       iprc(1:nidx) = max(iprc(1:nidx), lclidx((j-1)*nidx+1:(j-1)*nidx+nidx))
     end do
+    if (do_timings) call psb_toc(idx_phase3)
     if (debug) write(0,*) me,' End of adjcncy_fnd ',iprc(1:nidx)
 
-  else if (psb_rcv_impl) then 
+  case(psi_adj_fnd_pbrcv_) 
 
     Allocate(hidx(0:np),hsz(np),&
          & sdsz(0:np-1),rvsz(0:np-1),stat=info)
@@ -382,11 +424,11 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
       iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
     end do
-  else
+  case default 
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid exchange alg choice')
     goto 9999      
-  end if
+  end select
 
   call psb_erractionrestore(err_act)
   return
