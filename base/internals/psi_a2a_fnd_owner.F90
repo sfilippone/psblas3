@@ -73,8 +73,9 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_) :: i,n_row,n_col,err_act,nv
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
-  real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
-  character(len=20)   :: name
+  logical, parameter :: use_psi_adj=.true.
+  real(psb_dpk_)     :: t0, t1, t2, t3, t4, tamx, tidx
+  character(len=20)  :: name
 
   info = psb_success_
   name = 'psi_a2a_fnd_owner'
@@ -100,15 +101,23 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
 
-  !
-  ! Reuse the adjcncy version by tricking it with an adjcncy list
-  ! that contains everybody but ME. 
-  !
-  nv = size(idx)
-  call psb_realloc(np-1,tmpadj,info)
-  tmpadj(1:me) = [(i,i=0,me-1)]
-  tmpadj(me+1:np-1) = [(i,i=me+1,np-1)]
-  call  psi_adjcncy_fnd_owner(idx,iprc,tmpadj,idxmap,info)
+  if (use_psi_adj) then 
+    !
+    ! Reuse the adjcncy version by tricking it with an adjcncy list
+    ! that contains everybody but ME. 
+    !
+    nv = size(idx)
+    call psb_realloc(np-1,tmpadj,info)
+    tmpadj(1:me) = [(i,i=0,me-1)]
+    tmpadj(me+1:np-1) = [(i,i=me+1,np-1)]
+    call  psi_adjcncy_fnd_owner(idx,iprc,tmpadj,idxmap,info)
+  else
+    !
+    ! 1. allgetherv
+    ! 2. local conversion
+    ! 3. reduce_scatter
+    !
+  end if
 
   call psb_erractionrestore(err_act)
   return
