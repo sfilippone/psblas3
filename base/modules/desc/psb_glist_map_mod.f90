@@ -126,7 +126,7 @@ contains
 
     idxmap%ictxt = ictxt
     idxmap%state = psb_desc_bld_
-    idxmap%mpic  = psb_get_mpicomm(ictxt)
+    idxmap%mpic  = psb_get_mpi_comm(ictxt)
 
     nl = 0 
     do i=1, n 

@@ -1,4 +1,4 @@
-PSBLAS library, version 3.6
+PSBLAS library, version 3.7
 ===========================
 
 The architecture of the Fortran 2003 sparse BLAS is described in:
@@ -110,6 +110,25 @@ Fix all reamining bugs. Bugs? We dont' have any ! ;-)
 
 
 The PSBLAS team. 
+---------------
+Project lead:
+Salvatore Filippone
+
+Contributors (roughly reverse cronological order):
+
+Soren 	   Rasmussen
+Zaak       Beekman
+Ambra	   Abdullahi Hassan
+Pasqua	   D'Ambra
+Alfredo    Buttari
+Daniela    di Serafino
+Michele    Martone
+Michele    Colajanni
+Fabio      Cerioni
+Stefano    Maiolatesi
+Dario      Pascucci
+
+
 
 RELATED SOFTWARE
 ----------------

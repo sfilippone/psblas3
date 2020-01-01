@@ -70,7 +70,7 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
   name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
-  icomm = psb_get_mpicomm(ictxt)
+  icomm = psb_get_mpi_comm(ictxt)
 
   call psb_info(ictxt, me, np)
 
@@ -151,7 +151,7 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
-  icomm = psb_get_mpicomm(ictxt)
+  icomm = psb_get_mpi_comm(ictxt)
 
   call psb_info(ictxt, me, np)
 

@@ -214,8 +214,7 @@ contains
     ! Note: integer control variables going directly into an MPI call
     ! must be 4 bytes, i.e. psb_mpk_
     integer(psb_mpk_) :: npdims(3), npp, minfo
-    integer(psb_mpk_) :: npx,npy,npz, iamx,iamy,iamz
-    integer(psb_ipk_) :: mynx,myny,mynz
+    integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
     ! Process grid
     integer(psb_ipk_) :: np, iam
@@ -236,9 +235,8 @@ contains
     call psb_erractionsave(err_act)
 
     call psb_info(ictxt, iam, np)
-    call psb_cd_set_large_threshold(1000)
-    call psb_cd_set_maxspace(-1)
-    
+
+
     if (present(f)) then 
       f_ => f
     else
@@ -373,49 +371,7 @@ contains
       ! the set of global indices it owns.
       ! 
       call psb_cdall(ictxt,desc_a,info,vl=myidx)
-
       
-      block
-        !
-        ! Test adjcncy methods 
-        ! 
-        integer(psb_mpk_), allocatable :: neighbours(:)
-        integer(psb_mpk_) :: cnt
-        logical, parameter :: debug_adj=.false.
-        if (debug_adj.and.(np > 1)) then 
-          cnt = 0
-          allocate(neighbours(np))
-          if (iamx < npx-1) then
-            cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx+1,iamy,iamz,npx,npy,npz,base=0)
-          end if
-          if (iamy < npy-1) then
-            cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy+1,iamz,npx,npy,npz,base=0)
-          end if
-          if (iamz < npz-1) then
-            cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy,iamz+1,npx,npy,npz,base=0)
-          end if
-          if (iamx >0) then
-            cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx-1,iamy,iamz,npx,npy,npz,base=0)
-          end if
-          if (iamy >0) then
-            cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy-1,iamz,npx,npy,npz,base=0)
-          end if
-          if (iamz >0) then
-            cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy,iamz-1,npx,npy,npz,base=0)
-          end if
-          call psb_realloc(cnt, neighbours,info)
-          call desc_a%set_p_adjcncy(neighbours)
-          write(0,*) iam,' Check on neighbours: ',desc_a%get_p_adjcncy()
-        end if
-      end block
-
-
     case default
       write(psb_err_unit,*) iam, 'Initialization error: should not get here'
       info = -1

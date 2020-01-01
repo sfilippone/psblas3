@@ -28,8 +28,14 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
+!
+! Subroutine: psi_dovrl_update
+!   These subroutines update the overlap region of a vector; they are  used
+!   for the transpose  matrix-vector product when there is a nonempty overlap,
+!   or for the application of Additive Schwarz preconditioners.                                           
 !    
-
+!    
+!    
 subroutine  psi_dovrl_upd_vect(x,desc_a,update,info)
   use psi_mod, psi_protect_name =>   psi_dovrl_upd_vect
   use psb_realloc_mod

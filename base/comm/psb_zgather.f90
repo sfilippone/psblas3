@@ -31,14 +31,14 @@
 !    
 ! File:  psb_zgather.f90
 !
-! Subroutine: psb_zgatherm
-!   This subroutine gathers pieces of a distributed dense matrix into a local one.
+! Subroutine: psb_zgather_vect
+!   This subroutine gathers pieces of a distributed vector into a local one.
 !
 ! Arguments:
-!   globx     -  complex,dimension(:,:).          The local matrix into which gather 
+!   globx     -  complex,dimension(:).           The local matrix into which gather 
 !                                                  the distributed pieces.
-!   locx      -  complex,dimension(:,:).          The local piece of the distributed 
-!                                                  matrix to be gathered.
+!   locx      -  type(psb_z_vect_type@         The local piece of the distributed 
+!                                                  vector to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
@@ -159,6 +159,8 @@ subroutine  psb_zgather_vect(globx, locx, desc_a, info, iroot)
 
 end subroutine psb_zgather_vect
 
+! Subroutine: psb_zgather_multivect
+!   This subroutine gathers pieces of a distributed multivector into a local one.
 
 subroutine  psb_zgather_multivect(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_zgather_multivect

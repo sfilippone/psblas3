@@ -37,13 +37,12 @@ Module psb_s_tools_mod
   use psb_s_multivect_mod, only : psb_s_base_multivect_type, psb_s_multivect_type
 
   interface  psb_geall
-    subroutine psb_salloc_vect(x, desc_a,info,n)
+    subroutine psb_salloc_vect(x, desc_a,info)
       import
       implicit none
       type(psb_s_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_salloc_vect
     subroutine psb_salloc_vect_r2(x, desc_a,info,n,lb)
       import

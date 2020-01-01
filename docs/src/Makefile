@@ -113,6 +113,7 @@ DATE     = $(shell date +%Y-%m-%d)
 #
 LATEX    = latex
 LTX2HTML = latex2html -local_icons
+LTX2HTML = htlatex 
 PDFLATEX = pdflatex
 ACRO     = evince
 XPDF     = xpdf
@@ -138,11 +139,12 @@ PDF      = $(join $(BASEFILE),.pdf)
 PS       = $(join $(BASEFILE),.ps)
 GXS      = $(join $(BASEFILE),.gxs)
 GLX      = $(join $(BASEFILE),.glx)
-TARGETPDF= ../psblas-3.6.pdf
+TARGETPDF= ../psblas-3.7.pdf
 BASEHTML = $(patsubst %.tex,%,$(HTMLFILE))
-HTML     = $(join $(HTMLFILE),.html)
+HTML     = $(join $(BASEHTML),.html)
 HTMLDIR  = ../html
 HTMLFLAGS = -noaddress
+HTMLFLAGS = "html,3"
 
 FIGURES  = $(sort $(wildcard $(FIGDIR)/*))
 GLOFILES:= $(sort $(wildcard lib/*.gdf))
@@ -159,9 +161,9 @@ TEXLNFIL = $(addprefix $(PWD)/,$(TEXFILES))
 #============================================================================
 
 all: pdf html
-	
+
 pdf: $(PDF) copypdf
-html: $(HTML)
+html: $(HTML) copyhtml
 
 $(PDF): $(TEXFILES) $(LIBFILES) $(FIGURES) Makefile
 	$(header)
@@ -184,18 +186,20 @@ copypdf:
 $(HTML): $(TEXFILES) $(LIBFILES) $(FIGURES) Makefile
 	$(header)
 	$(initialize)
-	$(latex-filter)
+	$(pdflatex-filter)
         ifneq ($(BIBFILES),)
 	  $(bibtex)
-	  $(latex-filter)
+	  $(pdflatex-filter)
         endif
         ifneq ($(GLOFILES),)
 	  $(glosstex)
-	  $(latex-filter)
+	  $(pdflatex-filter)
         endif
 #	$(makeindex)
-	$(latex-filter)
 	$(ltx2html-filter)
+
+copyhtml:
+	$(ltx2html-cpy)
 
 $(PS): $(PDF)
 	$(PDF2PS) $< $(PS)
@@ -285,6 +289,7 @@ define initialize
   @ln -sf $(TEXLNFIL) tmp
   @ln -sf $(PWD)/lib/* tmp
   @ln -sf $(PWD)/$(FIGDIR) tmp
+  @ln -sf $(PWD)/$(FIGDIR)/*png tmp
 endef
 
 #----------------------------------------------------------------------------
@@ -328,7 +333,16 @@ define ltx2html-filter
   @echo "----- latex -------------------------------------------------------"
   @echo -n "Starting: "; date
   @echo
-  cd tmp; ($(LTX2HTML) $(HTMLFLAGS) -dir ../$(HTMLDIR) $(HTMLFILE)  2>&1) | $(FILTER)
+#  cd tmp; ($(LTX2HTML) $(HTMLFLAGS) -dir ../$(HTMLDIR) $(HTMLFILE)  2>&1) | $(FILTER)
+  cd tmp; ($(LTX2HTML) $(HTMLFILE) $(HTMLFLAGS)  2>&1) | $(FILTER)
+endef
+
+define ltx2html-cpy
+  @echo
+  @echo "----- latex -------------------------------------------------------"
+  @echo -n "Starting: "; date
+  @echo
+  cd tmp; (cp *.css *.html *.png ../$(HTMLDIR)); (cp $(HTML) ../$(HTMLDIR)/index.html)
 endef
 
 #----------------------------------------------------------------------------

@@ -37,13 +37,12 @@ Module psb_d_tools_mod
   use psb_d_multivect_mod, only : psb_d_base_multivect_type, psb_d_multivect_type
 
   interface  psb_geall
-    subroutine psb_dalloc_vect(x, desc_a,info,n)
+    subroutine psb_dalloc_vect(x, desc_a,info)
       import
       implicit none
       type(psb_d_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_dalloc_vect
     subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
       import

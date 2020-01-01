@@ -961,7 +961,7 @@ contains
     idxmap%local_cols   = nl
     idxmap%ictxt        = ictxt
     idxmap%state        = psb_desc_bld_
-    idxmap%mpic         = psb_get_mpicomm(ictxt)
+    idxmap%mpic         = psb_get_mpi_comm(ictxt)
 
     lc2 = int(1.5*nl) 
     call psb_realloc(lc2,idxmap%loc_to_glob,info) 

@@ -30,6 +30,17 @@
 !   
 !    
 ! File:  psb_ispgather.f90
+!
+! Gathers a sparse matrix onto a single process.
+! Two variants:
+! 1. Gathers to PSB_i_SPARSE_MAT   (i.e. to matrix with IPK_ indices)
+! 2. Gathers to PSB_@LX@_SPARSE_MAT  (i.e. to matrix with LPK_ indices)
+!
+! Note: this function uses MPI_ALLGATHERV. At this time, the size of the
+! resulting matrix must be within the range of 4 bytes because of the
+! restriction on MPI displacements to be 4 bytes. 
+! 
+!
 subroutine  psb_isp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
 #if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env

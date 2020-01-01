@@ -31,7 +31,7 @@
 !    
 ! File:  psb_mgather.f90
 !
-! Subroutine: psb_mgatherm
+! Subroutine: psb_mgather
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
 ! Arguments:

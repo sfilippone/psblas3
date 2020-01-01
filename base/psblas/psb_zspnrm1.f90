@@ -40,6 +40,7 @@
 !    a      -  type(psb_zspmat_type).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
 function psb_zspnrm1(a,desc_a,info,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_zspnrm1

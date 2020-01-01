@@ -31,13 +31,13 @@
 !    
 ! File:  psb_zscatter.f90
 !
-! Subroutine: psb_zscatterm
-!   This subroutine scatters a global matrix locally owned by one process
-!   into pieces that are local to alle the processes.
+! Subroutine: psb_zscatter_vect
+!   This subroutine scatters a global vector locally owned by one process
+!   into pieces that are local to all the processes.
 !
 ! Arguments:
-!   globx     -  complex,dimension(:,:).       The global matrix to scatter.
-!   locx      -  complex,dimension(:,:).       The local piece of the distributed matrix.
+!   globx     -  complex,dimension(:)          The global matrix to scatter.
+!   locx      -  type(psb_z_vect_type)      The local piece of the distributed matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global matrix. 

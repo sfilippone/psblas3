@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_spins &#8212; Insert a set of coefficients into a sparse matrix</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 599--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu41.html" >next</a>] [<a 
+href="userhtmlsu36.html" >prev</a>] [<a 
+href="userhtmlsu36.html#tailuserhtmlsu36.html" >prev-tail</a>] [<a 
+href="userhtmlsu34.html#tailuserhtmlsu37.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu40.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.8   </span> <a 
+ id="x48-850006.8"></a>psb_spins &#8212; Insert a set of coefficients into a sparse matrix</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-64">
+call&#x00A0;psb_spins(nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;val,&#x00A0;a,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,local])
+&#x00A0;<br />call&#x00A0;psb_spins(nr,&#x00A0;irw,&#x00A0;irp,&#x00A0;ja,&#x00A0;val,&#x00A0;a,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,local])
+</div>
+<!--l. 604--><p class="nopar" >
+<!--l. 606--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Asynchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">nz</span> </dt><dd 
+class="description">the number of coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer scalar.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">nr</span> </dt><dd 
+class="description">the number of rows to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer scalar.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">irw</span> </dt><dd 
+class="description">the first row to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer scalar.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ia</span> </dt><dd 
+class="description">the row indices of the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of size <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">irp</span> </dt><dd 
+class="description">the row pointers of the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of size <span 
+class="cmmi-10">nr </span>+ 1.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">ja</span> </dt><dd 
+class="description">the column indices of the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of size <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">val</span> </dt><dd 
+class="description">the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an array of size <span 
+class="cmmi-10">nz</span>. Must be of the same type and kind of
+     the coefficients of the sparse matrix <span 
+class="cmmi-10">a</span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>. <br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">local</span> </dt><dd 
+class="description">Whether the entries in the indices vectors <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ia</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span> are already in local
+     numbering. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a logical value; default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.false.</span></span></span>.
+     </dd></dl>
+<!--l. 666--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">the matrix into which coefficients will be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu6.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>. <br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 685--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x48-85002x1">On entry to this routine the descriptor may be in either the build or
+     assembled state.
+     </li>
+     <li 
+  class="enumerate" id="x48-85004x2">On entry to this routine the sparse matrix may be in either the build or
+     update state.
+     </li>
+     <li 
+  class="enumerate" id="x48-85006x3">If the descriptor is in the build state, then the sparse matrix must also be
+     in the build state; the action of the routine is to (implicitly) call <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span>
+     to add entries to the sparsity pattern; each sparse matrix entry implicitly
+     defines  a  graph  edge,  that  is  passed  to  the  descriptor  routine  for  the
+     appropriate processing;
+     </li>
+     <li 
+  class="enumerate" id="x48-85008x4">The input data can be passed in either COO or CSR formats;
+     </li>
+     <li 
+  class="enumerate" id="x48-85010x5">In  COO  format  the  coefficients  to  be  inserted  are  represented  by  the
+     ordered  triples  <span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,ja</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,val</span>(<span 
+class="cmmi-10">i</span>),  for  <span 
+class="cmmi-10">i </span>=  1<span 
+class="cmmi-10">,</span><span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">,nz</span>;  these  triples  should
+     belong to the current process, i.e. <span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>) should be one of the local indices,
+     but are otherwise arbitrary;
+     </li>
+     <li 
+  class="enumerate" id="x48-85012x6">In CSR format the coefficients to be inserted for each input row <span 
+class="cmmi-10">i </span>= 1<span 
+class="cmmi-10">,nr</span>
+     are  represented  by  the  ordered  triples  (<span 
+class="cmmi-10">i </span>+ <span 
+class="cmmi-10">irw </span><span 
+class="cmsy-10">- </span>1)<span 
+class="cmmi-10">,ja</span>(<span 
+class="cmmi-10">j</span>)<span 
+class="cmmi-10">,val</span>(<span 
+class="cmmi-10">j</span>),  for
+     <span 
+class="cmmi-10">j </span>= <span 
+class="cmmi-10">irp</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,</span><span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">,irp</span>(<span 
+class="cmmi-10">i </span>+ 1) <span 
+class="cmsy-10">- </span>1; these triples should belong to the current
+     process, i.e. <span 
+class="cmmi-10">i</span>+<span 
+class="cmmi-10">irw</span><span 
+class="cmsy-10">-</span>1 should be one of the local indices, but are otherwise
+     arbitrary;
+     </li>
+     <li 
+  class="enumerate" id="x48-85014x7">There is no requirement that a given row must be passed in its entirety
+     to a single call to this routine: the buildup of a row may be split into as
+     many calls as desired (even in the CSR format);
+     </li>
+     <li 
+  class="enumerate" id="x48-85016x8">Coefficients from different rows may also be mixed up freely in a single
+     call, according to the application needs;
+     </li>
+     <li 
+  class="enumerate" id="x48-85018x9">Any coefficients from matrix rows not owned by the calling process are
+     silently ignored;
+                                                                  
+
+                                                                  
+     </li>
+     <li 
+  class="enumerate" id="x48-85020x10">If the descriptor is in the assembled state, then any entries in the sparse
+     matrix that would generate additional communication requirements are
+     ignored;
+     </li>
+     <li 
+  class="enumerate" id="x48-85022x11">If the matrix is in the update state, any entries in positions that were not
+     present in the original matrix are ignored.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 724--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu41.html" >next</a>] [<a 
+href="userhtmlsu36.html" >prev</a>] [<a 
+href="userhtmlsu36.html#tailuserhtmlsu36.html" >prev-tail</a>] [<a 
+href="userhtmlsu37.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu40.html" >up</a>] </p></div>
+<!--l. 724--><p class="indent" >   <a 
+ id="tailuserhtmlsu37.html"></a>  
+</body></html> 

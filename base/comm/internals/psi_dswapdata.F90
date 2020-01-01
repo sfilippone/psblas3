@@ -32,8 +32,10 @@
 !
 ! File: psi_dswapdata.F90
 !
-! Subroutine: psi_dswapdatam
-!   Does the data exchange among processes. Essentially this is doing 
+!
+!
+! Subroutine: psi_dswapdata_vect
+!   Implements the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
@@ -43,12 +45,15 @@
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
-!   sections SND(Y) and RCV(Y); then we do a send on (PACK(SND(Y)));
-!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
-!   but only on the elements involved in the UNPACK operation. 
+!   sections SND(Y) and RCV(Y); then we do a SEND(PACK(GTH(SND(Y))));
+!   then we receive, and we do an update with Y = SCT(RCV(Y)) + BETA * Y 
+!   but only on the elements involved in the SCT operation. 
 !   Thus: for halo data exchange, the receive section is confined in the 
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
+!   The first routine picks the desired exchange index list and passes it to the second.
+!   This version works on encapsulated vectors, and uses their methods to do  GTH and SCT,
+!   so that special versions (i.e. GPU vectors can override them 
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
@@ -69,10 +74,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - X                       Choose overwrite or sum. 
-!    y(:,:)   - X                       The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y        - type(psb_@x@_vect_type) The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -83,14 +88,6 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-!
-!
-! Subroutine: psi_dswapdata_vect
-!   Data exchange among processes.
-!
-!   Takes care of Y an exanspulated vector.
-!   
-!   
 ! 
 subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
@@ -263,7 +260,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
 
       rcv_pt = 1+pnti+psb_n_elem_recv_
-      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_double_swap_tag
@@ -426,7 +423,7 @@ end subroutine psi_dswap_vidx_vect
 ! Subroutine: psi_dswapdata_multivect
 !   Data exchange among processes.
 !
-!   Takes care of Y an encaspulated vector.
+!   Takes care of Y an encaspulated multivector.
 !   
 !   
 subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
@@ -602,7 +599,7 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      prcid(i) = psb_get_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_double_swap_tag

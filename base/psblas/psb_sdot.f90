@@ -31,22 +31,22 @@
 !    
 ! File: psb_sdot.f90
 !
-! Function: psb_sdot
-!    psb_sdot forms the dot product of two distributed vectors,
+! Function: psb_sdot_vect
+!    psb_sdot computes the dot product of two distributed vectors,
 !
-!    dot := sub( X )**C * sub( Y )
+!    dot := ( X )**C * ( Y )
 !
-!    where sub( X ) denotes X(:,JX)
-!
-!    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    x(:,:) -  complex               The input vector containing the entries of sub( X ).
-!    y(:,:) -  complex               The input vector containing the entries of sub( Y ).
+!    x      -  type(psb_s_vect_type) The input vector containing the entries of sub( X ).
+!    y      -  type(psb_s_vect_type) The input vector containing the entries of sub( Y ).
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
-!    jx     -  integer(optional).    The column offset for sub( X ).
-!    jy     -  integer(optional).    The column offset for sub( Y ).
+!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!
+!  Note: from a functional point of view, X and Y are input, but here
+!        they are declared INOUT because of the sync() methods. 
+!
 !
 function psb_sdot_vect(x, y, desc_a,info,global) result(res)
   use psb_desc_mod
@@ -156,7 +156,25 @@ function psb_sdot_vect(x, y, desc_a,info,global) result(res)
   return
 
 end function psb_sdot_vect
-
+!
+! Function: psb_sdot
+!    psb_sdot computes the dot product of two distributed vectors,
+!
+!    dot := sub( X )**C * sub( Y )
+!
+!    where sub( X ) denotes X(:,JX)
+!
+!    sub( Y ) denotes Y(:,JY).
+!
+! Arguments:
+!    x(:,:) -  real                The input vector containing the entries of sub( X ).
+!    y(:,:) -  real                The input vector containing the entries of sub( Y ).
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    jx     -  integer(optional).    The column offset for sub( X ).
+!    jy     -  integer(optional).    The column offset for sub( Y ).
+!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!
 function psb_sdot(x, y,desc_a, info, jx, jy,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_sdot
   implicit none
@@ -298,7 +316,7 @@ end function psb_sdot
 !!$
 ! 
 ! Function: psb_sdotv
-!    psb_sdotv forms the dot product of two distributed vectors,
+!    psb_sdotv computes the dot product of two distributed vectors,
 !
 !    dot := X**C * Y
 !
@@ -307,6 +325,7 @@ end function psb_sdot
 !    y(:)   -  real               The input vector containing the entries of Y.
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
+!    global -  logical(optional)     Whether to perform the global sum, default: .true.
 !
 function psb_sdotv(x, y,desc_a, info,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_sdotv
@@ -432,7 +451,7 @@ end function psb_sdotv
 !!$
 !  
 ! Subroutine: psb_sdotvs
-!    psb_sdotvs forms the dot product of two distributed vectors,
+!    psb_sdotvs computes the dot product of two distributed vectors,
 !
 !    res := X**C * Y
 !
@@ -442,6 +461,7 @@ end function psb_sdotv
 !    y(:)   -  real              The input vector containing the entries of Y.
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
+!    global -  logical(optional)     Whether to perform the global sum, default: .true.
 !
 subroutine psb_sdotvs(res, x, y,desc_a, info,global)  
   use psb_base_mod, psb_protect_name => psb_sdotvs
@@ -565,7 +585,7 @@ end subroutine psb_sdotvs
 !!$
 !
 ! Subroutine: psb_smdots
-!    psb_smdots forms the dot product of multiple distributed vectors,
+!    psb_smdots computes the dot product of multiple distributed vectors,
 !
 !    res(i) := ( X(:,i) )**C * ( Y(:,i) )
 !
@@ -575,6 +595,7 @@ end subroutine psb_sdotvs
 !    y(:)   -  real              The input vector containing the entries of sub( Y ).
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
+!    global -  logical(optional)     Whether to perform the global sum, default: .true.
 !
 subroutine psb_smdots(res, x, y, desc_a, info,global)  
   use psb_base_mod, psb_protect_name => psb_smdots

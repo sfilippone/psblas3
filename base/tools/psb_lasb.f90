@@ -31,17 +31,26 @@
 !    
 ! File: psb_lasb.f90
 !
-! Subroutine: psb_lasb
-!    Assembles a dense matrix for PSBLAS routines
+! Subroutine: psb_lasb_vect, _vect_r2 and _multivect
+!    Assembles a dense vector, an array of vectors or a multivector
+!    for PSBLAS routines. 
 !    Since the allocation may have been called with the desciptor 
 !    in the build state we make sure that X has a number of rows 
 !    allowing for the halo indices, reallocating if necessary. 
 !    We also call the halo routine for good measure.
+!    However, sometimes we need to create temporary vectors whose contents
+!    will be initialized through some subsequent call to geaxpby or similar;
+!    for this situation we provide the SCRATCH flag. 
+!    
 ! 
 ! Arguments: 
-!    x(:,:)  - integer, allocatable    The matrix to be assembled.
-!    desc_a  - type(psb_desc_type).  The communication descriptor.
+!    x       - type(psb_l_vect_type) The matrix to be assembled.
+!    desc_a  - type(psb_desc_type).    The communication descriptor.
 !    info    - integer.                return code
+!    mold    - type(psb_l_base_vect_type), optional   A mold for the inner storage format
+!    scratch - logical, optional       If true, allocate without checking/zeroing contents.
+!                                      default: .false.
+!    
 subroutine psb_lasb_vect(x, desc_a, info, mold, scratch)
   use psb_base_mod, psb_protect_name => psb_lasb_vect
   implicit none

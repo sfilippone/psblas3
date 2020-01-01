@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Preconditioner routines</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse9.html" >prev</a>] [<a 
+href="userhtmlse9.html#tailuserhtmlse9.html" >prev-tail</a>] [<a 
+href="userhtmlsu81.html#tailuserhtmlse10.html">tail</a>] [<a 
+href="userhtml.html#userhtmlsu86.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">10   </span> <a 
+ id="x98-13500010"></a>Preconditioner routines</h3>
+<!--l. 6--><p class="noindent" >The base PSBLAS library contains the implementation of two simple preconditioning
+techniques:
+     <ul class="itemize1">
+     <li class="itemize">Diagonal Scaling
+     </li>
+     <li class="itemize">Block Jacobi with ILU(0) factorization</li></ul>
+<!--l. 14--><p class="noindent" >The supporting data type and subroutine interfaces are defined in the module
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_prec_mod</span></span></span>. The old interfaces <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_precinit</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_precbld</span></span></span> are still
+supported for backward compatibility
+                                                                  
+
+                                                                  
+   <div class="subsectionTOCS">
+   &#x00A0;<span class="subsectionToc" >10.1 <a 
+href="userhtmlsu84.html#x99-13600010.1">init &#8212; Initialize a preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.2 <a 
+href="userhtmlsu85.html#x101-13700010.2">build &#8212; Builds a preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.3 <a 
+href="userhtmlsu86.html#x102-13800010.3">apply &#8212; Preconditioner application routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.4 <a 
+href="userhtmlsu87.html#x103-13900010.4">descr &#8212; Prints a description of current preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.5 <a 
+href="userhtmlsu88.html#x104-14000010.5">clone &#8212; clone current preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.6 <a 
+href="userhtmlsu89.html#x105-14100010.6">free &#8212; Free a preconditioner</a></span>
+   </div>
+
+
+
+
+
+                                                                  
+
+                                                                  
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse9.html" >prev</a>] [<a 
+href="userhtmlse9.html#tailuserhtmlse9.html" >prev-tail</a>] [<a 
+href="userhtmlse10.html" >front</a>] [<a 
+href="userhtml.html#userhtmlsu86.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >   <a 
+ id="tailuserhtmlse10.html"></a>  
+</body></html> 

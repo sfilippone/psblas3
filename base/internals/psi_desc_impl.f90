@@ -63,6 +63,7 @@ end subroutine psi_renum_index
 subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
   use psi_mod, psi_protect_name =>  psi_i_cnv_dsc
+  use psb_timers_mod
   use psb_realloc_mod
   implicit none
 
@@ -82,6 +83,9 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: debug=.false.
   character(len=20)  :: name
+  logical, parameter  :: do_timings=.false.
+  integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
+  integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
 
   name='psi_cnv_desc'
   call psb_get_erraction(err_act)
@@ -97,7 +101,22 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     call psb_errpush(info,name)
     goto 9999
   endif
+  if ((do_timings).and.(idx_phase1==-1))       &
+       & idx_phase1 = psb_get_timer_idx("PSI_CNV_DSC: phase1 ")
+  if ((do_timings).and.(idx_phase2==-1))       &
+       & idx_phase2 = psb_get_timer_idx("PSI_CNV_DSC: phase2")
+  if ((do_timings).and.(idx_phase3==-1))       &
+       & idx_phase3 = psb_get_timer_idx("PSI_CNV_DSC: phase3")
+  if ((do_timings).and.(idx_phase11==-1))       &
+       & idx_phase11 = psb_get_timer_idx("PSI_CNV_DSC: phase11 ")
+  if ((do_timings).and.(idx_phase12==-1))       &
+       & idx_phase12 = psb_get_timer_idx("PSI_CNV_DSC: phase12")
+  if ((do_timings).and.(idx_phase13==-1))       &
+       & idx_phase13 = psb_get_timer_idx("PSI_CNV_DSC: phase13")
 
+
+  if (do_timings) call psb_tic(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase11)
 
   ! first the halo index
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo',&
@@ -111,6 +130,8 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on halo'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
+  if (do_timings) call psb_toc(idx_phase11)
+  if (do_timings) call psb_tic(idx_phase12)
 
 
   ! then ext index
@@ -124,6 +145,8 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on ext'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
+  if (do_timings) call psb_toc(idx_phase12)
+  if (do_timings) call psb_tic(idx_phase13)
 
   ! then the overlap index
   call psi_crea_index(cdesc,ovrlap_in, idx_out,nxch,nsnd,nrcv,info)
@@ -136,6 +159,9 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
     goto 9999
   end if
+  if (do_timings) call psb_toc(idx_phase13)
+  if (do_timings) call psb_toc(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase2)
 
 
   ! next  ovrlap_elem 
@@ -161,6 +187,8 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
     goto 9999
   end if
+  if (do_timings) call psb_toc(idx_phase2)
+  if (do_timings) call psb_tic(idx_phase3)
 
   ! finally bnd_elem
   call psi_crea_bnd_elem(idx_out,cdesc,info)
@@ -177,7 +205,8 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   if (debug_level>0) write(debug_unit,*) me,'Done crea_bnd_elem'
-
+  if (do_timings) call psb_toc(idx_phase3)
+    
   call psb_erractionrestore(err_act)
   return
 

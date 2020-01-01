@@ -30,20 +30,50 @@
 !   
 !   
 !
-! File: psi_fnd_owner.f90
 !
-! Subroutine: psi_fnd_owner
+! File: psi_graph_fnd_owner.f90
+!
+! Subroutine: psi_graph_fnd_owner
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                 Number of indices required on  the calling
-!                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
-!                                       Note: the indices should be unique!
+!                                       
 !    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
-!    desc_a   - type(psb_desc_type).    The communication descriptor.        
+!    idxmap   - class(psb_indx_map).    The index map
 !    info     - integer.                return code.
+!
+! This is the method to find out who owns a set of indices. 
+! In principle we could do the following:
+!   1. Do an allgatherv of IDX
+!   2. For each of the collected indices figure if current proces owns it
+!   3. Scatter the results
+!   4. Loop through the answers
+! This method is guaranteed to find the owner, unless an input index has
+! an invalid value, however it could easily require too much additional space
+! because each block of indices is replicated to all processes.
+! Therefore the current routine takes a different approach:
+! -1. Figure out a maximum size for a buffer to collect the IDX; the buffer
+!     should allow for at least one index from each process (i.e. min size NP); also
+!     check if we have an adjacency list of processes on input; 
+!  0. If the initial adjacency list is not empty, use psi_adj_fnd_sweep to go
+!     through all indices and use  multiple calls to psi_adjcncy_fnd_owner
+!     (up to the buffer size) to see if the owning processes are in the
+!     initial neighbours list;
+!  1. Extract a sample from IDX, up to the buffer size, and do a call
+!     to psi_a2a_fnd_owner. This is guaranteed to find the owners of all indices
+!     in the sample;
+!  2. Build the list of processes that own the sample indices; these are
+!     (a subset of) the topological neighbours, and store the list in IDXMAP
+!  3. Use psi_adj_fnd_sweep to go through all remaining indices and use
+!     multiple calls to psi_adjcncy_fnd_owner (up to the buffer size)
+!     to see if the owning processes are in the current neighbours list;
+!  4. If the input indices IDX have not been exhausted, cycle to 1.
+!
+!  Thus, we are alternating between asking all processes for a subset of indices, and
+!  asking a subset of processes for all the indices, thereby limiting the memory footprint to
+!  a predefined maximum (that the user can force with psb_cd_set_maxspace()).
 ! 
 subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
@@ -51,6 +81,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
+  use psb_timers_mod
   use psb_desc_mod, psb_protect_name => psi_graph_fnd_owner
 #ifdef MPI_MOD
   use mpi
@@ -75,8 +106,9 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
-  integer(psb_ipk_) :: tmpv(2)
-  logical, parameter  :: gettime=.false., trace=.false.
+  integer(psb_ipk_) :: tmpv(4)
+  logical, parameter  :: do_timings=.false., trace=.false.
+  integer(psb_ipk_), save  :: idx_sweep0=-1, idx_loop_a2a=-1, idx_loop_neigh=-1
   real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name
 
@@ -90,6 +122,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
   iictxt  = ictxt 
+  if ((do_timings).and.(idx_sweep0==-1))       &
+       & idx_sweep0 = psb_get_timer_idx("GRPH_FND_OWN: Outer sweep")
+  if ((do_timings).and.(idx_loop_a2a==-1))       &
+       & idx_loop_a2a = psb_get_timer_idx("GRPH_FND_OWN: Loop a2a")
+  if ((do_timings).and.(idx_loop_neigh==-1))       &
+       & idx_loop_neigh = psb_get_timer_idx("GRPH_FND_OWN: Loop neigh")
+
 
   call psb_info(ictxt, me, np)
 
@@ -104,17 +143,6 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
 
-  !
-  ! Choice of maxspace should be adjusted to account for a default
-  ! "sensible" size and/or a user-specified value
-  !
-  tmpv(1) = n_row
-  tmpv(2) = psb_cd_get_maxspace()
-  call psb_max(ictxt,tmpv)
-  locr_max = tmpv(1)
-  maxspace = min(nt*locr_max,tmpv(2))
-  maxspace = max(maxspace,np)
-  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',maxspace
   !
   !
   !
@@ -139,9 +167,21 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   n_rest    = nv - n_answers
   nrest_max = n_rest
 
+  !
+  ! Choice of maxspace should be adjusted to account for a default
+  ! "sensible" size and/or a user-specified value
+  !
   tmpv(1) = nadj
   tmpv(2) = nrest_max
+  tmpv(3) = n_row
+  tmpv(4) = psb_cd_get_maxspace()
   call psb_max(ictxt,tmpv)
+  locr_max = tmpv(3)
+  maxspace = nt*locr_max
+  if (tmpv(4) > 0) maxspace = min(maxspace,tmpv(4))
+  maxspace = max(maxspace,np)
+  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',maxspace
+  if (do_timings) call psb_tic(idx_sweep0)
   if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
     !
     ! Do a preliminary run on the user-defined adjacency lists
@@ -155,9 +195,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     call psb_max(ictxt,nrest_max)
     if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nrest_max
   end if
-
+  if (do_timings) call psb_toc(idx_sweep0)
     
   fnd_owner_loop: do while (nrest_max>0)
+    if (do_timings) call psb_tic(idx_loop_a2a)    
     !
     ! The basic idea of this loop is to alternate between
     ! searching through all processes and searching
@@ -168,6 +209,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !    
     ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
     nsampl_in = min(n_rest,max(1,(maxspace+np-1)/np))
+    !nsampl_in = min(n_rest,32)
     !
     ! Choose a sample, should it be done in this simplistic way?
     ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
@@ -195,7 +237,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ladj = tprc(1:nsampl_in)
     call psb_msort_unique(ladj,nadj)
     call psb_realloc(nadj,ladj,info)
-
+    if (do_timings) call psb_toc(idx_loop_a2a)
+    if (do_timings) call psb_tic(idx_loop_neigh)    
     !
     ! 4. Extract again a sample and do a neighbourhood search
     !    so that the total size is <= maxspace
@@ -215,6 +258,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     nrest_max = n_rest
     call psb_max(ictxt,nrest_max)
     if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nrest_max
+    if (do_timings) call psb_toc(idx_loop_neigh)    
   end do fnd_owner_loop
 
   call psb_erractionrestore(err_act)

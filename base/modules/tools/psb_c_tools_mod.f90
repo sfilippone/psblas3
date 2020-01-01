@@ -37,13 +37,12 @@ Module psb_c_tools_mod
   use psb_c_multivect_mod, only : psb_c_base_multivect_type, psb_c_multivect_type
 
   interface  psb_geall
-    subroutine psb_calloc_vect(x, desc_a,info,n)
+    subroutine psb_calloc_vect(x, desc_a,info)
       import
       implicit none
       type(psb_c_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_calloc_vect
     subroutine psb_calloc_vect_r2(x, desc_a,info,n,lb)
       import

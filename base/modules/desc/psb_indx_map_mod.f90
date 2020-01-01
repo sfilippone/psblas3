@@ -331,9 +331,40 @@ module psb_indx_map_mod
     end subroutine psi_symm_dep_list_norv    
   end interface psi_symm_dep_list
 
+  integer(psb_mpk_), parameter :: psi_adj_fnd_irecv_  = 0
+  integer(psb_mpk_), parameter :: psi_adj_fnd_a2av_   = 1
+  integer(psb_mpk_), parameter :: psi_adj_fnd_pbrcv_  = 2
+  integer(psb_mpk_), parameter :: psi_adj_alg_max_  = psi_adj_fnd_pbrcv_  
+  integer(psb_mpk_), save      :: psi_adj_alg = psi_adj_fnd_irecv_
+  
 contains
 
+  subroutine psi_set_adj_alg(ialg)
+    integer(psb_mpk_), intent(in) :: ialg
+    if ((ialg >=0) .and. (ialg <= psi_adj_alg_max_))&
+         & psi_adj_alg = ialg
+  end subroutine psi_set_adj_alg
 
+  function psi_get_adj_alg() result(val)
+    integer(psb_mpk_) :: val
+    val = psi_adj_alg
+  end function psi_get_adj_alg
+
+  function psi_get_adj_alg_fmt() result(val)
+    character(len=20) :: val
+    select case(psi_adj_alg)
+    case(psi_adj_fnd_a2av_)
+      val = 'MPI_A2AV'
+    case(psi_adj_fnd_irecv_)
+      val = 'MPI_ISEND/IRECV'
+    case(psi_adj_fnd_pbrcv_)
+      val = 'PSB_SND/RCV'
+    case default
+      val = 'Unknown ?'
+    end select
+  end function psi_get_adj_alg_fmt
+  
+  
   !> 
   !! \memberof psb_indx_map
   !! \brief  Print a descriptive name

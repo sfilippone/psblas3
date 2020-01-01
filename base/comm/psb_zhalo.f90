@@ -31,17 +31,17 @@
 !    
 ! File:  psb_zhalo.f90
 !
-! Subroutine: psb_zhalom
+! Subroutine: psb_zhalo_vect
 !   This subroutine performs the exchange of the halo elements in a 
-!    distributed dense matrix between all the processes.
+!    distributed vector between all the processes.
 !
 ! Arguments:
-!   x         -  complex,dimension(:,:).          The local part of the dense matrix.
+!   x         -  type(psb_z_vect_type)    The local part of the vector
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
-!   work      -  complex(optional).            Work  area.
+!   work      -  complex(optional).             Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
 !   data     - integer                 Which index list in desc_a should be used
@@ -52,7 +52,6 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-
 subroutine  psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_zhalo_vect
   use psi_mod
@@ -185,7 +184,28 @@ subroutine  psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
     return
 end subroutine psb_zhalo_vect
 
-
+!
+! Subroutine: psb_zhalo_multivect
+!   This subroutine performs the exchange of the halo elements in a 
+!    distributed multivector between all the processes.
+!
+! Arguments:
+!   x         -  type(psb_z_multivect_type)    The local part of the multivector
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
+!   info      -  integer.                      Return code
+!   jx        -  integer(optional).            The starting column of the global matrix. 
+!   ik        -  integer(optional).            The number of columns to gather. 
+!   work      -  complex(optional).             Work  area.
+!   tran      -  character(optional).          Transpose exchange.
+!   mode      -  integer(optional).            Communication mode (see Swapdata)
+!   data     - integer                 Which index list in desc_a should be used
+!                                      to retrieve rows, default psb_comm_halo_
+!                                       psb_comm_halo_    use halo_index
+!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ovrl_    use ovrl_index
+!                                       psb_comm_mov_     use ovr_mst_idx
+!
+!
 subroutine  psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_zhalo_multivect
   use psi_mod

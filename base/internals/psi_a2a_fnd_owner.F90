@@ -30,20 +30,22 @@
 !   
 !   
 !
-! File: psi_fnd_owner.f90
+! File: psi_a2a_fnd_owner.f90
 !
-! Subroutine: psi_fnd_owner
+! Subroutine: psi_a2a_fnd_owner
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                 Number of indices required on  the calling
-!                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
 !    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
-!    desc_a   - type(psb_desc_type).    The communication descriptor.        
+!    idxmap   - class(psb_indx_map).    The index map
 !    info     - integer.                return code.
+!
+! This version does not assume any prior knowledge about the process topology,
+! so it goes for an all-to-all by building an auxiliary neighbours list and
+! reusing the neighbour version.
 ! 
 subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
@@ -99,7 +101,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   end if
 
   !
-  ! Reuse the other version by tricking it with an adjcncy list
+  ! Reuse the adjcncy version by tricking it with an adjcncy list
   ! that contains everybody but ME. 
   !
   nv = size(idx)

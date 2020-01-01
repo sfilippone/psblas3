@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Contents</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 91--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse1.html" >next</a>] [<a 
+href="#tailuserhtmlli1.html">tail</a>] [<a 
+href="userhtml.html#userhtmlli1.html" >up</a>] </p></div>
+   <h3 class="likesectionHead"><a 
+ id="x2-1000"></a>Contents</h3>
+   <div class="tableofcontents">
+   <span class="sectionToc" >1 <a 
+href="userhtmlse1.html#x3-20001">Introduction</a></span>
+<br />   <span class="sectionToc" >2 <a 
+href="userhtmlse2.html#x4-30002">General overview</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.1 <a 
+href="userhtmlsu1.html#x6-40002.1">Basic Nomenclature</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.2 <a 
+href="userhtmlsu2.html#x8-50002.2">Library contents</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.3 <a 
+href="userhtmlsu3.html#x9-60002.3">Application structure</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >2.3.1 <a 
+href="userhtmlsu3.html#x9-70002.3.1" id="QQ2-9-9">User-defined index mappings</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.4 <a 
+href="userhtmlsu4.html#x11-80002.4">Programming model</a></span>
+<br />   <span class="sectionToc" >3 <a 
+href="userhtmlse3.html#x12-90003">Data Structures and Classes</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.1 <a 
+href="userhtmlsu5.html#x13-100003.1">Descriptor data structure</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.1 <a 
+href="userhtmlsu5.html#x13-110003.1.1" id="QQ2-13-14">Descriptor Methods</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.2 <a 
+href="userhtmlsu5.html#x13-120003.1.2" id="QQ2-13-15">get_local_rows &#8212; Get number of local rows</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.3 <a 
+href="userhtmlsu5.html#x13-130003.1.3" id="QQ2-13-16">get_local_cols &#8212; Get number of local cols</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.4 <a 
+href="userhtmlsu5.html#x13-140003.1.4" id="QQ2-13-17">get_global_rows &#8212; Get number of global rows</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.5 <a 
+href="userhtmlsu5.html#x13-150003.1.5" id="QQ2-13-18">get_global_cols &#8212; Get number of global cols</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.6 <a 
+href="userhtmlsu5.html#x13-160003.1.6" id="QQ2-13-19">get_global_indices &#8212; Get vector of global indices</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.7 <a 
+href="userhtmlsu5.html#x13-170003.1.7" id="QQ2-13-20">get_context &#8212; Get communication context</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.8 <a 
+href="userhtmlsu5.html#x13-180003.1.8" id="QQ2-13-21">Clone &#8212; clone current object</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.9 <a 
+href="userhtmlsu5.html#x13-190003.1.9" id="QQ2-13-22">CNV &#8212; convert internal storage format</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.10 <a 
+href="userhtmlsu5.html#x13-200003.1.10" id="QQ2-13-23">psb_cd_get_large_threshold &#8212; Get threshold for index mapping switch</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.11 <a 
+href="userhtmlsu5.html#x13-210003.1.11" id="QQ2-13-24">psb_cd_set_large_threshold &#8212; Set threshold for index mapping switch</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.12 <a 
+href="userhtmlsu5.html#x13-220003.1.12" id="QQ2-13-25">get_p_adjcncy &#8212; Get process adjacency list</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.13 <a 
+href="userhtmlsu5.html#x13-230003.1.13" id="QQ2-13-26">set_p_adjcncy &#8212; Set process adjacency list</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.14 <a 
+href="userhtmlsu5.html#x13-240003.1.14" id="QQ2-13-27">fnd_owner &#8212; Find the owner process of a set of indices</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.15 <a 
+href="userhtmlsu5.html#x13-250003.1.15" id="QQ2-13-28">Named Constants</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.2 <a 
+href="userhtmlsu6.html#x14-260003.2">Sparse Matrix class</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.1 <a 
+href="userhtmlsu6.html#x14-270003.2.1" id="QQ2-14-31">Sparse Matrix Methods</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.2 <a 
+href="userhtmlsu6.html#x14-280003.2.2" id="QQ2-14-32">get_nrows &#8212; Get number of rows in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.3 <a 
+href="userhtmlsu6.html#x14-290003.2.3" id="QQ2-14-33">get_ncols &#8212; Get number of columns in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.4 <a 
+href="userhtmlsu6.html#x14-300003.2.4" id="QQ2-14-34">get_nnzeros &#8212; Get number of nonzero elements in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.5 <a 
+href="userhtmlsu6.html#x14-310003.2.5" id="QQ2-14-35">get_size &#8212; Get maximum number of nonzero elements in a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.6 <a 
+href="userhtmlsu6.html#x14-320003.2.6" id="QQ2-14-36">sizeof &#8212; Get memory occupation in bytes of a sparse matrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.7 <a 
+href="userhtmlsu6.html#x14-330003.2.7" id="QQ2-14-37">get_fmt &#8212; Short description of the dynamic type</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.8 <a 
+href="userhtmlsu6.html#x14-340003.2.8" id="QQ2-14-38">is_bld, is_upd, is_asb &#8212; Status check</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.9 <a 
+href="userhtmlsu6.html#x14-350003.2.9" id="QQ2-14-39">is_lower, is_upper, is_triangle, is_unit &#8212; Format check</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.10 <a 
+href="userhtmlsu6.html#x14-360003.2.10" id="QQ2-14-40">cscnv &#8212; Convert to a different storage format</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.11 <a 
+href="userhtmlsu6.html#x14-370003.2.11" id="QQ2-14-41">csclip &#8212; Reduce to a submatrix</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.12 <a 
+href="userhtmlsu6.html#x14-380003.2.12" id="QQ2-14-42">clean_zeros &#8212; Eliminate zero coefficients</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.13 <a 
+href="userhtmlsu6.html#x14-390003.2.13" id="QQ2-14-43">get_diag &#8212; Get main diagonal</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.14 <a 
+href="userhtmlsu6.html#x14-400003.2.14" id="QQ2-14-44">clip_diag &#8212; Cut out main diagonal</a></span>
+                                                                  
+
+                                                                  
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.15 <a 
+href="userhtmlsu6.html#x14-410003.2.15" id="QQ2-14-45">tril &#8212; Return the lower triangle</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.16 <a 
+href="userhtmlsu6.html#x14-420003.2.16" id="QQ2-14-46">triu &#8212; Return the upper triangle</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.17 <a 
+href="userhtmlsu6.html#x14-430003.2.17" id="QQ2-14-47">psb_set_mat_default &#8212; Set default storage format</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.18 <a 
+href="userhtmlsu6.html#x14-440003.2.18" id="QQ2-14-48">clone &#8212; Clone current object</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.19 <a 
+href="userhtmlsu6.html#x14-450003.2.19" id="QQ2-14-49">Named Constants</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.3 <a 
+href="userhtmlsu7.html#x15-460003.3">Dense Vector Data Structure</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.1 <a 
+href="userhtmlsu7.html#x15-470003.3.1" id="QQ2-15-52">Vector Methods</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.2 <a 
+href="userhtmlsu7.html#x15-480003.3.2" id="QQ2-15-53">get_nrows &#8212; Get number of rows in a dense vector</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.3 <a 
+href="userhtmlsu7.html#x15-490003.3.3" id="QQ2-15-54">sizeof &#8212; Get memory occupation in bytes of a dense vector</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.4 <a 
+href="userhtmlsu7.html#x15-500003.3.4" id="QQ2-15-55">set &#8212; Set contents of the vector</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.5 <a 
+href="userhtmlsu7.html#x15-510003.3.5" id="QQ2-15-56">get_vect &#8212; Get a copy of the vector contents</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.6 <a 
+href="userhtmlsu7.html#x15-520003.3.6" id="QQ2-15-57">clone &#8212; Clone current object</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.4 <a 
+href="userhtmlsu8.html#x16-530003.4">Preconditioner data structure</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.5 <a 
+href="userhtmlsu9.html#x17-540003.5">Heap data structure</a></span>
+<br />   <span class="sectionToc" >4 <a 
+href="userhtmlse4.html#x18-550004">Computational routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.1 <a 
+href="userhtmlsu10.html#x19-560004.1">psb_geaxpby &#8212; General Dense Matrix Sum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.2 <a 
+href="userhtmlsu11.html#x20-570004.2">psb_gedot &#8212; Dot Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.3 <a 
+href="userhtmlsu12.html#x21-580004.3">psb_gedots &#8212; Generalized Dot Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.4 <a 
+href="userhtmlsu13.html#x22-590004.4">psb_normi &#8212; Infinity-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.5 <a 
+href="userhtmlsu14.html#x23-600004.5">psb_geamaxs &#8212; Generalized Infinity Norm</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.6 <a 
+href="userhtmlsu15.html#x24-610004.6">psb_norm1 &#8212; 1-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.7 <a 
+href="userhtmlsu16.html#x25-620004.7">psb_geasums &#8212; Generalized 1-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.8 <a 
+href="userhtmlsu17.html#x26-630004.8">psb_norm2 &#8212; 2-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.9 <a 
+href="userhtmlsu18.html#x27-640004.9">psb_genrm2s &#8212; Generalized 2-Norm of Vector</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.10 <a 
+href="userhtmlsu19.html#x28-650004.10">psb_norm1 &#8212; 1-Norm of Sparse Matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.11 <a 
+href="userhtmlsu20.html#x29-660004.11">psb_normi &#8212; Infinity Norm of Sparse Matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.12 <a 
+href="userhtmlsu21.html#x30-670004.12">psb_spmm &#8212; Sparse Matrix by Dense Matrix Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.13 <a 
+href="userhtmlsu22.html#x31-680004.13">psb_spsm &#8212; Triangular System Solve</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.14 <a 
+href="userhtmlsu23.html#x32-690004.14">psb_gemlt &#8212; Entrywise Product</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.15 <a 
+href="userhtmlsu24.html#x33-700004.15">psb_gediv &#8212; Entrywise Division</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.16 <a 
+href="userhtmlsu25.html#x34-710004.16">psb_geinv &#8212; Entrywise Inversion</a></span>
+<br />   <span class="sectionToc" >5 <a 
+href="userhtmlse5.html#x35-720005">Communication routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.1 <a 
+href="userhtmlsu26.html#x36-730005.1">psb_halo &#8212; Halo Data Communication</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.2 <a 
+href="userhtmlsu27.html#x37-740005.2">psb_ovrl &#8212; Overlap Update</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.3 <a 
+href="userhtmlsu28.html#x38-750005.3">psb_gather &#8212; Gather Global Dense Matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.4 <a 
+href="userhtmlsu29.html#x39-760005.4">psb_scatter &#8212; Scatter Global Dense Matrix</a></span>
+<br />   <span class="sectionToc" >6 <a 
+href="userhtmlse6.html#x40-770006">Data management routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.1 <a 
+href="userhtmlsu30.html#x41-780006.1">psb_cdall &#8212; Allocates a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.2 <a 
+href="userhtmlsu31.html#x42-790006.2">psb_cdins &#8212; Communication descriptor insert routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.3 <a 
+href="userhtmlsu32.html#x43-800006.3">psb_cdasb &#8212; Communication descriptor assembly routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.4 <a 
+href="userhtmlsu33.html#x44-810006.4">psb_cdcpy &#8212; Copies a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.5 <a 
+href="userhtmlsu34.html#x45-820006.5">psb_cdfree &#8212; Frees a communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.6 <a 
+href="userhtmlsu35.html#x46-830006.6">psb_cdbldext &#8212; Build an extended communication descriptor</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.7 <a 
+href="userhtmlsu36.html#x47-840006.7">psb_spall &#8212; Allocates a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.8 <a 
+href="userhtmlsu37.html#x48-850006.8">psb_spins &#8212; Insert a set of coefficients into a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.9 <a 
+href="userhtmlsu38.html#x49-860006.9">psb_spasb &#8212; Sparse matrix assembly routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.10 <a 
+href="userhtmlsu39.html#x50-870006.10">psb_spfree &#8212; Frees a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.11 <a 
+href="userhtmlsu40.html#x51-880006.11">psb_sprn &#8212; Reinit sparse matrix structure for psblas routines.</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.12 <a 
+href="userhtmlsu41.html#x52-890006.12">psb_geall &#8212; Allocates a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.13 <a 
+href="userhtmlsu42.html#x53-900006.13">psb_geins &#8212; Dense matrix insertion routine</a></span>
+                                                                  
+
+                                                                  
+<br />   &#x00A0;<span class="subsectionToc" >6.14 <a 
+href="userhtmlsu43.html#x54-910006.14">psb_geasb &#8212; Assembly a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.15 <a 
+href="userhtmlsu44.html#x55-920006.15">psb_gefree &#8212; Frees a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.16 <a 
+href="userhtmlsu45.html#x56-930006.16">psb_gelp &#8212; Applies a left permutation to a dense matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.17 <a 
+href="userhtmlsu46.html#x57-940006.17">psb_glob_to_loc &#8212; Global to local indices convertion</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.18 <a 
+href="userhtmlsu47.html#x58-950006.18">psb_loc_to_glob &#8212; Local to global indices conversion</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.19 <a 
+href="userhtmlsu48.html#x59-960006.19">psb_is_owned &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.20 <a 
+href="userhtmlsu49.html#x60-970006.20">psb_owned_index &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.21 <a 
+href="userhtmlsu50.html#x61-980006.21">psb_is_local &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.22 <a 
+href="userhtmlsu51.html#x62-990006.22">psb_local_index &#8212; </a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.23 <a 
+href="userhtmlsu52.html#x63-1000006.23">psb_get_boundary &#8212; Extract list of boundary elements</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.24 <a 
+href="userhtmlsu53.html#x64-1010006.24">psb_get_overlap &#8212; Extract list of overlap elements</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.25 <a 
+href="userhtmlsu54.html#x65-1020006.25">psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.26 <a 
+href="userhtmlsu55.html#x66-1030006.26">psb_sizeof &#8212; Memory occupation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.27 <a 
+href="userhtmlsu56.html#x67-1040006.27">Sorting utilities &#8212; </a></span>
+<br />   <span class="sectionToc" >7 <a 
+href="userhtmlse7.html#x68-1050007">Parallel environment routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.1 <a 
+href="userhtmlsu57.html#x69-1060007.1">psb_init &#8212; Initializes PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.2 <a 
+href="userhtmlsu58.html#x70-1070007.2">psb_info &#8212; Return information about PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.3 <a 
+href="userhtmlsu59.html#x71-1080007.3">psb_exit &#8212; Exit from PSBLAS parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.4 <a 
+href="userhtmlsu60.html#x72-1090007.4">psb_get_mpi_comm &#8212; Get the MPI communicator</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.5 <a 
+href="userhtmlsu61.html#x73-1100007.5">psb_get_mpi_rank &#8212; Get the MPI rank</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.6 <a 
+href="userhtmlsu62.html#x74-1110007.6">psb_wtime &#8212; Wall clock timing</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.7 <a 
+href="userhtmlsu63.html#x75-1120007.7">psb_barrier &#8212; Sinchronization point parallel environment</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.8 <a 
+href="userhtmlsu64.html#x76-1130007.8">psb_abort &#8212; Abort a computation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.9 <a 
+href="userhtmlsu65.html#x77-1140007.9">psb_bcast &#8212; Broadcast data</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.10 <a 
+href="userhtmlsu66.html#x78-1150007.10">psb_sum &#8212; Global sum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.11 <a 
+href="userhtmlsu67.html#x79-1160007.11">psb_max &#8212; Global maximum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.12 <a 
+href="userhtmlsu68.html#x80-1170007.12">psb_min &#8212; Global minimum</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.13 <a 
+href="userhtmlsu69.html#x81-1180007.13">psb_amx &#8212; Global maximum absolute value</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.14 <a 
+href="userhtmlsu70.html#x82-1190007.14">psb_amn &#8212; Global minimum absolute value</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.15 <a 
+href="userhtmlsu71.html#x83-1200007.15">psb_nrm2 &#8212; Global 2-norm reduction</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.16 <a 
+href="userhtmlsu72.html#x84-1210007.16">psb_snd &#8212; Send data</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >7.17 <a 
+href="userhtmlsu73.html#x85-1220007.17">psb_rcv &#8212; Receive data</a></span>
+<br />   <span class="sectionToc" >8 <a 
+href="userhtmlse8.html#x86-1230008">Error handling</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.1 <a 
+href="userhtmlsu74.html#x87-1240008.1">psb_errpush &#8212; Pushes an error code onto the error stack</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.2 <a 
+href="userhtmlsu75.html#x88-1250008.2">psb_error &#8212; Prints the error stack content and aborts execution</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.3 <a 
+href="userhtmlsu76.html#x89-1260008.3">psb_set_errverbosity &#8212; Sets the verbosity of error messages</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >8.4 <a 
+href="userhtmlsu77.html#x90-1270008.4">psb_set_erraction &#8212; Set the type of action to be taken upon error condition</a></span>
+<br />   <span class="sectionToc" >9 <a 
+href="userhtmlse9.html#x91-1280009">Utilities</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.1 <a 
+href="userhtmlsu78.html#x92-1290009.1"> hb_read &#8212; Read a sparse matrix from a file in the Harwell&#8211;Boeing format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.2 <a 
+href="userhtmlsu79.html#x93-1300009.2">hb_write &#8212; Write a sparse matrix to a file in the Harwell&#8211;Boeing format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.3 <a 
+href="userhtmlsu80.html#x94-1310009.3">mm_mat_read &#8212; Read a sparse matrix from a file in the MatrixMarket format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.4 <a 
+href="userhtmlsu81.html#x95-1320009.4">mm_array_read &#8212; Read a dense array from a file in the MatrixMarket format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.5 <a 
+href="userhtmlsu82.html#x96-1330009.5">mm_mat_write &#8212; Write a sparse matrix to a file in the MatrixMarket format</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >9.6 <a 
+href="userhtmlsu83.html#x97-1340009.6">mm_array_write &#8212; Write a dense array from a file in the MatrixMarket format</a></span>
+<br />   <span class="sectionToc" >10 <a 
+href="userhtmlse10.html#x98-13500010">Preconditioner routines</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.1 <a 
+href="userhtmlsu84.html#x99-13600010.1">init &#8212; Initialize a preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.2 <a 
+href="userhtmlsu85.html#x101-13700010.2">build &#8212; Builds a preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.3 <a 
+href="userhtmlsu86.html#x102-13800010.3">apply &#8212; Preconditioner application routine</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.4 <a 
+href="userhtmlsu87.html#x103-13900010.4">descr &#8212; Prints a description of current preconditioner</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >10.5 <a 
+href="userhtmlsu88.html#x104-14000010.5">clone &#8212; clone current preconditioner</a></span>
+                                                                  
+
+                                                                  
+<br />   &#x00A0;<span class="subsectionToc" >10.6 <a 
+href="userhtmlsu89.html#x105-14100010.6">free &#8212; Free a preconditioner</a></span>
+<br />   <span class="sectionToc" >11 <a 
+href="userhtmlse11.html#x106-14200011">Iterative Methods</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >11.1 <a 
+href="userhtmlsu90.html#x107-14300011.1">psb_krylov &#8212; Krylov Methods Driver Routine</a></span>
+   </div>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse1.html" >next</a>] [<a 
+href="userhtmlli1.html" >front</a>] [<a 
+href="userhtml.html#userhtmlli1.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >   <a 
+ id="tailuserhtmlli1.html"></a> 
+</body></html> 

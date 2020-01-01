@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>psb_spasb &#8212; Sparse matrix assembly routine</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 724--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu42.html" >next</a>] [<a 
+href="userhtmlsu37.html" >prev</a>] [<a 
+href="userhtmlsu37.html#tailuserhtmlsu37.html" >prev-tail</a>] [<a 
+href="userhtmlsu35.html#tailuserhtmlsu38.html">tail</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu41.html" >up</a>] </p></div>
+   <h4 class="subsectionHead"><span class="titlemark">6.9   </span> <a 
+ id="x49-860006.9"></a>psb_spasb &#8212; Sparse matrix assembly routine</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-65">
+call&#x00A0;psb_spasb(a,&#x00A0;desc_a,&#x00A0;info,&#x00A0;afmt,&#x00A0;upd,&#x00A0;dupl,&#x00A0;mold)
+</div>
+<!--l. 728--><p class="nopar" >
+<!--l. 730--><p class="indent" >
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">Synchronous.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu5.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">afmt</span> </dt><dd 
+class="description">the storage format for the sparse matrix.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an array of characters. Defalt: &#8217;CSR&#8217;.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">upd</span> </dt><dd 
+class="description">Provide for updates to the matrix coefficients.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integer, possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_upd_srch_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_upd_perm_</span></span></span>
+     </dd><dt class="description">
+<span 
+class="cmbx-10">dupl</span> </dt><dd 
+class="description">How to handle duplicate coefficients.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integer, possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_ovwrt_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_add_</span></span></span>,
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_err_</span></span></span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">The desired dynamic type for the internal matrix storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="spbasedata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_sparse</span><span 
+class="cmtt-10">_mat</span></a>.</dd></dl>
+<!--l. 761--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     </dd><dt class="description">
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">the matrix to be assembled.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlsu6.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 775--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x49-86002x1">On entry to this routine the descriptor must be in the assembled state,
+     i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span> must already have been called.
+     </li>
+     <li 
+  class="enumerate" id="x49-86004x2">The sparse matrix may be in either the build or update state;
+     </li>
+     <li 
+  class="enumerate" id="x49-86006x3">Duplicate entries are detected and handled in both build and update state,
+     with the exception of the error action that is only taken in the build state,
+     i.e. on the first assembly;
+     </li>
+     <li 
+  class="enumerate" id="x49-86008x4">If the update choice is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_upd_perm_</span></span></span>, then subsequent calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span>
+     to update the matrix must be arranged in such a way as to produce exactly
+     the same sequence of coefficient values as encountered at the first assembly;
+     </li>
+     <li 
+  class="enumerate" id="x49-86010x5">The output storage format need not be the same on all processes;
+     </li>
+     <li 
+  class="enumerate" id="x49-86012x6">On exit from this routine the matrix is in the assembled state, and thus
+     is suitable for the computational routines.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 832--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlsu42.html" >next</a>] [<a 
+href="userhtmlsu37.html" >prev</a>] [<a 
+href="userhtmlsu37.html#tailuserhtmlsu37.html" >prev-tail</a>] [<a 
+href="userhtmlsu38.html" >front</a>] [<a 
+href="userhtmlsu32.html#userhtmlsu41.html" >up</a>] </p></div>
+<!--l. 832--><p class="indent" >   <a 
+ id="tailuserhtmlsu38.html"></a>  
+</body></html> 
