@@ -29,7 +29,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-!!$  
+! 
 !
 !
 ! package: psb_indx_map_mod
@@ -278,13 +278,14 @@ module psb_indx_map_mod
   end interface
 
   interface 
-    subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in)      :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in)    :: idxmap
       integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: samesize
     end subroutine psi_a2a_fnd_owner
   end interface
 
@@ -311,6 +312,25 @@ module psb_indx_map_mod
     end subroutine psi_graph_fnd_owner
   end interface
 
+  interface psb_cd_set_maxspace
+    module procedure  psb_cd_set_maxspace
+  end interface psb_cd_set_maxspace
+
+  interface psb_cd_get_maxspace
+    module procedure  psb_cd_get_maxspace
+  end interface psb_cd_get_maxspace
+
+  interface psb_cd_set_samplesize
+    module procedure  psb_cd_set_samplesize
+  end interface psb_cd_set_samplesize
+
+  interface psb_cd_get_samplesize
+    module procedure  psb_cd_get_samplesize
+  end interface psb_cd_get_samplesize
+
+  integer(psb_ipk_), private, save :: cd_maxspace   = -1
+  integer(psb_ipk_), private, save :: samplesize    = 32
+  
   integer, parameter :: psi_symm_flag_norv_ = 0
   integer, parameter :: psi_symm_flag_inrv_ = 1
   interface psi_symm_dep_list
@@ -363,7 +383,36 @@ contains
       val = 'Unknown ?'
     end select
   end function psi_get_adj_alg_fmt
-  
+
+  subroutine psb_cd_set_maxspace(ith)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
+    if (ith > 0) then 
+      cd_maxspace = ith
+    end if
+  end subroutine psb_cd_set_maxspace
+
+  function  psb_cd_get_maxspace() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = cd_maxspace
+  end function psb_cd_get_maxspace
+ 
+
+  subroutine psb_cd_set_samplesize(ith)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
+    if (ith > 0) then 
+      samplesize = ith
+    end if
+  end subroutine psb_cd_set_samplesize
+
+  function  psb_cd_get_samplesize() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = samplesize
+  end function psb_cd_get_samplesize
+ 
   
   !> 
   !! \memberof psb_indx_map

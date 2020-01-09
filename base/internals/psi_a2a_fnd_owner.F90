@@ -47,7 +47,7 @@
 ! so it goes for an all-to-all by building an auxiliary neighbours list and
 ! reusing the neighbour version.
 ! 
-subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
+subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -66,16 +66,22 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out)  :: info
+  logical, intent(in), optional   :: samesize
 
 
   integer(psb_ipk_), allocatable :: tmpadj(:)
-  integer(psb_mpk_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,nv
+  integer(psb_lpk_), allocatable :: rmtidx(:)
+  integer(psb_ipk_), allocatable :: tproc(:), lclidx(:)
+  integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
+       & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
+  integer(psb_mpk_) :: icomm, minfo, iictxt,nv
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,gsz
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter :: use_psi_adj=.true.
   real(psb_dpk_)     :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)  :: name
+  logical            :: samesize_
 
   info = psb_success_
   name = 'psi_a2a_fnd_owner'
@@ -101,22 +107,94 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
 
+  if (present(samesize)) then
+    samesize_ = samesize
+  else
+    samesize_ = .false.
+  end if
+  nv = size(idx)
+  ! write(0,*) me,name,' :',use_psi_adj,samesize_,nv
   if (use_psi_adj) then 
     !
     ! Reuse the adjcncy version by tricking it with an adjcncy list
     ! that contains everybody but ME. 
     !
-    nv = size(idx)
     call psb_realloc(np-1,tmpadj,info)
     tmpadj(1:me) = [(i,i=0,me-1)]
     tmpadj(me+1:np-1) = [(i,i=me+1,np-1)]
     call  psi_adjcncy_fnd_owner(idx,iprc,tmpadj,idxmap,info)
+
   else
-    !
-    ! 1. allgetherv
-    ! 2. local conversion
-    ! 3. reduce_scatter
-    !
+    if (samesize_) then
+      !
+      ! Variant when IDX is guaranteed to have the same size on all
+      ! processes. To be tested for performance: is it worth it?
+      ! Probably yes. 
+      !
+      gsz = nv*np
+      Allocate(rmtidx(gsz),lclidx(gsz),iprc(nv),stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
+      end if
+      call mpi_allgather(idx,nv,psb_mpi_lpk_,rmtidx,nv,psb_mpi_lpk_,icomm,minfo)
+      call idxmap%g2l(rmtidx(1:gsz),lclidx(1:gsz),info,owned=.true.)
+      !
+      ! Reuse lclidx to encode owning process
+      !
+      do i=1, gsz
+        if ((1<=lclidx(i)).and.(lclidx(i)<=n_row)) then
+          lclidx(i) = me
+        else
+          lclidx(i) = -1
+        end if
+      end do
+      call mpi_reduce_scatter_block(lclidx,iprc,nv,psb_mpi_ipk_,mpi_max,icomm,minfo)
+      
+    else
+      !
+      ! 1. allgetherv
+      ! 2. local conversion
+      ! 3. reduce_scatter
+      !
+      !
+      ! The basic idea is very simple. 
+      ! First we collect (to all) all the requests. 
+      Allocate(hidx(np+1),hsz(np),stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
+        goto 9999      
+      end if
+
+      call mpi_allgather(nv,1,psb_mpi_mpk_,hsz,1,psb_mpi_mpk_,icomm,minfo)
+      hidx(1)   = 0
+      do i=1, np
+        hidx(i+1) = hidx(i) + hsz(i)
+      end do
+      gsz = hidx(np+1)
+      Allocate(rmtidx(gsz),lclidx(gsz),iprc(nv),stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
+      end if
+
+      call mpi_allgatherv(idx,hsz(me+1),psb_mpi_lpk_,&
+           & rmtidx,hsz,hidx,psb_mpi_lpk_,&
+           & icomm,minfo)
+
+      call idxmap%g2l(rmtidx(1:gsz),lclidx(1:gsz),info,owned=.true.)
+      !
+      ! Reuse lclidx to encode owning process
+      !
+      do i=1, gsz
+        if ((1<=lclidx(i)).and.(lclidx(i)<=n_row)) then
+          lclidx(i) = me
+        else
+          lclidx(i) = -1
+        end if
+      end do
+      call mpi_reduce_scatter(lclidx,iprc,hsz,psb_mpi_ipk_,mpi_max,icomm,minfo)
+    end if
   end if
 
   call psb_erractionrestore(err_act)
