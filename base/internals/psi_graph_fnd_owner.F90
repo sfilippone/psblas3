@@ -197,11 +197,11 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     nreqst     = nv - n_answers
     nreqst_max = nreqst
     call psb_max(ictxt,nreqst_max)
-    if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nrest_max
+    if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nreqst_max
   end if
   if (do_timings) call psb_toc(idx_sweep0)
     
-  fnd_owner_loop: do while (nrest_max>0)
+  fnd_owner_loop: do while (nreqst_max>0)
     if (do_timings) call psb_tic(idx_loop_a2a)    
     !
     ! The basic idea of this loop is to alternate between
@@ -211,7 +211,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! 1. Select a sample such that the total size is <= maxspace
     !    sample query is then sent to all processes
     !    
-    ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nrest_max
+    ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nreqst_max
     nsampl_in = psb_cd_get_samplesize()
     nsampl_in = min(max(1,(maxspace+np-1)/np),nsampl_in)
     !
@@ -262,10 +262,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
 
-    nreqst    = nv - n_answers
-    nrest_max = nreqst
-    call psb_max(ictxt,nrest_max)
-    if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nrest_max
+    nreqst     = nv - n_answers
+    nreqst_max = nreqst
+    call psb_max(ictxt,nreqst_max)
+    if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nreqst_max
     if (do_timings) call psb_toc(idx_loop_neigh)    
   end do fnd_owner_loop
 
