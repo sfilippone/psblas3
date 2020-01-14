@@ -121,24 +121,41 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
-    if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
+    if ((root_ == -1).or.(root_ == me)) then  
+      if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
+    else
+      if (info == psb_success_) call glob_coo%allocate(1,1,1)
+    end if
     if (info /= psb_success_) goto 9999
     do ip=1,np
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
     ndx = nzbr(me+1) 
-    call mpi_allgatherv(loc_coo%val,ndx,psb_mpi_c_dpk_,&
-         & glob_coo%val,nzbr,idisp,&
-         & psb_mpi_c_dpk_,icomm,minfo)
-    if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
-         & glob_coo%ia,nzbr,idisp,&
-         & psb_mpi_ipk_integer,icomm,minfo)
-    if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
-         & glob_coo%ja,nzbr,idisp,&
-         & psb_mpi_ipk_integer,icomm,minfo)
-    
+    if (root_ == -1) then 
+      call mpi_allgatherv(loc_coo%val,ndx,psb_mpi_c_dpk_,&
+           & glob_coo%val,nzbr,idisp,&
+           & psb_mpi_c_dpk_,icomm,minfo)
+      if (minfo == psb_success_) call &
+           & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
+           & glob_coo%ia,nzbr,idisp,&
+           & psb_mpi_ipk_integer,icomm,minfo)
+      if (minfo == psb_success_) call &
+           & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
+           & glob_coo%ja,nzbr,idisp,&
+           & psb_mpi_ipk_integer,icomm,minfo)
+    else
+      call mpi_gatherv(loc_coo%val,ndx,psb_mpi_c_dpk_,&
+           & glob_coo%val,nzbr,idisp,&
+           & psb_mpi_c_dpk_,root_,icomm,minfo)
+      if (minfo == psb_success_) call &
+           & mpi_gatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
+           & glob_coo%ia,nzbr,idisp,&
+           & psb_mpi_ipk_integer,root_,icomm,minfo)
+      if (minfo == psb_success_) call &
+           & mpi_gatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
+           & glob_coo%ja,nzbr,idisp,&
+           & psb_mpi_ipk_integer,root_,icomm,minfo)
+    end if
     if (minfo /= psb_success_) then 
       info  = minfo
       call psb_errpush(psb_err_internal_error_,name,a_err=' from mpi_allgatherv')
@@ -146,9 +163,11 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     end if
     
     call loc_coo%free()
-    call glob_coo%set_nzeros(nzg)
-    if (present(dupl)) call glob_coo%set_dupl(dupl)
-    call globa%mv_from(glob_coo)
+    if ((root_ == -1).or.(root_ == me)) then  
+      call glob_coo%set_nzeros(nzg)
+      if (present(dupl)) call glob_coo%set_dupl(dupl)
+      call globa%mv_from(glob_coo)
+    end if
 
   else
     write(psb_err_unit,*) 'SP_ALLGATHER: Not implemented yet with keepnum ',keepnum_
