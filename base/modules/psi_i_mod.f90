@@ -101,7 +101,6 @@ module psi_i_mod
     subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
          & length_dl,dl_lda,mode,info)
       import 
-      implicit none 
       logical,  intent(in)           :: is_bld, is_upd
       integer(psb_ipk_), intent(in)  :: ictxt,mode
       integer(psb_ipk_), intent(out) :: dl_lda
