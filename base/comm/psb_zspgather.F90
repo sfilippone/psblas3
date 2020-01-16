@@ -53,7 +53,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   !
   type(psb_z_coo_sparse_mat)   :: loc_coo, glob_coo
   type(psb_desc_type), pointer   :: p_desc_c
-  
+
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
@@ -93,7 +93,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   else
     root_ = -1 
   end if
-    
+
   call globa%free()
 
   if (keepnum_) then 
@@ -108,7 +108,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       goto 9999      
     end if
 
-    
+
     if (keeploc_) then
       call loca%cp_to(loc_coo)
     else
@@ -161,7 +161,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       call psb_errpush(psb_err_internal_error_,name,a_err=' from mpi_allgatherv')
       goto 9999
     end if
-    
+
     call loc_coo%free()
     if ((root_ == -1).or.(root_ == me)) then  
       call glob_coo%set_nzeros(nzg)
@@ -185,5 +185,5 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   call psb_error_handler(ione*ictxt,err_act)
 
   return
- 
+
 end subroutine psb_zsp_allgather
