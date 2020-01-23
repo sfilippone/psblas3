@@ -31,6 +31,7 @@
 !    
 module psi_c_collective_mod
   use psi_penv_mod
+  use psi_comm_buffers_mod
 
 
   interface psb_sum
@@ -65,6 +66,10 @@ module psi_c_collective_mod
   interface psb_simple_a2av
     module procedure psb_c_simple_a2av
   end interface psb_simple_a2av
+
+  interface psb_triad_a2av
+    module procedure psb_c_e_triad_a2av, psb_c_m_triad_a2av
+  end interface psb_triad_a2av
 
 
 contains 
@@ -895,6 +900,172 @@ contains
     end do
 
   end subroutine psb_c_simple_a2av
+
+  subroutine psb_c_m_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & valrcv,iarcv,jarcv,rvsz,brvindx,ictxt,info)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    complex(psb_spk_), intent(in)  :: valsnd(:)
+    integer(psb_mpk_), intent(in)  :: iasnd(:), jasnd(:)
+    complex(psb_spk_), intent(out) :: valrcv(:)
+    integer(psb_mpk_), intent(out) :: iarcv(:), jarcv(:)
+    integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(out) :: info
+
+    !Local variables
+    integer(psb_ipk_)  :: iam, np, i,j,k, ip, ipx, idx, sz, counter
+    integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret, icomm
+    integer(psb_mpk_), allocatable :: prcid(:), rvhd(:,:)
+
+    call psb_info(ictxt,iam,np)
+
+    icomm = psb_get_mpi_comm(ictxt)
+
+    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
+      info = psb_err_internal_error_
+      return
+    end if
+    allocate(prcid(np),rvhd(np,3))
+    prcid = -1
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        prcid(ip+1) = psb_get_mpi_rank(ictxt,ip)
+        idx = brvindx(ip+1)
+        p2ptag =  psb_complex_tag
+        call mpi_irecv(valrcv(idx+1:idx+sz),sz,&
+             & psb_mpi_c_spk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,1),iret)
+        p2ptag = psb_int_swap_tag
+        call mpi_irecv(iarcv(idx+1:idx+sz),sz,&
+             & psb_mpi_mpk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,2),iret)
+        call mpi_irecv(jarcv(idx+1:idx+sz),sz,&
+             & psb_mpi_mpk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,3),iret)
+      end if
+    Enddo
+
+
+    do ip = 0, np-1
+      sz = sdsz(ip+1) 
+      if (sz > 0) then
+        if (prcid(ip+1)<0) prcid(ip+1) = psb_get_mpi_rank(ictxt,ip)
+        idx = bsdindx(ip+1)
+        p2ptag =  psb_complex_tag
+        call mpi_send(valsnd(idx+1:idx+sz),sz,&
+             & psb_mpi_c_spk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+        p2ptag = psb_int_swap_tag
+        call mpi_send(iasnd(idx+1:idx+sz),sz,&
+             & psb_mpi_mpk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+        call mpi_send(jasnd(idx+1:idx+sz),sz,&
+             & psb_mpi_mpk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+      end if
+    Enddo
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        call mpi_wait(rvhd(ip+1,1),p2pstat,iret)
+        call mpi_wait(rvhd(ip+1,2),p2pstat,iret)
+        call mpi_wait(rvhd(ip+1,3),p2pstat,iret)
+      end if
+    Enddo
+
+  end subroutine psb_c_m_triad_a2av
+
+  subroutine psb_c_e_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & valrcv,iarcv,jarcv,rvsz,brvindx,ictxt,info)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    complex(psb_spk_), intent(in)  :: valsnd(:)
+    integer(psb_epk_), intent(in)  :: iasnd(:), jasnd(:)
+    complex(psb_spk_), intent(out) :: valrcv(:)
+    integer(psb_epk_), intent(out) :: iarcv(:), jarcv(:)
+    integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(out) :: info
+
+    !Local variables
+    integer(psb_ipk_)  :: iam, np, i,j,k, ip, ipx, idx, sz, counter
+    integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret, icomm
+    integer(psb_mpk_), allocatable :: prcid(:), rvhd(:,:)
+
+    call psb_info(ictxt,iam,np)
+
+    icomm = psb_get_mpi_comm(ictxt)
+
+    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
+      info = psb_err_internal_error_
+      return
+    end if
+    allocate(prcid(np),rvhd(np,3))
+    prcid = -1
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        prcid(ip+1) = psb_get_mpi_rank(ictxt,ip)
+        idx = brvindx(ip+1)
+        p2ptag =  psb_complex_tag
+        call mpi_irecv(valrcv(idx+1:idx+sz),sz,&
+             & psb_mpi_c_spk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,1),iret)
+        p2ptag = psb_int_swap_tag
+        call mpi_irecv(iarcv(idx+1:idx+sz),sz,&
+             & psb_mpi_epk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,2),iret)
+        call mpi_irecv(jarcv(idx+1:idx+sz),sz,&
+             & psb_mpi_epk_,prcid(ip+1),&
+             & p2ptag, icomm,rvhd(ip+1,3),iret)
+      end if
+    Enddo
+
+
+    do ip = 0, np-1
+      sz = sdsz(ip+1) 
+      if (sz > 0) then
+        if (prcid(ip+1)<0) prcid(ip+1) = psb_get_mpi_rank(ictxt,ip)
+        idx = bsdindx(ip+1)
+        p2ptag = psb_complex_tag
+        call mpi_send(valsnd(idx+1:idx+sz),sz,&
+             & psb_mpi_r_dpk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+        p2ptag = psb_int_swap_tag
+        call mpi_send(iasnd(idx+1:idx+sz),sz,&
+             & psb_mpi_epk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+        call mpi_send(jasnd(idx+1:idx+sz),sz,&
+             & psb_mpi_epk_,prcid(ip+1),&
+             & p2ptag, icomm,iret)
+      end if
+    Enddo
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        call mpi_wait(rvhd(ip+1,1),p2pstat,iret)
+        call mpi_wait(rvhd(ip+1,2),p2pstat,iret)
+        call mpi_wait(rvhd(ip+1,3),p2pstat,iret)
+      end if
+    Enddo
+
+  end subroutine psb_c_e_triad_a2av
 
   
 end module psi_c_collective_mod
