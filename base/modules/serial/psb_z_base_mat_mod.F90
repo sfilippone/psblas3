@@ -186,6 +186,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: fix          => psb_z_fix_coo
     procedure, pass(a) :: trim         => psb_z_coo_trim
     procedure, pass(a) :: clean_zeros  => psb_z_coo_clean_zeros
+    procedure, pass(a) :: clean_negidx => psb_z_coo_clean_negidx
     procedure, pass(a) :: print        => psb_z_coo_print
     procedure, pass(a) :: free         => z_coo_free
     procedure, pass(a) :: mold         => psb_z_coo_mold
@@ -367,6 +368,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: fix          => psb_lz_fix_coo
     procedure, pass(a) :: trim         => psb_lz_coo_trim
     procedure, pass(a) :: clean_zeros  => psb_lz_coo_clean_zeros
+    procedure, pass(a) :: clean_negidx => psb_lz_coo_clean_negidx
     procedure, pass(a) :: print        => psb_lz_coo_print
     procedure, pass(a) :: free         => lz_coo_free
     procedure, pass(a) :: mold         => psb_lz_coo_mold
@@ -1613,6 +1615,46 @@ module psb_z_base_mat_mod
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psb_z_coo_clean_zeros
   end interface
+
+  !
+  !> 
+  !! \memberof  psb_z_coo_sparse_mat
+  !! \brief Take out any entries with negative row or column index
+  !!   May happen when converting local/global numbering
+  !! \param info   return code
+  !! 
+  !
+  interface
+    subroutine  psb_z_coo_clean_negidx(a,info)
+      import 
+      class(psb_z_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine psb_z_coo_clean_negidx
+  end interface
+
+  !
+  !> Funtion: coo_clean_negidx_inner
+  !! \brief Take out any entries with negative row or column index
+  !!   Used internally by coo_clean_negidx
+  !! \param nzin  Number of entries on input to be  handled
+  !! \param ia(:) Row indices
+  !! \param ja(:) Col indices
+  !! \param val(:) Coefficients
+  !! \param nzout  Number of entries after sorting/duplicate handling
+  !! \param info   return code
+  !! 
+  !
+  interface psb_coo_clean_negidx_inner
+    subroutine psb_z_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info) 
+      import 
+      integer(psb_ipk_), intent(in)           :: nzin
+      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
+      complex(psb_dpk_), intent(inout) :: val(:)
+      integer(psb_ipk_), intent(out)          :: nzout
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_z_coo_clean_negidx_inner
+  end interface psb_coo_clean_negidx_inner
+
   
   !
   !> 
@@ -3077,6 +3119,45 @@ module psb_z_base_mat_mod
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psb_lz_coo_clean_zeros
   end interface
+  
+  !
+  !> 
+  !! \memberof  psb_lz_coo_sparse_mat
+  !! \brief Take out any entries with negative row or column index
+  !!   May happen when converting local/global numbering
+  !! \param info   return code
+  !! 
+  !
+  interface
+    subroutine  psb_lz_coo_clean_negidx(a,info)
+      import 
+      class(psb_lz_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine psb_lz_coo_clean_negidx
+  end interface
+
+  !
+  !> Funtion: coo_clean_negidx_inner
+  !! \brief Take out any entries with negative row or column index
+  !!   Used internally by coo_clean_negidx
+  !! \param nzin  Number of entries on input to be  handled
+  !! \param ia(:) Row indices
+  !! \param ja(:) Col indices
+  !! \param val(:) Coefficients
+  !! \param nzout  Number of entries after sorting/duplicate handling
+  !! \param info   return code
+  !! 
+  !
+  interface  psb_coo_clean_negidx_inner
+    subroutine psb_lz_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info) 
+      import 
+      integer(psb_lpk_), intent(in)           :: nzin
+      integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
+      complex(psb_dpk_), intent(inout) :: val(:)
+      integer(psb_lpk_), intent(out)          :: nzout
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_lz_coo_clean_negidx_inner
+  end interface psb_coo_clean_negidx_inner
   
   !
   !> 
