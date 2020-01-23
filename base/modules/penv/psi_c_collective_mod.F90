@@ -62,7 +62,9 @@ module psi_c_collective_mod
     module procedure psb_cexscan_sums, psb_cexscan_sumv
   end interface psb_exscan_sum
 
-
+  interface psb_simple_a2av
+    module procedure psb_c_simple_a2av
+  end interface psb_simple_a2av
 
 
 contains 
@@ -856,5 +858,43 @@ contains
     dat = czero
 #endif
   end subroutine psb_cexscan_sumv
+
+  subroutine psb_c_simple_a2av(valsnd,sdsz,bsdindx,&
+       & valrcv,rvsz,brvindx,ictxt,info)
+    use psi_c_p2p_mod
+    implicit none 
+    complex(psb_spk_), intent(in)  :: valsnd(:)
+    complex(psb_spk_), intent(out) :: valrcv(:)
+    integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(out) :: info
+
+    integer(psb_ipk_) :: iam, np, i,j,k, ip, ipx, idx, sz
+
+    call psb_info(ictxt,iam,np)
+
+    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
+      info = psb_err_internal_error_
+      return
+    end if
+
+    do ip = 0, np-1
+      sz = sdsz(ip+1) 
+      if (sz > 0) then
+        idx = bsdindx(ip+1)
+        call psb_snd(ictxt,valsnd(idx+1:idx+sz),ip) 
+      end if
+    end do
+
+    do ip = 0, np-1
+      sz = rvsz(ip+1) 
+      if (sz > 0) then
+        idx = brvindx(ip+1)
+        call psb_rcv(ictxt,valrcv(idx+1:idx+sz),ip) 
+      end if
+    end do
+
+  end subroutine psb_c_simple_a2av
+
   
 end module psi_c_collective_mod
