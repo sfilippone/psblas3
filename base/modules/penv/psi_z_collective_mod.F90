@@ -67,9 +67,9 @@ module psi_z_collective_mod
     module procedure psb_z_simple_a2av
   end interface psb_simple_a2av
 
-  interface psb_triad_a2av
-    module procedure psb_z_e_triad_a2av, psb_z_m_triad_a2av
-  end interface psb_triad_a2av
+  interface psb_simple_triad_a2av
+    module procedure psb_z_e_simple_triad_a2av, psb_z_m_simple_triad_a2av
+  end interface psb_simple_triad_a2av
 
 
 contains 
@@ -901,7 +901,7 @@ contains
 
   end subroutine psb_z_simple_a2av
 
-  subroutine psb_z_m_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+  subroutine psb_z_m_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & valrcv,iarcv,jarcv,rvsz,brvindx,ictxt,info)
 #ifdef MPI_MOD
     use mpi
@@ -982,9 +982,9 @@ contains
       end if
     Enddo
 
-  end subroutine psb_z_m_triad_a2av
+  end subroutine psb_z_m_simple_triad_a2av
 
-  subroutine psb_z_e_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+  subroutine psb_z_e_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & valrcv,iarcv,jarcv,rvsz,brvindx,ictxt,info)
 #ifdef MPI_MOD
     use mpi
@@ -1065,7 +1065,7 @@ contains
       end if
     Enddo
 
-  end subroutine psb_z_e_triad_a2av
+  end subroutine psb_z_e_simple_triad_a2av
 
   
 end module psi_z_collective_mod
