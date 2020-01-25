@@ -145,8 +145,9 @@ module psb_c_mat_mod
     procedure, pass(a) :: tril        => psb_c_tril
     procedure, pass(a) :: triu        => psb_c_triu
     procedure, pass(a) :: m_csclip    => psb_c_csclip
+    procedure, pass(a) :: m_csclip_ip => psb_c_csclip_ip
     procedure, pass(a) :: b_csclip    => psb_c_b_csclip
-    generic, public    :: csclip      => b_csclip, m_csclip
+    generic, public    :: csclip      => b_csclip, m_csclip, m_csclip_ip
     procedure, pass(a) :: clean_zeros => psb_c_clean_zeros
     procedure, pass(a) :: reall       => psb_c_reallocate_nz
     procedure, pass(a) :: get_neigh   => psb_c_get_neigh
@@ -337,8 +338,9 @@ module psb_c_mat_mod
     procedure, pass(a) :: tril        => psb_lc_tril
     procedure, pass(a) :: triu        => psb_lc_triu
     procedure, pass(a) :: m_csclip    => psb_lc_csclip
+    procedure, pass(a) :: m_csclip_ip => psb_lc_csclip_ip
     procedure, pass(a) :: b_csclip    => psb_lc_b_csclip
-    generic, public    :: csclip      => b_csclip, m_csclip
+    generic, public    :: csclip      => b_csclip, m_csclip, m_csclip_ip
     procedure, pass(a) :: clean_zeros => psb_lc_clean_zeros
     procedure, pass(a) :: reall       => psb_lc_reallocate_nz
     procedure, pass(a) :: get_neigh   => psb_lc_get_neigh
@@ -733,6 +735,17 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_c_csclip
+  end interface
+
+  interface 
+    subroutine psb_c_csclip_ip(a,info,&
+       & imin,imax,jmin,jmax,rscale,cscale)
+      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(inout) :: a
+      integer(psb_ipk_),intent(out)                  :: info
+      integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
+      logical, intent(in), optional        :: rscale,cscale
+    end subroutine psb_c_csclip_ip
   end interface
   
   interface 
@@ -1461,6 +1474,17 @@ module psb_c_mat_mod
       integer(psb_lpk_), intent(in), optional        :: imin,imax,jmin,jmax
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lc_csclip
+  end interface
+
+  interface 
+    subroutine psb_lc_csclip_ip(a,info,&
+       & imin,imax,jmin,jmax,rscale,cscale)
+      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+      class(psb_lcspmat_type), intent(inout) :: a
+      integer(psb_ipk_),intent(out)                  :: info
+      integer(psb_lpk_), intent(in), optional        :: imin,imax,jmin,jmax
+      logical, intent(in), optional        :: rscale,cscale
+    end subroutine psb_lc_csclip_ip
   end interface
   
   interface 

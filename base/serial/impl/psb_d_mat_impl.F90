@@ -1047,7 +1047,6 @@ subroutine psb_d_triu(a,u,info,diag,imin,imax,&
 
 end subroutine psb_d_triu
 
-
 subroutine psb_d_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
   ! Output is always in  COO format 
@@ -1098,6 +1097,53 @@ subroutine psb_d_csclip(a,b,info,&
 
 end subroutine psb_d_csclip
 
+subroutine psb_d_csclip_ip(a,info,&
+     & imin,imax,jmin,jmax,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_csclip_ip
+  implicit none
+
+  class(psb_dspmat_type), intent(inout) :: a
+  integer(psb_ipk_),intent(out)                  :: info
+  integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
+  logical, intent(in), optional        :: rscale,cscale
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csclip'
+  logical, parameter :: debug=.false.
+  type(psb_d_coo_sparse_mat), allocatable  :: acoo
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(acoo,stat=info)    
+  if (info == psb_success_) then 
+    call a%a%csclip(acoo,info,&
+         & imin,imax,jmin,jmax,rscale,cscale)
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+  if (info == psb_success_) call a%free()
+  if (info == psb_success_) call move_alloc(acoo,a%a)
+  if (info /= psb_success_) goto 9999 
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_d_csclip_ip
 
 subroutine psb_d_b_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
@@ -3705,6 +3751,53 @@ subroutine psb_ld_csclip(a,b,info,&
 
 end subroutine psb_ld_csclip
 
+subroutine psb_ld_csclip_ip(a,info,&
+     & imin,imax,jmin,jmax,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
+  use psb_d_mat_mod, psb_protect_name => psb_ld_csclip_ip
+  implicit none
+
+  class(psb_ldspmat_type), intent(inout) :: a
+  integer(psb_ipk_),intent(out)                  :: info
+  integer(psb_lpk_), intent(in), optional        :: imin,imax,jmin,jmax
+  logical, intent(in), optional        :: rscale,cscale
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csclip'
+  logical, parameter :: debug=.false.
+  type(psb_ld_coo_sparse_mat), allocatable  :: acoo
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(acoo,stat=info)    
+  if (info == psb_success_) then 
+    call a%a%csclip(acoo,info,&
+         & imin,imax,jmin,jmax,rscale,cscale)
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+  if (info == psb_success_) call a%free()
+  if (info == psb_success_) call move_alloc(acoo,a%a)
+  if (info /= psb_success_) goto 9999 
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_csclip_ip
 
 subroutine psb_ld_b_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
