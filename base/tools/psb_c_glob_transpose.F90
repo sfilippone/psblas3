@@ -1,3 +1,45 @@
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!  
+! File: psb_c_glob_transpose.f90
+!
+! Subroutine: psb_c_glob_transpose
+! Version:    complex
+!
+!  This file provides multiple related versions of a parallel
+!  global transpose 
+!
+!         B = A^T
+!
+!
 #undef  SP_A2AV_MPI
 #undef  SP_A2AV_XI
 #define SP_A2AV_MAT
@@ -282,6 +324,188 @@ subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   return
 end subroutine psb_lc_coo_glob_transpose
 
+subroutine psb_c_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
+#ifdef MPI_MOD
+  use mpi
+#endif
+  use psb_base_mod, psb_protect_name => psb_c_coo_glob_transpose
+  Implicit None
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
+  type(psb_c_coo_sparse_mat), intent(inout) :: ain
+  type(psb_desc_type), intent(inout), target   :: desc_r
+  type(psb_c_coo_sparse_mat), intent(out), optional :: atrans
+  type(psb_desc_type), intent(inout), target, optional :: desc_c
+  type(psb_desc_type), intent(out), optional   :: desc_rx
+  integer(psb_ipk_), intent(out)               :: info
+  
+  type(psb_lc_coo_sparse_mat) :: atcoo
+
+  if (present(atrans)) then
+    call ain%cp_to_lcoo(atcoo,info)
+  else
+    call ain%mv_to_lcoo(atcoo,info)
+  end if
+  if (info == 0) call psb_glob_transpose(atcoo,desc_r,info,desc_c=desc_c,desc_rx=desc_rx)
+  if (present(atrans)) then
+    call atrans%mv_from_lcoo(atcoo,info)
+  else
+    call ain%mv_from_lcoo(atcoo,info)
+  end if
+end subroutine psb_c_coo_glob_transpose
+
+subroutine psb_c_simple_glob_transpose_ip(ain,desc_a,info)
+  use psb_base_mod, psb_protect_name => psb_c_simple_glob_transpose_ip
+  implicit none
+  type(psb_cspmat_type), intent(inout)  :: ain
+  type(psb_desc_type)           :: desc_a
+  integer(psb_ipk_), intent(out) :: info
+
+  !
+  ! BEWARE: This routine works under the assumption
+  ! that the same DESC_A works for both A and A^T, which
+  ! essentially means that A has a symmetric pattern.
+  !
+  type(psb_lc_coo_sparse_mat) :: tmpc1, tmpc2
+  integer(psb_ipk_) :: nz1, nz2, nzh, nz
+  integer(psb_ipk_) :: ictxt, me, np
+  integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
+  integer(psb_lpk_), allocatable :: ilv(:) 
+  character(len=80) :: aname
+  logical, parameter :: debug=.false., dump=.false., debug_sync=.false.
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt,me,np)
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  if (debug_sync) then
+    call psb_barrier(ictxt)
+    if (me == 0) write(0,*) 'Start htranspose '
+  end if
+
+
+  call ain%mv_to(tmpc1)
+  call psb_glob_transpose(tmpc1, desc_a,info,atrans=tmpc2)
+  call ain%mv_from(tmpc2)
+
+  if (dump) then
+    block
+      type(psb_lcspmat_type) :: aglb
+      write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'    
+      call ain%print(fname=aname,head='atrans ')
+      call psb_gather(aglb,ain,desc_a,info)
+      if (me==psb_root_) then
+        write(aname,'(a,i3.3,a)') 'atran.mtx'    
+        call aglb%print(fname=aname,head='Test ')
+      end if
+    end block
+  end if
+
+end subroutine psb_c_simple_glob_transpose_ip
+
+subroutine psb_c_simple_glob_transpose(ain,aout,desc_a,info)
+  use psb_base_mod, psb_protect_name => psb_c_simple_glob_transpose
+  implicit none
+  type(psb_cspmat_type), intent(in)  :: ain
+  type(psb_cspmat_type), intent(out) :: aout
+  type(psb_desc_type)           :: desc_a
+  integer(psb_ipk_), intent(out) :: info
+
+  !
+  ! BEWARE: This routine works under the assumption
+  ! that the same DESC_A works for both A and A^T, which
+  ! essentially means that A has a symmetric pattern.
+  !
+  type(psb_lc_coo_sparse_mat) :: tmpc1, tmpc2
+  integer(psb_ipk_) :: nz1, nz2, nzh, nz
+  integer(psb_ipk_) :: ictxt, me, np
+  integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
+  integer(psb_lpk_), allocatable :: ilv(:) 
+  character(len=80) :: aname
+  logical, parameter :: debug=.false., dump=.false., debug_sync=.false.
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt,me,np)
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  if (debug_sync) then
+    call psb_barrier(ictxt)
+    if (me == 0) write(0,*) 'Start htranspose '
+  end if
+
+
+  call ain%cp_to(tmpc1)
+  call psb_glob_transpose(tmpc1, desc_a,info,atrans=tmpc2)
+  call aout%mv_from(tmpc2)
+
+  if (dump) then
+    block
+      type(psb_lcspmat_type) :: aglb
+      
+      write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'    
+      call aout%print(fname=aname,head='atrans ')
+      call psb_gather(aglb,aout,desc_a,info)
+      if (me==psb_root_) then
+        write(aname,'(a,i3.3,a)') 'atran.mtx'    
+        call aglb%print(fname=aname,head='Test ')
+      end if
+    end block
+  end if
+
+end subroutine psb_c_simple_glob_transpose
+
+subroutine psb_lc_simple_glob_transpose_ip(ain,desc_a,info)
+  use psb_base_mod, psb_protect_name => psb_lc_simple_glob_transpose_ip
+  implicit none
+  type(psb_lcspmat_type), intent(inout)  :: ain
+  type(psb_desc_type)           :: desc_a
+  integer(psb_ipk_), intent(out) :: info
+
+  !
+  ! BEWARE: This routine works under the assumption
+  ! that the same DESC_A works for both A and A^T, which
+  ! essentially means that A has a symmetric pattern.
+  !
+  type(psb_lc_coo_sparse_mat) :: tmpc1, tmpc2
+  integer(psb_ipk_) :: nz1, nz2, nzh, nz
+  integer(psb_ipk_) :: ictxt, me, np
+  integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
+  integer(psb_lpk_), allocatable :: ilv(:) 
+  character(len=80) :: aname
+  logical, parameter :: debug=.false., dump=.false., debug_sync=.false.
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt,me,np)
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  if (debug_sync) then
+    call psb_barrier(ictxt)
+    if (me == 0) write(0,*) 'Start htranspose '
+  end if
+
+
+  call ain%mv_to(tmpc1)
+  call psb_glob_transpose(tmpc1, desc_a,info,atrans=tmpc2)
+  call ain%mv_from(tmpc2)
+
+  if (dump) then
+    block
+      type(psb_lcspmat_type) :: aglb
+      write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'    
+      call ain%print(fname=aname,head='atrans ',iv=ilv)
+      call psb_gather(aglb,ain,desc_a,info)
+      if (me==psb_root_) then
+        write(aname,'(a,i3.3,a)') 'atran.mtx'    
+        call aglb%print(fname=aname,head='Test ')
+      end if
+    end block
+  end if
+
+end subroutine psb_lc_simple_glob_transpose_ip
 
 subroutine psb_lc_simple_glob_transpose(ain,aout,desc_a,info)
   use psb_base_mod, psb_protect_name => psb_lc_simple_glob_transpose
@@ -296,9 +520,7 @@ subroutine psb_lc_simple_glob_transpose(ain,aout,desc_a,info)
   ! that the same DESC_A works for both A and A^T, which
   ! essentially means that A has a symmetric pattern.
   !
-  type(psb_lcspmat_type) :: atmp, ahalo, aglb
-  type(psb_lc_coo_sparse_mat) :: tmpcoo, tmpc1, tmpc2, tmpch
-  type(psb_lc_csr_sparse_mat) :: tmpcsr    
+  type(psb_lc_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
   integer(psb_ipk_) :: ictxt, me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
@@ -317,195 +539,24 @@ subroutine psb_lc_simple_glob_transpose(ain,aout,desc_a,info)
   end if
 
 
-  if (.true.) then
-    call ain%cp_to(tmpc1)
-    call psb_glob_transpose(tmpc1, desc_a,info,atrans=tmpc2)
-    call aout%mv_from(tmpc2)
-  else
+  call ain%cp_to(tmpc1)
+  call psb_glob_transpose(tmpc1, desc_a,info,atrans=tmpc2)
+  call aout%mv_from(tmpc2)
 
-    call ain%cscnv(tmpcsr,info)
-
-    if (debug) then 
-      ilv = [(i,i=1,ncol)]
-      call desc_a%l2gip(ilv,info,owned=.false.)
-      write(aname,'(a,i3.3,a)') 'atmp-preh-',me,'.mtx'    
-      call ain%print(fname=aname,head='atmp before haloTest ',iv=ilv)
-    end if
-    if (dump) then
-      call ain%cscnv(atmp,info)
-      call psb_gather(aglb,atmp,desc_a,info)
+  if (dump) then
+    block
+      type(psb_lcspmat_type) :: aglb
+      
+      write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'    
+      call aout%print(fname=aname,head='atrans ',iv=ilv)
+      call psb_gather(aglb,aout,desc_a,info)
       if (me==psb_root_) then
-        write(aname,'(a,i3.3,a)') 'aglob-prehalo.mtx'    
+        write(aname,'(a,i3.3,a)') 'atran.mtx'    
         call aglb%print(fname=aname,head='Test ')
       end if
-    end if
-
-    !call psb_loc_to_glob(tmpcsr%ja,desc_a,info)
-    call atmp%mv_from(tmpcsr)
-
-    if (debug) then 
-      write(aname,'(a,i3.3,a)') 'tmpcsr-',me,'.mtx'    
-      call atmp%print(fname=aname,head='tmpcsr ',iv=ilv)
-      !call psb_set_debug_level(9999)
-    end if
-
-    ! FIXME THIS NEEDS REWORKING 
-    if (debug) write(0,*) me,' Htranspose into sphalo :',atmp%get_nrows(),atmp%get_ncols()
-
-    call psb_sphalo(atmp,desc_a,ahalo,info, outfmt='coo  ')
-    call atmp%mv_to(tmpcoo)
-    call ahalo%mv_to(tmpch)
-    nz1 = tmpcoo%get_nzeros()
-    nzh = tmpch%get_nzeros()
-    nlz = nz1+nzh
-    call tmpcoo%reallocate(nlz)
-    tmpcoo%ia(nz1+1:nz1+nzh) = tmpch%ia(1:nzh)
-    tmpcoo%ja(nz1+1:nz1+nzh) = tmpch%ja(1:nzh)
-    tmpcoo%val(nz1+1:nz1+nzh) = tmpch%val(1:nzh)
-    call psb_loc_to_glob(tmpcoo%ia(1:nlz),desc_a,info,iact='I')
-    call psb_loc_to_glob(tmpcoo%ja(1:nlz),desc_a,info,iact='I')
-    call tmpcoo%set_nzeros(nlz) 
-    call tmpcoo%transp()
-    nz = tmpcoo%get_nzeros()
-    call psb_glob_to_loc(tmpcoo%ia(1:nz),desc_a,info,iact='I')
-    call psb_glob_to_loc(tmpcoo%ja(1:nz),desc_a,info,iact='I')
-
-    call tmpcoo%clean_negidx(info)
-
-    call aout%mv_from(tmpcoo)
-    call aout%csclip(info,imax=nrow)
-
-
-    if (debug) write(0,*) 'After clip:',aout%get_nzeros()
-
-    if (debug_sync) then
-      call psb_barrier(ictxt)
-      if (me == 0) write(0,*) 'End htranspose '
-    end if
-    !call aout%cscnv(info,type='csr')
-  endif
-  if (dump) then
-    write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'    
-    call aout%print(fname=aname,head='atrans ',iv=ilv)
-    call psb_gather(aglb,aout,desc_a,info)
-    if (me==psb_root_) then
-      write(aname,'(a,i3.3,a)') 'atran.mtx'    
-      call aglb%print(fname=aname,head='Test ')
-    end if
+    end block
   end if
 
 end subroutine psb_lc_simple_glob_transpose
 
-
-subroutine psb_lc_simple_glob_transpose_ip(ain,desc_a,info)
-  use psb_base_mod, psb_protect_name => psb_lc_simple_glob_transpose_ip
-  implicit none
-  type(psb_lcspmat_type), intent(inout)  :: ain
-  type(psb_desc_type)           :: desc_a
-  integer(psb_ipk_), intent(out) :: info
-
-  !
-  ! BEWARE: This routine works under the assumption
-  ! that the same DESC_A works for both A and A^T, which
-  ! essentially means that A has a symmetric pattern.
-  !
-  type(psb_lcspmat_type) :: atmp, ahalo, aglb
-  type(psb_lc_coo_sparse_mat) :: tmpcoo, tmpc1, tmpc2, tmpch
-  type(psb_lc_csr_sparse_mat) :: tmpcsr    
-  integer(psb_ipk_) :: nz1, nz2, nzh, nz
-  integer(psb_ipk_) :: ictxt, me, np
-  integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
-  integer(psb_lpk_), allocatable :: ilv(:) 
-  character(len=80) :: aname
-  logical, parameter :: debug=.false., dump=.false., debug_sync=.false.
-
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
-
-  nrow = desc_a%get_local_rows()
-  ncol = desc_a%get_local_cols()
-  if (debug_sync) then
-    call psb_barrier(ictxt)
-    if (me == 0) write(0,*) 'Start htranspose '
-  end if
-
-
-  if (.true.) then
-    call ain%mv_to(tmpc1)
-    call psb_glob_transpose(tmpc1, desc_a,info,atrans=tmpc2)
-    call ain%mv_from(tmpc2)
-  else
-
-    call ain%cscnv(tmpcsr,info)
-
-    if (debug) then 
-      ilv = [(i,i=1,ncol)]
-      call desc_a%l2gip(ilv,info,owned=.false.)
-      write(aname,'(a,i3.3,a)') 'atmp-preh-',me,'.mtx'    
-      call ain%print(fname=aname,head='atmp before haloTest ',iv=ilv)
-    end if
-    if (dump) then
-      call ain%cscnv(atmp,info)
-      call psb_gather(aglb,atmp,desc_a,info)
-      if (me==psb_root_) then
-        write(aname,'(a,i3.3,a)') 'aglob-prehalo.mtx'    
-        call aglb%print(fname=aname,head='Test ')
-      end if
-    end if
-
-    !call psb_loc_to_glob(tmpcsr%ja,desc_a,info)
-    call atmp%mv_from(tmpcsr)
-
-    if (debug) then 
-      write(aname,'(a,i3.3,a)') 'tmpcsr-',me,'.mtx'    
-      call atmp%print(fname=aname,head='tmpcsr ',iv=ilv)
-      !call psb_set_debug_level(9999)
-    end if
-
-    ! FIXME THIS NEEDS REWORKING 
-    if (debug) write(0,*) me,' Htranspose into sphalo :',atmp%get_nrows(),atmp%get_ncols()
-
-    call psb_sphalo(atmp,desc_a,ahalo,info, outfmt='coo  ')
-    call atmp%mv_to(tmpcoo)
-    call ahalo%mv_to(tmpch)
-    nz1 = tmpcoo%get_nzeros()
-    nzh = tmpch%get_nzeros()
-    nlz = nz1+nzh
-    call tmpcoo%reallocate(nlz)
-    tmpcoo%ia(nz1+1:nz1+nzh) = tmpch%ia(1:nzh)
-    tmpcoo%ja(nz1+1:nz1+nzh) = tmpch%ja(1:nzh)
-    tmpcoo%val(nz1+1:nz1+nzh) = tmpch%val(1:nzh)
-    call psb_loc_to_glob(tmpcoo%ia(1:nlz),desc_a,info,iact='I')
-    call psb_loc_to_glob(tmpcoo%ja(1:nlz),desc_a,info,iact='I')
-    call tmpcoo%set_nzeros(nlz) 
-    call tmpcoo%transp()
-    nz = tmpcoo%get_nzeros()
-    call psb_glob_to_loc(tmpcoo%ia(1:nz),desc_a,info,iact='I')
-    call psb_glob_to_loc(tmpcoo%ja(1:nz),desc_a,info,iact='I')
-
-    call tmpcoo%clean_negidx(info)
-
-    call ain%mv_from(tmpcoo)
-    call ain%csclip(info,imax=nrow)
-
-
-    if (debug) write(0,*) 'After clip:',ain%get_nzeros()
-
-    if (debug_sync) then
-      call psb_barrier(ictxt)
-      if (me == 0) write(0,*) 'End htranspose '
-    end if
-    !call aout%cscnv(info,type='csr')
-  endif
-  if (dump) then
-    write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'    
-    call ain%print(fname=aname,head='atrans ',iv=ilv)
-    call psb_gather(aglb,ain,desc_a,info)
-    if (me==psb_root_) then
-      write(aname,'(a,i3.3,a)') 'atran.mtx'    
-      call aglb%print(fname=aname,head='Test ')
-    end if
-  end if
-
-end subroutine psb_lc_simple_glob_transpose_ip
 

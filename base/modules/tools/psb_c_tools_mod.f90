@@ -33,7 +33,7 @@ Module psb_c_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
   use psb_c_vect_mod, only : psb_c_base_vect_type, psb_c_vect_type
   use psb_c_mat_mod, only : psb_cspmat_type, psb_lcspmat_type, psb_c_base_sparse_mat, &
-       & psb_lc_csr_sparse_mat, psb_lc_coo_sparse_mat
+       & psb_lc_csr_sparse_mat, psb_lc_coo_sparse_mat, psb_c_coo_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_c_multivect_mod, only : psb_c_base_multivect_type, psb_c_multivect_type
 
@@ -347,7 +347,15 @@ Module psb_c_tools_mod
   end interface psb_par_spspmm
 
   interface psb_glob_transpose
-
+    subroutine psb_c_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
+      import
+      type(psb_c_coo_sparse_mat), intent(inout) :: ain
+      type(psb_desc_type), intent(inout), target   :: desc_r
+      type(psb_c_coo_sparse_mat), intent(out), optional :: atrans
+      type(psb_desc_type), intent(inout), target, optional :: desc_c
+      type(psb_desc_type), intent(out), optional   :: desc_rx
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine psb_c_coo_glob_transpose
     subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       import
       type(psb_lc_coo_sparse_mat), intent(inout) :: ain
@@ -364,13 +372,25 @@ Module psb_c_tools_mod
       type(psb_desc_type)           :: desc_a
       integer(psb_ipk_), intent(out) :: info
     end subroutine psb_lc_simple_glob_transpose
-
     subroutine psb_lc_simple_glob_transpose_ip(ain,desc_a,info)
       import
       type(psb_lcspmat_type), intent(inout)  :: ain
       type(psb_desc_type)           :: desc_a
       integer(psb_ipk_), intent(out) :: info
     end subroutine psb_lc_simple_glob_transpose_ip
+    subroutine psb_c_simple_glob_transpose(ain,aout,desc_a,info)
+      import
+      type(psb_cspmat_type), intent(in)  :: ain
+      type(psb_cspmat_type), intent(out) :: aout
+      type(psb_desc_type)           :: desc_a
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_c_simple_glob_transpose
+    subroutine psb_c_simple_glob_transpose_ip(ain,desc_a,info)
+      import
+      type(psb_cspmat_type), intent(inout)  :: ain
+      type(psb_desc_type)           :: desc_a
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_c_simple_glob_transpose_ip
   end interface psb_glob_transpose
 
   
