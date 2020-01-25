@@ -32,7 +32,8 @@
 Module psb_d_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
   use psb_d_vect_mod, only : psb_d_base_vect_type, psb_d_vect_type
-  use psb_d_mat_mod, only : psb_dspmat_type, psb_ldspmat_type, psb_d_base_sparse_mat, psb_ld_csr_sparse_mat
+  use psb_d_mat_mod, only : psb_dspmat_type, psb_ldspmat_type, psb_d_base_sparse_mat, &
+       & psb_ld_csr_sparse_mat, psb_ld_coo_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_d_multivect_mod, only : psb_d_base_multivect_type, psb_d_multivect_type
 
@@ -344,5 +345,34 @@ Module psb_d_tools_mod
       integer(psb_ipk_), intent(in), optional  :: data
     End Subroutine psb_ld_par_csr_spspmm
   end interface psb_par_spspmm
+
+  interface psb_glob_transpose
+
+    subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
+      import
+      type(psb_ld_coo_sparse_mat), intent(inout) :: ain
+      type(psb_desc_type), intent(inout), target   :: desc_r
+      type(psb_ld_coo_sparse_mat), intent(out), optional :: atrans
+      type(psb_desc_type), intent(inout), target, optional :: desc_c
+      type(psb_desc_type), intent(out), optional   :: desc_rx
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine psb_ld_coo_glob_transpose
+    subroutine psb_ld_simple_glob_transpose(ain,aout,desc_a,info)
+      import
+      type(psb_ldspmat_type), intent(in)  :: ain
+      type(psb_ldspmat_type), intent(out) :: aout
+      type(psb_desc_type)           :: desc_a
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_ld_simple_glob_transpose
+
+    subroutine psb_ld_simple_glob_transpose_ip(ain,desc_a,info)
+      import
+      type(psb_ldspmat_type), intent(inout)  :: ain
+      type(psb_desc_type)           :: desc_a
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_ld_simple_glob_transpose_ip
+  end interface psb_glob_transpose
+
+  
   
 end module psb_d_tools_mod
