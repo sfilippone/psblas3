@@ -162,6 +162,7 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: sizeof       => s_coo_sizeof
     procedure, pass(a) :: reallocate_nz => psb_s_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_s_coo_allocate_mnnz
+    procedure, pass(a) :: ensure_size  => psb_s_coo_ensure_size
     procedure, pass(a) :: cp_to_coo    => psb_s_cp_coo_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_s_cp_coo_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_s_cp_coo_to_fmt
@@ -348,6 +349,7 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: sizeof       => ls_coo_sizeof
     procedure, pass(a) :: reallocate_nz => psb_ls_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_ls_coo_allocate_mnnz
+    procedure, pass(a) :: ensure_size  => psb_ls_coo_ensure_size
     procedure, pass(a) :: cp_to_coo    => psb_ls_cp_coo_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_ls_cp_coo_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_ls_cp_coo_to_fmt
@@ -1578,6 +1580,17 @@ module psb_s_base_mat_mod
       integer(psb_ipk_), intent(in) :: nz
       class(psb_s_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_s_coo_reallocate_nz
+  end interface
+  !
+  !> 
+  !! \memberof  psb_s_coo_sparse_mat
+  !
+  interface
+    subroutine  psb_s_coo_ensure_size(nz,a) 
+      import 
+      integer(psb_ipk_), intent(in) :: nz
+      class(psb_s_coo_sparse_mat), intent(inout) :: a
+    end subroutine psb_s_coo_ensure_size
   end interface
   
   !
@@ -3082,6 +3095,17 @@ module psb_s_base_mat_mod
       integer(psb_lpk_), intent(in) :: nz
       class(psb_ls_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_ls_coo_reallocate_nz
+  end interface
+  !
+  !> 
+  !! \memberof  psb_ls_coo_sparse_mat
+  !
+  interface
+    subroutine  psb_ls_coo_ensure_size(nz,a) 
+      import 
+      integer(psb_lpk_), intent(in) :: nz
+      class(psb_ls_coo_sparse_mat), intent(inout) :: a
+    end subroutine psb_ls_coo_ensure_size
   end interface
   
   !

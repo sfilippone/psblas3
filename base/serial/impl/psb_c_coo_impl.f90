@@ -211,6 +211,38 @@ subroutine  psb_c_coo_reallocate_nz(nz,a)
 
 end subroutine psb_c_coo_reallocate_nz
 
+subroutine  psb_c_coo_ensure_size(nz,a) 
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_ensure_size
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  integer(psb_ipk_), intent(in) :: nz
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_)  :: err_act, info, nz_
+  character(len=20)  :: name='c_coo_ensure_size'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  nz_ = max(nz,ione)
+  call psb_ensure_size(nz_,a%ia,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%ja,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%val,info)
+
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_c_coo_ensure_size
+
 subroutine psb_c_coo_mold(a,b,info) 
   use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_mold
   use psb_error_mod
@@ -1618,7 +1650,7 @@ subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans)
 
     end if                  !.....end testing on alpha
 
-  else if (ctra) then 
+  else if (ctra) then           !
 
     if (alpha == cone) then
       i    = 1
@@ -4554,6 +4586,38 @@ subroutine  psb_lc_coo_reallocate_nz(nz,a)
   return
 
 end subroutine psb_lc_coo_reallocate_nz
+
+subroutine  psb_lc_coo_ensure_size(nz,a) 
+  use psb_c_base_mat_mod, psb_protect_name => psb_lc_coo_ensure_size
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  integer(psb_lpk_), intent(in) :: nz
+  class(psb_lc_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_)  :: err_act, info, nz_
+  character(len=20)  :: name='lc_coo_ensure_size'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  nz_ = max(nz,ione)
+  call psb_ensure_size(nz_,a%ia,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%ja,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%val,info)
+
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_coo_ensure_size
 
 subroutine psb_lc_coo_mold(a,b,info) 
   use psb_c_base_mat_mod, psb_protect_name => psb_lc_coo_mold
