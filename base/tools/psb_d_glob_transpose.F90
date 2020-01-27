@@ -61,10 +61,10 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 
   !     ...local scalars....
   integer(psb_ipk_) :: ictxt, np,me
-  integer(psb_ipk_) :: counter,proc, j, err_act, inzl
-  integer(psb_lpk_) :: i, k,idx, r, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
+  integer(psb_ipk_) :: counter,proc, err_act, j
+  integer(psb_lpk_) :: i,  k, idx, r, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,&
-       &     l1, nsnds, nrcvs, nr,nc,nzl,hlstart, nzt 
+       &     l1, nsnds, nrcvs, nr,nc,nzl, hlstart, nzt, nzd, nzbase 
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:), sdsz(:), tsdx(:), trvx(:) 
@@ -127,7 +127,7 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   else
     call ain%mv_to_coo(acoo,info)
   end if
-  
+
   nr = desc_r%get_local_rows()
   nc = p_desc_c%get_local_cols()
   nzl = acoo%get_nzeros()
@@ -196,102 +196,219 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   end if
   nzl = acoo%get_nzeros()
   hlstart = p_desc_c%get_local_rows()
-  do k = 1, nzl
-    j = acoo%ia(k)
-    !
-    !  Put entries in global numbering
-    !
-    call desc_r%indxmap%l2gip(acoo%ja(k),info)
-    call p_desc_c%indxmap%l2gip(acoo%ia(k),info)     
-    if (j>hlstart) then 
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
-      tsdx(proc+1)         = tsdx(proc+1) +1
-      iasnd(tsdx(proc+1))  = acoo%ia(k)
-      jasnd(tsdx(proc+1))  = acoo%ja(k)
-      valsnd(tsdx(proc+1)) = acoo%val(k)
-    end if
-  end do
+  if (.false.) then 
+    do k = 1, nzl
+      j = acoo%ia(k)
+      !
+      !  Put entries in global numbering
+      !
+      call desc_r%indxmap%l2gip(acoo%ja(k),info)
+      call p_desc_c%indxmap%l2gip(acoo%ia(k),info)     
+      if (j>hlstart) then 
+        call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+        tsdx(proc+1)         = tsdx(proc+1) +1
+        iasnd(tsdx(proc+1))  = acoo%ia(k)
+        jasnd(tsdx(proc+1))  = acoo%ja(k)
+        valsnd(tsdx(proc+1)) = acoo%val(k)
+      end if
+    end do
 
 !!$  write(0,*) me,' Sanity check before send :',count(acoo%ia(1:nzl)<0),count(acoo%ja(1:nzl)<0),&
 !!$       & count(iasnd(1:iszs)<0),count(jasnd(1:iszs)<0)
-  ! And exchange data. 
-  nzl = acoo%get_nzeros()
-  call acoo%reallocate(nzl+iszr)
+    ! And exchange data. 
+    nzl = acoo%get_nzeros()
+    call acoo%reallocate(nzl+iszr)
 
 #if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
-       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= mpi_success) info = minfo
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
+         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
 #elif defined(SP_A2AV_XI)
-  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-       & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
 #elif defined(SP_A2AV_MAT)
-  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
-       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
 !!$  call d_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
 !!$       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
 !!$       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,icomm,info)
 #else
-  choke on me @!
+    choke on me @!
 #endif
-  if (info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='mpi_alltoallv')
-    goto 9999
-  end if
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='mpi_alltoallv')
+      goto 9999
+    end if
 
-  if (debug_level >= psb_debug_outer_)&
-       & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
+    if (debug_level >= psb_debug_outer_)&
+         & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
 
-  nzl = nzl + iszr
-  call acoo%set_nzeros(nzl)
+    nzl = nzl + iszr
+    call acoo%set_nzeros(nzl)
 
-  if (present(desc_rx)) then 
-    !
-    ! Extend the appropriate descriptor; started as R but on
-    ! transpose it now describes C
-    ! 
-    call desc_r%clone(desc_rx,info)
-    call psb_cd_reinit(desc_rx,info)
-    !
-    ! Take out non-local rows
-    !
-    call psb_glob_to_loc(acoo%ia(1:nzl),p_desc_c,info,iact='I',owned=.true.)
-    call acoo%clean_negidx(info)
-    nzl = acoo%get_nzeros()
-    call acoo%set_sorted(.false.)
-    !
-    ! Insert to extend descriptor
-    !
-    call psb_cdins(nzl,acoo%ja,desc_rx,info)
-    call psb_cdasb(desc_rx,info)
-    call psb_glob_to_loc(acoo%ja(1:nzl),desc_rx,info,iact='I') 
-    call acoo%set_nrows(p_desc_c%get_local_rows())
-    call acoo%set_ncols(desc_rx%get_local_cols())
+    if (present(desc_rx)) then 
+      !
+      ! Extend the appropriate descriptor; started as R but on
+      ! transpose it now describes C
+      ! 
+      call desc_r%clone(desc_rx,info)
+      call psb_cd_reinit(desc_rx,info)
+      !
+      ! Take out non-local rows
+      !
+      call psb_glob_to_loc(acoo%ia(1:nzl),p_desc_c,info,iact='I',owned=.true.)
+      call acoo%clean_negidx(info)
+      nzl = acoo%get_nzeros()
+      call acoo%set_sorted(.false.)
+      !
+      ! Insert to extend descriptor
+      !
+      call psb_cdins(nzl,acoo%ja,desc_rx,info)
+      call psb_cdasb(desc_rx,info)
+      call psb_glob_to_loc(acoo%ja(1:nzl),desc_rx,info,iact='I') 
+      call acoo%set_nrows(p_desc_c%get_local_rows())
+      call acoo%set_ncols(desc_rx%get_local_cols())
+      write(0,*) me,' Trans RX ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
+    else
+      !
+      !
+      ! Take out non-local rows
+      !
+      call psb_glob_to_loc(acoo%ia(1:nzl),p_desc_c,info,iact='I',owned=.true.)
+      call psb_glob_to_loc(acoo%ja(1:nzl),desc_r,info,iact='I') 
+      call acoo%clean_negidx(info)
+      nzl = acoo%get_nzeros()
+      call acoo%set_sorted(.false.)
+
+      call acoo%set_nrows(p_desc_c%get_local_rows())
+      call acoo%set_ncols(desc_r%get_local_cols())
+      write(0,*) me,' Trans R- ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
+    end if
+
   else
-    !
-    !
-    ! Take out non-local rows
-    !
-    call psb_glob_to_loc(acoo%ia(1:nzl),p_desc_c,info,iact='I',owned=.true.)
-    call psb_glob_to_loc(acoo%ja(1:nzl),desc_r,info,iact='I') 
-    call acoo%clean_negidx(info)
+
+    nzd = 0
+    do k = 1, nzl
+      j = acoo%ia(k)
+      if (j<=hlstart) then
+        nzd = nzd + 1
+        acoo%ia(nzd)  = acoo%ia(k) 
+        acoo%ja(nzd)  = acoo%ja(k) 
+        acoo%val(nzd) = acoo%val(k)
+      else
+        !
+        !  Put halo entries in global numbering
+        !
+        call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+        tsdx(proc+1)         = tsdx(proc+1) +1
+        iasnd(tsdx(proc+1))  = acoo%ia(k)
+        jasnd(tsdx(proc+1))  = acoo%ja(k)
+        valsnd(tsdx(proc+1)) = acoo%val(k)
+        call desc_r%indxmap%l2gip(jasnd(tsdx(proc+1)),info)
+        call p_desc_c%indxmap%l2gip(iasnd(tsdx(proc+1)),info)     
+      end if
+    end do
+    call acoo%set_nzeros(nzd)
+!!$  write(0,*) me,' Sanity check before send :',count(acoo%ia(1:nzl)<0),count(acoo%ja(1:nzl)<0),&
+!!$       & count(iasnd(1:iszs)<0),count(jasnd(1:iszs)<0)
+    ! And exchange data. 
     nzl = acoo%get_nzeros()
-    call acoo%set_sorted(.false.)
+    call acoo%reallocate(nzl+iszr)
+
+#if defined(SP_A2AV_MPI)
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
+         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+#elif defined(SP_A2AV_XI)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+#elif defined(SP_A2AV_MAT)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+!!$  call d_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+!!$       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
+!!$       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,icomm,info)
+#else
+    choke on me @!
+#endif
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='mpi_alltoallv')
+      goto 9999
+    end if
+
+    if (debug_level >= psb_debug_outer_)&
+         & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
+
+    nzbase = nzl 
     
-    call acoo%set_nrows(p_desc_c%get_local_rows())
-    call acoo%set_ncols(desc_r%get_local_cols())
+    if (present(desc_rx)) then 
+      !
+      ! Extend the appropriate descriptor; started as R but on
+      ! transpose it now describes C
+      ! 
+      call desc_r%clone(desc_rx,info)
+      call psb_cd_reinit(desc_rx,info)
+      !
+      ! Take out non-local rows
+      !      
+      call psb_glob_to_loc(acoo%ia(nzl+1:nzl+iszr),p_desc_c,info,iact='I',owned=.true.)
+      call psb_coo_clean_negidx_inner(iszr,acoo%ia(nzl+1:nzl+iszr),acoo%ja(nzl+1:nzl+iszr),&
+           & acoo%val(nzl+1:nzl+iszr),nzt,info)
+      call desc_rx%g2lip_ins(acoo%ja(nzl+1:nzl+nzt),info)
+      call psb_cdasb(desc_rx,info)
+      nzl = nzl + nzt
+      call acoo%set_nzeros(nzl)
+      nzl = acoo%get_nzeros()
+      call acoo%set_sorted(.false.)
+      !
+      ! Insert to extend descriptor
+      !
+      call acoo%set_nrows(p_desc_c%get_local_rows())
+      call acoo%set_ncols(desc_rx%get_local_cols())
+      !write(0,*) me,' Trans RX ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
+    else
+      !
+      !
+      ! Take out non-local rows
+      !
+      call psb_glob_to_loc(acoo%ia(nzl+1:nzl+iszr),p_desc_c,info,iact='I',owned=.true.)
+      call psb_glob_to_loc(acoo%ja(nzl+1:nzl+iszr),desc_r,info,iact='I')
+      call psb_coo_clean_negidx_inner(iszr,acoo%ia(nzl+1:nzl+iszr),acoo%ja(nzl+1:nzl+iszr),&
+           & acoo%val(nzl+1:nzl+iszr),nzt,info)
+      
+      nzl = nzl + nzt
+      call acoo%set_nzeros(nzl)
+      nzl = acoo%get_nzeros()
+      call acoo%set_sorted(.false.)
+
+      call acoo%set_nrows(p_desc_c%get_local_rows())
+      call acoo%set_ncols(desc_r%get_local_cols())
+      !write(0,*) me,' Trans R- ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
+    end if
   end if
 !!$  write(0,*) me,' Sanity check after rx%g2l :',count(acoo%ja(1:nzl)<0)
 
