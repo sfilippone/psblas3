@@ -39,6 +39,45 @@
 !
 !         B = A^T
 !
+!  There are some variations of this routine, that are accounted for
+!  in the workhorse  psb_lc_coo_glob_transpose
+!  1. The row and column spaces can share the same descriptor
+!     This essentially means that the descriptor relates to a
+!     matrix with a symmetric pattern. Examples are: symmetric
+!     matrices, matrices with symmetric pattern, lower or
+!     upper halves of such matrices
+!  2. The row and column index spaces are different
+!     In this case you need to have two descriptor on input,
+!     plus if you want the output to be distributed according
+!     to the row descriptor, you will still need a new descriptor
+!     because even if the row distribution is the same, the pattern
+!     will be different.
+!
+!  This is handled in the workhorse by having one mandatory and
+!  two optional descriptors:
+!  1. If only the mandatory descriptor is present, then it is assumed that it
+!     is both row and column descriptor, and that it is sufficient.
+!  2. If two descriptors are available, then use the second
+!  3. If the third output descriptor is available, then rebuild it
+!     after the data exchange.
+!
+!  The main transpose algorithm works like this:
+!  1. Compute sizes: any entry A(I,J) with J in the halo will have
+!     to be sent to the process owning J, so walk through the
+!     matrix and compute all the send sizes, then do an alltoall to figure
+!     the receive sizes;
+!  2. Adjust send bufffers;
+!  3. Perform a local transpose;
+!  4. Split the matrix: all local entries stay, all halo entries go into
+!     the send buffers, and are converted to global numbering;
+!  5. Do the all-to-all with our simple a2av (the exchange is with the halo
+!     pattern, so the full MPI A2AV is almost certainly too heavy)
+!  6. The receive is in the extra section of the ACOO buffer; convert
+!     the row indices to local numbering, and discard extra ones (there will
+!     be some)
+!  7. If desc_rx was required, make sure to insert the column indices
+!  8. Cleanup and sort the output matrix
+!  9. Copy back into AIN or ATRANS if requested. 
 !
 #undef  SP_A2AV_MPI
 #undef  SP_A2AV_XI
@@ -64,7 +103,7 @@ subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   integer(psb_ipk_) :: counter,proc, err_act, j
   integer(psb_lpk_) :: i,  k, idx, r, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,&
-       &     l1, nsnds, nrcvs, nr,nc,nzl, hlstart, nzt, nzd, nzbase 
+       &     l1, nsnds, nrcvs, nr,nc,nzl, hlstart, nzt, nzd
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:), sdsz(:), tsdx(:), trvx(:) 
@@ -128,6 +167,11 @@ subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
     call ain%mv_to_coo(acoo,info)
   end if
 
+
+  !
+  ! Compute number of entries in the
+  ! halo part, sorted by destination process
+  !
   nr = desc_r%get_local_rows()
   nc = p_desc_c%get_local_cols()
   nzl = acoo%get_nzeros()
@@ -143,7 +187,8 @@ subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   !
   ! Exchange  sizes, so as to know sends/receives.
   ! This is different from the halo exchange because the
-  ! number of entries has not been precomputed
+  ! number of entries was not  precomputed in the descriptor,
+  ! which was vector-oriented and not matrix-entry-oriented
   ! 
   call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
        & rvsz,1,psb_mpi_mpk_,icomm,minfo)
@@ -188,7 +233,8 @@ subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   end if
 
   !
-  ! Now, transpose and fill in the send buffers
+  ! Now, transpose the matrix, then split between itself
+  ! and the send buffers
   !
   call acoo%transp()
   if (acoo%get_nzeros()/= nzl) then
@@ -196,232 +242,120 @@ subroutine psb_lc_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   end if
   nzl = acoo%get_nzeros()
   hlstart = p_desc_c%get_local_rows()
-  if (.false.) then 
-    do k = 1, nzl
-      j = acoo%ia(k)
-      !
-      !  Put entries in global numbering
-      !
-      call desc_r%indxmap%l2gip(acoo%ja(k),info)
-      call p_desc_c%indxmap%l2gip(acoo%ia(k),info)     
-      if (j>hlstart) then 
-        call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
-        tsdx(proc+1)         = tsdx(proc+1) +1
-        iasnd(tsdx(proc+1))  = acoo%ia(k)
-        jasnd(tsdx(proc+1))  = acoo%ja(k)
-        valsnd(tsdx(proc+1)) = acoo%val(k)
-      end if
-    end do
 
-!!$  write(0,*) me,' Sanity check before send :',count(acoo%ia(1:nzl)<0),count(acoo%ja(1:nzl)<0),&
-!!$       & count(iasnd(1:iszs)<0),count(jasnd(1:iszs)<0)
-    ! And exchange data. 
-    nzl = acoo%get_nzeros()
-    call acoo%reallocate(nzl+iszr)
+
+  nzd = 0
+  do k = 1, nzl
+    j = acoo%ia(k)
+    if (j<=hlstart) then
+      nzd = nzd + 1
+      acoo%ia(nzd)  = acoo%ia(k) 
+      acoo%ja(nzd)  = acoo%ja(k) 
+      acoo%val(nzd) = acoo%val(k)
+    else
+      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      tsdx(proc+1)         = tsdx(proc+1) +1
+      iasnd(tsdx(proc+1))  = acoo%ia(k)
+      jasnd(tsdx(proc+1))  = acoo%ja(k)
+      valsnd(tsdx(proc+1)) = acoo%val(k)
+    end if
+  end do
+  !
+  !  Put halo entries in global numbering
+  !
+  call desc_r%indxmap%l2gip(jasnd(1:iszs),info)
+  call p_desc_c%indxmap%l2gip(iasnd(1:iszs),info)
+  call acoo%set_nzeros(nzd)
+  ! And exchange data.
+  ! Normally we'll use our SIMPLE A2AV and not MPI, because
+  ! the communication pattern is sparse, so ours is more
+  ! efficient. Using ACOO for the receive buffers.
+  nzl = acoo%get_nzeros()
+  call acoo%ensure_size(nzl+iszr)
 
 #if defined(SP_A2AV_MPI)
-    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
-         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
-    if (minfo == mpi_success) &
-         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-    if (minfo == mpi_success) &
-         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-    if (minfo /= mpi_success) info = minfo
+  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
+       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+       & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  if (minfo /= mpi_success) info = minfo
 #elif defined(SP_A2AV_XI)
-    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+       & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
 #elif defined(SP_A2AV_MAT)
-    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
-         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-!!$  call d_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-!!$       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
-!!$       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,icomm,info)
+  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
+       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
 #else
-    choke on me @!
+  choke on me @!
 #endif
-    if (info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='mpi_alltoallv')
-      goto 9999
-    end if
-
-    if (debug_level >= psb_debug_outer_)&
-         & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
-
-    nzl = nzl + iszr
-    call acoo%set_nzeros(nzl)
-
-    if (present(desc_rx)) then 
-      !
-      ! Extend the appropriate descriptor; started as R but on
-      ! transpose it now describes C
-      ! 
-      call desc_r%clone(desc_rx,info)
-      call psb_cd_reinit(desc_rx,info)
-      !
-      ! Take out non-local rows
-      !
-      call psb_glob_to_loc(acoo%ia(1:nzl),p_desc_c,info,iact='I',owned=.true.)
-      call acoo%clean_negidx(info)
-      nzl = acoo%get_nzeros()
-      call acoo%set_sorted(.false.)
-      !
-      ! Insert to extend descriptor
-      !
-      call psb_cdins(nzl,acoo%ja,desc_rx,info)
-      call psb_cdasb(desc_rx,info)
-      call psb_glob_to_loc(acoo%ja(1:nzl),desc_rx,info,iact='I') 
-      call acoo%set_nrows(p_desc_c%get_local_rows())
-      call acoo%set_ncols(desc_rx%get_local_cols())
-      write(0,*) me,' Trans RX ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
-    else
-      !
-      !
-      ! Take out non-local rows
-      !
-      call psb_glob_to_loc(acoo%ia(1:nzl),p_desc_c,info,iact='I',owned=.true.)
-      call psb_glob_to_loc(acoo%ja(1:nzl),desc_r,info,iact='I') 
-      call acoo%clean_negidx(info)
-      nzl = acoo%get_nzeros()
-      call acoo%set_sorted(.false.)
-
-      call acoo%set_nrows(p_desc_c%get_local_rows())
-      call acoo%set_ncols(desc_r%get_local_cols())
-      write(0,*) me,' Trans R- ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
-    end if
-
-  else
-
-    nzd = 0
-    do k = 1, nzl
-      j = acoo%ia(k)
-      if (j<=hlstart) then
-        nzd = nzd + 1
-        acoo%ia(nzd)  = acoo%ia(k) 
-        acoo%ja(nzd)  = acoo%ja(k) 
-        acoo%val(nzd) = acoo%val(k)
-      else
-        !
-        !  Put halo entries in global numbering
-        !
-        call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
-        tsdx(proc+1)         = tsdx(proc+1) +1
-        iasnd(tsdx(proc+1))  = acoo%ia(k)
-        jasnd(tsdx(proc+1))  = acoo%ja(k)
-        valsnd(tsdx(proc+1)) = acoo%val(k)
-        call desc_r%indxmap%l2gip(jasnd(tsdx(proc+1)),info)
-        call p_desc_c%indxmap%l2gip(iasnd(tsdx(proc+1)),info)     
-      end if
-    end do
-    call acoo%set_nzeros(nzd)
-!!$  write(0,*) me,' Sanity check before send :',count(acoo%ia(1:nzl)<0),count(acoo%ja(1:nzl)<0),&
-!!$       & count(iasnd(1:iszs)<0),count(jasnd(1:iszs)<0)
-    ! And exchange data. 
-    nzl = acoo%get_nzeros()
-    call acoo%reallocate(nzl+iszr)
-
-#if defined(SP_A2AV_MPI)
-    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
-         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
-    if (minfo == mpi_success) &
-         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-    if (minfo == mpi_success) &
-         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-    if (minfo /= mpi_success) info = minfo
-#elif defined(SP_A2AV_XI)
-    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_MAT)
-    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
-         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-!!$  call d_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-!!$       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
-!!$       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,icomm,info)
-#else
-    choke on me @!
-#endif
-    if (info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='mpi_alltoallv')
-      goto 9999
-    end if
-
-    if (debug_level >= psb_debug_outer_)&
-         & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
-
-    nzbase = nzl 
-    
-    if (present(desc_rx)) then 
-      !
-      ! Extend the appropriate descriptor; started as R but on
-      ! transpose it now describes C
-      ! 
-      call desc_r%clone(desc_rx,info)
-      call psb_cd_reinit(desc_rx,info)
-      !
-      ! Take out non-local rows
-      !      
-      call psb_glob_to_loc(acoo%ia(nzl+1:nzl+iszr),p_desc_c,info,iact='I',owned=.true.)
-      call psb_coo_clean_negidx_inner(iszr,acoo%ia(nzl+1:nzl+iszr),acoo%ja(nzl+1:nzl+iszr),&
-           & acoo%val(nzl+1:nzl+iszr),nzt,info)
-      call desc_rx%g2lip_ins(acoo%ja(nzl+1:nzl+nzt),info)
-      call psb_cdasb(desc_rx,info)
-      nzl = nzl + nzt
-      call acoo%set_nzeros(nzl)
-      nzl = acoo%get_nzeros()
-      call acoo%set_sorted(.false.)
-      !
-      ! Insert to extend descriptor
-      !
-      call acoo%set_nrows(p_desc_c%get_local_rows())
-      call acoo%set_ncols(desc_rx%get_local_cols())
-      !write(0,*) me,' Trans RX ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
-    else
-      !
-      !
-      ! Take out non-local rows
-      !
-      call psb_glob_to_loc(acoo%ia(nzl+1:nzl+iszr),p_desc_c,info,iact='I',owned=.true.)
-      call psb_glob_to_loc(acoo%ja(nzl+1:nzl+iszr),desc_r,info,iact='I')
-      call psb_coo_clean_negidx_inner(iszr,acoo%ia(nzl+1:nzl+iszr),acoo%ja(nzl+1:nzl+iszr),&
-           & acoo%val(nzl+1:nzl+iszr),nzt,info)
-      
-      nzl = nzl + nzt
-      call acoo%set_nzeros(nzl)
-      nzl = acoo%get_nzeros()
-      call acoo%set_sorted(.false.)
-
-      call acoo%set_nrows(p_desc_c%get_local_rows())
-      call acoo%set_ncols(desc_r%get_local_cols())
-      !write(0,*) me,' Trans R- ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
-    end if
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='mpi_alltoallv')
+    goto 9999
   end if
+
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
+
+  if (present(desc_rx)) then 
+    !
+    ! Extend the appropriate descriptor; started as R but on
+    ! transpose it now describes C
+    ! 
+    call desc_r%clone(desc_rx,info)
+    call psb_cd_reinit(desc_rx,info)
+    !
+    ! Take out non-local rows
+    !      
+    call psb_glob_to_loc(acoo%ia(nzl+1:nzl+iszr),p_desc_c,info,iact='I',owned=.true.)
+    call psb_coo_clean_negidx_inner(iszr,acoo%ia(nzl+1:nzl+iszr),acoo%ja(nzl+1:nzl+iszr),&
+         & acoo%val(nzl+1:nzl+iszr),nzt,info)
+    call desc_rx%g2lip_ins(acoo%ja(nzl+1:nzl+nzt),info)
+    call psb_cdasb(desc_rx,info)
+    nzl = nzl + nzt
+    call acoo%set_nzeros(nzl)
+    nzl = acoo%get_nzeros()
+    call acoo%set_sorted(.false.)
+    !
+    ! Insert to extend descriptor
+    !
+    call acoo%set_nrows(p_desc_c%get_local_rows())
+    call acoo%set_ncols(desc_rx%get_local_cols())
+    !write(0,*) me,' Trans RX ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
+  else
+    !
+    !
+    ! Take out non-local rows
+    !
+    call psb_glob_to_loc(acoo%ia(nzl+1:nzl+iszr),p_desc_c,info,iact='I',owned=.true.)
+    call psb_glob_to_loc(acoo%ja(nzl+1:nzl+iszr),desc_r,info,iact='I')
+    call psb_coo_clean_negidx_inner(iszr,acoo%ia(nzl+1:nzl+iszr),acoo%ja(nzl+1:nzl+iszr),&
+         & acoo%val(nzl+1:nzl+iszr),nzt,info)
+
+    nzl = nzl + nzt
+    call acoo%set_nzeros(nzl)
+    nzl = acoo%get_nzeros()
+    call acoo%set_sorted(.false.)
+
+    call acoo%set_nrows(p_desc_c%get_local_rows())
+    call acoo%set_ncols(desc_r%get_local_cols())
+    !write(0,*) me,' Trans R- ',acoo%get_nrows(),acoo%get_ncols(),acoo%get_nzeros()
+  end if
+
 !!$  write(0,*) me,' Sanity check after rx%g2l :',count(acoo%ja(1:nzl)<0)
 
 
   call acoo%fix(info)
   nzl = acoo%get_nzeros()
-!!$  nzt = nzl
-!!$  call psb_sum(ictxt,nzt)
-!!$  write(0,*) me,'From glob_transpose;   local:',p_desc_c%get_local_rows(),p_desc_c%get_local_cols(),&
-!!$       & desc_rx%get_local_rows(),desc_rx%get_local_cols(),nzl 
-!!$  write(0,*) me,'From glob_transpose;  global:',p_desc_c%get_global_rows(),p_desc_c%get_global_cols(),&
-!!$       & desc_rx%get_global_rows(),desc_rx%get_global_cols(),nzt
-!!$  
 
   if (present(atrans)) then
     call atrans%mv_from_coo(acoo,info)
