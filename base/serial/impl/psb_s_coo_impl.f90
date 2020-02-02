@@ -4767,6 +4767,7 @@ subroutine  psb_ls_coo_clean_negidx(a,info)
   
 end subroutine psb_ls_coo_clean_negidx
 
+#if defined(IPK4) && defined(LPK8) 
 subroutine psb_ls_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info) 
   use psb_error_mod
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_clean_negidx_inner
@@ -4791,6 +4792,7 @@ subroutine psb_ls_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
   end do
   
 end subroutine psb_ls_coo_clean_negidx_inner
+#endif
 
 subroutine  psb_ls_coo_allocate_mnnz(m,n,a,nz) 
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_allocate_mnnz

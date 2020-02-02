@@ -75,8 +75,15 @@ module psi_penv_mod
 
   interface psb_wtime
     module procedure  psb_wtime
-  end interface
+  end interface psb_wtime
 
+  interface psb_get_mpi_comm
+    module procedure psb_m_get_mpi_comm, psb_e_get_mpi_comm
+  end interface psb_get_mpi_comm
+  
+  interface psb_get_mpi_rank
+    module procedure psb_m_get_mpi_rank, psb_e_get_mpi_rank
+  end interface psb_get_mpi_rank
 
 #if defined(SERIAL_MPI)
   integer(psb_mpk_), private, save :: nctxt=0
@@ -563,17 +570,33 @@ contains
   end subroutine psb_info_mpik
 
 
-  function psb_get_mpi_comm(ictxt) result(comm)
+  function psb_m_get_mpi_comm(ictxt) result(comm)
     integer(psb_mpk_) :: ictxt, comm
 
     comm = ictxt
-  end function psb_get_mpi_comm
+  end function psb_m_get_mpi_comm
 
-  function psb_get_mpi_rank(ictxt,id) result(rank)
-    integer(psb_mpk_) :: rank,ictxt,id
+  function psb_e_get_mpi_comm(ictxt) result(comm)
+    integer(psb_epk_) :: ictxt
+    integer(psb_mpk_) :: comm
+
+    comm = ictxt
+  end function psb_e_get_mpi_comm
+
+  function psb_m_get_mpi_rank(ictxt,id) result(rank)
+    integer(psb_mpk_) :: rank
+    integer(psb_mpk_) :: ictxt,id
 
     rank = id
-  end function psb_get_mpi_rank
+  end function psb_m_get_mpi_rank
+
+
+  function psb_e_get_mpi_rank(ictxt,id) result(rank)
+    integer(psb_mpk_) :: rank
+    integer(psb_epk_) :: ictxt,id
+
+    rank = id
+  end function psb_e_get_mpi_rank
 
 
   subroutine psb_get_mpicomm(ictxt,comm)

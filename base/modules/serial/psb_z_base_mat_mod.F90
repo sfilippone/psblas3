@@ -3160,6 +3160,7 @@ module psb_z_base_mat_mod
     end subroutine psb_lz_coo_clean_negidx
   end interface
 
+#if defined(IPK4) && defined(LPK8) 
   !
   !> Funtion: coo_clean_negidx_inner
   !! \brief Take out any entries with negative row or column index
@@ -3182,7 +3183,7 @@ module psb_z_base_mat_mod
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_lz_coo_clean_negidx_inner
   end interface psb_coo_clean_negidx_inner
-  
+#endif  
   !
   !> 
   !! \memberof  psb_lz_coo_sparse_mat
