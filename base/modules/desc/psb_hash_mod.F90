@@ -64,8 +64,11 @@ module psb_hash_mod
   end type psb_hash_type
 
 
-  integer(psb_ipk_), parameter  :: HashDuplicate = 123, HashOK=0, HashOutOfMemory=-512,&
-       & HashFreeEntry = -1, HashNotFound = -256
+  integer(psb_ipk_), parameter  :: HashOK=0
+  integer(psb_ipk_), parameter  :: HashDuplicate = 123
+  integer(psb_ipk_), parameter  :: HashOutOfMemory=-512
+  integer(psb_ipk_), parameter  :: HashFreeEntry = -1
+  integer(psb_ipk_), parameter  :: HashNotFound = -256
 
   interface psb_hashval
 #if defined(IPK4)     
@@ -391,7 +394,7 @@ contains
       hd = 1
     else 
       hd = hsize - hk 
-      hd = ior(hd,1)
+      hd = ior(hd,1_psb_ipk_)
     end if
     if (.not.allocated(hash%table)) then
       info = HashOutOfMemory
@@ -451,7 +454,7 @@ contains
       hd = 1
     else 
       hd = hsize - hk 
-      hd = ior(hd,1)
+      hd = ior(hd,1_psb_ipk_)
     end if
     if (.not.allocated(hash%table)) then
       info = HashOutOfMemory
@@ -515,7 +518,7 @@ contains
       hd = 1
     else 
       hd = hsize - hk 
-      hd = ior(hd,1)
+      hd = ior(hd,1_psb_ipk_)
     end if
     
     hash%nsrch = hash%nsrch + 1
@@ -555,7 +558,7 @@ contains
       hd = 1
     else 
       hd = hsize - hk 
-      hd = ior(hd,1)
+      hd = ior(hd,1_psb_ipk_)
     end if
     
     hash%nsrch = hash%nsrch + 1
