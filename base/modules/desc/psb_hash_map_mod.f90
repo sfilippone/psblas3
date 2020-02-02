@@ -805,11 +805,11 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, int_err(5)
     integer(psb_lpk_) ::  m, nrt 
     integer(psb_lpk_), allocatable :: vlu(:)
@@ -878,11 +878,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) :: i, j, nl, int_err(5)
     integer(psb_lpk_) :: n
     integer(psb_lpk_), allocatable :: vlu(:)
@@ -938,12 +938,12 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_lpk_), intent(in)  :: vlu(:), ntot
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) :: i, j, lc2, nlu, m, nrt,int_err(5)
     character(len=20), parameter :: name='hash_map_init_vlu'
 
@@ -1522,8 +1522,6 @@ contains
          &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
   end subroutine hash_cpy
 
-    
-
   subroutine hash_reinit(idxmap,info)
     use psb_penv_mod
     use psb_error_mod
@@ -1534,7 +1532,7 @@ contains
     integer(psb_ipk_) :: err_act, nr,nc,k, nl
     integer(psb_lpk_) :: lk
     integer(psb_lpk_) :: ntot
-    integer(psb_mpk_) :: ictxt, me, np
+    integer(psb_ipk_) :: ictxt, me, np
     integer(psb_ipk_), allocatable :: lidx(:)
     integer(psb_lpk_), allocatable :: gidx(:)
     character(len=20)  :: name='hash_reinit'

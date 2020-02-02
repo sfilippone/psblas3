@@ -118,7 +118,6 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   integer(psb_lpk_) :: l_err(5),exch(2)
   integer(psb_ipk_) :: thalo(1), tovr(1), text(1)
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -131,7 +130,6 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np
-  iictxt = ictxt
   n = m
   !... check m and n parameters....
   if (m < 1) then
@@ -182,7 +180,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   allocate(psb_repl_map :: desc%indxmap, stat=info)
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(iictxt,m,info)
+    call aa%repl_map_init(ictxt,m,info)
   class default 
     ! This cannot happen 
     info = psb_err_internal_error_

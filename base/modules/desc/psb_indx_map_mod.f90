@@ -108,7 +108,7 @@ module psb_indx_map_mod
     !> State of the map 
     integer(psb_ipk_) :: state          = psb_desc_null_    
     !> Communication context
-    integer(psb_mpk_) :: ictxt          = -1
+    integer(psb_ipk_) :: ictxt          = -1
     !> MPI communicator
     integer(psb_mpk_) :: mpic           = -1
     !> Number of global rows
@@ -487,7 +487,7 @@ contains
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_mpk_) :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%ictxt
 
@@ -515,7 +515,7 @@ contains
   subroutine base_set_ctxt(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%ictxt = val
   end subroutine base_set_ctxt
@@ -1348,7 +1348,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
@@ -1470,7 +1470,7 @@ contains
     integer(psb_ipk_), intent(in)      :: v(:)
     integer(psb_ipk_), intent(out)     :: info
     !
-    integer(psb_mpk_) :: me, np
+    integer(psb_ipk_) :: me, np
     integer(psb_ipk_) :: i, j, nr, nc, nh
 
     call psb_info(idxmap%ictxt,me,np)

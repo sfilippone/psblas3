@@ -51,7 +51,6 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
 
   integer(psb_lpk_), allocatable :: vl(:)
   integer(psb_ipk_)  :: debug_level, debug_unit, ierr(5)
-  integer(psb_mpk_) :: iictxt
   character(len=20)  :: name, ch_err
 
   name='cd_switch_ovl_indxmap'
@@ -66,7 +65,6 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),&
        & ': start'
-  iictxt = ictxt 
   mglob  = desc%get_global_rows() 
   n_row  = desc%get_local_rows()
   n_col  = desc%get_local_cols()
@@ -99,7 +97,7 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   end if
   
   if (info == psb_success_)&
-       & call desc%indxmap%init(iictxt,vl(1:n_row),info)
+       & call desc%indxmap%init(ictxt,vl(1:n_row),info)
   if (info == psb_success_) call psb_cd_set_bld(desc,info)
   if (info == psb_success_) &
        & call  desc%indxmap%g2lip_ins(vl(n_row+1:n_col),info)

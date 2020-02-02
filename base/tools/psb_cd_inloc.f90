@@ -67,7 +67,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
        & nov(:), ov_idx(:,:), temp_ovrlap(:)
   integer(psb_lpk_), allocatable :: vl(:), ix(:), l_temp_ovrlap(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
-  integer(psb_mpk_)  :: iictxt
   real(psb_dpk_)     :: t0, t1, t2, t3, t4, t5 
   logical            :: do_timings=.false.
   logical            :: check_, islarge, usehash_
@@ -84,7 +83,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': start',np
-  iictxt = ictxt
   if (do_timings) then 
     call psb_barrier(ictxt)
     t0 = psb_wtime()
@@ -388,9 +386,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(iictxt,m,info)
+    call aa%repl_map_init(ictxt,m,info)
   class default 
-    call aa%init(iictxt,vl(1:nlu),info)
+    call aa%init(ictxt,vl(1:nlu),info)
   end select
 
   if (do_timings) then 

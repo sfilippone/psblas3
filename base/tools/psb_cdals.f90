@@ -67,7 +67,6 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   integer(psb_ipk_), allocatable  :: prc_v(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: me, np, nprocs
-  integer(psb_mpk_) :: iictxt
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -239,12 +238,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
-  iictxt = ictxt
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(iictxt,m,info)
+    call aa%repl_map_init(ictxt,m,info)
   class default 
-    call aa%init(iictxt,loc_idx(1:k),info)
+    call aa%init(ictxt,loc_idx(1:k),info)
   end select
 
 

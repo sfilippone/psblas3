@@ -1139,16 +1139,17 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_mpk_), intent(inout)  :: dat
     integer(psb_mpk_) :: dat_
-    integer(psb_mpk_) :: iam, np, info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iam, np, info
+    integer(psb_mpk_) :: minfo, icomm
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-    call mpi_scan(dat,dat_,1,psb_mpi_mpk_,mpi_sum,ictxt,info)
+    icomm = psb_get_mpi_comm(ictxt)
+    call mpi_scan(dat,dat_,1,psb_mpi_mpk_,mpi_sum,icomm,minfo)
     dat = dat_
 #endif    
   end subroutine psb_mscan_sums
@@ -1162,16 +1163,17 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_mpk_), intent(inout)  :: dat
     integer(psb_mpk_) :: dat_
-    integer(psb_mpk_) :: iam, np, info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm, minfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-    call mpi_exscan(dat,dat_,1,psb_mpi_mpk_,mpi_sum,ictxt,info)
+    icomm = psb_get_mpi_comm(ictxt)
+    call mpi_exscan(dat,dat_,1,psb_mpi_mpk_,mpi_sum,icomm,minfo)
     dat = dat_
 #else
     dat = mzero
@@ -1187,20 +1189,21 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_mpk_), intent(inout)  :: dat(:)
-    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
     integer(psb_mpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: iam, np,  info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iam, np,  info
+    integer(psb_mpk_) :: minfo, icomm
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-    call psb_realloc(size(dat),dat_,iinfo)
+    icomm = psb_get_mpi_comm(ictxt)
+    call psb_realloc(size(dat),dat_,info)
     dat_ = dat
-    if (iinfo == psb_success_) &
-         & call mpi_scan(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,ictxt,info)
+    if (info == psb_success_) &
+         & call mpi_scan(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,icomm,minfo)
 #endif
   end subroutine psb_mscan_sumv
 
@@ -1213,20 +1216,21 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_mpk_), intent(inout)  :: dat(:)
-    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
     integer(psb_mpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: iam, np,  info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iam, np,  info
+    integer(psb_mpk_) :: minfo, icomm
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-    call psb_realloc(size(dat),dat_,iinfo)
+    icomm = psb_get_mpi_comm(ictxt)
+    call psb_realloc(size(dat),dat_,info)
     dat_ = dat
-    if (iinfo == psb_success_) &
-         & call mpi_exscan(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,ictxt,info)
+    if (info == psb_success_) &
+         & call mpi_exscan(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,icomm,minfo)
 #else
     dat = mzero
 #endif

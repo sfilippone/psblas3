@@ -96,11 +96,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_glist_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt    
+    integer(psb_ipk_), intent(in)  :: ictxt    
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) :: nl
     integer(psb_lpk_) :: i, n
     

@@ -147,9 +147,9 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       if (info == psb_success_) call psb_realloc(nzg,glbja,info)    
       if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
     else
-      if (info == psb_success_) call psb_realloc(1,glbia,info)
-      if (info == psb_success_) call psb_realloc(1,glbja,info)    
-      if (info == psb_success_) call glob_coo%allocate(1,1,1)
+      if (info == psb_success_) call psb_realloc(ione,glbia,info)
+      if (info == psb_success_) call psb_realloc(ione,glbja,info)    
+      if (info == psb_success_) call glob_coo%allocate(ione,ione,ione)
     end if
     
     if (info /= psb_success_) goto 9999

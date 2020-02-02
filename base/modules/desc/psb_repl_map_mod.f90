@@ -726,10 +726,10 @@ contains
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(in)  :: nl
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 

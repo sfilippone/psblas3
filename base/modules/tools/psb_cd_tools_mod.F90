@@ -104,6 +104,7 @@ module psb_cd_tools_mod
   end interface
 
   interface psb_cdins
+#if defined(IPK4) && defined(LPK8) 
     subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       import :: psb_ipk_, psb_lpk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc_a
@@ -122,7 +123,7 @@ module psb_cd_tools_mod
       logical, optional, target, intent(in)      :: mask(:)
       integer(psb_ipk_), intent(in), optional    :: lidx(:)
     end subroutine psb_cdinsc
-#if defined(IPK4) && defined(LPK8) 
+#endif
     subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       import :: psb_ipk_, psb_lpk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc_a
@@ -141,7 +142,6 @@ module psb_cd_tools_mod
       logical, optional, target, intent(in)      :: mask(:)
       integer(psb_ipk_), intent(in), optional    :: lidx(:)
     end subroutine psb_lcdinsc
-#endif
   end interface
 
   interface psb_cdbldext

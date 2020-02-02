@@ -288,6 +288,7 @@ subroutine psb_dspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
 
 end subroutine psb_dspins_csr_lirp
 
+#if defined(IPK4) && defined(LPK8) 
 subroutine psb_dspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_dspins_csr_iirp
   use psi_mod
@@ -384,6 +385,7 @@ subroutine psb_dspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
   return
 
 end subroutine psb_dspins_csr_iirp
+#endif
 
 subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_base_mod, psb_protect_name => psb_dspins_2desc

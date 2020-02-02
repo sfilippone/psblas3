@@ -283,6 +283,7 @@ Module psb_c_tools_mod
       integer(psb_ipk_), intent(out)         :: info
       logical, intent(in), optional         :: rebuild, local
     end subroutine psb_cspins_csr_lirp
+#if defined(IPK4) && defined(LPK8)    
     subroutine psb_cspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
       import
       implicit none
@@ -294,6 +295,7 @@ Module psb_c_tools_mod
       integer(psb_ipk_), intent(out)         :: info
       logical, intent(in), optional         :: rebuild, local
     end subroutine psb_cspins_csr_iirp
+#endif
     subroutine psb_cspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       use psb_i_vect_mod, only : psb_i_vect_type
       import

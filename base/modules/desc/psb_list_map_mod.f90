@@ -1044,13 +1044,13 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(in) :: ictxt
     integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_lpk_) :: nl
     integer(psb_lpk_), allocatable :: lvl(:)
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -1078,12 +1078,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(in) :: ictxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_lpk_) ::  i, ix, nl, n, nrt
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 

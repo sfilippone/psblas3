@@ -125,6 +125,7 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet2_read
+#if defined(IPK4) && defined(LPK8) 
     subroutine mm_lvet_read(b, info, iunit, filename)   
       import :: psb_dpk_, psb_ipk_, psb_lpk_
       implicit none
@@ -141,6 +142,7 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet2_read
+#endif
   end interface
 
 
@@ -244,6 +246,7 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet1_write
+#if defined(IPK4) && defined(LPK8) 
     subroutine mm_lvet2_write(b, header, info, iunit, filename)   
       import :: psb_dpk_, psb_ipk_, psb_lpk_
       implicit none
@@ -262,6 +265,7 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet1_write
+#endif
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
