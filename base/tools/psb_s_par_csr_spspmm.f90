@@ -39,7 +39,7 @@
 !         C = A * B 
 !
 !  where all the matrices are stored in CSR. On input and output the matrices
-!  are stored with column indices in local numbering, but inermediate quantities
+!  are stored with column indices in local numbering, but intermediate quantities
 !  are in global numbering because gathering the halo of B to multiply it
 !  by A implies a potential enlargement of the support.
 !  Also, B may have a column index space different from its row index space,
