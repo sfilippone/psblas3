@@ -107,7 +107,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_) :: ictxt,np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
   integer(psb_ipk_) :: tmpv(4)
-  logical, parameter  :: do_timings=.false., trace=.false.
+  logical, parameter  :: do_timings=.false., trace=.false., debugsz=.false.
   integer(psb_ipk_), save  :: idx_sweep0=-1, idx_loop_a2a=-1, idx_loop_neigh=-1
   real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name
@@ -180,6 +180,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   tmpv(3) = n_row
   tmpv(4) = psb_cd_get_maxspace()
   call psb_max(ictxt,tmpv)
+  nreqst_max = tmpv(2)
   locr_max = tmpv(3)
   maxspace = nt*locr_max
   if (tmpv(4) > 0) maxspace = min(maxspace,tmpv(4))
@@ -191,6 +192,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! Do a preliminary run on the user-defined adjacency lists
     !
     if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology'
+    if (debugsz) write(0,*) me,' Initial sweep on user-defined topology',nreqst
     nsampl_in = min(nreqst,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
     call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
@@ -198,11 +200,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     nreqst_max = nreqst
     call psb_max(ictxt,nreqst_max)
     if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nreqst_max
+    if (debugsz) write(0,*) me,' After sweep on user-defined topology',nreqst_max
   end if
   if (do_timings) call psb_toc(idx_sweep0)
     
   fnd_owner_loop: do while (nreqst_max>0)
-    if (do_timings) call psb_tic(idx_loop_a2a)    
+    if (do_timings) call psb_tic(idx_loop_a2a)
+    if (debugsz) write(0,*) me,' fnd_owner_loop',nreqst_max
     !
     ! The basic idea of this loop is to alternate between
     ! searching through all processes and searching
@@ -221,12 +225,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ipnt = 1
     call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out, pad=.true.)      
     nsampl_in = min(nsampl_out,nsampl_in)
-!!$      write(0,*) me,' From first sampling ',nsampl_in
+    if (debugsz) write(0,*) me,' From first sampling ',nsampl_in
     ! 
     ! 2. Do a search on all processes; this is supposed to find
     !    the owning process for all inputs;
     !    
     call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info, samesize=.true.)
+    if (debugsz) write(0,*) me,' From a2a_fnd_owner ',info
     !
     ! We might have padded when looking for owners, so the actual samples
     ! could be less than they appear. Should be explained better.
