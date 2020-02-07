@@ -306,6 +306,7 @@ contains
     ! Make sure we sweep through the entire vector immediately
     ! 
     if (ns == 0) ns = nv
+    ns = min(ns,size(tsmpl))
     ns_out = 0
 
     do while (ipntidx<= nv)
