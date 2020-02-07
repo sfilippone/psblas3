@@ -303,7 +303,8 @@ contains
     !
     ! ns_in == 0 means that on the outside we figure there's
     ! nothing left, but we are here because we have to synchronize.
-    ! Make sure we sweep through the entire vector immediately
+    ! Make sure we sweep through the entire vector immediately.
+    ! But also make sure we do not overrun tsmpl
     ! 
     if (ns == 0) ns = nv
     ns = min(ns,size(tsmpl))
