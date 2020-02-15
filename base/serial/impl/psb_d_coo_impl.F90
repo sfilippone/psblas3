@@ -483,17 +483,15 @@ subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
 
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_d_coo_sparse_mat), intent(in) :: a   
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='d_coo_print'
   logical, parameter :: debug=.false.
-
-  character(len=*), parameter  :: datatype='real'
-  character(len=80)            :: frmtv 
-  integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)            :: frmt 
+  integer(psb_ipk_) :: i,j, ni, nr, nc, nz
 
   write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
   if (present(head)) write(iout,'(a,a)') '% ',head 
@@ -505,38 +503,29 @@ subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
-
-  if (datatype=='real') then 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
+  frmt = psb_d_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
+  
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do j=1,a%get_nzeros()
-      write(iout,frmtv) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
+      write(iout,frmt) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
     enddo
   else      
     if (present(ivr).and..not.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),a%ja(j),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),a%ja(j),a%val(j)
       enddo
     else if (present(ivr).and.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) a%ia(j),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),a%ja(j),a%val(j)
+        write(iout,frmt) a%ia(j),a%ja(j),a%val(j)
       enddo
     endif
   endif
@@ -4871,9 +4860,8 @@ subroutine psb_ld_coo_print(iout,a,iv,head,ivr,ivc)
   character(len=20)  :: name='ld_coo_print'
   logical, parameter :: debug=.false.
 
-  character(len=*), parameter  :: datatype='real'
-  character(len=80)            :: frmtv 
-  integer(psb_lpk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)            :: frmt
+  integer(psb_lpk_) :: i,j, ni, nr, nc, nz
 
   write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
   if (present(head)) write(iout,'(a,a)') '% ',head 
@@ -4885,38 +4873,29 @@ subroutine psb_ld_coo_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
-
-  if (datatype=='real') then 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
+  frmt = psb_ld_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
+  
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do j=1,a%get_nzeros()
-      write(iout,frmtv) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
+      write(iout,frmt) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
     enddo
   else      
     if (present(ivr).and..not.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),a%ja(j),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),a%ja(j),a%val(j)
       enddo
     else if (present(ivr).and.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) a%ia(j),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then 
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),a%ja(j),a%val(j)
+        write(iout,frmt) a%ia(j),a%ja(j),a%val(j)
       enddo
     endif
   endif

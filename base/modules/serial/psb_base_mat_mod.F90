@@ -306,12 +306,12 @@ module psb_base_mat_mod
   !    
   interface 
     subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
-      import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
+      import :: psb_ipk_, psb_epk_, psb_base_sparse_mat, psb_lpk_
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_base_sparse_mat), intent(in) :: a   
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_base_sparse_print
   end interface
 

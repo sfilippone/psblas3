@@ -565,9 +565,9 @@ module psb_z_mat_mod
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_zspmat_type), intent(in) :: a   
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_z_sparse_print
   end interface
 
@@ -576,9 +576,9 @@ module psb_z_mat_mod
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type
       character(len=*), intent(in)      :: fname
       class(psb_zspmat_type), intent(in) :: a   
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_z_n_sparse_print
   end interface
   

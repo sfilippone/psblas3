@@ -466,9 +466,9 @@ subroutine psb_c_sparse_print(iout,a,iv,head,ivr,ivc)
 
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_cspmat_type), intent(in) :: a   
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='sparse_print'
@@ -500,9 +500,9 @@ subroutine psb_c_n_sparse_print(fname,a,iv,head,ivr,ivc)
 
   character(len=*), intent(in)  :: fname   
   class(psb_cspmat_type), intent(in) :: a   
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act, info, iout
   logical :: isopen

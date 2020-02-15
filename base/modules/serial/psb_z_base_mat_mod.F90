@@ -1713,9 +1713,9 @@ module psb_z_base_mat_mod
       import 
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_z_coo_sparse_mat), intent(in) :: a   
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_z_coo_print
   end interface
   
@@ -3541,9 +3541,61 @@ module psb_z_base_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lz_coo_scals
   end interface
+
+  public :: psb_z_get_print_frmt, psb_lz_get_print_frmt
   
-contains 
- 
+contains
+  
+  function psb_z_get_print_frmt(nr,nc,nz,iv,ivr,ivc) result(frmt)
+    
+    implicit none
+    character(len=80) :: frmt
+    integer(psb_ipk_), intent(in) :: nr, nc, nz
+    integer(psb_lpk_), intent(in), optional     :: iv(:)
+    integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+    !
+    character(len=*), parameter  :: datatype='complex'
+    integer(psb_lpk_) :: nmx
+    integer(psb_ipk_) :: ni
+    nmx = max(nr,nc,ione)
+    if (present(iv))  nmx = max(nmx,maxval(abs(iv(1:nc))))
+    if (present(ivr)) nmx = max(nmx,maxval(abs(ivr(1:nr))))
+    if (present(ivc)) nmx = max(nmx,maxval(abs(ivc(1:nc))))
+    ni  = floor(log10(1.0*nmx)) + 2
+    
+    if (datatype=='complex') then 
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+    else 
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+    end if
+    
+  end function psb_z_get_print_frmt
+  
+  function psb_lz_get_print_frmt(nr,nc,nz,iv,ivr,ivc) result(frmt)
+    
+    implicit none
+    character(len=80) :: frmt
+    integer(psb_lpk_), intent(in) :: nr, nc, nz
+    integer(psb_lpk_), intent(in), optional     :: iv(:)
+    integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+    !
+    character(len=*), parameter  :: datatype='complex'
+    integer(psb_lpk_) :: nmx
+    integer(psb_lpk_) :: ni
+    nmx = max(nr,nc,lone)
+    if (present(iv))  nmx = max(nmx,maxval(abs(iv(1:nc))))
+    if (present(ivr)) nmx = max(nmx,maxval(abs(ivr(1:nr))))
+    if (present(ivc)) nmx = max(nmx,maxval(abs(ivc(1:nc))))
+    ni  = floor(log10(1.0*nmx)) + 2
+    
+    if (datatype=='complex') then 
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+    else 
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+    end if
+    
+  end function psb_lz_get_print_frmt
+  
   
   ! == ==================================
   !

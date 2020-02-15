@@ -2706,18 +2706,16 @@ subroutine psb_c_csc_print(iout,a,iv,head,ivr,ivc)
 
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_c_csc_sparse_mat), intent(in) :: a   
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='c_csc_print'
   logical, parameter :: debug=.false.
 
-  character(len=*), parameter  :: datatype='complex'
-  character(len=80)                 :: frmtv 
-  integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)                 :: frmt
+  integer(psb_ipk_) :: i,j, ni, nr, nc, nz
 
   
   write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
@@ -2730,47 +2728,37 @@ subroutine psb_c_csc_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
-
-  if (datatype=='real') then 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
+  frmt = psb_c_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nc
       do j=a%icp(i),a%icp(i+1)-1 
-        write(iout,frmtv) iv(a%ia(j)),iv(i),a%val(j)
+        write(iout,frmt) iv(a%ia(j)),iv(i),a%val(j)
       end do
     enddo
   else      
     if (present(ivr).and..not.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) ivr(a%ia(j)),i,a%val(j)
+          write(iout,frmt) ivr(a%ia(j)),i,a%val(j)
         end do
       enddo
     else if (present(ivr).and.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) ivr(a%ia(j)),ivc(i),a%val(j)
+          write(iout,frmt) ivr(a%ia(j)),ivc(i),a%val(j)
         end do
       enddo
     else if (.not.present(ivr).and.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) (a%ia(j)),ivc(i),a%val(j)
+          write(iout,frmt) (a%ia(j)),ivc(i),a%val(j)
         end do
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) (a%ia(j)),(i),a%val(j)
+          write(iout,frmt) (a%ia(j)),(i),a%val(j)
         end do
       enddo
     endif
@@ -4561,13 +4549,10 @@ subroutine psb_lc_csc_print(iout,a,iv,head,ivr,ivc)
   integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='lc_csc_print'
   logical, parameter :: debug=.false.
-
-  character(len=*), parameter  :: datatype='complex'
-  character(len=80)                 :: frmtv 
-  integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)                 :: frmt 
+  integer(psb_lpk_) :: i,j, ni, nr, nc, nz
 
   
   write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
@@ -4580,47 +4565,38 @@ subroutine psb_lc_csc_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
-
-  if (datatype=='real') then 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else 
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
+  frmt = psb_lc_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
+    
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nc
       do j=a%icp(i),a%icp(i+1)-1 
-        write(iout,frmtv) iv(a%ia(j)),iv(i),a%val(j)
+        write(iout,frmt) iv(a%ia(j)),iv(i),a%val(j)
       end do
     enddo
   else      
     if (present(ivr).and..not.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) ivr(a%ia(j)),i,a%val(j)
+          write(iout,frmt) ivr(a%ia(j)),i,a%val(j)
         end do
       enddo
     else if (present(ivr).and.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) ivr(a%ia(j)),ivc(i),a%val(j)
+          write(iout,frmt) ivr(a%ia(j)),ivc(i),a%val(j)
         end do
       enddo
     else if (.not.present(ivr).and.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) (a%ia(j)),ivc(i),a%val(j)
+          write(iout,frmt) (a%ia(j)),ivc(i),a%val(j)
         end do
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then 
       do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
-          write(iout,frmtv) (a%ia(j)),(i),a%val(j)
+          write(iout,frmt) (a%ia(j)),(i),a%val(j)
         end do
       enddo
     endif
