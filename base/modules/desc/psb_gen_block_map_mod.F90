@@ -127,7 +127,7 @@ module psb_gen_block_map_mod
 #if defined(IPK4) && defined(LPK8)
   private ::  l_gen_block_search
 #endif
-  
+
   interface gen_block_search
     module procedure i_gen_block_search
 #if defined(IPK4) && defined(LPK8)
@@ -373,7 +373,7 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i
+    integer(psb_lpk_) :: i
     logical :: owned_
     info = 0
 
@@ -431,7 +431,7 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: is, im, i
+    integer(psb_lpk_) :: is, im, i
     logical :: owned_
 
     info = 0
@@ -1527,7 +1527,7 @@ contains
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: i, nv, is, ix
+    integer(psb_lpk_) :: i, nv, is, ix
     integer(psb_lpk_) :: ip, lip, lnxt
     integer(psb_ipk_) :: nxt
 
@@ -1732,7 +1732,7 @@ contains
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: i, nv, is, ix, im
+    integer(psb_lpk_) :: i, nv, is, ix, im
     integer(psb_lpk_) :: ip, lip, lnxt
     integer(psb_ipk_) :: nxt
 

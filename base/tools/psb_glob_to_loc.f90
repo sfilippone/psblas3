@@ -60,10 +60,9 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
 
   !....locals....
   integer(psb_ipk_) :: n, ictxt, iam, np 
-  character                          :: act
-  integer(psb_ipk_) :: int_err(5), err_act
-  integer(psb_ipk_), parameter                 :: zero=0
-  character(len=20)   :: name
+  character         :: act
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -181,10 +180,9 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
 
   !....locals....
   integer(psb_ipk_) :: n
-  character                        :: act
+  character         :: act
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_), parameter               :: zero=0
-  character(len=20)   :: name
+  character(len=20) :: name
   integer(psb_ipk_) :: ictxt, iam, np
 
   if(psb_get_errstatus() /= 0) return 
