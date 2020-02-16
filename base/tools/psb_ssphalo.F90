@@ -506,8 +506,7 @@ Subroutine psb_lssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
   integer(psb_ipk_) :: ictxt, np,me
-  integer(psb_ipk_) :: counter, proc, i, &
-       &     n_el_send,n_el_recv,&
+  integer(psb_ipk_) :: counter, proc, i, n_el_send,n_el_recv, &
        &     n_elem, j, ipx,mat_recv, idxs,idxr,nz,&
        &     data_,totxch,nxs, nxr, ncg
   integer(psb_lpk_) :: r, k, irmin, irmax, icmin, icmax, iszs, iszr, &
@@ -829,12 +828,11 @@ Subroutine psb_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   type(psb_desc_type),Intent(in), optional, target :: col_desc
   !     ...local scalars....
   integer(psb_ipk_) :: ictxt, np,me
-  integer(psb_ipk_) :: counter,proc,i, &
-       &     n_el_send,k,n_el_recv,r,&
-       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
-       &     irmin,icmin,data_,totxch,nxs, nxr,&
-       &     err_act, nsnds, nrcvs
-  integer(psb_lpk_) :: ngtz,irmax,icmax,l1, lnr, lnc, lnnz, ncg, jpx, idx, tot_elem
+  integer(psb_ipk_) :: counter,proc,i, n_el_send,n_el_recv,&
+       &     n_elem, j,ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
+       &     data_,totxch,nxs, nxr, err_act, nsnds, nrcvs
+  integer(psb_lpk_) :: ngtz,irmax,icmax,irmin,icmin,l1, lnr, lnc, lnnz, &
+       &  r, k, ncg, jpx, idx, tot_elem
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
@@ -1067,9 +1065,9 @@ Subroutine psb_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 #elif defined(SP_A2AV_XI)
     call ls_my_a2av(valsnd,sdsz,bsdindx,&
          & acoo%val,rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call i_my_a2av(iasnd,sdsz,bsdindx,&
+    if (info == psb_success_) call l_my_a2av(iasnd,sdsz,bsdindx,&
          & acoo%ia,rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call i_my_a2av(jasnd,sdsz,bsdindx,&
+    if (info == psb_success_) call l_my_a2av(jasnd,sdsz,bsdindx,&
          & acoo%ja,rvsz,brvindx,ictxt,info)
 #elif defined(SP_A2AV_MAT)
     call ls_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
@@ -1308,10 +1306,10 @@ contains
     
   end subroutine ls_my_a2av
 
-  subroutine i_my_a2av(valsnd,sdsz,bsdindx,&
+  subroutine l_my_a2av(valsnd,sdsz,bsdindx,&
        & valrcv,rvsz,brvindx,ictxt,info)
-    integer(psb_ipk_), intent(in)  :: valsnd(:)
-    integer(psb_ipk_), intent(out) :: valrcv(:)
+    integer(psb_lpk_), intent(in)  :: valsnd(:)
+    integer(psb_lpk_), intent(out) :: valrcv(:)
     integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
     integer(psb_ipk_), intent(in) :: ictxt
     integer(psb_ipk_), intent(out) :: info
@@ -1341,7 +1339,7 @@ contains
       end if
     end do
     
-  end subroutine i_my_a2av
+  end subroutine l_my_a2av
 #endif
 #endif
 End Subroutine psb_ls_csr_halo
