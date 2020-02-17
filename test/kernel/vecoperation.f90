@@ -46,7 +46,7 @@ program vecoperation
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! vector
-  type(psb_d_vect_type)  :: x,y,z
+  type(psb_d_vect_type)  :: x,y,z,absz
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
   ! other variables
@@ -115,12 +115,16 @@ program vecoperation
   call psb_geall(x,desc_a,info)
   call psb_geall(y,desc_a,info)
   call psb_geall(z,desc_a,info)
+  call psb_geall(absz,desc_a,info)
   ! Put entries into the vectors
   do ii=1,nlr
-    zt(1) = 1.0
+    zt(1) = 1.0_psb_dpk_
     call psb_geins(ib,myidx(ii:),zt(1:),x,desc_a,info)
-    zt(1) = 2.0
+    zt(1) = 2.0_psb_dpk_
     call psb_geins(ib,myidx(ii:),zt(1:),y,desc_a,info)
+    zt(1) = -10.0_psb_dpk_
+    call psb_geins(ib,myidx(ii:),zt(1:),z,desc_a,info)
+    call psb_geins(ib,myidx(ii:),zt(1:),absz,desc_a,info)
   end do
   ! Assemble
   call psb_cdasb(desc_a,info)
@@ -132,6 +136,8 @@ program vecoperation
   end if
   if (info == psb_success_) call psb_geasb(x,desc_a,info)
   if (info == psb_success_) call psb_geasb(y,desc_a,info)
+  if (info == psb_success_) call psb_geasb(z,desc_a,info)
+  if (info == psb_success_) call psb_geasb(absz,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='vec asb rout.'
@@ -198,6 +204,21 @@ program vecoperation
     write(psb_out_unit,'("z = ",es12.1)')vz(:)
   end if
 
+  call psb_geaxpby(-1.0_psb_dpk_, x, 0.0_psb_dpk_, x, desc_a, info)
+  if (iam == psb_root_) then
+    write(psb_out_unit,'("abs : z = |x|")')
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+  end if
+
+  call psb_geabs(x,absz,desc_a,info)
+
+  if (iam == psb_root_) then
+    write(psb_out_unit,'("info = ",I1)')info
+    vz = absz%get_vect()
+    write(psb_out_unit,'("|x| = ",es12.1)')vz(:)
+  end if
+
   c = 1.0/2.0;
   call psb_gecmp(x,c,z,desc_a,info);
 
@@ -214,6 +235,8 @@ program vecoperation
   !
   call psb_gefree(x,desc_a,info)
   call psb_gefree(y,desc_a,info)
+  call psb_gefree(z,desc_a,info)
+  call psb_gefree(absz,desc_a,info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_

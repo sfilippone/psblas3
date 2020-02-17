@@ -479,5 +479,16 @@ module psb_z_psblas_mod
     end subroutine psb_zinv_vect_check
   end interface
 
+  interface psb_geabs
+    subroutine psb_zabs_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_z_vect_type
+      type(psb_z_vect_type), intent (inout) :: x
+      type(psb_z_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_zabs_vect
+  end interface
+
 
 end module psb_z_psblas_mod
