@@ -314,13 +314,29 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     call psb_errpush(info,name,a_err=ch_err);  goto 9999
   end if
 
-
+#if defined(SP_A2AV_MPI)
   call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
        & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & iarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & jarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  if (minfo /= mpi_success) info = minfo
+#elif defined(SP_A2AV_XI)
+  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+       & acoo%val,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+       & iarcv,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+       & jarcv,rvsz,brvindx,ictxt,info)
+#elif defined(SP_A2AV_MAT)
+  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & acoo%val,iarcv,jarcv,rvsz,brvindx,ictxt,info)
+#else
+  choke on me @!
+#endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'
@@ -390,13 +406,29 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-
+#if defined(SP_A2AV_MPI)
   call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
        & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_,icomm,minfo)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_,icomm,minfo)
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+       & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+       & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  if (minfo /= mpi_success) info = minfo
+#elif defined(SP_A2AV_XI)
+  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+       & acoo%val,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+       & acoo%ia,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+       & acoo%ja,rvsz,brvindx,ictxt,info)
+#elif defined(SP_A2AV_MAT)
+  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+#else
+  choke on me @!
+#endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'
@@ -717,13 +749,29 @@ Subroutine psb_lcsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-
+#if defined(SP_A2AV_MPI)
   call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
        & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+  if (minfo == mpi_success) &
+       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  if (minfo /= mpi_success) info = minfo
+#elif defined(SP_A2AV_XI)
+  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+       & acoo%val,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+       & acoo%ia,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+       & acoo%ja,rvsz,brvindx,ictxt,info)
+#elif defined(SP_A2AV_MAT)
+  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+#else
+  choke on me @!
+#endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='mpi_alltoallv')
@@ -1061,20 +1109,21 @@ Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (minfo == mpi_success) &
        & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-    if (minfo /= mpi_success) info = minfo
+  if (minfo /= mpi_success) info = minfo
 #elif defined(SP_A2AV_XI)
-    call lc_my_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val,rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call l_my_a2av(iasnd,sdsz,bsdindx,&
-         & acoo%ia,rvsz,brvindx,ictxt,info)
-    if (info == psb_success_) call l_my_a2av(jasnd,sdsz,bsdindx,&
-         & acoo%ja,rvsz,brvindx,ictxt,info)
+  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+       & acoo%val,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+       & acoo%ia,rvsz,brvindx,ictxt,info)
+  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+       & acoo%ja,rvsz,brvindx,ictxt,info)
 #elif defined(SP_A2AV_MAT)
-    call lc_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ipdxv,ictxt,icomm,info)
+  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+       & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
 #else
-    choke on me @!
+  choke on me @!
 #endif
+
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='mpi_alltoallv')
@@ -1161,185 +1210,4 @@ Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   return
 
-#if defined(SP_A2AV_XI) || defined(SP_A2AV_MAT) 
-contains
-
-#if defined(SP_A2AV_MAT) 
-  subroutine lc_coo_my_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & valrcv,iarcv,jarcv,rvsz,brvindx,ipdxv,ictxt,icomm,info)
-
-#ifdef MPI_MOD
-    use mpi
-#endif
-    Implicit None
-#ifdef MPI_H
-    include 'mpif.h'
-#endif
-    complex(psb_spk_), intent(in)     :: valsnd(:)
-    integer(psb_ipk_), intent(in)  :: ipdxv(:)
-    integer(psb_lpk_), intent(in)  :: iasnd(:), jasnd(:)
-    complex(psb_spk_), intent(out)    :: valrcv(:)
-    integer(psb_lpk_), intent(out) :: iarcv(:), jarcv(:)
-    integer(psb_mpk_), intent(in)  :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
-    integer(psb_ipk_), intent(in)  :: ictxt
-    integer(psb_mpk_), intent(in) :: icomm
-    integer(psb_ipk_), intent(out) :: info
-    !Local variables
-    integer(psb_ipk_)  :: iam, np, i,j,k, ip, ipx, idx, sz, counter
-    integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-    integer(psb_mpk_), allocatable :: prcid(:), rvhd(:,:)
-
-    call psb_info(ictxt,iam,np)
-    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
-      info = psb_err_internal_error_
-      return
-    end if
-
-    allocate(prcid(np),rvhd(np,3))
-    prcid = -1
-
-
-    counter=1
-    Do 
-      ip=ipdxv(counter)
-      if (ip == -1) exit
-      n_el_recv = ipdxv(counter+psb_n_elem_recv_)
-      counter   = counter+n_el_recv
-      n_el_send = ipdxv(counter+psb_n_elem_send_)
-      prcid(ip+1) = psb_get_mpi_rank(ictxt,ip)
-      sz = rvsz(ip+1) 
-      if (sz > 0) then
-        idx = brvindx(ip+1)
-        p2ptag =  psb_complex_swap_tag
-        call mpi_irecv(valrcv(idx+1:idx+sz),sz,&
-             & psb_mpi_c_spk_,prcid(ip+1),&
-             & p2ptag, icomm,rvhd(ip+1,1),iret)
-        p2ptag = psb_int_swap_tag
-        call mpi_irecv(iarcv(idx+1:idx+sz),sz,&
-             & psb_mpi_lpk_,prcid(ip+1),&
-             & p2ptag, icomm,rvhd(ip+1,2),iret)
-        call mpi_irecv(jarcv(idx+1:idx+sz),sz,&
-             & psb_mpi_lpk_,prcid(ip+1),&
-             & p2ptag, icomm,rvhd(ip+1,3),iret)
-      end if
-      counter   = counter+n_el_send+3
-    Enddo
-
-
-    counter=1
-    Do 
-      ip=ipdxv(counter)
-      if (ip == -1) exit
-      n_el_recv = ipdxv(counter+psb_n_elem_recv_)
-      counter   = counter+n_el_recv
-      n_el_send = ipdxv(counter+psb_n_elem_send_)
-      if (prcid(ip+1)<0) prcid(ip+1) = psb_get_mpi_rank(ictxt,ip)
-      sz = sdsz(ip+1) 
-      if (sz > 0) then
-        idx = bsdindx(ip+1)
-        p2ptag =  psb_complex_swap_tag
-        call mpi_send(valsnd(idx+1:idx+sz),sz,&
-             & psb_mpi_c_spk_,prcid(ip+1),&
-             & p2ptag, icomm,iret)
-        p2ptag = psb_int_swap_tag
-        call mpi_send(iasnd(idx+1:idx+sz),sz,&
-             & psb_mpi_lpk_,prcid(ip+1),&
-             & p2ptag, icomm,iret)
-        call mpi_send(jasnd(idx+1:idx+sz),sz,&
-             & psb_mpi_lpk_,prcid(ip+1),&
-             & p2ptag, icomm,iret)
-      end if
-      counter   = counter+n_el_send+3
-    Enddo
-
-    counter=1
-    Do 
-      ip=ipdxv(counter)
-      if (ip == -1) exit
-      n_el_recv = ipdxv(counter+psb_n_elem_recv_)
-      counter   = counter+n_el_recv
-      n_el_send = ipdxv(counter+psb_n_elem_send_)
-      sz = rvsz(ip+1) 
-      if (sz > 0) then
-        call mpi_wait(rvhd(ip+1,1),p2pstat,iret)
-        call mpi_wait(rvhd(ip+1,2),p2pstat,iret)
-        call mpi_wait(rvhd(ip+1,3),p2pstat,iret)
-      end if
-      counter   = counter+n_el_send+3
-    Enddo
-
-
-  end subroutine lc_coo_my_a2av
-#endif
-#if  defined(SP_A2AV_XI) 
-  subroutine lc_my_a2av(valsnd,sdsz,bsdindx,&
-       & valrcv,rvsz,brvindx,ictxt,info)
-    complex(psb_spk_), intent(in)  :: valsnd(:)
-    complex(psb_spk_), intent(out) :: valrcv(:)
-    integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
-    integer(psb_ipk_), intent(in) :: ictxt
-    integer(psb_ipk_), intent(out) :: info
-
-    integer(psb_ipk_) :: iam, np, i,j,k, ip, ipx, idx, sz
-
-    call psb_info(ictxt,iam,np)
-    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
-      info = psb_err_internal_error_
-      return
-    end if
-
-    do ip = 0, np-1
-      sz = sdsz(ip+1) 
-      if (sz > 0) then
-        idx = bsdindx(ip+1)
-        call psb_snd(ictxt,valsnd(idx+1:idx+sz),ip) 
-      end if
-    end do
-
-    do ip = 0, np-1
-      sz = rvsz(ip+1) 
-      if (sz > 0) then
-        idx = brvindx(ip+1)
-        call psb_rcv(ictxt,valrcv(idx+1:idx+sz),ip) 
-      end if
-    end do
-    
-  end subroutine lc_my_a2av
-
-  subroutine l_my_a2av(valsnd,sdsz,bsdindx,&
-       & valrcv,rvsz,brvindx,ictxt,info)
-    integer(psb_lpk_), intent(in)  :: valsnd(:)
-    integer(psb_lpk_), intent(out) :: valrcv(:)
-    integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
-    integer(psb_ipk_), intent(in) :: ictxt
-    integer(psb_ipk_), intent(out) :: info
-    
-
-    integer(psb_ipk_) :: iam, np, i,j,k, ip, ipx, idx, sz
-
-    call psb_info(ictxt,iam,np)
-    if (min(size(bsdindx),size(brvindx),size(sdsz),size(rvsz))<np) then
-      info = psb_err_internal_error_
-      return
-    end if
-
-    do ip = 0, np-1
-      sz = sdsz(ip+1) 
-      if (sz > 0) then
-        idx = bsdindx(ip+1) 
-        call psb_snd(ictxt,valsnd(idx+1:idx+sz),ip) 
-      end if
-    end do
-
-    do ip = 0, np-1
-      sz = rvsz(ip+1) 
-      if (sz > 0) then
-        idx = brvindx(ip+1)
-        call psb_rcv(ictxt,valrcv(idx+1:idx+sz),ip) 
-      end if
-    end do
-    
-  end subroutine l_my_a2av
-#endif
-#endif
 End Subroutine psb_lc_csr_halo
