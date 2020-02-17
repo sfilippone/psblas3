@@ -274,8 +274,8 @@ subroutine psb_ls_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   call acoo%ensure_size(nzl+iszr)
 
 #if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
-       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
+  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_spk_,&
+       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_r_spk_,icomm,minfo)
   if (minfo == mpi_success) &
        & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
