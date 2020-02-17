@@ -81,7 +81,7 @@
 !
 #undef  SP_A2AV_MPI
 #undef  SP_A2AV_XI
-#define SP_A2AV_MAT
+#define SP_A2AV_TRIAD
 subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 #ifdef MPI_MOD
   use mpi
@@ -290,7 +290,7 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
        & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
   if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
        & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_MAT)
+#elif defined(SP_A2AV_TRIAD)
   call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
        & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)

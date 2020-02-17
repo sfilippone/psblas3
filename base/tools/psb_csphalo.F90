@@ -57,7 +57,7 @@
 !
 #undef  SP_A2AV_MPI
 #undef  SP_A2AV_XI
-#define SP_A2AV_MAT
+#define SP_A2AV_TRIAD
 Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_csphalo
@@ -331,7 +331,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & iarcv,rvsz,brvindx,ictxt,info)
   if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
        & jarcv,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_MAT)
+#elif defined(SP_A2AV_TRIAD)
   call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & acoo%val,iarcv,jarcv,rvsz,brvindx,ictxt,info)
 #else
@@ -423,7 +423,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & acoo%ia,rvsz,brvindx,ictxt,info)
   if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
        & acoo%ja,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_MAT)
+#elif defined(SP_A2AV_TRIAD)
   call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
 #else
@@ -766,7 +766,7 @@ Subroutine psb_lcsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & acoo%ia,rvsz,brvindx,ictxt,info)
   if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
        & acoo%ja,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_MAT)
+#elif defined(SP_A2AV_TRIAD)
   call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
 #else
@@ -1117,7 +1117,7 @@ Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
        & acoo%ia,rvsz,brvindx,ictxt,info)
   if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
        & acoo%ja,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_MAT)
+#elif defined(SP_A2AV_TRIAD)
   call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
 #else
