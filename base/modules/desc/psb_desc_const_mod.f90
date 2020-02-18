@@ -104,9 +104,17 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_hash_bits     = 16
   integer(psb_ipk_), parameter :: psb_max_hash_bits = 22
   integer(psb_ipk_), parameter :: psb_hash_size     = 2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
-  integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024   
   integer(psb_ipk_), parameter :: psb_hpnt_nentries_ = 7
-
+  integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024   
+  !
+  ! Choice of algorithm for sparse matrix A2AV
+  !
+  integer(psb_ipk_), parameter :: psb_sp_a2av_smpl_triad_  =  1
+  integer(psb_ipk_), parameter :: psb_sp_a2av_smpl_v_      =  2
+  integer(psb_ipk_), parameter :: psb_sp_a2av_mpi_         =  3
+  integer(psb_ipk_), parameter :: psb_sp_a2av_alg_min_     =  psb_sp_a2av_smpl_triad_
+  integer(psb_ipk_), parameter :: psb_sp_a2av_alg_max_     =  psb_sp_a2av_mpi_
+  
   !
   !     Constants for desc_a handling
   !

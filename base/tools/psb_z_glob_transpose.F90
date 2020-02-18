@@ -93,9 +93,6 @@
 !  persistent collectives. 
 !
 !
-#undef  SP_A2AV_MPI
-#undef  SP_A2AV_XI
-#define SP_A2AV_TRIAD
 subroutine psb_lz_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 #ifdef MPI_MOD
   use mpi
@@ -287,33 +284,38 @@ subroutine psb_lz_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   nzl = acoo%get_nzeros()
   call acoo%ensure_size(nzl+iszr)
 
-#if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
-       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= mpi_success) info = minfo
-#elif defined(SP_A2AV_XI)
-  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-       & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-       & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_TRIAD)
-  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
-       & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
-#else
-  choke on me @!
-#endif
+  select case(psb_get_sp_a2av_alg())
+  case(psb_sp_a2av_smpl_triad_)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val(nzl+1:nzl+iszr),acoo%ia(nzl+1:nzl+iszr),&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_smpl_v_)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_mpi_)
+    
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
+         & acoo%val(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ia(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ja(nzl+1:nzl+iszr),rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
+    goto 9999
+  end select
+
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='mpi_alltoallv')
+    call psb_errpush(info,name,a_err='alltoallv')
     goto 9999
   end if
 

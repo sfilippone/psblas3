@@ -70,9 +70,6 @@
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_  DISABLED for this routine.
 !
-#undef  SP_A2AV_MPI
-#undef  SP_A2AV_XI
-#define SP_A2AV_TRIAD
 Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_csphalo
@@ -329,32 +326,36 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     call psb_errpush(info,name,a_err=ch_err);  goto 9999
   end if
 
-#if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
-       & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  if (minfo == mpi_success) &
+  select case(psb_get_sp_a2av_alg())
+  case(psb_sp_a2av_smpl_triad_)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val,iarcv,jarcv,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_smpl_v_)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & iarcv,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & jarcv,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_mpi_)
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
+         & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
+    if (minfo == mpi_success) &
        & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
        & iarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & jarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= mpi_success) info = minfo
-#elif defined(SP_A2AV_XI)
-  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-       & acoo%val,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-       & iarcv,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-       & jarcv,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_TRIAD)
-  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & acoo%val,iarcv,jarcv,rvsz,brvindx,ictxt,info)
-#else
-  choke on me @!
-#endif
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & jarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
+    goto 9999
+  end select
+
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='mpi_alltoallv'
+    ch_err='alltoallv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
@@ -421,32 +422,36 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-#if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
-       & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= mpi_success) info = minfo
-#elif defined(SP_A2AV_XI)
-  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-       & acoo%val,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-       & acoo%ia,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-       & acoo%ja,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_TRIAD)
-  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
-#else
-  choke on me @!
-#endif
+  select case(psb_get_sp_a2av_alg())
+  case(psb_sp_a2av_smpl_triad_)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_smpl_v_)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_mpi_)
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
+         & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
+    goto 9999
+  end select
+
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='mpi_alltoallv'
+    ch_err='alltoallv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
@@ -764,32 +769,37 @@ Subroutine psb_lcsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-#if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
-       & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= mpi_success) info = minfo
-#elif defined(SP_A2AV_XI)
-  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-       & acoo%val,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-       & acoo%ia,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-       & acoo%ja,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_TRIAD)
-  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
-#else
-  choke on me @!
-#endif
+  select case(psb_get_sp_a2av_alg())
+  case(psb_sp_a2av_smpl_triad_)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_smpl_v_)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_mpi_)
+    
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
+         & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
+    goto 9999
+  end select
+
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='mpi_alltoallv')
+    call psb_errpush(info,name,a_err='alltoallv')
     goto 9999
   end if
 
@@ -1115,33 +1125,36 @@ Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-#if defined(SP_A2AV_MPI)
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
-       & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo == mpi_success) &
-       & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= mpi_success) info = minfo
-#elif defined(SP_A2AV_XI)
-  call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-       & acoo%val,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-       & acoo%ia,rvsz,brvindx,ictxt,info)
-  if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-       & acoo%ja,rvsz,brvindx,ictxt,info)
-#elif defined(SP_A2AV_TRIAD)
-  call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-       & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
-#else
-  choke on me @!
-#endif
+  select case(psb_get_sp_a2av_alg())
+  case(psb_sp_a2av_smpl_triad_)
+    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_smpl_v_)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & acoo%val,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
+         & acoo%ia,rvsz,brvindx,ictxt,info)
+    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
+         & acoo%ja,rvsz,brvindx,ictxt,info)
+  case(psb_sp_a2av_mpi_)
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
+         & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
+    goto 9999
+  end select
 
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='mpi_alltoallv')
+    call psb_errpush(info,name,a_err='alltoallv')
     goto 9999
   end if
   
