@@ -31,11 +31,26 @@
 !    
 ! File: psb_dsphalo.f90
 !
-! Subroutine: psb_dsphalo
+! Subroutine: psb_dsphalo psb_ldsphalo
 !  This routine does the retrieval of remote matrix rows.                   
-!  Note that retrieval is done through GTBLK, therefore it should work      
-!  for any matrix format in A; as for the output, default is CSR. 
-!    
+!  Retrieval is done through GETROW, therefore it should work      
+!  for any matrix format in A; as for the output, default is CSR.
+!  
+!  There is also a specialized version ld_CSR whose interface
+!  is adapted for the needs of d_par_csr_spspmm. 
+!
+!  There are three possible exchange algorithms:
+!  1. Use MPI_Alltoallv
+!  2. Use psb_simple_a2av
+!  3. Use psb_simple_triad_a2av
+!  Default choice is 3. The MPI variant has proved to be inefficient;
+!  that is because it is not persistent, therefore you pay the initialization price
+!  every time, and it is not optimized for a sparse communication pattern,
+!  most MPI implementations assume that all communications are non-empty.
+!  The PSB_SIMPLE variants reuse the same communicator, and go for a simplistic
+!  sequence of sends/receive that is quite efficient for a sparse communication
+!  pattern. To be refined/reviewed in the future to compare with neighbour
+!  persistent collectives. 
 ! 
 ! Arguments: 
 !    a        - type(psb_dspmat_type)   The local part of input matrix A

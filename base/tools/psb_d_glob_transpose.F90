@@ -70,14 +70,28 @@
 !  3. Perform a local transpose;
 !  4. Split the matrix: all local entries stay, all halo entries go into
 !     the send buffers, and are converted to global numbering;
-!  5. Do the all-to-all with our simple a2av (the exchange is with the halo
-!     pattern, so the full MPI A2AV is almost certainly too heavy)
+!  5. Do the all-to-all (see below for a discussion of the alternative
+!     communication strategies)
 !  6. The receive is in the extra section of the ACOO buffer; convert
 !     the row indices to local numbering, and discard extra ones (there will
 !     be some)
-!  7. If desc_rx was required, make sure to insert the column indices
+!  7. If desc_rx was requested, make sure to insert the (new) column indices
 !  8. Cleanup and sort the output matrix
-!  9. Copy back into AIN or ATRANS if requested. 
+!  9. Copy back into AIN or ATRANS if requested.
+!
+!  There are three possible exchange algorithms:
+!  1. Use MPI_Alltoallv
+!  2. Use psb_simple_a2av
+!  3. Use psb_simple_triad_a2av
+!  Default choice is 3. The MPI variant has proved to be inefficient;
+!  that is because it is not persistent, therefore you pay the initialization price
+!  every time, and it is not optimized for a sparse communication pattern,
+!  most MPI implementations assume that all communications are non-empty.
+!  The PSB_SIMPLE variants reuse the same communicator, and go for a simplistic
+!  sequence of sends/receive that is quite efficient for a sparse communication
+!  pattern. To be refined/reviewed in the future to compare with neighbour
+!  persistent collectives. 
+!
 !
 #undef  SP_A2AV_MPI
 #undef  SP_A2AV_XI
