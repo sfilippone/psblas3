@@ -92,7 +92,7 @@ subroutine psb_sabs_vect(x,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call y%absval(x)
+    call x%absval(y)
   end if
 
   call psb_erractionrestore(err_act)

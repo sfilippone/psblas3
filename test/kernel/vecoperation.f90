@@ -214,7 +214,6 @@ program vecoperation
   call psb_geabs(x,absz,desc_a,info)
 
   if (iam == psb_root_) then
-    write(psb_out_unit,'("info = ",I1)')info
     vz = absz%get_vect()
     write(psb_out_unit,'("|x| = ",es12.1)')vz(:)
   end if

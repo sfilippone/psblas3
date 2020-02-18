@@ -2770,7 +2770,7 @@ contains
 
     if (x%is_dev()) call x%sync()
     if (allocated(x%v)) then
-      call y%axpby(min(x%get_nrows(),y%get_nrows()),czero,x,cone,info)
+      call y%axpby(min(x%get_nrows(),y%get_nrows()),cone,x,czero,info)
       call y%absval()
     end if
 
