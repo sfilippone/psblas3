@@ -53,7 +53,7 @@ program vecoperation
   integer(psb_ipk_) :: nr, nlr, info, i, ii, ib=1
   integer(psb_lpk_) :: nt
   integer(psb_lpk_), allocatable     :: myidx(:)
-  real(psb_dpk_)    :: zt(1), dotresult, norm2, norm1, norminf
+  real(psb_dpk_)    :: zt(1), dotresult, norm2, norm1, norminf, norm2w
   character(len=20) :: name,ch_err,readinput
   real(psb_dpk_), allocatable :: vx(:), vy(:), vz(:)
   real(psb_dpk_) :: c
@@ -160,10 +160,6 @@ program vecoperation
   !
   dotresult = psb_gedot(x,y,desc_a,info) ! Dot-product
   if (iam == psb_root_) write(psb_out_unit,'("Dot product result : ",es12.5)')dotresult
-  norm1 = psb_norm1(x,desc_a,info)
-  norm2 = psb_norm2(x,desc_a,info)
-  norminf = psb_normi(x,desc_a,info)
-  if (iam == psb_root_) write(psb_out_unit,'("\|x\|_inf : ",es12.5," \|x\|_1 :",es12.5," \|x\|_2",es12.5)')norminf,norm1,norm2
   call psb_geaxpby(1.0_psb_dpk_, x, 1.0_psb_dpk_, y, desc_a, info)  ! \alpha x + \beta y
 
   if (iam == psb_root_) then
@@ -218,7 +214,7 @@ program vecoperation
     write(psb_out_unit,'("|x| = ",es12.1)')vz(:)
   end if
 
-  c = 1.0/2.0;
+  c = 1.0/5.0;
   call psb_gecmp(x,c,z,desc_a,info);
 
   if (iam == psb_root_) then
@@ -228,6 +224,16 @@ program vecoperation
     vz = z%get_vect()
     write(psb_out_unit,'("z = ",es12.1)')vz(:)
   end if
+
+  write(psb_out_unit,'("Computation of vector norms:")')
+  norm1 = psb_norm1(x,desc_a,info)
+  norm2 = psb_norm2(x,desc_a,info)
+  norm2w = psb_norm2(x,absz,desc_a,info)
+  norminf = psb_normi(x,desc_a,info)
+  write(psb_out_unit,'("\|x\|_inf : ",es12.5," \|x\|_1 :",es12.5)')norminf,norm1
+  write(psb_out_unit,'(" \|x\|_2 : ",es12.5," \|x\|_2,w : ",es12.5)')norm2,norm2w
+
+
 
   !
   !  cleanup storage and exit

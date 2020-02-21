@@ -108,7 +108,9 @@ module psb_z_vect_mod
     procedure, pass(x) :: absval1  => z_vect_absval1
     procedure, pass(x) :: absval2  => z_vect_absval2
     generic, public    :: absval   => absval1, absval2
-    procedure, pass(x) :: nrm2     => z_vect_nrm2
+    procedure, pass(x) :: nrm2std  => z_vect_nrm2
+    procedure, pass(x) :: nrm2weight => z_vect_nrm2_weight
+    generic, public    :: nrm2     => nrm2std, nrm2weight
     procedure, pass(x) :: amax     => z_vect_amax
     procedure, pass(x) :: asum     => z_vect_asum
   end type psb_z_vect_type
@@ -902,6 +904,23 @@ contains
     end if
 
   end function z_vect_nrm2
+
+  function z_vect_nrm2_weight(n,x,w) result(res)
+    implicit none
+    class(psb_z_vect_type), intent(inout) :: x
+    class(psb_z_vect_type), intent(inout) :: w
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_)                        :: res
+    integer(psb_ipk_)                       :: info
+
+    if (allocated(x%v).and.allocated(w%v)) then
+      call w%v%mlt(x%v,info)
+      res = w%v%nrm2(n)
+    else
+      res = dzero
+    end if
+
+  end function z_vect_nrm2_weight
 
   function z_vect_amax(n,x) result(res)
     implicit none

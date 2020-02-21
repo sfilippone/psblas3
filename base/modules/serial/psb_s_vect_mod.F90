@@ -108,7 +108,9 @@ module psb_s_vect_mod
     procedure, pass(x) :: absval1  => s_vect_absval1
     procedure, pass(x) :: absval2  => s_vect_absval2
     generic, public    :: absval   => absval1, absval2
-    procedure, pass(x) :: nrm2     => s_vect_nrm2
+    procedure, pass(x) :: nrm2std  => s_vect_nrm2
+    procedure, pass(x) :: nrm2weight => s_vect_nrm2_weight
+    generic, public    :: nrm2     => nrm2std, nrm2weight
     procedure, pass(x) :: amax     => s_vect_amax
     procedure, pass(x) :: asum     => s_vect_asum
     procedure, pass(z) :: cmp_a2   => s_vect_cmp_a2
@@ -932,6 +934,23 @@ contains
     end if
 
   end function s_vect_nrm2
+
+  function s_vect_nrm2_weight(n,x,w) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+    class(psb_s_vect_type), intent(inout) :: w
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_spk_)                        :: res
+    integer(psb_ipk_)                       :: info
+
+    if (allocated(x%v).and.allocated(w%v)) then
+      call w%v%mlt(x%v,info)
+      res = w%v%nrm2(n)
+    else
+      res = szero
+    end if
+
+  end function s_vect_nrm2_weight
 
   function s_vect_amax(n,x) result(res)
     implicit none
