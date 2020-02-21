@@ -81,6 +81,7 @@ module psb_l_vect_mod
     procedure, pass(x) :: set_sync => l_vect_set_sync
 
 
+
   end type psb_l_vect_type
 
   public  :: psb_l_vect
@@ -550,6 +551,7 @@ contains
          & res =  x%v%is_dev()
 
   end function l_vect_is_dev
+
 
 
 end module psb_l_vect_mod

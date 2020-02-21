@@ -144,6 +144,7 @@ module psb_l_base_vect_mod
 
 
 
+
   end type psb_l_base_vect_type
 
   public  :: psb_l_base_vect
@@ -974,6 +975,7 @@ contains
     call y%set_host()
 
   end subroutine l_base_sctb_buf
+
 
 end module psb_l_base_vect_mod
 

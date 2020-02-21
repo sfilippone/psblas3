@@ -118,6 +118,7 @@ module psb_c_vect_mod
     procedure, pass(z) :: acmp_v2   => c_vect_acmp_v2
     generic, public    :: acmp      => acmp_a2, acmp_v2
 
+
   end type psb_c_vect_type
 
   public  :: psb_c_vect
@@ -1000,6 +1001,7 @@ contains
     end if
 
   end function c_vect_asum
+
 
 
 end module psb_c_vect_mod

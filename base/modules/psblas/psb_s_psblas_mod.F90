@@ -523,4 +523,17 @@ module psb_s_psblas_mod
     end subroutine psb_scmp_vect
   end interface
 
+  interface psb_mask
+    subroutine psb_smask_vect(c,x,m,t,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_s_vect_type, psb_spk_
+      type(psb_s_vect_type), intent (inout) :: c
+      type(psb_s_vect_type), intent (inout) :: x
+      type(psb_s_vect_type), intent (inout) :: m
+      logical, intent(out)                    :: t
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_smask_vect
+  end interface
+
 end module psb_s_psblas_mod

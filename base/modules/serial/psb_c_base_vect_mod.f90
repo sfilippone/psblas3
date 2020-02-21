@@ -194,6 +194,7 @@ module psb_c_base_vect_mod
     procedure, pass(z) :: acmp_v2   => c_base_acmp_v2
     generic, public    :: acmp      => acmp_a2,acmp_v2
 
+
   end type psb_c_base_vect_type
 
   public  :: psb_c_base_vect
@@ -1717,6 +1718,7 @@ contains
     call y%set_host()
 
   end subroutine c_base_sctb_buf
+
 
 end module psb_c_base_vect_mod
 

@@ -57,6 +57,7 @@ program vecoperation
   character(len=20) :: name,ch_err,readinput
   real(psb_dpk_), allocatable :: vx(:), vy(:), vz(:)
   real(psb_dpk_) :: c
+  logical :: t
 
   info=psb_success_
 
@@ -224,6 +225,8 @@ program vecoperation
     vz = z%get_vect()
     write(psb_out_unit,'("z = ",es12.1)')vz(:)
   end if
+
+  call psb_mask(z,x,absz,t,desc_a,info)
 
   write(psb_out_unit,'("Computation of vector norms:")')
   norm1 = psb_norm1(x,desc_a,info)

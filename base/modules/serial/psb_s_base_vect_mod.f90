@@ -194,6 +194,10 @@ module psb_s_base_vect_mod
     procedure, pass(z) :: acmp_v2   => s_base_acmp_v2
     generic, public    :: acmp      => acmp_a2,acmp_v2
 
+procedure, pass(m) :: mask_v => s_base_mask_v
+procedure, pass(m) :: mask_a => s_base_mask_a
+generic, public    :: mask => mask_a, mask_v
+
   end type psb_s_base_vect_type
 
   public  :: psb_s_base_vect
@@ -1717,6 +1721,99 @@ contains
     call y%set_host()
 
   end subroutine s_base_sctb_buf
+
+  !
+  !> Function  base_mask_a
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Peform constraint tests looking at the value of c
+  !! \param x The array to be compared
+  !! \param c The array containing the information on the type of test to be
+  !! performed, if c(i) = 2 ">0", if c(i) = 1 ">=0", if c(i) = 0 no test, if
+  !! c(i) =-1 "<=0", if c(i) = -2 "< 0"
+  !! \param m The vector containing the result of the comparison 1.0 for a
+  !! failed test, and 0.0 for a passed one.
+  !! \param t logical resulting from an and operation on all the tests
+  !! \param info return code
+  !
+  subroutine s_base_mask_a(c,x,m,t,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(inout)               :: c(:)
+    real(psb_spk_), intent(inout)               :: x(:)
+    class(psb_s_base_vect_type), intent(inout)  :: m
+    integer(psb_ipk_), intent(out)                :: info
+    logical, intent(out)                          :: t
+    integer(psb_ipk_) :: i, n
+
+    if (m%is_dev()) call m%sync()
+    t = .true.
+
+    n = size(x)
+    do i = 1, n, 1
+      if (c(i).eq.2_psb_spk_) then
+        if ( x(i) > szero ) then
+          m%v(i) = 0_psb_spk_
+        else
+          m%v(i) = 1_psb_spk_
+          t = .false.
+        end if
+      elseif (c(i).eq.1_psb_spk_) then
+        if ( x(i) >= szero ) then
+          m%v(i) = 0_psb_spk_
+        else
+          m%v(i) = 1_psb_spk_
+          t = .false.
+        end if
+      elseif (c(i).eq.-1_psb_spk_) then
+        if ( x(i) <= szero ) then
+          m%v(i) = 0_psb_spk_
+        else
+          m%v(i) = 1_psb_spk_
+          t = .false.
+        end if
+      elseif (c(i).eq.-2_psb_spk_) then
+        if ( x(i) < szero ) then
+          m%v(i) = 0_psb_spk_
+        else
+          m%v(i) = 1_psb_spk_
+          t = .false.
+        end if
+      else
+          m%v(i) = 0_psb_spk_
+      end if
+    end do
+    info = 0
+
+  end subroutine s_base_mask_a
+  !
+  !> Function  base_mask_v
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Peform constraint tests looking at the value of c
+  !! \param x The vector to be compared
+  !! \param c The vector containing the information on the type of test to be
+  !! performed, if c(i) = 2 ">0", if c(i) = 1 ">=0", if c(i) = 0 no test, if
+  !! c(i) =-1 "<=0", if c(i) = -2 "< 0"
+  !! \param m The vector containing the result of the comparison 1.0 for a
+  !! failed test, and 0.0 for a passed one.
+  !! \param t logical resulting from an and operation on all the tests
+  !! \param info return code
+  !
+  subroutine s_base_mask_v(c,x,m,t,info)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_base_vect_type), intent(inout)  :: c
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_vect_type), intent(inout)  :: m
+    integer(psb_ipk_), intent(out)                :: info
+    logical, intent(out)                          :: t
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    if (c%is_dev()) call c%sync()
+
+    call m%mask(x%v,c%v,t,info)
+  end subroutine s_base_mask_v
+
 
 end module psb_s_base_vect_mod
 

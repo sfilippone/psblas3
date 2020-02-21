@@ -118,6 +118,10 @@ module psb_s_vect_mod
     procedure, pass(z) :: acmp_v2   => s_vect_acmp_v2
     generic, public    :: acmp      => acmp_a2, acmp_v2
 
+    procedure, pass(m) :: mask_v => s_vect_mask_v
+    procedure, pass(m) :: mask_a => s_vect_mask_a
+    generic, public    :: mask => mask_a, mask_v
+
   end type psb_s_vect_type
 
   public  :: psb_s_vect
@@ -1001,6 +1005,36 @@ contains
 
   end function s_vect_asum
 
+
+  subroutine s_vect_mask_a(c,x,m,t,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(inout)          :: c(:)
+    real(psb_spk_), intent(inout)          :: x(:)
+    logical, intent(out)                     :: t;
+    class(psb_s_vect_type), intent(inout)  :: m
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(m%v)) &
+         & call m%mask(c,x,t,info)
+
+  end subroutine s_vect_mask_a
+
+  subroutine s_vect_mask_v(c,x,m,t,info)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_vect_type), intent(inout)  :: c
+    class(psb_s_vect_type), intent(inout)  :: x
+    class(psb_s_vect_type), intent(inout)  :: m
+    logical, intent(out)                     :: t;
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(x%v).and.allocated(c%v)) &
+         & call m%v%mask(x%v,c%v,t,info)
+
+  end subroutine s_vect_mask_v
 
 end module psb_s_vect_mod
 
