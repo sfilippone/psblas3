@@ -92,7 +92,7 @@ subroutine psb_ccmp_vect(x,c,z,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call z%cmp(x,c,info)
+    call z%acmp(x,c,info)
   end if
 
   call psb_erractionrestore(err_act)

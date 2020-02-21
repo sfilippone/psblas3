@@ -101,7 +101,7 @@ module psb_i_vect_mod
 
 !  @NOTCPLXS@
 !  @NOTINTS@
-!  private :: i_vect_cmp_a2, i_vect_cmp_v2
+!  private :: i_vect_acmp_a2, i_vect_acmp_v2
 !  @NOTINTE@
 !  @NOTCPLXE@
 

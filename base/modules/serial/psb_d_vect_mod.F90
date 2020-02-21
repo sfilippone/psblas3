@@ -114,9 +114,9 @@ module psb_d_vect_mod
     generic, public    :: nrm2     => nrm2std, nrm2weight, nrm2weightmask
     procedure, pass(x) :: amax     => d_vect_amax
     procedure, pass(x) :: asum     => d_vect_asum
-    procedure, pass(z) :: cmp_a2   => d_vect_cmp_a2
-    procedure, pass(z) :: cmp_v2   => d_vect_cmp_v2
-    generic, public    :: cmp      => cmp_a2, cmp_v2
+    procedure, pass(z) :: acmp_a2   => d_vect_acmp_a2
+    procedure, pass(z) :: acmp_v2   => d_vect_acmp_v2
+    generic, public    :: acmp      => acmp_a2, acmp_v2
 
   end type psb_d_vect_type
 
@@ -144,7 +144,7 @@ module psb_d_vect_mod
 
 !  @NOTCPLXS@
 !  @NOTINTS@
-!  private :: d_vect_cmp_a2, d_vect_cmp_v2
+!  private :: d_vect_acmp_a2, d_vect_acmp_v2
 !  @NOTINTE@
 !  @NOTCPLXE@
 
@@ -867,7 +867,7 @@ contains
 
   end subroutine d_vect_inv_a2_check
 
-  subroutine d_vect_cmp_a2(x,c,z,info)
+  subroutine d_vect_acmp_a2(x,c,z,info)
     use psi_serial_mod
     implicit none
     real(psb_dpk_), intent(in)              :: c
@@ -877,11 +877,11 @@ contains
 
     info = 0
     if (allocated(z%v)) &
-         & call z%cmp(x,c,info)
+         & call z%acmp(x,c,info)
 
-  end subroutine d_vect_cmp_a2
+  end subroutine d_vect_acmp_a2
 
-  subroutine d_vect_cmp_v2(x,c,z,info)
+  subroutine d_vect_acmp_v2(x,c,z,info)
     use psi_serial_mod
     implicit none
     real(psb_dpk_), intent(in)              :: c
@@ -891,9 +891,9 @@ contains
 
     info = 0
     if (allocated(x%v).and.allocated(z%v)) &
-         & call z%v%cmp(x%v,c,info)
+         & call z%v%acmp(x%v,c,info)
 
-  end subroutine d_vect_cmp_v2
+  end subroutine d_vect_acmp_v2
 
   subroutine d_vect_scal(alpha, x)
     use psi_serial_mod
@@ -964,7 +964,7 @@ contains
     integer(psb_ipk_)                       :: info
 
     if (allocated(x%v).and.allocated(w%v).and.allocated(id%v)) then
-      call w%v%cmp(id%v,dzero,info)
+      call w%v%acmp(id%v,dzero,info)
       call w%v%mlt(x%v,info)
       res = w%v%nrm2(n)
     else

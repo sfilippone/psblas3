@@ -190,9 +190,9 @@ module psb_z_base_vect_mod
     !
     ! Comparison and mask operation
     !
-    procedure, pass(z) :: cmp_a2   => z_base_cmp_a2
-    procedure, pass(z) :: cmp_v2   => z_base_cmp_v2
-    generic, public    :: cmp      => cmp_a2,cmp_v2
+    procedure, pass(z) :: acmp_a2   => z_base_acmp_a2
+    procedure, pass(z) :: acmp_v2   => z_base_acmp_v2
+    generic, public    :: acmp      => acmp_a2,acmp_v2
 
   end type psb_z_base_vect_type
 
@@ -1418,7 +1418,7 @@ contains
   !! \param c The comparison term
   !! \param info return code
   !
-  subroutine z_base_cmp_a2(x,c,z,info)
+  subroutine z_base_acmp_a2(x,c,z,info)
     use psi_serial_mod
     implicit none
     real(psb_dpk_), intent(in)             :: c
@@ -1439,7 +1439,7 @@ contains
     end do
     info = 0
 
-  end subroutine z_base_cmp_a2
+  end subroutine z_base_acmp_a2
   !
   !> Function  base_cmp_v2
   !! \memberof  psb_z_base_vect_type
@@ -1449,7 +1449,7 @@ contains
   !! \param c The comparison term
   !! \param info return code
   !
-  subroutine z_base_cmp_v2(x,c,z,info)
+  subroutine z_base_acmp_v2(x,c,z,info)
     use psi_serial_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
@@ -1459,8 +1459,8 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call z%cmp(x%v,c,info)
-  end subroutine z_base_cmp_v2
+    call z%acmp(x%v,c,info)
+  end subroutine z_base_acmp_v2
 
   !
   ! Simple scaling

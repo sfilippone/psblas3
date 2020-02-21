@@ -102,7 +102,7 @@ module psb_l_vect_mod
 
 !  @NOTCPLXS@
 !  @NOTINTS@
-!  private :: l_vect_cmp_a2, l_vect_cmp_v2
+!  private :: l_vect_acmp_a2, l_vect_acmp_v2
 !  @NOTINTE@
 !  @NOTCPLXE@
 
