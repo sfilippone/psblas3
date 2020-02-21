@@ -1408,6 +1408,7 @@ contains
 
 
   end subroutine d_base_inv_a2_check
+
   !
   !> Function  base_inv_a2_check
   !! \memberof  psb_d_base_vect_type
@@ -1420,7 +1421,7 @@ contains
   subroutine d_base_cmp_a2(x,c,z,info)
     use psi_serial_mod
     implicit none
-    real(psb_dpk_), intent(in)              :: c
+    real(psb_dpk_), intent(in)             :: c
     real(psb_dpk_), intent(inout)           :: x(:)
     class(psb_d_base_vect_type), intent(inout)  :: z
     integer(psb_ipk_), intent(out)           :: info
@@ -1452,7 +1453,7 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_d_base_vect_type), intent(inout)  :: x
-    real(psb_dpk_), intent(in)              :: c
+    real(psb_dpk_), intent(in)                  :: c
     class(psb_d_base_vect_type), intent(inout)  :: z
     integer(psb_ipk_), intent(out)           :: info
 
@@ -1460,6 +1461,7 @@ contains
     if (x%is_dev()) call x%sync()
     call z%cmp(x%v,c,info)
   end subroutine d_base_cmp_v2
+
   !
   ! Simple scaling
   !

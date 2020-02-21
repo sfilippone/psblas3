@@ -477,6 +477,115 @@ function psb_snrm2_weight_vect(x,w, desc_a, info,global)  result(res)
   return
 end function psb_snrm2_weight_vect
 
+! Function: psb_snrm2_weight_vect
+!    Computes the weighted norm2 of a distributed vector with respect to a mask
+!    contained in the vector id.
+!
+!    norm2 := sqrt ( (w(id > 0).*X(id > 0))**C * (w(id > 0).*X(id > 0)))
+!
+! Arguments:
+!    x      -  type(psb_s_vect_type) The input vector containing the entries of X.
+!    w      -  type(psb_s_vect_type) The input vector containing the entries of W.
+!    id     -  type(psb_s_vect_type) The inpute vector containing the mask
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
+!
+function psb_snrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_s_vect_mod
+  implicit none
+
+  real(psb_spk_)                        :: res
+  type(psb_s_vect_type), intent (inout) :: x
+  type(psb_s_vect_type), intent (inout) :: w
+  type(psb_s_vect_type), intent (inout) :: idv
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  logical, intent(in), optional        :: global
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
+  real(psb_spk_)         :: snrm2, dd
+  character(len=20)      :: name, ch_err
+
+  name='psb_snrm2v_weightmask'
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
+
+  ix = 1
+  jx = 1
+  m  = desc_a%get_global_rows()
+  ldx = x%get_nrows()
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (desc_a%get_local_rows() > 0) then
+    ndim = desc_a%get_local_rows()
+    res  = x%nrm2(ndim,w,idv)
+    ! adjust  because overlapped elements are computed more than once
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%is_dev()) call x%sync()
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        dd  = dble(ndm-1)/dble(ndm)
+        res = res - sqrt(sone - dd*(abs(x%v%v(idx))/res)**2)
+      end do
+    end if
+  else
+    res = szero
+  end if
+
+  if (global_) call psb_nrm2(ictxt,res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end function psb_snrm2_weightmask_vect
 
 !!$
 !!$              Parallel Sparse BLAS  version 3.5

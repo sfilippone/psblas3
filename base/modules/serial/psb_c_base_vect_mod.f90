@@ -187,6 +187,12 @@ module psb_c_base_vect_mod
     procedure, pass(x) :: amax     => c_base_amax
     procedure, pass(x) :: asum     => c_base_asum
 
+    !
+    ! Comparison and mask operation
+    !
+    procedure, pass(z) :: cmp_a2   => c_base_cmp_a2
+    procedure, pass(z) :: cmp_v2   => c_base_cmp_v2
+    generic, public    :: cmp      => cmp_a2,cmp_v2
 
   end type psb_c_base_vect_type
 
@@ -1402,6 +1408,60 @@ contains
 
 
   end subroutine c_base_inv_a2_check
+
+  !
+  !> Function  base_inv_a2_check
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Compare entry-by-entry the vector x with the scalar c
+  !! \param x The array to be compared
+  !! \param z The vector containing in position i 1 if |x(i)| > c, 0 otherwise
+  !! \param c The comparison term
+  !! \param info return code
+  !
+  subroutine c_base_cmp_a2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(in)             :: c
+    complex(psb_spk_), intent(inout)           :: x(:)
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+    integer(psb_ipk_) :: i, n
+
+    if (z%is_dev()) call z%sync()
+
+    n = size(x)
+    do i = 1, n, 1
+      if ( abs(x(i)).ge.c ) then
+        z%v(i) = 1_psb_spk_
+      else
+        z%v(i) = 0_psb_spk_
+      end if
+    end do
+    info = 0
+
+  end subroutine c_base_cmp_a2
+  !
+  !> Function  base_cmp_v2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Compare entry-by-entry the vector x with the scalar c
+  !! \param x The vector to be compared
+  !! \param z The vector containing in position i 1 if |x(i)| > c, 0 otherwise
+  !! \param c The comparison term
+  !! \param info return code
+  !
+  subroutine c_base_cmp_v2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    real(psb_spk_), intent(in)                  :: c
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call z%cmp(x%v,c,info)
+  end subroutine c_base_cmp_v2
+
   !
   ! Simple scaling
   !

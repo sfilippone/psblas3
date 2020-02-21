@@ -283,11 +283,22 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)      :: info
       logical, intent(in), optional       :: global
     end function psb_dnrm2_weight_vect
+    function psb_dnrm2_weightmask_vect(x,w,idv, desc_a, info,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_vect_type, psb_dspmat_type
+      real(psb_dpk_)                      :: res
+      type(psb_d_vect_type), intent (inout)   :: x
+      type(psb_d_vect_type), intent (inout)   :: w
+      type(psb_d_vect_type), intent (inout)   :: idv
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
+    end function psb_dnrm2_weightmask_vect
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
-    procedure psb_dnrm2, psb_dnrm2v, psb_dnrm2_vect, psb_dnrm2_weight_vect
+    procedure psb_dnrm2, psb_dnrm2v, psb_dnrm2_vect, psb_dnrm2_weight_vect, psb_dnrm2_weightmask_vect
   end interface
 #endif
 

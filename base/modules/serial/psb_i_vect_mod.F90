@@ -79,6 +79,7 @@ module psb_i_vect_mod
     procedure, pass(x) :: set_dev  => i_vect_set_dev
     procedure, pass(x) :: set_sync => i_vect_set_sync
 
+
   end type psb_i_vect_type
 
   public  :: psb_i_vect

@@ -110,9 +110,14 @@ module psb_z_vect_mod
     generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2std  => z_vect_nrm2
     procedure, pass(x) :: nrm2weight => z_vect_nrm2_weight
-    generic, public    :: nrm2     => nrm2std, nrm2weight
+    procedure, pass(x) :: nrm2weightmask => z_vect_nrm2_weight_mask
+    generic, public    :: nrm2     => nrm2std, nrm2weight, nrm2weightmask
     procedure, pass(x) :: amax     => z_vect_amax
     procedure, pass(x) :: asum     => z_vect_asum
+    procedure, pass(z) :: cmp_a2   => z_vect_cmp_a2
+    procedure, pass(z) :: cmp_v2   => z_vect_cmp_v2
+    generic, public    :: cmp      => cmp_a2, cmp_v2
+
   end type psb_z_vect_type
 
   public  :: psb_z_vect
@@ -862,6 +867,33 @@ contains
 
   end subroutine z_vect_inv_a2_check
 
+  subroutine z_vect_cmp_a2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(in)              :: c
+    complex(psb_dpk_), intent(inout)           :: x(:)
+    class(psb_z_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(z%v)) &
+         & call z%cmp(x,c,info)
+
+  end subroutine z_vect_cmp_a2
+
+  subroutine z_vect_cmp_v2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(in)              :: c
+    class(psb_z_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(x%v).and.allocated(z%v)) &
+         & call z%v%cmp(x%v,c,info)
+
+  end subroutine z_vect_cmp_v2
 
   subroutine z_vect_scal(alpha, x)
     use psi_serial_mod
@@ -921,6 +953,25 @@ contains
     end if
 
   end function z_vect_nrm2_weight
+
+  function z_vect_nrm2_weight_mask(n,x,w,id) result(res)
+    implicit none
+    class(psb_z_vect_type), intent(inout) :: x
+    class(psb_z_vect_type), intent(inout) :: w
+    class(psb_z_vect_type), intent(inout) :: id
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_)                        :: res
+    integer(psb_ipk_)                       :: info
+
+    if (allocated(x%v).and.allocated(w%v).and.allocated(id%v)) then
+      call w%v%cmp(id%v,dzero,info)
+      call w%v%mlt(x%v,info)
+      res = w%v%nrm2(n)
+    else
+      res = dzero
+    end if
+
+  end function z_vect_nrm2_weight_mask
 
   function z_vect_amax(n,x) result(res)
     implicit none

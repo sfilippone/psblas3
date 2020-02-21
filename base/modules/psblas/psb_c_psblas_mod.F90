@@ -283,11 +283,22 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)      :: info
       logical, intent(in), optional       :: global
     end function psb_cnrm2_weight_vect
+    function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global) result(res)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_c_vect_type, psb_cspmat_type
+      real(psb_spk_)                      :: res
+      type(psb_c_vect_type), intent (inout)   :: x
+      type(psb_c_vect_type), intent (inout)   :: w
+      type(psb_c_vect_type), intent (inout)   :: idv
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
+    end function psb_cnrm2_weightmask_vect
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
-    procedure psb_cnrm2, psb_cnrm2v, psb_cnrm2_vect, psb_cnrm2_weight_vect
+    procedure psb_cnrm2, psb_cnrm2v, psb_cnrm2_vect, psb_cnrm2_weight_vect, psb_cnrm2_weightmask_vect
   end interface
 #endif
 
@@ -500,5 +511,16 @@ module psb_c_psblas_mod
     end subroutine psb_cabs_vect
   end interface
 
+  interface psb_gecmp
+    subroutine psb_ccmp_vect(x,c,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type, psb_spk_
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: z
+      real(psb_spk_), intent(in)             :: c
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_ccmp_vect
+  end interface
 
 end module psb_c_psblas_mod

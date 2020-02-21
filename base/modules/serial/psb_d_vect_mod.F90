@@ -110,12 +110,14 @@ module psb_d_vect_mod
     generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2std  => d_vect_nrm2
     procedure, pass(x) :: nrm2weight => d_vect_nrm2_weight
-    generic, public    :: nrm2     => nrm2std, nrm2weight
+    procedure, pass(x) :: nrm2weightmask => d_vect_nrm2_weight_mask
+    generic, public    :: nrm2     => nrm2std, nrm2weight, nrm2weightmask
     procedure, pass(x) :: amax     => d_vect_amax
     procedure, pass(x) :: asum     => d_vect_asum
     procedure, pass(z) :: cmp_a2   => d_vect_cmp_a2
     procedure, pass(z) :: cmp_v2   => d_vect_cmp_v2
     generic, public    :: cmp      => cmp_a2, cmp_v2
+
   end type psb_d_vect_type
 
   public  :: psb_d_vect
@@ -951,6 +953,25 @@ contains
     end if
 
   end function d_vect_nrm2_weight
+
+  function d_vect_nrm2_weight_mask(n,x,w,id) result(res)
+    implicit none
+    class(psb_d_vect_type), intent(inout) :: x
+    class(psb_d_vect_type), intent(inout) :: w
+    class(psb_d_vect_type), intent(inout) :: id
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_)                        :: res
+    integer(psb_ipk_)                       :: info
+
+    if (allocated(x%v).and.allocated(w%v).and.allocated(id%v)) then
+      call w%v%cmp(id%v,dzero,info)
+      call w%v%mlt(x%v,info)
+      res = w%v%nrm2(n)
+    else
+      res = dzero
+    end if
+
+  end function d_vect_nrm2_weight_mask
 
   function d_vect_amax(n,x) result(res)
     implicit none
