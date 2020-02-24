@@ -214,6 +214,8 @@ subroutine psb_dmask_vect(c,x,m,t,desc_a,info)
     call m%mask(c,x,t,info)
   end if
 
+  call psb_lallreduceand(ictxt,t)
+
   call psb_erractionrestore(err_act)
   return
 
