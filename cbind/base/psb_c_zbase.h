@@ -8,11 +8,11 @@ extern "C" {
 
 typedef struct PSB_C_ZVECTOR {
   void *zvector;
-} psb_c_zvector; 
+} psb_c_zvector;
 
 typedef struct PSB_C_ZSPMAT {
   void *zspmat;
-} psb_c_zspmat; 
+} psb_c_zspmat;
 
 
 /* dense vectors */
@@ -43,7 +43,7 @@ psb_i_t    psb_c_zmat_get_ncols(psb_c_zspmat *mh);
 /* psb_i_t    psb_c_zspasb_opt(psb_c_zspmat *mh, psb_c_descriptor *cdh,  */
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
 psb_i_t    psb_c_zsprn(psb_c_zspmat *mh, psb_c_descriptor *cdh, _Bool clear);
-psb_i_t    psb_c_zmat_name_print(psb_c_zspmat *mh, char *name); 
+psb_i_t    psb_c_zmat_name_print(psb_c_zspmat *mh, char *name);
 
 /* psblas computational routines */
 psb_z_t psb_c_zgedot(psb_c_zvector *xh, psb_c_zvector *yh, psb_c_descriptor *cdh);
@@ -51,15 +51,25 @@ psb_d_t psb_c_zgenrm2(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgeamax(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgeasum(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zspnrmi(psb_c_zspmat *ah, psb_c_descriptor *cdh);
-psb_i_t psb_c_zgeaxpby(psb_z_t alpha, psb_c_zvector *xh, 
+psb_i_t psb_c_zgeaxpby(psb_z_t alpha, psb_c_zvector *xh,
 		       psb_z_t beta, psb_c_zvector *yh, psb_c_descriptor *cdh);
-psb_i_t psb_c_zspmm(psb_z_t alpha, psb_c_zspmat *ah, psb_c_zvector *xh, 
+psb_i_t psb_c_zspmm(psb_z_t alpha, psb_c_zspmat *ah, psb_c_zvector *xh,
 		    psb_z_t beta, psb_c_zvector *yh, psb_c_descriptor *cdh);
-psb_i_t psb_c_zspmm_opt(psb_z_t alpha, psb_c_zspmat *ah, psb_c_zvector *xh, 
+psb_i_t psb_c_zspmm_opt(psb_z_t alpha, psb_c_zspmat *ah, psb_c_zvector *xh,
 			psb_z_t beta, psb_c_zvector *yh, psb_c_descriptor *cdh,
 			char *trans, bool doswap);
-psb_i_t psb_c_zspsm(psb_z_t alpha, psb_c_zspmat *th, psb_c_zvector *xh, 
+psb_i_t psb_c_zspsm(psb_z_t alpha, psb_c_zspmat *th, psb_c_zvector *xh,
 		      psb_z_t beta, psb_c_zvector *yh, psb_c_descriptor *cdh);
+/* Additional computational routines */
+psb_i_t psb_c_zgemlt(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgediv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgediv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgeinv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgeinv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgeabs(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgecmp(psb_c_zvector *xh,psb_c_zvector *ch,psb_c_zvector *zh,psb_c_descriptor *cdh);
+psb_d_t psb_c_zgenrm2_weight(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_descriptor *cdh);
+psb_d_t psb_c_zgenrm2_weightmask(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_zvector *idvh,psb_c_descriptor *cdh);
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */

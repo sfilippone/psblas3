@@ -8,11 +8,11 @@ extern "C" {
 
 typedef struct PSB_C_SVECTOR {
   void *svector;
-} psb_c_svector; 
+} psb_c_svector;
 
 typedef struct PSB_C_SSPMAT {
   void *sspmat;
-} psb_c_sspmat; 
+} psb_c_sspmat;
 
 
 /* dense vectors */
@@ -43,7 +43,7 @@ psb_i_t    psb_c_smat_get_ncols(psb_c_sspmat *mh);
 /* psb_i_t    psb_c_sspasb_opt(psb_c_sspmat *mh, psb_c_descriptor *cdh,  */
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
 psb_i_t    psb_c_ssprn(psb_c_sspmat *mh, psb_c_descriptor *cdh, _Bool clear);
-psb_i_t    psb_c_smat_name_print(psb_c_sspmat *mh, char *name); 
+psb_i_t    psb_c_smat_name_print(psb_c_sspmat *mh, char *name);
 
 /* psblas computational routines */
 psb_s_t psb_c_sgedot(psb_c_svector *xh, psb_c_svector *yh, psb_c_descriptor *cdh);
@@ -51,15 +51,26 @@ psb_s_t psb_c_sgenrm2(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_s_t psb_c_sgeamax(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_s_t psb_c_sgeasum(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_s_t psb_c_sspnrmi(psb_c_sspmat *ah, psb_c_descriptor *cdh);
-psb_i_t psb_c_sgeaxpby(psb_s_t alpha, psb_c_svector *xh, 
+psb_i_t psb_c_sgeaxpby(psb_s_t alpha, psb_c_svector *xh,
 		       psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
-psb_i_t psb_c_sspmm(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh, 
+psb_i_t psb_c_sspmm(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh,
 		    psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
-psb_i_t psb_c_sspmm_opt(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh, 
+psb_i_t psb_c_sspmm_opt(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh,
 			psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh,
 			char *trans, bool doswap);
-psb_i_t psb_c_sspsm(psb_s_t alpha, psb_c_sspmat *th, psb_c_svector *xh, 
+psb_i_t psb_c_sspsm(psb_s_t alpha, psb_c_sspmat *th, psb_c_svector *xh,
 		      psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
+/* Additional computational routines */
+psb_i_t psb_c_sgemlt(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgediv(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgediv_check(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgeinv(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgeinv_check(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgeabs(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgecmp(psb_c_svector *xh,psb_c_svector *ch,psb_c_svector *zh,psb_c_descriptor *cdh);
+psb_s_t psb_c_sgenrm2_weight(psb_c_svector *xh,psb_c_svector *wh,psb_c_descriptor *cdh);
+psb_s_t psb_c_sgenrm2_weightmask(psb_c_svector *xh,psb_c_svector *wh,psb_c_svector *idvh,psb_c_descriptor *cdh);
+psb_i_t psb_c_smask(psb_c_svector *ch,psb_c_svector *xh,psb_c_svector *mh, bool t, psb_c_descriptor *cdh);
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */
