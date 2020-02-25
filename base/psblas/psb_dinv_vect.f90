@@ -112,6 +112,7 @@ subroutine psb_dinv_vect_check(x,y,desc_a,info,flag)
   type(psb_desc_type), intent (in)      :: desc_a
   integer(psb_ipk_), intent(out)        :: info
   logical, intent(in)                   :: flag
+  logical                               :: check
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
@@ -167,6 +168,20 @@ subroutine psb_dinv_vect_check(x,y,desc_a,info,flag)
 
   if(desc_a%get_local_rows() > 0) then
     call y%inv(x,info,flag)
+  end if
+
+  if (info == 1_psb_ipk_) then
+    check = .FALSE.
+  else
+    check = .TRUE.
+  end if
+
+  call psb_lallreduceand(ictxt,check)
+
+  if (check) then
+    info = 1_psb_ipk_
+  else
+    info = 0_psb_ipk_
   end if
 
   call psb_erractionrestore(err_act)
