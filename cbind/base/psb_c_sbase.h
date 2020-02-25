@@ -71,6 +71,8 @@ psb_i_t psb_c_sgecmp(psb_c_svector *xh,psb_s_t ch,psb_c_svector *zh,psb_c_descri
 psb_s_t psb_c_sgenrm2_weight(psb_c_svector *xh,psb_c_svector *wh,psb_c_descriptor *cdh);
 psb_s_t psb_c_sgenrm2_weightmask(psb_c_svector *xh,psb_c_svector *wh,psb_c_svector *idvh,psb_c_descriptor *cdh);
 psb_i_t psb_c_smask(psb_c_svector *ch,psb_c_svector *xh,psb_c_svector *mh, bool t, psb_c_descriptor *cdh);
+psb_s_t psb_c_sgemin(psb_c_svector *xh,psb_c_descriptor *cdh);
+
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */

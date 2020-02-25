@@ -418,6 +418,7 @@ contains
 
   end function psb_c_cgeamax
 
+
   function psb_c_cgeasum(xh,cdh) bind(c) result(res)
     implicit none
     real(c_float_complex) :: res
