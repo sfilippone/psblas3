@@ -19,7 +19,8 @@ program pingpong
       write(*,*) 'Hello, world: all ',np, &
            & ' processes checked in!'
     else
-      call psb_snd(icontxt,idummy,0)
+      ip = 0
+      call psb_snd(icontxt,idummy,ip)
     endif
   end if
 
@@ -27,9 +28,10 @@ program pingpong
   call psb_barrier(icontxt)
   if (iam == 0) then
     do i=1, 16
+      ip = 1
       t0 = psb_wtime()
-      call psb_snd(icontxt,v(1:n),1)
-      call psb_rcv(icontxt,v(1:n),1)
+      call psb_snd(icontxt,v(1:n),ip)
+      call psb_rcv(icontxt,v(1:n),ip)
       t1 = psb_wtime()
       bytes = done*n*psb_sizeof_dp
       mbs   = 2.d0*(bytes/(t1-t0))*1.d-6
@@ -38,8 +40,9 @@ program pingpong
     end do
   else if (iam == 1) then
     do i=1, 16
-      call psb_rcv(icontxt,v(1:n),0)
-      call psb_snd(icontxt,v(1:n),0)
+      ip = 0
+      call psb_rcv(icontxt,v(1:n),ip)
+      call psb_snd(icontxt,v(1:n),ip)
       n = n * 2
     end do
   end if

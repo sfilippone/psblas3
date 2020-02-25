@@ -1,7 +1,7 @@
 program hello
   use psb_base_mod
   implicit none
-  integer iam, np, icontxt, ip, jp, idummy
+  integer(psb_ipk_) ::  iam, np, icontxt, ip, jp, idummy
 
   call psb_init(icontxt)
   call psb_info(icontxt,iam,np)            
@@ -14,7 +14,8 @@ program hello
       write(*,*) 'Hello, world: all ',np, &
            & ' processes checked in!'
     else
-      call psb_snd(icontxt,idummy,0)
+      ip = 0
+      call psb_snd(icontxt,idummy,ip)
     endif
   end if
   call psb_exit(icontxt)

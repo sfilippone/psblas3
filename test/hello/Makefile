@@ -4,7 +4,7 @@ MODDIR=$(BASEDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
-LIBDIR=$(INSTALLDIR)/lib
+LIBDIR=$(BASEDIR)/lib
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
