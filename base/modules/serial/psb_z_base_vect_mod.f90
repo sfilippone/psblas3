@@ -1519,6 +1519,7 @@ contains
 
   end function z_base_amax
 
+
   !
   !> Function  base_asum
   !! \memberof  psb_z_base_vect_type

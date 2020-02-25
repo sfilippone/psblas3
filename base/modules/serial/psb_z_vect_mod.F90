@@ -988,6 +988,7 @@ contains
 
   end function z_vect_amax
 
+
   function z_vect_asum(n,x) result(res)
     implicit none
     class(psb_z_vect_type), intent(inout) :: x

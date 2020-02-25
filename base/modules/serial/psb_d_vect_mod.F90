@@ -118,6 +118,7 @@ module psb_d_vect_mod
     procedure, pass(z) :: acmp_v2   => d_vect_acmp_v2
     generic, public    :: acmp      => acmp_a2, acmp_v2
 
+    procedure, pass(x)   :: minreal   => d_vect_min
     procedure, pass(m) :: mask_v => d_vect_mask_v
     procedure, pass(m) :: mask_a => d_vect_mask_a
     generic, public    :: mask => mask_a, mask_v
@@ -990,6 +991,20 @@ contains
     end if
 
   end function d_vect_amax
+
+  function d_vect_min(n,x) result(res)
+    implicit none
+    class(psb_d_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_)                :: res
+
+    if (allocated(x%v)) then
+      res = x%v%minreal(n)
+    else
+      res = dzero
+    end if
+
+  end function d_vect_min
 
   function d_vect_asum(n,x) result(res)
     implicit none

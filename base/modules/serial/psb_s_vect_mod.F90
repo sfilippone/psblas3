@@ -118,6 +118,7 @@ module psb_s_vect_mod
     procedure, pass(z) :: acmp_v2   => s_vect_acmp_v2
     generic, public    :: acmp      => acmp_a2, acmp_v2
 
+    procedure, pass(x)   :: minreal   => s_vect_min
     procedure, pass(m) :: mask_v => s_vect_mask_v
     procedure, pass(m) :: mask_a => s_vect_mask_a
     generic, public    :: mask => mask_a, mask_v
@@ -990,6 +991,20 @@ contains
     end if
 
   end function s_vect_amax
+
+  function s_vect_min(n,x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_spk_)                :: res
+
+    if (allocated(x%v)) then
+      res = x%v%minreal(n)
+    else
+      res = szero
+    end if
+
+  end function s_vect_min
 
   function s_vect_asum(n,x) result(res)
     implicit none

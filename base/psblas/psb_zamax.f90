@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,14 +27,14 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 ! File: psb_zamax.f90
 !
 ! Function: psb_zamax
 !    Computes the maximum absolute value of X
 !
-!    normi := max(abs(sub(X)(i))  
+!    normi := max(abs(sub(X)(i))
 !
 !    where sub( X ) denotes X(1:N,JX:).
 !
@@ -77,7 +77,7 @@ function psb_zamax(x,desc_a, info, jx,global) result(res)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
-    goto 9999 
+    goto 9999
   endif
 
   ix = 1
@@ -113,7 +113,7 @@ function psb_zamax(x,desc_a, info, jx,global) result(res)
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = psb_amax(desc_a%get_local_rows()-iix+1,x(:,jjx))
-  else 
+  else
     res = dzero
   end if
 
@@ -121,7 +121,7 @@ function psb_zamax(x,desc_a, info, jx,global) result(res)
   if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -131,12 +131,12 @@ end function psb_zamax
 
 
 
-!!$ 
+!!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari      
-!!$ 
+!!$                       Alfredo Buttari
+!!$
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
 !!$  are met:
@@ -148,7 +148,7 @@ end function psb_zamax
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -160,13 +160,13 @@ end function psb_zamax
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
+!!$
 !!$
 !
 ! Function: psb_zamaxv
 !    Computes the maximum absolute value  of X.
 !
-!    normi := max(abs(X(i))  
+!    normi := max(abs(X(i))
 !
 ! Arguments:
 !    x(:)   -  complex               The input vector.
@@ -237,7 +237,7 @@ function psb_zamaxv (x,desc_a, info,global) result(res)
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = psb_amax(desc_a%get_local_rows()-iix+1,x)
-  else 
+  else
     res = dzero
   end if
 
@@ -245,7 +245,7 @@ function psb_zamaxv (x,desc_a, info,global) result(res)
   if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -256,7 +256,7 @@ end function psb_zamaxv
 ! Function: psb_zamax_vect
 !    Computes the maximum absolute value  of X.
 !
-!    normi := max(abs(X(i))  
+!    normi := max(abs(X(i))
 !
 ! Arguments:
 !    x      - type(psb_z_vect_type) The input vector.
@@ -302,7 +302,7 @@ function psb_zamax_vect(x, desc_a, info,global) result(res)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
@@ -335,7 +335,7 @@ function psb_zamax_vect(x, desc_a, info,global) result(res)
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = x%amax(desc_a%get_local_rows())
-  else 
+  else
     res = dzero
   end if
 
@@ -343,7 +343,7 @@ function psb_zamax_vect(x, desc_a, info,global) result(res)
   if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -352,12 +352,12 @@ function psb_zamax_vect(x, desc_a, info,global) result(res)
 end function psb_zamax_vect
 
 
-!!$ 
+!!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari      
-!!$ 
+!!$                       Alfredo Buttari
+!!$
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
 !!$  are met:
@@ -369,7 +369,7 @@ end function psb_zamax_vect
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -381,13 +381,13 @@ end function psb_zamax_vect
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!!$
+!!$
 !
 ! Subroutine: psb_zamaxvs
 !    Computes the maximum absolute value of X, subroutine version
 !
-!    normi := max(abs(sub(X)(i))  
+!    normi := max(abs(sub(X)(i))
 !
 !    where sub( X ) denotes X(1:N).
 !
@@ -460,7 +460,7 @@ subroutine psb_zamaxvs(res,x,desc_a, info,global)
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = psb_amax(desc_a%get_local_rows()-iix+1,x)
-  else 
+  else
     res = dzero
   end if
 
@@ -468,7 +468,7 @@ subroutine psb_zamaxvs(res,x,desc_a, info,global)
   if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -476,12 +476,12 @@ subroutine psb_zamaxvs(res,x,desc_a, info,global)
 end subroutine psb_zamaxvs
 
 
-!!$ 
+!!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari      
-!!$ 
+!!$                       Alfredo Buttari
+!!$
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
 !!$  are met:
@@ -493,7 +493,7 @@ end subroutine psb_zamaxvs
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -505,13 +505,13 @@ end subroutine psb_zamaxvs
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!!$
+!!$
 !
 ! Subroutine: psb_zmamaxs
 !    Searches the absolute max of X.
 !
-!    normi := max(abs(X(i))  
+!    normi := max(abs(X(i))
 !
 ! Arguments:
 !    res(:) -  real.                The result.
@@ -596,9 +596,10 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx,global)
   if (global_) call psb_amx(ictxt, res(1:k))
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
   return
 end subroutine psb_zmamaxs
+

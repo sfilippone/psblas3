@@ -183,6 +183,7 @@ module psb_c_psblas_mod
     end subroutine psb_cmamaxs
   end interface
 
+
   interface psb_geasum
     function psb_casum_vect(x, desc_a, info,global) result(res)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
