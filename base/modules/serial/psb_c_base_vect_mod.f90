@@ -197,6 +197,14 @@ module psb_c_base_vect_mod
     procedure, pass(z) :: acmp_a2   => c_base_acmp_a2
     procedure, pass(z) :: acmp_v2   => c_base_acmp_v2
     generic, public    :: acmp      => acmp_a2,acmp_v2
+    !
+    ! Add constant value to all entry of a vector
+    !
+    procedure, pass(z) :: addconst_a2   => c_base_addconst_a2
+    procedure, pass(z) :: addconst_v2   => c_base_addconst_v2
+    generic, public    :: addconst      => addconst_a2,addconst_v2
+
+
 
 
   end type psb_c_base_vect_type
@@ -1770,6 +1778,54 @@ contains
   end subroutine c_base_sctb_buf
 
 
+  !
+  !> Function  _base_addconst_a2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Add the constant b to every entry of the array x
+  !! \param x The input array
+  !! \param z The vector containing the x(i) + b
+  !! \param b The added term
+  !! \param info return code
+  !
+  subroutine c_base_addconst_a2(x,b,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(in)                  :: b
+    complex(psb_spk_), intent(inout)                :: x(:)
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_) :: i, n
+
+    if (z%is_dev()) call z%sync()
+
+    n = size(x)
+    do i = 1, n, 1
+        z%v(i) = x(i) + b
+    end do
+    info = 0
+
+  end subroutine c_base_addconst_a2
+  !
+  !> Function  _base_addconst_v2
+  !! \memberof  psb_c_base_vect_type
+  !! \briefAdd the constant b to every entry of the vector x
+  !! \param x The input vector
+  !! \param z The vector containing the x(i) + b
+  !! \param b The added term
+  !! \param info return code
+  !
+  subroutine c_base_addconst_v2(x,b,z,info)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    real(psb_spk_), intent(in)                  :: b
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)                :: info
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call z%addconst(x%v,b,info)
+  end subroutine c_base_addconst_v2
 end module psb_c_base_vect_mod
 
 

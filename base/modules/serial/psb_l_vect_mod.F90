@@ -101,12 +101,6 @@ module psb_l_vect_mod
        & l_vect_set_dev, l_vect_set_sync
 
 
-!  @NOTCPLXS@
-!  @NOTINTS@
-!  private :: l_vect_acmp_a2, l_vect_acmp_v2
-!  @NOTINTE@
-!  @NOTCPLXE@
-
   class(psb_l_base_vect_type), allocatable, target,&
        & save, private :: psb_l_base_vect_default
 
@@ -551,6 +545,7 @@ contains
          & res =  x%v%is_dev()
 
   end function l_vect_is_dev
+
 
 
 

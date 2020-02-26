@@ -120,6 +120,9 @@ module psb_d_vect_mod
     procedure, pass(z) :: acmp_a2   => d_vect_acmp_a2
     procedure, pass(z) :: acmp_v2   => d_vect_acmp_v2
     generic, public    :: acmp      => acmp_a2, acmp_v2
+    procedure, pass(z) :: addconst_a2   => d_vect_addconst_a2
+    procedure, pass(z) :: addconst_v2   => d_vect_addconst_v2
+    generic, public    :: addconst      => addconst_a2, addconst_v2
 
     procedure, pass(x)   :: minreal   => d_vect_min
     procedure, pass(m) :: mask_v => d_vect_mask_v
@@ -149,12 +152,6 @@ module psb_d_vect_mod
        & d_vect_mlt_va, d_vect_mlt_av, d_vect_scal, d_vect_absval1, &
        & d_vect_absval2, d_vect_nrm2, d_vect_amax, d_vect_asum
 
-
-!  @NOTCPLXS@
-!  @NOTINTS@
-!  private :: d_vect_acmp_a2, d_vect_acmp_v2
-!  @NOTINTE@
-!  @NOTCPLXE@
 
   class(psb_d_base_vect_type), allocatable, target,&
        & save, private :: psb_d_base_vect_default
@@ -1084,6 +1081,34 @@ contains
          & call m%v%mask(x%v,c%v,t,info)
 
   end subroutine d_vect_mask_v
+
+  subroutine d_vect_addconst_a2(x,b,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(in)             :: b
+    real(psb_dpk_), intent(inout)           :: x(:)
+    class(psb_d_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(z%v)) &
+         & call z%addconst(x,b,info)
+
+  end subroutine d_vect_addconst_a2
+
+  subroutine d_vect_addconst_v2(x,b,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_dpk_), intent(in)             :: b
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (allocated(x%v).and.allocated(z%v)) &
+         & call z%v%addconst(x%v,b,info)
+
+  end subroutine d_vect_addconst_v2
 
 end module psb_d_vect_mod
 

@@ -100,12 +100,6 @@ module psb_i_vect_mod
        & i_vect_set_dev, i_vect_set_sync
 
 
-!  @NOTCPLXS@
-!  @NOTINTS@
-!  private :: i_vect_acmp_a2, i_vect_acmp_v2
-!  @NOTINTE@
-!  @NOTCPLXE@
-
   class(psb_i_base_vect_type), allocatable, target,&
        & save, private :: psb_i_base_vect_default
 
@@ -550,6 +544,7 @@ contains
          & res =  x%v%is_dev()
 
   end function i_vect_is_dev
+
 
 
 

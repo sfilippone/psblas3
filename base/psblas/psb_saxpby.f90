@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 ! File: psb_saxpby.f90
 
 !
@@ -46,12 +46,12 @@
 !    info   -  integer              Return code
 !
 !  Note: from a functional point of view, X is input, but here
-!        it's declared INOUT because of the sync() methods. 
+!        it's declared INOUT because of the sync() methods.
 !
 subroutine psb_saxpby_vect(alpha, x, beta, y,&
      & desc_a, info)
   use psb_base_mod, psb_protect_name => psb_saxpby_vect
-  implicit none                    
+  implicit none
   type(psb_s_vect_type), intent (inout) ::  x
   type(psb_s_vect_type), intent (inout) ::  y
   real(psb_spk_), intent (in)        :: alpha, beta
@@ -65,7 +65,7 @@ subroutine psb_saxpby_vect(alpha, x, beta, y,&
   character(len=20)        :: name, ch_err
 
   name='psb_sgeaxpby'
-  if (psb_errstatus_fatal()) return 
+  if (psb_errstatus_fatal()) return
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -77,12 +77,12 @@ subroutine psb_saxpby_vect(alpha, x, beta, y,&
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(y%v)) then 
+  if (.not.allocated(y%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
@@ -121,7 +121,7 @@ subroutine psb_saxpby_vect(alpha, x, beta, y,&
   end if
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -146,13 +146,13 @@ end subroutine psb_saxpby_vect
 !    y(:,:) -  real,inout        The input vector Y
 !    desc_a -  type(psb_desc_type)  The communication descriptor.
 !    info   -  integer              Return code
-!    jx     -  integer(optional)    The column offset for X 
-!    jy     -  integer(optional)    The column offset for Y 
+!    jx     -  integer(optional)    The column offset for X
+!    jy     -  integer(optional)    The column offset for Y
 !
 subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_saxpby
 
-  implicit none                    
+  implicit none
 
   integer(psb_ipk_), intent(in), optional   :: n, jx, jy
   integer(psb_ipk_), intent(out)            :: info
@@ -198,7 +198,7 @@ subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if (present(n)) then
     if(((ijx+n) <= size(x,2)).and.&
-         & ((ijy+n) <= size(y,2))) then 
+         & ((ijy+n) <= size(y,2))) then
       in = n
     else
       in = min(size(x,2),size(y,2))
@@ -242,7 +242,7 @@ subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -253,12 +253,12 @@ end subroutine psb_saxpby
 
 
 
-!!$ 
+!!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari      
-!!$ 
+!!$                       Alfredo Buttari
+!!$
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
 !!$  are met:
@@ -270,7 +270,7 @@ end subroutine psb_saxpby
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -282,8 +282,8 @@ end subroutine psb_saxpby
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!!$
+!!$
 !
 ! Subroutine: psb_saxpbyv
 !    Adds one distributed vector to another,
@@ -301,7 +301,7 @@ end subroutine psb_saxpby
 !
 subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_base_mod, psb_protect_name => psb_saxpbyv
-  implicit none                    
+  implicit none
 
   integer(psb_ipk_), intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
@@ -366,9 +366,94 @@ subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
   return
 end subroutine psb_saxpbyv
+!
+! Subroutine: psb_saddconst_vect
+!    Adds one distributed vector to another,
+!
+!    Z(i) := X(i) + b
+!
+! Arguments:
+!    x      - type(psb_s_vect_type) The input vector containing the entries of X
+!    b      -  real,input        The scalar used to add each component of X
+!    z      - type(psb_s_vect_type)  The input/output vector Z
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
+subroutine psb_saddconst_vect(x,b,z,desc_a,info)
+  use psb_base_mod, psb_protect_name => psb_saddconst_vect
+  implicit none
+  type(psb_s_vect_type), intent (inout) :: x
+  type(psb_s_vect_type), intent (inout) :: z
+  real(psb_spk_), intent(in)             :: b
+  type(psb_desc_type), intent (in)        :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_s_cmp_vect'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(z%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,z%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call z%addconst(x,b,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_saddconst_vect
