@@ -33,7 +33,8 @@ Module psb_c_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
   use psb_c_vect_mod, only : psb_c_base_vect_type, psb_c_vect_type
   use psb_c_mat_mod, only : psb_cspmat_type, psb_lcspmat_type, psb_c_base_sparse_mat, &
-       & psb_lc_csr_sparse_mat, psb_lc_coo_sparse_mat, psb_c_coo_sparse_mat
+       & psb_lc_csr_sparse_mat, psb_lc_coo_sparse_mat, &
+       & psb_c_csr_sparse_mat, psb_c_coo_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_c_multivect_mod, only : psb_c_base_multivect_type, psb_c_multivect_type
 
@@ -221,6 +222,18 @@ Module psb_c_tools_mod
       integer(psb_ipk_), intent(in), optional          :: data
       type(psb_desc_type),Intent(in), optional, target :: col_desc
     end Subroutine psb_lc_csr_halo
+    Subroutine psb_c_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
+         &  rowscale,colscale,data,outcol_glob,col_desc)
+      import
+      implicit none
+      type(psb_c_csr_sparse_mat),Intent(in)    :: a
+      type(psb_lc_csr_sparse_mat),Intent(inout) :: blk
+      type(psb_desc_type),intent(in), target :: desc_a
+      integer(psb_ipk_), intent(out)                :: info
+      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale,outcol_glob
+      integer(psb_ipk_), intent(in), optional       :: data
+      type(psb_desc_type),Intent(in), optional, target :: col_desc
+    end Subroutine psb_c_lc_csr_halo    
   end interface
 
 
@@ -335,6 +348,17 @@ Module psb_c_tools_mod
   end interface
 
   interface psb_par_spspmm
+    subroutine psb_c_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
+      import :: psb_c_csr_sparse_mat, psb_desc_type, psb_ipk_
+      Implicit None
+      type(psb_c_csr_sparse_mat),intent(in)    :: acsr
+      type(psb_c_csr_sparse_mat),intent(inout) :: bcsr
+      type(psb_c_csr_sparse_mat),intent(out)   :: ccsr      
+      type(psb_desc_type),intent(in)           :: desc_a
+      type(psb_desc_type),intent(inout)        :: desc_c
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in), optional  :: data
+    End Subroutine psb_c_par_csr_spspmm
     subroutine psb_lc_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
       import :: psb_lc_csr_sparse_mat, psb_desc_type, psb_ipk_
       Implicit None
