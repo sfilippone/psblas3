@@ -470,6 +470,17 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dmlt_vect
+    subroutine psb_dmlt_vect2(alpha,x,y,beta,z,desc_a,info,conjgx,conjgy)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_d_vect_type, psb_dpk_
+      real(psb_dpk_), intent(in)        :: alpha,beta
+      type(psb_d_vect_type), intent (inout) :: x
+      type(psb_d_vect_type), intent (inout) :: y
+      type(psb_d_vect_type), intent (inout) :: z
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), intent(in), optional :: conjgx, conjgy
+    end subroutine psb_dmlt_vect2
   end interface
 
   interface psb_gediv

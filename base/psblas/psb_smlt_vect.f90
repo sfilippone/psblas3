@@ -103,3 +103,96 @@ subroutine psb_smlt_vect(x,y,desc_a,info)
   return
 
 end subroutine psb_smlt_vect
+
+!
+! Subroutine: psb_smlt_vect2
+!
+
+subroutine psb_smlt_vect2(alpha,x,y,beta,z,desc_a,info,conjgx, conjgy)
+  use psb_base_mod, psb_protect_name => psb_smlt_vect2
+  implicit none
+  real(psb_spk_), intent(in)        :: alpha,beta
+  type(psb_s_vect_type), intent (inout) :: x
+  type(psb_s_vect_type), intent (inout) :: y
+  type(psb_s_vect_type), intent (inout) :: z
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  character(len=1), intent(in), optional :: conjgx, conjgy
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, iiy, jjy, iiz, jjz
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_s_mlt_vect2'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(z%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = ione
+  iy = ione
+  iz = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,y%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,z%get_nrows(),iz,lone,desc_a,info,iiz,jjz)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 3'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call z%mlt(alpha,x,y,beta,info,conjgx,conjgy)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_smlt_vect2
