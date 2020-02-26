@@ -131,6 +131,9 @@ module psb_s_vect_mod
     procedure, pass(m) :: mask_v => s_vect_mask_v
     procedure, pass(m) :: mask_a => s_vect_mask_a
     generic, public    :: mask => mask_a, mask_v
+    procedure, pass(x) :: minquotient_v  => s_vect_minquotient_v
+    procedure, pass(x) :: minquotient_a2 => s_vect_minquotient_a2
+    generic, public    :: minquotient    => minquotient_v, minquotient_a2
 
   end type psb_s_vect_type
 
@@ -1112,6 +1115,36 @@ contains
          & call m%v%mask(x%v,c%v,t,info)
 
   end subroutine s_vect_mask_v
+
+  function s_vect_minquotient_v(x, y, info) result(z)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_vect_type), intent(inout)  :: x
+    class(psb_s_vect_type), intent(inout)  :: y
+    real(psb_spk_)                         :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v)) &
+         & z = x%v%minquotient(y%v,info)
+
+  end function s_vect_minquotient_v
+
+  function s_vect_minquotient_a2(x, y, info) result(z)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_vect_type), intent(inout)  :: x
+    real(psb_spk_), intent(inout)           :: y(:)
+    integer(psb_ipk_), intent(out)           :: info
+    real(psb_spk_)                         :: z
+
+    info = 0
+    z =  x%v%minquotient(y,info)
+
+  end function s_vect_minquotient_a2
+
+
 
   subroutine s_vect_addconst_a2(x,b,z,info)
     use psi_serial_mod

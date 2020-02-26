@@ -207,10 +207,13 @@ module psb_d_base_vect_mod
     procedure, pass(z) :: addconst_v2   => d_base_addconst_v2
     generic, public    :: addconst      => addconst_a2,addconst_v2
 
-procedure, pass(x) :: minreal    => d_base_min
-procedure, pass(m) :: mask_v => d_base_mask_v
-procedure, pass(m) :: mask_a => d_base_mask_a
-generic, public    :: mask => mask_a, mask_v
+    procedure, pass(x) :: minreal    => d_base_min
+    procedure, pass(m) :: mask_v => d_base_mask_v
+    procedure, pass(m) :: mask_a => d_base_mask_a
+    generic, public    :: mask => mask_a, mask_v
+    procedure, pass(x) :: minquotient_v  => d_base_minquotient_v
+    procedure, pass(x) :: minquotient_a2 => d_base_minquotient_a2
+    generic, public    :: minquotient    => minquotient_v, minquotient_a2
 
 
 
@@ -1648,6 +1651,62 @@ contains
     res =  minval(x%v(1:n))
 
   end function d_base_min
+
+  !
+  !> Function  base_minquotient_v
+  !! \memberof  psb_d_base_vect_type
+  !! \brief Minimum entry of the vector entry-by-entry divide  x/y
+  !! \param x The numerator vector
+  !! \param y The denumerator vector
+  !! \param info   return code
+  !!
+  function d_base_minquotient_v(x, y, info) result(z)
+    use psi_serial_mod
+    implicit none
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    real(psb_dpk_)                              :: z
+    integer(psb_ipk_), intent(out)                :: info
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    if (y%is_dev()) call y%sync()
+
+    z = x%minquotient(y%v,info)
+
+  end function d_base_minquotient_v
+
+  !
+  !> Function  base_minquotient_a2
+  !! \memberof  psb_d_base_vect_type
+  !! \brief Minimum entry of the array entry-by-entry divide  x/y
+  !! \param x The numerator array
+  !! \param y The denumerator array
+  !! \param info   return code
+  !!
+  function d_base_minquotient_a2(x, y, info) result(z)
+    use psi_serial_mod
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)                 :: y(:)
+    real(psb_dpk_)                             :: z
+    integer(psb_ipk_), intent(out)               :: info
+    integer(psb_ipk_) :: i, n
+    real(psb_dpk_)                             :: temp
+
+    info = 0
+
+    z = huge(z)
+    n = min(size(y), size(x%v))
+    do i=1, n
+      if ( y(i) /= dzero ) then
+        temp = x%v(i)/y(i)
+        if (temp <= z)  z = temp
+      end if
+    end do
+
+  end function d_base_minquotient_a2
+
 
   !
   !> Function  base_asum

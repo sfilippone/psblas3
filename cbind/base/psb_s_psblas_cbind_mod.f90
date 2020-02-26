@@ -536,6 +536,40 @@ contains
 
   end function psb_c_smask
 
+  function psb_c_sminquotient(xh,yh,cdh) bind(c) result(res)
+    implicit none
+    real(psb_spk_)       :: res
+
+    type(psb_c_svector)  :: xh,yh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp,yp
+    integer(psb_c_ipk_)          :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+    if (c_associated(yh%item)) then
+      call c_f_pointer(yh%item,yp)
+    else
+      return
+    end if
+
+    res = psb_minquotient(xp,yp,descp,info)
+
+
+  end function psb_c_sminquotient
+
   function psb_c_sgenrm2(xh,cdh) bind(c) result(res)
     implicit none
     real(c_float) :: res
