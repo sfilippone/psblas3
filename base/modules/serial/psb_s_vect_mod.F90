@@ -95,10 +95,13 @@ module psb_s_vect_mod
     generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
          & mlt_v_2, mlt_av, mlt_va
     procedure, pass(x) :: div_v    => s_vect_div_v
+    procedure, pass(x) :: div_v2    => s_vect_div_v2
     procedure, pass(x) :: div_v_check => s_vect_div_v_check
+    procedure, pass(x) :: div_v2_check => s_vect_div_v2_check
     procedure, pass(z) :: div_a2   => s_vect_div_a2
     procedure, pass(z) :: div_a2_check => s_vect_div_a2_check
-    generic, public    :: div      => div_v, div_v_check, div_a2, div_a2_check
+    generic, public    :: div      => div_v, div_v2, div_v_check, &
+                                        div_v2_check, div_a2, div_a2_check
     procedure, pass(y) :: inv_v    => s_vect_inv_v
     procedure, pass(y) :: inv_v_check => s_vect_inv_v_check
     procedure, pass(y) :: inv_a2   => s_vect_inv_a2
@@ -768,6 +771,21 @@ contains
 
   end subroutine s_vect_div_v
 
+  subroutine s_vect_div_v2( x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_vect_type), intent(inout)  :: x
+    class(psb_s_vect_type), intent(inout)  :: y
+    class(psb_s_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v).and.allocated(z%v)) &
+         & call z%v%div(x%v,y%v,info)
+
+  end subroutine s_vect_div_v2
+
   subroutine s_vect_div_v_check(x, y, info, flag)
     use psi_serial_mod
     implicit none
@@ -782,6 +800,22 @@ contains
          & call x%v%div(y%v,info,flag)
 
   end subroutine s_vect_div_v_check
+
+  subroutine s_vect_div_v2_check(x, y, z, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_s_vect_type), intent(inout)  :: x
+    class(psb_s_vect_type), intent(inout)  :: y
+    class(psb_s_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (allocated(x%v).and.allocated(y%v).and.allocated(z%v)) &
+         & call z%v%div(x%v,y%v,info,flag)
+
+  end subroutine s_vect_div_v2_check
 
   subroutine s_vect_div_a2(x, y, z, info)
     use psi_serial_mod

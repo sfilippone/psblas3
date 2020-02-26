@@ -64,7 +64,9 @@ psb_i_t psb_c_zspsm(psb_z_t alpha, psb_c_zspmat *th, psb_c_zvector *xh,
 psb_i_t psb_c_zgemlt(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgemlt2(psb_z_t alpha, psb_c_zvector *xh, psb_c_zvector *yh, psb_z_t beta, psb_c_zvector *zh, psb_c_descriptor *cdh);
 psb_i_t psb_c_zgediv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
-psb_i_t psb_c_zgediv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgediv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh, bool flag);
+psb_i_t psb_c_zgediv2(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *zh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgediv2_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *zh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_zgeinv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeinv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeabs(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);

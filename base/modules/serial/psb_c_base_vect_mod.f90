@@ -162,15 +162,19 @@ module psb_c_base_vect_mod
     procedure, pass(z) :: mlt_v_2  => c_base_mlt_v_2
     procedure, pass(z) :: mlt_va   => c_base_mlt_va
     procedure, pass(z) :: mlt_av   => c_base_mlt_av
-    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2, mlt_v_2, mlt_av, mlt_va
+    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2, mlt_v_2, mlt_av, &
+                                        mlt_va
     !
     ! Vector-Vector operations
     !
     procedure, pass(x) :: div_v         => c_base_div_v
     procedure, pass(x) :: div_v_check   => c_base_div_v_check
+    procedure, pass(x) :: div_v2         => c_base_div_v2
+    procedure, pass(x) :: div_v2_check   => c_base_div_v2_check
     procedure, pass(z) :: div_a2        => c_base_div_a2
     procedure, pass(z) :: div_a2_check  => c_base_div_a2_check
-    generic, public    :: div           => div_v, div_v_check, div_a2, div_a2_check
+    generic, public    :: div           => div_v, div_v2, div_v_check, &
+                                            div_v2_check, div_a2, div_a2_check
     procedure, pass(y) :: inv_v    => c_base_inv_v
     procedure, pass(y) :: inv_v_check => c_base_inv_v_check
     procedure, pass(y) :: inv_a2   => c_base_inv_a2
@@ -1220,6 +1224,28 @@ contains
 
   end subroutine c_base_div_v
   !
+  !> Function  base_div_v2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Vector entry-by-entry divide  by a vector z=x/y
+  !! \param y The array to be divided by
+  !! \param info   return code
+  !!
+  subroutine c_base_div_v2(x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (z%is_dev()) call z%sync()
+    call z%div(x%v,y%v,info)
+
+
+  end subroutine c_base_div_v2
+  !
   !> Function  base_div_v_check
   !! \memberof  psb_c_base_vect_type
   !! \brief Vector entry-by-entry divide  by a vector x=x/y
@@ -1242,9 +1268,32 @@ contains
 
   end subroutine c_base_div_v_check
   !
+  !> Function  base_div_v2_check
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Vector entry-by-entry divide  by a vector z=x/y
+  !! \param y The array to be divided by
+  !! \param info   return code
+  !!
+  subroutine c_base_div_v2_check(x, y, z, info, flag)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+    logical, intent(in) :: flag
+
+    info = 0
+    if (z%is_dev()) call z%sync()
+    call z%div(x%v,y%v,info,flag)
+
+
+  end subroutine c_base_div_v2_check
+  !
   !> Function  base_div_a2
   !! \memberof  psb_c_base_vect_type
-  !! \brief Entry-by-entry divide  between normal array x=x/y
+  !! \brief Entry-by-entry divide  between normal array z=x/y
   !! \param y(:) The array to be divided by
   !! \param info   return code
   !!

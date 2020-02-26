@@ -64,7 +64,9 @@ psb_i_t psb_c_cspsm(psb_c_t alpha, psb_c_cspmat *th, psb_c_cvector *xh,
 psb_i_t psb_c_cgemlt(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_cgemlt2(psb_c_t alpha, psb_c_cvector *xh, psb_c_cvector *yh, psb_c_t beta, psb_c_cvector *zh, psb_c_descriptor *cdh);
 psb_i_t psb_c_cgediv(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_descriptor *cdh);
-psb_i_t psb_c_cgediv_check(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_cgediv_check(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_descriptor *cdh, bool flag);
+psb_i_t psb_c_cgediv2(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_cvector *zh,psb_c_descriptor *cdh);
+psb_i_t psb_c_cgediv2_check(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_cvector *zh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_cgeinv(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_cgeinv_check(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_cgeabs(psb_c_cvector *xh,psb_c_cvector *yh,psb_c_cvector *cdh);

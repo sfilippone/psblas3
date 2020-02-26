@@ -481,6 +481,15 @@ module psb_z_psblas_mod
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_zdiv_vect
+    subroutine psb_zdiv_vect2(x,y,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_z_vect_type
+      type(psb_z_vect_type), intent (inout) :: x
+      type(psb_z_vect_type), intent (inout) :: y
+      type(psb_z_vect_type), intent (inout) :: z
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_zdiv_vect2
     subroutine psb_zdiv_vect_check(x,y,desc_a,info,flag)
       import :: psb_desc_type, psb_ipk_, &
            & psb_z_vect_type
@@ -490,6 +499,16 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       logical, intent(in)                   :: flag
     end subroutine psb_zdiv_vect_check
+    subroutine psb_zdiv_vect2_check(x,y,z,desc_a,info,flag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_z_vect_type
+      type(psb_z_vect_type), intent (inout) :: x
+      type(psb_z_vect_type), intent (inout) :: y
+      type(psb_z_vect_type), intent (inout) :: z
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in)                   :: flag
+    end subroutine psb_zdiv_vect2_check
   end interface
 
   interface psb_geinv
