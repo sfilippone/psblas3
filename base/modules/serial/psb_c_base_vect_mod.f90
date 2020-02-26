@@ -183,7 +183,10 @@ module psb_c_base_vect_mod
     !
     ! Scaling and norms
     !
-    procedure, pass(x) :: scal     => c_base_scal
+    procedure, pass(x) :: scal_v   => c_base_scal
+    procedure, pass(z) :: scal_v2  => c_base_scal_v2
+    procedure, pass(z) :: scal_a2  => c_base_scal_a2
+    generic, public    :: scal     => scal_v, scal_v2, scal_a2
     procedure, pass(x) :: absval1  => c_base_absval1
     procedure, pass(x) :: absval2  => c_base_absval2
     generic, public    :: absval   => absval1, absval2
@@ -1540,6 +1543,56 @@ contains
     end if
 
   end subroutine c_base_scal
+
+  !
+  !> Function  base_scal_a2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Out of place scaling of the array x
+  !! \param x The array to be scaled
+  !! \param z The scaled vector z = c*x
+  !! \param c The scaling term
+  !! \param info return code
+  !
+  subroutine c_base_scal_a2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(in)             :: c
+    complex(psb_spk_), intent(inout)           :: x(:)
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    integer(psb_ipk_) :: i,n
+
+    if (z%is_dev()) call z%sync()
+
+    n = size(x)
+    do i = 1, n, 1
+      z%v(i) = c*x(i)
+    end do
+    info = 0
+
+  end subroutine c_base_scal_a2
+  !
+  !> Function  base_cmp_v2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Out of place scaling of the vector x
+  !! \param x The vector to be scaled
+  !! \param z The scaled vector z = c*x
+  !! \param c The scaling term
+  !! \param info return code
+  !
+  subroutine c_base_scal_v2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    real(psb_spk_), intent(in)                  :: c
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call z%scal(x%v,c,info)
+  end subroutine c_base_scal_v2
 
   !
   ! Norms 1, 2 and infinity

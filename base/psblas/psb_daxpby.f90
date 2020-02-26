@@ -400,7 +400,7 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
-  name='psb_d_cmp_vect'
+  name='psb_d_addconst_vect'
   if (psb_errstatus_fatal()) return
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -457,3 +457,88 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   return
 
 end subroutine psb_daddconst_vect
+!
+! Subroutine: psb_dscal_vect
+!    Scale one distributed vector with scalar c,
+!
+!    Z(i) := c*X(i)
+!
+! Arguments:
+!    x      - type(psb_d_vect_type) The input vector containing the entries of X
+!    c      -  real,input        The scalar used to add each component of X
+!    z      - type(psb_d_vect_type)  The input/output vector Z
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
+subroutine psb_dscal_vect(x,c,z,desc_a,info)
+  use psb_base_mod, psb_protect_name => psb_dscal_vect
+  implicit none
+  type(psb_d_vect_type), intent (inout) :: x
+  type(psb_d_vect_type), intent (inout) :: z
+  real(psb_dpk_), intent(in)             :: c
+  type(psb_desc_type), intent (in)        :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_d_scal_vect'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(z%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,z%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call z%scal(x,c,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_dscal_vect

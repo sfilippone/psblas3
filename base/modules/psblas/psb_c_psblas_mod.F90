@@ -564,6 +564,17 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_caddconst_vect
   end interface
+  interface psb_gescal
+    subroutine psb_cscal_vect(x,c,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type, psb_spk_
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: z
+      real(psb_spk_), intent(in)            :: c
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_cscal_vect
+  end interface
 
 
 end module psb_c_psblas_mod

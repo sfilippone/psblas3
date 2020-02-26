@@ -575,6 +575,17 @@ module psb_s_psblas_mod
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_saddconst_vect
   end interface
+  interface psb_gescal
+    subroutine psb_sscal_vect(x,c,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_s_vect_type, psb_spk_
+      type(psb_s_vect_type), intent (inout) :: x
+      type(psb_s_vect_type), intent (inout) :: z
+      real(psb_spk_), intent(in)            :: c
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_sscal_vect
+  end interface
 
   interface psb_mask
     subroutine psb_smask_vect(c,x,m,t,desc_a,info)
