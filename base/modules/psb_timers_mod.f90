@@ -56,7 +56,7 @@ module psb_timers_mod
 
   ! The data itself 
   type psb_string_item
-    character(len=40), allocatable :: data
+    character(len=40) :: data
   end type psb_string_item
   integer(psb_ipk_), allocatable  :: nsamples(:) 
   real(psb_dpk_), allocatable     :: timers(:,:)
