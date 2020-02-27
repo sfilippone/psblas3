@@ -178,7 +178,7 @@ AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
  ac_fc=${MPIFC-$FC};
  AC_COMPILE_IFELSE([
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 9 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
@@ -187,7 +187,7 @@ AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])
-		     AC_MSG_NOTICE([Sorry, we require GNU Fortran version 4.8.4 or later.])
+		     AC_MSG_NOTICE([Sorry, we require GNU Fortran version 4.9 or later.])
 		     echo "configure: failed program was:" >&AC_FD_CC
 		     cat conftest.$ac_ext >&AC_FD_CC
 		     ifelse([$2], , , [ $2])])
