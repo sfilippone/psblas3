@@ -151,7 +151,9 @@ module psb_c_base_vect_mod
     generic, public    :: dot      => dot_v, dot_a
     procedure, pass(y) :: axpby_v  => c_base_axpby_v
     procedure, pass(y) :: axpby_a  => c_base_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
+    procedure, pass(z) :: axpby_v2  => c_base_axpby_v2
+    procedure, pass(z) :: axpby_a2  => c_base_axpby_a2
+    generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
     !
     ! Vector by vector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -975,6 +977,38 @@ contains
   end subroutine c_base_axpby_v
 
   !
+  ! AXPBY is invoked via Z, hence the structure below.
+  !
+  !
+  !
+  !> Function  base_axpby_v2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief AXPBY  by a (base_vect) z=alpha*x+beta*y
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x     The class(base_vect) to be added
+  !! \param beta scalar alpha
+  !! \param y     The class(base_vect) to be added
+  !! \param z     The class(base_vect) to be returned
+  !! \param info   return code
+  !!
+  subroutine c_base_axpby_v2(m,alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    complex(psb_spk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (x%is_dev()) call x%sync()
+
+    call z%axpby(m,alpha,x%v,beta,y%v,info)
+
+  end subroutine c_base_axpby_v2
+
+  !
   ! AXPBY is invoked via Y, hence the structure below.
   !
   !
@@ -1001,6 +1035,36 @@ contains
     call y%set_host()
 
   end subroutine c_base_axpby_a
+
+  !
+  ! AXPBY is invoked via Z, hence the structure below.
+  !
+  !
+  !> Function  base_axpby_a2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x(:) The array to be added
+  !! \param beta scalar beta
+  !! \param y(:) The array to be added
+  !! \param info   return code
+  !!
+  subroutine c_base_axpby_a2(m,alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                :: m
+    complex(psb_spk_), intent(in)                  :: x(:)
+    complex(psb_spk_), intent(in)                  :: y(:)
+    class(psb_c_base_vect_type), intent(inout) :: z
+    complex(psb_spk_), intent (in)                 :: alpha, beta
+    integer(psb_ipk_), intent(out)               :: info
+
+    if (z%is_dev()) call z%sync()
+    call psb_geaxpby(m,alpha,x,beta,y,z%v,info)
+    call z%set_host()
+
+  end subroutine c_base_axpby_a2
 
 
   !

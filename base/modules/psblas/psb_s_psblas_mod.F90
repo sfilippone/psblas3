@@ -98,6 +98,17 @@ module psb_s_psblas_mod
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_saxpby_vect
+    subroutine psb_saxpby_vect_out(alpha, x, beta, y,&
+         & z, desc_a, info)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_s_vect_type, psb_sspmat_type
+      type(psb_s_vect_type), intent (inout) :: x
+      type(psb_s_vect_type), intent (inout) :: y
+      type(psb_s_vect_type), intent (inout) :: z
+      real(psb_spk_), intent (in)        :: alpha, beta
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_saxpby_vect_out
     subroutine psb_saxpbyv(alpha, x, beta, y,&
          & desc_a, info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
@@ -108,6 +119,17 @@ module psb_s_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_saxpbyv
+    subroutine psb_saxpbyvout(alpha, x, beta, y,&
+         & z, desc_a, info)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_s_vect_type, psb_sspmat_type
+      real(psb_spk_), intent (in)       ::  x(:)
+      real(psb_spk_), intent (in)       ::  y(:)
+      real(psb_spk_), intent (inout)    ::  z(:)
+      real(psb_spk_), intent (in)       :: alpha, beta
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine psb_saxpbyvout
     subroutine psb_saxpby(alpha, x, beta, y,&
          & desc_a, info, n, jx, jy)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &

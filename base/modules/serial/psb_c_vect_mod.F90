@@ -85,7 +85,9 @@ module psb_c_vect_mod
     generic, public    :: dot      => dot_v, dot_a
     procedure, pass(y) :: axpby_v  => c_vect_axpby_v
     procedure, pass(y) :: axpby_a  => c_vect_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
+    procedure, pass(z) :: axpby_v2  => c_vect_axpby_v2
+    procedure, pass(z) :: axpby_a2  => c_vect_axpby_a2
+    generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
     procedure, pass(y) :: mlt_v    => c_vect_mlt_v
     procedure, pass(y) :: mlt_a    => c_vect_mlt_a
     procedure, pass(z) :: mlt_a_2  => c_vect_mlt_a_2
@@ -640,6 +642,24 @@ contains
 
   end subroutine c_vect_axpby_v
 
+  subroutine c_vect_axpby_v2(m,alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)            :: m
+    class(psb_c_vect_type), intent(inout)  :: x
+    class(psb_c_vect_type), intent(inout)  :: y
+    class(psb_c_vect_type), intent(inout)  :: z
+    complex(psb_spk_), intent (in)             :: alpha, beta
+    integer(psb_ipk_), intent(out)           :: info
+
+    if (allocated(x%v).and.allocated(y%v)) then
+      call z%v%axpby(m,alpha,x%v,beta,y%v,info)
+    else
+      info = psb_err_invalid_vect_state_
+    end if
+
+  end subroutine c_vect_axpby_v2
+
   subroutine c_vect_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
@@ -654,6 +674,20 @@ contains
 
   end subroutine c_vect_axpby_a
 
+  subroutine c_vect_axpby_a2(m,alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent(in)                 :: x(:)
+    complex(psb_spk_), intent(in)                 :: y(:)
+    class(psb_c_vect_type), intent(inout)     :: z
+    complex(psb_spk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (allocated(z%v)) &
+         & call z%v%axpby(m,alpha,x,beta,y,info)
+
+  end subroutine c_vect_axpby_a2
 
   subroutine c_vect_mlt_v(x, y, info)
     use psi_serial_mod

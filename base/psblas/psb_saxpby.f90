@@ -130,6 +130,152 @@ subroutine psb_saxpby_vect(alpha, x, beta, y,&
 end subroutine psb_saxpby_vect
 
 !
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!
+!
+! File: psb_saxpby.f90
+
+!
+! Subroutine: psb_saxpby_vect_out
+!    Adds one distributed vector to another,
+!
+!    Z := beta * Y + alpha * X
+!
+! Arguments:
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x      - type(psb_s_vect_type) The input vector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y      - type(psb_s_vect_type)  The input vector Y
+!    z      - type(psb_s_vect_type)  The output vector Z
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
+!  Note: from a functional point of view, X is input, but here
+!        it's declared INOUT because of the sync() methods.
+!
+subroutine psb_saxpby_vect_out(alpha, x, beta, y,&
+     & z, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_saxpby_vect_out
+  implicit none
+  type(psb_s_vect_type), intent (inout) ::  x
+  type(psb_s_vect_type), intent (inout) ::  y
+  type(psb_s_vect_type), intent (inout) ::  z
+  real(psb_spk_), intent (in)        :: alpha, beta
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer(psb_ipk_), intent(out)                  :: info
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, iiy, jjy, iiz, jjz
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_sgeaxpby'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(z%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = ione
+  iy = ione
+  iz = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,y%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,z%get_nrows(),iz,lone,desc_a,info,iiz,jjz)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 3'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione).or.(iiy /= ione).or.(iiz /= ione)) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call z%axpby(desc_a%get_local_rows(),&
+         & alpha,x,beta,z,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_saxpby_vect_out
+
+!
 ! Subroutine: psb_saxpby
 !    Adds one distributed matrix to another,
 !
@@ -372,6 +518,138 @@ subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
 
   return
 end subroutine psb_saxpbyv
+
+!!$
+!!$              Parallel Sparse BLAS  version 3.5
+!!$    (C) Copyright 2006-2018
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari
+!!$
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$
+!!$
+!
+! Subroutine: psb_saxpbyvout
+!    Adds one distributed vector to another,
+!
+!    Z := beta * Y + alpha * X
+!
+! Arguments:
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x(:)   -  real,input        The input vector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y(:)   -  real,input        The input vector Y containing the entries of Y
+!    Z(:)   -  real,inout        The output vector Z
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
+!
+subroutine  psb_saxpbyvout(alpha, x, beta,y, z, desc_a,info)
+  use psb_base_mod, psb_protect_name => psb_saxpbyvout
+  implicit none
+
+  integer(psb_ipk_), intent(out)            :: info
+  type(psb_desc_type), intent(in) :: desc_a
+  real(psb_spk_), intent(in)    :: alpha, beta
+  real(psb_spk_), intent(in)    :: x(:)
+  real(psb_spk_), intent(in)    :: y(:)
+  real(psb_spk_), intent(inout) :: z(:)
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, iiy, jjy, iiz, jjz, lldx, lldy, lldz
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
+  character(len=20)        :: name, ch_err
+  logical, parameter :: debug=.false.
+
+  name='psb_geaxpby'
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+  iz = ione
+
+  m = desc_a%get_global_rows()
+  lldx = size(x,1)
+  lldy = size(y,1)
+  lldz = size(z,1)
+  ! check vector correctness
+  call psb_chkvect(m,lone,lldx,ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,lldy,iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,lldz,iz,lone,desc_a,info,iiz,jjz)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione).or.(iiy /= ione).or.(iiz /= ione)) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call saxpby(desc_a%get_local_cols(),ione,&
+         & alpha,x,lldx,beta,&
+         & y,lldy,z,lldz,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end subroutine psb_saxpbyvout
+
 !
 ! Subroutine: psb_saddconst_vect
 !    Adds one distributed vector to another,

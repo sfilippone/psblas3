@@ -53,6 +53,8 @@ psb_s_t psb_c_cgeasum(psb_c_cvector *xh, psb_c_descriptor *cdh);
 psb_s_t psb_c_cspnrmi(psb_c_cspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_cgeaxpby(psb_c_t alpha, psb_c_cvector *xh,
 		       psb_c_t beta, psb_c_cvector *yh, psb_c_descriptor *cdh);
+psb_i_t psb_c_cgeaxpbyz(psb_c_t alpha, psb_c_cvector *xh,
+ 		       psb_c_t beta, psb_c_cvector *yh, psb_c_cvector *zh, psb_c_descriptor *cdh);
 psb_i_t psb_c_cspmm(psb_c_t alpha, psb_c_cspmat *ah, psb_c_cvector *xh,
 		    psb_c_t beta, psb_c_cvector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_cspmm_opt(psb_c_t alpha, psb_c_cspmat *ah, psb_c_cvector *xh,

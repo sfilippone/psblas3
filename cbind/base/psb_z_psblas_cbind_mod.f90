@@ -43,6 +43,49 @@ contains
 
   end function psb_c_zgeaxpby
 
+  function psb_c_zgeaxpbyz(alpha,xh,beta,yh,zh,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_) :: res
+
+    type(psb_c_zvector) :: xh,yh,zh
+    type(psb_c_descriptor) :: cdh
+    complex(c_double_complex), value   :: alpha,beta
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_z_vect_type), pointer :: xp,yp,zp
+    integer(psb_c_ipk_)          :: info
+
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+    if (c_associated(yh%item)) then
+      call c_f_pointer(yh%item,yp)
+    else
+      return
+    end if
+
+    if (c_associated(zh%item)) then
+      call c_f_pointer(zh%item,zp)
+    else
+      return
+    end if
+
+    call psb_geaxpby(alpha,xp,beta,yp,zp,descp,info)
+
+    res = info
+
+  end function psb_c_zgeaxpbyz
+
   function psb_c_zgemlt(xh,yh,cdh) bind(c) result(res)
     implicit none
     integer(psb_c_ipk_)    :: res
