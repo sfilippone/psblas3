@@ -21,6 +21,7 @@ psb_i_t    psb_c_cvect_get_nrows(psb_c_cvector *xh);
 psb_c_t   *psb_c_cvect_get_cpy( psb_c_cvector *xh);
 psb_i_t    psb_c_cvect_f_get_cpy(psb_c_t *v, psb_c_cvector *xh);
 psb_i_t    psb_c_cvect_zero(psb_c_cvector *xh);
+psb_i_t   *psb_c_cvect_f_get_pnt(psb_c_cvector *xh);
 
 psb_i_t    psb_c_cgeall(psb_c_cvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_cgeins(psb_i_t nz, const psb_l_t *irw, const psb_c_t *val,
