@@ -5,7 +5,7 @@
 psb_c_descriptor* psb_c_new_descriptor()
 {
   psb_c_descriptor* temp;
-  
+
   temp=(psb_c_descriptor *) malloc(sizeof(psb_c_descriptor));
   temp->descriptor=NULL;
   return(temp);
@@ -13,11 +13,11 @@ psb_c_descriptor* psb_c_new_descriptor()
 
 
 void psb_c_print_errmsg()
-{ 
-  char *mesg; 
-  
+{
+  char *mesg;
+
   for (mesg = psb_c_pop_errmsg(); mesg != NULL; mesg = psb_c_pop_errmsg()) {
-    fprintf(stderr,"%s\n",mesg); 
+    fprintf(stderr,"%s\n",mesg);
     free(mesg);
   }
 
@@ -28,7 +28,7 @@ void psb_c_print_errmsg()
 #define PSB_MAX_ERR_LINES   4
 static int maxlen=PSB_MAX_ERR_LINES*(PSB_MAX_ERRLINE_LEN+2);
 char *psb_c_pop_errmsg()
-{ 
+{
   char *tmp;
   tmp = (char*) malloc(maxlen*sizeof(char));
   if (psb_c_f2c_errmsg(tmp,maxlen)<=0) {
@@ -36,4 +36,5 @@ char *psb_c_pop_errmsg()
   }
   return(tmp);
 }
-    
+
+// Convertire il comunicatore fortran in comunicatore c

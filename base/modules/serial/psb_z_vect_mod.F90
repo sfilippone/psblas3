@@ -109,10 +109,7 @@ module psb_z_vect_mod
     procedure, pass(y) :: inv_a2   => z_vect_inv_a2
     procedure, pass(y) :: inv_a2_check => z_vect_inv_a2_check
     generic, public    :: inv      => inv_v, inv_v_check, inv_a2, inv_a2_check
-    procedure, pass(x) :: scal_v   => z_vect_scal
-    procedure, pass(z) :: scal_v2  => z_vect_scal_v2
-    procedure, pass(z) :: scal_a2  => z_vect_scal_a2
-    generic, public    :: scal     => scal_v, scal_v2, scal_a2
+    procedure, pass(x) :: scal     => z_vect_scal
     procedure, pass(x) :: absval1  => z_vect_absval1
     procedure, pass(x) :: absval2  => z_vect_absval2
     generic, public    :: absval   => absval1, absval2
@@ -973,34 +970,6 @@ contains
     if (allocated(x%v)) call x%v%scal(alpha)
 
   end subroutine z_vect_scal
-
-  subroutine z_vect_scal_a2(x,c,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_dpk_), intent(in)             :: c
-    complex(psb_dpk_), intent(inout)           :: x(:)
-    class(psb_z_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)           :: info
-
-    info = 0
-    if (allocated(z%v)) &
-         & call z%scal(x,c,info)
-
-  end subroutine z_vect_scal_a2
-
-  subroutine z_vect_scal_v2(x,c,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_dpk_), intent(in)             :: c
-    class(psb_z_vect_type), intent(inout)  :: x
-    class(psb_z_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)           :: info
-
-    info = 0
-    if (allocated(x%v).and.allocated(z%v)) &
-         & call z%v%scal(x%v,c,info)
-
-  end subroutine z_vect_scal_v2
 
   subroutine z_vect_absval1(x)
     class(psb_z_vect_type), intent(inout)  :: x
