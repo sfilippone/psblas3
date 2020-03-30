@@ -563,6 +563,37 @@ contains
 
   end function psb_c_zgenrm2
 
+  function psb_c_zgenrmi(xh,cdh) bind(c) result(res)
+    implicit none
+    real(c_double_complex) :: res
+
+    type(psb_c_zvector) :: xh
+    type(psb_c_descriptor) :: cdh
+    type(psb_desc_type), pointer :: descp
+    type(psb_z_vect_type), pointer :: xp
+    type(psb_z_vect_type) ::  yp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1.0
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_geall(yp,descp,info)
+    call psb_geabs(xp,yp,descp,info)
+    res = psb_geasum(yp,descp,info)
+    call psb_gefree(yp,descp,info)
+
+  end function psb_c_zgenrmi
+
   function psb_c_zgenrm2_weight(xh,wh,cdh) bind(c) result(res)
     implicit none
     real(c_double_complex) :: res

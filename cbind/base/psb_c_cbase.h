@@ -51,7 +51,7 @@ psb_c_t psb_c_cgedot(psb_c_cvector *xh, psb_c_cvector *yh, psb_c_descriptor *cdh
 psb_s_t psb_c_cgenrm2(psb_c_cvector *xh, psb_c_descriptor *cdh);
 psb_s_t psb_c_cgeamax(psb_c_cvector *xh, psb_c_descriptor *cdh);
 psb_s_t psb_c_cgeasum(psb_c_cvector *xh, psb_c_descriptor *cdh);
-psb_s_t psb_c_cspnrmi(psb_c_cspmat *ah, psb_c_descriptor *cdh);
+psb_s_t psb_c_cgenrmi(psb_c_cspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_cgeaxpby(psb_c_t alpha, psb_c_cvector *xh,
 		       psb_c_t beta, psb_c_cvector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_cgeaxpbyz(psb_c_t alpha, psb_c_cvector *xh,

@@ -51,7 +51,7 @@ psb_z_t psb_c_zgedot(psb_c_zvector *xh, psb_c_zvector *yh, psb_c_descriptor *cdh
 psb_d_t psb_c_zgenrm2(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgeamax(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgeasum(psb_c_zvector *xh, psb_c_descriptor *cdh);
-psb_d_t psb_c_zspnrmi(psb_c_zspmat *ah, psb_c_descriptor *cdh);
+psb_d_t psb_c_zgenrmi(psb_c_zspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaxpby(psb_z_t alpha, psb_c_zvector *xh,
 		       psb_z_t beta, psb_c_zvector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaxpbyz(psb_z_t alpha, psb_c_zvector *xh,
