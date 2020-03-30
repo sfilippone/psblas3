@@ -181,6 +181,18 @@ program vecoperation
     write(psb_out_unit,'("y = ",es12.1)')vy(:)
   end if
 
+  call psb_gemlt(1.0_psb_dpk_,x,y,0.0_psb_dpk_,z,desc_a,info)
+
+  if (iam == psb_root_) then
+    write(psb_out_unit,'("mlt : z = x*y ")')
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vy = y%get_vect()
+    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+    vz = z%get_vect()
+    write(psb_out_unit,'("z = ",es12.1)')vz(:)
+  end if
+
   call psb_gediv(x,y,desc_a,info)
 
   if (iam == psb_root_) then
