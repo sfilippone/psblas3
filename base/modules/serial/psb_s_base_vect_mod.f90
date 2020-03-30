@@ -171,8 +171,8 @@ module psb_s_base_vect_mod
     !
     procedure, pass(x) :: div_v         => s_base_div_v
     procedure, pass(x) :: div_v_check   => s_base_div_v_check
-    procedure, pass(x) :: div_v2         => s_base_div_v2
-    procedure, pass(x) :: div_v2_check   => s_base_div_v2_check
+    procedure, pass(z) :: div_v2         => s_base_div_v2
+    procedure, pass(z) :: div_v2_check   => s_base_div_v2_check
     procedure, pass(z) :: div_a2        => s_base_div_a2
     procedure, pass(z) :: div_a2_check  => s_base_div_a2_check
     generic, public    :: div           => div_v, div_v2, div_v_check, &

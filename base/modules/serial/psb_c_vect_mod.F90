@@ -97,7 +97,7 @@ module psb_c_vect_mod
     generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
          & mlt_v_2, mlt_av, mlt_va
     procedure, pass(x) :: div_v    => c_vect_div_v
-    procedure, pass(x) :: div_v2    => c_vect_div_v2
+    procedure, pass(z) :: div_v2    => c_vect_div_v2
     procedure, pass(x) :: div_v_check => c_vect_div_v_check
     procedure, pass(x) :: div_v2_check => c_vect_div_v2_check
     procedure, pass(z) :: div_a2   => c_vect_div_a2

@@ -203,6 +203,18 @@ program vecoperation
     write(psb_out_unit,'("y = ",es12.1)')vy(:)
   end if
 
+  call psb_gediv(x,y,z,desc_a,info)
+
+  if (iam == psb_root_) then
+    write(psb_out_unit,'("div : z = x/y")')
+    vx = x%get_vect()
+    write(psb_out_unit,'("x = ",es12.1)')vx(:)
+    vy = y%get_vect()
+    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+    vz = z%get_vect()
+    write(psb_out_unit,'("z = ",es12.1)')vz(:)
+  end if
+
   call psb_geinv(x,z,desc_a,info)
 
   if (iam == psb_root_) then
