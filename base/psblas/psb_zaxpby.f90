@@ -263,7 +263,7 @@ subroutine psb_zaxpby_vect_out(alpha, x, beta, y,&
 
   if(desc_a%get_local_rows() > 0) then
     call z%axpby(desc_a%get_local_rows(),&
-         & alpha,x,beta,z,info)
+         & alpha,x,beta,y,info)
   end if
 
   call psb_erractionrestore(err_act)
