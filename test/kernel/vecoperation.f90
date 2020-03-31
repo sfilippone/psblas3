@@ -31,37 +31,170 @@
 !
 ! File: vecoperation.f90
 !
+module unittestvector_mod
+
+  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
+       &  psb_dspmat_type, psb_d_vect_type, dzero,&
+       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
+
+  interface psb_gen_const
+   module procedure  psb_d_gen_const
+  end interface psb_gen_const
+
+contains
+
+  function psb_check_ans(v,val,ictxt) result(ans)
+    use psb_base_mod
+
+    implicit none
+
+    type(psb_d_vect_type) :: v
+    real(psb_dpk_)        :: val
+    integer(psb_ipk_)     :: ictxt
+    logical               :: ans
+
+    ! Local variables
+    integer(psb_ipk_) :: np, iam, info
+    real(psb_dpk_)    :: check
+    real(psb_dpk_), allocatable    :: va(:)
+
+    call psb_info(ictxt,iam,np)
+
+    va = v%get_vect()
+    va = va - val;
+
+    check = maxval(va);
+
+    call psb_sum(ictxt,check)
+
+    if(check == 0.d0) then
+      ans = .true.
+    else
+      ans = .false.
+    end if
+
+  end function psb_check_ans
+  !
+  !  subroutine to fill a vector with constant entries
+  !
+  subroutine psb_d_gen_const(v,val,idim,ictxt,desc_a,info)
+    use psb_base_mod
+    implicit none
+
+    type(psb_d_vect_type) :: v
+    type(psb_desc_type)   :: desc_a
+    integer(psb_lpk_)     :: idim
+    integer(psb_ipk_)     :: ictxt, info
+    real(psb_dpk_)        :: val
+
+    ! Local variables
+    integer(psb_ipk_), parameter    :: nb=20
+    real(psb_dpk_)                  :: zt(nb)
+    character(len=20)               :: name, ch_err
+    integer(psb_ipk_)               :: np, iam, nr, nt
+    integer(psb_ipk_)               :: n,nlr,ib,ii
+    integer(psb_ipk_)               :: err_act
+    integer(psb_lpk_), allocatable  :: myidx(:)
+
+
+    info = psb_success_
+    name = 'create_constant_vector'
+    call psb_erractionsave(err_act)
+
+    call psb_info(ictxt, iam, np)
+
+    n = idim*np         ! The global dimension is the number of process times
+                        ! the input size
+
+    ! We use a simple minded block distribution
+    nt = (n+np-1)/np
+    nr = max(0,min(nt,n-(iam*nt)))
+    nt = nr
+
+    call psb_sum(ictxt,nt)
+    if (nt /= n) then
+      write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,n
+      info = -1
+      call psb_barrier(ictxt)
+      call psb_abort(ictxt)
+      return
+    end if
+    ! Allocate the descriptor with simple minded data distribution
+    call psb_cdall(ictxt,desc_a,info,nl=nr)
+    ! Allocate the vector on the recently build descriptor
+    if (info == psb_success_) call psb_geall(v,desc_a,info)
+    ! Check that allocation has gone good
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='allocation rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    myidx = desc_a%get_global_indices()
+    nlr = size(myidx)
+
+    do ii=1,nlr,nb
+      ib = min(nb,nlr-ii+1)
+      zt(:) = val
+      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),v,desc_a,info)
+      if(info /= psb_success_) exit
+    end do
+
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='insert rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    ! Assembly of communicator and vector
+    call psb_cdasb(desc_a,info)
+    if (info == psb_success_) call psb_geasb(v,desc_a,info)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+    return
+  end subroutine psb_d_gen_const
+
+end module unittestvector_mod
+
+
 program vecoperation
   use psb_base_mod
   use psb_util_mod
+  use unittestvector_mod
   implicit none
 
   ! input parameters
-  integer(psb_ipk_) :: idim = 100
+  integer(psb_lpk_) :: idim = 100
 
   ! miscellaneous
   real(psb_dpk_), parameter :: one = 1.d0
-  real(psb_dpk_) :: t1, t2
-
+  real(psb_dpk_), parameter :: two = 2.d0
+  real(psb_dpk_), parameter :: onehalf = 0.5_psb_dpk_
+  real(psb_dpk_), parameter :: negativeone = -1.d0
+  real(psb_dpk_), parameter :: negativetwo = -2.d0
+  real(psb_dpk_), parameter :: negativeonehalf = -0.5_psb_dpk_
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! vector
-  type(psb_d_vect_type)  :: x,y,z,absz
+  type(psb_d_vect_type)  :: x,y,z
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
-  ! other variables
-  integer(psb_ipk_) :: nr, nlr, info, i, ii, ib=1
-  integer(psb_lpk_) :: nt
-  integer(psb_lpk_), allocatable     :: myidx(:)
-  real(psb_dpk_)    :: zt(1), dotresult, norm2, norm1, norminf, norm2w, norm2wc
+  ! auxiliary parameters
+  integer(psb_ipk_) :: info
   character(len=20) :: name,ch_err,readinput
-  real(psb_dpk_), allocatable :: vx(:), vy(:), vz(:)
-  real(psb_dpk_) :: c
-  logical :: t
+  real(psb_dpk_)    :: ans
+  logical           :: hasitnotfailed
+  integer(psb_lpk_), allocatable  :: myidx(:)
+  integer(psb_ipk_) :: ib = 1
+  real(psb_dpk_)                  :: zt(1)
 
   info=psb_success_
-
-
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
 
@@ -84,193 +217,153 @@ program vecoperation
   if (len_trim(readinput) /= 0) read(readinput,*)idim
 
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-  if (iam == psb_root_) write(psb_out_unit,'("Vector size",I10)')idim
+  if (iam == psb_root_) write(psb_out_unit,'("Local vector size",I10)')idim
+  if (iam == psb_root_) write(psb_out_unit,'("Global vector size",I10)')np*idim
 
   !
-  ! Data distribution
-  ! We assume a simple contiguous block distribution
+  ! Test of standard vector operation
   !
-  nt = (idim+np-1)/np
-  nr = max(0,min(nt,idim-(iam*nt)))
-  nt = nr
-
-  call psb_sum(ictxt,nt)
-  if (nt /= idim) then
-    write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,idim
-    info = -1
-    call psb_barrier(ictxt)
-    call psb_abort(ictxt)
-    return
-  end if
-
-  call psb_cdall(ictxt,desc_a,info,nl=nr)
-  myidx = desc_a%get_global_indices()
-  nlr = size(myidx)
-
-  !
-  !  allocate and fill in the vectors
-  !
-  call psb_barrier(ictxt)
-  t1 = psb_wtime()
-  ! Allocate memory
-  call psb_geall(x,desc_a,info)
-  call psb_geall(y,desc_a,info)
-  call psb_geall(z,desc_a,info)
-  call psb_geall(absz,desc_a,info)
-  ! Put entries into the vectors
-  do ii=1,nlr
-    zt(1) = 1.0_psb_dpk_
-    call psb_geins(ib,myidx(ii:),zt(1:),x,desc_a,info)
-    zt(1) = 2.0_psb_dpk_
-    call psb_geins(ib,myidx(ii:),zt(1:),y,desc_a,info)
-    zt(1) = -10.0_psb_dpk_
-    call psb_geins(ib,myidx(ii:),zt(1:),z,desc_a,info)
-    call psb_geins(ib,myidx(ii:),zt(1:),absz,desc_a,info)
-  end do
-  ! Assemble
-  call psb_cdasb(desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='comm asb rout.'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  if (info == psb_success_) call psb_geasb(x,desc_a,info)
-  if (info == psb_success_) call psb_geasb(y,desc_a,info)
-  if (info == psb_success_) call psb_geasb(z,desc_a,info)
-  if (info == psb_success_) call psb_geasb(absz,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='vec asb rout.'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  call psb_barrier(ictxt)
-  t2 = psb_wtime() - t1
-
-  if (iam == psb_root_) write(psb_out_unit,'("Overall vector creation time : ",es12.5)')t2
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  if (iam == psb_root_) write(psb_out_unit,'("Standard Vector Operations")')
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  ! X = 1
+  call psb_d_gen_const(x,one,idim,ictxt,desc_a,info)
+  hasitnotfailed = psb_check_ans(x,one,ictxt)
   if (iam == psb_root_) then
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vy = y%get_vect()
-    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> Constant vector ")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- Constant vector ")')
   end if
-
-  !
-  ! Vector operations
-  !
-  dotresult = psb_gedot(x,y,desc_a,info) ! Dot-product
-  if (iam == psb_root_) write(psb_out_unit,'("Dot product result : ",es12.5)')dotresult
-  call psb_geaxpby(1.0_psb_dpk_, x, 1.0_psb_dpk_, y, desc_a, info)  ! \alpha x + \beta y
-
+  ! X = 1 , Y = -2, Y = X + Y = 1 -2 = -1
+  call psb_d_gen_const(x,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,negativetwo,idim,ictxt,desc_a,info)
+  call psb_geaxpby(one,x,one,y,desc_a,info)
+  hasitnotfailed = psb_check_ans(y,negativeone,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("axpby : x + y")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vy = y%get_vect()
-    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> axpby Y = X + Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- axpby Y = X + Y ")')
   end if
-
-  call psb_gemlt(x,y,desc_a,info)
-
+  ! X = 1 , Y =  2, Y = -X + Y = -1 +2 = 1
+  call psb_d_gen_const(x,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,two,idim,ictxt,desc_a,info)
+  call psb_geaxpby(negativeone,x,one,y,desc_a,info)
+  hasitnotfailed = psb_check_ans(y,one,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("mlt : y = x*y ")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vy = y%get_vect()
-    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> axpby Y = -X + Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- axpby Y = -X + Y ")')
   end if
-
-  call psb_gemlt(1.0_psb_dpk_,x,y,0.0_psb_dpk_,z,desc_a,info)
-
+  ! X = 2 , Y =  -2, Y = 0.5*X + Y = 1 - 2 = -1
+  call psb_d_gen_const(x,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,negativetwo,idim,ictxt,desc_a,info)
+  call psb_geaxpby(onehalf,x,one,y,desc_a,info)
+  hasitnotfailed = psb_check_ans(y,negativeone,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("mlt : z = x*y ")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vy = y%get_vect()
-    write(psb_out_unit,'("y = ",es12.1)')vy(:)
-    vz = z%get_vect()
-    write(psb_out_unit,'("z = ",es12.1)')vz(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> axpby Y = 0.5 X + Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- axpby Y = 0.5 X + Y ")')
   end if
-
-  call psb_gediv(x,y,desc_a,info)
-
+  ! X = -2 , Y =  1, Z = 0, Z = X + Y = -2 + 1 = -1
+  call psb_d_gen_const(x,negativetwo,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
+  call psb_geaxpby(one,x,one,y,z,desc_a,info)
+  hasitnotfailed = psb_check_ans(z,negativeone,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("div : x = x/y")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vy = y%get_vect()
-    write(psb_out_unit,'("y = ",es12.1)')vy(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> axpby Z = X + Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- axpby Z = X + Y ")')
   end if
-
+  ! X = 2 , Y =  1, Z = 0, Z = X - Y = 2 - 1 = 1
+  call psb_d_gen_const(x,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
+  call psb_geaxpby(one,x,negativeone,y,z,desc_a,info)
+  hasitnotfailed = psb_check_ans(z,one,ictxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> axpby Z = X - Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- axpby Z = X - Y ")')
+  end if
+  ! X = 2 , Y =  1, Z = 0, Z = -X + Y = -2 + 1 = -1
+  call psb_d_gen_const(x,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
+  call psb_geaxpby(negativeone,x,one,y,z,desc_a,info)
+  hasitnotfailed = psb_check_ans(z,negativeone,ictxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> axpby Z = -X + Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- axpby Z = -X + Y ")')
+  end if
+  ! X = 2 , Y =  -0.5, Z = 0, Z = X*Y = 2*(-0.5) = -1
+  call psb_d_gen_const(x,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,negativeonehalf,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
+  call psb_gemlt(one,x,y,dzero,z,desc_a,info)
+  hasitnotfailed = psb_check_ans(z,negativeone,ictxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> mlt Z = X*Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- mlt Z = X*Y ")')
+  end if
+  ! X = 1 , Y =  2, Z = 0, Z = X/Y = 1/2 = 0.5
+  call psb_d_gen_const(x,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
   call psb_gediv(x,y,z,desc_a,info)
-
+  hasitnotfailed = psb_check_ans(z,onehalf,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("div : z = x/y")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vy = y%get_vect()
-    write(psb_out_unit,'("y = ",es12.1)')vy(:)
-    vz = z%get_vect()
-    write(psb_out_unit,'("z = ",es12.1)')vz(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> div Z = X/Y")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- div Z = X/Y ")')
   end if
-
+  ! X = -1 , Z =  0, Z = |X| = |-1| = 1
+  call psb_d_gen_const(x,negativeone,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
+  call psb_geabs(x,z,desc_a,info)
+  hasitnotfailed = psb_check_ans(z,one,ictxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> abs Z = |X|")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- abs Z = |X| ")')
+  end if
+  ! X = 2 , Z =  0, Z = 1/X = 1/2 = 0.5
+  call psb_d_gen_const(x,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
   call psb_geinv(x,z,desc_a,info)
-
+  hasitnotfailed = psb_check_ans(z,onehalf,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("inv : z = 1/x")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vz = z%get_vect()
-    write(psb_out_unit,'("z = ",es12.1)')vz(:)
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> inv Z = 1/X")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- inv Z = 1/X ")')
   end if
-
-  call psb_geaxpby(-1.0_psb_dpk_, x, 0.0_psb_dpk_, x, desc_a, info)
+  ! X = 1, Z = 0, c = -2, Z = X + c = -1
+  call psb_d_gen_const(x,one,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(z,dzero,idim,ictxt,desc_a,info)
+  call psb_geaddconst(x,negativetwo,z,desc_a,info)
+  hasitnotfailed = psb_check_ans(z,negativeone,ictxt)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("abs : z = |x|")')
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-  end if
-
-  call psb_geabs(x,absz,desc_a,info)
-
-  if (iam == psb_root_) then
-    vz = absz%get_vect()
-    write(psb_out_unit,'("|x| = ",es12.1)')vz(:)
-  end if
-
-  c = 1.0/5.0;
-  call psb_gecmp(x,c,z,desc_a,info);
-
-  if (iam == psb_root_) then
-    write(psb_out_unit,'("|z(i)| >=",es12.1)')c
-    vx = x%get_vect()
-    write(psb_out_unit,'("x = ",es12.1)')vx(:)
-    vz = z%get_vect()
-    write(psb_out_unit,'("z = ",es12.1)')vz(:)
-  end if
-
-  call psb_mask(z,x,absz,t,desc_a,info)
-
-  write(psb_out_unit,'("Computation of vector norms:")')
-  norm1 = psb_norm1(x,desc_a,info)
-  norm2 = psb_norm2(x,desc_a,info)
-  norm2w = psb_norm2(x,absz,desc_a,info)
-  norm2wc = psb_norm2(x,absz,z,desc_a,info)
-  norminf = psb_normi(x,desc_a,info)
-  if (iam == psb_root_) then
-   write(psb_out_unit,'("\|x\|_inf : ",es12.5," \|x\|_1 :",es12.5)')norminf,norm1
-   write(psb_out_unit,'(" \|x\|_2 : ",es12.5," \|x\|_2,w : ",es12.5)')norm2,norm2w
-   write(psb_out_unit,'(" masked \|x\|_2,w : ",es12.5)')norm2wc
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> Add constant Z = X + c")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- Add constant Z = X + c")')
   end if
 
   !
-  !  cleanup storage and exit
+  ! Vector to field operation
   !
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  if (iam == psb_root_) write(psb_out_unit,'("Vector to Field Operations")')
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+
+  ! Dot product
+  call psb_d_gen_const(x,two,idim,ictxt,desc_a,info)
+  call psb_d_gen_const(y,onehalf,idim,ictxt,desc_a,info)
+  ans = psb_gedot(x,y,desc_a,info)
+  if (iam == psb_root_) then
+    if(ans == np*idim) write(psb_out_unit,'("TEST PASSED >>> Dot product")')
+    if(ans /= np*idim) write(psb_out_unit,'("TEST FAILED --- Dot product")')
+  end if
+  ! MaxNorm
+  call psb_d_gen_const(x,negativeonehalf,idim,ictxt,desc_a,info)
+  ans = psb_geamax(x,desc_a,info)
+  if (iam == psb_root_) then
+    if(ans == onehalf) write(psb_out_unit,'("TEST PASSED >>> MaxNorm")')
+    if(ans /= onehalf) write(psb_out_unit,'("TEST FAILED --- MaxNorm")')
+  end if
+
   call psb_gefree(x,desc_a,info)
   call psb_gefree(y,desc_a,info)
   call psb_gefree(z,desc_a,info)
-  call psb_gefree(absz,desc_a,info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -278,6 +371,8 @@ program vecoperation
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+
+
 
   call psb_exit(ictxt)
   stop
