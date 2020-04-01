@@ -129,10 +129,10 @@ contains
     type(psb_c_descriptor) :: cdh
 
 
-    type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp,yp,zp
-    integer(psb_c_ipk_)          :: info
-    real(psb_dpk_), intent(in)        :: alpha,beta
+    type(psb_desc_type), pointer        :: descp
+    type(psb_d_vect_type), pointer    :: xp,yp,zp
+    integer(psb_c_ipk_)                 :: info
+    real(psb_dpk_), intent(in), value  :: alpha,beta
 
     res = -1
 
@@ -437,7 +437,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp,zp
     integer(psb_c_ipk_)          :: info
-    real(c_double) :: ch
+    real(c_double), value :: ch
 
     res = -1
 
@@ -473,7 +473,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: xp,zp
     integer(psb_c_ipk_)          :: info
-    real(c_double) :: bh
+    real(c_double), value :: bh
 
     res = -1
 
