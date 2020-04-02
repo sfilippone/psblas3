@@ -1037,7 +1037,7 @@ contains
     integer(psb_ipk_)                       :: info
 
     if (allocated(x%v).and.allocated(w%v).and.allocated(id%v)) then
-      call w%v%acmp(id%v,szero,info)
+      where( abs(id%v%v) <= szero) x%v%v = szero
       call w%v%mlt(x%v,info)
       res = w%v%nrm2(n)
     else
