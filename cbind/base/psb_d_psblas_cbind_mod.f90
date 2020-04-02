@@ -505,12 +505,12 @@ contains
 
     type(psb_c_dvector)  :: ch,xh,mh
     type(psb_c_descriptor) :: cdh
-    logical(c_bool), value :: t
+    type(c_ptr), value     :: t
 
     type(psb_desc_type), pointer :: descp
     type(psb_d_vect_type), pointer :: cp,xp,mp
     integer(psb_c_ipk_)          :: info
-    logical   :: ft
+    logical, pointer   :: fp
 
     res = -1
 
@@ -534,11 +534,10 @@ contains
     else
       return
     end if
+    call c_f_pointer(t,fp)
 
-    ft = t
-    call psb_mask(cp,xp,mp,ft,descp,info)
+    call psb_mask(cp,xp,mp,fp,descp,info)
 
-    t = ft
     res = info
 
   end function psb_c_dmask
