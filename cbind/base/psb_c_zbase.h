@@ -71,7 +71,7 @@ psb_i_t psb_c_zgediv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor 
 psb_i_t psb_c_zgediv2(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *zh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgediv2_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *zh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_zgeinv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
-psb_i_t psb_c_zgeinv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zgeinv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_zgeabs(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgecmp(psb_c_zvector *xh,psb_d_t ch,psb_c_zvector *zh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaddconst(psb_c_zvector *xh,psb_z_t bh,psb_c_zvector *zh,psb_c_descriptor *cdh);

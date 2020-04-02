@@ -71,7 +71,7 @@ psb_i_t psb_c_dgediv_check(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_descriptor 
 psb_i_t psb_c_dgediv2(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_dvector *zh,psb_c_descriptor *cdh);
 psb_i_t psb_c_dgediv2_check(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_dvector *zh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_dgeinv(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_descriptor *cdh);
-psb_i_t psb_c_dgeinv_check(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_dgeinv_check(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_dgeabs(psb_c_dvector *xh,psb_c_dvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_dgecmp(psb_c_dvector *xh,psb_d_t ch,psb_c_dvector *zh,psb_c_descriptor *cdh);
 psb_i_t psb_c_dgeaddconst(psb_c_dvector *xh,psb_d_t bh,psb_c_dvector *zh,psb_c_descriptor *cdh);

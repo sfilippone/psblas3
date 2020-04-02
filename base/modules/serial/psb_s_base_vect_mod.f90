@@ -1530,7 +1530,7 @@ contains
           y%v(i) = 1_psb_spk_/x(i)
         else
           info = 1
-          exit
+          y%v(i) = 0_psb_spk_
         end if
       end do
     end if
