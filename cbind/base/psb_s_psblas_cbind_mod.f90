@@ -1073,4 +1073,89 @@ contains
     res = psb_is_matbld(ap,descp,info)
   end function
 
+  function psb_c_sset_matupd(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_) :: res
+
+    type(psb_c_sspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_sspmat_type), pointer  :: ap
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%set_upd()
+
+    res = psb_success_
+  end function
+
+  function psb_c_sset_matasb(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)    :: res
+
+    type(psb_c_sspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_sspmat_type), pointer  :: ap
+
+    res = -1;
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%set_asb()
+
+    res = psb_success_
+
+  end function
+
+  function psb_c_sset_matbld(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)    :: res
+
+    type(psb_c_sspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_sspmat_type), pointer  :: ap
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%set_bld()
+
+    res = psb_success_
+  end function
+
 end module psb_s_psblas_cbind_mod
