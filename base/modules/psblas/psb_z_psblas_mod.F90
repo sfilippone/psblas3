@@ -599,4 +599,15 @@ module psb_z_psblas_mod
     end function
   end interface
 
+  interface psb_is_matupd
+    function psb_z_is_matupd(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_zspmat_type, &
+        & psb_dpk_, psb_ipk_
+      logical                               :: res
+      type(psb_zspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end function
+  end interface
+
 end module psb_z_psblas_mod
