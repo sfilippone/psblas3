@@ -43,6 +43,7 @@ psb_i_t    psb_c_zmat_get_ncols(psb_c_zspmat *mh);
 psb_l_t    psb_c_znnz(psb_c_zspmat *mh,psb_c_descriptor *cdh);
 bool    	 psb_c_zis_matupd(psb_c_zspmat *mh,psb_c_descriptor *cdh);
 bool    	 psb_c_zis_matasb(psb_c_zspmat *mh,psb_c_descriptor *cdh);
+bool    	 psb_c_zis_matbld(psb_c_zspmat *mh,psb_c_descriptor *cdh);
 
 /* psb_i_t    psb_c_zspasb_opt(psb_c_zspmat *mh, psb_c_descriptor *cdh,  */
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
