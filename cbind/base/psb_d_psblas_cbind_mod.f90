@@ -972,5 +972,31 @@ contains
 
   end function psb_c_dspsm
 
+  function psb_c_dnnz(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_) :: res
+
+    type(psb_c_dspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_dspmat_type), pointer  :: ap
+    integer(psb_c_ipk_)               :: info
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    res = psb_nnz(ap,descp,info)
+
+  end function psb_c_dnnz
+
 
 end module psb_d_psblas_cbind_mod

@@ -30,7 +30,7 @@
 !
 !
 module psb_c_psblas_mod
-  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
   use psb_c_vect_mod, only : psb_c_vect_type
   use psb_c_mat_mod, only : psb_cspmat_type
 
@@ -587,5 +587,16 @@ module psb_c_psblas_mod
     end subroutine psb_caddconst_vect
   end interface
 
+
+  interface psb_nnz
+    function  psb_cget_nnz(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_ipk_, psb_lpk_, &
+        & psb_cspmat_type, psb_spk_
+      integer(psb_lpk_)                     :: res
+      type(psb_cspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end function
+  end interface
 
 end module psb_c_psblas_mod

@@ -40,6 +40,7 @@ psb_i_t    psb_c_cspins(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl,
 			const psb_c_t *val, psb_c_cspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_cmat_get_nrows(psb_c_cspmat *mh);
 psb_i_t    psb_c_cmat_get_ncols(psb_c_cspmat *mh);
+psb_l_t    psb_c_cnnz(psb_c_cspmat *mh,psb_c_descriptor *cdh);
 
 /* psb_i_t    psb_c_cspasb_opt(psb_c_cspmat *mh, psb_c_descriptor *cdh,  */
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */

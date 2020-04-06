@@ -15,7 +15,8 @@ OBJS= psb_ddot.o psb_damax.o psb_dasum.o psb_daxpby.o\
 	psb_cinv_vect.o psb_dinv_vect.o psb_zinv_vect.o psb_sinv_vect.o\
 	psb_dcmp_vect.o psb_scmp_vect.o psb_ccmp_vect.o psb_zcmp_vect.o\
 	psb_cabs_vect.o psb_dabs_vect.o psb_sabs_vect.o \
-	psb_zabs_vect.o
+	psb_zabs_vect.o psb_cgetmatinfo.o psb_dgetmatinfo.o psb_sgetmatinfo.o \
+	psb_zgetmatinfo.o
 
 LIBDIR=..
 INCDIR=..

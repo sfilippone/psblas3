@@ -30,7 +30,7 @@
 !
 !
 module psb_d_psblas_mod
-  use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
   use psb_d_vect_mod, only : psb_d_vect_type
   use psb_d_mat_mod, only : psb_dspmat_type
 
@@ -620,6 +620,17 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in)        :: desc_a
       integer(psb_ipk_), intent(out)          :: info
       logical, intent(in), optional           :: global
+    end function
+  end interface
+
+  interface psb_nnz
+    function  psb_dget_nnz(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_ipk_, psb_lpk_, &
+        & psb_dspmat_type, psb_dpk_
+      integer(psb_lpk_)                     :: res
+      type(psb_dspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
     end function
   end interface
 
