@@ -47,6 +47,7 @@ bool    	 psb_c_sis_matbld(psb_c_sspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_sset_matupd(psb_c_sspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_sset_matasb(psb_c_sspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_sset_matbld(psb_c_sspmat *mh,psb_c_descriptor *cdh);
+psb_i_t		 psb_c_scopy_mat(psb_c_sspmat *ah,psb_c_sspmat *bh,psb_c_descriptor *cdh);
 
 /* psb_i_t    psb_c_sspasb_opt(psb_c_sspmat *mh, psb_c_descriptor *cdh,  */
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
