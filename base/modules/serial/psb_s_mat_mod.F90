@@ -418,6 +418,7 @@ module psb_s_mat_mod
     procedure, pass(a) :: scals    => psb_ls_scals
     procedure, pass(a) :: scalv    => psb_ls_scal
     generic, public    :: scal     => scals, scalv
+    procedure, pass(a) :: scalpid  => psb_ls_scalplusidentity
 
   end type psb_lsspmat_type
 
@@ -1760,6 +1761,15 @@ module psb_s_mat_mod
       real(psb_spk_), intent(in)             :: d
       integer(psb_ipk_), intent(out)                    :: info
     end subroutine psb_ls_scals
+  end interface
+
+  interface psb_scalplusidentity
+      subroutine psb_ls_scalplusidentity(d,a,info)
+        import :: psb_ipk_, psb_lpk_, psb_lsspmat_type, psb_spk_
+        class(psb_lsspmat_type), intent(inout) :: a
+        real(psb_spk_), intent(in)             :: d
+        integer(psb_ipk_), intent(out)                    :: info
+    end subroutine psb_ls_scalplusidentity
   end interface
 
   interface
