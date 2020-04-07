@@ -1192,4 +1192,64 @@ contains
     res = info
   end function
 
+  function psb_c_sspscal(alpha,ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)              ::  res
+
+    real(c_float), value :: alpha
+    type(psb_c_sspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)              ::  info
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%scal(alpha,info)
+
+    res = info
+
+  end function psb_c_sspscal
+
+  function psb_c_sspscalpid(alpha,ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)              ::  res
+
+    real(c_float), value :: alpha
+    type(psb_c_sspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)              ::  info
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%scalpid(alpha,info)
+
+    res = info
+
+  end function psb_c_sspscalpid
+
 end module psb_s_psblas_cbind_mod

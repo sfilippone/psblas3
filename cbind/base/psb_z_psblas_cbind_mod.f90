@@ -1091,4 +1091,64 @@ contains
     res = info
   end function
 
+  function psb_c_zspscal(alpha,ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)              ::  res
+
+    complex(c_double_complex), value :: alpha
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_zspmat_type), pointer :: ap
+    integer(psb_c_ipk_)              ::  info
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%scal(alpha,info)
+
+    res = info
+
+  end function psb_c_zspscal
+
+  function psb_c_zspscalpid(alpha,ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)              ::  res
+
+    complex(c_double_complex), value :: alpha
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_zspmat_type), pointer :: ap
+    integer(psb_c_ipk_)              ::  info
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%scalpid(alpha,info)
+
+    res = info
+
+  end function psb_c_zspscalpid
+
 end module psb_z_psblas_cbind_mod

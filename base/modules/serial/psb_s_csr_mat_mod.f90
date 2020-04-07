@@ -1,10 +1,10 @@
 
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -16,7 +16,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -28,8 +28,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! package: psb_s_csr_mat_mod
 !
@@ -48,17 +48,17 @@ module psb_s_csr_mat_mod
 
   !> \namespace  psb_base_mod  \class  psb_s_csr_sparse_mat
   !! \extends psb_s_base_mat_mod::psb_s_base_sparse_mat
-  !! 
+  !!
   !! psb_s_csr_sparse_mat type and the related methods.
   !! This is a very common storage type, and is the default for assembled
   !! matrices in our library
   type, extends(psb_s_base_sparse_mat) :: psb_s_csr_sparse_mat
 
-    !> Pointers to beginning of rows in JA and VAL. 
+    !> Pointers to beginning of rows in JA and VAL.
     integer(psb_ipk_), allocatable :: irp(:)
     !> Column indices.
     integer(psb_ipk_), allocatable :: ja(:)
-    !> Coefficient values. 
+    !> Coefficient values.
     real(psb_spk_), allocatable :: val(:)
 
   contains
@@ -73,6 +73,7 @@ module psb_s_csr_mat_mod
     procedure, pass(a) :: inner_cssv  => psb_s_csr_cssv
     procedure, pass(a) :: scals       => psb_s_csr_scals
     procedure, pass(a) :: scalv       => psb_s_csr_scal
+    procedure, pass(a) :: scalpid     => psb_s_csr_scalplusidentity
     procedure, pass(a) :: maxval      => psb_s_csr_maxval
     procedure, pass(a) :: spnmi       => psb_s_csr_csnmi
     procedure, pass(a) :: rowsum      => psb_s_csr_rowsum
@@ -112,23 +113,23 @@ module psb_s_csr_mat_mod
   !> \memberof psb_s_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reallocate_nz
   interface
-    subroutine  psb_s_csr_reallocate_nz(nz,a) 
+    subroutine  psb_s_csr_reallocate_nz(nz,a)
       import
       integer(psb_ipk_), intent(in) :: nz
       class(psb_s_csr_sparse_mat), intent(inout) :: a
     end subroutine psb_s_csr_reallocate_nz
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reinit
-  interface 
+  interface
     subroutine psb_s_csr_reinit(a,clear)
       import
-      class(psb_s_csr_sparse_mat), intent(inout) :: a   
+      class(psb_s_csr_sparse_mat), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_s_csr_reinit
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_trim
   interface
@@ -138,22 +139,22 @@ module psb_s_csr_mat_mod
     end subroutine psb_s_csr_trim
   end interface
 
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_mold
-  interface 
-    subroutine psb_s_csr_mold(a,b,info) 
+  interface
+    subroutine psb_s_csr_mold(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(in)                  :: a
       class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
       integer(psb_ipk_), intent(out)                           :: info
     end subroutine psb_s_csr_mold
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_allocate_mnnz
   interface
-    subroutine  psb_s_csr_allocate_mnnz(m,n,a,nz) 
+    subroutine  psb_s_csr_allocate_mnnz(m,n,a,nz)
       import
       integer(psb_ipk_), intent(in) :: m,n
       class(psb_s_csr_sparse_mat), intent(inout) :: a
@@ -161,14 +162,14 @@ module psb_s_csr_mat_mod
     end subroutine psb_s_csr_allocate_mnnz
   end interface
 
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_print
   interface
     subroutine psb_s_csr_print(iout,a,iv,head,ivr,ivc)
       import
       integer(psb_ipk_), intent(in)               :: iout
-      class(psb_s_csr_sparse_mat), intent(in) :: a   
+      class(psb_s_csr_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -187,27 +188,27 @@ module psb_s_csr_mat_mod
   !!         Moreover, apply a clipping by copying entries A(I,J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
-  !!         
+  !!
   !!  \param l     the output (sub)matrix
   !!  \param info  return code
   !!  \param diag [0] the last diagonal (J-I) to be considered.
-  !!  \param imin [1] the minimum row index we are interested in 
-  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
-  !!  \param jmin [1] minimum col index 
-  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param imin [1] the minimum row index we are interested in
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
   !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja 
+  !!  \param append [false] append to ia,ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param u  [none]  copy of the complementary triangle
-  !!           
+  !!
   !
-  interface 
+  interface
     subroutine psb_s_csr_tril(a,l,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,u)
-      import 
+      import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(out) :: l
       integer(psb_ipk_),intent(out)              :: info
@@ -216,13 +217,13 @@ module psb_s_csr_mat_mod
       class(psb_s_coo_sparse_mat), optional, intent(out) :: u
     end subroutine psb_s_csr_tril
   end interface
-  
+
   !
   !> Function  triu:
   !! \memberof  psb_s_csr_sparse_mat
   !! \brief  Copy the upper triangle, i.e. all entries
   !!         A(I,J) such that DIAG <= J-I
-  !!         default value is DIAG=0, i.e. upper triangle from 
+  !!         default value is DIAG=0, i.e. upper triangle from
   !!         the main diagonal up.
   !!         DIAG= 1 means copy the strictly upper triangle
   !!         DIAG=-1 means copy the upper triangle plus the first diagonal
@@ -231,27 +232,27 @@ module psb_s_csr_mat_mod
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!         Optionally copies the lower triangle at the same time
-  !!         
+  !!
   !!  \param u     the output (sub)matrix
   !!  \param info  return code
   !!  \param diag [0] the last diagonal (J-I) to be considered.
-  !!  \param imin [1] the minimum row index we are interested in 
-  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
-  !!  \param jmin [1] minimum col index 
-  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param imin [1] the minimum row index we are interested in
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
   !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja 
+  !!  \param append [false] append to ia,ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param l  [none]  copy of the complementary triangle
-  !!           
+  !!
   !
-  interface 
+  interface
     subroutine psb_s_csr_triu(a,u,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,l)
-      import 
+      import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(out) :: u
       integer(psb_ipk_),intent(out)              :: info
@@ -260,133 +261,133 @@ module psb_s_csr_mat_mod
       class(psb_s_coo_sparse_mat), optional, intent(out) :: l
     end subroutine psb_s_csr_triu
   end interface
-  
+
   !
-  !> 
+  !>
   !! \memberof  psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_clean_zeros
   !
   interface
     subroutine  psb_s_csr_clean_zeros(a, info)
-      import 
+      import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_s_csr_clean_zeros
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cp_to_coo
-  interface 
-    subroutine psb_s_cp_csr_to_coo(a,b,info) 
+  interface
+    subroutine psb_s_cp_csr_to_coo(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_s_cp_csr_to_coo
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cp_from_coo
-  interface 
-    subroutine psb_s_cp_csr_from_coo(a,b,info) 
+  interface
+    subroutine psb_s_cp_csr_from_coo(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       class(psb_s_coo_sparse_mat), intent(in)    :: b
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_s_cp_csr_from_coo
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cp_to_fmt
-  interface 
-    subroutine psb_s_cp_csr_to_fmt(a,b,info) 
+  interface
+    subroutine psb_s_cp_csr_to_fmt(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(in)   :: a
       class(psb_s_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                       :: info
     end subroutine psb_s_cp_csr_to_fmt
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cp_from_fmt
-  interface 
-    subroutine psb_s_cp_csr_from_fmt(a,b,info) 
+  interface
+    subroutine psb_s_cp_csr_from_fmt(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       class(psb_s_base_sparse_mat), intent(in)   :: b
       integer(psb_ipk_), intent(out)                        :: info
     end subroutine psb_s_cp_csr_from_fmt
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_mv_to_coo
-  interface 
-    subroutine psb_s_mv_csr_to_coo(a,b,info) 
+  interface
+    subroutine psb_s_mv_csr_to_coo(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       class(psb_s_coo_sparse_mat), intent(inout)   :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_s_mv_csr_to_coo
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_mv_from_coo
-  interface 
-    subroutine psb_s_mv_csr_from_coo(a,b,info) 
+  interface
+    subroutine psb_s_mv_csr_from_coo(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       class(psb_s_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                        :: info
     end subroutine psb_s_mv_csr_from_coo
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_mv_to_fmt
-  interface 
-    subroutine psb_s_mv_csr_to_fmt(a,b,info) 
+  interface
+    subroutine psb_s_mv_csr_to_fmt(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       class(psb_s_base_sparse_mat), intent(inout)  :: b
       integer(psb_ipk_), intent(out)                        :: info
     end subroutine psb_s_mv_csr_to_fmt
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_mv_from_fmt
-  interface 
-    subroutine psb_s_mv_csr_from_fmt(a,b,info) 
+  interface
+    subroutine psb_s_mv_csr_from_fmt(a,b,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout)  :: a
       class(psb_s_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                         :: info
     end subroutine psb_s_mv_csr_from_fmt
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cp_from
-  interface 
+  interface
     subroutine psb_s_csr_cp_from(a,b)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       type(psb_s_csr_sparse_mat), intent(in)   :: b
     end subroutine psb_s_csr_cp_from
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_mv_from
-  interface 
+  interface
     subroutine psb_s_csr_mv_from(a,b)
       import
       class(psb_s_csr_sparse_mat), intent(inout)  :: a
       type(psb_s_csr_sparse_mat), intent(inout) :: b
     end subroutine psb_s_csr_mv_from
   end interface
-  
-  
+
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csput_a
-  interface 
-    subroutine psb_s_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+  interface
+    subroutine psb_s_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
@@ -395,10 +396,10 @@ module psb_s_csr_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_s_csr_csput_a
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_base_mat_mod::psb_base_csgetptn
-  interface 
+  interface
     subroutine psb_s_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import
@@ -413,10 +414,10 @@ module psb_s_csr_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_s_csr_csgetptn
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csgetrow
-  interface 
+  interface
     subroutine psb_s_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
       import
@@ -435,8 +436,8 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cssv
-  interface 
-    subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans) 
+  interface
+    subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)          :: alpha, beta, x(:)
@@ -447,8 +448,8 @@ module psb_s_csr_mat_mod
   end interface
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cssm
-  interface 
-    subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans) 
+  interface
+    subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
@@ -457,11 +458,11 @@ module psb_s_csr_mat_mod
       character, optional, intent(in)     :: trans
     end subroutine psb_s_csr_cssm
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csmv
-  interface 
-    subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans) 
+  interface
+    subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)          :: alpha, beta, x(:)
@@ -473,8 +474,8 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csmm
-  interface 
-    subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans) 
+  interface
+    subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
@@ -483,32 +484,32 @@ module psb_s_csr_mat_mod
       character, optional, intent(in)     :: trans
     end subroutine psb_s_csr_csmm
   end interface
-  
-  
+
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_maxval
-  interface 
+  interface
     function psb_s_csr_maxval(a) result(res)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_s_csr_maxval
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csnmi
-  interface 
+  interface
     function psb_s_csr_csnmi(a) result(res)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_s_csr_csnmi
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_rowsum
-  interface 
-    subroutine psb_s_csr_rowsum(d,a) 
+  interface
+    subroutine psb_s_csr_rowsum(d,a)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
@@ -517,18 +518,18 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_arwsum
-  interface 
-    subroutine psb_s_csr_arwsum(d,a) 
+  interface
+    subroutine psb_s_csr_arwsum(d,a)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_s_csr_arwsum
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_colsum
-  interface 
-    subroutine psb_s_csr_colsum(d,a) 
+  interface
+    subroutine psb_s_csr_colsum(d,a)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
@@ -537,29 +538,29 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_aclsum
-  interface 
-    subroutine psb_s_csr_aclsum(d,a) 
+  interface
+    subroutine psb_s_csr_aclsum(d,a)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_s_csr_aclsum
   end interface
-    
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_get_diag
-  interface 
-    subroutine psb_s_csr_get_diag(a,d,info) 
+  interface
+    subroutine psb_s_csr_get_diag(a,d,info)
       import
       class(psb_s_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)     :: d(:)
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_s_csr_get_diag
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_scal
-  interface 
-    subroutine psb_s_csr_scal(d,a,info,side) 
+  interface
+    subroutine psb_s_csr_scal(d,a,info,side)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: d(:)
@@ -567,32 +568,43 @@ module psb_s_csr_mat_mod
       character, intent(in), optional :: side
     end subroutine psb_s_csr_scal
   end interface
-  
+
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_scals
   interface
-    subroutine psb_s_csr_scals(d,a,info) 
+    subroutine psb_s_csr_scals(d,a,info)
       import
       class(psb_s_csr_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: d
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_s_csr_scals
   end interface
-  
+
+  !> \memberof psb_s_csr_sparse_mat
+  !! \see psb_s_base_mat_mod::psb_s_base_scalplusidentity
+  interface
+    subroutine psb_s_csr_scalplusidentity(d,a,info)
+      import
+      class(psb_s_csr_sparse_mat), intent(inout) :: a
+      real(psb_spk_), intent(in)      :: d
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_s_csr_scalplusidentity
+  end interface
+
 
     !> \namespace  psb_base_mod  \class  psb_ls_csr_sparse_mat
   !! \extends psb_ls_base_mat_mod::psb_ls_base_sparse_mat
-  !! 
+  !!
   !! psb_ls_csr_sparse_mat type and the related methods.
   !! This is a very common storage type, and is the default for assembled
   !! matrices in our library
   type, extends(psb_ls_base_sparse_mat) :: psb_ls_csr_sparse_mat
 
-    !> Pointers to beginning of rows in JA and VAL. 
+    !> Pointers to beginning of rows in JA and VAL.
     integer(psb_lpk_), allocatable :: irp(:)
     !> Column indices.
     integer(psb_lpk_), allocatable :: ja(:)
-    !> Coefficient values. 
+    !> Coefficient values.
     real(psb_spk_), allocatable :: val(:)
 
   contains
@@ -642,23 +654,23 @@ module psb_s_csr_mat_mod
   !> \memberof psb_ls_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reallocate_nz
   interface
-    subroutine  psb_ls_csr_reallocate_nz(nz,a) 
+    subroutine  psb_ls_csr_reallocate_nz(nz,a)
       import
       integer(psb_lpk_), intent(in) :: nz
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
     end subroutine psb_ls_csr_reallocate_nz
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reinit
-  interface 
+  interface
     subroutine psb_ls_csr_reinit(a,clear)
       import
-      class(psb_ls_csr_sparse_mat), intent(inout) :: a   
+      class(psb_ls_csr_sparse_mat), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_ls_csr_reinit
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_trim
   interface
@@ -668,22 +680,22 @@ module psb_s_csr_mat_mod
     end subroutine psb_ls_csr_trim
   end interface
 
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_mold
-  interface 
-    subroutine psb_ls_csr_mold(a,b,info) 
+  interface
+    subroutine psb_ls_csr_mold(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(in)                  :: a
       class(psb_ls_base_sparse_mat), intent(inout), allocatable :: b
       integer(psb_ipk_), intent(out)                           :: info
     end subroutine psb_ls_csr_mold
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_allocate_mnnz
   interface
-    subroutine  psb_ls_csr_allocate_mnnz(m,n,a,nz) 
+    subroutine  psb_ls_csr_allocate_mnnz(m,n,a,nz)
       import
       integer(psb_lpk_), intent(in) :: m,n
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
@@ -691,14 +703,14 @@ module psb_s_csr_mat_mod
     end subroutine psb_ls_csr_allocate_mnnz
   end interface
 
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_print
   interface
     subroutine psb_ls_csr_print(iout,a,iv,head,ivr,ivc)
       import
       integer(psb_ipk_), intent(in)               :: iout
-      class(psb_ls_csr_sparse_mat), intent(in) :: a   
+      class(psb_ls_csr_sparse_mat), intent(in) :: a
       integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -717,27 +729,27 @@ module psb_s_csr_mat_mod
   !!         Moreover, apply a clipping by copying entries A(I,J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
-  !!         
+  !!
   !!  \param l     the output (sub)matrix
   !!  \param info  return code
   !!  \param diag [0] the last diagonal (J-I) to be considered.
-  !!  \param imin [1] the minimum row index we are interested in 
-  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
-  !!  \param jmin [1] minimum col index 
-  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param imin [1] the minimum row index we are interested in
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
   !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja 
+  !!  \param append [false] append to ia,ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param u  [none]  copy of the complementary triangle
-  !!           
+  !!
   !
-  interface 
+  interface
     subroutine psb_ls_csr_tril(a,l,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,u)
-      import 
+      import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       class(psb_ls_coo_sparse_mat), intent(out) :: l
       integer(psb_ipk_),intent(out)              :: info
@@ -746,13 +758,13 @@ module psb_s_csr_mat_mod
       class(psb_ls_coo_sparse_mat), optional, intent(out) :: u
     end subroutine psb_ls_csr_tril
   end interface
-  
+
   !
   !> Function  triu:
   !! \memberof  psb_s_csr_sparse_mat
   !! \brief  Copy the upper triangle, i.e. all entries
   !!         A(I,J) such that DIAG <= J-I
-  !!         default value is DIAG=0, i.e. upper triangle from 
+  !!         default value is DIAG=0, i.e. upper triangle from
   !!         the main diagonal up.
   !!         DIAG= 1 means copy the strictly upper triangle
   !!         DIAG=-1 means copy the upper triangle plus the first diagonal
@@ -761,27 +773,27 @@ module psb_s_csr_mat_mod
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!         Optionally copies the lower triangle at the same time
-  !!         
+  !!
   !!  \param u     the output (sub)matrix
   !!  \param info  return code
   !!  \param diag [0] the last diagonal (J-I) to be considered.
-  !!  \param imin [1] the minimum row index we are interested in 
-  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
-  !!  \param jmin [1] minimum col index 
-  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param imin [1] the minimum row index we are interested in
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
   !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja 
+  !!  \param append [false] append to ia,ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param l  [none]  copy of the complementary triangle
-  !!           
+  !!
   !
-  interface 
+  interface
     subroutine psb_ls_csr_triu(a,u,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,l)
-      import 
+      import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       class(psb_ls_coo_sparse_mat), intent(out) :: u
       integer(psb_ipk_),intent(out)              :: info
@@ -792,133 +804,133 @@ module psb_s_csr_mat_mod
   end interface
 
     !
-  !> 
+  !>
   !! \memberof  psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_clean_zeros
   !
   interface
     subroutine  psb_ls_csr_clean_zeros(a, info)
-      import 
+      import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ls_csr_clean_zeros
   end interface
-  
 
-  
+
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_cp_to_coo
-  interface 
-    subroutine psb_ls_cp_csr_to_coo(a,b,info) 
+  interface
+    subroutine psb_ls_cp_csr_to_coo(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       class(psb_ls_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ls_cp_csr_to_coo
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_cp_from_coo
-  interface 
-    subroutine psb_ls_cp_csr_from_coo(a,b,info) 
+  interface
+    subroutine psb_ls_cp_csr_from_coo(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       class(psb_ls_coo_sparse_mat), intent(in)    :: b
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_ls_cp_csr_from_coo
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_cp_to_fmt
-  interface 
-    subroutine psb_ls_cp_csr_to_fmt(a,b,info) 
+  interface
+    subroutine psb_ls_cp_csr_to_fmt(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(in)   :: a
       class(psb_ls_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                       :: info
     end subroutine psb_ls_cp_csr_to_fmt
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_cp_from_fmt
-  interface 
-    subroutine psb_ls_cp_csr_from_fmt(a,b,info) 
+  interface
+    subroutine psb_ls_cp_csr_from_fmt(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       class(psb_ls_base_sparse_mat), intent(in)   :: b
       integer(psb_ipk_), intent(out)                        :: info
     end subroutine psb_ls_cp_csr_from_fmt
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_mv_to_coo
-  interface 
-    subroutine psb_ls_mv_csr_to_coo(a,b,info) 
+  interface
+    subroutine psb_ls_mv_csr_to_coo(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       class(psb_ls_coo_sparse_mat), intent(inout)   :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ls_mv_csr_to_coo
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_mv_from_coo
-  interface 
-    subroutine psb_ls_mv_csr_from_coo(a,b,info) 
+  interface
+    subroutine psb_ls_mv_csr_from_coo(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       class(psb_ls_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                        :: info
     end subroutine psb_ls_mv_csr_from_coo
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_mv_to_fmt
-  interface 
-    subroutine psb_ls_mv_csr_to_fmt(a,b,info) 
+  interface
+    subroutine psb_ls_mv_csr_to_fmt(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       class(psb_ls_base_sparse_mat), intent(inout)  :: b
       integer(psb_ipk_), intent(out)                        :: info
     end subroutine psb_ls_mv_csr_to_fmt
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_mv_from_fmt
-  interface 
-    subroutine psb_ls_mv_csr_from_fmt(a,b,info) 
+  interface
+    subroutine psb_ls_mv_csr_from_fmt(a,b,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout)  :: a
       class(psb_ls_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                         :: info
     end subroutine psb_ls_mv_csr_from_fmt
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_cp_from
-  interface 
+  interface
     subroutine psb_ls_csr_cp_from(a,b)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       type(psb_ls_csr_sparse_mat), intent(in)   :: b
     end subroutine psb_ls_csr_cp_from
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_mv_from
-  interface 
+  interface
     subroutine psb_ls_csr_mv_from(a,b)
       import
       class(psb_ls_csr_sparse_mat), intent(inout)  :: a
       type(psb_ls_csr_sparse_mat), intent(inout) :: b
     end subroutine psb_ls_csr_mv_from
   end interface
-  
-  
+
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_csput_a
-  interface 
-    subroutine psb_ls_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+  interface
+    subroutine psb_ls_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
@@ -927,10 +939,10 @@ module psb_s_csr_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ls_csr_csput_a
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_base_mat_mod::psb_base_csgetptn
-  interface 
+  interface
     subroutine psb_ls_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import
@@ -945,10 +957,10 @@ module psb_s_csr_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_ls_csr_csgetptn
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_csgetrow
-  interface 
+  interface
     subroutine psb_ls_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import
@@ -964,11 +976,11 @@ module psb_s_csr_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_ls_csr_csgetrow
   end interface
-    
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_get_diag
-  interface 
-    subroutine psb_ls_csr_get_diag(a,d,info) 
+  interface
+    subroutine psb_ls_csr_get_diag(a,d,info)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)     :: d(:)
@@ -978,8 +990,8 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_scal
-  interface 
-    subroutine psb_ls_csr_scal(d,a,info,side) 
+  interface
+    subroutine psb_ls_csr_scal(d,a,info,side)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: d(:)
@@ -987,42 +999,42 @@ module psb_s_csr_mat_mod
       character, intent(in), optional :: side
     end subroutine psb_ls_csr_scal
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_scals
   interface
-    subroutine psb_ls_csr_scals(d,a,info) 
+    subroutine psb_ls_csr_scals(d,a,info)
       import
       class(psb_ls_csr_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: d
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ls_csr_scals
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_ls_base_maxval
-  interface 
+  interface
     function psb_ls_csr_maxval(a) result(res)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_ls_csr_maxval
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_ls_base_csnmi
-  interface 
+  interface
     function psb_ls_csr_csnmi(a) result(res)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_ls_csr_csnmi
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_ls_base_rowsum
-  interface 
-    subroutine psb_ls_csr_rowsum(d,a) 
+  interface
+    subroutine psb_ls_csr_rowsum(d,a)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
@@ -1031,18 +1043,18 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_ls_base_arwsum
-  interface 
-    subroutine psb_ls_csr_arwsum(d,a) 
+  interface
+    subroutine psb_ls_csr_arwsum(d,a)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_ls_csr_arwsum
   end interface
-  
+
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_ls_base_colsum
-  interface 
-    subroutine psb_ls_csr_colsum(d,a) 
+  interface
+    subroutine psb_ls_csr_colsum(d,a)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
@@ -1051,22 +1063,22 @@ module psb_s_csr_mat_mod
 
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_ls_base_aclsum
-  interface 
-    subroutine psb_ls_csr_aclsum(d,a) 
+  interface
+    subroutine psb_ls_csr_aclsum(d,a)
       import
       class(psb_ls_csr_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_ls_csr_aclsum
   end interface
-    
 
-contains 
+
+contains
 
   ! == ===================================
   !
   !
   !
-  ! Getters 
+  ! Getters
   !
   !
   !
@@ -1075,54 +1087,54 @@ contains
   ! == ===================================
 
 
-  
+
   function s_csr_is_by_rows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_csr_sparse_mat), intent(in) :: a
     logical  :: res
     res = .true.
-     
+
   end function s_csr_is_by_rows
 
-  
+
   function s_csr_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_csr_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
     res = 2 * psb_sizeof_ip
     res = res + psb_sizeof_sp  * psb_size(a%val)
     res = res + psb_sizeof_ip * psb_size(a%irp)
     res = res + psb_sizeof_ip * psb_size(a%ja)
-      
+
   end function s_csr_sizeof
 
   function s_csr_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'CSR'
   end function s_csr_get_fmt
-  
+
   function s_csr_get_nzeros(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%irp(a%get_nrows()+1)-1
   end function s_csr_get_nzeros
 
   function s_csr_get_size(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
 
     res = -1
-    
-    if (allocated(a%ja)) then 
+
+    if (allocated(a%ja)) then
       res = size(a%ja)
     end if
-    if (allocated(a%val)) then 
-      if (res >= 0) then 
+    if (allocated(a%val)) then
+      if (res >= 0) then
         res = min(res,size(a%val))
-      else 
+      else
         res = size(a%val)
       end if
     end if
@@ -1134,17 +1146,17 @@ contains
   function  s_csr_get_nz_row(idx,a) result(res)
 
     implicit none
-    
+
     class(psb_s_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_), intent(in)                  :: idx
     integer(psb_ipk_) :: res
-    
-    res = 0 
- 
-    if ((1<=idx).and.(idx<=a%get_nrows())) then 
+
+    res = 0
+
+    if ((1<=idx).and.(idx<=a%get_nrows())) then
       res = a%irp(idx+1)-a%irp(idx)
     end if
-    
+
   end function s_csr_get_nz_row
 
 
@@ -1159,10 +1171,10 @@ contains
   !
   !
   !
-  ! == ===================================  
+  ! == ===================================
 
-  subroutine  s_csr_free(a) 
-    implicit none 
+  subroutine  s_csr_free(a)
+    implicit none
 
     class(psb_s_csr_sparse_mat), intent(inout) :: a
 
@@ -1172,18 +1184,18 @@ contains
     call a%set_null()
     call a%set_nrows(0_psb_ipk_)
     call a%set_ncols(0_psb_ipk_)
-    
+
     return
 
   end subroutine s_csr_free
 
 
-  
+
   ! == ===================================
   !
   !
   !
-  ! Getters 
+  ! Getters
   !
   !
   !
@@ -1192,54 +1204,54 @@ contains
   ! == ===================================
 
 
-  
+
   function ls_csr_is_by_rows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_ls_csr_sparse_mat), intent(in) :: a
     logical  :: res
     res = .true.
-     
+
   end function ls_csr_is_by_rows
 
-  
+
   function ls_csr_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
-    res = 2 * psb_sizeof_lp 
+    res = 2 * psb_sizeof_lp
     res = res + psb_sizeof_sp  * psb_size(a%val)
     res = res + psb_sizeof_lp * psb_size(a%irp)
     res = res + psb_sizeof_lp * psb_size(a%ja)
-      
+
   end function ls_csr_sizeof
 
   function ls_csr_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'CSR'
   end function ls_csr_get_fmt
-  
+
   function ls_csr_get_nzeros(a) result(res)
-    implicit none 
+    implicit none
     class(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: res
     res = a%irp(a%get_nrows()+1)-1
   end function ls_csr_get_nzeros
 
   function ls_csr_get_size(a) result(res)
-    implicit none 
+    implicit none
     class(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: res
 
     res = -1
-    
-    if (allocated(a%ja)) then 
+
+    if (allocated(a%ja)) then
       res = size(a%ja)
     end if
-    if (allocated(a%val)) then 
-      if (res >= 0) then 
+    if (allocated(a%val)) then
+      if (res >= 0) then
         res = min(res,size(a%val))
-      else 
+      else
         res = size(a%val)
       end if
     end if
@@ -1251,17 +1263,17 @@ contains
   function  ls_csr_get_nz_row(idx,a) result(res)
 
     implicit none
-    
+
     class(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_), intent(in)                  :: idx
     integer(psb_lpk_) :: res
-    
-    res = 0 
- 
-    if ((1<=idx).and.(idx<=a%get_nrows())) then 
+
+    res = 0
+
+    if ((1<=idx).and.(idx<=a%get_nrows())) then
       res = a%irp(idx+1)-a%irp(idx)
     end if
-    
+
   end function ls_csr_get_nz_row
 
 
@@ -1276,10 +1288,10 @@ contains
   !
   !
   !
-  ! == ===================================  
+  ! == ===================================
 
-  subroutine  ls_csr_free(a) 
-    implicit none 
+  subroutine  ls_csr_free(a)
+    implicit none
 
     class(psb_ls_csr_sparse_mat), intent(inout) :: a
 
@@ -1289,7 +1301,7 @@ contains
     call a%set_null()
     call a%set_nrows(0_psb_lpk_)
     call a%set_ncols(0_psb_lpk_)
-    
+
     return
 
   end subroutine ls_csr_free
