@@ -88,6 +88,10 @@ psb_d_t psb_c_dgenrm2_weightmask(psb_c_dvector *xh,psb_c_dvector *wh,psb_c_dvect
 psb_i_t psb_c_dmask(psb_c_dvector *ch,psb_c_dvector *xh,psb_c_dvector *mh, void *t, psb_c_descriptor *cdh);
 psb_d_t psb_c_dgemin(psb_c_dvector *xh,psb_c_descriptor *cdh);
 psb_d_t psb_c_dminquotient(psb_c_dvector *xh,psb_c_dvector *yh, psb_c_descriptor *cdh);
+psb_i_t psb_c_dspscal(psb_d_t alpha, psb_c_dspmat *ah, psb_c_descriptor *cdh);
+psb_i_t psb_c_dspscalpid(psb_d_t alpha, psb_c_dspmat *ah, psb_c_descriptor *cdh);
+psb_i_t psb_c_dspaxpby(psb_d_t alpha, psb_c_dspmat *ah, psb_d_t beta, psb_c_dspmat *bh, psb_c_descriptor *cdh);
+
 
 #ifdef __cplusplus
 }

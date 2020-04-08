@@ -87,7 +87,9 @@ psb_s_t psb_c_sgenrm2_weight(psb_c_svector *xh,psb_c_svector *wh,psb_c_descripto
 psb_s_t psb_c_sgenrm2_weightmask(psb_c_svector *xh,psb_c_svector *wh,psb_c_svector *idvh,psb_c_descriptor *cdh);
 psb_i_t psb_c_smask(psb_c_svector *ch,psb_c_svector *xh,psb_c_svector *mh, void *t, psb_c_descriptor *cdh);
 psb_s_t psb_c_sgemin(psb_c_svector *xh,psb_c_descriptor *cdh);
-
+psb_i_t psb_c_dspscal(psb_s_t alpha, psb_c_sspmat *ah, psb_c_descriptor *cdh);
+psb_i_t psb_c_dspscalpid(psb_s_t alpha, psb_c_sspmat *ah, psb_c_descriptor *cdh);
+psb_i_t psb_c_dspaxpby(psb_s_t alpha, psb_c_sspmat *ah, psb_s_t beta, psb_c_sspmat *bh, psb_c_descriptor *cdh);
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */

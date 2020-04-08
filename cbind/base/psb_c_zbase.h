@@ -86,6 +86,10 @@ psb_i_t psb_c_zgecmp(psb_c_zvector *xh,psb_d_t ch,psb_c_zvector *zh,psb_c_descri
 psb_i_t psb_c_zgeaddconst(psb_c_zvector *xh,psb_z_t bh,psb_c_zvector *zh,psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2_weight(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2_weightmask(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_zvector *idvh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zspscal(psb_z_t alpha, psb_c_zspmat *ah, psb_c_descriptor *cdh);
+psb_i_t psb_c_zspscalpid(psb_z_t alpha, psb_c_zspmat *ah, psb_c_descriptor *cdh);
+psb_i_t psb_c_zspaxpby(psb_z_t alpha, psb_c_zspmat *ah, psb_z_t beta, psb_c_zspmat *bh, psb_c_descriptor *cdh);
+
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */
