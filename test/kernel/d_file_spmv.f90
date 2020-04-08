@@ -35,7 +35,8 @@ program d_file_spmv
   implicit none
 
   ! input parameters
-  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
+  character(len=40) :: kmethd, ptype
+  character(len=512) :: mtrx_file, rhs_file
 
   ! sparse matrices
   type(psb_dspmat_type) :: a, aux_a
