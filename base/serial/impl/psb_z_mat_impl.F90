@@ -2486,6 +2486,41 @@ subroutine psb_z_scalplusidentity(d,a,info)
 
 end subroutine psb_z_scalplusidentity
 
+subroutine psb_z_spaxpby(alpha,a,beta,b,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_mat_mod, psb_protect_name => psb_z_spaxpby
+  implicit none
+  complex(psb_dpk_), intent(in)             :: alpha
+  class(psb_zspmat_type), intent(inout) :: a
+  complex(psb_dpk_), intent(in)             :: beta
+  class(psb_zspmat_type), intent(inout) :: b
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='spaxby'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%spaxpby(alpha,beta,b%a,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_spaxpby
+
 subroutine psb_z_mv_from_lb(a,b)
   use psb_error_mod
   use psb_const_mod
@@ -4616,6 +4651,74 @@ subroutine psb_lz_scals(d,a,info)
   return
 
 end subroutine psb_lz_scals
+
+subroutine psb_lz_scalplusidentity(d,a,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_mat_mod, psb_protect_name => psb_lz_scalplusidentity
+  implicit none
+  class(psb_lzspmat_type), intent(inout) :: a
+  complex(psb_dpk_), intent(in)              :: d
+  integer(psb_ipk_), intent(out)                    :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='scalplusidentity'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%scalpid(d,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lz_scalplusidentity
+
+subroutine psb_lz_spaxpby(alpha,a,beta,b,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_mat_mod, psb_protect_name => psb_lz_spaxpby
+  implicit none
+  complex(psb_dpk_), intent(in)             :: alpha
+  class(psb_lzspmat_type), intent(inout) :: a
+  complex(psb_dpk_), intent(in)             :: beta
+  class(psb_lzspmat_type), intent(inout) :: b
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='spaxby'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%spaxpby(alpha,beta,b%a,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lz_spaxpby
 
 function psb_lz_maxval(a) result(res)
   use psb_z_mat_mod, psb_protect_name => psb_lz_maxval

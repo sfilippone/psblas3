@@ -4583,6 +4583,104 @@ subroutine psb_ld_coo_aclsum(d,a)
 
 end subroutine psb_ld_coo_aclsum
 
+subroutine psb_ld_coo_scalplusidentity(d,a,info)
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_scalplusidentity
+  use psb_error_mod
+  use psb_const_mod
+  implicit none
+  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  real(psb_dpk_), intent(in)      :: d
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_ipk_)  :: err_act,mnm, i, j, m
+  character(len=20)  :: name='scalplusidentity'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  if (a%is_unit()) then
+    call a%make_nonunit()
+  end if
+
+  mnm = min(a%get_nrows(),a%get_ncols())
+  do i=1,a%get_nzeros()
+    a%val(i) = a%val(i) * d
+    j=a%ia(i)
+    if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then
+      a%val(i) = a%val(i) + done
+    endif
+  enddo
+  call a%set_host()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_coo_scalplusidentity
+
+subroutine psb_ld_coo_spaxpby(alpha,a,beta,b,info)
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_spaxpby
+  use psb_error_mod
+  use psb_const_mod
+  implicit none
+
+  class(psb_ld_coo_sparse_mat),  intent(inout) :: a
+  class(psb_ld_base_sparse_mat), intent(inout) :: b
+  real(psb_dpk_), intent(in)      :: alpha
+  real(psb_dpk_), intent(in)      :: beta
+  integer(psb_ipk_), intent(out)   :: info
+
+  !Local
+  integer(psb_ipk_)            :: err_act
+  character(len=20)  :: name='ld_coo_spaxpby'
+  type(psb_ld_coo_sparse_mat) :: tcoo,bcoo
+  integer(psb_lpk_)            :: nza, nzb, M, N
+
+  call psb_erractionsave(err_act)
+  ! Copy (whatever) b format to coo
+  call b%cp_to_coo(bcoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cp_to_coo')
+    goto 9999
+  end if
+  ! Get information on the matrix
+  M = a%get_nrows()
+  N = a%get_ncols()
+  nza = a%get_nzeros()
+  nzb = b%get_nzeros()
+  ! Allocate (temporary) space for the solution
+  call tcoo%allocate(M,N,(nza+nzb))
+  ! Compute the sum
+  tcoo%ia(1:nza) = a%ia(1:nza)
+  tcoo%ja(1:nza) = a%ja(1:nza)
+  tcoo%val(1:nza) = alpha*a%val(1:nza)
+  tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
+  tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
+  tcoo%val(nza+1:nza+nzb) = beta*bcoo%val(1:nzb)
+  ! Fix the indexes
+  call tcoo%fix(info)
+  ! Move to correct output format
+  call tcoo%mv_to_coo(a,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine psb_ld_coo_spaxpby
+
 subroutine  psb_ld_coo_reallocate_nz(nz,a)
   use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_reallocate_nz
   use psb_error_mod
