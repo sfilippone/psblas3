@@ -126,6 +126,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: colsum      => psb_z_base_colsum
     procedure, pass(a) :: aclsum      => psb_z_base_aclsum
     procedure, pass(a) :: scalpid     => psb_z_base_scalplusidentity
+    procedure, pass(a) :: spaxpby     => psb_z_base_spaxpby
   end type psb_z_base_sparse_mat
 
   private :: z_base_mat_sync, z_base_mat_is_host, z_base_mat_is_dev, &
@@ -228,7 +229,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: colsum     => psb_z_coo_colsum
     procedure, pass(a) :: aclsum     => psb_z_coo_aclsum
     procedure, pass(a) :: scalpid    => psb_z_coo_scalplusidentity
-
+    procedure, pass(a) :: spaxpby    => psb_z_coo_spaxpby
   end type psb_z_coo_sparse_mat
 
   private :: z_coo_get_nzeros, z_coo_set_nzeros, &
@@ -293,6 +294,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: colsum      => psb_lz_base_colsum
     procedure, pass(a) :: aclsum      => psb_lz_base_aclsum
     procedure, pass(a) :: scalpid     => psb_lz_base_scalplusidentity
+    procedure, pass(a) :: spaxpby     => psb_lz_base_spaxpby
     !
     ! Convert internal indices
     !
@@ -394,7 +396,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: colsum     => psb_lz_coo_colsum
     procedure, pass(a) :: aclsum     => psb_lz_coo_aclsum
     procedure, pass(a) :: scalpid    => psb_lz_coo_scalplusidentity
-
+    procedure, pass(a) :: spaxpby    => psb_lz_coo_spaxpby
     !
     ! This is COO specific
     !
@@ -1476,6 +1478,28 @@ module psb_z_base_mat_mod
   end interface
 
   !
+  !> Function  base_spaxpby:
+  !! \memberof  psb_z_base_sparse_mat
+  !! \brief Scale add tow sparse matrices A = alpha A + beta B
+  !!
+  !! \param alpha  scaling for A
+  !! \param A      sparse matrix A (intent inout)
+  !! \param beta   scaling for B
+  !! \param B      sparse matrix B (intent in)
+  !! \param info   return code
+  !
+  interface
+    subroutine psb_z_base_spaxpby(alpha,a,beta,b,info)
+      import
+      class(psb_z_base_sparse_mat), intent(inout) :: a
+      class(psb_z_base_sparse_mat), intent(inout) :: b
+      complex(psb_dpk_), intent(in)      :: alpha
+      complex(psb_dpk_), intent(in)      :: beta
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_z_base_spaxpby
+  end interface
+
+  !
   !> Function  base_maxval:
   !! \memberof  psb_z_base_sparse_mat
   !! \brief Maximum absolute value of all coefficients;
@@ -2130,6 +2154,19 @@ module psb_z_base_mat_mod
       complex(psb_dpk_), intent(in)      :: d
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_z_coo_scalplusidentity
+  end interface
+  !
+  !! \memberof  psb_z_coo_sparse_mat
+  !! \see psb_z_base_mat_mod::psb_z_base_spaxpby
+  interface
+    subroutine psb_z_coo_spaxpby(alpha,a,beta,b,info)
+      import
+      class(psb_z_coo_sparse_mat), intent(inout) :: a
+      class(psb_z_base_sparse_mat), intent(inout) :: b
+      complex(psb_dpk_), intent(in)      :: alpha
+      complex(psb_dpk_), intent(in)      :: beta
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_z_coo_spaxpby
   end interface
 
   ! == =================
@@ -2887,6 +2924,28 @@ module psb_z_base_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lz_base_scalplusidentity
   end interface
+  !
+  !> Function  base_spaxpby:
+  !! \memberof  psb_lz_base_sparse_mat
+  !! \brief Scale add tow sparse matrices A = alpha A + beta B
+  !!
+  !! \param alpha  scaling for A
+  !! \param A      sparse matrix A (intent inout)
+  !! \param beta   scaling for B
+  !! \param B      sparse matrix B (intent in)
+  !! \param info   return code
+  !
+  interface
+    subroutine psb_lz_base_spaxpby(alpha,a,beta,b,info)
+      import
+      class(psb_lz_base_sparse_mat), intent(inout) :: a
+      class(psb_lz_base_sparse_mat), intent(inout) :: b
+      complex(psb_dpk_), intent(in)      :: alpha
+      complex(psb_dpk_), intent(in)      :: beta
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_lz_base_spaxpby
+  end interface
+
 
   !
   !> Function  base_scal:
@@ -3495,6 +3554,19 @@ module psb_z_base_mat_mod
       complex(psb_dpk_), intent(in)      :: d
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lz_coo_scalplusidentity
+  end interface
+  !>
+  !! \memberof  psb_lz_coo_sparse_mat
+  !! \see psb_lz_base_mat_mod::psb_lz_base_spaxpby
+  interface
+    subroutine psb_lz_coo_spaxpby(alpha,a,beta,b,info)
+      import
+      class(psb_lz_coo_sparse_mat), intent(inout)  :: a
+      class(psb_lz_base_sparse_mat), intent(inout) :: b
+      complex(psb_dpk_), intent(in)      :: alpha
+      complex(psb_dpk_), intent(in)      :: beta
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_lz_coo_spaxpby
   end interface
 
 contains

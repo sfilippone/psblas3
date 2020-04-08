@@ -1812,6 +1812,58 @@ subroutine psb_c_base_get_diag(a,d,info)
 
 end subroutine psb_c_base_get_diag
 
+subroutine psb_c_base_spaxpby(alpha,a,beta,b,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_spaxpby
+
+  complex(psb_spk_), intent(in)                   :: alpha
+  class(psb_c_base_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)                   :: beta
+  class(psb_c_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)                :: info
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='spaxpby'
+  logical, parameter           :: debug=.false.
+  type(psb_c_coo_sparse_mat) :: acoo
+
+  call psb_erractionsave(err_act)
+  if((a%get_ncols() /= b%get_ncols()).or.(a%get_nrows() /= b%get_nrows())) then
+    info  = psb_err_from_subroutine_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_coo')
+    goto 9999
+  end if
+
+  call acoo%spaxpby(alpha,beta,b,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='spaxby')
+    goto 9999
+  end if
+
+  call acoo%mv_to_fmt(a,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_fmt')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine psb_c_base_spaxpby
 
 ! == ==================================
 !

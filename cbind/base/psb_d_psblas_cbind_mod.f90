@@ -1252,4 +1252,40 @@ contains
 
   end function psb_c_dspscalpid
 
+  function psb_c_dspaxpby(alpha,ah,beta,bh,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)              ::  res
+
+    real(c_double), value :: alpha
+    type(psb_c_dspmat)   :: ah
+    real(c_double), value :: beta
+    type(psb_c_dspmat)   :: bh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_dspmat_type), pointer :: ap,bp
+    integer(psb_c_ipk_)              ::  info
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+    if (c_associated(bh%item)) then
+      call c_f_pointer(bh%item,bp)
+    else
+      return
+    end if
+
+    call ap%spaxpby(alpha,beta,bp,info)
+
+    res = info
+  end function psb_c_dspaxpby
+
 end module psb_d_psblas_cbind_mod
