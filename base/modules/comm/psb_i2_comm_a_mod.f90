@@ -29,95 +29,95 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-module psb_e_comm_a_mod
+module psb_i2_comm_a_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, &
        & psb_epk_, psb_mpk_, psb_i2pk_
   
   interface psb_ovrl
-    subroutine psb_eovrlm(x,desc_a,info,jx,ik,work,update,mode)
+    subroutine psb_i2ovrlm(x,desc_a,info,jx,ik,work,update,mode)
       import
       implicit none
-      integer(psb_epk_), intent(inout), target   :: x(:,:)
+      integer(psb_i2pk_), intent(inout), target   :: x(:,:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer(psb_ipk_), intent(out)                       :: info
-      integer(psb_epk_), intent(inout), optional, target :: work(:)
+      integer(psb_i2pk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional              :: update,jx,ik,mode
-    end subroutine psb_eovrlm
-    subroutine psb_eovrlv(x,desc_a,info,work,update,mode)
+    end subroutine psb_i2ovrlm
+    subroutine psb_i2ovrlv(x,desc_a,info,work,update,mode)
       import
       implicit none
-      integer(psb_epk_), intent(inout), target   :: x(:)
+      integer(psb_i2pk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer(psb_ipk_), intent(out)                       :: info
-      integer(psb_epk_), intent(inout), optional, target :: work(:)
+      integer(psb_i2pk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional              :: update,mode
-    end subroutine psb_eovrlv
+    end subroutine psb_i2ovrlv
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine psb_ehalom(x,desc_a,info,jx,ik,work,tran,mode,data)
+    subroutine psb_i2halom(x,desc_a,info,jx,ik,work,tran,mode,data)
       import
       implicit none
-      integer(psb_epk_), intent(inout), target :: x(:,:)
+      integer(psb_i2pk_), intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)          :: desc_a
       integer(psb_ipk_), intent(out)                     :: info
-      integer(psb_epk_), target, optional, intent(inout) :: work(:)
+      integer(psb_i2pk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
-    end subroutine psb_ehalom
-    subroutine psb_ehalov(x,desc_a,info,work,tran,mode,data)
+    end subroutine psb_i2halom
+    subroutine psb_i2halov(x,desc_a,info,work,tran,mode,data)
       import
       implicit none
-      integer(psb_epk_), intent(inout)        :: x(:)
+      integer(psb_i2pk_), intent(inout)        :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_epk_), target, optional, intent(inout) :: work(:)
+      integer(psb_i2pk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
-    end subroutine psb_ehalov
+    end subroutine psb_i2halov
   end interface psb_halo
 
 
   interface psb_scatter
-    subroutine  psb_escatterm(globx, locx, desc_a, info, root)
+    subroutine  psb_i2scatterm(globx, locx, desc_a, info, root)
       import
       implicit none
-      integer(psb_epk_), intent(out), allocatable :: locx(:,:)
-      integer(psb_epk_), intent(in)  :: globx(:,:)
+      integer(psb_i2pk_), intent(out), allocatable :: locx(:,:)
+      integer(psb_i2pk_), intent(in)  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_escatterm
-    subroutine  psb_escatterv(globx, locx, desc_a, info, root)
+    end subroutine psb_i2scatterm
+    subroutine  psb_i2scatterv(globx, locx, desc_a, info, root)
       import
       implicit none
-      integer(psb_epk_), intent(out), allocatable :: locx(:)
-      integer(psb_epk_), intent(in)  :: globx(:)
+      integer(psb_i2pk_), intent(out), allocatable :: locx(:)
+      integer(psb_i2pk_), intent(in)  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_escatterv
+    end subroutine psb_i2scatterv
   end interface psb_scatter
 
   interface psb_gather
-    subroutine psb_egatherm(globx, locx, desc_a, info, root)
+    subroutine psb_i2gatherm(globx, locx, desc_a, info, root)
       import
       implicit none
-      integer(psb_epk_), intent(in)  :: locx(:,:)
-      integer(psb_epk_), intent(out), allocatable  :: globx(:,:)
+      integer(psb_i2pk_), intent(in)  :: locx(:,:)
+      integer(psb_i2pk_), intent(out), allocatable  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_egatherm
-    subroutine psb_egatherv(globx, locx, desc_a, info, root)
+    end subroutine psb_i2gatherm
+    subroutine psb_i2gatherv(globx, locx, desc_a, info, root)
       import
       implicit none
-      integer(psb_epk_), intent(in)  :: locx(:)
-      integer(psb_epk_), intent(out), allocatable  :: globx(:)
+      integer(psb_i2pk_), intent(in)  :: locx(:)
+      integer(psb_i2pk_), intent(out), allocatable  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_egatherv
+    end subroutine psb_i2gatherv
   end interface psb_gather
 
-end module psb_e_comm_a_mod
+end module psb_i2_comm_a_mod
