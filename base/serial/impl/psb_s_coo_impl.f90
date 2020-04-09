@@ -277,6 +277,106 @@ subroutine psb_s_coo_spaxpby(alpha,a,beta,b,info)
   return
 end subroutine psb_s_coo_spaxpby
 
+function psb_s_coo_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_cmpval
+
+  class(psb_s_coo_sparse_mat),  intent(inout) :: a
+  real(psb_spk_), intent(in)                   :: val
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpval'
+  logical, parameter           :: debug=.false.
+  integer(psb_ipk_)            :: nza
+
+  nza = a%get_nzeros()
+
+  if (any(abs(a%val(1:nza)-val) > tol)) then
+    res = .false.
+  else
+    res = .true.
+  end if
+
+  info = psb_success_
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_s_coo_cmpval
+
+function psb_s_coo_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_cmpmat
+
+  class(psb_s_coo_sparse_mat),  intent(inout) :: a
+  class(psb_s_base_sparse_mat),  intent(inout) :: b
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpmat'
+  logical, parameter           :: debug=.false.
+
+  integer(psb_ipk_)              :: nza, nzb, M, N
+  type(psb_s_coo_sparse_mat) :: tcoo, bcoo
+  real(psb_spk_)               :: normval
+
+  ! Copy (whatever) b format to coo
+  call b%cp_to_coo(bcoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cp_to_coo')
+    goto 9999
+  end if
+  ! Get information on the matrix
+  M = a%get_nrows()
+  N = a%get_ncols()
+  nza = a%get_nzeros()
+  nzb = b%get_nzeros()
+  ! Allocate (temporary) space for the solution
+  call tcoo%allocate(M,N,(nza+nzb))
+  ! Compute the sum
+  tcoo%ia(1:nza) = a%ia(1:nza)
+  tcoo%ja(1:nza) = a%ja(1:nza)
+  tcoo%val(1:nza) = a%val(1:nza)
+  tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
+  tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
+  tcoo%val(nza+1:nza+nzb) = (-1_psb_spk_)*bcoo%val(1:nzb)
+  ! Fix the indexes
+  call tcoo%fix(info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='fix')
+    goto 9999
+  end if
+
+  normval = maxval(abs(tcoo%val));
+
+  if ( normval > tol) then
+    res = .false.
+  else
+    res = .true.
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_s_coo_cmpmat
+
 subroutine  psb_s_coo_reallocate_nz(nz,a)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_reallocate_nz
   use psb_error_mod
@@ -4680,6 +4780,106 @@ subroutine psb_ls_coo_spaxpby(alpha,a,beta,b,info)
 
   return
 end subroutine psb_ls_coo_spaxpby
+
+function psb_ls_coo_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_cmpval
+
+  class(psb_ls_coo_sparse_mat),  intent(inout) :: a
+  real(psb_spk_), intent(in)                   :: val
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpval'
+  logical, parameter           :: debug=.false.
+  integer(psb_lpk_)            :: nza
+
+  nza = a%get_nzeros()
+
+  if (any(abs(a%val(1:nza)-val) > tol)) then
+    res = .false.
+  else
+    res = .true.
+  end if
+
+  info = psb_success_
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_ls_coo_cmpval
+
+function psb_ls_coo_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_cmpmat
+
+  class(psb_ls_coo_sparse_mat),  intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpmat'
+  logical, parameter           :: debug=.false.
+
+  integer(psb_lpk_)              :: nza, nzb, M, N
+  type(psb_ls_coo_sparse_mat)  :: tcoo, bcoo
+  real(psb_spk_)               :: normval
+
+  ! Copy (whatever) b format to coo
+  call b%cp_to_coo(bcoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cp_to_coo')
+    goto 9999
+  end if
+  ! Get information on the matrix
+  M = a%get_nrows()
+  N = a%get_ncols()
+  nza = a%get_nzeros()
+  nzb = b%get_nzeros()
+  ! Allocate (temporary) space for the solution
+  call tcoo%allocate(M,N,(nza+nzb))
+  ! Compute the sum
+  tcoo%ia(1:nza) = a%ia(1:nza)
+  tcoo%ja(1:nza) = a%ja(1:nza)
+  tcoo%val(1:nza) = a%val(1:nza)
+  tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
+  tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
+  tcoo%val(nza+1:nza+nzb) = (-1_psb_spk_)*bcoo%val(1:nzb)
+  ! Fix the indexes
+  call tcoo%fix(info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='fix')
+    goto 9999
+  end if
+
+  normval = tcoo%spnmi()
+
+  if ( normval > tol) then
+    res = .false.
+  else
+    res = .true.
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_ls_coo_cmpmat
 
 subroutine  psb_ls_coo_reallocate_nz(nz,a)
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_reallocate_nz

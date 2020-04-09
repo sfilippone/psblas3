@@ -235,6 +235,9 @@ module psb_c_mat_mod
     generic, public    :: spsm     => cssm, cssv, cssv_v
     procedure, pass(a) :: scalpid  => psb_c_scalplusidentity
     procedure, pass(a) :: spaxpby  => psb_c_spaxpby
+    procedure, pass(a) :: cmpval   => psb_c_cmpval
+    procedure, pass(a) :: cmpmat   => psb_c_cmpmat
+    generic, public    :: spcmp    => cmpval, cmpmat
 
   end type psb_cspmat_type
 
@@ -421,6 +424,9 @@ module psb_c_mat_mod
     generic, public    :: scal     => scals, scalv
     procedure, pass(a) :: scalpid  => psb_lc_scalplusidentity
     procedure, pass(a) :: spaxpby  => psb_lc_spaxpby
+    procedure, pass(a) :: cmpval   => psb_lc_cmpval
+    procedure, pass(a) :: cmpmat   => psb_lc_cmpmat
+    generic, public    :: spcmp    => cmpval, cmpmat
 
   end type psb_lcspmat_type
 
@@ -1181,6 +1187,28 @@ module psb_c_mat_mod
       end subroutine psb_c_spaxpby
   end interface
 
+  interface
+      function psb_c_cmpval(a,val,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+          class(psb_cspmat_type), intent(inout) :: a
+          complex(psb_spk_), intent(in)             :: val
+          real(psb_spk_), intent(in)            :: tol
+          logical                                 :: res
+          integer(psb_ipk_), intent(out)          :: info
+      end function psb_c_cmpval
+  end interface
+
+  interface
+      function psb_c_cmpmat(a,b,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+          class(psb_cspmat_type), intent(inout) :: a
+          class(psb_cspmat_type), intent(inout) :: b
+          real(psb_spk_), intent(in)            :: tol
+          logical                                 :: res
+          integer(psb_ipk_), intent(out)          :: info
+      end function psb_c_cmpmat
+  end interface
+
   ! == ===================================
   !
   !
@@ -1854,6 +1882,25 @@ module psb_c_mat_mod
       real(psb_spk_), allocatable        :: d(:)
       integer(psb_ipk_), intent(out)        :: info
     end function psb_lc_aclsum
+  end interface
+
+  interface  psb_cmpmat
+      function psb_lc_cmpval(a,val,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+          class(psb_lcspmat_type), intent(inout) :: a
+          complex(psb_spk_), intent(in)              :: val
+          real(psb_spk_), intent(in)             :: tol
+          logical                                  :: res
+          integer(psb_ipk_), intent(out)           :: info
+      end function psb_lc_cmpval
+      function psb_lc_cmpmat(a,b,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+          class(psb_lcspmat_type), intent(inout) :: a
+          class(psb_lcspmat_type), intent(inout) :: b
+          real(psb_spk_), intent(in)             :: tol
+          logical                                  :: res
+          integer(psb_ipk_), intent(out)           :: info
+      end function psb_lc_cmpmat
   end interface
 
 contains

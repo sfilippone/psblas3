@@ -1865,6 +1865,92 @@ subroutine psb_s_base_spaxpby(alpha,a,beta,b,info)
   return
 end subroutine psb_s_base_spaxpby
 
+function psb_s_base_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cmpval
+
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  real(psb_spk_), intent(in)                   :: val
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpval'
+  logical, parameter           :: debug=.false.
+  type(psb_s_coo_sparse_mat) :: acoo
+
+  call a%cp_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cp_to_coo')
+    goto 9999
+  end if
+
+  res = acoo%spcmp(val,tol,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cmpval')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_s_base_cmpval
+
+function psb_s_base_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cmpmat
+
+  class(psb_s_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpmat'
+  logical, parameter           :: debug=.false.
+  type(psb_s_coo_sparse_mat) :: acoo
+
+  call a%cp_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cp_to_coo')
+    goto 9999
+  end if
+
+  ! Fix the indexes
+  call acoo%fix(info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='fix')
+    goto 9999
+  end if
+
+  res = acoo%spcmp(b,tol,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cmpmat')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_s_base_cmpmat
+
 ! == ==================================
 !
 !
@@ -3818,6 +3904,92 @@ subroutine psb_ls_base_spaxpby(alpha,a,beta,b,info)
 
   return
 end subroutine psb_ls_base_spaxpby
+
+function psb_ls_base_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cmpval
+
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  real(psb_spk_), intent(in)                   :: val
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpval'
+  logical, parameter           :: debug=.false.
+  type(psb_ls_coo_sparse_mat) :: acoo
+
+  call a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_coo')
+    goto 9999
+  end if
+
+  res = acoo%spcmp(val,tol,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cmpval')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_ls_base_cmpval
+
+function psb_ls_base_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_base_cmpmat
+
+  class(psb_ls_base_sparse_mat), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  real(psb_spk_), intent(in)                  :: tol
+  integer(psb_ipk_), intent(out)                :: info
+  logical                                       :: res
+
+  ! Auxiliary
+  integer(psb_ipk_)            :: err_act
+  character(len=20)            :: name='cmpmat'
+  logical, parameter           :: debug=.false.
+  type(psb_ls_coo_sparse_mat) :: acoo
+
+  call a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_coo')
+    goto 9999
+  end if
+
+  ! Fix the indexes
+  call acoo%fix(info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='fix')
+    goto 9999
+  end if
+
+  res = acoo%spcmp(b,tol,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='cmpmat')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end function psb_ls_base_cmpmat
 
 subroutine psb_ls_base_get_diag(a,d,info)
   use psb_error_mod

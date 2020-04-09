@@ -226,3 +226,140 @@ subroutine psb_dmask_vect(c,x,m,t,desc_a,info)
 end subroutine psb_dmask_vect
 
 
+subroutine psb_dcmp_spmatval(a,val,tol,desc_a,res,info)
+  use psb_base_mod, psb_protect_name => psb_dcmp_spmatval
+  implicit none
+  type(psb_dspmat_type), intent(inout)  :: a
+  real(psb_dpk_), intent(in)             :: val
+  real(psb_dpk_), intent(in)            :: tol
+  type(psb_desc_type), intent (in)        :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+  logical, intent(out)                    :: res
+
+  ! Local
+  integer(psb_ipk_) :: ictxt, np, me
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name, ch_err
+  integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_lpk_) :: m,n,ia,ja
+  integer(psb_ipk_) :: iia,jja
+
+  name='psb_dcmp_spmatval'
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ia = 1
+  ja = 1
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  ! checking for matrix correctness
+  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkmat'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  res = a%spcmp(val,tol,info)
+
+  call psb_lallreduceand(ictxt,res)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then
+    call psb_barrier(ictxt)
+    write(debug_unit,*) me,' ',trim(name),' Returning '
+  endif
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end subroutine psb_dcmp_spmatval
+
+subroutine psb_dcmp_spmat(a,b,tol,desc_a,res,info)
+  use psb_base_mod, psb_protect_name => psb_dcmp_spmat
+  implicit none
+  type(psb_dspmat_type), intent(inout)  :: a
+  type(psb_dspmat_type), intent(inout)  :: b
+  real(psb_dpk_), intent(in)            :: tol
+  type(psb_desc_type), intent (in)        :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+  logical, intent(out)                    :: res
+
+  ! Local
+  integer(psb_ipk_) :: ictxt, np, me
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name, ch_err
+  integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_lpk_) :: m,n,ia,ja,ib,jb
+  integer(psb_ipk_) :: iia,jja,iib,jjb
+
+  name='psb_dcmp_spmatval'
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ia = 1
+  ja = 1
+  ib = 1
+  jb = 1
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  ! checking for matrix correctness
+  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkmat_1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkmat(m,n,ib,jb,desc_a,info,iib,jjb)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkmat_2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  res = a%spcmp(b,tol,info)
+
+  call psb_lallreduceand(ictxt,res)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then
+    call psb_barrier(ictxt)
+    write(debug_unit,*) me,' ',trim(name),' Returning '
+  endif
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_dcmp_spmat

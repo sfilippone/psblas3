@@ -2521,6 +2521,78 @@ subroutine psb_s_spaxpby(alpha,a,beta,b,info)
 
 end subroutine psb_s_spaxpby
 
+function psb_s_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cmpval
+  implicit none
+  class(psb_sspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)             :: val
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpval'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(val,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_s_cmpval
+
+function psb_s_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cmpmat
+  implicit none
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_sspmat_type), intent(inout) :: b
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpmat'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(b%a,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_s_cmpmat
+
 subroutine psb_s_mv_from_lb(a,b)
   use psb_error_mod
   use psb_const_mod
@@ -4719,6 +4791,78 @@ subroutine psb_ls_spaxpby(alpha,a,beta,b,info)
   return
 
 end subroutine psb_ls_spaxpby
+
+function psb_ls_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cmpval
+  implicit none
+  class(psb_lsspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)             :: val
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpval'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(val,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_cmpval
+
+function psb_ls_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cmpmat
+  implicit none
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_lsspmat_type), intent(inout) :: b
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpmat'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(b%a,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_cmpmat
 
 function psb_ls_maxval(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_ls_maxval

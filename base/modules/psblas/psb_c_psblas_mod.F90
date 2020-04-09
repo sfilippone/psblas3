@@ -574,6 +574,26 @@ module psb_c_psblas_mod
       type(psb_desc_type), intent (in)        :: desc_a
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_ccmp_vect
+    subroutine psb_ccmp_spmatval(a,val,tol,desc_a,res,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_lpk_, psb_cspmat_type, psb_spk_
+      type(psb_cspmat_type), intent(inout)  :: a
+      complex(psb_spk_), intent(in)             :: val
+      real(psb_spk_), intent(in)            :: tol
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      logical, intent(out)                    :: res
+    end subroutine psb_ccmp_spmatval
+    subroutine psb_ccmp_spmat(a,b,tol,desc_a,res,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_lpk_, psb_cspmat_type, psb_spk_
+      type(psb_cspmat_type), intent(inout)  :: a
+      type(psb_cspmat_type), intent(inout)  :: b
+      real(psb_spk_), intent(in)            :: tol
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      logical, intent(out)                    :: res
+    end subroutine psb_ccmp_spmat
   end interface
   interface psb_geaddconst
     subroutine psb_caddconst_vect(x,b,z,desc_a,info)

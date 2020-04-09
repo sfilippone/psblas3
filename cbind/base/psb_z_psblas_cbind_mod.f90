@@ -463,6 +463,66 @@ contains
 
   end function psb_c_zgecmp
 
+  function psb_c_zgecmpmat(ah,bh,tol,cdh) bind(c) result(res)
+    implicit none
+    logical               :: res
+
+    type(psb_c_zspmat)  :: ah,bh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_zspmat_type), pointer :: ap,bp
+    integer(psb_c_ipk_)          :: info
+    real(c_double_complex), value :: tol
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+    if (c_associated(bh%item)) then
+      call c_f_pointer(bh%item,bp)
+    else
+      return
+    end if
+
+    call psb_gecmp(ap,bp,tol,descp,res,info)
+
+  end function psb_c_zgecmpmat
+
+  function psb_c_zgecmpmat_val(ah,val,tol,cdh) bind(c) result(res)
+    implicit none
+    logical               :: res
+
+    type(psb_c_zspmat)  :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_zspmat_type), pointer :: ap
+    integer(psb_c_ipk_)          :: info
+    complex(c_double_complex), value :: val
+    real(c_double_complex), value :: tol
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call psb_gecmp(ap,val,tol,descp,res,info)
+
+  end function psb_c_zgecmpmat_val
+
   function psb_c_zgeaddconst(xh,bh,zh,cdh) bind(c) result(res)
     implicit none
     integer(psb_c_ipk_)    :: res
