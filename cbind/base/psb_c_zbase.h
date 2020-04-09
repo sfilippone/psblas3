@@ -83,6 +83,8 @@ psb_i_t psb_c_zgeinv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeinv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_zgeabs(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgecmp(psb_c_zvector *xh,psb_d_t ch,psb_c_zvector *zh,psb_c_descriptor *cdh);
+bool psb_c_zgecmpmat(psb_c_zspmat *ah,psb_c_zspmat *bh,psb_d_t tol,psb_c_descriptor *cdh);
+bool psb_c_zgecmpmat_val(psb_c_zspmat *ah,psb_z_t val,psb_d_t tol,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaddconst(psb_c_zvector *xh,psb_z_t bh,psb_c_zvector *zh,psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2_weight(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2_weightmask(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_zvector *idvh,psb_c_descriptor *cdh);
