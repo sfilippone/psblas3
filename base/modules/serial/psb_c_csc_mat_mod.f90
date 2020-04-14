@@ -71,7 +71,6 @@ module psb_c_csc_mat_mod
     procedure, pass(a) :: inner_cssv  => psb_c_csc_cssv
     procedure, pass(a) :: scals       => psb_c_csc_scals
     procedure, pass(a) :: scalv       => psb_c_csc_scal
-!    procedure, pass(a) :: scalpid     => psb_c_csc_scalplusidentity
     procedure, pass(a) :: maxval      => psb_c_csc_maxval
     procedure, pass(a) :: spnm1       => psb_c_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_c_csc_rowsum
@@ -128,7 +127,6 @@ module psb_c_csc_mat_mod
     procedure, pass(a) :: sizeof      => lc_csc_sizeof
     procedure, pass(a) :: scals       => psb_lc_csc_scals
     procedure, pass(a) :: scalv       => psb_lc_csc_scal
-!    procedure, pass(a) :: scalpid     => psb_lc_csc_scalplusidentity
     procedure, pass(a) :: maxval      => psb_lc_csc_maxval
     procedure, pass(a) :: spnm1       => psb_lc_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_lc_csc_rowsum
@@ -563,18 +561,6 @@ module psb_c_csc_mat_mod
     end subroutine psb_c_csc_scals
   end interface
 
-  !> \memberof psb_c_csc_sparse_mat
-  !! \see psb_c_base_mat_mod::psb_c_base_scalplusidentity
-  ! interface
-  !   subroutine psb_c_csc_scalplusidentity(d,a,info)
-  !     import
-  !     class(psb_c_csc_sparse_mat), intent(inout) :: a
-  !     complex(psb_spk_), intent(in)      :: d
-  !     integer(psb_ipk_), intent(out)            :: info
-  !   end subroutine psb_c_csc_scalplusidentity
-  ! end interface
-
-
   !
   ! lc
   !
@@ -925,17 +911,6 @@ module psb_c_csc_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lc_csc_scals
   end interface
-
-  !> \memberof psb_lc_csc_sparse_mat
-  !! \see psb_lc_base_mat_mod::psb_lc_base_scalplusidentity
-!  interface
-!    subroutine psb_lc_csc_scalplusidentity(d,a,info)
-!      import
-!      class(psb_lc_csc_sparse_mat), intent(inout) :: a
-!      complex(psb_spk_), intent(in)      :: d
-!      integer(psb_ipk_), intent(out)            :: info
-!    end subroutine psb_lc_csc_scalplusidentity
-!  end interface
 
 contains
 

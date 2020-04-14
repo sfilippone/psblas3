@@ -71,7 +71,6 @@ module psb_d_csc_mat_mod
     procedure, pass(a) :: inner_cssv  => psb_d_csc_cssv
     procedure, pass(a) :: scals       => psb_d_csc_scals
     procedure, pass(a) :: scalv       => psb_d_csc_scal
-!    procedure, pass(a) :: scalpid     => psb_d_csc_scalplusidentity
     procedure, pass(a) :: maxval      => psb_d_csc_maxval
     procedure, pass(a) :: spnm1       => psb_d_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_d_csc_rowsum
@@ -128,7 +127,6 @@ module psb_d_csc_mat_mod
     procedure, pass(a) :: sizeof      => ld_csc_sizeof
     procedure, pass(a) :: scals       => psb_ld_csc_scals
     procedure, pass(a) :: scalv       => psb_ld_csc_scal
-!    procedure, pass(a) :: scalpid     => psb_ld_csc_scalplusidentity
     procedure, pass(a) :: maxval      => psb_ld_csc_maxval
     procedure, pass(a) :: spnm1       => psb_ld_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_ld_csc_rowsum
@@ -563,18 +561,6 @@ module psb_d_csc_mat_mod
     end subroutine psb_d_csc_scals
   end interface
 
-  !> \memberof psb_d_csc_sparse_mat
-  !! \see psb_d_base_mat_mod::psb_d_base_scalplusidentity
-  ! interface
-  !   subroutine psb_d_csc_scalplusidentity(d,a,info)
-  !     import
-  !     class(psb_d_csc_sparse_mat), intent(inout) :: a
-  !     real(psb_dpk_), intent(in)      :: d
-  !     integer(psb_ipk_), intent(out)            :: info
-  !   end subroutine psb_d_csc_scalplusidentity
-  ! end interface
-
-
   !
   ! ld
   !
@@ -925,17 +911,6 @@ module psb_d_csc_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ld_csc_scals
   end interface
-
-  !> \memberof psb_ld_csc_sparse_mat
-  !! \see psb_ld_base_mat_mod::psb_ld_base_scalplusidentity
-!  interface
-!    subroutine psb_ld_csc_scalplusidentity(d,a,info)
-!      import
-!      class(psb_ld_csc_sparse_mat), intent(inout) :: a
-!      real(psb_dpk_), intent(in)      :: d
-!      integer(psb_ipk_), intent(out)            :: info
-!    end subroutine psb_ld_csc_scalplusidentity
-!  end interface
 
 contains
 

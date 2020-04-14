@@ -73,7 +73,6 @@ module psb_c_csr_mat_mod
     procedure, pass(a) :: inner_cssv  => psb_c_csr_cssv
     procedure, pass(a) :: scals       => psb_c_csr_scals
     procedure, pass(a) :: scalv       => psb_c_csr_scal
-!    procedure, pass(a) :: scalpid     => psb_c_csr_scalplusidentity
     procedure, pass(a) :: maxval      => psb_c_csr_maxval
     procedure, pass(a) :: spnmi       => psb_c_csr_csnmi
     procedure, pass(a) :: rowsum      => psb_c_csr_rowsum
@@ -579,18 +578,6 @@ module psb_c_csr_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_c_csr_scals
   end interface
-
-  !> \memberof psb_c_csr_sparse_mat
-  !! \see psb_c_base_mat_mod::psb_c_base_scalplusidentity
-  ! interface
-  !   subroutine psb_c_csr_scalplusidentity(d,a,info)
-  !     import
-  !     class(psb_c_csr_sparse_mat), intent(inout) :: a
-  !     complex(psb_spk_), intent(in)      :: d
-  !     integer(psb_ipk_), intent(out)            :: info
-  !   end subroutine psb_c_csr_scalplusidentity
-  ! end interface
-
 
     !> \namespace  psb_base_mod  \class  psb_lc_csr_sparse_mat
   !! \extends psb_lc_base_mat_mod::psb_lc_base_sparse_mat
