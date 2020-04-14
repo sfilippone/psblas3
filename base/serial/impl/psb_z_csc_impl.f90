@@ -1485,48 +1485,48 @@ subroutine psb_z_csc_scals(d,a,info)
 
 end subroutine psb_z_csc_scals
 
-subroutine psb_z_csc_scalplusidentity(d,a,info)
-  use psb_error_mod
-  use psb_const_mod
-  use psb_z_csc_mat_mod, psb_protect_name => psb_z_csc_scalplusidentity
-  implicit none
-  class(psb_z_csc_sparse_mat), intent(inout) :: a
-  complex(psb_dpk_), intent(in)      :: d
-  integer(psb_ipk_), intent(out)            :: info
-
-  integer(psb_ipk_) :: err_act,mnm, i, j, k, m
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='scalplusidentity'
-  logical, parameter :: debug=.false.
-
-  info  = psb_success_
-  call psb_erractionsave(err_act)
-  if (a%is_dev())   call a%sync()
-
-  if (a%is_unit()) then
-    call a%make_nonunit()
-  end if
-
-  mnm = min(a%get_nrows(),a%get_ncols())
-  do i=1,a%get_nzeros()
-    a%val(i) = a%val(i) * d
-    do k=a%icp(i),a%icp(i+1)-1
-      j=a%ia(k)
-      if ((j == i) .and.(j <= mnm )) then
-        a%val(k) = a%val(k) + zone
-      endif
-    enddo
-  enddo
-  call a%set_host()
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_z_csc_scalplusidentity
+! subroutine psb_z_csc_scalplusidentity(d,a,info)
+!   use psb_error_mod
+!   use psb_const_mod
+!   use psb_z_csc_mat_mod, psb_protect_name => psb_z_csc_scalplusidentity
+!   implicit none
+!   class(psb_z_csc_sparse_mat), intent(inout) :: a
+!   complex(psb_dpk_), intent(in)      :: d
+!   integer(psb_ipk_), intent(out)            :: info
+!
+!   integer(psb_ipk_) :: err_act,mnm, i, j, k, m
+!   integer(psb_ipk_) :: ierr(5)
+!   character(len=20)  :: name='scalplusidentity'
+!   logical, parameter :: debug=.false.
+!
+!   info  = psb_success_
+!   call psb_erractionsave(err_act)
+!   if (a%is_dev())   call a%sync()
+!
+!   if (a%is_unit()) then
+!     call a%make_nonunit()
+!   end if
+!
+!   mnm = min(a%get_nrows(),a%get_ncols())
+!   do i=1,a%get_nzeros()
+!     a%val(i) = a%val(i) * d
+!     do k=a%icp(i),a%icp(i+1)-1
+!       j=a%ia(k)
+!       if ((j == i) .and.(j <= mnm )) then
+!         a%val(k) = a%val(k) + zone
+!       endif
+!     enddo
+!   enddo
+!   call a%set_host()
+!
+!   call psb_erractionrestore(err_act)
+!   return
+!
+! 9999 call psb_error_handler(err_act)
+!
+!   return
+!
+! end subroutine psb_z_csc_scalplusidentity
 
 
 ! == ===================================
@@ -3107,48 +3107,48 @@ subroutine psb_lz_csc_scals(d,a,info)
 
 end subroutine psb_lz_csc_scals
 
-subroutine psb_lz_csc_scalplusidentity(d,a,info)
-  use psb_error_mod
-  use psb_const_mod
-  use psb_z_csc_mat_mod, psb_protect_name => psb_lz_csc_scalplusidentity
-  implicit none
-  class(psb_lz_csc_sparse_mat), intent(inout) :: a
-  complex(psb_dpk_), intent(in)      :: d
-  integer(psb_ipk_), intent(out)            :: info
-
-  integer(psb_lpk_) :: mnm, i, j, k, m
-  integer(psb_ipk_) :: err_act, ierr(5)
-  character(len=20)  :: name='scalplusidentity'
-  logical, parameter :: debug=.false.
-
-  info  = psb_success_
-  call psb_erractionsave(err_act)
-  if (a%is_dev())   call a%sync()
-
-  if (a%is_unit()) then
-    call a%make_nonunit()
-  end if
-
-  mnm = min(a%get_nrows(),a%get_ncols())
-  do i=1,a%get_nzeros()
-    a%val(i) = a%val(i) * d
-    do k=a%icp(i),a%icp(i+1)-1
-      j=a%ia(k)
-      if ((j == i) .and.(j <= mnm )) then
-        a%val(k) = a%val(k) + zone
-      endif
-    enddo
-  enddo
-  call a%set_host()
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_lz_csc_scalplusidentity
+! subroutine psb_lz_csc_scalplusidentity(d,a,info)
+!   use psb_error_mod
+!   use psb_const_mod
+!   use psb_z_csc_mat_mod, psb_protect_name => psb_lz_csc_scalplusidentity
+!   implicit none
+!   class(psb_lz_csc_sparse_mat), intent(inout) :: a
+!   complex(psb_dpk_), intent(in)      :: d
+!   integer(psb_ipk_), intent(out)            :: info
+!
+!   integer(psb_lpk_) :: mnm, i, j, k, m
+!   integer(psb_ipk_) :: err_act, ierr(5)
+!   character(len=20)  :: name='scalplusidentity'
+!   logical, parameter :: debug=.false.
+!
+!   info  = psb_success_
+!   call psb_erractionsave(err_act)
+!   if (a%is_dev())   call a%sync()
+!
+!   if (a%is_unit()) then
+!     call a%make_nonunit()
+!   end if
+!
+!   mnm = min(a%get_nrows(),a%get_ncols())
+!   do i=1,a%get_nzeros()
+!     a%val(i) = a%val(i) * d
+!     do k=a%icp(i),a%icp(i+1)-1
+!       j=a%ia(k)
+!       if ((j == i) .and.(j <= mnm )) then
+!         a%val(k) = a%val(k) + zone
+!       endif
+!     enddo
+!   enddo
+!   call a%set_host()
+!
+!   call psb_erractionrestore(err_act)
+!   return
+!
+! 9999 call psb_error_handler(err_act)
+!
+!   return
+!
+! end subroutine psb_lz_csc_scalplusidentity
 
 function psb_lz_csc_maxval(a) result(res)
   use psb_error_mod

@@ -1677,46 +1677,46 @@ subroutine psb_d_csr_scals(d,a,info)
 
 end subroutine psb_d_csr_scals
 
-subroutine psb_d_csr_scalplusidentity(d,a,info)
-  use psb_error_mod
-  use psb_const_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_scalplusidentity
-  implicit none
-  class(psb_d_csr_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d
-  integer(psb_ipk_), intent(out)            :: info
-
-  integer(psb_ipk_) :: err_act,mnm, i, j, k, m
-  character(len=20)  :: name='scalplusidentity'
-  logical, parameter :: debug=.false.
-
-  info  = psb_success_
-  call psb_erractionsave(err_act)
-  if (a%is_dev())   call a%sync()
-
-  if (a%is_unit()) then
-    call a%make_nonunit()
-  end if
-
-  mnm = min(a%get_nrows(),a%get_ncols())
-  do i=1,a%get_nzeros()
-    a%val(i) = a%val(i) * d
-    do k=a%irp(i),a%irp(i+1)-1
-      j=a%ja(k)
-      if ((j == i) .and.(j <= mnm )) then
-        a%val(k) = a%val(k) + done
-      endif
-    enddo
-  enddo
-  call a%set_host()
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-  return
-
-end subroutine psb_d_csr_scalplusidentity
+! subroutine psb_d_csr_scalplusidentity(d,a,info)
+!   use psb_error_mod
+!   use psb_const_mod
+!   use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_scalplusidentity
+!   implicit none
+!   class(psb_d_csr_sparse_mat), intent(inout) :: a
+!   real(psb_dpk_), intent(in)      :: d
+!   integer(psb_ipk_), intent(out)            :: info
+!
+!   integer(psb_ipk_) :: err_act,mnm, i, j, k, m
+!   character(len=20)  :: name='scalplusidentity'
+!   logical, parameter :: debug=.false.
+!
+!   info  = psb_success_
+!   call psb_erractionsave(err_act)
+!   if (a%is_dev())   call a%sync()
+!
+!   if (a%is_unit()) then
+!     call a%make_nonunit()
+!   end if
+!
+!   mnm = min(a%get_nrows(),a%get_ncols())
+!   do i=1,a%get_nzeros()
+!     a%val(i) = a%val(i) * d
+!     do k=a%irp(i),a%irp(i+1)-1
+!       j=a%ja(k)
+!       if ((j == i) .and.(j <= mnm )) then
+!         a%val(k) = a%val(k) + done
+!       endif
+!     enddo
+!   enddo
+!   call a%set_host()
+!
+!   call psb_erractionrestore(err_act)
+!   return
+!
+! 9999 call psb_error_handler(err_act)
+!   return
+!
+! end subroutine psb_d_csr_scalplusidentity
 
 
 

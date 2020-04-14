@@ -71,7 +71,7 @@ module psb_z_csc_mat_mod
     procedure, pass(a) :: inner_cssv  => psb_z_csc_cssv
     procedure, pass(a) :: scals       => psb_z_csc_scals
     procedure, pass(a) :: scalv       => psb_z_csc_scal
-    procedure, pass(a) :: scalpid     => psb_z_csc_scalplusidentity
+!    procedure, pass(a) :: scalpid     => psb_z_csc_scalplusidentity
     procedure, pass(a) :: maxval      => psb_z_csc_maxval
     procedure, pass(a) :: spnm1       => psb_z_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_z_csc_rowsum
@@ -128,7 +128,7 @@ module psb_z_csc_mat_mod
     procedure, pass(a) :: sizeof      => lz_csc_sizeof
     procedure, pass(a) :: scals       => psb_lz_csc_scals
     procedure, pass(a) :: scalv       => psb_lz_csc_scal
-    procedure, pass(a) :: scalpid     => psb_lz_csc_scalplusidentity
+!    procedure, pass(a) :: scalpid     => psb_lz_csc_scalplusidentity
     procedure, pass(a) :: maxval      => psb_lz_csc_maxval
     procedure, pass(a) :: spnm1       => psb_lz_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_lz_csc_rowsum
@@ -565,14 +565,14 @@ module psb_z_csc_mat_mod
 
   !> \memberof psb_z_csc_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_scalplusidentity
-  interface
-    subroutine psb_z_csc_scalplusidentity(d,a,info)
-      import
-      class(psb_z_csc_sparse_mat), intent(inout) :: a
-      complex(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psb_z_csc_scalplusidentity
-  end interface
+  ! interface
+  !   subroutine psb_z_csc_scalplusidentity(d,a,info)
+  !     import
+  !     class(psb_z_csc_sparse_mat), intent(inout) :: a
+  !     complex(psb_dpk_), intent(in)      :: d
+  !     integer(psb_ipk_), intent(out)            :: info
+  !   end subroutine psb_z_csc_scalplusidentity
+  ! end interface
 
 
   !
@@ -928,14 +928,14 @@ module psb_z_csc_mat_mod
 
   !> \memberof psb_lz_csc_sparse_mat
   !! \see psb_lz_base_mat_mod::psb_lz_base_scalplusidentity
-  interface
-    subroutine psb_lz_csc_scalplusidentity(d,a,info)
-      import
-      class(psb_lz_csc_sparse_mat), intent(inout) :: a
-      complex(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psb_lz_csc_scalplusidentity
-  end interface
+!  interface
+!    subroutine psb_lz_csc_scalplusidentity(d,a,info)
+!      import
+!      class(psb_lz_csc_sparse_mat), intent(inout) :: a
+!      complex(psb_dpk_), intent(in)      :: d
+!      integer(psb_ipk_), intent(out)            :: info
+!    end subroutine psb_lz_csc_scalplusidentity
+!  end interface
 
 contains
 

@@ -1561,15 +1561,37 @@ subroutine psb_z_base_scalplusidentity(d,a,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_scalplusidentity'
   logical, parameter :: debug=.false.
+  type(psb_z_coo_sparse_mat) :: acoo
 
   call psb_erractionsave(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  call a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_coo')
+    goto 9999
+  end if
+
+  call acoo%scalpid(d,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='scalpid')
+    goto 9999
+  end if
+
+  call acoo%mv_to_fmt(a,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_fmt')
+    goto 9999
+  end if
 
   call psb_error_handler(err_act)
+
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_z_base_scalplusidentity
 
@@ -3629,15 +3651,37 @@ subroutine psb_lz_base_scalplusidentity(d,a,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='lz_scalplusidentity'
   logical, parameter :: debug=.false.
+  type(psb_lz_coo_sparse_mat) :: acoo
 
   call psb_erractionsave(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  call a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_coo')
+    goto 9999
+  end if
+
+  call acoo%scalpid(d,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='scalpid')
+    goto 9999
+  end if
+
+  call acoo%mv_to_fmt(a,info)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name, a_err='mv_to_fmt')
+    goto 9999
+  end if
 
   call psb_error_handler(err_act)
+
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_lz_base_scalplusidentity
 
