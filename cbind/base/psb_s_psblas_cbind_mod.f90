@@ -1066,7 +1066,7 @@ contains
 
   function psb_c_sis_matupd(ah,cdh) bind(c) result(res)
     implicit none
-    logical :: res
+    logical(c_bool) :: res
 
     type(psb_c_sspmat)   :: ah
     type(psb_c_descriptor) :: cdh
@@ -1086,12 +1086,12 @@ contains
       return
     end if
 
-    res = psb_is_matupd(ap,descp,info)
+    res = ap%is_upd()
   end function
 
   function psb_c_sis_matasb(ah,cdh) bind(c) result(res)
     implicit none
-    logical :: res
+    logical(c_bool) :: res
 
     type(psb_c_sspmat)   :: ah
     type(psb_c_descriptor) :: cdh
@@ -1111,12 +1111,12 @@ contains
       return
     end if
 
-    res = psb_is_matasb(ap,descp,info)
+    res = ap%is_asb()
   end function
 
   function psb_c_sis_matbld(ah,cdh) bind(c) result(res)
     implicit none
-    logical :: res
+    logical(c_bool) :: res
 
     type(psb_c_sspmat)   :: ah
     type(psb_c_descriptor) :: cdh
@@ -1136,7 +1136,7 @@ contains
       return
     end if
 
-    res = psb_is_matbld(ap,descp,info)
+    res = ap%is_bld()
   end function
 
   function psb_c_sset_matupd(ah,cdh) bind(c) result(res)
