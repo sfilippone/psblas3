@@ -49,7 +49,7 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iia, jja
-  integer(psb_lpk_) :: m,n,ia,ja,localnnz
+  integer(psb_lpk_) :: localnnz
   character(len=20) :: name, ch_err
   !
   name='psb_dget_nnz'
@@ -67,21 +67,9 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
     goto 9999
   endif
 
-  m    = desc_a%get_global_rows()
-  n    = desc_a%get_global_cols()
-
-  ! Check for matrix correctness
-  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkmat'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
   localnnz = a%get_nzeros()
 
-  call MPI_ALLREDUCE(localnnz, res, 1, MPI_LONG, MPI_SUM, ictxt, info)
+  call psb_sum(ictxt,localnnz)
 
   call psb_erractionrestore(err_act)
   return

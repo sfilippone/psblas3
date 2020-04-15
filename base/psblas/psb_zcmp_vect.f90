@@ -119,8 +119,6 @@ subroutine psb_zcmp_spmatval(a,val,tol,desc_a,res,info)
   integer(psb_ipk_) :: err_act
   character(len=20) :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_lpk_) :: m,n,ia,ja
-  integer(psb_ipk_) :: iia,jja
 
   name='psb_zcmp_spmatval'
   info=psb_success_
@@ -139,20 +137,12 @@ subroutine psb_zcmp_spmatval(a,val,tol,desc_a,res,info)
     goto 9999
   endif
 
-  ia = 1
-  ja = 1
-  m    = desc_a%get_global_rows()
-  n    = desc_a%get_global_cols()
-  ! checking for matrix correctness
-  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkmat'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+  if (.not.((desc_a%get_local_rows() == a%get_nrows())&
+    .and.(desc_a%get_local_cols() == a%get_ncols()))) then
+      res = .false.
+  else
+    res = a%spcmp(val,tol,info)
   end if
-
-  res = a%spcmp(val,tol,info)
 
   call psb_lallreduceand(ictxt,res)
 
@@ -183,8 +173,6 @@ subroutine psb_zcmp_spmat(a,b,tol,desc_a,res,info)
   integer(psb_ipk_) :: err_act
   character(len=20) :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_lpk_) :: m,n,ia,ja,ib,jb
-  integer(psb_ipk_) :: iia,jja,iib,jjb
 
   name='psb_zcmp_spmatval'
   info=psb_success_
@@ -203,31 +191,17 @@ subroutine psb_zcmp_spmat(a,b,tol,desc_a,res,info)
     goto 9999
   endif
 
-  ia = 1
-  ja = 1
-  ib = 1
-  jb = 1
-  m    = desc_a%get_global_rows()
-  n    = desc_a%get_global_cols()
-  ! checking for matrix correctness
-  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkmat_1'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+  if (.not.((desc_a%get_local_rows() == a%get_nrows())&
+    .and.(desc_a%get_local_rows() == b%get_nrows())&
+    .and.(desc_a%get_local_cols() == a%get_ncols())&
+      .and.(desc_a%get_local_cols() == b%get_ncols()))) then
+      res = .false.
+  else
+    res = a%spcmp(b,tol,info)
   end if
-  call psb_chkmat(m,n,ib,jb,desc_a,info,iib,jjb)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkmat_2'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  res = a%spcmp(b,tol,info)
 
   call psb_lallreduceand(ictxt,res)
+
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then

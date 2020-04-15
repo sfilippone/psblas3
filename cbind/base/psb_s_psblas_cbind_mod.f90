@@ -476,6 +476,8 @@ contains
     real(c_float), value :: tol
     logical                  :: isequal
 
+    res = .false.
+
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
     else
@@ -511,6 +513,8 @@ contains
     real(c_float), value :: val
     real(c_float), value :: tol
     logical                  :: isequal
+
+    res = .false.
 
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
@@ -1049,6 +1053,8 @@ contains
     type(psb_sspmat_type), pointer  :: ap
     integer(psb_c_ipk_)               :: info
 
+    res = 0
+
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
     else
@@ -1075,6 +1081,8 @@ contains
     type(psb_sspmat_type), pointer  :: ap
     integer(psb_c_ipk_)               :: info
 
+    res = .false.
+
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
     else
@@ -1100,6 +1108,8 @@ contains
     type(psb_sspmat_type), pointer  :: ap
     integer(psb_c_ipk_)               :: info
 
+    res = .false.
+
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
     else
@@ -1124,6 +1134,8 @@ contains
     type(psb_desc_type), pointer      :: descp
     type(psb_sspmat_type), pointer  :: ap
     integer(psb_c_ipk_)               :: info
+
+    res = .false.
 
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)

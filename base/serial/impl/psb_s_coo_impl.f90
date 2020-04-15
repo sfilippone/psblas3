@@ -328,9 +328,8 @@ function psb_s_coo_cmpmat(a,b,tol,info) result(res)
   character(len=20)            :: name='cmpmat'
   logical, parameter           :: debug=.false.
 
-  integer(psb_ipk_)              :: nza, nzb, M, N
+  integer(psb_ipk_)              :: nza, nzb, nzl, M, N
   type(psb_s_coo_sparse_mat) :: tcoo, bcoo
-  real(psb_spk_)               :: normval
 
   ! Copy (whatever) b format to coo
   call b%cp_to_coo(bcoo,info)
@@ -352,7 +351,7 @@ function psb_s_coo_cmpmat(a,b,tol,info) result(res)
   tcoo%val(1:nza) = a%val(1:nza)
   tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
   tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
-  tcoo%val(nza+1:nza+nzb) = (-1_psb_spk_)*bcoo%val(1:nzb)
+  tcoo%val(nza+1:nza+nzb) = (-sone)*bcoo%val(1:nzb)
   ! Fix the indexes
   call tcoo%fix(info)
   if (info /= psb_success_) then
@@ -360,10 +359,9 @@ function psb_s_coo_cmpmat(a,b,tol,info) result(res)
     call psb_errpush(info,name, a_err='fix')
     goto 9999
   end if
+  nzl = tcoo%get_nzeros()
 
-  normval = maxval(abs(tcoo%val));
-
-  if ( normval > tol) then
+  if (any(abs(tcoo%val(1:nzl)) > tol)) then
     res = .false.
   else
     res = .true.
@@ -4832,9 +4830,8 @@ function psb_ls_coo_cmpmat(a,b,tol,info) result(res)
   character(len=20)            :: name='cmpmat'
   logical, parameter           :: debug=.false.
 
-  integer(psb_lpk_)              :: nza, nzb, M, N
+  integer(psb_lpk_)              :: nza, nzb, nzl, M, N
   type(psb_ls_coo_sparse_mat)  :: tcoo, bcoo
-  real(psb_spk_)               :: normval
 
   ! Copy (whatever) b format to coo
   call b%cp_to_coo(bcoo,info)
@@ -4864,10 +4861,9 @@ function psb_ls_coo_cmpmat(a,b,tol,info) result(res)
     call psb_errpush(info,name, a_err='fix')
     goto 9999
   end if
+  nzl = tcoo%get_nzeros()
 
-  normval = tcoo%spnmi()
-
-  if ( normval > tol) then
+  if (any(abs(tcoo%val(1:nzl)) > tol)) then
     res = .false.
   else
     res = .true.
