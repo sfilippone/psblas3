@@ -270,12 +270,12 @@ subroutine psb_lz_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       valsnd(tsdx(proc+1)) = acoo%val(k)
     end if
   end do
+  call acoo%set_nzeros(nzd)
   !
   !  Put halo entries in global numbering
   !
   call desc_r%indxmap%l2gip(jasnd(1:iszs),info)
   call p_desc_c%indxmap%l2gip(iasnd(1:iszs),info)
-  call acoo%set_nzeros(nzd)
   ! And exchange data.
   ! Normally we'll use our SIMPLE A2AV and not MPI, because
   ! the communication pattern is sparse, so ours is more
@@ -569,12 +569,12 @@ subroutine psb_z_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       valsnd(tsdx(proc+1)) = acoo%val(k)
     end if
   end do
+  call acoo%set_nzeros(nzd)
   !
   !  Put halo entries in global numbering
   !
   call desc_r%indxmap%l2gip(jasnd(1:iszs),info)
   call p_desc_c%indxmap%l2gip(iasnd(1:iszs),info)
-  call acoo%set_nzeros(nzd)
   ! And exchange data.
   ! Normally we'll use our SIMPLE A2AV and not MPI, because
   ! the communication pattern is sparse, so ours is more
