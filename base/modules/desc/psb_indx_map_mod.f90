@@ -1486,6 +1486,7 @@ contains
   end subroutine base_set_halo_owner
 
   subroutine base_get_halo_owner(idxmap,v,info)
+    use psb_realloc_mod
     use psb_penv_mod
     use psb_error_mod
     implicit none 
@@ -1494,8 +1495,9 @@ contains
     integer(psb_ipk_), intent(out)     :: info
 
     integer(psb_ipk_)  :: nh
-    nh = min(size(v),size(idxmap%halo_owner))
-    v(1:nh) = idxmap%halo_owner(1:nh)
+    nh = size(idxmap%halo_owner)
+    !v = idxmap%halo_owner(1:nh)
+    call psb_safe_ab_cpy(idxmap%halo_owner,v,info)
   end subroutine base_get_halo_owner
 
   subroutine base_fnd_halo_owner_s(idxmap,xin,xout,info)
