@@ -74,7 +74,8 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   integer(psb_ipk_), allocatable :: hhidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i, err_act, hsize, nv
+  integer(psb_ipk_) :: i, err_act, hsize
+  integer(psb_lpk_) :: nv
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
@@ -140,7 +141,66 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   else
 
-    call psi_graph_fnd_owner(idx,iprc,idxmap,info)
+    if (allocated(idxmap%halo_owner)) then
+      !
+      ! Maybe we are coming here after a REINIT event.
+      ! In this case, reuse the existing information as much as possible.
+      !
+      block
+        integer(psb_ipk_), allocatable :: tprc(:), lidx(:)
+        integer(psb_lpk_), allocatable :: tidx(:)
+        integer(psb_lpk_) :: k1, k2, nh
+        allocate(lidx(nv),stat=info)
+        if (info /= psb_success_) then 
+          call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
+          goto 9999      
+        end if
+        !
+        ! Get local answers, if any
+        !
+        call idxmap%g2l(idx,lidx,info,owned=.false.)
+        call idxmap%fnd_halo_owner(lidx,iprc,info)
+
+        nh = count(iprc<0)
+        !write(0,*) me,'Going through new impl from ',nv,' to ',nh
+        allocate(tidx(nh),tprc(nh),stat=info)
+        if (info /= psb_success_) then 
+          call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
+          goto 9999      
+        end if
+        !
+        ! Prepare remote queries
+        !
+        k2  = 0
+        do k1 = 1, nv
+          if (iprc(k1) < 0) then
+            k2 = k2 + 1
+            if (k2 > nh) then 
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='Wrong auxiliary count')
+              goto 9999
+            end if
+            tidx(k2) = idx(k1)
+          end if
+        end do
+        call psi_graph_fnd_owner(tidx,tprc,idxmap,info)
+        k2  = 0
+        do k1 = 1, nv
+          if (iprc(k1) < 0) then
+            k2 = k2 + 1
+            if (k2 > nh) then 
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='Wrong auxiliary count')
+              goto 9999
+            end if
+            iprc(k1) = tprc(k2)
+          end if
+        end do
+      end block
+    else      
+      call psi_graph_fnd_owner(idx,iprc,idxmap,info)
+    end if
+
 
   end if
   

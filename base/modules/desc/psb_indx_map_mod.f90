@@ -1503,6 +1503,7 @@ contains
   subroutine base_fnd_halo_owner_s(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin
@@ -1512,16 +1513,17 @@ contains
     integer(psb_ipk_)  :: i, j, nr, nc, nh
     nr = idxmap%local_rows
     nc = idxmap%local_cols
+    nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))    
     xout = -1
     if (.not.allocated(idxmap%halo_owner)) then
       !write(0,*) 'Halo_owner not allocated!', nr, nc, xin
       return
     end if
     if ((nr<xin).and.(xin <= nc)) then
-      if (size(idxmap%halo_owner)<(xin-nr)) then
-        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
-        return
-      end if
+!!$      if (size(idxmap%halo_owner)<(xin-nr)) then
+!!$        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
+!!$        return
+!!$      end if
       xout = idxmap%halo_owner(xin-nr)
     end if
     
@@ -1530,6 +1532,7 @@ contains
   subroutine base_fnd_halo_owner_v(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin(:)
@@ -1538,13 +1541,15 @@ contains
 
     integer(psb_ipk_)  :: i, j, nr, nc, nh, sz
     nr = idxmap%local_rows
-    nc = idxmap%local_cols
+    nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))
     sz = min(size(xin),size(xout))
-    xout = -1
     do i = 1, sz
-      if ((nr<xin(i)).and.(xin(i) <= nc)) xout = idxmap%halo_owner(xin(i)-nr)
+      xout(i) = -1          
+      if ((nr<xin(i)).and.(xin(i) <= nc)) xout(i) = idxmap%halo_owner(xin(i)-nr)
     end do
-    
+    do i=sz+1,size(xout)
+      xout(i) = -1
+    end do
   end subroutine base_fnd_halo_owner_v
 
 end module psb_indx_map_mod
