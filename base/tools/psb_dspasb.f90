@@ -122,11 +122,11 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   end if
 
   
-  IF (debug_level >= psb_debug_ext_) then 
+  if (debug_level >= psb_debug_ext_) then 
     ch_err=a%get_fmt()
     write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&
          & info,' ',ch_err
-  end IF
+  end if
   
   if (psb_errstatus_fatal()) then    
     info=psb_err_from_subroutine_
