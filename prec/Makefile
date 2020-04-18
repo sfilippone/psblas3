@@ -27,7 +27,7 @@ lib:  $(OBJS) impld
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 impld: $(OBJS)
-	cd impl && $(MAKE)
+	$(MAKE) -C impl
 
 $(OBJS): $(MODDIR)/$(BASEMODNAME)$(.mod)
 

@@ -29,12 +29,12 @@ lib: impld sortd lib1 $(FOBJS)
 lib1:	$(FOBJS)
 
 impld:
-	cd impl && $(MAKE) lib
+	$(MAKE) -C impl lib
 sortd:
-	cd sort && $(MAKE) lib
+	$(MAKE) -C sort lib
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)
-	(cd impl; $(MAKE) clean)
-	(cd sort; $(MAKE) clean)
+	($(MAKE) -C impl clean)
+	($(MAKE) -C sort clean)
 
 veryclean: clean 
