@@ -747,7 +747,7 @@ subroutine psb_d_simple_glob_transpose_ip(ain,desc_a,info)
   ! that the same DESC_A works for both A and A^T, which
   ! essentially means that A has a symmetric pattern.
   !
-  type(psb_ld_coo_sparse_mat) :: tmpc1, tmpc2
+  type(psb_d_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
   integer(psb_ipk_) :: ictxt, me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
@@ -798,7 +798,7 @@ subroutine psb_d_simple_glob_transpose(ain,aout,desc_a,info)
   ! that the same DESC_A works for both A and A^T, which
   ! essentially means that A has a symmetric pattern.
   !
-  type(psb_ld_coo_sparse_mat) :: tmpc1, tmpc2
+  type(psb_d_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
   integer(psb_ipk_) :: ictxt, me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
