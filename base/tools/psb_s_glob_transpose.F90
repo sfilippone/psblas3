@@ -189,7 +189,7 @@ subroutine psb_ls_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   do k=1, nzl
     j = acoo%ja(k)
     if (j > hlstart) then
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       sdsz(proc+1) = sdsz(proc+1) +1
     end if
   end do
@@ -263,7 +263,7 @@ subroutine psb_ls_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       acoo%ja(nzd)  = acoo%ja(k) 
       acoo%val(nzd) = acoo%val(k)
     else
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       tsdx(proc+1)         = tsdx(proc+1) +1
       iasnd(tsdx(proc+1))  = acoo%ia(k)
       jasnd(tsdx(proc+1))  = acoo%ja(k)
@@ -486,7 +486,7 @@ subroutine psb_s_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   do k=1, nzl
     j = acoo%ja(k)
     if (j > hlstart) then
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       sdsz(proc+1) = sdsz(proc+1) +1
     end if
   end do
@@ -562,7 +562,7 @@ subroutine psb_s_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       acoo%ja(nzd)  = acoo%ja(k) 
       acoo%val(nzd) = acoo%val(k)
     else
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       tsdx(proc+1)         = tsdx(proc+1) +1
       iasnd(tsdx(proc+1))  = acoo%ia(k)
       jasnd(tsdx(proc+1))  = acoo%ja(k)

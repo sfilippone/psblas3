@@ -189,7 +189,7 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   do k=1, nzl
     j = acoo%ja(k)
     if (j > hlstart) then
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       sdsz(proc+1) = sdsz(proc+1) +1
     end if
   end do
@@ -263,7 +263,7 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       acoo%ja(nzd)  = acoo%ja(k) 
       acoo%val(nzd) = acoo%val(k)
     else
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       tsdx(proc+1)         = tsdx(proc+1) +1
       iasnd(tsdx(proc+1))  = acoo%ia(k)
       jasnd(tsdx(proc+1))  = acoo%ja(k)
@@ -423,12 +423,6 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name, ch_err
-  logical, parameter :: do_timings=.true.
-  integer(psb_ipk_), save :: idx_phase1=-1, idx_a2av=-1, idx_phase2=-1, idx_phase3=-1, &
-       & idx_refine1=-1, idx_refine2=-1, idx_refine3=-1
-  integer(psb_ipk_), save :: iters=0
-  real(psb_dpk_) :: t0, t1
-  
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -447,22 +441,6 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
-  if ((do_timings).and.(idx_phase1==-1)) &
-       & idx_phase1 = psb_get_timer_idx("D_GLB_TRANS: phase1    ")
-  if ((do_timings).and.(idx_phase2==-1)) &
-       & idx_phase2 = psb_get_timer_idx("D_GLB_TRANS: phase2    ")
-  if ((do_timings).and.(idx_phase3==-1)) &
-       & idx_phase3 = psb_get_timer_idx("D_GLB_TRANS: phase3    ")
-  if ((do_timings).and.(idx_a2av==-1)) &
-       & idx_a2av = psb_get_timer_idx("D_GLB_TRANS: a2av      ")
-  if ((do_timings).and.(idx_refine1==-1)) &
-       & idx_refine1 = psb_get_timer_idx("D_GLB_TRANS: refine1   ")
-  if ((do_timings).and.(idx_refine2==-1)) &
-       & idx_refine2 = psb_get_timer_idx("D_GLB_TRANS: refine2   ")
-  if ((do_timings).and.(idx_refine3==-1)) &
-       & idx_refine3 = psb_get_timer_idx("D_GLB_TRANS: refine3   ")
-
-  if (do_timings) call psb_tic(idx_phase1)
 
   if (present(desc_c)) then
     p_desc_c => desc_c
@@ -508,7 +486,7 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   do k=1, nzl
     j = acoo%ja(k)
     if (j > hlstart) then
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       sdsz(proc+1) = sdsz(proc+1) +1
     end if
   end do
@@ -562,8 +540,6 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
     call psb_errpush(info,name,a_err='ensure_size')
     goto 9999
   end if
-  if (do_timings) call psb_toc(idx_phase1)
-  if (do_timings) call psb_tic(idx_phase2)
 
   !
   ! Now, transpose the matrix, then split between itself
@@ -586,7 +562,7 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
       acoo%ja(nzd)  = acoo%ja(k) 
       acoo%val(nzd) = acoo%val(k)
     else
-      call p_desc_c%indxmap%fnd_halo_owner(j,proc,info)
+      call p_desc_c%indxmap%qry_halo_owner(j,proc,info)
       tsdx(proc+1)         = tsdx(proc+1) +1
       iasnd(tsdx(proc+1))  = acoo%ia(k)
       jasnd(tsdx(proc+1))  = acoo%ja(k)
@@ -606,9 +582,6 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   nzl = acoo%get_nzeros()
   call acoo%ensure_size(nzl+iszr)
 
-  if (do_timings) call psb_toc(idx_phase2)
-  if (do_timings) call psb_tic(idx_a2av)
-  
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
     call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
@@ -637,8 +610,6 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
     call psb_errpush(info,name,a_err='wrong A2AV alg selector')
     goto 9999
   end select
-  if (do_timings) call psb_toc(idx_a2av)
-  if (do_timings) call psb_tic(idx_phase3)
 
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -653,11 +624,9 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
     !
     ! Extend the appropriate descriptor; started as R but on
     ! transpose it now describes C
-    !
-    if (do_timings) call psb_tic(idx_refine1)    
+    ! 
     call desc_r%clone(desc_rx,info)
     call psb_cd_reinit(desc_rx,info)
-    if (do_timings) call psb_toc(idx_refine1)    
     !
     ! Take out non-local rows
     !      
@@ -665,16 +634,8 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
     lszr = iszr 
     call psb_coo_clean_negidx_inner(lszr,iarcv(1:iszr),jarcv(1:iszr),&
          & acoo%val(nzl+1:nzl+iszr),nzt,info)
-    if (do_timings) call psb_tic(idx_refine2)
     call desc_rx%g2lip_ins(jarcv(1:nzt),info)
-    if (do_timings) call psb_toc(idx_refine2)
-    if (do_timings) call psb_tic(idx_refine3)
-    !t0 = psb_wtime()
     call psb_cdasb(desc_rx,info)
-    !t1 = psb_wtime()
-    !iters = iters +1
-    !if (me == 0) write(0,*) 'Glob_transpose cdasb(desc_rx):',iters,(t1-t0),' ',desc_rx%get_fmt()
-    if (do_timings) call psb_toc(idx_refine3)
     acoo%ia(nzl+1:nzl+nzt) = iarcv(1:nzt)
     acoo%ja(nzl+1:nzl+nzt) = jarcv(1:nzt)
     nzl = nzl + nzt
@@ -723,7 +684,6 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   Deallocate(brvindx,bsdindx,rvsz,sdsz,&
        & iasnd,jasnd,valsnd,&
        & iarcv,jarcv,stat=info)
-  if (do_timings) call psb_toc(idx_phase3)  
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Done'
 

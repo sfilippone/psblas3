@@ -159,7 +159,7 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
         ! Get local answers, if any
         !
         call idxmap%g2l(idx,lidx,info,owned=.false.)
-        call idxmap%fnd_halo_owner(lidx,iprc,info)
+        call idxmap%qry_halo_owner(lidx,iprc,info)
 
         nh = count(iprc<0)
         !write(0,*) me,'Going through new impl from ',nv,' to ',nh

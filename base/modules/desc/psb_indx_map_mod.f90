@@ -219,9 +219,9 @@ module psb_indx_map_mod
 
     procedure, pass(idxmap)  :: set_halo_owner  => base_set_halo_owner
     procedure, pass(idxmap)  :: get_halo_owner  => base_get_halo_owner
-    procedure, pass(idxmap)  :: fnd_halo_owner_s => base_fnd_halo_owner_s
-    procedure, pass(idxmap)  :: fnd_halo_owner_v => base_fnd_halo_owner_v
-    generic, public          :: fnd_halo_owner => fnd_halo_owner_s, fnd_halo_owner_v
+    procedure, pass(idxmap)  :: qry_halo_owner_s => base_qry_halo_owner_s
+    procedure, pass(idxmap)  :: qry_halo_owner_v => base_qry_halo_owner_v
+    generic, public          :: qry_halo_owner => qry_halo_owner_s, qry_halo_owner_v
     
     procedure, pass(idxmap)  :: fnd_owner => psi_indx_map_fnd_owner
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
@@ -245,7 +245,7 @@ module psb_indx_map_mod
        & base_lg2lv2_ins, base_init_vl, base_is_null,&
        & base_row_extendable, base_clone, base_cpy, base_reinit, &
        & base_set_halo_owner, base_get_halo_owner, &
-       & base_fnd_halo_owner_s, base_fnd_halo_owner_v,&
+       & base_qry_halo_owner_s, base_qry_halo_owner_v,&
        & base_get_p_adjcncy, base_set_p_adjcncy, base_xtnd_p_adjcncy
   
   !> Function: psi_indx_map_fnd_owner
@@ -1500,7 +1500,7 @@ contains
     call psb_safe_ab_cpy(idxmap%halo_owner,v,info)
   end subroutine base_get_halo_owner
 
-  subroutine base_fnd_halo_owner_s(idxmap,xin,xout,info)
+  subroutine base_qry_halo_owner_s(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
     use psb_realloc_mod
@@ -1527,9 +1527,9 @@ contains
       xout = idxmap%halo_owner(xin-nr)
     end if
     
-  end subroutine base_fnd_halo_owner_s
+  end subroutine base_qry_halo_owner_s
 
-  subroutine base_fnd_halo_owner_v(idxmap,xin,xout,info)
+  subroutine base_qry_halo_owner_v(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
     use psb_realloc_mod
@@ -1550,6 +1550,6 @@ contains
     do i=sz+1,size(xout)
       xout(i) = -1
     end do
-  end subroutine base_fnd_halo_owner_v
+  end subroutine base_qry_halo_owner_v
 
 end module psb_indx_map_mod
