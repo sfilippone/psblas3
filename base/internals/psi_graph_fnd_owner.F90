@@ -142,6 +142,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   tmpv(1) = nadj
   tmpv(2) = nrest_max
   call psb_max(ictxt,tmpv)
+  nrest_max = tmpv(2)    
   if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
     !
     ! Do a preliminary run on the user-defined adjacency lists
