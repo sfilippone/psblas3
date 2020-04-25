@@ -112,7 +112,7 @@ DATE     = $(shell date +%Y-%m-%d)
 ## Programs
 #
 LATEX    = latex
-LTX2HTML = latex2html -local_icons
+#LTX2HTML = latex2html -local_icons
 LTX2HTML = htlatex 
 PDFLATEX = pdflatex
 ACRO     = evince

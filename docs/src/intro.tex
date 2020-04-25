@@ -293,7 +293,7 @@ are classified as:
 To finish our general description, we define a version string with the
 constant 
 \[ \verb|psb_version_string_|\]
-whose current value is \verb|3.4.0|
+whose current value is \verb|3.7.0|
 
 \subsection{Application structure}
 \label{sec:appstruct}
@@ -360,7 +360,8 @@ follows:
   build it with \verb|prec%build|\footnote{The subroutine style {\tt
       psb\_precinit} and {\tt psb\_precbl} are still supported for
     backward compatibility}. 
-\item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
+\item Call the iterative driver \verb|psb_krylov| with the method of
+  choice, e.g. \verb|bicgstab|.
 \end{enumerate}
 This is the structure of the sample programs in the directory 
 \verb|test/pargen/|. 

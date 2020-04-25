@@ -128,11 +128,13 @@ href="userhtml10.html#fn3x0"><sup class="textsuperscript">3</sup></a></span><a
  id="x9-6019f3"></a> .
      </li>
      <li 
-  class="enumerate" id="x9-6021x7">Call the iterative method of choice, e.g. <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_bicgstab</span></span></span></li></ol>
-<!--l. 365--><p class="noindent" >This is the structure of the sample programs in the directory <span class="obeylines-h"><span class="verb"><span 
+  class="enumerate" id="x9-6021x7">Call the iterative driver <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_krylov</span></span></span> with the method of choice, e.g.
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bicgstab</span></span></span>.</li></ol>
+<!--l. 366--><p class="noindent" >This is the structure of the sample programs in the directory <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">test/pargen/</span></span></span>.
-<!--l. 368--><p class="indent" >   For a simulation in which the same discretization mesh is used over multiple time
+<!--l. 369--><p class="indent" >   For a simulation in which the same discretization mesh is used over multiple time
 steps, the following structure may be more appropriate:
      <ol  class="enumerate1" >
      <li 
@@ -189,16 +191,16 @@ class="cmtt-10">prec%build</span></span></span>
   class="enumerate" id="x9-6043x5">Call the iterative method of choice, e.g. <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_bicgstab</span></span></span></li></ol>
      </li></ol>
-<!--l. 391--><p class="noindent" >The insertion routines will be called as many times as needed; they only need to be
+<!--l. 392--><p class="noindent" >The insertion routines will be called as many times as needed; they only need to be
 called on the data that is actually allocated to the current process, i.e. each process
 generates its own data.
-<!--l. 396--><p class="indent" >   In principle there is no specific order in the calls to <span class="obeylines-h"><span class="verb"><span 
+<!--l. 397--><p class="indent" >   In principle there is no specific order in the calls to <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spins</span></span></span>, nor is there a
 requirement to build a matrix row in its entirety before calling the routine; this
 allows the application programmer to walk through the discretization mesh element
 by element, generating the main part of a given matrix row but also contributions to
 the rows corresponding to neighbouring elements.
-<!--l. 403--><p class="indent" >   From a functional point of view it is even possible to execute one call for each
+<!--l. 404--><p class="indent" >   From a functional point of view it is even possible to execute one call for each
 nonzero coefficient; however this would have a substantial computational
 overhead. It is therefore advisable to pack a certain amount of data into each
 call to the insertion routine, say touching on a few tens of rows; the best
@@ -209,10 +211,10 @@ process and pass it in a single call to <span class="obeylines-h"><span class="v
 class="cmtt-10">psb_spins</span></span></span>; this, however, would entail a
 doubling of memory occupation, and thus would be almost always far from
 optimal.
-<!--l. 416--><p class="noindent" >
+<!--l. 417--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">2.3.1   </span> <a 
  id="x9-70002.3.1"></a>User-defined index mappings</h5>
-<!--l. 418--><p class="noindent" >PSBLAS supports user-defined global to local index mappings, subject to the
+<!--l. 419--><p class="noindent" >PSBLAS supports user-defined global to local index mappings, subject to the
 constraints outlined in sec.&#x00A0;<a 
 href="#x9-60002.3">2.3<!--tex4ht:ref: sec:appstruct --></a>:
      <ol  class="enumerate1" >
@@ -230,7 +232,7 @@ class="cmmi-10">&#x2026;</span><span
 class="cmmi-10">n</span><sub>col<sub>
 <span 
 class="cmmi-5">i</span></sub></sub>;</li></ol>
-<!--l. 426--><p class="noindent" >but otherwise the mapping is arbitrary. The user application is responsible to ensure
+<!--l. 427--><p class="noindent" >but otherwise the mapping is arbitrary. The user application is responsible to ensure
 consistency of this mapping; some errors may be caught by the library, but
 this is not guaranteed. The application structure to support this usage is as
 follows:
@@ -271,12 +273,12 @@ class="cmtt-10">irw</span></span></span>, respectively, are already local indice
                                                                   
 
                                                                   
-   <!--l. 448--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 449--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu6.html" >next</a>] [<a 
 href="userhtmlsu2.html" >prev</a>] [<a 
 href="userhtmlsu2.html#tailuserhtmlsu2.html" >prev-tail</a>] [<a 
 href="userhtmlsu3.html" >front</a>] [<a 
 href="userhtmlse2.html#userhtmlse3.html" >up</a>] </p></div>
-<!--l. 448--><p class="indent" >   <a 
+<!--l. 449--><p class="indent" >   <a 
  id="tailuserhtmlsu3.html"></a>   
 </body></html> 

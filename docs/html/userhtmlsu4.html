@@ -10,23 +10,23 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 448--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 449--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu3.html" >prev</a>] [<a 
 href="userhtmlsu3.html#tailuserhtmlsu3.html" >prev-tail</a>] [<a 
 href="userhtmlsu2.html#tailuserhtmlsu4.html">tail</a>] [<a 
 href="userhtmlse2.html#userhtmlsu6.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">2.4   </span> <a 
  id="x11-80002.4"></a>Programming model</h4>
-<!--l. 450--><p class="noindent" >The PSBLAS librarary is based on the Single Program Multiple Data (SPMD)
+<!--l. 451--><p class="noindent" >The PSBLAS librarary is based on the Single Program Multiple Data (SPMD)
 programming model: each process participating in the computation performs the
 same actions on a chunk of data. Parallelism is thus data-driven.
-<!--l. 455--><p class="indent" >   Because of this structure, many subroutines coordinate their action across the
+<!--l. 456--><p class="indent" >   Because of this structure, many subroutines coordinate their action across the
 various processes, thus providing an implicit synchronization point, and therefore
 <span 
 class="cmti-10">must </span>be called simultaneously by all processes participating in the computation. This
 is certainly true for the data allocation and assembly routines, for all the
 computational routines and for some of the tools routines.
-<!--l. 463--><p class="indent" >   However there are many cases where no synchronization, and indeed no
+<!--l. 464--><p class="indent" >   However there are many cases where no synchronization, and indeed no
 communication among processes, is implied; for instance, all the routines in sec.&#x00A0;<a 
 href="userhtmlse3.html#x12-90003">3<!--tex4ht:ref: sec:datastruct --></a>
 are only acting on the local data structures, and thus may be called independently.
@@ -34,7 +34,7 @@ The most important case is that of the coefficient insertion routines: since the
 number of coefficients in the sparse and dense matrices varies among the processors,
 and since the user is free to choose an arbitrary order in builiding the matrix entries,
 these routines cannot imply a synchronization.
-<!--l. 473--><p class="indent" >   Throughout this user&#8217;s guide each subroutine will be clearly indicated
+<!--l. 474--><p class="indent" >   Throughout this user&#8217;s guide each subroutine will be clearly indicated
 as:
      <dl class="description"><dt class="description">
 <span 
