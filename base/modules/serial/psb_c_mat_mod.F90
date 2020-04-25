@@ -445,7 +445,6 @@ module psb_c_mat_mod
     module procedure psb_lc_get_mat_default
   end interface
 
-
   ! == ===================================
   !
   !
@@ -1872,6 +1871,14 @@ contains
     
   end function psb_c_get_base_mat_default
 
+  subroutine  psb_c_clear_mat_default() 
+    implicit none 
+    
+    if (allocated(psb_c_base_mat_default)) then 
+      deallocate(psb_c_base_mat_default)
+    end if
+
+  end subroutine psb_c_clear_mat_default
 
 
 
@@ -2382,6 +2389,14 @@ contains
     
   end function psb_lc_get_base_mat_default
 
+  subroutine  psb_lc_clear_mat_default() 
+    implicit none 
+    
+    if (allocated(psb_lc_base_mat_default)) then 
+      deallocate(psb_lc_base_mat_default)
+    end if
+
+  end subroutine psb_lc_clear_mat_default
 
 
 

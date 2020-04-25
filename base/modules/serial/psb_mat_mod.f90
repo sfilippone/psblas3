@@ -23,4 +23,11 @@ contains
     
   end subroutine psb_init_mat_defaults
 
+  subroutine psb_clear_mat_defaults()
+    call psb_s_clear_mat_default()
+    call psb_d_clear_mat_default()
+    call psb_c_clear_mat_default()
+    call psb_z_clear_mat_default()
+  end subroutine psb_clear_mat_defaults
+  
 end module psb_mat_mod

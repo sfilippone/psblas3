@@ -417,7 +417,9 @@ contains
   end subroutine psb_init_mpik
 
   subroutine psb_exit_mpik(ictxt,close)
-    use psi_comm_buffers_mod 
+    use psi_comm_buffers_mod
+    use psb_mat_mod
+    use psb_vect_mod
 ! !$    use psb_rsb_mod
 #ifdef MPI_MOD
     use mpi
@@ -463,8 +465,10 @@ contains
     end if
 
     if (close_) call mpi_finalize(info)
-#endif
 
+#endif
+    if (close_) call psb_clear_vect_defaults()
+    if (close_) call psb_clear_mat_defaults()
 
   end subroutine psb_exit_mpik
 
