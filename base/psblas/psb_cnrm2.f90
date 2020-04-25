@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 ! File: psb_cnrm2.f90
 !
 ! Function: psb_cnrm2
@@ -111,7 +111,7 @@ function psb_cnrm2(x, desc_a, info, jx,global)  result(res)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then 
+  if (desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res  = scnrm2( int(ndim,kind=psb_mpk_), x(iix:,jjx), int(ione,kind=psb_mpk_) )
 
@@ -120,16 +120,16 @@ function psb_cnrm2(x, desc_a, info, jx,global)  result(res)
       idx = desc_a%ovrlap_elem(i,1)
       ndm = desc_a%ovrlap_elem(i,2)
       dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx,jjx))/res)**2) 
+      res = res * sqrt(sone - dd*(abs(x(idx,jjx))/res)**2)
     end do
-  else 	    
+  else
     res = szero
   end if
 
   if (global_) call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -138,12 +138,12 @@ end function psb_cnrm2
 
 
 
-!!$ 
+!!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari      
-!!$ 
+!!$                       Alfredo Buttari
+!!$
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
 !!$  are met:
@@ -155,7 +155,7 @@ end function psb_cnrm2
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -167,7 +167,7 @@ end function psb_cnrm2
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
+!!$
 !!$
 !
 ! Function: psb_cnrm2
@@ -226,7 +226,7 @@ function psb_cnrm2v(x, desc_a, info,global)  result(res)
   ix = 1
   jx=1
   m = desc_a%get_global_rows()
-  ldx = size(x,1) 
+  ldx = size(x,1)
   call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -240,7 +240,7 @@ function psb_cnrm2v(x, desc_a, info,global)  result(res)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then 
+  if (desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res  = scnrm2( int(ndim,kind=psb_mpk_), x, int(ione,kind=psb_mpk_) )
     ! adjust  because overlapped elements are computed more than once
@@ -248,16 +248,16 @@ function psb_cnrm2v(x, desc_a, info,global)  result(res)
       idx = desc_a%ovrlap_elem(i,1)
       ndm = desc_a%ovrlap_elem(i,2)
       dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2) 
+      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2)
     end do
-  else 	    
+  else
     res = szero
   end if
 
   if (global_) call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
@@ -314,7 +314,7 @@ function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
@@ -343,7 +343,7 @@ function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then 
+  if (desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res  = x%nrm2(ndim)
     ! adjust  because overlapped elements are computed more than once
@@ -356,27 +356,243 @@ function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
         res = res - sqrt(cone - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
-  else 	    
+  else
     res = szero
   end if
 
   if (global_) call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 
   return
 end function psb_cnrm2_vect
 
+! Function: psb_cnrm2_weight_vect
+!    Computes the weighted norm2 of a distributed vector,
+!
+!    norm2 := sqrt ( (w.*X)**C * (w.*X))
+!
+! Arguments:
+!    x      -  type(psb_c_vect_type) The input vector containing the entries of X.
+!    w      -  type(psb_c_vect_type) The input vector containing the entries of W.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
+!
+function psb_cnrm2_weight_vect(x,w, desc_a, info,global)  result(res)
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_c_vect_mod
+  implicit none
 
-!!$ 
+  real(psb_spk_)                        :: res
+  type(psb_c_vect_type), intent (inout) :: x
+  type(psb_c_vect_type), intent (inout) :: w
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  logical, intent(in), optional        :: global
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
+  real(psb_spk_)         :: snrm2, dd
+  character(len=20)      :: name, ch_err
+
+  name='psb_cnrm2v_weight'
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
+
+  ix = 1
+  jx = 1
+  m  = desc_a%get_global_rows()
+  ldx = x%get_nrows()
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (desc_a%get_local_rows() > 0) then
+    ndim = desc_a%get_local_rows()
+    res  = x%nrm2(ndim,w)
+    ! adjust  because overlapped elements are computed more than once
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%is_dev()) call x%sync()
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        dd  = dble(ndm-1)/dble(ndm)
+        res = res - sqrt(cone - dd*(abs(x%v%v(idx))/res)**2)
+      end do
+    end if
+  else
+    res = szero
+  end if
+
+  if (global_) call psb_nrm2(ictxt,res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end function psb_cnrm2_weight_vect
+
+! Function: psb_cnrm2_weight_vect
+!    Computes the weighted norm2 of a distributed vector with respect to a mask
+!    contained in the vector id.
+!
+!    norm2 := sqrt ( (w(id > 0).*X(id > 0))**C * (w(id > 0).*X(id > 0)))
+!
+! Arguments:
+!    x      -  type(psb_c_vect_type) The input vector containing the entries of X.
+!    w      -  type(psb_c_vect_type) The input vector containing the entries of W.
+!    id     -  type(psb_c_vect_type) The inpute vector containing the mask
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
+!
+function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_c_vect_mod
+  implicit none
+
+  real(psb_spk_)                        :: res
+  type(psb_c_vect_type), intent (inout) :: x
+  type(psb_c_vect_type), intent (inout) :: w
+  type(psb_c_vect_type), intent (inout) :: idv
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  logical, intent(in), optional        :: global
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
+  real(psb_spk_)         :: snrm2, dd
+  character(len=20)      :: name, ch_err
+
+  name='psb_cnrm2v_weightmask'
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
+
+  ix = 1
+  jx = 1
+  m  = desc_a%get_global_rows()
+  ldx = x%get_nrows()
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (desc_a%get_local_rows() > 0) then
+    ndim = desc_a%get_local_rows()
+    res  = x%nrm2(ndim,w,idv)
+    ! adjust  because overlapped elements are computed more than once
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%is_dev()) call x%sync()
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        dd  = dble(ndm-1)/dble(ndm)
+        res = res - sqrt(cone - dd*(abs(x%v%v(idx))/res)**2)
+      end do
+    end if
+  else
+    res = szero
+  end if
+
+  if (global_) call psb_nrm2(ictxt,res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end function psb_cnrm2_weightmask_vect
+
+!!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari      
-!!$ 
+!!$                       Alfredo Buttari
+!!$
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
 !!$  are met:
@@ -388,7 +604,7 @@ end function psb_cnrm2_vect
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -400,7 +616,7 @@ end function psb_cnrm2_vect
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
+!!$
 !!$
 !
 ! Subroutine: psb_cnrm2vs
@@ -461,7 +677,7 @@ subroutine psb_cnrm2vs(res, x, desc_a, info,global)
   ix = 1
   jx = 1
   m = desc_a%get_global_rows()
-  ldx = size(x,1) 
+  ldx = size(x,1)
   call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -475,7 +691,7 @@ subroutine psb_cnrm2vs(res, x, desc_a, info,global)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then 
+  if (desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res  = scnrm2( int(ndim,kind=psb_mpk_), x, int(ione,kind=psb_mpk_) )
 
@@ -484,9 +700,9 @@ subroutine psb_cnrm2vs(res, x, desc_a, info,global)
       idx = desc_a%ovrlap_elem(i,1)
       ndm = desc_a%ovrlap_elem(i,2)
       dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2) 
+      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2)
     end do
-  else 	    
+  else
     res = szero
   end if
 
@@ -494,7 +710,7 @@ subroutine psb_cnrm2vs(res, x, desc_a, info,global)
 
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ictxt,err_act)
 

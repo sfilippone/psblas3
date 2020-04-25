@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 module psi_e_serial_mod
   use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
 
@@ -36,7 +36,7 @@ module psi_e_serial_mod
     ! 2-D version
     subroutine psb_egelp(trans,iperm,x,info)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
-      implicit none 
+      implicit none
       integer(psb_epk_), intent(inout)     ::  x(:,:)
       integer(psb_ipk_), intent(in)      ::  iperm(:)
       integer(psb_ipk_), intent(out)     ::  info
@@ -44,18 +44,18 @@ module psi_e_serial_mod
     end subroutine psb_egelp
     subroutine psb_egelpv(trans,iperm,x,info)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
-      implicit none 
+      implicit none
       integer(psb_epk_), intent(inout)     ::  x(:)
       integer(psb_ipk_), intent(in)      ::  iperm(:)
       integer(psb_ipk_), intent(out)     ::  info
       character, intent(in)              :: trans
     end subroutine psb_egelpv
   end interface psb_gelp
-  
-  interface psb_geaxpby 
+
+  interface psb_geaxpby
     subroutine psi_eaxpby(m,n,alpha, x, beta, y, info)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
-      implicit none 
+      implicit none
       integer(psb_ipk_), intent(in)      :: m, n
       integer(psb_epk_), intent (in)       ::  x(:,:)
       integer(psb_epk_), intent (inout)    ::  y(:,:)
@@ -64,13 +64,23 @@ module psi_e_serial_mod
     end subroutine psi_eaxpby
     subroutine psi_eaxpbyv(m,alpha, x, beta, y, info)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
-      implicit none 
+      implicit none
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_epk_), intent (in)       ::  x(:)
       integer(psb_epk_), intent (inout)    ::  y(:)
       integer(psb_epk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_eaxpbyv
+    subroutine psi_eaxpbyv2(m,alpha, x, beta, y, z, info)
+      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      integer(psb_epk_), intent (in)       ::  x(:)
+      integer(psb_epk_), intent (in)       ::  y(:)
+      integer(psb_epk_), intent (in)       ::  z(:)
+      integer(psb_epk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_eaxpbyv2
   end interface psb_geaxpby
 
   interface psi_gth
@@ -91,18 +101,18 @@ module psi_e_serial_mod
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_epk_) :: x(:,:), y(:)
-      
+
     end subroutine psi_egthzmv
     subroutine psi_egthzmm(n,k,idx,x,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_epk_) :: x(:,:), y(:,:)
-      
+
     end subroutine psi_egthzmm
     subroutine psi_egthzv(n,idx,x,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
-      implicit none 
+      implicit none
       integer(psb_ipk_) :: n, idx(:)
       integer(psb_epk_) :: x(:), y(:)
     end subroutine psi_egthzv
@@ -124,7 +134,7 @@ module psi_e_serial_mod
     subroutine psi_esctv(n,idx,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      
+
       integer(psb_ipk_) :: n, idx(:)
       integer(psb_epk_) :: beta, x(:), y(:)
     end subroutine psi_esctv

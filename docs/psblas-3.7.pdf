@@ -30137,8 +30137,18 @@ endobj
 2131 0 obj
 <<
  /Title (Parallel Sparse BLAS V. 3.7.0) /Subject (Parallel Sparse Basic Linear Algebra Subroutines) /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners) /Creator (pdfLaTeX) /Producer ($Id$) /Author()/Title()/Subject()/Creator(LaTeX with hyperref package)/Producer(pdfTeX-1.40.19)/Keywords()
+<<<<<<< HEAD
 /CreationDate (D:20200425083929+02'00')
 /ModDate (D:20200425083929+02'00')
+=======
+<<<<<<< HEAD
+/CreationDate (D:20191217194209Z)
+/ModDate (D:20191217194209Z)
+=======
+/CreationDate (D:20191218141557Z)
+/ModDate (D:20191218141557Z)
+>>>>>>> unify_aggr_bld
+>>>>>>> merge-paraggr-newops
 /Trapped /False
 /PTEX.Fullbanner (This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) kpathsea version 6.3.0)
 >>
@@ -30271,10 +30281,17 @@ endobj
 /Index [0 2133]
 /Size 2133
 /W [1 3 1]
+<<<<<<< HEAD
+/Root 2129 0 R
+/Info 2130 0 R
+/ID [<362C1AAB92CF66A0E508C639DC7E96C3> <362C1AAB92CF66A0E508C639DC7E96C3>]
+/Length 10660     
+=======
 /Root 2130 0 R
 /Info 2131 0 R
 /ID [<CF39701A69C7A230DA7C0C0B3D0F6262> <CF39701A69C7A230DA7C0C0B3D0F6262>]
 /Length 10665     
+>>>>>>> unify_aggr_bld
 >>
 stream
     ÿ       ”Z Û     éI Û     éS Û      é[ Úc     @ Úb  	  

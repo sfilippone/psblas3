@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,14 +27,14 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! package: psb_l_base_vect_mod
 !
 ! This module contains the definition of the psb_l_base_vect type which
 ! is a container for dense vectors.
-!  This is encapsulated instead of being just a simple array to allow for 
+!  This is encapsulated instead of being just a simple array to allow for
 !  more complicated situations, such as GPU programming, where the memory
 !  area we are interested in is not easily accessible from the host/Fortran
 !  side. It is also meant to be encapsulated in an outer type, to allow
@@ -43,16 +43,16 @@
 !
 !
 module psb_l_base_vect_mod
-  
+
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_i_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_l_base_vect_type
-  !! The psb_l_base_vect_type 
+  !! The psb_l_base_vect_type
   !! defines a middle level  integer(psb_lpk_) encapsulated dense vector.
-  !! The encapsulation is needed, in place of a simple array, to allow  
+  !! The encapsulation is needed, in place of a simple array, to allow
   !! for complicated situations, such as GPU programming, where the memory
   !!  area we are interested in is not easily accessible from the host/Fortran
   !!  side. It is also meant to be encapsulated in an outer type, to allow
@@ -60,9 +60,9 @@ module psb_l_base_vect_mod
   !!  sparse matrix types.
   !!
   type psb_l_base_vect_type
-    !> Values. 
+    !> Values.
     integer(psb_lpk_), allocatable :: v(:)
-    integer(psb_lpk_), allocatable :: combuf(:) 
+    integer(psb_lpk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
   contains
     !
@@ -77,7 +77,7 @@ module psb_l_base_vect_mod
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
-    ! in derived classes. 
+    ! in derived classes.
     !
     procedure, pass(x) :: ins_a    => l_base_ins_a
     procedure, pass(x) :: ins_v    => l_base_ins_v
@@ -92,7 +92,7 @@ module psb_l_base_vect_mod
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
     ! external side contain the same data. The base
-    ! version is only a placeholder. 
+    ! version is only a placeholder.
     !
     procedure, pass(x) :: sync     => l_base_sync
     procedure, pass(x) :: is_host  => l_base_is_host
@@ -129,7 +129,7 @@ module psb_l_base_vect_mod
     generic, public    :: set      => set_vect, set_scal
     !
     ! Gather/scatter. These are needed for MPI interfacing.
-    ! May have to be reworked. 
+    ! May have to be reworked.
     !
     procedure, pass(x) :: gthab    => l_base_gthab
     procedure, pass(x) :: gthzv    => l_base_gthzv
@@ -143,6 +143,10 @@ module psb_l_base_vect_mod
 
 
 
+
+
+
+
   end type psb_l_base_vect_type
 
   public  :: psb_l_base_vect
@@ -152,11 +156,11 @@ module psb_l_base_vect_mod
   end interface psb_l_base_vect
 
 contains
-  
+
   !
-  ! Constructors. 
+  ! Constructors.
   !
-  
+
   !> Function  constructor:
   !! \brief     Constructor from an array
   !!  \param   x(:)  input array to be copied
@@ -169,11 +173,11 @@ contains
     this%v = x
     call this%asb(size(x,kind=psb_ipk_),info)
   end function constructor
-    
-  
+
+
   !> Function  constructor:
   !! \brief     Constructor from size
-  !!  \param    n   Size of vector to be built. 
+  !!  \param    n   Size of vector to be built.
   !!
   function size_const(n) result(this)
     integer(psb_ipk_), intent(in) :: n
@@ -183,7 +187,7 @@ contains
     call this%asb(n,info)
 
   end function size_const
-  
+
   !
   ! Build from a sample
   !
@@ -195,20 +199,20 @@ contains
   !!
   subroutine l_base_bld_x(x,this)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_lpk_), intent(in) :: this(:)
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
 
     call psb_realloc(size(this),x%v,info)
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
       return
     end if
     x%v(:)  = this(:)
 
   end subroutine l_base_bld_x
-    
+
   !
   ! Create with size, but no initialization
   !
@@ -216,11 +220,11 @@ contains
   !> Function  bld_mn:
   !! \memberof  psb_l_base_vect_type
   !! \brief     Build method with size (uninitialized data)
-  !!  \param    n    size to be allocated. 
+  !!  \param    n    size to be allocated.
   !!
   subroutine l_base_bld_mn(x,n)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_mpk_), intent(in) :: n
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
@@ -229,15 +233,15 @@ contains
     call x%asb(n,info)
 
   end subroutine l_base_bld_mn
-  
+
   !> Function  bld_en:
   !! \memberof  psb_l_base_vect_type
   !! \brief     Build method with size (uninitialized data)
-  !!  \param    n    size to be allocated. 
+  !!  \param    n    size to be allocated.
   !!
   subroutine l_base_bld_en(x,n)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_epk_), intent(in) :: n
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
@@ -246,24 +250,24 @@ contains
     call x%asb(n,info)
 
   end subroutine l_base_bld_en
-  
+
   !> Function  base_all:
   !! \memberof  psb_l_base_vect_type
   !! \brief     Build method with size (uninitialized data) and
   !!            allocation return code.
-  !!  \param    n    size to be allocated. 
+  !!  \param    n    size to be allocated.
   !!  \param info  return code
   !!
   subroutine l_base_all(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)               :: n
     class(psb_l_base_vect_type), intent(out)    :: x
     integer(psb_ipk_), intent(out)              :: info
-    
+
     call psb_realloc(n,x%v,info)
-    
+
   end subroutine l_base_all
 
   !> Function  base_mold:
@@ -275,11 +279,11 @@ contains
   subroutine l_base_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(in)   :: x
     class(psb_l_base_vect_type), intent(out), allocatable :: y
     integer(psb_ipk_), intent(out)              :: info
-    
+
     allocate(psb_l_base_vect_type :: y, stat=info)
 
   end subroutine l_base_mold
@@ -289,21 +293,21 @@ contains
   !
   !> Function  base_ins:
   !! \memberof  psb_l_base_vect_type
-  !! \brief Insert coefficients. 
+  !! \brief Insert coefficients.
   !!
   !!
   !!         Given  a list of N pairs
   !!           (IRL(i),VAL(i))
   !!         record a new coefficient in X such that
   !!            X(IRL(1:N)) = VAL(1:N).
-  !!            
+  !!
   !!         - the update operation will perform either
   !!               X(IRL(1:n)) = VAL(1:N)
   !!           or
   !!               X(IRL(1:n)) = X(IRL(1:n))+VAL(1:N)
   !!           according to the value of DUPLICATE.
-  !!           
-  !!           
+  !!
+  !!
   !!  \param n     number of pairs in input
   !!  \param irl(:)  the input row indices
   !!  \param val(:)  the input coefficients
@@ -313,7 +317,7 @@ contains
   !
   subroutine l_base_ins_a(n,irl,val,dupl,x,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl
     integer(psb_ipk_), intent(in)               :: irl(:)
@@ -323,21 +327,21 @@ contains
     integer(psb_ipk_) :: i, isz
 
     info = 0
-    if (psb_errstatus_fatal()) return 
+    if (psb_errstatus_fatal()) return
 
-    if (.not.allocated(x%v)) then 
+    if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
-    else if (n > min(size(irl),size(val))) then 
+    else if (n > min(size(irl),size(val))) then
       info = psb_err_invalid_input_
 
-    else 
+    else
       isz = size(x%v)
-      select case(dupl) 
-      case(psb_dupl_ovwrt_) 
+      select case(dupl)
+      case(psb_dupl_ovwrt_)
         do i = 1, n
           !loop over all val's rows
 
-          ! row actual block row 
+          ! row actual block row
           if ((1 <= irl(i)).and.(irl(i) <= isz)) then
             ! this row belongs to me
             ! copy i-th row of block val in x
@@ -345,7 +349,7 @@ contains
           end if
         enddo
 
-      case(psb_dupl_add_) 
+      case(psb_dupl_add_)
 
         do i = 1, n
           !loop over all val's rows
@@ -363,7 +367,7 @@ contains
       end select
     end if
     call x%set_host()
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(info,'base_vect_ins')
       return
     end if
@@ -372,7 +376,7 @@ contains
 
   subroutine l_base_ins_v(n,irl,val,dupl,x,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl
     class(psb_i_base_vect_type), intent(inout)  :: irl
@@ -382,14 +386,14 @@ contains
     integer(psb_ipk_) :: i, isz
 
     info = 0
-    if (psb_errstatus_fatal()) return 
+    if (psb_errstatus_fatal()) return
 
     if (irl%is_dev()) call irl%sync()
     if (val%is_dev()) call val%sync()
     if (x%is_dev())   call x%sync()
     call x%ins(n,irl%v,val%v,dupl,info)
 
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(info,'base_vect_ins')
       return
     end if
@@ -405,14 +409,14 @@ contains
   !
   subroutine l_base_zero(x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout)    :: x
-    
+
     if (allocated(x%v)) x%v=lzero
     call x%set_host()
   end subroutine l_base_zero
 
-  
+
   !
   ! Assembly.
   ! For derived classes: after this the vector
@@ -421,20 +425,20 @@ contains
   !> Function  base_asb:
   !! \memberof  psb_l_base_vect_type
   !! \brief Assemble vector: reallocate as necessary.
-  !!           
+  !!
   !!  \param n     final size
   !!  \param info  return code
   !!
   !
- 
+
   subroutine l_base_asb_m(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_mpk_), intent(in)              :: n
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
-    
+
     info = 0
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
@@ -451,20 +455,20 @@ contains
   !> Function  base_asb:
   !! \memberof  psb_l_base_vect_type
   !! \brief Assemble vector: reallocate as necessary.
-  !!           
+  !!
   !!  \param n     final size
   !!  \param info  return code
   !!
   !
- 
+
   subroutine l_base_asb_e(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_epk_), intent(in)              :: n
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
-    
+
     info = 0
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
@@ -477,39 +481,39 @@ contains
   !> Function  base_free:
   !! \memberof  psb_l_base_vect_type
   !! \brief Free vector
-  !!           
+  !!
   !!  \param info  return code
   !!
   !
   subroutine l_base_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
-    
+
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
     if (info == 0) call x%free_buffer(info)
     if (info == 0) call x%free_comid(info)
-    if (info /= 0) call & 
+    if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
-        
+
   end subroutine l_base_free
 
-  
+
 
   !
   !> Function  base_free_buffer:
   !! \memberof  psb_l_base_vect_type
   !! \brief Free aux buffer
-  !!           
+  !!
   !!  \param info  return code
   !!
   !
   subroutine l_base_free_buffer(x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
@@ -524,17 +528,17 @@ contains
   !!        In some derived classes, e.g. GPU,
   !!        does not really frees to avoid  runtime
   !!        costs
-  !!           
+  !!
   !!  \param info  return code
   !!
   !
   subroutine l_base_maybe_free_buffer(x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
-    info = 0 
+    info = 0
     if (psb_get_maybe_free_buffer())&
          &  call x%free_buffer(info)
 
@@ -544,13 +548,13 @@ contains
   !> Function  base_free_comid:
   !! \memberof  psb_l_base_vect_type
   !! \brief Free aux MPI communication id buffer
-  !!           
+  !!
   !!  \param info  return code
   !!
   !
   subroutine l_base_free_comid(x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
@@ -562,77 +566,77 @@ contains
   !
   ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.
-  ! 
+  !
   !
   !> Function  base_sync:
   !! \memberof  psb_l_base_vect_type
   !! \brief Sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_sync(x)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
-    
+
   end subroutine l_base_sync
 
   !
   !> Function  base_set_host:
   !! \memberof  psb_l_base_vect_type
   !! \brief Set_host: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_set_host(x)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
-    
+
   end subroutine l_base_set_host
 
   !
   !> Function  base_set_dev:
   !! \memberof  psb_l_base_vect_type
   !! \brief Set_dev: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_set_dev(x)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
-    
+
   end subroutine l_base_set_dev
 
   !
   !> Function  base_set_sync:
   !! \memberof  psb_l_base_vect_type
   !! \brief Set_sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_set_sync(x)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
-    
+
   end subroutine l_base_set_sync
 
   !
   !> Function  base_is_dev:
   !! \memberof  psb_l_base_vect_type
   !! \brief Is  vector on external device    .
-  !!           
+  !!
   !
   function l_base_is_dev(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(in) :: x
     logical  :: res
-  
+
     res = .false.
   end function l_base_is_dev
-  
+
   !
   !> Function  base_is_host
   !! \memberof  psb_l_base_vect_type
   !! \brief Is  vector on standard memory    .
-  !!           
+  !!
   !
   function l_base_is_host(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(in) :: x
     logical  :: res
 
@@ -643,10 +647,10 @@ contains
   !> Function  base_is_sync
   !! \memberof  psb_l_base_vect_type
   !! \brief Is  vector on sync               .
-  !!           
+  !!
   !
   function l_base_is_sync(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(in) :: x
     logical  :: res
 
@@ -655,16 +659,16 @@ contains
 
 
   !
-  ! Size info. 
+  ! Size info.
   !
   !
   !> Function  base_get_nrows
   !! \memberof  psb_l_base_vect_type
   !! \brief  Number of entries
-  !!           
+  !!
   !
   function l_base_get_nrows(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(in) :: x
     integer(psb_ipk_) :: res
 
@@ -677,13 +681,13 @@ contains
   !> Function  base_get_sizeof
   !! \memberof  psb_l_base_vect_type
   !! \brief  Size in bytes
-  !!           
+  !!
   !
   function l_base_sizeof(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(in) :: x
     integer(psb_epk_) :: res
-    
+
     ! Force 8-byte integers.
     res = (1_psb_epk_ * psb_sizeof_lp) * x%get_nrows()
 
@@ -693,14 +697,14 @@ contains
   !> Function  base_get_fmt
   !! \memberof  psb_l_base_vect_type
   !! \brief  Format
-  !!           
+  !!
   !
   function l_base_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'BASE'
   end function l_base_get_fmt
-  
+
 
   !
   !
@@ -709,7 +713,7 @@ contains
   !! \memberof  psb_l_base_vect_type
   !! \brief  Extract a copy of the contents
   !!
-  !    
+  !
   function  l_base_get_vect(x,n) result(res)
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_lpk_), allocatable                 :: res(:)
@@ -717,21 +721,21 @@ contains
     integer(psb_ipk_), optional :: n
     ! Local variables
     integer(psb_ipk_) :: isz
-    
-    if (.not.allocated(x%v)) return 
+
+    if (.not.allocated(x%v)) return
     if (.not.x%is_host()) call x%sync()
     isz = x%get_nrows()
     if (present(n)) isz = max(0,min(isz,n))
-    allocate(res(isz),stat=info) 
-    if (info /= 0) then 
+    allocate(res(isz),stat=info)
+    if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
     res(1:isz) = x%v(1:isz)
   end function l_base_get_vect
-    
+
   !
-  ! Reset all values 
+  ! Reset all values
   !
   !
   !> Function  base_set_scal
@@ -740,18 +744,18 @@ contains
   !! \param val   The value to set
   !!
   subroutine l_base_set_scal(x,val,first,last)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout)  :: x
     integer(psb_lpk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
-        
+
     integer(psb_ipk_) :: info, first_, last_
 
     first_=1
     last_=size(x%v)
     if (present(first)) first_ = max(1,first)
     if (present(last))  last_  = min(last,last_)
-    
+
     if (x%is_dev()) call x%sync()
     x%v(first_:last_) = val
     call x%set_host()
@@ -763,14 +767,14 @@ contains
   !> Function  base_set_vect
   !! \memberof  psb_l_base_vect_type
   !! \brief  Set all entries
-  !! \param val(:)  The vector to be copied in 
+  !! \param val(:)  The vector to be copied in
   !!
   subroutine l_base_set_vect(x,val,first,last)
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout)  :: x
     integer(psb_lpk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
-        
+
     integer(psb_ipk_) :: info, first_, last_, nr
 
     first_                     = 1
@@ -778,7 +782,7 @@ contains
     last_                      = min(psb_size(x%v),first_+size(val)-1)
     if (present(last))  last_  = min(last,last_)
 
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
       x%v(first_:last_) = val(1:last_-first_+1)
     else
@@ -789,8 +793,8 @@ contains
   end subroutine l_base_set_vect
 
 
-  
-  
+
+
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
   !
@@ -805,18 +809,18 @@ contains
   !! \param beta
   subroutine l_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) :: alpha, beta, y(:)
     class(psb_l_base_vect_type) :: x
-    
+
     if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,alpha,x%v,beta,y)
 
   end subroutine l_base_gthab
   !
   ! shortcut alpha=1 beta=0
-  ! 
+  !
   !> Function  base_gthzv
   !! \memberof  psb_l_base_vect_type
   !! \brief gather into an array special alpha=1 beta=0
@@ -825,28 +829,28 @@ contains
   !! \param idx(:) indices
   subroutine l_base_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i,n
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_vect_type) :: x
-    
+
     if (idx%is_dev()) call idx%sync()
     call x%gth(n,idx%v(i:),y)
 
   end subroutine l_base_gthzv_x
 
   !
-  ! New comm internals impl. 
+  ! New comm internals impl.
   !
   subroutine l_base_gthzbuf(i,n,idx,x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i,n
     class(psb_i_base_vect_type) :: idx
     class(psb_l_base_vect_type) :: x
-    
-    if (.not.allocated(x%combuf)) then 
+
+    if (.not.allocated(x%combuf)) then
       call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
       return
     end if
@@ -859,22 +863,22 @@ contains
   !> Function  base_device_wait:
   !! \memberof  psb_l_base_vect_type
   !! \brief device_wait: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_device_wait()
-    implicit none 
-    
+    implicit none
+
   end subroutine l_base_device_wait
 
   function l_base_use_buffer() result(res)
     logical :: res
-    
+
     res = .true.
   end function l_base_use_buffer
 
   subroutine l_base_new_buffer(n,x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
@@ -884,7 +888,7 @@ contains
 
   subroutine l_base_new_comid(n,x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
@@ -895,7 +899,7 @@ contains
 
   !
   ! shortcut alpha=1 beta=0
-  ! 
+  !
   !> Function  base_gthzv
   !! \memberof  psb_l_base_vect_type
   !! \brief gather into an array special alpha=1 beta=0
@@ -904,20 +908,20 @@ contains
   !! \param idx(:) indices
   subroutine l_base_gthzv(n,idx,x,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_vect_type) :: x
-    
+
     if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,x%v,y)
 
   end subroutine l_base_gthzv
 
   !
-  ! Scatter: 
+  ! Scatter:
   ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
-  ! 
+  !
   !
   !> Function  base_sctb
   !! \memberof  psb_l_base_vect_type
@@ -926,14 +930,14 @@ contains
   !! \param n  how many entries to consider
   !! \param idx(:) indices
   !! \param beta
-  !! \param x(:) 
+  !! \param x(:)
   subroutine l_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) :: beta, x(:)
     class(psb_l_base_vect_type) :: y
-    
+
     if (y%is_dev()) call y%sync()
     call psi_sct(n,idx,x,beta,y%v)
     call y%set_host()
@@ -942,12 +946,12 @@ contains
 
   subroutine l_base_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) :: beta, x(:)
     class(psb_l_base_vect_type) :: y
-    
+
     if (idx%is_dev()) call idx%sync()
     call y%sct(n,idx%v(i:),x,beta)
     call y%set_host()
@@ -956,14 +960,14 @@ contains
 
   subroutine l_base_sctb_buf(i,n,idx,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) :: beta
     class(psb_l_base_vect_type) :: y
-    
-    
-    if (.not.allocated(y%combuf)) then 
+
+
+    if (.not.allocated(y%combuf)) then
       call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
       return
     end if
@@ -973,6 +977,7 @@ contains
     call y%set_host()
 
   end subroutine l_base_sctb_buf
+
 
 end module psb_l_base_vect_mod
 
@@ -988,22 +993,22 @@ module psb_l_base_multivect_mod
   use psb_l_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_l_base_vect_type
-  !! The psb_l_base_vect_type 
+  !! The psb_l_base_vect_type
   !! defines a middle level  integer(psb_ipk_) encapsulated dense vector.
-  !! The encapsulation is needed, in place of a simple array, to allow  
+  !! The encapsulation is needed, in place of a simple array, to allow
   !! for complicated situations, such as GPU programming, where the memory
   !!  area we are interested in is not easily accessible from the host/Fortran
   !!  side. It is also meant to be encapsulated in an outer type, to allow
   !!  runtime switching as per the STATE design pattern, similar to the
   !!  sparse matrix types.
   !!
-  private 
+  private
   public  :: psb_l_base_multivect, psb_l_base_multivect_type
 
   type psb_l_base_multivect_type
-    !> Values. 
+    !> Values.
     integer(psb_lpk_), allocatable :: v(:,:)
-    integer(psb_lpk_), allocatable :: combuf(:) 
+    integer(psb_lpk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
   contains
     !
@@ -1017,7 +1022,7 @@ module psb_l_base_multivect_mod
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
-    ! in derived classes. 
+    ! in derived classes.
     !
     procedure, pass(x) :: ins      => l_base_mlv_ins
     procedure, pass(x) :: zero     => l_base_mlv_zero
@@ -1028,7 +1033,7 @@ module psb_l_base_multivect_mod
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
     ! external side contain the same data. The base
-    ! version is only a placeholder. 
+    ! version is only a placeholder.
     !
     procedure, pass(x) :: sync     => l_base_mlv_sync
     procedure, pass(x) :: is_host  => l_base_mlv_is_host
@@ -1068,7 +1073,7 @@ module psb_l_base_multivect_mod
 
     !
     ! Gather/scatter. These are needed for MPI interfacing.
-    ! May have to be reworked. 
+    ! May have to be reworked.
     !
     procedure, pass(x) :: gthab    => l_base_mlv_gthab
     procedure, pass(x) :: gthzv    => l_base_mlv_gthzv
@@ -1090,7 +1095,7 @@ module psb_l_base_multivect_mod
 contains
 
   !
-  ! Constructors. 
+  ! Constructors.
   !
 
   !> Function  constructor:
@@ -1109,7 +1114,7 @@ contains
 
   !> Function  constructor:
   !! \brief     Constructor from size
-  !!  \param    n   Size of vector to be built. 
+  !!  \param    n   Size of vector to be built.
   !!
   function size_const(m,n) result(this)
     integer(psb_ipk_), intent(in) :: m,n
@@ -1136,7 +1141,7 @@ contains
     integer(psb_ipk_) :: info
 
     call psb_realloc(size(this,1),size(this,2),x%v,info)
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_vect_bld')
       return
     end if
@@ -1151,7 +1156,7 @@ contains
   !> Function  bld_n:
   !! \memberof  psb_l_base_multivect_type
   !! \brief     Build method with size (uninitialized data)
-  !!  \param    n    size to be allocated. 
+  !!  \param    n    size to be allocated.
   !!
   subroutine l_base_mlv_bld_n(x,m,n)
     use psb_realloc_mod
@@ -1168,13 +1173,13 @@ contains
   !! \memberof  psb_l_base_multivect_type
   !! \brief     Build method with size (uninitialized data) and
   !!            allocation return code.
-  !!  \param    n    size to be allocated. 
+  !!  \param    n    size to be allocated.
   !!  \param info  return code
   !!
   subroutine l_base_mlv_all(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)               :: m,n
     class(psb_l_base_multivect_type), intent(out) :: x
     integer(psb_ipk_), intent(out)              :: info
@@ -1192,7 +1197,7 @@ contains
   subroutine l_base_mlv_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in)   :: x
     class(psb_l_base_multivect_type), intent(out), allocatable :: y
     integer(psb_ipk_), intent(out)              :: info
@@ -1206,21 +1211,21 @@ contains
   !
   !> Function  base_mlv_ins:
   !! \memberof  psb_l_base_multivect_type
-  !! \brief Insert coefficients. 
+  !! \brief Insert coefficients.
   !!
   !!
   !!         Given  a list of N pairs
   !!           (IRL(i),VAL(i))
   !!         record a new coefficient in X such that
   !!            X(IRL(1:N)) = VAL(1:N).
-  !!            
+  !!
   !!         - the update operation will perform either
   !!               X(IRL(1:n)) = VAL(1:N)
   !!           or
   !!               X(IRL(1:n)) = X(IRL(1:n))+VAL(1:N)
   !!           according to the value of DUPLICATE.
-  !!           
-  !!           
+  !!
+  !!
   !!  \param n     number of pairs in input
   !!  \param irl(:)  the input row indices
   !!  \param val(:)  the input coefficients
@@ -1230,7 +1235,7 @@ contains
   !
   subroutine l_base_mlv_ins(n,irl,val,dupl,x,info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl
     integer(psb_ipk_), intent(in)               :: irl(:)
@@ -1240,21 +1245,21 @@ contains
     integer(psb_ipk_) :: i, isz
 
     info = 0
-    if (psb_errstatus_fatal()) return 
+    if (psb_errstatus_fatal()) return
 
-    if (.not.allocated(x%v)) then 
+    if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
-    else if (n > min(size(irl),size(val))) then 
+    else if (n > min(size(irl),size(val))) then
       info = psb_err_invalid_input_
 
-    else 
+    else
       isz = size(x%v,1)
-      select case(dupl) 
-      case(psb_dupl_ovwrt_) 
+      select case(dupl)
+      case(psb_dupl_ovwrt_)
         do i = 1, n
           !loop over all val's rows
 
-          ! row actual block row 
+          ! row actual block row
           if ((1 <= irl(i)).and.(irl(i) <= isz)) then
             ! this row belongs to me
             ! copy i-th row of block val in x
@@ -1262,7 +1267,7 @@ contains
           end if
         enddo
 
-      case(psb_dupl_add_) 
+      case(psb_dupl_add_)
 
         do i = 1, n
           !loop over all val's rows
@@ -1279,7 +1284,7 @@ contains
         ! !$      goto 9999
       end select
     end if
-    if (info /= 0) then 
+    if (info /= 0) then
       call psb_errpush(info,'base_mlv_vect_ins')
       return
     end if
@@ -1294,7 +1299,7 @@ contains
   !
   subroutine l_base_mlv_zero(x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout)    :: x
 
     if (allocated(x%v)) x%v=lzero
@@ -1310,7 +1315,7 @@ contains
   !> Function  base_mlv_asb:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Assemble vector: reallocate as necessary.
-  !!           
+  !!
   !!  \param n     final size
   !!  \param info  return code
   !!
@@ -1319,7 +1324,7 @@ contains
   subroutine l_base_mlv_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)              :: m,n
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
@@ -1336,20 +1341,20 @@ contains
   !> Function  base_mlv_free:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Free vector
-  !!           
+  !!
   !!  \param info  return code
   !!
   !
   subroutine l_base_mlv_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info /= 0) call & 
+    if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
 
   end subroutine l_base_mlv_free
@@ -1359,15 +1364,15 @@ contains
   !
   ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.
-  ! 
+  !
   !
   !> Function  base_mlv_sync:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_mlv_sync(x)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
 
   end subroutine l_base_mlv_sync
@@ -1376,10 +1381,10 @@ contains
   !> Function  base_mlv_set_host:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Set_host: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_mlv_set_host(x)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
 
   end subroutine l_base_mlv_set_host
@@ -1388,10 +1393,10 @@ contains
   !> Function  base_mlv_set_dev:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Set_dev: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_mlv_set_dev(x)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
 
   end subroutine l_base_mlv_set_dev
@@ -1400,10 +1405,10 @@ contains
   !> Function  base_mlv_set_sync:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Set_sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_mlv_set_sync(x)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
 
   end subroutine l_base_mlv_set_sync
@@ -1412,10 +1417,10 @@ contains
   !> Function  base_mlv_is_dev:
   !! \memberof  psb_l_base_multivect_type
   !! \brief Is  vector on external device    .
-  !!           
+  !!
   !
   function l_base_mlv_is_dev(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in) :: x
     logical  :: res
 
@@ -1426,10 +1431,10 @@ contains
   !> Function  base_mlv_is_host
   !! \memberof  psb_l_base_multivect_type
   !! \brief Is  vector on standard memory    .
-  !!           
+  !!
   !
   function l_base_mlv_is_host(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in) :: x
     logical  :: res
 
@@ -1440,10 +1445,10 @@ contains
   !> Function  base_mlv_is_sync
   !! \memberof  psb_l_base_multivect_type
   !! \brief Is  vector on sync               .
-  !!           
+  !!
   !
   function l_base_mlv_is_sync(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in) :: x
     logical  :: res
 
@@ -1452,16 +1457,16 @@ contains
 
 
   !
-  ! Size info. 
+  ! Size info.
   !
   !
   !> Function  base_mlv_get_nrows
   !! \memberof  psb_l_base_multivect_type
   !! \brief  Number of entries
-  !!           
+  !!
   !
   function l_base_mlv_get_nrows(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
 
@@ -1471,7 +1476,7 @@ contains
   end function l_base_mlv_get_nrows
 
   function l_base_mlv_get_ncols(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
 
@@ -1484,10 +1489,10 @@ contains
   !> Function  base_mlv_get_sizeof
   !! \memberof  psb_l_base_multivect_type
   !! \brief  Size in bytesa
-  !!           
+  !!
   !
   function l_base_mlv_sizeof(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(in) :: x
     integer(psb_epk_) :: res
 
@@ -1500,10 +1505,10 @@ contains
   !> Function  base_mlv_get_fmt
   !! \memberof  psb_l_base_multivect_type
   !! \brief  Format
-  !!           
+  !!
   !
   function l_base_mlv_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'BASE'
   end function l_base_mlv_get_fmt
@@ -1516,18 +1521,18 @@ contains
   !! \memberof  psb_l_base_multivect_type
   !! \brief  Extract a copy of the contents
   !!
-  !    
+  !
   function  l_base_mlv_get_vect(x) result(res)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_lpk_), allocatable                 :: res(:,:)
     integer(psb_ipk_) :: info,m,n
     m = x%get_nrows()
     n = x%get_ncols()
-    if (.not.allocated(x%v)) return 
+    if (.not.allocated(x%v)) return
     call x%sync()
-    allocate(res(m,n),stat=info) 
-    if (info /= 0) then 
+    allocate(res(m,n),stat=info)
+    if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_get_vect')
       return
     end if
@@ -1535,7 +1540,7 @@ contains
   end function l_base_mlv_get_vect
 
   !
-  ! Reset all values 
+  ! Reset all values
   !
   !
   !> Function  base_mlv_set_scal
@@ -1544,7 +1549,7 @@ contains
   !! \param val   The value to set
   !!
   subroutine l_base_mlv_set_scal(x,val)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout)  :: x
     integer(psb_lpk_), intent(in) :: val
 
@@ -1557,16 +1562,16 @@ contains
   !> Function  base_mlv_set_vect
   !! \memberof  psb_l_base_multivect_type
   !! \brief  Set all entries
-  !! \param val(:)  The vector to be copied in 
+  !! \param val(:)  The vector to be copied in
   !!
   subroutine l_base_mlv_set_vect(x,val)
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout)  :: x
     integer(psb_lpk_), intent(in) :: val(:,:)
     integer(psb_ipk_) :: nr, nc
     integer(psb_ipk_) :: info
 
-    if (allocated(x%v)) then 
+    if (allocated(x%v)) then
       nr = min(size(x%v,1),size(val,1))
       nc = min(size(x%v,2),size(val,2))
 
@@ -1579,15 +1584,15 @@ contains
 
 
   function l_base_mlv_use_buffer() result(res)
-    implicit none 
+    implicit none
     logical :: res
-    
+
     res = .true.
   end function l_base_mlv_use_buffer
 
   subroutine l_base_mlv_new_buffer(n,x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
@@ -1599,7 +1604,7 @@ contains
 
   subroutine l_base_mlv_new_comid(n,x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
@@ -1610,12 +1615,12 @@ contains
 
   subroutine l_base_mlv_maybe_free_buffer(x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
 
-    info = 0 
+    info = 0
     if (psb_get_maybe_free_buffer())&
          &  call x%free_buffer(info)
 
@@ -1623,7 +1628,7 @@ contains
 
   subroutine l_base_mlv_free_buffer(x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
@@ -1633,7 +1638,7 @@ contains
 
   subroutine l_base_mlv_free_comid(x,info)
     use psb_realloc_mod
-    implicit none 
+    implicit none
     class(psb_l_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
@@ -1656,7 +1661,7 @@ contains
   !! \param beta
   subroutine l_base_mlv_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) :: alpha, beta, y(:)
     class(psb_l_base_multivect_type) :: x
@@ -1672,7 +1677,7 @@ contains
   end subroutine l_base_mlv_gthab
   !
   ! shortcut alpha=1 beta=0
-  ! 
+  !
   !> Function  base_mlv_gthzv
   !! \memberof  psb_l_base_multivect_type
   !! \brief gather into an array special alpha=1 beta=0
@@ -1681,7 +1686,7 @@ contains
   !! \param idx(:) indices
   subroutine l_base_mlv_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i,n
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) ::  y(:)
@@ -1694,7 +1699,7 @@ contains
 
   !
   ! shortcut alpha=1 beta=0
-  ! 
+  !
   !> Function  base_mlv_gthzv
   !! \memberof  psb_l_base_multivect_type
   !! \brief gather into an array special alpha=1 beta=0
@@ -1703,7 +1708,7 @@ contains
   !! \param idx(:) indices
   subroutine l_base_mlv_gthzv(n,idx,x,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_multivect_type) :: x
@@ -1720,7 +1725,7 @@ contains
   end subroutine l_base_mlv_gthzv
   !
   ! shortcut alpha=1 beta=0
-  ! 
+  !
   !> Function  base_mlv_gthzv
   !! \memberof  psb_l_base_multivect_type
   !! \brief gather into an array special alpha=1 beta=0
@@ -1729,7 +1734,7 @@ contains
   !! \param idx(:) indices
   subroutine l_base_mlv_gthzm(n,idx,x,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) ::  y(:,:)
     class(psb_l_base_multivect_type) :: x
@@ -1746,17 +1751,17 @@ contains
   end subroutine l_base_mlv_gthzm
 
   !
-  ! New comm internals impl. 
+  ! New comm internals impl.
   !
   subroutine l_base_mlv_gthzbuf(i,ixb,n,idx,x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i, ixb, n
     class(psb_i_base_vect_type) :: idx
     class(psb_l_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
-    
-    if (.not.allocated(x%combuf)) then 
+
+    if (.not.allocated(x%combuf)) then
       call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
       return
     end if
@@ -1768,9 +1773,9 @@ contains
   end subroutine l_base_mlv_gthzbuf
 
   !
-  ! Scatter: 
+  ! Scatter:
   ! Y(IDX(:),:) = beta*Y(IDX(:),:) + X(:)
-  ! 
+  !
   !
   !> Function  base_mlv_sctb
   !! \memberof  psb_l_base_multivect_type
@@ -1779,10 +1784,10 @@ contains
   !! \param n  how many entries to consider
   !! \param idx(:) indices
   !! \param beta
-  !! \param x(:) 
+  !! \param x(:)
   subroutine l_base_mlv_sctb(n,idx,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) :: beta, x(:)
     class(psb_l_base_multivect_type) :: y
@@ -1797,7 +1802,7 @@ contains
 
   subroutine l_base_mlv_sctbr2(n,idx,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_lpk_) :: beta, x(:,:)
     class(psb_l_base_multivect_type) :: y
@@ -1812,7 +1817,7 @@ contains
 
   subroutine l_base_mlv_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     integer( psb_lpk_) :: beta, x(:)
@@ -1824,14 +1829,14 @@ contains
 
   subroutine l_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
     use psi_serial_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_) :: i, iyb, n
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) :: beta
     class(psb_l_base_multivect_type) :: y
     integer(psb_ipk_) :: nc
-    
-    if (.not.allocated(y%combuf)) then 
+
+    if (.not.allocated(y%combuf)) then
       call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
       return
     end if
@@ -1840,19 +1845,18 @@ contains
     nc = y%get_ncols()
     call y%sct(n,idx%v(i:),y%combuf(iyb:),beta)
     call y%set_host()
-    
+
   end subroutine l_base_mlv_sctb_buf
 
   !
   !> Function  base_device_wait:
   !! \memberof  psb_l_base_vect_type
   !! \brief device_wait: base version is a no-op.
-  !!           
+  !!
   !
   subroutine l_base_mlv_device_wait()
-    implicit none 
-    
+    implicit none
+
   end subroutine l_base_mlv_device_wait
 
 end module psb_l_base_multivect_mod
-

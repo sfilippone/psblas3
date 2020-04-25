@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! package: psb_c_mat_mod
 !
@@ -37,7 +37,7 @@
 ! provide a mean of switching, at run-time, among different formats,
 ! potentially unknown at the library compile-time by adding a layer of
 ! indirection. This type encapsulates the psb_c_base_sparse_mat class
-! inside another class which is the one visible to the user. 
+! inside another class which is the one visible to the user.
 ! Most methods of the psb_c_mat_mod simply call the methods of the
 ! encapsulated class.
 ! The exceptions are mainly cscnv and cp_from/cp_to; these provide
@@ -48,14 +48,14 @@
 ! through the application life.
 ! In particular, computational methods can only be invoked when
 ! the matrix is in the ASSEMBLED state, whereas the other states are
-! dedicated to operations on the internal matrix data. 
-! A sparse matrix can move between states according to the 
+! dedicated to operations on the internal matrix data.
+! A sparse matrix can move between states according to the
 ! following state transition table. Associated with these states are
 ! the possible dynamic types of the inner matrix object.
 ! Only COO matrices can ever be in the BUILD state, whereas
-! the ASSEMBLED and UPDATE state can be entered by any class. 
-! 
-! In           Out        Method    
+! the ASSEMBLED and UPDATE state can be entered by any class.
+!
+! In           Out        Method
 !| ----------------------------------
 !| Null         Build      csall
 !| Build        Build      csput
@@ -64,7 +64,7 @@
 !| Assembled    Update     reinit
 !| Update       Update     csput
 !| Update       Assembled  cscnv
-!| *            unchanged  reall 
+!| *            unchanged  reall
 !| Assembled    Null       free
 !
 !
@@ -74,7 +74,7 @@
 ! of the indices, which are PSB_LPK_ so that the entries
 ! are guaranteed to be able to contain global indices.
 ! This type only supports data handling and preprocessing, it is
-! not supposed to be used for computations. 
+! not supposed to be used for computations.
 !
 module psb_c_mat_mod
 
@@ -84,7 +84,7 @@ module psb_c_mat_mod
 
   type :: psb_cspmat_type
 
-    class(psb_c_base_sparse_mat), allocatable  :: a 
+    class(psb_c_base_sparse_mat), allocatable  :: a
 
   contains
     ! Getters
@@ -126,12 +126,12 @@ module psb_c_mat_mod
     procedure, pass(a) :: set_unit     => psb_c_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_c_set_repeatable_updates
 
-    ! Memory/data management 
+    ! Memory/data management
     procedure, pass(a) :: csall       => psb_c_csall
     procedure, pass(a) :: free        => psb_c_free
     procedure, pass(a) :: trim        => psb_c_trim
     procedure, pass(a) :: csput_a     => psb_c_csput_a
-    procedure, pass(a) :: csput_v     => psb_c_csput_v 
+    procedure, pass(a) :: csput_v     => psb_c_csput_v
     generic, public    :: csput       => csput_a,  csput_v
     procedure, pass(a) :: csgetptn    => psb_c_csgetptn
     procedure, pass(a) :: csgetrow    => psb_c_csgetrow
@@ -141,7 +141,7 @@ module psb_c_mat_mod
     procedure, pass(a) :: lcsgetptn    => psb_c_lcsgetptn
     procedure, pass(a) :: lcsgetrow    => psb_c_lcsgetrow
     generic, public    :: csget        => lcsgetptn, lcsgetrow
-#endif    
+#endif
     procedure, pass(a) :: tril        => psb_c_tril
     procedure, pass(a) :: triu        => psb_c_triu
     procedure, pass(a) :: m_csclip    => psb_c_csclip
@@ -169,7 +169,7 @@ module psb_c_mat_mod
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
     ! external side contain the same data. The base
-    ! version is only a placeholder. 
+    ! version is only a placeholder.
     !
     procedure, pass(a) :: sync        => c_mat_sync
     procedure, pass(a) :: is_host     => c_mat_is_host
@@ -205,16 +205,16 @@ module psb_c_mat_mod
     procedure, pass(a) :: mv_to_lb    => psb_c_mv_to_lb
     procedure, pass(a) :: cp_from_lb  => psb_c_cp_from_lb
     procedure, pass(a) :: cp_to_lb    => psb_c_cp_to_lb
-    procedure, pass(a) :: mv_from_l   => psb_c_mv_from_l 
-    procedure, pass(a) :: mv_to_l     => psb_c_mv_to_l 
-    procedure, pass(a) :: cp_from_l   => psb_c_cp_from_l 
-    procedure, pass(a) :: cp_to_l     => psb_c_cp_to_l 
+    procedure, pass(a) :: mv_from_l   => psb_c_mv_from_l
+    procedure, pass(a) :: mv_to_l     => psb_c_mv_to_l
+    procedure, pass(a) :: cp_from_l   => psb_c_cp_from_l
+    procedure, pass(a) :: cp_to_l     => psb_c_cp_to_l
     generic, public    :: mv_from     => mv_from_lb, mv_from_l
     generic, public    :: mv_to       => mv_to_lb, mv_to_l
     generic, public    :: cp_from     => cp_from_lb, cp_from_l
     generic, public    :: cp_to       => cp_to_lb, cp_to_l
-    
-    ! Computational routines 
+
+    ! Computational routines
     procedure, pass(a) :: get_diag => psb_c_get_diag
     procedure, pass(a) :: maxval   => psb_c_maxval
     procedure, pass(a) :: spnmi    => psb_c_csnmi
@@ -234,6 +234,11 @@ module psb_c_mat_mod
     procedure, pass(a) :: cssv     => psb_c_cssv
     procedure, pass(a) :: cssm     => psb_c_cssm
     generic, public    :: spsm     => cssm, cssv, cssv_v
+    procedure, pass(a) :: scalpid  => psb_c_scalplusidentity
+    procedure, pass(a) :: spaxpby  => psb_c_spaxpby
+    procedure, pass(a) :: cmpval   => psb_c_cmpval
+    procedure, pass(a) :: cmpmat   => psb_c_cmpmat
+    generic, public    :: spcmp    => cmpval, cmpmat
 
   end type psb_cspmat_type
 
@@ -267,7 +272,7 @@ module psb_c_mat_mod
 
   type :: psb_lcspmat_type
 
-    class(psb_lc_base_sparse_mat), allocatable  :: a 
+    class(psb_lc_base_sparse_mat), allocatable  :: a
 
   contains
     ! Getters
@@ -296,7 +301,7 @@ module psb_c_mat_mod
     ! Setters
     procedure, pass(a) :: set_lnrows   => psb_lc_set_lnrows
     procedure, pass(a) :: set_lncols   => psb_lc_set_lncols
-#if defined(IPK4) && defined(LPK8)        
+#if defined(IPK4) && defined(LPK8)
     procedure, pass(a) :: set_inrows   => psb_lc_set_inrows
     procedure, pass(a) :: set_incols   => psb_lc_set_incols
     generic, public    :: set_nrows   => set_inrows, set_lnrows
@@ -305,7 +310,7 @@ module psb_c_mat_mod
     generic, public    :: set_nrows   => set_lnrows
     generic, public    :: set_ncols   => set_lncols
 #endif
-    
+
     procedure, pass(a) :: set_dupl     => psb_lc_set_dupl
     procedure, pass(a) :: set_null     => psb_lc_set_null
     procedure, pass(a) :: set_bld      => psb_lc_set_bld
@@ -319,12 +324,12 @@ module psb_c_mat_mod
     procedure, pass(a) :: set_unit     => psb_lc_set_unit
     procedure, pass(a) :: set_repeatable_updates => psb_lc_set_repeatable_updates
 
-    ! Memory/data management 
+    ! Memory/data management
     procedure, pass(a) :: csall       => psb_lc_csall
     procedure, pass(a) :: free        => psb_lc_free
     procedure, pass(a) :: trim        => psb_lc_trim
     procedure, pass(a) :: csput_a     => psb_lc_csput_a
-    procedure, pass(a) :: csput_v     => psb_lc_csput_v 
+    procedure, pass(a) :: csput_v     => psb_lc_csput_v
     generic, public    :: csput       => csput_a,  csput_v
     procedure, pass(a) :: csgetptn    => psb_lc_csgetptn
     procedure, pass(a) :: csgetrow    => psb_lc_csgetrow
@@ -334,7 +339,7 @@ module psb_c_mat_mod
 !!$    procedure, pass(a) :: icsgetptn    => psb_lc_icsgetptn
 !!$    procedure, pass(a) :: icsgetrow    => psb_lc_icsgetrow
 !!$    generic, public    :: csget        => icsgetptn, icsgetrow
-#endif    
+#endif
     procedure, pass(a) :: tril        => psb_lc_tril
     procedure, pass(a) :: triu        => psb_lc_triu
     procedure, pass(a) :: m_csclip    => psb_lc_csclip
@@ -362,7 +367,7 @@ module psb_c_mat_mod
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
     ! external side contain the same data. The base
-    ! version is only a placeholder. 
+    ! version is only a placeholder.
     !
     procedure, pass(a) :: sync        => lc_mat_sync
     procedure, pass(a) :: is_host     => lc_mat_is_host
@@ -398,16 +403,16 @@ module psb_c_mat_mod
     procedure, pass(a) :: mv_to_ib    => psb_lc_mv_to_ib
     procedure, pass(a) :: cp_from_ib  => psb_lc_cp_from_ib
     procedure, pass(a) :: cp_to_ib    => psb_lc_cp_to_ib
-    procedure, pass(a) :: mv_from_i   => psb_lc_mv_from_i 
-    procedure, pass(a) :: mv_to_i     => psb_lc_mv_to_i 
-    procedure, pass(a) :: cp_from_i   => psb_lc_cp_from_i 
-    procedure, pass(a) :: cp_to_i     => psb_lc_cp_to_i 
+    procedure, pass(a) :: mv_from_i   => psb_lc_mv_from_i
+    procedure, pass(a) :: mv_to_i     => psb_lc_mv_to_i
+    procedure, pass(a) :: cp_from_i   => psb_lc_cp_from_i
+    procedure, pass(a) :: cp_to_i     => psb_lc_cp_to_i
     generic, public    :: mv_from     => mv_from_ib, mv_from_i
     generic, public    :: mv_to       => mv_to_ib, mv_to_i
     generic, public    :: cp_from     => cp_from_ib, cp_from_i
     generic, public    :: cp_to       => cp_to_ib, cp_to_i
 
-    ! Computational routines 
+    ! Computational routines
     procedure, pass(a) :: get_diag => psb_lc_get_diag
     procedure, pass(a) :: maxval   => psb_lc_maxval
     procedure, pass(a) :: spnmi    => psb_lc_csnmi
@@ -419,6 +424,11 @@ module psb_c_mat_mod
     procedure, pass(a) :: scals    => psb_lc_scals
     procedure, pass(a) :: scalv    => psb_lc_scal
     generic, public    :: scal     => scals, scalv
+    procedure, pass(a) :: scalpid  => psb_lc_scalplusidentity
+    procedure, pass(a) :: spaxpby  => psb_lc_spaxpby
+    procedure, pass(a) :: cmpval   => psb_lc_cmpval
+    procedure, pass(a) :: cmpmat   => psb_lc_cmpmat
+    generic, public    :: spcmp    => cmpval, cmpmat
 
   end type psb_lcspmat_type
 
@@ -449,7 +459,7 @@ module psb_c_mat_mod
   !
   !
   !
-  ! Setters 
+  ! Setters
   !
   !
   !
@@ -459,142 +469,142 @@ module psb_c_mat_mod
   ! == ===================================
 
 
-  interface 
-    subroutine  psb_c_set_nrows(m,a) 
+  interface
+    subroutine  psb_c_set_nrows(m,a)
       import :: psb_ipk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: m
     end subroutine psb_c_set_nrows
   end interface
-  
-  interface 
-    subroutine psb_c_set_ncols(n,a) 
+
+  interface
+    subroutine psb_c_set_ncols(n,a)
       import :: psb_ipk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: n
     end subroutine psb_c_set_ncols
   end interface
-  
-  interface 
-    subroutine  psb_c_set_dupl(n,a) 
+
+  interface
+    subroutine  psb_c_set_dupl(n,a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: n
     end subroutine psb_c_set_dupl
   end interface
-  
-  interface 
-    subroutine psb_c_set_null(a) 
+
+  interface
+    subroutine psb_c_set_null(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_set_null
   end interface
-  
-  interface 
-    subroutine psb_c_set_bld(a) 
+
+  interface
+    subroutine psb_c_set_bld(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_set_bld
   end interface
-  
-  interface 
-    subroutine psb_c_set_upd(a) 
+
+  interface
+    subroutine psb_c_set_upd(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_set_upd
   end interface
-  
-  interface 
-    subroutine psb_c_set_asb(a) 
+
+  interface
+    subroutine psb_c_set_asb(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_set_asb
   end interface
-  
-  interface 
-    subroutine psb_c_set_sorted(a,val) 
+
+  interface
+    subroutine psb_c_set_sorted(a,val)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_sorted
   end interface
-  
-  interface 
-    subroutine psb_c_set_triangle(a,val) 
+
+  interface
+    subroutine psb_c_set_triangle(a,val)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_triangle
   end interface
-  
-  interface 
-    subroutine psb_c_set_symmetric(a,val) 
+
+  interface
+    subroutine psb_c_set_symmetric(a,val)
       import :: psb_ipk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_symmetric
   end interface
-    
-  interface 
-    subroutine psb_c_set_unit(a,val) 
+
+  interface
+    subroutine psb_c_set_unit(a,val)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_unit
   end interface
-  
-  interface 
-    subroutine psb_c_set_lower(a,val) 
+
+  interface
+    subroutine psb_c_set_lower(a,val)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_lower
   end interface
-  
-  interface 
-    subroutine psb_c_set_upper(a,val) 
+
+  interface
+    subroutine psb_c_set_upper(a,val)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_c_set_upper
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_sparse_print(iout,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       integer(psb_ipk_), intent(in)               :: iout
-      class(psb_cspmat_type), intent(in) :: a   
+      class(psb_cspmat_type), intent(in) :: a
       integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_c_sparse_print
   end interface
 
-  interface 
+  interface
     subroutine psb_c_n_sparse_print(fname,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       character(len=*), intent(in)      :: fname
-      class(psb_cspmat_type), intent(in) :: a   
+      class(psb_cspmat_type), intent(in) :: a
       integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_c_n_sparse_print
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
-      class(psb_cspmat_type), intent(in) :: a   
-      integer(psb_ipk_), intent(in)                :: idx 
-      integer(psb_ipk_), intent(out)               :: n   
+      class(psb_cspmat_type), intent(in) :: a
+      integer(psb_ipk_), intent(in)                :: idx
+      integer(psb_ipk_), intent(out)               :: n
       integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
       integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: lev 
+      integer(psb_ipk_), optional, intent(in)      :: lev
     end subroutine psb_c_get_neigh
   end interface
-  
-  interface 
-    subroutine psb_c_csall(nr,nc,a,info,nz) 
+
+  interface
+    subroutine psb_c_csall(nr,nc,a,info,nz)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in)             :: nr,nc
@@ -602,31 +612,31 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(in), optional   :: nz
     end subroutine psb_c_csall
   end interface
-  
-  interface 
-    subroutine psb_c_reallocate_nz(nz,a) 
+
+  interface
+    subroutine psb_c_reallocate_nz(nz,a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       integer(psb_ipk_), intent(in) :: nz
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_reallocate_nz
   end interface
-  
-  interface 
-    subroutine psb_c_free(a) 
+
+  interface
+    subroutine psb_c_free(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_free
   end interface
-  
-  interface 
-    subroutine psb_c_trim(a) 
+
+  interface
+    subroutine psb_c_trim(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_trim
   end interface
-  
-  interface 
-    subroutine psb_c_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+
+  interface
+    subroutine psb_c_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
@@ -635,9 +645,9 @@ module psb_c_mat_mod
     end subroutine psb_c_csput_a
   end interface
 
-  
-  interface 
-    subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+
+  interface
+    subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       use psb_c_vect_mod, only : psb_c_vect_type
       use psb_i_vect_mod, only : psb_i_vect_type
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
@@ -648,8 +658,8 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_c_csput_v
   end interface
- 
-  interface 
+
+  interface
     subroutine psb_c_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -664,8 +674,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_c_csgetptn
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -681,8 +691,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_c_csgetrow
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -696,8 +706,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_c_csgetblk
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_tril(a,l,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,u)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -709,8 +719,8 @@ module psb_c_mat_mod
       class(psb_cspmat_type), optional, intent(inout)   :: u
     end subroutine psb_c_tril
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_triu(a,u,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,l)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -724,7 +734,7 @@ module psb_c_mat_mod
   end interface
 
 
-  interface 
+  interface
     subroutine psb_c_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -736,7 +746,7 @@ module psb_c_mat_mod
     end subroutine psb_c_csclip
   end interface
 
-  interface 
+  interface
     subroutine psb_c_csclip_ip(a,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -746,8 +756,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_c_csclip_ip
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_b_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_coo_sparse_mat
@@ -758,60 +768,60 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_c_b_csclip
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_mold(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout)     :: a
       class(psb_c_base_sparse_mat), allocatable, intent(out) :: b
     end subroutine psb_c_mold
   end interface
-  
-  interface 
-    subroutine psb_c_asb(a,mold) 
+
+  interface
+    subroutine psb_c_asb(a,mold)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_c_base_sparse_mat), optional, intent(in) :: mold
     end subroutine psb_c_asb
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_transp_1mat(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_transp_1mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_transp_2mat(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(in)  :: a
       class(psb_cspmat_type), intent(inout) :: b
     end subroutine psb_c_transp_2mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_transc_1mat(a)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
     end subroutine psb_c_transc_1mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_transc_2mat(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(in)  :: a
       class(psb_cspmat_type), intent(inout) :: b
     end subroutine psb_c_transc_2mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_reinit(a,clear)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
-      class(psb_cspmat_type), intent(inout) :: a   
+      class(psb_cspmat_type), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_c_reinit
-    
+
   end interface
 
 
@@ -826,9 +836,9 @@ module psb_c_mat_mod
   !   3 versions: copying to target
   !               copying to a base_sparse_mat object.
   !               in place
-  !                 
   !
-  interface 
+  !
+  interface
     subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(in)      :: a
@@ -839,9 +849,9 @@ module psb_c_mat_mod
       class(psb_c_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_c_cscnv
   end interface
-  
 
-  interface 
+
+  interface
     subroutine psb_c_cscnv_ip(a,iinfo,type,mold,dupl)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
@@ -851,9 +861,9 @@ module psb_c_mat_mod
       class(psb_c_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_c_cscnv_ip
   end interface
-  
 
-  interface 
+
+  interface
     subroutine psb_c_cscnv_base(a,b,info,dupl)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(in)       :: a
@@ -862,12 +872,12 @@ module psb_c_mat_mod
       integer(psb_ipk_),optional, intent(in)           :: dupl
     end subroutine psb_c_cscnv_base
   end interface
-  
+
   !
   ! Produce a version of the matrix with diagonal cut
-  ! out; passes through a COO buffer. 
+  ! out; passes through a COO buffer.
   !
-  interface 
+  interface
     subroutine psb_c_clip_d(a,b,info)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(in)    :: a
@@ -875,46 +885,46 @@ module psb_c_mat_mod
       integer(psb_ipk_),intent(out)                  :: info
     end subroutine psb_c_clip_d
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_clip_d_ip(a,info)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       integer(psb_ipk_),intent(out)                  :: info
     end subroutine psb_c_clip_d_ip
   end interface
-  
+
   !
   ! These four interfaces cut through the
   ! encapsulation between spmat_type and base_sparse_mat.
   !
-  interface 
+  interface
     subroutine psb_c_mv_from(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_mv_from
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_cp_from(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(out) :: a
       class(psb_c_base_sparse_mat), intent(in) :: b
     end subroutine psb_c_cp_from
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_mv_to(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_mv_to
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_cp_to(a,b)
-      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat    
+      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(in) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_cp_to
@@ -922,63 +932,63 @@ module psb_c_mat_mod
   !
   ! Mixed type conversions
   !
-  interface 
+  interface
     subroutine psb_c_mv_from_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_mv_from_lb
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_cp_from_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_cspmat_type), intent(out) :: a
       class(psb_lc_base_sparse_mat), intent(in) :: b
     end subroutine psb_c_cp_from_lb
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_mv_to_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_mv_to_lb
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_cp_to_lb(a,b)
-      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lc_base_sparse_mat    
+      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_cspmat_type), intent(in) :: a
       class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_cp_to_lb
   end interface
 
-    interface 
+    interface
     subroutine psb_c_mv_from_l(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lcspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_lcspmat_type), intent(inout) :: b
     end subroutine psb_c_mv_from_l
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_cp_from_l(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lcspmat_type
       class(psb_cspmat_type), intent(out) :: a
       class(psb_lcspmat_type), intent(in) :: b
     end subroutine psb_c_cp_from_l
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_mv_to_l(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lcspmat_type
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_lcspmat_type), intent(inout) :: b
     end subroutine psb_c_mv_to_l
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_c_cp_to_l(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lcspmat_type
       class(psb_cspmat_type), intent(in) :: a
@@ -988,8 +998,8 @@ module psb_c_mat_mod
 
   !
   ! Transfer the internal allocation to the target.
-  !  
-  interface psb_move_alloc 
+  !
+  interface psb_move_alloc
     subroutine psb_cspmat_type_move(a,b,info)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
@@ -997,8 +1007,8 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_cspmat_type_move
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_cspmat_clone(a,b,info)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
@@ -1024,7 +1034,7 @@ module psb_c_mat_mod
   ! == ===================================
 
   interface psb_csmm
-    subroutine psb_c_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_csmm(alpha,a,x,beta,y,info,trans)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       complex(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
@@ -1032,7 +1042,7 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_c_csmm
-    subroutine psb_c_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_csmv(alpha,a,x,beta,y,info,trans)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
@@ -1040,7 +1050,7 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_c_csmv
-    subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans)
       use psb_c_vect_mod, only : psb_c_vect_type
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in)   :: a
@@ -1051,9 +1061,9 @@ module psb_c_mat_mod
       character, optional, intent(in)      :: trans
     end subroutine psb_c_csmv_vect
   end interface
-  
+
   interface psb_cssm
-    subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
+    subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       complex(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
@@ -1062,7 +1072,7 @@ module psb_c_mat_mod
       character, optional, intent(in) :: trans, scale
       complex(psb_spk_), intent(in), optional :: d(:)
     end subroutine psb_c_cssm
-    subroutine psb_c_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
+    subroutine psb_c_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
@@ -1071,7 +1081,7 @@ module psb_c_mat_mod
       character, optional, intent(in) :: trans, scale
       complex(psb_spk_), intent(in), optional :: d(:)
     end subroutine psb_c_cssv
-    subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+    subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d)
       use psb_c_vect_mod, only : psb_c_vect_type
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in)   :: a
@@ -1083,24 +1093,24 @@ module psb_c_mat_mod
       type(psb_c_vect_type), optional, intent(inout)   :: d
     end subroutine psb_c_cssv_vect
   end interface
-  
-  interface 
+
+  interface
     function psb_c_maxval(a) result(res)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_c_maxval
   end interface
-  
-  interface 
+
+  interface
     function psb_c_csnmi(a) result(res)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_c_csnmi
   end interface
-  
-  interface 
+
+  interface
     function psb_c_csnm1(a) result(res)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
@@ -1108,7 +1118,7 @@ module psb_c_mat_mod
     end function psb_c_csnm1
   end interface
 
-  interface 
+  interface
     function psb_c_rowsum(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
@@ -1117,7 +1127,7 @@ module psb_c_mat_mod
     end function psb_c_rowsum
   end interface
 
-  interface 
+  interface
     function psb_c_arwsum(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
@@ -1125,8 +1135,8 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)               :: info
     end function psb_c_arwsum
   end interface
-  
-  interface 
+
+  interface
     function psb_c_colsum(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
@@ -1135,7 +1145,7 @@ module psb_c_mat_mod
     end function psb_c_colsum
   end interface
 
-  interface 
+  interface
     function psb_c_aclsum(a,info)  result(d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
@@ -1144,7 +1154,7 @@ module psb_c_mat_mod
     end function psb_c_aclsum
   end interface
 
-  interface 
+  interface
     function psb_c_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
@@ -1152,7 +1162,7 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)       :: info
     end function psb_c_get_diag
   end interface
-  
+
   interface psb_scal
     subroutine psb_c_scal(d,a,info,side)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
@@ -1169,12 +1179,53 @@ module psb_c_mat_mod
     end subroutine psb_c_scals
   end interface
 
+  interface  psb_scalplusidentity
+      subroutine psb_c_scalplusidentity(d,a,info)
+          import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+          class(psb_cspmat_type), intent(inout) :: a
+          complex(psb_spk_), intent(in)             :: d
+          integer(psb_ipk_), intent(out)          :: info
+      end subroutine psb_c_scalplusidentity
+  end interface
+
+  interface psb_spaxpby
+      subroutine psb_c_spaxpby(alpha,a,beta,b,info)
+          import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+          class(psb_cspmat_type), intent(inout) :: a
+          class(psb_cspmat_type), intent(inout) :: b
+          complex(psb_spk_), intent(in)             :: alpha
+          complex(psb_spk_), intent(in)             :: beta
+          integer(psb_ipk_), intent(out)          :: info
+      end subroutine psb_c_spaxpby
+  end interface
+
+  interface
+      function psb_c_cmpval(a,val,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+          class(psb_cspmat_type), intent(inout) :: a
+          complex(psb_spk_), intent(in)             :: val
+          real(psb_spk_), intent(in)            :: tol
+          logical                                 :: res
+          integer(psb_ipk_), intent(out)          :: info
+      end function psb_c_cmpval
+  end interface
+
+  interface
+      function psb_c_cmpmat(a,b,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
+          class(psb_cspmat_type), intent(inout) :: a
+          class(psb_cspmat_type), intent(inout) :: b
+          real(psb_spk_), intent(in)            :: tol
+          logical                                 :: res
+          integer(psb_ipk_), intent(out)          :: info
+      end function psb_c_cmpmat
+  end interface
 
   ! == ===================================
   !
   !
   !
-  ! Setters 
+  ! Setters
   !
   !
   !
@@ -1184,156 +1235,156 @@ module psb_c_mat_mod
   ! == ===================================
 
 
-  interface 
-    subroutine  psb_lc_set_lnrows(m,a) 
+  interface
+    subroutine  psb_lc_set_lnrows(m,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: m
     end subroutine psb_lc_set_lnrows
 #if defined(IPK4) && defined(LPK8)
-    subroutine  psb_lc_set_inrows(m,a) 
+    subroutine  psb_lc_set_inrows(m,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: m
     end subroutine psb_lc_set_inrows
 #endif
   end interface
-  
-  interface 
-    subroutine psb_lc_set_lncols(n,a) 
+
+  interface
+    subroutine psb_lc_set_lncols(n,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: n
     end subroutine psb_lc_set_lncols
-#if defined(IPK4) && defined(LPK8)   
-    subroutine psb_lc_set_incols(n,a) 
+#if defined(IPK4) && defined(LPK8)
+    subroutine psb_lc_set_incols(n,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: n
     end subroutine psb_lc_set_incols
 #endif
   end interface
-  
-  interface 
-    subroutine  psb_lc_set_dupl(n,a) 
+
+  interface
+    subroutine  psb_lc_set_dupl(n,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: n
     end subroutine psb_lc_set_dupl
   end interface
-  
-  interface 
-    subroutine psb_lc_set_null(a) 
+
+  interface
+    subroutine psb_lc_set_null(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_set_null
   end interface
-  
-  interface 
-    subroutine psb_lc_set_bld(a) 
+
+  interface
+    subroutine psb_lc_set_bld(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_set_bld
   end interface
-  
-  interface 
-    subroutine psb_lc_set_upd(a) 
+
+  interface
+    subroutine psb_lc_set_upd(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_set_upd
   end interface
-  
-  interface 
-    subroutine psb_lc_set_asb(a) 
+
+  interface
+    subroutine psb_lc_set_asb(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_set_asb
   end interface
-  
-  interface 
-    subroutine psb_lc_set_sorted(a,val) 
+
+  interface
+    subroutine psb_lc_set_sorted(a,val)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_lc_set_sorted
   end interface
-  
-  interface 
-    subroutine psb_lc_set_triangle(a,val) 
+
+  interface
+    subroutine psb_lc_set_triangle(a,val)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_lc_set_triangle
   end interface
-  
-  interface 
-    subroutine psb_lc_set_symmetric(a,val) 
+
+  interface
+    subroutine psb_lc_set_symmetric(a,val)
       import :: psb_ipk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_lc_set_symmetric
   end interface
-    
-  interface 
-    subroutine psb_lc_set_unit(a,val) 
+
+  interface
+    subroutine psb_lc_set_unit(a,val)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_lc_set_unit
   end interface
-  
-  interface 
-    subroutine psb_lc_set_lower(a,val) 
+
+  interface
+    subroutine psb_lc_set_lower(a,val)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_lc_set_lower
   end interface
-  
-  interface 
-    subroutine psb_lc_set_upper(a,val) 
+
+  interface
+    subroutine psb_lc_set_upper(a,val)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_lc_set_upper
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_sparse_print(iout,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       integer(psb_ipk_), intent(in)               :: iout
-      class(psb_lcspmat_type), intent(in) :: a   
+      class(psb_lcspmat_type), intent(in) :: a
       integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_lc_sparse_print
   end interface
 
-  interface 
+  interface
     subroutine psb_lc_n_sparse_print(fname,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       character(len=*), intent(in)      :: fname
-      class(psb_lcspmat_type), intent(in) :: a   
+      class(psb_lcspmat_type), intent(in) :: a
       integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_lc_n_sparse_print
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
-      class(psb_lcspmat_type), intent(in) :: a   
-      integer(psb_lpk_), intent(in)                :: idx 
-      integer(psb_lpk_), intent(out)               :: n   
+      class(psb_lcspmat_type), intent(in) :: a
+      integer(psb_lpk_), intent(in)                :: idx
+      integer(psb_lpk_), intent(out)               :: n
       integer(psb_lpk_), allocatable, intent(out)  :: neigh(:)
       integer(psb_ipk_), intent(out)               :: info
-      integer(psb_lpk_), optional, intent(in)      :: lev 
+      integer(psb_lpk_), optional, intent(in)      :: lev
     end subroutine psb_lc_get_neigh
   end interface
-  
-  interface 
-    subroutine psb_lc_csall(nr,nc,a,info,nz) 
+
+  interface
+    subroutine psb_lc_csall(nr,nc,a,info,nz)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in)             :: nr,nc
@@ -1341,31 +1392,31 @@ module psb_c_mat_mod
       integer(psb_lpk_), intent(in), optional   :: nz
     end subroutine psb_lc_csall
   end interface
-  
-  interface 
-    subroutine psb_lc_reallocate_nz(nz,a) 
+
+  interface
+    subroutine psb_lc_reallocate_nz(nz,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       integer(psb_lpk_), intent(in) :: nz
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_reallocate_nz
   end interface
-  
-  interface 
-    subroutine psb_lc_free(a) 
+
+  interface
+    subroutine psb_lc_free(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_free
   end interface
-  
-  interface 
-    subroutine psb_lc_trim(a) 
+
+  interface
+    subroutine psb_lc_trim(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_trim
   end interface
-  
-  interface 
-    subroutine psb_lc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+
+  interface
+    subroutine psb_lc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
@@ -1374,9 +1425,9 @@ module psb_c_mat_mod
     end subroutine psb_lc_csput_a
   end interface
 
-  
-  interface 
-    subroutine psb_lc_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+
+  interface
+    subroutine psb_lc_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       use psb_c_vect_mod, only : psb_c_vect_type
       use psb_l_vect_mod, only : psb_l_vect_type
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
@@ -1387,8 +1438,8 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lc_csput_v
   end interface
- 
-  interface 
+
+  interface
     subroutine psb_lc_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1403,8 +1454,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lc_csgetptn
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1420,8 +1471,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lc_csgetrow
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1435,8 +1486,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lc_csgetblk
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_tril(a,l,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,u)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1448,8 +1499,8 @@ module psb_c_mat_mod
       class(psb_lcspmat_type), optional, intent(inout)   :: u
     end subroutine psb_lc_tril
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_triu(a,u,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,l)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1463,7 +1514,7 @@ module psb_c_mat_mod
   end interface
 
 
-  interface 
+  interface
     subroutine psb_lc_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1475,7 +1526,7 @@ module psb_c_mat_mod
     end subroutine psb_lc_csclip
   end interface
 
-  interface 
+  interface
     subroutine psb_lc_csclip_ip(a,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1485,8 +1536,8 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lc_csclip_ip
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_b_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_coo_sparse_mat
@@ -1497,60 +1548,60 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lc_b_csclip
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_mold(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(inout)     :: a
       class(psb_lc_base_sparse_mat), allocatable, intent(out) :: b
     end subroutine psb_lc_mold
   end interface
-  
-  interface 
-    subroutine psb_lc_asb(a,mold) 
+
+  interface
+    subroutine psb_lc_asb(a,mold)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_lc_base_sparse_mat), optional, intent(in) :: mold
     end subroutine psb_lc_asb
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_transp_1mat(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_transp_1mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_transp_2mat(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(in)  :: a
       class(psb_lcspmat_type), intent(inout) :: b
     end subroutine psb_lc_transp_2mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_transc_1mat(a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
     end subroutine psb_lc_transc_1mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_transc_2mat(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(in)  :: a
       class(psb_lcspmat_type), intent(inout) :: b
     end subroutine psb_lc_transc_2mat
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_reinit(a,clear)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
-      class(psb_lcspmat_type), intent(inout) :: a   
+      class(psb_lcspmat_type), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_lc_reinit
-    
+
   end interface
 
 
@@ -1565,9 +1616,9 @@ module psb_c_mat_mod
   !   3 versions: copying to target
   !               copying to a base_sparse_mat object.
   !               in place
-  !                 
   !
-  interface 
+  !
+  interface
     subroutine psb_lc_cscnv(a,b,info,type,mold,upd,dupl)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(in)      :: a
@@ -1578,9 +1629,9 @@ module psb_c_mat_mod
       class(psb_lc_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_lc_cscnv
   end interface
-  
 
-  interface 
+
+  interface
     subroutine psb_lc_cscnv_ip(a,iinfo,type,mold,dupl)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
@@ -1590,9 +1641,9 @@ module psb_c_mat_mod
       class(psb_lc_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_lc_cscnv_ip
   end interface
-  
 
-  interface 
+
+  interface
     subroutine psb_lc_cscnv_base(a,b,info,dupl)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(in)       :: a
@@ -1601,13 +1652,13 @@ module psb_c_mat_mod
       integer(psb_ipk_),optional, intent(in)           :: dupl
     end subroutine psb_lc_cscnv_base
   end interface
-  
-  
+
+
   !
   ! Produce a version of the matrix with diagonal cut
-  ! out; passes through a COO buffer. 
+  ! out; passes through a COO buffer.
   !
-  interface 
+  interface
     subroutine psb_lc_clip_d(a,b,info)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(in)    :: a
@@ -1615,47 +1666,47 @@ module psb_c_mat_mod
       integer(psb_ipk_),intent(out)                  :: info
     end subroutine psb_lc_clip_d
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_clip_d_ip(a,info)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_ipk_),intent(out)                  :: info
     end subroutine psb_lc_clip_d_ip
   end interface
-  
-  
+
+
   !
   ! These four interfaces cut through the
   ! encapsulation between spmat_type and base_sparse_mat.
   !
-  interface 
+  interface
     subroutine psb_lc_mv_from(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_mv_from
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_cp_from(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(out) :: a
       class(psb_lc_base_sparse_mat), intent(in) :: b
     end subroutine psb_lc_cp_from
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_mv_to(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_mv_to
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_cp_to(a,b)
-      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat    
+      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(in) :: a
       class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_cp_to
@@ -1663,63 +1714,63 @@ module psb_c_mat_mod
   !
   ! Mixed type conversions
   !
-  interface 
+  interface
     subroutine psb_lc_mv_from_ib(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_mv_from_ib
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_cp_from_ib(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_lcspmat_type), intent(out) :: a
       class(psb_c_base_sparse_mat), intent(in) :: b
     end subroutine psb_lc_cp_from_ib
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_mv_to_ib(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_mv_to_ib
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_cp_to_ib(a,b)
-      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_c_base_sparse_mat    
+      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_lcspmat_type), intent(in) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_cp_to_ib
   end interface
 
-    interface 
+    interface
     subroutine psb_lc_mv_from_i(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_cspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_cspmat_type), intent(inout) :: b
     end subroutine psb_lc_mv_from_i
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_cp_from_i(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_cspmat_type
       class(psb_lcspmat_type), intent(out) :: a
       class(psb_cspmat_type), intent(in) :: b
     end subroutine psb_lc_cp_from_i
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_mv_to_i(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_cspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
       class(psb_cspmat_type), intent(inout) :: b
     end subroutine psb_lc_mv_to_i
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lc_cp_to_i(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_cspmat_type
       class(psb_lcspmat_type), intent(in) :: a
@@ -1727,11 +1778,11 @@ module psb_c_mat_mod
     end subroutine psb_lc_cp_to_i
   end interface
 
-  
+
   !
   ! Transfer the internal allocation to the target.
-  !  
-  interface psb_move_alloc 
+  !
+  interface psb_move_alloc
     subroutine psb_lcspmat_type_move(a,b,info)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
@@ -1739,8 +1790,8 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_lcspmat_type_move
   end interface
-  
-  interface 
+
+  interface
     subroutine psb_lcspmat_clone(a,b,info)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
@@ -1751,7 +1802,7 @@ module psb_c_mat_mod
 
 
 
-  interface 
+  interface
     function psb_lc_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
@@ -1759,7 +1810,7 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)       :: info
     end function psb_lc_get_diag
   end interface
-  
+
   interface psb_scal
     subroutine psb_lc_scal(d,a,info,side)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
@@ -1776,23 +1827,43 @@ module psb_c_mat_mod
     end subroutine psb_lc_scals
   end interface
 
-  interface 
+  interface psb_scalplusidentity
+      subroutine psb_lc_scalplusidentity(d,a,info)
+        import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+        class(psb_lcspmat_type), intent(inout) :: a
+        complex(psb_spk_), intent(in)             :: d
+        integer(psb_ipk_), intent(out)                    :: info
+    end subroutine psb_lc_scalplusidentity
+  end interface
+
+  interface psb_spaxpby
+      subroutine psb_lc_spaxpby(alpha,a,beta,b,info)
+          import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+          class(psb_lcspmat_type), intent(inout) :: a
+          class(psb_lcspmat_type), intent(inout) :: b
+          complex(psb_spk_), intent(in)             :: alpha
+          complex(psb_spk_), intent(in)             :: beta
+          integer(psb_ipk_), intent(out)          :: info
+      end subroutine psb_lc_spaxpby
+  end interface
+
+  interface
     function psb_lc_maxval(a) result(res)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_lc_maxval
   end interface
-  
-  interface 
+
+  interface
     function psb_lc_csnmi(a) result(res)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
       real(psb_spk_)         :: res
     end function psb_lc_csnmi
   end interface
-  
-  interface 
+
+  interface
     function psb_lc_csnm1(a) result(res)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
@@ -1800,7 +1871,7 @@ module psb_c_mat_mod
     end function psb_lc_csnm1
   end interface
 
-  interface 
+  interface
     function psb_lc_rowsum(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
@@ -1809,7 +1880,7 @@ module psb_c_mat_mod
     end function psb_lc_rowsum
   end interface
 
-  interface 
+  interface
     function psb_lc_arwsum(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
@@ -1817,8 +1888,8 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)               :: info
     end function psb_lc_arwsum
   end interface
-  
-  interface 
+
+  interface
     function psb_lc_colsum(a,info) result(d)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
@@ -1827,7 +1898,7 @@ module psb_c_mat_mod
     end function psb_lc_colsum
   end interface
 
-  interface 
+  interface
     function psb_lc_aclsum(a,info)  result(d)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
       class(psb_lcspmat_type), intent(in) :: a
@@ -1835,40 +1906,59 @@ module psb_c_mat_mod
       integer(psb_ipk_), intent(out)        :: info
     end function psb_lc_aclsum
   end interface
-  
-contains 
 
-  subroutine  psb_c_set_mat_default(a) 
-    implicit none 
+  interface  psb_cmpmat
+      function psb_lc_cmpval(a,val,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+          class(psb_lcspmat_type), intent(inout) :: a
+          complex(psb_spk_), intent(in)              :: val
+          real(psb_spk_), intent(in)             :: tol
+          logical                                  :: res
+          integer(psb_ipk_), intent(out)           :: info
+      end function psb_lc_cmpval
+      function psb_lc_cmpmat(a,b,tol,info) result(res)
+          import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_
+          class(psb_lcspmat_type), intent(inout) :: a
+          class(psb_lcspmat_type), intent(inout) :: b
+          real(psb_spk_), intent(in)             :: tol
+          logical                                  :: res
+          integer(psb_ipk_), intent(out)           :: info
+      end function psb_lc_cmpmat
+  end interface
+
+contains
+
+  subroutine  psb_c_set_mat_default(a)
+    implicit none
     class(psb_c_base_sparse_mat), intent(in) :: a
-    
-    if (allocated(psb_c_base_mat_default)) then 
+
+    if (allocated(psb_c_base_mat_default)) then
       deallocate(psb_c_base_mat_default)
     end if
     allocate(psb_c_base_mat_default, mold=a)
 
   end subroutine psb_c_set_mat_default
-  
+
   function psb_c_get_mat_default(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     class(psb_c_base_sparse_mat), pointer :: res
-    
+
     res => psb_c_get_base_mat_default()
-    
+
   end function psb_c_get_mat_default
 
-  
+
   function psb_c_get_base_mat_default() result(res)
-    implicit none 
+    implicit none
     class(psb_c_base_sparse_mat), pointer :: res
-    
-    if (.not.allocated(psb_c_base_mat_default)) then 
+
+    if (.not.allocated(psb_c_base_mat_default)) then
       allocate(psb_c_csr_sparse_mat :: psb_c_base_mat_default)
     end if
 
     res => psb_c_base_mat_default
-    
+
   end function psb_c_get_base_mat_default
 
   subroutine  psb_c_clear_mat_default() 
@@ -1886,7 +1976,7 @@ contains
   !
   !
   !
-  ! Getters 
+  ! Getters
   !
   !
   !
@@ -1894,26 +1984,26 @@ contains
   !
   ! == ===================================
 
-  
+
   function psb_c_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_epk_) :: res
-    
+
     res = 0
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%sizeof()
     end if
-    
+
   end function psb_c_sizeof
 
 
   function psb_c_get_fmt(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     character(len=5) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_fmt()
     else
       res = 'NULL'
@@ -1923,11 +2013,11 @@ contains
 
 
   function psb_c_get_dupl(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_dupl()
     else
       res = psb_invalid_
@@ -1935,11 +2025,11 @@ contains
   end function psb_c_get_dupl
 
   function psb_c_get_nrows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_nrows()
     else
       res = 0
@@ -1948,11 +2038,11 @@ contains
   end function psb_c_get_nrows
 
   function psb_c_get_ncols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_ncols()
     else
       res = 0
@@ -1961,11 +2051,11 @@ contains
   end function psb_c_get_ncols
 
   function psb_c_is_triangle(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_triangle()
     else
       res = .false.
@@ -1974,11 +2064,11 @@ contains
   end function psb_c_is_triangle
 
   function psb_c_is_symmetric(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_symmetric()
     else
       res = .false.
@@ -1987,11 +2077,11 @@ contains
   end function psb_c_is_symmetric
 
   function psb_c_is_unit(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_unit()
     else
       res = .false.
@@ -2000,11 +2090,11 @@ contains
   end function psb_c_is_unit
 
   function psb_c_is_upper(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_upper()
     else
       res = .false.
@@ -2013,11 +2103,11 @@ contains
   end function psb_c_is_upper
 
   function psb_c_is_lower(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = .not. a%a%is_upper()
     else
       res = .false.
@@ -2026,12 +2116,12 @@ contains
   end function psb_c_is_lower
 
   function psb_c_is_null(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
-      res = a%a%is_null() 
+    if (allocated(a%a)) then
+      res = a%a%is_null()
     else
       res = .true.
     end if
@@ -2039,11 +2129,11 @@ contains
   end function psb_c_is_null
 
   function psb_c_is_bld(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_bld()
     else
       res = .false.
@@ -2052,11 +2142,11 @@ contains
   end function psb_c_is_bld
 
   function psb_c_is_upd(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_upd()
     else
       res = .false.
@@ -2065,11 +2155,11 @@ contains
   end function psb_c_is_upd
 
   function psb_c_is_asb(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_asb()
     else
       res = .false.
@@ -2078,11 +2168,11 @@ contains
   end function psb_c_is_asb
 
   function psb_c_is_sorted(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_sorted()
     else
       res = .false.
@@ -2091,11 +2181,11 @@ contains
   end function psb_c_is_sorted
 
   function psb_c_is_by_rows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_by_rows()
     else
       res = .false.
@@ -2104,11 +2194,11 @@ contains
   end function psb_c_is_by_rows
 
   function psb_c_is_by_cols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_by_cols()
     else
       res = .false.
@@ -2119,61 +2209,61 @@ contains
 
   !
   subroutine c_mat_sync(a)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), target, intent(in) :: a
-    
+
     if (allocated(a%a))  call a%a%sync()
 
   end subroutine c_mat_sync
 
   !
   subroutine c_mat_set_host(a)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(inout) :: a
 
     if (allocated(a%a))  call a%a%set_host()
-    
+
   end subroutine c_mat_set_host
 
 
   !
   subroutine c_mat_set_dev(a)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(inout) :: a
 
     if (allocated(a%a))  call a%a%set_dev()
-    
+
   end subroutine c_mat_set_dev
 
   !
   subroutine c_mat_set_sync(a)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(inout) :: a
 
     if (allocated(a%a))  call a%a%set_sync()
-    
+
   end subroutine c_mat_set_sync
 
   !
   function c_mat_is_dev(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical  :: res
-  
+
     if (allocated(a%a)) then
       res = a%a%is_dev()
     else
       res = .false.
     end if
   end function c_mat_is_dev
-  
+
   !
   function c_mat_is_host(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical  :: res
 
-  
+
     if (allocated(a%a)) then
       res = a%a%is_host()
     else
@@ -2183,11 +2273,11 @@ contains
 
   !
   function c_mat_is_sync(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical  :: res
 
-  
+
     if (allocated(a%a)) then
       res = a%a%is_sync()
     else
@@ -2198,11 +2288,11 @@ contains
 
 
   function psb_c_is_repeatable_updates(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_repeatable_updates()
     else
       res = .false.
@@ -2210,25 +2300,25 @@ contains
 
   end function psb_c_is_repeatable_updates
 
-  subroutine psb_c_set_repeatable_updates(a,val) 
-    implicit none 
+  subroutine psb_c_set_repeatable_updates(a,val)
+    implicit none
     class(psb_cspmat_type), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (allocated(a%a)) then 
+
+    if (allocated(a%a)) then
       call a%a%set_repeatable_updates(val)
     end if
-    
+
   end subroutine psb_c_set_repeatable_updates
 
 
   function psb_c_get_nzeros(a) result(res)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
     res = 0
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_nzeros()
     end if
 
@@ -2236,13 +2326,13 @@ contains
 
   function psb_c_get_size(a) result(res)
 
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
 
     res = 0
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_size()
     end if
 
@@ -2250,23 +2340,23 @@ contains
 
 
   function psb_c_get_nz_row(idx,a) result(res)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in)               :: idx
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
     res = 0
-    
+
     if (allocated(a%a)) res = a%a%get_nz_row(idx)
 
   end function psb_c_get_nz_row
 
   subroutine psb_c_clean_zeros(a,info)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(out)        :: info
     class(psb_cspmat_type), intent(inout) :: a
 
-    info = 0 
+    info = 0
     if (allocated(a%a)) call a%a%clean_zeros(info)
 
   end subroutine psb_c_clean_zeros
@@ -2274,7 +2364,7 @@ contains
 #if defined(IPK4) && defined(LPK8)
   subroutine psb_c_lcsgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_), intent(in)                  :: imin,imax
     integer(psb_ipk_), intent(out)                 :: nz
@@ -2303,17 +2393,17 @@ contains
     end if
     call a%csget(imin,imax,nz,lia,lja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-   
+
     call psb_ensure_size(size(lia),ia,info)
     if (info == psb_success_) ia(:) = lia(:)
     call psb_ensure_size(size(lja),ja,info)
     if (info == psb_success_) ja(:) = lja(:)
-    
+
   end subroutine psb_c_lcsgetptn
-  
+
   subroutine psb_c_lcsgetrow(imin,imax,a,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-    implicit none 
+    implicit none
     class(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_), intent(in)                  :: imin,imax
     integer(psb_ipk_), intent(out)                 :: nz
@@ -2342,12 +2432,12 @@ contains
 
     call a%csget(imin,imax,nz,lia,lja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-   
+
     call psb_ensure_size(size(lia),ia,info)
     if (info == psb_success_) ia(:) = lia(:)
     call psb_ensure_size(size(lja),ja,info)
     if (info == psb_success_) ja(:) = lja(:)
-        
+
   end subroutine psb_c_lcsgetrow
 #endif
 
@@ -2355,38 +2445,38 @@ contains
   ! lc methods
   !
 
-  
-  subroutine  psb_lc_set_mat_default(a) 
-    implicit none 
+
+  subroutine  psb_lc_set_mat_default(a)
+    implicit none
     class(psb_lc_base_sparse_mat), intent(in) :: a
-    
-    if (allocated(psb_lc_base_mat_default)) then 
+
+    if (allocated(psb_lc_base_mat_default)) then
       deallocate(psb_lc_base_mat_default)
     end if
     allocate(psb_lc_base_mat_default, mold=a)
 
   end subroutine psb_lc_set_mat_default
-  
+
   function psb_lc_get_mat_default(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     class(psb_lc_base_sparse_mat), pointer :: res
-    
+
     res => psb_lc_get_base_mat_default()
-    
+
   end function psb_lc_get_mat_default
 
-  
+
   function psb_lc_get_base_mat_default() result(res)
-    implicit none 
+    implicit none
     class(psb_lc_base_sparse_mat), pointer :: res
-    
-    if (.not.allocated(psb_lc_base_mat_default)) then 
+
+    if (.not.allocated(psb_lc_base_mat_default)) then
       allocate(psb_lc_csr_sparse_mat :: psb_lc_base_mat_default)
     end if
 
     res => psb_lc_base_mat_default
-    
+
   end function psb_lc_get_base_mat_default
 
   subroutine  psb_lc_clear_mat_default() 
@@ -2404,7 +2494,7 @@ contains
   !
   !
   !
-  ! Getters 
+  ! Getters
   !
   !
   !
@@ -2412,26 +2502,26 @@ contains
   !
   ! == ===================================
 
-  
+
   function psb_lc_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_epk_) :: res
-    
+
     res = 0
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%sizeof()
     end if
-    
+
   end function psb_lc_sizeof
 
 
   function psb_lc_get_fmt(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     character(len=5) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_fmt()
     else
       res = 'NULL'
@@ -2441,11 +2531,11 @@ contains
 
 
   function psb_lc_get_dupl(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_ipk_) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_dupl()
     else
       res = psb_invalid_
@@ -2453,11 +2543,11 @@ contains
   end function psb_lc_get_dupl
 
   function psb_lc_get_nrows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_lpk_) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_nrows()
     else
       res = 0
@@ -2466,11 +2556,11 @@ contains
   end function psb_lc_get_nrows
 
   function psb_lc_get_ncols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_lpk_) :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_ncols()
     else
       res = 0
@@ -2479,11 +2569,11 @@ contains
   end function psb_lc_get_ncols
 
   function psb_lc_is_triangle(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_triangle()
     else
       res = .false.
@@ -2493,11 +2583,11 @@ contains
 
 
   function psb_lc_is_symmetric(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_symmetric()
     else
       res = .false.
@@ -2506,11 +2596,11 @@ contains
   end function psb_lc_is_symmetric
 
   function psb_lc_is_unit(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_unit()
     else
       res = .false.
@@ -2519,11 +2609,11 @@ contains
   end function psb_lc_is_unit
 
   function psb_lc_is_upper(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_upper()
     else
       res = .false.
@@ -2532,11 +2622,11 @@ contains
   end function psb_lc_is_upper
 
   function psb_lc_is_lower(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = .not. a%a%is_upper()
     else
       res = .false.
@@ -2545,12 +2635,12 @@ contains
   end function psb_lc_is_lower
 
   function psb_lc_is_null(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
-      res = a%a%is_null() 
+    if (allocated(a%a)) then
+      res = a%a%is_null()
     else
       res = .true.
     end if
@@ -2558,11 +2648,11 @@ contains
   end function psb_lc_is_null
 
   function psb_lc_is_bld(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_bld()
     else
       res = .false.
@@ -2571,11 +2661,11 @@ contains
   end function psb_lc_is_bld
 
   function psb_lc_is_upd(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_upd()
     else
       res = .false.
@@ -2584,11 +2674,11 @@ contains
   end function psb_lc_is_upd
 
   function psb_lc_is_asb(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_asb()
     else
       res = .false.
@@ -2597,11 +2687,11 @@ contains
   end function psb_lc_is_asb
 
   function psb_lc_is_sorted(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_sorted()
     else
       res = .false.
@@ -2610,11 +2700,11 @@ contains
   end function psb_lc_is_sorted
 
   function psb_lc_is_by_rows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_by_rows()
     else
       res = .false.
@@ -2623,11 +2713,11 @@ contains
   end function psb_lc_is_by_rows
 
   function psb_lc_is_by_cols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_by_cols()
     else
       res = .false.
@@ -2638,61 +2728,61 @@ contains
 
   !
   subroutine lc_mat_sync(a)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), target, intent(in) :: a
-    
+
     if (allocated(a%a))  call a%a%sync()
 
   end subroutine lc_mat_sync
 
   !
   subroutine lc_mat_set_host(a)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(inout) :: a
 
     if (allocated(a%a))  call a%a%set_host()
-    
+
   end subroutine lc_mat_set_host
 
 
   !
   subroutine lc_mat_set_dev(a)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(inout) :: a
 
     if (allocated(a%a))  call a%a%set_dev()
-    
+
   end subroutine lc_mat_set_dev
 
   !
   subroutine lc_mat_set_sync(a)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(inout) :: a
 
     if (allocated(a%a))  call a%a%set_sync()
-    
+
   end subroutine lc_mat_set_sync
 
   !
   function lc_mat_is_dev(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical  :: res
-  
+
     if (allocated(a%a)) then
       res = a%a%is_dev()
     else
       res = .false.
     end if
   end function lc_mat_is_dev
-  
+
   !
   function lc_mat_is_host(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical  :: res
 
-  
+
     if (allocated(a%a)) then
       res = a%a%is_host()
     else
@@ -2702,11 +2792,11 @@ contains
 
   !
   function lc_mat_is_sync(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical  :: res
 
-  
+
     if (allocated(a%a)) then
       res = a%a%is_sync()
     else
@@ -2717,11 +2807,11 @@ contains
 
 
   function psb_lc_is_repeatable_updates(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     logical :: res
 
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%is_repeatable_updates()
     else
       res = .false.
@@ -2729,25 +2819,25 @@ contains
 
   end function psb_lc_is_repeatable_updates
 
-  subroutine psb_lc_set_repeatable_updates(a,val) 
-    implicit none 
+  subroutine psb_lc_set_repeatable_updates(a,val)
+    implicit none
     class(psb_lcspmat_type), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (allocated(a%a)) then 
+
+    if (allocated(a%a)) then
       call a%a%set_repeatable_updates(val)
     end if
-    
+
   end subroutine psb_lc_set_repeatable_updates
 
 
   function psb_lc_get_nzeros(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_lpk_) :: res
 
     res = 0
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_nzeros()
     end if
 
@@ -2755,13 +2845,13 @@ contains
 
   function psb_lc_get_size(a) result(res)
 
-    implicit none 
+    implicit none
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_lpk_) :: res
 
 
     res = 0
-    if (allocated(a%a)) then 
+    if (allocated(a%a)) then
       res = a%a%get_size()
     end if
 
@@ -2769,23 +2859,23 @@ contains
 
 
   function psb_lc_get_nz_row(idx,a) result(res)
-    implicit none 
+    implicit none
     integer(psb_lpk_), intent(in)               :: idx
     class(psb_lcspmat_type), intent(in) :: a
     integer(psb_lpk_) :: res
 
     res = 0
-    
+
     if (allocated(a%a)) res = a%a%get_nz_row(idx)
 
   end function psb_lc_get_nz_row
 
   subroutine psb_lc_clean_zeros(a,info)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(out)        :: info
     class(psb_lcspmat_type), intent(inout) :: a
 
-    info = 0 
+    info = 0
     if (allocated(a%a)) call a%a%clean_zeros(info)
 
   end subroutine psb_lc_clean_zeros
@@ -2793,7 +2883,7 @@ contains
 #if defined(IPK4) && defined(LPK8)
 !!$  subroutine psb_lc_icsgetptn(imin,imax,a,nz,ia,ja,info,&
 !!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_lcspmat_type), intent(in) :: a
 !!$    integer(psb_ipk_), intent(in)                  :: imin,imax
 !!$    integer(psb_ipk_), intent(out)                 :: nz
@@ -2829,12 +2919,12 @@ contains
 !!$    if (info == psb_success_) ia(:) = lia(:)
 !!$    call psb_ensure_size(size(lja),ja,info)
 !!$    if (info == psb_success_) ja(:) = lja(:)
-!!$    
+!!$
 !!$  end subroutine psb_lc_icsgetptn
-!!$  
+!!$
 !!$  subroutine psb_lc_icsgetrow(imin,imax,a,nz,ia,ja,val,info,&
 !!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
-!!$    implicit none 
+!!$    implicit none
 !!$    class(psb_lcspmat_type), intent(in) :: a
 !!$    integer(psb_ipk_), intent(in)                  :: imin,imax
 !!$    integer(psb_ipk_), intent(out)                 :: nz
@@ -2870,7 +2960,7 @@ contains
 !!$    if (info == psb_success_) ia(:) = lia(:)
 !!$    call psb_ensure_size(size(lja),ja,info)
 !!$    if (info == psb_success_) ja(:) = lja(:)
-!!$        
+!!$
 !!$  end subroutine psb_lc_icsgetrow
 #endif
 

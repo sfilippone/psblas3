@@ -9,25 +9,31 @@ OBJS= psb_ddot.o psb_damax.o psb_dasum.o psb_daxpby.o\
 	psb_saxpby.o psb_sdot.o  psb_sasum.o psb_samax.o\
 	psb_snrm2.o psb_snrmi.o  psb_sspmm.o psb_sspsm.o\
 	psb_camax.o psb_casum.o psb_caxpby.o psb_cdot.o \
-	psb_cnrm2.o psb_cnrmi.o psb_cspmm.o psb_cspsm.o
-
+	psb_cnrm2.o psb_cnrmi.o psb_cspmm.o psb_cspsm.o \
+	psb_cmlt_vect.o psb_dmlt_vect.o psb_zmlt_vect.o psb_smlt_vect.o\
+	psb_cdiv_vect.o psb_ddiv_vect.o psb_zdiv_vect.o psb_sdiv_vect.o\
+	psb_cinv_vect.o psb_dinv_vect.o psb_zinv_vect.o psb_sinv_vect.o\
+	psb_dcmp_vect.o psb_scmp_vect.o psb_ccmp_vect.o psb_zcmp_vect.o\
+	psb_cabs_vect.o psb_dabs_vect.o psb_sabs_vect.o \
+	psb_zabs_vect.o psb_cgetmatinfo.o psb_dgetmatinfo.o psb_sgetmatinfo.o \
+	psb_zgetmatinfo.o
 
 LIBDIR=..
 INCDIR=..
 MODDIR=../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR)
 
 
-lib: $(OBJS) 
+lib: $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
-#$(F90_PSDOBJS): $(MODS)  
+#$(F90_PSDOBJS): $(MODS)
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)
 
-clean: 
+clean:
 	/bin/rm -f $(OBJS) $(LOCAL_MODS)
 
 veryclean: clean

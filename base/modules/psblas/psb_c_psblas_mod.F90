@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,10 +27,10 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 module psb_c_psblas_mod
-  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
   use psb_c_vect_mod, only : psb_c_vect_type
   use psb_c_mat_mod, only : psb_cspmat_type
 
@@ -44,7 +44,7 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)       :: info
       logical, intent(in), optional        :: global
     end function psb_cdot_vect
-    function psb_cdotv(x, y, desc_a,info,global) 
+    function psb_cdotv(x, y, desc_a,info,global)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
       complex(psb_spk_)                :: psb_cdotv
@@ -53,7 +53,7 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
       logical, intent(in), optional      :: global
     end function psb_cdotv
-    function psb_cdot(x, y, desc_a, info, jx, jy,global) 
+    function psb_cdot(x, y, desc_a, info, jx, jy,global)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
       complex(psb_spk_)                :: psb_cdot
@@ -69,7 +69,7 @@ module psb_c_psblas_mod
   interface psb_gedots
     subroutine  psb_cdotvs(res,x, y, desc_a, info,global)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
-           & psb_c_vect_type, psb_cspmat_type 
+           & psb_c_vect_type, psb_cspmat_type
       complex(psb_spk_), intent(out)      :: res
       complex(psb_spk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
@@ -78,7 +78,7 @@ module psb_c_psblas_mod
     end subroutine psb_cdotvs
     subroutine  psb_cmdots(res,x, y, desc_a,info,global)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
-           & psb_c_vect_type, psb_cspmat_type 
+           & psb_c_vect_type, psb_cspmat_type
       complex(psb_spk_), intent(out)      :: res(:)
       complex(psb_spk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
@@ -98,6 +98,17 @@ module psb_c_psblas_mod
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_caxpby_vect
+    subroutine psb_caxpby_vect_out(alpha, x, beta, y,&
+         & z, desc_a, info)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_c_vect_type, psb_cspmat_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_c_vect_type), intent (inout) :: z
+      complex(psb_spk_), intent (in)        :: alpha, beta
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_caxpby_vect_out
     subroutine psb_caxpbyv(alpha, x, beta, y,&
          & desc_a, info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
@@ -108,6 +119,17 @@ module psb_c_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_caxpbyv
+    subroutine psb_caxpbyvout(alpha, x, beta, y,&
+         & z, desc_a, info)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_c_vect_type, psb_cspmat_type
+      complex(psb_spk_), intent (in)       ::  x(:)
+      complex(psb_spk_), intent (in)       ::  y(:)
+      complex(psb_spk_), intent (inout)    ::  z(:)
+      complex(psb_spk_), intent (in)       :: alpha, beta
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine psb_caxpbyvout
     subroutine psb_caxpby(alpha, x, beta, y,&
          & desc_a, info, n, jx, jy)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
@@ -155,10 +177,10 @@ module psb_c_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_camax, psb_camaxv, psb_camax_vect
-  end interface 
+  end interface
   interface psb_normi
     procedure psb_camax, psb_camaxv, psb_camax_vect
-  end interface 
+  end interface
 #endif
 
   interface psb_geamaxs
@@ -182,6 +204,7 @@ module psb_c_psblas_mod
       logical, intent(in), optional      :: global
     end subroutine psb_cmamaxs
   end interface
+
 
   interface psb_geasum
     function psb_casum_vect(x, desc_a, info,global) result(res)
@@ -238,10 +261,10 @@ module psb_c_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_casum, psb_casumv, psb_casum_vect
-  end interface 
+  end interface
   interface psb_norm1
     procedure psb_casum, psb_casumv, psb_casum_vect
-  end interface 
+  end interface
 #endif
 
   interface psb_genrm2
@@ -273,12 +296,33 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)      :: info
       logical, intent(in), optional       :: global
     end function psb_cnrm2_vect
+    function psb_cnrm2_weight_vect(x,w, desc_a, info,global) result(res)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_c_vect_type, psb_cspmat_type
+      real(psb_spk_)                      :: res
+      type(psb_c_vect_type), intent (inout)   :: x
+      type(psb_c_vect_type), intent (inout)   :: w
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
+    end function psb_cnrm2_weight_vect
+    function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global) result(res)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_c_vect_type, psb_cspmat_type
+      real(psb_spk_)                      :: res
+      type(psb_c_vect_type), intent (inout)   :: x
+      type(psb_c_vect_type), intent (inout)   :: w
+      type(psb_c_vect_type), intent (inout)   :: idv
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
+    end function psb_cnrm2_weightmask_vect
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
-    procedure psb_cnrm2, psb_cnrm2v, psb_cnrm2_vect
-  end interface 
+    procedure psb_cnrm2, psb_cnrm2v, psb_cnrm2_vect, psb_cnrm2_weight_vect, psb_cnrm2_weightmask_vect
+  end interface
 #endif
 
   interface psb_genrm2s
@@ -309,7 +353,7 @@ module psb_c_psblas_mod
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_cnrmi
-  end interface 
+  end interface
 #endif
 
   interface psb_spnrm1
@@ -323,11 +367,11 @@ module psb_c_psblas_mod
       logical, intent(in), optional        :: global
     end function psb_cspnrm1
   end interface
-  
+
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_cspnrm1
-  end interface 
+  end interface
 #endif
 
   interface psb_spmm
@@ -378,7 +422,7 @@ module psb_c_psblas_mod
 
   interface psb_spsm
     subroutine psb_cspsm(alpha, t, x, beta, y,&
-         & desc_a, info, trans, scale, choice,& 
+         & desc_a, info, trans, scale, choice,&
          & diag, n, jx, jy, work)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
@@ -395,7 +439,7 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_cspsm
     subroutine psb_cspsv(alpha, t, x, beta, y,&
-         & desc_a, info, trans, scale, choice,& 
+         & desc_a, info, trans, scale, choice,&
          & diag, work)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
@@ -411,7 +455,7 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_cspsv
     subroutine psb_cspsv_vect(alpha, t, x, beta, y,&
-         & desc_a, info, trans, scale, choice,& 
+         & desc_a, info, trans, scale, choice,&
          & diag, work)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
@@ -426,6 +470,186 @@ module psb_c_psblas_mod
       complex(psb_spk_), optional, intent(inout), target :: work(:)
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_cspsv_vect
+  end interface
+
+  interface psb_gemlt
+    subroutine psb_cmlt_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cmlt_vect
+    subroutine psb_cmlt_vect2(alpha,x,y,beta,z,desc_a,info,conjgx,conjgy)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type, psb_spk_
+      complex(psb_spk_), intent(in)        :: alpha,beta
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_c_vect_type), intent (inout) :: z
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), intent(in), optional :: conjgx, conjgy
+    end subroutine psb_cmlt_vect2
+  end interface
+
+  interface psb_gediv
+    subroutine psb_cdiv_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cdiv_vect
+    subroutine psb_cdiv_vect2(x,y,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_c_vect_type), intent (inout) :: z
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cdiv_vect2
+    subroutine psb_cdiv_vect_check(x,y,desc_a,info,flag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in)                   :: flag
+    end subroutine psb_cdiv_vect_check
+    subroutine psb_cdiv_vect2_check(x,y,z,desc_a,info,flag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_c_vect_type), intent (inout) :: z
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in)                   :: flag
+    end subroutine psb_cdiv_vect2_check
+  end interface
+
+  interface psb_geinv
+    subroutine psb_cinv_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cinv_vect
+    subroutine psb_cinv_vect_check(x,y,desc_a,info,flag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in)                   :: flag
+    end subroutine psb_cinv_vect_check
+  end interface
+
+  interface psb_geabs
+    subroutine psb_cabs_vect(x,y,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cabs_vect
+  end interface
+
+  interface psb_gecmp
+    subroutine psb_ccmp_vect(x,c,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type, psb_spk_
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: z
+      real(psb_spk_), intent(in)             :: c
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_ccmp_vect
+    subroutine psb_ccmp_spmatval(a,val,tol,desc_a,res,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_lpk_, psb_cspmat_type, psb_spk_
+      type(psb_cspmat_type), intent(inout)  :: a
+      complex(psb_spk_), intent(in)             :: val
+      real(psb_spk_), intent(in)            :: tol
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      logical, intent(out)                    :: res
+    end subroutine psb_ccmp_spmatval
+    subroutine psb_ccmp_spmat(a,b,tol,desc_a,res,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_lpk_, psb_cspmat_type, psb_spk_
+      type(psb_cspmat_type), intent(inout)  :: a
+      type(psb_cspmat_type), intent(inout)  :: b
+      real(psb_spk_), intent(in)            :: tol
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+      logical, intent(out)                    :: res
+    end subroutine psb_ccmp_spmat
+  end interface
+  interface psb_geaddconst
+    subroutine psb_caddconst_vect(x,b,z,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_c_vect_type, psb_spk_
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: z
+      real(psb_spk_), intent(in)            :: b
+      type(psb_desc_type), intent (in)        :: desc_a
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_caddconst_vect
+  end interface
+
+
+  interface psb_nnz
+    function  psb_cget_nnz(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_ipk_, psb_lpk_, &
+        & psb_cspmat_type, psb_spk_
+      integer(psb_lpk_)                     :: res
+      type(psb_cspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end function
+  end interface
+
+  interface psb_is_matupd
+    function psb_c_is_matupd(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_cspmat_type, &
+        & psb_spk_, psb_ipk_
+      logical                               :: res
+      type(psb_cspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end function
+  end interface
+
+  interface psb_is_matasb
+    function psb_c_is_matasb(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_cspmat_type, &
+        & psb_spk_, psb_ipk_
+      logical                               :: res
+      type(psb_cspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end function
+  end interface
+
+  interface psb_is_matbld
+    function psb_c_is_matbld(a,desc_a,info) result(res)
+      import :: psb_desc_type, psb_cspmat_type, &
+        & psb_spk_, psb_ipk_
+      logical                               :: res
+      type(psb_cspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end function
   end interface
 
 end module psb_c_psblas_mod

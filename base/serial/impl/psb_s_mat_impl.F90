@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 !  s_mat_impl:
 !   implementation of the outer matrix methods.
@@ -43,7 +43,7 @@
 !
 !
 !
-! Setters 
+! Setters
 !
 !
 !
@@ -53,10 +53,10 @@
 ! == ===================================
 
 
-subroutine  psb_s_set_nrows(m,a) 
+subroutine  psb_s_set_nrows(m,a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_nrows
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in) :: m
   integer(psb_ipk_) :: err_act, info
@@ -64,7 +64,7 @@ subroutine  psb_s_set_nrows(m,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -82,10 +82,10 @@ subroutine  psb_s_set_nrows(m,a)
 end subroutine psb_s_set_nrows
 
 
-subroutine  psb_s_set_ncols(n,a) 
+subroutine  psb_s_set_ncols(n,a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_ncols
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in) :: n
   integer(psb_ipk_) :: err_act, info
@@ -93,7 +93,7 @@ subroutine  psb_s_set_ncols(n,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -112,16 +112,16 @@ end subroutine psb_s_set_ncols
 
 
 !
-!  Valid values for DUPL: 
-!  psb_dupl_ovwrt_ 
-!  psb_dupl_add_   
-!  psb_dupl_err_   
+!  Valid values for DUPL:
+!  psb_dupl_ovwrt_
+!  psb_dupl_add_
+!  psb_dupl_err_
 !
 
-subroutine  psb_s_set_dupl(n,a) 
+subroutine  psb_s_set_dupl(n,a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_dupl
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in) :: n
   integer(psb_ipk_) :: err_act, info
@@ -129,7 +129,7 @@ subroutine  psb_s_set_dupl(n,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -151,17 +151,17 @@ end subroutine psb_s_set_dupl
 ! Set the STATE of the internal matrix object
 !
 
-subroutine  psb_s_set_null(a) 
+subroutine  psb_s_set_null(a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_null
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -179,17 +179,17 @@ subroutine  psb_s_set_null(a)
 end subroutine psb_s_set_null
 
 
-subroutine  psb_s_set_bld(a) 
+subroutine  psb_s_set_bld(a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_bld
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -208,17 +208,17 @@ subroutine  psb_s_set_bld(a)
 end subroutine psb_s_set_bld
 
 
-subroutine  psb_s_set_upd(a) 
+subroutine  psb_s_set_upd(a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_upd
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -238,17 +238,17 @@ subroutine  psb_s_set_upd(a)
 end subroutine psb_s_set_upd
 
 
-subroutine  psb_s_set_asb(a) 
+subroutine  psb_s_set_asb(a)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_asb
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -267,10 +267,10 @@ subroutine  psb_s_set_asb(a)
 end subroutine psb_s_set_asb
 
 
-subroutine psb_s_set_sorted(a,val) 
+subroutine psb_s_set_sorted(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_sorted
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -278,7 +278,7 @@ subroutine psb_s_set_sorted(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -297,10 +297,10 @@ subroutine psb_s_set_sorted(a,val)
 end subroutine psb_s_set_sorted
 
 
-subroutine psb_s_set_triangle(a,val) 
+subroutine psb_s_set_triangle(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_triangle
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -308,7 +308,7 @@ subroutine psb_s_set_triangle(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -326,10 +326,10 @@ subroutine psb_s_set_triangle(a,val)
 
 end subroutine psb_s_set_triangle
 
-subroutine psb_s_set_symmetric(a,val) 
+subroutine psb_s_set_symmetric(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_symmetric
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -337,7 +337,7 @@ subroutine psb_s_set_symmetric(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -355,10 +355,10 @@ subroutine psb_s_set_symmetric(a,val)
 
 end subroutine psb_s_set_symmetric
 
-subroutine psb_s_set_unit(a,val) 
+subroutine psb_s_set_unit(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_unit
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -366,7 +366,7 @@ subroutine psb_s_set_unit(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -385,10 +385,10 @@ subroutine psb_s_set_unit(a,val)
 end subroutine psb_s_set_unit
 
 
-subroutine psb_s_set_lower(a,val) 
+subroutine psb_s_set_lower(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_lower
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -396,7 +396,7 @@ subroutine psb_s_set_lower(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -415,10 +415,10 @@ subroutine psb_s_set_lower(a,val)
 end subroutine psb_s_set_lower
 
 
-subroutine psb_s_set_upper(a,val) 
+subroutine psb_s_set_upper(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_s_set_upper
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -426,7 +426,7 @@ subroutine psb_s_set_upper(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -456,16 +456,16 @@ end subroutine psb_s_set_upper
 !
 !
 !
-! == ===================================  
+! == ===================================
 
 
 subroutine psb_s_sparse_print(iout,a,iv,head,ivr,ivc)
   use psb_s_mat_mod, psb_protect_name => psb_s_sparse_print
   use psb_error_mod
-  implicit none 
+  implicit none
 
   integer(psb_ipk_), intent(in)               :: iout
-  class(psb_sspmat_type), intent(in) :: a   
+  class(psb_sspmat_type), intent(in) :: a
   integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
   integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -476,7 +476,7 @@ subroutine psb_s_sparse_print(iout,a,iv,head,ivr,ivc)
 
   info = psb_success_
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -496,10 +496,10 @@ end subroutine psb_s_sparse_print
 subroutine psb_s_n_sparse_print(fname,a,iv,head,ivr,ivc)
   use psb_s_mat_mod, psb_protect_name => psb_s_n_sparse_print
   use psb_error_mod
-  implicit none 
+  implicit none
 
-  character(len=*), intent(in)  :: fname   
-  class(psb_sspmat_type), intent(in) :: a   
+  character(len=*), intent(in)  :: fname
+  class(psb_sspmat_type), intent(in) :: a
   integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
   integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -511,24 +511,24 @@ subroutine psb_s_n_sparse_print(fname,a,iv,head,ivr,ivc)
 
   info = psb_success_
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   iout = max(psb_inp_unit,psb_err_unit,psb_out_unit) + 1
-  do 
+  do
     inquire(unit=iout, opened=isopen)
     if (.not.isopen) exit
     iout = iout + 1
     if (iout > 99) exit
   end do
-  if (iout > 99) then 
+  if (iout > 99) then
     write(psb_err_unit,*) 'Error: could not find a free unit for I/O'
     return
   end if
   open(iout,file=fname,iostat=info)
-  if (info == psb_success_) then 
+  if (info == psb_success_) then
     call a%a%print(iout,iv,head,ivr,ivc)
     close(iout)
   else
@@ -547,13 +547,13 @@ end subroutine psb_s_n_sparse_print
 subroutine psb_s_get_neigh(a,idx,neigh,n,info,lev)
   use psb_s_mat_mod, psb_protect_name => psb_s_get_neigh
   use psb_error_mod
-  implicit none 
-  class(psb_sspmat_type), intent(in) :: a   
-  integer(psb_ipk_), intent(in)                :: idx 
-  integer(psb_ipk_), intent(out)               :: n   
+  implicit none
+  class(psb_sspmat_type), intent(in) :: a
+  integer(psb_ipk_), intent(in)                :: idx
+  integer(psb_ipk_), intent(out)               :: n
   integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
   integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_), optional, intent(in)      :: lev 
+  integer(psb_ipk_), optional, intent(in)      :: lev
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='get_neigh'
@@ -561,7 +561,7 @@ subroutine psb_s_get_neigh(a,idx,neigh,n,info,lev)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -582,17 +582,17 @@ end subroutine psb_s_get_neigh
 
 
 
-subroutine psb_s_csall(nr,nc,a,info,nz) 
+subroutine psb_s_csall(nr,nc,a,info,nz)
   use psb_s_mat_mod, psb_protect_name => psb_s_csall
   use psb_s_base_mat_mod
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)             :: nr,nc
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: nz
 
-  integer(psb_ipk_) :: err_act 
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csall'
   logical, parameter :: debug=.false.
 
@@ -602,13 +602,13 @@ subroutine psb_s_csall(nr,nc,a,info,nz)
 
   info = psb_success_
   allocate(psb_s_coo_sparse_mat :: a%a, stat=info)
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_ 
+  if (info /= psb_success_) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
     goto 9999
   end if
   call a%a%allocate(nr,nc,nz)
-  call a%set_bld() 
+  call a%set_bld()
 
   return
 
@@ -619,10 +619,10 @@ subroutine psb_s_csall(nr,nc,a,info,nz)
 end subroutine psb_s_csall
 
 
-subroutine  psb_s_reallocate_nz(nz,a) 
+subroutine  psb_s_reallocate_nz(nz,a)
   use psb_s_mat_mod, psb_protect_name => psb_s_reallocate_nz
   use psb_error_mod
-  implicit none 
+  implicit none
   integer(psb_ipk_), intent(in) :: nz
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
@@ -630,7 +630,7 @@ subroutine  psb_s_reallocate_nz(nz,a)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -647,31 +647,31 @@ subroutine  psb_s_reallocate_nz(nz,a)
 end subroutine psb_s_reallocate_nz
 
 
-subroutine  psb_s_free(a) 
+subroutine  psb_s_free(a)
   use psb_s_mat_mod, psb_protect_name => psb_s_free
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
 
-  if (allocated(a%a)) then 
+  if (allocated(a%a)) then
     call a%a%free()
-    deallocate(a%a) 
+    deallocate(a%a)
   endif
 
 end subroutine psb_s_free
 
 
-subroutine  psb_s_trim(a) 
+subroutine  psb_s_trim(a)
   use psb_s_mat_mod, psb_protect_name => psb_s_trim
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -689,11 +689,11 @@ end subroutine psb_s_trim
 
 
 
-subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_s_mat_mod, psb_protect_name => psb_s_csput_a
   use psb_s_base_mat_mod
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
@@ -705,15 +705,15 @@ subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.(a%is_bld().or.a%is_upd())) then 
+  if (.not.(a%is_bld().or.a%is_upd())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
-  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info) 
-  if (info /= psb_success_) goto 9999 
+  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info)
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -725,13 +725,13 @@ subroutine psb_s_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
 end subroutine psb_s_csput_a
 
-subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_s_mat_mod, psb_protect_name => psb_s_csput_v
   use psb_s_base_mat_mod
   use psb_s_vect_mod, only : psb_s_vect_type
   use psb_i_vect_mod, only : psb_i_vect_type
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   type(psb_s_vect_type), intent(inout)  :: val
   type(psb_i_vect_type), intent(inout)  :: ia, ja
@@ -744,19 +744,19 @@ subroutine psb_s_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.(a%is_bld().or.a%is_upd())) then 
+  if (.not.(a%is_bld().or.a%is_upd())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
-    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info) 
+    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info)
   else
     info = psb_err_invalid_mat_state_
   endif
 
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -771,7 +771,7 @@ end subroutine psb_s_csput_v
 
 subroutine psb_s_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -794,7 +794,7 @@ subroutine psb_s_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -803,7 +803,7 @@ subroutine psb_s_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   call a%a%csget(imin,imax,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -818,7 +818,7 @@ end subroutine psb_s_csgetptn
 
 subroutine psb_s_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -842,7 +842,7 @@ subroutine psb_s_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -851,7 +851,7 @@ subroutine psb_s_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   call a%a%csget(imin,imax,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -868,7 +868,7 @@ end subroutine psb_s_csgetrow
 
 subroutine psb_s_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -893,31 +893,31 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(append))  then 
+  if (present(append))  then
     append_ = append
   else
     append_ = .false.
   end if
 
-  allocate(acoo,stat=info)    
-  if (append_.and.(info==psb_success_)) then 
+  allocate(acoo,stat=info)
+  if (append_.and.(info==psb_success_)) then
     if (allocated(b%a)) &
          & call b%a%mv_to_coo(acoo,info)
   end if
 
-  if (info == psb_success_) then 
+  if (info == psb_success_) then
     call a%a%csget(imin,imax,acoo,info,&
          & jmin,jmax,iren,append,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
   if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -936,7 +936,7 @@ subroutine psb_s_tril(a,l,info,diag,imin,imax,&
   use psb_const_mod
   use psb_s_base_mat_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_tril
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)      :: a
   class(psb_sspmat_type), intent(inout)   :: l
   integer(psb_ipk_),intent(out)           :: info
@@ -951,22 +951,22 @@ subroutine psb_s_tril(a,l,info,diag,imin,imax,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(lcoo,stat=info)    
+  allocate(lcoo,stat=info)
   call l%free()
   if (present(u)) then
-    if (info == psb_success_) allocate(ucoo,stat=info)    
+    if (info == psb_success_) allocate(ucoo,stat=info)
     call u%free()
     if (info == psb_success_) call a%a%tril(lcoo,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,ucoo)
     if (info == psb_success_) call move_alloc(ucoo,u%a)
     if (info == psb_success_) call u%cscnv(info,mold=a%a)
   else
-    if (info == psb_success_) then 
+    if (info == psb_success_) then
       call a%a%tril(lcoo,info,diag,imin,imax,&
            & jmin,jmax,rscale,cscale)
     else
@@ -975,7 +975,7 @@ subroutine psb_s_tril(a,l,info,diag,imin,imax,&
   end if
   if (info == psb_success_) call move_alloc(lcoo,l%a)
   if (info == psb_success_) call l%cscnv(info,mold=a%a)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -993,7 +993,7 @@ subroutine psb_s_triu(a,u,info,diag,imin,imax,&
   use psb_const_mod
   use psb_s_base_mat_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_triu
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)      :: a
   class(psb_sspmat_type), intent(inout)   :: u
   integer(psb_ipk_),intent(out)           :: info
@@ -1009,24 +1009,24 @@ subroutine psb_s_triu(a,u,info,diag,imin,imax,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(ucoo,stat=info)    
+  allocate(ucoo,stat=info)
   call u%free()
 
   if (present(l)) then
-    if (info == psb_success_) allocate(lcoo,stat=info)    
+    if (info == psb_success_) allocate(lcoo,stat=info)
     call l%free()
     if (info == psb_success_) call a%a%triu(ucoo,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,lcoo)
     if (info == psb_success_) call move_alloc(lcoo,l%a)
     if (info == psb_success_) call l%cscnv(info,mold=a%a)
   else
-    if (info == psb_success_) then 
+    if (info == psb_success_) then
       call a%a%triu(ucoo,info,diag,imin,imax,&
            & jmin,jmax,rscale,cscale)
     else
@@ -1035,7 +1035,7 @@ subroutine psb_s_triu(a,u,info,diag,imin,imax,&
   end if
   if (info == psb_success_) call move_alloc(ucoo,u%a)
   if (info == psb_success_) call u%cscnv(info,mold=a%a)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1047,9 +1047,10 @@ subroutine psb_s_triu(a,u,info,diag,imin,imax,&
 
 end subroutine psb_s_triu
 
+
 subroutine psb_s_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -1069,24 +1070,24 @@ subroutine psb_s_csclip(a,b,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(acoo,stat=info)
   call b%free()
-  if (info == psb_success_) then 
+  if (info == psb_success_) then
     call a%a%csclip(acoo,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
- 
+
   if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info /= psb_success_) goto 9999 
-  
+  if (info /= psb_success_) goto 9999
+
   call psb_erractionrestore(err_act)
   return
 
@@ -1099,7 +1100,7 @@ end subroutine psb_s_csclip
 
 subroutine psb_s_csclip_ip(a,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -1118,14 +1119,14 @@ subroutine psb_s_csclip_ip(a,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
-  if (info == psb_success_) then 
+  allocate(acoo,stat=info)
+  if (info == psb_success_) then
     call a%a%csclip(acoo,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
   else
@@ -1133,8 +1134,8 @@ subroutine psb_s_csclip_ip(a,info,&
   end if
   if (info == psb_success_) call a%free()
   if (info == psb_success_) call move_alloc(acoo,a%a)
-  if (info /= psb_success_) goto 9999 
-  
+  if (info /= psb_success_) goto 9999
+
   call psb_erractionrestore(err_act)
   return
 
@@ -1147,7 +1148,7 @@ end subroutine psb_s_csclip_ip
 
 subroutine psb_s_b_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -1166,7 +1167,7 @@ subroutine psb_s_b_csclip(a,b,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -1174,7 +1175,7 @@ subroutine psb_s_b_csclip(a,b,info,&
 
   call a%a%csclip(b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1190,7 +1191,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cscnv
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)      :: a
   class(psb_sspmat_type), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                   :: info
@@ -1207,7 +1208,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -1219,38 +1220,38 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
-  if (present(mold)) then 
+  if (present(mold)) then
 
-    allocate(altmp, mold=mold,stat=info) 
+    allocate(altmp, mold=mold,stat=info)
 
-  else if (present(type)) then 
+  else if (present(type)) then
 
     select case (psb_toupper(type))
     case ('CSR')
-      allocate(psb_s_csr_sparse_mat :: altmp, stat=info) 
+      allocate(psb_s_csr_sparse_mat :: altmp, stat=info)
     case ('COO')
-      allocate(psb_s_coo_sparse_mat :: altmp, stat=info) 
+      allocate(psb_s_coo_sparse_mat :: altmp, stat=info)
     case ('CSC')
-      allocate(psb_s_csc_sparse_mat :: altmp, stat=info) 
+      allocate(psb_s_csc_sparse_mat :: altmp, stat=info)
     case default
-      info = psb_err_format_unknown_ 
+      info = psb_err_format_unknown_
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
   else
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
   end if
 
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  
-  if (present(dupl)) then 
+
+  if (present(dupl)) then
     call altmp%set_dupl(dupl)
-  else if (a%is_bld()) then 
+  else if (a%is_bld()) then
     ! Does this make sense at all?? Who knows..
     call altmp%set_dupl(psb_dupl_def_)
   end if
@@ -1268,7 +1269,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
 
   call move_alloc(altmp,b%a)
   call b%trim()
-  call b%set_asb() 
+  call b%set_asb()
   call psb_erractionrestore(err_act)
   return
 
@@ -1283,7 +1284,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cscnv_ip
-  implicit none 
+  implicit none
 
   class(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(out)                   :: info
@@ -1300,15 +1301,15 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (present(dupl)) then 
+  if (present(dupl)) then
     call a%set_dupl(dupl)
-  else if (a%is_bld()) then 
+  else if (a%is_bld()) then
     call a%set_dupl(psb_dupl_def_)
   end if
 
@@ -1318,29 +1319,29 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
     goto 9999
   end if
 
-  if (present(mold)) then 
+  if (present(mold)) then
 
-    allocate(altmp, mold=mold,stat=info) 
+    allocate(altmp, mold=mold,stat=info)
 
-  else if (present(type)) then 
+  else if (present(type)) then
 
     select case (psb_toupper(type))
     case ('CSR')
-      allocate(psb_s_csr_sparse_mat :: altmp, stat=info) 
+      allocate(psb_s_csr_sparse_mat :: altmp, stat=info)
     case ('COO')
-      allocate(psb_s_coo_sparse_mat :: altmp, stat=info) 
+      allocate(psb_s_coo_sparse_mat :: altmp, stat=info)
     case ('CSC')
-      allocate(psb_s_csc_sparse_mat :: altmp, stat=info) 
+      allocate(psb_s_csc_sparse_mat :: altmp, stat=info)
     case default
-      info = psb_err_format_unknown_ 
+      info = psb_err_format_unknown_
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
   else
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
   end if
 
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -1359,7 +1360,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
 
   call move_alloc(altmp,a%a)
   call a%trim()
-  call a%set_asb() 
+  call a%set_asb()
   call psb_erractionrestore(err_act)
   return
 
@@ -1376,7 +1377,7 @@ subroutine psb_s_cscnv_base(a,b,info,dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cscnv_base
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)       :: a
   class(psb_s_base_sparse_mat), intent(out) :: b
   integer(psb_ipk_), intent(out)                   :: info
@@ -1391,19 +1392,19 @@ subroutine psb_s_cscnv_base(a,b,info,dupl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   call a%a%cp_to_coo(altmp,info )
-  if ((info == psb_success_).and.present(dupl)) then 
+  if ((info == psb_success_).and.present(dupl)) then
     call altmp%set_dupl(dupl)
   end if
   call altmp%fix(info)
   if (info == psb_success_) call altmp%trim()
-  if (info == psb_success_) call altmp%set_asb() 
+  if (info == psb_success_) call altmp%set_asb()
   if (info == psb_success_) call b%mv_from_coo(altmp,info)
 
   if (info /= psb_success_) then
@@ -1425,7 +1426,7 @@ end subroutine psb_s_cscnv_base
 
 
 subroutine psb_s_clip_d(a,b,info)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -1444,15 +1445,15 @@ subroutine psb_s_clip_d(a,b,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(acoo,stat=info)
   if (info == psb_success_) call a%a%cp_to_coo(acoo,info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -1461,8 +1462,8 @@ subroutine psb_s_clip_d(a,b,info)
   nz = acoo%get_nzeros()
   j = 0
   do i=1, nz
-    if (acoo%ia(i) /= acoo%ja(i)) then 
-      j = j + 1 
+    if (acoo%ia(i) /= acoo%ja(i)) then
+      j = j + 1
       acoo%ia(j)  = acoo%ia(i)
       acoo%ja(j)  = acoo%ja(i)
       acoo%val(j) = acoo%val(i)
@@ -1485,7 +1486,7 @@ end subroutine psb_s_clip_d
 
 
 subroutine psb_s_clip_d_ip(a,info)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -1503,13 +1504,13 @@ subroutine psb_s_clip_d_ip(a,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(acoo,stat=info)
   if (info == psb_success_) call a%a%mv_to_coo(acoo,info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
@@ -1520,8 +1521,8 @@ subroutine psb_s_clip_d_ip(a,info)
   nz = acoo%get_nzeros()
   j = 0
   do i=1, nz
-    if (acoo%ia(i) /= acoo%ja(i)) then 
-      j = j + 1 
+    if (acoo%ia(i) /= acoo%ja(i)) then
+      j = j + 1
       acoo%ia(j)  = acoo%ia(i)
       acoo%ja(j)  = acoo%ja(i)
       acoo%val(j) = acoo%val(i)
@@ -1546,7 +1547,7 @@ subroutine psb_s_mv_from(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_mv_from
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -1564,7 +1565,7 @@ subroutine psb_s_cp_from(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cp_from
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(out)      :: a
   class(psb_s_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_) :: err_act, info
@@ -1573,7 +1574,7 @@ subroutine psb_s_cp_from(a,b)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  
+
   call a%free()
   !
   ! Note: it is tempting to use SOURCE allocation below;
@@ -1582,8 +1583,8 @@ subroutine psb_s_cp_from(a,b)
   !
   allocate(a%a,mold=b,stat=info)
   if (info /= psb_success_) info = psb_err_alloc_dealloc_
-  if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
-  if (info /= psb_success_) goto 9999 
+  if (info == psb_success_) call a%a%cp_from_fmt(b, info)
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1599,11 +1600,11 @@ subroutine psb_s_mv_to(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_mv_to
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   call b%mv_from_fmt(a%a,info)
 
   return
@@ -1614,7 +1615,7 @@ subroutine psb_s_cp_to(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cp_to
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -1631,14 +1632,14 @@ subroutine psb_s_mold(a,b)
   integer(psb_ipk_) :: info
 
   allocate(b,mold=a%a, stat=info)
-  
+
 end subroutine psb_s_mold
 
 subroutine psb_sspmat_type_move(a,b,info)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_sspmat_type_move
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_sspmat_type), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                   :: info
@@ -1659,7 +1660,7 @@ subroutine psb_sspmat_clone(a,b,info)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_sspmat_clone
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_sspmat_type), intent(inout) :: b
   integer(psb_ipk_), intent(out)        :: info
@@ -1671,10 +1672,10 @@ subroutine psb_sspmat_clone(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   call b%free()
-  if (allocated(a%a)) then 
+  if (allocated(a%a)) then
     call a%a%clone(b%a,info)
   end if
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1691,7 +1692,7 @@ subroutine psb_s_transp_1mat(a)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_transp_1mat
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
 
   integer(psb_ipk_) :: err_act, info
@@ -1700,7 +1701,7 @@ subroutine psb_s_transp_1mat(a)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -1724,7 +1725,7 @@ subroutine psb_s_transp_2mat(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_transp_2mat
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)  :: a
   class(psb_sspmat_type), intent(inout) :: b
 
@@ -1734,18 +1735,18 @@ subroutine psb_s_transp_2mat(a,b)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   call b%free()
   allocate(b%a,mold=a%a,stat=info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transp(b%a)    
+  call a%a%transp(b%a)
 
   call psb_erractionrestore(err_act)
   return
@@ -1762,7 +1763,7 @@ subroutine psb_s_transc_1mat(a)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_transc_1mat
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
 
   integer(psb_ipk_) :: err_act, info
@@ -1771,7 +1772,7 @@ subroutine psb_s_transc_1mat(a)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -1795,7 +1796,7 @@ subroutine psb_s_transc_2mat(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_transc_2mat
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)    :: a
   class(psb_sspmat_type), intent(inout) :: b
 
@@ -1805,18 +1806,18 @@ subroutine psb_s_transc_2mat(a,b)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   call b%free()
   allocate(b%a,mold=a%a,stat=info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transc(b%a)    
+  call a%a%transc(b%a)
 
   call psb_erractionrestore(err_act)
   return
@@ -1832,9 +1833,9 @@ end subroutine psb_s_transc_2mat
 subroutine psb_s_asb(a,mold)
   use psb_s_mat_mod, psb_protect_name => psb_s_asb
   use psb_error_mod
-  implicit none 
+  implicit none
 
-  class(psb_sspmat_type), intent(inout) :: a   
+  class(psb_sspmat_type), intent(inout) :: a
   class(psb_s_base_sparse_mat), optional, intent(in) :: mold
   class(psb_s_base_sparse_mat), allocatable :: tmp
   class(psb_s_base_sparse_mat), pointer :: mld
@@ -1842,15 +1843,15 @@ subroutine psb_s_asb(a,mold)
   character(len=20)  :: name='s_asb'
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   call a%a%asb()
-  if (present(mold)) then 
-    if (.not.same_type_as(a%a,mold)) then 
+  if (present(mold)) then
+    if (.not.same_type_as(a%a,mold)) then
       allocate(tmp,mold=mold)
       call tmp%mv_from_fmt(a%a,info)
       call a%a%free()
@@ -1861,7 +1862,7 @@ subroutine psb_s_asb(a,mold)
     if (.not.same_type_as(a%a,mld)) &
          & call a%cscnv(info)
   end if
-  
+
 
   call psb_erractionrestore(err_act)
   return
@@ -1876,21 +1877,21 @@ end subroutine psb_s_asb
 subroutine psb_s_reinit(a,clear)
   use psb_s_mat_mod, psb_protect_name => psb_s_reinit
   use psb_error_mod
-  implicit none 
+  implicit none
 
-  class(psb_sspmat_type), intent(inout) :: a   
+  class(psb_sspmat_type), intent(inout) :: a
   logical, intent(in), optional :: clear
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='reinit'
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (a%a%has_update()) then 
+  if (a%a%has_update()) then
     call a%a%reinit(clear)
   else
     info = psb_err_missing_override_method_
@@ -1925,10 +1926,10 @@ end subroutine psb_s_reinit
 ! == ===================================
 
 
-subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans) 
+subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans)
   use psb_error_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_csmm
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_spk_), intent(inout) :: y(:,:)
@@ -1940,14 +1941,14 @@ subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  call a%a%spmm(alpha,x,beta,y,info,trans) 
-  if (info /= psb_success_) goto 9999 
+  call a%a%spmm(alpha,x,beta,y,info,trans)
+  if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -1958,10 +1959,10 @@ subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans)
 end subroutine psb_s_csmm
 
 
-subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans)
   use psb_error_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_csmv
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:)
   real(psb_spk_), intent(inout) :: y(:)
@@ -1973,14 +1974,14 @@ subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  call a%a%spmm(alpha,x,beta,y,info,trans) 
-  if (info /= psb_success_) goto 9999 
+  call a%a%spmm(alpha,x,beta,y,info,trans)
+  if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -1990,11 +1991,11 @@ subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans)
 
 end subroutine psb_s_csmv
 
-subroutine psb_s_csmv_vect(alpha,a,x,beta,y,info,trans) 
+subroutine psb_s_csmv_vect(alpha,a,x,beta,y,info,trans)
   use psb_error_mod
   use psb_s_vect_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_csmv_vect
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in)   :: a
   real(psb_spk_), intent(in)        :: alpha, beta
   type(psb_s_vect_type), intent(inout) :: x
@@ -2007,25 +2008,25 @@ subroutine psb_s_csmv_vect(alpha,a,x,beta,y,info,trans)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(y%v)) then 
+  if (.not.allocated(y%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
-  call a%a%spmm(alpha,x%v,beta,y%v,info,trans) 
-  if (info /= psb_success_) goto 9999 
+  call a%a%spmm(alpha,x%v,beta,y%v,info,trans)
+  if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -2037,10 +2038,10 @@ end subroutine psb_s_csmv_vect
 
 
 
-subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
+subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_error_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cssm
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_spk_), intent(inout) :: y(:,:)
@@ -2053,14 +2054,14 @@ subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  call a%a%spsm(alpha,x,beta,y,info,trans,scale,d) 
-  if (info /= psb_success_) goto 9999 
+  call a%a%spsm(alpha,x,beta,y,info,trans,scale,d)
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2072,10 +2073,10 @@ subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d)
 end subroutine psb_s_cssm
 
 
-subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
+subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_error_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cssv
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:)
   real(psb_spk_), intent(inout) :: y(:)
@@ -2088,15 +2089,15 @@ subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  call a%a%spsm(alpha,x,beta,y,info,trans,scale,d) 
+  call a%a%spsm(alpha,x,beta,y,info,trans,scale,d)
 
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2108,11 +2109,11 @@ subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 end subroutine psb_s_cssv
 
 
-subroutine psb_s_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+subroutine psb_s_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_error_mod
   use psb_s_vect_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cssv_vect
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), intent(in)         :: alpha, beta
   type(psb_s_vect_type), intent(inout)   :: x
@@ -2126,33 +2127,33 @@ subroutine psb_s_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(y%v)) then 
+  if (.not.allocated(y%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(d)) then 
-    if (.not.allocated(d%v)) then 
+  if (present(d)) then
+    if (.not.allocated(d%v)) then
       info = psb_err_invalid_vect_state_
       call psb_errpush(info,name)
       goto 9999
     endif
-    call a%a%spsm(alpha,x%v,beta,y%v,info,trans,scale,d%v) 
+    call a%a%spsm(alpha,x%v,beta,y%v,info,trans,scale,d%v)
   else
-    call a%a%spsm(alpha,x%v,beta,y%v,info,trans,scale) 
+    call a%a%spsm(alpha,x%v,beta,y%v,info,trans,scale)
   end if
 
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2167,7 +2168,7 @@ function psb_s_maxval(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_s_maxval
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
 
@@ -2178,7 +2179,7 @@ function psb_s_maxval(a) result(res)
 
   call psb_get_erraction(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2198,7 +2199,7 @@ function psb_s_csnmi(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_s_csnmi
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
 
@@ -2208,7 +2209,7 @@ function psb_s_csnmi(a) result(res)
 
   info = psb_success_
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2229,7 +2230,7 @@ function psb_s_csnm1(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_s_csnm1
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
 
@@ -2239,7 +2240,7 @@ function psb_s_csnm1(a) result(res)
 
   call psb_get_erraction(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2260,7 +2261,7 @@ function psb_s_rowsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_s_rowsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), allocatable     :: d(:)
   integer(psb_ipk_), intent(out)               :: info
@@ -2271,7 +2272,7 @@ function psb_s_rowsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2293,7 +2294,7 @@ function psb_s_arwsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_s_arwsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), allocatable           :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -2304,7 +2305,7 @@ function psb_s_arwsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2327,7 +2328,7 @@ function psb_s_colsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_s_colsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), allocatable         :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -2338,7 +2339,7 @@ function psb_s_colsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2361,7 +2362,7 @@ function psb_s_aclsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_s_aclsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), allocatable           :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -2372,7 +2373,7 @@ function psb_s_aclsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2396,7 +2397,7 @@ function psb_s_get_diag(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_s_get_diag
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   real(psb_spk_), allocatable         :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -2407,14 +2408,14 @@ function psb_s_get_diag(a,info) result(d)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   allocate(d(max(1,min(a%a%get_nrows(),a%a%get_ncols()))), stat=info)
-  if (info /= 0) then 
-    info = psb_err_alloc_dealloc_ 
+  if (info /= 0) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -2435,7 +2436,7 @@ subroutine psb_s_scal(d,a,info,side)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_scal
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   real(psb_spk_), intent(in)              :: d(:)
   integer(psb_ipk_), intent(out)                    :: info
@@ -2447,7 +2448,7 @@ subroutine psb_s_scal(d,a,info,side)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2470,7 +2471,7 @@ subroutine psb_s_scals(d,a,info)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_scals
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   real(psb_spk_), intent(in)              :: d
   integer(psb_ipk_), intent(out)                    :: info
@@ -2481,7 +2482,7 @@ subroutine psb_s_scals(d,a,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2499,12 +2500,152 @@ subroutine psb_s_scals(d,a,info)
 
 end subroutine psb_s_scals
 
+subroutine psb_s_scalplusidentity(d,a,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_scalplusidentity
+  implicit none
+  class(psb_sspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)              :: d
+  integer(psb_ipk_), intent(out)                    :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='scalplusidentity'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%scalpid(d,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_scalplusidentity
+
+subroutine psb_s_spaxpby(alpha,a,beta,b,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_spaxpby
+  implicit none
+  real(psb_spk_), intent(in)             :: alpha
+  class(psb_sspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)             :: beta
+  class(psb_sspmat_type), intent(inout) :: b
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='spaxby'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%spaxpby(alpha,beta,b%a,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_spaxpby
+
+function psb_s_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cmpval
+  implicit none
+  class(psb_sspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)             :: val
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpval'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(val,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_s_cmpval
+
+function psb_s_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cmpmat
+  implicit none
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_sspmat_type), intent(inout) :: b
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpmat'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(b%a,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_s_cmpmat
+
 subroutine psb_s_mv_from_lb(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_mv_from_lb
-  implicit none 
-  
+  implicit none
+
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -2512,16 +2653,16 @@ subroutine psb_s_mv_from_lb(a,b)
   info = psb_success_
   if (.not.allocated(a%a)) allocate(psb_s_csr_sparse_mat :: a%a, stat=info)
   if (info == psb_success_) call a%a%mv_from_lfmt(b,info)
-  
+
 end subroutine psb_s_mv_from_lb
 
-  
+
 subroutine psb_s_cp_from_lb(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cp_from_lb
-  implicit none 
-  
+  implicit none
+
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -2536,30 +2677,30 @@ subroutine psb_s_mv_to_lb(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_mv_to_lb
-  implicit none 
-  
+  implicit none
+
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (.not.allocated(a%a)) then
     call b%free()
   else
     call a%a%mv_to_lfmt(b,info)
     call a%free()
   end if
-  
+
 end subroutine psb_s_mv_to_lb
 
 subroutine psb_s_cp_to_lb(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cp_to_lb
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(in) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (.not.allocated(a%a)) then
     call b%free()
   else
@@ -2572,7 +2713,7 @@ subroutine psb_s_mv_from_l(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_mv_from_l
-  implicit none 
+  implicit none
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_lsspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -2585,21 +2726,21 @@ subroutine psb_s_mv_from_l(a,b)
     call a%free()
   end if
   call b%free()
-  
+
 end subroutine psb_s_mv_from_l
 
-  
+
 subroutine psb_s_cp_from_l(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cp_from_l
-  implicit none 
+  implicit none
 
   class(psb_sspmat_type), intent(out) :: a
   class(psb_lsspmat_type), intent(in) :: b
   integer(psb_ipk_) :: info
 
-  info = psb_success_  
+  info = psb_success_
   if (allocated(b%a)) then
     if (.not.allocated(a%a)) allocate(psb_s_csr_sparse_mat :: a%a, stat=info)
     call a%a%cp_from_lfmt(b%a,info)
@@ -2612,12 +2753,12 @@ subroutine psb_s_mv_to_l(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_mv_to_l
-  implicit none 
+  implicit none
 
   class(psb_sspmat_type), intent(inout) :: a
   class(psb_lsspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (allocated(a%a)) then
     if (.not.allocated(b%a)) allocate(psb_ls_csr_sparse_mat :: b%a, stat=info)
     call a%a%mv_to_lfmt(b%a,info)
@@ -2625,26 +2766,26 @@ subroutine psb_s_mv_to_l(a,b)
     call b%free()
   end if
   call a%free()
-  
+
 end subroutine psb_s_mv_to_l
 
 subroutine psb_s_cp_to_l(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_s_cp_to_l
-  implicit none 
-  
+  implicit none
+
   class(psb_sspmat_type), intent(in) :: a
   class(psb_lsspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (allocated(a%a)) then
     if (.not.allocated(b%a)) allocate(psb_ls_csr_sparse_mat :: b%a, stat=info)
     call a%a%cp_to_lfmt(b%a,info)
   else
     call b%free()
   end if
-  
+
 end subroutine psb_s_cp_to_l
 
 
@@ -2654,10 +2795,10 @@ end subroutine psb_s_cp_to_l
 !
 
 
-subroutine  psb_ls_set_lnrows(m,a) 
+subroutine  psb_ls_set_lnrows(m,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_lnrows
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_lpk_), intent(in) :: m
   integer(psb_ipk_) :: err_act, info
@@ -2665,7 +2806,7 @@ subroutine  psb_ls_set_lnrows(m,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2683,10 +2824,10 @@ subroutine  psb_ls_set_lnrows(m,a)
 end subroutine psb_ls_set_lnrows
 
 #if defined(IPK4) && defined(LPK8)
-subroutine  psb_ls_set_inrows(m,a) 
+subroutine  psb_ls_set_inrows(m,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_inrows
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in) :: m
   integer(psb_ipk_) :: err_act, info
@@ -2694,7 +2835,7 @@ subroutine  psb_ls_set_inrows(m,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2712,10 +2853,10 @@ subroutine  psb_ls_set_inrows(m,a)
 end subroutine psb_ls_set_inrows
 #endif
 
-subroutine  psb_ls_set_lncols(n,a) 
+subroutine  psb_ls_set_lncols(n,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_lncols
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_lpk_), intent(in) :: n
   integer(psb_ipk_) :: err_act, info
@@ -2723,7 +2864,7 @@ subroutine  psb_ls_set_lncols(n,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2740,10 +2881,10 @@ subroutine  psb_ls_set_lncols(n,a)
 end subroutine psb_ls_set_lncols
 
 #if defined(IPK4) && defined(LPK8)
-subroutine  psb_ls_set_incols(n,a) 
+subroutine  psb_ls_set_incols(n,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_incols
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in) :: n
   integer(psb_ipk_) :: err_act, info
@@ -2751,7 +2892,7 @@ subroutine  psb_ls_set_incols(n,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2770,16 +2911,16 @@ end subroutine psb_ls_set_incols
 #endif
 
 !
-!  Valid values for DUPL: 
-!  psb_dupl_ovwrt_ 
-!  psb_dupl_add_   
-!  psb_dupl_err_   
+!  Valid values for DUPL:
+!  psb_dupl_ovwrt_
+!  psb_dupl_add_
+!  psb_dupl_err_
 !
 
-subroutine  psb_ls_set_dupl(n,a) 
+subroutine  psb_ls_set_dupl(n,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_dupl
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in) :: n
   integer(psb_ipk_) :: err_act, info
@@ -2787,7 +2928,7 @@ subroutine  psb_ls_set_dupl(n,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2809,17 +2950,17 @@ end subroutine psb_ls_set_dupl
 ! Set the STATE of the internal matrix object
 !
 
-subroutine  psb_ls_set_null(a) 
+subroutine  psb_ls_set_null(a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_null
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2837,17 +2978,17 @@ subroutine  psb_ls_set_null(a)
 end subroutine psb_ls_set_null
 
 
-subroutine  psb_ls_set_bld(a) 
+subroutine  psb_ls_set_bld(a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_bld
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2866,17 +3007,17 @@ subroutine  psb_ls_set_bld(a)
 end subroutine psb_ls_set_bld
 
 
-subroutine  psb_ls_set_upd(a) 
+subroutine  psb_ls_set_upd(a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_upd
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2896,17 +3037,17 @@ subroutine  psb_ls_set_upd(a)
 end subroutine psb_ls_set_upd
 
 
-subroutine  psb_ls_set_asb(a) 
+subroutine  psb_ls_set_asb(a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_asb
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2925,10 +3066,10 @@ subroutine  psb_ls_set_asb(a)
 end subroutine psb_ls_set_asb
 
 
-subroutine psb_ls_set_sorted(a,val) 
+subroutine psb_ls_set_sorted(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_sorted
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -2936,7 +3077,7 @@ subroutine psb_ls_set_sorted(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2955,10 +3096,10 @@ subroutine psb_ls_set_sorted(a,val)
 end subroutine psb_ls_set_sorted
 
 
-subroutine psb_ls_set_triangle(a,val) 
+subroutine psb_ls_set_triangle(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_triangle
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -2966,7 +3107,7 @@ subroutine psb_ls_set_triangle(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -2984,10 +3125,10 @@ subroutine psb_ls_set_triangle(a,val)
 
 end subroutine psb_ls_set_triangle
 
-subroutine psb_ls_set_symmetric(a,val) 
+subroutine psb_ls_set_symmetric(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_symmetric
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -2995,7 +3136,7 @@ subroutine psb_ls_set_symmetric(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3013,10 +3154,10 @@ subroutine psb_ls_set_symmetric(a,val)
 
 end subroutine psb_ls_set_symmetric
 
-subroutine psb_ls_set_unit(a,val) 
+subroutine psb_ls_set_unit(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_unit
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -3024,7 +3165,7 @@ subroutine psb_ls_set_unit(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3043,10 +3184,10 @@ subroutine psb_ls_set_unit(a,val)
 end subroutine psb_ls_set_unit
 
 
-subroutine psb_ls_set_lower(a,val) 
+subroutine psb_ls_set_lower(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_lower
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -3054,7 +3195,7 @@ subroutine psb_ls_set_lower(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3073,10 +3214,10 @@ subroutine psb_ls_set_lower(a,val)
 end subroutine psb_ls_set_lower
 
 
-subroutine psb_ls_set_upper(a,val) 
+subroutine psb_ls_set_upper(a,val)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_upper
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   integer(psb_ipk_) :: err_act, info
@@ -3084,7 +3225,7 @@ subroutine psb_ls_set_upper(a,val)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3114,16 +3255,16 @@ end subroutine psb_ls_set_upper
 !
 !
 !
-! == ===================================  
+! == ===================================
 
 
 subroutine psb_ls_sparse_print(iout,a,iv,head,ivr,ivc)
   use psb_s_mat_mod, psb_protect_name => psb_ls_sparse_print
   use psb_error_mod
-  implicit none 
+  implicit none
 
   integer(psb_ipk_), intent(in)               :: iout
-  class(psb_lsspmat_type), intent(in) :: a   
+  class(psb_lsspmat_type), intent(in) :: a
   integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
   integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -3134,7 +3275,7 @@ subroutine psb_ls_sparse_print(iout,a,iv,head,ivr,ivc)
 
   info = psb_success_
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3154,10 +3295,10 @@ end subroutine psb_ls_sparse_print
 subroutine psb_ls_n_sparse_print(fname,a,iv,head,ivr,ivc)
   use psb_s_mat_mod, psb_protect_name => psb_ls_n_sparse_print
   use psb_error_mod
-  implicit none 
+  implicit none
 
-  character(len=*), intent(in)  :: fname   
-  class(psb_lsspmat_type), intent(in) :: a   
+  character(len=*), intent(in)  :: fname
+  class(psb_lsspmat_type), intent(in) :: a
   integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
   integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -3169,24 +3310,24 @@ subroutine psb_ls_n_sparse_print(fname,a,iv,head,ivr,ivc)
 
   info = psb_success_
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   iout = max(psb_inp_unit,psb_err_unit,psb_out_unit) + 1
-  do 
+  do
     inquire(unit=iout, opened=isopen)
     if (.not.isopen) exit
     iout = iout + 1
     if (iout > 99) exit
   end do
-  if (iout > 99) then 
+  if (iout > 99) then
     write(psb_err_unit,*) 'Error: could not find a free unit for I/O'
     return
   end if
   open(iout,file=fname,iostat=info)
-  if (info == psb_success_) then 
+  if (info == psb_success_) then
     call a%a%print(iout,iv,head,ivr,ivc)
     close(iout)
   else
@@ -3205,13 +3346,13 @@ end subroutine psb_ls_n_sparse_print
 subroutine psb_ls_get_neigh(a,idx,neigh,n,info,lev)
   use psb_s_mat_mod, psb_protect_name => psb_ls_get_neigh
   use psb_error_mod
-  implicit none 
-  class(psb_lsspmat_type), intent(in) :: a   
-  integer(psb_lpk_), intent(in)                :: idx 
-  integer(psb_lpk_), intent(out)               :: n   
+  implicit none
+  class(psb_lsspmat_type), intent(in) :: a
+  integer(psb_lpk_), intent(in)                :: idx
+  integer(psb_lpk_), intent(out)               :: n
   integer(psb_lpk_), allocatable, intent(out)  :: neigh(:)
   integer(psb_ipk_), intent(out)               :: info
-  integer(psb_lpk_), optional, intent(in)      :: lev 
+  integer(psb_lpk_), optional, intent(in)      :: lev
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='get_neigh'
@@ -3219,7 +3360,7 @@ subroutine psb_ls_get_neigh(a,idx,neigh,n,info,lev)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3240,17 +3381,17 @@ end subroutine psb_ls_get_neigh
 
 
 
-subroutine psb_ls_csall(nr,nc,a,info,nz) 
+subroutine psb_ls_csall(nr,nc,a,info,nz)
   use psb_s_mat_mod, psb_protect_name => psb_ls_csall
   use psb_s_base_mat_mod
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_lpk_), intent(in)             :: nr,nc
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_lpk_), intent(in), optional   :: nz
 
-  integer(psb_ipk_) :: err_act 
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csall'
   logical, parameter :: debug=.false.
 
@@ -3260,13 +3401,13 @@ subroutine psb_ls_csall(nr,nc,a,info,nz)
 
   info = psb_success_
   allocate(psb_ls_coo_sparse_mat :: a%a, stat=info)
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_ 
+  if (info /= psb_success_) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
     goto 9999
   end if
   call a%a%allocate(nr,nc,nz)
-  call a%set_bld() 
+  call a%set_bld()
 
   return
 
@@ -3277,10 +3418,10 @@ subroutine psb_ls_csall(nr,nc,a,info,nz)
 end subroutine psb_ls_csall
 
 
-subroutine  psb_ls_reallocate_nz(nz,a) 
+subroutine  psb_ls_reallocate_nz(nz,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_reallocate_nz
   use psb_error_mod
-  implicit none 
+  implicit none
   integer(psb_lpk_), intent(in) :: nz
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
@@ -3288,7 +3429,7 @@ subroutine  psb_ls_reallocate_nz(nz,a)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3305,31 +3446,31 @@ subroutine  psb_ls_reallocate_nz(nz,a)
 end subroutine psb_ls_reallocate_nz
 
 
-subroutine  psb_ls_free(a) 
+subroutine  psb_ls_free(a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_free
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
 
-  if (allocated(a%a)) then 
+  if (allocated(a%a)) then
     call a%a%free()
-    deallocate(a%a) 
+    deallocate(a%a)
   endif
 
 end subroutine psb_ls_free
 
 
-subroutine  psb_ls_trim(a) 
+subroutine  psb_ls_trim(a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_trim
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3347,11 +3488,11 @@ end subroutine psb_ls_trim
 
 
 
-subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_s_mat_mod, psb_protect_name => psb_ls_csput_a
   use psb_s_base_mat_mod
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   real(psb_spk_), intent(in)      :: val(:)
   integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
@@ -3363,15 +3504,15 @@ subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.(a%is_bld().or.a%is_upd())) then 
+  if (.not.(a%is_bld().or.a%is_upd())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
-  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info) 
-  if (info /= psb_success_) goto 9999 
+  call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info)
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3383,13 +3524,13 @@ subroutine psb_ls_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
 end subroutine psb_ls_csput_a
 
-subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_s_mat_mod, psb_protect_name => psb_ls_csput_v
   use psb_s_base_mat_mod
   use psb_s_vect_mod, only : psb_s_vect_type
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_error_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   type(psb_s_vect_type), intent(inout)  :: val
   type(psb_l_vect_type), intent(inout)  :: ia, ja
@@ -3402,19 +3543,19 @@ subroutine psb_ls_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.(a%is_bld().or.a%is_upd())) then 
+  if (.not.(a%is_bld().or.a%is_upd())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
-    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info) 
+    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info)
   else
     info = psb_err_invalid_mat_state_
   endif
 
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3429,7 +3570,7 @@ end subroutine psb_ls_csput_v
 
 subroutine psb_ls_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -3452,7 +3593,7 @@ subroutine psb_ls_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3461,7 +3602,7 @@ subroutine psb_ls_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   call a%a%csget(imin,imax,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3476,7 +3617,7 @@ end subroutine psb_ls_csgetptn
 
 subroutine psb_ls_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -3500,7 +3641,7 @@ subroutine psb_ls_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3509,7 +3650,7 @@ subroutine psb_ls_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   call a%a%csget(imin,imax,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3526,7 +3667,7 @@ end subroutine psb_ls_csgetrow
 
 subroutine psb_ls_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -3551,31 +3692,31 @@ subroutine psb_ls_csgetblk(imin,imax,a,b,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(append))  then 
+  if (present(append))  then
     append_ = append
   else
     append_ = .false.
   end if
 
-  allocate(acoo,stat=info)    
-  if (append_.and.(info==psb_success_)) then 
+  allocate(acoo,stat=info)
+  if (append_.and.(info==psb_success_)) then
     if (allocated(b%a)) &
          & call b%a%mv_to_coo(acoo,info)
   end if
 
-  if (info == psb_success_) then 
+  if (info == psb_success_) then
     call a%a%csget(imin,imax,acoo,info,&
          & jmin,jmax,iren,append,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
   if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3594,7 +3735,7 @@ subroutine psb_ls_tril(a,l,info,diag,imin,imax,&
   use psb_const_mod
   use psb_s_base_mat_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_tril
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in)      :: a
   class(psb_lsspmat_type), intent(inout)   :: l
   integer(psb_ipk_),intent(out)           :: info
@@ -3609,22 +3750,22 @@ subroutine psb_ls_tril(a,l,info,diag,imin,imax,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(lcoo,stat=info)    
+  allocate(lcoo,stat=info)
   call l%free()
   if (present(u)) then
-    if (info == psb_success_) allocate(ucoo,stat=info)    
+    if (info == psb_success_) allocate(ucoo,stat=info)
     call u%free()
     if (info == psb_success_) call a%a%tril(lcoo,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,ucoo)
     if (info == psb_success_) call move_alloc(ucoo,u%a)
     if (info == psb_success_) call u%cscnv(info,mold=a%a)
   else
-    if (info == psb_success_) then 
+    if (info == psb_success_) then
       call a%a%tril(lcoo,info,diag,imin,imax,&
            & jmin,jmax,rscale,cscale)
     else
@@ -3633,7 +3774,7 @@ subroutine psb_ls_tril(a,l,info,diag,imin,imax,&
   end if
   if (info == psb_success_) call move_alloc(lcoo,l%a)
   if (info == psb_success_) call l%cscnv(info,mold=a%a)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3651,7 +3792,7 @@ subroutine psb_ls_triu(a,u,info,diag,imin,imax,&
   use psb_const_mod
   use psb_s_base_mat_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_triu
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in)      :: a
   class(psb_lsspmat_type), intent(inout)   :: u
   integer(psb_ipk_),intent(out)           :: info
@@ -3667,24 +3808,24 @@ subroutine psb_ls_triu(a,u,info,diag,imin,imax,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(ucoo,stat=info)    
+  allocate(ucoo,stat=info)
   call u%free()
 
   if (present(l)) then
-    if (info == psb_success_) allocate(lcoo,stat=info)    
+    if (info == psb_success_) allocate(lcoo,stat=info)
     call l%free()
     if (info == psb_success_) call a%a%triu(ucoo,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,lcoo)
     if (info == psb_success_) call move_alloc(lcoo,l%a)
     if (info == psb_success_) call l%cscnv(info,mold=a%a)
   else
-    if (info == psb_success_) then 
+    if (info == psb_success_) then
       call a%a%triu(ucoo,info,diag,imin,imax,&
            & jmin,jmax,rscale,cscale)
     else
@@ -3693,7 +3834,7 @@ subroutine psb_ls_triu(a,u,info,diag,imin,imax,&
   end if
   if (info == psb_success_) call move_alloc(ucoo,u%a)
   if (info == psb_success_) call u%cscnv(info,mold=a%a)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3708,7 +3849,7 @@ end subroutine psb_ls_triu
 
 subroutine psb_ls_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -3728,24 +3869,24 @@ subroutine psb_ls_csclip(a,b,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(acoo,stat=info)
   call b%free()
-  if (info == psb_success_) then 
+  if (info == psb_success_) then
     call a%a%csclip(acoo,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
- 
+
   if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info /= psb_success_) goto 9999 
-  
+  if (info /= psb_success_) goto 9999
+
   call psb_erractionrestore(err_act)
   return
 
@@ -3758,7 +3899,7 @@ end subroutine psb_ls_csclip
 
 subroutine psb_ls_csclip_ip(a,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -3777,14 +3918,14 @@ subroutine psb_ls_csclip_ip(a,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
-  if (info == psb_success_) then 
+  allocate(acoo,stat=info)
+  if (info == psb_success_) then
     call a%a%csclip(acoo,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
   else
@@ -3792,8 +3933,8 @@ subroutine psb_ls_csclip_ip(a,info,&
   end if
   if (info == psb_success_) call a%free()
   if (info == psb_success_) call move_alloc(acoo,a%a)
-  if (info /= psb_success_) goto 9999 
-  
+  if (info /= psb_success_) goto 9999
+
   call psb_erractionrestore(err_act)
   return
 
@@ -3806,7 +3947,7 @@ end subroutine psb_ls_csclip_ip
 
 subroutine psb_ls_b_csclip(a,b,info,&
      & imin,imax,jmin,jmax,rscale,cscale)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -3825,7 +3966,7 @@ subroutine psb_ls_b_csclip(a,b,info,&
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3833,7 +3974,7 @@ subroutine psb_ls_b_csclip(a,b,info,&
 
   call a%a%csclip(b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3852,7 +3993,7 @@ subroutine psb_ls_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cscnv
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in)      :: a
   class(psb_lsspmat_type), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                   :: info
@@ -3869,7 +4010,7 @@ subroutine psb_ls_cscnv(a,b,info,type,mold,upd,dupl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -3881,38 +4022,38 @@ subroutine psb_ls_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
-  if (present(mold)) then 
+  if (present(mold)) then
 
-    allocate(altmp, mold=mold,stat=info) 
+    allocate(altmp, mold=mold,stat=info)
 
-  else if (present(type)) then 
+  else if (present(type)) then
 
     select case (psb_toupper(type))
     case ('CSR')
-      allocate(psb_ls_csr_sparse_mat :: altmp, stat=info) 
+      allocate(psb_ls_csr_sparse_mat :: altmp, stat=info)
     case ('COO')
-      allocate(psb_ls_coo_sparse_mat :: altmp, stat=info) 
+      allocate(psb_ls_coo_sparse_mat :: altmp, stat=info)
     case ('CSC')
-      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info) 
+      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info)
     case default
-      info = psb_err_format_unknown_ 
+      info = psb_err_format_unknown_
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
   else
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
   end if
 
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  
-  if (present(dupl)) then 
+
+  if (present(dupl)) then
     call altmp%set_dupl(dupl)
-  else if (a%is_bld()) then 
+  else if (a%is_bld()) then
     ! Does this make sense at all?? Who knows..
     call altmp%set_dupl(psb_dupl_def_)
   end if
@@ -3930,7 +4071,7 @@ subroutine psb_ls_cscnv(a,b,info,type,mold,upd,dupl)
 
   call move_alloc(altmp,b%a)
   call b%trim()
-  call b%asb() 
+  call b%asb()
   call psb_erractionrestore(err_act)
   return
 
@@ -3947,7 +4088,7 @@ subroutine psb_ls_cscnv_ip(a,info,type,mold,dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cscnv_ip
-  implicit none 
+  implicit none
 
   class(psb_lsspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(out)                   :: info
@@ -3964,15 +4105,15 @@ subroutine psb_ls_cscnv_ip(a,info,type,mold,dupl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (present(dupl)) then 
+  if (present(dupl)) then
     call a%set_dupl(dupl)
-  else if (a%is_bld()) then 
+  else if (a%is_bld()) then
     call a%set_dupl(psb_dupl_def_)
   end if
 
@@ -3982,29 +4123,29 @@ subroutine psb_ls_cscnv_ip(a,info,type,mold,dupl)
     goto 9999
   end if
 
-  if (present(mold)) then 
+  if (present(mold)) then
 
-    allocate(altmp, mold=mold,stat=info) 
+    allocate(altmp, mold=mold,stat=info)
 
-  else if (present(type)) then 
+  else if (present(type)) then
 
     select case (psb_toupper(type))
     case ('CSR')
-      allocate(psb_ls_csr_sparse_mat :: altmp, stat=info) 
+      allocate(psb_ls_csr_sparse_mat :: altmp, stat=info)
     case ('COO')
-      allocate(psb_ls_coo_sparse_mat :: altmp, stat=info) 
+      allocate(psb_ls_coo_sparse_mat :: altmp, stat=info)
     case ('CSC')
-      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info) 
+      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info)
     case default
-      info = psb_err_format_unknown_ 
+      info = psb_err_format_unknown_
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
   else
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
   end if
 
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -4022,7 +4163,7 @@ subroutine psb_ls_cscnv_ip(a,info,type,mold,dupl)
   end if
 
   call move_alloc(altmp,a%a)
-  call a%set_asb() 
+  call a%set_asb()
   call a%trim()
   call psb_erractionrestore(err_act)
   return
@@ -4040,7 +4181,7 @@ subroutine psb_ls_cscnv_base(a,b,info,dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cscnv_base
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in)       :: a
   class(psb_ls_base_sparse_mat), intent(out) :: b
   integer(psb_ipk_), intent(out)                   :: info
@@ -4055,19 +4196,19 @@ subroutine psb_ls_cscnv_base(a,b,info,dupl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   call a%a%cp_to_coo(altmp,info )
-  if ((info == psb_success_).and.present(dupl)) then 
+  if ((info == psb_success_).and.present(dupl)) then
     call altmp%set_dupl(dupl)
   end if
   call altmp%fix(info)
   if (info == psb_success_) call altmp%trim()
-  if (info == psb_success_) call altmp%set_asb() 
+  if (info == psb_success_) call altmp%set_asb()
   if (info == psb_success_) call b%mv_from_coo(altmp,info)
 
   if (info /= psb_success_) then
@@ -4089,7 +4230,7 @@ end subroutine psb_ls_cscnv_base
 
 
 subroutine psb_ls_clip_d(a,b,info)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -4108,15 +4249,15 @@ subroutine psb_ls_clip_d(a,b,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(acoo,stat=info)
   if (info == psb_success_) call a%a%cp_to_coo(acoo,info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -4125,8 +4266,8 @@ subroutine psb_ls_clip_d(a,b,info)
   nz = acoo%get_nzeros()
   j = 0
   do i=1, nz
-    if (acoo%ia(i) /= acoo%ja(i)) then 
-      j = j + 1 
+    if (acoo%ia(i) /= acoo%ja(i)) then
+      j = j + 1
       acoo%ia(j)  = acoo%ia(i)
       acoo%ja(j)  = acoo%ja(i)
       acoo%val(j) = acoo%val(i)
@@ -4149,7 +4290,7 @@ end subroutine psb_ls_clip_d
 
 
 subroutine psb_ls_clip_d_ip(a,info)
-  ! Output is always in  COO format 
+  ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -4167,13 +4308,13 @@ subroutine psb_ls_clip_d_ip(a,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(acoo,stat=info)
   if (info == psb_success_) call a%a%mv_to_coo(acoo,info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
@@ -4184,8 +4325,8 @@ subroutine psb_ls_clip_d_ip(a,info)
   nz = acoo%get_nzeros()
   j = 0
   do i=1, nz
-    if (acoo%ia(i) /= acoo%ja(i)) then 
-      j = j + 1 
+    if (acoo%ia(i) /= acoo%ja(i)) then
+      j = j + 1
       acoo%ia(j)  = acoo%ia(i)
       acoo%ja(j)  = acoo%ja(i)
       acoo%val(j) = acoo%val(i)
@@ -4210,7 +4351,7 @@ subroutine psb_ls_mv_from(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_mv_from
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -4228,7 +4369,7 @@ subroutine psb_ls_cp_from(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cp_from
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(out)      :: a
   class(psb_ls_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_) :: err_act, info
@@ -4237,7 +4378,7 @@ subroutine psb_ls_cp_from(a,b)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  
+
   call a%free()
   !
   ! Note: it is tempting to use SOURCE allocation below;
@@ -4246,8 +4387,8 @@ subroutine psb_ls_cp_from(a,b)
   !
   allocate(a%a,mold=b,stat=info)
   if (info /= psb_success_) info = psb_err_alloc_dealloc_
-  if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
-  if (info /= psb_success_) goto 9999 
+  if (info == psb_success_) call a%a%cp_from_fmt(b, info)
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -4263,11 +4404,11 @@ subroutine psb_ls_mv_to(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_mv_to
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   call b%mv_from_fmt(a%a,info)
 
   return
@@ -4278,7 +4419,7 @@ subroutine psb_ls_cp_to(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cp_to
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   class(psb_ls_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -4295,14 +4436,14 @@ subroutine psb_ls_mold(a,b)
   integer(psb_ipk_) :: info
 
   allocate(b,mold=a%a, stat=info)
-  
+
 end subroutine psb_ls_mold
 
 subroutine psb_lsspmat_type_move(a,b,info)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_lsspmat_type_move
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_lsspmat_type), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                   :: info
@@ -4323,7 +4464,7 @@ subroutine psb_lsspmat_clone(a,b,info)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_lsspmat_clone
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_lsspmat_type), intent(inout) :: b
   integer(psb_ipk_), intent(out)        :: info
@@ -4335,10 +4476,10 @@ subroutine psb_lsspmat_clone(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   call b%free()
-  if (allocated(a%a)) then 
+  if (allocated(a%a)) then
     call a%a%clone(b%a,info)
   end if
-  if (info /= psb_success_) goto 9999 
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -4355,7 +4496,7 @@ subroutine psb_ls_transp_1mat(a)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_transp_1mat
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
 
   integer(psb_ipk_) :: err_act, info
@@ -4364,7 +4505,7 @@ subroutine psb_ls_transp_1mat(a)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4388,7 +4529,7 @@ subroutine psb_ls_transp_2mat(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_transp_2mat
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in)  :: a
   class(psb_lsspmat_type), intent(inout) :: b
 
@@ -4398,18 +4539,18 @@ subroutine psb_ls_transp_2mat(a,b)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   call b%free()
   allocate(b%a,mold=a%a,stat=info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transp(b%a)    
+  call a%a%transp(b%a)
 
   call psb_erractionrestore(err_act)
   return
@@ -4426,7 +4567,7 @@ subroutine psb_ls_transc_1mat(a)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_transc_1mat
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
 
   integer(psb_ipk_) :: err_act, info
@@ -4435,7 +4576,7 @@ subroutine psb_ls_transc_1mat(a)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4459,7 +4600,7 @@ subroutine psb_ls_transc_2mat(a,b)
   use psb_error_mod
   use psb_string_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_transc_2mat
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in)    :: a
   class(psb_lsspmat_type), intent(inout) :: b
 
@@ -4469,18 +4610,18 @@ subroutine psb_ls_transc_2mat(a,b)
 
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   call b%free()
   allocate(b%a,mold=a%a,stat=info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transc(b%a)    
+  call a%a%transc(b%a)
 
   call psb_erractionrestore(err_act)
   return
@@ -4496,9 +4637,9 @@ end subroutine psb_ls_transc_2mat
 subroutine psb_ls_asb(a,mold)
   use psb_s_mat_mod, psb_protect_name => psb_ls_asb
   use psb_error_mod
-  implicit none 
+  implicit none
 
-  class(psb_lsspmat_type), intent(inout) :: a   
+  class(psb_lsspmat_type), intent(inout) :: a
   class(psb_ls_base_sparse_mat), optional, intent(in) :: mold
   class(psb_ls_base_sparse_mat), allocatable :: tmp
   class(psb_ls_base_sparse_mat), pointer :: mld
@@ -4506,15 +4647,15 @@ subroutine psb_ls_asb(a,mold)
   character(len=20)  :: name='ls_asb'
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   call a%a%asb()
-  if (present(mold)) then 
-    if (.not.same_type_as(a%a,mold)) then 
+  if (present(mold)) then
+    if (.not.same_type_as(a%a,mold)) then
       allocate(tmp,mold=mold)
       call tmp%mv_from_fmt(a%a,info)
       call a%a%free()
@@ -4525,7 +4666,7 @@ subroutine psb_ls_asb(a,mold)
     if (.not.same_type_as(a%a,mld)) &
          & call a%cscnv(info)
   end if
-  
+
 
   call psb_erractionrestore(err_act)
   return
@@ -4540,21 +4681,21 @@ end subroutine psb_ls_asb
 subroutine psb_ls_reinit(a,clear)
   use psb_s_mat_mod, psb_protect_name => psb_ls_reinit
   use psb_error_mod
-  implicit none 
+  implicit none
 
-  class(psb_lsspmat_type), intent(inout) :: a   
+  class(psb_lsspmat_type), intent(inout) :: a
   logical, intent(in), optional :: clear
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='reinit'
 
   call psb_erractionsave(err_act)
-  if (a%is_null()) then 
+  if (a%is_null()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (a%a%has_update()) then 
+  if (a%a%has_update()) then
     call a%a%reinit(clear)
   else
     info = psb_err_missing_override_method_
@@ -4579,7 +4720,7 @@ function psb_ls_get_diag(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_ls_get_diag
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_), allocatable         :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -4590,14 +4731,14 @@ function psb_ls_get_diag(a,info) result(d)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
   allocate(d(max(1,min(a%a%get_nrows(),a%a%get_ncols()))), stat=info)
-  if (info /= 0) then 
-    info = psb_err_alloc_dealloc_ 
+  if (info /= 0) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -4618,7 +4759,7 @@ subroutine psb_ls_scal(d,a,info,side)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_scal
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   real(psb_spk_), intent(in)              :: d(:)
   integer(psb_ipk_), intent(out)                    :: info
@@ -4630,7 +4771,7 @@ subroutine psb_ls_scal(d,a,info,side)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4653,7 +4794,7 @@ subroutine psb_ls_scals(d,a,info)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_scals
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   real(psb_spk_), intent(in)              :: d
   integer(psb_ipk_), intent(out)                    :: info
@@ -4664,7 +4805,7 @@ subroutine psb_ls_scals(d,a,info)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4682,11 +4823,151 @@ subroutine psb_ls_scals(d,a,info)
 
 end subroutine psb_ls_scals
 
+subroutine psb_ls_scalplusidentity(d,a,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_scalplusidentity
+  implicit none
+  class(psb_lsspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)              :: d
+  integer(psb_ipk_), intent(out)                    :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='scalplusidentity'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%scalpid(d,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_scalplusidentity
+
+subroutine psb_ls_spaxpby(alpha,a,beta,b,info)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_spaxpby
+  implicit none
+  real(psb_spk_), intent(in)             :: alpha
+  class(psb_lsspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)             :: beta
+  class(psb_lsspmat_type), intent(inout) :: b
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='spaxby'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%spaxpby(alpha,beta,b%a,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_spaxpby
+
+function psb_ls_cmpval(a,val,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cmpval
+  implicit none
+  class(psb_lsspmat_type), intent(inout) :: a
+  real(psb_spk_), intent(in)             :: val
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpval'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(val,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_cmpval
+
+function psb_ls_cmpmat(a,b,tol,info) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cmpmat
+  implicit none
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_lsspmat_type), intent(inout) :: b
+  real(psb_spk_), intent(in)            :: tol
+  logical                                 :: res
+  integer(psb_ipk_), intent(out)          :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='cmpmat'
+  logical, parameter :: debug=.false.
+
+  res = .false.
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spcmp(b%a,tol,info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_cmpmat
+
 function psb_ls_maxval(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_ls_maxval
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
 
@@ -4697,7 +4978,7 @@ function psb_ls_maxval(a) result(res)
 
   call psb_get_erraction(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4717,7 +4998,7 @@ function psb_ls_csnmi(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_ls_csnmi
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
 
@@ -4727,7 +5008,7 @@ function psb_ls_csnmi(a) result(res)
 
   info = psb_success_
   call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4747,7 +5028,7 @@ function psb_ls_csnm1(a) result(res)
   use psb_s_mat_mod, psb_protect_name => psb_ls_csnm1
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
 
@@ -4757,7 +5038,7 @@ function psb_ls_csnm1(a) result(res)
 
   call psb_get_erraction(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4778,7 +5059,7 @@ function psb_ls_rowsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_ls_rowsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_), allocatable     :: d(:)
   integer(psb_ipk_), intent(out)               :: info
@@ -4789,7 +5070,7 @@ function psb_ls_rowsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4811,7 +5092,7 @@ function psb_ls_arwsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_ls_arwsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_), allocatable           :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -4822,7 +5103,7 @@ function psb_ls_arwsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4845,7 +5126,7 @@ function psb_ls_colsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_ls_colsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_), allocatable         :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -4856,7 +5137,7 @@ function psb_ls_colsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4879,7 +5160,7 @@ function psb_ls_aclsum(a,info) result(d)
   use psb_s_mat_mod, psb_protect_name => psb_ls_aclsum
   use psb_error_mod
   use psb_const_mod
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   real(psb_spk_), allocatable           :: d(:)
   integer(psb_ipk_), intent(out)       :: info
@@ -4890,7 +5171,7 @@ function psb_ls_aclsum(a,info) result(d)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (.not.allocated(a%a)) then 
+  if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
@@ -4913,8 +5194,8 @@ subroutine psb_ls_mv_from_ib(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_mv_from_ib
-  implicit none 
-  
+  implicit none
+
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -4922,15 +5203,15 @@ subroutine psb_ls_mv_from_ib(a,b)
   info = psb_success_
   if (.not.allocated(a%a)) allocate(psb_ls_csr_sparse_mat :: a%a, stat=info)
   if (info == psb_success_) call a%a%mv_from_ifmt(b,info)
-  
+
 end subroutine psb_ls_mv_from_ib
-  
+
 subroutine psb_ls_cp_from_ib(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cp_from_ib
-  implicit none 
-  
+  implicit none
+
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -4945,30 +5226,30 @@ subroutine psb_ls_mv_to_ib(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_mv_to_ib
-  implicit none 
-  
+  implicit none
+
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (.not.allocated(a%a)) then
     call b%free()
   else
     call a%a%mv_to_ifmt(b,info)
     call a%free()
   end if
-  
+
 end subroutine psb_ls_mv_to_ib
 
 subroutine psb_ls_cp_to_ib(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cp_to_ib
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(in) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (.not.allocated(a%a)) then
     call b%free()
   else
@@ -4981,7 +5262,7 @@ subroutine psb_ls_mv_from_i(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_mv_from_i
-  implicit none 
+  implicit none
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_sspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
@@ -4993,20 +5274,20 @@ subroutine psb_ls_mv_from_i(a,b)
     call a%free()
   end if
   call b%free()
-  
+
 end subroutine psb_ls_mv_from_i
 
-  
+
 subroutine psb_ls_cp_from_i(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cp_from_i
-  implicit none 
+  implicit none
 
   class(psb_lsspmat_type), intent(out) :: a
   class(psb_sspmat_type), intent(in) :: b
   integer(psb_ipk_) :: info
-  
+
   if (allocated(b%a)) then
     if (.not.allocated(a%a)) allocate(psb_ls_csr_sparse_mat :: a%a, stat=info)
     call a%a%cp_from_ifmt(b%a,info)
@@ -5019,12 +5300,12 @@ subroutine psb_ls_mv_to_i(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_mv_to_i
-  implicit none 
+  implicit none
 
   class(psb_lsspmat_type), intent(inout) :: a
   class(psb_sspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (allocated(a%a)) then
     if (.not.allocated(b%a)) allocate(psb_s_csr_sparse_mat :: b%a, stat=info)
     call a%a%mv_to_ifmt(b%a,info)
@@ -5032,28 +5313,24 @@ subroutine psb_ls_mv_to_i(a,b)
     call b%free()
   end if
   call a%free()
-  
+
 end subroutine psb_ls_mv_to_i
 
 subroutine psb_ls_cp_to_i(a,b)
   use psb_error_mod
   use psb_const_mod
   use psb_s_mat_mod, psb_protect_name => psb_ls_cp_to_i
-  implicit none 
-  
+  implicit none
+
   class(psb_lsspmat_type), intent(in) :: a
   class(psb_sspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
-  
+
   if (allocated(a%a)) then
     if (.not.allocated(b%a)) allocate(psb_s_csr_sparse_mat :: b%a, stat=info)
     call a%a%cp_to_ifmt(b%a,info)
   else
     call b%free()
   end if
-  
+
 end subroutine psb_ls_cp_to_i
-
-
-
-  
