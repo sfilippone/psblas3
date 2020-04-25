@@ -54,6 +54,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_timers_mod
   use psi_mod, psb_protect_name => psi_i_crea_index
   implicit none
 
@@ -69,6 +70,9 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
+  logical, parameter  :: do_timings=.false.
+  integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
+  integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
 
   info = psb_success_
   name='psi_crea_index'
@@ -84,12 +88,26 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     call psb_errpush(info,name)
     goto 9999
   endif
+  if ((do_timings).and.(idx_phase1==-1))       &
+       & idx_phase1 = psb_get_timer_idx("PSI_CREA_INDEX: phase1 ")
+  if ((do_timings).and.(idx_phase2==-1))       &
+       & idx_phase2 = psb_get_timer_idx("PSI_CREA_INDEX: phase2")
+  if ((do_timings).and.(idx_phase3==-1))       &
+       & idx_phase3 = psb_get_timer_idx("PSI_CREA_INDEX: phase3")
+!!$  if ((do_timings).and.(idx_phase11==-1))       &
+!!$       & idx_phase11 = psb_get_timer_idx("PSI_CREA_INDEX: phase11 ")
+!!$  if ((do_timings).and.(idx_phase12==-1))       &
+!!$       & idx_phase12 = psb_get_timer_idx("PSI_CREA_INDEX: phase12")
+!!$  if ((do_timings).and.(idx_phase13==-1))       &
+!!$       & idx_phase13 = psb_get_timer_idx("PSI_CREA_INDEX: phase13")
+
 
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
   mode = 1
+  if (do_timings) call psb_tic(idx_phase1)
 
   call psi_extract_dep_list(ictxt,&
        & desc_a%is_bld(), desc_a%is_upd(),&
@@ -105,6 +123,8 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   ! ...now process root contains dependence list of all processes...
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
+  if (do_timings) call psb_toc(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase2)
 
   call psi_dl_check(dep_list,dl_lda,np,length_dl)
 
@@ -114,6 +134,8 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
     goto 9999
   end if
+  if (do_timings) call psb_toc(idx_phase2)
+  if (do_timings) call psb_tic(idx_phase3)
   
   if(debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
@@ -128,6 +150,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_desc_index')
     goto 9999
   end if
+  if (do_timings) call psb_toc(idx_phase3)
 
   deallocate(dep_list,length_dl)
   if(debug_level >= psb_debug_inner_) &

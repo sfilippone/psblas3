@@ -285,14 +285,6 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
-  interface psb_cd_set_maxspace
-    module procedure  psb_cd_set_maxspace
-  end interface psb_cd_set_maxspace
-
-  interface psb_cd_get_maxspace
-    module procedure  psb_cd_get_maxspace
-  end interface psb_cd_get_maxspace
-
   interface psb_cd_set_large_threshold    
     module procedure  psb_i_cd_set_large_threshold
   end interface psb_cd_set_large_threshold
@@ -302,7 +294,15 @@ module psb_desc_mod
     module procedure  psb_l_cd_set_large_threshold
   end interface psb_cd_set_large_threshold
 #endif
-  
+
+  interface psb_set_sp_a2av_alg
+    module procedure psb_m_set_sp_a2av_alg, psb_e_set_sp_a2av_alg
+  end interface psb_set_sp_a2av_alg
+
+  interface psb_get_sp_a2av_alg
+    module procedure psb_m_get_sp_a2av_alg
+  end interface psb_get_sp_a2av_alg
+
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
        & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&
@@ -310,11 +310,33 @@ module psb_desc_mod
 
 
   integer(psb_lpk_), private, save :: cd_large_threshold = psb_default_large_threshold
-  integer(psb_ipk_), private, save :: cd_maxspace        = -1
-
+  integer(psb_ipk_), private, save :: sp_a2av_alg        = psb_sp_a2av_smpl_triad_ 
 
 contains 
 
+  function psb_m_get_sp_a2av_alg() result(val)
+    implicit none
+    integer(psb_mpk_) :: val
+    val = sp_a2av_alg
+  end function psb_m_get_sp_a2av_alg
+
+  subroutine psb_m_set_sp_a2av_alg(val) 
+    implicit none
+    integer(psb_mpk_), intent(in) :: val
+
+    if ((psb_sp_a2av_alg_min_ <= val).and.(val<=psb_sp_a2av_alg_max_)) &
+         &  sp_a2av_alg = val
+  end subroutine psb_m_set_sp_a2av_alg
+  
+  subroutine psb_e_set_sp_a2av_alg(val) 
+    implicit none
+    integer(psb_epk_), intent(in) :: val
+
+    if ((psb_sp_a2av_alg_min_ <= val).and.(val<=psb_sp_a2av_alg_max_)) &
+         &  sp_a2av_alg = val
+  end subroutine psb_e_set_sp_a2av_alg
+  
+  
   function psb_cd_sizeof(desc)  result(val)
     implicit none
     !....Parameters...
@@ -362,21 +384,6 @@ contains
     integer(psb_lpk_) :: val
     val  = cd_large_threshold 
   end function psb_cd_get_large_threshold
-
-
-  subroutine psb_cd_set_maxspace(ith)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: ith
-    if (ith > 0) then 
-      cd_maxspace = ith
-    end if
-  end subroutine psb_cd_set_maxspace
-
-  function  psb_cd_get_maxspace() result(val)
-    implicit none 
-    integer(psb_ipk_) :: val
-    val  = cd_maxspace
-  end function psb_cd_get_maxspace
   
   function  psb_cd_is_large_size(m) result(val)
     use psb_penv_mod

@@ -127,7 +127,7 @@ module psb_gen_block_map_mod
 #if defined(IPK4) && defined(LPK8)
   private ::  l_gen_block_search
 #endif
-  
+
   interface gen_block_search
     module procedure i_gen_block_search
 #if defined(IPK4) && defined(LPK8)
@@ -373,7 +373,7 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i
+    integer(psb_lpk_) :: i
     logical :: owned_
     info = 0
 
@@ -431,7 +431,7 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: is, im, i
+    integer(psb_lpk_) :: is, im, i
     logical :: owned_
 
     info = 0
@@ -806,7 +806,7 @@ contains
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, nv, is
     integer(psb_lpk_) :: tidx, ip, lip 
-    integer(psb_mpk_) :: ictxt, iam, np
+    integer(psb_ipk_) :: ictxt, iam, np
     logical :: owned_
 
     info = 0
@@ -922,7 +922,7 @@ contains
 
     integer(psb_ipk_) :: i, nv, is, im
     integer(psb_lpk_) :: tidx, ip, lip
-    integer(psb_mpk_) :: ictxt, iam, np
+    integer(psb_ipk_) :: ictxt, iam, np
     logical :: owned_
 
     info = 0
@@ -1527,7 +1527,7 @@ contains
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: i, nv, is, ix
+    integer(psb_lpk_) :: i, nv, is, ix
     integer(psb_lpk_) :: ip, lip, lnxt
     integer(psb_ipk_) :: nxt
 
@@ -1732,7 +1732,7 @@ contains
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: i, nv, is, ix, im
+    integer(psb_lpk_) :: i, nv, is, ix, im
     integer(psb_lpk_) :: ip, lip, lnxt
     integer(psb_ipk_) :: nxt
 
@@ -1964,11 +1964,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) :: i
     integer(psb_lpk_) :: ntot
     integer(psb_lpk_), allocatable :: vnl(:)
@@ -2030,7 +2030,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
     
     integer(psb_ipk_) :: nhal, i
-    integer(psb_mpk_) :: ictxt, iam, np 
+    integer(psb_ipk_) :: ictxt, iam, np 
     logical :: debug=.false.
     info = 0 
     ictxt = idxmap%get_ctxt()

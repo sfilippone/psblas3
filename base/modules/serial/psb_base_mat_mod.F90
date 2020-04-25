@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! package: psb_base_mat_mod
 !
@@ -64,15 +64,15 @@
 ! of the indices, which are PSB_LPK_ so that the entries
 ! are guaranteed to be able to contain global indices.
 ! This type only supports data handling and preprocessing, it is
-! not supposed to be used for computations. 
+! not supposed to be used for computations.
 !
 !
 
 module psb_base_mat_mod
-  
-  use psb_const_mod 
+
+  use psb_const_mod
   use psi_serial_mod
-  
+
   !
   !> \namespace  psb_base_mod  \class  psb_base_sparse_mat
   !!  The basic data about your matrix.
@@ -81,7 +81,7 @@ module psb_base_mat_mod
   !!   storage formats. The grandchild classes are then
   !!   encapsulated to implement the STATE design pattern.
   !!   We have an ambiguity in that the inner class has a
-  !!   "state" variable; we hope the context will make it clear. 
+  !!   "state" variable; we hope the context will make it clear.
   !!
   !!
   !! The methods associated to this class can be grouped into three sets:
@@ -106,7 +106,7 @@ module psb_base_mat_mod
     !> Row size
     integer(psb_ipk_), private     :: m
     !> Col size
-    integer(psb_ipk_), private     :: n 
+    integer(psb_ipk_), private     :: n
     !> Matrix state:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -114,17 +114,17 @@ module psb_base_mat_mod
     !!    update: accepts coefficients but only
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
-    !!            psb_T_mat_mod. 
+    !!            psb_T_mat_mod.
     integer(psb_ipk_), private     :: state
     !> How to treat duplicate elements when
-    !!            transitioning from the BUILD to the ASSEMBLED state. 
+    !!            transitioning from the BUILD to the ASSEMBLED state.
     !!            While many formats would allow for duplicate
     !!            entries, it is much better to constrain the matrices
     !!            NOT to have duplicate entries, except while in the
     !!            BUILD state; in our overall design, only COO matrices
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
-    integer(psb_ipk_), private     :: duplicate 
+    integer(psb_ipk_), private     :: duplicate
     !> Is the matrix  symmetric? (must also be square)
     logical, private     :: symmetric
     !> Is the matrix triangular? (must also be square)
@@ -137,11 +137,11 @@ module psb_base_mat_mod
     logical, private     :: sorted
     logical, private     :: repeatable_updates=.false.
 
-  contains 
+  contains
 
     ! == = =================================
     !
-    ! Getters 
+    ! Getters
     !
     !
     ! == = =================================
@@ -168,10 +168,10 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_by_rows  => psb_base_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_base_is_by_cols
     procedure, pass(a) :: is_repeatable_updates     => psb_base_is_repeatable_updates
-    
+
     ! == = =================================
     !
-    ! Setters 
+    ! Setters
     !
     ! == = =================================
     procedure, pass(a) :: set_nrows    => psb_base_set_nrows
@@ -196,7 +196,7 @@ module psb_base_mat_mod
     !
     ! Data management
     !
-    ! == = =================================  
+    ! == = =================================
     procedure, pass(a) :: get_neigh  => psb_base_get_neigh
     procedure, pass(a) :: free       => psb_base_free
     procedure, pass(a) :: asb        => psb_base_mat_asb
@@ -224,7 +224,7 @@ module psb_base_mat_mod
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
     ! external side contain the same data. The base
-    ! version is only a placeholder. 
+    ! version is only a placeholder.
     !
     procedure, pass(a) :: sync          => psb_base_mat_sync
     procedure, pass(a) :: is_host       => psb_base_mat_is_host
@@ -233,7 +233,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_host      => psb_base_mat_set_host
     procedure, pass(a) :: set_dev       => psb_base_mat_set_dev
     procedure, pass(a) :: set_sync      => psb_base_mat_set_sync
- 
+
   end type psb_base_sparse_mat
 
   !>  Function: psb_base_get_nz_row
@@ -242,7 +242,7 @@ module psb_base_mat_mod
   !!    count(A(idx,:)/=0)
   !!    \param idx   The line we are interested in.
   !
-  interface 
+  interface
     function psb_base_get_nz_row(idx,a) result(res)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in)                    :: idx
@@ -250,14 +250,14 @@ module psb_base_mat_mod
       integer(psb_ipk_) :: res
     end function psb_base_get_nz_row
   end interface
-  
+
   !
   !>  Function: psb_base_get_nzeros
   !! \memberof  psb_base_sparse_mat
-  !!  Interface for  the get_nzeros method. Equivalent to: 
-  !!    count(A(:,:)/=0) 
+  !!  Interface for  the get_nzeros method. Equivalent to:
+  !!    count(A(:,:)/=0)
   !
-  interface 
+  interface
     function psb_base_get_nzeros(a) result(res)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
@@ -270,9 +270,9 @@ module psb_base_mat_mod
   !!  how many items can A hold with
   !!           its current space allocation?
   !!           (as opposed to how many are
-  !!            currently occupied) 
-  !    
-  interface 
+  !!            currently occupied)
+  !
+  interface
     function psb_base_get_size(a) result(res)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
@@ -284,34 +284,34 @@ module psb_base_mat_mod
   !> Function reinit: transition state from ASB to UPDATE
   !! \memberof  psb_base_sparse_mat
   !!  \param clear [true] explicitly zero out coefficients.
-  !    
-  interface 
+  !
+  interface
     subroutine psb_base_reinit(a,clear)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
-      class(psb_base_sparse_mat), intent(inout) :: a   
+      class(psb_base_sparse_mat), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_base_reinit
   end interface
-  
+
 
   !
   !> Function
   !! \memberof  psb_base_sparse_mat
-  !!  print on file in Matrix Market format. 
+  !!  print on file in Matrix Market format.
   !!  \param iout the output unit
   !!  \param iv(:) [none] renumber both row and column indices
   !!  \param head [none] a descriptive header for the matrix data
   !!  \param ivr(:) [none] renumbering for the rows
   !!  \param ivc(:) [none] renumbering for the cols
-  !    
-  interface 
+  !
+  interface
     subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
-      import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
+      import :: psb_ipk_, psb_epk_, psb_base_sparse_mat, psb_lpk_
       integer(psb_ipk_), intent(in)               :: iout
-      class(psb_base_sparse_mat), intent(in) :: a   
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      class(psb_base_sparse_mat), intent(in) :: a
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_base_sparse_print
   end interface
 
@@ -325,25 +325,25 @@ module psb_base_mat_mod
   !!         Return a list of NZ pairs
   !!           (IA(i),JA(i))
   !!         each identifying the position of a nonzero in A
-  !!         between row indices IMIN:IMAX; 
+  !!         between row indices IMIN:IMAX;
   !!         IA,JA are reallocated as necessary.
-  !!  \param imin  the minimum row index we are interested in 
-  !!  \param imax  the minimum row index we are interested in 
+  !!  \param imin  the minimum row index we are interested in
+  !!  \param imax  the minimum row index we are interested in
   !!  \param nz the number of output coefficients
   !!  \param ia(:)  the output row indices
   !!  \param ja(:)  the output col indices
   !!  \param info  return code
-  !!  \param jmin [1] minimum col index 
-  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
   !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja 
+  !!  \param append [false] append to ia,ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
-  !           
+  !
 
-  interface 
+  interface
     subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
@@ -358,7 +358,7 @@ module psb_base_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_base_csgetptn
   end interface
-  
+
   !
   !> Function  get_neigh:
   !! \memberof  psb_base_sparse_mat
@@ -372,21 +372,21 @@ module psb_base_mat_mod
   !!         \param n  the number of indices returned
   !!         \param info return code
   !!         \param lev [1] find neighbours recursively for LEV levels,
-  !!               i.e. when lev=2 find neighours of neighbours, etc. 
-  !           
-  interface 
+  !!               i.e. when lev=2 find neighours of neighbours, etc.
+  !
+  interface
     subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
-      class(psb_base_sparse_mat), intent(in) :: a   
-      integer(psb_ipk_), intent(in)                :: idx 
-      integer(psb_ipk_), intent(out)               :: n   
+      class(psb_base_sparse_mat), intent(in) :: a
+      integer(psb_ipk_), intent(in)                :: idx
+      integer(psb_ipk_), intent(out)               :: n
       integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
       integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: lev 
+      integer(psb_ipk_), optional, intent(in)      :: lev
     end subroutine psb_base_get_neigh
   end interface
-  
-  !         
+
+  !
   !
   !> Function  allocate_mnnz
   !! \memberof  psb_base_sparse_mat
@@ -396,8 +396,8 @@ module psb_base_mat_mod
   !!  \param n  number of cols
   !!  \param nz [estimated internally] number of nonzeros to allocate for
   !
-  interface 
-    subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
+  interface
+    subroutine  psb_base_allocate_mnnz(m,n,a,nz)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in) :: m,n
       class(psb_base_sparse_mat), intent(inout) :: a
@@ -405,8 +405,8 @@ module psb_base_mat_mod
     end subroutine psb_base_allocate_mnnz
   end interface
 
-  
-  !         
+
+  !
   !
   !> Function  reallocate_nz
   !! \memberof  psb_base_sparse_mat
@@ -414,40 +414,40 @@ module psb_base_mat_mod
   !!
   !!  \param nz  number of nonzeros to allocate for
   !
-  interface 
-    subroutine psb_base_reallocate_nz(nz,a) 
+  interface
+    subroutine psb_base_reallocate_nz(nz,a)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in) :: nz
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_reallocate_nz
   end interface
 
-  !         
+  !
   !> Function  free
   !! \memberof  psb_base_sparse_mat
   !! \brief destructor
   !
-  interface 
-    subroutine psb_base_free(a) 
+  interface
+    subroutine psb_base_free(a)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_free
   end interface
-  
-  !         
-  !> Function  trim 
+
+  !
+  !> Function  trim
   !! \memberof  psb_base_sparse_mat
   !! \brief Memory trim
   !! Make sure the memory allocation of the sparse matrix is as tight as
-  !! possible given the actual number of nonzeros it contains. 
+  !! possible given the actual number of nonzeros it contains.
   !
-  interface 
-    subroutine psb_base_trim(a) 
+  interface
+    subroutine psb_base_trim(a)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_trim
   end interface
-  
+
   !
   !> \namespace  psb_lbase_mod  \class  psb_lbase_sparse_mat
   !!  The basic data about your matrix.
@@ -456,7 +456,7 @@ module psb_base_mat_mod
   !!   storage formats. The grandchild classes are then
   !!   encapsulated to implement the STATE design pattern.
   !!   We have an ambiguity in that the inner class has a
-  !!   "state" variable; we hope the context will make it clear. 
+  !!   "state" variable; we hope the context will make it clear.
   !!
   !!
   !! The methods associated to this class can be grouped into three sets:
@@ -481,7 +481,7 @@ module psb_base_mat_mod
     !> Row size
     integer(psb_lpk_), private     :: m
     !> Col size
-    integer(psb_lpk_), private     :: n 
+    integer(psb_lpk_), private     :: n
     !> Matrix state:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -489,17 +489,17 @@ module psb_base_mat_mod
     !!    update: accepts coefficients but only
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
-    !!            psb_T_mat_mod. 
+    !!            psb_T_mat_mod.
     integer(psb_ipk_), private     :: state
     !> How to treat duplicate elements when
-    !!            transitioning from the BUILD to the ASSEMBLED state. 
+    !!            transitioning from the BUILD to the ASSEMBLED state.
     !!            While many formats would allow for duplicate
     !!            entries, it is much better to constrain the matrices
     !!            NOT to have duplicate entries, except while in the
     !!            BUILD state; in our overall design, only COO matrices
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
-    integer(psb_ipk_), private     :: duplicate 
+    integer(psb_ipk_), private     :: duplicate
     !> Is the matrix  symmetric? (must also be square)
     logical, private     :: symmetric
     !> Is the matrix triangular? (must also be square)
@@ -512,11 +512,11 @@ module psb_base_mat_mod
     logical, private     :: sorted
     logical, private     :: repeatable_updates=.false.
 
-  contains 
+  contains
 
     ! == = =================================
     !
-    ! Getters 
+    ! Getters
     !
     !
     ! == = =================================
@@ -543,15 +543,15 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_by_rows  => psb_lbase_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_lbase_is_by_cols
     procedure, pass(a) :: is_repeatable_updates     => psb_lbase_is_repeatable_updates
-    
+
     ! == = =================================
     !
-    ! Setters 
+    ! Setters
     !
     ! == = =================================
     procedure, pass(a) :: set_lnrows    => psb_lbase_set_lnrows
     procedure, pass(a) :: set_lncols    => psb_lbase_set_lncols
-#if defined(IPK4) && defined(LPK8)     
+#if defined(IPK4) && defined(LPK8)
     procedure, pass(a) :: set_inrows    => psb_lbase_set_inrows
     procedure, pass(a) :: set_incols    => psb_lbase_set_incols
     generic, public    :: set_nrows     => set_lnrows, set_inrows
@@ -559,7 +559,7 @@ module psb_base_mat_mod
 #else
     generic, public    :: set_nrows     => set_lnrows
     generic, public    :: set_ncols     => set_lncols
-#endif    
+#endif
     procedure, pass(a) :: set_dupl     => psb_lbase_set_dupl
     procedure, pass(a) :: set_state    => psb_lbase_set_state
     procedure, pass(a) :: set_null     => psb_lbase_set_null
@@ -580,7 +580,7 @@ module psb_base_mat_mod
     !
     ! Data management
     !
-    ! == = =================================  
+    ! == = =================================
     procedure, pass(a) :: get_neigh  => psb_lbase_get_neigh
     procedure, pass(a) :: free       => psb_lbase_free
     procedure, pass(a) :: asb        => psb_lbase_mat_asb
@@ -608,7 +608,7 @@ module psb_base_mat_mod
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
     ! external side contain the same data. The base
-    ! version is only a placeholder. 
+    ! version is only a placeholder.
     !
     procedure, pass(a) :: sync          => psb_lbase_mat_sync
     procedure, pass(a) :: is_host       => psb_lbase_mat_is_host
@@ -617,7 +617,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_host      => psb_lbase_mat_set_host
     procedure, pass(a) :: set_dev       => psb_lbase_mat_set_dev
     procedure, pass(a) :: set_sync      => psb_lbase_mat_set_sync
- 
+
   end type psb_lbase_sparse_mat
 
   !>  Function: psb_lbase_get_nz_row
@@ -626,7 +626,7 @@ module psb_base_mat_mod
   !!    count(A(idx,:)/=0)
   !!    \param idx   The line we are interested in.
   !
-  interface 
+  interface
     function psb_lbase_get_nz_row(idx,a) result(res)
       import :: psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       integer(psb_lpk_), intent(in)                    :: idx
@@ -634,14 +634,14 @@ module psb_base_mat_mod
       integer(psb_lpk_) :: res
     end function psb_lbase_get_nz_row
   end interface
-  
+
   !
   !>  Function: psb_lbase_get_nzeros
   !! \memberof  psb_lbase_sparse_mat
-  !!  Interface for  the get_nzeros method. Equivalent to: 
-  !!    count(A(:,:)/=0) 
+  !!  Interface for  the get_nzeros method. Equivalent to:
+  !!    count(A(:,:)/=0)
   !
-  interface 
+  interface
     function psb_lbase_get_nzeros(a) result(res)
       import :: psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       class(psb_lbase_sparse_mat), intent(in) :: a
@@ -654,9 +654,9 @@ module psb_base_mat_mod
   !!  how many items can A hold with
   !!           its current space allocation?
   !!           (as opposed to how many are
-  !!            currently occupied) 
-  !    
-  interface 
+  !!            currently occupied)
+  !
+  interface
     function psb_lbase_get_size(a) result(res)
       import :: psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       class(psb_lbase_sparse_mat), intent(in) :: a
@@ -668,31 +668,31 @@ module psb_base_mat_mod
   !> Function reinit: transition state from ASB to UPDATE
   !! \memberof  psb_lbase_sparse_mat
   !!  \param clear [true] explicitly zero out coefficients.
-  !    
-  interface 
+  !
+  interface
     subroutine psb_lbase_reinit(a,clear)
       import :: psb_ipk_, psb_epk_, psb_lbase_sparse_mat
-      class(psb_lbase_sparse_mat), intent(inout) :: a   
+      class(psb_lbase_sparse_mat), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_lbase_reinit
   end interface
-  
+
 
   !
   !> Function
   !! \memberof  psb_lbase_sparse_mat
-  !!  print on file in Matrix Market format. 
+  !!  print on file in Matrix Market format.
   !!  \param iout the output unit
   !!  \param iv(:) [none] renumber both row and column indices
   !!  \param head [none] a descriptive header for the matrix data
   !!  \param ivr(:) [none] renumbering for the rows
   !!  \param ivc(:) [none] renumbering for the cols
-  !    
-  interface 
+  !
+  interface
     subroutine psb_lbase_sparse_print(iout,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       integer(psb_ipk_), intent(in)               :: iout
-      class(psb_lbase_sparse_mat), intent(in) :: a   
+      class(psb_lbase_sparse_mat), intent(in) :: a
       integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
@@ -709,25 +709,25 @@ module psb_base_mat_mod
   !!         Return a list of NZ pairs
   !!           (IA(i),JA(i))
   !!         each identifying the position of a nonzero in A
-  !!         between row indices IMIN:IMAX; 
+  !!         between row indices IMIN:IMAX;
   !!         IA,JA are reallocated as necessary.
-  !!  \param imin  the minimum row index we are interested in 
-  !!  \param imax  the minimum row index we are interested in 
+  !!  \param imin  the minimum row index we are interested in
+  !!  \param imax  the minimum row index we are interested in
   !!  \param nz the number of output coefficients
   !!  \param ia(:)  the output row indices
   !!  \param ja(:)  the output col indices
   !!  \param info  return code
-  !!  \param jmin [1] minimum col index 
-  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
   !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja 
+  !!  \param append [false] append to ia,ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
-  !           
+  !
 
-  interface 
+  interface
     subroutine psb_lbase_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
@@ -742,7 +742,7 @@ module psb_base_mat_mod
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_lbase_csgetptn
   end interface
-  
+
   !
   !> Function  get_neigh:
   !! \memberof  psb_lbase_sparse_mat
@@ -756,21 +756,21 @@ module psb_base_mat_mod
   !!         \param n  the number of indices returned
   !!         \param info return code
   !!         \param lev [1] find neighbours recursively for LEV levels,
-  !!               i.e. when lev=2 find neighours of neighbours, etc. 
-  !           
-  interface 
+  !!               i.e. when lev=2 find neighours of neighbours, etc.
+  !
+  interface
     subroutine psb_lbase_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
-      class(psb_lbase_sparse_mat), intent(in) :: a   
-      integer(psb_lpk_), intent(in)                :: idx 
-      integer(psb_lpk_), intent(out)               :: n   
+      class(psb_lbase_sparse_mat), intent(in) :: a
+      integer(psb_lpk_), intent(in)                :: idx
+      integer(psb_lpk_), intent(out)               :: n
       integer(psb_lpk_), allocatable, intent(out)  :: neigh(:)
       integer(psb_ipk_), intent(out)               :: info
-      integer(psb_lpk_), optional, intent(in)      :: lev 
+      integer(psb_lpk_), optional, intent(in)      :: lev
     end subroutine psb_lbase_get_neigh
   end interface
-  
-  !         
+
+  !
   !
   !> Function  allocate_mnnz
   !! \memberof  psb_lbase_sparse_mat
@@ -780,8 +780,8 @@ module psb_base_mat_mod
   !!  \param n  number of cols
   !!  \param nz [estimated internally] number of nonzeros to allocate for
   !
-  interface 
-    subroutine  psb_lbase_allocate_mnnz(m,n,a,nz) 
+  interface
+    subroutine  psb_lbase_allocate_mnnz(m,n,a,nz)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       integer(psb_lpk_), intent(in) :: m,n
       class(psb_lbase_sparse_mat), intent(inout) :: a
@@ -789,8 +789,8 @@ module psb_base_mat_mod
     end subroutine psb_lbase_allocate_mnnz
   end interface
 
-  
-  !         
+
+  !
   !
   !> Function  reallocate_nz
   !! \memberof  psb_lbase_sparse_mat
@@ -798,249 +798,249 @@ module psb_base_mat_mod
   !!
   !!  \param nz  number of nonzeros to allocate for
   !
-  interface 
-    subroutine psb_lbase_reallocate_nz(nz,a) 
+  interface
+    subroutine psb_lbase_reallocate_nz(nz,a)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       integer(psb_lpk_), intent(in) :: nz
       class(psb_lbase_sparse_mat), intent(inout) :: a
     end subroutine psb_lbase_reallocate_nz
   end interface
 
-  !         
+  !
   !> Function  free
   !! \memberof  psb_lbase_sparse_mat
   !! \brief destructor
   !
-  interface 
-    subroutine psb_lbase_free(a) 
+  interface
+    subroutine psb_lbase_free(a)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       class(psb_lbase_sparse_mat), intent(inout) :: a
     end subroutine psb_lbase_free
   end interface
-  
-  !         
-  !> Function  trim 
+
+  !
+  !> Function  trim
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Memory trim
   !! Make sure the memory allocation of the sparse matrix is as tight as
-  !! possible given the actual number of nonzeros it contains. 
+  !! possible given the actual number of nonzeros it contains.
   !
-  interface 
-    subroutine psb_lbase_trim(a) 
+  interface
+    subroutine psb_lbase_trim(a)
       import :: psb_ipk_, psb_lpk_, psb_epk_, psb_lbase_sparse_mat
       class(psb_lbase_sparse_mat), intent(inout) :: a
     end subroutine psb_lbase_trim
   end interface
-  
+
 
   interface assignment(=)
     module procedure  psb_base_from_lbase,  psb_lbase_from_base
   end interface assignment(=)
-  
+
 contains
 
-  
-  !         
+
+  !
   !> Function   sizeof
   !! \memberof  psb_base_sparse_mat
   !! \brief Memory occupation in byes
   !
   function psb_base_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
     res = 8
   end function psb_base_sizeof
- 
-  !         
+
+  !
   !> Function  get_fmt
   !! \memberof  psb_base_sparse_mat
   !! \brief return a short descriptive name (e.g. COO CSR etc.)
   !
   function psb_base_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'NULL'
   end function psb_base_get_fmt
-  !         
+  !
   !> Function  has_update
   !! \memberof  psb_base_sparse_mat
-  !! \brief Does the forma have the UPDATE functionality? 
+  !! \brief Does the forma have the UPDATE functionality?
   !
   function psb_base_has_update() result(res)
-    implicit none 
+    implicit none
     logical  :: res
     res = .true.
   end function psb_base_has_update
-  
+
   !
-  ! Standard getter functions: self-explaining. 
+  ! Standard getter functions: self-explaining.
   !
   function psb_base_get_dupl(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%duplicate
   end function psb_base_get_dupl
- 
- 
+
+
   function psb_base_get_state(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%state
   end function psb_base_get_state
- 
+
   function psb_base_get_nrows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%m
   end function psb_base_get_nrows
 
   function psb_base_get_ncols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%n
   end function psb_base_get_ncols
 
-  subroutine  psb_base_set_nrows(m,a) 
-    implicit none 
+  subroutine  psb_base_set_nrows(m,a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: m
     a%m = m
   end subroutine psb_base_set_nrows
 
-  subroutine  psb_base_set_ncols(n,a) 
-    implicit none 
+  subroutine  psb_base_set_ncols(n,a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: n
     a%n = n
   end subroutine psb_base_set_ncols
-  
 
-  subroutine  psb_base_set_state(n,a) 
-    implicit none 
+
+  subroutine  psb_base_set_state(n,a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: n
     a%state = n
   end subroutine psb_base_set_state
 
 
-  subroutine  psb_base_set_dupl(n,a) 
-    implicit none 
+  subroutine  psb_base_set_dupl(n,a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: n
     a%duplicate = n
   end subroutine psb_base_set_dupl
 
-  subroutine  psb_base_set_null(a) 
-    implicit none 
+  subroutine  psb_base_set_null(a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_null_
   end subroutine psb_base_set_null
 
-  subroutine  psb_base_set_bld(a) 
-    implicit none 
+  subroutine  psb_base_set_bld(a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_bld_
   end subroutine psb_base_set_bld
 
-  subroutine  psb_base_set_upd(a) 
-    implicit none 
+  subroutine  psb_base_set_upd(a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_upd_
   end subroutine psb_base_set_upd
 
-  subroutine  psb_base_set_asb(a) 
-    implicit none 
+  subroutine  psb_base_set_asb(a)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_asb_
   end subroutine psb_base_set_asb
 
-  subroutine psb_base_set_sorted(a,val) 
-    implicit none 
+  subroutine psb_base_set_sorted(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%sorted = val
     else
       a%sorted = .true.
     end if
   end subroutine psb_base_set_sorted
 
-  subroutine psb_base_set_triangle(a,val) 
-    implicit none 
+  subroutine psb_base_set_triangle(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%triangle = val
     else
       a%triangle = .true.
     end if
   end subroutine psb_base_set_triangle
 
-  subroutine psb_base_set_symmetric(a,val) 
-    implicit none 
+  subroutine psb_base_set_symmetric(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%symmetric = val
     else
       a%symmetric = .true.
     end if
   end subroutine psb_base_set_symmetric
 
-  subroutine psb_base_set_unit(a,val) 
-    implicit none 
+  subroutine psb_base_set_unit(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%unitd = val
     else
       a%unitd = .true.
     end if
   end subroutine psb_base_set_unit
 
-  subroutine psb_base_set_lower(a,val) 
-    implicit none 
+  subroutine psb_base_set_lower(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%upper = .not.val
     else
       a%upper = .false.
     end if
   end subroutine psb_base_set_lower
 
-  subroutine psb_base_set_upper(a,val) 
-    implicit none 
+  subroutine psb_base_set_upper(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%upper = val
     else
       a%upper = .true.
     end if
   end subroutine psb_base_set_upper
 
-  subroutine psb_base_set_repeatable_updates(a,val) 
-    implicit none 
+  subroutine psb_base_set_repeatable_updates(a,val)
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%repeatable_updates = val
     else
       a%repeatable_updates = .true.
@@ -1048,70 +1048,70 @@ contains
   end subroutine psb_base_set_repeatable_updates
 
   function psb_base_is_triangle(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%triangle
   end function psb_base_is_triangle
 
   function psb_base_is_symmetric(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%symmetric
   end function psb_base_is_symmetric
 
   function psb_base_is_unit(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%unitd
   end function psb_base_is_unit
 
   function psb_base_is_upper(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%upper .and. a%triangle
   end function psb_base_is_upper
 
   function psb_base_is_lower(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (.not.a%upper) .and. a%triangle
   end function psb_base_is_lower
 
   function psb_base_is_null(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_null_)
   end function psb_base_is_null
 
   function psb_base_is_bld(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_bld_)
   end function psb_base_is_bld
 
   function psb_base_is_upd(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_upd_)
   end function psb_base_is_upd
 
   function psb_base_is_asb(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_asb_)
   end function psb_base_is_asb
 
   function psb_base_is_sorted(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%sorted
@@ -1119,21 +1119,21 @@ contains
 
 
   function psb_base_is_by_rows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = .false.
   end function psb_base_is_by_rows
 
   function psb_base_is_by_cols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = .false.
   end function psb_base_is_by_cols
 
   function psb_base_is_repeatable_updates(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%repeatable_updates
@@ -1141,27 +1141,27 @@ contains
 
   !
   !  has_xt_tri: does the current type support
-  !    extended triangle operations?  
-  !  
+  !    extended triangle operations?
+  !
   function psb_base_has_xt_tri() result(res)
-    implicit none 
+    implicit none
     logical :: res
-    
-    res = .false.    
+
+    res = .false.
   end function psb_base_has_xt_tri
 
-  
+
   !
   !  TRANSP: note sorted=.false.
   !    better invoke a fix() too many than
   !    regret it later...
   !
   subroutine psb_base_transp_2mat(a,b)
-    implicit none 
-    
+    implicit none
+
     class(psb_base_sparse_mat), intent(in)  :: a
     class(psb_base_sparse_mat), intent(out) :: b
-    
+
     b%m         = a%n
     b%n         = a%m
     b%state     = a%state
@@ -1172,16 +1172,16 @@ contains
     b%upper     = .not.a%upper
     b%sorted    = .false.
     b%repeatable_updates = .false.
-    
+
   end subroutine psb_base_transp_2mat
 
   subroutine psb_base_transc_2mat(a,b)
-    implicit none 
-    
+    implicit none
+
     class(psb_base_sparse_mat), intent(in)  :: a
     class(psb_base_sparse_mat), intent(out) :: b
 
-    
+
     b%m         = a%n
     b%n         = a%m
     b%state     = a%state
@@ -1196,8 +1196,8 @@ contains
   end subroutine psb_base_transc_2mat
 
   subroutine psb_base_transp_1mat(a)
-    implicit none 
-    
+    implicit none
+
     class(psb_base_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: itmp
 
@@ -1211,15 +1211,15 @@ contains
     a%upper     = .not.a%upper
     a%sorted    = .false.
     a%repeatable_updates = .false.
-    
+
   end subroutine psb_base_transp_1mat
 
   subroutine psb_base_transc_1mat(a)
-    implicit none 
-    
+    implicit none
+
     class(psb_base_sparse_mat), intent(inout) :: a
-    
-    call a%transp() 
+
+    call a%transp()
   end subroutine psb_base_transc_1mat
 
 
@@ -1228,89 +1228,89 @@ contains
   !> Function  base_asb:
   !! \memberof  psb_base_sparse_mat
   !! \brief Sync: base version calls sync and the set_asb.
-  !!           
+  !!
   !
   subroutine psb_base_mat_asb(a)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
-    
+
     call a%sync()
     call a%set_asb()
   end subroutine psb_base_mat_asb
   !
   ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.
-  ! 
+  !
   !
   !> Function  base_sync:
   !! \memberof  psb_base_sparse_mat
   !! \brief Sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_base_mat_sync(a)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), target, intent(in) :: a
-    
+
   end subroutine psb_base_mat_sync
 
   !
   !> Function  base_set_host:
   !! \memberof  psb_base_sparse_mat
   !! \brief Set_host: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_base_mat_set_host(a)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
-    
+
   end subroutine psb_base_mat_set_host
 
   !
   !> Function  base_set_dev:
   !! \memberof  psb_base_sparse_mat
   !! \brief Set_dev: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_base_mat_set_dev(a)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
-    
+
   end subroutine psb_base_mat_set_dev
 
   !
   !> Function  base_set_sync:
   !! \memberof  psb_base_sparse_mat
   !! \brief Set_sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_base_mat_set_sync(a)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
-    
+
   end subroutine psb_base_mat_set_sync
 
   !
   !> Function  base_is_dev:
   !! \memberof  psb_base_sparse_mat
   !! \brief Is matrix on eaternal device    .
-  !!           
+  !!
   !
   function psb_base_mat_is_dev(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical  :: res
-  
+
     res = .false.
   end function psb_base_mat_is_dev
-  
+
   !
   !> Function  base_is_host
   !! \memberof  psb_base_sparse_mat
   !! \brief Is matrix on standard memory    .
-  !!           
+  !!
   !
   function psb_base_mat_is_host(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical  :: res
 
@@ -1321,10 +1321,10 @@ contains
   !> Function  base_is_sync
   !! \memberof  psb_base_sparse_mat
   !! \brief Is matrix on sync               .
-  !!           
+  !!
   !
   function psb_base_mat_is_sync(a) result(res)
-    implicit none 
+    implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical  :: res
 
@@ -1332,225 +1332,225 @@ contains
   end function psb_base_mat_is_sync
 
 
-  
-  !         
+
+  !
   !> Function   sizeof
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Memory occupation in byes
   !
   function psb_lbase_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
     res = 8
   end function psb_lbase_sizeof
- 
-  !         
+
+  !
   !> Function  get_fmt
   !! \memberof  psb_lbase_sparse_mat
   !! \brief return a short descriptive name (e.g. COO CSR etc.)
   !
   function psb_lbase_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'NULL'
   end function psb_lbase_get_fmt
-  !         
+  !
   !> Function  has_update
   !! \memberof  psb_lbase_sparse_mat
-  !! \brief Does the forma have the UPDATE functionality? 
+  !! \brief Does the forma have the UPDATE functionality?
   !
   function psb_lbase_has_update() result(res)
-    implicit none 
+    implicit none
     logical  :: res
     res = .true.
   end function psb_lbase_has_update
-  
+
   !
-  ! Standard getter functions: self-explaining. 
+  ! Standard getter functions: self-explaining.
   !
   function psb_lbase_get_dupl(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%duplicate
   end function psb_lbase_get_dupl
- 
- 
+
+
   function psb_lbase_get_state(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = a%state
   end function psb_lbase_get_state
- 
+
   function psb_lbase_get_nrows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: res
     res = a%m
   end function psb_lbase_get_nrows
 
   function psb_lbase_get_ncols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: res
     res = a%n
   end function psb_lbase_get_ncols
 
-  subroutine  psb_lbase_set_lnrows(m,a) 
-    implicit none 
+  subroutine  psb_lbase_set_lnrows(m,a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: m
     a%m = m
   end subroutine psb_lbase_set_lnrows
 
-  subroutine  psb_lbase_set_lncols(n,a) 
-    implicit none 
+  subroutine  psb_lbase_set_lncols(n,a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: n
     a%n = n
   end subroutine psb_lbase_set_lncols
 
-#if defined(IPK4) && defined(LPK8)      
-  subroutine  psb_lbase_set_inrows(m,a) 
-    implicit none 
+#if defined(IPK4) && defined(LPK8)
+  subroutine  psb_lbase_set_inrows(m,a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: m
     ! This cannot overflow, since ipk_ <= lpk_
     a%m = m
   end subroutine psb_lbase_set_inrows
 
-  subroutine  psb_lbase_set_incols(n,a) 
-    implicit none 
+  subroutine  psb_lbase_set_incols(n,a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: n
     ! This cannot overflow, since ipk_ <= lpk_
     a%n = n
   end subroutine psb_lbase_set_incols
-#endif  
+#endif
 
-  subroutine  psb_lbase_set_state(n,a) 
-    implicit none 
+  subroutine  psb_lbase_set_state(n,a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: n
     a%state = n
   end subroutine psb_lbase_set_state
 
 
-  subroutine  psb_lbase_set_dupl(n,a) 
-    implicit none 
+  subroutine  psb_lbase_set_dupl(n,a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: n
     a%duplicate = n
   end subroutine psb_lbase_set_dupl
 
-  subroutine  psb_lbase_set_null(a) 
-    implicit none 
+  subroutine  psb_lbase_set_null(a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_null_
   end subroutine psb_lbase_set_null
 
-  subroutine  psb_lbase_set_bld(a) 
-    implicit none 
+  subroutine  psb_lbase_set_bld(a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_bld_
   end subroutine psb_lbase_set_bld
 
-  subroutine  psb_lbase_set_upd(a) 
-    implicit none 
+  subroutine  psb_lbase_set_upd(a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_upd_
   end subroutine psb_lbase_set_upd
 
-  subroutine  psb_lbase_set_asb(a) 
-    implicit none 
+  subroutine  psb_lbase_set_asb(a)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_asb_
   end subroutine psb_lbase_set_asb
 
-  subroutine psb_lbase_set_sorted(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_sorted(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%sorted = val
     else
       a%sorted = .true.
     end if
   end subroutine psb_lbase_set_sorted
 
-  subroutine psb_lbase_set_triangle(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_triangle(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%triangle = val
     else
       a%triangle = .true.
     end if
   end subroutine psb_lbase_set_triangle
 
-  subroutine psb_lbase_set_symmetric(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_symmetric(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%symmetric = val
     else
       a%symmetric = .true.
     end if
   end subroutine psb_lbase_set_symmetric
 
-  subroutine psb_lbase_set_unit(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_unit(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%unitd = val
     else
       a%unitd = .true.
     end if
   end subroutine psb_lbase_set_unit
 
-  subroutine psb_lbase_set_lower(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_lower(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%upper = .not.val
     else
       a%upper = .false.
     end if
   end subroutine psb_lbase_set_lower
 
-  subroutine psb_lbase_set_upper(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_upper(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%upper = val
     else
       a%upper = .true.
     end if
   end subroutine psb_lbase_set_upper
 
-  subroutine psb_lbase_set_repeatable_updates(a,val) 
-    implicit none 
+  subroutine psb_lbase_set_repeatable_updates(a,val)
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
-    
-    if (present(val)) then 
+
+    if (present(val)) then
       a%repeatable_updates = val
     else
       a%repeatable_updates = .true.
@@ -1559,80 +1559,80 @@ contains
 
   !
   !  has_xt_tri: does the current type support
-  !    extended triangle operations?  
-  !  
+  !    extended triangle operations?
+  !
   function psb_lbase_has_xt_tri() result(res)
-    implicit none 
+    implicit none
     logical :: res
-    
-    res = .false.    
+
+    res = .false.
   end function psb_lbase_has_xt_tri
 
   function psb_lbase_is_triangle(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%triangle
   end function psb_lbase_is_triangle
 
   function psb_lbase_is_symmetric(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%symmetric
   end function psb_lbase_is_symmetric
 
   function psb_lbase_is_unit(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%unitd
   end function psb_lbase_is_unit
 
   function psb_lbase_is_upper(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%upper .and. a%triangle
   end function psb_lbase_is_upper
 
   function psb_lbase_is_lower(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = (.not.a%upper) .and. a%triangle
   end function psb_lbase_is_lower
 
   function psb_lbase_is_null(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_null_)
   end function psb_lbase_is_null
 
   function psb_lbase_is_bld(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_bld_)
   end function psb_lbase_is_bld
 
   function psb_lbase_is_upd(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_upd_)
   end function psb_lbase_is_upd
 
   function psb_lbase_is_asb(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_asb_)
   end function psb_lbase_is_asb
 
   function psb_lbase_is_sorted(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%sorted
@@ -1640,38 +1640,38 @@ contains
 
 
   function psb_lbase_is_by_rows(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = .false.
   end function psb_lbase_is_by_rows
 
   function psb_lbase_is_by_cols(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = .false.
   end function psb_lbase_is_by_cols
 
   function psb_lbase_is_repeatable_updates(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
     res = a%repeatable_updates
   end function psb_lbase_is_repeatable_updates
 
-  
+
   !
   !  TRANSP: note sorted=.false.
   !    better invoke a fix() too many than
   !    regret it later...
   !
   subroutine psb_lbase_transp_2mat(a,b)
-    implicit none 
-    
+    implicit none
+
     class(psb_lbase_sparse_mat), intent(in)  :: a
     class(psb_lbase_sparse_mat), intent(out) :: b
-    
+
     b%m         = a%n
     b%n         = a%m
     b%state     = a%state
@@ -1681,16 +1681,16 @@ contains
     b%upper     = .not.a%upper
     b%sorted    = .false.
     b%repeatable_updates = .false.
-    
+
   end subroutine psb_lbase_transp_2mat
 
   subroutine psb_lbase_transc_2mat(a,b)
-    implicit none 
-    
+    implicit none
+
     class(psb_lbase_sparse_mat), intent(in)  :: a
     class(psb_lbase_sparse_mat), intent(out) :: b
 
-    
+
     b%m         = a%n
     b%n         = a%m
     b%state     = a%state
@@ -1704,8 +1704,8 @@ contains
   end subroutine psb_lbase_transc_2mat
 
   subroutine psb_lbase_transp_1mat(a)
-    implicit none 
-    
+    implicit none
+
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_) :: itmp
 
@@ -1719,15 +1719,15 @@ contains
     a%upper     = .not.a%upper
     a%sorted    = .false.
     a%repeatable_updates = .false.
-    
+
   end subroutine psb_lbase_transp_1mat
 
   subroutine psb_lbase_transc_1mat(a)
-    implicit none 
-    
+    implicit none
+
     class(psb_lbase_sparse_mat), intent(inout) :: a
-    
-    call a%transp() 
+
+    call a%transp()
   end subroutine psb_lbase_transc_1mat
 
 
@@ -1736,89 +1736,89 @@ contains
   !> Function  base_asb:
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Sync: base version calls sync and the set_asb.
-  !!           
+  !!
   !
   subroutine psb_lbase_mat_asb(a)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
-    
+
     call a%sync()
     call a%set_asb()
   end subroutine psb_lbase_mat_asb
   !
   ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.
-  ! 
+  !
   !
   !> Function  base_sync:
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_lbase_mat_sync(a)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), target, intent(in) :: a
-    
+
   end subroutine psb_lbase_mat_sync
 
   !
   !> Function  base_set_host:
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Set_host: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_lbase_mat_set_host(a)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
-    
+
   end subroutine psb_lbase_mat_set_host
 
   !
   !> Function  base_set_dev:
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Set_dev: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_lbase_mat_set_dev(a)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
-    
+
   end subroutine psb_lbase_mat_set_dev
 
   !
   !> Function  base_set_sync:
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Set_sync: base version is a no-op.
-  !!           
+  !!
   !
   subroutine psb_lbase_mat_set_sync(a)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
-    
+
   end subroutine psb_lbase_mat_set_sync
 
   !
   !> Function  base_is_dev:
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Is matrix on eaternal device    .
-  !!           
+  !!
   !
   function psb_lbase_mat_is_dev(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical  :: res
-  
+
     res = .false.
   end function psb_lbase_mat_is_dev
-  
+
   !
   !> Function  base_is_host
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Is matrix on standard memory    .
-  !!           
+  !!
   !
   function psb_lbase_mat_is_host(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical  :: res
 
@@ -1829,10 +1829,10 @@ contains
   !> Function  base_is_sync
   !! \memberof  psb_lbase_sparse_mat
   !! \brief Is matrix on sync               .
-  !!           
+  !!
   !
   function psb_lbase_mat_is_sync(a) result(res)
-    implicit none 
+    implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical  :: res
 
@@ -1844,33 +1844,32 @@ contains
     type(psb_lbase_sparse_mat), intent(inout) :: lb
     type(psb_base_sparse_mat), intent(in)     :: ib
 
-    lb%m                  = ib%m                  
-    lb%n                  = ib%n                  
-    lb%state              = ib%state              
-    lb%duplicate          = ib%duplicate          
-    lb%triangle           = ib%triangle           
-    lb%unitd              = ib%unitd              
-    lb%upper              = ib%upper              
-    lb%sorted             = ib%sorted             
-    lb%repeatable_updates = ib%repeatable_updates 
-     
+    lb%m                  = ib%m
+    lb%n                  = ib%n
+    lb%state              = ib%state
+    lb%duplicate          = ib%duplicate
+    lb%triangle           = ib%triangle
+    lb%unitd              = ib%unitd
+    lb%upper              = ib%upper
+    lb%sorted             = ib%sorted
+    lb%repeatable_updates = ib%repeatable_updates
+
   end subroutine psb_lbase_from_base
 
   subroutine psb_base_from_lbase(ib,lb)
     type(psb_base_sparse_mat), intent(inout) :: ib
     type(psb_lbase_sparse_mat), intent(in)   :: lb
-    
-    ib%m                  = lb%m                  
-    ib%n                  = lb%n                  
-    ib%state              = lb%state              
-    ib%duplicate          = lb%duplicate          
-    ib%triangle           = lb%triangle           
-    ib%unitd              = lb%unitd              
-    ib%upper              = lb%upper              
-    ib%sorted             = lb%sorted             
-    ib%repeatable_updates = lb%repeatable_updates 
- 
+
+    ib%m                  = lb%m
+    ib%n                  = lb%n
+    ib%state              = lb%state
+    ib%duplicate          = lb%duplicate
+    ib%triangle           = lb%triangle
+    ib%unitd              = lb%unitd
+    ib%upper              = lb%upper
+    ib%sorted             = lb%sorted
+    ib%repeatable_updates = lb%repeatable_updates
+
   end subroutine psb_base_from_lbase
 
 end module psb_base_mat_mod
-

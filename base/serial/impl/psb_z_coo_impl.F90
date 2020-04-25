@@ -29,13 +29,13 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine psb_d_coo_get_diag(a,d,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_get_diag
+subroutine psb_z_coo_get_diag(a,d,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_get_diag
   use psb_error_mod
   use psb_const_mod
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)     :: d(:)
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)     :: d(:)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act,mnm, i, j
@@ -54,9 +54,9 @@ subroutine psb_d_coo_get_diag(a,d,info)
   end if
 
   if (a%is_unit()) then
-    d(1:mnm) = done
+    d(1:mnm) = zone
   else
-    d(1:mnm) = dzero
+    d(1:mnm) = zzero
     do i=1,a%get_nzeros()
       j=a%ia(i)
       if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then
@@ -71,17 +71,17 @@ subroutine psb_d_coo_get_diag(a,d,info)
 
   return
 
-end subroutine psb_d_coo_get_diag
+end subroutine psb_z_coo_get_diag
 
 
-subroutine psb_d_coo_scal(d,a,info,side)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_scal
+subroutine psb_z_coo_scal(d,a,info,side)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_scal
   use psb_error_mod
   use psb_const_mod
   use psb_string_mod
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d(:)
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d(:)
   integer(psb_ipk_), intent(out)            :: info
   character, intent(in), optional :: side
 
@@ -140,16 +140,16 @@ subroutine psb_d_coo_scal(d,a,info,side)
 
   return
 
-end subroutine psb_d_coo_scal
+end subroutine psb_z_coo_scal
 
 
-subroutine psb_d_coo_scals(d,a,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_scals
+subroutine psb_z_coo_scals(d,a,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_scals
   use psb_error_mod
   use psb_const_mod
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act,mnm, i, j, m
@@ -177,15 +177,15 @@ subroutine psb_d_coo_scals(d,a,info)
 
   return
 
-end subroutine psb_d_coo_scals
+end subroutine psb_z_coo_scals
 
-subroutine psb_d_coo_scalplusidentity(d,a,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_scalplusidentity
+subroutine psb_z_coo_scalplusidentity(d,a,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_scalplusidentity
   use psb_error_mod
   use psb_const_mod
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act,mnm, i, j, m
@@ -205,7 +205,7 @@ subroutine psb_d_coo_scalplusidentity(d,a,info)
     a%val(i) = a%val(i) * d
     j=a%ia(i)
     if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then
-      a%val(i) = a%val(i) + done
+      a%val(i) = a%val(i) + zone
     endif
   enddo
   call a%set_host()
@@ -217,24 +217,24 @@ subroutine psb_d_coo_scalplusidentity(d,a,info)
 
   return
 
-end subroutine psb_d_coo_scalplusidentity
+end subroutine psb_z_coo_scalplusidentity
 
-subroutine psb_d_coo_spaxpby(alpha,a,beta,b,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_spaxpby
+subroutine psb_z_coo_spaxpby(alpha,a,beta,b,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_spaxpby
   use psb_error_mod
   use psb_const_mod
   implicit none
 
-  class(psb_d_coo_sparse_mat),  intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
-  real(psb_dpk_), intent(in)      :: alpha
-  real(psb_dpk_), intent(in)      :: beta
+  class(psb_z_coo_sparse_mat),  intent(inout) :: a
+  class(psb_z_base_sparse_mat), intent(inout) :: b
+  complex(psb_dpk_), intent(in)      :: alpha
+  complex(psb_dpk_), intent(in)      :: beta
   integer(psb_ipk_), intent(out)   :: info
 
   !Local
   integer(psb_ipk_)            :: err_act
-  character(len=20)  :: name='d_coo_spaxpby'
-  type(psb_d_coo_sparse_mat) :: tcoo,bcoo
+  character(len=20)  :: name='z_coo_spaxpby'
+  type(psb_z_coo_sparse_mat) :: tcoo,bcoo
   integer(psb_ipk_)            :: nza, nzb, M, N
 
   call psb_erractionsave(err_act)
@@ -275,15 +275,15 @@ subroutine psb_d_coo_spaxpby(alpha,a,beta,b,info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine psb_d_coo_spaxpby
+end subroutine psb_z_coo_spaxpby
 
-function psb_d_coo_cmpval(a,val,tol,info) result(res)
+function psb_z_coo_cmpval(a,val,tol,info) result(res)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_cmpval
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_cmpval
 
-  class(psb_d_coo_sparse_mat),  intent(inout) :: a
-  real(psb_dpk_), intent(in)                   :: val
+  class(psb_z_coo_sparse_mat),  intent(inout) :: a
+  complex(psb_dpk_), intent(in)                   :: val
   real(psb_dpk_), intent(in)                  :: tol
   integer(psb_ipk_), intent(out)                :: info
   logical                                       :: res
@@ -310,15 +310,15 @@ function psb_d_coo_cmpval(a,val,tol,info) result(res)
 9999 call psb_error_handler(err_act)
 
   return
-end function psb_d_coo_cmpval
+end function psb_z_coo_cmpval
 
-function psb_d_coo_cmpmat(a,b,tol,info) result(res)
+function psb_z_coo_cmpmat(a,b,tol,info) result(res)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_cmpmat
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_cmpmat
 
-  class(psb_d_coo_sparse_mat),  intent(inout) :: a
-  class(psb_d_base_sparse_mat),  intent(inout) :: b
+  class(psb_z_coo_sparse_mat),  intent(inout) :: a
+  class(psb_z_base_sparse_mat),  intent(inout) :: b
   real(psb_dpk_), intent(in)                  :: tol
   integer(psb_ipk_), intent(out)                :: info
   logical                                       :: res
@@ -329,7 +329,7 @@ function psb_d_coo_cmpmat(a,b,tol,info) result(res)
   logical, parameter           :: debug=.false.
 
   integer(psb_ipk_)              :: nza, nzb, nzl, M, N
-  type(psb_d_coo_sparse_mat) :: tcoo, bcoo
+  type(psb_z_coo_sparse_mat) :: tcoo, bcoo
 
   ! Copy (whatever) b format to coo
   call b%cp_to_coo(bcoo,info)
@@ -373,17 +373,17 @@ function psb_d_coo_cmpmat(a,b,tol,info) result(res)
 9999 call psb_error_handler(err_act)
 
   return
-end function psb_d_coo_cmpmat
+end function psb_z_coo_cmpmat
 
-subroutine  psb_d_coo_reallocate_nz(nz,a)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_reallocate_nz
+subroutine  psb_z_coo_reallocate_nz(nz,a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_reallocate_nz
   use psb_error_mod
   use psb_realloc_mod
   implicit none
   integer(psb_ipk_), intent(in) :: nz
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_)  :: err_act, info, nz_
-  character(len=20)  :: name='d_coo_reallocate_nz'
+  character(len=20)  :: name='z_coo_reallocate_nz'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
@@ -405,14 +405,46 @@ subroutine  psb_d_coo_reallocate_nz(nz,a)
 
   return
 
-end subroutine psb_d_coo_reallocate_nz
+end subroutine psb_z_coo_reallocate_nz
 
-subroutine psb_d_coo_mold(a,b,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_mold
+subroutine  psb_z_coo_ensure_size(nz,a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_ensure_size
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none
+  integer(psb_ipk_), intent(in) :: nz
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_)  :: err_act, info, nz_
+  character(len=20)  :: name='z_coo_ensure_size'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  nz_ = max(nz,ione)
+  call psb_ensure_size(nz_,a%ia,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%ja,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%val,info)
+
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_coo_ensure_size
+
+subroutine psb_z_coo_mold(a,b,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_mold
   use psb_error_mod
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in)                  :: a
-  class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+  class(psb_z_coo_sparse_mat), intent(in)                  :: a
+  class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='coo_mold'
@@ -425,7 +457,7 @@ subroutine psb_d_coo_mold(a,b,info)
     call b%free()
     deallocate(b,stat=info)
   end if
-  if (info == 0) allocate(psb_d_coo_sparse_mat :: b, stat=info)
+  if (info == 0) allocate(psb_z_coo_sparse_mat :: b, stat=info)
 
   if (info /= 0) then
     info = psb_err_alloc_dealloc_
@@ -438,14 +470,14 @@ subroutine psb_d_coo_mold(a,b,info)
 
   return
 
-end subroutine psb_d_coo_mold
+end subroutine psb_z_coo_mold
 
-subroutine psb_d_coo_reinit(a,clear)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_reinit
+subroutine psb_z_coo_reinit(a,clear)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_reinit
   use psb_error_mod
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
   logical, intent(in), optional :: clear
 
   integer(psb_ipk_)  :: err_act, info
@@ -468,7 +500,7 @@ subroutine psb_d_coo_reinit(a,clear)
     ! do nothing
     return
   else if (a%is_asb()) then
-    if (clear_) a%val(:) = dzero
+    if (clear_) a%val(:) = zzero
     call a%set_host()
     call a%set_upd()
   else
@@ -484,16 +516,16 @@ subroutine psb_d_coo_reinit(a,clear)
 
   return
 
-end subroutine psb_d_coo_reinit
+end subroutine psb_z_coo_reinit
 
 
 
-subroutine  psb_d_coo_trim(a)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_trim
+subroutine  psb_z_coo_trim(a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_trim
   use psb_realloc_mod
   use psb_error_mod
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_)  :: err_act, info, nz
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
@@ -514,13 +546,13 @@ subroutine  psb_d_coo_trim(a)
 
   return
 
-end subroutine psb_d_coo_trim
+end subroutine psb_z_coo_trim
 
-subroutine  psb_d_coo_clean_zeros(a, info)
+subroutine  psb_z_coo_clean_zeros(a, info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_clean_zeros
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_clean_zeros
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: info
   !
   integer(psb_ipk_) :: i,j,k, nzin
@@ -529,7 +561,7 @@ subroutine  psb_d_coo_clean_zeros(a, info)
   nzin = a%get_nzeros()
   j = 0
   do i=1, nzin
-    if (a%val(i) /= dzero) then
+    if (a%val(i) /= zzero) then
       j = j + 1
       a%val(j) = a%val(i)
       a%ia(j)  = a%ia(i)
@@ -538,17 +570,54 @@ subroutine  psb_d_coo_clean_zeros(a, info)
   end do
   call a%set_nzeros(j)
   call a%trim()
-end subroutine psb_d_coo_clean_zeros
+end subroutine psb_z_coo_clean_zeros
 
+subroutine  psb_z_coo_clean_negidx(a,info)
+  use psb_error_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_clean_negidx
+  implicit none
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out)             :: info
+  !
+  !
+  integer(psb_ipk_)  :: nz
+  call psb_coo_clean_negidx_inner(a%get_nzeros(),a%ia,a%ja,a%val,nz,info)
+  if (info == 0) call a%set_nzeros(nz)
 
+end subroutine psb_z_coo_clean_negidx
 
-subroutine  psb_d_coo_allocate_mnnz(m,n,a,nz)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_allocate_mnnz
+subroutine psb_z_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+  use psb_error_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_clean_negidx_inner
+  implicit none
+  integer(psb_ipk_), intent(in)           :: nzin
+  integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
+  complex(psb_dpk_), intent(inout) :: val(:)
+  integer(psb_ipk_), intent(out)          :: nzout
+  integer(psb_ipk_), intent(out)          :: info
+  !
+  !
+  integer(psb_ipk_)  :: i
+  info = 0
+  nzout = 0
+  do i=1, nzin
+    if ((ia(i)>0).and.(ja(i)>0)) then
+      nzout = nzout + 1
+      val(nzout) = val(i)
+      ia(nzout)  = ia(i)
+      ja(nzout)  = ja(i)
+    end if
+  end do
+
+end subroutine psb_z_coo_clean_negidx_inner
+
+subroutine  psb_z_coo_allocate_mnnz(m,n,a,nz)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_allocate_mnnz
   use psb_error_mod
   use psb_realloc_mod
   implicit none
   integer(psb_ipk_), intent(in) :: m,n
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(in), optional :: nz
   integer(psb_ipk_)  :: err_act, info, nz_
   character(len=20)  :: name='allocate_mnz'
@@ -599,30 +668,28 @@ subroutine  psb_d_coo_allocate_mnnz(m,n,a,nz)
 
   return
 
-end subroutine psb_d_coo_allocate_mnnz
+end subroutine psb_z_coo_allocate_mnnz
 
 
 
-subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_print
+subroutine psb_z_coo_print(iout,a,iv,head,ivr,ivc)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_print
   use psb_string_mod
   implicit none
 
   integer(psb_ipk_), intent(in)               :: iout
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_print'
+  character(len=20)  :: name='z_coo_print'
   logical, parameter :: debug=.false.
+  character(len=80)            :: frmt
+  integer(psb_ipk_) :: i,j, ni, nr, nc, nz
 
-  character(len=*), parameter  :: datatype='real'
-  character(len=80)            :: frmtv
-  integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
-
-  write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
   if (present(head)) write(iout,'(a,a)') '% ',head
   write(iout,'(a)') '%'
   write(iout,'(a,a)') '% COO'
@@ -632,54 +699,45 @@ subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
+  frmt = psb_z_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
 
-  if (datatype=='real') then
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
   write(iout,*) nr, nc, nz
   if(present(iv)) then
     do j=1,a%get_nzeros()
-      write(iout,frmtv) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
+      write(iout,frmt) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
     enddo
   else
     if (present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),a%ja(j),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),a%ja(j),a%val(j)
       enddo
     else if (present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) a%ia(j),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),a%ja(j),a%val(j)
+        write(iout,frmt) a%ia(j),a%ja(j),a%val(j)
       enddo
     endif
   endif
 
-end subroutine psb_d_coo_print
+end subroutine psb_z_coo_print
 
 
 
 
-function  psb_d_coo_get_nz_row(idx,a) result(res)
+function  psb_z_coo_get_nz_row(idx,a) result(res)
   use psb_const_mod
   use psb_sort_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_get_nz_row
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_get_nz_row
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   integer(psb_ipk_), intent(in)                  :: idx
   integer(psb_ipk_) :: res
   integer(psb_ipk_) :: nzin_, nza,ip,jp,i,k
@@ -723,27 +781,27 @@ function  psb_d_coo_get_nz_row(idx,a) result(res)
 
   end if
 
-end function psb_d_coo_get_nz_row
+end function psb_z_coo_get_nz_row
 
-subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
+subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_cssm
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_cssm
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-  real(psb_dpk_), intent(inout)       :: y(:,:)
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_dpk_), intent(inout)       :: y(:,:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: tmp(:,:)
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra, ctra
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_base_csmm'
+  character(len=20)  :: name='z_base_csmm'
   logical, parameter :: debug=.false.
 
   info = psb_success_
@@ -784,10 +842,10 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
   nc  = min(size(x,2) , size(y,2))
   nnz = a%get_nzeros()
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i,1:nc) = dzero
+        y(i,1:nc) = zzero
       enddo
     else
       do  i = 1, m
@@ -797,7 +855,7 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then
+  if (beta == zzero) then
     call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1,kind=psb_ipk_),y,size(y,1,kind=psb_ipk_),info)
@@ -842,12 +900,12 @@ contains
     implicit none
     logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer(psb_ipk_), intent(in)                 :: nr,nc,nz,ldx,ldy,ia(*),ja(*)
-    real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
-    real(psb_dpk_), intent(out)         :: y(ldy,*)
+    complex(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
+    complex(psb_dpk_), intent(out)         :: y(ldy,*)
     integer(psb_ipk_), intent(out)                :: info
 
     integer(psb_ipk_) :: i,j,k,m, ir, jc
-    real(psb_dpk_), allocatable  :: acc(:)
+    complex(psb_dpk_), allocatable  :: acc(:)
 
     info = psb_success_
     allocate(acc(nc), stat=info)
@@ -871,7 +929,7 @@ contains
         if (unit) then
           j = 1
           do i=1, nr
-            acc(1:nc) = dzero
+            acc(1:nc) = zzero
             do
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -883,7 +941,7 @@ contains
         else if (.not.unit) then
           j = 1
           do i=1, nr
-            acc(1:nc) = dzero
+            acc(1:nc) = zzero
             do
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -902,7 +960,7 @@ contains
         if (unit) then
           j = nnz
           do i=nr, 1, -1
-            acc(1:nc) = dzero
+            acc(1:nc) = zzero
             do
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -916,7 +974,7 @@ contains
 
           j = nnz
           do i=nr, 1, -1
-            acc(1:nc) = dzero
+            acc(1:nc) = zzero
             do
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -1017,7 +1075,7 @@ contains
               if (j < 1) exit
               if (ia(j) < i) exit
               jc    = ja(j)
-              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc)
+              y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc)
               j     = j - 1
             end do
           end do
@@ -1025,7 +1083,7 @@ contains
           j = nnz
           do i=nr, 1, -1
             if (ja(j) == i) then
-              y(i,1:nc) = y(i,1:nc) / (val(j))
+              y(i,1:nc) = y(i,1:nc) / conjg(val(j))
               j    = j - 1
             end if
             acc(1:nc)  = y(i,1:nc)
@@ -1033,7 +1091,7 @@ contains
               if (j < 1) exit
               if (ia(j) < i) exit
               jc    = ja(j)
-              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc)
+              y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc)
               j     = j - 1
             end do
           end do
@@ -1047,7 +1105,7 @@ contains
                 if (j > nnz) exit
                 if (ia(j) > i) exit
                 jc    = ja(j)
-                y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc)
+                y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc)
                 j   = j + 1
               end do
             end do
@@ -1055,7 +1113,7 @@ contains
             j = 1
             do i=1, nr
               if (ja(j) == i) then
-                y(i,1:nc) = y(i,1:nc) / (val(j))
+                y(i,1:nc) = y(i,1:nc) / conjg(val(j))
                 j    = j + 1
               end if
               acc(1:nc) = y(i,1:nc)
@@ -1063,7 +1121,7 @@ contains
                 if (j > nnz) exit
                 if (ia(j) > i) exit
                 jc    = ja(j)
-                y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc)
+                y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc)
                 j   = j + 1
               end do
             end do
@@ -1074,29 +1132,29 @@ contains
     end if
   end subroutine inner_coosm
 
-end subroutine psb_d_coo_cssm
+end subroutine psb_z_coo_cssm
 
 
 
-subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
+subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_cssv
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_cssv
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+  complex(psb_dpk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: tmp(:)
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: tmp(:)
   logical   :: tra, ctra
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_cssv_impl'
+  character(len=20)  :: name='z_coo_cssv_impl'
   logical, parameter :: debug=.false.
 
   info = psb_success_
@@ -1134,10 +1192,10 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = zzero
       enddo
     else
       do  i = 1, m
@@ -1147,7 +1205,7 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then
+  if (beta == zzero) then
     call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,y,info)
@@ -1192,12 +1250,12 @@ contains
     implicit none
     logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer(psb_ipk_), intent(in)                 :: nr,nz,ia(*),ja(*)
-    real(psb_dpk_), intent(in)          :: val(*), x(*)
-    real(psb_dpk_), intent(out)         :: y(*)
+    complex(psb_dpk_), intent(in)          :: val(*), x(*)
+    complex(psb_dpk_), intent(out)         :: y(*)
     integer(psb_ipk_), intent(out)                :: info
 
     integer(psb_ipk_) :: i,j,k,m, ir, jc, nnz
-    real(psb_dpk_) :: acc
+    complex(psb_dpk_) :: acc
 
     info = psb_success_
     if (.not.sorted) then
@@ -1213,7 +1271,7 @@ contains
         if (unit) then
           j = 1
           do i=1, nr
-            acc = dzero
+            acc = zzero
             do
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -1225,7 +1283,7 @@ contains
         else if (.not.unit) then
           j = 1
           do i=1, nr
-            acc = dzero
+            acc = zzero
             do
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -1244,7 +1302,7 @@ contains
         if (unit) then
           j = nnz
           do i=nr, 1, -1
-            acc = dzero
+            acc = zzero
             do
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -1258,7 +1316,7 @@ contains
 
           j = nnz
           do i=nr, 1, -1
-            acc = dzero
+            acc = zzero
             do
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -1359,7 +1417,7 @@ contains
               if (j < 1) exit
               if (ia(j) < i) exit
               jc    = ja(j)
-              y(jc) = y(jc) - (val(j))*acc
+              y(jc) = y(jc) - conjg(val(j))*acc
               j     = j - 1
             end do
           end do
@@ -1367,7 +1425,7 @@ contains
           j = nnz
           do i=nr, 1, -1
             if (ja(j) == i) then
-              y(i) = y(i) /(val(j))
+              y(i) = y(i) /conjg(val(j))
               j    = j - 1
             end if
             acc  = y(i)
@@ -1375,7 +1433,7 @@ contains
               if (j < 1) exit
               if (ia(j) < i) exit
               jc    = ja(j)
-              y(jc) = y(jc) - (val(j))*acc
+              y(jc) = y(jc) - conjg(val(j))*acc
               j     = j - 1
             end do
           end do
@@ -1389,7 +1447,7 @@ contains
                 if (j > nnz) exit
                 if (ia(j) > i) exit
                 jc    = ja(j)
-                y(jc) = y(jc) - (val(j))*acc
+                y(jc) = y(jc) - conjg(val(j))*acc
                 j   = j + 1
               end do
             end do
@@ -1397,7 +1455,7 @@ contains
             j = 1
             do i=1, nr
               if (ja(j) == i) then
-                y(i) = y(i) /(val(j))
+                y(i) = y(i) /conjg(val(j))
                 j    = j + 1
               end if
               acc = y(i)
@@ -1405,7 +1463,7 @@ contains
                 if (j > nnz) exit
                 if (ia(j) > i) exit
                 jc    = ja(j)
-                y(jc) = y(jc) - (val(j))*acc
+                y(jc) = y(jc) - conjg(val(j))*acc
                 j   = j + 1
               end do
             end do
@@ -1417,27 +1475,27 @@ contains
   end subroutine inner_coosv
 
 
-end subroutine psb_d_coo_cssv
+end subroutine psb_z_coo_cssv
 
-subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
+subroutine psb_z_coo_csmv(alpha,a,x,beta,y,info,trans)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csmv
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csmv
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+  complex(psb_dpk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
-  real(psb_dpk_) :: acc
+  complex(psb_dpk_) :: acc
   logical   :: tra, ctra
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_csmv_impl'
+  character(len=20)  :: name='z_coo_csmv_impl'
   logical, parameter :: debug=.false.
 
   info = psb_success_
@@ -1481,10 +1539,10 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
   nnz = a%get_nzeros()
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = zzero
       enddo
     else
       do  i = 1, m
@@ -1494,12 +1552,12 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
     return
   else
     if (a%is_unit()) then
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, min(m,n)
           y(i) = alpha*x(i)
         enddo
         do i = min(m,n)+1, m
-          y(i) = dzero
+          y(i) = zzero
         enddo
       else
         do  i = 1, min(m,n)
@@ -1510,9 +1568,9 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
         enddo
       endif
     else
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, m
-          y(i) = dzero
+          y(i) = zzero
         enddo
       else
         do  i = 1, m
@@ -1529,7 +1587,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
     j    = i
     if (nnz > 0) then
       ir   = a%ia(1)
-      acc  = dzero
+      acc  = zzero
       do
         if (i>nnz) then
           y(ir) = y(ir) + alpha * acc
@@ -1538,7 +1596,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
         if (a%ia(i) /= ir) then
           y(ir) = y(ir) + alpha * acc
           ir    = a%ia(i)
-          acc   = dzero
+          acc   = zzero
         endif
         acc     = acc + a%val(i) * x(a%ja(i))
         i       = i + 1
@@ -1547,7 +1605,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
   else if (tra) then
 
-    if (alpha == done) then
+    if (alpha == zone) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
@@ -1555,7 +1613,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
         y(ir) = y(ir) +  a%val(i)*x(jc)
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -zone) then
 
       do i=1,nnz
         ir = a%ja(i)
@@ -1575,20 +1633,20 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
   else if (ctra) then
 
-    if (alpha == done) then
+    if (alpha == zone) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) +  (a%val(i))*x(jc)
+        y(ir) = y(ir) +  conjg(a%val(i))*x(jc)
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -zone) then
 
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) - (a%val(i))*x(jc)
+        y(ir) = y(ir) - conjg(a%val(i))*x(jc)
       enddo
 
     else
@@ -1596,7 +1654,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) + alpha*(a%val(i))*x(jc)
+        y(ir) = y(ir) + alpha*conjg(a%val(i))*x(jc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -1610,27 +1668,27 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
   return
 
-end subroutine psb_d_coo_csmv
+end subroutine psb_z_coo_csmv
 
 
-subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
+subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csmm
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csmm
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-  real(psb_dpk_), intent(inout)       :: y(:,:)
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_dpk_), intent(inout)       :: y(:,:)
   integer(psb_ipk_), intent(out)       :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_), allocatable  :: acc(:)
+  complex(psb_dpk_), allocatable  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_csmm_impl'
+  character(len=20)  :: name='z_coo_csmm_impl'
   logical, parameter :: debug=.false.
 
   info = psb_success_
@@ -1685,10 +1743,10 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i,1:nc) = dzero
+        y(i,1:nc) = zzero
       enddo
     else
       do  i = 1, m
@@ -1698,12 +1756,12 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
     return
   else
     if (a%is_unit()) then
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, min(m,n)
           y(i,1:nc) = alpha*x(i,1:nc)
         enddo
         do i = min(m,n)+1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         enddo
       else
         do  i = 1, min(m,n)
@@ -1714,9 +1772,9 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
         enddo
       endif
     else
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         enddo
       else
         do  i = 1, m
@@ -1733,7 +1791,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
     j    = i
     if (nnz > 0) then
       ir   = a%ia(1)
-      acc  = dzero
+      acc  = zzero
       do
         if (i>nnz) then
           y(ir,1:nc) = y(ir,1:nc) + alpha * acc
@@ -1742,7 +1800,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
         if (a%ia(i) /= ir) then
           y(ir,1:nc) = y(ir,1:nc) + alpha * acc
           ir    = a%ia(i)
-          acc   = dzero
+          acc   = zzero
         endif
         acc     = acc + a%val(i) * x(a%ja(i),1:nc)
         i       = i + 1
@@ -1751,7 +1809,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
 
   else if (tra) then
 
-    if (alpha == done) then
+    if (alpha == zone) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
@@ -1759,7 +1817,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
         y(ir,1:nc) = y(ir,1:nc) +  a%val(i)*x(jc,1:nc)
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -zone) then
 
       do i=1,nnz
         ir = a%ja(i)
@@ -1777,22 +1835,22 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
 
     end if                  !.....end testing on alpha
 
-  else if (ctra) then
+  else if (ctra) then           !
 
-    if (alpha == done) then
+    if (alpha == zone) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) +  (a%val(i))*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) +  conjg(a%val(i))*x(jc,1:nc)
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -zone) then
 
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) - (a%val(i))*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) - conjg(a%val(i))*x(jc,1:nc)
       enddo
 
     else
@@ -1800,7 +1858,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) + alpha*(a%val(i))*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) + alpha*conjg(a%val(i))*x(jc,1:nc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -1814,17 +1872,17 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
 
   return
 
-end subroutine psb_d_coo_csmm
+end subroutine psb_z_coo_csmm
 
-function psb_d_coo_maxval(a) result(res)
+function psb_z_coo_maxval(a) result(res)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_maxval
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_maxval
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
   integer(psb_ipk_)  :: i,j,k,m,n, nnz, ir, jc, nc, info
-  character(len=20)  :: name='d_coo_maxval'
+  character(len=20)  :: name='z_coo_maxval'
   logical, parameter :: debug=.false.
 
   if (a%is_dev())   call a%sync()
@@ -1840,13 +1898,13 @@ function psb_d_coo_maxval(a) result(res)
     res = maxval(abs(a%val(1:nnz)))
   end if
 
-end function psb_d_coo_maxval
+end function psb_z_coo_maxval
 
-function psb_d_coo_csnmi(a) result(res)
+function psb_z_coo_csnmi(a) result(res)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csnmi
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csnmi
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
@@ -1854,7 +1912,7 @@ function psb_d_coo_csnmi(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical            :: tra, is_unit
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_csnmi'
+  character(len=20)  :: name='z_coo_csnmi'
   logical, parameter :: debug=.false.
 
   if (a%is_dev())   call a%sync()
@@ -1898,16 +1956,16 @@ function psb_d_coo_csnmi(a) result(res)
     deallocate(vt,stat=info)
   end if
 
-end function psb_d_coo_csnmi
+end function psb_z_coo_csnmi
 
 
-function psb_d_coo_csnm1(a) result(res)
+function psb_z_coo_csnm1(a) result(res)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csnm1
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csnm1
 
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
@@ -1915,7 +1973,7 @@ function psb_d_coo_csnm1(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='d_coo_csnm1'
+  character(len=20)  :: name='z_coo_csnm1'
   logical, parameter :: debug=.false.
 
   if (a%is_dev())   call a%sync()
@@ -1939,18 +1997,18 @@ function psb_d_coo_csnm1(a) result(res)
 
   return
 
-end function psb_d_coo_csnm1
+end function psb_z_coo_csnm1
 
-subroutine psb_d_coo_rowsum(d,a)
+subroutine psb_z_coo_rowsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_rowsum
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)             :: d(:)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_rowsum
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)             :: d(:)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='rowsum'
@@ -1968,9 +2026,9 @@ subroutine psb_d_coo_rowsum(d,a)
   end if
 
   if (a%is_unit()) then
-    d = done
+    d = zone
   else
-    d = dzero
+    d = zzero
   end if
   nnz = a%get_nzeros()
   do j=1, nnz
@@ -1987,13 +2045,13 @@ subroutine psb_d_coo_rowsum(d,a)
 
   return
 
-end subroutine psb_d_coo_rowsum
+end subroutine psb_z_coo_rowsum
 
-subroutine psb_d_coo_arwsum(d,a)
+subroutine psb_z_coo_arwsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_arwsum
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_arwsum
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
@@ -2033,18 +2091,18 @@ subroutine psb_d_coo_arwsum(d,a)
 
   return
 
-end subroutine psb_d_coo_arwsum
+end subroutine psb_z_coo_arwsum
 
-subroutine psb_d_coo_colsum(d,a)
+subroutine psb_z_coo_colsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_colsum
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)              :: d(:)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_colsum
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)              :: d(:)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='colsum'
@@ -2061,9 +2119,9 @@ subroutine psb_d_coo_colsum(d,a)
   end if
 
   if (a%is_unit()) then
-    d = done
+    d = zone
   else
-    d = dzero
+    d = zzero
   end if
 
   nnz = a%get_nzeros()
@@ -2080,13 +2138,13 @@ subroutine psb_d_coo_colsum(d,a)
 
   return
 
-end subroutine psb_d_coo_colsum
+end subroutine psb_z_coo_colsum
 
-subroutine psb_d_coo_aclsum(d,a)
+subroutine psb_z_coo_aclsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_aclsum
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_aclsum
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
@@ -2128,7 +2186,7 @@ subroutine psb_d_coo_aclsum(d,a)
 
   return
 
-end subroutine psb_d_coo_aclsum
+end subroutine psb_z_coo_aclsum
 
 
 ! == ==================================
@@ -2145,16 +2203,16 @@ end subroutine psb_d_coo_aclsum
 
 
 
-subroutine psb_d_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
+subroutine psb_z_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csgetptn
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csgetptn
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(in)       :: a
+  class(psb_z_coo_sparse_mat), intent(in)       :: a
   integer(psb_ipk_), intent(in)                 :: imin,imax
   integer(psb_ipk_), intent(out)                :: nz
   integer(psb_ipk_), allocatable, intent(inout) :: ia(:), ja(:)
@@ -2247,7 +2305,7 @@ contains
     use psb_sort_mod
     implicit none
 
-    class(psb_d_coo_sparse_mat), intent(in)    :: a
+    class(psb_z_coo_sparse_mat), intent(in)    :: a
     integer(psb_ipk_) :: imin,imax,jmin,jmax
     integer(psb_ipk_), intent(inout)               :: nz
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
@@ -2411,27 +2469,27 @@ contains
 
   end subroutine coo_getptn
 
-end subroutine psb_d_coo_csgetptn
+end subroutine psb_z_coo_csgetptn
 
 
 !
 ! NZ is the number of non-zeros on output.
 ! The output is guaranteed to be sorted
 !
-subroutine psb_d_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+subroutine psb_z_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csgetrow
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csgetrow
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   integer(psb_ipk_), intent(in)                  :: imin,imax
   integer(psb_ipk_), intent(out)                 :: nz
   integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+  complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
   integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
@@ -2526,11 +2584,11 @@ contains
     use psb_ip_reord_mod
     implicit none
 
-    class(psb_d_coo_sparse_mat), intent(in)    :: a
+    class(psb_z_coo_sparse_mat), intent(in)    :: a
     integer(psb_ipk_) :: imin,imax,jmin,jmax
     integer(psb_ipk_), intent(inout)               :: nz
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_ipk_), intent(in)                  :: nzin
     logical, intent(in)                            :: append,chksz
     integer(psb_ipk_) :: info
@@ -2632,7 +2690,7 @@ contains
               ja(nzin_+nz)  = iren(a%ja(i))
             end if
           enddo
-          call psb_d_fix_coo_inner(nra,nca,nzin_+nz,psb_dupl_add_,ia,ja,val,nz,info)
+          call psb_z_fix_coo_inner(nra,nca,nzin_+nz,psb_dupl_add_,ia,ja,val,nz,info)
           nz = nz - nzin_
         else
           do i=ip,jp
@@ -2702,30 +2760,30 @@ contains
           endif
         enddo
       end if
-      call psb_d_fix_coo_inner(nra,nca,nzin_+k,psb_dupl_add_,ia,ja,val,nz,info)
+      call psb_z_fix_coo_inner(nra,nca,nzin_+k,psb_dupl_add_,ia,ja,val,nz,info)
       nz = nz - nzin_
     end if
 
   end subroutine coo_getrow
 
-end subroutine psb_d_coo_csgetrow
+end subroutine psb_z_coo_csgetrow
 
 
-subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_error_mod
   use psb_realloc_mod
   use psb_sort_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_csput_a
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csput_a
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: val(:)
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: val(:)
   integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
 
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_csput_a_impl'
+  character(len=20)  :: name='z_coo_csput_a_impl'
   logical, parameter :: debug=.false.
   integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, debug_level, debug_unit
 
@@ -2783,7 +2841,7 @@ subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
     if (a%is_dev())   call a%sync()
 
-    call  d_coo_srch_upd(nz,ia,ja,val,a,&
+    call  z_coo_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info)
 
     if (info < 0) then
@@ -2820,8 +2878,8 @@ contains
     integer(psb_ipk_), intent(in) :: nz, imin,imax,jmin,jmax,maxsz
     integer(psb_ipk_), intent(in) :: ia(:),ja(:)
     integer(psb_ipk_), intent(inout) :: nza,ia1(:),ia2(:)
-    real(psb_dpk_), intent(in) :: val(:)
-    real(psb_dpk_), intent(inout) :: aspk(:)
+    complex(psb_dpk_), intent(in) :: val(:)
+    complex(psb_dpk_), intent(inout) :: aspk(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: i,ir,ic
 
@@ -2840,7 +2898,7 @@ contains
   end subroutine psb_inner_ins
 
 
-  subroutine d_coo_srch_upd(nz,ia,ja,val,a,&
+  subroutine z_coo_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info)
 
     use psb_const_mod
@@ -2848,15 +2906,15 @@ contains
     use psb_string_mod
     implicit none
 
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    class(psb_z_coo_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: nz, imin,imax,jmin,jmax
     integer(psb_ipk_), intent(in) :: ia(:),ja(:)
-    real(psb_dpk_), intent(in) :: val(:)
+    complex(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,nnz,dupl,nr
     integer(psb_ipk_) :: debug_level, debug_unit
-    character(len=20)    :: name='d_coo_srch_upd'
+    character(len=20)    :: name='z_coo_srch_upd'
 
     info = psb_success_
     debug_unit  = psb_get_debug_unit()
@@ -2959,17 +3017,17 @@ contains
            & ': Duplicate handling: ',dupl
     end select
 
-  end subroutine d_coo_srch_upd
+  end subroutine z_coo_srch_upd
 
-end subroutine psb_d_coo_csput_a
+end subroutine psb_z_coo_csput_a
 
 
-subroutine psb_d_cp_coo_to_coo(a,b,info)
+subroutine psb_z_cp_coo_to_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_cp_coo_to_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_to_coo
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act, nz
@@ -2981,7 +3039,7 @@ subroutine psb_d_cp_coo_to_coo(a,b,info)
   info = psb_success_
   if (a%is_dev())   call a%sync()
 
-  b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
+  b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
   call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
@@ -3004,14 +3062,14 @@ subroutine psb_d_cp_coo_to_coo(a,b,info)
 
   return
 
-end subroutine psb_d_cp_coo_to_coo
+end subroutine psb_z_cp_coo_to_coo
 
-subroutine psb_d_cp_coo_from_coo(a,b,info)
+subroutine psb_z_cp_coo_from_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_cp_coo_from_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_from_coo
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(in)    :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3023,7 +3081,7 @@ subroutine psb_d_cp_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (b%is_dev())   call b%sync()
-  a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
+  a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
   call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
@@ -3049,15 +3107,15 @@ subroutine psb_d_cp_coo_from_coo(a,b,info)
 
   return
 
-end subroutine psb_d_cp_coo_from_coo
+end subroutine psb_z_cp_coo_from_coo
 
 
-subroutine psb_d_cp_coo_to_fmt(a,b,info)
+subroutine psb_z_cp_coo_to_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_cp_coo_to_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_to_fmt
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3082,14 +3140,14 @@ subroutine psb_d_cp_coo_to_fmt(a,b,info)
 
   return
 
-end subroutine psb_d_cp_coo_to_fmt
+end subroutine psb_z_cp_coo_to_fmt
 
-subroutine psb_d_cp_coo_from_fmt(a,b,info)
+subroutine psb_z_cp_coo_from_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_cp_coo_from_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_from_fmt
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(in) :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3115,15 +3173,15 @@ subroutine psb_d_cp_coo_from_fmt(a,b,info)
 
   return
 
-end subroutine psb_d_cp_coo_from_fmt
+end subroutine psb_z_cp_coo_from_fmt
 
 
-subroutine psb_d_mv_coo_to_coo(a,b,info)
+subroutine psb_z_mv_coo_to_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_mv_coo_to_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_mv_coo_to_coo
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3134,7 +3192,7 @@ subroutine psb_d_mv_coo_to_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (a%is_dev())   call a%sync()
-  b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
+  b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
   call b%set_sort_status(a%get_sort_status())
   call b%set_nzeros(a%get_nzeros())
 
@@ -3158,14 +3216,14 @@ subroutine psb_d_mv_coo_to_coo(a,b,info)
 
   return
 
-end subroutine psb_d_mv_coo_to_coo
+end subroutine psb_z_mv_coo_to_coo
 
-subroutine psb_d_mv_coo_from_coo(a,b,info)
+subroutine psb_z_mv_coo_from_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_mv_coo_from_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_mv_coo_from_coo
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3177,7 +3235,7 @@ subroutine psb_d_mv_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (b%is_dev())   call b%sync()
-  a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
+  a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
   call a%set_sort_status(b%get_sort_status())
   call a%set_nzeros(b%get_nzeros())
 
@@ -3201,15 +3259,15 @@ subroutine psb_d_mv_coo_from_coo(a,b,info)
 
   return
 
-end subroutine psb_d_mv_coo_from_coo
+end subroutine psb_z_mv_coo_from_coo
 
 
-subroutine psb_d_mv_coo_to_fmt(a,b,info)
+subroutine psb_z_mv_coo_to_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_mv_coo_to_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_mv_coo_to_fmt
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3234,14 +3292,14 @@ subroutine psb_d_mv_coo_to_fmt(a,b,info)
 
   return
 
-end subroutine psb_d_mv_coo_to_fmt
+end subroutine psb_z_mv_coo_to_fmt
 
-subroutine psb_d_mv_coo_from_fmt(a,b,info)
+subroutine psb_z_mv_coo_from_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_mv_coo_from_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_mv_coo_from_fmt
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -3267,15 +3325,15 @@ subroutine psb_d_mv_coo_from_fmt(a,b,info)
 
   return
 
-end subroutine psb_d_mv_coo_from_fmt
+end subroutine psb_z_mv_coo_from_fmt
 
-subroutine psb_d_coo_cp_from(a,b)
+subroutine psb_z_coo_cp_from(a,b)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_cp_from
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_cp_from
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  type(psb_d_coo_sparse_mat), intent(in)   :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  type(psb_z_coo_sparse_mat), intent(in)   :: b
 
 
   integer(psb_ipk_)  :: err_act, info
@@ -3297,15 +3355,15 @@ subroutine psb_d_coo_cp_from(a,b)
 
   return
 
-end subroutine psb_d_coo_cp_from
+end subroutine psb_z_coo_cp_from
 
-subroutine psb_d_coo_mv_from(a,b)
+subroutine psb_z_coo_mv_from(a,b)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_mv_from
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_mv_from
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(inout)  :: a
-  type(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(inout)  :: a
+  type(psb_z_coo_sparse_mat), intent(inout) :: b
 
 
   integer(psb_ipk_)  :: err_act, info
@@ -3327,17 +3385,17 @@ subroutine psb_d_coo_mv_from(a,b)
 
   return
 
-end subroutine psb_d_coo_mv_from
+end subroutine psb_z_coo_mv_from
 
 
 
-subroutine psb_d_fix_coo(a,info,idir)
+subroutine psb_z_fix_coo(a,info,idir)
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_fix_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_fix_coo
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_), intent(in), optional :: idir
   integer(psb_ipk_), allocatable :: iaux(:)
@@ -3368,7 +3426,7 @@ subroutine psb_d_fix_coo(a,info,idir)
   nza = a%get_nzeros()
   if (nza >= 2) then
     dupl_ = a%get_dupl()
-    call psb_d_fix_coo_inner(nra,nca,nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
+    call psb_z_fix_coo_inner(nra,nca,nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
     if (info /= psb_success_) goto 9999
   else
     i = nza
@@ -3385,14 +3443,14 @@ subroutine psb_d_fix_coo(a,info,idir)
 
   return
 
-end subroutine psb_d_fix_coo
+end subroutine psb_z_fix_coo
 
 
 
-subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
+subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_fix_coo_inner
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_fix_coo_inner
   use psb_string_mod
   use psb_ip_reord_mod
   use psb_sort_mod
@@ -3400,12 +3458,12 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
   integer(psb_ipk_), intent(in)           :: nr, nc, nzin, dupl
   integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
-  real(psb_dpk_), intent(inout) :: val(:)
+  complex(psb_dpk_), intent(inout) :: val(:)
   integer(psb_ipk_), intent(out)          :: nzout, info
   integer(psb_ipk_), intent(in), optional :: idir
   !locals
   integer(psb_ipk_), allocatable :: iaux(:), ias(:),jas(:), ix2(:)
-  real(psb_dpk_),  allocatable :: vs(:)
+  complex(psb_dpk_),  allocatable :: vs(:)
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_
   integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -4114,15 +4172,15 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
   return
 
-end subroutine psb_d_fix_coo_inner
+end subroutine psb_z_fix_coo_inner
 
 
-subroutine psb_d_cp_coo_to_lcoo(a,b,info)
+subroutine psb_z_cp_coo_to_lcoo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_cp_coo_to_lcoo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_to_lcoo
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  class(psb_ld_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -4158,14 +4216,14 @@ subroutine psb_d_cp_coo_to_lcoo(a,b,info)
 
   return
 
-end subroutine psb_d_cp_coo_to_lcoo
+end subroutine psb_z_cp_coo_to_lcoo
 
-subroutine psb_d_cp_coo_from_lcoo(a,b,info)
+subroutine psb_z_cp_coo_from_lcoo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_cp_coo_from_lcoo
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_from_lcoo
   implicit none
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_coo_sparse_mat), intent(in)    :: b
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -4202,22 +4260,22 @@ subroutine psb_d_cp_coo_from_lcoo(a,b,info)
 
   return
 
-end subroutine psb_d_cp_coo_from_lcoo
+end subroutine psb_z_cp_coo_from_lcoo
 
 
 !
 !
-! ld coo impl
+! lz coo impl
 !
 !
 
-subroutine psb_ld_coo_get_diag(a,d,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_get_diag
+subroutine psb_lz_coo_get_diag(a,d,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_get_diag
   use psb_error_mod
   use psb_const_mod
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)     :: d(:)
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)     :: d(:)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -4237,9 +4295,9 @@ subroutine psb_ld_coo_get_diag(a,d,info)
   end if
 
   if (a%is_unit()) then
-    d(1:mnm) = done
+    d(1:mnm) = zone
   else
-    d(1:mnm) = dzero
+    d(1:mnm) = zzero
     do i=1,a%get_nzeros()
       j=a%ia(i)
       if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then
@@ -4254,16 +4312,16 @@ subroutine psb_ld_coo_get_diag(a,d,info)
 
   return
 
-end subroutine psb_ld_coo_get_diag
+end subroutine psb_lz_coo_get_diag
 
-subroutine psb_ld_coo_scal(d,a,info,side)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_scal
+subroutine psb_lz_coo_scal(d,a,info,side)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_scal
   use psb_error_mod
   use psb_const_mod
   use psb_string_mod
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d(:)
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d(:)
   integer(psb_ipk_), intent(out)            :: info
   character, intent(in), optional :: side
 
@@ -4323,16 +4381,16 @@ subroutine psb_ld_coo_scal(d,a,info,side)
 
   return
 
-end subroutine psb_ld_coo_scal
+end subroutine psb_lz_coo_scal
 
 
-subroutine psb_ld_coo_scals(d,a,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_scals
+subroutine psb_lz_coo_scals(d,a,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_scals
   use psb_error_mod
   use psb_const_mod
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -4360,18 +4418,18 @@ subroutine psb_ld_coo_scals(d,a,info)
 
   return
 
-end subroutine psb_ld_coo_scals
+end subroutine psb_lz_coo_scals
 
 
-function psb_ld_coo_maxval(a) result(res)
+function psb_lz_coo_maxval(a) result(res)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_maxval
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_maxval
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
   integer(psb_lpk_)  :: i,j,k,m,n, nnz, ir, jc, nc, info
-  character(len=20)  :: name='d_coo_maxval'
+  character(len=20)  :: name='z_coo_maxval'
   logical, parameter :: debug=.false.
 
   if (a%is_dev())   call a%sync()
@@ -4387,13 +4445,13 @@ function psb_ld_coo_maxval(a) result(res)
     res = maxval(abs(a%val(1:nnz)))
   end if
 
-end function psb_ld_coo_maxval
+end function psb_lz_coo_maxval
 
-function psb_ld_coo_csnmi(a) result(res)
+function psb_lz_coo_csnmi(a) result(res)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csnmi
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_csnmi
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
   integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
@@ -4401,7 +4459,7 @@ function psb_ld_coo_csnmi(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical            :: tra, is_unit
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_coo_csnmi'
+  character(len=20)  :: name='z_coo_csnmi'
   logical, parameter :: debug=.false.
 
   if (a%is_dev())   call a%sync()
@@ -4445,16 +4503,16 @@ function psb_ld_coo_csnmi(a) result(res)
     deallocate(vt,stat=info)
   end if
 
-end function psb_ld_coo_csnmi
+end function psb_lz_coo_csnmi
 
 
-function psb_ld_coo_csnm1(a) result(res)
+function psb_lz_coo_csnm1(a) result(res)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csnm1
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_csnm1
 
   implicit none
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
   integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
@@ -4462,7 +4520,7 @@ function psb_ld_coo_csnm1(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='ld_coo_csnm1'
+  character(len=20)  :: name='lz_coo_csnm1'
   logical, parameter :: debug=.false.
 
   if (a%is_dev())   call a%sync()
@@ -4486,19 +4544,19 @@ function psb_ld_coo_csnm1(a) result(res)
 
   return
 
-end function psb_ld_coo_csnm1
+end function psb_lz_coo_csnm1
 
-subroutine psb_ld_coo_rowsum(d,a)
+subroutine psb_lz_coo_rowsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_rowsum
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)             :: d(:)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_rowsum
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)             :: d(:)
 
   integer(psb_lpk_) :: i,j,k,n, nnz, ir, jc, nc
   integer(psb_epk_) :: m
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='rowsum'
@@ -4516,9 +4574,9 @@ subroutine psb_ld_coo_rowsum(d,a)
   end if
 
   if (a%is_unit()) then
-    d = done
+    d = zone
   else
-    d = dzero
+    d = zzero
   end if
   nnz = a%get_nzeros()
   do j=1, nnz
@@ -4535,13 +4593,13 @@ subroutine psb_ld_coo_rowsum(d,a)
 
   return
 
-end subroutine psb_ld_coo_rowsum
+end subroutine psb_lz_coo_rowsum
 
-subroutine psb_ld_coo_arwsum(d,a)
+subroutine psb_lz_coo_arwsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_arwsum
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_arwsum
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
   integer(psb_lpk_) :: i,j,k,n, nnz, ir, jc, nc
@@ -4582,19 +4640,19 @@ subroutine psb_ld_coo_arwsum(d,a)
 
   return
 
-end subroutine psb_ld_coo_arwsum
+end subroutine psb_lz_coo_arwsum
 
-subroutine psb_ld_coo_colsum(d,a)
+subroutine psb_lz_coo_colsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_colsum
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)              :: d(:)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_colsum
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)              :: d(:)
 
   integer(psb_lpk_) :: i,j,k,m, nnz, ir, jc, nc
   integer(psb_epk_) :: n
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  complex(psb_dpk_) :: acc
+  complex(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='colsum'
@@ -4611,9 +4669,9 @@ subroutine psb_ld_coo_colsum(d,a)
   end if
 
   if (a%is_unit()) then
-    d = done
+    d = zone
   else
-    d = dzero
+    d = zzero
   end if
 
   nnz = a%get_nzeros()
@@ -4630,13 +4688,13 @@ subroutine psb_ld_coo_colsum(d,a)
 
   return
 
-end subroutine psb_ld_coo_colsum
+end subroutine psb_lz_coo_colsum
 
-subroutine psb_ld_coo_aclsum(d,a)
+subroutine psb_lz_coo_aclsum(d,a)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_aclsum
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_aclsum
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
   integer(psb_lpk_) :: i,j,k,m, nnz, ir, jc, nc
@@ -4679,15 +4737,15 @@ subroutine psb_ld_coo_aclsum(d,a)
 
   return
 
-end subroutine psb_ld_coo_aclsum
+end subroutine psb_lz_coo_aclsum
 
-subroutine psb_ld_coo_scalplusidentity(d,a,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_scalplusidentity
+subroutine psb_lz_coo_scalplusidentity(d,a,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_scalplusidentity
   use psb_error_mod
   use psb_const_mod
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act,mnm, i, j, m
@@ -4707,7 +4765,7 @@ subroutine psb_ld_coo_scalplusidentity(d,a,info)
     a%val(i) = a%val(i) * d
     j=a%ia(i)
     if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then
-      a%val(i) = a%val(i) + done
+      a%val(i) = a%val(i) + zone
     endif
   enddo
   call a%set_host()
@@ -4719,24 +4777,24 @@ subroutine psb_ld_coo_scalplusidentity(d,a,info)
 
   return
 
-end subroutine psb_ld_coo_scalplusidentity
+end subroutine psb_lz_coo_scalplusidentity
 
-subroutine psb_ld_coo_spaxpby(alpha,a,beta,b,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_spaxpby
+subroutine psb_lz_coo_spaxpby(alpha,a,beta,b,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_spaxpby
   use psb_error_mod
   use psb_const_mod
   implicit none
 
-  class(psb_ld_coo_sparse_mat),  intent(inout) :: a
-  class(psb_ld_base_sparse_mat), intent(inout) :: b
-  real(psb_dpk_), intent(in)      :: alpha
-  real(psb_dpk_), intent(in)      :: beta
+  class(psb_lz_coo_sparse_mat),  intent(inout) :: a
+  class(psb_lz_base_sparse_mat), intent(inout) :: b
+  complex(psb_dpk_), intent(in)      :: alpha
+  complex(psb_dpk_), intent(in)      :: beta
   integer(psb_ipk_), intent(out)   :: info
 
   !Local
   integer(psb_ipk_)            :: err_act
-  character(len=20)  :: name='ld_coo_spaxpby'
-  type(psb_ld_coo_sparse_mat) :: tcoo,bcoo
+  character(len=20)  :: name='lz_coo_spaxpby'
+  type(psb_lz_coo_sparse_mat) :: tcoo,bcoo
   integer(psb_lpk_)            :: nza, nzb, M, N
 
   call psb_erractionsave(err_act)
@@ -4777,15 +4835,15 @@ subroutine psb_ld_coo_spaxpby(alpha,a,beta,b,info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine psb_ld_coo_spaxpby
+end subroutine psb_lz_coo_spaxpby
 
-function psb_ld_coo_cmpval(a,val,tol,info) result(res)
+function psb_lz_coo_cmpval(a,val,tol,info) result(res)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_cmpval
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_cmpval
 
-  class(psb_ld_coo_sparse_mat),  intent(inout) :: a
-  real(psb_dpk_), intent(in)                   :: val
+  class(psb_lz_coo_sparse_mat),  intent(inout) :: a
+  complex(psb_dpk_), intent(in)                   :: val
   real(psb_dpk_), intent(in)                  :: tol
   integer(psb_ipk_), intent(out)                :: info
   logical                                       :: res
@@ -4812,15 +4870,15 @@ function psb_ld_coo_cmpval(a,val,tol,info) result(res)
 9999 call psb_error_handler(err_act)
 
   return
-end function psb_ld_coo_cmpval
+end function psb_lz_coo_cmpval
 
-function psb_ld_coo_cmpmat(a,b,tol,info) result(res)
+function psb_lz_coo_cmpmat(a,b,tol,info) result(res)
   use psb_error_mod
   use psb_const_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_cmpmat
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_cmpmat
 
-  class(psb_ld_coo_sparse_mat),  intent(inout) :: a
-  class(psb_ld_base_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat),  intent(inout) :: a
+  class(psb_lz_base_sparse_mat), intent(inout) :: b
   real(psb_dpk_), intent(in)                  :: tol
   integer(psb_ipk_), intent(out)                :: info
   logical                                       :: res
@@ -4831,7 +4889,7 @@ function psb_ld_coo_cmpmat(a,b,tol,info) result(res)
   logical, parameter           :: debug=.false.
 
   integer(psb_lpk_)              :: nza, nzb, nzl, M, N
-  type(psb_ld_coo_sparse_mat)  :: tcoo, bcoo
+  type(psb_lz_coo_sparse_mat)  :: tcoo, bcoo
 
   ! Copy (whatever) b format to coo
   call b%cp_to_coo(bcoo,info)
@@ -4875,18 +4933,18 @@ function psb_ld_coo_cmpmat(a,b,tol,info) result(res)
 9999 call psb_error_handler(err_act)
 
   return
-end function psb_ld_coo_cmpmat
+end function psb_lz_coo_cmpmat
 
-subroutine  psb_ld_coo_reallocate_nz(nz,a)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_reallocate_nz
+subroutine  psb_lz_coo_reallocate_nz(nz,a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_reallocate_nz
   use psb_error_mod
   use psb_realloc_mod
   implicit none
   integer(psb_lpk_), intent(in) :: nz
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_)  :: err_act, info
   integer(psb_lpk_)  :: nz_
-  character(len=20)  :: name='ld_coo_reallocate_nz'
+  character(len=20)  :: name='lz_coo_reallocate_nz'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
@@ -4908,14 +4966,46 @@ subroutine  psb_ld_coo_reallocate_nz(nz,a)
 
   return
 
-end subroutine psb_ld_coo_reallocate_nz
+end subroutine psb_lz_coo_reallocate_nz
 
-subroutine psb_ld_coo_mold(a,b,info)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_mold
+subroutine  psb_lz_coo_ensure_size(nz,a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_ensure_size
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none
+  integer(psb_lpk_), intent(in) :: nz
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_)  :: err_act, info, nz_
+  character(len=20)  :: name='lz_coo_ensure_size'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  nz_ = max(nz,ione)
+  call psb_ensure_size(nz_,a%ia,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%ja,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%val,info)
+
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lz_coo_ensure_size
+
+subroutine psb_lz_coo_mold(a,b,info)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_mold
   use psb_error_mod
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in)                  :: a
-  class(psb_ld_base_sparse_mat), intent(inout), allocatable :: b
+  class(psb_lz_coo_sparse_mat), intent(in)                  :: a
+  class(psb_lz_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='coo_mold'
@@ -4928,7 +5018,7 @@ subroutine psb_ld_coo_mold(a,b,info)
     call b%free()
     deallocate(b,stat=info)
   end if
-  if (info == 0) allocate(psb_ld_coo_sparse_mat :: b, stat=info)
+  if (info == 0) allocate(psb_lz_coo_sparse_mat :: b, stat=info)
 
   if (info /= 0) then
     info = psb_err_alloc_dealloc_
@@ -4941,14 +5031,14 @@ subroutine psb_ld_coo_mold(a,b,info)
 
   return
 
-end subroutine psb_ld_coo_mold
+end subroutine psb_lz_coo_mold
 
-subroutine psb_ld_coo_reinit(a,clear)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_reinit
+subroutine psb_lz_coo_reinit(a,clear)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_reinit
   use psb_error_mod
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
   logical, intent(in), optional :: clear
 
   integer(psb_ipk_)  :: err_act, info
@@ -4971,7 +5061,7 @@ subroutine psb_ld_coo_reinit(a,clear)
     ! do nothing
     return
   else if (a%is_asb()) then
-    if (clear_) a%val(:) = dzero
+    if (clear_) a%val(:) = zzero
     call a%set_host()
     call a%set_upd()
   else
@@ -4987,16 +5077,16 @@ subroutine psb_ld_coo_reinit(a,clear)
 
   return
 
-end subroutine psb_ld_coo_reinit
+end subroutine psb_lz_coo_reinit
 
 
 
-subroutine  psb_ld_coo_trim(a)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_trim
+subroutine  psb_lz_coo_trim(a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_trim
   use psb_realloc_mod
   use psb_error_mod
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_)  :: err_act, info
   integer(psb_lpk_)  :: nz
   character(len=20)  :: name='trim'
@@ -5018,13 +5108,13 @@ subroutine  psb_ld_coo_trim(a)
 
   return
 
-end subroutine psb_ld_coo_trim
+end subroutine psb_lz_coo_trim
 
-subroutine  psb_ld_coo_clean_zeros(a, info)
+subroutine  psb_lz_coo_clean_zeros(a, info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_clean_zeros
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_clean_zeros
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: info
   !
   integer(psb_lpk_) :: i,j,k, nzin
@@ -5033,7 +5123,7 @@ subroutine  psb_ld_coo_clean_zeros(a, info)
   nzin = a%get_nzeros()
   j = 0
   do i=1, nzin
-    if (a%val(i) /= dzero) then
+    if (a%val(i) /= zzero) then
       j = j + 1
       a%val(j) = a%val(i)
       a%ia(j)  = a%ia(i)
@@ -5042,17 +5132,56 @@ subroutine  psb_ld_coo_clean_zeros(a, info)
   end do
   call a%set_nzeros(j)
   call a%trim()
-end subroutine psb_ld_coo_clean_zeros
+end subroutine psb_lz_coo_clean_zeros
 
+subroutine  psb_lz_coo_clean_negidx(a,info)
+  use psb_error_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_clean_negidx
+  implicit none
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out)             :: info
+  !
+  !
+  integer(psb_lpk_)  :: nz
+  call psb_coo_clean_negidx_inner(a%get_nzeros(),a%ia,a%ja,a%val,nz,info)
+  if (info == 0) call a%set_nzeros(nz)
 
+end subroutine psb_lz_coo_clean_negidx
 
-subroutine  psb_ld_coo_allocate_mnnz(m,n,a,nz)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_allocate_mnnz
+#if defined(IPK4) && defined(LPK8)
+subroutine psb_lz_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+  use psb_error_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_clean_negidx_inner
+  implicit none
+  integer(psb_lpk_), intent(in)           :: nzin
+  integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
+  complex(psb_dpk_), intent(inout) :: val(:)
+  integer(psb_lpk_), intent(out)          :: nzout
+  integer(psb_ipk_), intent(out)          :: info
+  !
+  !
+  integer(psb_lpk_)  :: i
+  info = 0
+  nzout = 0
+  do i=1, nzin
+    if ((ia(i)>0).and.(ja(i)>0)) then
+      nzout = nzout + 1
+      val(nzout) = val(i)
+      ia(nzout)  = ia(i)
+      ja(nzout)  = ja(i)
+    end if
+  end do
+
+end subroutine psb_lz_coo_clean_negidx_inner
+#endif
+
+subroutine  psb_lz_coo_allocate_mnnz(m,n,a,nz)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_allocate_mnnz
   use psb_error_mod
   use psb_realloc_mod
   implicit none
   integer(psb_lpk_), intent(in) :: m,n
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
   integer(psb_lpk_), intent(in), optional :: nz
   integer(psb_ipk_)  :: err_act, info
   integer(psb_lpk_)  :: nz_
@@ -5104,30 +5233,29 @@ subroutine  psb_ld_coo_allocate_mnnz(m,n,a,nz)
 
   return
 
-end subroutine psb_ld_coo_allocate_mnnz
+end subroutine psb_lz_coo_allocate_mnnz
 
 
 
-subroutine psb_ld_coo_print(iout,a,iv,head,ivr,ivc)
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_print
+subroutine psb_lz_coo_print(iout,a,iv,head,ivr,ivc)
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_print
   use psb_string_mod
   implicit none
 
   integer(psb_ipk_), intent(in)               :: iout
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
   integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='ld_coo_print'
+  character(len=20)  :: name='lz_coo_print'
   logical, parameter :: debug=.false.
 
-  character(len=*), parameter  :: datatype='real'
-  character(len=80)            :: frmtv
-  integer(psb_lpk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)            :: frmt
+  integer(psb_lpk_) :: i,j, ni, nr, nc, nz
 
-  write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
   if (present(head)) write(iout,'(a,a)') '% ',head
   write(iout,'(a)') '%'
   write(iout,'(a,a)') '% COO'
@@ -5137,54 +5265,45 @@ subroutine psb_ld_coo_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
+  frmt = psb_lz_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
 
-  if (datatype=='real') then
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
   write(iout,*) nr, nc, nz
   if(present(iv)) then
     do j=1,a%get_nzeros()
-      write(iout,frmtv) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
+      write(iout,frmt) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
     enddo
   else
     if (present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),a%ja(j),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),a%ja(j),a%val(j)
       enddo
     else if (present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) a%ia(j),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),a%ja(j),a%val(j)
+        write(iout,frmt) a%ia(j),a%ja(j),a%val(j)
       enddo
     endif
   endif
 
-end subroutine psb_ld_coo_print
+end subroutine psb_lz_coo_print
 
 
 
 
-function  psb_ld_coo_get_nz_row(idx,a) result(res)
+function  psb_lz_coo_get_nz_row(idx,a) result(res)
   use psb_const_mod
   use psb_sort_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_get_nz_row
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_get_nz_row
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   integer(psb_lpk_), intent(in)                  :: idx
   integer(psb_lpk_) :: res
   integer(psb_lpk_) :: nzin_, nza,ip,jp,i,k
@@ -5230,7 +5349,7 @@ function  psb_ld_coo_get_nz_row(idx,a) result(res)
 
   end if
 
-end function psb_ld_coo_get_nz_row
+end function psb_lz_coo_get_nz_row
 
 ! == ==================================
 !
@@ -5246,16 +5365,16 @@ end function psb_ld_coo_get_nz_row
 
 
 
-subroutine psb_ld_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
+subroutine psb_lz_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csgetptn
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_csgetptn
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(in)       :: a
+  class(psb_lz_coo_sparse_mat), intent(in)       :: a
   integer(psb_lpk_), intent(in)                 :: imin,imax
   integer(psb_lpk_), intent(out)                :: nz
   integer(psb_lpk_), allocatable, intent(inout) :: ia(:), ja(:)
@@ -5349,7 +5468,7 @@ contains
     use psb_sort_mod
     implicit none
 
-    class(psb_ld_coo_sparse_mat), intent(in)    :: a
+    class(psb_lz_coo_sparse_mat), intent(in)    :: a
     integer(psb_lpk_) :: imin,imax,jmin,jmax
     integer(psb_lpk_), intent(inout)               :: nz
     integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
@@ -5514,27 +5633,27 @@ contains
 
   end subroutine coo_getptn
 
-end subroutine psb_ld_coo_csgetptn
+end subroutine psb_lz_coo_csgetptn
 
 
 !
 ! NZ is the number of non-zeros on output.
 ! The output is guaranteed to be sorted
 !
-subroutine psb_ld_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+subroutine psb_lz_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csgetrow
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_csgetrow
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
   integer(psb_lpk_), intent(in)                  :: imin,imax
   integer(psb_lpk_), intent(out)                 :: nz
   integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
-  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+  complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
   integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
   integer(psb_lpk_), intent(in), optional        :: iren(:)
@@ -5625,11 +5744,11 @@ contains
     use psb_ip_reord_mod
     implicit none
 
-    class(psb_ld_coo_sparse_mat), intent(in)    :: a
+    class(psb_lz_coo_sparse_mat), intent(in)    :: a
     integer(psb_lpk_) :: imin,imax,jmin,jmax
     integer(psb_lpk_), intent(inout)               :: nz
     integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
-    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_lpk_), intent(in)                  :: nzin
     logical, intent(in)                            :: append
     integer(psb_ipk_) :: info
@@ -5730,7 +5849,7 @@ contains
               ja(nzin_+nz)  = iren(a%ja(i))
             end if
           enddo
-          call psb_ld_fix_coo_inner(nra,nca,nzin_+nz,psb_dupl_add_,ia,ja,val,nz,info)
+          call psb_lz_fix_coo_inner(nra,nca,nzin_+nz,psb_dupl_add_,ia,ja,val,nz,info)
           nz = nz - nzin_
         else
           do i=ip,jp
@@ -5795,30 +5914,30 @@ contains
           endif
         enddo
       end if
-      call psb_ld_fix_coo_inner(nra,nca,nzin_+k,psb_dupl_add_,ia,ja,val,nz,info)
+      call psb_lz_fix_coo_inner(nra,nca,nzin_+k,psb_dupl_add_,ia,ja,val,nz,info)
       nz = nz - nzin_
     end if
 
   end subroutine coo_getrow
 
-end subroutine psb_ld_coo_csgetrow
+end subroutine psb_lz_coo_csgetrow
 
 
-subroutine psb_ld_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+subroutine psb_lz_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_error_mod
   use psb_realloc_mod
   use psb_sort_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csput_a
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_csput_a
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: val(:)
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: val(:)
   integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer(psb_ipk_), intent(out)            :: info
 
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='ld_coo_csput_a_impl'
+  character(len=20)  :: name='lz_coo_csput_a_impl'
   logical, parameter :: debug=.false.
   integer(psb_lpk_)  :: nza, i,j,k, nzl, isza
   integer(psb_ipk_)  :: debug_level, debug_unit
@@ -5877,7 +5996,7 @@ subroutine psb_ld_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
     if (a%is_dev())   call a%sync()
 
-    call  ld_coo_srch_upd(nz,ia,ja,val,a,&
+    call  lz_coo_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info)
 
     if (info < 0) then
@@ -5914,8 +6033,8 @@ contains
     integer(psb_lpk_), intent(in) :: nz, imin,imax,jmin,jmax,maxsz
     integer(psb_lpk_), intent(in) :: ia(:),ja(:)
     integer(psb_lpk_), intent(inout) :: nza,ia1(:),ia2(:)
-    real(psb_dpk_), intent(in) :: val(:)
-    real(psb_dpk_), intent(inout) :: aspk(:)
+    complex(psb_dpk_), intent(in) :: val(:)
+    complex(psb_dpk_), intent(inout) :: aspk(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_lpk_) :: i,ir,ic
 
@@ -5934,7 +6053,7 @@ contains
   end subroutine psb_inner_ins
 
 
-  subroutine ld_coo_srch_upd(nz,ia,ja,val,a,&
+  subroutine lz_coo_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info)
 
     use psb_const_mod
@@ -5942,15 +6061,15 @@ contains
     use psb_string_mod
     implicit none
 
-    class(psb_ld_coo_sparse_mat), intent(inout) :: a
+    class(psb_lz_coo_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: nz, imin,imax,jmin,jmax
     integer(psb_lpk_), intent(in) :: ia(:),ja(:)
-    real(psb_dpk_), intent(in) :: val(:)
+    complex(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_lpk_) :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nnz,dupl, nr
     integer(psb_ipk_) :: debug_level, debug_unit, innz, nc
-    character(len=20)    :: name='ld_coo_srch_upd'
+    character(len=20)    :: name='lz_coo_srch_upd'
 
     info = psb_success_
     debug_unit  = psb_get_debug_unit()
@@ -6052,17 +6171,17 @@ contains
            & ': Duplicate handling: ',dupl
     end select
 
-  end subroutine ld_coo_srch_upd
+  end subroutine lz_coo_srch_upd
 
-end subroutine psb_ld_coo_csput_a
+end subroutine psb_lz_coo_csput_a
 
 
-subroutine psb_ld_cp_coo_to_coo(a,b,info)
+subroutine psb_lz_cp_coo_to_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_cp_coo_to_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_cp_coo_to_coo
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
-  class(psb_ld_coo_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6075,7 +6194,7 @@ subroutine psb_ld_cp_coo_to_coo(a,b,info)
   info = psb_success_
   if (a%is_dev())   call a%sync()
 
-  b%psb_ld_base_sparse_mat = a%psb_ld_base_sparse_mat
+  b%psb_lz_base_sparse_mat = a%psb_lz_base_sparse_mat
   call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
@@ -6098,14 +6217,14 @@ subroutine psb_ld_cp_coo_to_coo(a,b,info)
 
   return
 
-end subroutine psb_ld_cp_coo_to_coo
+end subroutine psb_lz_cp_coo_to_coo
 
-subroutine psb_ld_cp_coo_from_coo(a,b,info)
+subroutine psb_lz_cp_coo_from_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_cp_coo_from_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_cp_coo_from_coo
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_coo_sparse_mat), intent(in)    :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6117,7 +6236,7 @@ subroutine psb_ld_cp_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (b%is_dev())   call b%sync()
-  a%psb_ld_base_sparse_mat = b%psb_ld_base_sparse_mat
+  a%psb_lz_base_sparse_mat = b%psb_lz_base_sparse_mat
   call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
@@ -6143,15 +6262,15 @@ subroutine psb_ld_cp_coo_from_coo(a,b,info)
 
   return
 
-end subroutine psb_ld_cp_coo_from_coo
+end subroutine psb_lz_cp_coo_from_coo
 
 
-subroutine psb_ld_cp_coo_to_fmt(a,b,info)
+subroutine psb_lz_cp_coo_to_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_cp_coo_to_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_cp_coo_to_fmt
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
-  class(psb_ld_base_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
+  class(psb_lz_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6176,14 +6295,14 @@ subroutine psb_ld_cp_coo_to_fmt(a,b,info)
 
   return
 
-end subroutine psb_ld_cp_coo_to_fmt
+end subroutine psb_lz_cp_coo_to_fmt
 
-subroutine psb_ld_cp_coo_from_fmt(a,b,info)
+subroutine psb_lz_cp_coo_from_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_cp_coo_from_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_cp_coo_from_fmt
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_base_sparse_mat), intent(in) :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6209,15 +6328,15 @@ subroutine psb_ld_cp_coo_from_fmt(a,b,info)
 
   return
 
-end subroutine psb_ld_cp_coo_from_fmt
+end subroutine psb_lz_cp_coo_from_fmt
 
 
-subroutine psb_ld_mv_coo_to_coo(a,b,info)
+subroutine psb_lz_mv_coo_to_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_mv_coo_to_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_mv_coo_to_coo
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_coo_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6228,7 +6347,7 @@ subroutine psb_ld_mv_coo_to_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (a%is_dev())   call a%sync()
-  b%psb_ld_base_sparse_mat = a%psb_ld_base_sparse_mat
+  b%psb_lz_base_sparse_mat = a%psb_lz_base_sparse_mat
   call b%set_sort_status(a%get_sort_status())
   call b%set_nzeros(a%get_nzeros())
 
@@ -6252,14 +6371,14 @@ subroutine psb_ld_mv_coo_to_coo(a,b,info)
 
   return
 
-end subroutine psb_ld_mv_coo_to_coo
+end subroutine psb_lz_mv_coo_to_coo
 
-subroutine psb_ld_mv_coo_from_coo(a,b,info)
+subroutine psb_lz_mv_coo_from_coo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_mv_coo_from_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_mv_coo_from_coo
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_coo_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6271,7 +6390,7 @@ subroutine psb_ld_mv_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (b%is_dev())   call b%sync()
-  a%psb_ld_base_sparse_mat = b%psb_ld_base_sparse_mat
+  a%psb_lz_base_sparse_mat = b%psb_lz_base_sparse_mat
   call a%set_sort_status(b%get_sort_status())
   call a%set_nzeros(b%get_nzeros())
 
@@ -6295,15 +6414,15 @@ subroutine psb_ld_mv_coo_from_coo(a,b,info)
 
   return
 
-end subroutine psb_ld_mv_coo_from_coo
+end subroutine psb_lz_mv_coo_from_coo
 
 
-subroutine psb_ld_mv_coo_to_fmt(a,b,info)
+subroutine psb_lz_mv_coo_to_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_mv_coo_to_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_mv_coo_to_fmt
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_base_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6328,14 +6447,14 @@ subroutine psb_ld_mv_coo_to_fmt(a,b,info)
 
   return
 
-end subroutine psb_ld_mv_coo_to_fmt
+end subroutine psb_lz_mv_coo_to_fmt
 
-subroutine psb_ld_mv_coo_from_fmt(a,b,info)
+subroutine psb_lz_mv_coo_from_fmt(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_mv_coo_from_fmt
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_mv_coo_from_fmt
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_ld_base_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -6361,15 +6480,15 @@ subroutine psb_ld_mv_coo_from_fmt(a,b,info)
 
   return
 
-end subroutine psb_ld_mv_coo_from_fmt
+end subroutine psb_lz_mv_coo_from_fmt
 
-subroutine psb_ld_coo_cp_from(a,b)
+subroutine psb_lz_coo_cp_from(a,b)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_cp_from
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_cp_from
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  type(psb_ld_coo_sparse_mat), intent(in)   :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  type(psb_lz_coo_sparse_mat), intent(in)   :: b
 
 
   integer(psb_ipk_)  :: err_act, info
@@ -6391,15 +6510,15 @@ subroutine psb_ld_coo_cp_from(a,b)
 
   return
 
-end subroutine psb_ld_coo_cp_from
+end subroutine psb_lz_coo_cp_from
 
-subroutine psb_ld_coo_mv_from(a,b)
+subroutine psb_lz_coo_mv_from(a,b)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_mv_from
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_mv_from
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(inout)  :: a
-  type(psb_ld_coo_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(inout)  :: a
+  type(psb_lz_coo_sparse_mat), intent(inout) :: b
 
 
   integer(psb_ipk_)  :: err_act, info
@@ -6421,17 +6540,17 @@ subroutine psb_ld_coo_mv_from(a,b)
 
   return
 
-end subroutine psb_ld_coo_mv_from
+end subroutine psb_lz_coo_mv_from
 
 
 
-subroutine psb_ld_fix_coo(a,info,idir)
+subroutine psb_lz_fix_coo(a,info,idir)
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_fix_coo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_fix_coo
   implicit none
 
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_), intent(in), optional :: idir
   integer(psb_lpk_), allocatable :: iaux(:)
@@ -6462,7 +6581,7 @@ subroutine psb_ld_fix_coo(a,info,idir)
   nza = a%get_nzeros()
   if (nza >= 2) then
     dupl_ = a%get_dupl()
-    call psb_ld_fix_coo_inner(nra,nca,nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
+    call psb_lz_fix_coo_inner(nra,nca,nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
     if (info /= psb_success_) goto 9999
   else
     i = nza
@@ -6479,14 +6598,14 @@ subroutine psb_ld_fix_coo(a,info,idir)
 
   return
 
-end subroutine psb_ld_fix_coo
+end subroutine psb_lz_fix_coo
 
 
 
-subroutine psb_ld_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
+subroutine psb_lz_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_fix_coo_inner
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_fix_coo_inner
   use psb_string_mod
   use psb_ip_reord_mod
   use psb_sort_mod
@@ -6494,13 +6613,13 @@ subroutine psb_ld_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
   integer(psb_lpk_), intent(in)           :: nr, nc, nzin, dupl
   integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
-  real(psb_dpk_), intent(inout) :: val(:)
+  complex(psb_dpk_), intent(inout) :: val(:)
   integer(psb_lpk_), intent(out)          :: nzout
   integer(psb_ipk_), intent(out)          :: info
   integer(psb_ipk_), intent(in), optional :: idir
   !locals
   integer(psb_lpk_), allocatable :: iaux(:), ias(:),jas(:), ix2(:)
-  real(psb_dpk_),  allocatable :: vs(:)
+  complex(psb_dpk_),  allocatable :: vs(:)
   integer(psb_lpk_) :: nza
   integer(psb_ipk_) :: iret, nzl,idir_, dupl_, err_act, inzin
   integer(psb_lpk_) :: i,j, irw, icl, ip,is, imx, k, ii
@@ -7211,15 +7330,15 @@ subroutine psb_ld_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
   return
 
-end subroutine psb_ld_fix_coo_inner
+end subroutine psb_lz_fix_coo_inner
 
 
-subroutine psb_ld_cp_coo_to_icoo(a,b,info)
+subroutine psb_lz_cp_coo_to_icoo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_cp_coo_to_icoo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_cp_coo_to_icoo
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(in) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_lz_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -7255,14 +7374,14 @@ subroutine psb_ld_cp_coo_to_icoo(a,b,info)
 
   return
 
-end subroutine psb_ld_cp_coo_to_icoo
+end subroutine psb_lz_cp_coo_to_icoo
 
-subroutine psb_ld_cp_coo_from_icoo(a,b,info)
+subroutine psb_lz_cp_coo_from_icoo(a,b,info)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_ld_cp_coo_from_icoo
+  use psb_z_base_mat_mod, psb_protect_name => psb_lz_cp_coo_from_icoo
   implicit none
-  class(psb_ld_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(in)    :: b
+  class(psb_lz_coo_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
@@ -7299,4 +7418,4 @@ subroutine psb_ld_cp_coo_from_icoo(a,b,info)
 
   return
 
-end subroutine psb_ld_cp_coo_from_icoo
+end subroutine psb_lz_cp_coo_from_icoo

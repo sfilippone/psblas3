@@ -128,11 +128,15 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   integer(psb_mpk_),allocatable  :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:)
 
+  integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
+       & iret, sz
+  integer(psb_mpk_), allocatable :: prcid(:), rvhd(:)
+
   integer(psb_ipk_) :: ihinsz,ntot,k,err_act,nidx,&
-       & idxr, idxs, iszs, iszr, nesd, nerv
+       & idxr, idxs, iszs, iszr, nesd, nerv, ixp, idx
   integer(psb_mpk_) :: icomm, minfo
 
-  logical,parameter :: usempi=.true.
+  logical, parameter :: usempi=.false.
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name
 
@@ -255,12 +259,12 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     call desc%indxmap%l2g(index_in(i+1:i+nerv),&
          & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
          & info) 
-    
+
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
       goto 9999
     end if
-    
+
     bsdindx(proc+1) = bsdindx(proc+1) + nerv
     i = i + nerv + 1 
   end do
@@ -282,11 +286,76 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     idxr = idxr + rvsz(proc+1)
   end do
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_lpk_,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-  if (minfo /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
-    goto 9999
+  if (usempi) then   
+    call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_lpk_,&
+         & rcvbuf,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
+      goto 9999
+    end if
+  else
+    if (.true.) then 
+      allocate(prcid(length_dl),rvhd(length_dl))
+      prcid = -1
+      ixp   = 1 
+      do i=1, length_dl
+        proc = dep_list(i)
+        prcid(ixp) = psb_get_mpi_rank(ictxt,proc)
+        sz         = rvsz(proc+1)
+        if (sz > 0) then
+          p2ptag   = psb_long_tag
+          idx      = brvindx(proc+1)
+          call mpi_irecv(rcvbuf(idx+1:idx+sz),sz,&
+               & psb_mpi_lpk_, prcid(ixp), p2ptag, icomm,&
+               & rvhd(ixp),iret)
+        end if
+        ixp = ixp + 1
+      end do
+      ixp   = 1 
+      do i=1, length_dl
+        proc       = dep_list(i)
+        prcid(ixp) = psb_get_mpi_rank(ictxt,proc)
+        sz         = sdsz(proc+1)
+        if (sz > 0) then
+          p2ptag   = psb_long_tag
+          idx      = bsdindx(proc+1)
+          call mpi_send(sndbuf(idx+1:idx+sz),sz,&
+               & psb_mpi_lpk_, prcid(ixp), p2ptag, &
+               & icomm,iret)
+        end if
+        ixp = ixp + 1
+      end do
+      ixp   = 1 
+      do i=1, length_dl
+        proc = dep_list(i)
+        prcid(ixp) = psb_get_mpi_rank(ictxt,proc)
+        sz         = rvsz(proc+1)
+        if (sz > 0) then
+          call mpi_wait(rvhd(ixp),p2pstat,iret)
+        end if
+        ixp = ixp + 1
+      end do
+    else
+
+      do i=1, length_dl
+        proc       = dep_list(i)
+        sz         = sdsz(proc+1)
+        idx      = bsdindx(proc+1)
+        if (sz > 0) then
+          call psb_snd(ictxt,sndbuf(idx+1:idx+sz), proc)
+        end if
+      end do
+
+      do i=1, length_dl
+        proc = dep_list(i)
+        sz         = rvsz(proc+1)
+        idx      = brvindx(proc+1)
+        if (sz > 0) then
+          call psb_rcv(ictxt,rcvbuf(idx+1:idx+sz),proc)
+        end if
+      end do
+
+    end if
   end if
 
   !
@@ -327,7 +396,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   return
 
 9999 call psb_error_handler(ictxt,err_act)
-  
+
   return
 
 end subroutine psi_i_desc_index

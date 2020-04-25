@@ -47,6 +47,7 @@ module psb_partidx_mod
   interface ijk2idx
     module procedure ijk2idx3d, ijk2idxv, ijk2idx2d
   end interface ijk2idx
+  
   interface idx2ijk
     module procedure lidx2ijk3d, lidx2ijkv, lidx2ijk2d,&
          & lidx2lijk3d, lidx2lijkv, lidx2lijk2d

@@ -29,9 +29,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! File: psb_zspins.f90
+! File: psb_cspins.f90
 !
-! Subroutine: psb_zspins
+! Subroutine: psb_cspins
 !    Takes a cloud of coefficients and inserts them into a sparse matrix.
 !    Note: coefficients with a row index not belonging to the current process are
 !    ignored. 
@@ -48,17 +48,17 @@
 !    rebuild  - logical                     Allows to reopen a matrix under
 !                                           certain circumstances.
 !
-subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
-  use psb_base_mod, psb_protect_name => psb_zspins
+subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
+  use psb_base_mod, psb_protect_name => psb_cspins
   use psi_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(inout)    :: desc_a
-  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_cspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)       :: nz
   integer(psb_lpk_), intent(in)       :: ia(:),ja(:)
-  complex(psb_dpk_), intent(in)         :: val(:)
+  complex(psb_spk_), intent(in)         :: val(:)
   integer(psb_ipk_), intent(out)      :: info
   logical, intent(in), optional       :: rebuild, local
   !locals.....
@@ -72,7 +72,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   character(len=20)  :: name
 
   info = psb_success_
-  name = 'psb_zspins'
+  name = 'psb_cspins'
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%get_context()
@@ -189,19 +189,19 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   return
 
-end subroutine psb_zspins
+end subroutine psb_cspins
 
-subroutine psb_zspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
-  use psb_base_mod, psb_protect_name => psb_zspins_csr_lirp
+subroutine psb_cspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
+  use psb_base_mod, psb_protect_name => psb_cspins_csr_lirp
   use psi_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(inout)     :: desc_a
-  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_cspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)          :: nr
   integer(psb_lpk_), intent(in)          :: irw,irp(:),ja(:)
-  complex(psb_dpk_), intent(in)            :: val(:)
+  complex(psb_spk_), intent(in)            :: val(:)
   integer(psb_ipk_), intent(out)         :: info
   logical, intent(in), optional         :: rebuild, local
   !locals.....
@@ -216,7 +216,7 @@ subroutine psb_zspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
   character(len=20)  :: name
 
   info = psb_success_
-  name = 'psb_zspins_csr'
+  name = 'psb_cspins_csr'
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%get_context()
@@ -286,19 +286,20 @@ subroutine psb_zspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
 
   return
 
-end subroutine psb_zspins_csr_lirp
+end subroutine psb_cspins_csr_lirp
 
-subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
-  use psb_base_mod, psb_protect_name => psb_zspins_csr_iirp
+#if defined(IPK4) && defined(LPK8) 
+subroutine psb_cspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
+  use psb_base_mod, psb_protect_name => psb_cspins_csr_iirp
   use psi_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(inout)     :: desc_a
-  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_cspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)          :: nr,irp(:)
   integer(psb_lpk_), intent(in)          :: irw,ja(:)
-  complex(psb_dpk_), intent(in)            :: val(:)
+  complex(psb_spk_), intent(in)            :: val(:)
   integer(psb_ipk_), intent(out)         :: info
   logical, intent(in), optional         :: rebuild, local
   !locals.....
@@ -313,7 +314,7 @@ subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
   character(len=20)  :: name
 
   info = psb_success_
-  name = 'psb_zspins_csr'
+  name = 'psb_cspins_csr'
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%get_context()
@@ -383,20 +384,21 @@ subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
 
   return
 
-end subroutine psb_zspins_csr_iirp
+end subroutine psb_cspins_csr_iirp
+#endif
 
-subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
-  use psb_base_mod, psb_protect_name => psb_zspins_2desc
+subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
+  use psb_base_mod, psb_protect_name => psb_cspins_2desc
   use psi_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_ar
   type(psb_desc_type), intent(inout)   :: desc_ac
-  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_cspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)      :: nz
   integer(psb_lpk_), intent(in)      :: ia(:),ja(:)
-  complex(psb_dpk_), intent(in)        :: val(:)
+  complex(psb_spk_), intent(in)        :: val(:)
   integer(psb_ipk_), intent(out)     :: info
   !locals.....
 
@@ -497,20 +499,20 @@ subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
 
   return
 
-end subroutine psb_zspins_2desc
+end subroutine psb_cspins_2desc
 
 
-subroutine psb_zspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
-  use psb_base_mod, psb_protect_name => psb_zspins_v
+subroutine psb_cspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
+  use psb_base_mod, psb_protect_name => psb_cspins_v
   use psi_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(inout)    :: desc_a
-  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_cspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)        :: nz
   type(psb_l_vect_type), intent(inout) :: ia,ja
-  type(psb_z_vect_type), intent(inout) :: val
+  type(psb_c_vect_type), intent(inout) :: val
   integer(psb_ipk_), intent(out)                  :: info
   logical, intent(in), optional         :: rebuild, local
   !locals.....
@@ -525,7 +527,7 @@ subroutine psb_zspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   character(len=20)  :: name
 
   info = psb_success_
-  name = 'psb_zspins'
+  name = 'psb_cspins'
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%get_context()
@@ -648,4 +650,4 @@ subroutine psb_zspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   return
 
-end subroutine psb_zspins_v
+end subroutine psb_cspins_v

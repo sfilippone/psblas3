@@ -121,8 +121,9 @@ subroutine psb_sbase_rwextd(nr,a,info,b,rowscale)
     rowscale_ = .true.
   end if
 
-  ma = a%get_nrows()
-  na = a%get_ncols()
+  ma  = a%get_nrows()
+  na  = a%get_ncols()
+  nza = a%get_nzeros()
 
 
   select type(a) 
@@ -137,16 +138,12 @@ subroutine psb_sbase_rwextd(nr,a,info,b,rowscale)
 
       select type (b) 
       type is (psb_s_csr_sparse_mat)
-        call psb_ensure_size(size(a%ja)+nzb,a%ja,info)
-        call psb_ensure_size(size(a%val)+nzb,a%val,info)
+        call psb_ensure_size(nza+nzb,a%ja,info)
+        call psb_ensure_size(nza+nzb,a%val,info)
+        a%ja(nza+1:nza+nzb)  = b%ja(1:nzb)
+        a%val(nza+1:nza+nzb) = b%val(1:nzb)
         do i=1, min(nr-ma,mb)
           a%irp(ma+i+1) =  a%irp(ma+i) + b%irp(i+1) - b%irp(i)
-          ja = a%irp(ma+i)
-          do jb = b%irp(i), b%irp(i+1)-1
-            a%val(ja) = b%val(jb)
-            a%ja(ja)  = b%ja(jb)
-            ja = ja + 1
-          end do
         end do
         do j=i,nr-ma
           a%irp(ma+j+1) = a%irp(ma+j)
@@ -175,7 +172,7 @@ subroutine psb_sbase_rwextd(nr,a,info,b,rowscale)
       mb = b%get_nrows()
       nb = b%get_ncols()
       nzb = b%get_nzeros()
-      call a%reallocate(nza+nzb)
+      call a%ensure_size(nza+nzb)
 
       select type(b)
       type is (psb_s_coo_sparse_mat) 
@@ -326,8 +323,9 @@ subroutine psb_lsbase_rwextd(nr,a,info,b,rowscale)
     rowscale_ = .true.
   end if
 
-  ma = a%get_nrows()
-  na = a%get_ncols()
+  ma  = a%get_nrows()
+  na  = a%get_ncols()
+  nza = a%get_nzeros()
 
 
   select type(a) 
@@ -342,16 +340,12 @@ subroutine psb_lsbase_rwextd(nr,a,info,b,rowscale)
 
       select type (b) 
       type is (psb_ls_csr_sparse_mat)
-        call psb_ensure_size(size(a%ja)+nzb,a%ja,info)
-        call psb_ensure_size(size(a%val)+nzb,a%val,info)
+        call psb_ensure_size(nza+nzb,a%ja,info)
+        call psb_ensure_size(nza+nzb,a%val,info)
+        a%ja(nza+1:nza+nzb)  = b%ja(1:nzb)
+        a%val(nza+1:nza+nzb) = b%val(1:nzb)
         do i=1, min(nr-ma,mb)
           a%irp(ma+i+1) =  a%irp(ma+i) + b%irp(i+1) - b%irp(i)
-          ja = a%irp(ma+i)
-          do jb = b%irp(i), b%irp(i+1)-1
-            a%val(ja) = b%val(jb)
-            a%ja(ja)  = b%ja(jb)
-            ja = ja + 1
-          end do
         end do
         do j=i,nr-ma
           a%irp(ma+j+1) = a%irp(ma+j)
@@ -380,7 +374,7 @@ subroutine psb_lsbase_rwextd(nr,a,info,b,rowscale)
       mb = b%get_nrows()
       nb = b%get_ncols()
       nzb = b%get_nzeros()
-      call a%reallocate(nza+nzb)
+      call a%ensure_size(nza+nzb)
 
       select type(b)
       type is (psb_ls_coo_sparse_mat) 

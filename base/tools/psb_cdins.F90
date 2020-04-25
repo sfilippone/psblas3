@@ -45,6 +45,7 @@
 !    ila(:)   - integer(psb_ipk_), optional              The row indices in local numbering
 !    jla(:)   - integer(psb_ipk_), optional              The col indices in local numbering
 !
+#if defined(IPK4) && defined(LPK8) 
 subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   use psb_base_mod, psb_protect_name => psb_cdinsrc
   use psi_mod
@@ -61,7 +62,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   lnz = nz
   call psb_cdins(lnz,ia,ja,desc_a,info,ila,jla)
 end subroutine psb_cdinsrc
-  
+#endif  
 subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   use psb_base_mod, psb_protect_name => psb_lcdinsrc
   use psi_mod
@@ -180,6 +181,7 @@ end subroutine psb_lcdinsrc
 !    mask(:)  - logical, optional, target
 !    lidx(:)  - integer(psb_ipk_), optional    User-defined local col indices
 !
+#if defined(IPK4) && defined(LPK8) 
 subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   use psb_base_mod, psb_protect_name => psb_cdinsc
   use psi_mod
@@ -199,7 +201,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   lnz = nz
   call psb_cdins(lnz,ja,desc,info,jla,mask,lidx)
 end subroutine psb_cdinsc
-
+#endif
 subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
   use psb_base_mod, psb_protect_name => psb_lcdinsc
   use psi_mod

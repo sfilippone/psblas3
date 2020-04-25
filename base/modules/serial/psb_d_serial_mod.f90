@@ -292,9 +292,9 @@ contains
     use psb_d_mat_mod, only : psb_dspmat_type
     integer(psb_ipk_), intent(in)       :: iout
     type(psb_dspmat_type), intent(in) :: a
-    integer(psb_ipk_), intent(in), optional :: iv(:)
+    integer(psb_lpk_), intent(in), optional :: iv(:)
     character(len=*), optional    :: head
-    integer(psb_ipk_), intent(in), optional :: ivr(:),ivc(:)
+    integer(psb_lpk_), intent(in), optional :: ivr(:),ivc(:)
 
     call a%print(iout,iv,head,ivr,ivc)
 
@@ -304,9 +304,9 @@ contains
     use psb_d_mat_mod, only : psb_dspmat_type
     character(len=*), intent(in)  :: fname   
     type(psb_dspmat_type), intent(in) :: a
-    integer(psb_ipk_), intent(in), optional :: iv(:)
+    integer(psb_lpk_), intent(in), optional :: iv(:)
     character(len=*), optional    :: head
-    integer(psb_ipk_), intent(in), optional :: ivr(:),ivc(:)
+    integer(psb_lpk_), intent(in), optional :: ivr(:),ivc(:)
 
     call a%print(fname,iv,head,ivr,ivc)
 

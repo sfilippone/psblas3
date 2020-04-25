@@ -94,8 +94,8 @@ module psb_hash_map_mod
     procedure, pass(idxmap)  :: lg2lv1_ins => hash_g2lv1_ins
     procedure, pass(idxmap)  :: lg2lv2_ins => hash_g2lv2_ins
 
-    procedure, pass(idxmap)  :: hash_cpy
-    generic, public          :: assignment(=) => hash_cpy
+!!$    procedure, pass(idxmap)  :: hash_cpy
+!!$    generic, public          :: assignment(=) => hash_cpy
     procedure, pass(idxmap)  :: bld_g2l_map => hash_bld_g2l_map
 
   end type psb_hash_map
@@ -805,11 +805,11 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, int_err(5)
     integer(psb_lpk_) ::  m, nrt 
     integer(psb_lpk_), allocatable :: vlu(:)
@@ -878,11 +878,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) :: i, j, nl, int_err(5)
     integer(psb_lpk_) :: n
     integer(psb_lpk_), allocatable :: vlu(:)
@@ -938,12 +938,12 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_lpk_), intent(in)  :: vlu(:), ntot
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: iam, np
+    integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) :: i, j, lc2, nlu, m, nrt,int_err(5)
     character(len=20), parameter :: name='hash_map_init_vlu'
 
@@ -1464,7 +1464,7 @@ contains
     end if
 
     select type (outmap)
-    type is (psb_hash_map) 
+    type is (psb_hash_map)
       call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
       if (info == psb_success_) then 
         outmap%hashvsize    = idxmap%hashvsize
@@ -1478,7 +1478,7 @@ contains
            &  call psb_safe_ab_cpy(idxmap%glb_lc,outmap%glb_lc,info)
       if (info == psb_success_)&
            &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
-!!$      outmap = idxmap
+      
     class default
         ! This should be impossible 
       info = -1
@@ -1499,30 +1499,30 @@ contains
   end subroutine hash_clone
 
 
-  subroutine hash_cpy(outmap,idxmap)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_realloc_mod
-    implicit none 
-    class(psb_hash_map), intent(in) :: idxmap
-    type(psb_hash_map), intent(out) :: outmap
-    integer(psb_ipk_) :: info
-
-    info = psb_success_
-    outmap%psb_indx_map = idxmap%psb_indx_map
-    outmap%hashvsize    = idxmap%hashvsize
-    outmap%hashvmask    = idxmap%hashvmask
-    if (info == psb_success_)&
-         &  call psb_safe_ab_cpy(idxmap%loc_to_glob,outmap%loc_to_glob,info)
-    if (info == psb_success_)&
-         &  call psb_safe_ab_cpy(idxmap%hashv,outmap%hashv,info)
-    if (info == psb_success_)&
-         &  call psb_safe_ab_cpy(idxmap%glb_lc,outmap%glb_lc,info)
-    if (info == psb_success_)&
-         &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
-  end subroutine hash_cpy
-
-    
+!!$  subroutine hash_cpy(outmap,idxmap)
+!!$    use psb_penv_mod
+!!$    use psb_error_mod
+!!$    use psb_realloc_mod
+!!$    implicit none 
+!!$    class(psb_hash_map), intent(in) :: idxmap
+!!$    type(psb_hash_map), intent(out) :: outmap
+!!$    integer(psb_ipk_) :: info
+!!$
+!!$    info = psb_success_
+!!$    call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
+!!$    if (info == psb_success_) then 
+!!$      outmap%hashvsize    = idxmap%hashvsize
+!!$      outmap%hashvmask    = idxmap%hashvmask
+!!$    end if
+!!$    if (info == psb_success_)&
+!!$         &  call psb_safe_ab_cpy(idxmap%loc_to_glob,outmap%loc_to_glob,info)
+!!$    if (info == psb_success_)&
+!!$         &  call psb_safe_ab_cpy(idxmap%hashv,outmap%hashv,info)
+!!$    if (info == psb_success_)&
+!!$         &  call psb_safe_ab_cpy(idxmap%glb_lc,outmap%glb_lc,info)
+!!$    if (info == psb_success_)&
+!!$         &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
+!!$  end subroutine hash_cpy
 
   subroutine hash_reinit(idxmap,info)
     use psb_penv_mod
@@ -1534,8 +1534,8 @@ contains
     integer(psb_ipk_) :: err_act, nr,nc,k, nl
     integer(psb_lpk_) :: lk
     integer(psb_lpk_) :: ntot
-    integer(psb_mpk_) :: ictxt, me, np
-    integer(psb_ipk_), allocatable :: lidx(:)
+    integer(psb_ipk_) :: ictxt, me, np
+    integer(psb_ipk_), allocatable :: lidx(:), tadj(:), th_own(:)
     integer(psb_lpk_), allocatable :: gidx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.
@@ -1551,13 +1551,16 @@ contains
     lidx = (/(k,k=1,nc)/)
     gidx = (/(lk,lk=1,nc)/)
     call idxmap%l2gip(gidx,info)
-
+    tadj = idxmap%get_p_adjcncy()
+    call idxmap%get_halo_owner(th_own,info)
+    
     call idxmap%free()
     call hash_init_vlu(idxmap,ictxt,ntot,nr,gidx(1:nr),info) 
     if (nc>nr) then 
       call idxmap%g2lip_ins(gidx(nr+1:nc),info,lidx=lidx(nr+1:nc))
     end if
-
+    call idxmap%set_p_adjcncy(tadj)
+    call idxmap%set_halo_owner(th_own,info)
 
     if (info /= psb_success_) then 
       info = psb_err_from_subroutine_

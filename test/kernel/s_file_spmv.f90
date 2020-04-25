@@ -66,8 +66,8 @@ program s_file_spmv
   integer(psb_ipk_) :: iparm(20)
 
   ! other variables
-  integer(psb_ipk_) :: i,info,j,m_problem
-  integer(psb_ipk_) :: internal, m,ii,nnzero
+  integer(psb_lpk_) :: i,j,m_problem
+  integer(psb_ipk_) :: internal, m,ii,nnzero,info
   real(psb_dpk_) :: t1, t2, r_amax, b_amax,&
        &scale,resmx,resmxp, flops, bdwdth
   real(psb_dpk_) :: tt1, tt2, tflops
@@ -175,7 +175,7 @@ program s_file_spmv
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,vg=ivg)
     
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
@@ -188,7 +188,7 @@ program s_file_spmv
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt, desc_a,info,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt, desc_a,info,fmt=afmt,vg=ivg)
 
   else 
     if (iam==psb_root_) write(psb_out_unit,'("Partition type: default block")')

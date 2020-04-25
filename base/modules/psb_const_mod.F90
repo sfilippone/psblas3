@@ -103,9 +103,9 @@ module psb_const_mod
   
   integer(psb_ipk_), save      :: psb_sizeof_sp
   integer(psb_ipk_), save      :: psb_sizeof_dp
-  integer(psb_ipk_), save      :: psb_sizeof_i2p
-  integer(psb_ipk_), save      :: psb_sizeof_mp = 4
-  integer(psb_ipk_), save      :: psb_sizeof_ep = 8
+  integer(psb_ipk_), save      :: psb_sizeof_i2p = 2
+  integer(psb_ipk_), save      :: psb_sizeof_mp  = 4
+  integer(psb_ipk_), save      :: psb_sizeof_ep  = 8
 
 #if defined(IPK4) && defined(LPK4)
   integer(psb_ipk_), save      :: psb_sizeof_ip = 4
@@ -145,13 +145,15 @@ module psb_const_mod
   !     Handy & miscellaneous constants
   !
   integer(psb_epk_), parameter   :: ezero=0, eone=1
-  integer(psb_epk_), parameter   :: etwo=2, ethree=3,emone=-1
+  integer(psb_epk_), parameter   :: etwo=2, ethree=3, emone=-1
   integer(psb_mpk_), parameter   :: mzero=0, mone=1
-  integer(psb_mpk_), parameter   :: mtwo=2, mthree=3,mmone=-1
+  integer(psb_mpk_), parameter   :: mtwo=2, mthree=3, mmone=-1
   integer(psb_lpk_), parameter   :: lzero=0, lone=1
-  integer(psb_lpk_), parameter   :: ltwo=2, lthree=3,lmone=-1
+  integer(psb_lpk_), parameter   :: ltwo=2, lthree=3, lmone=-1
   integer(psb_ipk_), parameter   :: izero=0, ione=1
-  integer(psb_ipk_), parameter   :: itwo=2, ithree=3,imone=-1
+  integer(psb_ipk_), parameter   :: itwo=2, ithree=3, imone=-1
+  integer(psb_i2pk_), parameter  :: i2zero=0, i2one=1
+  integer(psb_i2pk_), parameter  :: i2two=2, i2three=3, i2mone=-1
 
   integer(psb_ipk_), parameter   :: psb_root_=0
   real(psb_spk_), parameter      :: szero=0.0_psb_spk_, sone=1.0_psb_spk_

@@ -29,7 +29,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-!!$  
+! 
 !
 !
 ! package: psb_indx_map_mod
@@ -108,7 +108,7 @@ module psb_indx_map_mod
     !> State of the map 
     integer(psb_ipk_) :: state          = psb_desc_null_    
     !> Communication context
-    integer(psb_mpk_) :: ictxt          = -1
+    integer(psb_ipk_) :: ictxt          = -1
     !> MPI communicator
     integer(psb_mpk_) :: mpic           = -1
     !> Number of global rows
@@ -278,13 +278,14 @@ module psb_indx_map_mod
   end interface
 
   interface 
-    subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in)      :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in)    :: idxmap
       integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: samesize
     end subroutine psi_a2a_fnd_owner
   end interface
 
@@ -311,6 +312,25 @@ module psb_indx_map_mod
     end subroutine psi_graph_fnd_owner
   end interface
 
+  interface psb_cd_set_maxspace
+    module procedure  psb_cd_set_maxspace
+  end interface psb_cd_set_maxspace
+
+  interface psb_cd_get_maxspace
+    module procedure  psb_cd_get_maxspace
+  end interface psb_cd_get_maxspace
+
+  interface psb_cd_set_samplesize
+    module procedure  psb_cd_set_samplesize
+  end interface psb_cd_set_samplesize
+
+  interface psb_cd_get_samplesize
+    module procedure  psb_cd_get_samplesize
+  end interface psb_cd_get_samplesize
+
+  integer(psb_ipk_), private, save :: cd_maxspace   = -1
+  integer(psb_ipk_), private, save :: samplesize    = 32
+  
   integer, parameter :: psi_symm_flag_norv_ = 0
   integer, parameter :: psi_symm_flag_inrv_ = 1
   interface psi_symm_dep_list
@@ -331,9 +351,69 @@ module psb_indx_map_mod
     end subroutine psi_symm_dep_list_norv    
   end interface psi_symm_dep_list
 
+  integer(psb_mpk_), parameter :: psi_adj_fnd_irecv_  = 0
+  integer(psb_mpk_), parameter :: psi_adj_fnd_a2av_   = 1
+  integer(psb_mpk_), parameter :: psi_adj_fnd_pbrcv_  = 2
+  integer(psb_mpk_), parameter :: psi_adj_alg_max_  = psi_adj_fnd_pbrcv_  
+  integer(psb_mpk_), save      :: psi_adj_alg = psi_adj_fnd_irecv_
+  
 contains
 
+  subroutine psi_set_adj_alg(ialg)
+    integer(psb_mpk_), intent(in) :: ialg
+    if ((ialg >=0) .and. (ialg <= psi_adj_alg_max_))&
+         & psi_adj_alg = ialg
+  end subroutine psi_set_adj_alg
 
+  function psi_get_adj_alg() result(val)
+    integer(psb_mpk_) :: val
+    val = psi_adj_alg
+  end function psi_get_adj_alg
+
+  function psi_get_adj_alg_fmt() result(val)
+    character(len=20) :: val
+    select case(psi_adj_alg)
+    case(psi_adj_fnd_a2av_)
+      val = 'MPI_A2AV'
+    case(psi_adj_fnd_irecv_)
+      val = 'MPI_ISEND/IRECV'
+    case(psi_adj_fnd_pbrcv_)
+      val = 'PSB_SND/RCV'
+    case default
+      val = 'Unknown ?'
+    end select
+  end function psi_get_adj_alg_fmt
+
+  subroutine psb_cd_set_maxspace(ith)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
+    if (ith > 0) then 
+      cd_maxspace = ith
+    end if
+  end subroutine psb_cd_set_maxspace
+
+  function  psb_cd_get_maxspace() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = cd_maxspace
+  end function psb_cd_get_maxspace
+ 
+
+  subroutine psb_cd_set_samplesize(ith)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
+    if (ith > 0) then 
+      samplesize = ith
+    end if
+  end subroutine psb_cd_set_samplesize
+
+  function  psb_cd_get_samplesize() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = samplesize
+  end function psb_cd_get_samplesize
+ 
+  
   !> 
   !! \memberof psb_indx_map
   !! \brief  Print a descriptive name
@@ -407,7 +487,7 @@ contains
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_mpk_) :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%ictxt
 
@@ -435,7 +515,7 @@ contains
   subroutine base_set_ctxt(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%ictxt = val
   end subroutine base_set_ctxt
@@ -1268,7 +1348,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
@@ -1390,7 +1470,7 @@ contains
     integer(psb_ipk_), intent(in)      :: v(:)
     integer(psb_ipk_), intent(out)     :: info
     !
-    integer(psb_mpk_) :: me, np
+    integer(psb_ipk_) :: me, np
     integer(psb_ipk_) :: i, j, nr, nc, nh
 
     call psb_info(idxmap%ictxt,me,np)
@@ -1406,6 +1486,7 @@ contains
   end subroutine base_set_halo_owner
 
   subroutine base_get_halo_owner(idxmap,v,info)
+    use psb_realloc_mod
     use psb_penv_mod
     use psb_error_mod
     implicit none 
@@ -1414,13 +1495,15 @@ contains
     integer(psb_ipk_), intent(out)     :: info
 
     integer(psb_ipk_)  :: nh
-    nh = min(size(v),size(idxmap%halo_owner))
-    v(1:nh) = idxmap%halo_owner(1:nh)
+    nh = size(idxmap%halo_owner)
+    !v = idxmap%halo_owner(1:nh)
+    call psb_safe_ab_cpy(idxmap%halo_owner,v,info)
   end subroutine base_get_halo_owner
 
   subroutine base_fnd_halo_owner_s(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin
@@ -1430,16 +1513,17 @@ contains
     integer(psb_ipk_)  :: i, j, nr, nc, nh
     nr = idxmap%local_rows
     nc = idxmap%local_cols
+    nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))    
     xout = -1
     if (.not.allocated(idxmap%halo_owner)) then
       !write(0,*) 'Halo_owner not allocated!', nr, nc, xin
       return
     end if
     if ((nr<xin).and.(xin <= nc)) then
-      if (size(idxmap%halo_owner)<(xin-nr)) then
-        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
-        return
-      end if
+!!$      if (size(idxmap%halo_owner)<(xin-nr)) then
+!!$        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
+!!$        return
+!!$      end if
       xout = idxmap%halo_owner(xin-nr)
     end if
     
@@ -1448,6 +1532,7 @@ contains
   subroutine base_fnd_halo_owner_v(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin(:)
@@ -1456,13 +1541,15 @@ contains
 
     integer(psb_ipk_)  :: i, j, nr, nc, nh, sz
     nr = idxmap%local_rows
-    nc = idxmap%local_cols
+    nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))
     sz = min(size(xin),size(xout))
-    xout = -1
     do i = 1, sz
-      if ((nr<xin(i)).and.(xin(i) <= nc)) xout = idxmap%halo_owner(xin(i)-nr)
+      xout(i) = -1          
+      if ((nr<xin(i)).and.(xin(i) <= nc)) xout(i) = idxmap%halo_owner(xin(i)-nr)
     end do
-    
+    do i=sz+1,size(xout)
+      xout(i) = -1
+    end do
   end subroutine base_fnd_halo_owner_v
 
 end module psb_indx_map_mod

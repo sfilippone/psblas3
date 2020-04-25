@@ -167,6 +167,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: sizeof       => z_coo_sizeof
     procedure, pass(a) :: reallocate_nz => psb_z_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_z_coo_allocate_mnnz
+    procedure, pass(a) :: ensure_size  => psb_z_coo_ensure_size
     procedure, pass(a) :: cp_to_coo    => psb_z_cp_coo_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_z_cp_coo_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_z_cp_coo_to_fmt
@@ -191,6 +192,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: fix          => psb_z_fix_coo
     procedure, pass(a) :: trim         => psb_z_coo_trim
     procedure, pass(a) :: clean_zeros  => psb_z_coo_clean_zeros
+    procedure, pass(a) :: clean_negidx => psb_z_coo_clean_negidx
     procedure, pass(a) :: print        => psb_z_coo_print
     procedure, pass(a) :: free         => z_coo_free
     procedure, pass(a) :: mold         => psb_z_coo_mold
@@ -360,6 +362,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: sizeof       => lz_coo_sizeof
     procedure, pass(a) :: reallocate_nz => psb_lz_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_lz_coo_allocate_mnnz
+    procedure, pass(a) :: ensure_size  => psb_lz_coo_ensure_size
     procedure, pass(a) :: cp_to_coo    => psb_lz_cp_coo_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_lz_cp_coo_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_lz_cp_coo_to_fmt
@@ -380,6 +383,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: fix          => psb_lz_fix_coo
     procedure, pass(a) :: trim         => psb_lz_coo_trim
     procedure, pass(a) :: clean_zeros  => psb_lz_coo_clean_zeros
+    procedure, pass(a) :: clean_negidx => psb_lz_coo_clean_negidx
     procedure, pass(a) :: print        => psb_lz_coo_print
     procedure, pass(a) :: free         => lz_coo_free
     procedure, pass(a) :: mold         => psb_lz_coo_mold
@@ -1678,6 +1682,17 @@ module psb_z_base_mat_mod
       class(psb_z_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_z_coo_reallocate_nz
   end interface
+  !
+  !>
+  !! \memberof  psb_z_coo_sparse_mat
+  !
+  interface
+    subroutine  psb_z_coo_ensure_size(nz,a)
+      import
+      integer(psb_ipk_), intent(in) :: nz
+      class(psb_z_coo_sparse_mat), intent(inout) :: a
+    end subroutine psb_z_coo_ensure_size
+  end interface
 
   !
   !>
@@ -1714,6 +1729,46 @@ module psb_z_base_mat_mod
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psb_z_coo_clean_zeros
   end interface
+
+  !
+  !>
+  !! \memberof  psb_z_coo_sparse_mat
+  !! \brief Take out any entries with negative row or column index
+  !!   May happen when converting local/global numbering
+  !! \param info   return code
+  !!
+  !
+  interface
+    subroutine  psb_z_coo_clean_negidx(a,info)
+      import
+      class(psb_z_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine psb_z_coo_clean_negidx
+  end interface
+
+  !
+  !> Funtion: coo_clean_negidx_inner
+  !! \brief Take out any entries with negative row or column index
+  !!   Used internally by coo_clean_negidx
+  !! \param nzin  Number of entries on input to be  handled
+  !! \param ia(:) Row indices
+  !! \param ja(:) Col indices
+  !! \param val(:) Coefficients
+  !! \param nzout  Number of entries after sorting/duplicate handling
+  !! \param info   return code
+  !!
+  !
+  interface psb_coo_clean_negidx_inner
+    subroutine psb_z_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+      import
+      integer(psb_ipk_), intent(in)           :: nzin
+      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
+      complex(psb_dpk_), intent(inout) :: val(:)
+      integer(psb_ipk_), intent(out)          :: nzout
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_z_coo_clean_negidx_inner
+  end interface psb_coo_clean_negidx_inner
+
 
   !
   !>
@@ -1759,9 +1814,9 @@ module psb_z_base_mat_mod
       import
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_z_coo_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_z_coo_print
   end interface
 
@@ -3279,6 +3334,17 @@ module psb_z_base_mat_mod
       class(psb_lz_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_lz_coo_reallocate_nz
   end interface
+  !
+  !>
+  !! \memberof  psb_lz_coo_sparse_mat
+  !
+  interface
+    subroutine  psb_lz_coo_ensure_size(nz,a)
+      import
+      integer(psb_lpk_), intent(in) :: nz
+      class(psb_lz_coo_sparse_mat), intent(inout) :: a
+    end subroutine psb_lz_coo_ensure_size
+  end interface
 
   !
   !>
@@ -3316,6 +3382,46 @@ module psb_z_base_mat_mod
     end subroutine psb_lz_coo_clean_zeros
   end interface
 
+  !
+  !>
+  !! \memberof  psb_lz_coo_sparse_mat
+  !! \brief Take out any entries with negative row or column index
+  !!   May happen when converting local/global numbering
+  !! \param info   return code
+  !!
+  !
+  interface
+    subroutine  psb_lz_coo_clean_negidx(a,info)
+      import
+      class(psb_lz_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine psb_lz_coo_clean_negidx
+  end interface
+
+#if defined(IPK4) && defined(LPK8)
+  !
+  !> Funtion: coo_clean_negidx_inner
+  !! \brief Take out any entries with negative row or column index
+  !!   Used internally by coo_clean_negidx
+  !! \param nzin  Number of entries on input to be  handled
+  !! \param ia(:) Row indices
+  !! \param ja(:) Col indices
+  !! \param val(:) Coefficients
+  !! \param nzout  Number of entries after sorting/duplicate handling
+  !! \param info   return code
+  !!
+  !
+  interface  psb_coo_clean_negidx_inner
+    subroutine psb_lz_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+      import
+      integer(psb_lpk_), intent(in)           :: nzin
+      integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
+      complex(psb_dpk_), intent(inout) :: val(:)
+      integer(psb_lpk_), intent(out)          :: nzout
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_lz_coo_clean_negidx_inner
+  end interface psb_coo_clean_negidx_inner
+#endif
   !
   !>
   !! \memberof  psb_lz_coo_sparse_mat
@@ -3674,6 +3780,8 @@ module psb_z_base_mat_mod
     end subroutine psb_lz_coo_scals
   end interface
 
+  public :: psb_z_get_print_frmt, psb_lz_get_print_frmt
+
   !>
   !! \memberof  psb_lz_coo_sparse_mat
   !! \see psb_lz_base_mat_mod::psb_lz_base_scalplusidentity
@@ -3728,6 +3836,56 @@ module psb_z_base_mat_mod
   end interface
 
 contains
+
+  function psb_z_get_print_frmt(nr,nc,nz,iv,ivr,ivc) result(frmt)
+
+    implicit none
+    character(len=80) :: frmt
+    integer(psb_ipk_), intent(in) :: nr, nc, nz
+    integer(psb_lpk_), intent(in), optional     :: iv(:)
+    integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+    !
+    character(len=*), parameter  :: datatype='complex'
+    integer(psb_lpk_) :: nmx
+    integer(psb_ipk_) :: ni
+    nmx = max(nr,nc,ione)
+    if (present(iv))  nmx = max(nmx,maxval(abs(iv(1:nc))))
+    if (present(ivr)) nmx = max(nmx,maxval(abs(ivr(1:nr))))
+    if (present(ivc)) nmx = max(nmx,maxval(abs(ivc(1:nc))))
+    ni  = floor(log10(1.0*nmx)) + 2
+
+    if (datatype=='complex') then
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+    else
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+    end if
+
+  end function psb_z_get_print_frmt
+
+  function psb_lz_get_print_frmt(nr,nc,nz,iv,ivr,ivc) result(frmt)
+
+    implicit none
+    character(len=80) :: frmt
+    integer(psb_lpk_), intent(in) :: nr, nc, nz
+    integer(psb_lpk_), intent(in), optional     :: iv(:)
+    integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+    !
+    character(len=*), parameter  :: datatype='complex'
+    integer(psb_lpk_) :: nmx
+    integer(psb_lpk_) :: ni
+    nmx = max(nr,nc,lone)
+    if (present(iv))  nmx = max(nmx,maxval(abs(iv(1:nc))))
+    if (present(ivr)) nmx = max(nmx,maxval(abs(ivr(1:nr))))
+    if (present(ivc)) nmx = max(nmx,maxval(abs(ivc(1:nc))))
+    ni  = floor(log10(1.0*nmx)) + 2
+
+    if (datatype=='complex') then
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+    else
+      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+    end if
+
+  end function psb_lz_get_print_frmt
 
 
   ! == ==================================

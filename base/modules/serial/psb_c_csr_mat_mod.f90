@@ -169,9 +169,9 @@ module psb_c_csr_mat_mod
       import
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_c_csr_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_c_csr_print
   end interface
   !

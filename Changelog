@@ -1,5 +1,21 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2019/12/18: New internals and algorithms for FND_OWNER, faster and less
+	memory hungry.	
+2019/07/20: New SCAN collective; improve handling of SYMmetric	
+2019/07/08: Fix memory usage in conversions to/from coo	
+2019/07/01: Timer facility 	
+2019/06/25: Fix memory footprint in spspmm and other borderline cases	
+2019/06/17: Make ADD default assembly action.	
+2019/05/30: new insertion routines in CSR mode	
+2019/05/27: Fix matrix generation.
+2019/05/26: New timer facility (undocumented).	
+2019/05/20: Change checks on vectors	
+2019/05/05: Reworked linmap internals	
+2019/04/15: Improved sphalo and test programs printout	
+2019/04/09: bump version to 3.6.1
+2019/04/09: new fnd_owner_halo method
+2019/03/31: New RENUM_BLK descriptor method	
 2019/01/16: In bldext, implement ALL_TO_ALLV by hand for certain
 	compilers. 
 2018/10/10: New ICTXT argument in prec%init

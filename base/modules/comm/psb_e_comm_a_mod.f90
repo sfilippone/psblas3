@@ -30,7 +30,8 @@
 !   
 !    
 module psb_e_comm_a_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_epk_, psb_mpk_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, &
+       & psb_epk_, psb_mpk_, psb_i2pk_
   
   interface psb_ovrl
     subroutine psb_eovrlm(x,desc_a,info,jx,ik,work,update,mode)

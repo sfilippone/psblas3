@@ -407,6 +407,38 @@ subroutine  psb_s_coo_reallocate_nz(nz,a)
 
 end subroutine psb_s_coo_reallocate_nz
 
+subroutine  psb_s_coo_ensure_size(nz,a)
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_ensure_size
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none
+  integer(psb_ipk_), intent(in) :: nz
+  class(psb_s_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_)  :: err_act, info, nz_
+  character(len=20)  :: name='s_coo_ensure_size'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  nz_ = max(nz,ione)
+  call psb_ensure_size(nz_,a%ia,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%ja,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%val,info)
+
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_s_coo_ensure_size
+
 subroutine psb_s_coo_mold(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_mold
   use psb_error_mod
@@ -540,7 +572,44 @@ subroutine  psb_s_coo_clean_zeros(a, info)
   call a%trim()
 end subroutine psb_s_coo_clean_zeros
 
+subroutine  psb_s_coo_clean_negidx(a,info)
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_clean_negidx
+  implicit none
+  class(psb_s_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out)             :: info
+  !
+  !
+  integer(psb_ipk_)  :: nz
+  call psb_coo_clean_negidx_inner(a%get_nzeros(),a%ia,a%ja,a%val,nz,info)
+  if (info == 0) call a%set_nzeros(nz)
 
+end subroutine psb_s_coo_clean_negidx
+
+subroutine psb_s_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_clean_negidx_inner
+  implicit none
+  integer(psb_ipk_), intent(in)           :: nzin
+  integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
+  real(psb_spk_), intent(inout) :: val(:)
+  integer(psb_ipk_), intent(out)          :: nzout
+  integer(psb_ipk_), intent(out)          :: info
+  !
+  !
+  integer(psb_ipk_)  :: i
+  info = 0
+  nzout = 0
+  do i=1, nzin
+    if ((ia(i)>0).and.(ja(i)>0)) then
+      nzout = nzout + 1
+      val(nzout) = val(i)
+      ia(nzout)  = ia(i)
+      ja(nzout)  = ja(i)
+    end if
+  end do
+
+end subroutine psb_s_coo_clean_negidx_inner
 
 subroutine  psb_s_coo_allocate_mnnz(m,n,a,nz)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_allocate_mnnz
@@ -610,17 +679,15 @@ subroutine psb_s_coo_print(iout,a,iv,head,ivr,ivc)
 
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_s_coo_sparse_mat), intent(in) :: a
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_coo_print'
   logical, parameter :: debug=.false.
-
-  character(len=*), parameter  :: datatype='real'
-  character(len=80)            :: frmtv
-  integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)            :: frmt
+  integer(psb_ipk_) :: i,j, ni, nr, nc, nz
 
   write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
   if (present(head)) write(iout,'(a,a)') '% ',head
@@ -632,38 +699,29 @@ subroutine psb_s_coo_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
+  frmt = psb_s_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
 
-  if (datatype=='real') then
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
   write(iout,*) nr, nc, nz
   if(present(iv)) then
     do j=1,a%get_nzeros()
-      write(iout,frmtv) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
+      write(iout,frmt) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
     enddo
   else
     if (present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),a%ja(j),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),a%ja(j),a%val(j)
       enddo
     else if (present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) a%ia(j),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),a%ja(j),a%val(j)
+        write(iout,frmt) a%ia(j),a%ja(j),a%val(j)
       enddo
     endif
   endif
@@ -1777,7 +1835,7 @@ subroutine psb_s_coo_csmm(alpha,a,x,beta,y,info,trans)
 
     end if                  !.....end testing on alpha
 
-  else if (ctra) then
+  else if (ctra) then           !
 
     if (alpha == sone) then
       i    = 1
@@ -4910,6 +4968,38 @@ subroutine  psb_ls_coo_reallocate_nz(nz,a)
 
 end subroutine psb_ls_coo_reallocate_nz
 
+subroutine  psb_ls_coo_ensure_size(nz,a)
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_ensure_size
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none
+  integer(psb_lpk_), intent(in) :: nz
+  class(psb_ls_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_)  :: err_act, info, nz_
+  character(len=20)  :: name='ls_coo_ensure_size'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  nz_ = max(nz,ione)
+  call psb_ensure_size(nz_,a%ia,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%ja,info)
+  if (info == psb_success_) call psb_ensure_size(nz_,a%val,info)
+
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_coo_ensure_size
+
 subroutine psb_ls_coo_mold(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_mold
   use psb_error_mod
@@ -5044,7 +5134,46 @@ subroutine  psb_ls_coo_clean_zeros(a, info)
   call a%trim()
 end subroutine psb_ls_coo_clean_zeros
 
+subroutine  psb_ls_coo_clean_negidx(a,info)
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_clean_negidx
+  implicit none
+  class(psb_ls_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out)             :: info
+  !
+  !
+  integer(psb_lpk_)  :: nz
+  call psb_coo_clean_negidx_inner(a%get_nzeros(),a%ia,a%ja,a%val,nz,info)
+  if (info == 0) call a%set_nzeros(nz)
 
+end subroutine psb_ls_coo_clean_negidx
+
+#if defined(IPK4) && defined(LPK8)
+subroutine psb_ls_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+  use psb_error_mod
+  use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_clean_negidx_inner
+  implicit none
+  integer(psb_lpk_), intent(in)           :: nzin
+  integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
+  real(psb_spk_), intent(inout) :: val(:)
+  integer(psb_lpk_), intent(out)          :: nzout
+  integer(psb_ipk_), intent(out)          :: info
+  !
+  !
+  integer(psb_lpk_)  :: i
+  info = 0
+  nzout = 0
+  do i=1, nzin
+    if ((ia(i)>0).and.(ja(i)>0)) then
+      nzout = nzout + 1
+      val(nzout) = val(i)
+      ia(nzout)  = ia(i)
+      ja(nzout)  = ja(i)
+    end if
+  end do
+
+end subroutine psb_ls_coo_clean_negidx_inner
+#endif
 
 subroutine  psb_ls_coo_allocate_mnnz(m,n,a,nz)
   use psb_s_base_mat_mod, psb_protect_name => psb_ls_coo_allocate_mnnz
@@ -5123,9 +5252,8 @@ subroutine psb_ls_coo_print(iout,a,iv,head,ivr,ivc)
   character(len=20)  :: name='ls_coo_print'
   logical, parameter :: debug=.false.
 
-  character(len=*), parameter  :: datatype='real'
-  character(len=80)            :: frmtv
-  integer(psb_lpk_) :: i,j, nmx, ni, nr, nc, nz
+  character(len=80)            :: frmt
+  integer(psb_lpk_) :: i,j, ni, nr, nc, nz
 
   write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
   if (present(head)) write(iout,'(a,a)') '% ',head
@@ -5137,38 +5265,29 @@ subroutine psb_ls_coo_print(iout,a,iv,head,ivr,ivc)
   nr = a%get_nrows()
   nc = a%get_ncols()
   nz = a%get_nzeros()
-  nmx = max(nr,nc,1)
-  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
-  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
-  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
-  ni  = floor(log10(1.0*nmx)) + 1
+  frmt = psb_ls_get_print_frmt(nr,nc,nz,iv,ivr,ivc)
 
-  if (datatype=='real') then
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-  else
-    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
-  end if
   write(iout,*) nr, nc, nz
   if(present(iv)) then
     do j=1,a%get_nzeros()
-      write(iout,frmtv) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
+      write(iout,frmt) iv(a%ia(j)),iv(a%ja(j)),a%val(j)
     enddo
   else
     if (present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),a%ja(j),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),a%ja(j),a%val(j)
       enddo
     else if (present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) ivr(a%ia(j)),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),ivc(a%ja(j)),a%val(j)
+        write(iout,frmt) a%ia(j),ivc(a%ja(j)),a%val(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then
       do j=1,a%get_nzeros()
-        write(iout,frmtv) a%ia(j),a%ja(j),a%val(j)
+        write(iout,frmt) a%ia(j),a%ja(j),a%val(j)
       enddo
     endif
   endif

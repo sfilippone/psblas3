@@ -32,7 +32,7 @@ lib: interns mpfobjs $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 interns:
-	cd internals && $(MAKE) lib
+	$(MAKE) -C internals lib
 mpfobjs: 
 	$(MAKE) $(MPFOBJS) FC="$(MPFC)" 
 

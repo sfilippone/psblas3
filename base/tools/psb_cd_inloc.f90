@@ -67,8 +67,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
        & nov(:), ov_idx(:,:), temp_ovrlap(:)
   integer(psb_lpk_), allocatable :: vl(:), ix(:), l_temp_ovrlap(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
-  integer(psb_mpk_)  :: iictxt
-  real(psb_dpk_)     :: t0, t1, t2, t3, t4, t5 
+  real(psb_dpk_)     :: t0, t1, t2, t3, t4, t5
+  logical, parameter :: debug_size=.false.
   logical            :: do_timings=.false.
   logical            :: check_, islarge, usehash_
   character(len=20)  :: name
@@ -84,14 +84,13 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': start',np
-  iictxt = ictxt
   if (do_timings) then 
     call psb_barrier(ictxt)
     t0 = psb_wtime()
   end if
   loc_row = size(v)
-  m = maxval(v)
-  nrt = loc_row
+  m       = maxval(v)
+  nrt     = loc_row
   call psb_sum(ictxt,nrt)
   call psb_max(ictxt,m)
   
@@ -148,12 +147,14 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
 
   islarge = psb_cd_is_large_size(m)
 
-  allocate(vl(loc_row),ix(loc_row),stat=info) 
+  allocate(vl(max(loc_row,ione)),ix(max(loc_row,ione)),stat=info) 
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes',loc_row,m,nrt,check_
 
   !
   ! Checks for valid input:
@@ -164,6 +165,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   !  
 
   if (check_.or.(.not.islarge)) then
+    if (debug_size) &
+         & write(debug_unit,*) me,' ',trim(name),': Going for global checks'
+  
     allocate(tmpgidx(m,2),stat=info) 
     if (info /= psb_success_) then 
       info=psb_err_alloc_dealloc_
@@ -228,6 +232,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
       write(psb_err_unit,*) trim(name),'        : in the global sizes!',m,nrt
     end if
   end if
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': After global checks '
+
   if (do_timings) then 
     call psb_barrier(ictxt)
     t1 = psb_wtime()
@@ -254,7 +261,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     end do
   end if
   call psb_msort(vl,ix,flag=psb_sort_keep_idx_)
-  nlu = 1
+  nlu = min(1,loc_row)
   do i=2,loc_row
     if (vl(i) /= vl(nlu)) then
       nlu = nlu + 1 
@@ -263,6 +270,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     end if
   end do
   call psb_msort(ix(1:nlu),vl(1:nlu),flag=psb_sort_keep_idx_)
+
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': After sort ',nlu
 
   call psb_nullify_desc(desc)
   if (do_timings) then 
@@ -276,7 +286,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   !       then novrl = 0, hence all accesses to tmpgidx
   !       are safe. 
   ! 
-  if (novrl > 0) then 
+  if (novrl > 0) then
+    if (debug_size) &
+         & write(debug_unit,*) me,' ',trim(name),': Check overlap '
+    
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': code for NOVRL>0',novrl,npr_ov
 
@@ -320,6 +333,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     call psb_msort(ov_idx(:,1),ix=ov_idx(:,2),flag=psb_sort_keep_idx_)
 
   end if
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': Done overlap '
+    
 
   ! allocate work vector
   allocate(l_temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
@@ -375,7 +391,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     call psb_barrier(ictxt)
     t3 = psb_wtime()
   end if
-
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': Allocate indxmap'
+    
   if (np == 1) then 
     allocate(psb_repl_map :: desc%indxmap, stat=info)
   else
@@ -388,11 +406,15 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(iictxt,m,info)
+    call aa%repl_map_init(ictxt,m,info)
   class default 
-    call aa%init(iictxt,vl(1:nlu),info)
+    call aa%init(ictxt,vl(1:nlu),info)
   end select
 
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': Done init indxmap'
+
+  
   if (do_timings) then 
     call psb_barrier(ictxt)
     t4 = psb_wtime()
@@ -420,6 +442,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     end if
   end block
   if (info == psb_success_) call psi_bld_tmpovrl(temp_ovrlap,desc,info)
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': Done bld_tmpovrl'
 
   if (info == psb_success_) deallocate(temp_ovrlap,vl,ix,stat=info)
   if ((info == psb_success_).and.(allocated(tmpgidx)))&
@@ -455,6 +479,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
       write(0,*) '    Phase 5     : ', t5
     end if
   end if
+  if (debug_size) &
+       & write(debug_unit,*) me,' ',trim(name),': Done cd_inloc'
 
   call psb_erractionrestore(err_act)
   return

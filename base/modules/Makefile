@@ -153,9 +153,13 @@ penv/psi_collective_mod.o: penv/psi_e_collective_mod.o \
 	 penv/psi_z_collective_mod.o 
 
 penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
-penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o\
+penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o: penv/psi_penv_mod.o 
+
 penv/psi_e_collective_mod.o  penv/psi_m_collective_mod.o penv/psi_s_collective_mod.o \
-penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_mod.o: penv/psi_penv_mod.o 
+penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_mod.o: penv/psi_penv_mod.o \
+	penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
+	penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o
+
 
 auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
 desc/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o  desc/psb_desc_const_mod.o

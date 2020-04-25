@@ -64,7 +64,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   integer(psb_lpk_) :: l_err(5)
   integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt
   character(len=20)  :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -77,7 +76,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np,me
-  iictxt = ictxt 
   m = size(v)
   n = m
   !... check m and n parameters....
@@ -192,11 +190,11 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(iictxt,m,info)
+    call aa%repl_map_init(ictxt,m,info)
   type is (psb_hash_map) 
-    call aa%hash_map_init(iictxt,v,info)
+    call aa%hash_map_init(ictxt,v,info)
   type is (psb_glist_map) 
-    call aa%glist_map_init(iictxt,v,info)
+    call aa%glist_map_init(ictxt,v,info)
   class default 
       ! This cannot happen 
     info = psb_err_internal_error_

@@ -15,15 +15,15 @@ libd:
 	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 	(if test ! -d modules ; then mkdir modules; fi;)	
 based:
-	cd base && $(MAKE) lib
+	$(MAKE) -C  base lib
 precd:
-	cd prec && $(MAKE) lib
+	$(MAKE) -C prec lib
 kryld:
-	cd krylov && $(MAKE) lib
+	$(MAKE) -C krylov lib
 utild:
-	cd util&& $(MAKE) lib 
+	$(MAKE) -C util lib 
 cbindd:
-	cd cbind&& $(MAKE) lib 
+	$(MAKE) -C cbind lib 
 
 install: all
 	mkdir -p  $(INSTALL_INCLUDEDIR) &&\
@@ -42,11 +42,11 @@ install: all
 	     /bin/cp -fr test/pargen test/fileread test/kernel $(INSTALL_SAMPLESDIR) && \
 	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
 clean: 
-	cd base && $(MAKE) clean
-	cd prec && $(MAKE) clean 
-	cd krylov && $(MAKE) clean
-	cd util && $(MAKE) clean
-	cd cbind && $(MAKE) clean
+	$(MAKE) -C base clean
+	$(MAKE) -C prec clean 
+	$(MAKE) -C krylov clean
+	$(MAKE) -C util clean
+	$(MAKE) -C cbind clean
 
 check: all
 	make check -C test/serial

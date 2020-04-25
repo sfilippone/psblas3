@@ -57,7 +57,6 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
   logical            :: usehash_
   integer(psb_ipk_), allocatable :: itmpv(:)
   integer(psb_lpk_), allocatable :: lvl(:)
-  integer(psb_mpk_) :: iictxt
 
 
 
@@ -67,7 +66,6 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
   call psb_erractionsave(err_act)
 
   call psb_info(ictxt, me, np)
-  iictxt  = ictxt
   if (count((/ present(vg),present(vl),&
        &  present(parts),present(nl), present(repl) /)) /= 1) then 
     info=psb_err_no_optional_arg_
@@ -159,9 +157,9 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
         select type(aa => desc%indxmap) 
         type is (psb_repl_map)
           n_ = nl
-          call aa%repl_map_init(iictxt,n_,info)
+          call aa%repl_map_init(ictxt,n_,info)
         type is (psb_gen_block_map) 
-          call aa%gen_block_map_init(iictxt,nl,info)
+          call aa%gen_block_map_init(ictxt,nl,info)
           class default 
             ! This cannot happen 
           info = psb_err_internal_error_

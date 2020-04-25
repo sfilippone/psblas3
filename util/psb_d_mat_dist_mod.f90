@@ -36,7 +36,7 @@ module psb_d_mat_dist_mod
 
   interface psb_matdist
     subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
-         & info, parts, v, inroot,fmt,mold)
+         & info, parts, vg, vsz, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -90,10 +90,11 @@ module psb_d_mat_dist_mod
       character(len=*), optional :: fmt
       class(psb_d_base_sparse_mat), optional :: mold
       procedure(psb_parts), optional  :: parts
-      integer(psb_ipk_), optional     :: v(:)
+      integer(psb_ipk_), optional     :: vg(:)
+      integer(psb_ipk_), optional     :: vsz(:)
     end subroutine psb_dmatdist
     subroutine psb_ldmatdist(a_glob, a, ictxt, desc_a,&
-         & info, parts, v, inroot,fmt,mold)
+         & info, parts, vg, vsz, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -148,7 +149,8 @@ module psb_d_mat_dist_mod
       character(len=*), optional :: fmt
       class(psb_d_base_sparse_mat), optional :: mold
       procedure(psb_parts), optional  :: parts
-      integer(psb_ipk_), optional     :: v(:)
+      integer(psb_ipk_), optional     :: vg(:)
+      integer(psb_ipk_), optional     :: vsz(:)
     end subroutine psb_ldmatdist
   end interface
 
