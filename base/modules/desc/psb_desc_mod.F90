@@ -934,6 +934,9 @@ contains
     if (allocated(desc%halo_index)) &
          &  deallocate(desc%halo_index,stat=info)
 
+    if (allocated(desc%ext_index)) &
+         &  deallocate(desc%ext_index,stat=info)
+
     if (allocated(desc%bnd_elem)) &
          &    deallocate(desc%bnd_elem,stat=info)
 
@@ -942,11 +945,13 @@ contains
     
     if (allocated(desc%ovrlap_elem)) &
          & deallocate(desc%ovrlap_elem,stat=info)
+
     if (allocated(desc%ovr_mst_idx)) &
          & deallocate(desc%ovr_mst_idx,stat=info)
 
     if (allocated(desc%lprm)) &
          & deallocate(desc%lprm,stat=info)
+
     if (allocated(desc%idx_space)) &
          & deallocate(desc%idx_space,stat=info)
 
