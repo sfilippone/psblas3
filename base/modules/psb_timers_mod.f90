@@ -41,7 +41,7 @@ module psb_timers_mod
   use psb_penv_mod
   
   public psb_init_timers, psb_get_timer_idx, psb_reset_timers,&
-       & psb_tic, psb_toc, psb_print_timers, psb_get_timer
+       & psb_tic, psb_toc, psb_print_timers, psb_get_timer, psb_free_timers
   private
 
   ! Reallocation
@@ -186,6 +186,17 @@ contains
     if (info == 0) call psb_reset_timers()
     
   end subroutine psb_init_timers
+
+  subroutine psb_free_timers()
+    implicit none 
+
+    integer(psb_ipk_)  :: info
+
+    if (allocated(nsamples)) deallocate(nsamples,stat=info)
+    if (allocated(timers)) deallocate(timers,stat=info)
+    if (allocated(timers_descr)) deallocate(timers_descr,stat=info)
+    
+  end subroutine psb_free_timers
 
   subroutine reallocate_timers(tsz,info)
     implicit none 
