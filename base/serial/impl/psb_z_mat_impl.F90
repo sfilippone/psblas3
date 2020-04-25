@@ -2508,6 +2508,8 @@ subroutine psb_z_mv_from_lb(a,b)
   class(psb_zspmat_type), intent(inout) :: a
   class(psb_lz_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
+
+  info = psb_success_
   if (.not.allocated(a%a)) allocate(psb_z_csr_sparse_mat :: a%a, stat=info)
   if (info == psb_success_) call a%a%mv_from_lfmt(b,info)
   
@@ -2524,6 +2526,7 @@ subroutine psb_z_cp_from_lb(a,b)
   class(psb_lz_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
 
+  info = psb_success_
   if (.not.allocated(a%a)) allocate(psb_z_csr_sparse_mat :: a%a, stat=info)
   if (info == psb_success_) call a%a%cp_from_lfmt(b,info)
 
@@ -2574,6 +2577,7 @@ subroutine psb_z_mv_from_l(a,b)
   class(psb_lzspmat_type), intent(inout) :: b
   integer(psb_ipk_) :: info
 
+  info = psb_success_
   if (allocated(b%a)) then
     if (.not.allocated(a%a)) allocate(psb_z_csr_sparse_mat :: a%a, stat=info)
     call a%a%mv_from_lfmt(b%a,info)
@@ -2594,7 +2598,8 @@ subroutine psb_z_cp_from_l(a,b)
   class(psb_zspmat_type), intent(out) :: a
   class(psb_lzspmat_type), intent(in) :: b
   integer(psb_ipk_) :: info
-  
+
+  info = psb_success_  
   if (allocated(b%a)) then
     if (.not.allocated(a%a)) allocate(psb_z_csr_sparse_mat :: a%a, stat=info)
     call a%a%cp_from_lfmt(b%a,info)
@@ -4913,6 +4918,8 @@ subroutine psb_lz_mv_from_ib(a,b)
   class(psb_lzspmat_type), intent(inout) :: a
   class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
+
+  info = psb_success_
   if (.not.allocated(a%a)) allocate(psb_lz_csr_sparse_mat :: a%a, stat=info)
   if (info == psb_success_) call a%a%mv_from_ifmt(b,info)
   
@@ -4928,6 +4935,7 @@ subroutine psb_lz_cp_from_ib(a,b)
   class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
 
+  info = psb_success_
   if (.not.allocated(a%a)) allocate(psb_lz_csr_sparse_mat :: a%a, stat=info)
   if (info == psb_success_) call a%a%cp_from_ifmt(b,info)
 

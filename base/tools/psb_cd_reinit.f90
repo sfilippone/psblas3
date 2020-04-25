@@ -69,6 +69,9 @@ Subroutine psb_cd_reinit(desc,info)
     call psb_move_alloc(tmp_halo,desc%halo_index,info)
     call psb_move_alloc(tmp_ext,desc%ext_index,info)
     call desc%indxmap%reinit(info)
+!!$    if (me == 0) write(0,*) 'On cdreinit status :',&
+!!$         & allocated(desc%indxmap%p_adjcncy),allocated(desc%indxmap%halo_owner), &
+!!$         & desc%get_fmt()
     !  call psb_cd_set_bld(desc,info)
   end if
 

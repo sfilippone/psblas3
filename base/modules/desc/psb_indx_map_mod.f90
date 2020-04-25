@@ -219,9 +219,9 @@ module psb_indx_map_mod
 
     procedure, pass(idxmap)  :: set_halo_owner  => base_set_halo_owner
     procedure, pass(idxmap)  :: get_halo_owner  => base_get_halo_owner
-    procedure, pass(idxmap)  :: fnd_halo_owner_s => base_fnd_halo_owner_s
-    procedure, pass(idxmap)  :: fnd_halo_owner_v => base_fnd_halo_owner_v
-    generic, public          :: fnd_halo_owner => fnd_halo_owner_s, fnd_halo_owner_v
+    procedure, pass(idxmap)  :: qry_halo_owner_s => base_qry_halo_owner_s
+    procedure, pass(idxmap)  :: qry_halo_owner_v => base_qry_halo_owner_v
+    generic, public          :: qry_halo_owner => qry_halo_owner_s, qry_halo_owner_v
     
     procedure, pass(idxmap)  :: fnd_owner => psi_indx_map_fnd_owner
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
@@ -245,7 +245,7 @@ module psb_indx_map_mod
        & base_lg2lv2_ins, base_init_vl, base_is_null,&
        & base_row_extendable, base_clone, base_cpy, base_reinit, &
        & base_set_halo_owner, base_get_halo_owner, &
-       & base_fnd_halo_owner_s, base_fnd_halo_owner_v,&
+       & base_qry_halo_owner_s, base_qry_halo_owner_v,&
        & base_get_p_adjcncy, base_set_p_adjcncy, base_xtnd_p_adjcncy
   
   !> Function: psi_indx_map_fnd_owner
@@ -1486,6 +1486,7 @@ contains
   end subroutine base_set_halo_owner
 
   subroutine base_get_halo_owner(idxmap,v,info)
+    use psb_realloc_mod
     use psb_penv_mod
     use psb_error_mod
     implicit none 
@@ -1494,13 +1495,15 @@ contains
     integer(psb_ipk_), intent(out)     :: info
 
     integer(psb_ipk_)  :: nh
-    nh = min(size(v),size(idxmap%halo_owner))
-    v(1:nh) = idxmap%halo_owner(1:nh)
+    nh = size(idxmap%halo_owner)
+    !v = idxmap%halo_owner(1:nh)
+    call psb_safe_ab_cpy(idxmap%halo_owner,v,info)
   end subroutine base_get_halo_owner
 
-  subroutine base_fnd_halo_owner_s(idxmap,xin,xout,info)
+  subroutine base_qry_halo_owner_s(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin
@@ -1510,24 +1513,26 @@ contains
     integer(psb_ipk_)  :: i, j, nr, nc, nh
     nr = idxmap%local_rows
     nc = idxmap%local_cols
+    nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))    
     xout = -1
     if (.not.allocated(idxmap%halo_owner)) then
       !write(0,*) 'Halo_owner not allocated!', nr, nc, xin
       return
     end if
     if ((nr<xin).and.(xin <= nc)) then
-      if (size(idxmap%halo_owner)<(xin-nr)) then
-        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
-        return
-      end if
+!!$      if (size(idxmap%halo_owner)<(xin-nr)) then
+!!$        !write(0,*) 'Halo_owner bad size',xin,nr,xin-nr,size(idxmap%halo_owner)
+!!$        return
+!!$      end if
       xout = idxmap%halo_owner(xin-nr)
     end if
     
-  end subroutine base_fnd_halo_owner_s
+  end subroutine base_qry_halo_owner_s
 
-  subroutine base_fnd_halo_owner_v(idxmap,xin,xout,info)
+  subroutine base_qry_halo_owner_v(idxmap,xin,xout,info)
     use psb_penv_mod
     use psb_error_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin(:)
@@ -1536,13 +1541,15 @@ contains
 
     integer(psb_ipk_)  :: i, j, nr, nc, nh, sz
     nr = idxmap%local_rows
-    nc = idxmap%local_cols
+    nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))
     sz = min(size(xin),size(xout))
-    xout = -1
     do i = 1, sz
-      if ((nr<xin(i)).and.(xin(i) <= nc)) xout = idxmap%halo_owner(xin(i)-nr)
+      xout(i) = -1          
+      if ((nr<xin(i)).and.(xin(i) <= nc)) xout(i) = idxmap%halo_owner(xin(i)-nr)
     end do
-    
-  end subroutine base_fnd_halo_owner_v
+    do i=sz+1,size(xout)
+      xout(i) = -1
+    end do
+  end subroutine base_qry_halo_owner_v
 
 end module psb_indx_map_mod

@@ -162,7 +162,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   !
   call psb_safe_ab_cpy(idxmap%p_adjcncy,ladj,info)
   nadj = psb_size(ladj)
-  ! This makes ladj allocated with size 0 just in case 
+  ! This makes ladj allocated with size 0 if needed, as opposed to unallocated
   call psb_realloc(nadj,ladj,info)
   !
   ! Throughout the subroutine, nreqst is the number of local inquiries
