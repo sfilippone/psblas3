@@ -6,5 +6,6 @@
 #include "psb_c_cutil.h"
 #include "psb_c_zutil.h"
 
+psb_i_t psb_c_idx2ijk(psb_i_t *i, psb_i_t *j, psb_i_t idx, psb_i_t nx, psb_i_t ny, psb_i_t base );
 
 #endif
