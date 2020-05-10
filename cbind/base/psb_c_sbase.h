@@ -87,7 +87,7 @@ bool psb_c_sgecmpmat_val(psb_c_sspmat *ah,psb_s_t val,psb_s_t tol,psb_c_descript
 psb_i_t psb_c_sgeaddconst(psb_c_svector *xh,psb_s_t bh,psb_c_svector *zh,psb_c_descriptor *cdh);
 psb_s_t psb_c_sgenrm2_weight(psb_c_svector *xh,psb_c_svector *wh,psb_c_descriptor *cdh);
 psb_s_t psb_c_sgenrm2_weightmask(psb_c_svector *xh,psb_c_svector *wh,psb_c_svector *idvh,psb_c_descriptor *cdh);
-psb_i_t psb_c_smask(psb_c_svector *ch,psb_c_svector *xh,psb_c_svector *mh, void *t, psb_c_descriptor *cdh);
+psb_i_t psb_c_smask(psb_c_svector *ch,psb_c_svector *xh,psb_c_svector *mh, bool *t, psb_c_descriptor *cdh);
 psb_s_t psb_c_sgemin(psb_c_svector *xh,psb_c_descriptor *cdh);
 psb_i_t psb_c_sspscal(psb_s_t alpha, psb_c_sspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_sspscalpid(psb_s_t alpha, psb_c_sspmat *ah, psb_c_descriptor *cdh);
