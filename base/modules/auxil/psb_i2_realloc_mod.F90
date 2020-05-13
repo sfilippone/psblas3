@@ -39,6 +39,7 @@ module psb_i2_realloc_mod
   ! the size specified, possibly shortening it. 
   !
   Interface psb_realloc
+    module procedure psb_r_i2_s
     module procedure psb_r_m_i2_rk1
     module procedure psb_r_m_i2_rk2
     module procedure psb_r_e_i2_rk1
@@ -56,7 +57,7 @@ module psb_i2_realloc_mod
   end interface psb_move_alloc
 
   Interface psb_safe_ab_cpy
-    module procedure psb_ab_cpy_i2_rk1, psb_ab_cpy_i2_rk2
+    module procedure psb_ab_cpy_i2_s, psb_ab_cpy_i2_rk1, psb_ab_cpy_i2_rk2
   end Interface psb_safe_ab_cpy
 
   Interface psb_safe_cpy
@@ -81,6 +82,42 @@ module psb_i2_realloc_mod
 
 
 Contains
+
+  Subroutine psb_r_i2_s(rrax,info)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    integer(psb_i2pk_), allocatable, intent(inout) :: rrax
+    integer(psb_ipk_) :: info
+
+    ! ...Local Variables
+    integer(psb_ipk_) :: err_act,err
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+
+    name='psb_r_i2_s'
+    call psb_erractionsave(err_act)
+    info=psb_success_ 
+
+    if (.not.allocated(rrax)) then 
+      Allocate(rrax,stat=info)
+      if (info /= psb_success_) then
+        err=4025
+        call psb_errpush(err,name, l_err=(/1_psb_lpk_/), &
+             & a_err='integer(psb_i2pk_)')
+        goto 9999
+      end if
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    info = err
+    call psb_error_handler(err_act)
+    return
+
+  End Subroutine psb_r_i2_s
 
   Subroutine psb_r_m_i2_rk1(len,rrax,info,pad,lb)
     use psb_error_mod
@@ -686,6 +723,48 @@ Contains
   End Subroutine psb_r_e_2_i2_rk1
 
 
+
+  subroutine psb_ab_cpy_i2_s(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    integer(psb_i2pk_), allocatable, intent(in)  :: vin
+    integer(psb_i2pk_), allocatable, intent(out) :: vout
+    integer(psb_ipk_) :: info
+    ! ...Local Variables
+
+    integer(psb_ipk_) :: isz,err_act,lb
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_ab_cpy_i2_s'
+    call psb_erractionsave(err_act)
+    info=psb_success_
+    if(psb_errstatus_fatal()) then 
+      info=psb_err_from_subroutine_
+      goto 9999
+    end if
+
+    if (allocated(vin)) then 
+      call psb_realloc(vout,info)
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout = vin
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(err_act)
+
+    return
+
+  end subroutine psb_ab_cpy_i2_s
 
   subroutine psb_ab_cpy_i2_rk1(vin,vout,info) 
     use psb_error_mod
