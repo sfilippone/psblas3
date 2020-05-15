@@ -56,7 +56,7 @@
 module psb_metispart_mod
   use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
        & psb_dspmat_type, psb_zspmat_type, psb_err_unit, &
-       & psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
+       & psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, psb_spk_,&
        & psb_s_csr_sparse_mat, psb_d_csr_sparse_mat, &
        & psb_c_csr_sparse_mat, psb_z_csr_sparse_mat
   public part_graph, build_mtpart, distr_mtpart,&
@@ -65,18 +65,26 @@ module psb_metispart_mod
   integer(psb_ipk_), allocatable, save :: graph_vect(:)
 
   interface build_mtpart
-    module procedure build_mtpart,&
-         & d_mat_build_mtpart, s_mat_build_mtpart,&
-         & z_mat_build_mtpart, c_mat_build_mtpart, &
-         & d_csr_build_mtpart, s_csr_build_mtpart,&
-         & z_csr_build_mtpart, c_csr_build_mtpart
-
+    module procedure d_mat_build_mtpart, s_mat_build_mtpart,&
+         & z_mat_build_mtpart, c_mat_build_mtpart
   end interface
 
+  interface
+    subroutine psi_build_mtpart(n,ja,irp,nparts,vect, weights)
+      import :: psb_ipk_, psb_spk_
+      implicit none 
+      integer(psb_ipk_), intent(in) :: n, nparts
+      integer(psb_ipk_), intent(in) :: ja(:), irp(:)
+      integer(psb_ipk_), allocatable, intent(inout) :: vect(:)
+      real(psb_spk_),optional, intent(in) :: weights(:)
+      
+    end subroutine psi_build_mtpart
+  end interface
+  
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
-    implicit none 
+    implicit none
     integer(psb_lpk_), intent(in)  :: global_indx, n
     integer(psb_ipk_), intent(in)  :: np
     integer(psb_ipk_), intent(out) :: nv
@@ -180,9 +188,9 @@ contains
       end if
     end if
     if (allocated(wgh_)) then 
-      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,wgh_)
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,wgh_)
     else
-      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts)
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect)
     end if
 
   end subroutine d_csr_build_mtpart
@@ -219,9 +227,9 @@ contains
       end if
     end if
     if (allocated(wgh_)) then 
-      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,wgh_)
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,wgh_)
     else
-      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts)
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect)
     end if
 
   end subroutine z_csr_build_mtpart
@@ -268,7 +276,7 @@ contains
     real(psb_spk_), optional :: weights(:)
     
     
-    call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
+    call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,weights)
 
   end subroutine c_csr_build_mtpart
   
@@ -280,110 +288,9 @@ contains
     real(psb_spk_), optional :: weights(:)
     
 
-    call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
+    call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,weights)
 
   end subroutine s_csr_build_mtpart
-
-  subroutine build_mtpart(n,fida,ja,irp,nparts,weights)
-    use psb_base_mod
-    implicit none 
-    integer(psb_ipk_) :: nparts
-    integer(psb_ipk_) :: ja(:), irp(:)
-    integer(psb_ipk_) :: n, i,numflag,nedc,wgflag
-    character(len=5)     :: fida
-    integer(psb_ipk_), parameter :: nb=512
-    real(psb_dpk_), parameter :: seed=12345.d0
-    integer(psb_ipk_) :: iopt(10),idummy(2),jdummy(2), info
-    real(psb_spk_),optional :: weights(:)
-    integer(psb_ipk_) :: nl,nptl
-    integer(psb_ipk_), allocatable :: irpl(:),jal(:),gvl(:)
-    real(psb_spk_),allocatable  :: wgh_(:)
-
-#if defined(HAVE_METIS) && defined(IPK4)
-    interface 
-      ! subroutine METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
-      !     & wgflag,numflag,nparts,weights,iopt,nedc,part) bind(c)
-      !   use iso_c_binding
-      !   integer(c_int) :: n,wgflag,numflag,nparts,nedc
-      !   integer(c_int) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-      !   real(c_float)  :: weights(*)
-      !   !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
-      !   !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-      ! end subroutine METIS_PartGraphKway
-
-      function METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
-           & nparts,weights,part) bind(c,name="metis_PartGraphKway_C") result(res)
-        use iso_c_binding
-        integer(c_int) :: res
-        integer(c_int) :: n,nparts
-        integer(c_int) :: ixadj(*),iadj(*),ivwg(*),iajw(*),part(*)
-        real(c_float)  :: weights(*)
-        !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
-        !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-      end function METIS_PartGraphKway
-    end interface
-
-    call psb_realloc(n,graph_vect,info)
-    if (info == psb_success_) allocate(gvl(n),wgh_(nparts),stat=info)
-
-    if (info /= psb_success_) then
-      write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
-           & ' failure.'
-      return
-    endif
-    if (nparts > 1) then
-      if (psb_toupper(fida) == 'CSR') then 
-        iopt(1) = 0
-        numflag  = 1
-        wgflag   = 0
-
-!!$        write(*,*) 'Before allocation',nparts
-
-        irpl=irp
-        jal = ja
-        nl = n
-        nptl = nparts
-        wgh_ = -1.0
-        if(present(weights)) then
-          if (size(weights) == nptl) then 
-!!$            write(*,*) 'weights present',weights
-            ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
-            !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
-            info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-                 & nptl,weights,gvl)
-
-          else
-!!$            write(*,*) 'weights absent',wgh_
-            info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-                 & nptl,wgh_,gvl)
-          end if
-        else
-!!$          write(*,*) 'weights absent',wgh_
-          info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-               & nptl,wgh_,gvl)
-        endif
-!!$        write(*,*) 'after allocation',info
-
-        do i=1, n
-          graph_vect(i) = gvl(i) - 1 
-        enddo
-      else
-        write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: matrix format ',&
-             & ' failure. ', FIDA
-        return
-      endif
-    else
-      do i=1, n
-        graph_vect(i) = 0
-      enddo
-    endif
-#else
-    write(psb_err_unit,*) 'Warning: METIS was not configured at PSBLAS compile time !'
-#endif
-
-    return
-
-  end subroutine build_mtpart
 
   !
   ! WARNING: called IRET otherwise Intel compiler complains,

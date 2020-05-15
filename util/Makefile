@@ -18,7 +18,7 @@ IMPLOBJS= psb_s_hbio_impl.o psb_d_hbio_impl.o \
 	psb_s_mat_dist_impl.o psb_d_mat_dist_impl.o \
 	psb_c_mat_dist_impl.o psb_z_mat_dist_impl.o \
 	psb_s_renum_impl.o psb_d_renum_impl.o \
-	psb_c_renum_impl.o psb_z_renum_impl.o
+	psb_c_renum_impl.o psb_z_renum_impl.o psi_build_mtpart.o
 
 MODOBJS=psb_util_mod.o $(BASEOBJS)
 COBJS=metis_int.o psb_amd_order.o
