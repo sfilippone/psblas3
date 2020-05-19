@@ -147,7 +147,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt, icomm, me, np, minfo
-  logical, parameter :: dist_symm_list=.false., print_dl=.false.
+  logical, parameter :: dist_symm_list=.false., print_dl=.false., profile=.true.
   character  name*20
   name='psi_extrct_dl'
 
@@ -257,6 +257,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
     call psi_symm_dep_list(itmp,ictxt,info)       
     dl_lda = max(size(itmp),1)
     call psb_max(iictxt, dl_lda)
+    
+    if (debug_level >= psb_debug_inner_) &
+         & write(debug_unit,*) me,' ',trim(name),': Dep_list length ',length_dl(me),dl_lda
     call psb_realloc(dl_lda,itmp,info)
     !  dl_lda = min(np,2*dl_lda)
     allocate(dep_list(dl_lda,0:np),stat=info)
@@ -282,6 +285,8 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 
       dl_lda = max(length_dl(me),1)
       call psb_max(iictxt, dl_lda)
+      if (debug_level >= psb_debug_inner_) &
+           & write(debug_unit,*) me,' ',trim(name),': Dep_list length ',length_dl(me),dl_lda
       allocate(dep_list(dl_lda,0:np),stat=info)
       if (info /= psb_success_) then 
         call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -361,6 +366,16 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       flush(0)
     end if
     call psb_barrier(ictxt)
+  end if
+  if ((profile).and.(me==0))  then
+    block
+      integer(psb_ipk_) :: dlmax, dlavg
+      dlmax = maxval(length_dl(:))
+      dlavg = (sum(length_dl(:))+np-1)/np
+      if (dlmax>0) write(0,*) 'Dependency list : max:',dlmax,&
+           & '  avg:',dlavg, ((dlmax>np/2).or.((dlavg>=np/4).and.(np>128)))
+      
+    end block
   end if
 
   call psb_erractionrestore(err_act)

@@ -65,7 +65,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row
   integer(psb_mpk_) ::  np,me, icomm, ictxt
   logical             :: ext_hv_
-  logical, parameter  :: do_timings=.false.
+  logical, parameter  :: do_timings=.true.
   integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
   integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
   integer(psb_ipk_), save  :: idx_total=-1
