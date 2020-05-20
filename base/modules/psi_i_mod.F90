@@ -126,16 +126,28 @@ module psi_i_mod
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_extract_dep_list
   end interface psi_extract_dep_list
+
+  interface psi_bld_glb_dep_list
+    subroutine psi_i_bld_glb_dep_list(ictxt,loc_dl,&
+         & length_dl,dep_list,dl_lda,info)
+      import
+      implicit none 
+      integer(psb_ipk_), intent(in)  :: ictxt
+      integer(psb_ipk_), intent(out) :: dl_lda
+      integer(psb_ipk_), intent(in)  :: loc_dl(:), length_dl(:)
+      integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:)
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psi_i_bld_glb_dep_list  
+  end interface psi_bld_glb_dep_list
   
   interface psi_extract_loc_dl
     subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,&
-         & ldl,max_ldl,mode,info)
+         & length_dl,info)
       import
       logical,  intent(in)           :: is_bld, is_upd
-      integer(psb_ipk_), intent(in)  :: ictxt,mode
-      integer(psb_ipk_), intent(out) :: max_ldl, ldl
-      integer(psb_ipk_), intent(in)  :: desc_str(*)
-      integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:)
+      integer(psb_ipk_), intent(in)  :: ictxt
+      integer(psb_ipk_), intent(in)  :: desc_str(:)
+      integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:), length_dl(:)
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_xtr_loc_dl
   end interface psi_extract_loc_dl

@@ -64,9 +64,10 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
 
   !         ....local scalars...      
-  integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda
+  integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda, ldl
   !         ...parameters...
-  integer(psb_ipk_), allocatable :: dep_list(:,:), length_dl(:)
+  integer(psb_ipk_), allocatable :: dep_list(:,:), length_dl(:), loc_dl(:)
+  integer(psb_ipk_) :: dlmax, dlavg
   integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
@@ -136,54 +137,80 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
       goto 9999
     end if
     if (do_timings) call psb_toc(idx_phase2)
+    ldl = length_dl(me)
+    loc_dl = dep_list(1:ldl,me)
+
   else
+
     if (do_timings) call psb_tic(idx_phase1)
 
-    call psi_extract_dep_list(ictxt,&
+    call psi_extract_loc_dl(ictxt,&
          & desc_a%is_bld(), desc_a%is_upd(),&
-         & index_in, dep_list,length_dl,dl_lda,mode,info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
-      goto 9999
+         & index_in, loc_dl,length_dl,info)
+
+    dlmax = maxval(length_dl(:))
+    dlavg = (sum(length_dl(:))+np-1)/np
+!!$    if ((dlmax>0).and.(me==0)) write(0,*) 'Dependency list : max:',dlmax,&
+!!$         & '  avg:',dlavg, ((dlmax>np/3).or.((dlavg>=np/4).and.(np>128)))
+
+    if (choose_sorting(dlmax,dlavg,np)) then 
+
+      call psi_bld_glb_dep_list(ictxt,&
+           & loc_dl,length_dl,dep_list,dl_lda,info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
+        goto 9999
+      end if
+
+      if (debug_level >= psb_debug_inner_) &
+           & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
+           &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
+      ! ...now process root contains dependence list of all processes...
+      if (debug_level >= psb_debug_inner_) &
+           & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
+      if (do_timings) call psb_toc(idx_phase1)
+      if (do_timings) call psb_tic(idx_phase2)
+
+      call psi_dl_check(dep_list,dl_lda,np,length_dl)
+
+      ! ....now i can sort dependency lists.
+      call psi_sort_dl(dep_list,length_dl,np,info)
+      if(info /= psb_success_) then
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
+        goto 9999
+      end if
+      if (do_timings) call psb_toc(idx_phase2)
+      ldl = length_dl(me)
+      loc_dl = dep_list(1:ldl,me)
+    else
+      ! Do nothing
+      ldl    = length_dl(me)
+      loc_dl = loc_dl(1:ldl)      
     end if
 
-    if (debug_level >= psb_debug_inner_) &
-         & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
-         &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
-    ! ...now process root contains dependence list of all processes...
-    if (debug_level >= psb_debug_inner_) &
-         & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
-    if (do_timings) call psb_toc(idx_phase1)
-    if (do_timings) call psb_tic(idx_phase2)
-
-    call psi_dl_check(dep_list,dl_lda,np,length_dl)
-
-    ! ....now i can sort dependency lists.
-    call psi_sort_dl(dep_list,length_dl,np,info)
-    if(info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
-      goto 9999
-    end if
-    if (do_timings) call psb_toc(idx_phase2)
   end if
-  if (do_timings) call psb_tic(idx_phase3)
 
+  if (do_timings) call psb_tic(idx_phase3)
   if(debug_level >= psb_debug_inner_)&
-       & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
+       & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index',ldl,':',loc_dl(1:ldl)
   ! Do the actual format conversion. 
-  call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
-       & length_dl(me),nsnd,nrcv, index_out,info)
+  call psi_desc_index(desc_a,index_in,loc_dl,ldl,nsnd,nrcv,index_out,info)
   if(debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
        & size(index_out)
-  nxch = length_dl(me)
+  nxch = ldl
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_desc_index')
     goto 9999
   end if
   if (do_timings) call psb_toc(idx_phase3)
 
-  deallocate(dep_list,length_dl)
+  if (allocated(dep_list)) deallocate(dep_list,stat=info)
+  if ((info==0).and.allocated(length_dl)) deallocate(length_dl,stat=info)
+  if (info /= 0) then
+    info = psb_err_alloc_dealloc_
+    goto 9999
+  end if
   if(debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': done'
 
@@ -193,4 +220,14 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 9999 call psb_error_handler(ictxt,err_act)
 
   return
+contains
+  function choose_sorting(dlmax,dlavg,np) result(val)
+    implicit none
+    integer(psb_ipk_), intent(in) :: dlmax,dlavg,np
+    logical                       :: val
+
+    val = .not.(((dlmax>(27*4)).or.((dlavg>=(27*2)).and.(np>128))))
+    val = .false.
+  end function choose_sorting
+   
 end subroutine psi_i_crea_index
