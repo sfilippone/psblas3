@@ -125,7 +125,20 @@ module psi_i_mod
       integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:), length_dl(:)
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_extract_dep_list
-  end interface
+  end interface psi_extract_dep_list
+  
+  interface psi_extract_loc_dl
+    subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,&
+         & ldl,max_ldl,mode,info)
+      import
+      logical,  intent(in)           :: is_bld, is_upd
+      integer(psb_ipk_), intent(in)  :: ictxt,mode
+      integer(psb_ipk_), intent(out) :: max_ldl, ldl
+      integer(psb_ipk_), intent(in)  :: desc_str(*)
+      integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:)
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psi_i_xtr_loc_dl
+  end interface psi_extract_loc_dl
 
   interface psi_fnd_owner
     subroutine psi_i_fnd_owner(nv,idx,iprc,desc,info)

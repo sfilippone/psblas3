@@ -29,8 +29,8 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
-     & length_dl,dl_lda,mode,info)
+subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,&
+     & ldl,max_ldl,mode,info)
 
   !    internal routine
   !    == = ============= 
@@ -118,7 +118,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   !            desc_str list.
   !   length_dl  integer array(0:np)
   !             length_dl(i) is the length of dep_list(*,i) list
-  use psi_mod, psb_protect_name => psi_i_extract_dep_list
+  use psi_mod, psb_protect_name => psi_i_xtr_loc_dl
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -134,9 +134,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   !     ....scalar parameters...
   logical,  intent(in)           :: is_bld, is_upd
   integer(psb_ipk_), intent(in)  :: ictxt,mode
-  integer(psb_ipk_), intent(out) :: dl_lda
+  integer(psb_ipk_), intent(out) :: max_ldl, ldl
   integer(psb_ipk_), intent(in)  :: desc_str(*)
-  integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:),length_dl(:)
+  integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:)
   integer(psb_ipk_), intent(out) :: info
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)
@@ -146,6 +146,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_), allocatable :: length_dl(:)
   integer(psb_mpk_) :: iictxt, icomm, me, np, minfo
   logical, parameter :: dist_symm_list=.false., print_dl=.false., profile=.true.
   character  name*20
@@ -390,4 +391,4 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 
   return
 
-end subroutine psi_i_extract_dep_list
+end subroutine psi_i_xtr_loc_dl
