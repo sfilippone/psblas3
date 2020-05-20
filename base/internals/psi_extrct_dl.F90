@@ -127,6 +127,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   use psb_error_mod
   use psb_desc_mod
   use psb_sort_mod
+  use psb_timers_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -148,6 +149,8 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt, icomm, me, np, minfo
   logical, parameter :: dist_symm_list=.false., print_dl=.false., profile=.true.
+  logical, parameter  :: do_timings=.false.
+  integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
   character  name*20
   name='psi_extrct_dl'
 
@@ -156,8 +159,16 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   debug_level = psb_get_debug_level()
   iictxt = ictxt 
   info = psb_success_
+  if ((do_timings).and.(idx_phase1==-1))       &
+       & idx_phase1 = psb_get_timer_idx("PSI_XTR_DL: phase1 ")
+  if ((do_timings).and.(idx_phase2==-1))       &
+       & idx_phase2 = psb_get_timer_idx("PSI_XTR_DL: phase2")
+!!$  if ((do_timings).and.(idx_phase3==-1))       &
+!!$       & idx_phase3 = psb_get_timer_idx("PSI_XTR_DL: phase3")
 
   call psb_info(iictxt,me,np)
+  if (do_timings) call psb_tic(idx_phase1)
+
   allocate(itmp(2*np+1),length_dl(0:np),stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
@@ -252,6 +263,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   endif
 
   length_dl(me)=pointer_dep_list-1
+  if (do_timings) call psb_toc(idx_phase1)
+  
+  if (do_timings) call psb_tic(idx_phase2)
   if (dist_symm_list) then 
     call psb_realloc(length_dl(me),itmp,info)
     call psi_symm_dep_list(itmp,ictxt,info)       
@@ -367,6 +381,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
     end if
     call psb_barrier(ictxt)
   end if
+  if (do_timings) call psb_toc(idx_phase2)
   if ((profile).and.(me==0))  then
     block
       integer(psb_ipk_) :: dlmax, dlavg
