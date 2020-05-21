@@ -151,7 +151,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     dlmax = maxval(length_dl(:))
     dlavg = (sum(length_dl(:))+np-1)/np
 !!$    if ((dlmax>0).and.(me==0)) write(0,*) 'Dependency list : max:',dlmax,&
-!!$         & '  avg:',dlavg, ((dlmax>np/3).or.((dlavg>=np/4).and.(np>128)))
+!!$         & '  avg:',dlavg, choose_sorting(dlmax,dlavg,np)
 
     if (choose_sorting(dlmax,dlavg,np)) then 
 
@@ -226,8 +226,7 @@ contains
     integer(psb_ipk_), intent(in) :: dlmax,dlavg,np
     logical                       :: val
 
-    val = .not.(((dlmax>(27*4)).or.((dlavg>=(27*2)).and.(np>128))))
-    val = .false.
+    val = .not.(((dlmax>(26*4)).or.((dlavg>=(26*2)).and.(np>=128))))
   end function choose_sorting
    
 end subroutine psi_i_crea_index
