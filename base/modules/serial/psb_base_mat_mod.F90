@@ -588,8 +588,16 @@ module psb_base_mat_mod
     procedure, pass(a) :: reinit     => psb_lbase_reinit
     procedure, pass(a) :: allocate_mnnz => psb_lbase_allocate_mnnz
     procedure, pass(a) :: reallocate_nz => psb_lbase_reallocate_nz
+#if defined(IPK4) && defined(LPK8)
+    procedure, pass(a) :: allocate_imnnz => psb_lbase_allocate_imnnz
+    procedure, pass(a) :: reallocate_inz => psb_lbase_reallocate_inz
+    generic,   public  :: allocate   => allocate_mnnz, allocate_imnnz
+    generic,   public  :: reallocate => reallocate_nz, reallocate_inz
+#else
     generic,   public  :: allocate   => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
+#endif    
+    
 
 
     procedure, pass(a) :: csgetptn => psb_lbase_csgetptn
@@ -1413,6 +1421,30 @@ contains
   end subroutine psb_lbase_set_lncols
 
 #if defined(IPK4) && defined(LPK8)
+  subroutine  psb_lbase_allocate_imnnz(m,n,a,nz)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: m,n
+    class(psb_lbase_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_), intent(in), optional  :: nz
+    integer(psb_lpk_) :: lm, ln, lnz
+    lm = m
+    ln = n
+    if (present(nz)) then
+      lnz = nz
+      call a%allocate(lm,ln,lnz)
+    else
+      call a%allocate(lm,ln)
+    end if
+  end subroutine psb_lbase_allocate_imnnz
+  
+  subroutine psb_lbase_reallocate_inz(nz,a)
+    integer(psb_ipk_), intent(in) :: nz
+    class(psb_lbase_sparse_mat), intent(inout) :: a
+    integer(psb_lpk_) :: lnz
+    lnz = nz
+    call a%reallocate(lnz)
+  end subroutine psb_lbase_reallocate_inz
+  
   subroutine  psb_lbase_set_inrows(m,a)
     implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
