@@ -614,8 +614,8 @@ contains
       val = desc%indxmap%get_ctxt()    
     else
       val = -1
-      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
-      call psb_error()
+!!$      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
+!!$      call psb_error()
     end if
   end function psb_cd_get_context
 
@@ -629,8 +629,8 @@ contains
       val = desc%indxmap%get_state()    
     else
       val = -1
-      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_dectype')
-      call psb_error()
+!!$      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_dectype')
+!!$      call psb_error()
     end if
 
   end function psb_cd_get_dectype
@@ -645,8 +645,8 @@ contains
       val = desc%indxmap%get_mpic()    
     else
       val = -1
-      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
-      call psb_error()
+!!$      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
+!!$      call psb_error()
     end if
 
   end function psb_cd_get_mpic

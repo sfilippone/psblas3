@@ -563,7 +563,10 @@ contains
         call mpi_comm_size(ictxt,np,info) 
         if (info /= mpi_success) np = -1 
         call mpi_comm_rank(ictxt,iam,info) 
-        if (info /= mpi_success) iam = -1 
+        if (info /= mpi_success) iam = -1
+      else
+        np  = -1
+        iam = -1
       end if
       lctxt = ictxt
       lam   = iam
