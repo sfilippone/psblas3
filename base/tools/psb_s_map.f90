@@ -159,7 +159,7 @@ subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%p_desc_V,info)
     if (info /= psb_success_) then 
-      write(psb_err_unit,*) iam,' ',trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     else 
       if (.not.present(vty)) call yt%free(info)
@@ -173,6 +173,7 @@ subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     nc1   = map%desc_U%get_local_cols() 
     nr2   = map%desc_V%get_global_rows()
     nc2   = map%desc_V%get_local_cols() 
+
     if (present(vtx).and.present(vty)) then
       ptx => vtx
       pty => vty
@@ -193,7 +194,7 @@ subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%desc_V,info)
     if (info /= psb_success_) then 
-      write(psb_err_unit,*) iam,' ',trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     else
       if (.not.(present(vtx).and.present(vty) )) then 
