@@ -216,7 +216,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !    sample query is then sent to all processes
     !    
     ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nreqst_max
-    nsampl_in = psb_cd_get_samplesize()
+    nsampl_in = nreqst
     nsampl_in = min(max(1,(maxspace+np-1)/np),nsampl_in)
     !
     ! Choose a sample, should it be done in this simplistic way?
