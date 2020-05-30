@@ -89,5 +89,19 @@ subroutine psi_i_sort_dl(dep_list,l_dep_list,np,info)
 
 end subroutine psi_i_sort_dl
 
+subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
+  use psi_mod, psb_protect_name => psi_i_csr_sort_dl
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  
+  integer(psb_ipk_), intent(in)    :: c_dep_list(:), dl_ptr(0:)
+  integer(psb_ipk_), intent(inout) :: l_dep_list(0:)
+  integer(psb_ipk_), intent(in)    :: np
+  integer(psb_ipk_), intent(out)   :: info
+  ! Local variables
+
+  
+end subroutine psi_i_csr_sort_dl
 
       
