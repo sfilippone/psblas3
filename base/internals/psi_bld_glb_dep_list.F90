@@ -181,7 +181,7 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
     goto 9999      
   end if
   icomm = psb_get_mpi_comm(iictxt)
-  call mpi_allgather(loc_dl,myld,psb_mpi_ipk_,&
+  call mpi_allgatherv(loc_dl,myld,psb_mpi_ipk_,&
        & c_dep_list,length_dl,dl_ptr,psb_mpi_ipk_,icomm,minfo)
   
   info = minfo  

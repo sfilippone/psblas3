@@ -154,8 +154,8 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 !!$         & '  avg:',dlavg, choose_sorting(dlmax,dlavg,np)
 
     if (choose_sorting(dlmax,dlavg,np)) then 
-      if (.true.) then 
-        call psi_bld_glb_dep_list(ictxt,&
+      if (.false.) then 
+        call psi_bld_glb_dep_list(ictxt,& 
              & loc_dl,length_dl,dep_list,dl_lda,info)
 
         if (info /= psb_success_) then
@@ -196,6 +196,9 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 !!$
 !!$        ! ....now i can sort dependency lists.
         call psi_sort_dl(dl_ptr,c_dep_list,length_dl,np,info)
+        ldl    = length_dl(me)
+        loc_dl = c_dep_list(dl_ptr(me):dl_ptr(me)+ldl-1)
+        
 !!$        if(info /= psb_success_) then
 !!$          call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
 !!$          goto 9999
@@ -215,6 +218,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   if (do_timings) call psb_tic(idx_phase3)
   if(debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index',ldl,':',loc_dl(1:ldl)
+
   ! Do the actual format conversion. 
   call psi_desc_index(desc_a,index_in,loc_dl,ldl,nsnd,nrcv,index_out,info)
   if(debug_level >= psb_debug_inner_) &
@@ -249,6 +253,7 @@ contains
     logical                       :: val
 
     val = .not.(((dlmax>(26*4)).or.((dlavg>=(26*2)).and.(np>=128))))
+    val = .true.
   end function choose_sorting
 
 end subroutine psi_i_crea_index

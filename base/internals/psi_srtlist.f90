@@ -124,7 +124,6 @@ subroutine srtlist(dep_list,dl_lda,ldl,np,dg,dgp,upd, edges,idx,ich,info)
 
   ist = 1
   do while (ist.le.nedges)         
-
     do i=1, np
       upd(i) = 0      
     enddo
