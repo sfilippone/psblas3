@@ -197,7 +197,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 !!$        call psi_dl_check(dep_list,dl_lda,np,length_dl)
 !!$
 !!$        ! ....now i can sort dependency lists.
-        call psi_sort_dl(dl_ptr,c_dep_list,length_dl,np,info)
+        call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ictxt,info)
         if (info /= 0) then
           write(0,*) me,trim(name),' From sort_dl ',info
         end if
