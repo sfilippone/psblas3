@@ -136,7 +136,7 @@ end subroutine psi_i_sort_dl
 !                  node in the dependency list for the current one    *
 !                                                                     *
 !**********************************************************************
-subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
+subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
   use psi_mod, psb_protect_name => psi_i_csr_sort_dl
   use psb_const_mod
   use psb_error_mod
@@ -144,14 +144,18 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
   implicit none
   
   integer(psb_ipk_), intent(inout) :: c_dep_list(:), dl_ptr(0:), l_dep_list(0:)
-  integer(psb_ipk_), intent(in)    :: np
+  integer(psb_ipk_), intent(in)    :: ictxt
   integer(psb_ipk_), intent(out)   :: info
   ! Local variables
   integer(psb_ipk_), allocatable  ::  dg(:), dgp(:),&
        &  idx(:), upd(:), edges(:,:), ich(:)
   integer(psb_ipk_) ::  i, j, nedges, ip1, ip2, nch, ip, iedge,&
        &  i1, ix, ist, iswap(2)
+  logical :: internal_error 
+  integer(psb_ipk_) :: me, np
 
+  info = 0
+  call psb_info(ictxt,me,np)
   nedges = size(c_dep_list)
   
   allocate(dg(0:np-1),dgp(nedges),edges(2,nedges),upd(0:np-1),&
@@ -173,7 +177,7 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
   do i = 0, np-1
     do j = dl_ptr(i),dl_ptr(i+1) - 1
       ip = c_dep_list(j)
-      if (i<ip) then
+      if (i<=ip) then
         nedges = nedges + 1
         edges(1,nedges) = i
         edges(2,nedges) = ip
@@ -237,21 +241,28 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
       iswap(1:2)        = edges(1:2,ist)
       edges(1:2,ist)    = edges(1:2,ich(i))
       edges(1:2,ich(i)) = iswap(1:2)
-      ist = ist + 1 
+      ist               = ist + 1 
     end do
     do i=0, np-1
       dg(i) = dg(i) + upd(i) 
     end do
   end do
-
+  internal_error = .false.
   do i=0, np-1
-    if (dg(i) /= 0) then 
-      write(psb_err_unit,*)&
-           &  'SRTLIST Error on exit:',i,dg(i)
+    if (dg(i) /= 0) then
+      internal_error = .true.
+      if (me == 0) write(psb_err_unit,*)&
+           &  'csr_SRTLIST Error on exit:',i,dg(i)
     end if
     dg(i) = 0
   end do
-  
+  if (internal_error .and. (me==0)) then
+    write(0,*) 'Error on srt_list. Input:'
+    do i = 0, np-1
+      write(0,*) 'Proc: ',i,' list: '
+      write(0,*) c_dep_list(dl_ptr(i):dl_ptr(i+1) - 1)
+    end do
+  end if
   !
   ! 10. Scan the edge sequence;
   !     for each edge, take each one of its
@@ -268,11 +279,16 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
     ix    = dl_ptr(i)
     c_dep_list(ix+dg(i)) = edges(1,j)
     dg(i) = dg(i)+1
+    !
+    ! If there are any self loops, adjust for error condition
+    ! check
+    !
+    if (edges(1,j) == edges(2,j)) dg(i) = dg(i) -1 
   end do
 
   do i=0, np-1
     if (dg(i) /= l_dep_list(i)) then 
-      write(psb_err_unit,*) &
+      if (me == 0) write(psb_err_unit,*) &
            &   'SRTLIST Mismatch on output',i,dg(i),l_dep_list(i)
     end if
   end do

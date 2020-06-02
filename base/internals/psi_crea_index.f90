@@ -191,11 +191,16 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
         if (do_timings) call psb_tic(idx_phase2)
         call psi_bld_glb_dep_list(ictxt,&
              & loc_dl,length_dl,c_dep_list,dl_ptr,info)
-
+        if (info /= 0) then
+          write(0,*) me,trim(name),' From bld_glb_list ',info
+        end if
 !!$        call psi_dl_check(dep_list,dl_lda,np,length_dl)
 !!$
 !!$        ! ....now i can sort dependency lists.
         call psi_sort_dl(dl_ptr,c_dep_list,length_dl,np,info)
+        if (info /= 0) then
+          write(0,*) me,trim(name),' From sort_dl ',info
+        end if
         ldl    = length_dl(me)
         loc_dl = c_dep_list(dl_ptr(me):dl_ptr(me)+ldl-1)
         
@@ -253,7 +258,7 @@ contains
     logical                       :: val
 
     val = .not.(((dlmax>(26*4)).or.((dlavg>=(26*2)).and.(np>=128))))
-    val = .true.
+    !val = .true.
   end function choose_sorting
 
 end subroutine psi_i_crea_index

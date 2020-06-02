@@ -111,13 +111,13 @@ module psi_i_mod
       integer(psb_ipk_) :: np
       integer(psb_ipk_) :: info
     end subroutine psi_i_sort_dl
-    subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,np,info)
+    subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
       import
       implicit none 
-      integer(psb_ipk_), intent(in)    :: c_dep_list(:), dl_ptr(0:)
+      integer(psb_ipk_), intent(in) :: c_dep_list(:), dl_ptr(0:)
       integer(psb_ipk_), intent(inout) :: l_dep_list(0:)
-      integer(psb_ipk_), intent(in)    :: np
-      integer(psb_ipk_), intent(out)   :: info
+      integer(psb_ipk_) :: ictxt
+      integer(psb_ipk_) :: info
     end subroutine psi_i_csr_sort_dl
   end interface
 
@@ -145,13 +145,13 @@ module psi_i_mod
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_bld_glb_dep_list
     subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
-      import 
+      import
       integer(psb_ipk_), intent(in)  :: ictxt
       integer(psb_ipk_), intent(in)  :: loc_dl(:), length_dl(0:)
-      integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:), dl_ptr(:) 
+      integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:), dl_ptr(:)
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_bld_glb_csr_dep_list
-  end interface psi_bld_glb_dep_list
+  end interface
 
   interface  psi_extract_loc_dl
     subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
