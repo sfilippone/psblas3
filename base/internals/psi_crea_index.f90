@@ -108,117 +108,48 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
   mode = 1
-  if (.false.) then 
-    if (do_timings) call psb_tic(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase1)
 
-    call psi_extract_dep_list(ictxt,&
-         & desc_a%is_bld(), desc_a%is_upd(),&
-         & index_in, dep_list,length_dl,dl_lda,mode,info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
-      goto 9999
-    end if
+  call psi_extract_loc_dl(ictxt,&
+       & desc_a%is_bld(), desc_a%is_upd(),&
+       & index_in, loc_dl,length_dl,info)
 
-    if (debug_level >= psb_debug_inner_) &
-         & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
-         &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
-    ! ...now process root contains dependence list of all processes...
-    if (debug_level >= psb_debug_inner_) &
-         & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
-    if (do_timings) call psb_toc(idx_phase1)
-    if (do_timings) call psb_tic(idx_phase2)
-
-    call psi_dl_check(dep_list,dl_lda,np,length_dl)
-
-    ! ....now i can sort dependency lists.
-    call psi_sort_dl(dep_list,length_dl,np,info)
-    if(info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
-      goto 9999
-    end if
-    if (do_timings) call psb_toc(idx_phase2)
-    ldl = length_dl(me)
-    loc_dl = dep_list(1:ldl,me)
-
-  else
-
-    if (do_timings) call psb_tic(idx_phase1)
-
-    call psi_extract_loc_dl(ictxt,&
-         & desc_a%is_bld(), desc_a%is_upd(),&
-         & index_in, loc_dl,length_dl,info)
-
-    dlmax = maxval(length_dl(:))
-    dlavg = (sum(length_dl(:))+np-1)/np
+  dlmax = maxval(length_dl(:))
+  dlavg = (sum(length_dl(:))+np-1)/np
 !!$    if ((dlmax>0).and.(me==0)) write(0,*) 'Dependency list : max:',dlmax,&
 !!$         & '  avg:',dlavg, choose_sorting(dlmax,dlavg,np)
 
-    if (choose_sorting(dlmax,dlavg,np)) then 
-      if (.false.) then 
-        call psi_bld_glb_dep_list(ictxt,& 
-             & loc_dl,length_dl,dep_list,dl_lda,info)
+  if (do_timings) call psb_toc(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase2)
 
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
-          goto 9999
-        end if
-
-        if (debug_level >= psb_debug_inner_) &
-             & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
-             &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
-        ! ...now process root contains dependence list of all processes...
-        if (debug_level >= psb_debug_inner_) &
-             & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
-        if (do_timings) call psb_toc(idx_phase1)
-        if (do_timings) call psb_tic(idx_phase2)
-
-        !
-        ! The dependency list has been symmetrized inside xtract_loc_dl
-        !       
-!!$       call psi_dl_check(dep_list,dl_lda,np,length_dl)
-        
-        ! ....now i can sort dependency lists.
-        call psi_sort_dl(dep_list,length_dl,np,info)
-        if(info /= psb_success_) then
-          call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
-          goto 9999
-        end if
-        if (do_timings) call psb_toc(idx_phase2)
-        ldl = length_dl(me)
-        loc_dl = dep_list(1:ldl,me)
-      else
-        if (do_timings) call psb_toc(idx_phase1)
-        if (do_timings) call psb_tic(idx_phase2)
-        call psi_bld_glb_dep_list(ictxt,&
-             & loc_dl,length_dl,c_dep_list,dl_ptr,info)
-        if (info /= 0) then
-          write(0,*) me,trim(name),' From bld_glb_list ',info
-        end if
+  if (choose_sorting(dlmax,dlavg,np)) then 
+    call psi_bld_glb_dep_list(ictxt,&
+         & loc_dl,length_dl,c_dep_list,dl_ptr,info)
+    if (info /= 0) then
+      write(0,*) me,trim(name),' From bld_glb_list ',info
+    end if
 !!$        call psi_dl_check(dep_list,dl_lda,np,length_dl)
 !!$
 !!$        ! ....now i can sort dependency lists.
-        call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ictxt,info)
-        if (info /= 0) then
-          write(0,*) me,trim(name),' From sort_dl ',info
-        end if
-        ldl    = length_dl(me)
-        loc_dl = c_dep_list(dl_ptr(me):dl_ptr(me)+ldl-1)
-        
+    call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ictxt,info)
+    if (info /= 0) then
+      write(0,*) me,trim(name),' From sort_dl ',info
+    end if
+    ldl    = length_dl(me)
+    loc_dl = c_dep_list(dl_ptr(me):dl_ptr(me)+ldl-1)
+
 !!$        if(info /= psb_success_) then
 !!$          call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
 !!$          goto 9999
 !!$        end if
-        if (do_timings) call psb_toc(idx_phase2)
-        
-        
-      end if
-    else
-      ! Do nothing
-      ldl    = length_dl(me)
-      loc_dl = loc_dl(1:ldl)      
-    end if
 
+  else
+    ! Do nothing
+    ldl    = length_dl(me)
+    loc_dl = loc_dl(1:ldl)      
   end if
+  if (do_timings) call psb_toc(idx_phase2)
+
 
   if (do_timings) call psb_tic(idx_phase3)
   if(debug_level >= psb_debug_inner_)&

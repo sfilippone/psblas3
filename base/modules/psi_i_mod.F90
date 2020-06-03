@@ -94,23 +94,7 @@ module psi_i_mod
     end subroutine psi_i_desc_index
   end interface
 
-  interface psi_dl_check
-    subroutine psi_i_dl_check(dep_list,dl_lda,np,length_dl)
-      import
-      implicit none 
-      integer(psb_ipk_) :: np,dl_lda,length_dl(0:np)
-      integer(psb_ipk_) :: dep_list(dl_lda,0:np)
-    end subroutine psi_i_dl_check
-  end interface
-
   interface psi_sort_dl
-    subroutine psi_i_sort_dl(dep_list,l_dep_list,np,info)
-      import
-      implicit none 
-      integer(psb_ipk_) :: dep_list(:,:), l_dep_list(:)
-      integer(psb_ipk_) :: np
-      integer(psb_ipk_) :: info
-    end subroutine psi_i_sort_dl
     subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
       import
       implicit none 
