@@ -2192,16 +2192,7 @@ contains
 
     integer(psb_ipk_) :: lb, ub, m
 
-    if (n < 5) then 
-      ! don't bother with binary search for very
-      ! small vectors
-      ipos = 0
-      do
-        if (ipos == n) return
-        if (key < v(ipos+1)) return 
-        ipos = ipos + 1 
-      end do
-    else
+    choice: if (n >5) then 
       lb = 1 
       ub = n
       ipos = -1 
@@ -2210,7 +2201,7 @@ contains
         m = (lb+ub)/2
         if (key==v(m))  then
           ipos = m 
-          return
+          exit choice
         else if (key < v(m))  then
           ub = m-1
         else 
@@ -2220,8 +2211,21 @@ contains
       if (v(ub) > key) then
         ub = ub - 1 
       end if
-      ipos = ub 
-    endif
+      ipos = ub
+    else
+      ! No binary search, do everything in the final cleanup
+      ipos = 0
+    end if choice
+
+    ! Final cleanup
+    ! This is needed because V may contain repeated entries
+    ! i.e. there may be processes that own 0 indices
+    do
+      if (ipos == n) exit
+      if (key < v(ipos+1) ) exit
+      ipos = ipos + 1 
+    end do
+    
     return
   end function i_gen_block_search
 
@@ -2234,17 +2238,8 @@ contains
     integer(psb_lpk_) :: v(:)
 
     integer(psb_ipk_) :: lb, ub, m
-
-    if (n < 5) then 
-      ! don't bother with binary search for very
-      ! small vectors
-      ipos = 0
-      do
-        if (ipos == n) return
-        if (key < v(ipos+1)) return 
-        ipos = ipos + 1 
-      end do
-    else
+    
+    choice: if (n >5) then 
       lb = 1 
       ub = n
       ipos = -1 
@@ -2253,7 +2248,7 @@ contains
         m = (lb+ub)/2
         if (key==v(m))  then
           ipos = m 
-          return
+          exit choice
         else if (key < v(m))  then
           ub = m-1
         else 
@@ -2263,8 +2258,21 @@ contains
       if (v(ub) > key) then
         ub = ub - 1 
       end if
-      ipos = ub 
-    endif
+      ipos = ub
+    else
+      ! No binary search, do everything in the final cleanup
+      ipos = 0
+    end if choice
+
+    ! Final cleanup
+    ! This is needed because V may contain repeated entries
+    ! i.e. there may be processes that own 0 indices
+    do
+      if (ipos == n) exit
+      if (key < v(ipos+1) ) exit
+      ipos = ipos + 1 
+    end do
+
     return
   end function l_gen_block_search
 #endif
