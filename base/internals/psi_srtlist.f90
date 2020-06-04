@@ -114,7 +114,7 @@ subroutine srtlist(dep_list,dl_lda,ldl,np,dg,dgp,upd, edges,idx,ich,info)
   do i=1, np
     do j=1, dg(i) 
       ip = dep_list(j,i) + 1            
-      if (ip.gt.i) then 
+      if (ip >= i) then 
         iedge = iedge + 1
         edges(1,iedge) = i
         edges(2,iedge) = ip
@@ -124,7 +124,6 @@ subroutine srtlist(dep_list,dl_lda,ldl,np,dg,dgp,upd, edges,idx,ich,info)
 
   ist = 1
   do while (ist.le.nedges)         
-
     do i=1, np
       upd(i) = 0      
     enddo
@@ -188,6 +187,7 @@ subroutine srtlist(dep_list,dl_lda,ldl,np,dg,dgp,upd, edges,idx,ich,info)
     i = edges(2,j)
     dg(i) = dg(i)+1
     dep_list(dg(i),i) = edges(1,j)-1
+    if (edges(1,j) == edges(2,j)) dg(i) = dg(i) -1 
   enddo
   do i=1, np
     if (dg(i).ne.ldl(i)) then 

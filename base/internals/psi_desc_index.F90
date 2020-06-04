@@ -105,6 +105,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   use mpi
 #endif
   use psb_penv_mod
+  use psb_timers_mod
   use psi_mod, psb_protect_name => psi_i_desc_index
   implicit none
 #ifdef MPI_H
@@ -136,6 +137,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
        & idxr, idxs, iszs, iszr, nesd, nerv, ixp, idx
   integer(psb_mpk_) :: icomm, minfo
 
+  logical, parameter :: do_timings=.true., oldstyle=.false., debug=.false. 
+  integer(psb_ipk_), save :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1, idx_phase4=-1
   logical, parameter :: usempi=.false.
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name
@@ -159,13 +162,22 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     write(debug_unit,*) me,' ',trim(name),': start'
     call psb_barrier(ictxt)
   endif
+  if ((do_timings).and.(idx_phase1==-1)) &
+       & idx_phase1 = psb_get_timer_idx("I_DSC_IDX: phase1   ")
+  if ((do_timings).and.(idx_phase2==-1)) &
+       & idx_phase2 = psb_get_timer_idx("I_DSC_IDX: phase2   ")
+  if ((do_timings).and.(idx_phase3==-1)) &
+       & idx_phase3 = psb_get_timer_idx("I_DSC_IDX: phase3   ")
+  if ((do_timings).and.(idx_phase4==-1)) &
+       & idx_phase4 = psb_get_timer_idx("I_DSC_IDX: phase4   ")
 
+  if (do_timings) call psb_tic(idx_phase1)
   ! 
   !     first, find out the sizes to be exchanged.
   !     note: things marked here as sndbuf/rcvbuf (for mpi) corresponds to things  
   !     to be received/sent (in the final psblas descriptor).
   !     be careful of the inversion
-  !   
+  !
   allocate(sdsz(np),rvsz(np),bsdindx(np),brvindx(np),stat=info)
   if(info /= psb_success_) then
     info=psb_err_alloc_dealloc_
@@ -239,6 +251,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     call psb_errpush(info,name)
     goto 9999
   end if
+  if (do_timings) call psb_toc(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase2)
 
   ! 
   !     Second build the lists of requests
@@ -285,6 +299,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     brvindx(proc+1) = idxr
     idxr = idxr + rvsz(proc+1)
   end do
+  if (do_timings) call psb_toc(idx_phase2)
+  if (do_timings) call psb_tic(idx_phase3)
 
   if (usempi) then   
     call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_lpk_,&
@@ -357,6 +373,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
     end if
   end if
+  if (do_timings) call psb_toc(idx_phase3)
+  if (do_timings) call psb_tic(idx_phase4)
 
   !
   !  at this point we can finally build the output desc_index. beware
@@ -386,7 +404,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     call psb_errpush(info,name)
     goto 9999
   end if
-
+  if (do_timings) call psb_toc(idx_phase4)
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': done'
     call psb_barrier(ictxt)

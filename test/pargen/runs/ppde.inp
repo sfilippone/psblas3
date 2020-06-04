@@ -6,7 +6,7 @@ CSR                    Storage format for matrix A:  CSR COO
 3                      Partition: 1 BLOCK  3 3D
 2                      Stopping criterion 1 2 
 0100                   MAXIT
--1                     ITRACE
+05                     ITRACE
 002                    IRST    restart for RGMRES  and BiCGSTABL
 
 
