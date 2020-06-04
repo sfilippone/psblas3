@@ -47,7 +47,7 @@
 ! This is the method to find out who owns a set of indices. 
 ! In principle we could do the following:
 !   1. Do an allgatherv of IDX
-!   2. For each of the collected indices figure if current proces owns it
+!   2. For each of the collected indices figure out if current proces owns it
 !   3. Scatter the results
 !   4. Loop through the answers
 ! This method is guaranteed to find the owner, unless an input index has
@@ -101,8 +101,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:), ladj(:)  
   integer(psb_mpk_) :: icomm, minfo, iictxt
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j,ipnt, nsampl_out,&
-       & nv, n_answers, nreqst, nsampl_in, locr_max, &
-       & nreqst_max, nadj, maxspace, mxnsin
+       & nv, n_answers, nqries, nsampl_in, locr_max, &
+       & nqries_max, nadj, maxspace, mxnsin
   integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
@@ -165,22 +165,22 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   ! This makes ladj allocated with size 0 if needed, as opposed to unallocated
   call psb_realloc(nadj,ladj,info)
   !
-  ! Throughout the subroutine, nreqst is the number of local inquiries
+  ! Throughout the subroutine, nqries is the number of local inquiries
   ! that have not been answered yet
   ! 
-  nreqst     = nv - n_answers
-  nreqst_max = nreqst
+  nqries     = nv - n_answers
+  nqries_max = nqries
 
   !
   ! Choice of maxspace should be adjusted to account for a default
   ! "sensible" size and/or a user-specified value
   !
   tmpv(1) = nadj
-  tmpv(2) = nreqst_max
+  tmpv(2) = nqries_max
   tmpv(3) = n_row
   tmpv(4) = psb_cd_get_maxspace()
   call psb_max(ictxt,tmpv)
-  nreqst_max = tmpv(2)
+  nqries_max = tmpv(2)
   locr_max = tmpv(3)
   maxspace = nt*locr_max
   if (tmpv(4) > 0) maxspace = min(maxspace,tmpv(4))
@@ -192,21 +192,21 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! Do a preliminary run on the user-defined adjacency lists
     !
     if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology'
-    if (debugsz) write(0,*) me,' Initial sweep on user-defined topology',nreqst
-    nsampl_in = min(nreqst,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+    if (debugsz) write(0,*) me,' Initial sweep on user-defined topology',nqries
+    nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
     call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
-    nreqst     = nv - n_answers
-    nreqst_max = nreqst
-    call psb_max(ictxt,nreqst_max)
-    if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nreqst_max
-    if (debugsz) write(0,*) me,' After sweep on user-defined topology',nreqst_max
+    nqries     = nv - n_answers
+    nqries_max = nqries
+    call psb_max(ictxt,nqries_max)
+    if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nqries_max
+    if (debugsz) write(0,*) me,' After sweep on user-defined topology',nqries_max
   end if
   if (do_timings) call psb_toc(idx_sweep0)
     
-  fnd_owner_loop: do while (nreqst_max>0)
+  fnd_owner_loop: do while (nqries_max>0)
     if (do_timings) call psb_tic(idx_loop_a2a)
-    if (debugsz) write(0,*) me,' fnd_owner_loop',nreqst_max
+    if (debugsz) write(0,*) me,' fnd_owner_loop',nqries_max
     !
     ! The basic idea of this loop is to alternate between
     ! searching through all processes and searching
@@ -215,8 +215,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! 1. Select a sample such that the total size is <= maxspace
     !    sample query is then sent to all processes
     !    
-    ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nreqst_max
-    nsampl_in = psb_cd_get_samplesize()
+    ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nqries_max
+    nsampl_in = nqries
     nsampl_in = min(max(1,(maxspace+np-1)/np),nsampl_in)
     !
     ! Choose a sample, should it be done in this simplistic way?
@@ -236,13 +236,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! We might have padded when looking for owners, so the actual samples
     ! could be less than they appear. Should be explained better.
     !
-    nsampl_in = min(nreqst,nsampl_in)
+    nsampl_in = min(nqries,nsampl_in)
     call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
     if (nsampl_out /= nsampl_in) then 
       write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',nsampl_out,nsampl_in
     end if
     n_answers = n_answers + nsampl_out
-    nreqst    = nv - n_answers
+    nqries    = nv - n_answers
     !
     ! 3. Extract the resulting adjacency list and add it to the
     !    indxmap;
@@ -259,18 +259,18 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !    Need to set up a proper loop here to have a complete
     !    sweep over the input vector. Done inside adj_fnd_sweep. 
     !
-!!$      write(0,*) me,' After a2a ',nreqst
-    nsampl_in = min(nreqst,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+!!$      write(0,*) me,' After a2a ',nqries
+    nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
     mxnsin = nsampl_in
     call psb_max(ictxt,mxnsin)
 !!$      write(0,*) me, ' mxnsin ',mxnsin
     if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
 
-    nreqst     = nv - n_answers
-    nreqst_max = nreqst
-    call psb_max(ictxt,nreqst_max)
-    if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nreqst_max
+    nqries     = nv - n_answers
+    nqries_max = nqries
+    call psb_max(ictxt,nqries_max)
+    if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nqries_max
     if (do_timings) call psb_toc(idx_loop_neigh)    
   end do fnd_owner_loop
 
