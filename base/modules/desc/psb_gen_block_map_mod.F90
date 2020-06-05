@@ -2192,7 +2192,7 @@ contains
 
     integer(psb_ipk_) :: lb, ub, m
 
-    choice: if (n >5) then 
+    binsrch: if (n > 8) then 
       lb = 1 
       ub = n
       ipos = -1 
@@ -2201,7 +2201,7 @@ contains
         m = (lb+ub)/2
         if (key==v(m))  then
           ipos = m 
-          exit choice
+          exit binsrch
         else if (key < v(m))  then
           ub = m-1
         else 
@@ -2215,7 +2215,7 @@ contains
     else
       ! No binary search, do everything in the final cleanup
       ipos = 0
-    end if choice
+    end if binsrch
 
     ! Final cleanup
     ! This is needed because V may contain repeated entries
@@ -2239,7 +2239,7 @@ contains
 
     integer(psb_ipk_) :: lb, ub, m
     
-    choice: if (n >5) then 
+    binsrch: if (n > 8) then 
       lb = 1 
       ub = n
       ipos = -1 
@@ -2248,7 +2248,7 @@ contains
         m = (lb+ub)/2
         if (key==v(m))  then
           ipos = m 
-          exit choice
+          exit binsrch
         else if (key < v(m))  then
           ub = m-1
         else 
@@ -2262,7 +2262,7 @@ contains
     else
       ! No binary search, do everything in the final cleanup
       ipos = 0
-    end if choice
+    end if binsrch
 
     ! Final cleanup
     ! This is needed because V may contain repeated entries
