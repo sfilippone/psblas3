@@ -11,7 +11,7 @@ format</title>
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 209--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 211--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu79.html" >prev</a>] [<a 
 href="userhtmlsu79.html#tailuserhtmlsu79.html" >prev-tail</a>] [<a 
 href="userhtmlsu77.html#tailuserhtmlsu80.html">tail</a>] [<a 
@@ -19,13 +19,13 @@ href="userhtmlsu77.html#userhtmlsu82.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">9.6   </span> <a 
  id="x94-1280009.6"></a>mm_array_write &#8212; Write a dense array from a file in the MatrixMarket
 format</h4>
-   <!--l. 211-->
+   <!--l. 213-->
    <div class="lstlisting" id="listing-19"><span class="label"><a 
  id="x94-128001r1"></a></span><span 
-class="cmbx-10">call</span>&#x00A0;mm_array_write(b,&#x00A0;iret,&#x00A0;iunit,&#x00A0;filename)
+class="cmbx-10">call</span>&#x00A0;mm_array_write(b,&#x00A0;vtitle,&#x00A0;iret,&#x00A0;iunit,&#x00A0;filename)
    
    </div>
-<!--l. 215--><p class="indent" >
+<!--l. 217--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -40,12 +40,28 @@ class="cmbx-10">b</span> </dt><dd
 class="description">Rigth hand side(s).<br 
 class="newline" />Type: <span 
 class="cmbx-10">required </span><br 
-class="newline" />An array of type real or complex, rank 1 or 2; will be written..&#x00A0;
+class="newline" />An  array  of  type  real  or  complex,  rank  1  or  2,  or  an  object  of  type
+     <a 
+href="userhtmlsu7.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real or complex; its contents will be written to
+     disk.<br 
+class="newline" />
      </dd><dt class="description">
 <span 
 class="cmbx-10">filename</span> </dt><dd 
 class="description">The name of the file to be written.<br 
-class="newline" />Type:<span 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">vtitle</span> </dt><dd 
+class="description">Matrix title.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />A charachter variable holding a descriptive title for the vector to be written
+     to file. Type:<span 
 class="cmbx-10">optional</span>.<br 
 class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">-</span></span></span>, in
@@ -60,11 +76,14 @@ class="newline" />Type:<span
 class="cmbx-10">optional</span>.<br 
 class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">-</span></span></span>.</dd></dl>
-<!--l. 231--><p class="indent" >
+<!--l. 239--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
 class="description">
+                                                                  
+
+                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">iret</span> </dt><dd 

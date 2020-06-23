@@ -279,6 +279,39 @@ subroutine mm_dvet1_write(b, header, info, iunit, filename)
 
 end subroutine mm_dvet1_write
 
+subroutine mm_dvect_read(b, info, iunit, filename)   
+  use psb_base_mod
+  use psb_mmio_mod, psb_protect_name => mm_dvect_read
+  implicit none
+  type(psb_d_vect_type), intent(inout)  :: b
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in) :: iunit
+  character(len=*), optional, intent(in) :: filename
+  !
+  real(psb_dpk_), allocatable :: bv(:)
+
+  call mm_array_read(bv, info, iunit, filename)
+  if (info == 0) call b%bld(bv)
+  
+end subroutine mm_dvect_read
+
+subroutine mm_dvect_write(b, header, info, iunit, filename)   
+  use psb_base_mod
+  use psb_mmio_mod, psb_protect_name => mm_dvect_write
+  implicit none
+  type(psb_d_vect_type), intent(inout)  :: b
+  character(len=*), intent(in) :: header
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  info = psb_success_
+  if (.not.allocated(b%v)) return
+  call b%sync()
+
+  call mm_array_write(b%v%v,header,info,iunit,filename)
+  
+end subroutine mm_dvect_write
+
 subroutine dmm_mat_read(a, info, iunit, filename)   
   use psb_base_mod
   implicit none
