@@ -161,8 +161,10 @@ Specified as: an integer value. Only meaningful if filename is not \verb|-|.
 \item[b] Rigth hand side(s).\\
 Type: {\bf required} \\
 An  array of type real or complex, rank 1 or 2 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side, otherwise will be left in the UNALLOCATED state. 
+attribute, or an
+object of type \vdata, of type real or complex.\\
+Will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. \\
 \item[iret] Error code.\\
 Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
@@ -209,7 +211,7 @@ An integer value; 0 means no error has been detected.
   file in the MatrixMarket format}
 
 \begin{lstlisting}
-call mm_array_write(b, iret, iunit, filename)
+call mm_array_write(b, vtitle, iret, iunit, filename)
 \end{lstlisting}
 
 \begin{description}
@@ -217,8 +219,14 @@ call mm_array_write(b, iret, iunit, filename)
 \item[\bf  On Entry ]
 \item[b] Rigth hand side(s).\\
 Type: {\bf required} \\
-An  array of type real or complex, rank 1 or 2; will be written..\
+An  array of type real or complex, rank 1 or 2, or an
+object of type \vdata, of type real or complex; its contents will be
+written to disk.\\
 \item[filename] The name of the file to be written.\\
+\item[vtitle] Matrix title.\\
+Type: {\bf required} \\
+A charachter variable holding a descriptive title for the vector to be
+ written to file.
 Type:{\bf optional}.\\
 Specified as: a character variable containing a valid file name, or
 \verb|-|, in which case the default input unit  5 (i.e. standard input

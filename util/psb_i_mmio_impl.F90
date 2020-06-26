@@ -536,3 +536,69 @@ subroutine mm_lvet1_write(b, header, info, iunit, filename)
 end subroutine mm_lvet1_write
 
 #endif
+
+subroutine mm_ivect_read(b, info, iunit, filename)   
+  use psb_base_mod
+  use psb_mmio_mod, psb_protect_name => mm_ivect_read
+  implicit none
+  type(psb_i_vect_type), intent(inout)  :: b
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in) :: iunit
+  character(len=*), optional, intent(in) :: filename
+  !
+  integer(psb_ipk_), allocatable :: bv(:)
+
+  call mm_array_read(bv, info, iunit, filename)
+  call b%bld(bv)
+  
+end subroutine mm_ivect_read
+
+subroutine mm_ivect_write(b, header, info, iunit, filename)   
+  use psb_base_mod
+  use psb_mmio_mod, psb_protect_name => mm_ivect_write
+  implicit none
+  type(psb_i_vect_type), intent(inout)  :: b
+  character(len=*), intent(in) :: header
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  info = psb_success_
+  if (.not.allocated(b%v)) return
+  call b%sync()
+
+  call mm_array_write(b%v%v,header,info,iunit,filename)
+  
+end subroutine mm_ivect_write
+
+subroutine mm_lvect_read(b, info, iunit, filename)   
+  use psb_base_mod
+  use psb_mmio_mod, psb_protect_name => mm_lvect_read
+  implicit none
+  type(psb_l_vect_type), intent(inout)  :: b
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in) :: iunit
+  character(len=*), optional, intent(in) :: filename
+  !
+  integer(psb_lpk_), allocatable :: bv(:)
+
+  call mm_array_read(bv, info, iunit, filename)
+  call b%bld(bv)
+  
+end subroutine mm_lvect_read
+
+subroutine mm_lvect_write(b, header, info, iunit, filename)   
+  use psb_base_mod
+  use psb_mmio_mod, psb_protect_name => mm_lvect_write
+  implicit none
+  type(psb_l_vect_type), intent(inout)  :: b
+  character(len=*), intent(in) :: header
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  info = psb_success_
+  if (.not.allocated(b%v)) return
+  call b%sync()
+
+  call mm_array_write(b%v%v,header,info,iunit,filename)
+  
+end subroutine mm_lvect_write

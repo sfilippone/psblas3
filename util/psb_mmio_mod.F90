@@ -33,6 +33,8 @@ module psb_mmio_mod
 
 
   use psb_base_mod, only :  psb_ipk_, psb_lpk_, psb_spk_, psb_dpk_,&
+       & psb_s_vect_type, psb_d_vect_type, psb_i_vect_type, psb_l_vect_type,&
+       & psb_c_vect_type, psb_z_vect_type, &
        & psb_sspmat_type, psb_cspmat_type, &
        & psb_dspmat_type, psb_zspmat_type, &
        & psb_lsspmat_type, psb_lcspmat_type, &
@@ -143,6 +145,54 @@ module psb_mmio_mod
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet2_read
 #endif
+    subroutine mm_svect_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_s_vect_type
+      implicit none
+      type(psb_s_vect_type), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_svect_read
+    subroutine mm_dvect_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_d_vect_type
+      implicit none
+      type(psb_d_vect_type), intent(inout)    :: b
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_dvect_read
+    subroutine mm_cvect_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_c_vect_type
+      implicit none
+      type(psb_c_vect_type), intent(inout)    :: b
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_cvect_read
+    subroutine mm_zvect_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_z_vect_type
+      implicit none
+      type(psb_z_vect_type), intent(inout)    :: b
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_zvect_read
+    subroutine mm_ivect_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_i_vect_type
+      implicit none
+      type(psb_i_vect_type), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivect_read
+    subroutine mm_lvect_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_l_vect_type
+      implicit none
+      type(psb_l_vect_type), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvect_read
   end interface
 
 
@@ -266,6 +316,60 @@ module psb_mmio_mod
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet1_write
 #endif
+    subroutine mm_svect_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_s_vect_type
+      implicit none
+      type(psb_s_vect_type), intent(inout)    :: b
+      character(len=*), intent(in)            :: header
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_svect_write  
+    subroutine mm_dvect_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_,psb_d_vect_type
+      implicit none
+      type(psb_d_vect_type), intent(inout)    :: b
+      character(len=*), intent(in)            :: header
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_dvect_write
+    subroutine mm_cvect_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_c_vect_type
+      implicit none
+      type(psb_c_vect_type), intent(inout)    :: b
+      character(len=*), intent(in)            :: header
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_cvect_write
+    subroutine mm_zvect_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_,psb_z_vect_type
+      implicit none
+      type(psb_z_vect_type), intent(inout)    :: b
+      character(len=*), intent(in)            :: header
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: iunit
+      character(len=*), optional, intent(in)  :: filename
+    end subroutine mm_zvect_write
+    subroutine mm_ivect_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_i_vect_type
+      implicit none
+      type(psb_i_vect_type), intent(inout)  :: b
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivect_write
+    subroutine mm_lvect_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_,psb_l_vect_type
+      implicit none
+      type(psb_l_vect_type), intent(inout)  :: b
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvect_write
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
