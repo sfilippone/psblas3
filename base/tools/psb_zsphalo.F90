@@ -1284,7 +1284,7 @@ Subroutine psb_z_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
-  name='psb_lz_csr_sphalo'
+  name='psb_z_lz_csr_sphalo'
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
