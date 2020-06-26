@@ -147,7 +147,7 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt, icomm, me, np, minfo
-  logical, parameter :: dist_symm_list=.false., print_dl=.false.
+  logical, parameter :: dist_symm_list=.false., print_dl=.true. 
   character  name*20
   name='psi_bld_glb_csr_dep_list'
 
@@ -189,14 +189,38 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
     info=psb_err_internal_error_
     goto 9999
   endif
-  dl_ptr = dl_ptr + 1 
+  dl_ptr = dl_ptr + 1
+  
   if (print_dl) then
     if (me == 0) then
-      write(0,*) ' Dep_list '
-      do i=0,np-1
-        write(0,*) 'Proc ',i,':',c_dep_list(dl_ptr(i):dl_ptr(i+1)-1) 
-      end do
-      flush(0)
+      block
+        character(len=80) :: fname, frmt 
+        integer :: ni, nl,ldl, lname, iout = 87
+        ldl = dl_ptr(np) 
+        ni  = floor(log10(1.0*np)) + 1
+        nl  = floor(log10(1.0*ldl)) + 1
+        write(frmt,'(a,i3.3,a,i3.3,a)') '(a,i',ni,'.',ni,')'
+        write(fname,frmt) 'dep_list_p_',np
+        lname = len_trim(fname) 
+        write(frmt,'(a,i3.3,a,i3.3,a)') '(a,i',nl,'.',nl,')'
+        write(fname(lname+1:lname+nl+3),frmt) '_l_',ldl
+        fname = trim(fname)//'.mtx'
+        open(iout,file=fname)
+        if (.true.) then
+          write(iout,*)   np, np, ldl-1
+          do i=0,np-1
+            do j=dl_ptr(i),dl_ptr(i+1)-1
+              write(iout,*) i+1,c_dep_list(j)+1
+            end do
+          end do
+        else
+          write(iout,*) ' Dep_list '
+          do i=0,np-1
+            write(iout,*) 'Proc ',i,':',c_dep_list(dl_ptr(i):dl_ptr(i+1)-1) 
+          end do
+        end if
+        close(iout)
+      end block
     end if
     call psb_barrier(ictxt)
   end if

@@ -107,7 +107,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_) :: ictxt,np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
   integer(psb_ipk_) :: tmpv(4)
-  logical, parameter  :: do_timings=.false., trace=.false., debugsz=.false.
+  logical, parameter  :: do_timings=.true., trace=.false., debugsz=.false.
   integer(psb_ipk_), save  :: idx_sweep0=-1, idx_loop_a2a=-1, idx_loop_neigh=-1
   real(psb_dpk_)      :: t0, t1, t2, t3, t4
   character(len=20)   :: name

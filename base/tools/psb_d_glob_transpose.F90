@@ -423,6 +423,8 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name, ch_err
+  logical, parameter  :: do_timings=.true.
+  integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -441,7 +443,15 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
+  if ((do_timings).and.(idx_phase1==-1))       &
+       & idx_phase1 = psb_get_timer_idx("GLB_TRANSP: phase1 ")
+  if ((do_timings).and.(idx_phase2==-1))       &
+       & idx_phase2 = psb_get_timer_idx("GLB_TRANSP: phase2")
+  if ((do_timings).and.(idx_phase3==-1))       &
+       & idx_phase3 = psb_get_timer_idx("GLB_TRANSP: phase3")
 
+  if (do_timings) call psb_tic(idx_phase1)    
+    
   if (present(desc_c)) then
     p_desc_c => desc_c
   else
@@ -525,7 +535,9 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 
   iszr = sum(rvsz)
   iszs = sum(sdsz)
-
+  if (do_timings) call psb_toc(idx_phase1)
+  if (do_timings) call psb_tic(idx_phase2)    
+    
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
@@ -619,6 +631,8 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Done alltoallv'
+  if (do_timings) call psb_toc(idx_phase2)
+  if (do_timings) call psb_tic(idx_phase3)    
 
   if (present(desc_rx)) then 
     !
@@ -686,7 +700,7 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
        & iarcv,jarcv,stat=info)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Done'
-
+  if (do_timings) call psb_toc(idx_phase3)
   call psb_erractionrestore(err_act)
   return
 
