@@ -77,8 +77,8 @@
 !                  node in the dependency list for the current one    *
 !                                                                     *
 !**********************************************************************
-subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
-  use psi_mod, psb_protect_name => psi_i_csr_sort_dl
+subroutine psi_i_csr_sort_dl_ctxt(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
+  use psi_mod, psb_protect_name => psi_i_csr_sort_dl_ctxt
   use psb_const_mod
   use psb_error_mod
   use psb_sort_mod
@@ -97,6 +97,29 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
 
   info = 0
   call psb_info(ictxt,me,np)
+
+  call psi_sort_dl(me,np,dl_ptr,c_dep_list,l_dep_list,info)
+  
+end subroutine psi_i_csr_sort_dl_ctxt
+
+subroutine psi_i_csr_sort_dl_np(me,np,dl_ptr,c_dep_list,l_dep_list,info)
+  use psi_mod, psb_protect_name => psi_i_csr_sort_dl_np
+  use psb_const_mod
+  use psb_error_mod
+  use psb_sort_mod
+  implicit none
+  
+  integer(psb_ipk_), intent(inout) :: c_dep_list(:), dl_ptr(0:), l_dep_list(0:)
+  integer(psb_ipk_), intent(in)    :: me,np
+  integer(psb_ipk_), intent(out)   :: info
+  ! Local variables
+  integer(psb_ipk_), allocatable  ::  dg(:), dgp(:),&
+       &  idx(:), upd(:), edges(:,:), ich(:)
+  integer(psb_ipk_) ::  i, j, nedges, ip1, ip2, nch, ip, iedge,&
+       &  i1, ix, ist, iswap(2)
+  logical :: internal_error 
+
+  
   nedges = size(c_dep_list)
   
   allocate(dg(0:np-1),dgp(nedges),edges(2,nedges),upd(0:np-1),&
@@ -234,4 +257,4 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
     end if
   end do
   
-end subroutine psi_i_csr_sort_dl
+end subroutine psi_i_csr_sort_dl_np

@@ -134,7 +134,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 !!$        ! ....now i can sort dependency lists.
     if (do_timings) call psb_toc(idx_phase21)
     if (do_timings) call psb_tic(idx_phase22)
-    call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ictxt,info)
+    call psi_sort_dl(me,np,dl_ptr,c_dep_list,length_dl,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From sort_dl ',info
     end if

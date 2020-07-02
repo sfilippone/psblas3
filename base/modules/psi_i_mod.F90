@@ -95,14 +95,22 @@ module psi_i_mod
   end interface
 
   interface psi_sort_dl
-    subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
+    subroutine psi_i_csr_sort_dl_ctxt(dl_ptr,c_dep_list,l_dep_list,ictxt,info)
       import
       implicit none 
       integer(psb_ipk_), intent(in) :: c_dep_list(:), dl_ptr(0:)
       integer(psb_ipk_), intent(inout) :: l_dep_list(0:)
       integer(psb_ipk_) :: ictxt
       integer(psb_ipk_) :: info
-    end subroutine psi_i_csr_sort_dl
+    end subroutine psi_i_csr_sort_dl_ctxt
+    subroutine psi_i_csr_sort_dl_np(me,np,dl_ptr,c_dep_list,l_dep_list,info)
+      import
+      implicit none 
+      integer(psb_ipk_), intent(in) :: c_dep_list(:), dl_ptr(0:)
+      integer(psb_ipk_), intent(inout) :: l_dep_list(0:)
+      integer(psb_ipk_) :: me,np
+      integer(psb_ipk_) :: info
+    end subroutine psi_i_csr_sort_dl_np
   end interface
 
   interface psi_extract_dep_list
