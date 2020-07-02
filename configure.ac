@@ -36,11 +36,11 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.5, [https://github.com/sfilippone/psblas3/issues])
+AC_INIT([PSBLAS],3.7, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.5"
+psblas_cv_version="3.7"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
