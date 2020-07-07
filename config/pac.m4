@@ -1792,6 +1792,9 @@ AC_DEFUN(PAC_CHECK_METIS,
 Default: "-lmetis"]),
         [psblas_cv_metis=$withval],
         [psblas_cv_metis='-lmetis'])
+AC_ARG_WITH(metisincfile, AC_HELP_STRING([--with-metisincfile=DIR], [Specify the name  for METIS include file.]),
+        [psblas_cv_metisincfile=$withval],
+        [psblas_cv_metisincfile='metis.h'])
 AC_ARG_WITH(metisdir, AC_HELP_STRING([--with-metisdir=DIR], [Specify the directory for METIS library and includes.]),
         [psblas_cv_metisdir=$withval],
         [psblas_cv_metisdir=''])
@@ -1821,7 +1824,7 @@ if test "x$psblas_cv_metislibdir" != "x"; then
 fi
 
 AC_MSG_NOTICE([metis dir $psblas_cv_metisdir])
-AC_CHECK_HEADERS([limits.h metis.h],
+AC_CHECK_HEADERS([limits.h $psblas_cv_metisincfile],
  [pac_metis_header_ok=yes],
  [pac_metis_header_ok=no; METIS_INCLUDES=""])
 if test "x$pac_metis_header_ok" == "xno" ; then
@@ -1831,7 +1834,7 @@ dnl Maybe Include or include subdirs?
   CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
 
  AC_MSG_CHECKING([for metis_h in $METIS_INCLUDES])
- AC_CHECK_HEADERS([limits.h metis.h],
+ AC_CHECK_HEADERS([limits.h  $psblas_cv_metisincfile],
     [pac_metis_header_ok=yes],
     [pac_metis_header_ok=no; METIS_INCLUDES=""])
 fi
@@ -1840,11 +1843,27 @@ dnl Maybe new structure with METIS UFconfig METIS?
    unset ac_cv_header_metis_h
    METIS_INCLUDES="-I$psblas_cv_metisdir/UFconfig -I$psblas_cv_metisdir/METIS/Include -I$psblas_cv_metisdir/METIS/Include"
    CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
-   AC_CHECK_HEADERS([limits.h metis.h],
+   AC_CHECK_HEADERS([limits.h  $psblas_cv_metisincfile],
      [pac_metis_header_ok=yes],
      [pac_metis_header_ok=no; METIS_INCLUDES=""])
 fi
 
+if test "x$pac_metis_header_ok" == "xyes" ; then
+   AC_LANG_PUSH([C])
+   AC_MSG_CHECKING([for METIS idx size])
+   AC_LINK_IFELSE([AC_LANG_SOURCE(
+	#include <$psblas_cv_metisincfile>
+	#include <stdio.h>
+        void main(){
+		    printf("%d\n",IDXTYPEWIDTH);
+		    }
+	       )],
+	       [pac_cv_metis_idx=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_metis_idx="unknown"])
+      AC_MSG_RESULT($pac_cv_metis_idx)
+
+   AC_LANG_POP()
+fi
 
 if test "x$pac_metis_header_ok" == "xyes" ; then 
       psblas_cv_metis_includes="$METIS_INCLUDES"

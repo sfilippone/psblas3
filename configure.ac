@@ -702,11 +702,6 @@ fi
 
 
 
-# Note  : We would like to detect PSBLAS, but this is complicated by the
-#         module symbols mangling rules, which are compiler specific !
-#
-#	  Moreover, the PSBLAS doesn't have an installer, currently.
-
 ###############################################################################
 #		Library target directory and archive files.
 ###############################################################################
