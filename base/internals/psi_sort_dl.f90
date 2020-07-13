@@ -118,7 +118,7 @@ subroutine psi_i_csr_sort_dl_np(me,np,dl_ptr,c_dep_list,l_dep_list,info)
   integer(psb_ipk_) ::  i, j, nedges, ip1, ip2, nch, ip, iedge,&
        &  i1, ix, ist, iswap(2)
   logical :: internal_error 
-
+  logical, parameter :: sort_dg=.false.
   
   nedges = size(c_dep_list)
   
@@ -161,8 +161,14 @@ subroutine psi_i_csr_sort_dl_np(me,np,dl_ptr,c_dep_list,l_dep_list,info)
     do i = ist, nedges
       dgp(i) = (dg(edges(1,i)) + dg(edges(2,i)))
     end do
-    call psb_msort(dgp(ist:nedges),ix=idx(ist:nedges),dir=psb_sort_down_)
-    
+    if (sort_dg) then 
+      call psb_msort(dgp(ist:nedges),ix=idx(ist:nedges),dir=psb_sort_down_)
+    else
+      do i=ist,nedges
+        idx(i) = i-ist+1
+      end do
+    end if
+        
     !  5. Scan the list of edges; if neither node of the     
     !     edge has been marked yet, take out the edge and mark 
     !     the two nodes                                      

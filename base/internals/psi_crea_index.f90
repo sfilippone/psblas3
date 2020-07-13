@@ -212,8 +212,8 @@ contains
 
     val = .not.(((dlmax>(26*4)).or.((dlavg>=(26*2)).and.(np>=128))))
     val = (dlmax<16)
-    !val = .true.
-    val = .false.
+    val = .true.
+    !val = .false.
   end function choose_sorting
 
 end subroutine psi_i_crea_index
