@@ -689,9 +689,11 @@ LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS
-if test "x$psblas_cv_have_metis" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES"
+if test "x$pac_cv_metis_idx" == "xunknown" ; then
+   true ; # do nothing
+elif test "x$psblas_cv_have_metis" == "xyes" ; then 
+   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $FDEFINES"
+   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx"
 fi
 
 PAC_CHECK_AMD
