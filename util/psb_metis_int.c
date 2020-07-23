@@ -1,31 +1,10 @@
 #include <stdio.h>
 #if defined(HAVE_METIS_)
-#include "metis.h"
+#include "psb_metis_int.h"
 
-typedef int32_t psb_m_t;
-
-#if defined(IPK4) &&  defined(LPK4)
-typedef int32_t psb_i_t;
-typedef int32_t psb_l_t;
-#elif defined(IPK4) &&  defined(LPK8)
-typedef int32_t psb_i_t;
-typedef int64_t psb_l_t;
-#elif defined(IPK8) &&  defined(LPK8)
-typedef int64_t psb_i_t;
-typedef int64_t psb_l_t;
-#else
-#endif
-typedef int64_t psb_e_t;
-
-typedef float  psb_s_t;
-typedef double psb_d_t;
-typedef float  complex psb_c_t;
-typedef double complex psb_z_t;
-
-
-int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg, 
-				int *iajw, int *nparts, float *weights, 
-				int *graphpart)
+int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg, 
+				idx_t *iajw, idx_t *nparts, float *weights, 
+				idx_t *graphpart)
 {
   int res = -1;
   idx_t objval = 0;
@@ -58,9 +37,9 @@ int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg,
 
 #else 
 
-int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg, 
-				int *iajw, int *nparts, float *weights, 
-				int *graphpart)
+int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg, 
+				idx_t *iajw, idx_t *nparts, float *weights, 
+				idx_t *graphpart)
 {
   return(-1);
 }

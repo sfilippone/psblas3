@@ -38,7 +38,7 @@ $(HERE)/$(LIBNAME): $(OBJS)
 
 $(OBJS): $(MODDIR)/$(BASEMODNAME)$(.mod)
 psb_util_mod.o: $(BASEOBJS)
-psb_metispart_mod.o: metis_int.o
+psb_metispart_mod.o: psb_metis_int.o
 psb_mat_dist_mod.o:  psb_s_mat_dist_mod.o psb_d_mat_dist_mod.o psb_c_mat_dist_mod.o psb_z_mat_dist_mod.o 
 
 $(IMPLOBJS): $(BASEOBJS)
