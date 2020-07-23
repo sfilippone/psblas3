@@ -1852,8 +1852,8 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
    AC_LANG_PUSH([C])
    AC_MSG_CHECKING([for METIS idx size])
    AC_LINK_IFELSE([AC_LANG_SOURCE(
-	#include <$psblas_cv_metisincfile>
 	#include <stdio.h>
+	#include "$psblas_cv_metisincfile"
         void main(){
 		    printf("%d\n",IDXTYPEWIDTH);
 		    }
