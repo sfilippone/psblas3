@@ -58,7 +58,6 @@ program psb_sf_sample
 
   integer(psb_ipk_) :: ictxt, iam, np
   integer(psb_lpk_) :: lnp
-
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode,&
        & methd, istopc, irst
@@ -182,7 +181,7 @@ program psb_sf_sample
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
       call aux_a%cscnv(info,type='csr')
-      lnp = np
+      lnp = np 
       call build_mtpart(aux_a,lnp)
 
     endif
