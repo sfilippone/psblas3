@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 1051--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1053--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu10.html" >next</a>] [<a 
 href="userhtmlsu6.html" >prev</a>] [<a 
 href="userhtmlsu6.html#tailuserhtmlsu6.html" >prev-tail</a>] [<a 
@@ -18,7 +18,7 @@ href="userhtmlse3.html#tailuserhtmlsu7.html">tail</a>] [<a
 href="userhtmlsu7.html#userhtmlse4.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
  id="x15-460003.3"></a>Dense Vector Data Structure</h4>
-<!--l. 1053--><p class="noindent" >The <a 
+<!--l. 1055--><p class="noindent" >The <a 
  id="vdata"><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
@@ -36,7 +36,7 @@ sec.&#x00A0;<a
 href="userhtmlse6.html#x40-770006">6<!--tex4ht:ref: sec:toolsrout --></a>. Among other simple things, we define here an extraction method that
 can be used to get a full copy of the part of the vector stored on the local
 process.
-<!--l. 1063--><p class="indent" >   The type declaration is shown in figure&#x00A0;<a 
+<!--l. 1065--><p class="indent" >   The type declaration is shown in figure&#x00A0;<a 
 href="#x15-460015">5<!--tex4ht:ref: fig:vectype --></a> where <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">T</span></span></span> is a placeholder for the data
 type and precision variants
@@ -60,7 +60,7 @@ class="description">Single precision complex;
 <span 
 class="cmbx-10">Z</span> </dt><dd 
 class="description">Double precision complex.</dd></dl>
-<!--l. 1073--><p class="noindent" >The actual data is contained in the polymorphic component <span class="obeylines-h"><span class="verb"><span 
+<!--l. 1075--><p class="noindent" >The actual data is contained in the polymorphic component <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">v%v</span></span></span>; the separation between
 the application and the actual data is essential for cases where it is necessary to link
 to data storage made available elsewhere outside the direct control of the
@@ -70,7 +70,7 @@ compiler/application, e.g. data stored in a graphics accelerator&#8217;s private
  id="x15-460015"></a>
 <div class="center" 
 >
-<!--l. 1081--><p class="noindent" >
+<!--l. 1083--><p class="noindent" >
 <div class="minipage"><div class="verbatim" id="verbatim-33">
 &#x00A0;&#x00A0;type&#x00A0;psb_T_base_vect_type
 &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;TYPE(KIND_),&#x00A0;allocatable&#x00A0;::&#x00A0;v(:)
@@ -81,18 +81,18 @@ compiler/application, e.g. data stored in a graphics accelerator&#8217;s private
 &#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_T_vect_type
 &#x00A0;<br />
 </div>
-<!--l. 1092--><p class="nopar" ></div></div>
+<!--l. 1094--><p class="nopar" ></div></div>
                                                                   
 
                                                                   
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;5: </span><span  
 class="content"> The PSBLAS defined data type that contains a dense vector.</span></div><!--tex4ht:label?: x15-460015 -->
-<!--l. 1103--><p class="indent" >   </div><hr class="endfigure">
-<!--l. 1105--><p class="noindent" >
+<!--l. 1105--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 1107--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.1   </span> <a 
  id="x15-470003.3.1"></a>Vector Methods</h5>
-<!--l. 1106--><p class="noindent" >
+<!--l. 1108--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.2   </span> <a 
  id="x15-480003.3.2"></a>get_nrows &#8212; Get number of rows in a dense vector</h5>
                                                                   
@@ -101,8 +101,8 @@ class="content"> The PSBLAS defined data type that contains a dense vector.</spa
    <div class="verbatim" id="verbatim-34">
 nr&#x00A0;=&#x00A0;v%get_nrows()
 </div>
-<!--l. 1111--><p class="nopar" >
-<!--l. 1113--><p class="indent" >
+<!--l. 1113--><p class="nopar" >
+<!--l. 1115--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -118,7 +118,7 @@ class="description">the dense vector<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 1123--><p class="indent" >
+<!--l. 1125--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -128,7 +128,7 @@ class="description">
 class="cmbx-10">Function value</span> </dt><dd 
 class="description">The number of rows of dense vector <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">v</span></span></span>.</dd></dl>
-<!--l. 1130--><p class="noindent" >
+<!--l. 1132--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.3   </span> <a 
  id="x15-490003.3.3"></a>sizeof &#8212; Get memory occupation in bytes of a dense vector</h5>
                                                                   
@@ -137,8 +137,8 @@ class="cmtt-10">v</span></span></span>.</dd></dl>
    <div class="verbatim" id="verbatim-35">
 memory_size&#x00A0;=&#x00A0;v%sizeof()
 </div>
-<!--l. 1135--><p class="nopar" >
-<!--l. 1137--><p class="indent" >
+<!--l. 1137--><p class="nopar" >
+<!--l. 1139--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -154,7 +154,7 @@ class="description">the dense vector<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 1147--><p class="indent" >
+<!--l. 1149--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -163,7 +163,7 @@ class="description">
 <span 
 class="cmbx-10">Function value</span> </dt><dd 
 class="description">The memory occupation in bytes.</dd></dl>
-<!--l. 1153--><p class="noindent" >
+<!--l. 1155--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.4   </span> <a 
  id="x15-500003.3.4"></a>set &#8212; Set contents of the vector</h5>
                                                                   
@@ -174,8 +174,8 @@ class="description">The memory occupation in bytes.</dd></dl>
 &#x00A0;<br />&#x00A0;call&#x00A0;&#x00A0;v%set(vect[,first,last])
 &#x00A0;<br />&#x00A0;call&#x00A0;&#x00A0;v%zero()
 </div>
-<!--l. 1160--><p class="nopar" >
-<!--l. 1162--><p class="indent" >
+<!--l. 1162--><p class="nopar" >
+<!--l. 1164--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -226,13 +226,13 @@ class="newline" />Intent: <span
 class="cmbx-10">in</span>.<br 
 class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
 href="userhtmlsu10.html#x19-560011">1<!--tex4ht:ref: tab:f90axpby --></a>.</dd></dl>
-<!--l. 1181--><p class="noindent" >Note that a call to <span class="obeylines-h"><span class="verb"><span 
+<!--l. 1183--><p class="noindent" >Note that a call to <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">v%zero()</span></span></span> is provided as a shorthand, but is equivalent to a call
 to <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">v%set(zero)</span></span></span> with the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">zero</span></span></span> constant having the appropriate type and
 kind.
-<!--l. 1185--><p class="indent" >
+<!--l. 1187--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -247,7 +247,7 @@ class="newline" /></dd></dl>
                                                                   
 
                                                                   
-<!--l. 1191--><p class="noindent" >
+<!--l. 1193--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.5   </span> <a 
  id="x15-510003.3.5"></a>get_vect &#8212; Get a copy of the vector contents</h5>
                                                                   
@@ -256,8 +256,8 @@ class="newline" /></dd></dl>
    <div class="verbatim" id="verbatim-37">
 extv&#x00A0;=&#x00A0;v%get_vect([n])
 </div>
-<!--l. 1196--><p class="nopar" >
-<!--l. 1198--><p class="indent" >
+<!--l. 1198--><p class="nopar" >
+<!--l. 1200--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -283,7 +283,7 @@ class="newline" />Type: <span
 class="cmbx-10">optional</span>; default: entire vector.<br 
 class="newline" />
      </dd></dl>
-<!--l. 1212--><p class="indent" >
+<!--l. 1214--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -299,7 +299,7 @@ class="cmmi-10">n </span>and the internal size of the vector, or 0 if
      <span 
 class="cmmi-10">n </span>is negative; otherwise, the size of the array is the same as the internal
      size of the vector.</dd></dl>
-<!--l. 1221--><p class="noindent" >
+<!--l. 1223--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.6   </span> <a 
  id="x15-520003.3.6"></a>clone &#8212; Clone current object</h5>
                                                                   
@@ -308,8 +308,8 @@ class="cmmi-10">n </span>is negative; otherwise, the size of the array is the sa
    <div class="verbatim" id="verbatim-38">
 call&#x00A0;&#x00A0;x%clone(y,info)
 </div>
-<!--l. 1225--><p class="nopar" >
-<!--l. 1227--><p class="indent" >
+<!--l. 1227--><p class="nopar" >
+<!--l. 1229--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -325,7 +325,7 @@ class="description">the dense vector.<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 1237--><p class="indent" >
+<!--l. 1239--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -341,12 +341,12 @@ class="description">Return code.</dd></dl>
                                                                   
 
                                                                   
-   <!--l. 1244--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1246--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu10.html" >next</a>] [<a 
 href="userhtmlsu6.html" >prev</a>] [<a 
 href="userhtmlsu6.html#tailuserhtmlsu6.html" >prev-tail</a>] [<a 
 href="userhtmlsu7.html" >front</a>] [<a 
 href="userhtmlsu7.html#userhtmlse4.html" >up</a>] </p></div>
-<!--l. 1244--><p class="indent" >   <a 
+<!--l. 1246--><p class="indent" >   <a 
  id="tailuserhtmlsu7.html"></a>   
 </body></html> 
