@@ -191,9 +191,7 @@ subroutine psi_ctranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   logical, parameter :: usersend=.false.
 
   complex(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
-#endif
   character(len=20)  :: name
 
   info=psb_success_
@@ -685,9 +683,7 @@ subroutine psi_ctranidxv(iictxt,iicomm,flag,beta,y,idx,&
   logical, parameter :: usersend=.false.
 
   complex(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
-#endif
   character(len=20)  :: name
 
   info=psb_success_

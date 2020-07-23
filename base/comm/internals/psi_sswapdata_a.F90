@@ -186,9 +186,7 @@ subroutine psi_sswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   real(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
-#endif
   character(len=20)  :: name
 
   info=psb_success_
@@ -672,9 +670,7 @@ subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   real(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
-#endif
   character(len=20)  :: name
 
   info=psb_success_
