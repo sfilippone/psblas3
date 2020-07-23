@@ -1048,7 +1048,7 @@ contains
         idx = bsdindx(ip+1)
         p2ptag = psb_complex_tag
         call mpi_send(valsnd(idx+1:idx+sz),sz,&
-             & psb_mpi_r_dpk_,prcid(ip+1),&
+             & psb_mpi_c_spk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
         p2ptag = psb_int_swap_tag
         call mpi_send(iasnd(idx+1:idx+sz),sz,&

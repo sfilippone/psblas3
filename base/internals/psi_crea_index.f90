@@ -71,9 +71,9 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
-  logical, parameter  :: do_timings=.false.
+  logical, parameter  :: do_timings=.false., shuffle_dep_list=.false. 
   integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
-  integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
+  integer(psb_ipk_), save  :: idx_phase21=-1, idx_phase22=-1, idx_phase13=-1
 
   info = psb_success_
   name='psi_crea_index'
@@ -95,10 +95,10 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
        & idx_phase2 = psb_get_timer_idx("PSI_CREA_INDEX: phase2")
   if ((do_timings).and.(idx_phase3==-1))       &
        & idx_phase3 = psb_get_timer_idx("PSI_CREA_INDEX: phase3")
-!!$  if ((do_timings).and.(idx_phase11==-1))       &
-!!$       & idx_phase11 = psb_get_timer_idx("PSI_CREA_INDEX: phase11 ")
-!!$  if ((do_timings).and.(idx_phase12==-1))       &
-!!$       & idx_phase12 = psb_get_timer_idx("PSI_CREA_INDEX: phase12")
+  if ((do_timings).and.(idx_phase21==-1))       &
+       & idx_phase21 = psb_get_timer_idx("PSI_CREA_INDEX: phase21 ")
+  if ((do_timings).and.(idx_phase22==-1))       &
+       & idx_phase22 = psb_get_timer_idx("PSI_CREA_INDEX: phase22")
 !!$  if ((do_timings).and.(idx_phase13==-1))       &
 !!$       & idx_phase13 = psb_get_timer_idx("PSI_CREA_INDEX: phase13")
 
@@ -123,6 +123,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   if (do_timings) call psb_tic(idx_phase2)
 
   if (choose_sorting(dlmax,dlavg,np)) then 
+    if (do_timings) call psb_tic(idx_phase21)
     call psi_bld_glb_dep_list(ictxt,&
          & loc_dl,length_dl,c_dep_list,dl_ptr,info)
     if (info /= 0) then
@@ -131,13 +132,15 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 !!$        call psi_dl_check(dep_list,dl_lda,np,length_dl)
 !!$
 !!$        ! ....now i can sort dependency lists.
+    if (do_timings) call psb_toc(idx_phase21)
+    if (do_timings) call psb_tic(idx_phase22)
     call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ictxt,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From sort_dl ',info
     end if
     ldl    = length_dl(me)
     loc_dl = c_dep_list(dl_ptr(me):dl_ptr(me)+ldl-1)
-
+    if (do_timings) call psb_toc(idx_phase22)
 !!$        if(info /= psb_success_) then
 !!$          call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
 !!$          goto 9999
@@ -146,7 +149,26 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   else
     ! Do nothing
     ldl    = length_dl(me)
-    loc_dl = loc_dl(1:ldl)      
+    loc_dl = loc_dl(1:ldl)
+    if (shuffle_dep_list) then
+      !
+      ! Apply a random shuffle to the dependency list
+      ! should improve the behaviour
+      !
+      block
+        ! Algorithm 3.4.2P from TAOCP vol 2.
+        integer(psb_ipk_) :: tmp
+        integer :: j,k
+        real    :: u
+        do j=ldl,2,-1
+          call random_number(u)
+          k = min(j,floor(j*u)+1)
+          tmp       = loc_dl(k)
+          loc_dl(k) = loc_dl(j)
+          loc_dl(j) = tmp
+        end do
+      end block
+    end if    
   end if
   if (do_timings) call psb_toc(idx_phase2)
 
@@ -189,7 +211,9 @@ contains
     logical                       :: val
 
     val = .not.(((dlmax>(26*4)).or.((dlavg>=(26*2)).and.(np>=128))))
+    val = (dlmax<16)
     !val = .true.
+    val = .false.
   end function choose_sorting
 
 end subroutine psi_i_crea_index

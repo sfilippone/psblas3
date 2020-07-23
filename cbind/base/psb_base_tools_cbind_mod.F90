@@ -301,5 +301,34 @@ contains
 
   end function psb_c_cd_get_global_cols
 
+  function psb_c_cd_get_global_indices(idx,nidx,owned,cdh) bind(c,name='psb_c_cd_get_global_indices') result(res)
+    implicit none
+
+    integer(psb_c_ipk_)            :: res
+    type(psb_c_object_type)        :: cdh
+
+    integer(psb_c_lpk_)            :: idx(nidx)
+    integer(psb_c_ipk_), value     :: nidx
+    logical(c_bool), value         :: owned
+
+
+    type(psb_desc_type), pointer   :: descp
+    integer(psb_lpk_), allocatable :: myidx(:)
+    logical                        :: fowned
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+
+      fowned = owned
+      myidx = descp%get_global_indices(owned=fowned)
+
+      idx(1:nidx) = myidx(1:nidx)
+      res = 0
+
+    end if
+
+  end function psb_c_cd_get_global_indices
+
 
 end module psb_base_tools_cbind_mod

@@ -38,10 +38,11 @@ program psb_df_sample
   implicit none
 
   ! input parameters
-  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file,renum
+  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_dspmat_type) :: a, aux_a
+  type(psb_dspmat_type)  :: a
+  type(psb_ldspmat_type) :: aux_a
 
   ! preconditioner data
   type(psb_dprec_type)  :: prec
@@ -56,6 +57,7 @@ program psb_df_sample
   type(psb_desc_type):: desc_a
 
   integer(psb_ipk_) :: ictxt, iam, np
+  integer(psb_lpk_) :: lnp
 
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode,&
@@ -140,7 +142,6 @@ program psb_df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
     if (size(aux_b,dim=1) == m_problem) then
@@ -180,7 +181,9 @@ program psb_df_sample
       write(psb_out_unit,'("Partition type: graph vector")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
-      call build_mtpart(aux_a,np)
+      call aux_a%cscnv(info,type='csr')
+      lnp = np
+      call build_mtpart(aux_a,lnp)
 
     endif
     call psb_barrier(ictxt)
