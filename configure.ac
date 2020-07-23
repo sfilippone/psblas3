@@ -36,11 +36,11 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.7, [https://github.com/sfilippone/psblas3/issues])
+AC_INIT([PSBLAS],3.7.0, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.7"
+psblas_cv_version="3.7.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -561,13 +561,26 @@ PAC_FORTRAN_TEST_MOLD(
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
+PAC_FORTRAN_TEST_VOLATILE(
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for	VOLATILE])]	
+)
+
+PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for	ISO_FORTRAN_ENV])]	
+)
+
+PAC_FORTRAN_TEST_FINAL( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for FINAL])]	
+)
+
+
 #
 # Optional features
 #
 
-PAC_FORTRAN_TEST_VOLATILE( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
-)
 
 PAC_FORTRAN_TEST_GENERICS( 
 	[],
@@ -576,14 +589,6 @@ PAC_FORTRAN_TEST_GENERICS(
 
 PAC_FORTRAN_TEST_FLUSH( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
-)
-
-PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_FORTRAN_ENV $FDEFINES"],
-)
-
-PAC_FORTRAN_TEST_FINAL( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
 )
 
 
@@ -689,9 +694,12 @@ LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS
-if test "x$psblas_cv_have_metis" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES"
+if test "x$pac_cv_metis_idx" == "xunknown" ; then
+   true ; # do nothing
+elif test "x$psblas_cv_have_metis" == "xyes" ; then 
+   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $FDEFINES"
+   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx"
+   METISINCFILE=$psblas_cv_metisincfile
 fi
 
 PAC_CHECK_AMD
@@ -701,11 +709,6 @@ if test "x$psblas_cv_have_amd" == "xyes" ; then
 fi
 
 
-
-# Note  : We would like to detect PSBLAS, but this is complicated by the
-#         module symbols mangling rules, which are compiler specific !
-#
-#	  Moreover, the PSBLAS doesn't have an installer, currently.
 
 ###############################################################################
 #		Library target directory and archive files.
@@ -761,7 +764,6 @@ AC_SUBST(LAPACK_LIBS)
 AC_SUBST(CINCLUDES)
 AC_SUBST(FINCLUDES)
 
-
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
@@ -784,11 +786,13 @@ AC_SUBST(BASELIBNAME)
 AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
+AC_SUBST(METISINCFILE)
 
 ###############################################################################
 # the following files will be created by Automake
 
 AC_CONFIG_FILES([Make.inc])
+AC_CONFIG_FILES([util/psb_metis_int.h])	
 AC_OUTPUT()
 #AC_OUTPUT(Make.inc Makefile)
 ###############################################################################
