@@ -45,8 +45,14 @@ class="description">Single precision complex;
      </dd><dt class="description">
 <span 
 class="cmbx-10">Z</span> </dt><dd 
-class="description">Double precision complex.</dd></dl>
-<!--l. 535--><p class="noindent" >The actual data is contained in the polymorphic component <span class="obeylines-h"><span class="verb"><span 
+class="description">Double precision complex;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">LS,LD,LC,LZ</span> </dt><dd 
+class="description">Same  numeric  type  as  above,  but  with  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lpk_</span></span></span> integer
+     indices.</dd></dl>
+<!--l. 537--><p class="noindent" >The actual data is contained in the polymorphic component <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">a%a</span></span></span> of type
 <a 
  id="spbasedata"><span 
@@ -62,18 +68,18 @@ class="cmtt-10">psb_spasb</span></span></span> routine. <hr class="figure"><div 
  id="x14-260014"></a>
 <div class="center" 
 >
-<!--l. 542--><p class="noindent" >
+<!--l. 544--><p class="noindent" >
 <div class="minipage"><div class="verbatim" id="verbatim-15">
 &#x00A0;&#x00A0;type&#x00A0;::&#x00A0;psb_Tspmat_type
 &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_sparse_mat),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;a
 &#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_Tspmat_type
 </div>
-<!--l. 548--><p class="nopar" ></div></div>
+<!--l. 550--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;4: </span><span  
 class="content"> The PSBLAS defined data type that contains a sparse matrix.</span></div><!--tex4ht:label?: x14-260014 -->
-<!--l. 559--><p class="indent" >   </div><hr class="endfigure">
-<!--l. 560--><p class="indent" >   The following very common formats are precompiled in PSBLAS and thus are
+<!--l. 561--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 562--><p class="indent" >   The following very common formats are precompiled in PSBLAS and thus are
 always available:
      <dl class="description"><dt class="description">
 <span 
@@ -83,6 +89,9 @@ class="cmbx-10">_coo</span><span
 class="cmbx-10">_sparse</span><span 
 class="cmbx-10">_mat</span> </dt><dd 
 class="description">Coordinate storage;
+                                                                  
+
+                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">psb</span><span 
@@ -99,10 +108,7 @@ class="cmbx-10">_csc</span><span
 class="cmbx-10">_sparse</span><span 
 class="cmbx-10">_mat</span> </dt><dd 
 class="description">Compressed storage by columns;</dd></dl>
-                                                                  
-
-                                                                  
-<!--l. 567--><p class="noindent" >The inner sparse matrix has an associated state, which can take the following
+<!--l. 569--><p class="noindent" >The inner sparse matrix has an associated state, which can take the following
 values:
      <dl class="description"><dt class="description">
 <span 
@@ -121,12 +127,12 @@ class="description">State entered after a reinitalization; this is used to handl
      in which the same sparsity pattern is used multiple times with different
      coefficients. In this state it is only possible to enter coefficients for already
      existing nonzero entries.</dd></dl>
-<!--l. 580--><p class="noindent" >The only storage variant supporting the build state is COO; all other variants are
+<!--l. 582--><p class="noindent" >The only storage variant supporting the build state is COO; all other variants are
 obtained by conversion to/from it.
-<!--l. 583--><p class="noindent" >
+<!--l. 585--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.1   </span> <a 
  id="x14-270003.2.1"></a>Sparse Matrix Methods</h5>
-<!--l. 585--><p class="noindent" >
+<!--l. 587--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.2   </span> <a 
  id="x14-280003.2.2"></a>get_nrows &#8212; Get number of rows in a sparse matrix</h5>
                                                                   
@@ -135,8 +141,8 @@ obtained by conversion to/from it.
    <div class="verbatim" id="verbatim-16">
 nr&#x00A0;=&#x00A0;a%get_nrows()
 </div>
-<!--l. 590--><p class="nopar" >
-<!--l. 592--><p class="indent" >
+<!--l. 592--><p class="nopar" >
+<!--l. 594--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -152,7 +158,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 602--><p class="indent" >
+<!--l. 604--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -162,7 +168,7 @@ class="description">
 class="cmbx-10">Function value</span> </dt><dd 
 class="description">The number of rows of sparse matrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">a</span></span></span>.</dd></dl>
-<!--l. 609--><p class="noindent" >
+<!--l. 611--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.3   </span> <a 
  id="x14-290003.2.3"></a>get_ncols &#8212; Get number of columns in a sparse matrix</h5>
                                                                   
@@ -171,8 +177,8 @@ class="cmtt-10">a</span></span></span>.</dd></dl>
    <div class="verbatim" id="verbatim-17">
 nc&#x00A0;=&#x00A0;a%get_ncols()
 </div>
-<!--l. 614--><p class="nopar" >
-<!--l. 616--><p class="indent" >
+<!--l. 616--><p class="nopar" >
+<!--l. 618--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -188,7 +194,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 626--><p class="indent" >
+<!--l. 628--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -198,7 +204,7 @@ class="description">
 class="cmbx-10">Function value</span> </dt><dd 
 class="description">The number of columns of sparse matrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">a</span></span></span>.</dd></dl>
-<!--l. 633--><p class="noindent" >
+<!--l. 635--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.4   </span> <a 
  id="x14-300003.2.4"></a>get_nnzeros &#8212; Get number of nonzero elements in a sparse matrix</h5>
                                                                   
@@ -207,8 +213,8 @@ class="cmtt-10">a</span></span></span>.</dd></dl>
    <div class="verbatim" id="verbatim-18">
 nz&#x00A0;=&#x00A0;a%get_nnzeros()
 </div>
-<!--l. 638--><p class="nopar" >
-<!--l. 640--><p class="indent" >
+<!--l. 640--><p class="nopar" >
+<!--l. 642--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -224,7 +230,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 650--><p class="indent" >
+<!--l. 652--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -234,7 +240,7 @@ class="description">
 class="cmbx-10">Function value</span> </dt><dd 
 class="description">The number of nonzero elements stored in sparse matrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">a</span></span></span>.</dd></dl>
-<!--l. 655--><p class="noindent" ><span 
+<!--l. 657--><p class="noindent" ><span 
 class="cmbx-10">Notes</span>
      <ol  class="enumerate1" >
      <li 
@@ -242,7 +248,7 @@ class="cmbx-10">Notes</span>
 class="cmtt-10">a</span></span></span>; some
      storage formats employ padding, thus the returned value for the same
      matrix may be different for different storage choices.</li></ol>
-<!--l. 663--><p class="noindent" >
+<!--l. 665--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.5   </span> <a 
  id="x14-310003.2.5"></a>get_size &#8212; Get maximum number of nonzero elements in a sparse
 matrix</h5>
@@ -252,8 +258,8 @@ matrix</h5>
    <div class="verbatim" id="verbatim-19">
 maxnz&#x00A0;=&#x00A0;a%get_size()
 </div>
-<!--l. 668--><p class="nopar" >
-<!--l. 670--><p class="indent" >
+<!--l. 670--><p class="nopar" >
+<!--l. 672--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -269,7 +275,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 680--><p class="indent" >
+<!--l. 682--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -280,7 +286,7 @@ class="cmbx-10">Function value</span> </dt><dd
 class="description">The maximum number of nonzero elements that can be stored
      in sparse matrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">a</span></span></span> using its current memory allocation.</dd></dl>
-<!--l. 687--><p class="noindent" >
+<!--l. 689--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.6   </span> <a 
  id="x14-320003.2.6"></a>sizeof &#8212; Get memory occupation in bytes of a sparse matrix</h5>
                                                                   
@@ -289,8 +295,8 @@ class="cmtt-10">a</span></span></span> using its current memory allocation.</dd>
    <div class="verbatim" id="verbatim-20">
 memory_size&#x00A0;=&#x00A0;a%sizeof()
 </div>
-<!--l. 692--><p class="nopar" >
-<!--l. 694--><p class="indent" >
+<!--l. 694--><p class="nopar" >
+<!--l. 696--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -306,7 +312,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 704--><p class="indent" >
+<!--l. 706--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -315,7 +321,7 @@ class="description">
 <span 
 class="cmbx-10">Function value</span> </dt><dd 
 class="description">The memory occupation in bytes.</dd></dl>
-<!--l. 710--><p class="noindent" >
+<!--l. 712--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.7   </span> <a 
  id="x14-330003.2.7"></a>get_fmt &#8212; Short description of the dynamic type</h5>
                                                                   
@@ -324,8 +330,8 @@ class="description">The memory occupation in bytes.</dd></dl>
    <div class="verbatim" id="verbatim-21">
 write(*,*)&#x00A0;a%get_fmt()
 </div>
-<!--l. 715--><p class="nopar" >
-<!--l. 717--><p class="indent" >
+<!--l. 717--><p class="nopar" >
+<!--l. 719--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -341,7 +347,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 727--><p class="indent" >
+<!--l. 729--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -355,7 +361,7 @@ class="cmtt-10">NULL</span></span></span>, <span class="obeylines-h"><span class
 class="cmtt-10">COO</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">CSR</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">CSC</span></span></span>.</dd></dl>
-<!--l. 734--><p class="noindent" >
+<!--l. 736--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.8   </span> <a 
  id="x14-340003.2.8"></a>is_bld, is_upd, is_asb &#8212; Status check</h5>
                                                                   
@@ -366,8 +372,8 @@ if&#x00A0;(a%is_bld())&#x00A0;then
 &#x00A0;<br />if&#x00A0;(a%is_upd())&#x00A0;then
 &#x00A0;<br />if&#x00A0;(a%is_asb())&#x00A0;then
 </div>
-<!--l. 741--><p class="nopar" >
-<!--l. 743--><p class="indent" >
+<!--l. 743--><p class="nopar" >
+<!--l. 745--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -383,7 +389,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 753--><p class="indent" >
+<!--l. 755--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -394,7 +400,7 @@ class="cmbx-10">Function value</span> </dt><dd
 class="description">A <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">logical</span></span></span> value indicating whether the matrix is in the Build,
      Update or Assembled state, respectively.</dd></dl>
-<!--l. 760--><p class="noindent" >
+<!--l. 762--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.9   </span> <a 
  id="x14-350003.2.9"></a>is_lower, is_upper, is_triangle, is_unit &#8212; Format check</h5>
                                                                   
@@ -406,8 +412,8 @@ if&#x00A0;(a%is_triangle())&#x00A0;then
 &#x00A0;<br />if&#x00A0;(a%is_lower())&#x00A0;then
 &#x00A0;<br />if&#x00A0;(a%is_unit())&#x00A0;then
 </div>
-<!--l. 768--><p class="nopar" >
-<!--l. 770--><p class="indent" >
+<!--l. 770--><p class="nopar" >
+<!--l. 772--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -423,7 +429,7 @@ class="description">the sparse matrix<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 780--><p class="indent" >
+<!--l. 782--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -437,7 +443,7 @@ class="cmtt-10">logical</span></span></span> value indicating whether the matrix
 class="cmtt-10">is_triangle()</span></span></span> returns <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">.true.</span></span></span> check also if it is lower, upper and with
      a unit (i.e. assumed) diagonal.</dd></dl>
-<!--l. 789--><p class="noindent" >
+<!--l. 791--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.10   </span> <a 
  id="x14-360003.2.10"></a>cscnv &#8212; Convert to a different storage format</h5>
                                                                   
@@ -447,8 +453,8 @@ class="cmtt-10">.true.</span></span></span> check also if it is lower, upper and
 call&#x00A0;&#x00A0;a%cscnv(b,info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
 &#x00A0;<br />call&#x00A0;&#x00A0;a%cscnv(info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
 </div>
-<!--l. 795--><p class="nopar" >
-<!--l. 797--><p class="indent" >
+<!--l. 797--><p class="nopar" >
+<!--l. 799--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -482,7 +488,7 @@ class="newline" />Type: optional.
 class="cmbx-10">dupl</span> </dt><dd 
 class="description">an integer value specifing how to handle duplicates (see Named Constants
      below)</dd></dl>
-<!--l. 811--><p class="indent" >
+<!--l. 813--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -498,10 +504,10 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 817--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+<!--l. 819--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mold</span></span></span> arguments may be employed to interface with special devices, such as GPUs
 and other accelerators.
-<!--l. 822--><p class="noindent" >
+<!--l. 824--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.11   </span> <a 
  id="x14-370003.2.11"></a>csclip &#8212; Reduce to a submatrix</h5>
                                                                   
@@ -511,8 +517,8 @@ and other accelerators.
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%csclip(b,info[,&amp;
 &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;imin,imax,jmin,jmax,rscale,cscale])
 </div>
-<!--l. 827--><p class="nopar" >
-<!--l. 829--><p class="indent" >   Returns the submatrix <span class="obeylines-h"><span class="verb"><span 
+<!--l. 829--><p class="nopar" >
+<!--l. 831--><p class="indent" >   Returns the submatrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">A(imin:imax,jmin:jmax)</span></span></span>, optionally rescaling row/col
 indices to the range <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">1:imax-imin+1,1:jmax-jmin+1</span></span></span>.
@@ -542,7 +548,7 @@ class="newline" />Type: optional.
 <span 
 class="cmbx-10">rscale,cscale</span> </dt><dd 
 class="description">Whether to rescale row/column indices. Type: optional.</dd></dl>
-<!--l. 843--><p class="noindent" >
+<!--l. 845--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -558,7 +564,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 850--><p class="noindent" >
+<!--l. 852--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.12   </span> <a 
  id="x14-380003.2.12"></a>clean_zeros &#8212; Eliminate zero coefficients</h5>
                                                                   
@@ -567,11 +573,11 @@ class="description">Return code.</dd></dl>
    <div class="verbatim" id="verbatim-26">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%clean_zeros(info)
 </div>
-<!--l. 854--><p class="nopar" >
-<!--l. 856--><p class="indent" >   Eliminates zero coefficients in the input matrix. Note that depending on the
+<!--l. 856--><p class="nopar" >
+<!--l. 858--><p class="indent" >   Eliminates zero coefficients in the input matrix. Note that depending on the
 internal storage format, there may still be some amount of zero padding in the
 output.
-<!--l. 860--><p class="indent" >
+<!--l. 862--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -589,7 +595,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 867--><p class="noindent" >
+<!--l. 869--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -605,7 +611,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 874--><p class="noindent" >
+<!--l. 876--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.13   </span> <a 
  id="x14-390003.2.13"></a>get_diag &#8212; Get main diagonal</h5>
                                                                   
@@ -614,8 +620,8 @@ class="description">Return code.</dd></dl>
    <div class="verbatim" id="verbatim-27">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%get_diag(d,info)
 </div>
-<!--l. 878--><p class="nopar" >
-<!--l. 880--><p class="indent" >   Returns a copy of the main diagonal.
+<!--l. 880--><p class="nopar" >
+<!--l. 882--><p class="indent" >   Returns a copy of the main diagonal.
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -633,7 +639,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 888--><p class="noindent" >
+<!--l. 890--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -647,7 +653,7 @@ class="newline" />A one-dimensional array of the appropriate type.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 896--><p class="noindent" >
+<!--l. 898--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.14   </span> <a 
  id="x14-400003.2.14"></a>clip_diag &#8212; Cut out main diagonal</h5>
                                                                   
@@ -656,8 +662,8 @@ class="description">Return code.</dd></dl>
    <div class="verbatim" id="verbatim-28">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%clip_diag(b,info)
 </div>
-<!--l. 900--><p class="nopar" >
-<!--l. 902--><p class="indent" >   Returns a copy of <span class="obeylines-h"><span class="verb"><span 
+<!--l. 902--><p class="nopar" >
+<!--l. 904--><p class="indent" >   Returns a copy of <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">a</span></span></span> without the main diagonal.
      <dl class="description"><dt class="description">
 <span 
@@ -676,7 +682,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 910--><p class="noindent" >
+<!--l. 912--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -692,7 +698,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 918--><p class="noindent" >
+<!--l. 920--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.15   </span> <a 
  id="x14-410003.2.15"></a>tril &#8212; Return the lower triangle</h5>
                                                                   
@@ -702,8 +708,8 @@ class="description">Return code.</dd></dl>
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%tril(l,info[,&amp;
 &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,u])
 </div>
-<!--l. 923--><p class="nopar" >
-<!--l. 925--><p class="indent" >   Returns the lower triangular part of submatrix <span class="obeylines-h"><span class="verb"><span 
+<!--l. 925--><p class="nopar" >
+<!--l. 927--><p class="indent" >   Returns the lower triangular part of submatrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">A(imin:imax,jmin:jmax)</span></span></span>,
 optionally rescaling row/col indices to the range <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">1:imax-imin+1,1:jmax-jmin+1</span></span></span> and
@@ -741,7 +747,7 @@ class="newline" />Type: optional.
 <span 
 class="cmbx-10">rscale,cscale</span> </dt><dd 
 class="description">Whether to rescale row/column indices. Type: optional.</dd></dl>
-<!--l. 943--><p class="noindent" >
+<!--l. 945--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -764,7 +770,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 952--><p class="noindent" >
+<!--l. 954--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.16   </span> <a 
  id="x14-420003.2.16"></a>triu &#8212; Return the upper triangle</h5>
                                                                   
@@ -774,8 +780,8 @@ class="description">Return code.</dd></dl>
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%triu(u,info[,&amp;
 &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,l])
 </div>
-<!--l. 957--><p class="nopar" >
-<!--l. 959--><p class="indent" >   Returns the upper triangular part of submatrix <span class="obeylines-h"><span class="verb"><span 
+<!--l. 959--><p class="nopar" >
+<!--l. 961--><p class="indent" >   Returns the upper triangular part of submatrix <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">A(imin:imax,jmin:jmax)</span></span></span>,
 optionally rescaling row/col indices to the range <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">1:imax-imin+1,1:jmax-jmin+1</span></span></span>,
@@ -813,7 +819,7 @@ class="newline" />Type: optional.
 <span 
 class="cmbx-10">rscale,cscale</span> </dt><dd 
 class="description">Whether to rescale row/column indices. Type: optional.</dd></dl>
-<!--l. 977--><p class="noindent" >
+<!--l. 979--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -836,7 +842,7 @@ class="cmtt-10">psb_Tspmat_type</span></span></span>.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 989--><p class="noindent" >
+<!--l. 991--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.17   </span> <a 
  id="x14-430003.2.17"></a>psb_set_mat_default &#8212; Set default storage format</h5>
                                                                   
@@ -845,8 +851,8 @@ class="description">Return code.</dd></dl>
    <div class="verbatim" id="verbatim-31">
 call&#x00A0;&#x00A0;psb_set_mat_default(a)
 </div>
-<!--l. 995--><p class="nopar" >
-<!--l. 997--><p class="indent" >
+<!--l. 997--><p class="nopar" >
+<!--l. 999--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -862,7 +868,7 @@ class="description">a  variable  of  <span class="obeylines-h"><span class="verb
 class="cmtt-10">class(psb_T_base_sparse_mat)</span></span></span> requesting  a  new  default
      storage format.<br 
 class="newline" />Type: required.</dd></dl>
-<!--l. 1009--><p class="noindent" >
+<!--l. 1011--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.18   </span> <a 
  id="x14-440003.2.18"></a>clone &#8212; Clone current object</h5>
                                                                   
@@ -871,8 +877,8 @@ class="newline" />Type: required.</dd></dl>
    <div class="verbatim" id="verbatim-32">
 call&#x00A0;&#x00A0;a%clone(b,info)
 </div>
-<!--l. 1014--><p class="nopar" >
-<!--l. 1016--><p class="indent" >
+<!--l. 1016--><p class="nopar" >
+<!--l. 1018--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -888,7 +894,7 @@ class="description">the sparse matrix.<br
 class="newline" />Scope: <span 
 class="cmbx-10">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 1026--><p class="indent" >
+<!--l. 1028--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -901,10 +907,10 @@ class="description">A copy of the input object.
 <span 
 class="cmbx-10">info</span> </dt><dd 
 class="description">Return code.</dd></dl>
-<!--l. 1033--><p class="noindent" >
+<!--l. 1035--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.19   </span> <a 
  id="x14-450003.2.19"></a>Named Constants</h5>
-<!--l. 1035--><p class="noindent" >
+<!--l. 1037--><p class="noindent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">psb</span><span 
@@ -952,12 +958,12 @@ class="description">Update strategy based on additional permutation data (see
                                                                   
 
                                                                   
-   <!--l. 1051--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1053--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlse4.html" >next</a>] [<a 
 href="userhtmlsu5.html" >prev</a>] [<a 
 href="userhtmlsu5.html#tailuserhtmlsu5.html" >prev-tail</a>] [<a 
 href="userhtmlsu6.html" >front</a>] [<a 
 href="userhtmlsu7.html#userhtmlsu9.html" >up</a>] </p></div>
-<!--l. 1051--><p class="indent" >   <a 
+<!--l. 1053--><p class="indent" >   <a 
  id="tailuserhtmlsu6.html"></a>   
 </body></html> 

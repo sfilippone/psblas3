@@ -1,13 +1,10 @@
 #include <stdio.h>
 #if defined(HAVE_METIS_)
-#include "metis.h"
+#include "psb_metis_int.h"
 
-/* extern int METIS_PartGraphKway(int *, int *, int *, int *, int *, int *, int *, int *, float *, float, int *, int *, int *); */
-
-
-int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg, 
-				int *iajw, int *nparts, float *weights, 
-				int *graphpart)
+int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg, 
+				idx_t *iajw, idx_t *nparts, float *weights, 
+				idx_t *graphpart)
 {
   int res = -1;
   idx_t objval = 0;
@@ -40,9 +37,9 @@ int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg,
 
 #else 
 
-int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg, 
-				int *iajw, int *nparts, float *weights, 
-				int *graphpart)
+int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg, 
+				idx_t *iajw, idx_t *nparts, float *weights, 
+				idx_t *graphpart)
 {
   return(-1);
 }
