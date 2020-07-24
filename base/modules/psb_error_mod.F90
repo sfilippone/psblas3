@@ -387,8 +387,6 @@ contains
     integer(psb_mpk_), optional      ::  m_err(:)
     integer(psb_epk_), optional      ::  e_err(:)
 
-    type(psb_errstack_node), pointer     ::  new_node
-
     call psb_set_errstatus(psb_err_fatal_)
     call psb_stackpush(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
 
@@ -404,9 +402,6 @@ contains
     integer(psb_lpk_), optional      ::  l_err(:)
     integer(psb_mpk_), optional      ::  m_err(:)
     integer(psb_epk_), optional      ::  e_err(:)
-
-    type(psb_errstack_node), pointer     ::  new_node
-
 
     if (.not.psb_errstatus_fatal())&
          &  call psb_set_errstatus( psb_err_warning_)

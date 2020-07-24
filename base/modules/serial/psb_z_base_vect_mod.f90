@@ -445,7 +445,7 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i, isz
+    integer(psb_ipk_) :: isz
 
     info = 0
     if (psb_errstatus_fatal()) return
@@ -811,7 +811,7 @@ contains
     complex(psb_dpk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: info, first_, last_
+    integer(psb_ipk_) :: first_, last_
 
     first_=1
     last_=size(x%v)
@@ -837,7 +837,7 @@ contains
     complex(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: info, first_, last_, nr
+    integer(psb_ipk_) :: first_, last_
 
     first_                     = 1
     if (present(first)) first_ = max(1,first)
