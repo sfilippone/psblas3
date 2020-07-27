@@ -48,7 +48,6 @@ contains
     integer(psb_c_ipk_)    :: iter
     real(c_double)        :: err
     character(c_char)       :: methd(*)
-    type(solveroptions)     :: options
     type(psb_desc_type), pointer   :: descp
     type(psb_cspmat_type), pointer :: ap
     type(psb_cprec_type), pointer  :: precp
