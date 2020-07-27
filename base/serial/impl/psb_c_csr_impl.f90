@@ -3228,7 +3228,7 @@ subroutine  psb_c_csr_clean_zeros(a, info)
   info = 0
   call a%sync()
   nr   = a%get_nrows()
-  ilrp = a%irp(:)
+  ilrp = a%irp
   a%irp(1) = 1
   j        = a%irp(1)
   do i=1, nr
@@ -5343,7 +5343,7 @@ subroutine  psb_lc_csr_clean_zeros(a, info)
   info = 0
   call a%sync()
   nr   = a%get_nrows()
-  ilrp = a%irp(:)
+  ilrp = a%irp
   a%irp(1) = 1
   j        = a%irp(1)
   do i=1, nr

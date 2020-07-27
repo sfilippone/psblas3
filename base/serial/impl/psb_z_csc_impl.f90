@@ -2379,7 +2379,7 @@ subroutine  psb_z_csc_clean_zeros(a, info)
   info = 0
   call a%sync()
   nc   = a%get_ncols()
-  ilcp = a%icp(:)
+  ilcp = a%icp
   a%icp(1) = 1
   j        = a%icp(1)
   do i=1, nc
@@ -4263,7 +4263,7 @@ subroutine  psb_lz_csc_clean_zeros(a, info)
   info = 0
   call a%sync()
   nc   = a%get_ncols()
-  ilcp = a%icp(:)
+  ilcp = a%icp
   a%icp(1) = 1
   j        = a%icp(1)
   do i=1, nc
