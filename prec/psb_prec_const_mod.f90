@@ -59,8 +59,9 @@ module psb_prec_const_mod
   integer(psb_ipk_), parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
   integer(psb_ipk_), parameter :: psb_max_avsz=psb_bp_ilu_avsz
 
-  integer(psb_ipk_), parameter :: psb_ilu_n_=1, psb_milu_n_=2
-  integer(psb_ipk_), parameter :: psb_ilu_t_=3
+  integer(psb_ipk_), parameter :: psb_ilu_n_             = 13
+  integer(psb_ipk_), parameter :: psb_milu_n_            = 14
+  integer(psb_ipk_), parameter :: psb_ilu_t_             = 15
   integer(psb_ipk_), parameter :: psb_ilu_scale_none_    = 0
   integer(psb_ipk_), parameter :: psb_ilu_scale_maxval_  = 1
   integer(psb_ipk_), parameter :: psb_ilu_scale_diag_    = 2
