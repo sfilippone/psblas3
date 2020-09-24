@@ -89,7 +89,7 @@ function psb_d_getelem(x,index,desc_a,info) result(res)
     myidx = desc_a%get_global_indices(owned=.false.)
     mylocal = desc_a%get_global_indices(owned=.true.)
     write(*,*)"My (local+halo) indexes are: ",myidx
-    write(*,*)"My (local) indexes are: ",myidx
+    write(*,*)"My (local) indexes are: ",mylocal
   end if
   res = x%get_entry(localindex(1))
   call psb_erractionrestore(err_act)
