@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,13 +27,14 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 Module psb_l_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_success_
   use psb_l_vect_mod, only : psb_l_base_vect_type, psb_l_vect_type
 !  use psb_i_vect_mod, only : psb_i_vect_type
   use psb_l_multivect_mod, only : psb_l_base_multivect_type, psb_l_multivect_type
+  use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
 
   interface  psb_geall
     subroutine psb_lalloc_vect(x, desc_a,info)
@@ -169,5 +170,5 @@ Module psb_l_tools_mod
     end subroutine psb_lins_multivect
   end interface
 
-  
+
 end module psb_l_tools_mod

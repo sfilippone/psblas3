@@ -30,6 +30,7 @@ psb_i_t    psb_c_zgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_z_t *val,
 			psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgeasb(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgefree(psb_c_zvector *xh, psb_c_descriptor *cdh);
+psb_z_t    psb_c_zgetelem(psb_c_zvector *xh,psb_l_t index,psb_c_descriptor *cd);
 
 /* sparse matrices*/
 psb_c_zspmat* psb_c_new_zspmat();

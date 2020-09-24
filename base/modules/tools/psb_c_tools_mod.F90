@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 Module psb_c_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
   use psb_c_vect_mod, only : psb_c_base_vect_type, psb_c_vect_type
@@ -37,6 +37,7 @@ Module psb_c_tools_mod
        & psb_c_csr_sparse_mat, psb_c_coo_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_c_multivect_mod, only : psb_c_base_multivect_type, psb_c_multivect_type
+  use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
 
   interface  psb_geall
     subroutine psb_calloc_vect(x, desc_a,info)
@@ -195,7 +196,7 @@ Module psb_c_tools_mod
       Type(psb_desc_type),Intent(in), target :: desc_a
       integer(psb_ipk_), intent(out)                   :: info
       logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
-      character(len=5), optional             :: outfmt 
+      character(len=5), optional             :: outfmt
       integer(psb_ipk_), intent(in), optional          :: data
     end Subroutine psb_csphalo
     Subroutine psb_lcsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
@@ -207,7 +208,7 @@ Module psb_c_tools_mod
       Type(psb_desc_type),Intent(in), target :: desc_a
       integer(psb_ipk_), intent(out)                   :: info
       logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
-      character(len=5), optional             :: outfmt 
+      character(len=5), optional             :: outfmt
       integer(psb_ipk_), intent(in), optional          :: data
     end Subroutine psb_lcsphalo
     Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
@@ -233,7 +234,7 @@ Module psb_c_tools_mod
       logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale,outcol_glob
       integer(psb_ipk_), intent(in), optional       :: data
       type(psb_desc_type),Intent(in), optional, target :: col_desc
-    end Subroutine psb_c_lc_csr_halo    
+    end Subroutine psb_c_lc_csr_halo
   end interface
 
 
@@ -296,7 +297,7 @@ Module psb_c_tools_mod
       integer(psb_ipk_), intent(out)         :: info
       logical, intent(in), optional         :: rebuild, local
     end subroutine psb_cspins_csr_lirp
-#if defined(IPK4) && defined(LPK8)    
+#if defined(IPK4) && defined(LPK8)
     subroutine psb_cspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
       import
       implicit none
@@ -353,7 +354,7 @@ Module psb_c_tools_mod
       Implicit None
       type(psb_c_csr_sparse_mat),intent(in)    :: acsr
       type(psb_c_csr_sparse_mat),intent(inout) :: bcsr
-      type(psb_c_csr_sparse_mat),intent(out)   :: ccsr      
+      type(psb_c_csr_sparse_mat),intent(out)   :: ccsr
       type(psb_desc_type),intent(in)           :: desc_a
       type(psb_desc_type),intent(inout)        :: desc_c
       integer(psb_ipk_), intent(out)           :: info
@@ -364,7 +365,7 @@ Module psb_c_tools_mod
       Implicit None
       type(psb_lc_csr_sparse_mat),intent(in)    :: acsr
       type(psb_lc_csr_sparse_mat),intent(inout) :: bcsr
-      type(psb_lc_csr_sparse_mat),intent(out)   :: ccsr      
+      type(psb_lc_csr_sparse_mat),intent(out)   :: ccsr
       type(psb_desc_type),intent(in)           :: desc_a
       type(psb_desc_type),intent(inout)        :: desc_c
       integer(psb_ipk_), intent(out)           :: info
@@ -419,6 +420,16 @@ Module psb_c_tools_mod
     end subroutine psb_c_simple_glob_transpose_ip
   end interface psb_glob_transpose
 
-  
-  
+  interface psb_getelem
+    function psb_c_getelem(x,index,desc_a,info) result(res)
+      import
+      type(psb_c_vect_type), intent(inout) :: x
+      integer(psb_lpk_), intent(in)          :: index
+      type(psb_desc_type), intent(inout)     :: desc_a
+      integer(psb_ipk_), intent(out)         :: info
+      complex(psb_spk_)                        :: res
+    end function
+  end interface
+
+
 end module psb_c_tools_mod

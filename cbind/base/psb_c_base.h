@@ -89,7 +89,7 @@ extern "C" {
 
   psb_i_t    psb_c_cd_get_local_rows(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_local_cols(psb_c_descriptor *cd);
-  psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
+  // psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
   psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_global_indices(psb_l_t idx[], psb_i_t nidx, bool owned, psb_c_descriptor *cd);
 

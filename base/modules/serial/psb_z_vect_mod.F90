@@ -80,6 +80,8 @@ module psb_z_vect_mod
     procedure, pass(x) :: set_dev  => z_vect_set_dev
     procedure, pass(x) :: set_sync => z_vect_set_sync
 
+    procedure, pass(x) :: get_entry => z_vect_get_entry
+
     procedure, pass(x) :: dot_v    => z_vect_dot_v
     procedure, pass(x) :: dot_a    => z_vect_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -186,10 +188,10 @@ contains
 
   end function psb_z_get_vect_default
 
-  subroutine  psb_z_clear_vect_default() 
-    implicit none 
+  subroutine  psb_z_clear_vect_default()
+    implicit none
 
-    if (allocated(psb_z_base_vect_default)) then 
+    if (allocated(psb_z_base_vect_default)) then
       deallocate(psb_z_base_vect_default)
     end if
 
@@ -602,6 +604,15 @@ contains
 
   end function z_vect_is_dev
 
+
+  function z_vect_get_entry(x,index) result(res)
+    implicit none
+    class(psb_z_vect_type), intent(in) :: x
+    integer(psb_ipk_), intent(in)        :: index
+    complex(psb_dpk_) :: res
+    res = 0
+    if (allocated(x%v)) res = x%v%get_entry(index)
+  end function z_vect_get_entry
 
   function z_vect_dot_v(n,x,y) result(res)
     implicit none

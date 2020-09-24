@@ -794,7 +794,6 @@ contains
 
 
 
-
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
   !
