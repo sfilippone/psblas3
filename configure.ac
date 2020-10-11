@@ -483,10 +483,10 @@ PAC_ARG_WITH_IPK
 PAC_ARG_WITH_LPK
 # Defaults for IPK/LPK
 if test x"$pac_cv_ipk_size" == x"" ; then
-  pac_cv_ipk_size=4;
+  pac_cv_ipk_size=4
 fi
 if test x"$pac_cv_lpk_size" == x"" ; then
-  pac_cv_lpk_size=8;
+  pac_cv_lpk_size=8
 fi
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
@@ -694,9 +694,29 @@ LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS
+
+AC_MSG_CHECKING([Compatibility between metis and LPK])
+if  test  "x$pac_cv_lpk_size" == "x4" ; then
+  if test  "x$pac_cv_metis_idx" == "x64" ; then
+  dnl mismatch between metis size and PSBLAS LPK
+       psblas_cv_have_metis="no";
+ dnl 
+   fi
+ fi			   
+ if test "x$pac_cv_lpk_size" == "x8" ; then
+   if test "x$pac_cv_metis_idx" == "x32" ; then 
+   dnl mismatch between metis size and PSBLAS LPK
+      psblas_cv_have_metis="no";
+   fi
+ fi			   
+AC_MSG_RESULT([$psblas_cv_have_metis])
+
 if test "x$pac_cv_metis_idx" == "xunknown" ; then
-   true ; # do nothing
-elif test "x$psblas_cv_have_metis" == "xyes" ; then 
+  dnl mismatch between metis size and PSBLAS LPK
+     AC_MSG_NOTICE([Unknown  METIS bitsize.])	
+     $psblas_cv_have_metis = "no";
+fi		   
+if test "x$psblas_cv_have_metis" == "xyes" ; then 
    FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $FDEFINES"
    CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx"
    METISINCFILE=$psblas_cv_metisincfile
@@ -814,7 +834,8 @@ AC_MSG_NOTICE([
 
 	BLAS                  : ${BLAS_LIBS}
 
-	METIS detected        : ${psblas_cv_have_metis}
+	METIS usable          : ${psblas_cv_have_metis}
+	METIS bitsize         : ${pac_cv_metis_idx}
 	AMD detected          : ${psblas_cv_have_amd}
         LIBS                  : ${LIBS}
 dnl Note : we should use LDLIBS sooner or later!

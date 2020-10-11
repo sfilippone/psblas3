@@ -1865,7 +1865,7 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
    AC_LANG_POP()
 fi
 
-if test "x$pac_metis_header_ok" == "xyes" ; then 
+if test "x$pac_metis_header_ok" = "xyes" ; then 
       psblas_cv_metis_includes="$METIS_INCLUDES"
       METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
       LIBS="$METIS_LIBS -lm $LIBS";
@@ -1874,7 +1874,7 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
        [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
        [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
       AC_MSG_RESULT($pac_metis_lib_ok)
-     if test "x$pac_metis_lib_ok" == "xno" ; then 
+     if test "x$pac_metis_lib_ok" = "xno" ; then 
         dnl Maybe Lib or lib? 
         METIS_LIBDIR="-L$psblas_cv_metisdir/Lib -L$psblas_cv_metisdir/lib"
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
@@ -1886,24 +1886,29 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
        [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
       AC_MSG_RESULT($pac_metis_lib_ok)
      fi
-     if test "x$pac_metis_lib_ok" == "xno" ; then 
+
+     if test "x$pac_metis_lib_ok" = "xno" ; then 
         dnl Maybe METIS/Lib? 
         METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
       AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
       AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
-       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
-       [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok="yes"; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok="no"; METIS_LIBS=""])
       AC_MSG_RESULT($pac_metis_lib_ok)
-     fi
-fi
-if test "x$pac_metis_lib_ok" == "xyes" ; then 
+      fi
+ fi
+ AC_MSG_NOTICE([ metis lib ok $pac_metis_lib_ok])
+
+ if test "x$pac_metis_lib_ok" = "xyes" ; then 
       AC_MSG_CHECKING([for METIS_SetDefaultOptions in $LIBS])
       AC_TRY_LINK_FUNC(METIS_SetDefaultOptions, 
-       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
-       [psblas_cv_have_metis=no;pac_metis_lib_ok="no. Unusable METIS version, sorry."; METIS_LIBS=""])
+        [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+        [psblas_cv_have_metis=no;pac_metis_lib_ok="no. Unusable METIS version, sorry."; METIS_LIBS=""
+      ])
       AC_MSG_RESULT($pac_metis_lib_ok)
+
 fi
 
 LIBS="$SAVE_LIBS";
