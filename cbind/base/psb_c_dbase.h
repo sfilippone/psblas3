@@ -30,6 +30,7 @@ psb_i_t    psb_c_dgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,
 			psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeasb(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgefree(psb_c_dvector *xh, psb_c_descriptor *cdh);
+psb_d_t    psb_c_dgetelem(psb_c_dvector *xh,psb_l_t index,psb_c_descriptor *cd);
 
 /* sparse matrices*/
 psb_c_dspmat* psb_c_new_dspmat();

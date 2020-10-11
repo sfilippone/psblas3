@@ -128,6 +128,7 @@ module psb_c_base_vect_mod
     procedure, pass(x) :: set_scal => c_base_set_scal
     procedure, pass(x) :: set_vect => c_base_set_vect
     generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: get_entry=> c_base_get_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -854,6 +855,26 @@ contains
 
   end subroutine c_base_set_vect
 
+
+  !
+  ! Get entry.
+  !
+  !
+  !> Function  base_get_entry
+  !! \memberof  psb_c_base_vect_type
+  !! \brief  Get one entry from the vector
+  !!
+  !
+  function c_base_get_entry(x, index) result(res)
+    implicit none
+    class(psb_c_base_vect_type), intent(in) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    complex(psb_spk_)                           :: res
+
+    res = 0
+    if (allocated(x%v)) res = x%v(index)
+
+  end function c_base_get_entry
 
   !
   ! Overwrite with absolute value
