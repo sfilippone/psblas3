@@ -135,10 +135,10 @@ contains
 
   end function psb_i_get_vect_default
 
-  subroutine  psb_i_clear_vect_default() 
-    implicit none 
+  subroutine  psb_i_clear_vect_default()
+    implicit none
 
-    if (allocated(psb_i_base_vect_default)) then 
+    if (allocated(psb_i_base_vect_default)) then
       deallocate(psb_i_base_vect_default)
     end if
 

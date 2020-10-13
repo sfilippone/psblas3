@@ -55,8 +55,7 @@ subroutine psb_c_csr_csmv(alpha,a,x,beta,y,info,trans)
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
-  complex(psb_spk_) :: acc
+  integer(psb_ipk_) :: m, n
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -126,7 +125,7 @@ contains
     logical, intent(in)             :: is_triangle,is_unit,tra, ctra
 
 
-    integer(psb_ipk_) :: i,j,k, ir, jc
+    integer(psb_ipk_) :: i,j,ir
     complex(psb_spk_) :: acc
 
     if (alpha == czero) then
@@ -400,7 +399,7 @@ subroutine psb_c_csr_csmm(alpha,a,x,beta,y,info,trans)
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: j,m,n, nc
   complex(psb_spk_), allocatable  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
@@ -478,7 +477,7 @@ contains
     logical, intent(in)             :: is_triangle,is_unit,tra,ctra
 
     complex(psb_spk_), intent(inout)   :: acc(*)
-    integer(psb_ipk_) :: i,j,k, ir, jc
+    integer(psb_ipk_) :: i,j, ir
 
 
     if (alpha == czero) then
@@ -749,8 +748,7 @@ subroutine psb_c_csr_cssv(alpha,a,x,beta,y,info,trans)
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
-  complex(psb_spk_) :: acc
+  integer(psb_ipk_) :: i,k,m
   complex(psb_spk_), allocatable :: tmp(:)
   logical   :: tra,ctra
   integer(psb_ipk_) :: err_act
@@ -854,7 +852,7 @@ contains
     complex(psb_spk_), intent(in)  :: x(*)
     complex(psb_spk_), intent(out) :: y(*)
 
-    integer(psb_ipk_) :: i,j,k,m, ir, jc
+    integer(psb_ipk_) :: i,j, jc
     complex(psb_spk_) :: acc
 
     if ((.not.tra).and.(.not.ctra)) then
@@ -1013,8 +1011,7 @@ subroutine psb_c_csr_cssm(alpha,a,x,beta,y,info,trans)
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  complex(psb_spk_) :: acc
+  integer(psb_ipk_) :: i,k,m, nc
   complex(psb_spk_), allocatable :: tmp(:,:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
@@ -1109,7 +1106,7 @@ contains
     complex(psb_spk_), intent(in)    :: val(*), x(ldx,*)
     complex(psb_spk_), intent(out)   :: y(ldy,*)
     integer(psb_ipk_), intent(out)             :: info
-    integer(psb_ipk_) :: i,j,k,m, ir, jc
+    integer(psb_ipk_) :: i,j, jc
     complex(psb_spk_), allocatable  :: acc(:)
 
     info = psb_success_
@@ -1268,7 +1265,7 @@ function psb_c_csr_maxval(a) result(res)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: nnz, nc
   integer(psb_ipk_) :: info
   character(len=20)  :: name='c_csr_maxval'
   logical, parameter :: debug=.false.
@@ -1290,10 +1287,9 @@ function psb_c_csr_csnmi(a) result(res)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  integer(psb_ipk_) :: i,j,k,m,n, nr, ir, jc, nc
+  integer(psb_ipk_) :: i,j
   real(psb_spk_) :: acc
   logical   :: tra
-  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='c_csnmi'
   logical, parameter :: debug=.false.
 
@@ -1318,10 +1314,7 @@ subroutine psb_c_csr_rowsum(d,a)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(out)             :: d(:)
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  complex(psb_spk_) :: acc
-  complex(psb_spk_), allocatable :: vt(:)
-  logical   :: tra
+  integer(psb_ipk_) :: i,j,k,m
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
@@ -1368,9 +1361,7 @@ subroutine psb_c_csr_arwsum(d,a)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: vt(:)
+  integer(psb_ipk_) :: i,j,m
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1418,10 +1409,7 @@ subroutine psb_c_csr_colsum(d,a)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  complex(psb_spk_) :: acc
-  complex(psb_spk_), allocatable :: vt(:)
-  logical   :: tra
+  integer(psb_ipk_) :: i,j,k,m,n
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='colsum'
@@ -1471,10 +1459,7 @@ subroutine psb_c_csr_aclsum(d,a)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: vt(:)
-  logical   :: tra
+  integer(psb_ipk_) :: i,j,k,m,n, nnz
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='aclsum'
@@ -1581,7 +1566,7 @@ subroutine psb_c_csr_scal(d,a,info,side)
   integer(psb_ipk_), intent(out)            :: info
   character, intent(in), optional :: side
 
-  integer(psb_ipk_) :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: err_act, i, j, m
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
   character :: side_
@@ -1652,7 +1637,7 @@ subroutine psb_c_csr_scals(d,a,info)
   complex(psb_spk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: err_act, i
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -1928,7 +1913,7 @@ contains
     logical, intent(in)                  :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl,nrd,ncd
+    integer(psb_ipk_) :: nzin_, nza,i,j, nzt, irw, lrw, icl,lcl
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='csr_getptn'
 
@@ -2109,7 +2094,7 @@ contains
     logical, intent(in)                  :: append, chksz
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl, nrd, ncd
+    integer(psb_ipk_) :: nzin_, nza,i,j, nzt, irw, lrw, icl,lcl
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='coo_getrow'
 
@@ -2198,7 +2183,6 @@ subroutine psb_c_csr_tril(a,l,info,&
 
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
@@ -2352,7 +2336,6 @@ subroutine psb_c_csr_triu(a,u,info,&
 
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
@@ -2503,7 +2486,7 @@ subroutine psb_c_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='c_csr_csput_a'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
+  integer(psb_ipk_) :: nza, i, debug_level, debug_unit
 
 
   call psb_erractionsave(err_act)
@@ -2764,7 +2747,7 @@ subroutine psb_c_csr_print(iout,a,iv,head,ivr,ivc)
   character(len=20)  :: name='c_csr_print'
   logical, parameter :: debug=.false.
   character(len=80)                 :: frmt
-  integer(psb_ipk_) :: irs,ics,i,j, ni, nr, nc, nz
+  integer(psb_ipk_) :: i,j, nr, nc, nz
 
 
   write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
@@ -2832,7 +2815,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, nc, i,j,k,ip,irw, err_act, ncl
+  integer(psb_ipk_) :: nza, nr, nc, i,k,ip, ncl
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='c_cp_csr_from_coo'
@@ -3228,7 +3211,7 @@ subroutine  psb_c_csr_clean_zeros(a, info)
   info = 0
   call a%sync()
   nr   = a%get_nrows()
-  ilrp = a%irp(:)
+  ilrp = a%irp
   a%irp(1) = 1
   j        = a%irp(1)
   do i=1, nr
@@ -5343,7 +5326,7 @@ subroutine  psb_lc_csr_clean_zeros(a, info)
   info = 0
   call a%sync()
   nr   = a%get_nrows()
-  ilrp = a%irp(:)
+  ilrp = a%irp
   a%irp(1) = 1
   j        = a%irp(1)
   do i=1, nr

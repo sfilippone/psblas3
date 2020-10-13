@@ -92,7 +92,7 @@ Contains
 
     ! ...Local Variables
     integer(psb_ipk_) :: err_act,err
-    character(len=20)  :: name
+    character(len=30)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_r_s_s'
@@ -133,7 +133,7 @@ Contains
     real(psb_spk_),allocatable  :: tmp(:)
     integer(psb_mpk_) :: dim, lb_, lbi,ub_
     integer(psb_ipk_) :: err_act,err
-    character(len=20)  :: name
+    character(len=30)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_r_m_s_rk1'
@@ -205,7 +205,7 @@ Contains
     real(psb_spk_),allocatable  :: tmp(:,:)
     integer(psb_ipk_) :: err_act,err
     integer(psb_mpk_) :: dim,dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
-    character(len=20)  :: name
+    character(len=30)  :: name
 
     name='psb_r_m_s_rk2'
     call psb_erractionsave(err_act)
@@ -294,9 +294,8 @@ Contains
     ! ...Local Variables
     real(psb_spk_),allocatable  :: tmp(:)
     integer(psb_epk_) :: dim, lb_, lbi,ub_
-    integer(psb_ipk_) :: iplen 
     integer(psb_ipk_) :: err_act,err
-    character(len=20)  :: name
+    character(len=30)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_r_m_s_rk1'
@@ -311,8 +310,7 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      iplen = len 
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, e_err=(/len/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
@@ -325,8 +323,7 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          iplen = len 
-          call psb_errpush(err,name, i_err=(/iplen/), &
+          call psb_errpush(err,name, e_err=(/len/), &
                & a_err='real(psb_spk_)')
           goto 9999
         end if
@@ -338,8 +335,7 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        iplen = len 
-        call psb_errpush(err,name, i_err=(/iplen/), &
+        call psb_errpush(err,name, e_err=(/len/), &
              & a_err='real(psb_spk_)')
         goto 9999
       end if
@@ -369,9 +365,9 @@ Contains
     ! ...Local Variables
 
     real(psb_spk_),allocatable  :: tmp(:,:)
-    integer(psb_ipk_) :: err_act,err, iplen
+    integer(psb_ipk_) :: err_act,err
     integer(psb_epk_) :: dim,dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
-    character(len=20)  :: name
+    character(len=30)  :: name
 
     name='psb_r_e_s_rk2'
     call psb_erractionsave(err_act)
@@ -391,15 +387,13 @@ Contains
 
     if (len1 < 0) then
       err=4025
-      iplen = len1             
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, e_err=(/len1/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      iplen = len2 
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, e_err=(/len2/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
@@ -415,8 +409,7 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          iplen = len1*len2
-          call psb_errpush(err,name, i_err=(/iplen/), &
+          call psb_errpush(err,name, e_err=(/(len1*len2)/), &
                & a_err='real(psb_spk_)')
           goto 9999
         end if
@@ -430,8 +423,7 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        iplen = len1*len2
-        call psb_errpush(err,name, i_err=(/iplen/), &
+        call psb_errpush(err,name, e_err=(/(len1*len2)/), &
              & a_err='real(psb_spk_)')
         goto 9999
       end if
@@ -463,10 +455,10 @@ Contains
     ! ...Local Variables
 
     real(psb_spk_),allocatable  :: tmp(:,:)
-    integer(psb_ipk_) :: err_act,err, iplen
-    integer(psb_mpk_) :: dim,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
+    integer(psb_ipk_) :: err_act,err
+    integer(psb_epk_) :: dim,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
     integer(psb_epk_) :: dim2
-    character(len=20)  :: name
+    character(len=30)  :: name
 
     name='psb_r_me_s_rk2'
     call psb_erractionsave(err_act)
@@ -486,15 +478,13 @@ Contains
 
     if (len1 < 0) then
       err=4025 
-      iplen = len1
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, m_err=(/len1/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      iplen = len2
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, e_err=(/len2/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
@@ -510,8 +500,7 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          iplen = len1*len2
-          call psb_errpush(err,name, i_err=(/iplen/), &
+          call psb_errpush(err,name, e_err=(/len1*len2/), &
                & a_err='real(psb_spk_)')
           goto 9999
         end if
@@ -525,8 +514,7 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        iplen = len1*len2
-        call psb_errpush(err,name,i_err=(/iplen/),&
+        call psb_errpush(err,name,e_err=(/len1*len2/),&
              &  a_err='real(psb_spk_)')
         goto 9999
       end if
@@ -558,10 +546,10 @@ Contains
     ! ...Local Variables
 
     real(psb_spk_),allocatable  :: tmp(:,:)
-    integer(psb_ipk_) :: err_act,err, iplen
-    integer(psb_mpk_) :: dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
+    integer(psb_ipk_) :: err_act,err
+    integer(psb_epk_) :: dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
     integer(psb_epk_) :: dim
-    character(len=20)  :: name
+    character(len=30)  :: name
 
     name='psb_r_me_s_rk2'
     call psb_erractionsave(err_act)
@@ -581,15 +569,13 @@ Contains
 
     if (len1 < 0) then
       err=4025 
-      iplen = len1
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, e_err=(/len1/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      iplen = len2
-      call psb_errpush(err,name, i_err=(/iplen/), &
+      call psb_errpush(err,name, m_err=(/len2/), &
            & a_err='real(psb_spk_)')
       goto 9999
     end if
@@ -605,8 +591,7 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          iplen = len1*len2
-          call psb_errpush(err,name, i_err=(/iplen/), &
+          call psb_errpush(err,name, e_err=(/len1*len2/), &
                & a_err='real(psb_spk_)')
           goto 9999
         end if
@@ -620,8 +605,7 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        iplen = len1*len2              
-        call psb_errpush(err,name, i_err=(/iplen/), &
+        call psb_errpush(err,name, e_err=(/len1*len2/), &
              & a_err='real(psb_spk_)')
         goto 9999
       end if
@@ -648,7 +632,7 @@ Contains
     real(psb_spk_),allocatable, intent(inout) :: rrax(:),y(:)
     integer(psb_ipk_) :: info
     real(psb_spk_), optional, intent(in) :: pad
-    character(len=20)  :: name
+    character(len=30)  :: name
     integer(psb_ipk_) :: err_act, err
 
     name='psb_r_m_2_s_rk1'
@@ -689,7 +673,7 @@ Contains
     real(psb_spk_),allocatable, intent(inout) :: rrax(:),y(:)
     integer(psb_ipk_) :: info
     real(psb_spk_), optional, intent(in) :: pad
-    character(len=20)  :: name
+    character(len=30)  :: name
     integer(psb_ipk_) :: err_act, err
 
     name='psb_r_m_2_s_rk1'
@@ -733,8 +717,8 @@ Contains
     integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    integer(psb_ipk_) :: isz,err_act,lb
-    character(len=20)  :: name, char_err
+    integer(psb_ipk_) :: err_act
+    character(len=30)  :: name, char_err
     logical, parameter :: debug=.false.
 
     name='psb_ab_cpy_s_s'
@@ -776,7 +760,7 @@ Contains
     ! ...Local Variables
 
     integer(psb_ipk_) :: isz,err_act,lb
-    character(len=20)  :: name, char_err
+    character(len=30)  :: name, char_err
     logical, parameter :: debug=.false.
 
     name='psb_ab_cpy_s_rk1'
@@ -820,7 +804,7 @@ Contains
     ! ...Local Variables
 
     integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
-    character(len=20)  :: name, char_err
+    character(len=30)  :: name, char_err
     logical, parameter :: debug=.false.
 
     name='psb_ab_cpy_s_rk2'
@@ -867,7 +851,7 @@ Contains
     ! ...Local Variables
 
     integer(psb_ipk_) :: isz,err_act,lb
-    character(len=20)  :: name, char_err
+    character(len=30)  :: name, char_err
     logical, parameter :: debug=.false.
 
     name='psb_cpy_s_rk1'
@@ -908,7 +892,7 @@ Contains
     ! ...Local Variables
 
     integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
-    character(len=20)  :: name, char_err
+    character(len=30)  :: name, char_err
     logical, parameter :: debug=.false.
 
     name='psb_safe_cpy'
@@ -984,7 +968,7 @@ Contains
     integer(psb_mpk_), optional, intent(in)          :: addsz,newsz
     real(psb_spk_), optional, intent(in) :: pad
     ! ...Local Variables
-    character(len=20)  :: name
+    character(len=30)  :: name
     logical, parameter :: debug=.false.
     integer(psb_ipk_) :: err_act
     integer(psb_mpk_) :: isz
@@ -1037,7 +1021,7 @@ Contains
     integer(psb_epk_), optional, intent(in)          :: addsz,newsz
     real(psb_spk_), optional, intent(in) :: pad
     ! ...Local Variables
-    character(len=20)  :: name
+    character(len=30)  :: name
     logical, parameter :: debug=.false.
     integer(psb_ipk_) :: err_act
     integer(psb_epk_) :: isz

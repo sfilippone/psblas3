@@ -128,6 +128,7 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: set_scal => z_base_set_scal
     procedure, pass(x) :: set_vect => z_base_set_vect
     generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: get_entry=> z_base_get_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -445,7 +446,7 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i, isz
+    integer(psb_ipk_) :: isz
 
     info = 0
     if (psb_errstatus_fatal()) return
@@ -811,7 +812,7 @@ contains
     complex(psb_dpk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: info, first_, last_
+    integer(psb_ipk_) :: first_, last_
 
     first_=1
     last_=size(x%v)
@@ -837,7 +838,7 @@ contains
     complex(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: info, first_, last_, nr
+    integer(psb_ipk_) :: first_, last_
 
     first_                     = 1
     if (present(first)) first_ = max(1,first)
@@ -854,6 +855,26 @@ contains
 
   end subroutine z_base_set_vect
 
+
+  !
+  ! Get entry.
+  !
+  !
+  !> Function  base_get_entry
+  !! \memberof  psb_z_base_vect_type
+  !! \brief  Get one entry from the vector
+  !!
+  !
+  function z_base_get_entry(x, index) result(res)
+    implicit none
+    class(psb_z_base_vect_type), intent(in) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    complex(psb_dpk_)                           :: res
+
+    res = 0
+    if (allocated(x%v)) res = x%v(index)
+
+  end function z_base_get_entry
 
   !
   ! Overwrite with absolute value

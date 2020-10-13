@@ -6873,10 +6873,10 @@ fi
 
 # Defaults for IPK/LPK
 if test x"$pac_cv_ipk_size" == x"" ; then
-  pac_cv_ipk_size=4;
+  pac_cv_ipk_size=4
 fi
 if test x"$pac_cv_lpk_size" == x"" ; then
-  pac_cv_lpk_size=8;
+  pac_cv_lpk_size=8
 fi
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
@@ -9017,7 +9017,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
 
-if test "x$pac_metis_header_ok" == "xyes" ; then
+if test "x$pac_metis_header_ok" = "xyes" ; then
       psblas_cv_metis_includes="$METIS_INCLUDES"
       METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
       LIBS="$METIS_LIBS -lm $LIBS";
@@ -9050,7 +9050,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_metis_lib_ok" >&5
 $as_echo "$pac_metis_lib_ok" >&6; }
-     if test "x$pac_metis_lib_ok" == "xno" ; then
+     if test "x$pac_metis_lib_ok" = "xno" ; then
                 METIS_LIBDIR="-L$psblas_cv_metisdir/Lib -L$psblas_cv_metisdir/lib"
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
@@ -9085,7 +9085,8 @@ rm -f core conftest.err conftest.$ac_objext \
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_metis_lib_ok" >&5
 $as_echo "$pac_metis_lib_ok" >&6; }
      fi
-     if test "x$pac_metis_lib_ok" == "xno" ; then
+
+     if test "x$pac_metis_lib_ok" = "xno" ; then
                 METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
@@ -9110,17 +9111,18 @@ return METIS_PartGraphKway ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  psblas_cv_have_metis=yes;pac_metis_lib_ok=yes;
+  psblas_cv_have_metis=yes;pac_metis_lib_ok="yes";
 else
-  psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""
+  psblas_cv_have_metis=no;pac_metis_lib_ok="no"; METIS_LIBS=""
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_metis_lib_ok" >&5
 $as_echo "$pac_metis_lib_ok" >&6; }
-     fi
-fi
-if test "x$pac_metis_lib_ok" == "xyes" ; then
+      fi
+ fi
+
+ if test "x$pac_metis_lib_ok" = "xyes" ; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS_SetDefaultOptions in $LIBS" >&5
 $as_echo_n "checking for METIS_SetDefaultOptions in $LIBS... " >&6; }
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -9145,19 +9147,40 @@ if ac_fn_c_try_link "$LINENO"; then :
   psblas_cv_have_metis=yes;pac_metis_lib_ok=yes;
 else
   psblas_cv_have_metis=no;pac_metis_lib_ok="no. Unusable METIS version, sorry."; METIS_LIBS=""
+
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_metis_lib_ok" >&5
 $as_echo "$pac_metis_lib_ok" >&6; }
+
 fi
 
 LIBS="$SAVE_LIBS";
 CPPFLAGS="$SAVE_CPPFLAGS";
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Compatibility between metis and LPK" >&5
+$as_echo_n "checking Compatibility between metis and LPK... " >&6; }
+if  test  "x$pac_cv_lpk_size" == "x4" ; then
+  if test  "x$pac_cv_metis_idx" == "x64" ; then
+         psblas_cv_have_metis="no";
+    fi
+ fi
+ if test "x$pac_cv_lpk_size" == "x8" ; then
+   if test "x$pac_cv_metis_idx" == "x32" ; then
+         psblas_cv_have_metis="no";
+   fi
+ fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $psblas_cv_have_metis" >&5
+$as_echo "$psblas_cv_have_metis" >&6; }
+
 if test "x$pac_cv_metis_idx" == "xunknown" ; then
-   true ; # do nothing
-elif test "x$psblas_cv_have_metis" == "xyes" ; then
+       { $as_echo "$as_me:${as_lineno-$LINENO}: Unknown  METIS bitsize." >&5
+$as_echo "$as_me: Unknown  METIS bitsize." >&6;}
+     $psblas_cv_have_metis = "no";
+fi
+if test "x$psblas_cv_have_metis" == "xyes" ; then
    FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $FDEFINES"
    CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx"
    METISINCFILE=$psblas_cv_metisincfile
@@ -10782,7 +10805,8 @@ fi
 
 	BLAS                  : ${BLAS_LIBS}
 
-	METIS detected        : ${psblas_cv_have_metis}
+	METIS usable          : ${psblas_cv_have_metis}
+	METIS bitsize         : ${pac_cv_metis_idx}
 	AMD detected          : ${psblas_cv_have_amd}
         LIBS                  : ${LIBS}
 	LDLIBS                : ${LDLIBS}
@@ -10810,7 +10834,8 @@ $as_echo "$as_me:
 
 	BLAS                  : ${BLAS_LIBS}
 
-	METIS detected        : ${psblas_cv_have_metis}
+	METIS usable          : ${psblas_cv_have_metis}
+	METIS bitsize         : ${pac_cv_metis_idx}
 	AMD detected          : ${psblas_cv_have_amd}
         LIBS                  : ${LIBS}
 	LDLIBS                : ${LDLIBS}

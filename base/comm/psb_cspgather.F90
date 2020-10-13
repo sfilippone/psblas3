@@ -42,9 +42,7 @@
 ! 
 !
 subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-#if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
-#endif
   use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
@@ -136,12 +134,10 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
-#if defined(HAVE_ISO_FORTRAN_ENV)
     if (nrg > HUGE(1_psb_mpk_))  then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
-#endif
     if ((root_ == -1).or.(root_ == me)) then  
       if (info == psb_success_) call psb_realloc(nzg,glbia,info)
       if (info == psb_success_) call psb_realloc(nzg,glbja,info)    
@@ -228,9 +224,7 @@ end subroutine psb_csp_allgather
 
 
 subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-#if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
-#endif
   use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
@@ -321,13 +315,11 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
-#if defined(HAVE_ISO_FORTRAN_ENV)
     if ((nrg > HUGE(1_psb_mpk_)).or.(nzg > HUGE(1_psb_mpk_))&
          & .or.(sum(lnzbr) > HUGE(1_psb_mpk_)))  then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
-#endif
     if ((root_ == -1).or.(root_ == me)) then  
       if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
     else
@@ -403,9 +395,7 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
 end subroutine psb_lcsp_allgather
 
 subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-#if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
-#endif
   use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
@@ -496,13 +486,11 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
-#if defined(HAVE_ISO_FORTRAN_ENV)
     if ((nrg > HUGE(1_psb_mpk_)).or.(nzg > HUGE(1_psb_mpk_))&
          & .or.(sum(lnzbr) > HUGE(1_psb_mpk_)))  then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
-#endif
     if ((root_ == -1).or.(root_ == me)) then  
       if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
     else

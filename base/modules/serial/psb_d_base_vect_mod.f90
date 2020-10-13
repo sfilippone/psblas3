@@ -128,6 +128,7 @@ module psb_d_base_vect_mod
     procedure, pass(x) :: set_scal => d_base_set_scal
     procedure, pass(x) :: set_vect => d_base_set_vect
     generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: get_entry=> d_base_get_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -452,7 +453,7 @@ contains
     class(psb_d_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i, isz
+    integer(psb_ipk_) :: isz
 
     info = 0
     if (psb_errstatus_fatal()) return
@@ -818,7 +819,7 @@ contains
     real(psb_dpk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: info, first_, last_
+    integer(psb_ipk_) :: first_, last_
 
     first_=1
     last_=size(x%v)
@@ -844,7 +845,7 @@ contains
     real(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: info, first_, last_, nr
+    integer(psb_ipk_) :: first_, last_
 
     first_                     = 1
     if (present(first)) first_ = max(1,first)
@@ -861,6 +862,26 @@ contains
 
   end subroutine d_base_set_vect
 
+
+  !
+  ! Get entry.
+  !
+  !
+  !> Function  base_get_entry
+  !! \memberof  psb_d_base_vect_type
+  !! \brief  Get one entry from the vector
+  !!
+  !
+  function d_base_get_entry(x, index) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    real(psb_dpk_)                           :: res
+
+    res = 0
+    if (allocated(x%v)) res = x%v(index)
+
+  end function d_base_get_entry
 
   !
   ! Overwrite with absolute value

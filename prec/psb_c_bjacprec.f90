@@ -32,6 +32,7 @@
 module psb_c_bjacprec
 
   use psb_c_base_prec_mod
+  use psb_c_ilu_fact_mod
   
   type, extends(psb_c_base_prec_type)   :: psb_c_bjac_prec_type
     integer(psb_ipk_), allocatable      :: iprcparm(:)

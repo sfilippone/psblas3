@@ -30,6 +30,7 @@ psb_i_t    psb_c_sgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_s_t *val,
 			psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeasb(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgefree(psb_c_svector *xh, psb_c_descriptor *cdh);
+psb_s_t    psb_c_sgetelem(psb_c_svector *xh,psb_l_t index,psb_c_descriptor *cd);
 
 /* sparse matrices*/
 psb_c_sspmat* psb_c_new_sspmat();
