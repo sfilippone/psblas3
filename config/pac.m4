@@ -1899,7 +1899,7 @@ if test "x$pac_metis_header_ok" = "xyes" ; then
       AC_MSG_RESULT($pac_metis_lib_ok)
       fi
  fi
- AC_MSG_NOTICE([ metis lib ok $pac_metis_lib_ok])
+dnl AC_MSG_NOTICE([ metis lib ok $pac_metis_lib_ok])
 
  if test "x$pac_metis_lib_ok" = "xyes" ; then 
       AC_MSG_CHECKING([for METIS_SetDefaultOptions in $LIBS])

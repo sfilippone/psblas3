@@ -9121,8 +9121,6 @@ rm -f core conftest.err conftest.$ac_objext \
 $as_echo "$pac_metis_lib_ok" >&6; }
       fi
  fi
- { $as_echo "$as_me:${as_lineno-$LINENO}:  metis lib ok $pac_metis_lib_ok" >&5
-$as_echo "$as_me:  metis lib ok $pac_metis_lib_ok" >&6;}
 
  if test "x$pac_metis_lib_ok" = "xyes" ; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS_SetDefaultOptions in $LIBS" >&5
