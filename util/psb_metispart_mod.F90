@@ -55,7 +55,7 @@
 !
 module psb_metispart_mod
   use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
-       & psb_err_unit, psb_spk_,&
+       & psb_err_unit, psb_spk_, psb_dpk_,&
        & psb_lsspmat_type, psb_lcspmat_type,&
        & psb_ldspmat_type, psb_lzspmat_type,  &
        & psb_ls_csr_sparse_mat, psb_ld_csr_sparse_mat, &
