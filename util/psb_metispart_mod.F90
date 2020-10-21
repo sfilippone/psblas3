@@ -72,7 +72,7 @@ module psb_metispart_mod
 
   interface psi_build_mtpart
     subroutine psi_l_build_mtpart(n,ja,irp,nparts,vect, weights)
-      import :: psb_lpk_, psb_spk_
+      import :: psb_lpk_, psb_spk_, psb_dpk_
       implicit none 
       integer(psb_lpk_), intent(in) :: n, nparts
       integer(psb_lpk_), intent(in) :: ja(:), irp(:)
