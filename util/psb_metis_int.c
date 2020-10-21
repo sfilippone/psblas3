@@ -3,6 +3,7 @@
 #include "psb_metis_int.h"
 
 #if defined(METIS_REAL_32)
+
 int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg, 
 				idx_t *iajw, idx_t *nparts, float *weights, 
 				idx_t *graphpart)
@@ -36,6 +37,7 @@ int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg,
 }
 
 #elif  defined(METIS_REAL_64)
+
 int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg, 
 				idx_t *iajw, idx_t *nparts, double *weights, 
 				idx_t *graphpart)
@@ -76,4 +78,5 @@ int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg,
 {
   return(-1);
 }
+#endif
 #endif
