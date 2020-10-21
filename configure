@@ -8988,26 +8988,26 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS idx size" >&5
-$as_echo_n "checking for METIS idx size... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS real size" >&5
+$as_echo_n "checking for METIS real size... " >&6; }
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
 	#include "$psblas_cv_metisincfile"
         void main(){
-		    printf("%d\n",IDXTYPEWIDTH);
+		    printf("%d\n",REALTYPEWIDTH);
 		    }
 
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  pac_cv_metis_idx=`./conftest${ac_exeext} | sed 's/^ *//'`
+  pac_cv_metis_real=`./conftest${ac_exeext} | sed 's/^ *//'`
 else
-  pac_cv_metis_idx="unknown"
+  pac_cv_metis_real="unknown"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_cv_metis_idx" >&5
-$as_echo "$pac_cv_metis_idx" >&6; }
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_cv_metis_real" >&5
+$as_echo "$pac_cv_metis_real" >&6; }
 
    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -9180,9 +9180,14 @@ if test "x$pac_cv_metis_idx" == "xunknown" ; then
 $as_echo "$as_me: Unknown  METIS bitsize." >&6;}
      $psblas_cv_have_metis = "no";
 fi
+if test "x$pac_cv_metis_real" == "xunknown" ; then
+       { $as_echo "$as_me:${as_lineno-$LINENO}: Unknown  METIS REAL bitsize." >&5
+$as_echo "$as_me: Unknown  METIS REAL bitsize." >&6;}
+     $psblas_cv_have_metis = "no";
+fi
 if test "x$psblas_cv_have_metis" == "xyes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx"
+   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
+   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
    METISINCFILE=$psblas_cv_metisincfile
 fi
 

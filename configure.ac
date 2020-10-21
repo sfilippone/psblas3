@@ -716,9 +716,14 @@ if test "x$pac_cv_metis_idx" == "xunknown" ; then
      AC_MSG_NOTICE([Unknown  METIS bitsize.])	
      $psblas_cv_have_metis = "no";
 fi		   
+if test "x$pac_cv_metis_real" == "xunknown" ; then
+  dnl mismatch between metis size and PSBLAS LPK
+     AC_MSG_NOTICE([Unknown  METIS REAL bitsize.])	
+     $psblas_cv_have_metis = "no";
+fi		   
 if test "x$psblas_cv_have_metis" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx"
+   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
+   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
    METISINCFILE=$psblas_cv_metisincfile
 fi
 
