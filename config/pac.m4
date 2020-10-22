@@ -1850,6 +1850,23 @@ fi
 
 if test "x$pac_metis_header_ok" == "xyes" ; then
    AC_LANG_PUSH([C])
+   AC_MSG_CHECKING([for METIS integer size])
+   AC_LINK_IFELSE([AC_LANG_SOURCE(
+	#include <stdio.h>
+	#include "$psblas_cv_metisincfile"
+        void main(){
+		    printf("%d\n",IDXTYPEWIDTH);
+		    }
+	       )],
+	       [pac_cv_metis_idx=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_metis_idx="unknown"])
+      AC_MSG_RESULT($pac_cv_metis_idx)
+
+   AC_LANG_POP()
+fi
+
+if test "x$pac_metis_header_ok" == "xyes" ; then
+   AC_LANG_PUSH([C])
    AC_MSG_CHECKING([for METIS real size])
    AC_LINK_IFELSE([AC_LANG_SOURCE(
 	#include <stdio.h>

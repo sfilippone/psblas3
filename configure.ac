@@ -841,6 +841,7 @@ AC_MSG_NOTICE([
 
 	METIS usable          : ${psblas_cv_have_metis}
 	METIS bitsize         : ${pac_cv_metis_idx}
+	METIS realsize        : ${pac_cv_metis_real}
 	AMD detected          : ${psblas_cv_have_amd}
         LIBS                  : ${LIBS}
 dnl Note : we should use LDLIBS sooner or later!

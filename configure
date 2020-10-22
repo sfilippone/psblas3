@@ -8988,6 +8988,42 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS integer size" >&5
+$as_echo_n "checking for METIS integer size... " >&6; }
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+	#include "$psblas_cv_metisincfile"
+        void main(){
+		    printf("%d\n",IDXTYPEWIDTH);
+		    }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  pac_cv_metis_idx=`./conftest${ac_exeext} | sed 's/^ *//'`
+else
+  pac_cv_metis_idx="unknown"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_cv_metis_idx" >&5
+$as_echo "$pac_cv_metis_idx" >&6; }
+
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+
+if test "x$pac_metis_header_ok" == "xyes" ; then
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS real size" >&5
 $as_echo_n "checking for METIS real size... " >&6; }
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -10812,6 +10848,7 @@ fi
 
 	METIS usable          : ${psblas_cv_have_metis}
 	METIS bitsize         : ${pac_cv_metis_idx}
+	METIS realsize        : ${pac_cv_metis_real}
 	AMD detected          : ${psblas_cv_have_amd}
         LIBS                  : ${LIBS}
 	LDLIBS                : ${LDLIBS}
@@ -10841,6 +10878,7 @@ $as_echo "$as_me:
 
 	METIS usable          : ${psblas_cv_have_metis}
 	METIS bitsize         : ${pac_cv_metis_idx}
+	METIS realsize        : ${pac_cv_metis_real}
 	AMD detected          : ${psblas_cv_have_amd}
         LIBS                  : ${LIBS}
 	LDLIBS                : ${LDLIBS}
