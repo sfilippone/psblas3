@@ -42,7 +42,7 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)        :: name, ch_err
+  character(len=20) :: name, ch_err
 
   name='psb_geaxpby'
   info=psb_success_
@@ -78,8 +78,9 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
     goto 9999
   end if
 
-  if ((m>0).and.(n>0)) call daxpby(m,n,alpha,x,lx,beta,y,ly,info)
+  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -99,9 +100,9 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
   real(psb_dpk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: lx, ly, i
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)        :: name, ch_err
+  character(len=20) :: name, ch_err
 
   name='psb_geaxpby'
   info=psb_success_
@@ -131,7 +132,90 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
     goto 9999
   end if
 
-  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+
+  if (alpha.eq.@XZERO@) then
+    if (beta.eq.@XZERO@) then
+      do i=1,m
+        y(i) = @XZERO@
+      enddo
+    else if (beta.eq.@XONE@) then
+      !
+      !        Do nothing!
+      !
+
+    else if (beta.eq.-@XONE@) then
+      do i=1,m
+        y(i) = - y(i)
+      enddo
+    else
+      do i=1,m
+        y(i) =  beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.@XONE@) then
+
+    if (beta.eq.@XZERO@) then
+      do i=1,m
+        y(i) = x(i)
+      enddo
+    else if (beta.eq.@XONE@) then
+      do i=1,m
+        y(i) = x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-@XONE@) then
+      do i=1,m
+        y(i) = x(i) - y(i)
+      enddo
+    else
+      do i=1,m
+        y(i) = x(i) + beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.-@XONE@) then
+
+    if (beta.eq.@XZERO@) then
+      do i=1,m
+        y(i) = -x(i)
+      enddo
+    else if (beta.eq.@XONE@) then
+      do i=1,m
+        y(i) = -x(i) + y(i)
+      enddo
+    else if (beta.eq.-@XONE@) then
+      do i=1,m
+        y(i) = -x(i) - y(i)
+      enddo
+    else
+      do i=1,m
+        y(i) = -x(i) + beta*y(i)
+      enddo
+    endif
+
+  else
+
+    if (beta.eq.@XZERO@) then
+      do i=1,m
+        y(i) = alpha*x(i)
+      enddo
+    else if (beta.eq.@XONE@) then
+      do i=1,m
+        y(i) = alpha*x(i) + y(i)
+      enddo
+    else if (beta.eq.-@XONE@) then
+      do i=1,m
+        y(i) = alpha*x(i) - y(i)
+      enddo
+    else
+      do i=1,m
+        y(i) = alpha*x(i) + beta*y(i)
+      enddo
+    endif
+
+  endif
+
 
   call psb_erractionrestore(err_act)
   return
