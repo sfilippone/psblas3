@@ -363,6 +363,45 @@ fi
 ]
 )
 
+dnl @synopsis PAC_ARG_OPENMP
+dnl
+dnl Test for --enable-openmp
+dnl 
+dnl 
+dnl
+dnl Example use:
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_OPENMP],
+[AC_MSG_CHECKING([whether we want openmp ])
+AC_ARG_ENABLE(openmp,
+AC_HELP_STRING([--enable-openmp], 
+[Specify whether to enable openmp. ]),
+[
+pac_cv_openmp="yes";
+]
+dnl ,
+dnl [pac_cv_openmp="no";]
+	     )
+if test x"$pac_cv_openmp" == x"yes" ; then
+   AC_MSG_RESULT([yes.])
+   AC_LANG_PUSH([Fortran])
+   AC_OPENMP() 
+   pac_cv_openmp_fcopt="$OPENMP_FCFLAGS";
+   AC_LANG_POP()
+   AC_LANG_PUSH([C])
+   AC_OPENMP() 
+   pac_cv_openmp_ccopt="$OPENMP_CFLAGS";
+   AC_LANG_POP()
+else
+ pac_cv_openmp="no";
+ AC_MSG_RESULT([no.])
+fi
+]
+)
+
 dnl @synopsis PAC_ARG_LONG_INTEGERS
 dnl
 dnl Test for --enable-long-integers
