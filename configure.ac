@@ -499,9 +499,12 @@ FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";
 CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
 
 PAC_ARG_OPENMP()
-FCOPT="$FCOPT $pac_cv_openmp_fcopt";
-CCOPT="$CCOPT $pac_cv_openmp_ccopt";
-AC_MSG_NOTICE(["FLAGS: $FCOPT $OPENMP_FFLAGS"])
+if test x"$pac_cv_openmp" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   CDEFINES="-DOPENMP $CDEFINES";	
+   FCOPT="$FCOPT $pac_cv_openmp_fcopt";
+   CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+fi
 #
 # Tests for support of various Fortran features; some of them are critical,
 # some optional

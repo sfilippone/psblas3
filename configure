@@ -7072,10 +7072,12 @@ $as_echo "no." >&6; }
 fi
 
 
-FCOPT="$FCOPT $pac_cv_openmp_fcopt";
-CCOPT="$CCOPT $pac_cv_openmp_ccopt";
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"FLAGS: $FCOPT $OPENMP_FFLAGS\"" >&5
-$as_echo "$as_me: \"FLAGS: $FCOPT $OPENMP_FFLAGS\"" >&6;}
+if test x"$pac_cv_openmp" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   CDEFINES="-DOPENMP $CDEFINES";
+   FCOPT="$FCOPT $pac_cv_openmp_fcopt";
+   CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+fi
 #
 # Tests for support of various Fortran features; some of them are critical,
 # some optional
