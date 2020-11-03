@@ -17,13 +17,16 @@ OBJS=psb_s_prec_type_impl.o psb_d_prec_type_impl.o \
      psb_cprecbld.o psb_cprecset.o psb_cprecinit.o \
      psb_z_diagprec_impl.o psb_z_bjacprec_impl.o psb_z_nullprec_impl.o \
      psb_zilu_fct.o psb_z_ilu0_fact.o psb_z_iluk_fact.o psb_z_ilut_fact.o \
-     psb_zprecbld.o psb_zprecset.o psb_zprecinit.o 
+     psb_zprecbld.o psb_zprecset.o psb_zprecinit.o \
+		 psb_c_sparsify.o psb_d_sparsify.o psb_s_sparsify.o psb_z_sparsify.o \
+		 psb_crwclip.o psb_drwclip.o psb_srwclip.o psb_zrwclip.o \
+		 psb_c_sp_drop.o psb_d_sp_drop.o psb_s_sp_drop.o psb_z_sp_drop.o
 
 LIBNAME=$(PRECLIBNAME)
 COBJS=
-FINCLUDES=$(FMFLAG).. $(FMFLAG)$(MODDIR) 
+FINCLUDES=$(FMFLAG).. $(FMFLAG)$(MODDIR)
 
-lib:  $(OBJS) 
+lib:  $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
@@ -31,4 +34,3 @@ veryclean: clean
 
 clean:
 	/bin/rm -f $(OBJS) $(LOCAL_MODS)
-
