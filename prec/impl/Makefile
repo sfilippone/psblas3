@@ -20,7 +20,19 @@ OBJS=psb_s_prec_type_impl.o psb_d_prec_type_impl.o \
      psb_zprecbld.o psb_zprecset.o psb_zprecinit.o \
 		 psb_c_sparsify.o psb_d_sparsify.o psb_s_sparsify.o psb_z_sparsify.o \
 		 psb_crwclip.o psb_drwclip.o psb_srwclip.o psb_zrwclip.o \
-		 psb_c_sp_drop.o psb_d_sp_drop.o psb_s_sp_drop.o psb_z_sp_drop.o
+		 psb_c_sp_drop.o psb_d_sp_drop.o psb_s_sp_drop.o psb_z_sp_drop.o \
+		 psb_dsparse_biconjg_llk_noth.o psb_dsparse_biconjg_llk.o \
+		 psb_dsparse_biconjg_mlk.o psb_dsparse_biconjg_s_ft_llk.o \
+		 psb_dsparse_biconjg_s_llk.o \
+		 psb_csparse_biconjg_llk_noth.o psb_csparse_biconjg_llk.o \
+		 psb_csparse_biconjg_mlk.o psb_csparse_biconjg_s_ft_llk.o \
+		 psb_csparse_biconjg_s_llk.o \
+		 psb_zsparse_biconjg_llk_noth.o psb_zsparse_biconjg_llk.o \
+		 psb_zsparse_biconjg_mlk.o psb_zsparse_biconjg_s_ft_llk.o \
+		 psb_zsparse_biconjg_s_llk.o \
+		 psb_ssparse_biconjg_llk_noth.o psb_ssparse_biconjg_llk.o \
+		 psb_ssparse_biconjg_mlk.o psb_ssparse_biconjg_s_ft_llk.o \
+		 psb_ssparse_biconjg_s_llk.o \
 
 LIBNAME=$(PRECLIBNAME)
 COBJS=
