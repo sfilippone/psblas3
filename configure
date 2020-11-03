@@ -6895,6 +6895,7 @@ FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";
 CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
 
+FLINK="$MPIFC"
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we want openmp " >&5
 $as_echo_n "checking whether we want openmp ... " >&6; }
 # Check whether --enable-openmp was given.
@@ -7077,6 +7078,7 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    CDEFINES="-DOPENMP $CDEFINES";
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+   FLINK="$FLINK $pac_cv_openmp_fcopt";
 fi
 #
 # Tests for support of various Fortran features; some of them are critical,
