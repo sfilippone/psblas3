@@ -40,7 +40,7 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
   real(psb_dpk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: lx, ly, i
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
@@ -78,9 +78,8 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
     goto 9999
   end if
 
-  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+  if ((m>0).and.(n>0)) call daxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
-  
   call psb_erractionrestore(err_act)
   return
 
@@ -100,8 +99,9 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
   real(psb_dpk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly, i
+  integer(psb_ipk_) :: lx, ly
   integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_) :: i
   character(len=20) :: name, ch_err
 
   name='psb_geaxpby'
@@ -132,63 +132,75 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
     goto 9999
   end if
 
+!  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
-  if (alpha.eq.@XZERO@) then
-    if (beta.eq.@XZERO@) then
+  if (alpha.eq.dzero) then
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
       do i=1,m
-        y(i) = @XZERO@
+        y(i) = dzero
       enddo
-    else if (beta.eq.@XONE@) then
+    else if (beta.eq.done) then
       !
       !        Do nothing!
       !
 
-    else if (beta.eq.-@XONE@) then
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = - y(i)
       enddo
     else
+      !$omp parallel do private(i)
       do i=1,m
         y(i) =  beta*y(i)
       enddo
     endif
 
-  else if (alpha.eq.@XONE@) then
+  else if (alpha.eq.done) then
 
-    if (beta.eq.@XZERO@) then
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = x(i)
       enddo
-    else if (beta.eq.@XONE@) then
+    else if (beta.eq.done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = x(i) + y(i)
       enddo
 
-    else if (beta.eq.-@XONE@) then
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = x(i) - y(i)
       enddo
     else
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = x(i) + beta*y(i)
       enddo
     endif
 
-  else if (alpha.eq.-@XONE@) then
+  else if (alpha.eq.-done) then
 
-    if (beta.eq.@XZERO@) then
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = -x(i)
       enddo
-    else if (beta.eq.@XONE@) then
+    else if (beta.eq.done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = -x(i) + y(i)
       enddo
-    else if (beta.eq.-@XONE@) then
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = -x(i) - y(i)
       enddo
     else
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = -x(i) + beta*y(i)
       enddo
@@ -196,19 +208,23 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
 
   else
 
-    if (beta.eq.@XZERO@) then
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = alpha*x(i)
       enddo
-    else if (beta.eq.@XONE@) then
+    else if (beta.eq.done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = alpha*x(i) + y(i)
       enddo
-    else if (beta.eq.-@XONE@) then
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = alpha*x(i) - y(i)
       enddo
     else
+      !$omp parallel do private(i)
       do i=1,m
         y(i) = alpha*x(i) + beta*y(i)
       enddo
@@ -238,7 +254,7 @@ subroutine psi_daxpbyv2(m,alpha, x, beta, y, z, info)
   real(psb_dpk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly, lz
+  integer(psb_ipk_) :: lx, ly, lz, i
   integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
@@ -277,7 +293,105 @@ subroutine psi_daxpbyv2(m,alpha, x, beta, y, z, info)
     goto 9999
   end if
 
-  if (m>0) call daxpbyv2(m,ione,alpha,x,lx,beta,y,ly,z,lz,info)
+  if (alpha.eq.dzero) then
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = dzero
+      enddo
+    else if (beta.eq.done) then
+      !
+      !        Do nothing!
+      !
+
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) =  beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.done) then
+
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = x(i)
+      enddo
+    else if (beta.eq.done) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
+      do i=1,m
+          Z(i) = x(i) - y(i)
+        enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = x(i) + beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.-done) then
+
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i)
+      enddo
+    else if (beta.eq.done) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i) + beta*y(i)
+      enddo
+    endif
+
+  else
+
+    if (beta.eq.dzero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = alpha*x(i)
+      enddo
+    else if (beta.eq.done) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = alpha*x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-done) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = alpha*x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+          Z(i) = alpha*x(i) + beta*y(i)
+      enddo
+    endif
+
+  endif
 
   call psb_erractionrestore(err_act)
   return
@@ -625,6 +739,7 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   if (alpha.eq.dzero) then
     if (beta.eq.dzero) then
       do j=1, n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = dzero
         enddo
@@ -636,12 +751,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) =  beta*y(i,j)
         enddo
@@ -652,12 +769,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.dzero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j)
         enddo
       enddo
     else if (beta.eq.done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j) + y(i,j)
         enddo
@@ -665,12 +784,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j) + beta*y(i,j)
         enddo
@@ -681,12 +802,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.dzero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j)
         enddo
       enddo
     else if (beta.eq.done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j) + y(i,j)
         enddo
@@ -694,12 +817,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j) + beta*y(i,j)
         enddo
@@ -710,12 +835,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.dzero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
     else if (beta.eq.done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
@@ -723,12 +850,14 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j) + beta*y(i,j)
         enddo
@@ -814,12 +943,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) =  beta*y(i,j)
         enddo
@@ -830,12 +961,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     if (beta.eq.dzero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j)
         enddo
       enddo
     else if (beta.eq.done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j) + y(i,j)
         enddo
@@ -843,12 +976,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j) + beta*y(i,j)
         enddo
@@ -859,12 +994,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     if (beta.eq.dzero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j)
         enddo
       enddo
     else if (beta.eq.done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j) + y(i,j)
         enddo
@@ -872,12 +1009,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j) + beta*y(i,j)
         enddo
@@ -888,12 +1027,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     if (beta.eq.dzero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j)
         enddo
       enddo
     else if (beta.eq.done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j) + y(i,j)
         enddo
@@ -901,12 +1042,14 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-done) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j) + beta*y(i,j)
         enddo
