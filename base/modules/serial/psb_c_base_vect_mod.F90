@@ -266,14 +266,21 @@ contains
     complex(psb_spk_), intent(in) :: this(:)
     class(psb_c_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
-
+    integer(psb_ipk_) :: i
+    
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
       return
     end if
+#if defined (OPENMP)
+    !$omp parallel do private(i)
+    do i = 1, size(this)
+      x%v(i) = this(i)
+    end do
+#else
     x%v(:)  = this(:)
-
+#endif
   end subroutine c_base_bld_x
 
   !
@@ -403,7 +410,6 @@ contains
       case(psb_dupl_ovwrt_)
         do i = 1, n
           !loop over all val's rows
-
           ! row actual block row
           if ((1 <= irl(i)).and.(irl(i) <= isz)) then
             ! this row belongs to me
@@ -783,7 +789,7 @@ contains
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional :: n
     ! Local variables
-    integer(psb_ipk_) :: isz
+    integer(psb_ipk_) :: isz, i
 
     if (.not.allocated(x%v)) return
     if (.not.x%is_host()) call x%sync()
@@ -794,7 +800,15 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
-    res(1:isz) = x%v(1:isz)
+    if (.false.) then 
+      res(1:isz) = x%v(1:isz)
+    else
+      !$omp parallel do private(i)
+      do i=1, isz
+        res(i) = x%v(i)
+      end do
+    end if
+    
   end function c_base_get_vect
 
   !
@@ -812,7 +826,7 @@ contains
     complex(psb_spk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: first_, last_
+    integer(psb_ipk_) :: first_, last_, i
 
     first_=1
     last_=size(x%v)
@@ -820,7 +834,14 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+    !$omp parallel do private(i)
+    do i = first_, last_        
+      x%v(i) = val
+    end do
+#else
     x%v(first_:last_) = val
+#endif
     call x%set_host()
 
   end subroutine c_base_set_scal
@@ -838,19 +859,27 @@ contains
     complex(psb_spk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: first_, last_
+    integer(psb_ipk_) :: first_, last_, i,  info
 
+    if (.not.allocated(x%v)) then
+      call psb_realloc(size(val),x%v,info)
+    end if
+    
     first_                     = 1
     if (present(first)) first_ = max(1,first)
     last_                      = min(psb_size(x%v),first_+size(val)-1)
     if (present(last))  last_  = min(last,last_)
 
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
+    if (x%is_dev()) call x%sync()
+
+#if defined(OPENMP)
+      !$omp parallel do private(i)
+      do i  = first_, last_
+        x%v(i) = val(i-first_+1)
+      end do
+#else
       x%v(first_:last_) = val(1:last_-first_+1)
-    else
-      x%v = val
-    end if
+#endif
     call x%set_host()
 
   end subroutine c_base_set_vect
@@ -888,9 +917,18 @@ contains
     implicit none
     class(psb_c_base_vect_type), intent(inout)  :: x
 
+    integer(psb_ipk_) :: i
+    
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+      !$omp parallel do private(i)
+      do i=1, size(x%v)
+        x%v(i) =  abs(x%v(i))
+      end do
+#else
       x%v =  abs(x%v)
+#endif
       call x%set_host()
     end if
 
@@ -1132,6 +1170,7 @@ contains
     info = 0
     if (y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
+    !$omp parallel do private(i)    
     do i=1, n
       y%v(i) = y%v(i)*x(i)
     end do
@@ -1169,6 +1208,7 @@ contains
       if (beta == cone) then
         return
       else
+        !$omp parallel do private(i)    
         do i=1, n
           z%v(i) = beta*z%v(i)
         end do
@@ -1176,42 +1216,51 @@ contains
     else
       if (alpha == cone) then
         if (beta == czero) then
+          !$omp parallel do private(i)    
           do i=1, n
             z%v(i) = y(i)*x(i)
           end do
         else if (beta == cone) then
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = z%v(i) + y(i)*x(i)
           end do
         else
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = beta*z%v(i) + y(i)*x(i)
           end do
         end if
       else if (alpha == -cone) then
         if (beta == czero) then
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = -y(i)*x(i)
           end do
         else if (beta == cone) then
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = z%v(i) - y(i)*x(i)
           end do
         else
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = beta*z%v(i) - y(i)*x(i)
           end do
         end if
       else
         if (beta == czero) then
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = alpha*y(i)*x(i)
           end do
         else if (beta == cone) then
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = z%v(i) + alpha*y(i)*x(i)
           end do
         else
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
           end do
@@ -1314,7 +1363,6 @@ contains
     if (x%is_dev()) call x%sync()
     call x%div(x%v,y%v,info)
 
-
   end subroutine c_base_div_v
   !
   !> Function  base_div_v2
@@ -1358,7 +1406,6 @@ contains
     if (x%is_dev()) call x%sync()
     call x%div(x%v,y%v,info,flag)
 
-
   end subroutine c_base_div_v_check
   !
   !> Function  base_div_v2_check
@@ -1381,7 +1428,6 @@ contains
     if (z%is_dev()) call z%sync()
     call z%div(x%v,y%v,info,flag)
 
-
   end subroutine c_base_div_v2_check
   !
   !> Function  base_div_a2
@@ -1403,6 +1449,7 @@ contains
     if (z%is_dev()) call z%sync()
 
     n = min(size(y), size(x))
+    !$omp parallel do private(i)
     do i=1, n
       z%v(i) = x(i)/y(i)
     end do
@@ -1433,6 +1480,7 @@ contains
       if (z%is_dev()) call z%sync()
 
       n = min(size(y), size(x))
+      !  $omp parallel do private(i)
       do i=1, n
         if (y(i) /= 0) then
           z%v(i) = x(i)/y(i)
@@ -1442,7 +1490,6 @@ contains
         end if
       end do
     end if
-
 
   end subroutine c_base_div_a2_check
   !
@@ -1487,7 +1534,6 @@ contains
     if (y%is_dev()) call y%sync()
     call y%inv(x%v,info,flag)
 
-
   end subroutine c_base_inv_v_check
   !
   !> Function  base_inv_a2
@@ -1509,6 +1555,7 @@ contains
     if (y%is_dev()) call y%sync()
 
     n = size(x)
+    !$omp parallel do private(i)
     do i=1, n
       y%v(i) = 1_psb_spk_/x(i)
     end do
@@ -1539,6 +1586,7 @@ contains
       if (y%is_dev()) call y%sync()
 
       n = size(x)
+      !$omp parallel do private(i)
       do i=1, n
         if (x(i) /= 0) then
           y%v(i) = 1_psb_spk_/x(i)
@@ -1573,6 +1621,7 @@ contains
     if (z%is_dev()) call z%sync()
 
     n = size(x)
+    !$omp parallel do private(i)
     do i = 1, n, 1
       if ( abs(x(i)).ge.c ) then
         z%v(i) = 1_psb_spk_
@@ -1618,14 +1667,21 @@ contains
     implicit none
     class(psb_c_base_vect_type), intent(inout)  :: x
     complex(psb_spk_), intent (in)       :: alpha
+    integer(psb_ipk_) :: i
 
     if (allocated(x%v)) then
+#if defined(OPENMP)
+      !$omp parallel do private(i)
+      do i=1,size(x%v)
+        x%v(i) = alpha*x%v(i)
+      end do
+#else
       x%v = alpha*x%v
-      call x%set_host()
+#endif
     end if
-
+    call x%set_host()
   end subroutine c_base_scal
-
+  
   !
   ! Norms 1, 2 and infinity
   !
@@ -1655,10 +1711,18 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                :: res
+    integer(psb_ipk_) :: i
 
     if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+    res = szero
+    !$omp parallel do private(i) reduction(max: res)
+    do i=1, n
+      res = max(res,abs(x%v(i)))
+    end do
+#else
     res =  maxval(abs(x%v(1:n)))
-
+#endif
   end function c_base_amax
 
 
@@ -1672,10 +1736,18 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                :: res
-
+    integer(psb_ipk_) :: i
+    
     if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+    res=szero
+    !$omp parallel do private(i) reduction(+: res)
+    do i= 1, size(x%v)
+      res = res + abs(x%v(i))
+    end do
+#else
     res =  sum(abs(x%v(1:n)))
-
+#endif
   end function c_base_asum
 
 
@@ -1882,13 +1954,17 @@ contains
     integer(psb_ipk_) :: i, n
 
     if (z%is_dev()) call z%sync()
-
+#if defined(OPENMP)
     n = size(x)
-    do i = 1, n, 1
-        z%v(i) = x(i) + b
+    !$omp parallel do private(i)
+    do i = 1, n
+      z%v(i) = x(i) + b
     end do
+#else
+    z%v = x + b
+#endif
     info = 0
-
+    
   end subroutine c_base_addconst_a2
   !
   !> Function  _base_addconst_v2
@@ -1912,9 +1988,6 @@ contains
     call z%addconst(x%v,b,info)
   end subroutine c_base_addconst_v2
 end module psb_c_base_vect_mod
-
-
-
 
 
 module psb_c_base_multivect_mod

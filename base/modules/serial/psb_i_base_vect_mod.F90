@@ -202,14 +202,21 @@ contains
     integer(psb_ipk_), intent(in) :: this(:)
     class(psb_i_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
-
+    integer(psb_ipk_) :: i
+    
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
       return
     end if
+#if defined (OPENMP)
+    !$omp parallel do private(i)
+    do i = 1, size(this)
+      x%v(i) = this(i)
+    end do
+#else
     x%v(:)  = this(:)
-
+#endif
   end subroutine i_base_bld_x
 
   !
@@ -339,7 +346,6 @@ contains
       case(psb_dupl_ovwrt_)
         do i = 1, n
           !loop over all val's rows
-
           ! row actual block row
           if ((1 <= irl(i)).and.(irl(i) <= isz)) then
             ! this row belongs to me
@@ -719,7 +725,7 @@ contains
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional :: n
     ! Local variables
-    integer(psb_ipk_) :: isz
+    integer(psb_ipk_) :: isz, i
 
     if (.not.allocated(x%v)) return
     if (.not.x%is_host()) call x%sync()
@@ -730,7 +736,15 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
-    res(1:isz) = x%v(1:isz)
+    if (.false.) then 
+      res(1:isz) = x%v(1:isz)
+    else
+      !$omp parallel do private(i)
+      do i=1, isz
+        res(i) = x%v(i)
+      end do
+    end if
+    
   end function i_base_get_vect
 
   !
@@ -748,7 +762,7 @@ contains
     integer(psb_ipk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: first_, last_
+    integer(psb_ipk_) :: first_, last_, i
 
     first_=1
     last_=size(x%v)
@@ -756,7 +770,14 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+    !$omp parallel do private(i)
+    do i = first_, last_        
+      x%v(i) = val
+    end do
+#else
     x%v(first_:last_) = val
+#endif
     call x%set_host()
 
   end subroutine i_base_set_scal
@@ -774,19 +795,27 @@ contains
     integer(psb_ipk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
 
-    integer(psb_ipk_) :: first_, last_
+    integer(psb_ipk_) :: first_, last_, i,  info
 
+    if (.not.allocated(x%v)) then
+      call psb_realloc(size(val),x%v,info)
+    end if
+    
     first_                     = 1
     if (present(first)) first_ = max(1,first)
     last_                      = min(psb_size(x%v),first_+size(val)-1)
     if (present(last))  last_  = min(last,last_)
 
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
+    if (x%is_dev()) call x%sync()
+
+#if defined(OPENMP)
+      !$omp parallel do private(i)
+      do i  = first_, last_
+        x%v(i) = val(i-first_+1)
+      end do
+#else
       x%v(first_:last_) = val(1:last_-first_+1)
-    else
-      x%v = val
-    end if
+#endif
     call x%set_host()
 
   end subroutine i_base_set_vect
@@ -978,9 +1007,6 @@ contains
 
 
 end module psb_i_base_vect_mod
-
-
-
 
 
 module psb_i_base_multivect_mod
