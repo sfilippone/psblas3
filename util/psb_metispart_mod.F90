@@ -55,7 +55,7 @@
 !
 module psb_metispart_mod
   use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
-       & psb_err_unit, psb_spk_,&
+       & psb_err_unit, psb_spk_, psb_dpk_,&
        & psb_lsspmat_type, psb_lcspmat_type,&
        & psb_ldspmat_type, psb_lzspmat_type,  &
        & psb_ls_csr_sparse_mat, psb_ld_csr_sparse_mat, &
@@ -72,13 +72,18 @@ module psb_metispart_mod
 
   interface psi_build_mtpart
     subroutine psi_l_build_mtpart(n,ja,irp,nparts,vect, weights)
-      import :: psb_lpk_, psb_spk_
+      import :: psb_lpk_, psb_spk_, psb_dpk_
       implicit none 
       integer(psb_lpk_), intent(in) :: n, nparts
       integer(psb_lpk_), intent(in) :: ja(:), irp(:)
       integer(psb_lpk_), allocatable, intent(inout) :: vect(:)
+#if defined(METIS_REAL_32)
       real(psb_spk_),optional, intent(in) :: weights(:)
-      
+#elif defined(METIS_REAL_64)
+      real(psb_dpk_),optional, intent(in) :: weights(:)
+#else
+      choke on me;
+#endif
     end subroutine psi_l_build_mtpart
   end interface
   
@@ -181,8 +186,13 @@ contains
     type(psb_ld_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
+#if defined(METIS_REAL_32)
     real(psb_spk_), allocatable :: wgh_(:)
-
+#elif defined(METIS_REAL_64)
+    real(psb_dpk_), allocatable :: wgh_(:)
+#else
+      choke on me;
+#endif
 
     if (present(weights)) then 
       if (size(weights)==nparts) then 
@@ -220,8 +230,13 @@ contains
     type(psb_lz_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
+#if defined(METIS_REAL_32)
     real(psb_spk_), allocatable :: wgh_(:)
-  
+#elif defined(METIS_REAL_64)
+    real(psb_dpk_), allocatable :: wgh_(:)
+#else
+      choke on me;
+#endif
 
     if (present(weights)) then 
       if (size(weights)==nparts) then 
@@ -276,9 +291,25 @@ contains
     type(psb_lc_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-    
-    
-    call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,weights)
+#if defined(METIS_REAL_32)
+    real(psb_spk_), allocatable :: wgh_(:)
+#elif defined(METIS_REAL_64)
+    real(psb_dpk_), allocatable :: wgh_(:)
+#else
+      choke on me;
+#endif
+
+  
+    if (present(weights)) then 
+      if (size(weights)==nparts) then 
+        wgh_ = weights
+      end if
+    end if
+    if (allocated(wgh_)) then 
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,wgh_)
+    else
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect)
+    end if
 
   end subroutine lc_csr_build_mtpart
   
@@ -288,10 +319,26 @@ contains
     type(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-    
-    
-    call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,weights)
+#if defined(METIS_REAL_32)
+    real(psb_spk_), allocatable :: wgh_(:)
+#elif defined(METIS_REAL_64)
+    real(psb_dpk_), allocatable :: wgh_(:)
+#else
+      choke on me;
+#endif
 
+  
+    if (present(weights)) then 
+      if (size(weights)==nparts) then 
+        wgh_ = weights
+      end if
+    end if
+    if (allocated(wgh_)) then 
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect,wgh_)
+    else
+      call psi_build_mtpart(a%get_nrows(),a%ja,a%irp,nparts,graph_vect)
+    end if
+    
   end subroutine ls_csr_build_mtpart
   
   !
