@@ -697,7 +697,7 @@ program psb_d_pde3d
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 
   call psb_cd_renum_block(desc_a,desc_blk,info)
-  do rnp = 1, np/2+1
+  do rnp = 2, np/2+1
     if (iam == 0) write(0,*) 'Remapping from ',np,' to ',rnp
     flush(0)
     call psb_barrier(ictxt)
