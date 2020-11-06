@@ -80,25 +80,16 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch)
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
   call psb_info(ictxt, me, np)
-  
+
   !     ....verify blacs grid correctness..
-  if (.false.) then
-    if (np == -1) then
-      info = psb_err_context_error_
-      call psb_errpush(info,name)
-      goto 9999
-    else   if (.not.desc_a%is_ok()) then
-      info = psb_err_invalid_cd_state_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-  else
-    if (np == -1) then
-      ncol = 0
-      call x%bld(ncol,mold=mold)
-      call psb_erractionrestore(err_act)
-      return
-    end if
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  else   if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   nrow = desc_a%get_local_rows()

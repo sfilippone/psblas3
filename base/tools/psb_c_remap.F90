@@ -30,22 +30,22 @@
 !   
 !    
 !
-! Subroutine: psb_d_remap
+! Subroutine: psb_c_remap
 ! 
 ! Arguments: 
 !    desc_in  - type(psb_desc_type).       The communication descriptor to be cloned.
 !    desc_out - type(psb_desc_type).       The output communication descriptor.
 !    info     - integer.                       Return code.
-subroutine psb_d_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
+subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
 
-  use psb_base_mod, psb_protect_name => psb_d_remap
+  use psb_base_mod, psb_protect_name => psb_c_remap
 
   implicit none
   !....parameters...
   integer(psb_ipk_), intent(in)        :: np_remap
   type(psb_desc_type), intent(inout)   :: desc_in
-  type(psb_dspmat_type), intent(inout) :: a_in
-  type(psb_dspmat_type), intent(out)   :: a_out
+  type(psb_cspmat_type), intent(inout) :: a_in
+  type(psb_cspmat_type), intent(out)   :: a_out
   type(psb_desc_type), intent(out)     :: desc_out
   integer(psb_ipk_), intent(out)       :: info
 
@@ -55,7 +55,7 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
   integer(psb_ipk_) :: rnp, rme, newctxt
   integer(psb_ipk_) :: ipdest, ipd, id1, id2, imd, i, nsrc
   integer(psb_ipk_), allocatable :: newnl(:), isrc(:), nzsrc(:), ids(:) 
-  type(psb_ld_coo_sparse_mat) :: acoo_snd, acoo_rcv
+  type(psb_lc_coo_sparse_mat) :: acoo_snd, acoo_rcv
   integer(psb_ipk_) :: debug_level, debug_unit  
   character(len=20)   :: name
 
@@ -241,4 +241,4 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
 
   return  
 
-end subroutine psb_d_remap
+end subroutine psb_c_remap

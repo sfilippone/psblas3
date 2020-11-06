@@ -431,5 +431,19 @@ Module psb_s_tools_mod
     end function
   end interface
 
+  interface psb_remap
+    subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, a_out, info)      
+      import      
+      implicit none
+      !....parameters...
+      integer(psb_ipk_), intent(in)        :: np_remap
+      type(psb_desc_type), intent(inout)   :: desc_in
+      type(psb_sspmat_type), intent(inout) :: a_in
+      type(psb_sspmat_type), intent(out)   :: a_out
+      type(psb_desc_type), intent(out)     :: desc_out
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psb_s_remap
+  end interface psb_remap
+
 
 end module psb_s_tools_mod
