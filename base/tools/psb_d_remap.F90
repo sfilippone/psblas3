@@ -34,22 +34,28 @@
 !   Produces a clone of a descriptor.
 ! 
 ! Arguments: 
-!    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
-!    desc_out - type(psb_desc_type).         The output communication descriptor.
+!    desc_in  - type(psb_desc_type).       The communication descriptor to be cloned.
+!    desc_out - type(psb_desc_type).       The output communication descriptor.
 !    info     - integer.                       Return code.
-subroutine psb_cdcpy(desc_in, desc_out, info)
+subroutine psb_d_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
 
-  use psb_base_mod, psb_protect_name => psb_cdcpy
+  use psb_base_mod, psb_protect_name => psb_d_remap
 
   implicit none
   !....parameters...
+  integer(psb_ipk_), intent(in)        :: np_remap
+  type(psb_desc_type), intent(inout)   :: desc_in
+  type(psb_dspmat_type), intent(inout) :: a_in
+  type(psb_dspmat_type), intent(out)   :: a_out
+  type(psb_desc_type), intent(out)     :: desc_out
+  integer(psb_ipk_), intent(out)       :: info
 
-  type(psb_desc_type), intent(inout) :: desc_in
-  type(psb_desc_type), intent(out)   :: desc_out
-  integer(psb_ipk_), intent(out)     :: info
 
   !locals
-  integer(psb_ipk_) :: np,me,ictxt, err_act
+  integer(psb_ipk_) :: np, me, ictxt, err_act
+  integer(psb_ipk_) :: newctxt, rnp, rme
+  integer(psb_ipk_) :: ipdest, id1, id2, imd, i
+  integer(psb_ipk_), allocatable :: newnl(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -73,21 +79,65 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
     goto 9999
   endif
 
-  call desc_in%clone(desc_out,info)
+  write(0,*) ' Remapping from ',np,' onto ', np_remap
+ 
+  if (desc_in%get_fmt() == 'BLOCK') then
+    ! OK
+    call psb_init(newctxt,np=np_remap,basectxt=ictxt)
+    call psb_info(newctxt,rme,rnp)
+    write(0,*) 'Old context: ',me,np,' New context: ',rme,rnp
+    call psb_bcast(ictxt,rnp)
+    allocate(newnl(rnp),stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    endif    
+    if (rnp >= np) then 
+      write(0,*) ' No remapping on larger proc count now'
+      info = psb_err_internal_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    id2 = np/rnp
+    id1 = id2+1
+    imd = mod(np,rnp)
+    if (me < (imd*id1)) then
+      ipdest = (me/id1)
+    else
+      ipdest = ( ((me-imd*id1)/id2) +  imd)
+    end if
 
-  if (info /= psb_success_) then
-    info = psb_err_from_subroutine_
+    write(0,*) ' Sending my data from ',me,' to ', &
+         & ipdest, 'out of ',rnp,rnp-1
+    newnl = 0
+    newnl(ipdest+1) = desc_in%get_local_rows()
+    call psb_sum(ictxt,newnl)
+    if (rme>=0) then
+      call psb_cdall(newctxt,desc_out,info,nl=newnl(rme+1))
+      call psb_cdasb(desc_out,info)
+      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
+           & ' out ',desc_out%get_local_rows(),desc_out%get_global_rows()
+    else 
+      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
+           & ' out ',0,0
+    end if
+    call psb_exit(newctxt,close=.false.)
+  else
+    write(0,*) 'Right now only BLOCK on input '
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': Done'
-
+    
+  !call psb_cdall()
+  
+  ! For the time being cleanup
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(ictxt,err_act)
 
-  return
-
-end subroutine psb_cdcpy
+  return  
+  
+end subroutine psb_d_remap

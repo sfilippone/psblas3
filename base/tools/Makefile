@@ -1,9 +1,9 @@
 include ../../Make.inc
 
 FOBJS = psb_cdall.o psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt.o \
-	psb_cdren.o psb_cdrep.o psb_get_overlap.o psb_cd_lstext.o\
+	psb_cdren.o psb_cdrep.o psb_get_overlap.o psb_cd_lstext.o psb_cd_remap.o\
 	psb_cdcpy.o psb_cd_reinit.o psb_cd_switch_ovl_indxmap.o psb_cd_renum_block.o \
-	psb_dspalloc.o psb_dspasb.o \
+	psb_dspalloc.o psb_dspasb.o psb_d_remap.o \
 	psb_dspfree.o psb_dspins.o psb_dsprn.o \
 	psb_sspalloc.o psb_sspasb.o \
 	psb_sspfree.o psb_sspins.o psb_ssprn.o\

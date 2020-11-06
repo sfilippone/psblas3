@@ -634,10 +634,10 @@ program psb_d_pde3d
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psb_dspmat_type) :: a, aremap
   type(psb_dprec_type)  :: prec
   ! descriptor
-  type(psb_desc_type)   :: desc_a
+  type(psb_desc_type)   :: desc_a, desc_rmp, desc_blk
   ! dense vectors
   type(psb_d_vect_type) :: xxv,bv
   ! parallel environment
@@ -649,7 +649,7 @@ program psb_d_pde3d
   real(psb_dpk_)   :: err, eps
 
   ! other variables
-  integer(psb_ipk_) :: info, i
+  integer(psb_ipk_) :: info, i, rnp
   character(len=20) :: name,ch_err
   character(len=40) :: fname
 
@@ -696,6 +696,16 @@ program psb_d_pde3d
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 
+  call psb_cd_renum_block(desc_a,desc_blk,info)
+  do rnp = 1, np/2+1
+    if (iam == 0) write(0,*) 'Remapping from ',np,' to ',rnp
+    flush(0)
+    call psb_barrier(ictxt)
+    call   psb_remap(rnp,desc_blk,a,desc_rmp,aremap,info)
+    flush(0)
+    call psb_barrier(ictxt)
+    if (iam == 0) write(0,*) '                   Info ',info
+  end do
   !  
   !  cleanup storage and exit
   !

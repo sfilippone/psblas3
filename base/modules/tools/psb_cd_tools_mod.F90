@@ -320,6 +320,19 @@ module psb_cd_tools_mod
     module procedure psb_local_index, psb_local_index_v
   end interface
 
+  interface psb_remap
+    subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
+      import :: psb_ipk_, psb_desc_type
+
+      implicit none
+      !....parameters...
+      integer(psb_ipk_), intent(in)      :: np_remap
+      type(psb_desc_type), intent(inout) :: desc_in
+      type(psb_desc_type), intent(out)   :: desc_out
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psb_cd_remap
+  end interface
+ 
 contains
 
   subroutine psb_get_boundary(bndel,desc,info)
