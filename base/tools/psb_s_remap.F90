@@ -36,7 +36,7 @@
 !    desc_in  - type(psb_desc_type).       The communication descriptor to be cloned.
 !    desc_out - type(psb_desc_type).       The output communication descriptor.
 !    info     - integer.                       Return code.
-subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
+subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, isrc, nrsrc, a_out, info)
 
   use psb_base_mod, psb_protect_name => psb_s_remap
 
@@ -47,6 +47,7 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
   type(psb_sspmat_type), intent(inout) :: a_in
   type(psb_sspmat_type), intent(out)   :: a_out
   type(psb_desc_type), intent(out)     :: desc_out
+  integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:)
   integer(psb_ipk_), intent(out)       :: info
 
 
@@ -54,7 +55,7 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
   integer(psb_ipk_) :: np, me, ictxt, err_act
   integer(psb_ipk_) :: rnp, rme, newctxt
   integer(psb_ipk_) :: ipdest, ipd, id1, id2, imd, i, nsrc
-  integer(psb_ipk_), allocatable :: newnl(:), isrc(:), nzsrc(:), ids(:) 
+  integer(psb_ipk_), allocatable :: newnl(:), nzsrc(:), ids(:) 
   type(psb_ls_coo_sparse_mat) :: acoo_snd, acoo_rcv
   integer(psb_ipk_) :: debug_level, debug_unit  
   character(len=20)   :: name
@@ -183,6 +184,7 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
     call a_in%cp_to(acoo_snd)
     nzsnd = acoo_snd%get_nzeros()
     call psb_snd(ictxt,nzsnd,ipd)
+    call psb_snd(ictxt,desc_in%get_local_rows(),ipd)
     ! Convert to global numbering
     call psb_loc_to_glob(acoo_snd%ia(1:nzsnd),desc_in,info)
     call psb_loc_to_glob(acoo_snd%ja(1:nzsnd),desc_in,info)
@@ -194,9 +196,11 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, desc_out, a_out, info)
     if (rme>=0) then
       ! prepare to receive
       nzsrc = isrc
+      nrsrc = isrc
       nzl = 0
       do ip=1, nsrc
         call psb_rcv(ictxt,nzsrc(ip),isrc(ip))
+        call psb_rcv(ictxt,nrsrc(ip),isrc(ip))
         nzl = nzl + nzsrc(ip)
       end do
       call acoo_rcv%allocate(newnl(rme+1),newnl(rme+1),nzl)
