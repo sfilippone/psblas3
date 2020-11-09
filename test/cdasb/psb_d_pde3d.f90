@@ -644,7 +644,7 @@ program psb_d_pde3d
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
-  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart, idest
   integer(psb_epk_) :: amatsize, precsize, descsize, d2size
   real(psb_dpk_)   :: err, eps
   integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:)
@@ -701,7 +701,7 @@ program psb_d_pde3d
     if (iam == 0) write(0,*) 'Remapping from ',np,' to ',rnp
     flush(0)
     call psb_barrier(ictxt)
-    call   psb_remap(rnp,desc_blk,a,desc_rmp,isrc,nrsrc,aremap,info)
+    call   psb_remap(rnp,desc_blk,a,desc_rmp,idest,isrc,nrsrc,aremap,info)
     flush(0)
     call psb_barrier(ictxt)
     if (iam == 0) write(0,*) '                   Info ',info

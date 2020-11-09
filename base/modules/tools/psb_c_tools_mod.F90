@@ -432,7 +432,8 @@ Module psb_c_tools_mod
   end interface
 
   interface psb_remap
-    subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, isrc, nrsrc, a_out, info)
+    subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, &
+         & ipd, isrc, nrsrc, a_out, info)
       import
       implicit none
       !....parameters...
@@ -441,6 +442,7 @@ Module psb_c_tools_mod
       type(psb_cspmat_type), intent(inout) :: a_in
       type(psb_cspmat_type), intent(out)   :: a_out
       type(psb_desc_type), intent(out)     :: desc_out
+      integer(psb_ipk_), intent(out)       :: ipd 
       integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:)
       integer(psb_ipk_), intent(out)       :: info
     end subroutine psb_c_remap
