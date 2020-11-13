@@ -40,21 +40,17 @@ module psi_collective_mod
 
   interface psb_bcast
     module procedure  psb_hbcasts, psb_hbcastv,&
-         & psb_hbcasts_ec, psb_hbcastv_ec,&
-         & psb_lbcasts, psb_lbcastv, &
-         & psb_lbcasts_ec, psb_lbcastv_ec
+         & psb_lbcasts, psb_lbcastv
   end interface psb_bcast
 
 
 #if defined(SHORT_INTEGERS)
   interface psb_sum
-    module procedure psb_i2sums, psb_i2sumv, psb_i2summ, &
-         & psb_i2sums_ec, psb_i2sumv_ec, psb_i2summ_ec
+    module procedure psb_i2sums, psb_i2sumv, psb_i2summ
   end interface psb_sum
 #endif
 
 contains
-
 
   subroutine psb_hbcasts(ictxt,dat,root,length)
 #ifdef MPI_MOD
@@ -64,11 +60,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)             :: ictxt
+    type(psb_ctxt_type), intent(in)             :: ictxt
     character(len=*), intent(inout) :: dat
     integer(psb_mpk_), intent(in), optional   :: root,length
 
-    integer(psb_mpk_) :: iam, np, root_,length_,info
+    integer(psb_mpk_) :: iam, np, root_,length_,info, icomm
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -83,8 +79,8 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-
-    call mpi_bcast(dat,length_,MPI_CHARACTER,root_,ictxt,info)
+    icomm = psb_get_mpi_comm(ictxt)
+    call mpi_bcast(dat,length_,MPI_CHARACTER,root_,icomm,info)
 #endif
 
   end subroutine psb_hbcasts
@@ -97,11 +93,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)             :: ictxt
+    type(psb_ctxt_type), intent(in)             :: ictxt
     character(len=*), intent(inout) :: dat(:)
     integer(psb_mpk_), intent(in), optional   :: root
 
-    integer(psb_mpk_) :: iam, np, root_,length_,info, size_
+    integer(psb_mpk_) :: iam, np, root_, icomm
+    integer(psb_mpk_) :: length_,info, size_
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -113,45 +110,11 @@ contains
     size_   = size(dat)
 
     call psb_info(ictxt,iam,np)
-
-    call mpi_bcast(dat,length_*size_,MPI_CHARACTER,root_,ictxt,info)
+    icomm = psb_get_mpi_comm(ictxt)
+    call mpi_bcast(dat,length_*size_,MPI_CHARACTER,root_,icomm,info)
 #endif
 
   end subroutine psb_hbcastv
-
-  subroutine psb_hbcasts_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    character(len=*), intent(inout)  :: dat
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_bcast(ictxt_,dat,root_)
-    else
-      call psb_bcast(ictxt_,dat)
-    end if
-  end subroutine psb_hbcasts_ec
-
-  subroutine psb_hbcastv_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    character(len=*), intent(inout)  :: dat(:)
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_bcast(ictxt_,dat,root_)
-    else
-      call psb_bcast(ictxt_,dat)
-    end if
-  end subroutine psb_hbcastv_ec
-
-
 
   subroutine psb_lbcasts(ictxt,dat,root)
 #ifdef MPI_MOD
@@ -161,11 +124,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)             :: ictxt
+    type(psb_ctxt_type), intent(in)             :: ictxt
     logical, intent(inout)          :: dat
     integer(psb_mpk_), intent(in), optional   :: root
 
-    integer(psb_mpk_) :: iam, np, root_,info
+    integer(psb_mpk_) :: iam, np, root_,info, icomm
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -175,7 +138,8 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,MPI_LOGICAL,root_,ictxt,info)
+    icomm = psb_get_mpi_comm(ictxt)
+    call mpi_bcast(dat,1,MPI_LOGICAL,root_,icomm,info)
 #endif
 
   end subroutine psb_lbcasts
@@ -188,18 +152,19 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)             :: ictxt
+    type(psb_ctxt_type), intent(in)             :: ictxt
     logical, intent(inout)          :: dat
     logical, intent(inout), optional :: rec
 
-    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: iam, np, info, icomm
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
+    icomm = psb_get_mpi_comm(ictxt)
     if (present(rec)) then
-      call mpi_allreduce(dat,rec,1,MPI_LOGICAL,MPI_LAND,ictxt,info)
+      call mpi_allreduce(dat,rec,1,MPI_LOGICAL,MPI_LAND,icomm,info)
     else
-      call mpi_allreduce(MPI_IN_PLACE,dat,1,MPI_LOGICAL,MPI_LAND,ictxt,info)
+      call mpi_allreduce(MPI_IN_PLACE,dat,1,MPI_LOGICAL,MPI_LAND,icomm,info)
     endif
 #endif
 
@@ -214,11 +179,11 @@ end subroutine psb_lallreduceand
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)             :: ictxt
+    type(psb_ctxt_type), intent(in)             :: ictxt
     logical, intent(inout)          :: dat(:)
     integer(psb_mpk_), intent(in), optional   :: root
 
-    integer(psb_mpk_) :: iam, np, root_,info
+    integer(psb_mpk_) :: iam, np, root_,info, icomm
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -226,47 +191,12 @@ end subroutine psb_lallreduceand
     else
       root_ = psb_root_
     endif
-
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),MPI_LOGICAL,root_,ictxt,info)
+    icomm = psb_get_mpi_comm(ictxt)
+    call mpi_bcast(dat,size(dat),MPI_LOGICAL,root_,icomm,info)
 #endif
 
   end subroutine psb_lbcastv
-
-
-  subroutine psb_lbcasts_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    logical, intent(inout)  :: dat
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_bcast(ictxt_,dat,root_)
-    else
-      call psb_bcast(ictxt_,dat)
-    end if
-  end subroutine psb_lbcasts_ec
-
-  subroutine psb_lbcastv_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    logical, intent(inout)  :: dat(:)
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_bcast(ictxt_,dat,root_)
-    else
-      call psb_bcast(ictxt_,dat)
-    end if
-  end subroutine psb_lbcastv_ec
-
-
 
 #if defined(SHORT_INTEGERS)
   subroutine psb_i2sums(ictxt,dat,root)
@@ -283,7 +213,7 @@ end subroutine psb_lallreduceand
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
     integer(psb_i2pk_) :: dat_
-    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: iam, np, info, icomm
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -295,11 +225,12 @@ end subroutine psb_lallreduceand
     else
       root_ = -1
     endif
+    icomm = psb_get_mpi_comm(ictxt)
     if (root_ == -1) then
-      call mpi_allreduce(dat,dat_,1,psb_mpi_i2pk_,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_i2pk_,mpi_sum,icomm,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_i2pk_,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_i2pk_,mpi_sum,root_,icomm,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -320,7 +251,7 @@ end subroutine psb_lallreduceand
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
     integer(psb_i2pk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: iam, np,  info, icomm
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -332,18 +263,19 @@ end subroutine psb_lallreduceand
     else
       root_ = -1
     endif
+    icomm = psb_get_mpi_comm(ictxt)
     if (root_ == -1) then
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_i2pk_,mpi_sum,ictxt,info)
+           & psb_mpi_i2pk_,mpi_sum,icomm,info)
     else
       if (iam == root_) then
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_i2pk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_i2pk_,mpi_sum,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_i2pk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_i2pk_,mpi_sum,root_,icomm,info)
       end if
     endif
 #endif
@@ -363,7 +295,7 @@ end subroutine psb_lallreduceand
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
     integer(psb_i2pk_), allocatable :: dat_(:,:)
-    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: iam, np,  info, icomm
     integer(psb_ipk_) :: iinfo
 
 
@@ -375,70 +307,23 @@ end subroutine psb_lallreduceand
     else
       root_ = -1
     endif
+    icomm = psb_get_mpi_comm(ictxt)
     if (root_ == -1) then
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_i2pk_,mpi_sum,ictxt,info)
+           & psb_mpi_i2pk_,mpi_sum,icomm,info)
     else
       if (iam == root_) then
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_i2pk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_i2pk_,mpi_sum,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_i2pk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_i2pk_,mpi_sum,root_,icomm,info)
       end if
     endif
 #endif
   end subroutine psb_i2summ
-
-  subroutine psb_i2sums_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_i2pk_), intent(inout)  :: dat
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_sum(ictxt_,dat,root_)
-    else
-      call psb_sum(ictxt_,dat)
-    end if
-  end subroutine psb_i2sums_ec
-
-  subroutine psb_i2sumv_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_i2pk_), intent(inout)  :: dat(:)
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_sum(ictxt_,dat,root_)
-    else
-      call psb_sum(ictxt_,dat)
-    end if
-  end subroutine psb_i2sumv_ec
-
-  subroutine psb_i2summ_ec(ictxt,dat,root)
-    implicit none
-    integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_i2pk_), intent(inout)  :: dat(:,:)
-    integer(psb_epk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: ictxt_, root_
-
-    ictxt_ = ictxt
-    if (present(root)) then
-      root_ = root
-      call psb_sum(ictxt_,dat,root_)
-    else
-      call psb_sum(ictxt_,dat)
-    end if
-  end subroutine psb_i2summ_ec
 
 #endif
 

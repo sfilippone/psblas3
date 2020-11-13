@@ -144,7 +144,12 @@ module psi_penv_mod
   interface psb_info
     module procedure psb_info_mpik
   end interface
-
+#if defined(IPK4) && defined(LPK8)
+  interface psb_info
+    module procedure psb_info_epk
+  end interface
+#endif
+  
   interface psb_barrier
     module procedure  psb_barrier_mpik
   end interface
@@ -392,7 +397,7 @@ contains
       return
     end if
     call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_mpk_,&
-         & dest,tag,icontxt,node%request,minfo)
+         & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
     
@@ -852,23 +857,22 @@ contains
 !!$    end if
 !!$  end subroutine psb_abort_epk
 !!$  
-!!$  subroutine psb_info_epk(ictxt,iam,np)
-!!$
-!!$    integer(psb_epk_), intent(in)  :: ictxt
-!!$    integer(psb_epk_), intent(out) :: iam, np
-!!$
-!!$    !
-!!$    ! Simple caching scheme, keep track
-!!$    ! of the last CTXT encountered. 
-!!$    !
-!!$    integer(psb_mpk_), save :: lctxt=-1, lam, lnp
-!!$    if (ictxt /= lctxt) then
-!!$      lctxt = ictxt
-!!$      call psb_info(lctxt,lam,lnp)
-!!$    end if
-!!$    iam = lam
-!!$    np  = lnp
-!!$  end subroutine psb_info_epk
+#if defined(IPK4) && defined(LPK8)
+  subroutine psb_info_epk(ictxt,iam,np)
+
+    type(psb_ctxt_type), intent(in)  :: ictxt
+    integer(psb_epk_), intent(out) :: iam, np
+
+    !
+    ! Simple caching scheme, keep track
+    ! of the last CTXT encountered. 
+    !
+    integer(psb_mpk_), save :: lam, lnp
+    call psb_info(ictxt,lam,lnp)
+    iam = lam
+    np  = lnp
+  end subroutine psb_info_epk
+#endif
   
   subroutine psb_init_mpik(ictxt,np,basectxt,ids)
     use psb_const_mod
