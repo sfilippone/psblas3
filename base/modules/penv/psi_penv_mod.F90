@@ -29,9 +29,105 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
+#if defined(SERIAL_MPI)
+! Provide a fake mpi module just to keep the compiler(s) happy.
+module mpi
+  use psb_const_mod
+  integer(psb_mpk_), parameter :: mpi_success          = 0
+  integer(psb_mpk_), parameter :: mpi_request_null     = 0
+  integer(psb_mpk_), parameter :: mpi_status_size      = 1
+  integer(psb_mpk_), parameter :: mpi_integer          = 1
+  integer(psb_mpk_), parameter :: mpi_integer8         = 2
+  integer(psb_mpk_), parameter :: mpi_real             = 3
+  integer(psb_mpk_), parameter :: mpi_double_precision = 4
+  integer(psb_mpk_), parameter :: mpi_complex          = 5   
+  integer(psb_mpk_), parameter :: mpi_double_complex   = 6 
+  integer(psb_mpk_), parameter :: mpi_character        = 7
+  integer(psb_mpk_), parameter :: mpi_logical          = 8
+  integer(psb_mpk_), parameter :: mpi_integer2         = 9
+  integer(psb_mpk_), parameter :: mpi_comm_null        = -1
+  integer(psb_mpk_), parameter :: mpi_comm_world       = 1
+  
+  real(psb_dpk_), external :: mpi_wtime
+end module mpi
+#endif    
+
+
 module psi_penv_mod
   use psb_const_mod
-  use psi_comm_buffers_mod, only : psb_buffer_queue
+
+  integer(psb_mpk_), parameter:: psb_int_tag      = 543987
+  integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
+  integer(psb_mpk_), parameter:: psb_double_tag   = psb_real_tag     + 1
+  integer(psb_mpk_), parameter:: psb_complex_tag  = psb_double_tag   + 1
+  integer(psb_mpk_), parameter:: psb_dcomplex_tag = psb_complex_tag  + 1
+  integer(psb_mpk_), parameter:: psb_logical_tag  = psb_dcomplex_tag + 1
+  integer(psb_mpk_), parameter:: psb_char_tag     = psb_logical_tag  + 1
+  integer(psb_mpk_), parameter:: psb_int8_tag     = psb_char_tag     + 1
+  integer(psb_mpk_), parameter:: psb_int2_tag     = psb_int8_tag     + 1
+  integer(psb_mpk_), parameter:: psb_int4_tag     = psb_int2_tag     + 1
+  integer(psb_mpk_), parameter:: psb_long_tag     = psb_int4_tag     + 1
+
+  integer(psb_mpk_), parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_double_swap_tag   = psb_double_tag   + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_complex_swap_tag  = psb_complex_tag  + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_dcomplex_swap_tag = psb_dcomplex_tag + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_logical_swap_tag  = psb_logical_tag  + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_char_swap_tag     = psb_char_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_long_swap_tag     = psb_long_tag     + psb_int_tag
+
+
+  
+  integer(psb_mpk_), private, parameter:: psb_int_type      = 987543
+  integer(psb_mpk_), private, parameter:: psb_real_type     = psb_int_type      + 1
+  integer(psb_mpk_), private, parameter:: psb_double_type   = psb_real_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_complex_type  = psb_double_type   + 1
+  integer(psb_mpk_), private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
+  integer(psb_mpk_), private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
+  integer(psb_mpk_), private, parameter:: psb_char_type     = psb_logical_type  + 1
+  integer(psb_mpk_), private, parameter:: psb_int8_type     = psb_char_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_long_type     = psb_int4_type     + 1
+
+
+  type psb_ctxt_type
+    integer(psb_mpk_), allocatable :: ctxt
+  end type psb_ctxt_type
+
+  type psb_buffer_node
+    integer(psb_mpk_)   :: request
+    type(psb_ctxt_type) :: icontxt 
+    integer(psb_mpk_) :: buffer_type
+    integer(psb_epk_), allocatable     :: int8buf(:)
+    integer(psb_i2pk_), allocatable    :: int2buf(:)
+    integer(psb_mpk_), allocatable     :: int4buf(:)
+    real(psb_spk_), allocatable        :: realbuf(:)
+    real(psb_dpk_), allocatable        :: doublebuf(:)
+    complex(psb_spk_), allocatable     :: complexbuf(:)
+    complex(psb_dpk_), allocatable     :: dcomplbuf(:)
+    logical, allocatable               :: logbuf(:)
+    character(len=1), allocatable      :: charbuf(:)
+    type(psb_buffer_node), pointer :: prev=>null(), next=>null()
+  end type psb_buffer_node
+
+  type psb_buffer_queue
+    type(psb_buffer_node), pointer :: head=>null(), tail=>null()
+  end type psb_buffer_queue
+
+  interface psi_snd
+    module procedure&
+         & psi_msnd, psi_esnd,&
+         & psi_ssnd, psi_dsnd,&
+         & psi_csnd, psi_zsnd,&
+         & psi_logsnd, psi_hsnd,&
+         & psi_i2snd
+  end interface
+
 
   interface psb_init
     module procedure  psb_init_mpik
@@ -53,36 +149,16 @@ module psi_penv_mod
     module procedure  psb_barrier_mpik
   end interface
   
-  interface psb_init
-    module procedure  psb_init_epk
-  end interface
-
-  interface psb_exit
-    module procedure  psb_exit_epk
-  end interface
-
-  interface psb_abort
-    module procedure  psb_abort_epk
-  end interface
-
-  interface psb_info
-    module procedure psb_info_epk
-  end interface
-
-  interface psb_barrier
-    module procedure  psb_barrier_epk
-  end interface
-
   interface psb_wtime
     module procedure  psb_wtime
   end interface psb_wtime
 
   interface psb_get_mpi_comm
-    module procedure psb_m_get_mpi_comm, psb_e_get_mpi_comm
+    module procedure psb_m_get_mpi_comm !, psb_e_get_mpi_comm
   end interface psb_get_mpi_comm
   
   interface psb_get_mpi_rank
-    module procedure psb_m_get_mpi_rank, psb_e_get_mpi_rank
+    module procedure psb_m_get_mpi_rank!, psb_e_get_mpi_rank
   end interface psb_get_mpi_rank
 
 #if defined(SERIAL_MPI)
@@ -115,6 +191,515 @@ module psi_penv_mod
 
 
 contains
+  
+  function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
+    type(psb_ctxt_type), intent(in) :: ctxt1, ctxt2
+    logical :: res
+
+    res = .false.
+    if (.not.allocated(ctxt1%ctxt).and.(.not.allocated(ctxt2%ctxt))) &
+         & res = .true.
+    if (allocated(ctxt1%ctxt).and.allocated(ctxt2%ctxt)) &
+         & res = (ctxt1%ctxt == ctxt2%ctxt)
+
+  end function psb_cmp_ctxt
+
+  subroutine psb_init_queue(mesg_queue,info)
+    implicit none 
+    type(psb_buffer_queue), intent(inout) :: mesg_queue
+    integer(psb_ipk_), intent(out)                  :: info
+
+    info = 0
+    if ((.not.associated(mesg_queue%head)).and.&
+         & (.not.associated(mesg_queue%tail))) then 
+      ! Nothing to do
+      return
+    end if
+
+    if ((.not.associated(mesg_queue%head)).or.&
+         & (.not.associated(mesg_queue%tail))) then 
+      ! If we are here one is associated, the other is not.
+      ! This is impossible. 
+      info = -1
+      write(psb_err_unit,*) 'Wrong status on init '
+      return
+    end if
+
+  end subroutine psb_init_queue
+
+  subroutine psb_wait_buffer(node, info)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_buffer_node), intent(inout) :: node
+    integer(psb_ipk_), intent(out) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size),minfo
+    minfo = mpi_success
+    call mpi_wait(node%request,status,minfo)
+    info=minfo
+  end subroutine psb_wait_buffer
+
+  subroutine psb_test_buffer(node, flag, info)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_buffer_node), intent(inout) :: node
+    logical, intent(out) :: flag
+    integer(psb_ipk_), intent(out) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size), minfo
+    minfo = mpi_success
+#if defined(SERIAL_MPI)
+    flag  = .true.
+#else
+    call mpi_test(node%request,flag,status,minfo)
+#endif
+    info=minfo
+  end subroutine psb_test_buffer
+  
+
+  subroutine psb_close_context(mesg_queue,icontxt)
+    type(psb_buffer_queue), intent(inout) :: mesg_queue
+    type(psb_ctxt_type), intent(in) :: icontxt
+    integer(psb_ipk_) :: info
+    type(psb_buffer_node), pointer :: node, nextnode
+
+    node => mesg_queue%head
+    do 
+      if (.not.associated(node)) exit
+      nextnode => node%next
+      if (psb_cmp_ctxt(node%icontxt,icontxt)) then 
+        call psb_wait_buffer(node,info)
+        call psb_delete_node(mesg_queue,node)
+      end if
+      node => nextnode
+    end do
+  end subroutine psb_close_context
+
+  subroutine psb_close_all_context(mesg_queue)
+    type(psb_buffer_queue), intent(inout) :: mesg_queue
+    type(psb_buffer_node), pointer :: node, nextnode
+    integer(psb_ipk_) :: info
+    
+    node => mesg_queue%head
+    do 
+      if (.not.associated(node)) exit
+      nextnode => node%next
+      call psb_wait_buffer(node,info)
+      call psb_delete_node(mesg_queue,node)
+      node => nextnode
+    end do
+  end subroutine psb_close_all_context
+
+
+  subroutine psb_delete_node(mesg_queue,node)
+    type(psb_buffer_queue), intent(inout) :: mesg_queue
+    type(psb_buffer_node), pointer   :: node
+    type(psb_buffer_node), pointer  :: prevnode
+    
+    if (.not.associated(node)) then 
+      return
+    end if
+    prevnode => node%prev
+    if (associated(mesg_queue%head,node)) mesg_queue%head => node%next
+    if (associated(mesg_queue%tail,node)) mesg_queue%tail => prevnode
+    if (associated(prevnode)) prevnode%next => node%next
+    if (associated(node%next)) node%next%prev => prevnode
+    deallocate(node)
+    
+  end subroutine psb_delete_node
+
+  subroutine psb_insert_node(mesg_queue,node)
+    type(psb_buffer_queue), intent(inout) :: mesg_queue
+    type(psb_buffer_node), pointer   :: node
+
+    node%next => null()
+    node%prev => null()
+    if ((.not.associated(mesg_queue%head)).and.&
+         & (.not.associated(mesg_queue%tail))) then 
+      mesg_Queue%head => node
+      mesg_queue%tail => node
+      return
+    end if
+    mesg_queue%tail%next => node
+    node%prev => mesg_queue%tail
+    mesg_queue%tail => node
+
+  end subroutine psb_insert_node
+
+  subroutine psb_test_nodes(mesg_queue)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node, nextnode
+    integer(psb_ipk_) :: info
+    logical :: flag
+    
+    node => mesg_queue%head
+    do 
+      if (.not.associated(node)) exit
+      nextnode => node%next
+      call psb_test_buffer(node,flag,info)
+      if (flag) then 
+        call psb_delete_node(mesg_queue,node)
+      end if
+      node => nextnode
+    end do
+  end subroutine psb_test_nodes
+
+  ! !!!!!!!!!!!!!!!!!
+  !
+  ! Inner send. Basic idea:
+  !  the input buffer is MOVE_ALLOCed
+  !  to a node in the mesg queue, then it is sent.
+  !  Thus the calling process should guarantee that
+  !  the buffer is dispensable, i.e. the user data
+  !  has already been copied. 
+  !
+  ! !!!!!!!!!!!!!!!!!
+  subroutine psi_msnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    integer(psb_mpk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_int_type
+    call move_alloc(buffer,node%int4buf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_mpk_,&
+         & dest,tag,icontxt,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)
+    
+    call psb_test_nodes(mesg_queue)
+
+  end subroutine psi_msnd
+
+
+  subroutine psi_esnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    integer(psb_epk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_int8_type
+    call move_alloc(buffer,node%int8buf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_epk_,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo 
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+
+  end subroutine psi_esnd
+
+  subroutine psi_i2snd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    integer(psb_i2pk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_int2_type
+    call move_alloc(buffer,node%int2buf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_i2pk_,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+
+  end subroutine psi_i2snd
+
+  subroutine psi_ssnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    real(psb_spk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_real_type
+    call move_alloc(buffer,node%realbuf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%realbuf,size(node%realbuf),psb_mpi_r_spk_,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)  
+    call psb_test_nodes(mesg_queue)
+    
+  end subroutine psi_ssnd
+
+  subroutine psi_dsnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_)   :: tag, dest
+    real(psb_dpk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_double_type
+    call move_alloc(buffer,node%doublebuf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%doublebuf,size(node%doublebuf),psb_mpi_r_dpk_,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+    
+  end subroutine psi_dsnd
+    
+  subroutine psi_csnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    complex(psb_spk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_complex_type
+    call move_alloc(buffer,node%complexbuf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%complexbuf,size(node%complexbuf),psb_mpi_c_spk_,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo 
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+    
+  end subroutine psi_csnd
+
+  subroutine psi_zsnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    complex(psb_dpk_), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_dcomplex_type
+    call move_alloc(buffer,node%dcomplbuf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%dcomplbuf,size(node%dcomplbuf),psb_mpi_c_dpk_,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+    
+  end subroutine psi_zsnd
+
+
+  subroutine psi_logsnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    logical, allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_logical_type
+    call move_alloc(buffer,node%logbuf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%logbuf,size(node%logbuf),mpi_logical,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+    
+  end subroutine psi_logsnd
+
+
+  subroutine psi_hsnd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_mpk_) :: tag, dest
+    character(len=1), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: minfo, icomm
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    icomm            = psb_get_mpi_comm(icontxt)
+    node%buffer_type = psb_char_type
+    call move_alloc(buffer,node%charbuf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%charbuf,size(node%charbuf),mpi_character,&
+         & dest,tag,icomm,node%request,minfo)
+    info = minfo
+    call psb_insert_node(mesg_queue,node)
+    call psb_test_nodes(mesg_queue)
+    
+  end subroutine psi_hsnd
+
+  
   ! !!!!!!!!!!!!!!!!!!!!!!
   !
   ! Environment handling 
@@ -207,87 +792,85 @@ contains
 
   end subroutine psi_register_mpi_extras
 
-  subroutine psb_init_epk(ictxt,np,basectxt,ids)
-    integer(psb_epk_), intent(out) :: ictxt
-    integer(psb_epk_), intent(in), optional :: np, basectxt, ids(:)
+!!$  subroutine psb_init_epk(ictxt,np,basectxt,ids)
+!!$    type(psb_ctxt_type), intent(out) :: ictxt
+!!$    integer(psb_epk_), intent(in), optional :: np, basectxt, ids(:)
+!!$
+!!$    integer(psb_mpk_) :: iictxt
+!!$    integer(psb_mpk_) :: inp, ibasectxt
+!!$    integer(psb_mpk_), allocatable :: ids_(:)
+!!$
+!!$    if (present(ids)) then 
+!!$      allocate(ids_(size(ids)))
+!!$      ids_ = ids
+!!$    else
+!!$      allocate(ids_(0))
+!!$    end if
+!!$    if (present(np).and.present(basectxt)) then 
+!!$      inp       = np
+!!$      ibasectxt = basectxt
+!!$      call psb_init(ictxt,np=inp,basectxt=ibasectxt,ids=ids_)
+!!$    else if (present(np)) then 
+!!$      inp       = np
+!!$      call psb_init(ictxt,np=inp,ids=ids_)
+!!$    else if (present(basectxt)) then 
+!!$      ibasectxt = basectxt
+!!$      call psb_init(ictxt,basectxt=ibasectxt,ids=ids_)
+!!$    else
+!!$      call psb_init(ictxt,ids=ids_)
+!!$    end if
+!!$  end subroutine psb_init_epk
 
-    integer(psb_mpk_) :: iictxt
-    integer(psb_mpk_) :: inp, ibasectxt
-    integer(psb_mpk_), allocatable :: ids_(:)
-
-    if (present(ids)) then 
-      allocate(ids_(size(ids)))
-      ids_ = ids
-    else
-      allocate(ids_(0))
-    end if
-    if (present(np).and.present(basectxt)) then 
-      inp       = np
-      ibasectxt = basectxt
-      call psb_init(iictxt,np=inp,basectxt=ibasectxt,ids=ids_)
-    else if (present(np)) then 
-      inp       = np
-      call psb_init(iictxt,np=inp,ids=ids_)
-    else if (present(basectxt)) then 
-      ibasectxt = basectxt
-      call psb_init(iictxt,basectxt=ibasectxt,ids=ids_)
-    else
-      call psb_init(iictxt,ids=ids_)
-    end if
-    ictxt = iictxt
-  end subroutine psb_init_epk
-
-  subroutine psb_exit_epk(ictxt,close)
-    integer(psb_epk_), intent(inout) :: ictxt
-    logical, intent(in), optional :: close
-    integer(psb_mpk_) :: iictxt
-    
-    iictxt = ictxt
-    call psb_exit(iictxt, close)
-  end subroutine psb_exit_epk
-
-  subroutine psb_barrier_epk(ictxt)
-    integer(psb_epk_), intent(in) :: ictxt
-    integer(psb_mpk_) :: iictxt
-    
-    iictxt = ictxt
-    call psb_barrier(iictxt)
-  end subroutine psb_barrier_epk
-
-  subroutine psb_abort_epk(ictxt,errc)
-    integer(psb_epk_), intent(in) :: ictxt
-    integer(psb_epk_), intent(in), optional :: errc
-    integer(psb_mpk_) :: iictxt, ierrc
-
-    iictxt = ictxt
-    if (present(errc)) then 
-      ierrc = errc
-      call psb_abort(iictxt,ierrc)
-    else
-      call psb_abort(iictxt)
-    end if
-  end subroutine psb_abort_epk
-  
-  subroutine psb_info_epk(ictxt,iam,np)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    integer(psb_epk_), intent(out) :: iam, np
-
-    !
-    ! Simple caching scheme, keep track
-    ! of the last CTXT encountered. 
-    !
-    integer(psb_mpk_), save :: lctxt=-1, lam, lnp
-    if (ictxt /= lctxt) then
-      lctxt = ictxt
-      call psb_info(lctxt,lam,lnp)
-    end if
-    iam = lam
-    np  = lnp
-  end subroutine psb_info_epk
+!!$  subroutine psb_exit_epk(ictxt,close)
+!!$    integer(psb_epk_), intent(inout) :: ictxt
+!!$    logical, intent(in), optional :: close
+!!$    integer(psb_mpk_) :: iictxt
+!!$    
+!!$    iictxt = ictxt
+!!$    call psb_exit(iictxt, close)
+!!$  end subroutine psb_exit_epk
+!!$
+!!$  subroutine psb_barrier_epk(ictxt)
+!!$    integer(psb_epk_), intent(in) :: ictxt
+!!$    integer(psb_mpk_) :: iictxt
+!!$    
+!!$    iictxt = ictxt
+!!$    call psb_barrier(iictxt)
+!!$  end subroutine psb_barrier_epk
+!!$
+!!$  subroutine psb_abort_epk(ictxt,errc)
+!!$    integer(psb_epk_), intent(in) :: ictxt
+!!$    integer(psb_epk_), intent(in), optional :: errc
+!!$    integer(psb_mpk_) :: iictxt, ierrc
+!!$
+!!$    iictxt = ictxt
+!!$    if (present(errc)) then 
+!!$      ierrc = errc
+!!$      call psb_abort(iictxt,ierrc)
+!!$    else
+!!$      call psb_abort(iictxt)
+!!$    end if
+!!$  end subroutine psb_abort_epk
+!!$  
+!!$  subroutine psb_info_epk(ictxt,iam,np)
+!!$
+!!$    integer(psb_epk_), intent(in)  :: ictxt
+!!$    integer(psb_epk_), intent(out) :: iam, np
+!!$
+!!$    !
+!!$    ! Simple caching scheme, keep track
+!!$    ! of the last CTXT encountered. 
+!!$    !
+!!$    integer(psb_mpk_), save :: lctxt=-1, lam, lnp
+!!$    if (ictxt /= lctxt) then
+!!$      lctxt = ictxt
+!!$      call psb_info(lctxt,lam,lnp)
+!!$    end if
+!!$    iam = lam
+!!$    np  = lnp
+!!$  end subroutine psb_info_epk
   
   subroutine psb_init_mpik(ictxt,np,basectxt,ids)
-    use psi_comm_buffers_mod 
     use psb_const_mod
     use psb_error_mod
     use psb_mat_mod
@@ -300,10 +883,10 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(out) :: ictxt
+    type(psb_ctxt_type), intent(out) :: ictxt
     integer(psb_mpk_), intent(in), optional :: np, basectxt, ids(:)
 
-    integer(psb_mpk_) :: i, isnullcomm
+    integer(psb_mpk_) :: i, isnullcomm, icomm
     integer(psb_mpk_), allocatable :: iids(:) 
     logical :: initialized    
     integer(psb_mpk_) :: np_, npavail, iam, info, basecomm, basegroup, newgroup
@@ -340,7 +923,7 @@ contains
         iinfo=psb_err_initerror_neugh_procs_
         call psb_errpush(iinfo,name)
         call psb_error()
-        ictxt = mpi_comm_null
+        !ictxt = mpi_comm_null
         return
       endif
       call mpi_comm_size(basecomm,np_,info)
@@ -348,32 +931,32 @@ contains
         iinfo=psb_err_initerror_neugh_procs_
         call psb_errpush(iinfo,name)
         call psb_error()
-        ictxt = mpi_comm_null
+        !ictxt = mpi_comm_null
         return
       endif
       call mpi_comm_group(basecomm,basegroup,info)
       if (present(ids)) then 
         if (size(ids)<np) then 
           write(psb_err_unit,*) 'Error in init: too few ids in input'
-          ictxt = mpi_comm_null
+          !ictxt%ctxt = mpi_comm_null
           return
         end if
         do i=1, np 
           if ((ids(i)<0).or.(ids(i)>np_)) then 
             write(psb_err_unit,*) 'Error in init: invalid rank in input'
-            ictxt = mpi_comm_null
+            !ictxt%ctxt = mpi_comm_null
             return
           end if
         end do
         call mpi_group_incl(basegroup,np,ids,newgroup,info)
         if (info /= mpi_success) then 
-          ictxt = mpi_comm_null 
+          !ictxt%ctxt = mpi_comm_null 
           return
         endif
       else
         allocate(iids(np),stat=info)
         if (info /= 0) then 
-          ictxt = mpi_comm_null
+          !ictxt%ctxt = mpi_comm_null
           return
         endif
         do i=1, np
@@ -381,23 +964,28 @@ contains
         end do
         call mpi_group_incl(basegroup,np,iids,newgroup,info)
         if (info /= mpi_success) then 
-          ictxt = mpi_comm_null 
+          !ictxt = mpi_comm_null 
           return
         endif
         deallocate(iids)
       end if
-      call mpi_comm_create(basecomm,newgroup,ictxt,info)
-
+      
+      call mpi_comm_create(basecomm,newgroup,icomm,info)
+   
     else
       if (basecomm /= mpi_comm_null) then 
-        call mpi_comm_dup(basecomm,ictxt,info)
+        call mpi_comm_dup(basecomm,icomm,info)
       else 
-        ictxt = mpi_comm_null
+        ! ictxt = mpi_comm_null
       end if
     endif
+    if (info == 0) then
+      ictxt%ctxt = icomm ! allocate on assignment
+    end if
     call psi_register_mpi_extras(info)
     call psi_get_sizes()
-    if (ictxt == mpi_comm_null) return 
+    !if (ictxt == mpi_comm_null) return
+    if (.not.allocated(ictxt%ctxt)) return 
 #endif
     call psb_init_vect_defaults()
     call psb_init_mat_defaults()
@@ -417,7 +1005,6 @@ contains
   end subroutine psb_init_mpik
 
   subroutine psb_exit_mpik(ictxt,close)
-    use psi_comm_buffers_mod
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
@@ -428,7 +1015,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(inout) :: ictxt
+    type(psb_ctxt_type), intent(inout) :: ictxt
     logical, intent(in), optional :: close
     logical  :: close_
     integer(psb_mpk_) :: info
@@ -460,8 +1047,9 @@ contains
     else
       call psb_close_context(psb_mesg_queue,ictxt)
     end if
-    if ((ictxt /= mpi_comm_null).and.(ictxt /= mpi_comm_world)) then 
-      call mpi_comm_Free(ictxt,info)
+    !if ((ictxt /= mpi_comm_null).and.(ictxt /= mpi_comm_world)) then
+    if (allocated(ictxt%ctxt)) then 
+      if (ictxt%ctxt /= mpi_comm_world)call mpi_comm_Free(ictxt%ctxt,info)
     end if
 
     if (close_) call mpi_finalize(info)
@@ -481,12 +1069,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ictxt
 
     integer(psb_mpk_) :: info
 #if !defined(SERIAL_MPI)
-    if (ictxt /= mpi_comm_null) then 
-      call mpi_barrier(ictxt, info)
+    if (allocated(ictxt%ctxt)) then 
+      if (ictxt%ctxt /= mpi_comm_null) call mpi_barrier(ictxt%ctxt, info)
     end if
 #endif    
 
@@ -508,9 +1096,8 @@ contains
   end function psb_wtime
 
   subroutine psb_abort_mpik(ictxt,errc)
-    use psi_comm_buffers_mod 
 
-    integer(psb_mpk_), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ictxt
     integer(psb_mpk_), intent(in), optional :: errc
     
     integer(psb_mpk_) :: code, info 
@@ -524,14 +1111,13 @@ contains
       code = -1 
     endif
 
-    call mpi_abort(ictxt,code,info)
+    if (allocated(ictxt%ctxt)) call mpi_abort(ictxt%ctxt,code,info)
 #endif    
 
   end subroutine psb_abort_mpik
 
 
   subroutine psb_info_mpik(ictxt,iam,np)
-    use psi_comm_buffers_mod 
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -540,7 +1126,7 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ictxt
     integer(psb_mpk_), intent(out) :: iam, np
     integer(psb_mpk_) :: info
     !
@@ -555,62 +1141,51 @@ contains
 #else    
     iam = -1
     np  = -1
-    if (ictxt == lctxt) then
-      iam = lam
-      np  = lnp
-    else
-      if (ictxt /= mpi_comm_null) then 
-        call mpi_comm_size(ictxt,np,info) 
-        if (info /= mpi_success) np = -1 
-        call mpi_comm_rank(ictxt,iam,info) 
-        if (info /= mpi_success) iam = -1 
+    if (allocated(ictxt%ctxt)) then 
+      if (ictxt%ctxt == lctxt) then
+        iam = lam
+        np  = lnp
+      else
+        if (ictxt%ctxt /= mpi_comm_null) then 
+          call mpi_comm_size(ictxt%ctxt,np,info) 
+          if (info /= mpi_success) np = -1 
+          call mpi_comm_rank(ictxt%ctxt,iam,info) 
+          if (info /= mpi_success) iam = -1 
+        end if
+        lctxt = ictxt%ctxt
+        lam   = iam
+        lnp   = np
       end if
-      lctxt = ictxt
-      lam   = iam
-      lnp   = np
     end if
 #endif    
-
   end subroutine psb_info_mpik
 
 
   function psb_m_get_mpi_comm(ictxt) result(comm)
-    integer(psb_mpk_) :: ictxt, comm
-
-    comm = ictxt
-  end function psb_m_get_mpi_comm
-
-  function psb_e_get_mpi_comm(ictxt) result(comm)
-    integer(psb_epk_) :: ictxt
+    type(psb_ctxt_type) :: ictxt
     integer(psb_mpk_) :: comm
-
-    comm = ictxt
-  end function psb_e_get_mpi_comm
+    comm = mpi_comm_null
+    if (allocated(ictxt%ctxt)) comm = ictxt%ctxt
+  end function psb_m_get_mpi_comm
 
   function psb_m_get_mpi_rank(ictxt,id) result(rank)
     integer(psb_mpk_) :: rank
-    integer(psb_mpk_) :: ictxt,id
+    integer(psb_mpk_) :: id
+    type(psb_ctxt_type) :: ictxt
 
     rank = id
   end function psb_m_get_mpi_rank
 
-
-  function psb_e_get_mpi_rank(ictxt,id) result(rank)
-    integer(psb_mpk_) :: rank
-    integer(psb_epk_) :: ictxt,id
-
-    rank = id
-  end function psb_e_get_mpi_rank
-
-
   subroutine psb_get_mpicomm(ictxt,comm)
-    integer(psb_mpk_) :: ictxt, comm
-
-    comm = psb_get_mpi_comm(ictxt)
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_) :: comm
+    comm = mpi_comm_null
+    if (allocated(ictxt%ctxt)) comm = ictxt%ctxt
   end subroutine psb_get_mpicomm
 
   subroutine psb_get_rank(rank,ictxt,id)
-    integer(psb_mpk_) :: rank,ictxt,id
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_) :: rank,id
 
     rank = psb_get_mpi_rank(ictxt,id) 
   end subroutine psb_get_rank
@@ -789,4 +1364,5 @@ contains
     end do
   end subroutine psi_dnrm2_op
 
+  
 end module psi_penv_mod

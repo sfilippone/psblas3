@@ -8,7 +8,7 @@ BASIC_MODS= psb_const_mod.o psb_cbind_const_mod.o psb_error_mod.o psb_realloc_mo
 	auxil/psb_c_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o
 
-COMMINT=penv/psi_comm_buffers_mod.o penv/psi_penv_mod.o \
+COMMINT=penv/psi_penv_mod.o \
 	penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o \
 	 penv/psi_e_p2p_mod.o \
 	 penv/psi_s_p2p_mod.o \
@@ -129,7 +129,6 @@ psb_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o:   psb_error_mod.o
 $(UTIL_MODS): $(BASIC_MODS)
 
-penv/psi_penv_mod.o: penv/psi_comm_buffers_mod.o serial/psb_vect_mod.o  serial/psb_mat_mod.o 
 penv/psi_collective_mod.o penv/psi_p2p_mod.o: penv/psi_penv_mod.o	
 
 psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
@@ -161,7 +160,7 @@ penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_m
 	penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o
 
 
-auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
+auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_penv_mod.o: psb_const_mod.o
 desc/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o  desc/psb_desc_const_mod.o
 auxil/psb_i_sort_mod.o auxil/psb_s_sort_mod.o auxil/psb_d_sort_mod.o auxil/psb_c_sort_mod.o auxil/psb_z_sort_mod.o \
 auxil/psb_ip_reord_mod.o auxil/psi_serial_mod.o auxil/psb_sort_mod.o: $(BASIC_MODS)
@@ -353,8 +352,8 @@ penv/psi_penv_mod.o: penv/psi_penv_mod.F90 $(BASIC_MODS) serial/psb_vect_mod.o  
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
-penv/psi_comm_buffers_mod.o: penv/psi_comm_buffers_mod.F90 $(BASIC_MODS)
-	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
+#penv/psi_comm_buffers_mod.o: penv/psi_comm_buffers_mod.F90 $(BASIC_MODS)
+#	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 penv/psi_p2p_mod.o: penv/psi_p2p_mod.F90 $(BASIC_MODS) 
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
