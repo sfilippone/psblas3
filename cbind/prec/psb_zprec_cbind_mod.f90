@@ -26,6 +26,8 @@ contains
     type(psb_zprec_type), pointer :: precp
     integer(psb_c_ipk_)              :: info
     character(len=80)       :: fptype
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
 
     res = -1
     if (c_associated(ph%item)) then 
@@ -38,7 +40,7 @@ contains
 
     call stringc2f(ptype,fptype)
     
-    call psb_precinit(ictxt,precp,fptype,info) 
+    call psb_precinit(ctxt,precp,fptype,info) 
     
     res = min(0,info)
     return

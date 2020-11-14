@@ -55,7 +55,7 @@
 !
 module psb_metispart_mod
   use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
-       & psb_err_unit, psb_spk_, psb_dpk_,&
+       & psb_err_unit, psb_spk_, psb_dpk_, psb_ctxt_type,&
        & psb_lsspmat_type, psb_lcspmat_type,&
        & psb_ldspmat_type, psb_lzspmat_type,  &
        & psb_ls_csr_sparse_mat, psb_ld_csr_sparse_mat, &
@@ -115,7 +115,8 @@ contains
   subroutine distr_mtpart(root, ictxt)
     use psb_base_mod
     implicit none 
-    integer(psb_ipk_) :: root, ictxt
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: root
     integer(psb_ipk_) :: me, np, info
     integer(psb_lpk_) :: n
 

@@ -84,7 +84,8 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), intent(in), optional           :: choice
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
@@ -289,7 +290,8 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
        & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
@@ -533,7 +535,8 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), intent(in), optional             :: choice
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
        & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy

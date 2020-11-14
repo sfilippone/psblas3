@@ -68,7 +68,8 @@ subroutine psb_minsvi(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt,np, me, dupl_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -248,7 +249,8 @@ subroutine psb_minsi(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i,loc_row,j,n, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt,np,me,dupl_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)   :: name

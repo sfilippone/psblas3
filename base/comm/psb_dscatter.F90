@@ -54,7 +54,8 @@ subroutine  psb_dscatter_vect(globx, locx, desc_a, info, root, mold)
   class(psb_d_base_vect_type), intent(in), optional :: mold
   
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, icomm, myrank, rootrank
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   real(psb_dpk_), allocatable  :: vlocx(:)
@@ -92,7 +93,7 @@ subroutine  psb_dscatter_vect(globx, locx, desc_a, info, root, mold)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
   
   return
   

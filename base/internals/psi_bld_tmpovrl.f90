@@ -68,8 +68,8 @@ subroutine psi_i_bld_tmpovrl(iv,desc,info)
        & l_ov_ix,l_ov_el, err_act, itmpov, k, glx, icomm
   integer(psb_ipk_) :: idx
   integer(psb_ipk_), allocatable  :: ov_idx(:),ov_el(:,:)
-
-  integer(psb_ipk_) :: ictxt,n_row, debug_unit, debug_level
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: n_row, debug_unit, debug_level
   character(len=20)   :: name,ch_err
 
   info = psb_success_

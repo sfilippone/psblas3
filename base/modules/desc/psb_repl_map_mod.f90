@@ -703,8 +703,9 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)     :: info
-    integer(psb_ipk_) :: nv
-    integer(psb_mpk_) :: ictxt, iam, np
+    integer(psb_ipk_)   :: nv
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_)   :: iam, np
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -726,7 +727,7 @@ contains
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(in)  :: nl
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_ipk_) :: iam, np
@@ -734,7 +735,7 @@ contains
     info = 0
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt:'
       info = -1
       return
     end if
@@ -759,7 +760,8 @@ contains
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     
-    integer(psb_mpk_) :: ictxt, iam, np 
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_)   :: iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()

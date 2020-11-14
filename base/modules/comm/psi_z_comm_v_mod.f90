@@ -30,7 +30,8 @@
 !   
 !    
 module psi_z_comm_v_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_, psb_i_base_vect_type
+  use psi_penv_mod, only : psb_ctxt_type
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, psb_dpk_, psb_i_base_vect_type
   use psb_z_base_vect_mod, only : psb_z_base_vect_type 
   use psb_z_base_multivect_mod, only : psb_z_base_multivect_type 
 
@@ -43,7 +44,7 @@ module psi_z_comm_v_mod
       complex(psb_dpk_)           :: beta 
       complex(psb_dpk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
+      integer(psb_ipk_), optional :: data
     end subroutine psi_zswapdata_vect
     subroutine psi_zswapdata_multivect(flag,beta,y,desc_a,work,info,data)
       import 
@@ -53,12 +54,14 @@ module psi_z_comm_v_mod
       complex(psb_dpk_)           :: beta 
       complex(psb_dpk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
+      integer(psb_ipk_), optional :: data
     end subroutine psi_zswapdata_multivect
     subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      type(psb_ctxt_type), intent(in)         :: iictxt
+      integer(psb_mpk_), intent(in)           :: iicomm
+      integer(psb_ipk_), intent(in)           :: flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_z_base_vect_type)             :: y
       complex(psb_dpk_)                       :: beta
@@ -69,9 +72,11 @@ module psi_z_comm_v_mod
     subroutine psi_zswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_z_base_multivect_type)      :: y
+      type(psb_ctxt_type), intent(in)       :: iictxt
+      integer(psb_mpk_), intent(in)         :: iicomm
+      integer(psb_ipk_), intent(in)         :: flag
+      integer(psb_ipk_), intent(out)        :: info
+      class(psb_z_base_multivect_type)    :: y
       complex(psb_dpk_)                       :: beta
       complex(psb_dpk_), target               :: work(:)
       class(psb_i_base_vect_type), intent(inout) :: idx
@@ -104,9 +109,11 @@ module psi_z_comm_v_mod
     subroutine psi_ztran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_z_base_vect_type)             :: y
+      type(psb_ctxt_type), intent(in)       :: iictxt
+      integer(psb_mpk_), intent(in)         :: iicomm
+      integer(psb_ipk_), intent(in)         :: flag
+      integer(psb_ipk_), intent(out)        :: info
+      class(psb_z_base_vect_type)          :: y
       complex(psb_dpk_)                       :: beta
       complex(psb_dpk_), target               :: work(:)
       class(psb_i_base_vect_type), intent(inout) :: idx
@@ -115,8 +122,10 @@ module psi_z_comm_v_mod
     subroutine psi_ztran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
+      type(psb_ctxt_type), intent(in)       :: iictxt
+      integer(psb_mpk_), intent(in)         :: iicomm
+      integer(psb_ipk_), intent(in)         :: flag
+      integer(psb_ipk_), intent(out)        :: info
       class(psb_z_base_multivect_type)      :: y
       complex(psb_dpk_)                       :: beta
       complex(psb_dpk_), target               :: work(:)

@@ -52,7 +52,7 @@ subroutine psb_ialloc_vect(x, desc_a,info)
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
-  integer(psb_ipk_) :: ictxt
+  type(psb_ctxt_type) :: ictxt
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -133,8 +133,9 @@ subroutine psb_ialloc_vect_r2(x, desc_a,info,n,lb)
   integer(psb_ipk_), optional, intent(in)   :: n,lb
 
   !locals
+  type(psb_ctxt_type) :: ictxt
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
-  integer(psb_ipk_) :: ictxt, exch(1)
+  integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
 
@@ -235,8 +236,9 @@ subroutine psb_ialloc_multivect(x, desc_a,info,n)
   integer(psb_ipk_), optional, intent(in)   :: n
 
   !locals
+  type(psb_ctxt_type) :: ictxt
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
-  integer(psb_ipk_) :: ictxt, exch(1)
+  integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
 

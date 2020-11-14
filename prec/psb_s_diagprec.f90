@@ -171,7 +171,8 @@ contains
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='s_diag_precdescr'
-    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iout_, iam, np, root_
 
     call psb_erractionsave(err_act)
 

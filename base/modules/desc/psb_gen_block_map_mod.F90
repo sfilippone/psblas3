@@ -805,8 +805,9 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, nv, is
-    integer(psb_lpk_) :: tidx, ip, lip 
-    integer(psb_ipk_) :: ictxt, iam, np
+    integer(psb_lpk_) :: tidx, ip, lip
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam, np
     logical :: owned_
 
     info = 0
@@ -922,7 +923,8 @@ contains
 
     integer(psb_ipk_) :: i, nv, is, im
     integer(psb_lpk_) :: tidx, ip, lip
-    integer(psb_ipk_) :: ictxt, iam, np
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)   :: iam, np
     logical :: owned_
 
     info = 0
@@ -1938,7 +1940,8 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_gen_block_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)          :: info
-    integer(psb_ipk_) :: ictxt, iam, np, nv, ip, i
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam, np, nv, ip, i
     integer(psb_lpk_) :: tidx
     
     ictxt = idxmap%get_ctxt()
@@ -1964,7 +1967,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -1976,7 +1979,7 @@ contains
     info = 0
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt'
       info = -1
       return
     end if
@@ -2030,7 +2033,8 @@ contains
     integer(psb_ipk_), intent(out) :: info
     
     integer(psb_ipk_) :: nhal, i
-    integer(psb_ipk_) :: ictxt, iam, np 
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)   :: iam, np 
     logical :: debug=.false.
     info = 0 
     ictxt = idxmap%get_ctxt()
@@ -2135,7 +2139,7 @@ contains
     implicit none 
     class(psb_gen_block_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, ictxt
+    integer(psb_ipk_) :: err_act
     integer(psb_ipk_) :: k, nr, nc
     integer(psb_lpk_) :: lk
     integer(psb_ipk_), allocatable :: lidx(:)

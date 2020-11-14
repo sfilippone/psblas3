@@ -33,6 +33,8 @@ contains
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
 
     res = -1
     if (ng <=0) then
@@ -50,7 +52,7 @@ contains
     allocate(descp,stat=info)
     if (info < 0) return
 
-    call psb_cdall(ictxt,descp,info,vg=vg(1:ng))
+    call psb_cdall(ctxt,descp,info,vg=vg(1:ng))
     cdh%item = c_loc(descp)
     res = info
 
@@ -66,6 +68,8 @@ contains
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info, ixb
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
 
     res = -1
     if (nl <=0) then
@@ -86,9 +90,9 @@ contains
     ixb = psb_c_get_index_base()
 
     if (ixb == 1) then
-      call psb_cdall(ictxt,descp,info,vl=vl(1:nl))
+      call psb_cdall(ctxt,descp,info,vl=vl(1:nl))
     else
-      call psb_cdall(ictxt,descp,info,vl=(vl(1:nl)+(1-ixb)))
+      call psb_cdall(ctxt,descp,info,vl=(vl(1:nl)+(1-ixb)))
     end if
     cdh%item = c_loc(descp)
     res = info
@@ -103,6 +107,8 @@ contains
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
 
     res = -1
     if (nl <=0) then
@@ -120,7 +126,7 @@ contains
     allocate(descp,stat=info)
     if (info < 0) return
 
-    call psb_cdall(ictxt,descp,info,nl=nl)
+    call psb_cdall(ctxt,descp,info,nl=nl)
     cdh%item = c_loc(descp)
     res = info
 
@@ -135,6 +141,8 @@ contains
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
 
     res = -1
     if (n <=0) then
@@ -152,7 +160,7 @@ contains
     allocate(descp,stat=info)
     if (info < 0) return
 
-    call psb_cdall(ictxt,descp,info,mg=n,repl=.true.)
+    call psb_cdall(ctxt,descp,info,mg=n,repl=.true.)
     cdh%item = c_loc(descp)
     res = info
 
@@ -301,7 +309,8 @@ contains
 
   end function psb_c_cd_get_global_cols
 
-  function psb_c_cd_get_global_indices(idx,nidx,owned,cdh) bind(c,name='psb_c_cd_get_global_indices') result(res)
+  function psb_c_cd_get_global_indices(idx,nidx,owned,cdh) &
+       & bind(c,name='psb_c_cd_get_global_indices') result(res)
     implicit none
 
     integer(psb_c_ipk_)            :: res

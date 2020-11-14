@@ -97,7 +97,7 @@ contains
   
   subroutine psb_print_timers(ictxt, idx, proc, global, iout)
     implicit none
-    integer(psb_ipk_), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in)         :: ictxt
     integer(psb_ipk_), intent(in), optional :: idx, proc, iout
     logical, optional :: global
     !
@@ -280,7 +280,7 @@ contains
     use psb_error_mod
     implicit none 
     ! ...Subroutine Arguments  
-    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),Intent(in)                     :: len
     type(psb_string_item),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional, intent(in) :: lb

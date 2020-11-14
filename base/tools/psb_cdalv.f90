@@ -51,9 +51,10 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  integer(psb_ipk_), intent(in)               :: ictxt, v(:)
-  integer(psb_ipk_), intent(in), optional     :: flag
-  integer(psb_ipk_), intent(out)              :: info
+  type(psb_ctxt_type)                      :: ictxt
+  integer(psb_ipk_), intent(in)            :: v(:)
+  integer(psb_ipk_), intent(in), optional  :: flag
+  integer(psb_ipk_), intent(out)           :: info
   type(psb_desc_type), intent(out)  :: desc
 
   !locals

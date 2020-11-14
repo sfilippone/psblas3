@@ -94,11 +94,6 @@ module psi_penv_mod
   integer(psb_mpk_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
   integer(psb_mpk_), private, parameter:: psb_long_type     = psb_int4_type     + 1
 
-
-  type psb_ctxt_type
-    integer(psb_mpk_), allocatable :: ctxt
-  end type psb_ctxt_type
-
   type psb_buffer_node
     integer(psb_mpk_)   :: request
     type(psb_ctxt_type) :: icontxt 
@@ -196,19 +191,6 @@ module psi_penv_mod
 
 
 contains
-  
-  function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
-    type(psb_ctxt_type), intent(in) :: ctxt1, ctxt2
-    logical :: res
-
-    res = .false.
-    if (.not.allocated(ctxt1%ctxt).and.(.not.allocated(ctxt2%ctxt))) &
-         & res = .true.
-    if (allocated(ctxt1%ctxt).and.allocated(ctxt2%ctxt)) &
-         & res = (ctxt1%ctxt == ctxt2%ctxt)
-
-  end function psb_cmp_ctxt
-
   subroutine psb_init_queue(mesg_queue,info)
     implicit none 
     type(psb_buffer_queue), intent(inout) :: mesg_queue

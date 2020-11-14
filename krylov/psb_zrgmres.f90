@@ -137,7 +137,8 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ictxt, np, me  
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me  
   Real(psb_dpk_)     :: rni, xni, bni, ani,bn2, dt, r0n2
   real(psb_dpk_)     :: errnum, errden, deps, derr
   character(len=20)           :: name

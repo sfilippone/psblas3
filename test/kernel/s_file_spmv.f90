@@ -50,7 +50,8 @@ program s_file_spmv
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: iam, np
 
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&

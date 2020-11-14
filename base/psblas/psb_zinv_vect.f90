@@ -40,7 +40,8 @@ subroutine psb_zinv_vect(x,y,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -115,7 +116,8 @@ subroutine psb_zinv_vect_check(x,y,desc_a,info,flag)
   logical                               :: check
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err

@@ -75,7 +75,8 @@ subroutine  psb_zovrl_vect(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, k, iix, jjx, &
        & nrow, ncol, ldx, liwork, data_, update_, mode_
   integer(psb_lpk_) :: m, n, ix, ijx
   complex(psb_dpk_),pointer :: iwork(:)
@@ -175,7 +176,7 @@ subroutine  psb_zovrl_vect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psb_zovrl_vect
@@ -224,7 +225,8 @@ subroutine  psb_zovrl_multivect(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, k, iix, jjx, &
        & nrow, ncol, ldx, liwork, data_, update_, mode_
   integer(psb_lpk_) :: m, n, ix, ijx
   complex(psb_dpk_),pointer :: iwork(:)
@@ -326,7 +328,7 @@ subroutine  psb_zovrl_multivect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
   
   return
 end subroutine psb_zovrl_multivect

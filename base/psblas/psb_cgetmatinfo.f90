@@ -47,7 +47,8 @@ function  psb_cget_nnz(a,desc_a,info) result(res)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iia, jja
   integer(psb_lpk_) :: localnnz
   character(len=20) :: name, ch_err

@@ -73,11 +73,12 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
 
   integer(psb_ipk_), allocatable :: hhidx(:)
-  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i, err_act, hsize
   integer(psb_lpk_) :: nv
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt,np,me, nresp
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np,me, nresp
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
@@ -89,7 +90,6 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   ictxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
   mglob   = idxmap%get_gr()
-  iictxt = ictxt 
 
   call psb_info(ictxt, me, np)
 

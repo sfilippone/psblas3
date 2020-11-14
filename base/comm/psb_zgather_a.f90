@@ -57,12 +57,12 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) ::  np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, lda_locx, lda_globx, lock, globk,&
        & maxk, k, jlx, ilx, i, j
   integer(psb_lpk_) :: m, n, ilocx,  jlocx, idx, iglobx, jglobx
-
-  character(len=20)        :: name, ch_err
+  character(len=20) :: name, ch_err
 
   name='psb_zgatherm'
   info=psb_success_
@@ -162,7 +162,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 
@@ -231,7 +231,8 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, lda_locx, lda_globx, lock, globk,&
        & maxk, k, jlx, ilx, i, j
   integer(psb_lpk_) :: m, n, ilocx,  jlocx, idx, iglobx, jglobx
@@ -327,7 +328,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 

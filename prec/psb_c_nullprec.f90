@@ -170,7 +170,8 @@ contains
     character(len=20)  :: name='c_null_precset'
     character(len=32) :: dprefix, frmtv
     integer(psb_ipk_) :: ni
-    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iout_, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -212,7 +213,8 @@ contains
     class(psb_c_null_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(out)          :: info
     character(len=*), intent(in), optional  :: prefix,head
-    integer(psb_ipk_) :: iout, iam, np, ictxt, lname
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iout, iam, np, lname
     logical :: isopen
     character(len=80)  :: prefix_
     character(len=120) :: fname ! len should be at least 20 more than

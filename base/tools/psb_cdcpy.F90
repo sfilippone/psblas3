@@ -29,14 +29,14 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-  !
-  ! Subroutine: psb_cdcpy
-  !   Produces a clone of a descriptor.
-  ! 
-  ! Arguments: 
-  !    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
-  !    desc_out - type(psb_desc_type).         The output communication descriptor.
-  !    info     - integer.                       Return code.
+!
+! Subroutine: psb_cdcpy
+!   Produces a clone of a descriptor.
+! 
+! Arguments: 
+!    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
+!    desc_out - type(psb_desc_type).         The output communication descriptor.
+!    info     - integer.                       Return code.
 subroutine psb_cdcpy(desc_in, desc_out, info)
 
   use psb_base_mod, psb_protect_name => psb_cdcpy
@@ -49,7 +49,8 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   integer(psb_ipk_), intent(out)     :: info
 
   !locals
-  integer(psb_ipk_) :: np,me,ictxt, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 

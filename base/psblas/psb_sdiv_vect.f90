@@ -40,7 +40,8 @@ subroutine psb_sdiv_vect(x,y,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -114,7 +115,8 @@ subroutine psb_sdiv_vect2(x,y,z,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err
@@ -201,7 +203,8 @@ subroutine psb_sdiv_vect_check(x,y,desc_a,info,flag)
   logical, intent(in)                   :: flag
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -276,7 +279,8 @@ subroutine psb_sdiv_vect2_check(x,y,z,desc_a,info,flag)
   logical, intent(in)                   :: flag
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err
@@ -369,7 +373,8 @@ function psb_sminquotient_vect(x,y,desc_a,info,global) result(res)
   logical, intent(in), optional           :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_

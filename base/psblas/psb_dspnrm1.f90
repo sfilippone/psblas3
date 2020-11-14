@@ -53,7 +53,8 @@ function psb_dspnrm1(a,desc_a,info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, nr,nc,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, nr,nc,&
        & err_act, iia, jja, mdim, ndim
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   logical :: global_

@@ -37,7 +37,7 @@ subroutine psb_dprecinit(ictxt,p,ptype,info)
   use psb_d_diagprec, only : psb_d_diag_prec_type
   use psb_d_bjacprec, only : psb_d_bjac_prec_type
   implicit none
-  integer(psb_ipk_), intent(in)          :: ictxt
+  type(psb_ctxt_type), intent(in) :: ictxt
   class(psb_dprec_type), intent(inout) :: p
   character(len=*), intent(in)           :: ptype
   integer(psb_ipk_), intent(out)         :: info

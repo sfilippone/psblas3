@@ -32,7 +32,7 @@
 ! Subroutine: psi_covrl_update
 !   These subroutines update the overlap region of a vector; they are  used
 !   for the transpose  matrix-vector product when there is a nonempty overlap,
-!   or for the application of Additive Schwarz preconditioners.                                           
+!   or for the application of Additive Schwarz preconditioners.          
 !    
 !    
 !    
@@ -50,7 +50,8 @@ subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
 
   ! locals
   complex(psb_spk_), allocatable :: xs(:)
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm, nx
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
@@ -131,7 +132,8 @@ subroutine  psi_covrl_upd_multivect(x,desc_a,update,info)
 
   ! locals
   complex(psb_spk_), allocatable :: xs(:,:)
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx, nc
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm, nx, nc
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 

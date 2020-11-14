@@ -53,10 +53,11 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   type(psb_gen_block_map), allocatable :: blck_map
   integer(psb_ipk_), allocatable :: lidx(:),reflidx(:)
   integer(psb_lpk_), allocatable :: gidx(:),vnl(:)
-  integer(psb_ipk_) :: i, n_row, n_col
-  integer(psb_lpk_) :: li, n_glob_row, n_glob_col
-  integer(psb_ipk_) :: np, me, ictxt, err_act
-  integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_)   :: i, n_row, n_col
+  integer(psb_lpk_)   :: li, n_glob_row, n_glob_col
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np, me, err_act
+  integer(psb_ipk_)   :: debug_level, debug_unit
   character(len=20)   :: name
   
   debug_unit  = psb_get_debug_unit()

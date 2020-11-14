@@ -110,7 +110,9 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional         :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, err_act, totxch, data_
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -172,14 +174,17 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag,n
-  integer(psb_ipk_), intent(out)     :: info
+  type(psb_ctxt_type), intent(in)   :: iictxt
+  integer(psb_mpk_), intent(in)     :: iicomm
+  integer(psb_ipk_), intent(in)     :: flag,n
+  integer(psb_ipk_), intent(out)    :: info
   integer(psb_i2pk_)         :: y(:,:), beta
   integer(psb_i2pk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -508,7 +513,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psi_i2tranidxm
@@ -592,7 +597,9 @@ subroutine psi_i2swaptranv(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional    :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, err_act, data_
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -664,14 +671,17 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
-  integer(psb_ipk_), intent(out)     :: info
+  type(psb_ctxt_type), intent(in) :: iictxt
+  integer(psb_mpk_), intent(in)   :: iicomm
+  integer(psb_ipk_), intent(in)   :: flag
+  integer(psb_ipk_), intent(out)  :: info
   integer(psb_i2pk_)         :: y(:), beta
   integer(psb_i2pk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -996,7 +1006,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psi_i2tranidxv

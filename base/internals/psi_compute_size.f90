@@ -47,7 +47,8 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   integer(psb_ipk_) :: desc_data(:), index_in(:)
   !     ....local scalars....      
   integer(psb_ipk_) :: i,np,me,proc, max_index
-  integer(psb_ipk_) :: ictxt, err_act
+  integer(psb_ipk_) :: err_act
+  type(psb_ctxt_type) :: ictxt
   !     ...local array...
   integer(psb_ipk_) :: int_err(5)
   integer(psb_ipk_), allocatable :: counter_recv(:), counter_dl(:)

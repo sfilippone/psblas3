@@ -121,7 +121,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   !    ....local scalars...        
   integer(psb_ipk_) :: j,me,np,i,proc
   !    ...parameters...
-  integer(psb_ipk_) :: ictxt
+  type(psb_ctxt_type) :: ictxt
   integer(psb_ipk_), parameter  :: no_comm=-1
   !     ...local arrays..
   integer(psb_lpk_),allocatable  :: sndbuf(:), rcvbuf(:)

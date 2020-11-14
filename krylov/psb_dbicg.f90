@@ -123,7 +123,8 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer(psb_ipk_), parameter :: irmax = 8
   integer(psb_ipk_) :: itx
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   real(psb_dpk_)     :: alpha, beta, rho, rho_old, sigma
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type) :: stopdat

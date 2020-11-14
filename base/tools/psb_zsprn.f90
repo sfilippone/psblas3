@@ -53,7 +53,8 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   logical, intent(in), optional        :: clear
 
   !locals
-  integer(psb_ipk_) :: ictxt,np,me,err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me,err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
   logical             :: clear_

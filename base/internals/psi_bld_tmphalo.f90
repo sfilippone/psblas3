@@ -62,7 +62,8 @@ subroutine psi_bld_tmphalo(desc,info)
 
   integer(psb_ipk_) ::  i,j,np,me,lhalo,nhalo,&
        & n_col, err_act,  key, ih, nh, idx, nk,icomm
-  integer(psb_ipk_) :: ictxt,n_row
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: n_row
   character(len=20)   :: name,ch_err
 
   info = psb_success_

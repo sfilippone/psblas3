@@ -67,7 +67,8 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k
   logical :: keepnum_, keeploc_
-  integer(psb_mpk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me
   integer(psb_mpk_) :: icomm, minfo, ndx, root_
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_lpk_), allocatable :: locia(:), locja(:), glbia(:), glbja(:)
@@ -216,7 +217,7 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ione*ictxt,err_act)
+  call psb_error_handler(ictxt,err_act)
 
   return
  
@@ -249,7 +250,8 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
-  integer(psb_mpk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   integer(psb_mpk_) :: icomm, minfo, ndx, root_
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_lpk_), allocatable :: lnzbr(:)
@@ -388,7 +390,7 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ione*ictxt,err_act)
+  call psb_error_handler(ictxt,err_act)
 
   return
 
@@ -420,7 +422,8 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_lpk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
-  integer(psb_mpk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   integer(psb_mpk_) :: icomm, minfo, ndx, root_
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_lpk_), allocatable :: lnzbr(:)
@@ -554,7 +557,7 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ione*ictxt,err_act)
+  call psb_error_handler(ictxt,err_act)
 
   return
  

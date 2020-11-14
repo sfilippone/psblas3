@@ -146,7 +146,8 @@ contains
     real(psb_dpk_), optional, intent(out) :: err
     integer(psb_ipk_), optional, intent(out)  :: iter
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act, itrace
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: me, np, err_act, itrace
     real(psb_dpk_)                  :: errnum, errden, eps
     character(len=20)               :: name
 

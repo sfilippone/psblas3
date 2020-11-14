@@ -46,7 +46,8 @@ subroutine  psi_movrl_updr1(x,desc_a,update,info)
   integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
@@ -103,7 +104,6 @@ subroutine  psi_movrl_updr1(x,desc_a,update,info)
   return
 end subroutine psi_movrl_updr1
 
-
 subroutine  psi_movrl_updr2(x,desc_a,update,info)
   use psi_mod, psi_protect_name =>   psi_movrl_updr2
 
@@ -115,7 +115,8 @@ subroutine  psi_movrl_updr2(x,desc_a,update,info)
   integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 

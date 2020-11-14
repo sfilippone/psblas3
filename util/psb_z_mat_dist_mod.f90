@@ -32,7 +32,7 @@
 module psb_z_mat_dist_mod
   use psb_base_mod, only :  psb_ipk_, psb_dpk_, psb_desc_type, psb_parts, &
        & psb_zspmat_type, psb_z_base_sparse_mat, psb_z_vect_type, &
-       & psb_lzspmat_type
+       & psb_lzspmat_type,  psb_ctxt_type
 
   interface psb_matdist
     subroutine psb_zmatdist(a_glob, a, ictxt, desc_a,&
@@ -76,13 +76,12 @@ module psb_z_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      import :: psb_ipk_, psb_zspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_z_base_sparse_mat, psb_z_vect_type, psb_parts
+      import
       implicit none
 
       ! parameters
       type(psb_zspmat_type)      :: a_glob
-      integer(psb_ipk_) :: ictxt
+      type(psb_ctxt_type) :: ictxt
       type(psb_zspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info
@@ -134,14 +133,12 @@ module psb_z_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      import :: psb_ipk_, psb_zspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_z_base_sparse_mat, psb_z_vect_type, psb_parts, &
-           & psb_lzspmat_type
+      import
       implicit none
 
       ! parameters
       type(psb_lzspmat_type)      :: a_glob
-      integer(psb_ipk_) :: ictxt
+      type(psb_ctxt_type) :: ictxt
       type(psb_zspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info

@@ -65,7 +65,8 @@ subroutine  psb_zhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me
   integer(psb_ipk_) :: err_act, iix, jjx, k, maxk, nrow, imode, i,&
        & liwork,data_, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
@@ -192,7 +193,7 @@ subroutine  psb_zhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psb_zhalom
@@ -266,7 +267,8 @@ subroutine  psb_zhalov(x,desc_a,info,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me
   integer(psb_ipk_) :: err_act, ldx, iix, jjx, nrow, imode, liwork,data_
   integer(psb_lpk_) :: m, n, ix, ijx
   complex(psb_dpk_),pointer :: iwork(:)
@@ -373,7 +375,7 @@ subroutine  psb_zhalov(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psb_zhalov

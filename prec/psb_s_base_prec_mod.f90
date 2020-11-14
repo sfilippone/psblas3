@@ -36,17 +36,18 @@
 module psb_s_base_prec_mod
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_spk_, psb_ipk_, psb_epk_,&
+  use psb_base_mod, only : psb_spk_, psb_ipk_, psb_epk_, psb_ctxt_type, &
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
        & psb_sizeof_ip, psb_sizeof_lp, psb_sizeof_sp, psb_sizeof_dp, &
-       & psb_erractionsave, psb_erractionrestore, psb_error, psb_errstatus_fatal, psb_success_,&
+       & psb_erractionsave, psb_erractionrestore, psb_error, &
+       & psb_errstatus_fatal, psb_success_,&
        & psb_s_base_sparse_mat, psb_sspmat_type, psb_s_csr_sparse_mat,& 
        & psb_s_base_vect_type, psb_s_vect_type, psb_i_base_vect_type
 
   use psb_prec_const_mod
 
   type, abstract :: psb_s_base_prec_type
-    integer(psb_ipk_) :: ictxt
+    type(psb_ctxt_type) :: ictxt
   contains
     procedure, pass(prec) :: set_ctxt   => psb_s_base_set_ctxt
     procedure, pass(prec) :: get_ctxt   => psb_s_base_get_ctxt
@@ -345,7 +346,7 @@ contains
   subroutine psb_s_base_set_ctxt(prec,ictxt)
     implicit none 
     class(psb_s_base_prec_type), intent(inout) :: prec
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type) :: ictxt
 
     prec%ictxt = ictxt
 
@@ -361,7 +362,7 @@ contains
 
   function psb_s_base_get_ctxt(prec) result(val)
     class(psb_s_base_prec_type), intent(in) :: prec
-    integer(psb_ipk_) :: val
+    type(psb_ctxt_type) :: val
 
     val = prec%ictxt
     return
@@ -382,7 +383,8 @@ contains
     character(len=32) :: res 
     !
     character(len=32) :: frmtv
-    integer(psb_ipk_) :: ni, ictxt,iam,np
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: ni, iam, np
 
     ictxt = prec%ictxt
     call psb_info(ictxt,iam,np)

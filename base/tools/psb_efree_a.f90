@@ -48,7 +48,8 @@ subroutine psb_efree(x, desc_a, info)
   integer(psb_ipk_), intent(out)            :: info
 
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me, err_act
   character(len=20)   :: name
 
   name='psb_efree'
@@ -116,7 +117,8 @@ subroutine psb_efreev(x, desc_a, info)
   integer(psb_ipk_), intent(out)            :: info
 
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me, err_act
   character(len=20)   :: name
 
   name='psb_efreev'

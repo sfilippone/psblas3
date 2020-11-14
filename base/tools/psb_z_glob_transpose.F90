@@ -110,7 +110,8 @@ subroutine psb_lz_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   integer(psb_ipk_), intent(out)               :: info
 
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc, err_act, j
   integer(psb_lpk_) :: i,  k, idx, r, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     l1, nsnds, nrcvs, nr,nc,nzl, hlstart, nzt, nzd
@@ -406,7 +407,8 @@ subroutine psb_z_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   type(psb_desc_type), intent(out), optional   :: desc_rx
   integer(psb_ipk_), intent(out)               :: info
   
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc, err_act, j
   integer(psb_ipk_) :: i,  k, idx, r, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     l1, nsnds, nrcvs, nr,nc,nzl, hlstart, nzd
@@ -709,7 +711,8 @@ subroutine psb_z_simple_glob_transpose_ip(ain,desc_a,info)
   !
   type(psb_z_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
-  integer(psb_ipk_) :: ictxt, me, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
   integer(psb_lpk_), allocatable :: ilv(:) 
   character(len=80) :: aname
@@ -760,7 +763,8 @@ subroutine psb_z_simple_glob_transpose(ain,aout,desc_a,info)
   !
   type(psb_z_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
-  integer(psb_ipk_) :: ictxt, me, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
   integer(psb_lpk_), allocatable :: ilv(:) 
   character(len=80) :: aname
@@ -811,7 +815,8 @@ subroutine psb_lz_simple_glob_transpose_ip(ain,desc_a,info)
   !
   type(psb_lz_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
-  integer(psb_ipk_) :: ictxt, me, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
   integer(psb_lpk_), allocatable :: ilv(:) 
   character(len=80) :: aname
@@ -862,7 +867,8 @@ subroutine psb_lz_simple_glob_transpose(ain,aout,desc_a,info)
   !
   type(psb_lz_coo_sparse_mat) :: tmpc1, tmpc2
   integer(psb_ipk_) :: nz1, nz2, nzh, nz
-  integer(psb_ipk_) :: ictxt, me, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me, np
   integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
   integer(psb_lpk_), allocatable :: ilv(:) 
   character(len=80) :: aname

@@ -74,11 +74,12 @@ subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
-  !LOCALS.....
 
-  integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
-  integer(psb_ipk_) :: np, me
-  integer(psb_ipk_) :: nrow,ncol, err_act
+  !LOCALS.....
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: dectype,mglob, nglob
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: nrow,ncol, err_act
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
@@ -218,11 +219,11 @@ subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
 
 
   !LOCALS.....
-
-  integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
-  integer(psb_ipk_) :: np, me
-  integer(psb_ipk_) :: nrow,ncol, err_act
-  logical, parameter     :: debug=.false.
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: dectype,mglob, nglob
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: nrow,ncol, err_act
+  logical, parameter  :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
   character(len=20)      :: name

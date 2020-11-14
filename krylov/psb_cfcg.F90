@@ -128,7 +128,8 @@ subroutine psb_cfcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: n_col, naux, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: np, me, ictxt
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   complex(psb_spk_), allocatable, target   :: aux(:)
   complex(psb_spk_)   :: vres(3)
   character(len=20)           :: name

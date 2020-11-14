@@ -57,7 +57,8 @@ function psb_zasum (x,desc_a, info, jx,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -160,7 +161,8 @@ function psb_zasum_vect(x, desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, imax, i, idx, ndm
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -297,7 +299,8 @@ function psb_zasumv(x,desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -428,7 +431,8 @@ subroutine psb_zasumvs(res,x,desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_

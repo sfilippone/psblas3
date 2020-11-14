@@ -2,8 +2,8 @@
 subroutine psb_errcomm_i(ictxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
-  integer(psb_ipk_), intent(in)   :: ictxt
-  integer(psb_ipk_), intent(inout):: err
+  type(psb_ctxt_type), intent(in)  :: ictxt
+  integer(psb_ipk_), intent(inout) :: err
 
   if (psb_get_global_checks()) call psb_amx(ictxt, err)
 
@@ -14,8 +14,8 @@ end subroutine psb_errcomm_i
 subroutine psb_errcomm_m(ictxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
-  integer(psb_mpk_), intent(in)   :: ictxt
-  integer(psb_ipk_), intent(inout):: err
+  type(psb_ctxt_type), intent(in)  :: ictxt
+  integer(psb_ipk_), intent(inout) :: err
   
   if (psb_get_global_checks()) call psb_amx(ictxt, err)
 
@@ -41,8 +41,8 @@ subroutine psb_par_error_handler(ictxt,err_act)
   use psb_error_mod, psb_protect_name => psb_par_error_handler
   use psb_penv_mod
   implicit none 
-  integer(psb_ipk_), intent(in) ::  ictxt
-  integer(psb_ipk_), intent(in) ::  err_act
+  type(psb_ctxt_type), intent(in) ::  ictxt
+  integer(psb_ipk_), intent(in)   ::  err_act
 
   call psb_erractionrestore(err_act)
 
@@ -58,7 +58,7 @@ end subroutine psb_par_error_handler
 subroutine psb_par_error_print_stack(ictxt)
   use psb_error_mod, psb_protect_name => psb_par_error_print_stack
   use psb_penv_mod
-  integer(psb_ipk_), intent(in) ::  ictxt
+  type(psb_ctxt_type), intent(in) ::  ictxt
 
   call psb_error(ictxt, abrt=.false.)
   
@@ -79,8 +79,8 @@ subroutine psb_serror()
   use psb_error_mod
   implicit none 
   integer(psb_ipk_) ::  err_c
-  character(len=20)       ::  r_name
-  character(len=40)       ::  a_e_d
+  character(len=20) ::  r_name
+  character(len=40) ::  a_e_d
   integer(psb_epk_) ::  e_e_d(5)
 
   if (psb_errstatus_fatal()) then
@@ -116,20 +116,19 @@ subroutine psb_perror(ictxt,abrt)
   use psb_error_mod
   use psb_penv_mod
   implicit none 
-  integer(psb_ipk_), intent(in) :: ictxt
-  logical, intent(in), optional  :: abrt
+  type(psb_ctxt_type), intent(in) :: ictxt
+  logical, intent(in), optional   :: abrt
 
-  integer(psb_ipk_)  :: err_c
-  character(len=20)  :: r_name
-  character(len=40)  :: a_e_d
-  integer(psb_epk_)  :: e_e_d(5)
-  integer(psb_mpk_) :: iictxt, iam, np
+  integer(psb_ipk_) :: err_c
+  character(len=20) :: r_name
+  character(len=40) :: a_e_d
+  integer(psb_epk_) :: e_e_d(5)
+  integer(psb_mpk_) :: iam, np
   logical :: abrt_
 
   abrt_=.true.
   if (present(abrt)) abrt_=abrt
-  iictxt = ictxt 
-  call psb_info(iictxt,iam,np)
+  call psb_info(ictxt,iam,np)
   
   if (psb_errstatus_fatal()) then
     if (psb_get_errverbosity() > 1) then
@@ -144,7 +143,7 @@ subroutine psb_perror(ictxt,abrt)
       flush(psb_err_unit) 
 #endif
       
-      if (abrt_) call psb_abort(iictxt,-1)
+      if (abrt_) call psb_abort(ictxt,-1)
       
     else
 
@@ -157,7 +156,7 @@ subroutine psb_perror(ictxt,abrt)
       flush(psb_err_unit) 
 #endif
 
-      if (abrt_) call psb_abort(iictxt,-1)
+      if (abrt_) call psb_abort(ictxt,-1)
 
     end if
   end if

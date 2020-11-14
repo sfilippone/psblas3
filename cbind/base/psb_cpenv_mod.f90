@@ -22,7 +22,7 @@ contains
   end subroutine psb_c_set_index_base  
   
   function psb_c_get_errstatus() bind(c) result(res)
-    use psb_base_mod, only : psb_get_errstatus
+    use psb_base_mod, only : psb_get_errstatus, psb_ctxt_type
     implicit none 
     
     integer(psb_c_ipk_)  :: res
@@ -31,84 +31,101 @@ contains
   end function psb_c_get_errstatus
 
   function psb_c_init() bind(c)
-    use psb_base_mod, only : psb_init
+    use psb_base_mod, only : psb_init, psb_ctxt_type
     implicit none 
     
     integer(psb_c_ipk_)  :: psb_c_init
     
-    integer :: ictxt
+    type(psb_ctxt_type) :: ictxt
 
     call psb_init(ictxt)
-    psb_c_init = ictxt
+    psb_c_init = ictxt%ctxt
   end function psb_c_init
   
   subroutine psb_c_exit_ctxt(ictxt) bind(c)
-    use psb_base_mod, only : psb_exit
+    use psb_base_mod, only : psb_exit, psb_ctxt_type
     integer(psb_c_ipk_), value :: ictxt
-    
-    call psb_exit(ictxt,close=.false.)
+
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+    call psb_exit(ctxt,close=.false.)
     return
   end subroutine psb_c_exit_ctxt
   
   subroutine psb_c_exit(ictxt) bind(c)
-    use psb_base_mod, only : psb_exit
+    use psb_base_mod, only : psb_exit, psb_ctxt_type
     integer(psb_c_ipk_), value :: ictxt
+
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
     
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     return
   end subroutine psb_c_exit
   
   subroutine psb_c_abort(ictxt) bind(c)
-    use psb_base_mod, only : psb_abort
+    use psb_base_mod, only : psb_abort, psb_ctxt_type
     integer(psb_c_ipk_), value :: ictxt
     
-    call psb_abort(ictxt)
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+    call psb_abort(ctxt)
     return
   end subroutine psb_c_abort
   
 
   subroutine psb_c_info(ictxt,iam,np) bind(c)
-    use psb_base_mod, only : psb_info
+    use psb_base_mod, only : psb_info, psb_ctxt_type
     integer(psb_c_ipk_), value :: ictxt
     integer(psb_c_ipk_)        :: iam,np
     
-    call psb_info(ictxt,iam,np)
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+    call psb_info(ctxt,iam,np)
     return
   end subroutine psb_c_info
   
   subroutine psb_c_barrier(ictxt) bind(c)
-    use psb_base_mod, only : psb_barrier
+    use psb_base_mod, only : psb_barrier, psb_ctxt_type
     integer(psb_c_ipk_), value :: ictxt
 
-    call psb_barrier(ictxt)
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+    call psb_barrier(ctxt)
   end subroutine psb_c_barrier
   
   real(c_double) function psb_c_wtime() bind(c)
-    use psb_base_mod, only : psb_wtime
+    use psb_base_mod, only : psb_wtime, psb_ctxt_type
     
     psb_c_wtime = psb_wtime()
   end function psb_c_wtime
 
   subroutine psb_c_mbcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast
+    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     integer(psb_c_mpk_)        :: v(*) 
     
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
       return
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_mbcast
 
   subroutine psb_c_ibcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast
+    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     integer(psb_c_ipk_)        :: v(*) 
+    type(psb_ctxt_type) :: ctxt
+
+    ctxt%ctxt = ictxt
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -116,37 +133,41 @@ contains
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_ibcast
 
   subroutine psb_c_lbcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast
+    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     integer(psb_c_lpk_)        :: v(*) 
-    
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
       return
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_lbcast
 
   subroutine psb_c_ebcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast
+    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     integer(psb_c_epk_)        :: v(*) 
-    
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
+
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
       return
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_ebcast
 
   subroutine psb_c_sbcast(ictxt,n,v,root) bind(c)
@@ -154,6 +175,8 @@ contains
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     real(c_float)     :: v(*) 
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -161,14 +184,16 @@ contains
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_sbcast
 
   subroutine psb_c_dbcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast
+    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     real(c_double)        :: v(*) 
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -176,15 +201,17 @@ contains
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_dbcast
 
 
   subroutine psb_c_cbcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast
+    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     complex(c_float_complex)        :: v(*) 
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -192,7 +219,7 @@ contains
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_cbcast
 
   subroutine psb_c_zbcast(ictxt,n,v,root) bind(c)
@@ -200,6 +227,8 @@ contains
     implicit none 
     integer(psb_c_ipk_), value :: ictxt,n, root
     complex(c_double_complex)     :: v(*) 
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -207,17 +236,19 @@ contains
     end if
     if (n==0) return 
     
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_zbcast
 
   subroutine psb_c_hbcast(ictxt,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_info, psb_ipk_
+    use psb_base_mod, only : psb_bcast, psb_info, psb_ipk_, psb_ctxt_type
     implicit none 
     integer(psb_c_ipk_), value :: ictxt, root
     character(c_char)  :: v(*) 
     integer(psb_ipk_)  :: iam, np, n
+    type(psb_ctxt_type) :: ctxt
+    ctxt%ctxt = ictxt
     
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     
     if (iam==root) then 
       n = 1 
@@ -226,12 +257,12 @@ contains
         n = n + 1
       end do
     end if
-    call psb_bcast(ictxt,n,root=root)
-    call psb_bcast(ictxt,v(1:n),root=root)
+    call psb_bcast(ctxt,n,root=root)
+    call psb_bcast(ctxt,v(1:n),root=root)
   end subroutine psb_c_hbcast
 
   function psb_c_f2c_errmsg(cmesg,len) bind(c) result(res)
-    use psb_base_mod, only : psb_errpop,psb_max_errmsg_len_
+    use psb_base_mod, only : psb_errpop,psb_max_errmsg_len_, psb_ctxt_type
     use psb_base_string_cbind_mod
     implicit none 
     character(c_char), intent(inout)  :: cmesg(*)
@@ -261,17 +292,17 @@ contains
   end function psb_c_f2c_errmsg
 
   subroutine psb_c_seterraction_ret() bind(c)
-    use psb_base_mod, only : psb_set_erraction, psb_act_ret_
+    use psb_base_mod, only : psb_set_erraction, psb_act_ret_, psb_ctxt_type
     call psb_set_erraction(psb_act_ret_)
   end subroutine psb_c_seterraction_ret
 
   subroutine psb_c_seterraction_print() bind(c)
-    use psb_base_mod, only : psb_set_erraction, psb_act_print_
+    use psb_base_mod, only : psb_set_erraction, psb_act_print_, psb_ctxt_type
     call psb_set_erraction(psb_act_print_)
   end subroutine psb_c_seterraction_print
 
   subroutine psb_c_seterraction_abort() bind(c)
-    use psb_base_mod, only : psb_set_erraction, psb_act_abort_
+    use psb_base_mod, only : psb_set_erraction, psb_act_abort_, psb_ctxt_type
     call psb_set_erraction(psb_act_abort_)
   end subroutine psb_c_seterraction_abort
     

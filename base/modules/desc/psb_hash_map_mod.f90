@@ -329,7 +329,8 @@ contains
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, lip, nrow, nrm, is
     integer(psb_lpk_) :: ncol, ip, tlip, mglob
-    integer(psb_mpk_) :: ictxt, iam, np
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_)   :: iam, np
     logical :: owned_
 
     info = 0
@@ -541,8 +542,9 @@ contains
     integer(psb_ipk_) :: i, is, lip, nrow, ncol, &
          & err_act
     integer(psb_lpk_) :: mglob, ip, nxt, tlip
-    integer(psb_ipk_) :: ictxt, me, np
-    character(len=20)  :: name,ch_err
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)   :: me, np
+    character(len=20)   :: name,ch_err
 
     info = psb_success_
     name = 'hash_g2l_ins'
@@ -805,7 +807,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)    :: ictxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -819,7 +821,7 @@ contains
     info = 0
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt'
       info = -1
       return
     end if
@@ -878,7 +880,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)    :: ictxt
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -890,7 +892,7 @@ contains
     info = 0
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt:'
       info = -1
       return
     end if
@@ -938,7 +940,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)    :: ictxt
     integer(psb_lpk_), intent(in)  :: vlu(:), ntot
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
@@ -950,7 +952,7 @@ contains
     info = 0
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt:'
       info = -1
       return
     end if
@@ -996,10 +998,11 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpk_) :: ictxt, iam, np
-    integer(psb_ipk_) :: i, j, m, nl
-    integer(psb_ipk_) :: ih, nh, idx, nbits
-    integer(psb_lpk_) :: key, hsize, hmask
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_)   :: iam, np
+    integer(psb_ipk_)   :: i, j, m, nl
+    integer(psb_ipk_)   :: ih, nh, idx, nbits
+    integer(psb_lpk_)   :: key, hsize, hmask
     character(len=20), parameter :: name='hash_map_init_vlu'
 
     info = 0
@@ -1007,7 +1010,7 @@ contains
 
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt:'
       info = -1
       return
     end if
@@ -1098,10 +1101,11 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_), intent(out)     :: info
 
-    integer(psb_mpk_) :: ictxt, iam, np 
-    integer(psb_ipk_) :: nhal
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_)   :: iam, np 
+    integer(psb_ipk_)   :: nhal
 
     info = 0 
     ictxt = idxmap%get_ctxt()
@@ -1534,7 +1538,8 @@ contains
     integer(psb_ipk_) :: err_act, nr,nc,k, nl
     integer(psb_lpk_) :: lk
     integer(psb_lpk_) :: ntot
-    integer(psb_ipk_) :: ictxt, me, np
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)   :: me, np
     integer(psb_ipk_), allocatable :: lidx(:), tadj(:), th_own(:)
     integer(psb_lpk_), allocatable :: gidx(:)
     character(len=20)  :: name='hash_reinit'

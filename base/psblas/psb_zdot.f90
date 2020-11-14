@@ -64,7 +64,8 @@ function psb_zdot_vect(x, y, desc_a,info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -187,7 +188,8 @@ function psb_zdot(x, y,desc_a, info, jx, jy,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   complex(psb_dpk_)        :: zdotc
@@ -338,7 +340,8 @@ function psb_zdotv(x, y,desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
   integer(psb_lpk_) :: ix, jx, iy, jy, m
   logical :: global_
@@ -474,7 +477,8 @@ subroutine psb_zdotvs(res, x, y,desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i,nr, lldx, lldy
   integer(psb_lpk_) :: ix, jx, iy, jy, m
   logical :: global_
@@ -608,7 +612,8 @@ subroutine psb_zmdots(res, x, y, desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_

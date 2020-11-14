@@ -134,7 +134,8 @@ Subroutine psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_,j, k
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   real(psb_dpk_) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
   real(psb_dpk_)     :: derr  

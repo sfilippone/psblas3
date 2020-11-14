@@ -44,7 +44,8 @@ subroutine psb_cprecbld(a,desc_a,p,info,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   ! Local scalars
-  integer(psb_ipk_) :: ictxt, me,np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me,np
   integer(psb_ipk_) :: err, n_row, n_col,mglob, err_act
   integer(psb_ipk_),parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err

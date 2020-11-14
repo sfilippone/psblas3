@@ -47,7 +47,8 @@ subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_restr_vect'
@@ -89,7 +90,8 @@ subroutine  psi_iovrl_restr_multivect(x,xs,desc_a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_restr_mv'

@@ -148,7 +148,8 @@ contains
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20) :: name='z_bjac_precdescr'
-    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iout_, iam, np, root_
 
     call psb_erractionsave(err_act)
 

@@ -41,7 +41,8 @@ subroutine psb_ccmp_vect(x,c,z,desc_a,info)
   integer(psb_ipk_), intent(out)          :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -115,7 +116,8 @@ subroutine psb_ccmp_spmatval(a,val,tol,desc_a,res,info)
   logical, intent(out)                    :: res
 
   ! Local
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: err_act
   character(len=20) :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -169,7 +171,8 @@ subroutine psb_ccmp_spmat(a,b,tol,desc_a,res,info)
   logical, intent(out)                    :: res
 
   ! Local
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: err_act
   character(len=20) :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit

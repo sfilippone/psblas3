@@ -52,7 +52,8 @@ subroutine psb_dasb(x, desc_a, info, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me,nrow,ncol, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me,nrow,ncol, err_act
   integer(psb_ipk_) :: i1sz, i2sz
   integer(psb_ipk_) :: debug_level, debug_unit
   logical :: scratch_
@@ -188,7 +189,8 @@ subroutine psb_dasbv(x, desc_a, info, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   logical :: scratch_

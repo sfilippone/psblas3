@@ -38,7 +38,8 @@ subroutine psb_d_diag_dump(prec,info,prefix,head)
   integer(psb_ipk_), intent(out)                    :: info
   character(len=*), intent(in), optional  :: prefix,head
   integer(psb_ipk_) :: i, j, il1, iln, lname, lev
-  integer(psb_ipk_) :: ictxt,iam, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
 

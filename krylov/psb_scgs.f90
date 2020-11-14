@@ -117,7 +117,8 @@ Subroutine psb_scgs_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
        & n_row, n_col,istop_, itx, err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np, me, ictxt
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: debug_level, debug_unit
   real(psb_spk_)  :: alpha, beta, rho, rho_old, sigma 
   real(psb_dpk_)     :: derr  

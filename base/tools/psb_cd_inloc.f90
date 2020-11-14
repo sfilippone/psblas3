@@ -49,11 +49,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  integer(psb_ipk_), intent(in)               :: ictxt
-  integer(psb_lpk_), intent(in)               :: v(:)
-  integer(psb_ipk_), intent(out)              :: info
-  type(psb_desc_type), intent(out)  :: desc
-  logical, intent(in), optional     :: globalcheck,usehash
+  type(psb_ctxt_type), intent(in)  :: ictxt
+  integer(psb_lpk_), intent(in)    :: v(:)
+  integer(psb_ipk_), intent(out)   :: info
+  type(psb_desc_type), intent(out) :: desc
+  logical, intent(in), optional    :: globalcheck,usehash
   integer(psb_ipk_), intent(in), optional     :: idx(:)
 
   !locals

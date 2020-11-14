@@ -165,7 +165,8 @@ contains
     type(psb_dspmat_type) :: a
     type(psb_d_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_)     :: ictxt, info
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)     :: info
     character(len=*)      :: afmt
     procedure(d_func_3d), optional :: f
     class(psb_d_base_sparse_mat), optional :: amold
@@ -567,7 +568,8 @@ program pdgenspmv
   type(psb_d_vect_type)  :: xv,bv, vtst
   real(psb_dpk_), allocatable :: tst(:)
   ! blacs parameters
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: iam, np
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr, ipart
@@ -720,7 +722,7 @@ contains
   ! get iteration parameters from standard input
   !
   subroutine  get_parms(ictxt,afmt,idim)
-    integer(psb_ipk_) :: ictxt
+    type(psb_ctxt_type) :: ictxt
     character(len=*) :: afmt
     integer(psb_ipk_) :: idim
     integer(psb_ipk_) :: np, iam

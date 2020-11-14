@@ -62,7 +62,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam, nlr
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me, iroot, icomm, myrank, rootrank, iam, nlr
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
@@ -235,7 +236,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, root)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 
@@ -306,7 +307,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_lpk_) :: m, n, i, j, idx, iglobx, jglobx
@@ -472,7 +474,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, root)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 

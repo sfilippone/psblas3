@@ -62,7 +62,8 @@ subroutine psb_sasb_vect(x, desc_a, info, mold, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -135,7 +136,8 @@ subroutine psb_sasb_vect_r2(x, desc_a, info, mold, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me, i, n 
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me, i, n 
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -217,7 +219,8 @@ subroutine psb_sasb_multivect(x, desc_a, info, mold, scratch,n)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_
   logical :: scratch_
   

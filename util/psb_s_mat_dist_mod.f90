@@ -32,7 +32,7 @@
 module psb_s_mat_dist_mod
   use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_desc_type, psb_parts, &
        & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_vect_type, &
-       & psb_lsspmat_type
+       & psb_lsspmat_type,  psb_ctxt_type
 
   interface psb_matdist
     subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
@@ -76,13 +76,12 @@ module psb_s_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      import :: psb_ipk_, psb_sspmat_type, psb_spk_, psb_desc_type,&
-           & psb_s_base_sparse_mat, psb_s_vect_type, psb_parts
+      import
       implicit none
 
       ! parameters
       type(psb_sspmat_type)      :: a_glob
-      integer(psb_ipk_) :: ictxt
+      type(psb_ctxt_type) :: ictxt
       type(psb_sspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info
@@ -134,14 +133,12 @@ module psb_s_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      import :: psb_ipk_, psb_sspmat_type, psb_spk_, psb_desc_type,&
-           & psb_s_base_sparse_mat, psb_s_vect_type, psb_parts, &
-           & psb_lsspmat_type
+      import
       implicit none
 
       ! parameters
       type(psb_lsspmat_type)      :: a_glob
-      integer(psb_ipk_) :: ictxt
+      type(psb_ctxt_type) :: ictxt
       type(psb_sspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info

@@ -74,7 +74,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
        & last_ih, last_j
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name

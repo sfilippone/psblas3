@@ -99,12 +99,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
 
   integer(psb_lpk_), allocatable :: tidx(:)
   integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:), ladj(:)  
-  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j,ipnt, nsampl_out,&
        & nv, n_answers, nqries, nsampl_in, locr_max, &
        & nqries_max, nadj, maxspace, mxnsin
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me, nresp
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
   integer(psb_ipk_) :: tmpv(4)
   logical, parameter  :: do_timings=.false., trace=.false., debugsz=.false.
@@ -121,7 +122,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt  = ictxt 
+
   if ((do_timings).and.(idx_sweep0==-1))       &
        & idx_sweep0 = psb_get_timer_idx("GRPH_FND_OWN: Outer sweep")
   if ((do_timings).and.(idx_loop_a2a==-1))       &
@@ -360,7 +361,8 @@ contains
     integer(psb_ipk_), intent(in)    :: adj(:)
     class(psb_indx_map), intent(inout) :: idxmap
     !
-    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, ictxt, me, np, isw
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw
     integer(psb_lpk_), allocatable    :: tidx(:)
     integer(psb_ipk_), allocatable    :: tsmpl(:)
 

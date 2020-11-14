@@ -46,7 +46,8 @@ subroutine psb_dfree_vect(x, desc_a, info)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)             :: info 
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me,err_act
   character(len=20)   :: name
 
 
@@ -100,7 +101,8 @@ subroutine psb_dfree_vect_r2(x, desc_a, info)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)             :: info 
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act, i
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me,err_act, i
   character(len=20)   :: name
 
 
@@ -152,7 +154,8 @@ subroutine psb_dfree_multivect(x, desc_a, info)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)             :: info 
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me,err_act
   character(len=20)   :: name
 
 

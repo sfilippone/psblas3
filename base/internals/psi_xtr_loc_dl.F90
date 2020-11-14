@@ -122,11 +122,11 @@ subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   include 'mpif.h'
 #endif
   !     ....scalar parameters...
-  logical,  intent(in)           :: is_bld, is_upd
-  integer(psb_ipk_), intent(in)  :: ictxt
-  integer(psb_ipk_), intent(in)  :: desc_str(:)
+  logical,  intent(in)            :: is_bld, is_upd
+  type(psb_ctxt_type), intent(in) :: ictxt
+  integer(psb_ipk_), intent(in)   :: desc_str(:)
   integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:), length_dl(:)
-  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_), intent(out)  :: info
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)
 
@@ -134,7 +134,7 @@ subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   integer(psb_ipk_) :: i,pdl,proc,j,err_act, ldu
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt, icomm, me, np, minfo
+  integer(psb_ipk_) :: me, np
   logical, parameter :: dist_symm_list=.true., print_dl=.false., profile=.true.
   character  name*20
   name='psi_extrct_dl'
@@ -142,10 +142,9 @@ subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  iictxt = ictxt 
   info = psb_success_
 
-  call psb_info(iictxt,me,np)
+  call psb_info(ictxt,me,np)
   pdl = size(desc_str)
   allocate(loc_dl(pdl+1),length_dl(0:np),stat=info)
   if (info /= psb_success_) then 

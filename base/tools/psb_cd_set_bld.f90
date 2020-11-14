@@ -53,7 +53,8 @@ subroutine psb_cd_set_bld(desc,info)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_) :: info
   !locals
-  integer(psb_ipk_) :: np,me,ictxt, err_act,idx,gidx,lidx,nc
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np, me, err_act,idx,gidx,lidx,nc
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name
   if (debug) write(psb_err_unit,*) me,'Entered CDCPY'
@@ -64,7 +65,7 @@ subroutine psb_cd_set_bld(desc,info)
 
   ictxt = desc%get_context()
 
-  if (debug) write(psb_err_unit,*)'Entered CDSETBLD',ictxt
+  if (debug) write(psb_err_unit,*)'Entered CDSETBLD'
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (debug) write(psb_err_unit,*) me,'Entered CDSETBLD'

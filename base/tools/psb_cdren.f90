@@ -56,11 +56,12 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   character, intent(in)               :: trans
   integer(psb_ipk_), intent(out)                :: info
   !....locals....
-  integer(psb_ipk_) :: i,j,np,me, n_col, kh, nh
-  integer(psb_ipk_) :: dectype
-  integer(psb_ipk_) :: ictxt,n_row, err_act
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name
+  integer(psb_ipk_)   :: i,j,np,me, n_col, kh, nh
+  integer(psb_ipk_)   :: dectype
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: n_row, err_act
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_

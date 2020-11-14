@@ -50,12 +50,12 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   use psb_list_map_mod
   use psb_hash_map_mod
   implicit None
-  procedure(psb_parts)               :: parts
+  procedure(psb_parts)             :: parts
   !....Parameters...
-  integer(psb_lpk_), intent(in)      :: M,N
-  integer(psb_ipk_), intent(in)      :: ictxt
-  Type(psb_desc_type), intent(out)   :: desc
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_lpk_), intent(in)    :: M,N
+  type(psb_ctxt_type), intent(in)  :: ictxt
+  Type(psb_desc_type), intent(out) :: desc
+  integer(psb_ipk_), intent(out)   :: info
 
   !locals
   integer(psb_ipk_) :: counter,i,j,loc_row,err,loc_col,&

@@ -55,7 +55,8 @@ subroutine psb_ealloc(x, desc_a, info, n, lb)
 
   !locals
   integer(psb_ipk_) :: err,nr,i,j,n_,err_act
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: exch(3)
   character(len=20)   :: name
 
@@ -183,7 +184,8 @@ subroutine psb_eallocv(x, desc_a,info,n)
 
   !locals
   integer(psb_ipk_) :: nr,i,err_act
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 

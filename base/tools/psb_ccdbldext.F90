@@ -90,7 +90,9 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
   integer(psb_lpk_) :: gidx, lnz
-  integer(psb_mpk_) :: icomm, ictxt, me, np, minfo
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me, np
+  integer(psb_mpk_) :: icomm, minfo
 
   integer(psb_ipk_), allocatable :: irow(:), icol(:)
   integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
@@ -701,7 +703,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 

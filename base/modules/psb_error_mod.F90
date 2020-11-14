@@ -31,7 +31,7 @@
 !    
 module psb_error_mod
   use psb_const_mod
-
+  
   integer(psb_ipk_), parameter, public :: psb_act_ret_=0
   integer(psb_ipk_), parameter, public :: psb_act_print_=1
   integer(psb_ipk_), parameter, public :: psb_act_abort_=2
@@ -72,8 +72,8 @@ module psb_error_mod
       integer(psb_ipk_), intent(inout) ::  err_act
     end subroutine psb_ser_error_handler
     subroutine psb_par_error_handler(ictxt,err_act)
-      import :: psb_ipk_,psb_mpk_
-      integer(psb_ipk_), intent(in) ::  ictxt
+      import :: psb_ipk_,psb_mpk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in) ::  ictxt
       integer(psb_ipk_), intent(in) ::  err_act
     end subroutine psb_par_error_handler
   end interface
@@ -82,8 +82,8 @@ module psb_error_mod
     subroutine psb_serror()
     end subroutine psb_serror
     subroutine psb_perror(ictxt,abrt)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent(in) ::  ictxt
+      import :: psb_ipk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in) ::  ictxt
       logical, intent(in), optional  :: abrt
     end subroutine psb_perror
   end interface
@@ -91,8 +91,8 @@ module psb_error_mod
 
   interface psb_error_print_stack
     subroutine psb_par_error_print_stack(ictxt)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent(in) ::  ictxt
+      import :: psb_ipk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in) ::  ictxt
     end subroutine psb_par_error_print_stack
     subroutine psb_ser_error_print_stack()
     end subroutine psb_ser_error_print_stack
@@ -101,15 +101,15 @@ module psb_error_mod
   interface psb_errcomm
 #if defined(IPK8)
     subroutine psb_errcomm_m(ictxt, err)
-      import :: psb_ipk_, psb_mpk_
-      integer(psb_mpk_), intent(in)   :: ictxt
-      integer(psb_ipk_), intent(inout):: err
+      import :: psb_ipk_, psb_mpk_, psb_ctxt_type
+      type(pxb_ctxt_type), intent(in)  :: ictxt
+      integer(psb_ipk_), intent(inout) :: err
     end subroutine psb_errcomm_m
 #endif    
     subroutine psb_errcomm_i(ictxt, err)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent(in)   :: ictxt
-      integer(psb_ipk_), intent(inout):: err
+      import :: psb_ipk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in)  :: ictxt
+      integer(psb_ipk_), intent(inout) :: err
     end subroutine psb_errcomm_i
   end interface psb_errcomm
 

@@ -192,7 +192,8 @@ contains
     type(psb_dspmat_type) :: a
     type(psb_d_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_)     :: ictxt, info
+    type(psb_ctxt_type)   :: ictxt
+    integer(psb_ipk_)     :: info
     character(len=*)      :: afmt
     procedure(d_func_3d), optional :: f
     class(psb_d_base_sparse_mat), optional :: amold
@@ -641,7 +642,8 @@ program psb_d_pde3d
   ! dense vectors
   type(psb_d_vect_type) :: xxv,bv
   ! parallel environment
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: iam, np
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
@@ -722,7 +724,7 @@ contains
   ! get iteration parameters from standard input
   !
   subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart)
-    integer(psb_ipk_) :: ictxt
+    type(psb_ctxt_type) :: ictxt
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst,ipart
     integer(psb_ipk_) :: np, iam

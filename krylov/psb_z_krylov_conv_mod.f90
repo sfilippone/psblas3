@@ -61,7 +61,8 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)                 :: name
     complex(psb_dpk_), allocatable     :: r(:)
 
@@ -134,7 +135,8 @@ contains
     logical                         :: res
     integer(psb_ipk_), intent(out)            :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)               :: name
 
     info = psb_success_
@@ -212,7 +214,8 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)                 :: name
     type(psb_z_vect_type) :: r
 
@@ -284,7 +287,8 @@ contains
     logical                          :: res
     integer(psb_ipk_), intent(out)             :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)               :: name
 
     info = psb_success_

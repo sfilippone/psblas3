@@ -53,7 +53,8 @@ function psb_cnrmi(a,desc_a,info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iia, jja, mdim, ndim
   integer(psb_lpk_) :: m, n, ia, ja
   logical :: global_

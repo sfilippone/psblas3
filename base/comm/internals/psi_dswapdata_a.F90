@@ -106,7 +106,9 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional        :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -152,7 +154,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
     return
 end subroutine psi_dswapdatam
 
-subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
+subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_dswapidxm
@@ -167,14 +169,17 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag,n
-  integer(psb_ipk_), intent(out)     :: info
+  type(psb_ctxt_type), intent(in) :: ictxt
+  integer(psb_mpk_), intent(in)   :: icomm
+  integer(psb_ipk_), intent(in)   :: flag,n
+  integer(psb_ipk_), intent(out)  :: info
   real(psb_dpk_)         :: y(:,:), beta
   real(psb_dpk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
+  
+  integer(psb_mpk_) :: np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -192,8 +197,6 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   info=psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
-  ictxt = iictxt
-  icomm = iicomm
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
@@ -498,7 +501,7 @@ subroutine psi_dswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psi_dswapidxm
@@ -579,7 +582,9 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional        :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -651,14 +656,17 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
-  integer(psb_ipk_), intent(out)     :: info
+  type(psb_ctxt_type), intent(in) :: iictxt
+  integer(psb_mpk_), intent(in)   :: iicomm
+  integer(psb_ipk_), intent(in)   :: flag
+  integer(psb_ipk_), intent(out)  :: info
   real(psb_dpk_)         :: y(:), beta
   real(psb_dpk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -980,7 +988,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
     return
 end subroutine psi_dswapidxv

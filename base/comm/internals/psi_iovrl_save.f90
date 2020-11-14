@@ -47,7 +47,8 @@ subroutine  psi_iovrl_save_vect(x,xs,desc_a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_saver1'
@@ -82,8 +83,6 @@ subroutine  psi_iovrl_save_vect(x,xs,desc_a,info)
   return
 end subroutine psi_iovrl_save_vect
 
-
-
 subroutine  psi_iovrl_save_multivect(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_iovrl_save_multivect
   use psb_realloc_mod
@@ -97,7 +96,8 @@ subroutine  psi_iovrl_save_multivect(x,xs,desc_a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_saver1'

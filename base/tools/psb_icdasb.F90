@@ -63,7 +63,9 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   integer(psb_ipk_),allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
   integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row
-  integer(psb_mpk_) ::  np,me, icomm, ictxt
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) ::  icomm
+  integer(psb_ipk_) ::  np,me
   logical             :: ext_hv_
   logical, parameter  :: do_timings=.true.
   integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
@@ -191,7 +193,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 

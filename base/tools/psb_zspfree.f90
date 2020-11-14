@@ -48,7 +48,8 @@ subroutine psb_zspfree(a, desc_a,info)
   type(psb_zspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(out)        :: info
   !...locals....
-  integer(psb_ipk_) :: ictxt, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
   info=psb_success_

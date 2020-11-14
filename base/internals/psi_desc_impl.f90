@@ -74,8 +74,9 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   class(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !     ....local scalars....      
-  integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: ictxt, err_act,nxch,nsnd,nrcv,j,k
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np,me
+  integer(psb_ipk_)   :: err_act,nxch,nsnd,nrcv,j,k
   !     ...local array...
   integer(psb_ipk_), allocatable  :: idx_out(:), tmp_mst_idx(:)
 

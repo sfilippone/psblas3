@@ -38,15 +38,16 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
   !     .. Array Arguments ..
   Type(psb_desc_type), Intent(inout), target :: desc_a
-  integer(psb_lpk_), intent(in)                     :: in_list(:)
+  integer(psb_lpk_), intent(in)           :: in_list(:)
   Type(psb_desc_type), Intent(out)        :: desc_ov
-  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_), intent(out)          :: info
   logical, intent(in), optional, target   :: mask(:)
-  integer(psb_ipk_), intent(in),optional            :: extype
+  integer(psb_ipk_), intent(in),optional  :: extype
 
   !     .. Local Scalars ..
-  integer(psb_ipk_) ::  i, j, np, me,m,nnzero,&
-       &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   ::  i, j, np, me,m,nnzero,&
+       &  lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&

@@ -59,7 +59,8 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   logical, intent(in),  optional     :: owned
 
   !....locals....
-  integer(psb_ipk_) :: n, ictxt, iam, np 
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: n, iam, np 
   character         :: act
   integer(psb_ipk_) :: err_act
   character(len=20) :: name
@@ -183,7 +184,8 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   character         :: act
   integer(psb_ipk_) :: err_act
   character(len=20) :: name
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: iam, np
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_

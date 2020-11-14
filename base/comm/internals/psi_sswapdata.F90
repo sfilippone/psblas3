@@ -113,7 +113,9 @@ subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional           :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
 
@@ -190,8 +192,10 @@ subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)         :: iictxt,iicomm,flag
-  integer(psb_ipk_), intent(out)        :: info
+  type(psb_ctxt_type), intent(in)  :: iictxt
+  integer(psb_mpk_), intent(in)    :: iicomm
+  integer(psb_ipk_), intent(in)    :: flag
+  integer(psb_ipk_), intent(out)   :: info
   class(psb_s_base_vect_type) :: y
   real(psb_spk_)           :: beta
   real(psb_spk_), target   :: work(:)
@@ -199,7 +203,8 @@ subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
@@ -413,7 +418,7 @@ subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 end subroutine psi_sswap_vidx_vect
@@ -450,7 +455,9 @@ subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional           :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
 
@@ -527,8 +534,10 @@ subroutine psi_sswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)         :: iictxt,iicomm,flag
-  integer(psb_ipk_), intent(out)        :: info
+  type(psb_ctxt_type), intent(in)    :: iictxt
+  integer(psb_mpk_), intent(in)      :: iicomm
+  integer(psb_ipk_), intent(in)      :: flag
+  integer(psb_ipk_), intent(out)     :: info
   class(psb_s_base_multivect_type) :: y
   real(psb_spk_)         :: beta
   real(psb_spk_), target :: work(:)
@@ -536,7 +545,8 @@ subroutine psi_sswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
@@ -756,7 +766,7 @@ subroutine psi_sswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 end subroutine psi_sswap_vidx_multivect

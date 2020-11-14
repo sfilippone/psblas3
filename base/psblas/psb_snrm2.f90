@@ -60,7 +60,8 @@ function psb_snrm2(x, desc_a, info, jx,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -195,7 +196,8 @@ function psb_snrm2v(x, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   real(psb_spk_)         :: snrm2, dd
@@ -291,7 +293,8 @@ function psb_snrm2_vect(x, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -398,7 +401,8 @@ function psb_snrm2_weight_vect(x,w, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -508,7 +512,8 @@ function psb_snrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -645,7 +650,8 @@ subroutine psb_snrm2vs(res, x, desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_

@@ -121,7 +121,8 @@ Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, err_act, i
   integer(psb_ipk_) :: istop_
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me
   real(psb_dpk_)     :: derr
   complex(psb_spk_)     :: alpha, beta, rho, rho_old, sigma, omega, tau
   type(psb_itconv_type) :: stopdat

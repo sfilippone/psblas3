@@ -71,7 +71,8 @@ subroutine  psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
        & liwork, iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
@@ -309,7 +310,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
        & liwork, iiy, jjy, i, ib, ib1, ip, idx, ik
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
@@ -656,7 +658,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
        & liwork, iiy, jjy, ib, ip, idx, ik
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy

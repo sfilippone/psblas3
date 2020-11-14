@@ -51,7 +51,8 @@ subroutine psb_z_map_U2V_a(alpha,x,beta,y,map,info,work)
   !
   complex(psb_dpk_), allocatable :: xt(:), yt(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt
+       & map_kind, nr
+  type(psb_ctxt_type) :: ictxt
   character(len=20), parameter  :: name='psb_map_U2V'
 
   info = psb_success_
@@ -125,7 +126,8 @@ subroutine psb_z_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
   type(psb_z_vect_type),pointer  :: ptx, pty
   complex(psb_dpk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
-       &  map_kind, nr, ictxt, iam, np
+       &  map_kind, nr, iam, np
+  type(psb_ctxt_type) :: ictxt
   character(len=20), parameter   :: name='psb_map_U2V_v'
 
   info = psb_success_
@@ -232,7 +234,8 @@ subroutine psb_z_map_V2U_a(alpha,x,beta,y,map,info,work)
   !
   complex(psb_dpk_), allocatable :: xt(:), yt(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt
+       & map_kind, nr
+  type(psb_ctxt_type) :: ictxt
   character(len=20), parameter  :: name='psb_map_V2U'
 
   info = psb_success_
@@ -305,7 +308,8 @@ subroutine psb_z_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
   type(psb_z_vect_type),pointer  :: ptx, pty
   complex(psb_dpk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt, iam, np
+       & map_kind, nr, iam, np
+  type(psb_ctxt_type) :: ictxt
   character(len=20), parameter   :: name='psb_map_V2U_v'
 
   info = psb_success_

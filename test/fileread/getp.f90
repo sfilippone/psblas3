@@ -41,7 +41,7 @@ contains
   subroutine  get_dparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
-    integer(psb_ipk_) :: ictxt
+    type(psb_ctxt_type) :: ictxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
     character(len=20) :: part
@@ -161,7 +161,7 @@ contains
   subroutine  get_sparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
-    integer(psb_ipk_) :: ictxt
+    type(psb_ctxt_type) :: ictxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
     character(len=20) :: part

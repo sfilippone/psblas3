@@ -59,7 +59,8 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
   integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -192,7 +193,8 @@ subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
   integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err
@@ -308,7 +310,8 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   real(psb_dpk_), intent(inout) :: y(:,:)
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, in, jjy, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -456,7 +459,8 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   real(psb_dpk_), intent(inout) :: y(:)
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -578,7 +582,8 @@ subroutine  psb_daxpbyvout(alpha, x, beta,y, z, desc_a,info)
   real(psb_dpk_), intent(inout) :: z(:)
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz, lldx, lldy, lldz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err
@@ -673,7 +678,8 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   integer(psb_ipk_), intent(out)          :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err

@@ -40,7 +40,8 @@ subroutine psb_zmlt_vect(x,y,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -120,7 +121,8 @@ subroutine psb_zmlt_vect2(alpha,x,y,beta,z,desc_a,info,conjgx, conjgy)
   character(len=1), intent(in), optional :: conjgx, conjgy
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err

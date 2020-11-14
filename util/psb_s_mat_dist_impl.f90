@@ -75,7 +75,7 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
 
   ! parameters
   type(psb_sspmat_type)      :: a_glob
-  integer(psb_ipk_) :: ictxt
+  type(psb_ctxt_type) :: ictxt
   type(psb_sspmat_type)      :: a
   type(psb_desc_type)        :: desc_a
   integer(psb_ipk_), intent(out)       :: info
@@ -416,7 +416,7 @@ subroutine psb_lsmatdist(a_glob, a, ictxt, desc_a,&
 
   ! parameters
   type(psb_lsspmat_type)      :: a_glob
-  integer(psb_ipk_) :: ictxt
+  type(psb_ctxt_type) :: ictxt
   type(psb_sspmat_type)      :: a
   type(psb_desc_type)        :: desc_a
   integer(psb_ipk_), intent(out)       :: info

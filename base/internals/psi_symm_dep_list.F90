@@ -54,8 +54,8 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
 #endif
   integer(psb_mpk_), intent(inout)   :: rvsz(0:)
   integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-  integer(psb_ipk_), intent(in)      :: ictxt
-  integer(psb_ipk_), intent(out)     :: info
+  type(psb_ctxt_type), intent(in)    :: ictxt
+    integer(psb_ipk_), intent(out)   :: info
   
   !
   integer(psb_ipk_), allocatable :: ladj(:) 
@@ -70,15 +70,13 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
   name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
-  icomm = psb_get_mpi_comm(ictxt)
-
   call psb_info(ictxt, me, np)
-
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
+  icomm = psb_get_mpi_comm(ictxt)
 
   nadj = size(adj)
 
@@ -134,8 +132,8 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   include 'mpif.h'
 #endif
   integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-  integer(psb_ipk_), intent(in)      :: ictxt
-  integer(psb_ipk_), intent(out)     :: info
+  type(psb_ctxt_type), intent(in) :: ictxt
+  integer(psb_ipk_), intent(out)  :: info
   
   !
   integer(psb_mpk_), allocatable :: rvsz(:), sdsz(:) 
@@ -144,22 +142,21 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,&
        & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_ipk_) :: mglob, ih
-  integer(psb_ipk_) :: np,me
+  integer(psb_ipk_) :: np, me 
   character(len=20) :: name
 
   info = psb_success_
   name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
-  icomm = psb_get_mpi_comm(ictxt)
 
   call psb_info(ictxt, me, np)
-
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
+  icomm = psb_get_mpi_comm(ictxt)
 
   nadj = size(adj)
   

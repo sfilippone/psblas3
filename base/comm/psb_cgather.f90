@@ -57,7 +57,8 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, jlx, ilx, lda_locx, lda_globx, i
   integer(psb_lpk_) :: m, n, k, ilocx,  jlocx, idx, iglobx, jglobx
   complex(psb_spk_), allocatable :: llocx(:)
@@ -153,7 +154,7 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 
@@ -174,7 +175,8 @@ subroutine  psb_cgather_multivect(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, jlx, ilx, lda_locx, lda_globx, i 
   integer(psb_lpk_) :: m, n, k, ilocx, jlocx, idx, iglobx, jglobx
   complex(psb_spk_), allocatable :: llocx(:,:)
@@ -269,7 +271,7 @@ subroutine  psb_cgather_multivect(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
   return
 

@@ -57,7 +57,8 @@ function psb_damax(x,desc_a, info, jx,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -185,7 +186,8 @@ function psb_damaxv (x,desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -280,7 +282,8 @@ function psb_damax_vect(x, desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -409,7 +412,8 @@ subroutine psb_damaxvs(res,x,desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -532,7 +536,8 @@ subroutine psb_dmamaxs(res,x,desc_a, info,jx,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ldx, i, k
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -631,7 +636,8 @@ function psb_dmin_vect(x, desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_

@@ -64,7 +64,8 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -208,7 +209,8 @@ subroutine psb_cspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate, nz, i, j
   integer(psb_lpk_) :: ir
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -306,7 +308,8 @@ subroutine psb_cspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate, nz, i, j
   integer(psb_lpk_) :: ir
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -403,7 +406,8 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
@@ -518,7 +522,8 @@ subroutine psb_cspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_

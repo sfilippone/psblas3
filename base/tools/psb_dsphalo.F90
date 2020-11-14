@@ -90,7 +90,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=5), optional          :: outfmt 
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc,i, &
        &     n_el_send,k,n_el_recv,idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
@@ -557,7 +558,8 @@ Subroutine psb_ldsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=5), optional          :: outfmt 
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter, proc, i, n_el_send,n_el_recv, &
        &     n_elem, j, ipx,mat_recv, idxs,idxr,nz,&
        &     data_,totxch,nxs, nxr, ncg
@@ -900,7 +902,8 @@ Subroutine psb_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_ipk_), intent(in), optional       :: data
   type(psb_desc_type),Intent(in), optional, target :: col_desc
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc,i, n_el_send,n_el_recv,&
        &     n_elem, j,ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     data_,totxch,nxs, nxr, err_act, nsnds, nrcvs
@@ -1260,7 +1263,8 @@ Subroutine psb_d_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_ipk_), intent(in), optional       :: data
   type(psb_desc_type),Intent(in), optional, target :: col_desc
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc,i, n_el_send,n_el_recv,&
        &     n_elem, j,ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     data_,totxch,ngtz, idx, nxs, nxr, err_act, &

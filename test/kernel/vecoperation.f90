@@ -34,7 +34,7 @@
 module unittestvector_mod
 
   use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
-       &  psb_dspmat_type, psb_d_vect_type, dzero,&
+       &  psb_dspmat_type, psb_d_vect_type, dzero, psb_ctxt_type,&
        &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
 
   interface psb_gen_const
@@ -50,7 +50,7 @@ contains
 
     type(psb_d_vect_type) :: v
     real(psb_dpk_)        :: val
-    integer(psb_ipk_)     :: ictxt
+    type(psb_ctxt_type) :: ictxt
     logical               :: ans
 
     ! Local variables
@@ -84,7 +84,8 @@ contains
     type(psb_d_vect_type) :: v
     type(psb_desc_type)   :: desc_a
     integer(psb_lpk_)     :: idim
-    integer(psb_ipk_)     :: ictxt, info
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)     :: info
     real(psb_dpk_)        :: val
 
     ! Local variables
@@ -184,7 +185,8 @@ program vecoperation
   ! vector
   type(psb_d_vect_type)  :: x,y,z
   ! blacs parameters
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: iam, np
   ! auxiliary parameters
   integer(psb_ipk_) :: info
   character(len=20) :: name,ch_err,readinput

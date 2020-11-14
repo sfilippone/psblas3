@@ -45,9 +45,10 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   integer(psb_ipk_), intent(out)               :: info
 
   !     .. Local Scalars ..
-  integer(psb_ipk_) ::  i, j, np, me, ictxt, n_row, n_col
-  integer(psb_lpk_) ::  mglob
-  integer(psb_ipk_) :: err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   ::  i, j, np, me, n_row, n_col
+  integer(psb_lpk_)   ::  mglob
+  integer(psb_ipk_)   :: err_act
 
   integer(psb_lpk_), allocatable :: vl(:)
   integer(psb_ipk_)  :: debug_level, debug_unit, ierr(5)

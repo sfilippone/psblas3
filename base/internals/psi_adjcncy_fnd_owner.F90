@@ -81,11 +81,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
        & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
   integer(psb_mpk_) :: prc, p2ptag, iret
-  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
        & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np,me
   logical, parameter  :: gettime=.true., debug=.false.
   integer(psb_mpk_)   :: xchg_alg 
   logical, parameter  :: do_timings=.false.
@@ -103,7 +104,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt = ictxt 
+
   if ((do_timings).and.(idx_phase1==-1))       &
        & idx_phase1 = psb_get_timer_idx("ADJ_FND_OWN: phase1 ")
   if ((do_timings).and.(idx_phase2==-1))       &

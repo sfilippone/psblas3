@@ -63,7 +63,8 @@ subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt, np, me, dupl_,err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, dupl_,err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -190,7 +191,8 @@ subroutine psb_zins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt, np, me, dupl_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   complex(psb_dpk_), allocatable   :: lval(:)
   logical :: local_
@@ -295,7 +297,8 @@ subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols, n
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt, np, me, dupl_, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, dupl_, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -409,7 +412,8 @@ subroutine psb_zins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt, np, me, dupl_, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, dupl_, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name

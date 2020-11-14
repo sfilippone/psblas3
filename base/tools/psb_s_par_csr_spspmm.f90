@@ -73,7 +73,8 @@ Subroutine psb_s_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), intent(in), optional  :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: ncol, nnz
   type(psb_ls_csr_sparse_mat) :: ltcsr
   type(psb_s_csr_sparse_mat) :: tcsr
@@ -168,7 +169,8 @@ Subroutine psb_ls_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), intent(in), optional  :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np,me
   integer(psb_lpk_) :: nacol, nccol, nnz
   type(psb_ls_csr_sparse_mat) :: tcsr1
   logical           :: update_desc_c

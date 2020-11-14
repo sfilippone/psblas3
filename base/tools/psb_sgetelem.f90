@@ -55,7 +55,8 @@ function psb_s_getelem(x,index,desc_a,info) result(res)
 
   !locals
   integer(psb_ipk_) :: localindex(1)
-  integer(psb_ipk_) :: ictxt, np, me, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_lpk_) :: gindex(1)
   integer(psb_lpk_), allocatable :: myidx(:),mylocal(:)
   character(len=20) :: name

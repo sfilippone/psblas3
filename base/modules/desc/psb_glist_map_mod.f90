@@ -96,7 +96,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_glist_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt    
+    type(psb_ctxt_type), intent(in)    :: ictxt    
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -108,7 +108,7 @@ contains
     info = 0
     call psb_info(ictxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ictxt'
       info = -1
       return
     end if
@@ -158,8 +158,9 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)      :: info
-    integer(psb_mpk_) :: ictxt, iam, np
-    integer(psb_lpk_) :: nv, i, ngp
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_mpk_)   :: iam, np
+    integer(psb_lpk_)   :: nv, i, ngp
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)

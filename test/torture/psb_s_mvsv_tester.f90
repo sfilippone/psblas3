@@ -6,7 +6,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -82,7 +83,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -158,7 +160,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -234,7 +237,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -310,7 +314,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -386,7 +391,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -462,7 +468,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -538,7 +545,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -614,7 +622,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -690,7 +699,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -766,7 +776,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -842,7 +853,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -918,7 +930,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -994,7 +1007,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1070,7 +1084,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1146,7 +1161,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1222,7 +1238,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1298,7 +1315,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1374,7 +1392,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1450,7 +1469,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1526,7 +1546,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1602,7 +1623,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1678,7 +1700,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1754,7 +1777,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1830,7 +1854,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1908,7 +1933,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -1987,7 +2013,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2066,7 +2093,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2145,7 +2173,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2224,7 +2253,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2303,7 +2333,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2382,7 +2413,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2461,7 +2493,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2540,7 +2573,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2619,7 +2653,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i
@@ -2698,7 +2733,8 @@ contains
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
     integer(psb_ipk_) ::res,istat=0,i

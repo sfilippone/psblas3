@@ -52,10 +52,11 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
 
   integer(psb_ipk_) :: m, n_row, n_col,counter,idx,&
        & n_elem_recv,n_elem_send,proc,i, verb_
-  integer(psb_ipk_) :: ictxt, me, np
-  integer(psb_ipk_) :: total_snd, total_rcv, total_xhcg, global_halo, global_points
-  integer(psb_ipk_) :: local_snd, local_rcv, local_xhcg, local_halo, local_points
-  real(psb_dpk_)    :: av2s, v2s
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: me, np
+  integer(psb_ipk_)   :: total_snd, total_rcv, total_xhcg, global_halo, global_points
+  integer(psb_ipk_)   :: local_snd, local_rcv, local_xhcg, local_halo, local_points
+  real(psb_dpk_)      :: av2s, v2s
   
   if (present(glob)) then 
     glob_ = glob
@@ -147,8 +148,9 @@ contains
     logical, intent(in), optional      :: glob,short
     logical :: short_, glob_
     
-    integer(psb_ipk_) :: ip, nerv, nesd, totxch,idxr,idxs
-    integer(psb_ipk_) :: ictxt, me, np, data_, info, verb_
+    integer(psb_ipk_)   :: ip, nerv, nesd, totxch,idxr,idxs
+    type(psb_ctxt_type) :: ictxt
+    integer(psb_ipk_)   :: me, np, data_, info, verb_
     integer(psb_lpk_), allocatable :: gidx(:)
     class(psb_i_base_vect_type), pointer :: vpnt
     

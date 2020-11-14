@@ -52,7 +52,8 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   integer(psb_ipk_), optional, intent(in)      :: nnz
 
   !locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_) :: loc_row,loc_col, nnz_, dectype
   integer(psb_lpk_) :: m, n
   integer(psb_ipk_) :: debug_level, debug_unit

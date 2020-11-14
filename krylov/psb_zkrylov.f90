@@ -152,7 +152,8 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   procedure(psb_zkryl_cond_vect) :: psb_zcg_vect, psb_zfcg_vect
 
   logical           :: do_alloc_wrk
-  integer(psb_ipk_) :: ictxt,me,np,err_act, itrace_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_) :: me,np,err_act, itrace_
   character(len=20)             :: name
 
   info = psb_success_

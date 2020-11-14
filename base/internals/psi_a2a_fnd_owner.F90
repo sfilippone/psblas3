@@ -74,14 +74,15 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   integer(psb_ipk_), allocatable :: tproc(:), lclidx(:)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
        & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
-  integer(psb_mpk_) :: icomm, minfo, iictxt,nv
+  integer(psb_mpk_) :: icomm, minfo, nv
   integer(psb_ipk_) :: i,n_row,n_col,err_act,gsz
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me, nresp
-  logical, parameter :: use_psi_adj=.true.
-  real(psb_dpk_)     :: t0, t1, t2, t3, t4, tamx, tidx
-  character(len=20)  :: name
-  logical            :: samesize_
+  type(psb_ctxt_type) :: ictxt
+  integer(psb_ipk_)   :: np,me, nresp
+  logical, parameter  :: use_psi_adj=.true.
+  real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
+  character(len=20)   :: name
+  logical             :: samesize_
 
   info = psb_success_
   name = 'psi_a2a_fnd_owner'
@@ -92,7 +93,6 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt = ictxt 
 
   call psb_info(ictxt, me, np)
 
