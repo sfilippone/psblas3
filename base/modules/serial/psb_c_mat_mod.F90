@@ -128,6 +128,7 @@ module psb_c_mat_mod
 
     ! Memory/data management
     procedure, pass(a) :: csall       => psb_c_csall
+    generic, public    :: allocate    => csall
     procedure, pass(a) :: free        => psb_c_free
     procedure, pass(a) :: trim        => psb_c_trim
     procedure, pass(a) :: csput_a     => psb_c_csput_a
@@ -326,6 +327,7 @@ module psb_c_mat_mod
 
     ! Memory/data management
     procedure, pass(a) :: csall       => psb_lc_csall
+    generic, public    :: allocate    => csall
     procedure, pass(a) :: free        => psb_lc_free
     procedure, pass(a) :: trim        => psb_lc_trim
     procedure, pass(a) :: csput_a     => psb_lc_csput_a
@@ -604,12 +606,14 @@ module psb_c_mat_mod
   end interface
 
   interface
-    subroutine psb_c_csall(nr,nc,a,info,nz)
-      import :: psb_ipk_, psb_lpk_, psb_cspmat_type
+    subroutine psb_c_csall(nr,nc,a,info,nz,type,mold)
+      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in)             :: nr,nc
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: nz
+      character(len=*), intent(in), optional    :: type
+      class(psb_c_base_sparse_mat), optional, intent(in) :: mold
     end subroutine psb_c_csall
   end interface
 
@@ -1384,12 +1388,14 @@ module psb_c_mat_mod
   end interface
 
   interface
-    subroutine psb_lc_csall(nr,nc,a,info,nz)
-      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
+    subroutine psb_lc_csall(nr,nc,a,info,nz,type,mold)
+      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_lc_base_sparse_mat
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in)             :: nr,nc
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_lpk_), intent(in), optional   :: nz
+      character(len=*), intent(in), optional    :: type
+      class(psb_lc_base_sparse_mat), optional, intent(in) :: mold
     end subroutine psb_lc_csall
   end interface
 

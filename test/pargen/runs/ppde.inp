@@ -8,5 +8,11 @@ CSR                    Storage format for matrix A:  CSR COO
 0100                   MAXIT
 05                     ITRACE
 002                    IRST    restart for RGMRES  and BiCGSTABL
+ILU		       Factorization variant: ILU,ILUT,MILU,INVK,AINVT,AORTH
+0     		       Fill in for forward factorization 
+1                      Fill in for inverse factorization (ignored if not INVK)
+1E-1                   Threshold for forward factorization (ignored if ILU)
+1E-1                   Threshold for inverse factorization (ignored if ILU,ILUT,MILU)
+LLK                    What orthogonalization algorithm? (ignored if ILU,ILUT,MILU,INVK)
 
 
