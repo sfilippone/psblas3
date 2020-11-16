@@ -23,18 +23,18 @@ contains
     call psb_clean_errstack()
   end function psb_c_clean_errstack
 
-  function psb_c_cdall_vg(ng,vg,ictxt,cdh) bind(c,name='psb_c_cdall_vg') result(res)
+  function psb_c_cdall_vg(ng,vg,cctxt,cdh) bind(c,name='psb_c_cdall_vg') result(res)
     implicit none
 
     integer(psb_c_ipk_) :: res
     integer(psb_c_lpk_), value :: ng
-    integer(psb_c_ipk_), value :: ictxt
+    integer(psb_c_ipk_), value :: cctxt
     integer(psb_c_ipk_)        :: vg(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
     type(psb_ctxt_type) :: ctxt
-    ctxt%ctxt = ictxt
+    ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
     if (ng <=0) then
@@ -59,17 +59,17 @@ contains
   end function psb_c_cdall_vg
 
 
-  function psb_c_cdall_vl(nl,vl,ictxt,cdh) bind(c,name='psb_c_cdall_vl') result(res)
+  function psb_c_cdall_vl(nl,vl,cctxt,cdh) bind(c,name='psb_c_cdall_vl') result(res)
     implicit none
 
     integer(psb_c_ipk_) :: res
-    integer(psb_c_ipk_), value :: nl, ictxt
+    integer(psb_c_ipk_), value :: nl, cctxt
     integer(psb_c_lpk_)        :: vl(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info, ixb
     type(psb_ctxt_type) :: ctxt
-    ctxt%ctxt = ictxt
+    ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
     if (nl <=0) then
@@ -99,16 +99,16 @@ contains
 
   end function psb_c_cdall_vl
 
-  function psb_c_cdall_nl(nl,ictxt,cdh) bind(c,name='psb_c_cdall_nl') result(res)
+  function psb_c_cdall_nl(nl,cctxt,cdh) bind(c,name='psb_c_cdall_nl') result(res)
     implicit none
 
     integer(psb_c_ipk_) :: res
-    integer(psb_c_ipk_), value :: nl, ictxt
+    integer(psb_c_ipk_), value :: nl, cctxt
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
     type(psb_ctxt_type) :: ctxt
-    ctxt%ctxt = ictxt
+    ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
     if (nl <=0) then
@@ -132,17 +132,18 @@ contains
 
   end function psb_c_cdall_nl
 
-  function psb_c_cdall_repl(n,ictxt,cdh) bind(c,name='psb_c_cdall_repl') result(res)
+  function psb_c_cdall_repl(n,cctxt,cdh) bind(c,name='psb_c_cdall_repl') result(res)
     implicit none
 
     integer(psb_c_ipk_) :: res
     integer(psb_c_lpk_), value :: n
-    integer(psb_c_ipk_), value :: ictxt
+    integer(psb_c_ipk_), value :: cctxt
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
     type(psb_ctxt_type) :: ctxt
-    ctxt%ctxt = ictxt
+    ctxt = psb_c2f_ctxt(cctxt)
+
 
     res = -1
     if (n <=0) then
