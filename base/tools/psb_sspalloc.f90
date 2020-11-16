@@ -52,7 +52,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   integer(psb_ipk_), optional, intent(in)      :: nnz
 
   !locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_) :: loc_row,loc_col, nnz_, dectype
   integer(psb_lpk_) :: m, n
@@ -68,10 +68,10 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt   = desc_a%get_context()
+  ctxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -118,7 +118,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

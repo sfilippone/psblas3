@@ -63,7 +63,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   integer(psb_ipk_),allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
   integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) ::  icomm
   integer(psb_ipk_) ::  np,me
   logical             :: ext_hv_
@@ -82,7 +82,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt   = desc%get_context()
+  ctxt   = desc%get_context()
   dectype = desc%get_dectype()
   n_row   = desc%get_local_rows()
   n_col   = desc%get_local_cols()
@@ -104,7 +104,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
 
   call psb_tic(idx_total)
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -193,7 +193,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

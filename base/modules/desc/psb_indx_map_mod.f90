@@ -108,7 +108,7 @@ module psb_indx_map_mod
     !> State of the map 
     integer(psb_ipk_)   :: state        = psb_desc_null_    
     !> Communication context
-    type(psb_ctxt_type) :: ictxt        
+    type(psb_ctxt_type) :: ctxt        
     !> MPI communicator
     integer(psb_mpk_)   :: mpic         = -1
     !> Number of global rows
@@ -334,21 +334,21 @@ module psb_indx_map_mod
   integer, parameter :: psi_symm_flag_norv_ = 0
   integer, parameter :: psi_symm_flag_inrv_ = 1
   interface psi_symm_dep_list
-    subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
+    subroutine psi_symm_dep_list_inrv(rvsz,adj,ctxt,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_, &
            & psb_ctxt_type
       implicit none 
       integer(psb_mpk_), intent(inout)   :: rvsz(0:)
       integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-      type(psb_ctxt_type), intent(in)      :: ictxt
+      type(psb_ctxt_type), intent(in)      :: ctxt
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_symm_dep_list_inrv
-    subroutine psi_symm_dep_list_norv(adj,ictxt,info)
+    subroutine psi_symm_dep_list_norv(adj,ctxt,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_, &
            & psb_ctxt_type
       implicit none 
       integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-      type(psb_ctxt_type), intent(in)      :: ictxt
+      type(psb_ctxt_type), intent(in)      :: ctxt
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_symm_dep_list_norv    
   end interface psi_symm_dep_list
@@ -491,7 +491,7 @@ contains
     class(psb_indx_map), intent(in) :: idxmap
     type(psb_ctxt_type) :: val
 
-    val = idxmap%ictxt
+    val = idxmap%ctxt
 
   end function base_get_ctxt
 
@@ -519,7 +519,7 @@ contains
     class(psb_indx_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)  :: val
 
-    idxmap%ictxt = val
+    idxmap%ctxt = val
   end subroutine base_set_ctxt
 
   subroutine base_set_gri(idxmap,val)
@@ -1320,7 +1320,7 @@ contains
 
     ! almost nothing to be done here
     idxmap%state          = -1 
-    if (allocated(idxmap%ictxt%ctxt)) deallocate(idxmap%ictxt%ctxt)
+    if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
     idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
@@ -1336,7 +1336,7 @@ contains
     class(psb_indx_map), intent(inout) :: idxmap
 
     idxmap%state          = psb_desc_null_
-    if (allocated(idxmap%ictxt%ctxt)) deallocate(idxmap%ictxt%ctxt)
+    if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
     idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
@@ -1345,12 +1345,12 @@ contains
 
   end subroutine base_set_null
 
-  subroutine base_init_vl(idxmap,ictxt,vl,info)
+  subroutine base_init_vl(idxmap,ctxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
@@ -1414,7 +1414,7 @@ contains
     call psb_get_erraction(err_act)
 
     outmap%state       = idxmap%state      
-    outmap%ictxt       = idxmap%ictxt      
+    outmap%ctxt       = idxmap%ctxt      
     outmap%mpic        = idxmap%mpic       
     outmap%global_rows = idxmap%global_rows
     outmap%global_cols = idxmap%global_cols
@@ -1475,7 +1475,7 @@ contains
     integer(psb_ipk_) :: me, np
     integer(psb_ipk_) :: i, j, nr, nc, nh
 
-    call psb_info(idxmap%ictxt,me,np)
+    call psb_info(idxmap%ctxt,me,np)
     ! The idea here is to store only the halo part
     nr = idxmap%local_rows
     nc = idxmap%local_cols

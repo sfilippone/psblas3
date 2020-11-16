@@ -52,7 +52,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
 
   integer(psb_ipk_) :: m, n_row, n_col,counter,idx,&
        & n_elem_recv,n_elem_send,proc,i, verb_
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: me, np
   integer(psb_ipk_)   :: total_snd, total_rcv, total_xhcg, global_halo, global_points
   integer(psb_ipk_)   :: local_snd, local_rcv, local_xhcg, local_halo, local_points
@@ -74,9 +74,9 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
     verb_ = 1
   endif
   
-  ictxt = desc_p%get_ctxt()
-  call psb_info(ictxt, me,np)
-  call psb_min(ictxt,verb_)
+  ctxt = desc_p%get_ctxt()
+  call psb_info(ctxt, me,np)
+  call psb_min(ctxt,verb_)
   
   !
   ! Level 1: Print global info
@@ -92,8 +92,8 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
 
   global_halo   = local_halo
   av2s          = v2s
-  call psb_sum(ictxt, global_halo)
-  call psb_sum(ictxt, av2s)
+  call psb_sum(ctxt, global_halo)
+  call psb_sum(ctxt, av2s)
   av2s = av2s / np 
   if (me == psb_root_) then
     write(iout,*) ' Communication descriptor details '
@@ -103,7 +103,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
     write(iout,*) ' Average volume to surface ratio :',av2s
     write(iout,*)
   end if
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   
   if (verb_ <= 1) return
   
@@ -120,21 +120,21 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
         write(iout,*) me,': Volume to surface ratio:',0.0_psb_dpk_
       end if
     end if
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end do
 
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_halo'
   do i=0, np-1
     if (me == i)  &
        &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_halo_,glob=glob_)
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end do
   
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_ext'
   do i=0, np-1
     if (me == i)  &
        &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_ext_,glob=glob_)
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end do
   
   return
@@ -149,13 +149,13 @@ contains
     logical :: short_, glob_
     
     integer(psb_ipk_)   :: ip, nerv, nesd, totxch,idxr,idxs
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: me, np, data_, info, verb_
     integer(psb_lpk_), allocatable :: gidx(:)
     class(psb_i_base_vect_type), pointer :: vpnt
     
-    ictxt = desc_p%get_ctxt()
-    call psb_info(ictxt, me,np)
+    ctxt = desc_p%get_ctxt()
+    call psb_info(ctxt, me,np)
     if (present(data)) then
       data_ = data
     else

@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-!!$subroutine psi_i_bld_glb_dep_list(ictxt,loc_dl,length_dl,dep_list,dl_lda,info)
+!!$subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,dep_list,dl_lda,info)
 !!$  use psi_mod, psb_protect_name => psi_i_bld_glb_dep_list
 !!$#ifdef MPI_MOD
 !!$  use mpi
@@ -44,7 +44,7 @@
 !!$  include 'mpif.h'
 !!$#endif
 !!$  !     ....scalar parameters...
-!!$  type(psb_ctxt_type), intent(in) :: ictxt
+!!$  type(psb_ctxt_type), intent(in) :: ctxt
 !!$  integer(psb_ipk_), intent(out)  :: dl_lda
 !!$  integer(psb_ipk_), intent(in)   :: loc_dl(:), length_dl(0:)
 !!$  integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:)
@@ -70,11 +70,11 @@
 !!$
 !!$  info = psb_success_
 !!$
-!!$  call psb_info(ictxt,me,np)
+!!$  call psb_info(ctxt,me,np)
 !!$
 !!$
 !!$  dl_lda = length_dl(me)
-!!$  call psb_max(ictxt, dl_lda)
+!!$  call psb_max(ctxt, dl_lda)
 !!$
 !!$  if (debug_level >= psb_debug_inner_) &
 !!$       & write(debug_unit,*) me,' ',trim(name),': Dep_list length ',length_dl(me),dl_lda
@@ -84,7 +84,7 @@
 !!$    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
 !!$    goto 9999      
 !!$  end if
-!!$  icomm = psb_get_mpi_comm(ictxt)
+!!$  icomm = psb_get_mpi_comm(ctxt)
 !!$  call mpi_allgather(loc_dl,dl_lda,psb_mpi_ipk_,&
 !!$       & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
 !!$
@@ -102,7 +102,7 @@
 !!$      end do
 !!$      flush(0)
 !!$    end if
-!!$    call psb_barrier(ictxt)
+!!$    call psb_barrier(ctxt)
 !!$  end if
 !!$
 !!$  call psb_erractionrestore(err_act)
@@ -118,7 +118,7 @@
 !!$
 !!$end subroutine psi_i_bld_glb_dep_list
 
-subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
+subroutine psi_i_bld_glb_csr_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   use psi_mod, psb_protect_name => psi_i_bld_glb_csr_dep_list
 #ifdef MPI_MOD
   use mpi
@@ -133,7 +133,7 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
   include 'mpif.h'
 #endif
   !     ....scalar parameters...
-  type(psb_ctxt_type), intent(in) :: ictxt
+  type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(in)  :: loc_dl(:), length_dl(0:)
   integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:), dl_ptr(:) 
   integer(psb_ipk_), intent(out) :: info
@@ -158,7 +158,7 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
 
   info = psb_success_
 
-  call psb_info(ictxt,me,np)
+  call psb_info(ctxt,me,np)
 
   myld = length_dl(me)
   length = sum(length_dl(0:np-1)) 
@@ -180,7 +180,7 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
-  icomm = psb_get_mpi_comm(ictxt)
+  icomm = psb_get_mpi_comm(ctxt)
   call mpi_allgatherv(loc_dl,myld,psb_mpi_ipk_,&
        & c_dep_list,length_dl,dl_ptr,psb_mpi_ipk_,icomm,minfo)
   
@@ -198,7 +198,7 @@ subroutine psi_i_bld_glb_csr_dep_list(ictxt,loc_dl,length_dl,c_dep_list,dl_ptr,i
       end do
       flush(0)
     end if
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end if
 
   call psb_erractionrestore(err_act)

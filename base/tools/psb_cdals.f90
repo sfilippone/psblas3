@@ -40,10 +40,10 @@
 !    n       - integer.                       The number of columns.
 !    parts   - external subroutine.           The routine that contains the 
 !                                                 partitioning scheme.
-!    ictxt - integer.                         The communication context.
+!    ctxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Error code (if any).
-subroutine psb_cdals(m, n, parts, ictxt, desc, info)
+subroutine psb_cdals(m, n, parts, ctxt, desc, info)
   use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
@@ -53,7 +53,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   procedure(psb_parts)             :: parts
   !....Parameters...
   integer(psb_lpk_), intent(in)    :: M,N
-  type(psb_ctxt_type), intent(in)  :: ictxt
+  type(psb_ctxt_type), intent(in)  :: ctxt
   Type(psb_desc_type), intent(out) :: desc
   integer(psb_ipk_), intent(out)   :: info
 
@@ -77,7 +77,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np
   !     ....verify blacs grid correctness..
@@ -100,9 +100,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   !global check on m and n parameters
   if (me == psb_root_) then
     exch(1)=m; exch(2)=n; exch(3)=psb_cd_get_large_threshold()
-    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:3),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
       call psb_errpush(err,name,m_err=(/1/))
@@ -240,9 +240,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(ctxt,m,info)
   class default 
-    call aa%init(ictxt,loc_idx(1:k),info)
+    call aa%init(ctxt,loc_idx(1:k),info)
   end select
 
 
@@ -285,7 +285,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

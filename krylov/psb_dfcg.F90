@@ -128,7 +128,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: n_col, naux, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
   real(psb_dpk_), allocatable, target   :: aux(:)
   real(psb_dpk_)   :: vres(3)
@@ -143,9 +143,9 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (.not.allocated(b%v)) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
@@ -240,7 +240,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
 
 
-    call psb_sum(ictxt, vres(1:2))
+    call psb_sum(ctxt, vres(1:2))
 
     alpha = vres(1)
     beta  = vres(2)
@@ -279,7 +279,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
       vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
       vres(3) = psb_gedot(q, v, desc_a, info, global = .false.) 
 
-      call psb_sum(ictxt, vres(1:3))
+      call psb_sum(ctxt, vres(1:3))
 
       alpha = vres(1)
       beta  = vres(2)

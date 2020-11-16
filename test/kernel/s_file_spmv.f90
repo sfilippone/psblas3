@@ -50,7 +50,7 @@ program s_file_spmv
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: iam, np
 
   ! solver paramters
@@ -76,12 +76,12 @@ program s_file_spmv
   integer(psb_ipk_), allocatable :: ivg(:), ipv(:)
 
 
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 
   if (iam < 0) then 
     ! This should not happen, but just in case
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     stop
   endif
 
@@ -100,12 +100,12 @@ program s_file_spmv
     read(psb_inp_unit,*) filefmt
     read(psb_inp_unit,*) ipart
   end if
-  call psb_bcast(ictxt,mtrx_file)
-  call psb_bcast(ictxt,filefmt)
-  call psb_bcast(ictxt,ipart)
+  call psb_bcast(ctxt,mtrx_file)
+  call psb_bcast(ctxt,filefmt)
+  call psb_bcast(ctxt,ipart)
   rhs_file = 'NONE'
   afmt     = 'CSR'
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()  
   ! read the input matrix to be processed and (possibly) the rhs 
   nrhs = 1
@@ -133,11 +133,11 @@ program s_file_spmv
     end select
     if (info /= psb_success_) then
       write(psb_err_unit,*) 'Error while reading input matrix '
-      call psb_abort(ictxt)
+      call psb_abort(ctxt)
     end if
     
     m_problem = aux_a%get_nrows()
-    call psb_bcast(ictxt,m_problem)
+    call psb_bcast(ctxt,m_problem)
     
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1)==m_problem) then
@@ -161,7 +161,7 @@ program s_file_spmv
 
   else
 
-    call psb_bcast(ictxt,m_problem)
+    call psb_bcast(ctxt,m_problem)
     b_col_glob =>aux_b(:,1)
 
   end if
@@ -169,14 +169,14 @@ program s_file_spmv
   ! switch over different partition types
   write(psb_out_unit,'("Number of processors : ",i0)')np
   if (ipart == 0) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,vg=ivg)
+    call psb_matdist(aux_a, a, ctxt,desc_a,info,fmt=afmt,vg=ivg)
     
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
@@ -186,14 +186,14 @@ program s_file_spmv
       call build_mtpart(aux_a,np)
 
     endif
-    call psb_barrier(ictxt)
-    call distr_mtpart(psb_root_,ictxt)
+    call psb_barrier(ctxt)
+    call distr_mtpart(psb_root_,ctxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt, desc_a,info,fmt=afmt,vg=ivg)
+    call psb_matdist(aux_a, a, ctxt, desc_a,info,fmt=afmt,vg=ivg)
 
   else 
     if (iam==psb_root_) write(psb_out_unit,'("Partition type: default block")')
-    call psb_matdist(aux_a, a,  ictxt, desc_a,info,fmt=afmt,parts=part_block)
+    call psb_matdist(aux_a, a,  ctxt, desc_a,info,fmt=afmt,parts=part_block)
   end if
 
   call psb_geall(x_col,desc_a,info)
@@ -205,7 +205,7 @@ program s_file_spmv
   t2 = psb_wtime() - t1
 
 
-  call psb_amx(ictxt, t2)
+  call psb_amx(ctxt, t2)
 
   if (iam==psb_root_) then
     write(psb_out_unit,'(" ")')
@@ -214,32 +214,32 @@ program s_file_spmv
   end if
 
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   do i=1,times 
     call psb_spmm(sone,a,x_col,szero,b_col,desc_a,info,'n')
   end do
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
+  call psb_amx(ctxt,t2)
 
   ! FIXME: cache flush needed here
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   tt1 = psb_wtime()
   do i=1,times 
     call psb_spmm(sone,a,x_col,szero,b_col,desc_a,info,'t')
   end do
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   tt2 = psb_wtime() - tt1
-  call psb_amx(ictxt,tt2)
+  call psb_amx(ctxt,tt2)
 
   nr       = desc_a%get_global_rows() 
   annz     = a%get_nzeros()
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)
-  call psb_sum(ictxt,annz)
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
+  call psb_sum(ctxt,annz)
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
   
   if (iam==psb_root_) then 
     flops = 2.d0*times*annz
@@ -278,10 +278,10 @@ program s_file_spmv
   call psb_spfree(a, desc_a,info)
   call psb_cdfree(desc_a,info)
 
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 
-9999 call psb_error(ictxt)
+9999 call psb_error(ctxt)
 
   stop
 

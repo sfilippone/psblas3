@@ -42,7 +42,7 @@
 !                    Total number of  equations
 !                    required.
 !
-! ictxt      : (Global Input)Integer BLACS context for an NPx1 grid 
+! ctxt      : (Global Input)Integer BLACS context for an NPx1 grid 
 !                required.
 !
 ! OUTPUT
@@ -101,14 +101,14 @@
 ! END OF desc OUTPUT FIELDS
 !
 !
-subroutine psb_cdrep(m, ictxt, desc, info)
+subroutine psb_cdrep(m, ctxt, desc, info)
   use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
   implicit None
   !....Parameters...
   integer(psb_lpk_), intent(in)    :: m
-  type(psb_ctxt_type), intent(in)  :: ictxt
+  type(psb_ctxt_type), intent(in)  :: ctxt
   integer(psb_ipk_), intent(out)   :: info
   Type(psb_desc_type), intent(out) :: desc
 
@@ -127,7 +127,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np
   n = m
@@ -153,9 +153,9 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   if (me == psb_root_) then
     exch(1)=m
     exch(2)=n
-    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:2),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:2),root=psb_root_)
     if (exch(1) /= m) then
       info=psb_err_parm_differs_among_procs_
       l_err(1)=1
@@ -180,7 +180,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   allocate(psb_repl_map :: desc%indxmap, stat=info)
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(ctxt,m,info)
   class default 
     ! This cannot happen 
     info = psb_err_internal_error_
@@ -198,7 +198,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_cdrep

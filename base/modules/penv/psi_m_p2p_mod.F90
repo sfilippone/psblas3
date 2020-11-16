@@ -43,7 +43,7 @@ module psi_m_p2p_mod
 
 contains
 
-  subroutine psb_msnds(ictxt,dat,dst)
+  subroutine psb_msnds(ctxt,dat,dst)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -51,7 +51,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(in)  :: dat
     integer(psb_mpk_), intent(in)  :: dst
     integer(psb_mpk_), allocatable :: dat_(:)
@@ -61,11 +61,11 @@ contains
 #else
     allocate(dat_(1), stat=info)
     dat_(1) = dat
-    call psi_snd(ictxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_msnds
 
-  subroutine psb_msndv(ictxt,dat,dst)
+  subroutine psb_msndv(ctxt,dat,dst)
 
 #ifdef MPI_MOD
     use mpi
@@ -74,7 +74,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(in)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: dst
     integer(psb_mpk_), allocatable :: dat_(:)
@@ -84,12 +84,12 @@ contains
 #else
     allocate(dat_(size(dat)), stat=info)
     dat_(:) = dat(:)
-    call psi_snd(ictxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
 #endif    
 
   end subroutine psb_msndv
 
-  subroutine psb_msndm(ictxt,dat,dst,m)
+  subroutine psb_msndm(ctxt,dat,dst,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -98,7 +98,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(in)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
@@ -122,11 +122,11 @@ contains
         k = k + 1
       end do
     end do
-    call psi_snd(ictxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_msndm
 
-  subroutine psb_mrcvs(ictxt,dat,src)
+  subroutine psb_mrcvs(ctxt,dat,src)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -134,7 +134,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(out)  :: dat
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info, icomm
@@ -142,13 +142,13 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    icomm = psb_get_mpi_comm(ictxt)
+    icomm = psb_get_mpi_comm(ctxt)
     call mpi_recv(dat,1,psb_mpi_mpk_,src,psb_int4_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_mrcvs
 
-  subroutine psb_mrcvv(ictxt,dat,src)
+  subroutine psb_mrcvv(ctxt,dat,src)
 
 #ifdef MPI_MOD
     use mpi
@@ -157,7 +157,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(out)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_), allocatable :: dat_(:)
@@ -165,14 +165,14 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    icomm = psb_get_mpi_comm(ictxt)
+    icomm = psb_get_mpi_comm(ctxt)
     call mpi_recv(dat,size(dat),psb_mpi_mpk_,src,psb_int4_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
   end subroutine psb_mrcvv
 
-  subroutine psb_mrcvm(ictxt,dat,src,m)
+  subroutine psb_mrcvm(ctxt,dat,src,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -181,7 +181,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(out)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
@@ -198,12 +198,12 @@ contains
       n_ = size(dat,2)
       call mpi_type_vector(n_,m_,ld,psb_mpi_mpk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
-      icomm = psb_get_mpi_comm(ictxt)
+      icomm = psb_get_mpi_comm(ctxt)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int4_tag,icomm,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      icomm = psb_get_mpi_comm(ictxt) 
+      icomm = psb_get_mpi_comm(ctxt) 
       call mpi_recv(dat,size(dat),psb_mpi_mpk_,src,psb_int4_tag,icomm,status,info)
     end if
     if (info /= mpi_success) then 

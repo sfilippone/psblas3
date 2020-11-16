@@ -52,10 +52,10 @@ module psi_e_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_eswapdatav
-      subroutine psi_eswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
+      subroutine psi_eswapidxm(ctxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag, n
       integer(psb_ipk_), intent(out)  :: info
@@ -63,10 +63,10 @@ module psi_e_comm_a_mod
       integer(psb_epk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_eswapidxm
-    subroutine psi_eswapidxv(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_eswapidxv(ctxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_Mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
@@ -96,10 +96,10 @@ module psi_e_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_eswaptranv
-    subroutine psi_etranidxm(ictxt,icomm,flag,n,beta,y,idx,&
+    subroutine psi_etranidxm(ctxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag, n
       integer(psb_ipk_), intent(out)  :: info
@@ -107,10 +107,10 @@ module psi_e_comm_a_mod
       integer(psb_epk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_etranidxm
-    subroutine psi_etranidxv(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_etranidxv(ctxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info

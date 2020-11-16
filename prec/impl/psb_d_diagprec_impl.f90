@@ -38,7 +38,7 @@ subroutine psb_d_diag_dump(prec,info,prefix,head)
   integer(psb_ipk_), intent(out)                    :: info
   character(len=*), intent(in), optional  :: prefix,head
   integer(psb_ipk_) :: i, j, il1, iln, lname, lev
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
@@ -46,8 +46,8 @@ subroutine psb_d_diag_dump(prec,info,prefix,head)
   !  len of prefix_ 
 
   info = 0
-  ictxt = prec%get_ctxt()
-  call psb_info(ictxt,iam,np)
+  ctxt = prec%get_ctxt()
+  call psb_info(ctxt,iam,np)
 
   if (present(prefix)) then 
     prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))

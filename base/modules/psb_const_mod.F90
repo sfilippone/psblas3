@@ -78,7 +78,7 @@ module psb_const_mod
   !
   !  Additional rules:
   !  1. MPI related stuff is always MPK
-  !  2. ICTXT,IAM,NP: should we have two versions of everything,
+  !  2. ctxt,IAM,NP: should we have two versions of everything,
   !                   one with MPK the other with EPK?
   !  3. INFO, ERR_ACT, IERR etc are always IPK
   !  4. For the array version of things, where it makes sense

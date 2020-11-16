@@ -37,7 +37,7 @@
 ! 
 ! Arguments: 
 ! 
-subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
+subroutine psi_symm_dep_list_inrv(rvsz,adj,ctxt,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -54,7 +54,7 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
 #endif
   integer(psb_mpk_), intent(inout)   :: rvsz(0:)
   integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-  type(psb_ctxt_type), intent(in)    :: ictxt
+  type(psb_ctxt_type), intent(in)    :: ctxt
     integer(psb_ipk_), intent(out)   :: info
   
   !
@@ -70,13 +70,13 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
   name = 'psi_symm_dep_list'
   call psb_erractionsave(err_act)
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
-  icomm = psb_get_mpi_comm(ictxt)
+  icomm = psb_get_mpi_comm(ctxt)
 
   nadj = size(adj)
 
@@ -110,13 +110,13 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
 end subroutine psi_symm_dep_list_inrv
 
-subroutine psi_symm_dep_list_norv(adj,ictxt,info)
+subroutine psi_symm_dep_list_norv(adj,ctxt,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -132,7 +132,7 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   include 'mpif.h'
 #endif
   integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-  type(psb_ctxt_type), intent(in) :: ictxt
+  type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(out)  :: info
   
   !
@@ -150,13 +150,13 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   call psb_erractionsave(err_act)
 
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
-  icomm = psb_get_mpi_comm(ictxt)
+  icomm = psb_get_mpi_comm(ctxt)
 
   nadj = size(adj)
   
@@ -174,7 +174,7 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   
   call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
        & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-  if (minfo == 0)  call psi_symm_dep_list(rvsz,adj,ictxt,info)
+  if (minfo == 0)  call psi_symm_dep_list(rvsz,adj,ctxt,info)
   if ((minfo /=0).or.(info /= 0)) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='inner call symm_dep')
     goto 9999      
@@ -183,7 +183,7 @@ subroutine psi_symm_dep_list_norv(adj,ictxt,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

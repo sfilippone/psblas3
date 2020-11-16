@@ -76,7 +76,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   integer(psb_ipk_), intent(in), optional             :: update,jx,ik,mode
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: np, me
   integer(psb_ipk_) :: err_act, iix, jjx, nrow, ncol, k, maxk, update_,&
        & mode_, liwork, ldx
@@ -93,10 +93,10 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -188,7 +188,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psb_zovrlm
@@ -266,7 +266,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional             :: update,mode
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, iix, jjx, nrow, ncol, &
        & k, update_, mode_, liwork, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
@@ -282,10 +282,10 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -370,7 +370,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psb_zovrlv

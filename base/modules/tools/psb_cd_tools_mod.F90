@@ -190,13 +190,13 @@ module psb_cd_tools_mod
 
   interface psb_cdall
 
-    subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,&
+    subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,&
          & globalcheck,lidx,usehash)
       import :: psb_ipk_, psb_lpk_, psb_desc_type, psb_parts, psb_ctxt_type
       implicit None
       procedure(psb_parts)                :: parts
       integer(psb_lpk_), intent(in)       :: mg,ng, vl(:)
-      type(psb_ctxt_type)                 :: ictxt
+      type(psb_ctxt_type)                 :: ctxt
       integer(psb_ipk_), intent(in)       :: vg(:), lidx(:),nl
       integer(psb_ipk_), intent(in)       :: flag
       logical, intent(in)                 :: repl, globalcheck, usehash

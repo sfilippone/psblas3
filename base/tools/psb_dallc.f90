@@ -52,7 +52,7 @@ subroutine psb_dalloc_vect(x, desc_a,info)
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -63,9 +63,9 @@ subroutine psb_dalloc_vect(x, desc_a,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -105,7 +105,7 @@ subroutine psb_dalloc_vect(x, desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -133,7 +133,7 @@ subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
   integer(psb_ipk_), optional, intent(in)   :: n,lb
 
   !locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
   integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -146,9 +146,9 @@ subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -177,9 +177,9 @@ subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
   !global check on n parameters
   if (me == psb_root_) then
     exch(1)=n_
-    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    call psb_bcast(ctxt,exch(1),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    call psb_bcast(ctxt,exch(1),root=psb_root_)
     if (exch(1) /= n_) then
       info=psb_err_parm_differs_among_procs_
       call psb_errpush(info,name,i_err=(/ione/))
@@ -217,7 +217,7 @@ subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -236,7 +236,7 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n)
   integer(psb_ipk_), optional, intent(in)   :: n
 
   !locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
   integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -249,9 +249,9 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -275,9 +275,9 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n)
   !global check on n parameters
   if (me == psb_root_) then
     exch(1)=n_
-    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    call psb_bcast(ctxt,exch(1),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    call psb_bcast(ctxt,exch(1),root=psb_root_)
     if (exch(1) /= n_) then
       info=psb_err_parm_differs_among_procs_
       call psb_errpush(info,name,i_err=(/ione/))
@@ -310,7 +310,7 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

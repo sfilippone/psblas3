@@ -52,10 +52,10 @@ module psi_i2_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_i2swapdatav
-      subroutine psi_i2swapidxm(ictxt,icomm,flag,n,beta,y,idx,&
+      subroutine psi_i2swapidxm(ctxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag, n
       integer(psb_ipk_), intent(out)  :: info
@@ -63,10 +63,10 @@ module psi_i2_comm_a_mod
       integer(psb_i2pk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_i2swapidxm
-    subroutine psi_i2swapidxv(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_i2swapidxv(ctxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_Mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
@@ -96,10 +96,10 @@ module psi_i2_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_i2swaptranv
-    subroutine psi_i2tranidxm(ictxt,icomm,flag,n,beta,y,idx,&
+    subroutine psi_i2tranidxm(ctxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag, n
       integer(psb_ipk_), intent(out)  :: info
@@ -107,10 +107,10 @@ module psi_i2_comm_a_mod
       integer(psb_i2pk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_i2tranidxm
-    subroutine psi_i2tranidxv(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_i2tranidxv(ctxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      type(psb_ctxt_type), intent(in) :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info

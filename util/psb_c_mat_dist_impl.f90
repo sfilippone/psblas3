@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
+subroutine psb_cmatdist(a_glob, a, ctxt, desc_a,&
      & info, parts, vg, vsz, inroot,fmt,mold)
   !
   ! an utility subroutine to distribute a matrix among processors
@@ -59,7 +59,7 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
   !        usually nv=1; if nv >1 then we have an overlap in the data
   !        distribution.
   !
-  !  integer(psb_ipk_) :: ictxt
+  !  integer(psb_ipk_) :: ctxt
   !     on entry: the PSBLAS parallel environment context.
   !
   !  type (desc_type)                  :: desc_a
@@ -75,7 +75,7 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
 
   ! parameters
   type(psb_cspmat_type)      :: a_glob
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   type(psb_cspmat_type)      :: a
   type(psb_desc_type)        :: desc_a
   integer(psb_ipk_), intent(out)       :: info
@@ -110,7 +110,7 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
   else
     root = psb_root_
   end if
-  call psb_info(ictxt, iam, np)     
+  call psb_info(ctxt, iam, np)     
 
   use_parts = present(parts)
   use_vg    = present(vg)
@@ -140,10 +140,10 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
     
   endif
   ! broadcast informations to other processors
-  call psb_bcast(ictxt,nrow, root)
-  call psb_bcast(ictxt,ncol, root)
-  call psb_bcast(ictxt,nnzero, root)
-  call psb_bcast(ictxt,nrhs, root)
+  call psb_bcast(ctxt,nrow, root)
+  call psb_bcast(ctxt,ncol, root)
+  call psb_bcast(ctxt,nnzero, root)
+  call psb_bcast(ctxt,nrhs, root)
   liwork = max(np, nrow + ncol)
   allocate(iwork(liwork), iwrk2(np),stat = info)
   if (info /= psb_success_) then
@@ -156,11 +156,11 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
          &nrow, ncol, nnzero,nrhs
   endif
   if (use_parts) then 
-    call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
+    call psb_cdall(ctxt,desc_a,info,mg=nrow,parts=parts)
   else if (use_vg) then 
-    call psb_cdall(ictxt,desc_a,info,vg=vg)
+    call psb_cdall(ctxt,desc_a,info,vg=vg)
   else if (use_vsz) then
-    call psb_cdall(ictxt,desc_a,info,nl=vsz(iam+1))
+    call psb_cdall(ctxt,desc_a,info,nl=vsz(iam+1))
   else
     info = -1
   end if
@@ -269,12 +269,12 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
             goto 9999
           end if
         else
-          call psb_snd(ictxt,nnr,iproc)
-          call psb_snd(ictxt,ll,iproc)
-          call psb_snd(ictxt,irow(1:ll),iproc)
-          call psb_snd(ictxt,icol(1:ll),iproc)
-          call psb_snd(ictxt,val(1:ll),iproc)
-          call psb_rcv(ictxt,ll,iproc)
+          call psb_snd(ctxt,nnr,iproc)
+          call psb_snd(ctxt,ll,iproc)
+          call psb_snd(ctxt,irow(1:ll),iproc)
+          call psb_snd(ctxt,icol(1:ll),iproc)
+          call psb_snd(ctxt,val(1:ll),iproc)
+          call psb_rcv(ctxt,ll,iproc)
         endif
       end do
     else if (iam /= root) then
@@ -282,8 +282,8 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
       do k_count = 1, np_sharing
         iproc = iwork(k_count)
         if (iproc == iam) then
-          call psb_rcv(ictxt,nnr,root)
-          call psb_rcv(ictxt,ll,root)
+          call psb_rcv(ctxt,nnr,root)
+          call psb_rcv(ctxt,ll,root)
           if (ll > size(irow)) then 
             write(psb_err_unit,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
@@ -296,10 +296,10 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
             end if
             
           endif
-          call psb_rcv(ictxt,irow(1:ll),root)
-          call psb_rcv(ictxt,icol(1:ll),root)
-          call psb_rcv(ictxt,val(1:ll),root)
-          call psb_snd(ictxt,ll,root)
+          call psb_rcv(ctxt,irow(1:ll),root)
+          call psb_rcv(ctxt,icol(1:ll),root)
+          call psb_rcv(ctxt,val(1:ll),root)
+          call psb_snd(ctxt,ll,root)
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
           if(info /= psb_success_) then
             info=psb_err_from_subroutine_
@@ -319,7 +319,7 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
     end if
   end do
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
   t1 = psb_wtime()
@@ -330,7 +330,7 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
     goto 9999
   end if
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t2 = psb_wtime()
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
@@ -362,7 +362,7 @@ subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -370,7 +370,7 @@ end subroutine psb_cmatdist
 
 
 
-subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
+subroutine psb_lcmatdist(a_glob, a, ctxt, desc_a,&
      & info, parts, vg, vsz, inroot,fmt,mold)
   !
   ! an utility subroutine to distribute a matrix among processors
@@ -400,7 +400,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
   !        usually nv=1; if nv >1 then we have an overlap in the data
   !        distribution.
   !
-  !  integer(psb_ipk_) :: ictxt
+  !  integer(psb_ipk_) :: ctxt
   !     on entry: the PSBLAS parallel environment context.
   !
   !  type (desc_type)                  :: desc_a
@@ -416,7 +416,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
 
   ! parameters
   type(psb_lcspmat_type)      :: a_glob
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   type(psb_cspmat_type)      :: a
   type(psb_desc_type)        :: desc_a
   integer(psb_ipk_), intent(out)       :: info
@@ -452,7 +452,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
   else
     root = psb_root_
   end if
-  call psb_info(ictxt, iam, np)     
+  call psb_info(ctxt, iam, np)     
   if (iam == root) then
     nrow = a_glob%get_nrows()
     ncol = a_glob%get_ncols()
@@ -476,10 +476,10 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
   endif
   
   ! broadcast informations to other processors
-  call psb_bcast(ictxt,nrow, root)
-  call psb_bcast(ictxt,ncol, root)
-  call psb_bcast(ictxt,nnzero, root)
-  call psb_bcast(ictxt,nrhs, root)
+  call psb_bcast(ctxt,nrow, root)
+  call psb_bcast(ctxt,ncol, root)
+  call psb_bcast(ctxt,nnzero, root)
+  call psb_bcast(ctxt,nrhs, root)
   liwork = max(np, nrow + ncol)
   allocate(iwork(liwork), iwrk2(np),stat = info)
   if (info /= psb_success_) then
@@ -492,11 +492,11 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
          &nrow, ncol, nnzero,nrhs
   endif
   if (use_parts) then 
-    call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
+    call psb_cdall(ctxt,desc_a,info,mg=nrow,parts=parts)
   else if (use_vg) then 
-    call psb_cdall(ictxt,desc_a,info,vg=vg)
+    call psb_cdall(ctxt,desc_a,info,vg=vg)
   else if (use_vsz) then 
-    call psb_cdall(ictxt,desc_a,info,nl=vsz(iam+1))
+    call psb_cdall(ctxt,desc_a,info,nl=vsz(iam+1))
   else
     info = -1
   end if
@@ -607,12 +607,12 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
             goto 9999
           end if
         else
-          call psb_snd(ictxt,nnr,iproc)
-          call psb_snd(ictxt,ll,iproc)
-          call psb_snd(ictxt,irow(1:ll),iproc)
-          call psb_snd(ictxt,icol(1:ll),iproc)
-          call psb_snd(ictxt,val(1:ll),iproc)
-          call psb_rcv(ictxt,ll,iproc)
+          call psb_snd(ctxt,nnr,iproc)
+          call psb_snd(ctxt,ll,iproc)
+          call psb_snd(ctxt,irow(1:ll),iproc)
+          call psb_snd(ctxt,icol(1:ll),iproc)
+          call psb_snd(ctxt,val(1:ll),iproc)
+          call psb_rcv(ctxt,ll,iproc)
         endif
       end do
     else if (iam /= root) then
@@ -620,8 +620,8 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
       do k_count = 1, np_sharing
         iproc = iwork(k_count)
         if (iproc == iam) then
-          call psb_rcv(ictxt,nnr,root)
-          call psb_rcv(ictxt,ll,root)
+          call psb_rcv(ctxt,nnr,root)
+          call psb_rcv(ctxt,ll,root)
           if (ll > size(irow)) then 
             write(psb_err_unit,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
@@ -634,10 +634,10 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
             end if
             
           endif
-          call psb_rcv(ictxt,irow(1:ll),root)
-          call psb_rcv(ictxt,icol(1:ll),root)
-          call psb_rcv(ictxt,val(1:ll),root)
-          call psb_snd(ictxt,ll,root)
+          call psb_rcv(ctxt,irow(1:ll),root)
+          call psb_rcv(ctxt,icol(1:ll),root)
+          call psb_rcv(ctxt,val(1:ll),root)
+          call psb_snd(ctxt,ll,root)
           il = ll 
           call psb_spins(il,irow,icol,val,a,desc_a,info)
           if(info /= psb_success_) then
@@ -658,7 +658,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
     end if
   end do
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
   t1 = psb_wtime()
@@ -669,7 +669,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
     goto 9999
   end if
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t2 = psb_wtime()
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
@@ -701,7 +701,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

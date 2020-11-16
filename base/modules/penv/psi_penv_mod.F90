@@ -779,11 +779,11 @@ contains
 
   end subroutine psi_register_mpi_extras
 
-!!$  subroutine psb_init_epk(ictxt,np,basectxt,ids)
-!!$    type(psb_ctxt_type), intent(out) :: ictxt
+!!$  subroutine psb_init_epk(ctxt,np,basectxt,ids)
+!!$    type(psb_ctxt_type), intent(out) :: ctxt
 !!$    integer(psb_epk_), intent(in), optional :: np, basectxt, ids(:)
 !!$
-!!$    integer(psb_mpk_) :: iictxt
+!!$    integer(psb_mpk_) :: ictxt
 !!$    integer(psb_mpk_) :: inp, ibasectxt
 !!$    integer(psb_mpk_), allocatable :: ids_(:)
 !!$
@@ -796,53 +796,53 @@ contains
 !!$    if (present(np).and.present(basectxt)) then 
 !!$      inp       = np
 !!$      ibasectxt = basectxt
-!!$      call psb_init(ictxt,np=inp,basectxt=ibasectxt,ids=ids_)
+!!$      call psb_init(ctxt,np=inp,basectxt=ibasectxt,ids=ids_)
 !!$    else if (present(np)) then 
 !!$      inp       = np
-!!$      call psb_init(ictxt,np=inp,ids=ids_)
+!!$      call psb_init(ctxt,np=inp,ids=ids_)
 !!$    else if (present(basectxt)) then 
 !!$      ibasectxt = basectxt
-!!$      call psb_init(ictxt,basectxt=ibasectxt,ids=ids_)
+!!$      call psb_init(ctxt,basectxt=ibasectxt,ids=ids_)
 !!$    else
-!!$      call psb_init(ictxt,ids=ids_)
+!!$      call psb_init(ctxt,ids=ids_)
 !!$    end if
 !!$  end subroutine psb_init_epk
 
-!!$  subroutine psb_exit_epk(ictxt,close)
-!!$    integer(psb_epk_), intent(inout) :: ictxt
+!!$  subroutine psb_exit_epk(ctxt,close)
+!!$    integer(psb_epk_), intent(inout) :: ctxt
 !!$    logical, intent(in), optional :: close
-!!$    integer(psb_mpk_) :: iictxt
+!!$    integer(psb_mpk_) :: ictxt
 !!$    
-!!$    iictxt = ictxt
-!!$    call psb_exit(iictxt, close)
+!!$    ictxt = ctxt
+!!$    call psb_exit(ictxt, close)
 !!$  end subroutine psb_exit_epk
 !!$
-!!$  subroutine psb_barrier_epk(ictxt)
-!!$    integer(psb_epk_), intent(in) :: ictxt
-!!$    integer(psb_mpk_) :: iictxt
+!!$  subroutine psb_barrier_epk(ctxt)
+!!$    integer(psb_epk_), intent(in) :: ctxt
+!!$    integer(psb_mpk_) :: ictxt
 !!$    
-!!$    iictxt = ictxt
-!!$    call psb_barrier(iictxt)
+!!$    ictxt = ctxt
+!!$    call psb_barrier(ictxt)
 !!$  end subroutine psb_barrier_epk
 !!$
-!!$  subroutine psb_abort_epk(ictxt,errc)
-!!$    integer(psb_epk_), intent(in) :: ictxt
+!!$  subroutine psb_abort_epk(ctxt,errc)
+!!$    integer(psb_epk_), intent(in) :: ctxt
 !!$    integer(psb_epk_), intent(in), optional :: errc
-!!$    integer(psb_mpk_) :: iictxt, ierrc
+!!$    integer(psb_mpk_) :: ictxt, ierrc
 !!$
-!!$    iictxt = ictxt
+!!$    ictxt = ctxt
 !!$    if (present(errc)) then 
 !!$      ierrc = errc
-!!$      call psb_abort(iictxt,ierrc)
+!!$      call psb_abort(ictxt,ierrc)
 !!$    else
-!!$      call psb_abort(iictxt)
+!!$      call psb_abort(ictxt)
 !!$    end if
 !!$  end subroutine psb_abort_epk
 !!$  
 #if defined(IPK4) && defined(LPK8)
-  subroutine psb_info_epk(ictxt,iam,np)
+  subroutine psb_info_epk(ctxt,iam,np)
 
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_epk_), intent(out) :: iam, np
 
     !
@@ -850,13 +850,13 @@ contains
     ! of the last CTXT encountered. 
     !
     integer(psb_mpk_), save :: lam, lnp
-    call psb_info(ictxt,lam,lnp)
+    call psb_info(ctxt,lam,lnp)
     iam = lam
     np  = lnp
   end subroutine psb_info_epk
 #endif
   
-  subroutine psb_init_mpik(ictxt,np,basectxt,ids)
+  subroutine psb_init_mpik(ctxt,np,basectxt,ids)
     use psb_const_mod
     use psb_error_mod
     use psb_mat_mod
@@ -869,7 +869,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(out) :: ictxt
+    type(psb_ctxt_type), intent(out) :: ctxt
     type(psb_ctxt_type), intent(in), optional :: basectxt
     integer(psb_mpk_), intent(in), optional :: np, ids(:)
 
@@ -883,7 +883,7 @@ contains
     call psb_set_debug_unit(psb_err_unit)
 
 #if defined(SERIAL_MPI) 
-    ictxt = nctxt
+    ctxt = nctxt
     nctxt = nctxt + 1
 
     call psi_register_mpi_extras(info)
@@ -914,7 +914,7 @@ contains
         iinfo=psb_err_initerror_neugh_procs_
         call psb_errpush(iinfo,name)
         call psb_error()
-        !ictxt = mpi_comm_null
+        !ctxt = mpi_comm_null
         return
       endif
       call mpi_comm_size(basecomm,np_,info)
@@ -922,32 +922,32 @@ contains
         iinfo=psb_err_initerror_neugh_procs_
         call psb_errpush(iinfo,name)
         call psb_error()
-        !ictxt = mpi_comm_null
+        !ctxt = mpi_comm_null
         return
       endif
       call mpi_comm_group(basecomm,basegroup,info)
       if (present(ids)) then 
         if (size(ids)<np) then 
           write(psb_err_unit,*) 'Error in init: too few ids in input'
-          !ictxt%ctxt = mpi_comm_null
+          !ctxt%ctxt = mpi_comm_null
           return
         end if
         do i=1, np 
           if ((ids(i)<0).or.(ids(i)>np_)) then 
             write(psb_err_unit,*) 'Error in init: invalid rank in input'
-            !ictxt%ctxt = mpi_comm_null
+            !ctxt%ctxt = mpi_comm_null
             return
           end if
         end do
         call mpi_group_incl(basegroup,np,ids,newgroup,info)
         if (info /= mpi_success) then 
-          !ictxt%ctxt = mpi_comm_null 
+          !ctxt%ctxt = mpi_comm_null 
           return
         endif
       else
         allocate(iids(np),stat=info)
         if (info /= 0) then 
-          !ictxt%ctxt = mpi_comm_null
+          !ctxt%ctxt = mpi_comm_null
           return
         endif
         do i=1, np
@@ -955,7 +955,7 @@ contains
         end do
         call mpi_group_incl(basegroup,np,iids,newgroup,info)
         if (info /= mpi_success) then 
-          !ictxt = mpi_comm_null 
+          !ctxt = mpi_comm_null 
           return
         endif
         deallocate(iids)
@@ -967,16 +967,16 @@ contains
       if (basecomm /= mpi_comm_null) then 
         call mpi_comm_dup(basecomm,icomm,info)
       else 
-        ! ictxt = mpi_comm_null
+        ! ctxt = mpi_comm_null
       end if
     endif
     if (info == 0) then
-      ictxt%ctxt = icomm ! allocate on assignment
+      ctxt%ctxt = icomm ! allocate on assignment
     end if
     call psi_register_mpi_extras(info)
     call psi_get_sizes()
-    !if (ictxt == mpi_comm_null) return
-    if (.not.allocated(ictxt%ctxt)) return 
+    !if (ctxt == mpi_comm_null) return
+    if (.not.allocated(ctxt%ctxt)) return 
 #endif
     call psb_init_vect_defaults()
     call psb_init_mat_defaults()
@@ -989,13 +989,13 @@ contains
     ! !$        ! or shall we tolerate this ?
     ! !$        info=psb_err_internal_error_
     ! !$        call psb_errpush(info,name)
-    ! !$        call psb_error(ictxt)
+    ! !$        call psb_error(ctxt)
     ! !$      endif
     ! !$    endif
 
   end subroutine psb_init_mpik
 
-  subroutine psb_exit_mpik(ictxt,close)
+  subroutine psb_exit_mpik(ctxt,close)
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
@@ -1006,7 +1006,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(inout) :: ictxt
+    type(psb_ctxt_type), intent(inout) :: ctxt
     logical, intent(in), optional :: close
     logical  :: close_
     integer(psb_mpk_) :: info
@@ -1025,22 +1025,22 @@ contains
 ! !$      else
 ! !$        info=psb_err_internal_error_ ! rsb failed to exit, and we issue an internal error. or  shall we tolerate this ?
 ! !$        call psb_errpush(info,name)
-! !$        call psb_error(ictxt)
+! !$        call psb_error(ctxt)
 ! !$      endif
 ! !$    endif
 #if defined(SERIAL_MPI)
     ! Under serial mode, CLOSE has no effect, but reclaim
-    ! the used ICTXT number. 
+    ! the used ctxt number. 
     nctxt = max(0, nctxt - 1)    
 #else 
     if (close_) then 
       call psb_close_all_context(psb_mesg_queue)
     else
-      call psb_close_context(psb_mesg_queue,ictxt)
+      call psb_close_context(psb_mesg_queue,ctxt)
     end if
-    !if ((ictxt /= mpi_comm_null).and.(ictxt /= mpi_comm_world)) then
-    if (allocated(ictxt%ctxt)) then 
-      if (ictxt%ctxt /= mpi_comm_world)call mpi_comm_Free(ictxt%ctxt,info)
+    !if ((ctxt /= mpi_comm_null).and.(ctxt /= mpi_comm_world)) then
+    if (allocated(ctxt%ctxt)) then 
+      if (ctxt%ctxt /= mpi_comm_world)call mpi_comm_Free(ctxt%ctxt,info)
     end if
 
     if (close_) call mpi_finalize(info)
@@ -1052,7 +1052,7 @@ contains
   end subroutine psb_exit_mpik
 
 
-  subroutine psb_barrier_mpik(ictxt)
+  subroutine psb_barrier_mpik(ctxt)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1060,12 +1060,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
 
     integer(psb_mpk_) :: info
 #if !defined(SERIAL_MPI)
-    if (allocated(ictxt%ctxt)) then 
-      if (ictxt%ctxt /= mpi_comm_null) call mpi_barrier(ictxt%ctxt, info)
+    if (allocated(ctxt%ctxt)) then 
+      if (ctxt%ctxt /= mpi_comm_null) call mpi_barrier(ctxt%ctxt, info)
     end if
 #endif    
 
@@ -1086,9 +1086,9 @@ contains
     psb_wtime = mpi_wtime()
   end function psb_wtime
 
-  subroutine psb_abort_mpik(ictxt,errc)
+  subroutine psb_abort_mpik(ctxt,errc)
 
-    type(psb_ctxt_type), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_mpk_), intent(in), optional :: errc
     
     integer(psb_mpk_) :: code, info 
@@ -1102,13 +1102,13 @@ contains
       code = -1 
     endif
 
-    if (allocated(ictxt%ctxt)) call mpi_abort(ictxt%ctxt,code,info)
+    if (allocated(ctxt%ctxt)) call mpi_abort(ctxt%ctxt,code,info)
 #endif    
 
   end subroutine psb_abort_mpik
 
 
-  subroutine psb_info_mpik(ictxt,iam,np)
+  subroutine psb_info_mpik(ctxt,iam,np)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1117,7 +1117,7 @@ contains
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(out) :: iam, np
     integer(psb_mpk_) :: info
     !
@@ -1132,18 +1132,18 @@ contains
 #else    
     iam = -1
     np  = -1
-    if (allocated(ictxt%ctxt)) then 
-      if (ictxt%ctxt == lctxt) then
+    if (allocated(ctxt%ctxt)) then 
+      if (ctxt%ctxt == lctxt) then
         iam = lam
         np  = lnp
       else
-        if (ictxt%ctxt /= mpi_comm_null) then 
-          call mpi_comm_size(ictxt%ctxt,np,info) 
+        if (ctxt%ctxt /= mpi_comm_null) then 
+          call mpi_comm_size(ctxt%ctxt,np,info) 
           if (info /= mpi_success) np = -1 
-          call mpi_comm_rank(ictxt%ctxt,iam,info) 
+          call mpi_comm_rank(ctxt%ctxt,iam,info) 
           if (info /= mpi_success) iam = -1 
         end if
-        lctxt = ictxt%ctxt
+        lctxt = ctxt%ctxt
         lam   = iam
         lnp   = np
       end if
@@ -1152,33 +1152,33 @@ contains
   end subroutine psb_info_mpik
 
 
-  function psb_m_get_mpi_comm(ictxt) result(comm)
-    type(psb_ctxt_type) :: ictxt
+  function psb_m_get_mpi_comm(ctxt) result(comm)
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: comm
     comm = mpi_comm_null
-    if (allocated(ictxt%ctxt)) comm = ictxt%ctxt
+    if (allocated(ctxt%ctxt)) comm = ctxt%ctxt
   end function psb_m_get_mpi_comm
 
-  function psb_m_get_mpi_rank(ictxt,id) result(rank)
+  function psb_m_get_mpi_rank(ctxt,id) result(rank)
     integer(psb_mpk_) :: rank
     integer(psb_mpk_) :: id
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
 
     rank = id
   end function psb_m_get_mpi_rank
 
-  subroutine psb_get_mpicomm(ictxt,comm)
-    type(psb_ctxt_type) :: ictxt
+  subroutine psb_get_mpicomm(ctxt,comm)
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: comm
     comm = mpi_comm_null
-    if (allocated(ictxt%ctxt)) comm = ictxt%ctxt
+    if (allocated(ctxt%ctxt)) comm = ctxt%ctxt
   end subroutine psb_get_mpicomm
 
-  subroutine psb_get_rank(rank,ictxt,id)
-    type(psb_ctxt_type) :: ictxt
+  subroutine psb_get_rank(rank,ctxt,id)
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: rank,id
 
-    rank = psb_get_mpi_rank(ictxt,id) 
+    rank = psb_get_mpi_rank(ctxt,id) 
   end subroutine psb_get_rank
 
 

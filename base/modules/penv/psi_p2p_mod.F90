@@ -65,7 +65,7 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine psb_lsnds(ictxt,dat,dst)
+  subroutine psb_lsnds(ctxt,dat,dst)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -73,7 +73,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     logical, intent(in)  :: dat
     integer(psb_mpk_), intent(in)  :: dst
     logical, allocatable :: dat_(:)
@@ -83,11 +83,11 @@ contains
 #else
     allocate(dat_(1), stat=info)
     dat_(1) = dat
-    call psi_snd(ictxt,psb_logical_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_logical_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_lsnds
 
-  subroutine psb_lsndv(ictxt,dat,dst)
+  subroutine psb_lsndv(ctxt,dat,dst)
 
 #ifdef MPI_MOD
     use mpi
@@ -96,7 +96,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     logical, intent(in)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: dst
     logical, allocatable :: dat_(:)
@@ -106,12 +106,12 @@ contains
 #else
     allocate(dat_(size(dat)), stat=info)
     dat_(:) = dat(:)
-    call psi_snd(ictxt,psb_logical_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_logical_tag,dst,dat_,psb_mesg_queue)
 #endif    
 
   end subroutine psb_lsndv
 
-  subroutine psb_lsndm(ictxt,dat,dst,m)
+  subroutine psb_lsndm(ctxt,dat,dst,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -120,7 +120,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     logical, intent(in)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
@@ -144,11 +144,11 @@ contains
         k = k + 1
       end do
     end do
-    call psi_snd(ictxt,psb_logical_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_logical_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_lsndm
 
-  subroutine psb_hsnds(ictxt,dat,dst)
+  subroutine psb_hsnds(ctxt,dat,dst)
 
 #ifdef MPI_MOD
     use mpi
@@ -157,7 +157,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     character(len=*), intent(in)  :: dat
     integer(psb_mpk_), intent(in)  :: dst
     character(len=1), allocatable :: dat_(:)
@@ -170,7 +170,7 @@ contains
     do i=1, l
       dat_(i) = dat(i:i)
     end do
-    call psi_snd(ictxt,psb_char_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_char_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_hsnds
 
@@ -180,7 +180,7 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine psb_lrcvs(ictxt,dat,src)
+  subroutine psb_lrcvs(ctxt,dat,src)
 
 #ifdef MPI_MOD
     use mpi
@@ -189,7 +189,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     logical, intent(out)  :: dat
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info, icomm
@@ -197,13 +197,13 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    icomm = psb_get_mpi_comm(ictxt)
+    icomm = psb_get_mpi_comm(ctxt)
     call mpi_recv(dat,1,mpi_logical,src,psb_logical_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_lrcvs
 
-  subroutine psb_lrcvv(ictxt,dat,src)
+  subroutine psb_lrcvv(ctxt,dat,src)
 
 #ifdef MPI_MOD
     use mpi
@@ -212,20 +212,20 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     logical, intent(out)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info 
     integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_logical,src,psb_logical_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),mpi_logical,src,psb_logical_tag,ctxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
   end subroutine psb_lrcvv
 
-  subroutine psb_lrcvm(ictxt,dat,src,m)
+  subroutine psb_lrcvm(ctxt,dat,src,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -234,7 +234,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     logical, intent(out)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
@@ -244,7 +244,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
-    icomm = psb_get_mpi_comm(ictxt)
+    icomm = psb_get_mpi_comm(ctxt)
     if (present(m)) then 
       m_ = m
       ld = size(dat,1)
@@ -266,7 +266,7 @@ contains
   end subroutine psb_lrcvm
 
 
-  subroutine psb_hrcvs(ictxt,dat,src)
+  subroutine psb_hrcvs(ctxt,dat,src)
 
 #ifdef MPI_MOD
     use mpi
@@ -275,7 +275,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     character(len=*), intent(out)  :: dat
     integer(psb_mpk_), intent(in)  :: src
     character(len=1), allocatable :: dat_(:)
@@ -285,7 +285,7 @@ contains
     ! do nothing
 #else
     l = len(dat) 
-    icomm = psb_get_mpi_comm(ictxt)
+    icomm = psb_get_mpi_comm(ctxt)
     allocate(dat_(l), stat=info)
     call mpi_recv(dat_,l,mpi_character,src,psb_char_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)

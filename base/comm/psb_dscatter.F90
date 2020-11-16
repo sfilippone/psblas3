@@ -54,7 +54,7 @@ subroutine  psb_dscatter_vect(globx, locx, desc_a, info, root, mold)
   class(psb_d_base_vect_type), intent(in), optional :: mold
   
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: np, me, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
@@ -68,13 +68,13 @@ subroutine  psb_dscatter_vect(globx, locx, desc_a, info, root, mold)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -93,7 +93,7 @@ subroutine  psb_dscatter_vect(globx, locx, desc_a, info, root, mold)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
   
   return
   

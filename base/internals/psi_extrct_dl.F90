@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
+subroutine psi_i_extract_dep_list(ctxt,is_bld,is_upd,desc_str,dep_list,&
      & length_dl,dl_lda,mode,info)
 
   !    internal routine
@@ -134,7 +134,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 #endif
   !     ....scalar parameters...
   logical,  intent(in)            :: is_bld, is_upd
-  type(psb_ctxt_type), intent(in) :: ictxt
+  type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(in)   :: mode
   integer(psb_ipk_), intent(out)  :: dl_lda
   integer(psb_ipk_), intent(in)   :: desc_str(*)
@@ -167,7 +167,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 !!$  if ((do_timings).and.(idx_phase3==-1))       &
 !!$       & idx_phase3 = psb_get_timer_idx("PSI_XTR_DL: phase3")
 
-  call psb_info(ictxt,me,np)
+  call psb_info(ctxt,me,np)
   if (do_timings) call psb_tic(idx_phase1)
 
   allocate(itmp(2*np+1),length_dl(0:np),stat=info)
@@ -269,9 +269,9 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   if (do_timings) call psb_tic(idx_phase2)
   if (dist_symm_list) then 
     call psb_realloc(length_dl(me),itmp,info)
-    call psi_symm_dep_list(itmp,ictxt,info)       
+    call psi_symm_dep_list(itmp,ctxt,info)       
     dl_lda = max(size(itmp),1)
-    call psb_max(ictxt, dl_lda)
+    call psb_max(ctxt, dl_lda)
     
     if (debug_level >= psb_debug_inner_) &
          & write(debug_unit,*) me,' ',trim(name),': Dep_list length ',length_dl(me),dl_lda
@@ -283,8 +283,8 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       goto 9999      
     end if
 
-    call psb_sum(ictxt,length_dl(0:np))
-    icomm = psb_get_mpi_comm(ictxt)
+    call psb_sum(ctxt,length_dl(0:np))
+    icomm = psb_get_mpi_comm(ctxt)
     call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
          & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
     info = minfo  
@@ -299,7 +299,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       integer(psb_ipk_) :: i,j,ip,dlsym, ldu, mdl, l1, l2
 
       dl_lda = max(length_dl(me),1)
-      call psb_max(ictxt, dl_lda)
+      call psb_max(ctxt, dl_lda)
       if (debug_level >= psb_debug_inner_) &
            & write(debug_unit,*) me,' ',trim(name),': Dep_list length ',length_dl(me),dl_lda
       allocate(dep_list(dl_lda,0:np),stat=info)
@@ -307,8 +307,8 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
         call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
         goto 9999      
       end if
-      call psb_sum(ictxt,length_dl(0:np))
-      icomm = psb_get_mpi_comm(ictxt)
+      call psb_sum(ctxt,length_dl(0:np))
+      icomm = psb_get_mpi_comm(ctxt)
       call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_,&
            & dep_list,dl_lda,psb_mpi_ipk_,icomm,minfo)
       info = minfo  
@@ -380,7 +380,7 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       end do
       flush(0)
     end if
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end if
   if (do_timings) call psb_toc(idx_phase2)
   if ((profile).and.(me==0))  then

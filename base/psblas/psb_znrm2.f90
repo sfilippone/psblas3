@@ -60,7 +60,7 @@ function psb_znrm2(x, desc_a, info, jx,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -75,9 +75,9 @@ function psb_znrm2(x, desc_a, info, jx,global)  result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -127,12 +127,12 @@ function psb_znrm2(x, desc_a, info, jx,global)  result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_znrm2
@@ -196,7 +196,7 @@ function psb_znrm2v(x, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
@@ -211,9 +211,9 @@ function psb_znrm2v(x, desc_a, info,global)  result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -256,12 +256,12 @@ function psb_znrm2v(x, desc_a, info,global)  result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_znrm2v
@@ -293,7 +293,7 @@ function psb_znrm2_vect(x, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
@@ -308,9 +308,9 @@ function psb_znrm2_vect(x, desc_a, info,global)  result(res)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -363,12 +363,12 @@ function psb_znrm2_vect(x, desc_a, info,global)  result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_znrm2_vect
@@ -401,7 +401,7 @@ function psb_znrm2_weight_vect(x,w, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
@@ -416,9 +416,9 @@ function psb_znrm2_weight_vect(x,w, desc_a, info,global)  result(res)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -471,12 +471,12 @@ function psb_znrm2_weight_vect(x,w, desc_a, info,global)  result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_znrm2_weight_vect
@@ -512,7 +512,7 @@ function psb_znrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
@@ -527,9 +527,9 @@ function psb_znrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -582,12 +582,12 @@ function psb_znrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_znrm2_weightmask_vect
@@ -650,7 +650,7 @@ subroutine psb_znrm2vs(res, x, desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
@@ -665,9 +665,9 @@ subroutine psb_znrm2vs(res, x, desc_a, info,global)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -712,13 +712,13 @@ subroutine psb_znrm2vs(res, x, desc_a, info,global)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ctxt,res)
 
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_znrm2vs

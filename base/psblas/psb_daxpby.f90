@@ -59,7 +59,7 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
   integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -70,9 +70,9 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -124,7 +124,7 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -193,7 +193,7 @@ subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
   integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
@@ -204,9 +204,9 @@ subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -271,7 +271,7 @@ subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -310,7 +310,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   real(psb_dpk_), intent(inout) :: y(:,:)
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, in, jjy, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -323,8 +323,8 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -393,7 +393,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_daxpby
@@ -459,7 +459,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   real(psb_dpk_), intent(inout) :: y(:)
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -473,9 +473,9 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -518,7 +518,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_daxpbyv
@@ -582,7 +582,7 @@ subroutine  psb_daxpbyvout(alpha, x, beta,y, z, desc_a,info)
   real(psb_dpk_), intent(inout) :: z(:)
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz, lldx, lldy, lldz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
@@ -596,9 +596,9 @@ subroutine  psb_daxpbyvout(alpha, x, beta,y, z, desc_a,info)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -650,7 +650,7 @@ subroutine  psb_daxpbyvout(alpha, x, beta,y, z, desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_daxpbyvout
@@ -678,7 +678,7 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   integer(psb_ipk_), intent(out)          :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -689,9 +689,9 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -736,7 +736,7 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

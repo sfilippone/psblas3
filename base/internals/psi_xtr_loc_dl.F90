@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
+subroutine psi_i_xtr_loc_dl(ctxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
 
   !    internal routine
   !    == = ============= 
@@ -123,7 +123,7 @@ subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
 #endif
   !     ....scalar parameters...
   logical,  intent(in)            :: is_bld, is_upd
-  type(psb_ctxt_type), intent(in) :: ictxt
+  type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(in)   :: desc_str(:)
   integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:), length_dl(:)
   integer(psb_ipk_), intent(out)  :: info
@@ -144,7 +144,7 @@ subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   debug_level = psb_get_debug_level()
   info = psb_success_
 
-  call psb_info(ictxt,me,np)
+  call psb_info(ctxt,me,np)
   pdl = size(desc_str)
   allocate(loc_dl(pdl+1),length_dl(0:np),stat=info)
   if (info /= psb_success_) then 
@@ -209,11 +209,11 @@ subroutine psi_i_xtr_loc_dl(ictxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   call psb_msort_unique(loc_dl(1:pdl),ldu)
   pdl = ldu
   call psb_realloc(pdl,loc_dl,info)
-  call psi_symm_dep_list(loc_dl,ictxt,info)       
+  call psi_symm_dep_list(loc_dl,ctxt,info)       
   pdl = size(loc_dl)
   length_dl     = 0
   length_dl(me) = pdl
-  call psb_sum(ictxt,length_dl)
+  call psb_sum(ctxt,length_dl)
   
   call psb_erractionrestore(err_act)
   return

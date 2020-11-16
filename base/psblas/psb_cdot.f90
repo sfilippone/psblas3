@@ -64,7 +64,7 @@ function psb_cdot_vect(x, y, desc_a,info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -79,8 +79,8 @@ function psb_cdot_vect(x, y, desc_a,info,global) result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -147,12 +147,12 @@ function psb_cdot_vect(x, y, desc_a,info,global) result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -188,7 +188,7 @@ function psb_cdot(x, y,desc_a, info, jx, jy,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -203,8 +203,8 @@ function psb_cdot(x, y,desc_a, info, jx, jy,global)  result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -272,12 +272,12 @@ function psb_cdot(x, y,desc_a, info, jx, jy,global)  result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_cdot
@@ -340,7 +340,7 @@ function psb_cdotv(x, y,desc_a, info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
   integer(psb_lpk_) :: ix, jx, iy, jy, m
@@ -355,9 +355,9 @@ function psb_cdotv(x, y,desc_a, info,global)  result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -408,13 +408,13 @@ function psb_cdotv(x, y,desc_a, info,global)  result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_cdotv
@@ -477,7 +477,7 @@ subroutine psb_cdotvs(res, x, y,desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i,nr, lldx, lldy
   integer(psb_lpk_) :: ix, jx, iy, jy, m
@@ -492,9 +492,9 @@ subroutine psb_cdotvs(res, x, y,desc_a, info,global)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -543,12 +543,12 @@ subroutine psb_cdotvs(res, x, y,desc_a, info,global)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_cdotvs
@@ -612,7 +612,7 @@ subroutine psb_cmdots(res, x, y, desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -627,9 +627,9 @@ subroutine psb_cmdots(res, x, y, desc_a, info,global)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -690,12 +690,12 @@ subroutine psb_cmdots(res, x, y, desc_a, info,global)
 
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res(1:k))
+  if (global_) call psb_sum(ctxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_cmdots

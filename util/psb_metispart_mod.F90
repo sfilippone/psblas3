@@ -45,7 +45,7 @@
 !        integer(psb_ipk_) :: NPARTS  How many parts we are requiring to the 
 !                                 partition utility
 ! 
-!  DISTR_MTPART(ROOT,ICTXT): This subroutine will be called by
+!  DISTR_MTPART(ROOT,ctxt): This subroutine will be called by
 !      all processes to distribute the information computed by the root
 !      process, to be used subsequently.
 !
@@ -112,20 +112,20 @@ contains
   end subroutine part_graph
 
 
-  subroutine distr_mtpart(root, ictxt)
+  subroutine distr_mtpart(root, ctxt)
     use psb_base_mod
     implicit none 
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: root
     integer(psb_ipk_) :: me, np, info
     integer(psb_lpk_) :: n
 
-    call psb_info(ictxt,me,np)
+    call psb_info(ctxt,me,np)
 
     if (.not.((root>=0).and.(root<np))) then 
       write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: invalid ROOT  ',&
            & 'coordinates '
-      call psb_abort(ictxt)
+      call psb_abort(ctxt)
       return
     endif
 
@@ -133,13 +133,13 @@ contains
       if (.not.allocated(graph_vect)) then
         write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
              & 'not initialized'
-        call psb_abort(ictxt)
+        call psb_abort(ctxt)
         return
       endif
       n = size(graph_vect)
-      call psb_bcast(ictxt,n,root=root)
+      call psb_bcast(ctxt,n,root=root)
     else 
-      call psb_bcast(ictxt,n,root=root)
+      call psb_bcast(ctxt,n,root=root)
 
       allocate(graph_vect(n),stat=info)
       if (info /= psb_success_) then
@@ -148,7 +148,7 @@ contains
         return
       endif
     endif
-    call psb_bcast(ictxt,graph_vect(1:n),root=root)
+    call psb_bcast(ctxt,graph_vect(1:n),root=root)
 
     return
 

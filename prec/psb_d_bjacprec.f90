@@ -148,7 +148,7 @@ contains
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20) :: name='d_bjac_precdescr'
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iout_, iam, np, root_
 
     call psb_erractionsave(err_act)
@@ -172,8 +172,8 @@ contains
       goto 9999
     end if
 
-    ictxt = prec%ictxt
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     if (root_ == -1) root_ = iam
 
     if (iam == root_) &

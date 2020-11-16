@@ -40,7 +40,7 @@ subroutine psb_dinv_vect(x,y,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -51,9 +51,9 @@ subroutine psb_dinv_vect(x,y,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -99,7 +99,7 @@ subroutine psb_dinv_vect(x,y,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -116,7 +116,7 @@ subroutine psb_dinv_vect_check(x,y,desc_a,info,flag)
   logical                               :: check
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -127,9 +127,9 @@ subroutine psb_dinv_vect_check(x,y,desc_a,info,flag)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -178,7 +178,7 @@ subroutine psb_dinv_vect_check(x,y,desc_a,info,flag)
     check = .TRUE.
   end if
 
-  call psb_lallreduceand(ictxt,check)
+  call psb_lallreduceand(ctxt,check)
 
   if (check) then
     info = 1_psb_ipk_
@@ -189,7 +189,7 @@ subroutine psb_dinv_vect_check(x,y,desc_a,info,flag)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

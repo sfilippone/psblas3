@@ -71,9 +71,9 @@ module psb_error_mod
       import :: psb_ipk_
       integer(psb_ipk_), intent(inout) ::  err_act
     end subroutine psb_ser_error_handler
-    subroutine psb_par_error_handler(ictxt,err_act)
+    subroutine psb_par_error_handler(ctxt,err_act)
       import :: psb_ipk_,psb_mpk_, psb_ctxt_type
-      type(psb_ctxt_type), intent(in) ::  ictxt
+      type(psb_ctxt_type), intent(in) ::  ctxt
       integer(psb_ipk_), intent(in) ::  err_act
     end subroutine psb_par_error_handler
   end interface
@@ -81,18 +81,18 @@ module psb_error_mod
   interface psb_error
     subroutine psb_serror()
     end subroutine psb_serror
-    subroutine psb_perror(ictxt,abrt)
+    subroutine psb_perror(ctxt,abrt)
       import :: psb_ipk_, psb_ctxt_type
-      type(psb_ctxt_type), intent(in) ::  ictxt
+      type(psb_ctxt_type), intent(in) ::  ctxt
       logical, intent(in), optional  :: abrt
     end subroutine psb_perror
   end interface
 
 
   interface psb_error_print_stack
-    subroutine psb_par_error_print_stack(ictxt)
+    subroutine psb_par_error_print_stack(ctxt)
       import :: psb_ipk_, psb_ctxt_type
-      type(psb_ctxt_type), intent(in) ::  ictxt
+      type(psb_ctxt_type), intent(in) ::  ctxt
     end subroutine psb_par_error_print_stack
     subroutine psb_ser_error_print_stack()
     end subroutine psb_ser_error_print_stack
@@ -100,15 +100,15 @@ module psb_error_mod
 
   interface psb_errcomm
 #if defined(IPK8)
-    subroutine psb_errcomm_m(ictxt, err)
+    subroutine psb_errcomm_m(ctxt, err)
       import :: psb_ipk_, psb_mpk_, psb_ctxt_type
-      type(pxb_ctxt_type), intent(in)  :: ictxt
+      type(pxb_ctxt_type), intent(in)  :: ctxt
       integer(psb_ipk_), intent(inout) :: err
     end subroutine psb_errcomm_m
 #endif    
-    subroutine psb_errcomm_i(ictxt, err)
+    subroutine psb_errcomm_i(ctxt, err)
       import :: psb_ipk_, psb_ctxt_type
-      type(psb_ctxt_type), intent(in)  :: ictxt
+      type(psb_ctxt_type), intent(in)  :: ctxt
       integer(psb_ipk_), intent(inout) :: err
     end subroutine psb_errcomm_i
   end interface psb_errcomm

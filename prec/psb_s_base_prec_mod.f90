@@ -47,7 +47,7 @@ module psb_s_base_prec_mod
   use psb_prec_const_mod
 
   type, abstract :: psb_s_base_prec_type
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
   contains
     procedure, pass(prec) :: set_ctxt   => psb_s_base_set_ctxt
     procedure, pass(prec) :: get_ctxt   => psb_s_base_get_ctxt
@@ -343,12 +343,12 @@ contains
     
   end function psb_s_base_is_allocated_wrk
   
-  subroutine psb_s_base_set_ctxt(prec,ictxt)
+  subroutine psb_s_base_set_ctxt(prec,ctxt)
     implicit none 
     class(psb_s_base_prec_type), intent(inout) :: prec
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
 
-    prec%ictxt = ictxt
+    prec%ctxt = ctxt
 
   end subroutine psb_s_base_set_ctxt
 
@@ -364,7 +364,7 @@ contains
     class(psb_s_base_prec_type), intent(in) :: prec
     type(psb_ctxt_type) :: val
 
-    val = prec%ictxt
+    val = prec%ctxt
     return
   end function psb_s_base_get_ctxt
 
@@ -383,11 +383,11 @@ contains
     character(len=32) :: res 
     !
     character(len=32) :: frmtv
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: ni, iam, np
 
-    ictxt = prec%ictxt
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     
     res = ''
     if (iam /= psb_root_) then

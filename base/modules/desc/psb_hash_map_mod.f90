@@ -329,13 +329,13 @@ contains
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, lip, nrow, nrm, is
     integer(psb_lpk_) :: ncol, ip, tlip, mglob
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: iam, np
     logical :: owned_
 
     info = 0
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np) 
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np) 
 
     if (present(mask)) then 
       if (size(mask) < size(idx)) then 
@@ -542,7 +542,7 @@ contains
     integer(psb_ipk_) :: i, is, lip, nrow, ncol, &
          & err_act
     integer(psb_lpk_) :: mglob, ip, nxt, tlip
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: me, np
     character(len=20)   :: name,ch_err
 
@@ -550,8 +550,8 @@ contains
     name = 'hash_g2l_ins'
     call psb_erractionsave(err_act)
 
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt, me, np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt, me, np)
 
     is = size(idx)
 
@@ -766,7 +766,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -800,14 +800,14 @@ contains
   !
   ! init from VL, with checks on input.
   !
-  subroutine hash_init_vl(idxmap,ictxt,vl,info)
+  subroutine hash_init_vl(idxmap,ctxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
     use psb_sort_mod
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    type(psb_ctxt_type), intent(in)    :: ictxt
+    type(psb_ctxt_type), intent(in)    :: ctxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -819,9 +819,9 @@ contains
     character(len=20), parameter :: name='hash_map_init_vl'
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt'
+      write(psb_err_unit,*) 'Invalid ctxt'
       info = -1
       return
     end if
@@ -830,8 +830,8 @@ contains
 
     m   = maxval(vl(1:nl))
     nrt = nl
-    call psb_sum(ictxt,nrt)
-    call psb_max(ictxt,m)
+    call psb_sum(ctxt,nrt)
+    call psb_max(ctxt,m)
 
     allocate(vlu(nl), ix(nl), stat=info) 
     if (info /= 0) then 
@@ -871,16 +871,16 @@ contains
     call psb_msort(ix(1:nlu),vlu(1:nlu),flag=psb_sort_keep_idx_)
     
     nlu = nl
-    call hash_init_vlu(idxmap,ictxt,m,nlu,vlu,info)    
+    call hash_init_vlu(idxmap,ctxt,m,nlu,vlu,info)    
 
   end subroutine hash_init_vl
 
-  subroutine hash_init_vg(idxmap,ictxt,vg,info)
+  subroutine hash_init_vg(idxmap,ctxt,vg,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    type(psb_ctxt_type), intent(in)    :: ictxt
+    type(psb_ctxt_type), intent(in)    :: ctxt
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -890,9 +890,9 @@ contains
     integer(psb_lpk_), allocatable :: vlu(:)
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:'
+      write(psb_err_unit,*) 'Invalid ctxt:'
       info = -1
       return
     end if
@@ -925,7 +925,7 @@ contains
     end do
 
 
-    call hash_init_vlu(idxmap,ictxt,n,nl,vlu,info)    
+    call hash_init_vlu(idxmap,ctxt,n,nl,vlu,info)    
 
 
   end subroutine hash_init_vg
@@ -933,14 +933,14 @@ contains
   !
   ! init from VL, with no checks on input
   !
-  subroutine hash_init_vlu(idxmap,ictxt,ntot,nl,vlu,info)
+  subroutine hash_init_vlu(idxmap,ctxt,ntot,nl,vlu,info)
     use psb_penv_mod
     use psb_error_mod
     use psb_sort_mod
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    type(psb_ctxt_type), intent(in)    :: ictxt
+    type(psb_ctxt_type), intent(in)    :: ctxt
     integer(psb_lpk_), intent(in)  :: vlu(:), ntot
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
@@ -950,9 +950,9 @@ contains
     character(len=20), parameter :: name='hash_map_init_vlu'
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:'
+      write(psb_err_unit,*) 'Invalid ctxt:'
       info = -1
       return
     end if
@@ -961,9 +961,9 @@ contains
     idxmap%global_cols  = ntot
     idxmap%local_rows   = nl
     idxmap%local_cols   = nl
-    idxmap%ictxt        = ictxt
+    idxmap%ctxt        = ctxt
     idxmap%state        = psb_desc_bld_
-    idxmap%mpic         = psb_get_mpi_comm(ictxt)
+    idxmap%mpic         = psb_get_mpi_comm(ctxt)
 
     lc2 = int(1.5*nl) 
     call psb_realloc(lc2,idxmap%loc_to_glob,info) 
@@ -998,7 +998,7 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: iam, np
     integer(psb_ipk_)   :: i, j, m, nl
     integer(psb_ipk_)   :: ih, nh, idx, nbits
@@ -1006,11 +1006,11 @@ contains
     character(len=20), parameter :: name='hash_map_init_vlu'
 
     info = 0
-    ictxt = idxmap%get_ctxt()
+    ctxt = idxmap%get_ctxt()
 
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:'
+      write(psb_err_unit,*) 'Invalid ctxt:'
       info = -1
       return
     end if
@@ -1103,13 +1103,13 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)     :: info
 
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: iam, np 
     integer(psb_ipk_)   :: nhal
 
     info = 0 
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
 
     nhal = max(0,idxmap%local_cols-idxmap%local_rows)
 
@@ -1538,7 +1538,7 @@ contains
     integer(psb_ipk_) :: err_act, nr,nc,k, nl
     integer(psb_lpk_) :: lk
     integer(psb_lpk_) :: ntot
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: me, np
     integer(psb_ipk_), allocatable :: lidx(:), tadj(:), th_own(:)
     integer(psb_lpk_), allocatable :: gidx(:)
@@ -1547,7 +1547,7 @@ contains
 
     info = psb_success_
     call psb_get_erraction(err_act)
-    ictxt = idxmap%get_ctxt()
+    ctxt = idxmap%get_ctxt()
     nr = idxmap%get_lr()
     nc = idxmap%get_lc()
     ntot = idxmap%get_gr()
@@ -1560,7 +1560,7 @@ contains
     call idxmap%get_halo_owner(th_own,info)
     
     call idxmap%free()
-    call hash_init_vlu(idxmap,ictxt,ntot,nr,gidx(1:nr),info) 
+    call hash_init_vlu(idxmap,ctxt,ntot,nr,gidx(1:nr),info) 
     if (nc>nr) then 
       call idxmap%g2lip_ins(gidx(nr+1:nc),info,lidx=lidx(nr+1:nc))
     end if

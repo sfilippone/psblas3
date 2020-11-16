@@ -51,7 +51,7 @@ subroutine psb_sgelp(trans,iperm,x,info)
   integer(psb_ipk_), intent(out)          ::  info
   character, intent(in)         :: trans
   ! local variables
-  integer(psb_ipk_) :: ictxt
+  integer(psb_ipk_) :: ctxt
   real(psb_spk_),allocatable :: temp(:)
   integer(psb_ipk_) :: int_err(5), i1sz, i2sz, err_act,i,j
   integer(psb_ipk_), allocatable       :: itemp(:)
@@ -178,7 +178,7 @@ subroutine psb_sgelpv(trans,iperm,x,info)
   character, intent(in)         ::  trans
 
   ! local variables
-  integer(psb_ipk_) :: ictxt
+  integer(psb_ipk_) :: ctxt
   integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
   real(psb_spk_),allocatable  ::  temp(:)
   integer(psb_ipk_), allocatable        :: itemp(:)

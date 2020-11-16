@@ -74,7 +74,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
        & last_ih, last_j
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
@@ -84,14 +84,14 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   name = 'psi_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = desc%get_context()
+  ctxt   = desc%get_context()
   icomm   = desc%get_mpic()
   n_row   = desc%get_local_rows()
   n_col   = desc%get_local_cols()
 
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (np == -1) then
     info = psb_err_context_error_
@@ -119,7 +119,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

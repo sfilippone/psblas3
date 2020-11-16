@@ -48,7 +48,7 @@ subroutine psb_sspfree(a, desc_a,info)
   type(psb_sspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(out)        :: info
   !...locals....
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -64,7 +64,7 @@ subroutine psb_sspfree(a, desc_a,info)
     call psb_errpush(info,name)
     return
   else
-    ictxt = desc_a%get_context()
+    ctxt = desc_a%get_context()
   end if
 
   !...deallocate a....
@@ -73,7 +73,7 @@ subroutine psb_sspfree(a, desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

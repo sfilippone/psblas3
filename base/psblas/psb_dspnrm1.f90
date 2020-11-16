@@ -53,7 +53,7 @@ function psb_dspnrm1(a,desc_a,info,global)  result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, nr,nc,&
        & err_act, iia, jja, mdim, ndim
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
@@ -66,9 +66,9 @@ function psb_dspnrm1(a,desc_a,info,global)  result(res)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -130,12 +130,12 @@ function psb_dspnrm1(a,desc_a,info,global)  result(res)
     res = dzero 
   end if
   ! compute global max
-  if (global_) call psb_amx(ictxt, res)
+  if (global_) call psb_amx(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_dspnrm1

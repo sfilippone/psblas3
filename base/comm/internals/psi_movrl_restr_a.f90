@@ -45,7 +45,7 @@ subroutine  psi_movrl_restrr1(x,xs,desc_a,info)
   integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
@@ -55,8 +55,8 @@ subroutine  psi_movrl_restrr1(x,xs,desc_a,info)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -73,7 +73,7 @@ subroutine  psi_movrl_restrr1(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psi_movrl_restrr1
@@ -89,7 +89,7 @@ subroutine  psi_movrl_restrr2(x,xs,desc_a,info)
   integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
@@ -99,8 +99,8 @@ subroutine  psi_movrl_restrr2(x,xs,desc_a,info)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -124,7 +124,7 @@ subroutine  psi_movrl_restrr2(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psi_movrl_restrr2

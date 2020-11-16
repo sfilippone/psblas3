@@ -45,7 +45,7 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   integer(psb_ipk_), intent(out)               :: info
 
   !     .. Local Scalars ..
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   ::  i, j, np, me, n_row, n_col
   integer(psb_lpk_)   ::  mglob
   integer(psb_ipk_)   :: err_act
@@ -60,8 +60,8 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc%get_context()
-  Call psb_info(ictxt, me, np)
+  ctxt = desc%get_context()
+  Call psb_info(ctxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),&
@@ -91,14 +91,14 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   call desc%indxmap%free()
   deallocate(desc%indxmap)
   
-  if (psb_cd_choose_large_state(ictxt,mglob)) then 
+  if (psb_cd_choose_large_state(ctxt,mglob)) then 
     allocate(psb_hash_map :: desc%indxmap, stat=info)
   else 
     allocate(psb_list_map :: desc%indxmap, stat=info)
   end if
   
   if (info == psb_success_)&
-       & call desc%indxmap%init(ictxt,vl(1:n_row),info)
+       & call desc%indxmap%init(ctxt,vl(1:n_row),info)
   if (info == psb_success_) call psb_cd_set_bld(desc,info)
   if (info == psb_success_) &
        & call  desc%indxmap%g2lip_ins(vl(n_row+1:n_col),info)
@@ -127,7 +127,7 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

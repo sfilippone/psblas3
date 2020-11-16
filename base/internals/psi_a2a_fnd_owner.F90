@@ -77,7 +77,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   integer(psb_mpk_) :: icomm, minfo, nv
   integer(psb_ipk_) :: i,n_row,n_col,err_act,gsz
   integer(psb_lpk_) :: mglob, ih
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me, nresp
   logical, parameter  :: use_psi_adj=.true.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
@@ -88,13 +88,13 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   name = 'psi_a2a_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = idxmap%get_ctxt()
+  ctxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (np == -1) then
     info = psb_err_context_error_
@@ -200,7 +200,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

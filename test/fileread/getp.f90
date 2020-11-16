@@ -38,10 +38,10 @@ contains
   !
   ! Get iteration parameters from the command line
   !
-  subroutine  get_dparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,&
+  subroutine  get_dparms(ctxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
     character(len=20) :: part
@@ -53,7 +53,7 @@ contains
     integer(psb_ipk_) :: inparms(40), ip, inp_unit
     character(len=1024)   :: filename 
 
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if (iam == 0) then
       if (command_argument_count()>0) then
         call get_command_argument(1,filename)
@@ -61,7 +61,7 @@ contains
         open(inp_unit,file=filename,action='read',iostat=info)
         if (info /= 0) then
           write(psb_err_unit,*) 'Could not open file ',filename,' for input'
-          call psb_abort(ictxt)
+          call psb_abort(ctxt)
           stop
         else
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
@@ -81,13 +81,13 @@ contains
         read(inp_unit,*) part
 
 
-        call psb_bcast(ictxt,mtrx_file)
-        call psb_bcast(ictxt,rhs_file)
-        call psb_bcast(ictxt,filefmt)
-        call psb_bcast(ictxt,kmethd)
-        call psb_bcast(ictxt,ptype)
-        call psb_bcast(ictxt,afmt)
-        call psb_bcast(ictxt,part)
+        call psb_bcast(ctxt,mtrx_file)
+        call psb_bcast(ctxt,rhs_file)
+        call psb_bcast(ctxt,filefmt)
+        call psb_bcast(ctxt,kmethd)
+        call psb_bcast(ctxt,ptype)
+        call psb_bcast(ctxt,afmt)
+        call psb_bcast(ctxt,part)
 
         if (ip >= 7) then
           read(inp_unit,*) istopc
@@ -118,8 +118,8 @@ contains
         inparms(2) = itmax
         inparms(3) = itrace
         inparms(4) = irst
-        call psb_bcast(ictxt,inparms(1:4))
-        call psb_bcast(ictxt,eps)
+        call psb_bcast(ctxt,inparms(1:4))
+        call psb_bcast(ctxt,eps)
 
         write(psb_out_unit,'("Solving matrix       : ",a)')  mtrx_file      
         write(psb_out_unit,'("Number of processors : ",i3)') np
@@ -131,7 +131,7 @@ contains
         write(psb_out_unit,'(" ")')
       else
         write(psb_err_unit,*) 'Wrong format for input file'
-        call psb_abort(ictxt)
+        call psb_abort(ctxt)
         stop 1
       end if
       if (inp_unit /= psb_inp_unit) then
@@ -139,29 +139,29 @@ contains
       end if
     else
       ! Receive Parameters
-      call psb_bcast(ictxt,mtrx_file)
-      call psb_bcast(ictxt,rhs_file)
-      call psb_bcast(ictxt,filefmt)
-      call psb_bcast(ictxt,kmethd)
-      call psb_bcast(ictxt,ptype)
-      call psb_bcast(ictxt,afmt)
-      call psb_bcast(ictxt,part)
+      call psb_bcast(ctxt,mtrx_file)
+      call psb_bcast(ctxt,rhs_file)
+      call psb_bcast(ctxt,filefmt)
+      call psb_bcast(ctxt,kmethd)
+      call psb_bcast(ctxt,ptype)
+      call psb_bcast(ctxt,afmt)
+      call psb_bcast(ctxt,part)
 
-      call psb_bcast(ictxt,inparms(1:4))
+      call psb_bcast(ctxt,inparms(1:4))
       istopc =  inparms(1) 
       itmax  =  inparms(2) 
       itrace =  inparms(3) 
       irst   =  inparms(4) 
-      call psb_bcast(ictxt,eps)
+      call psb_bcast(ctxt,eps)
 
     end if
 
   end subroutine get_dparms
   
-  subroutine  get_sparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,&
+  subroutine  get_sparms(ctxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
     character(len=20) :: part
@@ -173,7 +173,7 @@ contains
     integer(psb_ipk_) :: inparms(40), ip, inp_unit
     character(len=1024)   :: filename
 
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if (iam == 0) then
       if (command_argument_count()>0) then
         call get_command_argument(1,filename)
@@ -181,7 +181,7 @@ contains
         open(inp_unit,file=filename,action='read',iostat=info)
         if (info /= 0) then
           write(psb_err_unit,*) 'Could not open file ',filename,' for input'
-          call psb_abort(ictxt)
+          call psb_abort(ctxt)
           stop
         else
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
@@ -201,13 +201,13 @@ contains
         read(inp_unit,*) ipart
 
 
-        call psb_bcast(ictxt,mtrx_file)
-        call psb_bcast(ictxt,rhs_file)
-        call psb_bcast(ictxt,filefmt)
-        call psb_bcast(ictxt,kmethd)
-        call psb_bcast(ictxt,ptype)
-        call psb_bcast(ictxt,afmt)
-        call psb_bcast(ictxt,part)
+        call psb_bcast(ctxt,mtrx_file)
+        call psb_bcast(ctxt,rhs_file)
+        call psb_bcast(ctxt,filefmt)
+        call psb_bcast(ctxt,kmethd)
+        call psb_bcast(ctxt,ptype)
+        call psb_bcast(ctxt,afmt)
+        call psb_bcast(ctxt,part)
 
         if (ip >= 7) then
           read(inp_unit,*) istopc
@@ -238,8 +238,8 @@ contains
         inparms(2) = itmax
         inparms(3) = itrace
         inparms(4) = irst
-        call psb_bcast(ictxt,inparms(1:4))
-        call psb_bcast(ictxt,eps)
+        call psb_bcast(ctxt,inparms(1:4))
+        call psb_bcast(ctxt,eps)
 
         write(psb_out_unit,'("Solving matrix       : ",a)')  mtrx_file      
         write(psb_out_unit,'("Number of processors : ",i3)') np
@@ -251,7 +251,7 @@ contains
         write(psb_out_unit,'(" ")')
       else
         write(psb_err_unit,*) 'Wrong format for input file'
-        call psb_abort(ictxt)
+        call psb_abort(ctxt)
         stop 1
       end if
       if (inp_unit /= psb_inp_unit) then
@@ -259,20 +259,20 @@ contains
       end if
     else
       ! Receive Parameters
-      call psb_bcast(ictxt,mtrx_file)
-      call psb_bcast(ictxt,rhs_file)
-      call psb_bcast(ictxt,filefmt)
-      call psb_bcast(ictxt,kmethd)
-      call psb_bcast(ictxt,ptype)
-      call psb_bcast(ictxt,afmt)
-      call psb_bcast(ictxt,part)
+      call psb_bcast(ctxt,mtrx_file)
+      call psb_bcast(ctxt,rhs_file)
+      call psb_bcast(ctxt,filefmt)
+      call psb_bcast(ctxt,kmethd)
+      call psb_bcast(ctxt,ptype)
+      call psb_bcast(ctxt,afmt)
+      call psb_bcast(ctxt,part)
 
-      call psb_bcast(ictxt,inparms(1:4))
+      call psb_bcast(ctxt,inparms(1:4))
       istopc =  inparms(1) 
       itmax  =  inparms(2) 
       itrace =  inparms(3) 
       irst   =  inparms(4) 
-      call psb_bcast(ictxt,eps)
+      call psb_bcast(ctxt,eps)
 
     end if
 

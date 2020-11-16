@@ -48,7 +48,7 @@ subroutine psb_sfree(x, desc_a, info)
   integer(psb_ipk_), intent(out)            :: info
 
   !...locals....
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, err_act
   character(len=20)   :: name
 
@@ -65,9 +65,9 @@ subroutine psb_sfree(x, desc_a, info)
     return
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -93,7 +93,7 @@ subroutine psb_sfree(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -117,7 +117,7 @@ subroutine psb_sfreev(x, desc_a, info)
   integer(psb_ipk_), intent(out)            :: info
 
   !...locals....
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, err_act
   character(len=20)   :: name
 
@@ -133,9 +133,9 @@ subroutine psb_sfreev(x, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   end if
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -159,7 +159,7 @@ subroutine psb_sfreev(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

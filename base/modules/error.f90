@@ -33,14 +33,14 @@
 !  Wrapper subroutines to provide error tools to F77 and C code
 !
 
-subroutine FCpsb_errcomm(ictxt, err)
+subroutine FCpsb_errcomm(ctxt, err)
   use psb_const_mod
   use psb_error_mod
   use psi_penv_mod
-  type(psb_ctxt_type), intent(in)   :: ictxt
+  type(psb_ctxt_type), intent(in)   :: ctxt
   integer(psb_ipk_), intent(inout):: err
 
-  call psb_errcomm(ictxt, err)
+  call psb_errcomm(ctxt, err)
 
 end subroutine FCpsb_errcomm
 
@@ -66,15 +66,15 @@ subroutine FCpsb_serror()
 
 end subroutine FCpsb_serror
 
-subroutine FCpsb_perror(ictxt)
+subroutine FCpsb_perror(ctxt)
   use psb_const_mod
   use psb_error_mod
   use psi_penv_mod
   implicit none
 
-  type(psb_ctxt_type), intent(in)   :: ictxt
+  type(psb_ctxt_type), intent(in)   :: ctxt
   
-  call psb_error(ictxt)
+  call psb_error(ctxt)
 
 end subroutine FCpsb_perror
 

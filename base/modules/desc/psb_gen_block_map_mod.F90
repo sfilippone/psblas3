@@ -535,12 +535,12 @@ contains
 !!$    logical, intent(in), optional :: owned
 !!$    integer(psb_ipk_) :: i, nv, is, ip, lip 
 !!$    integer(psb_lpk_) :: tidx
-!!$    integer(psb_mpk_) :: ictxt, iam, np
+!!$    integer(psb_mpk_) :: ctxt, iam, np
 !!$    logical :: owned_
 !!$
 !!$    info = 0
-!!$    ictxt = idxmap%get_ctxt()
-!!$    call psb_info(ictxt,iam,np) 
+!!$    ctxt = idxmap%get_ctxt()
+!!$    call psb_info(ctxt,iam,np) 
 !!$
 !!$    if (present(mask)) then 
 !!$      if (size(mask) < size(idx)) then 
@@ -648,12 +648,12 @@ contains
 !!$
 !!$    integer(psb_ipk_) :: i, nv, is, ip, lip, im
 !!$    integer(psb_lpk_) :: tidx
-!!$    integer(psb_mpk_) :: ictxt, iam, np
+!!$    integer(psb_mpk_) :: ctxt, iam, np
 !!$    logical :: owned_
 !!$
 !!$    info = 0
-!!$    ictxt = idxmap%get_ctxt()
-!!$    call psb_info(ictxt,iam,np) 
+!!$    ctxt = idxmap%get_ctxt()
+!!$    call psb_info(ctxt,iam,np) 
 !!$    is = size(idxin)
 !!$    im = min(is,size(idxout))
 !!$
@@ -806,13 +806,13 @@ contains
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, nv, is
     integer(psb_lpk_) :: tidx, ip, lip
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam, np
     logical :: owned_
 
     info = 0
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np) 
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np) 
 
     if (present(mask)) then 
       if (size(mask) < size(idx)) then 
@@ -923,13 +923,13 @@ contains
 
     integer(psb_ipk_) :: i, nv, is, im
     integer(psb_lpk_) :: tidx, ip, lip
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: iam, np
     logical :: owned_
 
     info = 0
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np) 
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np) 
     is = size(idxin)
     im = min(is,size(idxout))
 
@@ -1940,12 +1940,12 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_gen_block_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)          :: info
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam, np, nv, ip, i
     integer(psb_lpk_) :: tidx
     
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
     nv = size(idx)
     allocate(iprc(nv),stat=info) 
     if (info /= 0) then 
@@ -1961,13 +1961,13 @@ contains
 
 
 
-  subroutine block_init(idxmap,ictxt,nl,info)
+  subroutine block_init(idxmap,ctxt,nl,info)
     use psb_penv_mod
     use psb_realloc_mod
     use psb_error_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    type(psb_ctxt_type), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -1977,9 +1977,9 @@ contains
     integer(psb_lpk_), allocatable :: vnl(:)
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt'
+      write(psb_err_unit,*) 'Invalid ctxt'
       info = -1
       return
     end if
@@ -1991,7 +1991,7 @@ contains
     
     vnl(:)   = 0
     vnl(iam) = nl
-    call psb_sum(ictxt,vnl)
+    call psb_sum(ctxt,vnl)
     ntot = sum(vnl)
     vnl(1:np) = vnl(0:np-1)
     vnl(0) = 0
@@ -2006,9 +2006,9 @@ contains
     idxmap%global_cols  = ntot
     idxmap%local_rows   = nl
     idxmap%local_cols   = nl
-    idxmap%ictxt        = ictxt
+    idxmap%ctxt        = ctxt
     idxmap%state        = psb_desc_bld_
-    idxmap%mpic         = psb_get_mpi_comm(ictxt)
+    idxmap%mpic         = psb_get_mpi_comm(ctxt)
     idxmap%min_glob_row = vnl(iam)+1
     idxmap%max_glob_row = vnl(iam+1) 
     call move_alloc(vnl,idxmap%vnl)
@@ -2033,12 +2033,12 @@ contains
     integer(psb_ipk_), intent(out) :: info
     
     integer(psb_ipk_) :: nhal, i
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: iam, np 
     logical :: debug=.false.
     info = 0 
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
 
     nhal = idxmap%local_cols-idxmap%local_rows
 

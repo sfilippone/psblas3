@@ -146,7 +146,7 @@ contains
     real(psb_dpk_), optional, intent(out) :: err
     integer(psb_ipk_), optional, intent(out)  :: iter
 
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: me, np, err_act, itrace
     real(psb_dpk_)                  :: errnum, errden, eps
     character(len=20)               :: name
@@ -154,8 +154,8 @@ contains
     info = psb_success_
     name = 'psb_end_conv'
 
-    ictxt = desc_a%get_context()
-    call psb_info(ictxt,me,np)
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt,me,np)
 
     errnum = stopdat%values(psb_ik_errnum_) 
     errden = stopdat%values(psb_ik_errden_) 

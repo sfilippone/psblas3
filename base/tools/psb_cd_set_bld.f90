@@ -53,7 +53,7 @@ subroutine psb_cd_set_bld(desc,info)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_) :: info
   !locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, err_act,idx,gidx,lidx,nc
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name
@@ -63,11 +63,11 @@ subroutine psb_cd_set_bld(desc,info)
   call psb_erractionsave(err_act)
   name = 'psb_cd_set_bld'
 
-  ictxt = desc%get_context()
+  ctxt = desc%get_context()
 
   if (debug) write(psb_err_unit,*)'Entered CDSETBLD'
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug) write(psb_err_unit,*) me,'Entered CDSETBLD'
 
   if (desc%is_asb())  call psb_cd_reinit(desc,info) 
@@ -78,7 +78,7 @@ subroutine psb_cd_set_bld(desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

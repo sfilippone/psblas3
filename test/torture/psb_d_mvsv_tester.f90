@@ -2,13 +2,13 @@ module psb_d_mvsv_tester
 contains
 
 
-  subroutine d_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -35,17 +35,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -79,13 +79,13 @@ contains
   end subroutine d_usmv_2_n_ap3_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -112,17 +112,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -156,13 +156,13 @@ contains
   end subroutine d_usmv_2_t_ap3_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -189,17 +189,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -233,13 +233,13 @@ contains
   end subroutine d_usmv_2_c_ap3_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -266,17 +266,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -310,13 +310,13 @@ contains
   end subroutine d_usmv_2_n_ap3_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -343,17 +343,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -387,13 +387,13 @@ contains
   end subroutine d_usmv_2_t_ap3_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -420,17 +420,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -464,13 +464,13 @@ contains
   end subroutine d_usmv_2_c_ap3_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -497,17 +497,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -541,13 +541,13 @@ contains
   end subroutine d_usmv_2_n_ap1_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -574,17 +574,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -618,13 +618,13 @@ contains
   end subroutine d_usmv_2_t_ap1_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -651,17 +651,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -695,13 +695,13 @@ contains
   end subroutine d_usmv_2_c_ap1_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -728,17 +728,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -772,13 +772,13 @@ contains
   end subroutine d_usmv_2_n_ap1_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -805,17 +805,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -849,13 +849,13 @@ contains
   end subroutine d_usmv_2_t_ap1_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -882,17 +882,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -926,13 +926,13 @@ contains
   end subroutine d_usmv_2_c_ap1_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -959,17 +959,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1003,13 +1003,13 @@ contains
   end subroutine d_usmv_2_n_am1_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1036,17 +1036,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1080,13 +1080,13 @@ contains
   end subroutine d_usmv_2_t_am1_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1113,17 +1113,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1157,13 +1157,13 @@ contains
   end subroutine d_usmv_2_c_am1_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1190,17 +1190,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1234,13 +1234,13 @@ contains
   end subroutine d_usmv_2_n_am1_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1267,17 +1267,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1311,13 +1311,13 @@ contains
   end subroutine d_usmv_2_t_am1_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1344,17 +1344,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1388,13 +1388,13 @@ contains
   end subroutine d_usmv_2_c_am1_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1421,17 +1421,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1465,13 +1465,13 @@ contains
   end subroutine d_usmv_2_n_am3_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1498,17 +1498,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1542,13 +1542,13 @@ contains
   end subroutine d_usmv_2_t_am3_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1575,17 +1575,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1619,13 +1619,13 @@ contains
   end subroutine d_usmv_2_c_am3_bp1_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1652,17 +1652,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1696,13 +1696,13 @@ contains
   end subroutine d_usmv_2_n_am3_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1729,17 +1729,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1773,13 +1773,13 @@ contains
   end subroutine d_usmv_2_t_am3_bm0_ix1_iy1
   ! 
 
-  subroutine d_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1806,17 +1806,17 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1850,13 +1850,13 @@ contains
   end subroutine d_usmv_2_c_am3_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1882,13 +1882,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -1896,7 +1896,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -1930,13 +1930,13 @@ contains
   end subroutine d_ussv_2_n_ap3_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -1962,13 +1962,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -1976,7 +1976,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2010,13 +2010,13 @@ contains
   end subroutine d_ussv_2_t_ap3_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2042,13 +2042,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2056,7 +2056,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2090,13 +2090,13 @@ contains
   end subroutine d_ussv_2_c_ap3_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2122,13 +2122,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2136,7 +2136,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2170,13 +2170,13 @@ contains
   end subroutine d_ussv_2_n_ap1_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2202,13 +2202,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2216,7 +2216,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2250,13 +2250,13 @@ contains
   end subroutine d_ussv_2_t_ap1_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2282,13 +2282,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2296,7 +2296,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2330,13 +2330,13 @@ contains
   end subroutine d_ussv_2_c_ap1_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2362,13 +2362,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2376,7 +2376,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2410,13 +2410,13 @@ contains
   end subroutine d_ussv_2_n_am1_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2442,13 +2442,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2456,7 +2456,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2490,13 +2490,13 @@ contains
   end subroutine d_ussv_2_t_am1_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2522,13 +2522,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2536,7 +2536,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2570,13 +2570,13 @@ contains
   end subroutine d_ussv_2_c_am1_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2602,13 +2602,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2616,7 +2616,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2650,13 +2650,13 @@ contains
   end subroutine d_ussv_2_n_am3_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2682,13 +2682,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2696,7 +2696,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
@@ -2730,13 +2730,13 @@ contains
   end subroutine d_ussv_2_t_am3_bm0_ix1_iy1
   ! 
 
-  subroutine d_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
+  subroutine d_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ctxt)
     use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam=-1, np=-1
     integer(psb_ipk_) :: info=-1
 
@@ -2762,13 +2762,13 @@ contains
 
     y=bcy
     res=0
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     if(iam<0)then
       info=-1
       goto 9999
     endif
-    call psb_barrier(ictxt)
-    call psb_cdall(ictxt,desc_a,info,nl=m)
+    call psb_barrier(ctxt)
+    call psb_cdall(ctxt,desc_a,info,nl=m)
     if (info /= psb_success_)goto 9996
     call psb_spall(a,desc_a,info,nnz=nnz)
     if (info /= psb_success_)goto 9996
@@ -2776,7 +2776,7 @@ contains
     call a%set_lower()
     call a%set_unit(.false.)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)

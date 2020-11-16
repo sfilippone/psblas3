@@ -35,7 +35,7 @@ module psb_c_mat_dist_mod
        & psb_lcspmat_type,  psb_ctxt_type
 
   interface psb_matdist
-    subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
+    subroutine psb_cmatdist(a_glob, a, ctxt, desc_a,&
          & info, parts, vg, vsz, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
@@ -65,7 +65,7 @@ module psb_c_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer(psb_ipk_) :: ictxt
+      !  integer(psb_ipk_) :: ctxt
       !     on entry: the PSBLAS parallel environment context.
       !
       !  type (desc_type)                  :: desc_a
@@ -81,7 +81,7 @@ module psb_c_mat_dist_mod
 
       ! parameters
       type(psb_cspmat_type)      :: a_glob
-      type(psb_ctxt_type) :: ictxt
+      type(psb_ctxt_type) :: ctxt
       type(psb_cspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info
@@ -92,7 +92,7 @@ module psb_c_mat_dist_mod
       integer(psb_ipk_), optional     :: vg(:)
       integer(psb_ipk_), optional     :: vsz(:)
     end subroutine psb_cmatdist
-    subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
+    subroutine psb_lcmatdist(a_glob, a, ctxt, desc_a,&
          & info, parts, vg, vsz, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
@@ -122,7 +122,7 @@ module psb_c_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer(psb_ipk_) :: ictxt
+      !  integer(psb_ipk_) :: ctxt
       !     on entry: the PSBLAS parallel environment context.
       !
       !  type (desc_type)                  :: desc_a
@@ -138,7 +138,7 @@ module psb_c_mat_dist_mod
 
       ! parameters
       type(psb_lcspmat_type)      :: a_glob
-      type(psb_ctxt_type) :: ictxt
+      type(psb_ctxt_type) :: ctxt
       type(psb_cspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info

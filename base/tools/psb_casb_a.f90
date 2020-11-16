@@ -52,7 +52,7 @@ subroutine psb_casb(x, desc_a, info, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me,nrow,ncol, err_act
   integer(psb_ipk_) :: i1sz, i2sz
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -75,9 +75,9 @@ subroutine psb_casb(x, desc_a, info, scratch)
     call psb_errpush(info,name)
     goto 9999
   endif
-  ictxt   = desc_a%get_context()
+  ctxt   = desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
 
   if (debug_level >= psb_debug_ext_) &
@@ -97,7 +97,7 @@ subroutine psb_casb(x, desc_a, info, scratch)
   endif
 
   ! check size
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   nrow  = desc_a%get_local_rows()
   ncol  = desc_a%get_local_cols()
   i1sz = size(x,dim=1)
@@ -130,7 +130,7 @@ subroutine psb_casb(x, desc_a, info, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -189,7 +189,7 @@ subroutine psb_casbv(x, desc_a, info, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -203,13 +203,13 @@ subroutine psb_casbv(x, desc_a, info, scratch)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt   = desc_a%get_context()
+  ctxt   = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -254,7 +254,7 @@ subroutine psb_casbv(x, desc_a, info, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

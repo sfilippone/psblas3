@@ -41,7 +41,7 @@ subroutine psb_scmp_vect(x,c,z,desc_a,info)
   integer(psb_ipk_), intent(out)          :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
@@ -52,9 +52,9 @@ subroutine psb_scmp_vect(x,c,z,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -99,7 +99,7 @@ subroutine psb_scmp_vect(x,c,z,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -149,7 +149,7 @@ subroutine psb_smask_vect(c,x,m,t,desc_a,info)
   integer(psb_ipk_), intent(out)          :: info
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, mm
@@ -160,9 +160,9 @@ subroutine psb_smask_vect(c,x,m,t,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -216,12 +216,12 @@ subroutine psb_smask_vect(c,x,m,t,desc_a,info)
     call m%mask(c,x,t,info)
   end if
 
-  call psb_lallreduceand(ictxt,t)
+  call psb_lallreduceand(ctxt,t)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -239,7 +239,7 @@ subroutine psb_scmp_spmatval(a,val,tol,desc_a,res,info)
   logical, intent(out)                    :: res
 
   ! Local
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: err_act
   character(len=20) :: name, ch_err
@@ -254,8 +254,8 @@ subroutine psb_scmp_spmatval(a,val,tol,desc_a,res,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -269,16 +269,16 @@ subroutine psb_scmp_spmatval(a,val,tol,desc_a,res,info)
     res = a%spcmp(val,tol,info)
   end if
 
-  call psb_lallreduceand(ictxt,res)
+  call psb_lallreduceand(ctxt,res)
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     write(debug_unit,*) me,' ',trim(name),' Returning '
   endif
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_scmp_spmatval
@@ -294,7 +294,7 @@ subroutine psb_scmp_spmat(a,b,tol,desc_a,res,info)
   logical, intent(out)                    :: res
 
   ! Local
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: err_act
   character(len=20) :: name, ch_err
@@ -309,8 +309,8 @@ subroutine psb_scmp_spmat(a,b,tol,desc_a,res,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -326,17 +326,17 @@ subroutine psb_scmp_spmat(a,b,tol,desc_a,res,info)
     res = a%spcmp(b,tol,info)
   end if
 
-  call psb_lallreduceand(ictxt,res)
+  call psb_lallreduceand(ctxt,res)
 
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     write(debug_unit,*) me,' ',trim(name),' Returning '
   endif
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

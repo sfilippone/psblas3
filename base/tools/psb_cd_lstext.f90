@@ -45,7 +45,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   integer(psb_ipk_), intent(in),optional  :: extype
 
   !     .. Local Scalars ..
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   ::  i, j, np, me,m,nnzero,&
        &  lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
@@ -71,8 +71,8 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
-  Call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  Call psb_info(ctxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),': start',size(in_list)
@@ -134,7 +134,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
   if (debug_level >= psb_debug_outer_) then
     write(debug_unit,*) me,' ',trim(name),': converting indexes'
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end if
 
   call psb_icdasb(desc_ov,info,ext_hv=.true.)
@@ -154,7 +154,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

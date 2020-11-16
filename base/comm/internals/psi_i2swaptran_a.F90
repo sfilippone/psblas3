@@ -110,7 +110,7 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional         :: data
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: icomm
   integer(psb_ipk_) :: np, me, idxs, idxr, err_act, totxch, data_
   integer(psb_ipk_), pointer :: d_idx(:)
@@ -120,10 +120,10 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -148,18 +148,18 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  call  psi_swaptran(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  call  psi_swaptran(ctxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psi_i2swaptranm
 
-subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
+subroutine psi_i2tranidxm(ictxt,iicomm,flag,n,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_i2tranidxm
@@ -174,7 +174,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)   :: iictxt
+  type(psb_ctxt_type), intent(in)   :: ictxt
   integer(psb_mpk_), intent(in)     :: iicomm
   integer(psb_ipk_), intent(in)     :: flag,n
   integer(psb_ipk_), intent(out)    :: info
@@ -183,7 +183,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
@@ -202,10 +202,10 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-  ictxt = iictxt
+  ctxt = ictxt
   icomm = iicomm
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -245,7 +245,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      prcid(proc_to_comm) = psb_get_mpi_rank(ictxt,proc_to_comm)
+      prcid(proc_to_comm) = psb_get_mpi_rank(ctxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = n*nerv
@@ -329,14 +329,14 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if (proc_to_comm  <  me) then
-        if (nerv>0) call psb_snd(ictxt,&
+        if (nerv>0) call psb_snd(ctxt,&
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
-        if (nesd>0) call psb_rcv(ictxt,&
+        if (nesd>0) call psb_rcv(ctxt,&
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       else if (proc_to_comm  >  me) then
-        if (nesd>0) call psb_rcv(ictxt,&
+        if (nesd>0) call psb_rcv(ctxt,&
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
-        if (nerv>0) call psb_snd(ictxt,&
+        if (nerv>0) call psb_snd(ctxt,&
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
       else if (proc_to_comm == me) then 
         if (nesd /= nerv) then 
@@ -363,7 +363,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int2_swap_tag
         call mpi_irecv(sndbuf(snd_pt),n*nesd,&
@@ -448,7 +448,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      if (nerv>0) call psb_snd(ictxt,&
+      if (nerv>0) call psb_snd(ctxt,&
            & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
@@ -465,7 +465,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      if (nesd>0) call psb_rcv(ictxt,&
+      if (nesd>0) call psb_rcv(ctxt,&
            & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
@@ -513,7 +513,7 @@ subroutine psi_i2tranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psi_i2tranidxm
@@ -597,7 +597,7 @@ subroutine psi_i2swaptranv(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional    :: data
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: icomm
   integer(psb_ipk_) :: np, me, idxs, idxr, totxch, err_act, data_
   integer(psb_ipk_), pointer :: d_idx(:)
@@ -607,9 +607,9 @@ subroutine psi_i2swaptranv(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_tranv'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -634,13 +634,13 @@ subroutine psi_i2swaptranv(flag,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  call  psi_swaptran(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  call  psi_swaptran(ctxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psi_i2swaptranv
@@ -656,7 +656,7 @@ end subroutine psi_i2swaptranv
 !   
 !   
 ! 
-subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
+subroutine psi_i2tranidxv(ictxt,iicomm,flag,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_i2tranidxv
@@ -671,7 +671,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in) :: iictxt
+  type(psb_ctxt_type), intent(in) :: ictxt
   integer(psb_mpk_), intent(in)   :: iicomm
   integer(psb_ipk_), intent(in)   :: flag
   integer(psb_ipk_), intent(out)  :: info
@@ -680,7 +680,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_)   :: icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
@@ -699,10 +699,10 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-  ictxt = iictxt
+  ctxt = ictxt
   icomm = iicomm
 
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -742,7 +742,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      prcid(proc_to_comm) = psb_get_mpi_rank(ictxt,proc_to_comm)
+      prcid(proc_to_comm) = psb_get_mpi_rank(ctxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = nerv
@@ -827,14 +827,14 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if (proc_to_comm  <  me) then
-        if (nerv>0) call psb_snd(ictxt,&
+        if (nerv>0) call psb_snd(ctxt,&
              & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
-        if (nesd>0) call psb_rcv(ictxt,&
+        if (nesd>0) call psb_rcv(ctxt,&
              & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       else if (proc_to_comm  >  me) then
-        if (nesd>0) call psb_rcv(ictxt,&
+        if (nesd>0) call psb_rcv(ctxt,&
              & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
-        if (nerv>0) call psb_snd(ictxt,&
+        if (nerv>0) call psb_snd(ctxt,&
              & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       else if (proc_to_comm ==  me) then
         if (nesd /= nerv) then 
@@ -860,7 +860,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int2_swap_tag
         call mpi_irecv(sndbuf(snd_pt),nesd,&
@@ -943,7 +943,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      if (nerv>0) call psb_snd(ictxt,&
+      if (nerv>0) call psb_snd(ctxt,&
            & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -959,7 +959,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-      if (nesd>0) call psb_rcv(ictxt,&
+      if (nesd>0) call psb_rcv(ctxt,&
            & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -1006,7 +1006,7 @@ subroutine psi_i2tranidxv(iictxt,iicomm,flag,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psi_i2tranidxv

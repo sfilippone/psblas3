@@ -122,7 +122,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
        &  n_col, n_row,err_act, ieg,nspl, istebz
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type)       :: stopdat
@@ -136,9 +136,9 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (.not.allocated(b%v)) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
@@ -310,7 +310,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
 #endif
       info=psb_success_
     end if
-    call psb_bcast(ictxt,cond)
+    call psb_bcast(ctxt,cond)
   end if
 
 

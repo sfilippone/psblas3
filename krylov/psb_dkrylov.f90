@@ -152,7 +152,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   procedure(psb_dkryl_cond_vect) :: psb_dcg_vect, psb_dfcg_vect
 
   logical           :: do_alloc_wrk
-  type(psb_ctxt_type) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: me,np,err_act, itrace_
   character(len=20)             :: name
 
@@ -160,9 +160,9 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   name = 'psb_krylov'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   ! Default return for COND
   if (present(cond)) cond = dzero
@@ -220,7 +220,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

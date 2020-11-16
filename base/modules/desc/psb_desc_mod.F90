@@ -395,17 +395,17 @@ contains
     val = (m > psb_cd_get_large_threshold()) 
   end function psb_cd_is_large_size
 
-  function  psb_cd_choose_large_state(ictxt,m) result(val)
+  function  psb_cd_choose_large_state(ctxt,m) result(val)
     use psb_penv_mod
 
     implicit none
-    type(psb_ctxt_type), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_lpk_), intent(in)   :: m
     logical :: val
     !locals
     integer(psb_ipk_) :: np,me
 
-    call psb_info(ictxt, me, np)
+    call psb_info(ctxt, me, np)
     ! 
     ! Since the hashed lists take up (somewhat) more than 2*N_COL integers,
     ! it makes no sense to use them if you don't have at least 
@@ -750,7 +750,7 @@ contains
     integer(psb_ipk_), intent(out) :: totxch,idxr,idxs,info
 
     !locals
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act, debug_level, debug_unit
     logical, parameter  :: debug=.false., debugprt=.false.
     character(len=20), parameter :: name='psb_cd_get_list'
@@ -760,9 +760,9 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    ictxt = psb_cd_get_context(desc)
+    ctxt = psb_cd_get_context(desc)
 
-    call psb_info(ictxt, me, np)
+    call psb_info(ctxt, me, np)
 
     select case(data) 
     case(psb_comm_halo_) 
@@ -815,7 +815,7 @@ contains
     integer(psb_ipk_), intent(out)       :: totxch,idxr,idxs,info
 
     !locals
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act, debug_level, debug_unit
     logical, parameter  :: debug=.false., debugprt=.false.
     character(len=20), parameter :: name='psb_cd_v_get_list'
@@ -825,9 +825,9 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    ictxt = psb_cd_get_context(desc)
+    ctxt = psb_cd_get_context(desc)
 
-    call psb_info(ictxt, me, np)
+    call psb_info(ctxt, me, np)
 
     select case(data) 
     case(psb_comm_halo_) 
@@ -896,7 +896,7 @@ contains
     class(psb_desc_type), intent(inout) :: desc
     integer(psb_ipk_), intent(out)      :: info
     !...locals....
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act
     character(len=20)   :: name
 
@@ -996,7 +996,7 @@ contains
     integer(psb_ipk_), intent(out)     :: info
 
     !locals
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act
     integer(psb_ipk_)   :: debug_level, debug_unit
     character(len=20)   :: name
@@ -1012,8 +1012,8 @@ contains
     ! when desc is empty.
     ! 
     if (desc%is_valid()) then 
-      ictxt = desc%get_ctxt()
-      call psb_info(ictxt,me,np)
+      ctxt = desc%get_ctxt()
+      call psb_info(ctxt,me,np)
 
       if (info == psb_success_)  &
            & call psb_move_alloc( desc%halo_index  ,    desc_out%halo_index   , info)
@@ -1085,7 +1085,7 @@ contains
     class(psb_desc_type), intent(inout)         :: desc_out
     integer(psb_ipk_), intent(out)              :: info
     !locals
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act
     integer(psb_ipk_)   :: debug_level, debug_unit
     character(len=20)   :: name
@@ -1100,10 +1100,10 @@ contains
 
     call desc_out%free(info)
     if ((info == psb_success_).and.desc%is_valid()) then 
-      ictxt = desc%get_ctxt()
+      ctxt = desc%get_ctxt()
 
       ! check on blacs grid 
-      call psb_info(ictxt, me, np)
+      call psb_info(ctxt, me, np)
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),': Entered'
       if (np == -1) then
@@ -1153,7 +1153,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -1171,7 +1171,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     !     .. Local Scalars ..
-    type(psb_ctxt_type) ::  ictxt
+    type(psb_ctxt_type) ::  ctxt
     integer(psb_ipk_)   ::  incnt, outcnt, j, np, me, l_tmp,&
          & idx, proc, n_elem_send, n_elem_recv
     integer(psb_ipk_), pointer   :: idxlist(:)
@@ -1184,8 +1184,8 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    ictxt = desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = desc%get_context()
+    call psb_info(ctxt, me, np)
 
     select case(data)
     case(psb_comm_halo_)
@@ -1240,7 +1240,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -1258,7 +1258,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     !     .. Local Scalars ..
-    type(psb_ctxt_type) :: ictxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   ::  incnt, outcnt, j, np, me, l_tmp,&
          & idx, proc, n_elem_send, n_elem_recv
     integer(psb_ipk_), pointer   :: idxlist(:)
@@ -1272,8 +1272,8 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    ictxt = desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = desc%get_context()
+    call psb_info(ctxt, me, np)
 
     select case(data)
     case(psb_comm_halo_)
@@ -1335,7 +1335,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
