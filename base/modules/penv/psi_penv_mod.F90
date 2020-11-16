@@ -870,7 +870,8 @@ contains
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(out) :: ictxt
-    integer(psb_mpk_), intent(in), optional :: np, basectxt, ids(:)
+    type(psb_ctxt_type), intent(in), optional :: basectxt
+    integer(psb_mpk_), intent(in), optional :: np, ids(:)
 
     integer(psb_mpk_) :: i, isnullcomm, icomm
     integer(psb_mpk_), allocatable :: iids(:) 
@@ -898,8 +899,12 @@ contains
       end if
     end if
 
-    if (present(basectxt)) then 
-      basecomm = basectxt
+    if (present(basectxt)) then
+      if (allocated(basectxt%ctxt)) then 
+        basecomm = basectxt%ctxt
+      else
+        basecomm = mpi_comm_world
+      end if
     else
       basecomm = mpi_comm_world
     end if

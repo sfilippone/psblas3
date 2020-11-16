@@ -242,8 +242,8 @@ int main(int argc, char *argv[])
   ictxt = psb_c_init();
   psb_c_info(ictxt,&iam,&np);
   fprintf(stdout,"Initialization: am %d of %d\n",iam,np);
-
   fflush(stdout);
+
   psb_c_barrier(ictxt);
   if (iam == 0) {
     fgets(buffer,LINEBUFSIZE,stdin);
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
   
   fprintf(stderr,"%d Check on received: methd %s ptype %s afmt %s\n",
 	  iam,methd,ptype,afmt);
-
+  fflush(stderr);
   psb_c_barrier(ictxt);
 
   cdh=psb_c_new_descriptor();
