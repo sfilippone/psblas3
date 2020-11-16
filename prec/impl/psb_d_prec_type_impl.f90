@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,14 +27,14 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
-!   
+!
+!
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -46,7 +46,7 @@
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
-!!$ 
+!!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -58,14 +58,14 @@
 !!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!!$
+!!$
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply2_vect
-  implicit none 
+  implicit none
   type(psb_desc_type),intent(in)       :: desc_data
   class(psb_dprec_type), intent(inout) :: prec
   type(psb_d_vect_type),intent(inout)  :: x
@@ -74,7 +74,7 @@ subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
   character(len=1), optional           :: trans
   real(psb_dpk_),intent(inout), optional, target :: work(:)
 
-  character     :: trans_ 
+  character     :: trans_
   real(psb_dpk_), pointer :: work_(:)
   integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
@@ -87,25 +87,25 @@ subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
   ictxt = desc_data%get_context()
   call psb_info(ictxt, me, np)
 
-  if (present(trans)) then 
+  if (present(trans)) then
     trans_=psb_toupper(trans)
   else
     trans_='N'
   end if
 
-  if (present(work)) then 
+  if (present(work)) then
     work_ => work
   else
     allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocate')
-      goto 9999      
+      goto 9999
     end if
 
   end if
 
-  if (.not.allocated(prec%prec)) then 
+  if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
@@ -114,13 +114,13 @@ subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
   call prec%prec%apply(done,x,dzero,y,desc_data,info,&
        & trans=trans_,work=work_)
 
-  if (present(work)) then 
+  if (present(work)) then
   else
     deallocate(work_,stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999      
+      goto 9999
     end if
   end if
 
@@ -135,7 +135,7 @@ end subroutine psb_d_apply2_vect
 subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply1_vect
-  implicit none 
+  implicit none
   type(psb_desc_type),intent(in)       :: desc_data
   class(psb_dprec_type), intent(inout) :: prec
   type(psb_d_vect_type),intent(inout)  :: x
@@ -144,7 +144,7 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
   real(psb_dpk_),intent(inout), optional, target :: work(:)
 
   type(psb_d_vect_type)       :: ww
-  character     :: trans_ 
+  character     :: trans_
   real(psb_dpk_), pointer :: work_(:)
   integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
@@ -157,25 +157,25 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
   ictxt = desc_data%get_context()
   call psb_info(ictxt, me, np)
 
-  if (present(trans)) then 
+  if (present(trans)) then
     trans_=psb_toupper(trans)
   else
     trans_='N'
   end if
 
-  if (present(work)) then 
+  if (present(work)) then
     work_ => work
   else
     allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocate')
-      goto 9999      
+      goto 9999
     end if
 
   end if
 
-  if (.not.allocated(prec%prec)) then 
+  if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
@@ -186,13 +186,13 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
        & trans=trans_,work=work_)
   if (info == 0) call psb_geaxpby(done,ww,dzero,x,desc_data,info)
   call psb_gefree(ww,desc_data,info)
-  if (present(work)) then 
+  if (present(work)) then
   else
     deallocate(work_,stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999      
+      goto 9999
     end if
   end if
 
@@ -207,7 +207,7 @@ end subroutine psb_d_apply1_vect
 subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply2v
-  implicit none 
+  implicit none
   type(psb_desc_type),intent(in)    :: desc_data
   class(psb_dprec_type), intent(inout) :: prec
   real(psb_dpk_),intent(inout)   :: x(:)
@@ -216,7 +216,7 @@ subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
   character(len=1), optional        :: trans
   real(psb_dpk_),intent(inout), optional, target :: work(:)
 
-  character     :: trans_ 
+  character     :: trans_
   real(psb_dpk_), pointer :: work_(:)
   integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
@@ -229,37 +229,37 @@ subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
   ictxt = desc_data%get_context()
   call psb_info(ictxt, me, np)
 
-  if (present(trans)) then 
+  if (present(trans)) then
     trans_=trans
   else
     trans_='N'
   end if
 
-  if (present(work)) then 
+  if (present(work)) then
     work_ => work
   else
     allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocate')
-      goto 9999      
+      goto 9999
     end if
 
   end if
 
-  if (.not.allocated(prec%prec)) then 
+  if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
   call prec%prec%apply(done,x,dzero,y,desc_data,info,trans_,work=work_)
-  if (present(work)) then 
+  if (present(work)) then
   else
     deallocate(work_,stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999      
+      goto 9999
     end if
   end if
 
@@ -274,7 +274,7 @@ end subroutine psb_d_apply2v
 subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply1v
-  implicit none 
+  implicit none
   type(psb_desc_type),intent(in)    :: desc_data
   class(psb_dprec_type), intent(inout) :: prec
   real(psb_dpk_),intent(inout)   :: x(:)
@@ -293,32 +293,32 @@ subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
 
   ictxt=desc_data%get_context()
   call psb_info(ictxt, me, np)
-  if (present(trans)) then 
+  if (present(trans)) then
     trans_=psb_toupper(trans)
   else
     trans_='N'
   end if
 
-  if (.not.allocated(prec%prec)) then 
+  if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
   allocate(ww(size(x)),w1(size(x)),stat=info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='Allocate')
-    goto 9999      
+    goto 9999
   end if
   call prec%prec%apply(done,x,dzero,ww,desc_data,info,&
        & trans_,work=w1)
   if(info /= psb_success_) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1,stat=info)
-  if (info /= psb_success_) then 
+  if (info /= psb_success_) then
     info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='DeAllocate')
-    goto 9999      
+    goto 9999
   end if
 
 
@@ -332,3 +332,126 @@ subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
 
 end subroutine psb_d_apply1v
 
+subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
+  use psb_base_mod
+  use psb_d_prec_type, psb_protect_name => psb_dcprecseti
+  implicit none
+
+  class(psb_dprec_type), intent(inout)   :: prec
+  character(len=*), intent(in)             :: what
+  integer(psb_ipk_), intent(in)            :: val
+  integer(psb_ipk_), intent(out)           :: info
+  ! This optional inputs are backport from the inputs available in AMG4PSBLAS,
+  ! they are of no actual use here a part from compatibility reasons.
+  integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
+  character(len=*), optional, intent(in)   :: pos
+
+  ! Local variables
+  character(len=*), parameter            :: name='psb_precseti'
+
+  info = psb_success_
+
+  ! We need to convert from the 'what' string to the corresponding integer
+  ! value befor passing the call to the set of the inner method.
+  select case (psb_toupper(what))
+    case ("SUB_FILLIN")
+      call prec%prec%precset(psb_ilu_fill_in_,val,info)
+    case default
+      info = psb_err_invalid_args_combination_
+      write(psb_err_unit,*) name,&
+           & ': Error: uninitialized preconditioner,',&
+           &' should call prec%init'
+      return
+  end select
+
+end subroutine psb_dcprecseti
+
+subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
+  use psb_base_mod
+  use psb_d_prec_type, psb_protect_name => psb_dcprecsetr
+  implicit none
+
+  class(psb_dprec_type), intent(inout)   :: prec
+  character(len=*), intent(in)             :: what
+  real(psb_dpk_), intent(in)             :: val
+  integer(psb_ipk_), intent(out)           :: info
+  ! This optional inputs are backport from the inputs available in AMG4PSBLAS,
+  ! they are of no actual use here a part from compatibility reasons.
+  integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
+  character(len=*), optional, intent(in)   :: pos
+
+  ! Local variables
+  character(len=*), parameter            :: name='amg_precsetr'
+
+  info = psb_success_
+
+  ! We need to convert from the 'what' string to the corresponding integer
+  ! value befor passing the call to the set of the inner method.
+  select case (psb_toupper(what))
+  case('SUB_ILUTHRS')
+    call prec%prec%precset(psb_fact_eps_,val,info)
+  case default
+    info = psb_err_invalid_args_combination_
+    write(psb_err_unit,*) name,&
+         & ': Error: uninitialized preconditioner,',&
+         &' should call prec%init'
+    return
+  end select
+
+end subroutine psb_dcprecsetr
+
+subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
+  use psb_base_mod
+  use psb_d_prec_type, psb_protect_name => psb_dcprecsetc
+  implicit none
+
+  class(psb_dprec_type), intent(inout)   :: prec
+  character(len=*), intent(in)             :: what
+  character(len=*), intent(in)             :: string
+  integer(psb_ipk_), intent(out)           :: info
+  ! This optional inputs are backport from the inputs available in AMG4PSBLAS,
+  ! they are of no actual use here a part from compatibility reasons.
+  integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
+  character(len=*), optional, intent(in)   :: pos
+
+  ! Local variables
+  character(len=*), parameter            :: name='amg_precsetc'
+
+  info = psb_success_
+
+  ! We need to convert from the 'what' string to the corresponding integer
+  ! value befor passing the call to the set of the inner method.
+  select case (psb_toupper(what))
+    case ('SUB_SOLVE')
+      ! We select here the type of solver on the block
+      select case (psb_toupper(string))
+        case("ILU")
+            call prec%prec%precset(psb_f_type_,psb_f_ilu_k_,info)
+            call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
+        case("ILUT")
+            call prec%prec%precset(psb_f_type_,psb_f_ilu_t_,info)
+            call prec%prec%precset(psb_ilu_ialg_,psb_ilu_t_,info)
+        case default
+          ! Default to ILU(0) factorization
+          call prec%prec%precset(psb_f_type_,psb_f_ilu_n_,info)
+          call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
+      end select
+    case ("ILU_ALG")
+      select case (psb_toupper(string))
+        case ("MILU")
+          call prec%prec%precset(psb_ilu_ialg_,psb_milu_n_,info)
+        case default
+          ! Do nothing
+      end select
+    case ("ILUT_SCALE")
+      select case (psb_toupper(string))
+      case ("MAXVAL")
+        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_maxval_,info)
+      case default
+        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
+      end select
+    case default
+
+  end select
+
+end subroutine psb_dcprecsetc

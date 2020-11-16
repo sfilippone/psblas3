@@ -606,9 +606,9 @@ program psb_s_pde3d
 
   ! Parameters for solvers in Block-Jacobi preconditioner
   type ainvparms
-    character(len=12) :: alg, orth_alg
+    character(len=12) :: alg, orth_alg, ilu_alg, ilut_scale
     integer(psb_ipk_) :: fill, inv_fill
-    real(psb_dpk_)    :: thresh, inv_thresh
+    real(psb_spk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
 
@@ -664,6 +664,25 @@ program psb_s_pde3d
   !
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
   call prec%init(ictxt,ptype,info)
+  !
+  ! Set the options for the BJAC preconditioner
+  !
+  if (psb_toupper(ptype) == "BJAC") then
+      call prec%set('sub_solve',       parms%alg,   info)
+      select case (psb_toupper(parms%alg))
+      case ("ILU")
+        call prec%set('sub_fillin',      parms%fill,      info)
+        call prec%set('ilu_alg',         parms%ilu_alg,   info)
+      case ("ILUT")
+        call prec%set('sub_fillin',      parms%fill,      info)
+        call prec%set('sub_iluthrs',     parms%thresh,    info)
+        call prec%set('ilut_scale',      parms%ilut_scale, info)
+      case default
+        ! Do nothing, use default setting in the init routine
+      end select
+  else
+    ! nothing to set for NONE or DIAG preconditioner
+  end if
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
@@ -813,16 +832,20 @@ contains
           irst=1
         endif
         if (ip >= 9) then
-          read(psb_inp_unit,*) parms%alg
-          read(psb_inp_unit,*) parms%fill
-          read(psb_inp_unit,*) parms%inv_fill
-          read(psb_inp_unit,*) parms%thresh
-          read(psb_inp_unit,*) parms%inv_thresh
-          read(psb_inp_unit,*) parms%orth_alg
+          read(inp_unit,*) parms%alg
+          read(inp_unit,*) parms%ilu_alg
+          read(inp_unit,*) parms%ilut_scale
+          read(inp_unit,*) parms%fill
+          read(inp_unit,*) parms%inv_fill
+          read(inp_unit,*) parms%thresh
+          read(inp_unit,*) parms%inv_thresh
+          read(inp_unit,*) parms%orth_alg
         else
-          parms%alg =  'ILU' ! AINV variant: ILU,ILUT,MILU,INVK,AINVT,AORTH
-          parms%fill = 0     ! Fill in for forward factorization
-          parms%inv_fill = 1 ! Fill in for inverse factorization
+          parms%alg =  'ILU' ! Block Solver ILU,ILUT,INVK,AINVT,AORTH
+          parms%ilu_alg = 'NONE' ! If ILU : MILU or NONE othewise ignored
+          parms%ilut_scale = 'NONE' ! If ILUT: NONE, MAXVAL, DIAG, ARWSUM, ACLSUM, ARCSUM
+          parms%fill = 0     ! Level of fill for forward factorization
+          parms%inv_fill = 1 ! Level of fill for inverse factorization (only INVK)
           parms%thresh = 1E-1_psb_spk_ ! Threshold for forward factorization
           parms%inv_thresh = 1E-1_psb_spk_ ! Threshold for inverse factorization
           parms%orth_alg = 'LLK'  ! What orthogonalization algorithm?
@@ -846,16 +869,20 @@ contains
         if( psb_toupper(ptype) == "BJAC" ) then
           write(psb_out_unit,'("Block subsolver      : ",a)') parms%alg
           select case (psb_toupper(parms%alg))
-            case ('ILU','ILUT','MILU')
+            case ('ILU')
               write(psb_out_unit,'("Fill in       : ",i0)') parms%fill
-              write(psb_out_unit,'("Threshold     : ",e2.2)') parms%thresh
+              write(psb_out_unit,'("MILU          : ",a)') parms%ilu_alg
+            case ('ILUT')
+              write(psb_out_unit,'("Fill in       : ",i0)') parms%fill
+              write(psb_out_unit,'("Threshold     : ",es12.5)') parms%thresh
+              write(psb_out_unit,'("Scaling       : ",a)') parms%ilut_scale
             case ('INVK')
-              write(psb_out_unit,'("Fill               : ",i0)') parms%fill
-              write(psb_out_unit,'("Threshold          : ",e2.2)') parms%thresh
-              write(psb_out_unit,'("Invese Fill        : ",i0)') parms%inv_fill
-              write(psb_out_unit,'("Inverse Threshold  : ",e2.2)') parms%inv_thresh
+              write(psb_out_unit,'("Fill in            : ",i0)') parms%fill
+              write(psb_out_unit,'("Threshold          : ",es12.5)') parms%thresh
+              write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill
+              write(psb_out_unit,'("Inverse Threshold  : ",es12.5)') parms%inv_thresh
             case ('AINVT','AORTH')
-              write(psb_out_unit,'("Inverse Threshold  : ",e2.2)') parms%inv_thresh
+              write(psb_out_unit,'("Inverse Threshold  : ",es12.5)') parms%inv_thresh
             case default
               write(psb_out_unit,'("Unknown diagonal solver")')
           end select

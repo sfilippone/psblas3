@@ -568,7 +568,6 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       goto 9999
     endif
     ! This is where we have no renumbering, thus no need
-    ! call psb_ilu_fct(a,lf,uf,dd,info)
     call psb_ilu0_fact(ialg,a,lf,uf,dd,info)
 
     if(info == psb_success_) then
@@ -782,45 +781,19 @@ subroutine psb_c_bjac_precseti(prec,what,val,info)
 
   select case(what)
   case (psb_f_type_)
-    if (prec%iprcparm(psb_p_type_) /= psb_bjac_) then
-      write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',&
-           & prec%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
     prec%iprcparm(psb_f_type_)     = val
 
   case (psb_ilu_fill_in_)
-    if ((prec%iprcparm(psb_p_type_) /= psb_bjac_).or.&
-         & ((prec%iprcparm(psb_f_type_) /= psb_f_ilu_n_).or.&
-         & (prec%iprcparm(psb_f_type_) /= psb_f_ilu_t_))) then
-      write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',&
-           & prec%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
     prec%iprcparm(psb_ilu_fill_in_) = val
 
   case (psb_ilu_ialg_)
-    if (prec%iprcparm(psb_p_type_) /= psb_bjac_) then
-      write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',&
-          & prec%iprcparm(psb_p_type_),&
-          & 'ignoring user specification'
-      return
-    endif
     prec%iprcparm(psb_ilu_ialg_) = val
 
   case (psb_ilu_scale_)
-    if (prec%iprcparm(psb_p_type_) /= psb_bjac_) then
-      write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',&
-          & prec%iprcparm(psb_p_type_),&
-          & 'ignoring user specification'
-      return
-    endif
     prec%iprcparm(psb_ilu_scale_) = val
 
   case default
-    write(psb_err_unit,*) 'WHAT is invalid, ignoring user specification'
+    write(psb_err_unit,'(i0," is invalid, ignoring user specification")') what
 
   end select
 
@@ -855,26 +828,13 @@ subroutine psb_c_bjac_precsetr(prec,what,val,info)
 
   select case(what)
   case (psb_f_type_)
-    if (prec%iprcparm(psb_p_type_) /= psb_bjac_) then
-      write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',&
-           & prec%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
     prec%iprcparm(psb_f_type_)     = val
 
   case (psb_fact_eps_)
-    if ((prec%iprcparm(psb_p_type_) /= psb_bjac_).or.&
-         & (prec%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then
-      write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',&
-           & prec%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
     prec%rprcparm(psb_fact_eps_) = val
 
   case default
-    write(psb_err_unit,*) 'WHAT is invalid, ignoring user specification'
+    write(psb_err_unit,'(i0," is invalid, ignoring user specification")') what
 
   end select
 
