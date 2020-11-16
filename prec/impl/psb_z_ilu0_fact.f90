@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,21 +27,21 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
+!
 !    Moved here from MLD2P4, original copyright below.
-!  
-!  
-!   
+!
+!
+!
 !                             MLD2P4  version 2.2
 !    MultiLevel Domain Decomposition Parallel Preconditioners Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2008-2018 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Daniela di Serafino   
-!   
+!
+!    (C) Copyright 2008-2018
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Daniela di Serafino
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -53,7 +53,7 @@
 !      3. The name of the MLD2P4 group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -65,8 +65,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: psb_zilu0_fact.f90
 !
 ! Subroutine: psb_zilu0_fact
@@ -75,7 +75,7 @@
 !
 !  This routine computes either the ILU(0) or the MILU(0) factorization of
 !  the diagonal blocks of a distributed matrix. These factorizations are used
-!  to build the 'base preconditioner' (block-Jacobi preconditioner/solver, 
+!  to build the 'base preconditioner' (block-Jacobi preconditioner/solver,
 !  Additive Schwarz preconditioner) corresponding to a given level of a
 !  multilevel preconditioner.
 !
@@ -83,10 +83,10 @@
 !    Y. Saad, Iterative Methods for Sparse Linear Systems, Second Edition,
 !    SIAM, 2003, Chapter 10.
 !
-!  The local matrix is stored into a and blck, as specified in the description 
-!  of the arguments below. The storage format for both the L and U factors is CSR. 
-!  The diagonal of the U factor is stored separately (actually, the inverse of the 
-!  diagonal entries is stored; this is then managed in the solve stage associated 
+!  The local matrix is stored into a and blck, as specified in the description
+!  of the arguments below. The storage format for both the L and U factors is CSR.
+!  The diagonal of the U factor is stored separately (actually, the inverse of the
+!  diagonal entries is stored; this is then managed in the solve stage associated
 !  to the ILU(0)/MILU(0) factorization).
 !
 !  The routine copies and factors "on the fly" from a and blck into l (L factor),
@@ -94,7 +94,7 @@
 !
 !  This implementation of ILU(0)/MILU(0) is faster than the implementation in
 !  psb_ziluk_fct (the latter routine performs the more general ILU(k)/MILU(k)).
-!  
+!
 !
 ! Arguments:
 !    ialg    -  integer, input.
@@ -121,7 +121,7 @@
 !               factorization.
 !               Note: its allocation is managed by the calling routine psb_ilu_bld,
 !               hence it cannot be only intent(out).
-!    info    -  integer, output.                         
+!    info    -  integer, output.
 !               Error code.
 !    blck    -  type(psb_zspmat_type), input, optional, target.
 !               The sparse matrix structure containing the remote rows of the
@@ -129,7 +129,7 @@
 !               to build an Additive Schwarz base preconditioner with overlap
 !               greater than 0. If the overlap is 0 or the matrix has been reordered
 !               (see psb_fact_bld), then blck is empty.
-!  
+!
 subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck, upd)
 
   use psb_base_mod
@@ -157,30 +157,30 @@ subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck, upd)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ! 
+  !
   ! Point to / allocate memory for the incomplete factorization
   !
-  if (present(blck)) then 
+  if (present(blck)) then
     blck_ => blck
   else
-    allocate(blck_,stat=info) 
-    if (info == psb_success_) call blck_%csall(izero,izero,info,ione) 
+    allocate(blck_,stat=info)
+    if (info == psb_success_) call blck_%allocate(izero,izero,info,ione,type='CSR')
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
-      ch_err='csall'
+      ch_err='allocate'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
   endif
-  if (present(upd)) then 
-    upd_ = psb_toupper(upd) 
+  if (present(upd)) then
+    upd_ = psb_toupper(upd)
   else
     upd_ = 'F'
   end if
-  
+
   m = a%get_nrows() + blck_%get_nrows()
   if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
-       & (m > size(d))    ) then 
+       & (m > size(d))    ) then
     write(0,*) 'Wrong allocation status for L,D,U? ',&
          & l%get_nrows(),size(d),u%get_nrows()
     info = -1
@@ -212,12 +212,12 @@ subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck, upd)
   call u%set_triangle()
   call u%set_unit()
   call u%set_upper()
-  
+
   !
   ! Nullify pointer / deallocate memory
   !
-  if (present(blck)) then 
-    blck_ => null() 
+  if (present(blck)) then
+    blck_ => null()
   else
     call blck_%free()
     if(info.ne.0) then
@@ -226,7 +226,7 @@ subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck, upd)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    deallocate(blck_) 
+    deallocate(blck_)
   endif
 
   call psb_erractionrestore(err_act)
@@ -243,9 +243,9 @@ contains
   ! Version:    complex
   ! Note: internal subroutine of psb_zilu0_fact.
   !
-  !  This routine computes either the ILU(0) or the MILU(0) factorization of the 
-  !  diagonal blocks of a distributed matrix. 
-  !  These factorizations are used to build the 'base preconditioner' 
+  !  This routine computes either the ILU(0) or the MILU(0) factorization of the
+  !  diagonal blocks of a distributed matrix.
+  !  These factorizations are used to build the 'base preconditioner'
   !  (block-Jacobi preconditioner/solver, Additive Schwarz
   !  preconditioner) corresponding to a given level of a multilevel preconditioner.
   !
@@ -257,7 +257,7 @@ contains
   !
   !  The routine copies and factors "on the fly" from the sparse matrix structures a
   !  and b into the arrays lval, uval, d (L, U without its diagonal, diagonal of U).
-  !  
+  !
   !
   ! Arguments:
   !    ialg    -  integer, input.
@@ -296,7 +296,7 @@ contains
   !               according to the CSR storage format.
   !    lirp    -  integer, dimension(:), input/output.
   !               The indices identifying the first nonzero entry of each row
-  !               of the L factor in lval, according to the CSR storage format. 
+  !               of the L factor in lval, according to the CSR storage format.
   !    uval   -   complex(psb_dpk_), dimension(:), input/output.
   !               The U factor in the incomplete factorization.
   !               The entries of U are stored according to the CSR format.
@@ -305,18 +305,18 @@ contains
   !               according to the CSR storage format.
   !    uirp    -  integer, dimension(:), input/output.
   !               The indices identifying the first nonzero entry of each row
-  !               of the U factor in uval, according to the CSR storage format. 
+  !               of the U factor in uval, according to the CSR storage format.
   !    l1      -  integer, output.
   !               The number of nonzero entries in lval.
   !    l2      -  integer, output.
   !               The number of nonzero entries in uval.
-  !    info    -  integer, output.           
+  !    info    -  integer, output.
   !               Error code.
   !
   subroutine psb_zilu0_factint(ialg,a,b,&
        & d,lval,lja,lirp,uval,uja,uirp,l1,l2,upd,info)
 
-    implicit none 
+    implicit none
 
     ! Arguments
     integer(psb_ipk_), intent(in)     :: ialg
@@ -332,7 +332,7 @@ contains
     complex(psb_dpk_) :: dia,temp
     integer(psb_ipk_), parameter :: nrb=16
     type(psb_z_coo_sparse_mat) :: trw
-    integer(psb_ipk_)   :: int_err(5) 
+    integer(psb_ipk_)   :: int_err(5)
     character(len=20)   :: name, ch_err
 
     name='psb_zilu0_factint'
@@ -346,10 +346,10 @@ contains
 
     select case(ialg)
     case(psb_ilu_n_,psb_milu_n_)
-      ! Ok 
+      ! Ok
     case default
       info=psb_err_input_asize_invalid_i_
-      call psb_errpush(info,name,& 
+      call psb_errpush(info,name,&
            & i_err=(/ione,ialg,izero,izero,izero/))
       goto 9999
     end select
@@ -363,7 +363,7 @@ contains
     end if
     m = ma+mb
 
-    if (psb_toupper(upd) == 'F' ) then 
+    if (psb_toupper(upd) == 'F' ) then
       lirp(1) = 1
       uirp(1) = 1
       l1      = 0
@@ -379,14 +379,14 @@ contains
         if (i <= ma) then
           !
           ! Copy the i-th local row of the matrix, stored in a,
-          ! into lval/d(i)/uval 
+          ! into lval/d(i)/uval
           !
           call ilu_copyin(i,ma,a,i,ione,m,l1,lja,lval,&
                & d(i),l2,uja,uval,ktrw,trw,upd)
         else
           !
           ! Copy the i-th local row of the matrix, stored in b
-          ! (as (i-ma)-th row), into lval/d(i)/uval 
+          ! (as (i-ma)-th row), into lval/d(i)/uval
           !
           call ilu_copyin(i-ma,mb,b,i,ione,m,l1,lja,lval,&
                & d(i),l2,uja,uval,ktrw,trw,upd)
@@ -437,7 +437,7 @@ contains
               !
               dia = dia - temp*uval(jj)
               cycle updateloop
-              !     
+              !
             else if (j > i) then
               !
               ! search u(i,*) (i-th row of U) for a matching index j
@@ -454,23 +454,23 @@ contains
                 end if
               enddo
             end if
-            !     
-            ! If we get here we missed the cycle updateloop, which means 
+            !
+            ! If we get here we missed the cycle updateloop, which means
             ! that this entry does not match; thus we accumulate on the
             ! diagonal for MILU(0).
             !
-            if (ialg == psb_milu_n_) then 
+            if (ialg == psb_milu_n_) then
               dia = dia - temp*uval(jj)
             end if
           enddo updateloop
         enddo
-        !     
+        !
         ! Check the pivot size
-        !     
+        !
         if (abs(dia) < d_epstol) then
           !
           ! Too small pivot: unstable factorization
-          !     
+          !
           info = psb_err_pivot_too_small_
           int_err(1) = i
           write(ch_err,'(g20.10)') abs(dia)
@@ -493,7 +493,7 @@ contains
     else
       write(0,*) 'Update not implemented '
       info = 31
-      call psb_errpush(info,name,& 
+      call psb_errpush(info,name,&
            & i_err=(/ione*13,izero,izero,izero,izero/),a_err=upd)
       goto 9999
 
@@ -515,7 +515,7 @@ contains
   ! Version:    complex
   ! Note: internal subroutine of psb_zilu0_fact
   !
-  !  This routine copies a row of a sparse matrix A, stored in the psb_zspmat_type 
+  !  This routine copies a row of a sparse matrix A, stored in the psb_zspmat_type
   !  data structure a, into the arrays lval and uval and into the scalar variable
   !  dia, corresponding to the lower and upper triangles of A and to the diagonal
   !  entry of the row, respectively. The entries in lval and uval are stored
@@ -529,14 +529,14 @@ contains
   !
   !  The routine is used by psb_zilu0_factint in the computation of the ILU(0)/MILU(0)
   !  factorization of a local sparse matrix.
-  !  
+  !
   !  TODO: modify the routine to allow copying into output L and U that are
   !  already filled with indices; this would allow computing an ILU(k) pattern,
-  !  then use the ILU(0) internal for subsequent calls with the same pattern. 
+  !  then use the ILU(0) internal for subsequent calls with the same pattern.
   !
   ! Arguments:
   !    i       -  integer, input.
-  !               The local index of the row to be extracted from  the 
+  !               The local index of the row to be extracted from  the
   !               sparse matrix structure a.
   !    m       -  integer, input.
   !               The number of rows of the local matrix stored into a.
@@ -570,13 +570,13 @@ contains
   !               to the CSR storage format.
   !    uval   -  complex(psb_dpk_), dimension(:), input/output.
   !               The array where the entries of the row corresponding to the
-  !               upper triangle are copied. 
+  !               upper triangle are copied.
   !    ktrw    -  integer, input/output.
   !               The index identifying the last entry taken from the
   !               staging buffer trw. See below.
   !    trw     -  type(psb_zspmat_type), input/output.
   !               A staging buffer. If the matrix A is not in CSR format, we use
-  !               the psb_sp_getblk routine and store its output in trw; when we 
+  !               the psb_sp_getblk routine and store its output in trw; when we
   !               need to call psb_sp_getblk we do it for a block of rows, and then
   !               we consume them from trw in successive calls to this routine,
   !               until we empty the buffer. Thus we will make a call to psb_sp_getblk
@@ -608,10 +608,10 @@ contains
     if (psb_errstatus_fatal()) then
       info = psb_err_internal_error_; goto 9999
     end if
-    if (psb_toupper(upd) == 'F') then 
+    if (psb_toupper(upd) == 'F') then
 
-      select type(aa => a%a) 
-      type is (psb_z_csr_sparse_mat) 
+      select type(aa => a%a)
+      type is (psb_z_csr_sparse_mat)
 
         !
         ! Take a fast shortcut if the matrix is stored in CSR format
@@ -633,19 +633,19 @@ contains
           end if
         enddo
 
-      class default 
+      class default
 
         !
-        ! Otherwise use psb_sp_getblk, slower but able (in principle) of 
+        ! Otherwise use psb_sp_getblk, slower but able (in principle) of
         ! handling any format. In this case, a block of rows is extracted
         ! instead of a single row, for performance reasons, and these
         ! rows are copied one by one into lval, dia, uval, through
         ! successive calls to ilu_copyin.
         !
 
-        if ((mod(i,nrb) == 1).or.(nrb == 1)) then 
+        if ((mod(i,nrb) == 1).or.(nrb == 1)) then
           irb = min(m-i+1,nrb)
-          call aa%csget(i,i+irb-1,trw,info) 
+          call aa%csget(i,i+irb-1,trw,info)
           if(info /= psb_success_) then
             info=psb_err_from_subroutine_
             ch_err='csget'
@@ -656,7 +656,7 @@ contains
         end if
 
         nz = trw%get_nzeros()
-        do 
+        do
           if (ktrw > nz) exit
           if (trw%ia(ktrw) > i) exit
           k = trw%ja(ktrw)
@@ -680,7 +680,7 @@ contains
 
       write(0,*) 'Update not implemented '
       info = 31
-      call psb_errpush(info,name,& 
+      call psb_errpush(info,name,&
            & i_err=(/ione*13,izero,izero,izero,izero/),a_err=upd)
       goto 9999
 
