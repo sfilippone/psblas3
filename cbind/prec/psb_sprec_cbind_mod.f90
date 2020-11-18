@@ -18,16 +18,17 @@ contains
     use psb_cpenv_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk_)          :: res
-    integer(psb_c_ipk_), value :: cctxt   
+    integer(psb_c_ipk_)            :: res
+    type(psb_c_object_type), value :: cctxt   
 
     type(psb_c_sprec) :: ph
     character(c_char)       :: ptype(*)
     type(psb_sprec_type), pointer :: precp
     integer(psb_c_ipk_)              :: info
     character(len=80)       :: fptype
-    type(psb_ctxt_type) :: ctxt
-    ctxt = psb_c2f_ctxt(cctxt)
+    type(psb_ctxt_type), pointer :: ctxt
+
+    ctxt => psb_c2f_ctxt(cctxt)
 
     res = -1
     if (c_associated(ph%item)) then 

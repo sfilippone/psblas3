@@ -126,7 +126,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 
   if (choose_sorting(dlmax,dlavg,np)) then 
     if (do_timings) call psb_tic(idx_phase21)
-    call psi_bld_glb_dep_csr_list(ctxt,&
+    call psi_bld_glb_dep_list(ctxt,&
          & loc_dl,length_dl,c_dep_list,dl_ptr,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From bld_glb_list ',info

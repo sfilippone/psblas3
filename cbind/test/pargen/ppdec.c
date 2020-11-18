@@ -120,7 +120,7 @@ double g(double x, double y, double z)
   }
 }
 
-psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
+psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
 	       psb_c_dspmat *ah,psb_c_descriptor *cdh,
 	       psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
@@ -132,7 +132,7 @@ psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
   psb_l_t irow[10*NBMAX], icol[10*NBMAX];
 
   info = 0;
-  psb_c_info(ictxt,&iam,&np);
+  psb_c_info(cctxt,&iam,&np);
   deltah = (double) 1.0/(idim+1);
   sqdeltah = deltah*deltah;
   deltah2  = 2.0* deltah;
@@ -223,7 +223,8 @@ psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
   
 int main(int argc, char *argv[])
 {
-  psb_i_t ictxt, iam, np;
+  psb_c_ctxt *cctxt;
+  psb_i_t iam, np;
   char methd[40], ptype[20], afmt[8], buffer[LINEBUFSIZE+1];
   psb_i_t nparms;
   psb_i_t idim,info,istop,itmax,itrace,irst,iter,ret;
@@ -238,13 +239,12 @@ int main(int argc, char *argv[])
   psb_c_SolverOptions options; 
   psb_c_descriptor *cdh;
   FILE *vectfile;
-  
-  ictxt = psb_c_init();
-  psb_c_info(ictxt,&iam,&np);
-  fprintf(stdout,"Initialization: am %d of %d\n",iam,np);
-  fflush(stdout);
 
-  psb_c_barrier(ictxt);
+  cctxt = psb_c_new_ctxt();
+  psb_c_init(cctxt);
+  psb_c_info(*cctxt,&iam,&np);
+
+  psb_c_barrier(*cctxt);
   if (iam == 0) {
     fgets(buffer,LINEBUFSIZE,stdin);
     sscanf(buffer,"%d ",&nparms);
@@ -264,22 +264,22 @@ int main(int argc, char *argv[])
     sscanf(buffer,"%d",&itrace);
     fgets(buffer,LINEBUFSIZE,stdin);
     sscanf(buffer,"%d",&irst);
-  } 
+  }
   /* Now broadcast the values, and check they're OK */
-  psb_c_ibcast(ictxt,1,&nparms,0);
-  psb_c_hbcast(ictxt,methd,0);
-  psb_c_hbcast(ictxt,ptype,0);
-  psb_c_hbcast(ictxt,afmt,0);
-  psb_c_ibcast(ictxt,1,&idim,0);
-  psb_c_ibcast(ictxt,1,&istop,0);
-  psb_c_ibcast(ictxt,1,&itmax,0);
-  psb_c_ibcast(ictxt,1,&itrace,0);
-  psb_c_ibcast(ictxt,1,&irst,0);
+  psb_c_ibcast(*cctxt,1,&nparms,0);
+  psb_c_hbcast(*cctxt,methd,0);
+  psb_c_hbcast(*cctxt,ptype,0);
+  psb_c_hbcast(*cctxt,afmt,0);
+  psb_c_ibcast(*cctxt,1,&idim,0);
+  psb_c_ibcast(*cctxt,1,&istop,0);
+  psb_c_ibcast(*cctxt,1,&itmax,0);
+  psb_c_ibcast(*cctxt,1,&itrace,0);
+  psb_c_ibcast(*cctxt,1,&irst,0);
   
   fprintf(stderr,"%d Check on received: methd %s ptype %s afmt %s\n",
 	  iam,methd,ptype,afmt);
   fflush(stderr);
-  psb_c_barrier(ictxt);
+  psb_c_barrier(*cctxt);
 
   cdh=psb_c_new_descriptor();
   psb_c_set_index_base(0);
@@ -292,15 +292,15 @@ int main(int argc, char *argv[])
   fprintf(stderr,"%d: Input data %d %ld %d %d\n",iam,idim,ng,nb, nl);
   if ((vl=malloc(nb*sizeof(psb_l_t)))==NULL) {
     fprintf(stderr,"On %d: malloc failure\n",iam);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   i = ((psb_l_t)iam) * nb;
   for (k=0; k<nl; k++)
     vl[k] = i+k; 
 
-  if ((info=psb_c_cdall_vl(nl,vl,ictxt,cdh))!=0) {
+  if ((info=psb_c_cdall_vl(nl,vl,*cctxt,cdh))!=0) {
     fprintf(stderr,"From cdall: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
 
   bh  = psb_c_new_dvector();
@@ -319,14 +319,14 @@ int main(int argc, char *argv[])
 
   
   /* Matrix generation  */
-  if (matgen(ictxt,nl,idim,vl,ah,cdh,xh,bh,rh) != 0) {
+  if (matgen(*cctxt,nl,idim,vl,ah,cdh,xh,bh,rh) != 0) {
     fprintf(stderr,"Error during matrix build loop\n");
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }    
-  psb_c_barrier(ictxt);
+  psb_c_barrier(*cctxt);
   /* Set up the preconditioner */ 
   ph  = psb_c_new_dprec();
-  psb_c_dprecinit(ictxt,ph,ptype);
+  psb_c_dprecinit(*cctxt,ph,ptype);
   ret=psb_c_dprecbld(ah,cdh,ph);
   //fprintf(stderr,"From psb_c_dprecbld: %d\n",ret); 
 
@@ -387,20 +387,20 @@ int main(int argc, char *argv[])
   /* Clean up memory */ 
   if ((info=psb_c_dgefree(xh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   if ((info=psb_c_dgefree(bh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   if ((info=psb_c_dgefree(rh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
 
   if ((info=psb_c_cdfree(cdh))!=0) {
     fprintf(stderr,"From cdfree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   //fprintf(stderr,"pointer  from cdfree: %p\n",cdh->descriptor);
  
@@ -412,8 +412,8 @@ int main(int argc, char *argv[])
   free(cdh);
 
 
-  if (iam == 0) fprintf(stderr,"program completed successfully\n");
+  //if (iam == 0) fprintf(stderr,"program completed successfully\n");
 
-  psb_c_barrier(ictxt);
-  psb_c_exit(ictxt);
+  psb_c_barrier(*cctxt);
+  psb_c_exit(*cctxt);
 }

@@ -28,7 +28,7 @@ contains
 
     integer(psb_c_ipk_) :: res
     integer(psb_c_lpk_), value :: ng
-    integer(psb_c_ipk_), value :: cctxt
+    type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_)        :: vg(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
@@ -63,7 +63,8 @@ contains
     implicit none
 
     integer(psb_c_ipk_) :: res
-    integer(psb_c_ipk_), value :: nl, cctxt
+    type(psb_c_object_type), value :: cctxt
+    integer(psb_c_ipk_), value :: nl
     integer(psb_c_lpk_)        :: vl(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
@@ -103,7 +104,8 @@ contains
     implicit none
 
     integer(psb_c_ipk_) :: res
-    integer(psb_c_ipk_), value :: nl, cctxt
+    type(psb_c_object_type), value :: cctxt
+    integer(psb_c_ipk_), value :: nl
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
@@ -137,7 +139,7 @@ contains
 
     integer(psb_c_ipk_) :: res
     integer(psb_c_lpk_), value :: n
-    integer(psb_c_ipk_), value :: cctxt
+    type(psb_c_object_type), value :: cctxt
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info
