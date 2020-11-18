@@ -613,8 +613,10 @@ contains
     if (allocated(desc%indxmap)) then
       val = desc%indxmap%get_ctxt()    
     else
-      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
-      call psb_error()
+      ! At this point, val should a non-ALLOCATED
+      ! ctxt component, which suits us just fine. 
+      !call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
+      !call psb_error()
     end if
   end function psb_cd_get_context
 
