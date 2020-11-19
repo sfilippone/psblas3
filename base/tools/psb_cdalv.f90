@@ -39,11 +39,11 @@
 ! 
 ! Arguments: 
 !    v       - integer(psb_ipk_), dimension(:).         The array containg the partitioning scheme.
-!    ictxt - integer.                         The communication context.
+!    ctxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Return code
 !    flag    - integer.                       Are V's contents 0- or 1-based?
-subroutine psb_cdalv(v, ictxt, desc, info, flag)
+subroutine psb_cdalv(v, ctxt, desc, info, flag)
   use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
@@ -51,9 +51,10 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  integer(psb_ipk_), intent(in)               :: ictxt, v(:)
-  integer(psb_ipk_), intent(in), optional     :: flag
-  integer(psb_ipk_), intent(out)              :: info
+  type(psb_ctxt_type)                      :: ctxt
+  integer(psb_ipk_), intent(in)            :: v(:)
+  integer(psb_ipk_), intent(in), optional  :: flag
+  integer(psb_ipk_), intent(out)           :: info
   type(psb_desc_type), intent(out)  :: desc
 
   !locals
@@ -73,7 +74,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   err  = 0
   name = 'psb_cdalv'
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np,me
   m = size(v)
@@ -102,9 +103,9 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     exch(1)=m
     exch(2)=n
     exch(3)=psb_cd_get_large_threshold()
-    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:3),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
       l_err(1)=1
@@ -178,7 +179,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   if (np == 1) then 
     allocate(psb_repl_map :: desc%indxmap, stat=info)
   else
-    if (psb_cd_choose_large_state(ictxt,m)) then 
+    if (psb_cd_choose_large_state(ctxt,m)) then 
       allocate(psb_hash_map :: desc%indxmap, stat=info)
       if (info == 0) allocate(desc%indxmap%tempvg(m),stat=info)
       if (info ==0) desc%indxmap%tempvg(1:m) = v(1:m) - flag_
@@ -190,11 +191,11 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(ctxt,m,info)
   type is (psb_hash_map) 
-    call aa%hash_map_init(ictxt,v,info)
+    call aa%hash_map_init(ctxt,v,info)
   type is (psb_glist_map) 
-    call aa%glist_map_init(ictxt,v,info)
+    call aa%glist_map_init(ctxt,v,info)
   class default 
       ! This cannot happen 
     info = psb_err_internal_error_
@@ -218,7 +219,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

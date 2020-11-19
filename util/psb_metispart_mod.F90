@@ -45,7 +45,7 @@
 !        integer(psb_ipk_) :: NPARTS  How many parts we are requiring to the 
 !                                 partition utility
 ! 
-!  DISTR_MTPART(ROOT,ICTXT): This subroutine will be called by
+!  DISTR_MTPART(ROOT,ctxt): This subroutine will be called by
 !      all processes to distribute the information computed by the root
 !      process, to be used subsequently.
 !
@@ -55,7 +55,7 @@
 !
 module psb_metispart_mod
   use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
-       & psb_err_unit, psb_spk_, psb_dpk_,&
+       & psb_err_unit, psb_spk_, psb_dpk_, psb_ctxt_type,&
        & psb_lsspmat_type, psb_lcspmat_type,&
        & psb_ldspmat_type, psb_lzspmat_type,  &
        & psb_ls_csr_sparse_mat, psb_ld_csr_sparse_mat, &
@@ -77,7 +77,7 @@ module psb_metispart_mod
       integer(psb_lpk_), intent(in) :: n, nparts
       integer(psb_lpk_), intent(in) :: ja(:), irp(:)
       integer(psb_lpk_), allocatable, intent(inout) :: vect(:)
-#if defined(METIS_REAL_32)
+#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
       real(psb_spk_),optional, intent(in) :: weights(:)
 #elif defined(METIS_REAL_64)
       real(psb_dpk_),optional, intent(in) :: weights(:)
@@ -112,19 +112,20 @@ contains
   end subroutine part_graph
 
 
-  subroutine distr_mtpart(root, ictxt)
+  subroutine distr_mtpart(root, ctxt)
     use psb_base_mod
     implicit none 
-    integer(psb_ipk_) :: root, ictxt
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: root
     integer(psb_ipk_) :: me, np, info
     integer(psb_lpk_) :: n
 
-    call psb_info(ictxt,me,np)
+    call psb_info(ctxt,me,np)
 
     if (.not.((root>=0).and.(root<np))) then 
       write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: invalid ROOT  ',&
            & 'coordinates '
-      call psb_abort(ictxt)
+      call psb_abort(ctxt)
       return
     endif
 
@@ -132,13 +133,13 @@ contains
       if (.not.allocated(graph_vect)) then
         write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
              & 'not initialized'
-        call psb_abort(ictxt)
+        call psb_abort(ctxt)
         return
       endif
       n = size(graph_vect)
-      call psb_bcast(ictxt,n,root=root)
+      call psb_bcast(ctxt,n,root=root)
     else 
-      call psb_bcast(ictxt,n,root=root)
+      call psb_bcast(ctxt,n,root=root)
 
       allocate(graph_vect(n),stat=info)
       if (info /= psb_success_) then
@@ -147,7 +148,7 @@ contains
         return
       endif
     endif
-    call psb_bcast(ictxt,graph_vect(1:n),root=root)
+    call psb_bcast(ctxt,graph_vect(1:n),root=root)
 
     return
 
@@ -186,7 +187,7 @@ contains
     type(psb_ld_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-#if defined(METIS_REAL_32)
+#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
 #elif defined(METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
@@ -230,7 +231,7 @@ contains
     type(psb_lz_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-#if defined(METIS_REAL_32)
+#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
 #elif defined(METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
@@ -291,7 +292,7 @@ contains
     type(psb_lc_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-#if defined(METIS_REAL_32)
+#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
 #elif defined(METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
@@ -319,7 +320,7 @@ contains
     type(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-#if defined(METIS_REAL_32)
+#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
 #elif defined(METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)

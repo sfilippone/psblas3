@@ -68,8 +68,8 @@ subroutine psi_i_bld_tmpovrl(iv,desc,info)
        & l_ov_ix,l_ov_el, err_act, itmpov, k, glx, icomm
   integer(psb_ipk_) :: idx
   integer(psb_ipk_), allocatable  :: ov_idx(:),ov_el(:,:)
-
-  integer(psb_ipk_) :: ictxt,n_row, debug_unit, debug_level
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: n_row, debug_unit, debug_level
   character(len=20)   :: name,ch_err
 
   info = psb_success_
@@ -77,11 +77,11 @@ subroutine psi_i_bld_tmpovrl(iv,desc,info)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt = desc%get_context()
+  ctxt = desc%get_context()
   icomm = desc%get_mpic()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -144,7 +144,7 @@ subroutine psi_i_bld_tmpovrl(iv,desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

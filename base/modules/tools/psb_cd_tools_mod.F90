@@ -190,13 +190,14 @@ module psb_cd_tools_mod
 
   interface psb_cdall
 
-    subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,&
+    subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,&
          & globalcheck,lidx,usehash)
-      import :: psb_ipk_, psb_lpk_, psb_desc_type, psb_parts
+      import :: psb_ipk_, psb_lpk_, psb_desc_type, psb_parts, psb_ctxt_type
       implicit None
       procedure(psb_parts)                :: parts
       integer(psb_lpk_), intent(in)       :: mg,ng, vl(:)
-      integer(psb_ipk_), intent(in)       :: ictxt, vg(:), lidx(:),nl
+      type(psb_ctxt_type)                 :: ctxt
+      integer(psb_ipk_), intent(in)       :: vg(:), lidx(:),nl
       integer(psb_ipk_), intent(in)       :: flag
       logical, intent(in)                 :: repl, globalcheck, usehash
       integer(psb_ipk_), intent(out)      :: info
@@ -352,7 +353,12 @@ contains
     integer(psb_ipk_), intent(out)     :: info
     class(psb_i_base_vect_type), optional, intent(in) :: mold
 
-    call psb_icdasb(desc,info,ext_hv=.false.,mold=mold)
+    if (desc%indxmap%get_fmt() == 'NULL') then
+      ! Do nothing
+      info = 0
+    else
+      call psb_icdasb(desc,info,ext_hv=.false.,mold=mold)
+    end if
   end subroutine psb_cdasb
   
 

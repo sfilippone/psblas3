@@ -57,7 +57,8 @@ function psb_sasum (x,desc_a, info, jx,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
@@ -71,9 +72,9 @@ function psb_sasum (x,desc_a, info, jx,global) result(res)
   end if
 
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -125,12 +126,12 @@ function psb_sasum (x,desc_a, info, jx,global) result(res)
     res = szero
   end if
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_sasum
@@ -160,7 +161,8 @@ function psb_sasum_vect(x, desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, imax, i, idx, ndm
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -174,9 +176,9 @@ function psb_sasum_vect(x, desc_a, info,global) result(res)
   call psb_erractionsave(err_act)
 
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -230,12 +232,12 @@ function psb_sasum_vect(x, desc_a, info,global) result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -297,7 +299,8 @@ function psb_sasumv(x,desc_a, info,global) result(res)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -310,9 +313,9 @@ function psb_sasumv(x,desc_a, info,global) result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -361,12 +364,12 @@ function psb_sasumv(x,desc_a, info,global) result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function psb_sasumv
@@ -428,7 +431,8 @@ subroutine psb_sasumvs(res,x,desc_a, info,global)
   logical, intent(in), optional        :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -441,9 +445,9 @@ subroutine psb_sasumvs(res,x,desc_a, info,global)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -492,12 +496,12 @@ subroutine psb_sasumvs(res,x,desc_a, info,global)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ictxt,res)
+  if (global_) call psb_sum(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sasumvs

@@ -62,7 +62,8 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   character(len=*), optional, intent(in)         :: afmt
   class(psb_d_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
-  integer(psb_ipk_) :: ictxt,np,me, err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me, err_act
   integer(psb_ipk_) :: n_row,n_col
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
@@ -73,12 +74,12 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt    = desc_a%get_context()
+  ctxt    = desc_a%get_context()
   n_row    = desc_a%get_local_rows()
   n_col    = desc_a%get_local_cols()
 
   ! check on BLACS grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -137,7 +138,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

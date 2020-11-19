@@ -40,7 +40,8 @@ subroutine psb_ddiv_vect(x,y,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -50,9 +51,9 @@ subroutine psb_ddiv_vect(x,y,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -98,7 +99,7 @@ subroutine psb_ddiv_vect(x,y,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -114,7 +115,8 @@ subroutine psb_ddiv_vect2(x,y,z,desc_a,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err
@@ -124,9 +126,9 @@ subroutine psb_ddiv_vect2(x,y,z,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -185,7 +187,7 @@ subroutine psb_ddiv_vect2(x,y,z,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -201,7 +203,8 @@ subroutine psb_ddiv_vect_check(x,y,desc_a,info,flag)
   logical, intent(in)                   :: flag
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
@@ -211,9 +214,9 @@ subroutine psb_ddiv_vect_check(x,y,desc_a,info,flag)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -259,7 +262,7 @@ subroutine psb_ddiv_vect_check(x,y,desc_a,info,flag)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -276,7 +279,8 @@ subroutine psb_ddiv_vect2_check(x,y,z,desc_a,info,flag)
   logical, intent(in)                   :: flag
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy, iiz, jjz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
   character(len=20)        :: name, ch_err
@@ -286,9 +290,9 @@ subroutine psb_ddiv_vect2_check(x,y,z,desc_a,info,flag)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -346,7 +350,7 @@ subroutine psb_ddiv_vect2_check(x,y,z,desc_a,info,flag)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -369,7 +373,8 @@ function psb_dminquotient_vect(x,y,desc_a,info,global) result(res)
   logical, intent(in), optional           :: global
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
   logical :: global_
@@ -382,9 +387,9 @@ function psb_dminquotient_vect(x,y,desc_a,info,global) result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -429,12 +434,12 @@ function psb_dminquotient_vect(x,y,desc_a,info,global) result(res)
   end if
 
   ! compute global min
-  if (global_) call psb_min(ictxt, res)
+  if (global_) call psb_min(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

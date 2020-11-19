@@ -40,7 +40,7 @@
 module psb_indx_map_mod
   use psb_const_mod
   use psb_desc_const_mod
-
+  use psi_penv_mod, only : psb_ctxt_type
   !
   !> \namespace  psb_base_mod  \class  psb_indx_map
   !! \brief Object to handle the mapping between global and local indices.
@@ -106,19 +106,19 @@ module psb_indx_map_mod
   !!
   type      :: psb_indx_map
     !> State of the map 
-    integer(psb_ipk_) :: state          = psb_desc_null_    
+    integer(psb_ipk_)   :: state        = psb_desc_null_    
     !> Communication context
-    integer(psb_ipk_) :: ictxt          = -1
+    type(psb_ctxt_type) :: ctxt        
     !> MPI communicator
-    integer(psb_mpk_) :: mpic           = -1
+    integer(psb_mpk_)   :: mpic         = -1
     !> Number of global rows
-    integer(psb_lpk_) :: global_rows    = -1
+    integer(psb_lpk_)   :: global_rows  = -1
     !> Number of global columns
-    integer(psb_lpk_) :: global_cols    = -1
+    integer(psb_lpk_)   :: global_cols  = -1
     !> Number of local rows
-    integer(psb_ipk_) :: local_rows     = -1
+    integer(psb_ipk_)   :: local_rows   = -1
     !> Number of local columns
-    integer(psb_ipk_) :: local_cols     = -1
+    integer(psb_ipk_)   :: local_cols   = -1
     !> A pointer to the user-defined parts subroutine
     procedure(psb_parts), nopass, pointer  :: parts => null()
     !> The global vector assigning indices to processes, temp copy
@@ -224,6 +224,7 @@ module psb_indx_map_mod
     generic, public          :: qry_halo_owner => qry_halo_owner_s, qry_halo_owner_v
     
     procedure, pass(idxmap)  :: fnd_owner => psi_indx_map_fnd_owner
+    procedure, pass(idxmap)  :: init_null => base_init_null 
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
     generic, public          :: init      => init_vl
 
@@ -242,7 +243,7 @@ module psb_indx_map_mod
        & base_ll2gs1, base_ll2gs2, base_ll2gv1, base_ll2gv2,&
        & base_lg2ls1, base_lg2ls2, base_lg2lv1, base_lg2lv2,&
        & base_lg2ls1_ins, base_lg2ls2_ins, base_lg2lv1_ins,&
-       & base_lg2lv2_ins, base_init_vl, base_is_null,&
+       & base_lg2lv2_ins, base_init_vl, base_is_null, base_init_null, &
        & base_row_extendable, base_clone, base_cpy, base_reinit, &
        & base_set_halo_owner, base_get_halo_owner, &
        & base_qry_halo_owner_s, base_qry_halo_owner_v,&
@@ -334,19 +335,21 @@ module psb_indx_map_mod
   integer, parameter :: psi_symm_flag_norv_ = 0
   integer, parameter :: psi_symm_flag_inrv_ = 1
   interface psi_symm_dep_list
-    subroutine psi_symm_dep_list_inrv(rvsz,adj,ictxt,info)
-      import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_
+    subroutine psi_symm_dep_list_inrv(rvsz,adj,ctxt,info)
+      import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_, &
+           & psb_ctxt_type
       implicit none 
       integer(psb_mpk_), intent(inout)   :: rvsz(0:)
       integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-      integer(psb_ipk_), intent(in)      :: ictxt
+      type(psb_ctxt_type), intent(in)      :: ctxt
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_symm_dep_list_inrv
-    subroutine psi_symm_dep_list_norv(adj,ictxt,info)
-      import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_
+    subroutine psi_symm_dep_list_norv(adj,ctxt,info)
+      import :: psb_indx_map, psb_ipk_, psb_lpk_, psb_mpk_, &
+           & psb_ctxt_type
       implicit none 
       integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
-      integer(psb_ipk_), intent(in)      :: ictxt
+      type(psb_ctxt_type), intent(in)      :: ctxt
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_symm_dep_list_norv    
   end interface psi_symm_dep_list
@@ -487,9 +490,9 @@ contains
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    type(psb_ctxt_type) :: val
 
-    val = idxmap%ictxt
+    val = idxmap%ctxt
 
   end function base_get_ctxt
 
@@ -515,9 +518,9 @@ contains
   subroutine base_set_ctxt(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: val
+    type(psb_ctxt_type), intent(in)  :: val
 
-    idxmap%ictxt = val
+    idxmap%ctxt = val
   end subroutine base_set_ctxt
 
   subroutine base_set_gri(idxmap,val)
@@ -1318,7 +1321,7 @@ contains
 
     ! almost nothing to be done here
     idxmap%state          = -1 
-    idxmap%ictxt          = -1
+    if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
     idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
@@ -1334,7 +1337,7 @@ contains
     class(psb_indx_map), intent(inout) :: idxmap
 
     idxmap%state          = psb_desc_null_
-    idxmap%ictxt          = -1
+    if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
     idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
@@ -1343,12 +1346,23 @@ contains
 
   end subroutine base_set_null
 
-  subroutine base_init_vl(idxmap,ictxt,vl,info)
+  subroutine base_init_null(idxmap,ctxt,info)
+    class(psb_indx_map), intent(inout) :: idxmap
+    type(psb_ctxt_type), intent(in)  :: ctxt
+    integer(psb_ipk_), intent(out) :: info
+
+    call idxmap%set_null()
+    idxmap%ctxt = ctxt
+    info = 0
+    return
+  end subroutine base_init_null
+    
+  subroutine base_init_vl(idxmap,ctxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
@@ -1412,7 +1426,7 @@ contains
     call psb_get_erraction(err_act)
 
     outmap%state       = idxmap%state      
-    outmap%ictxt       = idxmap%ictxt      
+    outmap%ctxt        = idxmap%ctxt      
     outmap%mpic        = idxmap%mpic       
     outmap%global_rows = idxmap%global_rows
     outmap%global_cols = idxmap%global_cols
@@ -1473,7 +1487,7 @@ contains
     integer(psb_ipk_) :: me, np
     integer(psb_ipk_) :: i, j, nr, nc, nh
 
-    call psb_info(idxmap%ictxt,me,np)
+    call psb_info(idxmap%ctxt,me,np)
     ! The idea here is to store only the halo part
     nr = idxmap%local_rows
     nc = idxmap%local_cols

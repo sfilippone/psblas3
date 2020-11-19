@@ -81,11 +81,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
        & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
   integer(psb_mpk_) :: prc, p2ptag, iret
-  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
        & last_ih, last_j, nidx, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np,me
   logical, parameter  :: gettime=.true., debug=.false.
   integer(psb_mpk_)   :: xchg_alg 
   logical, parameter  :: do_timings=.false.
@@ -98,12 +99,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   name = 'psi_adjcncy_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = idxmap%get_ctxt()
+  ctxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt = ictxt 
+
   if ((do_timings).and.(idx_phase1==-1))       &
        & idx_phase1 = psb_get_timer_idx("ADJ_FND_OWN: phase1 ")
   if ((do_timings).and.(idx_phase2==-1))       &
@@ -118,7 +119,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
        & idx_phase13 = psb_get_timer_idx("ADJ_FND_OWN: phase13")
 
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (np == -1) then
     info = psb_err_context_error_
@@ -279,7 +280,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     do i = 0, np-1
       if (rvsz(i)>0) then
         ! write(0,*) me, ' First receive from ',i,rvsz(i)
-        prc = psb_get_mpi_rank(ictxt,i)        
+        prc = psb_get_mpi_rank(ctxt,i)        
         p2ptag = psb_long_swap_tag
         !write(0,*) me, ' Posting first receive from ',i,rvsz(i),prc           
         call mpi_irecv(rmtidx(hidx(i)+1),rvsz(i),&
@@ -291,7 +292,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     if (do_timings) call psb_tic(idx_phase12)    
     do j=1, nadj
       if (nidx > 0) then
-        prc = psb_get_mpi_rank(ictxt,adj(j))        
+        prc = psb_get_mpi_rank(ctxt,adj(j))        
         p2ptag = psb_long_swap_tag
         !write(0,*) me, ' First send to ',adj(j),nidx, prc
         call mpi_send(idx,nidx,&
@@ -323,7 +324,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     do j=1, nadj
       !write(0,*) me, ' First send to ',adj(j),nidx
       if (nidx > 0) then
-        prc = psb_get_mpi_rank(ictxt,adj(j))        
+        prc = psb_get_mpi_rank(ctxt,adj(j))        
         p2ptag = psb_int_swap_tag
         !write(0,*) me, ' Posting second receive from ',adj(j),nidx, prc
         call mpi_irecv(lclidx((j-1)*nidx+1),nidx, &
@@ -337,7 +338,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     do i = 0, np-1
       if (rvsz(i)>0) then
-        prc = psb_get_mpi_rank(ictxt,i)        
+        prc = psb_get_mpi_rank(ctxt,i)        
         p2ptag = psb_int_swap_tag
         !write(0,*) me, ' Second send to ',i,rvsz(i), prc
         call mpi_send(tproc(hidx(i)+1),rvsz(i),&
@@ -388,12 +389,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     end if
     do j=1, nadj
       !write(0,*) me, ' First send to ',adj(j),nidx
-      if (nidx > 0) call psb_snd(ictxt,idx(1:nidx),adj(j))
+      if (nidx > 0) call psb_snd(ctxt,idx(1:nidx),adj(j))
     end do
     do i = 0, np-1
       if (rvsz(i)>0) then
         ! write(0,*) me, ' First receive from ',i,rvsz(i)           
-        call psb_rcv(ictxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
+        call psb_rcv(ctxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
       end if
     end do
 
@@ -412,7 +413,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     do i = 0, np-1
       if (rvsz(i)>0) then
         !write(0,*) me, ' Second send to ',i,rvsz(i)
-        call psb_snd(ictxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
+        call psb_snd(ctxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
       end if
     end do
     !
@@ -421,7 +422,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     do j = 1, nadj
       !write(0,*) me, ' Second receive from ',adj(j), nidx          
-      if (nidx > 0) call psb_rcv(ictxt,tproc(1:nidx),adj(j))
+      if (nidx > 0) call psb_rcv(ctxt,tproc(1:nidx),adj(j))
       iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
     end do
   case default 
@@ -433,7 +434,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

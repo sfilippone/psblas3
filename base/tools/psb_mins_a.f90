@@ -68,7 +68,8 @@ subroutine psb_minsvi(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt,np, me, dupl_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -86,9 +87,9 @@ subroutine psb_minsvi(m, irw, val, x, desc_a, info, dupl,local)
     return
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -169,7 +170,7 @@ subroutine psb_minsvi(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -248,7 +249,8 @@ subroutine psb_minsi(m, irw, val, x, desc_a, info, dupl,local)
   !locals.....
   integer(psb_ipk_) :: i,loc_row,j,n, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt,np,me,dupl_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)   :: name
@@ -266,9 +268,9 @@ subroutine psb_minsi(m, irw, val, x, desc_a, info, dupl,local)
     return
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -359,7 +361,7 @@ subroutine psb_minsi(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

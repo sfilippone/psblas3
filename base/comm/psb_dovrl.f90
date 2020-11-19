@@ -75,7 +75,8 @@ subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, k, iix, jjx, &
        & nrow, ncol, ldx, liwork, data_, update_, mode_
   integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_dpk_),pointer :: iwork(:)
@@ -90,10 +91,10 @@ subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -175,7 +176,7 @@ subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psb_dovrl_vect
@@ -224,7 +225,8 @@ subroutine  psb_dovrl_multivect(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, k, iix, jjx, &
        & nrow, ncol, ldx, liwork, data_, update_, mode_
   integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_dpk_),pointer :: iwork(:)
@@ -239,10 +241,10 @@ subroutine  psb_dovrl_multivect(x,desc_a,info,work,update,mode)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -326,7 +328,7 @@ subroutine  psb_dovrl_multivect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
   
   return
 end subroutine psb_dovrl_multivect

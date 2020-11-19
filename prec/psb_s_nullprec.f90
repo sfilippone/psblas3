@@ -170,7 +170,8 @@ contains
     character(len=20)  :: name='s_null_precset'
     character(len=32) :: dprefix, frmtv
     integer(psb_ipk_) :: ni
-    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: iout_, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -187,8 +188,8 @@ contains
       root_ = psb_root_
     end if
 
-    ictxt = prec%ictxt
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     if (root_ == -1) root_ = iam
 
 
@@ -212,7 +213,8 @@ contains
     class(psb_s_null_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(out)          :: info
     character(len=*), intent(in), optional  :: prefix,head
-    integer(psb_ipk_) :: iout, iam, np, ictxt, lname
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: iout, iam, np, lname
     logical :: isopen
     character(len=80)  :: prefix_
     character(len=120) :: fname ! len should be at least 20 more than
@@ -220,8 +222,8 @@ contains
     !  len of prefix_ 
     
     info = 0
-    ictxt = prec%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%get_ctxt()
+    call psb_info(ctxt,iam,np)
     
     if (present(prefix)) then 
       prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))

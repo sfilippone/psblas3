@@ -74,27 +74,27 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   integer(psb_ipk_), allocatable :: tproc(:), lclidx(:)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
        & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
-  integer(psb_mpk_) :: icomm, minfo, iictxt,nv
+  integer(psb_mpk_) :: icomm, minfo, nv
   integer(psb_ipk_) :: i,n_row,n_col,err_act,gsz
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me, nresp
-  logical, parameter :: use_psi_adj=.true.
-  real(psb_dpk_)     :: t0, t1, t2, t3, t4, tamx, tidx
-  character(len=20)  :: name
-  logical            :: samesize_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np,me, nresp
+  logical, parameter  :: use_psi_adj=.true.
+  real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
+  character(len=20)   :: name
+  logical             :: samesize_
 
   info = psb_success_
   name = 'psi_a2a_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = idxmap%get_ctxt()
+  ctxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt = ictxt 
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (np == -1) then
     info = psb_err_context_error_
@@ -200,7 +200,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

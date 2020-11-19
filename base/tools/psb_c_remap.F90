@@ -36,7 +36,8 @@
 !    desc_in  - type(psb_desc_type).       The communication descriptor to be cloned.
 !    desc_out - type(psb_desc_type).       The output communication descriptor.
 !    info     - integer.                       Return code.
-subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_out, info)
+subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
+     & desc_out, a_out, info)
 
   use psb_base_mod, psb_protect_name => psb_c_remap
 
@@ -48,13 +49,14 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
   type(psb_cspmat_type), intent(out)   :: a_out
   type(psb_desc_type), intent(out)     :: desc_out
   integer(psb_ipk_), intent(out)       :: ipd 
-  integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:)
+  integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:), naggr(:)
   integer(psb_ipk_), intent(out)       :: info
 
 
   ! locals
-  integer(psb_ipk_) :: np, me, ictxt, err_act
-  integer(psb_ipk_) :: rnp, rme, newctxt
+  type(psb_ctxt_type) :: ctxt, newctxt
+  integer(psb_ipk_) :: np, me, err_act
+  integer(psb_ipk_) :: rnp, rme
   integer(psb_ipk_) :: ipdest, id1, id2, imd, i, nsrc
   integer(psb_ipk_), allocatable :: newnl(:), nzsrc(:), ids(:) 
   type(psb_lc_coo_sparse_mat) :: acoo_snd, acoo_rcv
@@ -69,10 +71,10 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
-  ictxt = desc_in%get_context()
+  ctxt = desc_in%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Entered'
   if (np == -1) then
@@ -81,7 +83,7 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
     goto 9999
   endif
 
-  write(0,*) ' Remapping from ',np,' onto ', np_remap
+!!$  write(0,*) ' Remapping from ',np,' onto ', np_remap
 
   if (desc_in%get_fmt() == 'BLOCK') then
     !
@@ -95,21 +97,21 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
         do ipdest=1,np_remap -1
           ids(ipdest) = ids(ipdest-1) + np/np_remap
         end do
-        write(0,*) ' IDS ',ids(:) 
+!!$        write(0,*) ' IDS ',ids(:) 
       else
         do ipdest = 0, np_remap-1
           ids(ipdest) = ipdest
         end do
       end if
-      call psb_init(newctxt,np=np_remap,basectxt=ictxt,ids=ids)
+      call psb_init(newctxt,np=np_remap,basectxt=ctxt,ids=ids)
     else
-      call psb_init(newctxt,np=np_remap,basectxt=ictxt)
+      call psb_init(newctxt,np=np_remap,basectxt=ctxt)
     end if
 
     call psb_info(newctxt,rme,rnp)
-    write(0,*) 'Old context: ',me,np,' New context: ',rme,rnp
-    call psb_bcast(ictxt,rnp)
-    allocate(newnl(rnp),stat=info)
+!!$    write(0,*) 'Old context: ',me,np,' New context: ',rme,rnp
+    call psb_bcast(ctxt,rnp)
+    allocate(newnl(rnp),naggr(np),stat=info)
     if (info /= 0) then
       info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
@@ -121,6 +123,7 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
       call psb_errpush(info,name)
       goto 9999
     end if
+    naggr = 0
 
     !
     ! Compute destination for my data.
@@ -141,8 +144,8 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
     else
       ipd = ipdest
     end if
-    write(0,*) ' Sending my data from ',me,' to ', &
-         & ipd, 'out of ',rnp,rnp-1
+!!$    write(0,*) ' Sending my data from ',me,' to ', &
+!!$         & ipd, 'out of ',rnp,rnp-1
 
     !
     ! Compute local rows for all new
@@ -150,7 +153,7 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
     ! 
     newnl = 0
     newnl(ipdest+1) = desc_in%get_local_rows()    
-    call psb_sum(ictxt,newnl)
+    call psb_sum(ctxt,newnl)
 
     if (rme>=0) then
       ! 
@@ -160,13 +163,13 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
         isrc = [ (i, i=  imd*id1+((rme-imd))*id2,&
              & min(imd*id1+(rme-imd)*id2+id2-1,np-1) ) ]            
       end if
-      write(0,*) me,rme,imd,' ISRC: ',isrc(:)
+!!$      write(0,*) me,rme,imd,' ISRC: ',isrc(:)
       nsrc = size(isrc)
-      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
-           & ' out ',desc_out%get_local_rows(),desc_out%get_global_rows()
+!!$      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
+!!$           & ' out ',desc_out%get_local_rows(),desc_out%get_global_rows()
     else 
-      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
-           & ' out ',0,0
+!!$      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
+!!$           & ' out ',0,0
     end if
   else
     write(0,*) 'Right now only BLOCK on input '
@@ -184,15 +187,15 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
     integer(psb_ipk_) :: nrl, ncl, nzl, nzp
     call a_in%cp_to(acoo_snd)
     nzsnd = acoo_snd%get_nzeros()
-    call psb_snd(ictxt,nzsnd,ipd)
-    call psb_snd(ictxt,desc_in%get_local_rows(),ipd)
+    call psb_snd(ctxt,nzsnd,ipd)
+    call psb_snd(ctxt,desc_in%get_local_rows(),ipd)
     ! Convert to global numbering
     call psb_loc_to_glob(acoo_snd%ia(1:nzsnd),desc_in,info)
     call psb_loc_to_glob(acoo_snd%ja(1:nzsnd),desc_in,info)
 
-    call psb_snd(ictxt,acoo_snd%ia(1:nzsnd),ipd)
-    call psb_snd(ictxt,acoo_snd%ja(1:nzsnd),ipd)
-    call psb_snd(ictxt,acoo_snd%val(1:nzsnd),ipd)
+    call psb_snd(ctxt,acoo_snd%ia(1:nzsnd),ipd)
+    call psb_snd(ctxt,acoo_snd%ja(1:nzsnd),ipd)
+    call psb_snd(ctxt,acoo_snd%val(1:nzsnd),ipd)
 
     if (rme>=0) then
       ! prepare to receive
@@ -200,24 +203,24 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
       nrsrc = isrc
       nzl = 0
       do ip=1, nsrc
-        call psb_rcv(ictxt,nzsrc(ip),isrc(ip))
-        call psb_rcv(ictxt,nrsrc(ip),isrc(ip))
+        call psb_rcv(ctxt,nzsrc(ip),isrc(ip))
+        call psb_rcv(ctxt,nrsrc(ip),isrc(ip))
         nzl = nzl + nzsrc(ip)
       end do
-      write(0,*) rme,' Check on NR:',newnl(rme+1),sum(nrsrc)
+!!$      write(0,*) rme,' Check on NR:',newnl(rme+1),sum(nrsrc)
       call acoo_rcv%allocate(newnl(rme+1),newnl(rme+1),nzl)
       nrl = acoo_rcv%get_nrows()
       ncl = acoo_rcv%get_ncols()
       nzp = 0
       do ip=1, nsrc
-        call psb_rcv(ictxt,acoo_rcv%ia(nzp+1:nzp+nzsrc(ip)),isrc(ip))
-        call psb_rcv(ictxt,acoo_rcv%ja(nzp+1:nzp+nzsrc(ip)),isrc(ip))
-        call psb_rcv(ictxt,acoo_rcv%val(nzp+1:nzp+nzsrc(ip)),isrc(ip))
+        call psb_rcv(ctxt,acoo_rcv%ia(nzp+1:nzp+nzsrc(ip)),isrc(ip))
+        call psb_rcv(ctxt,acoo_rcv%ja(nzp+1:nzp+nzsrc(ip)),isrc(ip))
+        call psb_rcv(ctxt,acoo_rcv%val(nzp+1:nzp+nzsrc(ip)),isrc(ip))
         nzp = nzp + nzsrc(ip)
       end do
       call acoo_rcv%set_nzeros(nzp)
-      write(0,*) rme,' Collected: ',&
-           & acoo_rcv%get_nrows(),acoo_rcv%get_ncols(),acoo_rcv%get_nzeros()
+!!$      write(0,*) rme,' Collected: ',&
+!!$           & acoo_rcv%get_nrows(),acoo_rcv%get_ncols(),acoo_rcv%get_nzeros()
 
       !
       !  New descriptor
@@ -231,19 +234,21 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, desc_out, ipd, isrc, nrsrc, a_ou
       call psb_cdasb(desc_out,info)
       call psb_spasb(a_out,desc_out,info)
 
-      write(0,*) rme,' Regenerated: ',&
-           & desc_out%get_local_rows(), desc_out%get_local_cols(),&
-           & a_out%get_nrows(),a_out%get_ncols(),a_out%get_nzeros()
-      
-!!$      call desc_out%free(info)
-!!$      call psb_exit(newctxt,close=.false.)
+!!$      write(0,*) rme,' Regenerated: ',&
+!!$           & desc_out%get_local_rows(), desc_out%get_local_cols(),&
+!!$           & a_out%get_nrows(),a_out%get_ncols(),a_out%get_nzeros()
+      naggr(me+1) = desc_out%get_local_rows()
+    else
+      naggr(me+1) = 0
     end if
+    call psb_sum(ctxt,naggr)
+    
   end block
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return  
 

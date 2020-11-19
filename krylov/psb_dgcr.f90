@@ -133,7 +133,8 @@ subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: n_col, naux, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: np, me, ictxt
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me
   integer(psb_ipk_) ::  i, j, it, itx, istop_, itmax_, itrace_, nl, m, nrst
   real(psb_dpk_) :: hjj
   real(psb_dpk_), allocatable, target   :: aux(:)
@@ -146,9 +147,9 @@ subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (.not.allocated(b%v)) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)

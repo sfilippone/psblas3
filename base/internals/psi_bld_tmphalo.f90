@@ -62,20 +62,21 @@ subroutine psi_bld_tmphalo(desc,info)
 
   integer(psb_ipk_) ::  i,j,np,me,lhalo,nhalo,&
        & n_col, err_act,  key, ih, nh, idx, nk,icomm
-  integer(psb_ipk_) :: ictxt,n_row
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: n_row
   character(len=20)   :: name,ch_err
 
   info = psb_success_
   name = 'psi_bld_tmphalo'
   call psb_erractionsave(err_act)
 
-  ictxt = desc%get_context()
+  ctxt = desc%get_context()
   icomm = desc%get_mpic()
   n_row = desc%get_local_rows()
   n_col = desc%get_local_cols()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -144,7 +145,7 @@ subroutine psi_bld_tmphalo(desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 

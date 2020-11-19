@@ -67,7 +67,8 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k
   logical :: keepnum_, keeploc_
-  integer(psb_mpk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_) :: np, me
   integer(psb_mpk_) :: icomm, minfo, ndx, root_
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_lpk_), allocatable :: locia(:), locja(:), glbia(:), glbja(:)
@@ -82,9 +83,9 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (present(keepnum)) then 
     keepnum_ = keepnum
@@ -128,7 +129,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     call psb_loc_to_glob(loc_coo%ja(1:nzl),locja(1:nzl),desc_a,info,iact='I')
     nzbr(:) = 0
     nzbr(me+1) = nzl
-    call psb_sum(ictxt,nzbr(1:np))
+    call psb_sum(ctxt,nzbr(1:np))
     nzg = sum(nzbr)
     if (nzg <0) then
       info = psb_err_mpi_int_ovflw_
@@ -216,7 +217,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ione*ictxt,err_act)
+  call psb_error_handler(ctxt,err_act)
 
   return
  
@@ -249,7 +250,8 @@ subroutine  psb_ldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
-  integer(psb_mpk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me
   integer(psb_mpk_) :: icomm, minfo, ndx, root_
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_lpk_), allocatable :: lnzbr(:)
@@ -264,9 +266,9 @@ subroutine  psb_ldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (present(keepnum)) then 
     keepnum_ = keepnum
@@ -308,7 +310,7 @@ subroutine  psb_ldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
     call psb_loc_to_glob(loc_coo%ja(1:nzl),desc_a,info,iact='I')
     nzbr(:) = 0
     nzbr(me+1) = nzl
-    call psb_sum(ictxt,nzbr(1:np))
+    call psb_sum(ctxt,nzbr(1:np))
     lnzbr = nzbr
     nzg = sum(nzbr)
     if ((nzg < 0).or.(nzg /= sum(lnzbr))) then
@@ -388,7 +390,7 @@ subroutine  psb_ldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ione*ictxt,err_act)
+  call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -420,7 +422,8 @@ subroutine  psb_ldldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_lpk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
-  integer(psb_mpk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me
   integer(psb_mpk_) :: icomm, minfo, ndx, root_
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_lpk_), allocatable :: lnzbr(:)
@@ -435,9 +438,9 @@ subroutine  psb_ldldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (present(keepnum)) then 
     keepnum_ = keepnum
@@ -479,7 +482,7 @@ subroutine  psb_ldldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     call psb_loc_to_glob(loc_coo%ja(1:nzl),desc_a,info,iact='I')
     nzbr(:) = 0
     nzbr(me+1) = nzl
-    call psb_sum(ictxt,nzbr(1:np))
+    call psb_sum(ctxt,nzbr(1:np))
     lnzbr = nzbr
     nzg = sum(nzbr)
     if ((nzg < 0).or.(nzg /= sum(lnzbr))) then
@@ -554,7 +557,7 @@ subroutine  psb_ldldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ione*ictxt,err_act)
+  call psb_error_handler(ctxt,err_act)
 
   return
  

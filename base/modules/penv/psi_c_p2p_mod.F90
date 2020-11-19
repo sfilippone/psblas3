@@ -32,22 +32,18 @@
 
 module psi_c_p2p_mod
   use psi_penv_mod
-  use psi_comm_buffers_mod
 
   interface psb_snd
-    module procedure psb_csnds, psb_csndv, psb_csndm, &
-         & psb_csnds_ec, psb_csndv_ec, psb_csndm_ec 
+    module procedure psb_csnds, psb_csndv, psb_csndm
   end interface
 
   interface psb_rcv
-    module procedure psb_crcvs, psb_crcvv, psb_crcvm, &
-         & psb_crcvs_ec, psb_crcvv_ec, psb_crcvm_ec 
+    module procedure psb_crcvs, psb_crcvv, psb_crcvm
   end interface
 
 contains
 
-  subroutine psb_csnds(ictxt,dat,dst)
-    use psi_comm_buffers_mod 
+  subroutine psb_csnds(ctxt,dat,dst)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -55,7 +51,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     complex(psb_spk_), intent(in)  :: dat
     integer(psb_mpk_), intent(in)  :: dst
     complex(psb_spk_), allocatable :: dat_(:)
@@ -65,12 +61,11 @@ contains
 #else
     allocate(dat_(1), stat=info)
     dat_(1) = dat
-    call psi_snd(ictxt,psb_complex_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_complex_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_csnds
 
-  subroutine psb_csndv(ictxt,dat,dst)
-    use psi_comm_buffers_mod 
+  subroutine psb_csndv(ctxt,dat,dst)
 
 #ifdef MPI_MOD
     use mpi
@@ -79,23 +74,22 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     complex(psb_spk_), intent(in)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: dst
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info
 
 #if defined(SERIAL_MPI) 
 #else
     allocate(dat_(size(dat)), stat=info)
     dat_(:) = dat(:)
-    call psi_snd(ictxt,psb_complex_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_complex_tag,dst,dat_,psb_mesg_queue)
 #endif    
 
   end subroutine psb_csndv
 
-  subroutine psb_csndm(ictxt,dat,dst,m)
-    use psi_comm_buffers_mod 
+  subroutine psb_csndm(ctxt,dat,dst,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -104,13 +98,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     complex(psb_spk_), intent(in)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     complex(psb_spk_), allocatable :: dat_(:)
     integer(psb_ipk_) :: i,j,k,m_,n_
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info
 
 #if defined(SERIAL_MPI) 
 #else
@@ -128,12 +122,11 @@ contains
         k = k + 1
       end do
     end do
-    call psi_snd(ictxt,psb_complex_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_complex_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_csndm
 
-  subroutine psb_crcvs(ictxt,dat,src)
-    use psi_comm_buffers_mod 
+  subroutine psb_crcvs(ctxt,dat,src)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -141,21 +134,21 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     complex(psb_spk_), intent(out)  :: dat
     integer(psb_mpk_), intent(in)  :: src
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_c_spk_,src,psb_complex_tag,ictxt,status,info)
+    icomm = psb_get_mpi_comm(ctxt)
+    call mpi_recv(dat,1,psb_mpi_c_spk_,src,psb_complex_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_crcvs
 
-  subroutine psb_crcvv(ictxt,dat,src)
-    use psi_comm_buffers_mod 
+  subroutine psb_crcvv(ctxt,dat,src)
 
 #ifdef MPI_MOD
     use mpi
@@ -164,22 +157,22 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     complex(psb_spk_), intent(out)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: src
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,psb_complex_tag,ictxt,status,info)
+    icomm = psb_get_mpi_comm(ctxt)
+    call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,psb_complex_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
   end subroutine psb_crcvv
 
-  subroutine psb_crcvm(ictxt,dat,src,m)
-    use psi_comm_buffers_mod 
+  subroutine psb_crcvm(ctxt,dat,src,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -188,14 +181,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     complex(psb_spk_), intent(out)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
     complex(psb_spk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_mpk_) :: i,j,k
-    integer(psb_mpk_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size), icomm
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -205,11 +198,13 @@ contains
       n_ = size(dat,2)
       call mpi_type_vector(n_,m_,ld,psb_mpi_c_spk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
+      icomm = psb_get_mpi_comm(ctxt)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
-           & psb_complex_tag,ictxt,status,info)
+           & psb_complex_tag,icomm,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,psb_complex_tag,ictxt,status,info)
+      icomm = psb_get_mpi_comm(ctxt) 
+      call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,psb_complex_tag,icomm,status,info)
     end if
     if (info /= mpi_success) then 
       write(psb_err_unit,*) 'Error in psb_recv', info
@@ -217,91 +212,5 @@ contains
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_crcvm
-
-
-  subroutine psb_csnds_ec(ictxt,dat,dst)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    complex(psb_spk_), intent(in)  :: dat
-    integer(psb_epk_), intent(in)  :: dst
-    
-    integer(psb_mpk_) :: iictxt, idst 
-
-    iictxt = ictxt
-    idst   = dst 
-    call psb_snd(iictxt, dat, idst)
-
-  end subroutine psb_csnds_ec
-
-  subroutine psb_csndv_ec(ictxt,dat,dst)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    complex(psb_spk_), intent(in)  :: dat(:)
-    integer(psb_epk_), intent(in)  :: dst
-    
-    integer(psb_mpk_) :: iictxt, idst 
-
-    iictxt = ictxt
-    idst   = dst 
-    call psb_snd(iictxt, dat, idst)
-
-  end subroutine psb_csndv_ec
-
-  subroutine psb_csndm_ec(ictxt,dat,dst,m)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    complex(psb_spk_), intent(in)  :: dat(:,:)
-    integer(psb_epk_), intent(in)  :: dst
-    
-    integer(psb_mpk_) :: iictxt, idst 
-
-    iictxt = ictxt
-    idst   = dst 
-    call psb_snd(iictxt, dat, idst)
-
-  end subroutine psb_csndm_ec
-
-  subroutine psb_crcvs_ec(ictxt,dat,src)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    complex(psb_spk_), intent(out) :: dat
-    integer(psb_epk_), intent(in)  :: src
-    
-    integer(psb_mpk_) :: iictxt, isrc 
-
-    iictxt = ictxt
-    isrc   = src 
-    call psb_rcv(iictxt, dat, isrc)
-
-  end subroutine psb_crcvs_ec
-
-  subroutine psb_crcvv_ec(ictxt,dat,src)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    complex(psb_spk_), intent(out) :: dat(:)
-    integer(psb_epk_), intent(in)  :: src
-    
-    integer(psb_mpk_) :: iictxt, isrc 
-
-    iictxt = ictxt
-    isrc   = src 
-    call psb_rcv(iictxt, dat, isrc)
-
-  end subroutine psb_crcvv_ec
-
-  subroutine psb_crcvm_ec(ictxt,dat,src,m)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    complex(psb_spk_), intent(out) :: dat(:,:)
-    integer(psb_epk_), intent(in)  :: src
-    
-    integer(psb_mpk_) :: iictxt, isrc 
-
-    iictxt = ictxt
-    isrc   = src 
-    call psb_rcv(iictxt, dat, isrc)
-
-  end subroutine psb_crcvm_ec
-
 
 end module psi_c_p2p_mod

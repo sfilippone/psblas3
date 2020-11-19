@@ -50,8 +50,9 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
 
 
   !locals
-  integer(psb_ipk_) :: np, me, ictxt, err_act
-  integer(psb_ipk_) :: newctxt, rnp, rme
+  type(psb_ctxt_type) :: ctxt, newctxt 
+  integer(psb_ipk_) :: np, me, err_act
+  integer(psb_ipk_) :: rnp, rme
   integer(psb_ipk_) :: ipdest, id1, id2, imd, i
   integer(psb_ipk_), allocatable :: newnl(:)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -65,10 +66,10 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
-  ictxt = desc_in%get_context()
+  ctxt = desc_in%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Entered'
   if (np == -1) then
@@ -81,10 +82,10 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
  
   if (desc_in%get_fmt() == 'BLOCK') then
     ! OK
-    call psb_init(newctxt,np=np_remap,basectxt=ictxt)
+    call psb_init(newctxt,np=np_remap,basectxt=ctxt)
     call psb_info(newctxt,rme,rnp)
     write(0,*) 'Old context: ',me,np,' New context: ',rme,rnp
-    call psb_bcast(ictxt,rnp)
+    call psb_bcast(ctxt,rnp)
     allocate(newnl(rnp),stat=info)
     if (info /= 0) then
       info = psb_err_alloc_dealloc_
@@ -110,7 +111,7 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
          & ipdest, 'out of ',rnp,rnp-1
     newnl = 0
     newnl(ipdest+1) = desc_in%get_local_rows()
-    call psb_sum(ictxt,newnl)
+    call psb_sum(ctxt,newnl)
     if (rme>=0) then
       call psb_cdall(newctxt,desc_out,info,nl=newnl(rme+1))
       call psb_cdasb(desc_out,info)
@@ -134,7 +135,7 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return  
   

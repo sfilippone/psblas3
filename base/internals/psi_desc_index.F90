@@ -121,7 +121,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   !    ....local scalars...        
   integer(psb_ipk_) :: j,me,np,i,proc
   !    ...parameters...
-  integer(psb_ipk_) :: ictxt
+  type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_), parameter  :: no_comm=-1
   !     ...local arrays..
   integer(psb_lpk_),allocatable  :: sndbuf(:), rcvbuf(:)
@@ -149,9 +149,9 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level() 
 
-  ictxt = desc%get_context()
+  ctxt = desc%get_context()
   icomm = desc%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -160,7 +160,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': start'
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
   if ((do_timings).and.(idx_phase1==-1)) &
        & idx_phase1 = psb_get_timer_idx("I_DSC_IDX: phase1   ")
@@ -226,7 +226,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   end if
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': computed sizes ',iszr,iszs
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
 
   ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
@@ -243,7 +243,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': computed allocated workspace ',iszr,iszs
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
   allocate(sndbuf(iszs),rcvbuf(iszr),stat=info)
   if(info /= psb_success_) then
@@ -285,7 +285,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': prepared send buffer '
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
   !
   !   now have to regenerate bsdindx
@@ -316,7 +316,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
       ixp   = 1 
       do i=1, length_dl
         proc = dep_list(i)
-        prcid(ixp) = psb_get_mpi_rank(ictxt,proc)
+        prcid(ixp) = psb_get_mpi_rank(ctxt,proc)
         sz         = rvsz(proc+1)
         if (sz > 0) then
           p2ptag   = psb_long_tag
@@ -330,7 +330,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
       ixp   = 1 
       do i=1, length_dl
         proc       = dep_list(i)
-        prcid(ixp) = psb_get_mpi_rank(ictxt,proc)
+        prcid(ixp) = psb_get_mpi_rank(ctxt,proc)
         sz         = sdsz(proc+1)
         if (sz > 0) then
           p2ptag   = psb_long_tag
@@ -344,7 +344,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
       ixp   = 1 
       do i=1, length_dl
         proc = dep_list(i)
-        prcid(ixp) = psb_get_mpi_rank(ictxt,proc)
+        prcid(ixp) = psb_get_mpi_rank(ctxt,proc)
         sz         = rvsz(proc+1)
         if (sz > 0) then
           call mpi_wait(rvhd(ixp),p2pstat,iret)
@@ -358,7 +358,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
         sz         = sdsz(proc+1)
         idx      = bsdindx(proc+1)
         if (sz > 0) then
-          call psb_snd(ictxt,sndbuf(idx+1:idx+sz), proc)
+          call psb_snd(ctxt,sndbuf(idx+1:idx+sz), proc)
         end if
       end do
 
@@ -367,7 +367,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
         sz         = rvsz(proc+1)
         idx      = brvindx(proc+1)
         if (sz > 0) then
-          call psb_rcv(ictxt,rcvbuf(idx+1:idx+sz),proc)
+          call psb_rcv(ctxt,rcvbuf(idx+1:idx+sz),proc)
         end if
       end do
 
@@ -407,13 +407,13 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   if (do_timings) call psb_toc(idx_phase4)
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': done'
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

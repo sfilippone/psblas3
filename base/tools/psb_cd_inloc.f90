@@ -38,10 +38,10 @@
 ! 
 ! Arguments: 
 !    v       - integer(psb_ipk_), dimension(:).         The array containg the partitioning scheme.
-!    ictxt - integer.                         The communication context.
+!    ctxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
-subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
+subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
@@ -49,11 +49,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  integer(psb_ipk_), intent(in)               :: ictxt
-  integer(psb_lpk_), intent(in)               :: v(:)
-  integer(psb_ipk_), intent(out)              :: info
-  type(psb_desc_type), intent(out)  :: desc
-  logical, intent(in), optional     :: globalcheck,usehash
+  type(psb_ctxt_type), intent(in)  :: ctxt
+  integer(psb_lpk_), intent(in)    :: v(:)
+  integer(psb_ipk_), intent(out)   :: info
+  type(psb_desc_type), intent(out) :: desc
+  logical, intent(in), optional    :: globalcheck,usehash
   integer(psb_ipk_), intent(in), optional     :: idx(:)
 
   !locals
@@ -81,18 +81,18 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': start',np
   if (do_timings) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t0 = psb_wtime()
   end if
   loc_row = size(v)
   m       = maxval(v)
   nrt     = loc_row
-  call psb_sum(ictxt,nrt)
-  call psb_max(ictxt,m)
+  call psb_sum(ctxt,nrt)
+  call psb_max(ctxt,m)
   
   if (present(globalcheck)) then 
     check_ = globalcheck
@@ -126,9 +126,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     exch(1)=m
     exch(2)=n
     exch(3)=psb_cd_get_large_threshold()
-    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:3),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    call psb_bcast(ctxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
       l_err(1)=1
@@ -191,8 +191,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     end do
 
     if (info == psb_success_) then 
-      call psb_amx(ictxt,tmpgidx(:,1))
-      call psb_sum(ictxt,tmpgidx(:,2))
+      call psb_amx(ctxt,tmpgidx(:,1))
+      call psb_sum(ctxt,tmpgidx(:,2))
       novrl   = 0
       npr_ov  = 0
       norphan = 0
@@ -236,7 +236,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
        & write(debug_unit,*) me,' ',trim(name),': After global checks '
 
   if (do_timings) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t1 = psb_wtime()
   end if
 
@@ -276,7 +276,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
 
   call psb_nullify_desc(desc)
   if (do_timings) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t2 = psb_wtime()
   end if
 
@@ -307,7 +307,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
         nov(me) = nov(me) + 1 
       end if
     end do
-    call psb_sum(ictxt,nov)
+    call psb_sum(ctxt,nov)
     nov(1:np) = nov(0:np-1)
     nov(0) = 1
     do i=1, np
@@ -329,7 +329,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
       call psb_errpush(info,name,a_err='overlap count')
       goto 9999
     end if
-    call psb_max(ictxt,ov_idx)
+    call psb_max(ctxt,ov_idx)
     call psb_msort(ov_idx(:,1),ix=ov_idx(:,2),flag=psb_sort_keep_idx_)
 
   end if
@@ -388,7 +388,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     end do
   end if
   if (do_timings) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t3 = psb_wtime()
   end if
   if (debug_size) &
@@ -406,9 +406,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(ctxt,m,info)
   class default 
-    call aa%init(ictxt,vl(1:nlu),info)
+    call aa%init(ctxt,vl(1:nlu),info)
   end select
 
   if (debug_size) &
@@ -416,7 +416,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
 
   
   if (do_timings) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t4 = psb_wtime()
   end if
 
@@ -457,7 +457,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   endif
 
   if (do_timings) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t5 = psb_wtime()
 
     t5 = t5 - t4
@@ -465,11 +465,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
     t3 = t3 - t2
     t2 = t2 - t1
     t1 = t1 - t0
-    call psb_amx(ictxt,t1)
-    call psb_amx(ictxt,t2)
-    call psb_amx(ictxt,t3)
-    call psb_amx(ictxt,t4)
-    call psb_amx(ictxt,t5)
+    call psb_amx(ctxt,t1)
+    call psb_amx(ctxt,t2)
+    call psb_amx(ctxt,t3)
+    call psb_amx(ctxt,t4)
+    call psb_amx(ctxt,t5)
     if (me==0) then
       write(0,*) 'CD_INLOC Timings: '
       write(0,*) '    Phase 1     : ', t1
@@ -485,7 +485,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx,usehash)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

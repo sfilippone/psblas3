@@ -49,7 +49,8 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   integer(psb_ipk_), intent(out)     :: info
 
   !locals
-  integer(psb_ipk_) :: np,me,ictxt, err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -61,10 +62,10 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
-  ictxt = desc_in%get_context()
+  ctxt = desc_in%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Entered'
   if (np == -1) then
@@ -86,7 +87,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

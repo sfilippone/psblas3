@@ -62,7 +62,8 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -73,13 +74,13 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
 
   name = 'psb_cgeasb_v'
 
-  ictxt       = desc_a%get_context()
+  ctxt       = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -117,7 +118,7 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -135,7 +136,8 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me, i, n 
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me, i, n 
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -146,13 +148,13 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
 
   name = 'psb_cgeasb_v'
 
-  ictxt       = desc_a%get_context()
+  ctxt       = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -198,7 +200,7 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -217,7 +219,8 @@ subroutine psb_casb_multivect(x, desc_a, info, mold, scratch,n)
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_
   logical :: scratch_
   
@@ -229,7 +232,7 @@ subroutine psb_casb_multivect(x, desc_a, info, mold, scratch,n)
 
   name = 'psb_cgeasb'
 
-  ictxt       = desc_a%get_context()
+  ctxt       = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -246,7 +249,7 @@ subroutine psb_casb_multivect(x, desc_a, info, mold, scratch,n)
     end if
   endif
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -286,7 +289,7 @@ subroutine psb_casb_multivect(x, desc_a, info, mold, scratch,n)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
