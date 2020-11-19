@@ -200,34 +200,20 @@ subroutine psb_z_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       select case(trans_)
       case('N')
         call psb_spmm(zone,prec%av(psb_l_pr_),x,zzero,wv,desc_data,info,&
-             & trans=trans_, work=aux)
+             & trans=trans_,work=aux,doswap=.false.)
 
-        call wv1%mlt(zone,prec%dv,wv,zzero,info)
-        
-        if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),wv,&
-             & beta,y,desc_data,info,&
-             & trans=trans_, work=aux)
+        if (info == psb_success_) call wv1%mlt(zone,prec%dv,wv,zzero,info)
+        if(info == psb_success_) &
+             & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1,&
+             & beta,y,desc_data,info, trans=trans_, work=aux,doswap=.false.)
 
-      case('T')
-        call psb_spmm(zone,prec%av(psb_u_pr_),x,zzero,wv,desc_data,info,&
-             & trans=trans_, work=aux)
-
-        call wv1%mlt(zone,prec%dv,wv,zzero,info)
-
-        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
-             & beta,y,desc_data,info,&
-             & trans=trans_,work=aux)
-
-      case('C')
-
-        call psb_spmm(zone,prec%av(psb_u_pr_),x,zzero,wv,desc_data,info,&
-             & trans=trans_,work=aux)
-
-        call wv1%mlt(zone,prec%dv,wv,zzero,info,conjgx=trans_)
-
-        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
-             & beta,y,desc_data,info,&
-             & trans=trans_,work=aux)
+       case('T','C')
+         call psb_spmm(zone,prec%av(psb_l_pr_),x,zzero,wv,desc_data,info,&
+              & trans=trans_,work=aux,doswap=.false.)
+         if (info == psb_success_) call wv1%mlt(zone,prec%dv,wv,zzero,info)
+         if (info == psb_success_) &
+              & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1, &
+              & beta,y,desc_data,info,trans=trans_,work=aux,doswap=.false.)
 
       end select
       if (info /= psb_success_) then
@@ -394,19 +380,30 @@ subroutine psb_z_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
 
     select case(trans_)
-    case('N','T')
-      call psb_spmm(zone,prec%av(psb_l_pr_),x,zzero,ww,desc_data,info,&
-           & trans=trans_, work=aux)
-      ww(1:n_row) = ww(1:n_row)*prec%dv%v%v(1:n_row)
-      if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,&
-           & beta,y,desc_data,info, trans=trans_, work=aux)
 
-    case('C')
-      call psb_spmm(zone,prec%av(psb_l_pr_),x,zzero,ww,desc_data,info,&
-           & trans=trans_, work=aux)
-      ww(1:n_row) = ww(1:n_row)*conjg(prec%dv%v%v(1:n_row))
-      if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,&
-           & beta,y,desc_data,info, trans=trans_, work=aux)
+      case('N')
+        call psb_spmm(zone,prec%av(psb_l_pr_),x,zzero,ww,desc_data,info,&
+            & trans=trans_,work=aux,doswap=.false.)
+        ww(1:n_row) = ww(1:n_row) * prec%dv%v%v(1:n_row)
+        if (info == psb_success_) &
+            & call psb_spmm(alpha,prec%av(psb_u_pr_),ww,beta,y,desc_data,info,&
+            & trans=trans_,work=aux,doswap=.false.)
+
+      case('T')
+        call psb_spmm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
+            & trans=trans_,work=aux,doswap=.false.)
+        ww(1:n_row) = ww(1:n_row) * prec%dv%v%v(1:n_row)
+        if (info == psb_success_) &
+            & call psb_spmm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
+            & trans=trans_,work=aux,doswap=.false.)
+
+      case('C')
+        call psb_spmm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
+             & trans=trans_,work=aux,doswap=.false.)
+        ww(1:n_row) = ww(1:n_row) * conjg(prec%dv%v%v(1:n_row))
+        if (info == psb_success_) &
+             & call psb_spmm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
+             & trans=trans_,work=aux,doswap=.false.)
 
     end select
 
@@ -592,6 +589,8 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       prec%iprcparm(psb_f_type_) = psb_f_ilu_n_
     end if
   end if
+  inv_fill = prec%iprcparm(psb_inv_fillin_)
+  if (inv_fill <= 0) inv_fill = m ! If no limit on the fill_in is required we allow everything
   ! Select on the type of factorization to be used
   select case(prec%iprcparm(psb_f_type_))
 

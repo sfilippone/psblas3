@@ -166,6 +166,8 @@ contains
       goto 9999
     end if
 
+    if (nzrmax <= 0) write(psb_out_unit,'("Out nzrmax = ",i0)') nzrmax
+
     select case(alg)
     case (psb_ainv_llk_)
       call psb_csparse_biconjg_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)

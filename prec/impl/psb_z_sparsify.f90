@@ -100,7 +100,6 @@ subroutine psb_z_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
     end do
 
   else
-
     allocate(xw(nzrmax),xwid(nzrmax),indx(nzrmax),stat=info)
     if (info /= psb_success_) then
       return
