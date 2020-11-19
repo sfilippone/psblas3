@@ -224,6 +224,7 @@ module psb_indx_map_mod
     generic, public          :: qry_halo_owner => qry_halo_owner_s, qry_halo_owner_v
     
     procedure, pass(idxmap)  :: fnd_owner => psi_indx_map_fnd_owner
+    procedure, pass(idxmap)  :: init_null => base_init_null 
     procedure, pass(idxmap)  :: init_vl   => base_init_vl
     generic, public          :: init      => init_vl
 
@@ -242,7 +243,7 @@ module psb_indx_map_mod
        & base_ll2gs1, base_ll2gs2, base_ll2gv1, base_ll2gv2,&
        & base_lg2ls1, base_lg2ls2, base_lg2lv1, base_lg2lv2,&
        & base_lg2ls1_ins, base_lg2ls2_ins, base_lg2lv1_ins,&
-       & base_lg2lv2_ins, base_init_vl, base_is_null,&
+       & base_lg2lv2_ins, base_init_vl, base_is_null, base_init_null, &
        & base_row_extendable, base_clone, base_cpy, base_reinit, &
        & base_set_halo_owner, base_get_halo_owner, &
        & base_qry_halo_owner_s, base_qry_halo_owner_v,&
@@ -1345,6 +1346,18 @@ contains
 
   end subroutine base_set_null
 
+  subroutine base_init_null(idxmap,ctxt,info)
+    class(psb_indx_map), intent(inout) :: idxmap
+    type(psb_ctxt_type), intent(in)  :: ctxt
+    integer(psb_lpk_), intent(in)  :: vl(:)
+    integer(psb_ipk_), intent(out) :: info
+
+    call idxmap%set_null()
+    idxmap%ctxt = ctxt
+    info = 0
+    return
+  end subroutine base_init_null
+    
   subroutine base_init_vl(idxmap,ctxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
@@ -1414,7 +1427,7 @@ contains
     call psb_get_erraction(err_act)
 
     outmap%state       = idxmap%state      
-    outmap%ctxt       = idxmap%ctxt      
+    outmap%ctxt        = idxmap%ctxt      
     outmap%mpic        = idxmap%mpic       
     outmap%global_rows = idxmap%global_rows
     outmap%global_cols = idxmap%global_cols
