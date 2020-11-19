@@ -63,7 +63,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_rwclip(nz,ia,ja,val,imin,imax,jmin,jmax)
+subroutine psb_d_rwclip(nz,ia,ja,val,imin,imax,jmin,jmax)
   use psb_base_mod
 
   implicit none
@@ -87,4 +87,4 @@ subroutine amg_d_rwclip(nz,ia,ja,val,imin,imax,jmin,jmax)
     end if
   end do
   nz = j
-end subroutine amg_d_rwclip
+end subroutine psb_d_rwclip

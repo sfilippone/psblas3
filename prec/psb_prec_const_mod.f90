@@ -54,9 +54,11 @@ module psb_prec_const_mod
   ! Entries in rprcparm: ILU(E) epsilon, smoother omega
   integer(psb_ipk_), parameter :: psb_ilu_scale_=7
   integer(psb_ipk_), parameter :: psb_fact_eps_=1
-  integer(psb_ipk_), parameter :: psb_rfpsz=4
+  integer(psb_ipk_), parameter :: psb_rfpsz=8
   ! Factorization types: none, ILU(0), ILU(N), ILU(N,E)
   integer(psb_ipk_), parameter :: psb_f_none_=0,psb_f_ilu_n_=1,psb_f_ilu_k_=2,psb_f_ilu_t_=3
+  ! Approximate Inverse factorization type: AINV
+  integer(psb_ipk_), parameter :: psb_f_ainv_=4
   ! Fields for sparse matrices ensembles:
   integer(psb_ipk_), parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
   integer(psb_ipk_), parameter :: psb_max_avsz=psb_bp_ilu_avsz
@@ -71,6 +73,20 @@ module psb_prec_const_mod
   integer(psb_ipk_), parameter :: psb_ilu_scale_aclsum_  = 4
   integer(psb_ipk_), parameter :: psb_ilu_scale_arcsum_  = 5
 
+  ! Numerical parameters relative to Approximate Inverse Preconditioners
+  integer, parameter   :: psb_inv_fillin_     = 3
+  integer, parameter   :: psb_ainv_alg_       = psb_inv_fillin_ + 1
+  integer, parameter   :: psb_inv_thresh_     = 3
+  integer, parameter   :: psb_ainv_llk_       = psb_inv_thresh_ + 1
+  integer, parameter   :: psb_ainv_s_llk_     = psb_ainv_llk_ + 1
+  integer, parameter   :: psb_ainv_s_ft_llk_  = psb_ainv_s_llk_ + 1
+  integer, parameter   :: psb_ainv_llk_noth_  = psb_ainv_s_ft_llk_  + 1
+  integer, parameter   :: psb_ainv_mlk_       = psb_ainv_llk_noth_  + 1
+  integer, parameter   :: psb_ainv_lmx_       = psb_ainv_mlk_
+#if defined(HAVE_TUMA_SAINV)
+  integer, parameter   :: psb_ainv_s_tuma_    = psb_ainv_lmx_  + 1
+  integer, parameter   :: psb_ainv_l_tuma_    = psb_ainv_s_tuma_  + 1
+#endif
 
 
   interface psb_check_def

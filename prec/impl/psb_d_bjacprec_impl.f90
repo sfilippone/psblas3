@@ -195,6 +195,46 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
         goto 9999
       end if
 
+    case(psb_f_ainv_)
+
+      select case(trans_)
+      case('N')
+        call psb_spmm(done,prec%av(psb_l_pr_),x,dzero,wv,desc_data,info,&
+             & trans=trans_, work=aux)
+
+        call wv1%mlt(done,prec%dv,wv,dzero,info)
+        
+        if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),wv,&
+             & beta,y,desc_data,info,&
+             & trans=trans_, work=aux)
+
+      case('T')
+        call psb_spmm(done,prec%av(psb_u_pr_),x,dzero,wv,desc_data,info,&
+             & trans=trans_, work=aux)
+
+        call wv1%mlt(done,prec%dv,wv,dzero,info)
+
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
+             & beta,y,desc_data,info,&
+             & trans=trans_,work=aux)
+
+      case('C')
+
+        call psb_spmm(done,prec%av(psb_u_pr_),x,dzero,wv,desc_data,info,&
+             & trans=trans_,work=aux)
+
+        call wv1%mlt(done,prec%dv,wv,dzero,info,conjgx=trans_)
+
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
+             & beta,y,desc_data,info,&
+             & trans=trans_,work=aux)
+
+      end select
+      if (info /= psb_success_) then
+        ch_err="psb_spsm"
+        goto 9999
+      end if
+
     case default
       info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='Invalid factorization')
@@ -242,6 +282,7 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
+  type(psb_d_vect_type) :: tx,ty
   integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -346,6 +387,29 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       goto 9999
     end if
 
+  case(psb_f_ainv_)
+    ! Application of approximate inverse preconditioner, just some spmm
+    ! call psb_spmm(alpha, a, x, beta, y,desc_a, info, &
+    ! & trans, work)
+
+
+    select case(trans_)
+    case('N','T')
+      call psb_spmm(done,prec%av(psb_l_pr_),x,dzero,ww,desc_data,info,&
+           & trans=trans_, work=aux)
+      ww(1:n_row) = ww(1:n_row)*prec%dv%v%v(1:n_row)
+      if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,&
+           & beta,y,desc_data,info, trans=trans_, work=aux)
+
+    case('C')
+      call psb_spmm(done,prec%av(psb_l_pr_),x,dzero,ww,desc_data,info,&
+           & trans=trans_, work=aux)
+      ww(1:n_row) = ww(1:n_row)*(prec%dv%v%v(1:n_row))
+      if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,&
+           & beta,y,desc_data,info, trans=trans_, work=aux)
+
+    end select
+
 
   case default
     info = psb_err_internal_error_
@@ -402,9 +466,13 @@ subroutine psb_d_bjac_precinit(prec,info)
   prec%iprcparm(psb_ilu_fill_in_) = 0
   prec%iprcparm(psb_ilu_ialg_)    = psb_ilu_n_
   prec%iprcparm(psb_ilu_scale_)   = psb_ilu_scale_none_
+  prec%iprcparm(psb_inv_fillin_)  = 0
+  prec%iprcparm(psb_ainv_alg_)    = psb_ainv_llk_
+
 
   prec%rprcparm(:)                = 0
   prec%rprcparm(psb_fact_eps_)    = 1E-1_psb_dpk_
+  prec%rprcparm(psb_inv_thresh_)  = 1E-1_psb_dpk_
 
 
   call psb_erractionrestore(err_act)
@@ -420,6 +488,7 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
 
   use psb_base_mod
   use psb_d_ilu_fact_mod
+  use psb_d_ainv_fact_mod
   use psb_d_bjacprec, psb_protect_name => psb_d_bjac_precbld
   Implicit None
 
@@ -432,12 +501,12 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   !     .. Local Scalars ..
-  integer(psb_ipk_) ::    i, m, ialg, fill_in, iscale
+  integer(psb_ipk_) ::    i, m, ialg, fill_in, iscale, inv_fill, iinvalg
   integer(psb_ipk_) ::    ierr(5)
   character ::        trans, unitd
   type(psb_dspmat_type), allocatable :: lf, uf
   real(psb_dpk_), allocatable :: dd(:)
-  real(psb_dpk_) :: fact_eps
+  real(psb_dpk_) :: fact_eps, inv_thresh
   integer(psb_ipk_) :: nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer(psb_ipk_) :: ictxt,np,me
   character(len=20)  :: name='d_bjac_precbld'
@@ -468,8 +537,13 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   ! We check if all the information contained in the preconditioner structure
   ! are meaningful, otherwise we give an error and get out of the build
   ! procedure
-  ialg = prec%iprcparm(psb_ilu_ialg_)
-  if ((ialg == psb_ilu_n_).or.(ialg == psb_milu_n_).or.(ialg == psb_ilu_t_)) then
+  ialg = prec%iprcparm(psb_ilu_ialg_)    ! Integer for ILU type algorithm
+  iinvalg = prec%iprcparm(psb_ainv_alg_) ! Integer for AINV type algorithm
+  if ((ialg == psb_ilu_n_).or.(ialg == psb_milu_n_).or.&
+    & (ialg == psb_ilu_t_).or.(iinvalg == psb_ainv_llk_).or.&
+    & (iinvalg == psb_ainv_s_llk_).or.(iinvalg == psb_ainv_s_ft_llk_).or.&
+    & (iinvalg == psb_ainv_llk_noth_).or.(iinvalg == psb_ainv_mlk_).or.&
+    & (iinvalg == psb_ainv_lmx_)) then
   ! Do nothing: admissible request
   else
     info=psb_err_from_subroutine_
@@ -492,24 +566,32 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     goto 9999
   end if
   fact_eps = prec%rprcparm(psb_fact_eps_)
-  if(fact_eps > 1 ) then
+  if( (fact_eps > 1).and.(prec%iprcparm(psb_f_type_) == psb_f_ainv_) ) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_fact_eps_'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  inv_thresh = prec%rprcparm(psb_inv_thresh_)
+  if( (inv_thresh > 1) ) then
     info=psb_err_from_subroutine_
     ch_err='psb_fact_eps_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   fill_in = prec%iprcparm(psb_ilu_fill_in_)
-  if(fill_in < 0) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_ilu_fill_in_'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  else if (fill_in == 0) then
-    ! If the requested level of fill is equal to zero, we default to the
-    ! specialized ILU(0) routine
-    prec%iprcparm(psb_f_type_) = psb_f_ilu_n_
+  if (prec%iprcparm(psb_f_type_) == psb_f_ilu_n_) then
+    if(fill_in < 0) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_ilu_fill_in_'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    else if (fill_in == 0) then
+      ! If the requested level of fill is equal to zero, we default to the
+      ! specialized ILU(0) routine
+      prec%iprcparm(psb_f_type_) = psb_f_ilu_n_
+    end if
   end if
-
   ! Select on the type of factorization to be used
   select case(prec%iprcparm(psb_f_type_))
 
@@ -732,6 +814,78 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       goto 9999
     end if
 
+  case(psb_f_ainv_)
+    ! Approximate Inverse Factorizations based on variants of the incomplete
+    ! biconjugation algorithms
+    if (allocated(prec%av)) then
+      if (size(prec%av) < psb_bp_ilu_avsz) then
+        do i=1,size(prec%av)
+          call prec%av(i)%free()
+        enddo
+        deallocate(prec%av,stat=info)
+      endif
+    end if
+    if (.not.allocated(prec%av)) then
+      allocate(prec%av(psb_max_avsz),stat=info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_alloc_dealloc_,name)
+        goto 9999
+      end if
+    endif
+
+    nrow_a = desc_a%get_local_rows()
+    nztota = a%get_nzeros()
+
+    n_col  = desc_a%get_local_cols()
+    nhalo  = n_col-nrow_a
+    n_row  = nrow_a
+
+    allocate(lf,uf,stat=info)
+    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
+    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
+
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_sp_all'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    allocate(dd(n_row),stat=info)
+    if (info == psb_success_) then
+      allocate(prec%dv, stat=info)
+      if (info == 0) then
+        if (present(vmold)) then
+          allocate(prec%dv%v,mold=vmold,stat=info)
+        else
+          allocate(psb_d_base_vect_type :: prec%dv%v,stat=info)
+        end if
+      end if
+    end if
+
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999
+    endif
+    ! Computin the factorization
+    call psb_ainv_fact(a,iinvalg,inv_fill,inv_thresh,lf,dd,uf,desc_a,info,iscale=iscale)
+
+    if(info == psb_success_) then
+      call prec%av(psb_l_pr_)%mv_from(lf%a)
+      call prec%av(psb_u_pr_)%mv_from(uf%a)
+      call prec%av(psb_l_pr_)%set_asb()
+      call prec%av(psb_u_pr_)%set_asb()
+      call prec%av(psb_l_pr_)%trim()
+      call prec%av(psb_u_pr_)%trim()
+      call prec%dv%bld(dd)
+      ! call move_alloc(dd,prec%d)
+    else
+      info=psb_err_from_subroutine_
+      ch_err='psb_ilut_fact'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
   case(psb_f_none_)
     info=psb_err_from_subroutine_
     ch_err='Inconsistent prec  psb_f_none_'
@@ -792,6 +946,12 @@ subroutine psb_d_bjac_precseti(prec,what,val,info)
   case (psb_ilu_scale_)
     prec%iprcparm(psb_ilu_scale_) = val
 
+  case (psb_ainv_alg_)
+    prec%iprcparm(psb_ainv_alg_) = val
+
+  case(psb_inv_fillin_)
+    prec%iprcparm(psb_inv_fillin_) = val
+
   case default
     write(psb_err_unit,'(i0," is invalid, ignoring user specification")') what
 
@@ -832,6 +992,9 @@ subroutine psb_d_bjac_precsetr(prec,what,val,info)
 
   case (psb_fact_eps_)
     prec%rprcparm(psb_fact_eps_) = val
+
+  case (psb_inv_thresh_)
+    prec%rprcparm(psb_inv_thresh_) = val
 
   case default
     write(psb_err_unit,'(i0," is invalid, ignoring user specification")') what

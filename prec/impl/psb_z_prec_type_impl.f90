@@ -356,6 +356,8 @@ subroutine psb_zcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
   select case (psb_toupper(what))
     case ("SUB_FILLIN")
       call prec%prec%precset(psb_ilu_fill_in_,val,info)
+    case('INV_FILLIN')
+      call prec%prec%precset(psb_inv_fillin_,val,info)
     case default
       info = psb_err_invalid_args_combination_
       write(psb_err_unit,*) name,&
@@ -390,6 +392,8 @@ subroutine psb_zcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
   select case (psb_toupper(what))
   case('SUB_ILUTHRS')
     call prec%prec%precset(psb_fact_eps_,val,info)
+  case('INV_THRESH')
+    call prec%prec%precset(psb_inv_thresh_,val,info)
   case default
     info = psb_err_invalid_args_combination_
     write(psb_err_unit,*) name,&
@@ -431,6 +435,8 @@ subroutine psb_zcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
         case("ILUT")
             call prec%prec%precset(psb_f_type_,psb_f_ilu_t_,info)
             call prec%prec%precset(psb_ilu_ialg_,psb_ilu_t_,info)
+        case("AINV")
+            call prec%prec%precset(psb_f_type_,psb_f_ainv_,info)
         case default
           ! Default to ILU(0) factorization
           call prec%prec%precset(psb_f_type_,psb_f_ilu_n_,info)
@@ -449,6 +455,19 @@ subroutine psb_zcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
         call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_maxval_,info)
       case default
         call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
+      end select
+    case ("AINV_ALG")
+      select case (psb_toupper(string))
+      case("LLK")
+        call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
+      case("SYM-LLK")
+        call prec%prec%precset(psb_ainv_alg_,psb_ainv_s_llk_,info)
+      case("STAB-LLK")
+        call prec%prec%precset(psb_ainv_alg_,psb_ainv_s_ft_llk_,info)
+      case("MLK","LMX")
+        call prec%prec%precset(psb_ainv_alg_,psb_ainv_mlk_,info)
+      case default
+        call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
       end select
     case default
 

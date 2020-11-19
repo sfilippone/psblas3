@@ -34,7 +34,7 @@
 !
 subroutine psb_ssparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   use psb_base_mod
-  use psb_ainv_tools_mod
+  use psb_s_ainv_tools_mod
   use psb_s_biconjg_mod, psb_protect_name => psb_ssparse_biconjg_s_llk
 
   !

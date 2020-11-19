@@ -34,7 +34,7 @@
 !
 subroutine psb_zsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
   use psb_base_mod
-  use psb_ainv_tools_mod
+  use psb_z_ainv_tools_mod
   use psb_z_biconjg_mod, psb_protect_name => psb_zsparse_biconjg_mlk
   !
   ! Left-looking variant

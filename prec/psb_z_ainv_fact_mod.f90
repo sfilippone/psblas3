@@ -28,15 +28,18 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-!    Moved here from AMG-AINV, original copyright below.
+!    Moved here from MLD2P4, original copyright below.
 !
 !
-!                       AMG-AINV: Approximate Inverse plugin for
-!                             AMG4PSBLAS version 1.0
+!                             MLD2P4  version 2.2
+!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
 !
-!    (C) Copyright 2020
+!    (C) Copyright 2008-2018
 !
-!                        Salvatore Filippone  University of Rome Tor Vergata
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Daniela di Serafino
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -46,14 +49,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the AMG4PSBLAS group or the names of its contributors may
+!      3. The name of the MLD2P4 group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -63,28 +66,33 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine psb_z_rwclip(nz,ia,ja,val,imin,imax,jmin,jmax)
+!
+!
+! File: psb_z_ainv_fact_mod.f90
+!
+! Module: psb_z_ainv_fact_mod
+!
+!  This module defines some interfaces used internally by the implementation of
+!  psb_z_ainv_solver, but not visible to the end user.
+!
+!
+module psb_z_ainv_fact_mod
   use psb_base_mod
+  use psb_prec_const_mod
 
-  implicit none
-  integer(psb_ipk_), intent(inout)  :: nz
-  integer(psb_ipk_), intent(inout)  :: ia(*), ja(*)
-  complex(psb_dpk_), intent(inout)    :: val(*)
-  integer(psb_ipk_), intent(in)     :: imin,imax,jmin,jmax
+  interface psb_ainv_fact
+    subroutine psb_z_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
+      import psb_zspmat_type, psb_dpk_, psb_ipk_, psb_desc_type
+      type(psb_zspmat_type), intent(in), target   :: a
+      integer(psb_ipk_), intent(in)                 :: fillin,alg
+      real(psb_dpk_), intent(in)                  :: thresh
+      type(psb_zspmat_type), intent(inout)        :: wmat, zmat
+      complex(psb_dpk_), allocatable                  :: d(:)
+      Type(psb_desc_type), Intent(in)               :: desc
+      integer(psb_ipk_), intent(out)                :: info
+      type(psb_zspmat_type), intent(in), optional :: blck
+      integer(psb_ipk_), intent(in), optional       :: iscale
+    end subroutine psb_z_ainv_bld
+  end interface
 
-  integer(psb_ipk_) :: i,j
-
-  j = 0
-  do i=1, nz
-    if ((imin <= ia(i)).and.&
-         & (ia(i) <= imax).and.&
-         & (jmin <= ja(i)).and.&
-         & (ja(i) <= jmax) ) then
-      j = j + 1
-      ia(j) = ia(i)
-      ja(j) = ja(i)
-      val(j) = val(i)
-    end if
-  end do
-  nz = j
-end subroutine psb_z_rwclip
+end module psb_z_ainv_fact_mod

@@ -34,7 +34,7 @@
 !
 subroutine psb_ssparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   use psb_base_mod
-  use psb_ainv_tools_mod
+  use psb_s_ainv_tools_mod
   use psb_s_biconjg_mod, psb_protect_name => psb_ssparse_biconjg_s_ft_llk
 
   !
@@ -164,7 +164,7 @@ subroutine psb_ssparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
       ip2 = w%icp(j+1) - 1
       nzra = max(0,ip2 - ip1 + 1)
       nzww = 0
-      call psb_d_spvspm(sone,a,nzra,w%ia(ip1:ip2),w%val(ip1:ip2),&
+      call psb_s_spvspm(sone,a,nzra,w%ia(ip1:ip2),w%val(ip1:ip2),&
            & szero,nzww,iww,ww,info)
 
       p(i) =  psb_spge_dot(nzww,iww,ww,zval)
@@ -299,7 +299,7 @@ subroutine psb_ssparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
         ip2 = z%icp(j+1) - 1
         nzra = max(0,ip2 - ip1 + 1)
         nzww = 0
-        call psb_d_spmspv(sone,ac,nzra,z%ia(ip1:ip2),z%val(ip1:ip2),&
+        call psb_s_spmspv(sone,ac,nzra,z%ia(ip1:ip2),z%val(ip1:ip2),&
              & szero,nzww,iww,ww,info)
 
         q(i) =  psb_spge_dot(nzww,iww,ww,zval)
@@ -384,7 +384,7 @@ subroutine psb_ssparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     nzww = 0
     nzrz = z%icp(i+1)-z%icp(i)
     ipz1 = z%icp(i)
-    call psb_d_spmspv(sone,ac,&
+    call psb_s_spmspv(sone,ac,&
          & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
          & szero,nzww,iww,ww,info)
     tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)

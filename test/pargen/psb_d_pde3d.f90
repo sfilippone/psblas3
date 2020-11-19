@@ -671,14 +671,19 @@ program psb_d_pde3d
       call prec%set('sub_solve',       parms%alg,   info)
       select case (psb_toupper(parms%alg))
       case ("ILU")
-        call prec%set('sub_fillin',      parms%fill,      info)
-        call prec%set('ilu_alg',         parms%ilu_alg,   info)
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('ilu_alg',         parms%ilu_alg,    info)
       case ("ILUT")
-        call prec%set('sub_fillin',      parms%fill,      info)
-        call prec%set('sub_iluthrs',     parms%thresh,    info)
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('sub_iluthrs',     parms%thresh,     info)
         call prec%set('ilut_scale',      parms%ilut_scale, info)
+      case ("AINV")
+        call prec%set('inv_thresh',     parms%inv_thresh,  info)
       case default
         ! Do nothing, use default setting in the init routine
+      end select
+      select case (psb_toupper(parms%orth_alg))
+
       end select
   else
     ! nothing to set for NONE or DIAG preconditioner
@@ -881,8 +886,9 @@ contains
               write(psb_out_unit,'("Threshold          : ",es12.5)') parms%thresh
               write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill
               write(psb_out_unit,'("Inverse Threshold  : ",es12.5)') parms%inv_thresh
-            case ('AINVT','AORTH')
+            case ('AINV','AORTH')
               write(psb_out_unit,'("Inverse Threshold  : ",es12.5)') parms%inv_thresh
+              write(psb_out_unit,'("Orthogonalization  : ",a)') parms%orth_alg
             case default
               write(psb_out_unit,'("Unknown diagonal solver")')
           end select

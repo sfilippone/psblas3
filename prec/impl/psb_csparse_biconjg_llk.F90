@@ -34,7 +34,7 @@
 !
 subroutine psb_csparse_biconjg_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   use psb_base_mod
-  use psb_ainv_tools_mod
+  use psb_c_ainv_tools_mod
   use psb_c_biconjg_mod, psb_protect_name => psb_csparse_biconjg_llk
   !
   ! Left-looking variant
@@ -224,6 +224,7 @@ subroutine psb_csparse_biconjg_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     !
     ! Sparsify current ZVAL and put into ZMAT
     !
+    write(psb_out_unit,'("z(1) = ",f16.14)') zval(1)
     call sparsify(i,nzrmax,sp_thresh,n,zval,nzrz,ia,val,info,iheap=heap,ikr=izkr)
     if (info /= psb_success_) then
       info = psb_err_internal_error_

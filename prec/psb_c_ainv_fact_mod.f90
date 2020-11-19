@@ -28,15 +28,18 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-!    Moved here from AMG-AINV, original copyright below.
+!    Moved here from MLD2P4, original copyright below.
 !
 !
-!                       AMG-AINV: Approximate Inverse plugin for
-!                             AMG4PSBLAS version 1.0
+!                             MLD2P4  version 2.2
+!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
 !
-!    (C) Copyright 2020
+!    (C) Copyright 2008-2018
 !
-!                        Salvatore Filippone  University of Rome Tor Vergata
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Daniela di Serafino
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -46,14 +49,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the AMG4PSBLAS group or the names of its contributors may
+!      3. The name of the MLD2P4 group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -64,31 +67,32 @@
 !
 !
 !
-module psb_base_ainv_mod
+!
+! File: psb_c_ainv_fact_mod.f90
+!
+! Module: psb_c_ainv_fact_mod
+!
+!  This module defines some interfaces used internally by the implementation of
+!  psb_c_ainv_solver, but not visible to the end user.
+!
+!
+module psb_c_ainv_fact_mod
+  use psb_base_mod
+  use psb_prec_const_mod
 
-  use psb_prec_mod
+  interface psb_ainv_fact
+    subroutine psb_c_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
+      import psb_cspmat_type, psb_spk_, psb_ipk_, psb_desc_type
+      type(psb_cspmat_type), intent(in), target   :: a
+      integer(psb_ipk_), intent(in)                 :: fillin,alg
+      real(psb_spk_), intent(in)                  :: thresh
+      type(psb_cspmat_type), intent(inout)        :: wmat, zmat
+      complex(psb_spk_), allocatable                  :: d(:)
+      Type(psb_desc_type), Intent(in)               :: desc
+      integer(psb_ipk_), intent(out)                :: info
+      type(psb_cspmat_type), intent(in), optional :: blck
+      integer(psb_ipk_), intent(in), optional       :: iscale
+    end subroutine psb_c_ainv_bld
+  end interface
 
-  integer, parameter   :: psb_inv_fillin_     = 100 ! To check for compatibility
-  integer, parameter   :: psb_ainv_alg_       = psb_inv_fillin_ + 1
-  integer, parameter   :: psb_inv_thresh_     = 102 ! To check for compatibility
-#if 0
-  integer, parameter   :: psb_ainv_orth1_     = psb_inv_thresh_ + 1
-  integer, parameter   :: psb_ainv_orth2_     = psb_ainv_orth1_ + 1
-  integer, parameter   :: psb_ainv_orth3_     = psb_ainv_orth2_ + 1
-  integer, parameter   :: psb_ainv_orth4_     = psb_ainv_orth3_ + 1
-  integer, parameter   :: psb_ainv_llk_       = psb_ainv_orth4_ + 1
-#else
-  integer, parameter   :: psb_ainv_llk_       = psb_inv_thresh_ + 1
-#endif
-  integer, parameter   :: psb_ainv_s_llk_     = psb_ainv_llk_ + 1
-  integer, parameter   :: psb_ainv_s_ft_llk_  = psb_ainv_s_llk_ + 1
-  integer, parameter   :: psb_ainv_llk_noth_  = psb_ainv_s_ft_llk_  + 1
-  integer, parameter   :: psb_ainv_mlk_       = psb_ainv_llk_noth_  + 1
-  integer, parameter   :: psb_ainv_lmx_       = psb_ainv_mlk_
-#if defined(HAVE_TUMA_SAINV)
-  integer, parameter   :: psb_ainv_s_tuma_    = psb_ainv_lmx_  + 1
-  integer, parameter   :: psb_ainv_l_tuma_    = psb_ainv_s_tuma_  + 1
-#endif
-
-
-end module psb_base_ainv_mod
+end module psb_c_ainv_fact_mod

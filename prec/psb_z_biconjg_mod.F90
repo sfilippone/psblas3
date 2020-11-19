@@ -100,10 +100,12 @@
 !
 module psb_z_biconjg_mod
 
+  use psb_base_mod
+  use psb_prec_const_mod
+
   interface psb_sparse_biconjg
     module procedure psb_zsparse_biconjg
   end interface
-
 
   abstract interface
     subroutine psb_zsparse_biconjg_variant(n,a,p,z,w,nzrmax,sp_thresh,info)
@@ -131,12 +133,11 @@ module psb_z_biconjg_mod
        & psb_zsparse_tuma_lainv
 #endif
 
-
 contains
 
   subroutine psb_zsparse_biconjg(alg,n,acsr,p,z,w,nzrmax,sp_thresh,info)
     use psb_base_mod
-    use psb_base_ainv_mod
+    use psb_prec_const_mod
     integer(psb_ipk_), intent(in)            :: alg,n
     type(psb_z_csr_sparse_mat), intent(in) :: acsr
     type(psb_zspmat_type), intent(out)     :: z, w
