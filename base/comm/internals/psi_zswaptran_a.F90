@@ -201,7 +201,6 @@ subroutine psi_ztranidxm(ctxt,icomm,flag,n,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -695,7 +694,6 @@ subroutine psi_ztranidxv(ctxt,icomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_

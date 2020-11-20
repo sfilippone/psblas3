@@ -105,8 +105,6 @@ contains
     integer(psb_mpk_) :: root_
     real(psb_spk_) :: dat_
     integer(psb_mpk_) :: iam, np, info, icomm
-    integer(psb_ipk_) :: iinfo
-
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
