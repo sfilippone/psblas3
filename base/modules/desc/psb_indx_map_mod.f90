@@ -1349,7 +1349,6 @@ contains
   subroutine base_init_null(idxmap,ctxt,info)
     class(psb_indx_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)  :: ctxt
-    integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
 
     call idxmap%set_null()
