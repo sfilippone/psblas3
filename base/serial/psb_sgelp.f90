@@ -50,11 +50,11 @@ subroutine psb_sgelp(trans,iperm,x,info)
   integer(psb_ipk_), intent(in)           ::  iperm(:)
   integer(psb_ipk_), intent(out)          ::  info
   character, intent(in)         :: trans
+
   ! local variables
-  integer(psb_ipk_) :: ctxt
   real(psb_spk_),allocatable :: temp(:)
   integer(psb_ipk_) :: int_err(5), i1sz, i2sz, err_act,i,j
-  integer(psb_ipk_), allocatable       :: itemp(:)
+  integer(psb_ipk_), allocatable          :: itemp(:)
   real(psb_spk_),parameter   :: one=1
   integer(psb_ipk_) :: debug_level, debug_unit
 
@@ -178,11 +178,10 @@ subroutine psb_sgelpv(trans,iperm,x,info)
   character, intent(in)         ::  trans
 
   ! local variables
-  integer(psb_ipk_) :: ctxt
   integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
-  real(psb_spk_),allocatable  ::  temp(:)
-  integer(psb_ipk_), allocatable        :: itemp(:)
-  real(psb_spk_),parameter    :: one=1
+  real(psb_spk_),allocatable ::  temp(:)
+  integer(psb_ipk_), allocatable          :: itemp(:)
+  real(psb_spk_),parameter   :: one=1
   integer(psb_ipk_) :: debug_level, debug_unit
 
   character(len=20)   :: name, ch_err
@@ -205,7 +204,7 @@ subroutine psb_sgelpv(trans,iperm,x,info)
     goto 9999
   end if
   itemp(:) = iperm(:) 
-  
+
   if (.not.psb_isaperm(i1sz,itemp)) then
     info=psb_err_iarg_invalid_value_
     int_err(1) = 1      

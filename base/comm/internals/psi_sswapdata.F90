@@ -217,7 +217,6 @@ subroutine psi_sswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -556,7 +555,6 @@ subroutine psi_sswap_vidx_multivect(ctxt,icomm,flag,beta,y,idx, &
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_

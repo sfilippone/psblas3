@@ -193,7 +193,7 @@ subroutine psi_ztran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)      :: ctxt
+  type(psb_ctxt_type), intent(in)    :: ctxt
   integer(psb_mpk_), intent(in)      :: icomm
   integer(psb_ipk_), intent(in)      :: flag
   integer(psb_ipk_), intent(out)     :: info
@@ -218,7 +218,6 @@ subroutine psi_ztran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -567,7 +566,6 @@ subroutine psi_ztran_vidx_multivect(ctxt,icomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_

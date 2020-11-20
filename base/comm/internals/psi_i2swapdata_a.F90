@@ -179,8 +179,8 @@ subroutine psi_i2swapidxm(ctxt,icomm,flag,n,beta,y,idx, &
 
   ! locals
   
-  integer(psb_mpk_) :: np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
@@ -197,7 +197,6 @@ subroutine psi_i2swapidxm(ctxt,icomm,flag,n,beta,y,idx, &
   info=psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -683,7 +682,6 @@ subroutine psi_i2swapidxv(ctxt,icomm,flag,beta,y,idx, &
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
