@@ -145,6 +145,24 @@ module psb_s_invt_fact_mod
      end subroutine psb_s_invt_copyout
   end interface
 
+  interface psb_invt_inv
+    subroutine psb_s_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val, &
+      & nidx,idxs,info)
+      ! import
+      import psb_spk_, psb_i_heap, psb_ipk_
+      ! Arguments
+      type(psb_i_heap), intent(inout)     :: heap
+      integer(psb_ipk_), intent(in)       :: i
+      integer(psb_ipk_), intent(inout)    :: nidx,info
+      integer(psb_ipk_), intent(inout)    :: irwt(:)
+      real(psb_spk_), intent(in)          :: thres,nrmi
+      integer(psb_ipk_), allocatable, intent(inout) :: idxs(:)
+      integer(psb_ipk_), intent(in)       :: ja(:),irp(:)
+      real(psb_spk_), intent(in)          :: val(:)
+      real(psb_spk_), intent(inout)       :: row(:)
+    end subroutine
+  end interface
+
 contains
 
 end module psb_s_invt_fact_mod
