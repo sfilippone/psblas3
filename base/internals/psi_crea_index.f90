@@ -64,9 +64,11 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
 
   !         ....local scalars...      
-  integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda, ldl
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np, mode, err_act, dl_lda, ldl
   !         ...parameters...
-  integer(psb_ipk_), allocatable :: dep_list(:,:), length_dl(:), loc_dl(:), c_dep_list(:), dl_ptr(:)
+  integer(psb_ipk_), allocatable :: length_dl(:), loc_dl(:),&
+       &  c_dep_list(:), dl_ptr(:)
   integer(psb_ipk_) :: dlmax, dlavg
   integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -81,9 +83,9 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_ctxt()
+  ctxt = desc_a%get_ctxt()
 
-  call psb_info(ictxt,me,np)
+  call psb_info(ctxt,me,np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -110,7 +112,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   mode = 1
   if (do_timings) call psb_tic(idx_phase1)
 
-  call psi_extract_loc_dl(ictxt,&
+  call psi_extract_loc_dl(ctxt,&
        & desc_a%is_bld(), desc_a%is_upd(),&
        & index_in, loc_dl,length_dl,info)
 
@@ -124,7 +126,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 
   if (choose_sorting(dlmax,dlavg,np)) then 
     if (do_timings) call psb_tic(idx_phase21)
-    call psi_bld_glb_dep_list(ictxt,&
+    call psi_bld_glb_dep_list(ctxt,&
          & loc_dl,length_dl,c_dep_list,dl_ptr,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From bld_glb_list ',info
@@ -134,7 +136,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 !!$        ! ....now i can sort dependency lists.
     if (do_timings) call psb_toc(idx_phase21)
     if (do_timings) call psb_tic(idx_phase22)
-    call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ictxt,info)
+    call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ctxt,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From sort_dl ',info
     end if
@@ -189,8 +191,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   end if
   if (do_timings) call psb_toc(idx_phase3)
 
-  if (allocated(dep_list)) deallocate(dep_list,stat=info)
-  if ((info==0).and.allocated(length_dl)) deallocate(length_dl,stat=info)
+  if (allocated(length_dl)) deallocate(length_dl,stat=info)
   if (info /= 0) then
     info = psb_err_alloc_dealloc_
     goto 9999
@@ -201,7 +202,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 contains

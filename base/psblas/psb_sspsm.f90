@@ -84,7 +84,8 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), intent(in), optional           :: choice
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
@@ -103,9 +104,9 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -223,7 +224,7 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sspsv_vect
@@ -289,7 +290,8 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
        & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
@@ -308,9 +310,9 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -476,7 +478,7 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sspsm
@@ -533,7 +535,8 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), intent(in), optional             :: choice
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
        & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
@@ -552,9 +555,9 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -705,7 +708,7 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sspsv

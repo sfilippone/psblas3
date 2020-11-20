@@ -74,11 +74,12 @@ subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
-  !LOCALS.....
 
-  integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
-  integer(psb_ipk_) :: np, me
-  integer(psb_ipk_) :: nrow,ncol, err_act
+  !LOCALS.....
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: dectype,mglob, nglob
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: nrow,ncol, err_act
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
@@ -94,14 +95,14 @@ subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
     goto 9999
   endif
 
-  ictxt   = desc_a%get_context()
+  ctxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
   mglob   = desc_a%get_global_rows()
   nglob   = desc_a%get_global_cols()
   nrow    = desc_a%get_local_rows()
   ncol    = desc_a%get_local_cols()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -160,7 +161,7 @@ subroutine psb_lcdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -218,11 +219,11 @@ subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
 
 
   !LOCALS.....
-
-  integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
-  integer(psb_ipk_) :: np, me
-  integer(psb_ipk_) :: nrow,ncol, err_act
-  logical, parameter     :: debug=.false.
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: dectype,mglob, nglob
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: nrow,ncol, err_act
+  logical, parameter  :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
   character(len=20)      :: name
@@ -238,14 +239,14 @@ subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
     goto 9999
   endif
 
-  ictxt   = desc%get_context()
+  ctxt   = desc%get_context()
   dectype = desc%get_dectype()
   mglob   = desc%get_global_rows()
   nglob   = desc%get_global_cols()
   nrow    = desc%get_local_rows()
   ncol    = desc%get_local_cols()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -298,7 +299,7 @@ subroutine psb_lcdinsc(nz,ja,desc,info,jla,mask,lidx)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

@@ -47,7 +47,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   implicit none 
   integer(psb_ipk_), allocatable, intent(out) :: ovrel(:)
   type(psb_desc_type), intent(in) :: desc
-  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(out)  :: info
 
   integer(psb_ipk_) :: i,j, err_act
   character(len=20)    :: name
@@ -56,7 +56,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   name='psi_get_overlap'
   call psb_erractionsave(err_act)
 
-  if (.not.psb_is_asb_desc(desc)) then
+  if (.not.desc%is_asb()) then
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999

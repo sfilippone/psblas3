@@ -43,6 +43,11 @@ extern "C" {
   } psb_c_descriptor;
 
 
+  typedef struct PSB_C_CTXT {
+    psb_i_t *ctxt;
+  } psb_c_ctxt;
+
+
 
   psb_i_t psb_c_error();
   psb_i_t psb_c_clean_errstack();
@@ -54,34 +59,37 @@ extern "C" {
   void psb_c_seterraction_abort();
 
   /* Environment routines */
-  psb_i_t psb_c_init();
-  void    psb_c_exit_ctxt(psb_i_t ictxt);
-  void    psb_c_exit(psb_i_t ictxt);
-  void    psb_c_abort(psb_i_t ictxt);
-  void    psb_c_barrier(psb_i_t ictxt);
-  void    psb_c_info(psb_i_t ictxt, psb_i_t *iam, psb_i_t *np);
+  void    psb_c_init(psb_c_ctxt *cctxt);
+  void    psb_c_exit(psb_c_ctxt cctxt);
+  void    psb_c_exit_ctxt(psb_c_ctxt cctxt);
+  void    psb_c_abort(psb_c_ctxt cctxt);
+  void    psb_c_barrier(psb_c_ctxt cctxt);
+  void    psb_c_info(psb_c_ctxt cctxt, psb_i_t *iam, psb_i_t *np);
   psb_d_t  psb_c_wtime();
   psb_i_t psb_c_get_errstatus();
 
   psb_i_t psb_c_get_index_base();
   void psb_c_set_index_base(psb_i_t base);
 
-  void   psb_c_mbcast(psb_i_t ictxt, psb_i_t n, psb_m_t *v, psb_i_t root);
-  void   psb_c_ibcast(psb_i_t ictxt, psb_i_t n, psb_i_t *v, psb_i_t root);
-  void   psb_c_lbcast(psb_i_t ictxt, psb_i_t n, psb_l_t *v, psb_i_t root);
-  void   psb_c_ebcast(psb_i_t ictxt, psb_i_t n, psb_e_t *v, psb_i_t root);
-  void   psb_c_sbcast(psb_i_t ictxt, psb_i_t n, psb_s_t *v, psb_i_t root);
-  void   psb_c_dbcast(psb_i_t ictxt, psb_i_t n, psb_d_t *v, psb_i_t root);
-  void   psb_c_cbcast(psb_i_t ictxt, psb_i_t n, psb_c_t *v, psb_i_t root);
-  void   psb_c_zbcast(psb_i_t ictxt, psb_i_t n, psb_z_t *v, psb_i_t root);
-  void   psb_c_hbcast(psb_i_t ictxt, const char *v, psb_i_t root);
+  void   psb_c_mbcast(psb_c_ctxt cctxt, psb_i_t n, psb_m_t *v, psb_i_t root);
+  void   psb_c_ibcast(psb_c_ctxt cctxt, psb_i_t n, psb_i_t *v, psb_i_t root);
+  void   psb_c_lbcast(psb_c_ctxt cctxt, psb_i_t n, psb_l_t *v, psb_i_t root);
+  void   psb_c_ebcast(psb_c_ctxt cctxt, psb_i_t n, psb_e_t *v, psb_i_t root);
+  void   psb_c_sbcast(psb_c_ctxt cctxt, psb_i_t n, psb_s_t *v, psb_i_t root);
+  void   psb_c_dbcast(psb_c_ctxt cctxt, psb_i_t n, psb_d_t *v, psb_i_t root);
+  void   psb_c_cbcast(psb_c_ctxt cctxt, psb_i_t n, psb_c_t *v, psb_i_t root);
+  void   psb_c_zbcast(psb_c_ctxt cctxt, psb_i_t n, psb_z_t *v, psb_i_t root);
+  void   psb_c_hbcast(psb_c_ctxt cctxt, const char *v, psb_i_t root);
 
   /* Descriptor/integer routines */
   psb_c_descriptor* psb_c_new_descriptor();
-  psb_i_t    psb_c_cdall_vg(psb_l_t ng, psb_i_t *vg, psb_i_t ictxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_l_t *vl, psb_i_t ictxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_i_t ictxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_repl(psb_l_t n, psb_i_t ictxt, psb_c_descriptor *cd);
+  void psb_c_delete_descriptor(psb_c_descriptor *);
+  psb_c_ctxt* psb_c_new_ctxt();
+  void psb_c_delete_ctxt(psb_c_ctxt *);
+  psb_i_t    psb_c_cdall_vg(psb_l_t ng, psb_i_t *vg, psb_c_ctxt cctxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_l_t *vl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_repl(psb_l_t n, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdasb(psb_c_descriptor *cd);
   psb_i_t    psb_c_cdfree(psb_c_descriptor *cd);
   psb_i_t    psb_c_cdins(psb_i_t nz, const psb_l_t *ia, const psb_l_t *ja, psb_c_descriptor *cd);

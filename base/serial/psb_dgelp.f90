@@ -54,7 +54,7 @@ subroutine psb_dgelp(trans,iperm,x,info)
   ! local variables
   real(psb_dpk_),allocatable :: temp(:)
   integer(psb_ipk_) :: int_err(5), i1sz, i2sz, err_act,i,j
-  integer(psb_ipk_), allocatable       :: itemp(:)
+  integer(psb_ipk_), allocatable          :: itemp(:)
   real(psb_dpk_),parameter   :: one=1
   integer(psb_ipk_) :: debug_level, debug_unit
 
@@ -180,7 +180,7 @@ subroutine psb_dgelpv(trans,iperm,x,info)
   ! local variables
   integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
   real(psb_dpk_),allocatable ::  temp(:)
-  integer(psb_ipk_), allocatable       :: itemp(:)
+  integer(psb_ipk_), allocatable          :: itemp(:)
   real(psb_dpk_),parameter   :: one=1
   integer(psb_ipk_) :: debug_level, debug_unit
 

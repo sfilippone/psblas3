@@ -71,7 +71,8 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
        & liwork, iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
@@ -92,8 +93,8 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -250,12 +251,12 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     write(debug_unit,*) me,' ',trim(name),' Returning '
   endif
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sspmv_vect
@@ -309,7 +310,8 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
        & liwork, iiy, jjy, i, ib, ib1, ip, idx, ik
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
@@ -330,9 +332,9 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -581,7 +583,7 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sspmm
@@ -656,7 +658,8 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
        & liwork, iiy, jjy, ib, ip, idx, ik
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
@@ -677,8 +680,8 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -886,12 +889,12 @@ subroutine  psb_sspmv(alpha,a,x,beta,y,desc_a,info,&
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     write(debug_unit,*) me,' ',trim(name),' Returning '
   endif
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end subroutine psb_sspmv

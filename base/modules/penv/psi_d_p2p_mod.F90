@@ -32,22 +32,18 @@
 
 module psi_d_p2p_mod
   use psi_penv_mod
-  use psi_comm_buffers_mod
 
   interface psb_snd
-    module procedure psb_dsnds, psb_dsndv, psb_dsndm, &
-         & psb_dsnds_ec, psb_dsndv_ec, psb_dsndm_ec 
+    module procedure psb_dsnds, psb_dsndv, psb_dsndm
   end interface
 
   interface psb_rcv
-    module procedure psb_drcvs, psb_drcvv, psb_drcvm, &
-         & psb_drcvs_ec, psb_drcvv_ec, psb_drcvm_ec 
+    module procedure psb_drcvs, psb_drcvv, psb_drcvm
   end interface
 
 contains
 
-  subroutine psb_dsnds(ictxt,dat,dst)
-    use psi_comm_buffers_mod 
+  subroutine psb_dsnds(ctxt,dat,dst)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -55,7 +51,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     real(psb_dpk_), intent(in)  :: dat
     integer(psb_mpk_), intent(in)  :: dst
     real(psb_dpk_), allocatable :: dat_(:)
@@ -65,12 +61,11 @@ contains
 #else
     allocate(dat_(1), stat=info)
     dat_(1) = dat
-    call psi_snd(ictxt,psb_double_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_double_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_dsnds
 
-  subroutine psb_dsndv(ictxt,dat,dst)
-    use psi_comm_buffers_mod 
+  subroutine psb_dsndv(ctxt,dat,dst)
 
 #ifdef MPI_MOD
     use mpi
@@ -79,23 +74,22 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     real(psb_dpk_), intent(in)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: dst
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info
 
 #if defined(SERIAL_MPI) 
 #else
     allocate(dat_(size(dat)), stat=info)
     dat_(:) = dat(:)
-    call psi_snd(ictxt,psb_double_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_double_tag,dst,dat_,psb_mesg_queue)
 #endif    
 
   end subroutine psb_dsndv
 
-  subroutine psb_dsndm(ictxt,dat,dst,m)
-    use psi_comm_buffers_mod 
+  subroutine psb_dsndm(ctxt,dat,dst,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -104,13 +98,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     real(psb_dpk_), intent(in)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     real(psb_dpk_), allocatable :: dat_(:)
     integer(psb_ipk_) :: i,j,k,m_,n_
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info
 
 #if defined(SERIAL_MPI) 
 #else
@@ -128,12 +122,11 @@ contains
         k = k + 1
       end do
     end do
-    call psi_snd(ictxt,psb_double_tag,dst,dat_,psb_mesg_queue)
+    call psi_snd(ctxt,psb_double_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_dsndm
 
-  subroutine psb_drcvs(ictxt,dat,src)
-    use psi_comm_buffers_mod 
+  subroutine psb_drcvs(ctxt,dat,src)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -141,21 +134,21 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     real(psb_dpk_), intent(out)  :: dat
     integer(psb_mpk_), intent(in)  :: src
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_r_dpk_,src,psb_double_tag,ictxt,status,info)
+    icomm = psb_get_mpi_comm(ctxt)
+    call mpi_recv(dat,1,psb_mpi_r_dpk_,src,psb_double_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_drcvs
 
-  subroutine psb_drcvv(ictxt,dat,src)
-    use psi_comm_buffers_mod 
+  subroutine psb_drcvv(ctxt,dat,src)
 
 #ifdef MPI_MOD
     use mpi
@@ -164,22 +157,22 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     real(psb_dpk_), intent(out)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: src
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,psb_double_tag,ictxt,status,info)
+    icomm = psb_get_mpi_comm(ctxt)
+    call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,psb_double_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
   end subroutine psb_drcvv
 
-  subroutine psb_drcvm(ictxt,dat,src,m)
-    use psi_comm_buffers_mod 
+  subroutine psb_drcvm(ctxt,dat,src,m)
 
 #ifdef MPI_MOD
     use mpi
@@ -188,14 +181,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     real(psb_dpk_), intent(out)  :: dat(:,:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
     real(psb_dpk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_mpk_) :: i,j,k
-    integer(psb_mpk_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size), icomm
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -205,11 +198,13 @@ contains
       n_ = size(dat,2)
       call mpi_type_vector(n_,m_,ld,psb_mpi_r_dpk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
+      icomm = psb_get_mpi_comm(ctxt)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
-           & psb_double_tag,ictxt,status,info)
+           & psb_double_tag,icomm,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,psb_double_tag,ictxt,status,info)
+      icomm = psb_get_mpi_comm(ctxt) 
+      call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,psb_double_tag,icomm,status,info)
     end if
     if (info /= mpi_success) then 
       write(psb_err_unit,*) 'Error in psb_recv', info
@@ -217,91 +212,5 @@ contains
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_drcvm
-
-
-  subroutine psb_dsnds_ec(ictxt,dat,dst)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    real(psb_dpk_), intent(in)  :: dat
-    integer(psb_epk_), intent(in)  :: dst
-    
-    integer(psb_mpk_) :: iictxt, idst 
-
-    iictxt = ictxt
-    idst   = dst 
-    call psb_snd(iictxt, dat, idst)
-
-  end subroutine psb_dsnds_ec
-
-  subroutine psb_dsndv_ec(ictxt,dat,dst)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    real(psb_dpk_), intent(in)  :: dat(:)
-    integer(psb_epk_), intent(in)  :: dst
-    
-    integer(psb_mpk_) :: iictxt, idst 
-
-    iictxt = ictxt
-    idst   = dst 
-    call psb_snd(iictxt, dat, idst)
-
-  end subroutine psb_dsndv_ec
-
-  subroutine psb_dsndm_ec(ictxt,dat,dst,m)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    real(psb_dpk_), intent(in)  :: dat(:,:)
-    integer(psb_epk_), intent(in)  :: dst
-    
-    integer(psb_mpk_) :: iictxt, idst 
-
-    iictxt = ictxt
-    idst   = dst 
-    call psb_snd(iictxt, dat, idst)
-
-  end subroutine psb_dsndm_ec
-
-  subroutine psb_drcvs_ec(ictxt,dat,src)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    real(psb_dpk_), intent(out) :: dat
-    integer(psb_epk_), intent(in)  :: src
-    
-    integer(psb_mpk_) :: iictxt, isrc 
-
-    iictxt = ictxt
-    isrc   = src 
-    call psb_rcv(iictxt, dat, isrc)
-
-  end subroutine psb_drcvs_ec
-
-  subroutine psb_drcvv_ec(ictxt,dat,src)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    real(psb_dpk_), intent(out) :: dat(:)
-    integer(psb_epk_), intent(in)  :: src
-    
-    integer(psb_mpk_) :: iictxt, isrc 
-
-    iictxt = ictxt
-    isrc   = src 
-    call psb_rcv(iictxt, dat, isrc)
-
-  end subroutine psb_drcvv_ec
-
-  subroutine psb_drcvm_ec(ictxt,dat,src,m)
-
-    integer(psb_epk_), intent(in)  :: ictxt
-    real(psb_dpk_), intent(out) :: dat(:,:)
-    integer(psb_epk_), intent(in)  :: src
-    
-    integer(psb_mpk_) :: iictxt, isrc 
-
-    iictxt = ictxt
-    isrc   = src 
-    call psb_rcv(iictxt, dat, isrc)
-
-  end subroutine psb_drcvm_ec
-
 
 end module psi_d_p2p_mod

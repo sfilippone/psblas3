@@ -1039,12 +1039,12 @@ contains
 
 
 
-  subroutine list_initvl(idxmap,ictxt,vl,info)
+  subroutine list_initvl(idxmap,ctxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -1053,9 +1053,9 @@ contains
     integer(psb_ipk_) :: iam, np
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ctxt:'
       info = -1
       return
     end if
@@ -1068,17 +1068,17 @@ contains
     end if
 
     lvl(1:nl) = vl(1:nl)
-    call idxmap%init_vl(ictxt,lvl,info)
+    call idxmap%init_vl(ctxt,lvl,info)
    
   end subroutine list_initvl
 
 
-  subroutine list_initlvl(idxmap,ictxt,vl,info)
+  subroutine list_initlvl(idxmap,ctxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -1086,9 +1086,9 @@ contains
     integer(psb_ipk_) :: iam, np
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ctxt:'
       info = -1
       return
     end if
@@ -1098,8 +1098,8 @@ contains
 
     n   = maxval(vl(1:nl))
     nrt = nl
-    call psb_sum(ictxt,nrt)
-    call psb_max(ictxt,n)
+    call psb_sum(ctxt,nrt)
+    call psb_max(ctxt,n)
 
 
     if (n /= nrt) then 
@@ -1117,9 +1117,9 @@ contains
       return
     end if
 
-    idxmap%ictxt = ictxt
+    idxmap%ctxt = ctxt
     idxmap%state = psb_desc_bld_
-    idxmap%mpic  = psb_get_mpi_comm(ictxt)
+    idxmap%mpic  = psb_get_mpi_comm(ctxt)
     do i=1, n
       idxmap%glob_to_loc(i) = -1
     end do
@@ -1147,11 +1147,12 @@ contains
     integer(psb_ipk_), intent(out) :: info
     
     integer(psb_ipk_) :: nhal
-    integer(psb_mpk_) :: ictxt, iam, np 
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_) :: iam, np 
     
     info = 0 
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
 
     nhal = idxmap%local_cols
     call psb_realloc(nhal,idxmap%loc_to_glob,info)

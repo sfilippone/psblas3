@@ -39,7 +39,7 @@ module psb_c_prec_type
   use psb_c_base_prec_mod
 
   type psb_cprec_type
-    integer(psb_ipk_)                  :: ictxt
+    type(psb_ctxt_type) :: ctxt
     class(psb_c_base_prec_type), allocatable :: prec
   contains
     procedure, pass(prec)               :: psb_c_apply1_vect
@@ -68,10 +68,10 @@ module psb_c_prec_type
   end interface
 
   interface psb_precinit
-    subroutine psb_cprecinit(ictxt,prec,ptype,info)
-      import :: psb_ipk_, psb_cprec_type
+    subroutine psb_cprecinit(ctxt,prec,ptype,info)
+      import :: psb_ipk_, psb_cprec_type, psb_ctxt_type
       implicit none
-      integer(psb_ipk_), intent(in)          :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       class(psb_cprec_type), intent(inout)   :: prec
       character(len=*), intent(in)           :: ptype
       integer(psb_ipk_), intent(out)         :: info

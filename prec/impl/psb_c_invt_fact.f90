@@ -87,8 +87,9 @@ subroutine psb_c_invt_bld(a,fillin,invfill,thresh,invthresh,&
   type(psb_cspmat_type)       :: atmp
   complex(psb_spk_), allocatable :: pq(:), pd(:), w(:)
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ictxt,np,me
-  integer(psb_ipk_) :: nzrmax
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np,me
+  integer(psb_ipk_)   :: nzrmax
   real(psb_spk_)    :: sp_thresh
   character(len=20) :: name, ch_err, fname
 
@@ -101,8 +102,8 @@ subroutine psb_c_invt_bld(a,fillin,invfill,thresh,invthresh,&
   end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = psb_cd_get_context(desc)
-  call psb_info(ictxt, me, np)
+  ctxt        = psb_cd_get_context(desc)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 

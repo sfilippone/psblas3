@@ -73,11 +73,12 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
 
   integer(psb_ipk_), allocatable :: hhidx(:)
-  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i, err_act, hsize
   integer(psb_lpk_) :: nv
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: ictxt,np,me, nresp
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np,me, nresp
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
@@ -86,12 +87,11 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   name = 'psb_indx_map_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = idxmap%get_ctxt()
+  ctxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
   mglob   = idxmap%get_gr()
-  iictxt = ictxt 
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (np == -1) then
     info = psb_err_context_error_
@@ -205,12 +205,12 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   end if
   
   if (gettime) then 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t1 = psb_wtime()
     t1 = t1 -t0 - tamx - tidx   
-    call psb_amx(ictxt,tamx)
-    call psb_amx(ictxt,tidx)
-    call psb_amx(ictxt,t1)
+    call psb_amx(ctxt,tamx)
+    call psb_amx(ctxt,tidx)
+    call psb_amx(ctxt,t1)
     if (me == psb_root_) then 
       write(psb_out_unit,'(" fnd_owner  idx time  : ",es10.4)') tidx
       write(psb_out_unit,'(" fnd_owner  amx time  : ",es10.4)') tamx
@@ -221,7 +221,7 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

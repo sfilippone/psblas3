@@ -90,7 +90,8 @@ subroutine psb_s_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   real(psb_spk_), allocatable :: arws(:), acls(:)
   real(psb_spk_), allocatable  :: pq(:), ad(:)
   integer(psb_ipk_)             :: debug_level, debug_unit
-  integer(psb_ipk_)             :: ictxt,np,me
+  type(psb_ctxt_type)           :: ctxt
+  integer(psb_ipk_)             :: np,me
   integer(psb_ipk_)             :: nzrmax, iscale_
   real(psb_spk_)              :: sp_thresh
   real(psb_spk_)               :: weight
@@ -105,8 +106,8 @@ subroutine psb_s_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = psb_cd_get_context(desc)
-  call psb_info(ictxt, me, np)
+  ctxt        = psb_cd_get_context(desc)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 

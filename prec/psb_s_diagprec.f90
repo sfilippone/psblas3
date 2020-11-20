@@ -171,7 +171,8 @@ contains
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='s_diag_precdescr'
-    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: iout_, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -188,8 +189,8 @@ contains
       root_ = psb_root_
     end if
     
-    ictxt = prec%ictxt
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
   
     if (root_ == -1) root_ = iam
     

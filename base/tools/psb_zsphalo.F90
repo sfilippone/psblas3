@@ -90,7 +90,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=5), optional          :: outfmt 
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc,i, &
        &     n_el_send,k,n_el_recv,idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
@@ -125,10 +126,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
 
-  Call psb_info(ictxt, me, np)
+  Call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
@@ -329,14 +330,14 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
     call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val,iarcv,jarcv,rvsz,brvindx,ictxt,info)
+         & acoo%val,iarcv,jarcv,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_smpl_v_)
     call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val,rvsz,brvindx,ictxt,info)
+         & acoo%val,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-         & iarcv,rvsz,brvindx,ictxt,info)
+         & iarcv,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-         & jarcv,rvsz,brvindx,ictxt,info)
+         & jarcv,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_mpi_)
     call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
          & acoo%val,rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
@@ -425,14 +426,14 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
     call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_smpl_v_)
     call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val,rvsz,brvindx,ictxt,info)
+         & acoo%val,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-         & acoo%ia,rvsz,brvindx,ictxt,info)
+         & acoo%ia,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-         & acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_mpi_)
     call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
          & acoo%val,rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
@@ -530,7 +531,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -557,7 +558,8 @@ Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=5), optional          :: outfmt 
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter, proc, i, n_el_send,n_el_recv, &
        &     n_elem, j, ipx,mat_recv, idxs,idxr,nz,&
        &     data_,totxch,nxs, nxr, ncg
@@ -586,10 +588,10 @@ Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
 
-  Call psb_info(ictxt, me, np)
+  Call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
@@ -772,14 +774,14 @@ Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
     call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_smpl_v_)
     call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val,rvsz,brvindx,ictxt,info)
+         & acoo%val,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-         & acoo%ia,rvsz,brvindx,ictxt,info)
+         & acoo%ia,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-         & acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_mpi_)
     
     call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
@@ -874,7 +876,7 @@ Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -900,7 +902,8 @@ Subroutine psb_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_ipk_), intent(in), optional       :: data
   type(psb_desc_type),Intent(in), optional, target :: col_desc
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc,i, n_el_send,n_el_recv,&
        &     n_elem, j,ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     data_,totxch,nxs, nxr, err_act, nsnds, nrcvs
@@ -930,10 +933,10 @@ Subroutine psb_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
 
-  Call psb_info(ictxt, me, np)
+  Call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
@@ -1128,14 +1131,14 @@ Subroutine psb_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
     call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_smpl_v_)
     call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val,rvsz,brvindx,ictxt,info)
+         & acoo%val,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-         & acoo%ia,rvsz,brvindx,ictxt,info)
+         & acoo%ia,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-         & acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_mpi_)
     call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
          & acoo%val,rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
@@ -1234,7 +1237,7 @@ Subroutine psb_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -1260,7 +1263,8 @@ Subroutine psb_z_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_ipk_), intent(in), optional       :: data
   type(psb_desc_type),Intent(in), optional, target :: col_desc
   !     ...local scalars....
-  integer(psb_ipk_) :: ictxt, np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter,proc,i, n_el_send,n_el_recv,&
        &     n_elem, j,ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     data_,totxch,ngtz, idx, nxs, nxr, err_act, &
@@ -1292,10 +1296,10 @@ Subroutine psb_z_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
 
-  Call psb_info(ictxt, me, np)
+  Call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
@@ -1500,14 +1504,14 @@ Subroutine psb_z_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
     call psb_simple_triad_a2av(valsnd,liasnd,ljasnd,sdsz,bsdindx,&
-         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_smpl_v_)
     call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-         & acoo%val,rvsz,brvindx,ictxt,info)
+         & acoo%val,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(liasnd,sdsz,bsdindx,&
-         & acoo%ia,rvsz,brvindx,ictxt,info)
+         & acoo%ia,rvsz,brvindx,ctxt,info)
     if (info == psb_success_) call psb_simple_a2av(ljasnd,sdsz,bsdindx,&
-         & acoo%ja,rvsz,brvindx,ictxt,info)
+         & acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_mpi_)
     call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
          & acoo%val,rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
@@ -1606,7 +1610,7 @@ Subroutine psb_z_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

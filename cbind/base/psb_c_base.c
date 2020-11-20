@@ -11,6 +11,27 @@ psb_c_descriptor* psb_c_new_descriptor()
   return(temp);
 }
 
+void psb_c_delete_descriptor(psb_c_descriptor*  cdh)
+{
+  if (cdh != NULL) free(cdh); 
+  return;
+}
+
+psb_c_ctxt* psb_c_new_ctxt()
+{
+  psb_c_ctxt* temp;
+
+  temp=(psb_c_ctxt *) malloc(sizeof(psb_c_ctxt));
+  temp->ctxt=NULL;
+  return(temp);
+}
+
+void psb_c_delete_ctxt(psb_c_ctxt*  cctxt)
+{
+  if (cctxt != NULL) free(cctxt); 
+  return;
+}
+
 
 void psb_c_print_errmsg()
 {

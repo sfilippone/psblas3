@@ -51,7 +51,8 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
   !
   complex(psb_spk_), allocatable :: xt(:), yt(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt
+       & map_kind, nr
+  type(psb_ctxt_type) :: ctxt
   character(len=20), parameter  :: name='psb_map_U2V'
 
   info = psb_success_
@@ -66,14 +67,14 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
   select case(map_kind)
   case(psb_map_aggr_)
 
-    ictxt = map%p_desc_V%get_context()
+    ctxt = map%p_desc_V%get_context()
     nr2   = map%p_desc_V%get_global_rows()
     nc2   = map%p_desc_V%get_local_cols() 
     allocate(yt(nc2),stat=info) 
     if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%mat_U2V,x,czero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_V)) then
-      call psb_sum(ictxt,yt(1:nr2))
+      call psb_sum(ctxt,yt(1:nr2))
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_V,info)
     if (info /= psb_success_) then 
@@ -83,7 +84,7 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
 
   case(psb_map_gen_linear_)
 
-    ictxt = map%desc_V%get_context()
+    ctxt = map%desc_V%get_context()
     nr1   = map%desc_U%get_local_rows() 
     nc1   = map%desc_U%get_local_cols() 
     nr2   = map%desc_V%get_global_rows()
@@ -93,7 +94,7 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
     if (info == psb_success_) call psb_halo(xt,map%desc_U,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%mat_U2V,xt,czero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_V)) then
-      call psb_sum(ictxt,yt(1:nr2))
+      call psb_sum(ctxt,yt(1:nr2))
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_V,info)
     if (info /= psb_success_) then 
@@ -125,7 +126,8 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
   type(psb_c_vect_type),pointer  :: ptx, pty
   complex(psb_spk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
-       &  map_kind, nr, ictxt, iam, np
+       &  map_kind, nr, iam, np
+  type(psb_ctxt_type) :: ctxt
   character(len=20), parameter   :: name='psb_map_U2V_v'
 
   info = psb_success_
@@ -140,8 +142,8 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
   select case(map_kind)
   case(psb_map_aggr_)
 
-    ictxt = map%p_desc_V%get_context()
-    call psb_info(ictxt,iam,np)
+    ctxt = map%p_desc_V%get_context()
+    call psb_info(ctxt,iam,np)
     nr2   = map%p_desc_V%get_global_rows()
     nc2   = map%p_desc_V%get_local_cols()
     if (present(vty)) then
@@ -154,7 +156,7 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     if (info == psb_success_) call psb_csmm(cone,map%mat_U2V,x,czero,pty,info)
     if ((info == psb_success_) .and. map%p_desc_V%is_repl().and.(np>1)) then
       yta = pty%get_vect()
-      call psb_sum(ictxt,yta(1:nr2))
+      call psb_sum(ctxt,yta(1:nr2))
       call pty%set(yta)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%p_desc_V,info)
@@ -167,8 +169,8 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
 
   case(psb_map_gen_linear_)
 
-    ictxt = map%desc_V%get_context()
-    call psb_info(ictxt,iam,np)
+    ctxt = map%desc_V%get_context()
+    call psb_info(ctxt,iam,np)
     nr1   = map%desc_U%get_local_rows() 
     nc1   = map%desc_U%get_local_cols() 
     nr2   = map%desc_V%get_global_rows()
@@ -188,7 +190,7 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     if (info == psb_success_) call psb_csmm(cone,map%mat_U2V,ptx,czero,pty,info)
     if ((info == psb_success_) .and. map%desc_V%is_repl().and.(np>1)) then
       yta = pty%get_vect()
-      call psb_sum(ictxt,yta(1:nr2))
+      call psb_sum(ctxt,yta(1:nr2))
       call pty%set(yta)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%desc_V,info)
@@ -232,7 +234,8 @@ subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
   !
   complex(psb_spk_), allocatable :: xt(:), yt(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt
+       & map_kind, nr
+  type(psb_ctxt_type) :: ctxt
   character(len=20), parameter  :: name='psb_map_V2U'
 
   info = psb_success_
@@ -247,14 +250,14 @@ subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
   select case(map_kind)
   case(psb_map_aggr_)
 
-    ictxt = map%p_desc_U%get_context()
+    ctxt = map%p_desc_U%get_context()
     nr2   = map%p_desc_U%get_global_rows()
     nc2   = map%p_desc_U%get_local_cols() 
     allocate(yt(nc2),stat=info) 
     if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%mat_V2U,x,czero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_U)) then
-      call psb_sum(ictxt,yt(1:nr2))
+      call psb_sum(ctxt,yt(1:nr2))
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_U,info)
     if (info /= psb_success_) then 
@@ -264,7 +267,7 @@ subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
 
   case(psb_map_gen_linear_)
 
-    ictxt = map%desc_U%get_context()
+    ctxt = map%desc_U%get_context()
     nr1   = map%desc_V%get_local_rows() 
     nc1   = map%desc_V%get_local_cols() 
     nr2   = map%desc_U%get_global_rows()
@@ -274,7 +277,7 @@ subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
     if (info == psb_success_) call psb_halo(xt,map%desc_V,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%mat_V2U,xt,czero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_U)) then
-      call psb_sum(ictxt,yt(1:nr2))
+      call psb_sum(ctxt,yt(1:nr2))
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_U,info)
     if (info /= psb_success_) then 
@@ -305,7 +308,8 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
   type(psb_c_vect_type),pointer  :: ptx, pty
   complex(psb_spk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt, iam, np
+       & map_kind, nr, iam, np
+  type(psb_ctxt_type) :: ctxt
   character(len=20), parameter   :: name='psb_map_V2U_v'
 
   info = psb_success_
@@ -320,8 +324,8 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
   select case(map_kind)
   case(psb_map_aggr_)
 
-    ictxt = map%p_desc_U%get_context()
-    call psb_info(ictxt,iam,np)
+    ctxt = map%p_desc_U%get_context()
+    call psb_info(ctxt,iam,np)
     nr2   = map%p_desc_U%get_global_rows()
     nc2   = map%p_desc_U%get_local_cols() 
     if (present(vty)) then
@@ -334,7 +338,7 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
     if (info == psb_success_) call psb_csmm(cone,map%mat_V2U,x,czero,pty,info)
     if ((info == psb_success_) .and. map%p_desc_U%is_repl().and.(np>1)) then
       yta = pty%get_vect()
-      call psb_sum(ictxt,yta(1:nr2))
+      call psb_sum(ctxt,yta(1:nr2))
       call pty%set(yta)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%p_desc_U,info)
@@ -347,8 +351,8 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
 
   case(psb_map_gen_linear_)
 
-    ictxt = map%desc_U%get_context()
-    call psb_info(ictxt,iam,np)
+    ctxt = map%desc_U%get_context()
+    call psb_info(ctxt,iam,np)
     nr1   = map%desc_V%get_local_rows() 
     nc1   = map%desc_V%get_local_cols() 
     nr2   = map%desc_U%get_global_rows()
@@ -369,7 +373,7 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
     if (info == psb_success_) call psb_csmm(cone,map%mat_V2U,ptx,czero,pty,info)
     if ((info == psb_success_) .and. map%desc_U%is_repl().and.(np>1)) then
       yta = pty%get_vect()
-      call psb_sum(ictxt,yta(1:nr2))
+      call psb_sum(ctxt,yta(1:nr2))
       call pty%set(yta)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%desc_U,info)

@@ -152,7 +152,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs.
   !
-  subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,info,&
+  subroutine psb_d_gen_pde2d(ctxt,idim,a,bv,xv,desc_a,afmt,info,&
        & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
@@ -176,7 +176,8 @@ contains
     type(psb_dspmat_type) :: a
     type(psb_d_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
-    integer(psb_ipk_)     :: ictxt, info
+    type(psb_ctxt_type)   :: ctxt
+    integer(psb_ipk_)     :: info
     character(len=*)      :: afmt
     procedure(d_func_2d), optional :: f
     class(psb_d_base_sparse_mat), optional :: amold
@@ -218,7 +219,7 @@ contains
     name = 'create_matrix'
     call psb_erractionsave(err_act)
 
-    call psb_info(ictxt, iam, np)
+    call psb_info(ctxt, iam, np)
 
 
     if (present(f)) then
@@ -264,20 +265,20 @@ contains
       end if
 
       nt = nr
-      call psb_sum(ictxt,nt)
-      if (nt /= m) then
+      call psb_sum(ctxt,nt) 
+      if (nt /= m) then 
         write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
         info = -1
-        call psb_barrier(ictxt)
-        call psb_abort(ictxt)
-        return
+        call psb_barrier(ctxt)
+        call psb_abort(ctxt)
+        return    
       end if
 
       !
       ! First example  of use of CDALL: specify for each process a number of
       ! contiguous rows
-      !
-      call psb_cdall(ictxt,desc_a,info,nl=nr)
+      ! 
+      call psb_cdall(ctxt,desc_a,info,nl=nr)
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -288,23 +289,23 @@ contains
         if (size(iv) /= m) then
           write(psb_err_unit,*) iam, 'Initialization error: wrong IV size',size(iv),m
           info = -1
-          call psb_barrier(ictxt)
-          call psb_abort(ictxt)
-          return
+          call psb_barrier(ctxt)
+          call psb_abort(ctxt)
+          return    
         end if
       else
         write(psb_err_unit,*) iam, 'Initialization error: IV not present'
         info = -1
-        call psb_barrier(ictxt)
-        call psb_abort(ictxt)
-        return
+        call psb_barrier(ctxt)
+        call psb_abort(ctxt)
+        return    
       end if
 
       !
       ! Second example  of use of CDALL: specify for each row the
-      ! process that owns it
-      !
-      call psb_cdall(ictxt,desc_a,info,vg=iv)
+      ! process that owns it 
+      ! 
+      call psb_cdall(ctxt,desc_a,info,vg=iv)
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -341,21 +342,20 @@ contains
         write(psb_err_unit,*) iam,iamx,iamy, 'Initialization error: NR vs NLR ',&
              & nr,nlr,mynx,myny
         info = -1
-        call psb_barrier(ictxt)
-        call psb_abort(ictxt)
+        call psb_barrier(ctxt)
+        call psb_abort(ctxt)
       end if
 
       !
       ! Third example  of use of CDALL: specify for each process
       ! the set of global indices it owns.
-      !
-      call psb_cdall(ictxt,desc_a,info,vl=myidx)
-
+      ! 
+      call psb_cdall(ctxt,desc_a,info,vl=myidx)
     case default
       write(psb_err_unit,*) iam, 'Initialization error: should not get here'
       info = -1
-      call psb_barrier(ictxt)
-      call psb_abort(ictxt)
+      call psb_barrier(ctxt)
+      call psb_abort(ctxt)
       return
     end select
 
@@ -365,7 +365,7 @@ contains
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     talc = psb_wtime()-t0
 
     if (info /= psb_success_) then
@@ -391,7 +391,7 @@ contains
     ! loop over rows belonging to current process in a block
     ! distribution.
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t1 = psb_wtime()
     do ii=1, nlr,nb
       ib = min(nb,nlr-ii+1)
@@ -473,11 +473,11 @@ contains
 
     deallocate(val,irow,icol)
 
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info,mold=imold)
     tcdasb = psb_wtime()-t1
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
@@ -486,7 +486,7 @@ contains
         call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
       end if
     end if
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='asb rout.'
@@ -502,13 +502,13 @@ contains
       goto 9999
     end if
     tasb = psb_wtime()-t1
-    call psb_barrier(ictxt)
-    ttot = psb_wtime() - t0
+    call psb_barrier(ctxt)
+    ttot = psb_wtime() - t0 
 
-    call psb_amx(ictxt,talc)
-    call psb_amx(ictxt,tgen)
-    call psb_amx(ictxt,tasb)
-    call psb_amx(ictxt,ttot)
+    call psb_amx(ctxt,talc)
+    call psb_amx(ctxt,tgen)
+    call psb_amx(ctxt,tasb)
+    call psb_amx(ctxt,ttot)
     if(iam == psb_root_) then
       tmpfmt = a%get_fmt()
       write(psb_out_unit,'("The matrix has been generated and assembled in ",a3," format.")')&
@@ -523,7 +523,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
   end subroutine psb_d_gen_pde2d
@@ -556,7 +556,8 @@ program psb_d_pde2d
   ! dense vectors
   type(psb_d_vect_type) :: xxv,bv
   ! parallel environment
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: iam, np
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
@@ -579,12 +580,12 @@ program psb_d_pde2d
   info=psb_success_
 
 
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 
   if (iam < 0) then
     ! This should not happen, but just in case
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     stop
   endif
   if(psb_errstatus_fatal()) goto 9999
@@ -600,15 +601,15 @@ program psb_d_pde2d
   !
   !  get parameters
   !
-  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,parms)
+  call get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,parms)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess
   !
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)
-  call psb_barrier(ictxt)
+  call psb_gen_pde2d(ctxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)  
+  call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -622,7 +623,7 @@ program psb_d_pde2d
   !  prepare the preconditioner.
   !
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
-  call prec%init(ictxt,ptype,info)
+  call prec%init(ctxt,ptype,info)
   !
   ! Set the options for the BJAC preconditioner
   !
@@ -643,7 +644,7 @@ program psb_d_pde2d
     ! nothing to set for NONE or DIAG preconditioner
   end if
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%build(a,desc_a,info)
   if(info /= psb_success_) then
@@ -655,7 +656,7 @@ program psb_d_pde2d
 
   tprec = psb_wtime()-t1
 
-  call psb_amx(ictxt,tprec)
+  call psb_amx(ctxt,tprec)
 
   if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
@@ -664,8 +665,8 @@ program psb_d_pde2d
   ! iterative method parameters
   !
   if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
-  call psb_barrier(ictxt)
-  t1 = psb_wtime()
+  call psb_barrier(ctxt)
+  t1 = psb_wtime()  
   eps   = 1.d-6
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,&
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)
@@ -677,16 +678,16 @@ program psb_d_pde2d
     goto 9999
   end if
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
+  call psb_amx(ctxt,t2)
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = prec%sizeof()
   system_size = desc_a%get_global_rows()
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
-  call psb_sum(ictxt,precsize)
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
+  call psb_sum(ctxt,precsize)
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
@@ -720,10 +721,10 @@ program psb_d_pde2d
     goto 9999
   end if
 
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 
-9999 call psb_error(ictxt)
+9999 call psb_error(ctxt)
 
   stop
 
@@ -731,8 +732,8 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,parms)
-    integer(psb_ipk_) :: ictxt
+  subroutine  get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,parms)
+    type(psb_ctxt_type) :: ctxt
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst,ipart
     integer(psb_ipk_) :: np, iam
@@ -740,7 +741,7 @@ contains
     character(len=1024)   :: filename
     type(ainvparms)   :: parms
 
-    call psb_info(ictxt, iam, np)
+    call psb_info(ctxt, iam, np)
 
     if (iam == 0) then
       if (command_argument_count()>0) then
@@ -749,7 +750,7 @@ contains
         open(inp_unit,file=filename,action='read',iostat=info)
         if (info /= 0) then
           write(psb_err_unit,*) 'Could not open file ',filename,' for input'
-          call psb_abort(ictxt)
+          call psb_abort(ctxt)
           stop
         else
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
@@ -847,8 +848,8 @@ contains
         write(psb_out_unit,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
-        call pr_usage(izero)
-        call psb_abort(ictxt)
+        call pr_usage(izero)      
+        call psb_abort(ctxt)
         stop 1
       endif
       if (inp_unit /= psb_inp_unit) then
@@ -857,15 +858,15 @@ contains
 
     end if
     ! broadcast parameters to all processors
-    call psb_bcast(ictxt,kmethd)
-    call psb_bcast(ictxt,afmt)
-    call psb_bcast(ictxt,ptype)
-    call psb_bcast(ictxt,idim)
-    call psb_bcast(ictxt,ipart)
-    call psb_bcast(ictxt,istopc)
-    call psb_bcast(ictxt,itmax)
-    call psb_bcast(ictxt,itrace)
-    call psb_bcast(ictxt,irst)
+    call psb_bcast(ctxt,kmethd)
+    call psb_bcast(ctxt,afmt)
+    call psb_bcast(ctxt,ptype)
+    call psb_bcast(ctxt,idim)
+    call psb_bcast(ctxt,ipart)
+    call psb_bcast(ctxt,istopc)
+    call psb_bcast(ctxt,itmax)
+    call psb_bcast(ctxt,itrace)
+    call psb_bcast(ctxt,irst)
 
     return
 

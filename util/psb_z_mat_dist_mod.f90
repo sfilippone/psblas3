@@ -32,10 +32,10 @@
 module psb_z_mat_dist_mod
   use psb_base_mod, only :  psb_ipk_, psb_dpk_, psb_desc_type, psb_parts, &
        & psb_zspmat_type, psb_z_base_sparse_mat, psb_z_vect_type, &
-       & psb_lzspmat_type
+       & psb_lzspmat_type,  psb_ctxt_type
 
   interface psb_matdist
-    subroutine psb_zmatdist(a_glob, a, ictxt, desc_a,&
+    subroutine psb_zmatdist(a_glob, a, ctxt, desc_a,&
          & info, parts, vg, vsz, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
@@ -65,7 +65,7 @@ module psb_z_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer(psb_ipk_) :: ictxt
+      !  integer(psb_ipk_) :: ctxt
       !     on entry: the PSBLAS parallel environment context.
       !
       !  type (desc_type)                  :: desc_a
@@ -76,13 +76,12 @@ module psb_z_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      import :: psb_ipk_, psb_zspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_z_base_sparse_mat, psb_z_vect_type, psb_parts
+      import
       implicit none
 
       ! parameters
       type(psb_zspmat_type)      :: a_glob
-      integer(psb_ipk_) :: ictxt
+      type(psb_ctxt_type) :: ctxt
       type(psb_zspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info
@@ -93,7 +92,7 @@ module psb_z_mat_dist_mod
       integer(psb_ipk_), optional     :: vg(:)
       integer(psb_ipk_), optional     :: vsz(:)
     end subroutine psb_zmatdist
-    subroutine psb_lzmatdist(a_glob, a, ictxt, desc_a,&
+    subroutine psb_lzmatdist(a_glob, a, ctxt, desc_a,&
          & info, parts, vg, vsz, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
@@ -123,7 +122,7 @@ module psb_z_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer(psb_ipk_) :: ictxt
+      !  integer(psb_ipk_) :: ctxt
       !     on entry: the PSBLAS parallel environment context.
       !
       !  type (desc_type)                  :: desc_a
@@ -134,14 +133,12 @@ module psb_z_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      import :: psb_ipk_, psb_zspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_z_base_sparse_mat, psb_z_vect_type, psb_parts, &
-           & psb_lzspmat_type
+      import
       implicit none
 
       ! parameters
       type(psb_lzspmat_type)      :: a_glob
-      integer(psb_ipk_) :: ictxt
+      type(psb_ctxt_type) :: ctxt
       type(psb_zspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info

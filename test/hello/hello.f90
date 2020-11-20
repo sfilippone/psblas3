@@ -1,7 +1,8 @@
 program hello
   use psb_base_mod
   implicit none
-  integer(psb_ipk_) ::  iam, np, icontxt, ip, jp, idummy
+  type(psb_ctxt_type) :: icontxt
+  integer(psb_ipk_) ::  iam, np, ip, jp, idummy
 
   call psb_init(icontxt)
   call psb_info(icontxt,iam,np)            

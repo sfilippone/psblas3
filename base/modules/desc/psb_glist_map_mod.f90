@@ -91,12 +91,12 @@ contains
 
 
 
-  subroutine glist_initvg(idxmap,ictxt,vg,info)
+  subroutine glist_initvg(idxmap,ctxt,vg,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_glist_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt    
+    type(psb_ctxt_type), intent(in)    :: ctxt    
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
@@ -106,9 +106,9 @@ contains
     
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ctxt'
       info = -1
       return
     end if
@@ -124,9 +124,9 @@ contains
       return
     end if
 
-    idxmap%ictxt = ictxt
+    idxmap%ctxt = ctxt
     idxmap%state = psb_desc_bld_
-    idxmap%mpic  = psb_get_mpi_comm(ictxt)
+    idxmap%mpic  = psb_get_mpi_comm(ctxt)
 
     nl = 0 
     do i=1, n 
@@ -158,11 +158,12 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)      :: info
-    integer(psb_mpk_) :: ictxt, iam, np
-    integer(psb_lpk_) :: nv, i, ngp
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_)   :: iam, np
+    integer(psb_lpk_)   :: nv, i, ngp
     
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
     nv = size(idx)
     allocate(iprc(nv),stat=info) 
     if (info /= 0) then 

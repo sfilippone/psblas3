@@ -115,7 +115,9 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional    :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, err_act, data_
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
 
@@ -123,9 +125,9 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_tranv'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -150,18 +152,16 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  call  psi_swaptran(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+  call  psi_swaptran(ctxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 end subroutine psi_sswaptran_vect
-
-
 
 !
 !
@@ -176,7 +176,7 @@ end subroutine psi_sswaptran_vect
 !   
 !   
 ! 
-subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+subroutine psi_stran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_stran_vidx_vect
@@ -193,7 +193,9 @@ subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
+  type(psb_ctxt_type), intent(in)    :: ctxt
+  integer(psb_mpk_), intent(in)      :: icomm
+  integer(psb_ipk_), intent(in)      :: flag
   integer(psb_ipk_), intent(out)     :: info
   class(psb_s_base_vect_type) :: y
   real(psb_spk_)         :: beta
@@ -202,8 +204,8 @@ subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_)   :: np, me
+  integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -216,10 +218,7 @@ subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-  ictxt = iictxt
-  icomm = iicomm
-
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -266,7 +265,7 @@ subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
-      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         call mpi_irecv(y%combuf(snd_pt),nesd,&
@@ -422,7 +421,7 @@ subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -463,7 +462,9 @@ subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,work,info,data)
   integer(psb_ipk_), optional    :: data
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_) :: icomm
+  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, err_act, data_
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
 
@@ -471,9 +472,9 @@ subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_tranv'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -498,13 +499,13 @@ subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  call  psi_swaptran(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+  call  psi_swaptran(ctxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
   end subroutine psi_sswaptran_multivect
@@ -523,7 +524,7 @@ subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,work,info,data)
 !   
 !   
 ! 
-subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
+subroutine psi_stran_vidx_multivect(ctxt,icomm,flag,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_stran_vidx_multivect
@@ -540,7 +541,9 @@ subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
+  type(psb_ctxt_type), intent(in) :: ctxt
+  integer(psb_mpk_), intent(in)      :: icomm
+  integer(psb_ipk_), intent(in)      :: flag
   integer(psb_ipk_), intent(out)     :: info
   class(psb_s_base_multivect_type) :: y
   real(psb_spk_)         :: beta
@@ -549,8 +552,8 @@ subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpk_) :: ictxt, icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_)   :: np, me
+  integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -563,10 +566,7 @@ subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-  ictxt = iictxt
-  icomm = iicomm
-
-  call psb_info(ictxt,me,np) 
+  call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
     call psb_errpush(info,name)
@@ -613,7 +613,7 @@ subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      prcid(i) = psb_get_mpi_rank(ictxt,proc_to_comm)      
+      prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),snd_pt
         call mpi_irecv(y%combuf(snd_pt),n*nesd,&
@@ -773,7 +773,7 @@ subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(iictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

@@ -74,8 +74,9 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   class(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !     ....local scalars....      
-  integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: ictxt, err_act,nxch,nsnd,nrcv,j,k
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np,me
+  integer(psb_ipk_)   :: err_act,nxch,nsnd,nrcv,j,k
   !     ...local array...
   integer(psb_ipk_), allocatable  :: idx_out(:), tmp_mst_idx(:)
 
@@ -93,9 +94,9 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   debug_unit  = psb_get_debug_unit()
 
   info = psb_success_
-  ictxt = cdesc%get_context()
+  ctxt = cdesc%get_context()
 
-  call psb_info(ictxt,me,np)
+  call psb_info(ctxt,me,np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -210,7 +211,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

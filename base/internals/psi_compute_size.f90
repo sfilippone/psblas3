@@ -47,7 +47,8 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   integer(psb_ipk_) :: desc_data(:), index_in(:)
   !     ....local scalars....      
   integer(psb_ipk_) :: i,np,me,proc, max_index
-  integer(psb_ipk_) :: ictxt, err_act
+  integer(psb_ipk_) :: err_act
+  type(psb_ctxt_type) :: ctxt
   !     ...local array...
   integer(psb_ipk_) :: int_err(5)
   integer(psb_ipk_), allocatable :: counter_recv(:), counter_dl(:)
@@ -62,9 +63,9 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   debug_level = psb_get_debug_level()
 
   info = psb_success_
-  ictxt = desc_data(psb_ctxt_)
+  ctxt = desc_data(psb_ctxt_)
 
-  call psb_info(ictxt,me,np)
+  call psb_info(ctxt,me,np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -114,7 +115,7 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   enddo
 
   !     computing max global value of dl_lda
-  call psb_amx(ictxt, dl_lda)
+  call psb_amx(ctxt, dl_lda)
 
   if (debug_level>=psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': ',dl_lda
@@ -123,7 +124,7 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

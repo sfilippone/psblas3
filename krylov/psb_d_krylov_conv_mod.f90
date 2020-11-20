@@ -61,7 +61,8 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)                 :: name
     real(psb_dpk_), allocatable     :: r(:)
 
@@ -70,9 +71,9 @@ contains
     call psb_erractionsave(err_act)
 
 
-    ictxt=desc_a%get_context()
+    ctxt=desc_a%get_context()
 
-    call psb_info(ictxt, me, np)
+    call psb_info(ctxt, me, np)
 
     stopdat%controls(:) = 0
     stopdat%values(:)   = 0.0d0
@@ -116,7 +117,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -134,15 +135,16 @@ contains
     logical                         :: res
     integer(psb_ipk_), intent(out)            :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)               :: name
 
     info = psb_success_
     name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
-    ictxt = desc_a%get_context()
-    call psb_info(ictxt,me,np)
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt,me,np)
 
     res = .false. 
 
@@ -193,7 +195,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -212,7 +214,8 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)                 :: name
     type(psb_d_vect_type) :: r
 
@@ -221,9 +224,9 @@ contains
     call psb_erractionsave(err_act)
 
 
-    ictxt=desc_a%get_context()
+    ctxt=desc_a%get_context()
 
-    call psb_info(ictxt, me, np)
+    call psb_info(ctxt, me, np)
 
     stopdat%controls(:) = 0
     stopdat%values(:)   = dzero
@@ -267,7 +270,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -284,7 +287,8 @@ contains
     logical                          :: res
     integer(psb_ipk_), intent(out)             :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: me, np, err_act
     character(len=20)               :: name
 
     info = psb_success_
@@ -293,8 +297,8 @@ contains
     name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
-    ictxt = desc_a%get_context()
-    call psb_info(ictxt,me,np)
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt,me,np)
 
 
 
@@ -345,7 +349,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 

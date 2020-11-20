@@ -62,7 +62,8 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam, nlr
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_) :: np, me, iroot, icomm, myrank, rootrank, iam, nlr
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
@@ -79,10 +80,10 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, iam, np)
+  call psb_info(ctxt, iam, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -107,8 +108,8 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-  icomm  = psb_get_mpi_comm(ictxt)
-  myrank = psb_get_mpi_rank(ictxt,me)
+  icomm  = psb_get_mpi_comm(ctxt)
+  myrank = psb_get_mpi_rank(ctxt,me)
 
   if  (iroot==-1) then
     lda_globx = size(globx, 1)
@@ -159,7 +160,7 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
     end do
   else
     
-    rootrank = psb_get_mpi_rank(ictxt,iroot)
+    rootrank = psb_get_mpi_rank(ctxt,iroot)
     !
     ! This is potentially unsafe when IPK=8
     ! But then, IPK=8 is highly experimental anyway.
@@ -235,7 +236,7 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
@@ -306,7 +307,8 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_) :: np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_lpk_) :: m, n, i, j, idx, iglobx, jglobx
@@ -322,13 +324,13 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
-  ictxt=desc_a%get_context()
+  ctxt=desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
 
   ! check on blacs grid 
-  call psb_info(ictxt, iam, np)
+  call psb_info(ctxt, iam, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -347,8 +349,8 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
      iroot = psb_root_
   end if
   
-  icomm  = psb_get_mpi_comm(ictxt)
-  myrank = psb_get_mpi_rank(ictxt,iam)
+  icomm  = psb_get_mpi_comm(ctxt)
+  myrank = psb_get_mpi_rank(ctxt,iam)
 
   iglobx = 1
   jglobx = 1
@@ -394,7 +396,7 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
       locx(i)=globx(ltg(i))
     end do
   else
-    rootrank = psb_get_mpi_rank(ictxt,iroot)
+    rootrank = psb_get_mpi_rank(ctxt,iroot)
     !
     ! This is potentially unsafe when IPK=8
     ! But then, IPK=8 is highly experimental anyway.
@@ -472,7 +474,7 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
     return
 
