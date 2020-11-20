@@ -703,11 +703,12 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)     :: info
-    integer(psb_ipk_) :: nv
-    integer(psb_mpk_) :: ictxt, iam, np
+    integer(psb_ipk_)   :: nv
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_)   :: iam, np
     
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
     
     nv = size(idx)
     allocate(iprc(nv),stat=info) 
@@ -720,21 +721,21 @@ contains
   end subroutine repl_fnd_owner
 
 
-  subroutine repl_init(idxmap,ictxt,nl,info)
+  subroutine repl_init(idxmap,ctxt,nl,info)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(in)  :: nl
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_ipk_) :: iam, np
 
     info = 0
-    call psb_info(ictxt,iam,np) 
+    call psb_info(ctxt,iam,np) 
     if (np < 0) then 
-      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      write(psb_err_unit,*) 'Invalid ctxt:'
       info = -1
       return
     end if
@@ -744,9 +745,9 @@ contains
     idxmap%global_cols  = nl
     idxmap%local_rows   = nl
     idxmap%local_cols   = nl
-    idxmap%ictxt        = ictxt
+    idxmap%ctxt        = ctxt
     idxmap%state        = psb_desc_bld_
-    idxmap%mpic         = psb_get_mpi_comm(ictxt)
+    idxmap%mpic         = psb_get_mpi_comm(ctxt)
     call idxmap%set_state(psb_desc_bld_)
 
   end subroutine repl_init
@@ -759,11 +760,12 @@ contains
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     
-    integer(psb_mpk_) :: ictxt, iam, np 
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_)   :: iam, np 
     
     info = 0 
-    ictxt = idxmap%get_ctxt()
-    call psb_info(ictxt,iam,np)
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np)
 
     call idxmap%set_state(psb_desc_asb_)
     

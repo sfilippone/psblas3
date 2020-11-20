@@ -76,7 +76,8 @@ subroutine psb_s_apply2_vect(prec,x,y,desc_data,info,trans,work)
 
   character     :: trans_ 
   real(psb_spk_), pointer :: work_(:)
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -84,8 +85,8 @@ subroutine psb_s_apply2_vect(prec,x,y,desc_data,info,trans,work)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (present(trans)) then 
     trans_=psb_toupper(trans)
@@ -146,7 +147,8 @@ subroutine psb_s_apply1_vect(prec,x,desc_data,info,trans,work)
   type(psb_s_vect_type)       :: ww
   character     :: trans_ 
   real(psb_spk_), pointer :: work_(:)
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -154,8 +156,8 @@ subroutine psb_s_apply1_vect(prec,x,desc_data,info,trans,work)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (present(trans)) then 
     trans_=psb_toupper(trans)
@@ -218,7 +220,8 @@ subroutine psb_s_apply2v(prec,x,y,desc_data,info,trans,work)
 
   character     :: trans_ 
   real(psb_spk_), pointer :: work_(:)
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -226,8 +229,8 @@ subroutine psb_s_apply2v(prec,x,y,desc_data,info,trans,work)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (present(trans)) then 
     trans_=trans
@@ -282,7 +285,8 @@ subroutine psb_s_apply1v(prec,x,desc_data,info,trans)
   character(len=1), optional        :: trans
 
   character     :: trans_
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
   real(psb_spk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name
@@ -291,8 +295,8 @@ subroutine psb_s_apply1v(prec,x,desc_data,info,trans)
   call psb_erractionsave(err_act)
 
 
-  ictxt=desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
   if (present(trans)) then 
     trans_=psb_toupper(trans)
   else

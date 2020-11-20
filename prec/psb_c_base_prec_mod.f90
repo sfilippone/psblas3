@@ -36,17 +36,18 @@
 module psb_c_base_prec_mod
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_spk_, psb_ipk_, psb_epk_,&
+  use psb_base_mod, only : psb_spk_, psb_ipk_, psb_epk_, psb_ctxt_type, &
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
        & psb_sizeof_ip, psb_sizeof_lp, psb_sizeof_sp, psb_sizeof_dp, &
-       & psb_erractionsave, psb_erractionrestore, psb_error, psb_errstatus_fatal, psb_success_,&
+       & psb_erractionsave, psb_erractionrestore, psb_error, &
+       & psb_errstatus_fatal, psb_success_,&
        & psb_c_base_sparse_mat, psb_cspmat_type, psb_c_csr_sparse_mat,& 
        & psb_c_base_vect_type, psb_c_vect_type, psb_i_base_vect_type
 
   use psb_prec_const_mod
 
   type, abstract :: psb_c_base_prec_type
-    integer(psb_ipk_) :: ictxt
+    type(psb_ctxt_type) :: ctxt
   contains
     procedure, pass(prec) :: set_ctxt   => psb_c_base_set_ctxt
     procedure, pass(prec) :: get_ctxt   => psb_c_base_get_ctxt
@@ -342,12 +343,12 @@ contains
     
   end function psb_c_base_is_allocated_wrk
   
-  subroutine psb_c_base_set_ctxt(prec,ictxt)
+  subroutine psb_c_base_set_ctxt(prec,ctxt)
     implicit none 
     class(psb_c_base_prec_type), intent(inout) :: prec
-    integer(psb_ipk_), intent(in)  :: ictxt
+    type(psb_ctxt_type) :: ctxt
 
-    prec%ictxt = ictxt
+    prec%ctxt = ctxt
 
   end subroutine psb_c_base_set_ctxt
 
@@ -361,9 +362,9 @@ contains
 
   function psb_c_base_get_ctxt(prec) result(val)
     class(psb_c_base_prec_type), intent(in) :: prec
-    integer(psb_ipk_) :: val
+    type(psb_ctxt_type) :: val
 
-    val = prec%ictxt
+    val = prec%ctxt
     return
   end function psb_c_base_get_ctxt
 
@@ -382,10 +383,11 @@ contains
     character(len=32) :: res 
     !
     character(len=32) :: frmtv
-    integer(psb_ipk_) :: ni, ictxt,iam,np
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: ni, iam, np
 
-    ictxt = prec%ictxt
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     
     res = ''
     if (iam /= psb_root_) then

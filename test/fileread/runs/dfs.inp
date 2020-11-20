@@ -5,7 +5,7 @@ MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
 BiCGSTAB            Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
 BJAC                Preconditioner NONE  DIAG  BJAC 
 CSR                 Storage format CSR COO JAD 
-BLOCK               PART: Partition method  BLOCK   GRAPH 
+GRAPH               PART: Partition method  BLOCK   GRAPH 
 2                   ISTOPC
 00500               ITMAX
 -1                  ITRACE

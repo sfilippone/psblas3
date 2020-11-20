@@ -32,6 +32,7 @@
 
 module psb_cbind_const_mod
   use iso_c_binding 
+  use psb_const_mod
   
   integer, parameter :: psb_c_mpk_ = c_int32_t
 #if defined(IPK4) &&  defined(LPK4)
@@ -48,5 +49,4 @@ module psb_cbind_const_mod
   integer, parameter :: psb_c_lpk_ = -1
 #endif
   integer, parameter :: psb_c_epk_ = c_int64_t
-
 end module psb_cbind_const_mod

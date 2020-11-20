@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psb_cprecinit(ictxt,p,ptype,info)
+subroutine psb_cprecinit(ctxt,p,ptype,info)
 
   use psb_base_mod
   use psb_c_prec_type, psb_protect_name => psb_cprecinit
@@ -37,7 +37,7 @@ subroutine psb_cprecinit(ictxt,p,ptype,info)
   use psb_c_diagprec, only : psb_c_diag_prec_type
   use psb_c_bjacprec, only : psb_c_bjac_prec_type
   implicit none
-  integer(psb_ipk_), intent(in)          :: ictxt
+  type(psb_ctxt_type), intent(in) :: ctxt
   class(psb_cprec_type), intent(inout) :: p
   character(len=*), intent(in)           :: ptype
   integer(psb_ipk_), intent(out)         :: info
@@ -50,7 +50,7 @@ subroutine psb_cprecinit(ictxt,p,ptype,info)
     if (info /= psb_success_) return
   end if
   
-  p%ictxt = ictxt
+  p%ctxt = ctxt
   
   select case(psb_toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 

@@ -123,7 +123,8 @@ subroutine psb_zbicg_vect(a,prec,b,x,eps,desc_a,info,&
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer(psb_ipk_), parameter :: irmax = 8
   integer(psb_ipk_) :: itx
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me
   complex(psb_dpk_)     :: alpha, beta, rho, rho_old, sigma
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type) :: stopdat
@@ -136,8 +137,8 @@ subroutine psb_zbicg_vect(a,prec,b,x,eps,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 

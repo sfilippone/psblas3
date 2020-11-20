@@ -38,15 +38,16 @@ subroutine psb_c_bjac_dump(prec,info,prefix,head)
   integer(psb_ipk_), intent(out)                    :: info
   character(len=*), intent(in), optional  :: prefix,head
   integer(psb_ipk_) :: i, j, il1, iln, lname, lev
-  integer(psb_ipk_) :: ictxt,iam, np
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
 
   !  len of prefix_ 
 
   info = 0
-  ictxt = prec%get_ctxt()
-  call psb_info(ictxt,iam,np)
+  ctxt = prec%get_ctxt()
+  call psb_info(ctxt,iam,np)
 
   if (present(prefix)) then 
     prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))
@@ -87,7 +88,8 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_) :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:)
   type(psb_c_vect_type) :: wv, wv1
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   logical            :: do_alloc_wrk
@@ -99,8 +101,8 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
 
   trans_ = psb_toupper(trans)
@@ -242,7 +244,8 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:)
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
@@ -253,8 +256,8 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
 
   trans_ = psb_toupper(trans)
@@ -432,7 +435,8 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   type(psb_c_csr_sparse_mat), allocatable  :: lf, uf
   complex(psb_spk_), allocatable :: dd(:)
   integer(psb_ipk_) :: nztota,  err_act, n_row, nrow_a,n_col, nhalo
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   character(len=20)  :: name='c_bjac_precbld'
   character(len=20)  :: ch_err
 
@@ -444,9 +448,9 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_ctxt()
-  call prec%set_ctxt(ictxt)
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_ctxt()
+  call prec%set_ctxt(ctxt)
+  call psb_info(ctxt, me, np)
 
   m = a%get_nrows()
   if (m < 0) then

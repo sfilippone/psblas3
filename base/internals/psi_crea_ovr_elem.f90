@@ -63,7 +63,6 @@ subroutine psi_i_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
 
   integer(psb_ipk_) :: nel, ip, ix, iel, insize, err_act, iproc
   integer(psb_ipk_), allocatable :: telem(:,:)
-
   character(len=20)    :: name
 
 

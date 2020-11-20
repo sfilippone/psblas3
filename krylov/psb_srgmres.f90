@@ -137,7 +137,8 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ictxt, np, me  
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me  
   Real(psb_spk_)     :: rni, xni, bni, ani,bn2, dt, r0n2
   real(psb_dpk_)     :: errnum, errden, deps, derr
   character(len=20)           :: name
@@ -149,8 +150,8 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
-  Call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  Call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
   if (.not.allocated(b%v)) then 

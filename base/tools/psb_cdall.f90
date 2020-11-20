@@ -1,4 +1,5 @@
-subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalcheck,lidx,usehash)
+subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,&
+     & vg,vl,flag,nl,repl,globalcheck,lidx,usehash)
   use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
@@ -7,46 +8,50 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
   use psb_cd_tools_mod, psb_protect_name => psb_cdall
   use psi_mod
   implicit None
-  procedure(psb_parts)               :: parts
-  integer(psb_lpk_), intent(in)       :: mg,ng, vl(:)
-  integer(psb_ipk_), intent(in)       :: ictxt, vg(:), lidx(:),nl
-  integer(psb_ipk_), intent(in)       :: flag
-  logical, intent(in)               :: repl, globalcheck,usehash
-  integer(psb_ipk_), intent(out)              :: info
-  type(psb_desc_type), intent(out)  :: desc
+  procedure(psb_parts)             :: parts
+  integer(psb_lpk_), intent(in)    :: mg,ng, vl(:)
+  type(psb_ctxt_type), intent(in)  :: ctxt
+  integer(psb_ipk_), intent(in)    :: vg(:), lidx(:),nl
+  integer(psb_ipk_), intent(in)    :: flag
+  logical, intent(in)              :: repl, globalcheck,usehash
+  integer(psb_ipk_), intent(out)   :: info
+  type(psb_desc_type), intent(out) :: desc
 
   optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx, usehash
 
   interface 
-    subroutine psb_cdals(m, n, parts, ictxt, desc, info)
+    subroutine psb_cdals(m, n, parts, ctxt, desc, info)
       use psb_desc_mod
       procedure(psb_parts)               :: parts
       integer(psb_lpk_), intent(in)      :: m,n
-      integer(psb_ipk_), intent(in)      :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       Type(psb_desc_type), intent(out)   :: desc
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_cdals
-    subroutine psb_cdalv(v, ictxt, desc, info, flag)
+    subroutine psb_cdalv(v, ctxt, desc, info, flag)
       use psb_desc_mod
-      integer(psb_ipk_), intent(in)               :: ictxt, v(:)
+      type(psb_ctxt_type), intent(in) :: ctxt
+      integer(psb_ipk_), intent(in)               :: v(:)
       integer(psb_ipk_), intent(in), optional     :: flag
       integer(psb_ipk_), intent(out)              :: info
       Type(psb_desc_type), intent(out)  :: desc
     end subroutine psb_cdalv
-    subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx, usehash)
+    subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx, usehash)
       use psb_desc_mod
       implicit None
-      integer(psb_ipk_), intent(in)               :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_lpk_), intent(in)               :: v(:)
       integer(psb_ipk_), intent(out)              :: info
       type(psb_desc_type), intent(out)  :: desc
       logical, intent(in), optional     :: globalcheck, usehash
       integer(psb_ipk_), intent(in), optional     :: idx(:)
     end subroutine psb_cd_inloc
-    subroutine psb_cdrep(m, ictxt, desc,info)
+    subroutine psb_cdrep(m, ctxt, desc,info)
       use psb_desc_mod
       integer(psb_lpk_), intent(in)     :: m
-      integer(psb_ipk_), intent(in)     :: ictxt
+      type(psb_ctxt_type), intent(in) :: ctxt
+
+
       Type(psb_desc_type), intent(out)  :: desc
       integer(psb_ipk_), intent(out)    :: info
     end subroutine psb_cdrep
@@ -65,7 +70,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
   name = 'psb_cdall'
   call psb_erractionsave(err_act)
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (count((/ present(vg),present(vl),&
        &  present(parts),present(nl), present(repl) /)) /= 1) then 
     info=psb_err_no_optional_arg_
@@ -90,7 +95,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
     else
       n_ = mg 
     endif
-    call  psb_cdals(mg, n_, parts, ictxt, desc, info)
+    call  psb_cdals(mg, n_, parts, ctxt, desc, info)
 
   else if (present(repl)) then 
 
@@ -105,7 +110,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
       goto 9999 
     end if
 
-    call  psb_cdrep(mg, ictxt, desc, info)
+    call  psb_cdrep(mg, ctxt, desc, info)
 
 
   else if (present(vg)) then 
@@ -121,7 +126,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
       nnv = size(vg)
     end if
 
-    call psb_cdalv(vg(1:nnv), ictxt, desc, info, flag=flag_)
+    call psb_cdalv(vg(1:nnv), ctxt, desc, info, flag=flag_)
 
   else if (present(vl)) then 
 
@@ -131,7 +136,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
       nnv = size(vl)
     end if
 
-    call psb_cd_inloc(vl(1:nnv),ictxt,desc,info, globalcheck=globalcheck,idx=lidx)
+    call psb_cd_inloc(vl(1:nnv),ctxt,desc,info, globalcheck=globalcheck,idx=lidx)
 
   else if (present(nl)) then 
 
@@ -143,9 +148,9 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
 
     if (usehash_) then
       nlp = nl
-      call psb_exscan_sum(ictxt,nlp)
+      call psb_exscan_sum(ctxt,nlp)
       lvl = [ (i,i=1,nl) ] + nlp
-      call psb_cd_inloc(lvl(1:nl),ictxt,desc,info, globalcheck=.false.)
+      call psb_cd_inloc(lvl(1:nl),ctxt,desc,info, globalcheck=.false.)
 
     else
       if (np == 1) then 
@@ -157,9 +162,9 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
         select type(aa => desc%indxmap) 
         type is (psb_repl_map)
           n_ = nl
-          call aa%repl_map_init(ictxt,n_,info)
+          call aa%repl_map_init(ctxt,n_,info)
         type is (psb_gen_block_map) 
-          call aa%gen_block_map_init(ictxt,nl,info)
+          call aa%gen_block_map_init(ctxt,nl,info)
           class default 
             ! This cannot happen 
           info = psb_err_internal_error_
@@ -197,7 +202,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,globalchec
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

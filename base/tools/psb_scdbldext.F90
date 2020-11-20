@@ -90,7 +90,9 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
   integer(psb_lpk_) :: gidx, lnz
-  integer(psb_mpk_) :: icomm, ictxt, me, np, minfo
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: me, np
+  integer(psb_mpk_) :: icomm, minfo
 
   integer(psb_ipk_), allocatable :: irow(:), icol(:)
   integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
@@ -114,9 +116,9 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(info,name)
     goto 9999
   end if
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  Call psb_info(ictxt, me, np)
+  Call psb_info(ctxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),&
@@ -187,7 +189,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   If (debug_level >= psb_debug_outer_)then 
     Write(debug_unit,*) me,' ',trim(name),&
          & ': BEGIN ',nhalo, desc_ov%indxmap%get_state()
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
   !
   ! Ok, since we are only estimating, do it as follows: 
@@ -215,7 +217,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   If (debug_level >= psb_debug_outer_) then
     Write(debug_unit,*) me,' ',trim(name),':Start',&
          & lworks,lworkr, desc_ov%indxmap%get_state()
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   endif
 
 
@@ -593,7 +595,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
 
       if (debug_level >= psb_debug_outer_) then 
         write(debug_unit,*) me,' ',trim(name),':Done Crea_Index'
-        call psb_barrier(ictxt)
+        call psb_barrier(ctxt)
       end if
       call psb_move_alloc(t_halo_out,halo,info)
       !
@@ -672,7 +674,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   if (debug_level >= psb_debug_outer_) then
     write(debug_unit,*) me,' ',trim(name),': converting indexes'
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
   end if
 
   call psb_icdasb(desc_ov,info,ext_hv=.true.)
@@ -701,7 +703,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ione*ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

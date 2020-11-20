@@ -78,7 +78,7 @@ module psb_const_mod
   !
   !  Additional rules:
   !  1. MPI related stuff is always MPK
-  !  2. ICTXT,IAM,NP: should we have two versions of everything,
+  !  2. ctxt,IAM,NP: should we have two versions of everything,
   !                   one with MPK the other with EPK?
   !  3. INFO, ERR_ACT, IERR etc are always IPK
   !  4. For the array version of things, where it makes sense
@@ -314,5 +314,24 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_invalid_irst_ =5002
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preci_=5003
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preca_=5004
+
+
+  type psb_ctxt_type
+    integer(psb_mpk_), allocatable :: ctxt
+  end type psb_ctxt_type
+
+contains
+
+  function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
+    type(psb_ctxt_type), intent(in) :: ctxt1, ctxt2
+    logical :: res
+
+    res = .false.
+    if (.not.allocated(ctxt1%ctxt).and.(.not.allocated(ctxt2%ctxt))) &
+         & res = .true.
+    if (allocated(ctxt1%ctxt).and.allocated(ctxt2%ctxt)) &
+         & res = (ctxt1%ctxt == ctxt2%ctxt)
+
+  end function psb_cmp_ctxt
 
 end module psb_const_mod

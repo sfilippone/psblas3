@@ -59,7 +59,8 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   logical, intent(in),  optional     :: owned
 
   !....locals....
-  integer(psb_ipk_) :: n, ictxt, iam, np 
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: n, iam, np 
   character         :: act
   integer(psb_ipk_) :: err_act
   character(len=20) :: name
@@ -74,8 +75,8 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
     goto 9999
   end if
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,iam,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,iam,np)
 
 
   if (present(iact)) then
@@ -113,7 +114,7 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -183,7 +184,8 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   character         :: act
   integer(psb_ipk_) :: err_act
   character(len=20) :: name
-  integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: iam, np
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -196,8 +198,8 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
     goto 9999
   end if
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,iam,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,iam,np)
 
 
   if (present(iact)) then
@@ -229,7 +231,7 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
