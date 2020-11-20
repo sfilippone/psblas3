@@ -175,7 +175,7 @@ end subroutine psi_iswapdata_vect
 !   
 !   
 ! 
-subroutine psi_iswap_vidx_vect(ictxt,iicomm,flag,beta,y,idx, &
+subroutine psi_iswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_iswap_vidx_vect
@@ -192,8 +192,8 @@ subroutine psi_iswap_vidx_vect(ictxt,iicomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)  :: ictxt
-  integer(psb_mpk_), intent(in)    :: iicomm
+  type(psb_ctxt_type), intent(in)  :: ctxt
+  integer(psb_mpk_), intent(in)    :: icomm
   integer(psb_ipk_), intent(in)    :: flag
   integer(psb_ipk_), intent(out)   :: info
   class(psb_i_base_vect_type) :: y
@@ -203,9 +203,8 @@ subroutine psi_iswap_vidx_vect(ictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_)   :: icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_)   :: np, me
+  integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -218,8 +217,6 @@ subroutine psi_iswap_vidx_vect(ictxt,iicomm,flag,beta,y,idx, &
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
-  ctxt = ictxt
-  icomm = iicomm
 
   call psb_info(ctxt,me,np) 
   if (np == -1) then
@@ -517,7 +514,7 @@ end subroutine psi_iswapdata_multivect
 !   
 !   
 ! 
-subroutine psi_iswap_vidx_multivect(ictxt,iicomm,flag,beta,y,idx, &
+subroutine psi_iswap_vidx_multivect(ctxt,icomm,flag,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_iswap_vidx_multivect
@@ -534,8 +531,8 @@ subroutine psi_iswap_vidx_multivect(ictxt,iicomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)    :: ictxt
-  integer(psb_mpk_), intent(in)      :: iicomm
+  type(psb_ctxt_type), intent(in)    :: ctxt
+  integer(psb_mpk_), intent(in)      :: icomm
   integer(psb_ipk_), intent(in)      :: flag
   integer(psb_ipk_), intent(out)     :: info
   class(psb_i_base_multivect_type) :: y
@@ -545,9 +542,8 @@ subroutine psi_iswap_vidx_multivect(ictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_)   :: icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_)   :: np, me
+  integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -560,8 +556,6 @@ subroutine psi_iswap_vidx_multivect(ictxt,iicomm,flag,beta,y,idx, &
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
-  ctxt = ictxt
-  icomm = iicomm
 
   call psb_info(ctxt,me,np) 
   if (np == -1) then
