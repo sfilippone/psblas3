@@ -34,7 +34,9 @@ OBJS=psb_s_prec_type_impl.o psb_d_prec_type_impl.o \
 		 psb_ssparse_biconjg_mlk.o psb_ssparse_biconjg_s_ft_llk.o \
 		 psb_ssparse_biconjg_s_llk.o \
 		 psb_d_ainv_bld.o psb_c_ainv_bld.o psb_s_ainv_bld.o \
-		 psb_z_ainv_bld.o 
+		 psb_z_ainv_bld.o \
+		 psb_c_invt_fact.o psb_d_invt_fact.o psb_s_invt_fact.o psb_z_invt_fact.o\
+		 psb_c_invk_fact.o psb_d_invk_fact.o psb_s_invk_fact.o psb_z_invk_fact.o
 
 LIBNAME=$(PRECLIBNAME)
 COBJS=
