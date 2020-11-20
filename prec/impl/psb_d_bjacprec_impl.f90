@@ -448,6 +448,11 @@ subroutine psb_d_bjac_precinit(prec,info)
 
   info = psb_success_
   call psb_realloc(psb_ifpsz,prec%iprcparm,info)
+  if (info /= psb_success_) then
+    info = psb_err_alloc_dealloc_
+    call psb_Errpush(info,name)
+    goto 9999
+  end if
   call psb_realloc(psb_rfpsz,prec%rprcparm,info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
@@ -1122,15 +1127,13 @@ subroutine psb_d_bjac_precsetr(prec,what,val,info)
   call psb_erractionsave(err_act)
 
   info = psb_success_
-  if (.not.allocated(prec%iprcparm)) then
+  if (.not.allocated(prec%rprcparm)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
 
   select case(what)
-  case (psb_f_type_)
-    prec%iprcparm(psb_f_type_)     = val
 
   case (psb_fact_eps_)
     prec%rprcparm(psb_fact_eps_) = val

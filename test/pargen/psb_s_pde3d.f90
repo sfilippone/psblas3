@@ -681,6 +681,14 @@ program psb_s_pde3d
         call prec%set('inv_thresh',      parms%inv_thresh, info)
         call prec%set('inv_fillin',      parms%inv_fill,   info)
         call prec%set('ilut_scale',      parms%ilut_scale, info)
+      case ("INVK")
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('inv_fillin',      parms%inv_fill,   info)
+      case ("INVT")
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('inv_fillin',      parms%inv_fill,   info)
+        call prec%set('sub_iluthrs',     parms%thresh,     info)
+        call prec%set('inv_thresh',      parms%inv_thresh, info)
       case default
         ! Do nothing, use default setting in the init routine
       end select
@@ -884,6 +892,9 @@ contains
               write(psb_out_unit,'("Threshold     : ",es12.5)') parms%thresh
               write(psb_out_unit,'("Scaling       : ",a)') parms%ilut_scale
             case ('INVK')
+              write(psb_out_unit,'("Fill in            : ",i0)') parms%fill
+              write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill
+            case ('INVT')
               write(psb_out_unit,'("Fill in            : ",i0)') parms%fill
               write(psb_out_unit,'("Threshold          : ",es12.5)') parms%thresh
               write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill

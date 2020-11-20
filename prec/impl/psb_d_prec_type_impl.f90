@@ -354,9 +354,9 @@ subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
   select case (psb_toupper(what))
-    case ("SUB_FILLIN")
+    case ('SUB_FILLIN')
       call prec%prec%precset(psb_ilu_fill_in_,val,info)
-    case('INV_FILLIN')
+    case ('INV_FILLIN')
       call prec%prec%precset(psb_inv_fillin_,val,info)
     case default
       info = psb_err_invalid_args_combination_
@@ -383,7 +383,7 @@ subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
   character(len=*), optional, intent(in)   :: pos
 
   ! Local variables
-  character(len=*), parameter            :: name='amg_precsetr'
+  character(len=*), parameter            :: name='psb_precsetr'
 
   info = psb_success_
 
@@ -419,7 +419,7 @@ subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
   character(len=*), optional, intent(in)   :: pos
 
   ! Local variables
-  character(len=*), parameter            :: name='amg_precsetc'
+  character(len=*), parameter            :: name='psb_precsetc'
 
   info = psb_success_
 
@@ -437,6 +437,10 @@ subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
             call prec%prec%precset(psb_ilu_ialg_,psb_ilu_t_,info)
         case("AINV")
             call prec%prec%precset(psb_f_type_,psb_f_ainv_,info)
+        case("INVK")
+            call prec%prec%precset(psb_f_type_,psb_f_invk_,info)
+        case("INVT")
+            call prec%prec%precset(psb_f_type_,psb_f_invt_,info)
         case default
           ! Default to ILU(0) factorization
           call prec%prec%precset(psb_f_type_,psb_f_ilu_n_,info)
