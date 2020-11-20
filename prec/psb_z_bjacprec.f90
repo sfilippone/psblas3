@@ -34,6 +34,8 @@ module psb_z_bjacprec
   use psb_z_base_prec_mod
   use psb_z_ilu_fact_mod
   use psb_z_ainv_fact_mod
+  use psb_z_invk_fact_mod
+  use psb_z_invt_fact_mod
 
   type, extends(psb_z_base_prec_type)   :: psb_z_bjac_prec_type
     integer(psb_ipk_), allocatable      :: iprcparm(:)
@@ -59,9 +61,9 @@ module psb_z_bjacprec
   end type psb_z_bjac_prec_type
 
   character(len=15), parameter, private :: &
-       &  fact_names(0:5)=(/'None          ','ILU(0)        ',&
+       &  fact_names(0:6)=(/'None          ','ILU(0)        ',&
        &  'ILU(n)        ','ILU(eps)      ','AINV(eps)     ',&
-       &  'INVT          '/)
+       &  'INVT          ','INVK          '/)
 
   private :: psb_z_bjac_sizeof, psb_z_bjac_precdescr, psb_z_bjac_get_nzeros
 

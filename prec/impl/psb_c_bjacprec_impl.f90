@@ -195,7 +195,8 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
         goto 9999
       end if
 
-    case(psb_f_ainv_)
+    case(psb_f_ainv_,psb_f_invt_,psb_f_invk_)
+      ! Application of approximate inverse preconditioner, just some spmm
 
       select case(trans_)
       case('N')
@@ -373,11 +374,8 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       goto 9999
     end if
 
-  case(psb_f_ainv_)
+  case(psb_f_ainv_,psb_f_invt_,psb_f_invk_)
     ! Application of approximate inverse preconditioner, just some spmm
-    ! call psb_spmm(alpha, a, x, beta, y,desc_a, info, &
-    ! & trans, work)
-
 
     select case(trans_)
 
@@ -866,8 +864,153 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999
     endif
-    ! Computin the factorization
+    ! Computing the factorization
     call psb_ainv_fact(a,iinvalg,inv_fill,inv_thresh,lf,dd,uf,desc_a,info,iscale=iscale)
+
+    if(info == psb_success_) then
+      call prec%av(psb_l_pr_)%mv_from(lf%a)
+      call prec%av(psb_u_pr_)%mv_from(uf%a)
+      call prec%av(psb_l_pr_)%set_asb()
+      call prec%av(psb_u_pr_)%set_asb()
+      call prec%av(psb_l_pr_)%trim()
+      call prec%av(psb_u_pr_)%trim()
+      call prec%dv%bld(dd)
+      ! call move_alloc(dd,prec%d)
+    else
+      info=psb_err_from_subroutine_
+      ch_err='psb_ilut_fact'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+  case(psb_f_invk_)
+    ! Approximate Inverse Factorizations based on the sparse inversion of
+    ! triangular factors of an ILU(n) factorization
+    if (allocated(prec%av)) then
+      if (size(prec%av) < psb_bp_ilu_avsz) then
+        do i=1,size(prec%av)
+          call prec%av(i)%free()
+        enddo
+        deallocate(prec%av,stat=info)
+      endif
+    end if
+    if (.not.allocated(prec%av)) then
+      allocate(prec%av(psb_max_avsz),stat=info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_alloc_dealloc_,name)
+        goto 9999
+      end if
+    endif
+
+    nrow_a = desc_a%get_local_rows()
+    nztota = a%get_nzeros()
+
+    n_col  = desc_a%get_local_cols()
+    nhalo  = n_col-nrow_a
+    n_row  = nrow_a
+
+    allocate(lf,uf,stat=info)
+    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
+    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
+
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_sp_all'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    allocate(dd(n_row),stat=info)
+    if (info == psb_success_) then
+      allocate(prec%dv, stat=info)
+      if (info == 0) then
+        if (present(vmold)) then
+          allocate(prec%dv%v,mold=vmold,stat=info)
+        else
+          allocate(psb_c_base_vect_type :: prec%dv%v,stat=info)
+        end if
+      end if
+    end if
+
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999
+    endif
+    ! Computing the factorization
+    call psb_invk_fact(a,fill_in, inv_fill,lf,dd,uf,desc_a,info)
+
+    if(info == psb_success_) then
+      call prec%av(psb_l_pr_)%mv_from(lf%a)
+      call prec%av(psb_u_pr_)%mv_from(uf%a)
+      call prec%av(psb_l_pr_)%set_asb()
+      call prec%av(psb_u_pr_)%set_asb()
+      call prec%av(psb_l_pr_)%trim()
+      call prec%av(psb_u_pr_)%trim()
+      call prec%dv%bld(dd)
+      ! call move_alloc(dd,prec%d)
+    else
+      info=psb_err_from_subroutine_
+      ch_err='psb_ilut_fact'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+  case(psb_f_invt_)
+    ! Approximate Inverse Factorizations based on the sparse inversion of
+    ! triangular factors of an ILU(eps) factorization
+    if (allocated(prec%av)) then
+      if (size(prec%av) < psb_bp_ilu_avsz) then
+        do i=1,size(prec%av)
+          call prec%av(i)%free()
+        enddo
+        deallocate(prec%av,stat=info)
+      endif
+    end if
+    if (.not.allocated(prec%av)) then
+      allocate(prec%av(psb_max_avsz),stat=info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_alloc_dealloc_,name)
+        goto 9999
+      end if
+    endif
+
+    nrow_a = desc_a%get_local_rows()
+    nztota = a%get_nzeros()
+
+    n_col  = desc_a%get_local_cols()
+    nhalo  = n_col-nrow_a
+    n_row  = nrow_a
+
+    allocate(lf,uf,stat=info)
+    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
+    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
+
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_sp_all'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    allocate(dd(n_row),stat=info)
+    if (info == psb_success_) then
+      allocate(prec%dv, stat=info)
+      if (info == 0) then
+        if (present(vmold)) then
+          allocate(prec%dv%v,mold=vmold,stat=info)
+        else
+          allocate(psb_c_base_vect_type :: prec%dv%v,stat=info)
+        end if
+      end if
+    end if
+
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999
+    endif
+    ! Computing the factorization
+    call psb_invt_fact(a,fill_in,inv_fill,fact_eps,inv_thresh,lf,dd,uf,&
+      & desc_a,info)
 
     if(info == psb_success_) then
       call prec%av(psb_l_pr_)%mv_from(lf%a)

@@ -57,8 +57,8 @@ module psb_prec_const_mod
   integer(psb_ipk_), parameter :: psb_rfpsz=8
   ! Factorization types: none, ILU(0), ILU(N), ILU(N,E)
   integer(psb_ipk_), parameter :: psb_f_none_=0,psb_f_ilu_n_=1,psb_f_ilu_k_=2,psb_f_ilu_t_=3
-  ! Approximate Inverse factorization type: AINV
-  integer(psb_ipk_), parameter :: psb_f_ainv_=4, psb_f_invt_=5
+  ! Approximate Inverse factorization type: AINV, INVT, INVK
+  integer(psb_ipk_), parameter :: psb_f_ainv_=4, psb_f_invt_=5, psb_f_invk_=6
   ! Fields for sparse matrices ensembles:
   integer(psb_ipk_), parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
   integer(psb_ipk_), parameter :: psb_max_avsz=psb_bp_ilu_avsz
