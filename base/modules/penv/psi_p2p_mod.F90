@@ -216,10 +216,11 @@ contains
     logical, intent(out)  :: dat(:)
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info 
-    integer(psb_mpk_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size), icomm
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_logical,src,psb_logical_tag,ctxt,status,info)
+    icomm = psb_get_mpi_comm(ctxt)
+    call mpi_recv(dat,size(dat),mpi_logical,src,psb_logical_tag,icomm,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
