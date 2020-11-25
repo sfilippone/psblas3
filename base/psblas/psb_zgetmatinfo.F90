@@ -29,20 +29,24 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: psb_dgetmatinfo.f90
+! File: psb_zgetmatinfo.f90
 !
 ! This function containts the implementation for obtaining information on the
 ! paralle sparse matrix
 !
-function  psb_dget_nnz(a,desc_a,info) result(res)
-  use psb_base_mod, psb_protect_name => psb_dget_nnz
+function  psb_zget_nnz(a,desc_a,info) result(res)
+  use psb_base_mod, psb_protect_name => psb_zget_nnz
   use psi_mod
-  use mpi
-
-  implicit none
+#ifdef MPI_MOD
+      use mpi
+#endif
+      implicit none
+#ifdef MPI_H
+      include 'mpif.h'
+#endif
 
   integer(psb_lpk_)                     :: res
-  type(psb_dspmat_type), intent(in)   :: a
+  type(psb_zspmat_type), intent(in)   :: a
   type(psb_desc_type), intent (in)      :: desc_a
   integer(psb_ipk_), intent(out)        :: info
 
@@ -53,7 +57,7 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
   integer(psb_lpk_) :: localnnz
   character(len=20) :: name, ch_err
   !
-  name='psb_dget_nnz'
+  name='psb_zget_nnz'
   info=psb_success_
   call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
