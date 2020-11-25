@@ -295,7 +295,7 @@ subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
   call psb_erractionsave(err_act)
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
-  if (present(trans)) then 
+  if (present(trans)) then
     trans_=psb_toupper(trans)
   else
     trans_='N'
@@ -355,7 +355,7 @@ subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
 
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
-  select case (psb_toupper(what))
+  select case (psb_toupper(trim(what)))
     case ('SUB_FILLIN')
       call prec%prec%precset(psb_ilu_fill_in_,val,info)
     case ('INV_FILLIN')
@@ -391,7 +391,7 @@ subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
 
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
-  select case (psb_toupper(what))
+  select case (psb_toupper(trim(what)))
   case('SUB_ILUTHRS')
     call prec%prec%precset(psb_fact_eps_,val,info)
   case('INV_THRESH')
@@ -427,10 +427,10 @@ subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
 
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
-  select case (psb_toupper(what))
+  select case (psb_toupper(trim(what)))
     case ('SUB_SOLVE')
       ! We select here the type of solver on the block
-      select case (psb_toupper(string))
+      select case (psb_toupper(trim(string)))
         case("ILU")
             call prec%prec%precset(psb_f_type_,psb_f_ilu_k_,info)
             call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
@@ -449,14 +449,14 @@ subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
           call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
       end select
     case ("ILU_ALG")
-      select case (psb_toupper(string))
+      select case (psb_toupper(trim(string)))
         case ("MILU")
           call prec%prec%precset(psb_ilu_ialg_,psb_milu_n_,info)
         case default
           ! Do nothing
       end select
     case ("ILUT_SCALE")
-      select case (psb_toupper(string))
+      select case (psb_toupper(trim(string)))
       case ("MAXVAL")
         call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_maxval_,info)
       case ("DIAG")
@@ -467,11 +467,13 @@ subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
         call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_arcsum_,info)
       case ("ACLSUM")
         call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_aclsum_,info)
+      case ("NONE")
+        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
       case default
         call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
       end select
     case ("AINV_ALG")
-      select case (psb_toupper(string))
+      select case (psb_toupper(trim(string)))
       case("LLK")
         call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
       case("SYM-LLK")
