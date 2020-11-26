@@ -37,9 +37,13 @@
 function  psb_cget_nnz(a,desc_a,info) result(res)
   use psb_base_mod, psb_protect_name => psb_cget_nnz
   use psi_mod
-  use mpi
-
-  implicit none
+#ifdef MPI_MOD
+      use mpi
+#endif
+      implicit none
+#ifdef MPI_H
+      include 'mpif.h'
+#endif
 
   integer(psb_lpk_)                     :: res
   type(psb_cspmat_type), intent(in)   :: a

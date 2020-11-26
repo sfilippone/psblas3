@@ -110,13 +110,13 @@ module psi_i_mod
   end interface
 
   interface  psi_bld_glb_dep_list
-    subroutine psi_i_bld_glb_csr_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
+    subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
       import
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(in)     :: loc_dl(:), length_dl(0:)
       integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:), dl_ptr(:)
       integer(psb_ipk_), intent(out) :: info
-    end subroutine psi_i_bld_glb_csr_dep_list
+    end subroutine psi_i_bld_glb_dep_list
   end interface
 
   interface  psi_extract_loc_dl
