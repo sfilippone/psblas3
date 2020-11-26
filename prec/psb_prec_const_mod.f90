@@ -83,10 +83,6 @@ module psb_prec_const_mod
   integer, parameter   :: psb_ainv_llk_noth_  = psb_ainv_s_ft_llk_  + 1
   integer, parameter   :: psb_ainv_mlk_       = psb_ainv_llk_noth_  + 1
   integer, parameter   :: psb_ainv_lmx_       = psb_ainv_mlk_
-#if defined(HAVE_TUMA_SAINV)
-  integer, parameter   :: psb_ainv_s_tuma_    = psb_ainv_lmx_  + 1
-  integer, parameter   :: psb_ainv_l_tuma_    = psb_ainv_s_tuma_  + 1
-#endif
 
 
   interface psb_check_def

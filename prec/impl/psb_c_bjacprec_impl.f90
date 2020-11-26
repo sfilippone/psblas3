@@ -541,21 +541,18 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   ! We check if all the information contained in the preconditioner structure
   ! are meaningful, otherwise we give an error and get out of the build
   ! procedure
-  ialg = prec%iprcparm(psb_ilu_ialg_)    ! Integer for ILU type algorithm
-  iinvalg = prec%iprcparm(psb_ainv_alg_) ! Integer for AINV type algorithm
-  if ((ialg == psb_ilu_n_).or.(ialg == psb_milu_n_).or.&
-    & (ialg == psb_ilu_t_).or.(iinvalg == psb_ainv_llk_).or.&
-    & (iinvalg == psb_ainv_s_llk_).or.(iinvalg == psb_ainv_s_ft_llk_).or.&
-    & (iinvalg == psb_ainv_llk_noth_).or.(iinvalg == psb_ainv_mlk_).or.&
-    & (iinvalg == psb_ainv_lmx_)) then
-  ! Do nothing: admissible request
-  else
-    info=psb_err_from_subroutine_
-    ch_err='psb_ilu_ialg_'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  iscale = prec%iprcparm(psb_ilu_scale_)
+  ialg    = prec%iprcparm(psb_ilu_ialg_)  ! Integer for ILU type algorithm
+  iinvalg = prec%iprcparm(psb_ainv_alg_)  ! Integer for AINV type algorithm
+  iscale = prec%iprcparm(psb_ilu_scale_)  ! Integer for scaling of matrix
+  fact_eps = prec%rprcparm(psb_fact_eps_) ! Drop-tolerance for factorization
+  inv_thresh = prec%rprcparm(psb_inv_thresh_) ! Drop-tolerance for inverse
+  fill_in = prec%iprcparm(psb_ilu_fill_in_) ! Fill-In for factorization
+  inv_fill = prec%iprcparm(psb_inv_fillin_) ! Fill-In for inverse factorization
+
+  ! Check if the type of scaling is known, pay attention that not all the
+  ! scalings make sense for all the factorization, if something that does not
+  ! make sense is required the factorization routine will fail in an
+  ! unnrecoverable way.
   if ((iscale == psb_ilu_scale_none_).or.&
       (iscale == psb_ilu_scale_maxval_).or.&
       (iscale == psb_ilu_scale_diag_).or.&
@@ -569,21 +566,39 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  fact_eps = prec%rprcparm(psb_fact_eps_)
-  if( (fact_eps > 1).and.(prec%iprcparm(psb_f_type_) == psb_f_ainv_) ) then
+  ! Check if the variant for the AINV is known to the library
+  if( (prec%iprcparm(psb_f_type_) == psb_f_ainv_).and.(&
+    & (iinvalg == psb_ainv_llk_).or.(iinvalg == psb_ainv_s_llk_).or. &
+    & (iinvalg == psb_ainv_s_ft_llk_).or.(iinvalg == psb_ainv_llk_noth_).or.&
+    & (iinvalg == psb_ainv_mlk_).or.(iinvalg == psb_ainv_lmx_ ) ) ) then
+    ! Do nothing, these are okay
+  else
+    info=psb_err_from_subroutine_
+    ch_err='psb_ainv_alg_'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  ! Check if the drop-tolerance make sense, if fact_eps > 1 and we are requiring
+  ! either ILUT, or INVT we give an error.
+  if( (fact_eps > 1).and.( &
+    & (prec%iprcparm(psb_f_type_) == psb_f_ilu_t_).or.&
+    & (prec%iprcparm(psb_f_type_) == psb_f_invt_) )) then
     info=psb_err_from_subroutine_
     ch_err='psb_fact_eps_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  inv_thresh = prec%rprcparm(psb_inv_thresh_)
-  if( (inv_thresh > 1) ) then
+  ! It the drop-tolerance for the inverse factors, inv_thresh > 1 and we are
+  ! requiring AINV or, or INVT we give an error
+  if( (inv_thresh > 1).and.( &
+    & (prec%iprcparm(psb_f_type_) == psb_f_ainv_).or.&
+    & (prec%iprcparm(psb_f_type_) == psb_f_invt_) )) then
     info=psb_err_from_subroutine_
-    ch_err='psb_fact_eps_'
+    ch_err='psb_inv_thresh_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  fill_in = prec%iprcparm(psb_ilu_fill_in_)
+  ! Checks relative to the fill-in parameters
   if (prec%iprcparm(psb_f_type_) == psb_f_ilu_n_) then
     if(fill_in < 0) then
       info=psb_err_from_subroutine_
@@ -596,8 +611,11 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       prec%iprcparm(psb_f_type_) = psb_f_ilu_n_
     end if
   end if
-  inv_fill = prec%iprcparm(psb_inv_fillin_)
-  if (inv_fill <= 0) inv_fill = m ! If no limit on the fill_in is required we allow everything
+  ! If no limit on the fill_in is required we allow every fill, this is needed
+  ! since this quantity is used to allocate the auxiliary vectors for the
+  ! factorization
+  if (inv_fill <= 0) inv_fill = m
+
   ! Select on the type of factorization to be used
   select case(prec%iprcparm(psb_f_type_))
 

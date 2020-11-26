@@ -265,19 +265,19 @@ contains
       end if
 
       nt = nr
-      call psb_sum(ctxt,nt) 
-      if (nt /= m) then 
+      call psb_sum(ctxt,nt)
+      if (nt /= m) then
         write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
         info = -1
         call psb_barrier(ctxt)
         call psb_abort(ctxt)
-        return    
+        return
       end if
 
       !
       ! First example  of use of CDALL: specify for each process a number of
       ! contiguous rows
-      ! 
+      !
       call psb_cdall(ctxt,desc_a,info,nl=nr)
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
@@ -291,20 +291,20 @@ contains
           info = -1
           call psb_barrier(ctxt)
           call psb_abort(ctxt)
-          return    
+          return
         end if
       else
         write(psb_err_unit,*) iam, 'Initialization error: IV not present'
         info = -1
         call psb_barrier(ctxt)
         call psb_abort(ctxt)
-        return    
+        return
       end if
 
       !
       ! Second example  of use of CDALL: specify for each row the
-      ! process that owns it 
-      ! 
+      ! process that owns it
+      !
       call psb_cdall(ctxt,desc_a,info,vg=iv)
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
@@ -349,7 +349,7 @@ contains
       !
       ! Third example  of use of CDALL: specify for each process
       ! the set of global indices it owns.
-      ! 
+      !
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
     case default
       write(psb_err_unit,*) iam, 'Initialization error: should not get here'
@@ -503,7 +503,7 @@ contains
     end if
     tasb = psb_wtime()-t1
     call psb_barrier(ctxt)
-    ttot = psb_wtime() - t0 
+    ttot = psb_wtime() - t0
 
     call psb_amx(ctxt,talc)
     call psb_amx(ctxt,tgen)
@@ -608,7 +608,7 @@ program psb_s_pde2d
   !
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call psb_gen_pde2d(ctxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)  
+  call psb_gen_pde2d(ctxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)
   call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -631,11 +631,26 @@ program psb_s_pde2d
       call prec%set('sub_solve',       parms%alg,   info)
       select case (psb_toupper(parms%alg))
       case ("ILU")
-        call prec%set('sub_fillin',      parms%fill,      info)
-        call prec%set('ilu_alg',         parms%ilu_alg,   info)
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('ilu_alg',         parms%ilu_alg,    info)
       case ("ILUT")
-        call prec%set('sub_fillin',      parms%fill,      info)
-        call prec%set('sub_iluthrs',     parms%thresh,    info)
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('sub_iluthrs',     parms%thresh,     info)
+        call prec%set('ilut_scale',      parms%ilut_scale, info)
+      case ("AINV")
+        call prec%set('inv_thresh',      parms%inv_thresh, info)
+        call prec%set('inv_fillin',      parms%inv_fill,   info)
+        call prec%set('ilut_scale',      parms%ilut_scale, info)
+        call prec%set('ainv_alg',        parms%orth_alg,   info)
+      case ("INVK")
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('inv_fillin',      parms%inv_fill,   info)
+        call prec%set('ilut_scale',      parms%ilut_scale, info)
+      case ("INVT")
+        call prec%set('sub_fillin',      parms%fill,       info)
+        call prec%set('inv_fillin',      parms%inv_fill,   info)
+        call prec%set('sub_iluthrs',     parms%thresh,     info)
+        call prec%set('inv_thresh',      parms%inv_thresh, info)
         call prec%set('ilut_scale',      parms%ilut_scale, info)
       case default
         ! Do nothing, use default setting in the init routine
@@ -666,7 +681,7 @@ program psb_s_pde2d
   !
   if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ctxt)
-  t1 = psb_wtime()  
+  t1 = psb_wtime()
   eps   = 1.d-6
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,&
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)
@@ -835,20 +850,28 @@ contains
               write(psb_out_unit,'("Scaling       : ",a)') parms%ilut_scale
             case ('INVK')
               write(psb_out_unit,'("Fill in            : ",i0)') parms%fill
+              write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill
+              write(psb_out_unit,'("Scaling            : ",a)') parms%ilut_scale
+            case ('INVT')
+              write(psb_out_unit,'("Fill in            : ",i0)') parms%fill
               write(psb_out_unit,'("Threshold          : ",es12.5)') parms%thresh
               write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill
               write(psb_out_unit,'("Inverse Threshold  : ",es12.5)') parms%inv_thresh
-            case ('AINVT','AORTH')
+              write(psb_out_unit,'("Scaling            : ",a)') parms%ilut_scale
+            case ('AINV','AORTH')
               write(psb_out_unit,'("Inverse Threshold  : ",es12.5)') parms%inv_thresh
+              write(psb_out_unit,'("Invese Fill in     : ",i0)') parms%inv_fill
+              write(psb_out_unit,'("Orthogonalization  : ",a)') parms%orth_alg
+              write(psb_out_unit,'("Scaling            : ",a)') parms%ilut_scale
             case default
               write(psb_out_unit,'("Unknown diagonal solver")')
-          end select
+            end select
         end if
         write(psb_out_unit,'("Iterative method     : ",a)') kmethd
         write(psb_out_unit,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
-        call pr_usage(izero)      
+        call pr_usage(izero)
         call psb_abort(ctxt)
         stop 1
       endif
@@ -867,7 +890,14 @@ contains
     call psb_bcast(ctxt,itmax)
     call psb_bcast(ctxt,itrace)
     call psb_bcast(ctxt,irst)
-
+    call psb_bcast(ctxt,parms%alg)
+    call psb_bcast(ctxt,parms%fill)
+    call psb_bcast(ctxt,parms%inv_fill)
+    call psb_bcast(ctxt,parms%thresh)
+    call psb_bcast(ctxt,parms%inv_thresh)
+    call psb_bcast(ctxt,parms%orth_alg)
+    call psb_bcast(ctxt,parms%ilut_scale)
+    
     return
 
   end subroutine get_parms
