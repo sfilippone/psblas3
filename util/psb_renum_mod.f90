@@ -126,6 +126,34 @@ module psb_renum_mod
       integer(psb_ipk_), intent(out) :: prf
       integer(psb_ipk_), intent(out) :: info
     end subroutine psb_z_cmp_bwpf
+    subroutine psb_ls_cmp_bwpf(mat,bwl,bwu,prf,info)
+      import :: psb_ipk_, psb_lpk_, psb_lsspmat_type
+      type(psb_lsspmat_type), intent(in) :: mat
+      integer(psb_lpk_), intent(out) :: bwl, bwu
+      integer(psb_lpk_), intent(out) :: prf
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_ls_cmp_bwpf
+    subroutine psb_ld_cmp_bwpf(mat,bwl,bwu,prf,info)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type
+      type(psb_ldspmat_type), intent(in) :: mat
+      integer(psb_lpk_), intent(out) :: bwl, bwu
+      integer(psb_lpk_), intent(out) :: prf
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_ld_cmp_bwpf
+    subroutine psb_lc_cmp_bwpf(mat,bwl,bwu,prf,info)
+      import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
+      type(psb_lcspmat_type), intent(in) :: mat
+      integer(psb_lpk_), intent(out) :: bwl, bwu
+      integer(psb_lpk_), intent(out) :: prf
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_lc_cmp_bwpf
+    subroutine psb_lz_cmp_bwpf(mat,bwl,bwu,prf,info)
+      import :: psb_ipk_, psb_lpk_, psb_lzspmat_type
+      type(psb_lzspmat_type), intent(in) :: mat
+      integer(psb_lpk_), intent(out) :: bwl, bwu
+      integer(psb_lpk_), intent(out) :: prf
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_lz_cmp_bwpf
   end interface psb_cmp_bwpf
 
 
