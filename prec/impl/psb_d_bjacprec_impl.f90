@@ -566,38 +566,52 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  ! Check if the variant for the AINV is known to the library
-  if( (prec%iprcparm(psb_f_type_) == psb_f_ainv_).and.(&
-    & (iinvalg == psb_ainv_llk_).or.(iinvalg == psb_ainv_s_llk_).or. &
-    & (iinvalg == psb_ainv_s_ft_llk_).or.(iinvalg == psb_ainv_llk_noth_).or.&
-    & (iinvalg == psb_ainv_mlk_).or.(iinvalg == psb_ainv_lmx_ ) ) ) then
-    ! Do nothing, these are okay
-  else
-    info=psb_err_from_subroutine_
-    ch_err='psb_ainv_alg_'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  ! Check if the drop-tolerance make sense, if fact_eps > 1 and we are requiring
-  ! either ILUT, or INVT we give an error.
-  if( (fact_eps > 1).and.( &
-    & (prec%iprcparm(psb_f_type_) == psb_f_ilu_t_).or.&
-    & (prec%iprcparm(psb_f_type_) == psb_f_invt_) )) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_fact_eps_'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  ! It the drop-tolerance for the inverse factors, inv_thresh > 1 and we are
-  ! requiring AINV or, or INVT we give an error
-  if( (inv_thresh > 1).and.( &
-    & (prec%iprcparm(psb_f_type_) == psb_f_ainv_).or.&
-    & (prec%iprcparm(psb_f_type_) == psb_f_invt_) )) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_inv_thresh_'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
+  select case (prec%iprcparm(psb_f_type_))
+    case (psb_f_ainv_)
+      ! Check if the variant for the AINV is known to the library
+      select case (iinvalg)
+      case(psb_ainv_llk_,psb_ainv_s_llk_,psb_ainv_s_ft_llk_,psb_ainv_llk_noth_,&
+        & psb_ainv_mlk_)
+        ! Do nothing these are okay
+      case default
+        info=psb_err_from_subroutine_
+        ch_err='psb_ainv_alg_'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end select ! AINV Variant
+      ! Check if the drop-tolerance make sense
+      if( inv_thresh > 1) then
+        info=psb_err_from_subroutine_
+        ch_err='psb_inv_thresh_'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+    case (psb_f_ilu_t_)
+      if (fact_eps > 1) then
+        ! Check if the drop-tolerance make sense
+        info=psb_err_from_subroutine_
+        ch_err='psb_fact_eps_'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+    case (psb_f_invt_)
+      ! Check both tolerances
+      if (fact_eps > 1) then
+        info=psb_err_from_subroutine_
+        ch_err='psb_fact_eps_'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+      if( inv_thresh > 1) then
+        info=psb_err_from_subroutine_
+        ch_err='psb_inv_thresh_'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+    case default
+  end select
+
+
   ! Checks relative to the fill-in parameters
   if (prec%iprcparm(psb_f_type_) == psb_f_ilu_n_) then
     if(fill_in < 0) then
