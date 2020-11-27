@@ -47,13 +47,14 @@ module psb_base_linmap_mod
     type(psb_desc_type), pointer :: p_desc_U=>null(), p_desc_V=>null()
     type(psb_desc_type)   :: desc_U, desc_V
   contains
-    procedure, pass(map)  :: sizeof   => base_map_sizeof
-    procedure, pass(map)  :: is_ok    => base_is_ok
-    procedure, pass(map)  :: is_asb   => base_is_asb
-    procedure, pass(map)  :: get_kind => base_get_kind
-    procedure, pass(map)  :: set_kind => base_set_kind
-    procedure, pass(map)  :: free     => base_free
-    procedure, pass(map)  :: clone    => base_clone
+    procedure, pass(map)  :: sizeof    => base_map_sizeof
+    procedure, pass(map)  :: is_ok     => base_is_ok
+    procedure, pass(map)  :: is_asb    => base_is_asb
+    procedure, pass(map)  :: is_v_repl => base_is_v_repl
+    procedure, pass(map)  :: get_kind  => base_get_kind
+    procedure, pass(map)  :: set_kind  => base_set_kind
+    procedure, pass(map)  :: free      => base_free
+    procedure, pass(map)  :: clone     => base_clone
   end type psb_base_linmap_type
 
 
@@ -61,7 +62,7 @@ module psb_base_linmap_mod
     module procedure  psb_base_linmap_transfer
   end interface
 
-  private :: base_map_sizeof, base_is_ok, base_is_asb,&
+  private :: base_map_sizeof, base_is_ok, base_is_asb, base_is_v_repl, &
        & base_get_kind, base_set_kind, base_free, base_clone
 
 contains
@@ -84,7 +85,6 @@ contains
 
   end subroutine base_set_kind
 
-
   function base_is_ok(map) result(res)
     use psb_desc_mod
     implicit none 
@@ -102,6 +102,23 @@ contains
     end select
 
   end function base_is_ok
+
+  function base_is_v_repl(map) result(res)
+    use psb_desc_mod
+    implicit none 
+    class(psb_base_linmap_type), intent(in) :: map
+    logical  :: res
+    res = .false.
+
+    select case(map%get_kind())
+    case (psb_map_aggr_)
+      if (.not.associated(map%p_desc_V)) return
+      res = map%p_desc_V%is_repl()    
+    case(psb_map_gen_linear_)    
+      res = map%desc_V%is_repl()    
+    end select
+
+  end function base_is_v_repl
 
   function base_is_asb(map) result(res)
     use psb_desc_mod

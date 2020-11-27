@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,21 +27,21 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
+!
 !    Moved here from MLD2P4, original copyright below.
-!  
-!  
-!   
+!
+!
+!
 !                             MLD2P4  version 2.2
 !    MultiLevel Domain Decomposition Parallel Preconditioners Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2008-2018 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Daniela di Serafino   
-!   
+!
+!    (C) Copyright 2008-2018
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Daniela di Serafino
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -53,7 +53,7 @@
 !      3. The name of the MLD2P4 group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -65,8 +65,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: psb_silut_fact.f90
 !
 ! Subroutine: psb_silut_fact
@@ -87,7 +87,7 @@
 !  CSR. The diagonal of the U factor is stored separately (actually, the
 !  inverse of the diagonal entries is stored; this is then managed in the
 !  solve stage associated to the ILU(k,t) factorization).
-!  
+!
 !
 ! Arguments:
 !    fill_in -  integer, input.
@@ -114,7 +114,7 @@
 !               factorization.
 !               Note: its allocation is managed by the calling routine psb_ilu_bld,
 !               hence it cannot be only intent(out).
-!    info    -  integer, output.                    
+!    info    -  integer, output.
 !               Error code.
 !    blck    -  type(psb_sspmat_type), input, optional, target.
 !               The sparse matrix structure containing the remote rows of the
@@ -122,9 +122,9 @@
 !               to build an Additive Schwarz base preconditioner with overlap
 !               greater than 0. If the overlap is 0 or the matrix has been reordered
 !               (see psb_fact_bld), then blck does not contain any row.
-!  
+!
 subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
-  
+
   use psb_base_mod
   use psb_s_ilu_fact_mod, psb_protect_name => psb_silut_fact
 
@@ -141,7 +141,7 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
   integer(psb_ipk_), intent(in), optional       :: iscale
   !     Local Variables
   integer(psb_ipk_)   ::  l1, l2, m, err_act, iscale_
-  
+
   type(psb_sspmat_type), pointer  :: blck_
   type(psb_s_csr_sparse_mat)       :: ll, uu
   real(psb_spk_)      :: scale
@@ -151,34 +151,34 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (fill_in < 0) then 
+  if (fill_in < 0) then
     info=psb_err_input_asize_invalid_i_
     call psb_errpush(info,name, &
          & i_err=(/ione,fill_in,izero,izero,izero/))
     goto 9999
   end if
-  ! 
+  !
   ! Point to / allocate memory for the incomplete factorization
   !
-  if (present(blck)) then 
+  if (present(blck)) then
     blck_ => blck
   else
-    allocate(blck_,stat=info) 
-    if (info == psb_success_) call blck_%csall(izero,izero,info,ione) 
+    allocate(blck_,stat=info)
+    if (info == psb_success_) call blck_%allocate(izero,izero,info,ione,type='CSR')
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
-      ch_err='csall'
+      ch_err='allocate'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
   endif
-  if (present(iscale)) then 
+  if (present(iscale)) then
     iscale_ = iscale
   else
     iscale_ = psb_ilu_scale_none_
   end if
-  
-  select case(iscale_) 
+
+  select case(iscale_)
   case(psb_ilu_scale_none_)
     scale = sone
   case(psb_ilu_scale_maxval_)
@@ -189,10 +189,10 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
     call psb_errpush(info,name,i_err=(/ione*9,iscale_,izero,izero,izero/))
     goto 9999
   end select
-  
+
   m = a%get_nrows() + blck_%get_nrows()
   if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
-       & (m > size(d))    ) then 
+       & (m > size(d))    ) then
     write(0,*) 'Wrong allocation status for L,D,U? ',&
          & l%get_nrows(),size(d),u%get_nrows()
     info = -1
@@ -225,15 +225,15 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
   call u%set_triangle()
   call u%set_unit()
   call u%set_upper()
-  
+
   !
   ! Nullify pointer / deallocate memory
   !
-  if (present(blck)) then 
-    blck_ => null() 
+  if (present(blck)) then
+    blck_ => null()
   else
     call blck_%free()
-    deallocate(blck_,stat=info) 
+    deallocate(blck_,stat=info)
     if(info.ne.0) then
       info=psb_err_from_subroutine_
       ch_err='psb_sp_free'
@@ -298,7 +298,7 @@ contains
   !               according to the CSR storage format.
   !    lirp    -  integer, dimension(:), input/output.
   !               The indices identifying the first nonzero entry of each row
-  !               of the L factor in lval, according to the CSR storage format. 
+  !               of the L factor in lval, according to the CSR storage format.
   !    uval   -  real(psb_spk_), dimension(:), input/output.
   !               The U factor in the incomplete factorization.
   !               The entries of U are stored according to the CSR format.
@@ -307,12 +307,12 @@ contains
   !               according to the CSR storage format.
   !    uirp    -  integer, dimension(:), input/output.
   !               The indices identifying the first nonzero entry of each row
-  !               of the U factor in uval, according to the CSR storage format. 
+  !               of the U factor in uval, according to the CSR storage format.
   !    l1      -  integer, output
   !               The number of nonzero entries in lval.
   !    l2      -  integer, output
   !               The number of nonzero entries in uval.
-  !    info    -  integer, output.           
+  !    info    -  integer, output.
   !               Error code.
   !
   subroutine psb_silut_factint(fill_in,thres,a,b,&
@@ -320,7 +320,7 @@ contains
 
     use psb_base_mod
 
-    implicit none 
+    implicit none
 
   ! Arguments
     integer(psb_ipk_), intent(in)                 :: fill_in
@@ -355,7 +355,7 @@ contains
     m  = ma+mb
 
     !
-    ! Allocate a temporary buffer for the ilut_copyin function 
+    ! Allocate a temporary buffer for the ilut_copyin function
     !
     call trw%allocate(izero,izero,ione)
     if (info == psb_success_) call psb_ensure_size(m+1,lirp,info)
@@ -366,7 +366,7 @@ contains
       call psb_errpush(info,name,a_err='psb_sp_all')
       goto 9999
     end if
-    
+
     l1=0
     l2=0
     lirp(1) = 1
@@ -396,10 +396,10 @@ contains
       ! in the ilut_copyin function, and updated during the elimination, in
       ! the ilut_fact routine. The heap is ideal because at each step we need
       ! the lowest index, but we also need to insert new items, and the heap
-      ! allows to do both in log time. 
+      ! allows to do both in log time.
       !
       d(i) = czero
-      if (i<=ma) then 
+      if (i<=ma) then
         call ilut_copyin(i,ma,a,i,ione,m,nlw,nup,jmaxup,nrmi,weight,&
              & row,heap,ktrw,trw,info)
       else
@@ -414,7 +414,7 @@ contains
            & d,uja,uirp,uval,nidx,idxs,info)
       !
       ! Copy the row into lval/d(i)/uval
-      ! 
+      !
       if (info == psb_success_) call ilut_copyout(fill_in,thres,i,m,&
            & nlw,nup,jmaxup,nrmi,row,nidx,idxs,&
            & l1,l2,lja,lirp,lval,d,uja,uirp,uval,info)
@@ -429,7 +429,7 @@ contains
     !
     ! Adjust diagonal accounting for scale factor
     !
-    if (weight /= sone) then 
+    if (weight /= sone) then
       d(1:m) = d(1:m)*weight
     end if
 
@@ -469,7 +469,7 @@ contains
   !  - storing into a heap the column indices of the nonzero entries of the copied
   !    row;
   !  - computing the column index of the first entry with maximum absolute value
-  !    in the part of the row belonging to the upper triangle;            
+  !    in the part of the row belonging to the upper triangle;
   !  - computing the 2-norm of the row.
   !  The output array row is such that it contains a full row of A, i.e. it contains
   !  also the zero entries of the row. This is useful for the elimination step
@@ -482,11 +482,11 @@ contains
   !
   !  This routine is used by psb_silut_factint in the computation of the ILU(k,t)
   !  factorization of a local sparse matrix.
-  !  
+  !
   !
   ! Arguments:
   !    i       -  integer, input.
-  !               The local index of the row to be extracted from the 
+  !               The local index of the row to be extracted from the
   !               sparse matrix structure a.
   !    m       -  integer, input.
   !               The number of rows of the local matrix stored into a.
@@ -533,7 +533,7 @@ contains
   !               staging buffer trw. See below.
   !    trw     -  type(psb_sspmat_type), input/output.
   !               A staging buffer. If the matrix A is not in CSR format, we use
-  !               the psb_sp_getblk routine and store its output in trw; when we 
+  !               the psb_sp_getblk routine and store its output in trw; when we
   !               need to call psb_sp_getblk we do it for a block of rows, and then
   !               we consume them from trw in successive calls to this routine,
   !               until we empty the buffer. Thus we will make a call to psb_sp_getblk
@@ -542,7 +542,7 @@ contains
   subroutine ilut_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,&
        & nrmi,weight,row,heap,ktrw,trw,info)
     use psb_base_mod
-    implicit none 
+    implicit none
     type(psb_sspmat_type), intent(in)         :: a
     type(psb_s_coo_sparse_mat), intent(inout) :: trw
     integer(psb_ipk_), intent(in)               :: i, m,jmin,jmax,jd
@@ -584,29 +584,29 @@ contains
     dmaxup = szero
     nrmi   = szero
 
-    select type (aa=> a%a) 
-    type is (psb_s_csr_sparse_mat) 
+    select type (aa=> a%a)
+    type is (psb_s_csr_sparse_mat)
       !
       ! Take a fast shortcut if the matrix is stored in CSR format
       !
 
       do j = aa%irp(i), aa%irp(i+1) - 1
         k          = aa%ja(j)
-        if ((jmin<=k).and.(k<=jmax)) then 
-          row(k)     = aa%val(j)*weight 
+        if ((jmin<=k).and.(k<=jmax)) then
+          row(k)     = aa%val(j)*weight
           call heap%insert(k,info)
           if (info /= psb_success_) exit
-          if (k<jd) nlw = nlw + 1 
-          if (k>jd) then 
+          if (k<jd) nlw = nlw + 1
+          if (k>jd) then
             nup = nup + 1
-            if (abs(row(k))>dmaxup) then 
+            if (abs(row(k))>dmaxup) then
               jmaxup = k
               dmaxup = abs(row(k))
             end if
           end if
         end if
       end do
-      if (info /= psb_success_) then 
+      if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_insert_heap')
         goto 9999
@@ -617,16 +617,16 @@ contains
 
 
     class default
-      
+
       !
-      ! Otherwise use psb_sp_getblk, slower but able (in principle) of 
+      ! Otherwise use psb_sp_getblk, slower but able (in principle) of
       ! handling any format. In this case, a block of rows is extracted
       ! instead of a single row, for performance reasons, and these
       ! rows are copied one by one into the array row, through successive
       ! calls to ilut_copyin.
       !
 
-      if ((mod(i,nrb) == 1).or.(nrb == 1)) then 
+      if ((mod(i,nrb) == 1).or.(nrb == 1)) then
         irb = min(m-i+1,nrb)
         call aa%csget(i,i+irb-1,trw,info)
         if (info /= psb_success_) then
@@ -639,18 +639,18 @@ contains
 
       kin = ktrw
       nz = trw%get_nzeros()
-      do 
+      do
         if (ktrw > nz) exit
         if (trw%ia(ktrw) > i) exit
         k          = trw%ja(ktrw)
-        if ((jmin<=k).and.(k<=jmax)) then 
+        if ((jmin<=k).and.(k<=jmax)) then
           row(k)     = trw%val(ktrw)*weight
           call heap%insert(k,info)
           if (info /= psb_success_) exit
-          if (k<jd) nlw = nlw + 1 
-          if (k>jd) then 
+          if (k<jd) nlw = nlw + 1
+          if (k>jd) then
             nup = nup + 1
-            if (abs(row(k))>dmaxup) then 
+            if (abs(row(k))>dmaxup) then
               jmaxup = k
               dmaxup = abs(row(k))
             end if
@@ -734,10 +734,10 @@ contains
 
     use psb_base_mod
 
-    implicit none 
+    implicit none
 
   ! Arguments
-    type(psb_i_heap), intent(inout)               :: heap 
+    type(psb_i_heap), intent(inout)               :: heap
     integer(psb_ipk_), intent(in)                 :: i
     integer(psb_ipk_), intent(inout)              :: nidx,info
     real(psb_spk_), intent(in)                     :: thres,nrmi
@@ -753,23 +753,23 @@ contains
     call psb_ensure_size(200*ione,idxs,info)
     if (info /= psb_success_) return
     nidx  = 0
-    lastk = -1 
+    lastk = -1
     !
     ! Do while there are indices to be processed
     !
     do
 
-      call heap%get_first(k,iret) 
+      call heap%get_first(k,iret)
       if (iret < 0) exit
 
-      ! 
+      !
       ! An index may have been put on the heap more than once.
       !
       if (k == lastk) cycle
 
-      lastk = k 
+      lastk = k
       lowert: if (k<i)  then
- 
+
         !
         ! Dropping rule based on the threshold: compare the absolute
         ! value of each updated entry of row with thres * 2-norm of row.
@@ -777,7 +777,7 @@ contains
         rwk    = row(k)
         row(k) = row(k) * d(k)
         if (abs(row(k)) < thres*nrmi) then
-          ! 
+          !
           ! Drop the entry.
           !
           row(k) = czero
@@ -786,11 +786,11 @@ contains
           !
           ! Note: since U is scaled while copying it out (see ilut_copyout),
           ! we can use rwk in the update below.
-          !           
+          !
           do jj=uirp(k),uirp(k+1)-1
             j = uja(jj)
-            if (j<=k) then 
-              info = -i 
+            if (j<=k) then
+              info = -i
               return
             endif
             !
@@ -799,7 +799,7 @@ contains
             !
             row(j)     = row(j) - rwk * uval(jj)
             if (abs(row(j)) < thres*nrmi) then
-              ! 
+              !
               ! Drop the entry.
               !
               row(j) = czero
@@ -818,7 +818,7 @@ contains
       ! If we get here it is an index we need to keep on copyout.
       !
       nidx       = nidx + 1
-      call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)      
+      call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)
       if (info /= psb_success_) return
       idxs(nidx) = k
 
@@ -852,7 +852,7 @@ contains
   !
   !  This routine is used by psb_silut_factint in the computation of the ILU(k,t)
   !  factorization of a local sparse matrix.
-  !  
+  !
   !
   ! Arguments:
   !    fill_in -  integer, input.
@@ -895,14 +895,14 @@ contains
   !               to the CSR storage format.
   !    lirp    -  integer, dimension(:), input/output.
   !               The indices identifying the first nonzero entry of each row
-  !               of the L factor, copied in lval row by row (see 
+  !               of the L factor, copied in lval row by row (see
   !               psb_silut_factint), according to the CSR storage format.
   !    lval   -  real(psb_spk_), dimension(:), input/output.
   !               The array where the entries of the row corresponding to the
   !               L factor are copied.
   !    d       -  real(psb_spk_), dimension(:), input/output.
   !               The array where the inverse of the diagonal entry of the
-  !               row is copied (only d(i) is used by the routine). 
+  !               row is copied (only d(i) is used by the routine).
   !    uja    -  integer, dimension(:), input/output.
   !               The column indices of the nonzero entries of the U factor
   !               copied in uval row by row (see psb_silut_factint), according
@@ -921,7 +921,7 @@ contains
 
     use psb_base_mod
 
-    implicit none 
+    implicit none
 
     ! Arguments
     integer(psb_ipk_), intent(in)                       :: fill_in,i,m,nidx,nlw,nup,jmaxup
@@ -950,22 +950,22 @@ contains
     end if
 
     !
-    ! Here we need to apply also the dropping rule base on the fill-in. 
+    ! Here we need to apply also the dropping rule base on the fill-in.
     ! We do it by putting into a heap the elements that are not dropped
-    ! by using the 2-norm rule, and then copying them out. 
+    ! by using the 2-norm rule, and then copying them out.
     !
     ! The heap goes down on the entry absolute value, so the first item
-    ! is the largest absolute value. 
+    ! is the largest absolute value.
     !
 
     call heap%init(info,dir=psb_asort_down_)
 
     if (info == psb_success_) allocate(xwid(nidx),xw(nidx),indx(nidx),stat=info)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
       info=psb_err_alloc_request_
       call psb_errpush(info,name,i_err=(/3*nidx,izero,izero,izero,izero/),&
            & a_err='real(psb_spk_)')
-      goto 9999      
+      goto 9999
     end if
 
     !
@@ -976,7 +976,7 @@ contains
     idxp = 0
 
     do
- 
+
       idxp = idxp + 1
       if (idxp > nidx) exit
       if (idxs(idxp) >= i) exit
@@ -987,8 +987,8 @@ contains
       !
       if (abs(witem) < thres*nrmi) cycle
 
-      nz       = nz + 1 
-      xw(nz)   = witem 
+      nz       = nz + 1
+      xw(nz)   = witem
       xwid(nz) = widx
       call heap%insert(witem,widx,info)
       if (info /= psb_success_) then
@@ -1000,9 +1000,9 @@ contains
 
     !
     ! Now we have to take out the first nlw+fill_in entries
-    ! 
+    !
     if (nz <= nlw+fill_in) then
-      ! 
+      !
       ! Just copy everything from xw, and it is already ordered
       !
     else
@@ -1014,7 +1014,7 @@ contains
           call psb_errpush(info,name,a_err='psb_heap_get_first')
           goto 9999
         end if
-      
+
         xw(k)   = witem
         xwid(k) = widx
       end do
@@ -1029,15 +1029,15 @@ contains
     ! Copy out the lower part of the row
     !
     do k=1,nz
-      l1     = l1 + 1 
+      l1     = l1 + 1
       if (size(lval) < l1) then
-        ! 
+        !
         ! Figure out a good reallocation size!
-        ! 
+        !
         isz  = (max((l1/i)*m,int(1.2*l1),l1+100))
-        call psb_realloc(isz,lval,info) 
-        if (info == psb_success_) call psb_realloc(isz,lja,info) 
-        if (info /= psb_success_) then 
+        call psb_realloc(isz,lval,info)
+        if (info == psb_success_) call psb_realloc(isz,lja,info)
+        if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='Allocate')
           goto 9999
@@ -1046,25 +1046,25 @@ contains
       lja(l1)   = xwid(k)
       lval(l1)  = xw(indx(k))
     end do
-    
+
     !
     ! Make sure idxp points to the diagonal entry
     !
-    if (idxp <= size(idxs)) then 
-      if (idxs(idxp) < i) then 
-        do 
+    if (idxp <= size(idxs)) then
+      if (idxs(idxp) < i) then
+        do
           idxp = idxp + 1
           if (idxp > nidx) exit
           if (idxs(idxp) >= i) exit
         end do
       end if
     end if
-    if (idxp > size(idxs)) then 
+    if (idxp > size(idxs)) then
 !!$      write(0,*) 'Warning: missing diagonal element in the row '
     else
-      if (idxs(idxp) > i) then 
+      if (idxs(idxp) > i) then
 !!$        write(0,*) 'Warning: missing diagonal element in the row '
-      else if (idxs(idxp) /= i) then 
+      else if (idxs(idxp) /= i) then
 !!$        write(0,*) 'Warning: impossible error: diagonal has vanished'
       else
         !
@@ -1076,7 +1076,7 @@ contains
         if (abs(d(i)) < s_epstol) then
           !
           ! Too small pivot: unstable factorization
-          !     
+          !
           info = psb_err_pivot_too_small_
           int_err(1) = i
           write(ch_err,'(g20.10)') d(i)
@@ -1092,7 +1092,7 @@ contains
     end if
 
     !
-    ! Now the upper part 
+    ! Now the upper part
     !
 
     call heap%init(info,dir=psb_asort_down_)
@@ -1104,15 +1104,15 @@ contains
 
     nz       = 0
     do
- 
+
       idxp = idxp + 1
       if (idxp > nidx) exit
       widx      = idxs(idxp)
-      if (widx <= i) then 
+      if (widx <= i) then
 !!$        write(0,*) 'Warning: lower triangle in upper copy',widx,i,idxp,idxs(idxp)
         cycle
       end if
-      if (widx > m) then 
+      if (widx > m) then
 !!$        write(0,*) 'Warning: impossible value',widx,i,idxp,idxs(idxp)
         cycle
       end if
@@ -1120,12 +1120,12 @@ contains
       !
       ! Dropping rule based on the 2-norm. But keep the jmaxup-th entry anyway.
       !
-      if ((widx /= jmaxup) .and. (abs(witem) < thres*nrmi)) then 
-        cycle 
+      if ((widx /= jmaxup) .and. (abs(witem) < thres*nrmi)) then
+        cycle
       end if
 
       nz       = nz + 1
-      xw(nz)   = witem 
+      xw(nz)   = witem
       xwid(nz) = widx
       call heap%insert(witem,widx,info)
       if (info /= psb_success_) then
@@ -1133,7 +1133,7 @@ contains
         call psb_errpush(info,name,a_err='psb_insert_heap')
         goto 9999
       end if
-      
+
     end do
 
     !
@@ -1141,7 +1141,7 @@ contains
     ! we include entry jmaxup.
     !
     if (nz <= nup+fill_in) then
-      ! 
+      !
       ! Just copy everything from xw
       !
       fndmaxup=.true.
@@ -1155,13 +1155,13 @@ contains
         if (widx == jmaxup) fndmaxup=.true.
       end do
     end if
-    if ((i<jmaxup).and.(jmaxup<=m)) then 
-      if (.not.fndmaxup) then 
-        ! 
-        ! Include entry jmaxup, if it is not already there.
-        ! Put it in the place of the smallest coefficient. 
+    if ((i<jmaxup).and.(jmaxup<=m)) then
+      if (.not.fndmaxup) then
         !
-        xw(nz)   = row(jmaxup) 
+        ! Include entry jmaxup, if it is not already there.
+        ! Put it in the place of the smallest coefficient.
+        !
+        xw(nz)   = row(jmaxup)
         xwid(nz) = jmaxup
       endif
     end if
@@ -1175,15 +1175,15 @@ contains
     ! Copy out the upper part of the row
     !
     do k=1,nz
-      l2     = l2 + 1 
+      l2     = l2 + 1
       if (size(uval) < l2) then
-        ! 
+        !
         ! Figure out a good reallocation size!
-        ! 
+        !
         isz  = max((l2/i)*m,int(1.2*l2),l2+100)
-        call psb_realloc(isz,uval,info) 
-        if (info == psb_success_) call psb_realloc(isz,uja,info) 
-        if (info /= psb_success_) then 
+        call psb_realloc(isz,uval,info)
+        if (info == psb_success_) call psb_realloc(isz,uja,info)
+        if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='Allocate')
           goto 9999

@@ -102,7 +102,7 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
        & ':allocating size:',loc_row,loc_col,nnz_
   call a%free()
   !....allocate aspk, ia1, ia2.....
-  call a%csall(loc_row,loc_col,info,nz=nnz_)
+  call a%allocate(loc_row,loc_col,info,nz=nnz_)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='sp_all')
