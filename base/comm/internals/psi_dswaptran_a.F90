@@ -183,13 +183,8 @@ subroutine psi_dtranidxm(ctxt,icomm,flag,n,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-<<<<<<< HEAD
-  integer(psb_ipk_)   :: np, me
-  integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-=======
   integer(psb_ipk_) :: np, me
   integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
->>>>>>> implement-ainv
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
@@ -681,13 +676,8 @@ subroutine psi_dtranidxv(ctxt,icomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-<<<<<<< HEAD
-  integer(psb_ipk_)   :: np, me
-  integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-=======
   integer(psb_ipk_) :: np, me
   integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
->>>>>>> implement-ainv
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
