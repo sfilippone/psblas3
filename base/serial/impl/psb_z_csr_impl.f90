@@ -149,7 +149,7 @@ contains
       if (beta == zzero) then
 
         if (alpha == zone) then
-          !$omp parallel do private(i,j, acc)
+          !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = zzero
             do j=irp(i), irp(i+1)-1

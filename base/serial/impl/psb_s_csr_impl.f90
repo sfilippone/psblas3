@@ -149,7 +149,7 @@ contains
       if (beta == szero) then
 
         if (alpha == sone) then
-          !$omp parallel do private(i,j, acc)
+          !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = szero
             do j=irp(i), irp(i+1)-1

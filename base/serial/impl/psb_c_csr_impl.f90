@@ -149,7 +149,7 @@ contains
       if (beta == czero) then
 
         if (alpha == cone) then
-          !$omp parallel do private(i,j, acc)
+          !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = czero
             do j=irp(i), irp(i+1)-1
