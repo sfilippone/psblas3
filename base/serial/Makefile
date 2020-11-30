@@ -11,9 +11,9 @@ FOBJS = psb_lsame.o psi_m_serial_impl.o psi_e_serial_impl.o \
 	smmp.o lsmmp.o \
 	psb_sgeprt.o psb_dgeprt.o psb_cgeprt.o psb_zgeprt.o\
 	psb_spdot_srtd.o psb_aspxpby.o psb_spge_dot.o\
-	psb_sgelp.o psb_dgelp.o psb_cgelp.o psb_zgelp.o \
 	psb_samax_s.o psb_damax_s.o psb_camax_s.o psb_zamax_s.o \
 	psb_sasum_s.o psb_dasum_s.o psb_casum_s.o psb_zasum_s.o 
+
 
 LIBDIR=..
 INCDIR=..
