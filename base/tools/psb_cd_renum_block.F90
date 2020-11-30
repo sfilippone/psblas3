@@ -53,10 +53,11 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   type(psb_gen_block_map), allocatable :: blck_map
   integer(psb_ipk_), allocatable :: lidx(:),reflidx(:)
   integer(psb_lpk_), allocatable :: gidx(:),vnl(:)
-  integer(psb_ipk_) :: i, n_row, n_col
-  integer(psb_lpk_) :: li, n_glob_row, n_glob_col
-  integer(psb_ipk_) :: np, me, ictxt, err_act
-  integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_)   :: i, n_row, n_col
+  integer(psb_lpk_)   :: li, n_glob_row, n_glob_col
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, err_act
+  integer(psb_ipk_)   :: debug_level, debug_unit
   character(len=20)   :: name
   
   debug_unit  = psb_get_debug_unit()
@@ -67,10 +68,10 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   call psb_erractionsave(err_act)
   name = 'psb_cd_renum_block'
 
-  ictxt = desc_in%get_context()
+  ctxt = desc_in%get_context()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Entered'
   if (np == -1) then
@@ -99,7 +100,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
     n_glob_col = desc_in%get_global_cols()
     vnl = 0
     vnl(me) = n_row
-    call psb_sum(ictxt,vnl)
+    call psb_sum(ctxt,vnl)
     vnl(1:np) = vnl(0:np-1)
     vnl(0) = 0
     do i=1,np
@@ -123,7 +124,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
     reflidx(1:n_col) = [(i,i=1,n_col)]
     gidx(1:n_row)    = reflidx(1:n_row) + vnl(me)
     call psb_halo(gidx,desc_in,info)
-    if (info == 0) call blck_map%gen_block_map_init(ictxt,n_row,info)
+    if (info == 0) call blck_map%gen_block_map_init(ctxt,n_row,info)
     if (info == 0) call blck_map%g2l_ins(gidx,lidx,info,lidx=reflidx)
     if (info == 0) call blck_map%asb(info)
     if (info == 0) call &
@@ -148,7 +149,7 @@ subroutine psb_cd_renum_block(desc_in, desc_out, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

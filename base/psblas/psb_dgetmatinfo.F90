@@ -37,9 +37,13 @@
 function  psb_dget_nnz(a,desc_a,info) result(res)
   use psb_base_mod, psb_protect_name => psb_dget_nnz
   use psi_mod
-  use mpi
-
-  implicit none
+#ifdef MPI_MOD
+      use mpi
+#endif
+      implicit none
+#ifdef MPI_H
+      include 'mpif.h'
+#endif
 
   integer(psb_lpk_)                     :: res
   type(psb_dspmat_type), intent(in)   :: a
@@ -47,7 +51,8 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
   integer(psb_ipk_), intent(out)        :: info
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
        & err_act, iia, jja
   integer(psb_lpk_) :: localnnz
   character(len=20) :: name, ch_err
@@ -59,8 +64,8 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -69,12 +74,12 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
 
   localnnz = a%get_nzeros()
 
-  call psb_sum(ictxt,localnnz)
+  call psb_sum(ctxt,localnnz)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 end function

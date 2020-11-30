@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!	Module to   define PREC_DATA,           !!
 !!      structure for preconditioning.          !!
@@ -43,19 +43,23 @@ module psb_prec_const_mod
 
   ! Entries in iprcparm: preconditioner type, factorization type,
   ! prolongation type, restriction type, renumbering algorithm,
-  ! number of overlap layers, pointer to SuperLU factors, 
-  ! levels of fill in for ILU(N), 
+  ! number of overlap layers, pointer to SuperLU factors,
+  ! levels of fill in for ILU(N),
   integer(psb_ipk_), parameter :: psb_p_type_=1, psb_f_type_=2
   integer(psb_ipk_), parameter :: psb_ilu_fill_in_=8
+  integer(psb_ipk_), parameter :: psb_ilu_ialg_=9
   !Renumbering. SEE BELOW
   integer(psb_ipk_), parameter :: psb_renum_none_=0, psb_renum_glb_=1, psb_renum_gps_=2
   integer(psb_ipk_), parameter :: psb_ifpsz=10
   ! Entries in rprcparm: ILU(E) epsilon, smoother omega
+  integer(psb_ipk_), parameter :: psb_ilu_scale_=7
   integer(psb_ipk_), parameter :: psb_fact_eps_=1
-  integer(psb_ipk_), parameter :: psb_rfpsz=4
-  ! Factorization types: none, ILU(N), ILU(E)
-  integer(psb_ipk_), parameter :: psb_f_none_=0,psb_f_ilu_n_=1
-  ! Fields for sparse matrices ensembles: 
+  integer(psb_ipk_), parameter :: psb_rfpsz=8
+  ! Factorization types: none, ILU(0), ILU(N), ILU(N,E)
+  integer(psb_ipk_), parameter :: psb_f_none_=0,psb_f_ilu_n_=1,psb_f_ilu_k_=2,psb_f_ilu_t_=3
+  ! Approximate Inverse factorization type: AINV, INVT, INVK
+  integer(psb_ipk_), parameter :: psb_f_ainv_=4, psb_f_invt_=5, psb_f_invk_=6
+  ! Fields for sparse matrices ensembles:
   integer(psb_ipk_), parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
   integer(psb_ipk_), parameter :: psb_max_avsz=psb_bp_ilu_avsz
 
@@ -65,11 +69,21 @@ module psb_prec_const_mod
   integer(psb_ipk_), parameter :: psb_ilu_scale_none_    = 0
   integer(psb_ipk_), parameter :: psb_ilu_scale_maxval_  = 1
   integer(psb_ipk_), parameter :: psb_ilu_scale_diag_    = 2
-  integer(psb_ipk_), parameter :: psb_ilu_scale_arwsum_  = 3 
+  integer(psb_ipk_), parameter :: psb_ilu_scale_arwsum_  = 3
   integer(psb_ipk_), parameter :: psb_ilu_scale_aclsum_  = 4
   integer(psb_ipk_), parameter :: psb_ilu_scale_arcsum_  = 5
 
-  
+  ! Numerical parameters relative to Approximate Inverse Preconditioners
+  integer, parameter   :: psb_inv_fillin_     = 3
+  integer, parameter   :: psb_ainv_alg_       = psb_inv_fillin_ + 1
+  integer, parameter   :: psb_inv_thresh_     = 3
+  integer, parameter   :: psb_ainv_llk_       = psb_inv_thresh_ + 1
+  integer, parameter   :: psb_ainv_s_llk_     = psb_ainv_llk_ + 1
+  integer, parameter   :: psb_ainv_s_ft_llk_  = psb_ainv_s_llk_ + 1
+  integer, parameter   :: psb_ainv_llk_noth_  = psb_ainv_s_ft_llk_  + 1
+  integer, parameter   :: psb_ainv_mlk_       = psb_ainv_llk_noth_  + 1
+  integer, parameter   :: psb_ainv_lmx_       = psb_ainv_mlk_
+
 
   interface psb_check_def
     module procedure psb_icheck_def, psb_scheck_def, psb_dcheck_def
@@ -87,9 +101,9 @@ contains
     select case(iprec)
     case(psb_noprec_)
       pr_to_str='NOPREC'
-    case(psb_diag_)         
+    case(psb_diag_)
       pr_to_str='DIAG'
-    case(psb_bjac_)         
+    case(psb_bjac_)
       pr_to_str='BJAC'
     case default
       pr_to_str='???'
@@ -125,7 +139,7 @@ contains
     integer(psb_ipk_), intent(inout) :: ip
     integer(psb_ipk_), intent(in)    :: id
     character(len=*), intent(in) :: name
-    interface 
+    interface
       function is_legal(i)
         import :: psb_ipk_
         integer(psb_ipk_), intent(in) :: i
@@ -133,7 +147,7 @@ contains
       end function is_legal
     end interface
 
-    if (.not.is_legal(ip)) then     
+    if (.not.is_legal(ip)) then
       write(psb_err_unit,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
       ip = id
     end if
@@ -143,7 +157,7 @@ contains
     real(psb_spk_), intent(inout) :: ip
     real(psb_spk_), intent(in)    :: id
     character(len=*), intent(in) :: name
-    interface 
+    interface
       function is_legal(i)
         import :: psb_ipk_, psb_spk_
         real(psb_spk_), intent(in) :: i
@@ -151,7 +165,7 @@ contains
       end function is_legal
     end interface
 
-    if (.not.is_legal(ip)) then     
+    if (.not.is_legal(ip)) then
       write(psb_err_unit,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
       ip = id
     end if
@@ -161,7 +175,7 @@ contains
     real(psb_dpk_), intent(inout) :: ip
     real(psb_dpk_), intent(in)    :: id
     character(len=*), intent(in) :: name
-    interface 
+    interface
       function is_legal(i)
         import :: psb_ipk_, psb_spk_, psb_dpk_
         real(psb_dpk_), intent(in) :: i
@@ -169,7 +183,7 @@ contains
       end function is_legal
     end interface
 
-    if (.not.is_legal(ip)) then     
+    if (.not.is_legal(ip)) then
       write(psb_err_unit,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
       ip = id
     end if

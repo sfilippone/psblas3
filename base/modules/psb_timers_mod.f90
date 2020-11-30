@@ -95,9 +95,9 @@ contains
     
   end subroutine print_timer
   
-  subroutine psb_print_timers(ictxt, idx, proc, global, iout)
+  subroutine psb_print_timers(ctxt, idx, proc, global, iout)
     implicit none
-    integer(psb_ipk_), intent(in) :: ictxt
+    type(psb_ctxt_type), intent(in)         :: ctxt
     integer(psb_ipk_), intent(in), optional :: idx, proc, iout
     logical, optional :: global
     !
@@ -108,7 +108,7 @@ contains
     real(psb_dpk_), allocatable :: ptimers(:,:) 
     logical :: global_
     
-    call psb_info(ictxt,me,np)
+    call psb_info(ctxt,me,np)
     if (present(global)) then
       global_ = global
     else
@@ -132,10 +132,10 @@ contains
         allocate(ptimers(timer_entries_,size(timers,2)),stat=info)
         if (info /= 0) then
           write(0,*) 'Error while trying to allocate temporary ',info
-          call psb_abort(ictxt)
+          call psb_abort(ctxt)
         end if
         ptimers = timers
-        call psb_max(ictxt,ptimers)
+        call psb_max(ctxt,ptimers)
         if (me == psb_root_) then
           do i=idxmin_, idxmax_
             call print_timer(me, ptimers(:,i), timers_descr(i), iout)
@@ -280,7 +280,7 @@ contains
     use psb_error_mod
     implicit none 
     ! ...Subroutine Arguments  
-    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),Intent(in)                     :: len
     type(psb_string_item),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional, intent(in) :: lb

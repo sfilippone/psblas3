@@ -1,23 +1,23 @@
 ! checks wether an error has occurred on one of the porecesses in the execution pool
-subroutine psb_errcomm_i(ictxt, err)
+subroutine psb_errcomm_i(ctxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
-  integer(psb_ipk_), intent(in)   :: ictxt
-  integer(psb_ipk_), intent(inout):: err
+  type(psb_ctxt_type), intent(in)  :: ctxt
+  integer(psb_ipk_), intent(inout) :: err
 
-  if (psb_get_global_checks()) call psb_amx(ictxt, err)
+  if (psb_get_global_checks()) call psb_amx(ctxt, err)
 
 end subroutine psb_errcomm_i
 
 #if defined(IPK8)
 
-subroutine psb_errcomm_m(ictxt, err)
+subroutine psb_errcomm_m(ctxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
-  integer(psb_mpk_), intent(in)   :: ictxt
-  integer(psb_ipk_), intent(inout):: err
+  type(psb_ctxt_type), intent(in)  :: ctxt
+  integer(psb_ipk_), intent(inout) :: err
   
-  if (psb_get_global_checks()) call psb_amx(ictxt, err)
+  if (psb_get_global_checks()) call psb_amx(ctxt, err)
 
 end subroutine psb_errcomm_m
 #endif
@@ -37,30 +37,30 @@ subroutine psb_ser_error_handler(err_act)
   return 
 end subroutine psb_ser_error_handler
 
-subroutine psb_par_error_handler(ictxt,err_act)
+subroutine psb_par_error_handler(ctxt,err_act)
   use psb_error_mod, psb_protect_name => psb_par_error_handler
   use psb_penv_mod
   implicit none 
-  integer(psb_ipk_), intent(in) ::  ictxt
-  integer(psb_ipk_), intent(in) ::  err_act
+  type(psb_ctxt_type), intent(in) ::  ctxt
+  integer(psb_ipk_), intent(in)   ::  err_act
 
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_print_)     &
-       &  call psb_error(ictxt, abrt=.false.)
+       &  call psb_error(ctxt, abrt=.false.)
   if (err_act == psb_act_abort_)      &
-       &  call psb_error(ictxt, abrt=.true.)
+       &  call psb_error(ctxt, abrt=.true.)
 
   return 
 
 end subroutine psb_par_error_handler
 
-subroutine psb_par_error_print_stack(ictxt)
+subroutine psb_par_error_print_stack(ctxt)
   use psb_error_mod, psb_protect_name => psb_par_error_print_stack
   use psb_penv_mod
-  integer(psb_ipk_), intent(in) ::  ictxt
+  type(psb_ctxt_type), intent(in) ::  ctxt
 
-  call psb_error(ictxt, abrt=.false.)
+  call psb_error(ctxt, abrt=.false.)
   
 end subroutine psb_par_error_print_stack
 
@@ -79,8 +79,8 @@ subroutine psb_serror()
   use psb_error_mod
   implicit none 
   integer(psb_ipk_) ::  err_c
-  character(len=20)       ::  r_name
-  character(len=40)       ::  a_e_d
+  character(len=20) ::  r_name
+  character(len=40) ::  a_e_d
   integer(psb_epk_) ::  e_e_d(5)
 
   if (psb_errstatus_fatal()) then
@@ -111,25 +111,24 @@ end subroutine psb_serror
 
 
 ! handles the occurence of an error in a parallel routine
-subroutine psb_perror(ictxt,abrt)
+subroutine psb_perror(ctxt,abrt)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none 
-  integer(psb_ipk_), intent(in) :: ictxt
-  logical, intent(in), optional  :: abrt
+  type(psb_ctxt_type), intent(in) :: ctxt
+  logical, intent(in), optional   :: abrt
 
-  integer(psb_ipk_)  :: err_c
-  character(len=20)  :: r_name
-  character(len=40)  :: a_e_d
-  integer(psb_epk_)  :: e_e_d(5)
-  integer(psb_mpk_) :: iictxt, iam, np
+  integer(psb_ipk_) :: err_c
+  character(len=20) :: r_name
+  character(len=40) :: a_e_d
+  integer(psb_epk_) :: e_e_d(5)
+  integer(psb_mpk_) :: iam, np
   logical :: abrt_
 
   abrt_=.true.
   if (present(abrt)) abrt_=abrt
-  iictxt = ictxt 
-  call psb_info(iictxt,iam,np)
+  call psb_info(ctxt,iam,np)
   
   if (psb_errstatus_fatal()) then
     if (psb_get_errverbosity() > 1) then
@@ -144,7 +143,7 @@ subroutine psb_perror(ictxt,abrt)
       flush(psb_err_unit) 
 #endif
       
-      if (abrt_) call psb_abort(iictxt,-1)
+      if (abrt_) call psb_abort(ctxt,-1)
       
     else
 
@@ -157,7 +156,7 @@ subroutine psb_perror(ictxt,abrt)
       flush(psb_err_unit) 
 #endif
 
-      if (abrt_) call psb_abort(iictxt,-1)
+      if (abrt_) call psb_abort(ctxt,-1)
 
     end if
   end if

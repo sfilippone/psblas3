@@ -1,7 +1,8 @@
 program pingpong
   use psb_base_mod
   implicit none
-  integer(psb_ipk_) :: iam, np, icontxt, ip, jp, idummy
+  type(psb_ctxt_type) :: icontxt
+  integer(psb_ipk_) :: iam, np, ip, jp, idummy
   integer(psb_ipk_), parameter  :: nmax=2**16
   integer(psb_ipk_) :: i,j,k,n
   real(psb_dpk_) :: v(nmax)

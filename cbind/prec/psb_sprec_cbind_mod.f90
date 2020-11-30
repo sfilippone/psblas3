@@ -12,20 +12,23 @@ module psb_sprec_cbind_mod
   
 contains 
 
-
-  function  psb_c_sprecinit(ictxt,ph,ptype) bind(c) result(res)
+  function  psb_c_sprecinit(cctxt,ph,ptype) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
+    use psb_cpenv_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_ipk_)          :: res
-    integer(psb_c_ipk_), value :: ictxt   
+    integer(psb_c_ipk_)            :: res
+    type(psb_c_object_type), value :: cctxt   
 
     type(psb_c_sprec) :: ph
     character(c_char)       :: ptype(*)
     type(psb_sprec_type), pointer :: precp
     integer(psb_c_ipk_)              :: info
     character(len=80)       :: fptype
+    type(psb_ctxt_type), pointer :: ctxt
+
+    ctxt => psb_c2f_ctxt(cctxt)
 
     res = -1
     if (c_associated(ph%item)) then 
@@ -38,7 +41,7 @@ contains
 
     call stringc2f(ptype,fptype)
     
-    call psb_precinit(ictxt,precp,fptype,info) 
+    call psb_precinit(ctxt,precp,fptype,info) 
     
     res = min(0,info)
     return

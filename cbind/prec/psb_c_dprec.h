@@ -14,7 +14,7 @@ extern "C" {
   
   psb_c_dprec* psb_c_new_dprec();
   
-  psb_i_t  psb_c_dprecinit(psb_i_t ictxt, psb_c_dprec *ph, const char *ptype);
+  psb_i_t  psb_c_dprecinit(psb_c_ctxt cctxt, psb_c_dprec *ph, const char *ptype);
   psb_i_t  psb_c_dprecbld(psb_c_dspmat *ah, psb_c_descriptor *cdh, psb_c_dprec *ph);
   psb_i_t  psb_c_dprecfree(psb_c_dprec *ph);
 #ifdef __cplusplus

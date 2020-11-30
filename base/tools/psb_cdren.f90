@@ -56,11 +56,12 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   character, intent(in)               :: trans
   integer(psb_ipk_), intent(out)                :: info
   !....locals....
-  integer(psb_ipk_) :: i,j,np,me, n_col, kh, nh
-  integer(psb_ipk_) :: dectype
-  integer(psb_ipk_) :: ictxt,n_row, err_act
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name
+  integer(psb_ipk_)   :: i,j,np,me, n_col, kh, nh
+  integer(psb_ipk_)   :: dectype
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: n_row, err_act
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -69,13 +70,13 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt   = desc_a%get_context()
+  ctxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
   n_row   = desc_a%get_local_rows()
   n_col   = desc_a%get_local_cols()
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -151,7 +152,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

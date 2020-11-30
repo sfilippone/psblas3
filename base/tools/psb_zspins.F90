@@ -64,7 +64,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -75,8 +76,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   name = 'psb_zspins'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -185,7 +186,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -208,7 +209,8 @@ subroutine psb_zspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate, nz, i, j
   integer(psb_lpk_) :: ir
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -219,8 +221,8 @@ subroutine psb_zspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
   name = 'psb_zspins_csr'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
 
   if (nr < 0) then 
     info = 1111
@@ -282,7 +284,7 @@ subroutine psb_zspins_csr_lirp(nr,irp,ja,val,irw,a,desc_a,info,rebuild,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -306,7 +308,8 @@ subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate, nz, i, j
   integer(psb_lpk_) :: ir
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -317,8 +320,8 @@ subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
   name = 'psb_zspins_csr'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
 
   if (nr < 0) then 
     info = 1111
@@ -380,7 +383,7 @@ subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -403,7 +406,8 @@ subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
@@ -424,8 +428,8 @@ subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
     goto 9999
   end if
 
-  ictxt = desc_ar%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_ar%get_context()
+  call psb_info(ctxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -495,7 +499,7 @@ subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -518,7 +522,8 @@ subroutine psb_zspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
@@ -530,8 +535,8 @@ subroutine psb_zspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   name = 'psb_zspins'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -646,7 +651,7 @@ subroutine psb_zspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

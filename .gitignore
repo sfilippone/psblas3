@@ -5,6 +5,7 @@
 
 # header files generated
 cbind/*.h
+util/psb_metis_int.h
 
 # Make.inc generated
 /Make.inc

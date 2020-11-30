@@ -41,13 +41,14 @@ Subroutine psb_cd_reinit(desc,info)
   Type(psb_desc_type), Intent(inout) :: desc
   integer(psb_ipk_), intent(out)               :: info
 
-  integer(psb_ipk_) :: icomm, err_act
 
   !     .. Local Scalars ..
-  integer(psb_ipk_) ::  np, me, ictxt
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   ::  np, me, err_act
+  integer(psb_mpk_)   :: icomm
   integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ext(:), tmp_ovr(:)
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name, ch_err
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name, ch_err
 
   name='psb_cd_reinit'
   info  = psb_success_
@@ -55,9 +56,9 @@ Subroutine psb_cd_reinit(desc,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc%get_context()
+  ctxt = desc%get_context()
   icomm = desc%get_mpic()
-  Call psb_info(ictxt, me, np)
+  Call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start'
   if (desc%is_asb()) then 
@@ -81,7 +82,7 @@ Subroutine psb_cd_reinit(desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 

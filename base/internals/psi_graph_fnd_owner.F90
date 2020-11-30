@@ -99,12 +99,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
 
   integer(psb_lpk_), allocatable :: tidx(:)
   integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:), ladj(:)  
-  integer(psb_mpk_) :: icomm, minfo, iictxt
+  integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j,ipnt, nsampl_out,&
        & nv, n_answers, nqries, nsampl_in, locr_max, &
        & nqries_max, nadj, maxspace, mxnsin
   integer(psb_lpk_) :: mglob, ih
-  integer(psb_ipk_) :: ictxt,np,me, nresp
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np,me, nresp
   integer(psb_ipk_), parameter :: nt=4
   integer(psb_ipk_) :: tmpv(4)
   logical, parameter  :: do_timings=.false., trace=.false., debugsz=.false.
@@ -116,12 +117,12 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   name = 'psi_graph_fnd_owner'
   call psb_erractionsave(err_act)
 
-  ictxt   = idxmap%get_ctxt()
+  ctxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-  iictxt  = ictxt 
+
   if ((do_timings).and.(idx_sweep0==-1))       &
        & idx_sweep0 = psb_get_timer_idx("GRPH_FND_OWN: Outer sweep")
   if ((do_timings).and.(idx_loop_a2a==-1))       &
@@ -130,7 +131,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
        & idx_loop_neigh = psb_get_timer_idx("GRPH_FND_OWN: Loop neigh")
 
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   if (np == -1) then
     info = psb_err_context_error_
@@ -179,7 +180,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   tmpv(2) = nqries_max
   tmpv(3) = n_row
   tmpv(4) = psb_cd_get_maxspace()
-  call psb_max(ictxt,tmpv)
+  call psb_max(ctxt,tmpv)
   nqries_max = tmpv(2)
   locr_max = tmpv(3)
   maxspace = nt*locr_max
@@ -198,7 +199,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     call idxmap%xtnd_p_adjcncy(ladj) 
     nqries     = nv - n_answers
     nqries_max = nqries
-    call psb_max(ictxt,nqries_max)
+    call psb_max(ctxt,nqries_max)
     if (trace.and.(me == 0)) write(0,*) ' After initial sweep:',nqries_max
     if (debugsz) write(0,*) me,' After sweep on user-defined topology',nqries_max
   end if
@@ -262,14 +263,14 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
 !!$      write(0,*) me,' After a2a ',nqries
     nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
     mxnsin = nsampl_in
-    call psb_max(ictxt,mxnsin)
+    call psb_max(ctxt,mxnsin)
 !!$      write(0,*) me, ' mxnsin ',mxnsin
     if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
 
     nqries     = nv - n_answers
     nqries_max = nqries
-    call psb_max(ictxt,nqries_max)
+    call psb_max(ctxt,nqries_max)
     if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nqries_max
     if (do_timings) call psb_toc(idx_loop_neigh)    
   end do fnd_owner_loop
@@ -277,7 +278,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ctxt,err_act)
 
   return
 
@@ -360,12 +361,13 @@ contains
     integer(psb_ipk_), intent(in)    :: adj(:)
     class(psb_indx_map), intent(inout) :: idxmap
     !
-    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, ictxt, me, np, isw
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw
     integer(psb_lpk_), allocatable    :: tidx(:)
     integer(psb_ipk_), allocatable    :: tsmpl(:)
 
-    ictxt   = idxmap%get_ctxt()
-    call psb_info(ictxt,me,np)
+    ctxt   = idxmap%get_ctxt()
+    call psb_info(ctxt,me,np)
     call psb_realloc(n_samples,tidx,info)
     call psb_realloc(n_samples,tsmpl,info)
     ipnt = 1
@@ -380,7 +382,7 @@ contains
       !write(0,*) me,' Sweep ',isw,' answers:',ns_out
       n_answers = n_answers + ns_out
       n_rem = size(idx)-ipnt
-      call psb_max(ictxt,n_rem)
+      call psb_max(ctxt,n_rem)
       !write(0,*) me,' Sweep ',isw,n_rem, ipnt, n_samples
       if (n_rem <= 0) exit
       isw = isw + 1 
