@@ -64,7 +64,7 @@ First we describe the \verb|psb_indx_map| type. This is a data
 structure that keeps track of a certain number of basic issues such
 as:
 \begin{itemize}
-\item The value of the communication/MPI context;
+\item The value of the communication context;
 \item The number of indices in the index space, i.e. global number of
   rows and columns of a sparse matrix;
 \item The local set of indices, including:
@@ -309,7 +309,7 @@ Type: {\bf optional}; default: \verb|.true.|.\\
 \subsubsection{get\_context --- Get communication context}
 
 \begin{verbatim}
-ictxt = desc%get_context()
+ctxt = desc%get_context()
 \end{verbatim}
 
 \begin{description}
