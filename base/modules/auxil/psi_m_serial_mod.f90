@@ -32,24 +32,40 @@
 module psi_m_serial_mod
   use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
 
-  interface psb_gelp
+  interface psb_gelp 
     ! 2-D version
-    subroutine psb_mgelp(trans,iperm,x,info)
+    subroutine psb_m_mgelp(trans,iperm,x,info)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
       integer(psb_mpk_), intent(inout)     ::  x(:,:)
-      integer(psb_ipk_), intent(in)      ::  iperm(:)
+      integer(psb_mpk_), intent(in)      ::  iperm(:)
       integer(psb_ipk_), intent(out)     ::  info
       character, intent(in)              :: trans
-    end subroutine psb_mgelp
-    subroutine psb_mgelpv(trans,iperm,x,info)
+    end subroutine psb_m_mgelp
+    subroutine psb_m_mgelpv(trans,iperm,x,info)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
       integer(psb_mpk_), intent(inout)     ::  x(:)
-      integer(psb_ipk_), intent(in)      ::  iperm(:)
+      integer(psb_mpk_), intent(in)      ::  iperm(:)
       integer(psb_ipk_), intent(out)     ::  info
       character, intent(in)              :: trans
-    end subroutine psb_mgelpv
+    end subroutine psb_m_mgelpv
+    subroutine psb_e_mgelp(trans,iperm,x,info)
+      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      implicit none
+      integer(psb_mpk_), intent(inout)     ::  x(:,:)
+      integer(psb_epk_), intent(in)      ::  iperm(:)
+      integer(psb_ipk_), intent(out)     ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_e_mgelp
+    subroutine psb_e_mgelpv(trans,iperm,x,info)
+      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      implicit none
+      integer(psb_mpk_), intent(inout)     ::  x(:)
+      integer(psb_epk_), intent(in)      ::  iperm(:)
+      integer(psb_ipk_), intent(out)     ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_e_mgelpv
   end interface psb_gelp
 
   interface psb_geaxpby

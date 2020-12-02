@@ -114,6 +114,7 @@ subroutine psb_c_coo_scal(d,a,info,side)
       goto 9999
     end if
 
+    !$omp parallel do private(i,j)
     do i=1,a%get_nzeros()
       j        = a%ia(i)
       a%val(i) = a%val(i) * d(j)
@@ -126,6 +127,7 @@ subroutine psb_c_coo_scal(d,a,info,side)
       goto 9999
     end if
 
+    !$omp parallel do private(i,j)
     do i=1,a%get_nzeros()
       j        = a%ja(i)
       a%val(i) = a%val(i) * d(j)
@@ -201,6 +203,7 @@ subroutine psb_c_coo_scalplusidentity(d,a,info)
   end if
 
   mnm = min(a%get_nrows(),a%get_ncols())
+  !$omp parallel do private(i,j)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
     j=a%ia(i)
@@ -253,12 +256,30 @@ subroutine psb_c_coo_spaxpby(alpha,a,beta,b,info)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
+#if defined (OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nza
+      tcoo%ia(i) = a%ia(i)
+      tcoo%ja(i) = a%ja(i)
+      tcoo%val(i) = alpha*a%val(i)
+    end do
+    !$omp parallel do private(i)
+    do i=1, nzb
+      tcoo%ia(nza+i) = bcoo%ia(i)
+      tcoo%ja(nza+i) = bcoo%ja(i)
+      tcoo%val(nza+i) = beta*bcoo%val(i)
+    end do
+  end block
+#else
   tcoo%ia(1:nza) = a%ia(1:nza)
   tcoo%ja(1:nza) = a%ja(1:nza)
   tcoo%val(1:nza) = alpha*a%val(1:nza)
   tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
   tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
   tcoo%val(nza+1:nza+nzb) = beta*bcoo%val(1:nzb)
+#endif
   ! Fix the indexes
   call tcoo%fix(info)
   ! Move to correct output format
@@ -346,12 +367,30 @@ function psb_c_coo_cmpmat(a,b,tol,info) result(res)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
+#if defined (OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nza
+      tcoo%ia(i) = a%ia(i)
+      tcoo%ja(i) = a%ja(i)
+      tcoo%val(i) = alpha*a%val(i)
+    end do
+    !$omp parallel do private(i)
+    do i=1, nzb
+      tcoo%ia(nza+i) = bcoo%ia(i)
+      tcoo%ja(nza+i) = bcoo%ja(i)
+      tcoo%val(nza+i) =  (-sone)*beta*bcoo%val(i)
+    end do
+  end block
+#else
   tcoo%ia(1:nza) = a%ia(1:nza)
   tcoo%ja(1:nza) = a%ja(1:nza)
   tcoo%val(1:nza) = a%val(1:nza)
   tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
   tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
   tcoo%val(nza+1:nza+nzb) = (-sone)*bcoo%val(1:nzb)
+#endif
   ! Fix the indexes
   call tcoo%fix(info)
   if (info /= psb_success_) then
@@ -727,9 +766,6 @@ subroutine psb_c_coo_print(iout,a,iv,head,ivr,ivc)
   endif
 
 end subroutine psb_c_coo_print
-
-
-
 
 function  psb_c_coo_get_nz_row(idx,a) result(res)
   use psb_const_mod
@@ -1670,7 +1706,6 @@ subroutine psb_c_coo_csmv(alpha,a,x,beta,y,info,trans)
 
 end subroutine psb_c_coo_csmv
 
-
 subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans)
   use psb_const_mod
   use psb_error_mod
@@ -1709,10 +1744,8 @@ subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')
-
 
   if (tra.or.ctra) then
     m = a%get_ncols()
@@ -1895,7 +1928,15 @@ function psb_c_coo_maxval(a) result(res)
   nnz = a%get_nzeros()
   if (allocated(a%val)) then
     nnz = min(nnz,size(a%val))
+#if defined(OPENMP)
+    res = szero
+    !$omp parallel do private(i) reduction(max: res)
+    do i=1, nnz
+      res = max(res,abs(a%val(i)))
+    end do
+#else
     res = maxval(abs(a%val(1:nnz)))
+#endif
   end if
 
 end function psb_c_coo_maxval
@@ -2275,11 +2316,13 @@ subroutine psb_c_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & iren)
 
   if (rscale_) then
+    !$omp parallel do private(i)
     do i=nzin_+1, nzin_+nz
       ia(i) = ia(i) - imin + 1
     end do
   end if
   if (cscale_) then
+    !$omp parallel do private(i)
     do i=nzin_+1, nzin_+nz
       ja(i) = ja(i) - jmin_ + 1
     end do
@@ -2553,11 +2596,13 @@ subroutine psb_c_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
        & iren)
 
   if (rscale_) then
+    !$omp parallel do private(i)
     do i=nzin_+1, nzin_+nz
       ia(i) = ia(i) - imin + 1
     end do
   end if
   if (cscale_) then
+    !$omp parallel do private(i)
     do i=nzin_+1, nzin_+nz
       ja(i) = ja(i) - jmin_ + 1
     end do
@@ -2767,7 +2812,6 @@ contains
   end subroutine coo_getrow
 
 end subroutine psb_c_coo_csgetrow
-
 
 subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_error_mod
@@ -3021,7 +3065,6 @@ contains
 
 end subroutine psb_c_coo_csput_a
 
-
 subroutine psb_c_cp_coo_to_coo(a,b,info)
   use psb_error_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_cp_coo_to_coo
@@ -3045,10 +3088,21 @@ subroutine psb_c_cp_coo_to_coo(a,b,info)
   call b%set_nzeros(nz)
   call b%reallocate(nz)
 
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nz
+      b%ia(i)  = a%ia(i)
+      b%ja(i)  = a%ja(i)
+      b%val(i) = a%val(i)
+    end do
+  end block
+#else
   b%ia(1:nz)  = a%ia(1:nz)
   b%ja(1:nz)  = a%ja(1:nz)
   b%val(1:nz) = a%val(1:nz)
-
+#endif
   call b%set_host()
 
   if (.not.b%is_by_rows()) call b%fix(info)
@@ -3087,10 +3141,21 @@ subroutine psb_c_cp_coo_from_coo(a,b,info)
   call a%set_nzeros(nz)
   call a%reallocate(nz)
 
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nz
+       a%ia(i)  = b%ia(i) 
+       a%ja(i)  = b%ja(i) 
+       a%val(i) = b%val(i)
+    end do
+  end block
+#else
   a%ia(1:nz)  = b%ia(1:nz)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)
-
+#endif
   call a%set_host()
 
   if (.not.a%is_by_rows()) call a%fix(info)
@@ -3444,8 +3509,6 @@ subroutine psb_c_fix_coo(a,info,idir)
   return
 
 end subroutine psb_c_fix_coo
-
-
 
 subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_const_mod
@@ -4174,7 +4237,6 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
 end subroutine psb_c_fix_coo_inner
 
-
 subroutine psb_c_cp_coo_to_lcoo(a,b,info)
   use psb_error_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_cp_coo_to_lcoo
@@ -4199,10 +4261,21 @@ subroutine psb_c_cp_coo_to_lcoo(a,b,info)
   call b%set_nzeros(nz)
   call b%reallocate(nz)
 
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nz
+      b%ia(i)  = a%ia(i)
+      b%ja(i)  = a%ja(i)
+      b%val(i) = a%val(i)
+    end do
+  end block
+#else
   b%ia(1:nz)  = a%ia(1:nz)
   b%ja(1:nz)  = a%ja(1:nz)
   b%val(1:nz) = a%val(1:nz)
-
+#endif
   call b%set_host()
 
   if (.not.b%is_by_rows()) call b%fix(info)
@@ -4240,10 +4313,21 @@ subroutine psb_c_cp_coo_from_lcoo(a,b,info)
   call a%set_nzeros(nz)
   call a%reallocate(nz)
 
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nz
+      a%ia(i)  = b%ia(i) 
+      a%ja(i)  = b%ja(i) 
+      a%val(i) = b%val(i)
+    end do
+  end block
+#else
   a%ia(1:nz)  = b%ia(1:nz)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)
-
+#endif
   call a%set_host()
 
   if (.not.a%is_by_rows()) call a%fix(info)
@@ -4442,7 +4526,17 @@ function psb_lc_coo_maxval(a) result(res)
   nnz = a%get_nzeros()
   if (allocated(a%val)) then
     nnz = min(nnz,size(a%val))
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nnz
+      res = max(res,abs(a%val(i)))
+    end do
+  end block
+#else
     res = maxval(abs(a%val(1:nnz)))
+#endif
   end if
 
 end function psb_lc_coo_maxval
@@ -4499,7 +4593,17 @@ function psb_lc_coo_csnmi(a) result(res)
       i = a%ia(j)
       vt(i) = vt(i) + abs(a%val(j))
     end do
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, m
+      res = max(res,abs(vt(i)))
+    end do
+  end block 
+#else
     res = maxval(vt(1:m))
+#endif
     deallocate(vt,stat=info)
   end if
 
@@ -4539,7 +4643,17 @@ function psb_lc_coo_csnm1(a) result(res)
     i = a%ja(j)
     vt(i) = vt(i) + abs(a%val(j))
   end do
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, n
+      res = max(res,abs(vt(i)))
+    end do
+  end block 
+#else
   res = maxval(vt(1:n))
+#endif
   deallocate(vt,stat=info)
 
   return
@@ -4584,7 +4698,6 @@ subroutine psb_lc_coo_rowsum(d,a)
     d(i) = d(i) + a%val(j)
   end do
 
-
   return
   call psb_erractionrestore(err_act)
   return
@@ -4592,7 +4705,6 @@ subroutine psb_lc_coo_rowsum(d,a)
 9999 call psb_error_handler(err_act)
 
   return
-
 end subroutine psb_lc_coo_rowsum
 
 subroutine psb_lc_coo_arwsum(d,a)
@@ -4761,6 +4873,7 @@ subroutine psb_lc_coo_scalplusidentity(d,a,info)
   end if
 
   mnm = min(a%get_nrows(),a%get_ncols())
+  !$omp parallel do private(i,j)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
     j=a%ia(i)
@@ -4813,12 +4926,30 @@ subroutine psb_lc_coo_spaxpby(alpha,a,beta,b,info)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nza
+      tcoo%ia(i) = a%ia(i)
+      tcoo%ja(i) = a%ja(i)
+      tcoo%val(i) = alpha*a%val(i)
+    end do
+    !$omp parallel do private(i)
+    do i=1, nzb
+      tcoo%ia(nza+i) = bcoo%ia(i)
+      tcoo%ja(nza+i) = bcoo%ja(i)
+      tcoo%val(nza+i) =  beta*bcoo%val(i)
+    end do
+  end block
+#else
   tcoo%ia(1:nza) = a%ia(1:nza)
   tcoo%ja(1:nza) = a%ja(1:nza)
   tcoo%val(1:nza) = alpha*a%val(1:nza)
   tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
   tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
   tcoo%val(nza+1:nza+nzb) = beta*bcoo%val(1:nzb)
+#endif
   ! Fix the indexes
   call tcoo%fix(info)
   ! Move to correct output format
@@ -4906,12 +5037,30 @@ function psb_lc_coo_cmpmat(a,b,tol,info) result(res)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nza
+      tcoo%ia(i) = a%ia(i)
+      tcoo%ja(i) = a%ja(i)
+      tcoo%val(i) = a%val(i)
+    end do
+    !$omp parallel do private(i)
+    do i=1, nzb
+      tcoo%ia(nza+i) = bcoo%ia(i)
+      tcoo%ja(nza+i) = bcoo%ja(i)
+      tcoo%val(nza+i) =  (-1_psb_spk_)*bcoo%val(i)
+    end do
+  end block
+#else
   tcoo%ia(1:nza) = a%ia(1:nza)
   tcoo%ja(1:nza) = a%ja(1:nza)
   tcoo%val(1:nza) = a%val(1:nza)
   tcoo%ia(nza+1:nza+nzb) = bcoo%ia(1:nzb)
   tcoo%ja(nza+1:nza+nzb) = bcoo%ja(1:nzb)
   tcoo%val(nza+1:nza+nzb) = (-1_psb_spk_)*bcoo%val(1:nzb)
+#endif
   ! Fix the indexes
   call tcoo%fix(info)
   if (info /= psb_success_) then
@@ -5950,7 +6099,7 @@ subroutine psb_lc_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
+3    call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
     goto 9999
   end if
   if (size(ia) < nz) then

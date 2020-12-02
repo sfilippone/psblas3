@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 module psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -66,9 +66,42 @@ module psb_serial_mod
       real(psb_dpk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_nspaxpby
+    subroutine psb_s_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
+      use psb_const_mod
+      integer(psb_ipk_), intent(out)              :: nz
+      integer(psb_ipk_), intent(out)              :: iz(:)
+      real(psb_spk_), intent (out)      :: z(:)
+      integer(psb_ipk_), intent(in)               :: nx, ny
+      integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
+      real(psb_spk_), intent (in)       :: x(:), y(:)
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_s_nspaxpby
+    subroutine psb_c_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
+      use psb_const_mod
+      integer(psb_ipk_), intent(out)              :: nz
+      integer(psb_ipk_), intent(out)              :: iz(:)
+      complex(psb_spk_), intent (out)      :: z(:)
+      integer(psb_ipk_), intent(in)               :: nx, ny
+      integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
+      complex(psb_spk_), intent (in)       :: x(:), y(:)
+      complex(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_c_nspaxpby
+    subroutine psb_z_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
+      use psb_const_mod
+      integer(psb_ipk_), intent(out)              :: nz
+      integer(psb_ipk_), intent(out)              :: iz(:)
+      complex(psb_dpk_), intent (out)      :: z(:)
+      integer(psb_ipk_), intent(in)               :: nx, ny
+      integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
+      complex(psb_dpk_), intent (in)       :: x(:), y(:)
+      complex(psb_dpk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_z_nspaxpby
   end interface psb_nspaxpby
 
-  interface 
+  interface
     subroutine symbmm (n, m, l, ia, ja, diaga, &
          & ib, jb, diagb, ic, jc, diagc, index)
       import :: psb_ipk_
@@ -84,7 +117,7 @@ module psb_serial_mod
       integer(psb_lpk_), allocatable :: ic(:),jc(:)
     end subroutine lsymbmm
   end interface
-  
+
 
 contains
 
@@ -103,13 +136,13 @@ contains
   elemental function psb_cnrm1(x) result(res)
     complex(psb_spk_), intent(in)  :: x
     real(psb_spk_)                 :: res
-    res = abs( real( x ) ) + abs( aimag( x ) )  
+    res = abs( real( x ) ) + abs( aimag( x ) )
   end function psb_cnrm1
 
   elemental function psb_znrm1(x) result(res)
     complex(psb_dpk_), intent(in)  :: x
     real(psb_dpk_)                 :: res
-    res = abs( real( x ) ) + abs( aimag( x ) )  
+    res = abs( real( x ) ) + abs( aimag( x ) )
   end function psb_znrm1
 
   elemental function psb_sminreal(x) result(res)
@@ -127,13 +160,13 @@ contains
   elemental function psb_cminreal(x) result(res)
     complex(psb_spk_), intent(in)  :: x
     real(psb_spk_)                 :: res
-    res = min( real( x ) , aimag( x ) )  
+    res = min( real( x ) , aimag( x ) )
   end function psb_cminreal
 
   elemental function psb_zminreal(x) result(res)
     complex(psb_dpk_), intent(in)  :: x
     real(psb_dpk_)                 :: res
-    res = min( real( x ) , aimag( x ) )  
+    res = min( real( x ) , aimag( x ) )
   end function psb_zminreal
 
 
@@ -197,7 +230,7 @@ contains
     !     .. executable statements ..
     !
     if( n <= 0 ) return
-    if( incx == 1 .and. incy == 1 ) then 
+    if( incx == 1 .and. incy == 1 ) then
       !
       !     code for both increments equal to 1
       !
@@ -232,7 +265,7 @@ contains
     real(psb_spk_) norm,scale
     complex(psb_spk_) alpha
     !
-    if (cabs(ca) == 0.0) then 
+    if (cabs(ca) == 0.0) then
       !
       c = 0.0d0
       s = (1.0,0.0)
@@ -316,7 +349,7 @@ contains
     !     .. executable statements ..
     !
     if( n <= 0 ) return
-    if( incx == 1 .and. incy == 1 ) then 
+    if( incx == 1 .and. incy == 1 ) then
       !
       !     code for both increments equal to 1
       !
@@ -351,7 +384,7 @@ contains
     real(psb_dpk_) norm,scale
     complex(psb_dpk_) alpha
     !
-    if (cdabs(ca) == 0.0d0) then 
+    if (cdabs(ca) == 0.0d0) then
       !
       c = 0.0d0
       s = (1.0d0,0.0d0)
@@ -374,4 +407,3 @@ contains
 
 
 end module psb_serial_mod
-

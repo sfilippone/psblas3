@@ -159,7 +159,7 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
     return
 end subroutine psi_i2swaptranm
 
-subroutine psi_i2tranidxm(ictxt,iicomm,flag,n,beta,y,idx,&
+subroutine psi_i2tranidxm(ctxt,icomm,flag,n,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_i2tranidxm
@@ -174,8 +174,8 @@ subroutine psi_i2tranidxm(ictxt,iicomm,flag,n,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)   :: ictxt
-  integer(psb_mpk_), intent(in)     :: iicomm
+  type(psb_ctxt_type), intent(in)   :: ctxt
+  integer(psb_mpk_), intent(in)     :: icomm
   integer(psb_ipk_), intent(in)     :: flag,n
   integer(psb_ipk_), intent(out)    :: info
   integer(psb_i2pk_)         :: y(:,:), beta
@@ -183,9 +183,8 @@ subroutine psi_i2tranidxm(ictxt,iicomm,flag,n,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_)   :: icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
@@ -202,9 +201,6 @@ subroutine psi_i2tranidxm(ictxt,iicomm,flag,n,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-  ctxt = ictxt
-  icomm = iicomm
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -656,7 +652,7 @@ end subroutine psi_i2swaptranv
 !   
 !   
 ! 
-subroutine psi_i2tranidxv(ictxt,iicomm,flag,beta,y,idx,&
+subroutine psi_i2tranidxv(ctxt,icomm,flag,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_i2tranidxv
@@ -671,8 +667,8 @@ subroutine psi_i2tranidxv(ictxt,iicomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in) :: ictxt
-  integer(psb_mpk_), intent(in)   :: iicomm
+  type(psb_ctxt_type), intent(in) :: ctxt
+  integer(psb_mpk_), intent(in)   :: icomm
   integer(psb_ipk_), intent(in)   :: flag
   integer(psb_ipk_), intent(out)  :: info
   integer(psb_i2pk_)         :: y(:), beta
@@ -680,9 +676,8 @@ subroutine psi_i2tranidxv(ictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_)   :: icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
@@ -699,9 +694,6 @@ subroutine psi_i2tranidxv(ictxt,iicomm,flag,beta,y,idx,&
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
-  ctxt = ictxt
-  icomm = iicomm
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_

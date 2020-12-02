@@ -179,8 +179,8 @@ subroutine psi_sswapidxm(ctxt,icomm,flag,n,beta,y,idx, &
 
   ! locals
   
-  integer(psb_mpk_) :: np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
@@ -197,7 +197,6 @@ subroutine psi_sswapidxm(ctxt,icomm,flag,n,beta,y,idx, &
   info=psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -641,7 +640,7 @@ end subroutine psi_sswapdatav
 !   
 !   
 ! 
-subroutine psi_sswapidxv(ictxt,iicomm,flag,beta,y,idx, &
+subroutine psi_sswapidxv(ctxt,icomm,flag,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_sswapidxv
@@ -656,8 +655,8 @@ subroutine psi_sswapidxv(ictxt,iicomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in) :: ictxt
-  integer(psb_mpk_), intent(in)   :: iicomm
+  type(psb_ctxt_type), intent(in) :: ctxt
+  integer(psb_mpk_), intent(in)   :: icomm
   integer(psb_ipk_), intent(in)   :: flag
   integer(psb_ipk_), intent(out)  :: info
   real(psb_spk_)         :: y(:), beta
@@ -665,9 +664,8 @@ subroutine psi_sswapidxv(ictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_)   :: icomm, np, me,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
@@ -684,9 +682,6 @@ subroutine psi_sswapidxv(ictxt,iicomm,flag,beta,y,idx, &
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
-  ctxt = ictxt
-  icomm = iicomm
-
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
