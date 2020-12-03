@@ -250,7 +250,6 @@ subroutine psb_s_base_mv_from_coo(a,b,info)
 
 end subroutine psb_s_base_mv_from_coo
 
-
 subroutine psb_s_base_mv_to_fmt(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mv_to_fmt
   use psb_error_mod
@@ -698,6 +697,8 @@ subroutine psb_s_base_tril(a,l,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
+    ! Implementing this in OpenMP?
+    ! Tricky, to be seen 
     do i=imin_,imax_, nbk
       ibk = min(nbk,imax_-i+1)
       call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
@@ -849,6 +850,8 @@ subroutine psb_s_base_triu(a,u,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
+    ! Implementing this in OpenMP?
+    ! Tricky, to be seen 
     do i=imin_,imax_, nbk
       ibk = min(nbk,imax_-i+1)
       call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
@@ -914,8 +917,6 @@ subroutine psb_s_base_triu(a,u,info,&
 
 end subroutine psb_s_base_triu
 
-
-
 subroutine psb_s_base_clone(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_clone
   use psb_error_mod
@@ -960,6 +961,7 @@ subroutine psb_s_base_make_nonunit(a)
     mnm = min(m,n)
     nz = tmp%get_nzeros()
     call tmp%reallocate(nz+mnm)
+    !$omp parallel do private(i) shared(nz)
     do i=1, mnm
       tmp%val(nz+i) = sone
       tmp%ia(nz+i)  = i
@@ -1506,6 +1508,7 @@ contains
     real(psb_spk_), intent(out) :: y(*)
     integer(psb_ipk_) :: i
 
+    !$omp parallel do private(i)
     do i=1,n
       y(i) = d(i)*x(i)
     end do
@@ -1519,6 +1522,7 @@ contains
     real(psb_spk_), intent(inout) :: x(*)
     integer(psb_ipk_) :: i
 
+    !$omp parallel do private(i)
     do i=1,n
       x(i) = d(i)*x(i)
     end do
@@ -3182,6 +3186,8 @@ subroutine psb_ls_base_tril(a,l,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
+    ! Implementing this in OpenMP?
+    ! Tricky, to be seen 
     do i=imin_,imax_, nbk
       ibk = min(nbk,imax_-i+1)
       call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
@@ -3334,6 +3340,8 @@ subroutine psb_ls_base_triu(a,u,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
+    ! Implementing this in OpenMP?
+    ! Tricky, to be seen 
     do i=imin_,imax_, nbk
       ibk = min(nbk,imax_-i+1)
       call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
@@ -3446,6 +3454,7 @@ subroutine psb_ls_base_make_nonunit(a)
     mnm = min(m,n)
     nz = tmp%get_nzeros()
     call tmp%reallocate(nz+mnm)
+    !$omp parallel do private(i) shared(nz)
     do i=1, mnm
       tmp%val(nz+i) = sone
       tmp%ia(nz+i)  = i

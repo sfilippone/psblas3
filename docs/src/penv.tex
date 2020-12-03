@@ -7,7 +7,7 @@
   environment}
 
 \begin{verbatim}
-call psb_init(icontxt, np, basectxt, ids)
+call psb_init(ctxt, np, basectxt, ids)
 \end{verbatim}
 
 This subroutine initializes the PSBLAS parallel environment, defining
@@ -41,8 +41,8 @@ Default: use the indices $(0\dots np-1)$.
 
 \begin{description}
 \item[\bf On Return]
-\item[icontxt] the communication context identifying the virtual
-  parallel machine. Note that this is always a duplicate of
+\item[ctxt] the communication context identifying the virtual
+  parallel machine, type \verb|psb_ctxt_type|. Note that this is always a duplicate of
   \verb|basectxt|, so that library communications are completely
   separated from other communication operations.\\
 Scope: {\bf global}.\\
@@ -65,7 +65,7 @@ Specified as: an integer variable.
   environment}
 
 \begin{verbatim}
-call psb_info(icontxt, iam, np)
+call psb_info(ctxt, iam, np)
 \end{verbatim}
 
 This subroutine returns information about  the PSBLAS parallel environment, defining
@@ -73,7 +73,7 @@ a virtual parallel machine.
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -103,7 +103,7 @@ Specified as: an integer variable. \
 \item If the user has requested on \verb|psb_init| a number of
   processes less than the total available in the parallel execution
   environment, the remaining processes will have on return $iam=-1$;
-  the only call involving \verb|icontxt| that any such process may
+  the only call involving \verb|ctxt| that any such process may
   execute is  to \verb|psb_exit|. 
 \end{enumerate}
 
@@ -112,22 +112,22 @@ Specified as: an integer variable. \
   environment}
 
 \begin{verbatim}
-call psb_exit(icontxt)
-call psb_exit(icontxt,close)
+call psb_exit(ctxt)
+call psb_exit(ctxt,close)
 \end{verbatim}
 
 This subroutine exits from the  PSBLAS parallel virtual  machine.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer variable.
 \item[close] Whether to close all data structures related to the
-  virtual parallel machine, besides those associated with icontxt.\\
+  virtual parallel machine, besides those associated with ctxt.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
@@ -138,7 +138,7 @@ Specified as: a logical  variable, default value: true.
 \begin{enumerate}
 \item This routine may be called even if a previous call to
   \verb|psb_info| has returned with $iam=-1$; indeed, it it is the only
-  routine that may be called with argument \verb|icontxt| in this
+  routine that may be called with argument \verb|ctxt| in this
   situation.
 \item A call to this routine with \verb|close=.true.| implies a call
   to \verb|MPI_Finalize|, after which no parallel routine may be called.
@@ -154,14 +154,14 @@ Specified as: a logical  variable, default value: true.
 \clearpage\subsection{psb\_get\_mpi\_comm --- Get the MPI communicator}
 
 \begin{verbatim}
-icomm = psb_get_mpi_comm(icontxt)
+icomm = psb_get_mpi_comm(ctxt)
 \end{verbatim}
 
 This function returns the MPI communicator associated with a PSBLAS context
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -184,14 +184,14 @@ is deprecated.
 \clearpage\subsection{psb\_get\_mpi\_rank --- Get the MPI rank}
 
 \begin{verbatim}
-rank = psb_get_mpi_rank(icontxt, id)
+rank = psb_get_mpi_rank(ctxt, id)
 \end{verbatim}
 
 This function returns the MPI rank of the  PSBLAS process $id$
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -238,7 +238,7 @@ Returned  as: a  \verb|real(psb_dpk_)|  variable.
   environment}
 
 \begin{verbatim}
-call psb_barrier(icontxt)
+call psb_barrier(ctxt)
 \end{verbatim}
 
 This subroutine acts as an explicit synchronization point for  the  PSBLAS
@@ -246,7 +246,7 @@ parallel virtual  machine.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -258,14 +258,14 @@ Specified as: an integer variable.
 \clearpage\subsection{psb\_abort --- Abort a computation}
 
 \begin{verbatim}
-call psb_abort(icontxt)
+call psb_abort(ctxt)
 \end{verbatim}
 
 This subroutine aborts computation on the parallel virtual machine. 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -280,7 +280,7 @@ Specified as: an integer variable.
 \clearpage\subsection{psb\_bcast --- Broadcast data}
 
 \begin{verbatim}
-call psb_bcast(icontxt, dat, root)
+call psb_bcast(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a broadcast operation based on the
@@ -288,7 +288,7 @@ underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -325,7 +325,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_sum --- Global sum}
 
 \begin{verbatim}
-call psb_sum(icontxt, dat, root)
+call psb_sum(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a sum reduction  operation based on the
@@ -333,7 +333,7 @@ underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -379,7 +379,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_max --- Global maximum}
 
 \begin{verbatim}
-call psb_max(icontxt, dat, root)
+call psb_max(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a maximum valuereduction
@@ -387,7 +387,7 @@ operation based on the underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -432,7 +432,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_min --- Global minimum}
 
 \begin{verbatim}
-call psb_min(icontxt, dat, root)
+call psb_min(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a minimum value reduction
@@ -440,7 +440,7 @@ operation based on the underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -485,7 +485,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_amx --- Global maximum absolute value}
 
 \begin{verbatim}
-call psb_amx(icontxt, dat, root)
+call psb_amx(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a maximum absolute value reduction
@@ -493,7 +493,7 @@ operation based on the underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -538,7 +538,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_amn --- Global minimum absolute value}
 
 \begin{verbatim}
-call psb_amn(icontxt, dat, root)
+call psb_amn(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a minimum absolute value reduction
@@ -546,7 +546,7 @@ operation based on the underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -591,7 +591,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_nrm2 --- Global 2-norm reduction}
 
 \begin{verbatim}
-call psb_nrm2(icontxt, dat, root)
+call psb_nrm2(ctxt, dat, root)
 \end{verbatim}
 
 This subroutine implements a 2-norm value reduction 
@@ -599,7 +599,7 @@ operation based on the underlying communication library.
 \begin{description}
 \item[Type:] Synchronous.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -651,14 +651,14 @@ Kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_snd --- Send data}
 
 \begin{verbatim}
-call psb_snd(icontxt, dat, dst, m)
+call psb_snd(ctxt, dat, dst, m)
 \end{verbatim}
 
 This subroutine sends a packet of data to a destination.
 \begin{description}
 \item[Type:] Synchronous: see usage notes. 
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
@@ -702,14 +702,14 @@ same value on sending and receiving processes.
 \clearpage\subsection{psb\_rcv --- Receive data}
 
 \begin{verbatim}
-call psb_rcv(icontxt, dat, src, m)
+call psb_rcv(ctxt, dat, src, m)
 \end{verbatim}
 
 This subroutine receives a packet of data to a destination.
 \begin{description}
 \item[Type:] Synchronous: see usage notes.
 \item[\bf  On Entry ]
-\item[icontxt] the communication context identifying the virtual
+\item[ctxt] the communication context identifying the virtual
   parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\

@@ -582,7 +582,7 @@ end subroutine psb_d_get_neigh
 
 
 
-subroutine psb_d_csall(nr,nc,a,info,nz)
+subroutine psb_d_csall(nr,nc,a,info,nz,type,mold)
   use psb_d_mat_mod, psb_protect_name => psb_d_csall
   use psb_d_base_mat_mod
   use psb_error_mod
@@ -591,6 +591,8 @@ subroutine psb_d_csall(nr,nc,a,info,nz)
   integer(psb_ipk_), intent(in)             :: nr,nc
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: nz
+  character(len=*), intent(in), optional    :: type
+  class(psb_d_base_sparse_mat), optional, intent(in) :: mold
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csall'
@@ -601,7 +603,23 @@ subroutine psb_d_csall(nr,nc,a,info,nz)
   call a%free()
 
   info = psb_success_
-  allocate(psb_d_coo_sparse_mat :: a%a, stat=info)
+  if (present(mold)) then
+    allocate(a%a, stat=info, mold=mold)
+  else if (present(type)) then
+    select case (type)
+    case('CSR')
+      allocate(psb_d_csr_sparse_mat :: a%a, stat=info)
+    case('COO')
+      allocate(psb_d_coo_sparse_mat :: a%a, stat=info)
+    case('CSC')
+      allocate(psb_d_csc_sparse_mat :: a%a, stat=info)
+    case default
+      allocate(psb_d_coo_sparse_mat :: a%a, stat=info)
+    end select
+  else
+    allocate(psb_d_coo_sparse_mat :: a%a, stat=info)
+  end if
+
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
@@ -3381,7 +3399,7 @@ end subroutine psb_ld_get_neigh
 
 
 
-subroutine psb_ld_csall(nr,nc,a,info,nz)
+subroutine psb_ld_csall(nr,nc,a,info,nz,type,mold)
   use psb_d_mat_mod, psb_protect_name => psb_ld_csall
   use psb_d_base_mat_mod
   use psb_error_mod
@@ -3390,6 +3408,8 @@ subroutine psb_ld_csall(nr,nc,a,info,nz)
   integer(psb_lpk_), intent(in)             :: nr,nc
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_lpk_), intent(in), optional   :: nz
+  character(len=*), intent(in), optional    :: type
+  class(psb_ld_base_sparse_mat), optional, intent(in) :: mold
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csall'
@@ -3400,7 +3420,22 @@ subroutine psb_ld_csall(nr,nc,a,info,nz)
   call a%free()
 
   info = psb_success_
-  allocate(psb_ld_coo_sparse_mat :: a%a, stat=info)
+  if (present(mold)) then
+    allocate(a%a, stat=info, mold=mold)
+  else if (present(type)) then
+    select case (type)
+    case('CSR')
+      allocate(psb_ld_csr_sparse_mat :: a%a, stat=info)
+    case('COO')
+      allocate(psb_ld_coo_sparse_mat :: a%a, stat=info)
+    case('CSC')
+      allocate(psb_ld_csc_sparse_mat :: a%a, stat=info)
+    case default
+      allocate(psb_ld_coo_sparse_mat :: a%a, stat=info)
+    end select
+  else
+    allocate(psb_ld_coo_sparse_mat :: a%a, stat=info)
+  end if
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)

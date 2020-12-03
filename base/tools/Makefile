@@ -27,7 +27,8 @@ FOBJS = psb_cdall.o psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt
 	psb_s_map.o psb_d_map.o psb_c_map.o psb_z_map.o \
 	psb_s_par_csr_spspmm.o psb_d_par_csr_spspmm.o psb_c_par_csr_spspmm.o psb_z_par_csr_spspmm.o \
 	psb_s_glob_transpose.o psb_d_glob_transpose.o psb_c_glob_transpose.o psb_z_glob_transpose.o \
-	psb_cgetelem.o psb_dgetelem.o psb_sgetelem.o psb_zgetelem.o   
+	psb_cgetelem.o psb_dgetelem.o psb_sgetelem.o psb_zgetelem.o   \
+	psb_c_remap.o psb_s_remap.o psb_d_remap.o psb_z_remap.o
 #	psb_lallc.o psb_lasb.o psb_lfree.o psb_lins.o \
 
 MPFOBJS = psb_icdasb.o psb_ssphalo.o  psb_dsphalo.o psb_csphalo.o psb_zsphalo.o  \
