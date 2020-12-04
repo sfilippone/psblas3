@@ -56,7 +56,8 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   integer(psb_ipk_)   :: me, np
   integer(psb_ipk_)   :: total_snd, total_rcv, total_xhcg, global_halo, global_points
   integer(psb_ipk_)   :: local_snd, local_rcv, local_xhcg, local_halo, local_points
-  real(psb_dpk_)      :: av2s, v2s
+  integer(psb_ipk_)   :: max_xchg
+  real(psb_dpk_)      :: av2s, v2s, anxchg
   
   if (present(glob)) then 
     glob_ = glob
@@ -94,15 +95,24 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   av2s          = v2s
   call psb_sum(ctxt, global_halo)
   call psb_sum(ctxt, av2s)
-  av2s = av2s / np 
+  av2s = av2s / np
+  max_xchg = get_nxchg(desc_p)
+  anxchg   = max_xchg
+  call psb_max(ctxt, max_xchg)
+  call psb_sum(ctxt, anxchg)
+  anxchg = anxchg/np
+  
   if (me == psb_root_) then
     write(iout,*) ' Communication descriptor details '
     write(iout,*) '               Descriptor format:       ',desc_p%get_fmt()    
     write(iout,*) ' Global descriptor data: points:',global_points,' halo:',global_halo
+    write(iout,*) ' Maximum number of exchanges     :',max_xchg
+    write(iout,*) ' Average number of exchanges     :',anxchg
     write(iout,*)
     write(iout,*) ' Average volume to surface ratio :',av2s
     write(iout,*)
   end if
+  flush(iout)
   call psb_barrier(ctxt)
   
   if (verb_ <= 1) return
@@ -123,12 +133,16 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
     call psb_barrier(ctxt)
   end do
 
+  if (verb_ <= 2) return
+
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_halo'
   do i=0, np-1
     if (me == i)  &
        &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_halo_,glob=glob_)
     call psb_barrier(ctxt)
   end do
+
+  if (verb_ <= 3) return
   
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_ext'
   do i=0, np-1
@@ -140,6 +154,26 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   return
 
 contains
+
+  function get_nxchg(desc,data) result(res)
+    implicit none
+    type(psb_desc_type), intent(in), target :: desc
+    integer(psb_ipk_), intent(in), optional :: data
+    integer(psb_ipk_) :: res
+    
+    class(psb_i_base_vect_type), pointer :: vpnt
+    integer(psb_ipk_) :: ip, nerv, nesd, data_, totxch, idxr, idxs, info
+    
+    if (present(data)) then
+      data_ = data
+    else
+      data_ = psb_comm_halo_
+    end if
+    call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    res = totxch
+  end function get_nxchg
+  
+    
   subroutine print_my_xchg(iout,desc_p,data,glob,short, verbosity)
     implicit none 
     type(psb_desc_type), intent(in), target   :: desc_p
