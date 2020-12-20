@@ -39,8 +39,8 @@
 ! Arguments: 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
-!                                       indices
+!    iprc(:)  - integer(psb_ipk_), allocatable   Output: process identifiers
+!                                                    for the corresponding indices
 !    idxmap   - class(psb_indx_map).    The index map
 !    info     - integer.                return code.
 !
@@ -102,7 +102,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j,ipnt, nsampl_out,&
        & nv, n_answers, nqries, nsampl_in, locr_max, &
-       & nqries_max, nadj, maxspace, mxnsin
+       & nqries_max, nadj, maxspace, mxnsin, mnnsin
   integer(psb_lpk_) :: mglob, ih
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me, nresp
@@ -118,10 +118,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   call psb_erractionsave(err_act)
 
   ctxt   = idxmap%get_ctxt()
-  icomm   = idxmap%get_mpic()
-  mglob   = idxmap%get_gr()
-  n_row   = idxmap%get_lr()
-  n_col   = idxmap%get_lc()
+  icomm  = idxmap%get_mpic()
+  mglob  = idxmap%get_gr()
+  n_row  = idxmap%get_lr()
+  n_col  = idxmap%get_lc()
 
   if ((do_timings).and.(idx_sweep0==-1))       &
        & idx_sweep0 = psb_get_timer_idx("GRPH_FND_OWN: Outer sweep")
@@ -186,15 +186,15 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   maxspace = nt*locr_max
   if (tmpv(4) > 0) maxspace = min(maxspace,tmpv(4))
   maxspace = max(maxspace,np)
-  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',maxspace
+  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',maxspace,maxspace/np
   if (do_timings) call psb_tic(idx_sweep0)
   if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
     !
     ! Do a preliminary run on the user-defined adjacency lists
     !
-    if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology'
     if (debugsz) write(0,*) me,' Initial sweep on user-defined topology',nqries
     nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
+    if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology',nsampl_in
     call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
     nqries     = nv - n_answers
@@ -216,7 +216,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! 1. Select a sample such that the total size is <= maxspace
     !    sample query is then sent to all processes
     !    
-    ! if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nqries_max
+    if (trace.and.(me == 0)) write(0,*) 'Looping in graph_fnd_owner: ', nqries_max
     nsampl_in = nqries
     nsampl_in = min(max(1,(maxspace+np-1)/np),nsampl_in)
     !
@@ -231,7 +231,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! 2. Do a search on all processes; this is supposed to find
     !    the owning process for all inputs;
     !    
-    call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info, samesize=.true.)
+    call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info) 
     if (debugsz) write(0,*) me,' From a2a_fnd_owner ',info
     !
     ! We might have padded when looking for owners, so the actual samples
@@ -260,12 +260,17 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !    Need to set up a proper loop here to have a complete
     !    sweep over the input vector. Done inside adj_fnd_sweep. 
     !
-!!$      write(0,*) me,' After a2a ',nqries
+    !write(0,*) me,' After a2a ',nqries
     nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-    mxnsin = nsampl_in
+    mxnsin    = nsampl_in
     call psb_max(ctxt,mxnsin)
-!!$      write(0,*) me, ' mxnsin ',mxnsin
-    if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
+    !  mnnsin = nsampl_in
+    !  if (mnnsin==0) mnnsin=HUGE(mnnsin)
+    !  call psb_min(ctxt,mnnsin)
+    !  write(0,*) me, ' mxnsin ',mxnsin
+    if (trace.and.(me == 0)) write(0,*) ' Further sweep',nsampl_in, mxnsin, mnnsin
+    if (mxnsin>0) call psi_adj_fnd_sweep(idx(n_answers+1:),iprc(n_answers+1:),ladj,&
+         & idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
 
     nqries     = nv - n_answers
@@ -293,7 +298,7 @@ contains
     integer(psb_ipk_), intent(out)   :: tsmpl(:), ns_out
     logical, intent(in), optional    :: pad
     !
-    integer(psb_ipk_) :: nv, ns, k
+    integer(psb_ipk_) :: nv, ns, k, ipnt
     logical :: pad_
 
     if (present(pad)) then
@@ -312,7 +317,7 @@ contains
     ! Make sure we sweep through the entire vector immediately.
     ! But also make sure we do not overrun tsmpl
     ! 
-    if (ns == 0) ns = nv
+    !if (ns == 0) ns = nv
     ns = min(ns,size(tsmpl))
     ns_out = 0
 
@@ -362,7 +367,7 @@ contains
     class(psb_indx_map), intent(inout) :: idxmap
     !
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw
+    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw, n_reml
     integer(psb_lpk_), allocatable    :: tidx(:)
     integer(psb_ipk_), allocatable    :: tsmpl(:)
 
@@ -374,20 +379,21 @@ contains
     isw  = 1
     do
       !write(0,*) me,' Into  sampling ',n_samples
-      call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,n_samples,ns_out)      
+      call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,n_samples,ns_out,pad=.true.)      
       ns_in = min(n_samples,ns_out)
-      !write(0,*) me,' From second sampling ',ns_out
+      !write(0,*) me,' From second sampling ',ns_out, ns_in
       call psi_adjcncy_fnd_owner(tidx(1:ns_in),tprc,ladj,idxmap,info)
       call psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)
       !write(0,*) me,' Sweep ',isw,' answers:',ns_out
       n_answers = n_answers + ns_out
-      n_rem = size(idx)-ipnt
+      n_rem     = size(idx) - ipnt
+      n_reml    = n_rem
       call psb_max(ctxt,n_rem)
-      !write(0,*) me,' Sweep ',isw,n_rem, ipnt, n_samples
-      if (n_rem <= 0) exit
+      !if (me == 0) write(0,*) me,' fnd_sweep Sweep ',isw,n_rem, ipnt, n_samples, n_reml
       isw = isw + 1 
+      if (n_rem <= 0) exit
     end do
-
+    !  if (me == 0) write(0,*)'adj_fnd_sweep: sweeps: ',isw
 
   end subroutine psi_adj_fnd_sweep
 

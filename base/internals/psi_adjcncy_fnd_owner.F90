@@ -144,8 +144,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     goto 9999      
   end if
   iprc = -1
-  ! write(0,*) me,name,' Going through ',nidx,nadj
   xchg_alg = psi_get_adj_alg()
+  !if (me == 0)   write(0,*) me,'adj_fnd_owner alg: ',xchg_alg,' Going through ',nidx,nadj
   select case(xchg_alg)
   case(psi_adj_fnd_a2av_) 
     if (do_timings) call psb_tic(idx_phase1)

@@ -79,7 +79,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   integer(psb_lpk_) :: mglob, ih
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me, nresp
-  logical, parameter  :: use_psi_adj=.true.
+  logical, parameter  :: use_psi_adj=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
   logical             :: samesize_
@@ -113,7 +113,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
     samesize_ = .false.
   end if
   nv = size(idx)
-  ! write(0,*) me,name,' :',use_psi_adj,samesize_,nv
+  !if (me == 0)  write(0,*) me,name,' :',use_psi_adj,samesize_,nv
   if (use_psi_adj) then 
     !
     ! Reuse the adjcncy version by tricking it with an adjcncy list
@@ -152,6 +152,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
       call mpi_reduce_scatter_block(lclidx,iprc,nv,psb_mpi_ipk_,mpi_max,icomm,minfo)
       
     else
+      ! if (me == 0) write(0,*) 'a2a_fnd_owner : version 3'
       !
       ! 1. allgetherv
       ! 2. local conversion
