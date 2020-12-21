@@ -156,7 +156,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
-  iprc(:) = -1
+  iprc(:)   = -1
   n_answers = 0
   !
   ! Start from the adjacncy list
@@ -167,7 +167,9 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   call psb_realloc(nadj,ladj,info)
   !
   ! Throughout the subroutine, nqries is the number of local inquiries
-  ! that have not been answered yet
+  ! that have not been answered yet, stored in idx(n_aswers+1:)
+  ! idx(1:n_answers) and iprc(1:n_answers) are queries that have
+  ! already been answered; n_answers is updated by psi_adj_fnd_sweep. 
   ! 
   nqries     = nv - n_answers
   nqries_max = nqries
@@ -186,7 +188,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   maxspace = nt*locr_max
   if (tmpv(4) > 0) maxspace = min(maxspace,tmpv(4))
   maxspace = max(maxspace,np)
-  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',maxspace,maxspace/np
+  if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',&
+       & maxspace, maxspace/np
   if (do_timings) call psb_tic(idx_sweep0)
   if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
     !
@@ -194,8 +197,10 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !
     if (debugsz) write(0,*) me,' Initial sweep on user-defined topology',nqries
     nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-    if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology',nsampl_in
-    call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
+    if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology',&
+         & nsampl_in
+    ipnt = n_answers + 1
+    call psi_adj_fnd_sweep(idx(ipnt:),iprc(ipnt:),ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
     nqries     = nv - n_answers
     nqries_max = nqries
@@ -223,7 +228,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! Choose a sample, should it be done in this simplistic way?
     ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
     !
-    ipnt = 1
+    ipnt = n_answers + 1
     call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out, pad=.true.)      
     nsampl_in = min(nsampl_out,nsampl_in)
     if (debugsz) write(0,*) me,' From first sampling ',nsampl_in
@@ -269,7 +274,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !  call psb_min(ctxt,mnnsin)
     !  write(0,*) me, ' mxnsin ',mxnsin
     if (trace.and.(me == 0)) write(0,*) ' Further sweep',nsampl_in, mxnsin, mnnsin
-    if (mxnsin>0) call psi_adj_fnd_sweep(idx(n_answers+1:),iprc(n_answers+1:),ladj,&
+    ipnt = n_answers + 1
+    if (mxnsin>0) call psi_adj_fnd_sweep(idx(ipnt:),iprc(ipnt:),ladj,&
          & idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
 
