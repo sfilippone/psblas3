@@ -78,6 +78,23 @@ contains
 
   end subroutine
 
+  function psb_c_cmp_ctxt(cctxt1, cctxt2) result(res)
+    implicit none
+    type(psb_c_object_type), value :: cctxt1, cctxt2
+    logical(c_bool) :: res
+
+    logical :: equal
+    type(psb_ctxt_type),   pointer :: ctxt1, ctxt2
+
+    ctxt1 => psb_c2f_ctxt(cctxt1)
+    ctxt2 => psb_c2f_ctxt(cctxt2)
+
+    equal = psb_cmp_ctxt(ctxt1, ctxt2)
+
+    res = equal
+
+  end
+
   subroutine psb_c_exit_ctxt(cctxt) bind(c)
     use psb_base_mod, only : psb_exit, psb_ctxt_type
     type(psb_c_object_type), value :: cctxt

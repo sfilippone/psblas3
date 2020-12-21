@@ -66,6 +66,7 @@ extern "C" {
   void    psb_c_barrier(psb_c_ctxt cctxt);
   void    psb_c_info(psb_c_ctxt cctxt, psb_i_t *iam, psb_i_t *np);
   void    psb_c_get_i_ctxt(psb_c_ctxt cctxt, psb_i_t *ictxt, psb_i_t *info);
+  bool    psb_c_cmp_ctxt(psb_c_ctxt cctxt1, psb_c_ctxt cctxt2);
   psb_d_t  psb_c_wtime();
   psb_i_t psb_c_get_errstatus();
 
