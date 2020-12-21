@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 
 module psb_const_mod
 #if defined(HAVE_ISO_FORTRAN_ENV)
@@ -45,9 +45,9 @@ module psb_const_mod
   !
   integer, parameter  :: psb_spk_   = real32
   integer, parameter  :: psb_dpk_   = real64
-  
+
 #else
-  
+
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: i2ndig=4
   integer, parameter  :: psb_i2pk_ = selected_int_kind(i2ndig)
@@ -84,7 +84,7 @@ module psb_const_mod
   !  4. For the array version of things, where it makes sense
   !     e.g. realloc, snd/receive, define as MPK,EPK and the
   !     compiler will later pick up the correct version according
-  !     to what IPK/LPK are mapped onto. 
+  !     to what IPK/LPK are mapped onto.
   !
 #if defined(IPK4) && defined(LPK4)
   integer, parameter  :: psb_ipk_ = psb_mpk_
@@ -99,8 +99,8 @@ module psb_const_mod
   ! Unsupported combination, compilation will stop later on
   integer, parameter  :: psb_ipk_ = -1
   integer, parameter  :: psb_lpk_ = -1
-#endif 
-  
+#endif
+
   integer(psb_ipk_), save      :: psb_sizeof_sp
   integer(psb_ipk_), save      :: psb_sizeof_dp
   integer(psb_ipk_), save      :: psb_sizeof_i2p = 2
@@ -122,7 +122,7 @@ module psb_const_mod
 #endif
 
   !
-  ! Integer type identifiers for MPI operations. 
+  ! Integer type identifiers for MPI operations.
   !
   integer(psb_mpk_), save      :: psb_mpi_i2pk_
   integer(psb_mpk_), save      :: psb_mpi_epk_
@@ -133,7 +133,7 @@ module psb_const_mod
   integer(psb_mpk_), save      :: psb_mpi_r_dpk_
   integer(psb_mpk_), save      :: psb_mpi_c_spk_
   integer(psb_mpk_), save      :: psb_mpi_c_dpk_
-  ! 
+  !
   ! Version
   !
   character(len=*), parameter    :: psb_version_string_ = "3.7.0"
@@ -162,7 +162,7 @@ module psb_const_mod
   complex(psb_spk_), parameter   :: cone=(1.0_psb_spk_,0.0_psb_spk_)
   complex(psb_dpk_), parameter   :: zzero=(0.0_psb_dpk_,0.0_psb_dpk_)
   complex(psb_dpk_), parameter   :: zone=(1.0_psb_dpk_,0.0_psb_dpk_)
-  real(psb_dpk_), parameter      :: d_epstol=1.1e-16_psb_dpk_ ! Unit roundoff.  
+  real(psb_dpk_), parameter      :: d_epstol=1.1e-16_psb_dpk_ ! Unit roundoff.
   real(psb_spk_), parameter      :: s_epstol=5.e-8_psb_spk_   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
   logical, parameter             :: psb_m_is_complex_  = .false.
@@ -181,8 +181,8 @@ module psb_const_mod
   !
   ! Sort routines constants
   !
-  ! 
-  !  The up/down constant are defined in pairs having 
+  !
+  !  The up/down constant are defined in pairs having
   !  opposite values. We make use of this fact in the heapsort routine.
   !
   integer(psb_ipk_), parameter :: psb_sort_up_      = 1, psb_sort_down_     = -1
@@ -200,7 +200,7 @@ module psb_const_mod
   !
   ! State of matrices.
   !
-  integer(psb_ipk_), parameter :: psb_invalid_ = -1 
+  integer(psb_ipk_), parameter :: psb_invalid_ = -1
   integer(psb_ipk_), parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer(psb_ipk_), parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
 
@@ -208,10 +208,10 @@ module psb_const_mod
   integer(psb_ipk_), parameter :: psb_iflag_=2, psb_ichk_=3
   integer(psb_ipk_), parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
 
-  integer(psb_ipk_), parameter :: psb_unsorted_  = 0 
-  integer(psb_ipk_), parameter :: psb_row_major_ = 1 
+  integer(psb_ipk_), parameter :: psb_unsorted_  = 0
+  integer(psb_ipk_), parameter :: psb_row_major_ = 1
   integer(psb_ipk_), parameter :: psb_col_major_ = 2
-  
+
   ! Duplicate coefficients handling
   ! These are usually set while calling spcnv as one of its
   ! optional arugments.
@@ -224,18 +224,18 @@ module psb_const_mod
   integer(psb_ipk_), parameter :: psb_upd_perm_   = 98765
   integer(psb_ipk_), parameter :: psb_upd_dflt_   = psb_upd_srch_
 
-#if defined(HAVE_ISO_FORTRAN_ENV) 
-  integer(psb_ipk_), save :: psb_err_unit = error_unit  
-  integer(psb_ipk_), save :: psb_inp_unit = input_unit  
-  integer(psb_ipk_), save :: psb_out_unit = output_unit 
-#else 
+#if defined(HAVE_ISO_FORTRAN_ENV)
+  integer(psb_ipk_), save :: psb_err_unit = error_unit
+  integer(psb_ipk_), save :: psb_inp_unit = input_unit
+  integer(psb_ipk_), save :: psb_out_unit = output_unit
+#else
   integer(psb_ipk_), save :: psb_err_unit = 0
   integer(psb_ipk_), save :: psb_inp_unit = 5
   integer(psb_ipk_), save :: psb_out_unit = 6
 #endif
-  
+
   !
-  ! 
+  !
   !     Error constants
   integer(psb_ipk_), parameter, public :: psb_success_=0
   integer(psb_ipk_), parameter, public :: psb_err_pivot_too_small_=2
@@ -316,8 +316,10 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preca_=5004
 
 
-  type psb_ctxt_type
+  type :: psb_ctxt_type
     integer(psb_mpk_), allocatable :: ctxt
+  contains
+    procedure, pass(ctxt) :: get_i_ctxt => psb_get_i_ctxt
   end type psb_ctxt_type
 
 contains
@@ -333,5 +335,20 @@ contains
          & res = (ctxt1%ctxt == ctxt2%ctxt)
 
   end function psb_cmp_ctxt
+
+  subroutine psb_get_i_ctxt(ctxt,ictxt,info)
+    class(psb_ctxt_type), intent(in) :: ctxt
+    integer(psb_mpk_), intent(out) :: ictxt
+    integer(psb_ipk_), intent(out) :: info
+
+    if (.not.allocated(ctxt%ctxt)) then
+      ictxt = -1_psb_ipk_
+      info = psb_err_mpi_error_
+    else
+      ictxt = ctxt%ctxt
+      info = psb_success_
+    end if
+
+  end subroutine psb_get_i_ctxt
 
 end module psb_const_mod
