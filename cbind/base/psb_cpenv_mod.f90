@@ -78,7 +78,7 @@ contains
 
   end subroutine
 
-  function psb_c_cmp_ctxt(cctxt1, cctxt2) result(res)
+  function psb_c_cmp_ctxt(cctxt1, cctxt2) bind(c,name="psb_c_cmp_ctxt") result(res)
     implicit none
     type(psb_c_object_type), value :: cctxt1, cctxt2
     logical(c_bool) :: res
@@ -93,7 +93,7 @@ contains
 
     res = equal
 
-  end
+  end function
 
   subroutine psb_c_exit_ctxt(cctxt) bind(c)
     use psb_base_mod, only : psb_exit, psb_ctxt_type
