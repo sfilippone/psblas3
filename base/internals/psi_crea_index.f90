@@ -174,8 +174,8 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 
   ! Do the actual format conversion.
   if (dlmax == 0) then
-    ! There are a sufficient number of cases where
-    ! the initial exchange list is empty that
+    ! There is a sufficiently large number of cases
+    ! where the initial exchange list is empty that
     ! it's worthwhile to take a shortcut.     
     call psb_realloc(ione,index_out,info)
     index_out(1) = -1
