@@ -1328,7 +1328,8 @@ function psb_s_csr_csnmi(a) result(res)
   res = szero
   if (a%is_dev())   call a%sync()
 
-  do i = 1, a%get_nrows()
+  !$omp parallel do private(i,acc)  reduction(max: res)
+    do i = 1, a%get_nrows()
     acc = szero
     do j=a%irp(i),a%irp(i+1)-1
       acc = acc + abs(a%val(j))
