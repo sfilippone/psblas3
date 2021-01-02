@@ -108,7 +108,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
   if (debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
+       & write(debug_unit,*) me,' ',trim(name),': calling extract_loc_dl'
   mode = 1
   if (do_timings) call psb_tic(idx_phase1)
 
@@ -118,8 +118,6 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 
   dlmax = maxval(length_dl(:))
   dlavg = (sum(length_dl(:))+np-1)/np
-!!$    if ((dlmax>0).and.(me==0)) write(0,*) 'Dependency list : max:',dlmax,&
-!!$         & '  avg:',dlavg, choose_sorting(dlmax,dlavg,np)
 
   if (do_timings) call psb_toc(idx_phase1)
   if (do_timings) call psb_tic(idx_phase2)
@@ -131,9 +129,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From bld_glb_list ',info
     end if
-!!$        call psi_dl_check(dep_list,dl_lda,np,length_dl)
-!!$
-!!$        ! ....now i can sort dependency lists.
+
     if (do_timings) call psb_toc(idx_phase21)
     if (do_timings) call psb_tic(idx_phase22)
     call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ctxt,info)
@@ -143,10 +139,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
     ldl    = length_dl(me)
     loc_dl = c_dep_list(dl_ptr(me):dl_ptr(me)+ldl-1)
     if (do_timings) call psb_toc(idx_phase22)
-!!$        if(info /= psb_success_) then
-!!$          call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
-!!$          goto 9999
-!!$        end if
+
 
   else
     ! Do nothing
@@ -179,8 +172,16 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   if(debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index',ldl,':',loc_dl(1:ldl)
 
-  ! Do the actual format conversion. 
-  call psi_desc_index(desc_a,index_in,loc_dl,ldl,nsnd,nrcv,index_out,info)
+  ! Do the actual format conversion.
+  if (dlmax == 0) then
+    ! There are a sufficient number of cases where
+    ! the initial exchange list is empty that
+    ! it's worthwhile to take a shortcut.     
+    call psb_realloc(ione,index_out,info)
+    index_out(1) = -1
+  else
+    call psi_desc_index(desc_a,index_in,loc_dl,ldl,nsnd,nrcv,index_out,info)
+  endif
   if(debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
        & size(index_out)

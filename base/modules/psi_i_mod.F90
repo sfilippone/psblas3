@@ -94,21 +94,6 @@ module psi_i_mod
     end subroutine psi_i_csr_sort_dl
   end interface
 
-  interface psi_extract_dep_list
-    subroutine psi_i_extract_dep_list(ctxt,is_bld,is_upd,desc_str,dep_list,&
-         & length_dl,dl_lda,mode,info)
-      import
-      implicit none 
-      logical,  intent(in) :: is_bld, is_upd
-      type(psb_ctxt_type)  :: ctxt
-      integer(psb_ipk_), intent(in) :: mode
-      integer(psb_ipk_), intent(out)  :: dl_lda
-      integer(psb_ipk_), intent(in)   :: desc_str(*)
-      integer(psb_ipk_), allocatable, intent(out) :: dep_list(:,:), length_dl(:)
-      integer(psb_ipk_), intent(out) :: info
-    end subroutine psi_i_extract_dep_list
-  end interface
-
   interface  psi_bld_glb_dep_list
     subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
       import

@@ -231,10 +231,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
   ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
 
-  if (ntot > psb_size(desc_index)) then 
-    call psb_realloc(ntot,desc_index,info) 
-  endif
-!!$  call psb_ensure_size(ntot,desc_index,info)
+  call psb_ensure_size(ntot,desc_index,info)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
