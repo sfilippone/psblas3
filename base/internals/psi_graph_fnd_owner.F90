@@ -100,9 +100,9 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_lpk_), allocatable :: tidx(:)
   integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:), ladj(:)  
   integer(psb_mpk_) :: icomm, minfo
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j,ipnt, nsampl_out,&
-       & nv, n_answers, nqries, nsampl_in, locr_max, &
-       & nqries_max, nadj, maxspace, mxnsin, mnnsin
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j, nsampl_out,&
+       & nv, n_answers, nqries, nsampl_in, locr_max, ist, iend,&
+       & nqries_max, nadj, maxspace, mxnsin, mnnsin, nsampl, nlansw
   integer(psb_lpk_) :: mglob, ih
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me, nresp
@@ -157,7 +157,6 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     goto 9999      
   end if
   iprc(:)   = -1
-  n_answers = 0
   !
   ! Start from the adjacncy list
   !
@@ -167,16 +166,21 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   call psb_realloc(nadj,ladj,info)
   !
   ! Throughout the subroutine, nqries is the number of local inquiries
-  ! that have not been answered yet, stored in idx(n_aswers+1:)
-  ! idx(1:n_answers) and iprc(1:n_answers) are queries that have
-  ! already been answered; n_answers is updated by psi_adj_fnd_sweep. 
+  ! that have not been answered yet, n_answers is the number of queries
+  ! that have been resolved. The queries/answers may be scattered
+  ! through idx/iprc
   ! 
+  n_answers  = 0
   nqries     = nv - n_answers
   nqries_max = nqries
 
   !
   ! Choice of maxspace should be adjusted to account for a default
   ! "sensible" size and/or a user-specified value
+  ! Currently:
+  ! 1. Use psb_cd_get_max_space()
+  ! 2. If nt*locr_max > maxspace, use nt_loc_max
+  ! 3. Should be at least NP 
   !
   tmpv(1) = nadj
   tmpv(2) = nqries_max
@@ -184,12 +188,12 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   tmpv(4) = psb_cd_get_maxspace()
   call psb_max(ctxt,tmpv)
   nqries_max = tmpv(2)
-  locr_max = tmpv(3)
-  maxspace = nt*locr_max
-  if (tmpv(4) > 0) maxspace = min(maxspace,tmpv(4))
+  locr_max   = tmpv(3)
+  maxspace   = nt*locr_max
+  if (tmpv(4) > nt*locr_max)  maxspace = tmpv(4)
   maxspace = max(maxspace,np)
   if (trace.and.(me == 0)) write(0,*) ' Through graph_fnd_owner with maxspace:',&
-       & maxspace, maxspace/np
+       & maxspace, maxspace/np, nt*locr_max, psb_cd_get_maxspace()
   if (do_timings) call psb_tic(idx_sweep0)
   if ((tmpv(1) > 0).and.(tmpv(2) >0)) then
     !
@@ -199,8 +203,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
     if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology',&
          & nsampl_in
-    ipnt = n_answers + 1
-    call psi_adj_fnd_sweep(idx(ipnt:),iprc(ipnt:),ladj,idxmap,nsampl_in,n_answers)  
+    call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
     call idxmap%xtnd_p_adjcncy(ladj) 
     nqries     = nv - n_answers
     nqries_max = nqries
@@ -228,56 +231,46 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     ! Choose a sample, should it be done in this simplistic way?
     ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
     !
-    ipnt = n_answers + 1
-    call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,nsampl_in,nsampl_out, pad=.true.)      
-    nsampl_in = min(nsampl_out,nsampl_in)
+    call psi_get_sample(1,idx,iprc,tidx,tsmpl,iend,nsampl_in,nsampl_out)
+    nsampl = min(nsampl_out,nsampl_in)
     if (debugsz) write(0,*) me,' From first sampling ',nsampl_in
     ! 
     ! 2. Do a search on all processes; this is supposed to find
     !    the owning process for all inputs;
     !    
-    call psi_a2a_fnd_owner(tidx(1:nsampl_in),tprc,idxmap,info) 
+    call psi_a2a_fnd_owner(tidx(1:nsampl),tprc,idxmap,info) 
     if (debugsz) write(0,*) me,' From a2a_fnd_owner ',info
-    !
-    ! We might have padded when looking for owners, so the actual samples
-    ! could be less than they appear. Should be explained better.
-    !
-    nsampl_in = min(nqries,nsampl_in)
-    call psi_cpy_out(iprc,tprc,tsmpl,nsampl_in,nsampl_out)      
-    if (nsampl_out /= nsampl_in) then 
-      write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',nsampl_out,nsampl_in
+        
+    call psi_cpy_out(iprc,tprc,tsmpl,nsampl,nlansw)      
+    if (nlansw < nsampl) then 
+      write(0,*) me,'Warning: indices not found by a2a_fnd_owner ',nlansw,nsampl
     end if
-    n_answers = n_answers + nsampl_out
+    
+    n_answers = n_answers + nlansw
     nqries    = nv - n_answers
     !
     ! 3. Extract the resulting adjacency list and add it to the
     !    indxmap;
     !
-    ladj = tprc(1:nsampl_in)
+    ladj = tprc(1:nlansw)
     call psb_msort_unique(ladj,nadj)
     call psb_realloc(nadj,ladj,info)
+    call idxmap%xtnd_p_adjcncy(ladj) 
     if (do_timings) call psb_toc(idx_loop_a2a)
     if (do_timings) call psb_tic(idx_loop_neigh)    
     !
-    ! 4. Extract again a sample and do a neighbourhood search
-    !    so that the total size is <= maxspace
-    !    (will not be exact since nadj varies with process)
-    !    Need to set up a proper loop here to have a complete
-    !    sweep over the input vector. Done inside adj_fnd_sweep. 
+    ! 4. Do a complete sweep over the queries using
+    !    the adjacency list just computed.
+    !    Rationale: 
+    !    1. Only ask to the neighbours; any missing entries
+    !       will eventually be found by the a2a step;
+    !    2. Only use the adjacency list just recomputed: any
+    !       current open queries have already been tested
+    !       on previous adjacency lists, no need to try them again.
     !
-    !write(0,*) me,' After a2a ',nqries
-    nsampl_in = min(nqries,max(1,(maxspace+max(1,nadj)-1))/(max(1,nadj)))
-    mxnsin    = nsampl_in
-    call psb_max(ctxt,mxnsin)
-    !  mnnsin = nsampl_in
-    !  if (mnnsin==0) mnnsin=HUGE(mnnsin)
-    !  call psb_min(ctxt,mnnsin)
-    !  write(0,*) me, ' mxnsin ',mxnsin
     if (trace.and.(me == 0)) write(0,*) ' Further sweep',nsampl_in, mxnsin, mnnsin
-    ipnt = n_answers + 1
-    if (mxnsin>0) call psi_adj_fnd_sweep(idx(ipnt:),iprc(ipnt:),ladj,&
+    if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,&
          & idxmap,nsampl_in,n_answers)  
-    call idxmap%xtnd_p_adjcncy(ladj) 
 
     nqries     = nv - n_answers
     nqries_max = nqries
@@ -295,55 +288,50 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
 
 contains
 
-  subroutine psi_get_sample(ipntidx,idx,iprc,tidx,tsmpl,ns_in,ns_out,pad)      
+  !
+  !  Get a sample.
+  !  1. Start from  entry  istart;
+  !  2. Collect unanswered queries
+  !  3. Up to ns_in sample size;
+  !  4. Record the actual sample size;
+  !  5. Record where the sample stopped in case
+  !     you need to complete a sweep through the data
+  !  6. For each query, record where in the original vector
+  !     it came from, you could have scattered answered/unanswered queries.
+  !
+  !
+  subroutine psi_get_sample(istart,idx,iprc,tidx,tsmpl,iend,ns_in,ns_out)      
     implicit none
-    integer(psb_ipk_), intent(inout) :: ipntidx
+    
     integer(psb_lpk_), intent(in)    :: idx(:)
-    integer(psb_ipk_), intent(in)    :: ns_in, iprc(:)
+    integer(psb_ipk_), intent(in)    :: ns_in, iprc(:),istart
     integer(psb_lpk_), intent(out)   :: tidx(:)
-    integer(psb_ipk_), intent(out)   :: tsmpl(:), ns_out
-    logical, intent(in), optional    :: pad
+    integer(psb_ipk_), intent(out)   :: tsmpl(:), ns_out,iend
     !
     integer(psb_ipk_) :: nv, ns, k, ipnt
-    logical :: pad_
 
-    if (present(pad)) then
-      pad_ = pad
-    else
-      pad_ = .false.
-    end if
     nv = size(idx)
-    !
-    ! Choose a sample, should it be done in this simplistic way? 
-    !
     ns = ns_in
     !
     ! ns_in == 0 means that on the outside we figure there's
-    ! nothing left, but we are here because we have to synchronize.
+    ! nothing left, but we need to do something because the adj_sweep is
+    ! sinchronized 
     ! Make sure we sweep through the entire vector immediately.
     ! But also make sure we do not overrun tsmpl
-    ! 
-    !if (ns == 0) ns = nv
-    ns = min(ns,size(tsmpl))
+    !
+    ns     = min(ns,size(tsmpl))
     ns_out = 0
-
-    do while (ipntidx<= nv)
-      if (iprc(ipntidx) == -1) then
+    ipnt   = istart-1
+    do while(ipnt<nv)
+      ipnt = ipnt+1
+      if (iprc(ipnt) == -1) then
         ns_out        = ns_out + 1
-        tsmpl(ns_out) = ipntidx
-        tidx(ns_out)  = idx(ipntidx)
+        tsmpl(ns_out) = ipnt
+        tidx(ns_out)  = idx(ipnt)
       end if
-      ipntidx = ipntidx + 1
       if (ns_out >= ns) exit
     end do
-    if (pad_) then
-      do k = ns_out+1, ns
-        tsmpl(k) = -1
-        tidx(k)  = -1
-      end do
-      ns_out = ns
-    end if
-
+    iend = ipnt
   end subroutine psi_get_sample
 
   subroutine psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)      
@@ -373,7 +361,7 @@ contains
     class(psb_indx_map), intent(inout) :: idxmap
     !
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw, n_reml
+    integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw, n_reml,iend, nv
     integer(psb_lpk_), allocatable    :: tidx(:)
     integer(psb_ipk_), allocatable    :: tsmpl(:)
 
@@ -383,19 +371,28 @@ contains
     call psb_realloc(n_samples,tsmpl,info)
     ipnt = 1
     isw  = 1
+    nv   = size(idx)
     do
-      !write(0,*) me,' Into  sampling ',n_samples
-      call psi_get_sample(ipnt, idx,iprc,tidx,tsmpl,n_samples,ns_out,pad=.true.)      
+      ! Sweep through the vector, one section at a time,
+      ! up to N_SAMPLES samples. The sections are unpredictable, because
+      ! the queries are scattered; hence the need for get_sample
+      ! to tell us where the current section ends
+      !
+      call psi_get_sample(ipnt,idx,iprc,tidx,tsmpl,iend,n_samples,ns_out)
       ns_in = min(n_samples,ns_out)
-      !write(0,*) me,' From second sampling ',ns_out, ns_in
+      !
       call psi_adjcncy_fnd_owner(tidx(1:ns_in),tprc,ladj,idxmap,info)
       call psi_cpy_out(iprc,tprc,tsmpl,ns_in,ns_out)
-      !write(0,*) me,' Sweep ',isw,' answers:',ns_out
+      !
+      ! Update starting point of next sweep and number of remaining
+      ! queries to check for end of loop.
+      !
       n_answers = n_answers + ns_out
-      n_rem     = size(idx) - ipnt
-      n_reml    = n_rem
+      ipnt      = iend + 1
+      n_reml    = nv - ipnt + 1
+      n_rem     = n_reml
       call psb_max(ctxt,n_rem)
-      !if (me == 0) write(0,*) me,' fnd_sweep Sweep ',isw,n_rem, ipnt, n_samples, n_reml
+      ! if (me == 0) write(0,*) me,' fnd_sweep Sweep ',isw,n_rem, ipnt, n_samples, n_reml
       isw = isw + 1 
       if (n_rem <= 0) exit
     end do

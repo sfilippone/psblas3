@@ -44,8 +44,9 @@
 !    info     - integer.                return code.
 !
 ! This version does not assume any prior knowledge about the process topology,
-! so it goes for an all-to-all by building an auxiliary neighbours list and
-! reusing the neighbour version.
+! so it goes for an all-to-all by building
+! There is a choice bewteen building an auxiliary neighbours list and
+! reusing the neighbour version, and going for a stratight MPI alltoall (default).
 ! 
 subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   use psb_serial_mod
@@ -195,6 +196,10 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
         end if
       end do
       call mpi_reduce_scatter(lclidx,iprc,hsz,psb_mpi_ipk_,mpi_max,icomm,minfo)
+      if (any(iprc(1:hsz(me+1))<0)) then
+        write(0,*) me,' a2a_fnd: missing answers',count(iprc(1:hsz(me+1))<0),&
+             & gsz,hsz(me+1)
+      end if
     end if
   end if
 
