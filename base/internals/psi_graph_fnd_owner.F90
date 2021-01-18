@@ -71,9 +71,10 @@
 !     to see if the owning processes are in the current neighbours list;
 !  4. If the input indices IDX have not been exhausted, cycle to 1.
 !
-!  Thus, we are alternating between asking all processes for a subset of indices, and
-!  asking a subset of processes for all the indices, thereby limiting the memory footprint to
-!  a predefined maximum (that the user can force with psb_cd_set_maxspace()).
+!  Thus, we are alternating between asking all processes for a subset of indices,
+!  and asking a subset of processes for all the indices,
+!  thereby limiting the memory footprint to a predefined maximum
+!  (that the user can force with psb_cd_set_maxspace()).
 ! 
 subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   use psb_serial_mod
@@ -265,7 +266,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !    1. Only ask to the neighbours; any missing entries
     !       will eventually be found by the a2a step;
     !    2. Only use the adjacency list just recomputed: any
-    !       current open queries have already been tested
+    !       currently open queries have already been tested
     !       on previous adjacency lists, no need to try them again.
     !
     if (trace.and.(me == 0)) write(0,*) ' Further sweep',nsampl_in, mxnsin, mnnsin
