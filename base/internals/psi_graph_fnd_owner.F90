@@ -297,7 +297,11 @@ contains
   !  5. Record where the sample stopped in case
   !     you need to complete a sweep through the data
   !  6. For each query, record where in the original vector
-  !     it came from, you could have scattered answered/unanswered queries.
+  !     it came from;
+  !  7. There could be scattered answered/unanswered queries,
+  !     so the code needs to skip existing answers; hence, the
+  !     number of items sampled and the index where it stops
+  !     differ. 
   !
   !
   subroutine psi_get_sample(istart,idx,iprc,tidx,tsmpl,iend,ns_in,ns_out)      
