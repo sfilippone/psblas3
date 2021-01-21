@@ -77,7 +77,7 @@ program psb_sf_sample
   real(psb_dpk_) :: t1, t2, tprec
   real(psb_spk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv
-  integer(psb_ipk_), allocatable :: ivg(:), perm(:)
+  integer(psb_ipk_), allocatable :: ivg(:)
   integer(psb_ipk_), allocatable :: ipv(:)
   character(len=40)  :: fname, fnout
 
@@ -148,8 +148,6 @@ program psb_sf_sample
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
-      call psb_gelp('N',perm(1:m_problem),&
-           & b_col_glob(1:m_problem),info)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')
