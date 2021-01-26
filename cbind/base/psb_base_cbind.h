@@ -7,5 +7,10 @@
 #include "psb_c_cbase.h"
 #include "psb_c_zbase.h"
 
+#include "psb_c_scomm.h"
+#include "psb_c_dcomm.h"
+#include "psb_c_ccomm.h"
+#include "psb_c_zcomm.h"
+
 
 #endif
