@@ -1028,9 +1028,23 @@ contains
     real(psb_dpk_)                        :: res
     integer(psb_ipk_)                       :: info
 
-    if (allocated(x%v).and.allocated(w%v)) then
-      call w%v%mlt(x%v,info)
-      res = w%v%nrm2(n)
+    ! Temp vectors
+    type(psb_z_vect_type) :: wtemp
+
+    if( allocated(w%v) ) then
+      ! FIXME for GPU
+      allocate(wtemp%v, source=w%v, stat = info)
+    else
+      info = -1
+    end if
+    if (info /= 0 ) then
+      res = -done
+      return
+    end if
+
+    if (allocated(x%v)) then
+      call wtemp%v%mlt(x%v,info)
+      res = wtemp%v%nrm2(n)
     else
       res = dzero
     end if
@@ -1046,10 +1060,27 @@ contains
     real(psb_dpk_)                        :: res
     integer(psb_ipk_)                       :: info
 
-    if (allocated(x%v).and.allocated(w%v).and.allocated(id%v)) then
-      where( abs(id%v%v) <= dzero) x%v%v = dzero
-      call w%v%mlt(x%v,info)
-      res = w%v%nrm2(n)
+    ! Temp vectors
+    type(psb_z_vect_type) :: wtemp
+
+    if( allocated(w%v) ) then
+      ! FIXME for GPU
+      allocate(wtemp%v, source=w%v, stat = info)
+    else
+      info = -1
+    end if
+    if (info /= 0 ) then
+      res = -done
+      return
+    end if
+
+
+    if (allocated(x%v).and.allocated(id%v)) then
+      call wtemp%sync()     ! FIXME for GPU
+      where( abs(id%v%v) <= dzero) wtemp%v%v = dzero
+      call wtemp%set_host() ! FIXME for GPU
+      call wtemp%v%mlt(x%v,info)
+      res = wtemp%v%nrm2(n)
     else
       res = dzero
     end if
