@@ -63,7 +63,7 @@ function psb_c_getelem(x,index,desc_a,info) result(res)
   logical, parameter :: debug = .false.
 
   gindex(1) = index
-  res = -1.0
+  res = czero
   if (psb_errstatus_fatal()) return
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -92,7 +92,13 @@ function psb_c_getelem(x,index,desc_a,info) result(res)
     write(*,*)"My (local+halo) indexes are: ",myidx
     write(*,*)"My (local) indexes are: ",mylocal
   end if
-  res = x%get_entry(localindex(1))
+  if ( localindex(1) < 1) then
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err="Index not in the HALO")
+    goto 9999
+  else
+    res = x%get_entry(localindex(1))
+  end if
   call psb_erractionrestore(err_act)
   return
 
