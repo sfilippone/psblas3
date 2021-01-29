@@ -1027,10 +1027,12 @@ contains
 
   end function s_vect_nrm2
 
-  function s_vect_nrm2_weight(n,x,w) result(res)
+  function s_vect_nrm2_weight(n,x,w,aux) result(res)
+    use psi_serial_mod
     implicit none
     class(psb_s_vect_type), intent(inout) :: x
     class(psb_s_vect_type), intent(inout) :: w
+    class(psb_s_vect_type), intent(inout), optional :: aux
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                        :: res
     integer(psb_ipk_)                       :: info
@@ -1039,8 +1041,12 @@ contains
     type(psb_s_vect_type) :: wtemp
 
     if( allocated(w%v) ) then
-      ! FIXME for GPU
-      allocate(wtemp%v, source=w%v, stat = info)
+      if (.not.present(aux)) then
+        allocate(wtemp%v, mold=w%v)
+        call wtemp%v%bld(w%get_vect())
+      else
+        call psb_geaxpby(n,sone,w%v%v,szero,aux%v%v,info)
+      end if
     else
       info = -1
     end if
@@ -1050,29 +1056,44 @@ contains
     end if
 
     if (allocated(x%v)) then
-      call wtemp%v%mlt(x%v,info)
-      res = wtemp%v%nrm2(n)
+      if (.not.present(aux)) then
+        call wtemp%v%mlt(x%v,info)
+        res = wtemp%v%nrm2(n)
+      else
+        call aux%v%mlt(x%v,info)
+        res = aux%v%nrm2(n)
+      end if
     else
       res = szero
     end if
 
+    if (.not.present(aux)) then
+      call wtemp%free(info)
+    end if
+
   end function s_vect_nrm2_weight
 
-  function s_vect_nrm2_weight_mask(n,x,w,id) result(res)
+  function s_vect_nrm2_weight_mask(n,x,w,id,info,aux) result(res)
+    use psi_serial_mod
     implicit none
     class(psb_s_vect_type), intent(inout) :: x
     class(psb_s_vect_type), intent(inout) :: w
     class(psb_s_vect_type), intent(inout) :: id
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                        :: res
-    integer(psb_ipk_)                       :: info
+    integer(psb_ipk_), intent(out)          :: info
+    class(psb_s_vect_type), intent(inout), optional :: aux
 
     ! Temp vectors
     type(psb_s_vect_type) :: wtemp
 
     if( allocated(w%v) ) then
-      ! FIXME for GPU
-      allocate(wtemp%v, source=w%v, stat = info)
+      if (.not.present(aux)) then
+        allocate(wtemp%v, mold=w%v)
+        call wtemp%v%bld(w%get_vect())
+      else
+        call psb_geaxpby(n,sone,w%v%v,szero,aux%v%v,info)
+      end if
     else
       info = -1
     end if
@@ -1083,13 +1104,23 @@ contains
 
 
     if (allocated(x%v).and.allocated(id%v)) then
-      call wtemp%sync()     ! FIXME for GPU
-      where( abs(id%v%v) <= szero) wtemp%v%v = szero
-      call wtemp%set_host() ! FIXME for GPU
-      call wtemp%v%mlt(x%v,info)
-      res = wtemp%v%nrm2(n)
+      if (.not.present(aux)) then
+        where( abs(id%v%v) <= szero) wtemp%v%v = szero
+        call wtemp%set_host()
+        call wtemp%v%mlt(x%v,info)
+        res = wtemp%v%nrm2(n)
+      else
+        where( abs(id%v%v) <= szero) aux%v%v = szero
+        call aux%set_host()
+        call aux%v%mlt(x%v,info)
+        res = aux%v%nrm2(n)
+      end if
     else
       res = szero
+    end if
+
+    if (.not.present(aux)) then
+      call wtemp%free(info)
     end if
 
   end function s_vect_nrm2_weight_mask

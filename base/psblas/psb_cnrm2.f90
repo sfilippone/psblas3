@@ -385,7 +385,7 @@ end function psb_cnrm2_vect
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2_weight_vect(x,w, desc_a, info,global)  result(res)
+function psb_cnrm2_weight_vect(x,w, desc_a, info,global,aux)  result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -399,6 +399,7 @@ function psb_cnrm2_weight_vect(x,w, desc_a, info,global)  result(res)
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
   logical, intent(in), optional        :: global
+  type(psb_c_vect_type), intent(inout), optional :: aux
 
   ! locals
   type(psb_ctxt_type) :: ctxt
@@ -456,7 +457,7 @@ function psb_cnrm2_weight_vect(x,w, desc_a, info,global)  result(res)
 
   if (desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = x%nrm2(ndim,w)
+    res  = x%nrm2(ndim,w,aux)
     ! adjust  because overlapped elements are computed more than once
     if (size(desc_a%ovrlap_elem,1)>0) then
       if (x%is_dev()) call x%sync()
@@ -495,7 +496,7 @@ end function psb_cnrm2_weight_vect
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
+function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global, aux)  result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -510,6 +511,7 @@ function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
   logical, intent(in), optional        :: global
+  type(psb_c_vect_type), intent(inout), optional :: aux
 
   ! locals
   type(psb_ctxt_type) :: ctxt
@@ -567,7 +569,7 @@ function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global)  result(res)
 
   if (desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = x%nrm2(ndim,w,idv)
+    res  = x%nrm2(ndim,w,idv,info,aux)
     ! adjust  because overlapped elements are computed more than once
     if (size(desc_a%ovrlap_elem,1)>0) then
       if (x%is_dev()) call x%sync()
