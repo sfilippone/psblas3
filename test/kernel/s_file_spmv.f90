@@ -38,7 +38,8 @@ program s_file_spmv
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_sspmat_type) :: a, aux_a
+  type(psb_sspmat_type) :: a
+  type(psb_lsspmat_type) :: aux_a
 
   ! dense matrices
   real(psb_spk_), allocatable, target ::  aux_b(:,:), d(:)
@@ -56,6 +57,7 @@ program s_file_spmv
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst, nr
+  integer(psb_lpk_) :: lnp
   integer(psb_epk_) :: amatsize, descsize, annz, nbytes
   real(psb_spk_)   :: err, eps,cond
 
@@ -183,7 +185,7 @@ program s_file_spmv
       write(psb_out_unit,'("Partition type: graph")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
-      call build_mtpart(aux_a,np)
+      call build_mtpart(aux_a,lnp)
 
     endif
     call psb_barrier(ctxt)
