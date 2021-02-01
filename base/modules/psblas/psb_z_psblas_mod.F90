@@ -296,7 +296,7 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)      :: info
       logical, intent(in), optional       :: global
     end function psb_znrm2_vect
-    function psb_znrm2_weight_vect(x,w, desc_a, info,global) result(res)
+    function psb_znrm2_weight_vect(x,w, desc_a, info, global, aux) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                      :: res
@@ -305,8 +305,9 @@ module psb_z_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), intent(out)      :: info
       logical, intent(in), optional       :: global
+      type(psb_z_vect_type), intent (inout), optional :: aux
     end function psb_znrm2_weight_vect
-    function psb_znrm2_weightmask_vect(x,w,idv, desc_a, info,global) result(res)
+    function psb_znrm2_weightmask_vect(x,w,idv, desc_a, info, global, aux) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                      :: res
@@ -316,6 +317,7 @@ module psb_z_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), intent(out)      :: info
       logical, intent(in), optional       :: global
+      type(psb_z_vect_type), intent (inout), optional :: aux
     end function psb_znrm2_weightmask_vect
   end interface
 
