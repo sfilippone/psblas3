@@ -111,9 +111,9 @@ contains
     end if
     
     call psb_precfree(precp, info)
-
     res = min(info,0)
-    
+    deallocate(precp,stat=info)
+    ph%item = c_null_ptr
   end function psb_c_sprecfree
 
 

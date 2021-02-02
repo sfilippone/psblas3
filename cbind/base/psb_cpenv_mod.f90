@@ -102,6 +102,9 @@ contains
     type(psb_ctxt_type), pointer :: ctxt
     ctxt => psb_c2f_ctxt(cctxt)
     call psb_exit(ctxt,close=.false.)
+
+    deallocate(ctxt,stat=info)
+      
     return
   end subroutine psb_c_exit_ctxt
 
@@ -110,9 +113,12 @@ contains
     type(psb_c_object_type), value :: cctxt
 
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_ipk_) :: info
+    
     ctxt => psb_c2f_ctxt(cctxt)
-
     call psb_exit(ctxt)
+    deallocate(ctxt,stat=info)
+    cctxt%item = c_null_ptr
     return
   end subroutine psb_c_exit
 

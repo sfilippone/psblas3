@@ -93,6 +93,8 @@ contains
 
     call psb_gefree(xp,descp,info)
     res = min(0,info)
+    deallocate(xp,stat=info)
+    res = min(0,info)
     xh%item = c_null_ptr
 
     return
@@ -264,6 +266,7 @@ contains
 
     call psb_spfree(ap,descp,info)
     res = min(0,info)
+    deallocate(ap,stat=info)
     mh%item=c_null_ptr
     return
   end function psb_c_zspfree

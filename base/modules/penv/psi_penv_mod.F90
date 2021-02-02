@@ -979,8 +979,9 @@ contains
       call psb_close_context(psb_mesg_queue,ctxt)
     end if
     !if ((ctxt /= mpi_comm_null).and.(ctxt /= mpi_comm_world)) then
-    if (allocated(ctxt%ctxt)) then 
-      if (ctxt%ctxt /= mpi_comm_world)call mpi_comm_Free(ctxt%ctxt,info)
+    if (allocated(ctxt%ctxt)) then
+      !write(0,*) ctxt%ctxt,mpi_comm_world,mpi_comm_null
+      if ((ctxt%ctxt /= mpi_comm_world).and.(ctxt%ctxt /= mpi_comm_null)) call mpi_comm_Free(ctxt%ctxt,info)
     end if
 
     if (close_) call mpi_finalize(info)

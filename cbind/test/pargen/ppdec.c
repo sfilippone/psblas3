@@ -385,6 +385,10 @@ int main(int argc, char *argv[])
 #endif
   
   /* Clean up memory */ 
+  if ((info=psb_c_dprecfree(ph))!=0) {
+    fprintf(stderr,"From dprecfree: %d\nBailing out\n",info);
+    psb_c_abort(*cctxt);
+  }
   if ((info=psb_c_dgefree(xh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
     psb_c_abort(*cctxt);
@@ -395,6 +399,10 @@ int main(int argc, char *argv[])
   }
   if ((info=psb_c_dgefree(rh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
+    psb_c_abort(*cctxt);
+  }
+  if ((info=psb_c_dspfree(ah,cdh))!=0) {
+    fprintf(stderr,"From dspfree: %d\nBailing out\n",info);
     psb_c_abort(*cctxt);
   }
 
@@ -408,12 +416,15 @@ int main(int argc, char *argv[])
   free(ph);
   free(xh);
   free(bh);
+  free(rh);
   free(ah);
   free(cdh);
 
-
+  /* further cleanup */
+  free(vl);
   //if (iam == 0) fprintf(stderr,"program completed successfully\n");
 
   psb_c_barrier(*cctxt);
   psb_c_exit(*cctxt);
+  free(cctxt);
 }
