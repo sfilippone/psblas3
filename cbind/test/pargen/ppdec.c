@@ -276,8 +276,6 @@ int main(int argc, char *argv[])
   psb_c_ibcast(*cctxt,1,&itrace,0);
   psb_c_ibcast(*cctxt,1,&irst,0);
   
-  fprintf(stderr,"%d Check on received: methd %s ptype %s afmt %s\n",
-	  iam,methd,ptype,afmt);
   fflush(stderr);
   psb_c_barrier(*cctxt);
 
@@ -289,8 +287,7 @@ int main(int argc, char *argv[])
   nb = (ng+np-1)/np;
   nl = nb;
   if ( (ng -iam*nb) < nl) nl = ng -iam*nb; 
-  fprintf(stderr,"%d: Input data %d %ld %d %d\n",iam,idim,ng,nb, nl);
-  if ((vl=malloc(nb*sizeof(psb_l_t)))==NULL) {
+    if ((vl=malloc(nb*sizeof(psb_l_t)))==NULL) {
     fprintf(stderr,"On %d: malloc failure\n",iam);
     psb_c_abort(*cctxt);
   }
