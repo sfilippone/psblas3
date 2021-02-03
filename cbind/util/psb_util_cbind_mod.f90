@@ -96,4 +96,29 @@ contains
 
   end function
 
+  function psb_c_dist1didx(n,np,base,indexsize,v) bind(c) result(res)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
+    use psb_util_mod
+    implicit none
+
+    integer(psb_c_ipk_)        :: res
+    ! C inputs
+    integer(psb_c_ipk_), value :: n
+    integer(psb_c_ipk_), value :: np, base, indexsize
+    integer(psb_c_ipk_)        :: v(indexsize)
+
+
+    ! Fortran variables
+    integer(psb_ipk_) :: fv(indexsize)
+
+    res = -1
+
+    call dist1Didx(fv,n,np,base)
+
+    v(1:indexsize) = fv(1:indexsize)
+
+    res = 0
+
+  end function
+
 end module psb_base_util_cbind_mod
