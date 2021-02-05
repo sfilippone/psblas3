@@ -326,6 +326,7 @@ contains
 
     type(psb_desc_type), pointer   :: descp
     integer(psb_lpk_), allocatable :: myidx(:)
+    integer(psb_c_ipk_)            :: ixb
     logical                        :: fowned
     res = -1
 
@@ -334,8 +335,8 @@ contains
 
       fowned = owned
       myidx = descp%get_global_indices(owned=fowned)
-
-      idx(1:nidx) = myidx(1:nidx)
+      ixb = psb_c_get_index_base()
+      idx(1:nidx) = myidx(1:nidx) - (1-ixb)
       res = 0
 
     end if
