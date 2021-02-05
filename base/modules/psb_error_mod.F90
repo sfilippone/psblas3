@@ -162,6 +162,7 @@ module psb_error_mod
   logical, save             :: comm_global_checks = .false.
 
 contains
+  
   subroutine psb_set_global_checks(val)
     logical, intent(in), optional :: val
 
@@ -182,7 +183,16 @@ contains
 
     val = comm_global_checks
   end function psb_get_global_checks
-    
+
+  subroutine psb_check_error(ctxt,abrt)
+    implicit none 
+    type(psb_ctxt_type), intent(in) :: ctxt
+    logical, optional, intent(in)      :: abrt
+
+    if (psb_errstatus_fatal()) then
+      call psb_error(ctxt,abrt)
+    end if
+  end subroutine psb_check_error
   
   ! saves action to support error traceback
   ! also changes error action to "return"

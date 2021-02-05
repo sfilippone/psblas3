@@ -132,6 +132,24 @@ contains
     return
   end subroutine psb_c_abort
 
+  subroutine psb_c_check_error(cctxt) bind(c)
+    use psb_base_mod, only : psb_init, psb_ctxt_type
+    implicit none
+
+    type(psb_c_object_type)      :: cctxt
+    type(psb_ctxt_type), pointer :: ctxt
+    integer :: info
+
+    if (c_associated(cctxt%item)) then
+      call c_f_pointer(cctxt%item,ctxt)
+      deallocate(ctxt,stat=info)
+      if (info /= 0) return
+    end if
+    allocate(ctxt,stat=info)
+    if (info /= 0) return
+    call psb_check_error(ctxt,abrt=.true.)
+
+  end subroutine psb_c_check_error
 
   subroutine psb_c_info(cctxt,iam,np) bind(c)
     use psb_base_mod, only : psb_info, psb_ctxt_type

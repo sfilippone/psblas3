@@ -46,11 +46,14 @@ subroutine psb_par_error_handler(ctxt,err_act)
 
   call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_print_)     &
-       &  call psb_error(ctxt, abrt=.false.)
-  if (err_act == psb_act_abort_)      &
-       &  call psb_error(ctxt, abrt=.true.)
-
+  if (err_act == psb_act_print_)    then 
+    call psb_error(ctxt, abrt=.false.)
+  else if (err_act == psb_act_ret_)     then
+    ! do nothing 
+  else 
+    call psb_error(ctxt, abrt=.true.)
+  end if
+  
   return 
 
 end subroutine psb_par_error_handler
