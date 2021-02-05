@@ -64,7 +64,8 @@ module psb_error_mod
        & psb_ser_error_handler, psb_par_error_handler, &
        & psb_ser_error_print_stack, psb_par_error_print_stack,&
        & psb_error_print_stack, psb_errmsg, psb_ach_errmsg, & 
-       & psb_set_global_checks, psb_clear_global_checks, psb_get_global_checks
+       & psb_set_global_checks, psb_clear_global_checks, psb_get_global_checks,&
+       & psb_check_error
 
   interface psb_error_handler
     subroutine psb_ser_error_handler(err_act)
