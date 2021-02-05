@@ -70,9 +70,11 @@ subroutine psb_lasb_vect(x, desc_a, info, mold, scratch)
   character(len=20)    :: name,ch_err
 
   info = psb_success_
-  if (psb_errstatus_fatal()) return 
-
   name = 'psb_lgeasb_v'
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ctxt       = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
@@ -144,9 +146,11 @@ subroutine psb_lasb_vect_r2(x, desc_a, info, mold, scratch)
   character(len=20)    :: name,ch_err
 
   info = psb_success_
-  if (psb_errstatus_fatal()) return 
-
   name = 'psb_lgeasb_v'
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ctxt       = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
