@@ -116,6 +116,7 @@ contains
     integer(psb_c_ipk_)               :: ixb, info
 
     res = -1
+    info = 0 
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
     else
