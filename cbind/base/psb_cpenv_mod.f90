@@ -140,13 +140,7 @@ contains
     type(psb_ctxt_type), pointer   :: ctxt
     integer :: info
 
-    if (c_associated(cctxt%item)) then
-      call c_f_pointer(cctxt%item,ctxt)
-      deallocate(ctxt,stat=info)
-      if (info /= 0) return
-    end if
-    allocate(ctxt,stat=info)
-    if (info /= 0) return
+    ctxt => psb_c2f_ctxt(cctxt)
     call psb_check_error(ctxt,abrt=.true.)
 
   end subroutine psb_c_check_error
