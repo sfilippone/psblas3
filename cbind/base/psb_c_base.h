@@ -49,7 +49,7 @@ extern "C" {
 
 
 
-  void  psb_c_check_error(psb_c_ctxt *cctxt);
+  void  psb_c_check_error(psb_c_ctxt cctxt);
   psb_i_t psb_c_error();
   psb_i_t psb_c_clean_errstack();
   void psb_c_print_errmsg();

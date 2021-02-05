@@ -136,8 +136,8 @@ contains
     use psb_base_mod, only : psb_init, psb_ctxt_type, psb_check_error
     implicit none
 
-    type(psb_c_object_type)      :: cctxt
-    type(psb_ctxt_type), pointer :: ctxt
+    type(psb_c_object_type), value :: cctxt
+    type(psb_ctxt_type), pointer   :: ctxt
     integer :: info
 
     if (c_associated(cctxt%item)) then
