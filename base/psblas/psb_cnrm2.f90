@@ -302,11 +302,11 @@ function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_cnrm2v'
+  call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
   info=psb_success_
-  call psb_erractionsave(err_act)
 
   ctxt=desc_a%get_context()
 
@@ -411,11 +411,11 @@ function psb_cnrm2_weight_vect(x,w, desc_a, info,global,aux)  result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_cnrm2v_weight'
+  call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
   info=psb_success_
-  call psb_erractionsave(err_act)
 
   ctxt=desc_a%get_context()
 
@@ -523,11 +523,11 @@ function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global, aux)  result(re
   character(len=20)      :: name, ch_err
 
   name='psb_cnrm2v_weightmask'
+  call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
   info=psb_success_
-  call psb_erractionsave(err_act)
 
   ctxt=desc_a%get_context()
 
