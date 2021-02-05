@@ -1033,7 +1033,7 @@ contains
     ! Temp vectors
     type(psb_c_vect_type) :: wtemp
 
-    info = 0 
+    info = 0
     if( allocated(w%v) ) then
       if (.not.present(aux)) then
         allocate(wtemp%v, mold=w%v)
