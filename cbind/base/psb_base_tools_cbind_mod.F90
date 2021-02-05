@@ -218,13 +218,19 @@ contains
     integer(psb_c_lpk_)          :: ia(*),ja(*)
 
     type(psb_desc_type), pointer :: descp
-    integer(psb_c_ipk_)           :: info
+    integer(psb_c_ipk_)           :: ixb,info
 
     res = -1
 
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
-      call psb_cdins(nz,ia(1:nz),ja(1:nz),descp,info)
+      ixb = psb_c_get_index_base()
+      if (ixb == 1) then
+        call psb_cdins(nz,ia(1:nz),ja(1:nz),descp,info)
+      else
+        call psb_cdins(nz,(ia(1:nz)+(1-ixb)),(ja(1:nz)+(1-ixb)),descp,info)
+      end if
+        
       res = info
     end if
     return
