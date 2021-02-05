@@ -103,7 +103,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j, nsampl_out,&
        & nv, n_answers, nqries, nsampl_in, locr_max, ist, iend,&
-       & nqries_max, nadj, maxspace, mxnsin, mnnsin, nsampl, nlansw
+       & nqries_max, nadj, maxspace, nsampl, nlansw
   integer(psb_lpk_) :: mglob, ih
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me, nresp
@@ -269,8 +269,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     !       currently open queries have already been tested
     !       on previous adjacency lists, no need to try them again.
     !
-    if (trace.and.(me == 0)) write(0,*) ' Further sweep',nsampl_in, mxnsin, mnnsin
-    if (mxnsin>0) call psi_adj_fnd_sweep(idx,iprc,ladj,&
+    if (trace.and.(me == 0)) write(0,*) ' Further sweep',nsampl_in
+    call psi_adj_fnd_sweep(idx,iprc,ladj,&
          & idxmap,nsampl_in,n_answers)  
 
     nqries     = nv - n_answers
