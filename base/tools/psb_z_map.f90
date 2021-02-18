@@ -407,19 +407,22 @@ function psb_z_linmap(map_kind,desc_U, desc_V, mat_U2V, mat_V2U,iaggr,naggr) &
   integer(psb_lpk_), intent(in), optional     :: iaggr(:), naggr(:)
   !
   integer(psb_ipk_) :: info
+  integer(psb_ipk_) :: me, np
   character(len=20), parameter :: name='psb_linmap'
+  type(psb_ctxt_type) :: ctxt
 
   info = psb_success_
   select case(map_kind) 
   case (psb_map_aggr_)
     ! OK
     
-    if (psb_is_ok_desc(desc_U)) then 
+    if (desc_U%is_ok()) then 
       this%p_desc_U=>desc_U
+      ctxt = desc_U%get_ctxt()
     else
       info = psb_err_invalid_cd_state_
     endif
-    if (psb_is_ok_desc(desc_V)) then 
+    if (desc_V%is_ok()) then 
       this%p_desc_V=>desc_V
     else
       info = psb_err_invalid_cd_state_
@@ -443,6 +446,7 @@ function psb_z_linmap(map_kind,desc_U, desc_V, mat_U2V, mat_V2U,iaggr,naggr) &
     
     if (desc_U%is_ok()) then 
       call desc_U%clone(this%desc_U,info) 
+      ctxt = desc_U%get_ctxt()
     else
       info = psb_err_invalid_cd_state_
     endif
@@ -481,5 +485,12 @@ function psb_z_linmap(map_kind,desc_U, desc_V, mat_U2V, mat_V2U,iaggr,naggr) &
     write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     return
   end if
+
+  call psb_info(ctxt,me,np)
+  this%nagmin = minval(this%naggr)
+  this%nagmax = maxval(this%naggr)
+  this%nagtot = sum(this%naggr)
+  this%nagavg = this%nagtot
+  this%nagavg = this%nagavg/np
 
 end function psb_z_linmap

@@ -43,6 +43,8 @@ module psb_base_linmap_mod
 
   type psb_base_linmap_type
     integer(psb_ipk_) :: kind
+    integer(psb_lpk_) :: nagmin, nagmax, nagtot
+    real(psb_dpk_)    :: nagavg
     integer(psb_lpk_), allocatable  :: iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_U=>null(), p_desc_V=>null()
     type(psb_desc_type)   :: desc_U, desc_V
@@ -162,7 +164,11 @@ contains
     type(psb_base_linmap_type), intent(inout) :: mapin,mapout
     integer(psb_ipk_), intent(out)            :: info 
     
-    mapout%kind = mapin%kind
+    mapout%kind   = mapin%kind
+    mapout%nagmin = mapin%nagmin
+    mapout%nagmax = mapin%nagmax
+    mapout%nagavg = mapin%nagavg
+    mapout%nagtot = mapin%nagtot
     call psb_move_alloc(mapin%iaggr,mapout%iaggr,info)
     call psb_move_alloc(mapin%naggr,mapout%naggr,info)
     mapout%p_desc_U => mapin%p_desc_U 
@@ -184,7 +190,12 @@ contains
     class(psb_base_linmap_type), intent(inout) :: mapout
     integer(psb_ipk_)     :: info 
     
-    mapout%kind = map%kind
+    mapout%kind   = map%kind
+    mapout%nagmin = map%nagmin
+    mapout%nagmax = map%nagmax
+    mapout%nagavg = map%nagavg
+    mapout%nagtot = map%nagtot
+        
     call psb_safe_ab_cpy(map%iaggr,mapout%iaggr,info)
     call psb_safe_ab_cpy(map%naggr,mapout%naggr,info)
     mapout%p_desc_U => map%p_desc_U 
