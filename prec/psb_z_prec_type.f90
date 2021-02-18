@@ -190,13 +190,22 @@ end interface
 
 contains
 
-  subroutine psb_zfile_prec_descr(prec,iout, root)
+  !
+  !
+  ! verbosity:
+  !        -1: suppress all messages
+  !         0: normal
+  !        >1: increased details 
+  !
+  subroutine psb_zfile_prec_descr(prec,iout, root,verbosity)
     use psb_base_mod
     implicit none
-    class(psb_zprec_type), intent(in) :: prec
-    integer(psb_ipk_), intent(in), optional    :: iout
-    integer(psb_ipk_), intent(in), optional    :: root
-    integer(psb_ipk_) :: iout_,info
+    class(psb_zprec_type), intent(in)       :: prec
+    integer(psb_ipk_), intent(in), optional :: iout
+    integer(psb_ipk_), intent(in), optional :: root
+    integer(psb_ipk_), intent(in), optional :: verbosity
+
+    integer(psb_ipk_) :: iout_,info, verbosity_
     character(len=20) :: name='prec_descr'
 
     if (present(iout)) then
@@ -204,12 +213,12 @@ contains
     else
       iout_ = 6
     end if
-
+    
     if (.not.allocated(prec%prec)) then
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
     end if
-    call prec%prec%descr(iout=iout,root=root)
+    call prec%prec%descr(iout=iout,root=root, verbosity=verbosity)
 
   end subroutine psb_zfile_prec_descr
 

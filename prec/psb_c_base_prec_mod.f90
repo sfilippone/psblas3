@@ -161,15 +161,16 @@ module psb_c_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_c_base_precdescr(prec,iout,root)
+    subroutine psb_c_base_precdescr(prec,iout,root, verbosity)
       import psb_ipk_, psb_spk_, psb_desc_type, psb_c_vect_type, &
            & psb_c_base_vect_type, psb_cspmat_type, psb_c_base_prec_type,&
            & psb_c_base_sparse_mat
       Implicit None
 
-      class(psb_c_base_prec_type), intent(in) :: prec
-      integer(psb_ipk_), intent(in), optional    :: iout
-      integer(psb_ipk_), intent(in), optional    :: root
+      class(psb_c_base_prec_type), intent(in)   :: prec
+      integer(psb_ipk_), intent(in), optional   :: iout
+      integer(psb_ipk_), intent(in), optional   :: root
+      integer(psb_ipk_), intent(in), optional   :: verbosity
 
     end subroutine psb_c_base_precdescr
   end interface

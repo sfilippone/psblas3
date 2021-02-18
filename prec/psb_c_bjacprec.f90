@@ -151,19 +151,27 @@ module psb_c_bjacprec
 
 contains
 
-  subroutine psb_c_bjac_precdescr(prec,iout,root)
+  !
+  !
+  ! verbosity:
+  !        <0: suppress all messages
+  !         0: normal
+  !        >1: increased details 
+  !
+  subroutine psb_c_bjac_precdescr(prec,iout,root, verbosity)
     use psb_penv_mod
     use psb_error_mod
     implicit none
 
-    class(psb_c_bjac_prec_type), intent(in) :: prec
-    integer(psb_ipk_), intent(in), optional    :: iout
-    integer(psb_ipk_), intent(in), optional    :: root
+    class(psb_c_bjac_prec_type), intent(in)   :: prec
+    integer(psb_ipk_), intent(in), optional   :: iout
+    integer(psb_ipk_), intent(in), optional   :: root
+    integer(psb_ipk_), intent(in), optional   :: verbosity
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20) :: name='c_bjac_precdescr'
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_) :: iout_, iam, np, root_
+    integer(psb_ipk_) :: iout_, iam, np, root_, verbosity_
 
     call psb_erractionsave(err_act)
 
@@ -180,6 +188,13 @@ contains
       root_ = psb_root_
     end if
 
+    if (present(verbosity)) then
+      verbosity_ = verbosity
+    else
+      verbosity_ = 0
+    end if
+    if (verbosity_ < 0) goto 9998
+    
     if (.not.allocated(prec%iprcparm)) then
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
@@ -189,12 +204,13 @@ contains
     ctxt = prec%ctxt
     call psb_info(ctxt,iam,np)
     if (root_ == -1) root_ = iam
-
+    
     if (iam == root_) &
          &  write(iout_,*) trim(prec%desc_prefix()),' ',&
          & 'Block Jacobi with: ',&
          &  fact_names(prec%iprcparm(psb_f_type_))
 
+9998 continue
     call psb_erractionrestore(err_act)
     return
 

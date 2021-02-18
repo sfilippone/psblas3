@@ -161,15 +161,16 @@ module psb_z_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_z_base_precdescr(prec,iout,root)
+    subroutine psb_z_base_precdescr(prec,iout,root, verbosity)
       import psb_ipk_, psb_dpk_, psb_desc_type, psb_z_vect_type, &
            & psb_z_base_vect_type, psb_zspmat_type, psb_z_base_prec_type,&
            & psb_z_base_sparse_mat
       Implicit None
 
-      class(psb_z_base_prec_type), intent(in) :: prec
-      integer(psb_ipk_), intent(in), optional    :: iout
-      integer(psb_ipk_), intent(in), optional    :: root
+      class(psb_z_base_prec_type), intent(in)   :: prec
+      integer(psb_ipk_), intent(in), optional   :: iout
+      integer(psb_ipk_), intent(in), optional   :: root
+      integer(psb_ipk_), intent(in), optional   :: verbosity
 
     end subroutine psb_z_base_precdescr
   end interface
