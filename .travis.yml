@@ -1,0 +1,22 @@
+language: python
+os: linux
+dist: xenial
+python: 3.7
+
+services:
+ - docker
+
+stages:
+    - test
+env:
+  global:
+    - OMP_NUM_THREADS=2
+  jobs:
+    - IMG=debian:stable
+
+jobs:
+  allow_failures:
+    - env: IMG=debian:stable
+
+script:
+  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=${IMG}" "."
