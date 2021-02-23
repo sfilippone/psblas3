@@ -29,4 +29,5 @@
 7. For communication stuff: let us define psb_i_base_vect and
    psb_l_base_vect; the communication routines will work in terms of
    them, then remap onto the array routines, which are going to be
-   written in terms of E and M. 
+   written in terms of E and M. This guarantees working no matter what
+   the exact values for I and L are.
