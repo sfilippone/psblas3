@@ -385,14 +385,31 @@ contains
 
   end subroutine psb_c_prec_free
 
-  function psb_cprec_sizeof(prec) result(val)
+  function psb_cprec_sizeof(prec, global) result(val)
+    implicit none 
     class(psb_cprec_type), intent(in) :: prec
-    integer(psb_epk_) :: val
-    integer(psb_ipk_) :: i
+    logical, intent(in), optional :: global
+    integer(psb_epk_) :: val    
+    integer(psb_ipk_)        :: i
+    type(psb_ctxt_type) :: ctxt
+    logical :: global_
+
+    if (present(global)) then
+      global_ = global
+    else
+      global_ = .false.
+    end if
 
     val = 0
-    if (allocated(prec%prec)) then
-      val = val + prec%prec%sizeof()
+    val = val + psb_sizeof_int
+    if (allocated(prec%precv)) then 
+      do i=1, size(prec%precv)
+        val = val + prec%precv(i)%sizeof()
+      end do
+    end if
+    if (global_) then
+      ctxt = prec%ctxt
+      call psb_sum(ctxt,val)
     end if
 
   end function psb_cprec_sizeof
