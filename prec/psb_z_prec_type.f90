@@ -400,13 +400,8 @@ contains
       global_ = .false.
     end if
 
-    val = 0
-    val = val + psb_sizeof_int
-    if (allocated(prec%precv)) then 
-      do i=1, size(prec%precv)
-        val = val + prec%precv(i)%sizeof()
-      end do
-    end if
+    val = 0    
+    val = val + prec%prec%sizeof()
     if (global_) then
       ctxt = prec%ctxt
       call psb_sum(ctxt,val)
