@@ -386,6 +386,7 @@ contains
   end subroutine psb_s_prec_free
 
   function psb_sprec_sizeof(prec, global) result(val)
+    use psb_base_mod, only : psb_sum
     implicit none 
     class(psb_sprec_type), intent(in) :: prec
     logical, intent(in), optional :: global
