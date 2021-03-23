@@ -105,7 +105,7 @@ FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
 AC_PROG_CC([xlc pgcc icc gcc cc ])
 CFLAGS="$save_CFLAGS";
-dnl AC_PROG_CXX
+AC_PROG_CXX([CC xlc++  icpc g++])
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
 dnl AC_PROG_F90
@@ -140,6 +140,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FAKEMPI="fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
+   MPIXX="$CXX";	
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
@@ -149,6 +150,14 @@ fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 AC_PROG_CC_STDC
 
+AC_LANG([Fortran])
+AC_LANG([C++])
+if test "X$MPICXX" = "X" ; then
+    # This is our MPICC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+fi
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
+dnl AC_PROG_CC_STDC
 AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
@@ -160,6 +169,7 @@ ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fort
 
 FC="$MPIFC" ;
 CC="$MPICC";
+CXX="$MPICXX";
 fi
 
 AC_LANG([C])
@@ -184,6 +194,7 @@ fi
 
 dnl NOTE : no spaces before the comma, and no brackets before the second argument!
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
+PAC_ARG_WITH_FLAGS(cxxopt,CXXOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
@@ -368,6 +379,35 @@ if test "X$CCOPT" == "X" ; then
  fi
 fi
 #CFLAGS="${CCOPT}"
+if test "X$CXXOPT" == "X" ; then
+  CXXOPT="$CXXFLAGS";
+fi	
+if test "X$CXXOPT" == "X" ; then
+ if test "X$psblas_cv_fc" == "Xgcc" ; then
+ # note that no space should be placed around the equality symbol in assignements
+ # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
+   CXXOPT="-g -O3  $CXXOPT"
+
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+     CXXOPT="-O3 -qarch=auto $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     CXXOPT="-O3 $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
+   # other compilers ..
+     CXXCOPT="-fast $CXXOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"sun" ; then
+   # other compilers ..
+     CXXOPT="-fast $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     CXXOPT="-O3 $CXXOPT"
+     MPICXX="CC"
+ else 
+     CXXOPT="-g -O3 $CXXOPT"
+ fi
+fi
 
 # Honor FCFLAGS if they were specified explicitly, but --with-fcopt take precedence
 if test "X$FCOPT" == "X" ; then
@@ -415,6 +455,7 @@ fi
 ##############################################################################
 FC=${FC}
 CC=${CC}
+CXX=${CXX}
 CCOPT="$CCOPT $C99OPT"
 
 
@@ -768,6 +809,7 @@ AC_SUBST(MPIFC)
 AC_SUBST(MPICC)
 AC_SUBST(FCOPT)
 AC_SUBST(CCOPT)
+AC_SUBST(CXXOPT)
 AC_SUBST(EXTRA_OPT)
 AC_SUBST(FAKEMPI)
 AC_SUBST(FIFLAG)
@@ -799,6 +841,7 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
+CXXDEFINES=$(PSBCXXDEFINES)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 	
@@ -809,7 +852,9 @@ FDEFINES=$(PSBFDEFINES)
 .f90.o:
 	$(FC) $(FCOPT) $(FINCLUDES) -c $< -o $@
 .F90.o:
-	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@'
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
+.cpp.o:
+	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
 
 
 AC_SUBST(PSBLASRULES)
