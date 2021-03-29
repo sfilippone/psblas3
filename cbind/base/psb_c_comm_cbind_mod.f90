@@ -172,7 +172,7 @@ contains
 
   end function psb_c_cvscatter
 
-  function psb_c_cvgather(v,xh,cdh) bind(c) result(res)
+  function psb_c_cvgather_f(v,xh,cdh) bind(c) result(res)
     implicit none
 
     integer(psb_c_ipk_)    :: res
@@ -203,9 +203,9 @@ contains
     if (res /=0) return
     sz = size(fv)
     v(1:sz) = fv(1:sz)
-  end function psb_c_cvgather
+  end function psb_c_cvgather_f
 
-  function psb_c_cspgather(gah,ah,cdh) bind(c) result(res)
+  function psb_c_cspgather_f(gah,ah,cdh) bind(c) result(res)
     implicit none
 
     integer(psb_c_ipk_)    :: res
@@ -234,6 +234,6 @@ contains
     end if
     call psb_gather(gap,ap,descp,info)
     res = info
-  end function psb_c_cspgather
+  end function psb_c_cspgather_f
 
 end module psb_c_comm_cbind_mod
