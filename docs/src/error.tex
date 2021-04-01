@@ -37,7 +37,35 @@ user with \verb|psb_set_erraction|. The default is to print the error
 and terminate the program, but the user may choose to handle the error
 explicitly. 
 
-\begin{figure}[h!]
+\begin{listing}[h!]
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg]{fortran}
+subroutine psb_foo(some args, info)
+   !...
+   if(error detected) then
+      info=errcode1
+      call psb_errpush('psb_foo', errcode1)
+      goto 9999
+   end if
+   !...
+   call psb_bar(some args, info)
+   if(info .ne. zero) then
+      info=errcode2
+      call psb_errpush('psb_foo', errcode2)
+      goto 9999
+   end if
+   !...
+9999 continue
+   if (err_act .eq. act_abort) then
+      call psb_error(icontxt)
+      return
+   else
+   return
+end if
+
+end subroutine psb_foo
+\end{minted}
+\else
   \begin{Sbox}
     \begin{minipage}[tl]{0.95\textwidth}
 \small
@@ -73,9 +101,10 @@ end subroutine psb_foo
   \begin{center}
     \fbox{\TheSbox}
   \end{center}
+\fi
   \caption{\label{fig:routerr}The layout of a generic \texttt{psb\_foo}
   routine with respect to PSBLAS-2.0 error handling policy.}
-\end{figure}
+\end{listing}
 
 
 
@@ -88,7 +117,25 @@ the error has been detected inside the \verb|psb_cest| subroutine
 called by \verb|psb_spasb| ... by process 0 (i.e. the root process).
 
 
-\begin{figure}[h!]
+\begin{listing}[h!]
+\ifpdf
+\begin{minted}{bash}
+==========================================================
+Process: 0.  PSBLAS Error (4010) in subroutine: df_sample           
+Error from call to subroutine mat dist            
+==========================================================
+Process: 0.  PSBLAS Error (4010) in subroutine: mat_distv           
+Error from call to subroutine psb_spasb           
+==========================================================
+Process: 0.  PSBLAS Error (4010) in subroutine: psb_spasb           
+Error from call to subroutine psb_cest            
+==========================================================
+Process: 0.  PSBLAS Error (136) in subroutine: psb_cest            
+Format FOO is unknown
+==========================================================
+Aborting...
+\end{minted}
+\else	
   \begin{Sbox}
     \begin{minipage}[tl]{0.95\textwidth}
 \begin{verbatim}
@@ -113,10 +160,11 @@ Aborting...
   \begin{center}
     \fbox{\TheSbox}
   \end{center}
-  \caption{\label{fig:errormsg}A sample PSBLAS-2.0 error
+\fi
+  \caption{\label{fig:errormsg}A sample PSBLAS-3.0 error
     message. Process 0 detected an error condition inside the {\textrm
     psb\_cest} subroutine}
-\end{figure}
+\end{listing}
 
 
 \clearpage\subsection{psb\_errpush --- Pushes an error code onto the error

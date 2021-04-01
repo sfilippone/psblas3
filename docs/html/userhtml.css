@@ -8,8 +8,10 @@
 .cmbx-12x-x-144{font-size:172%; font-weight: bold;}
 .cmbx-12x-x-144{ font-weight: bold;}
 .cmbx-12x-x-144{ font-weight: bold;}
+.cmbx-12x-x-144{ font-weight: bold;}
 .cmti-10{ font-style: italic;}
 .cmti-12{font-size:120%; font-style: italic;}
+.cmbx-10{ font-weight: bold;}
 .cmbx-10{ font-weight: bold;}
 .cmbx-10{ font-weight: bold;}
 .cmbx-10{ font-weight: bold;}
@@ -21,6 +23,7 @@
 .cmbx-12{font-size:120%; font-weight: bold;}
 .cmbx-12{ font-weight: bold;}
 .cmbx-12{ font-weight: bold;}
+.cmbx-12{ font-weight: bold;}
 .cmtt-8{font-size:80%;font-family: monospace;}
 .cmtt-8{font-family: monospace;}
 .cmtt-8{font-family: monospace;}
@@ -28,6 +31,10 @@
 .cmtt-9{font-family: monospace;}
 .cmtt-9{font-family: monospace;}
 .cmmi-8{font-size:80%;font-style: italic;}
+.cmbx-9{font-size:90%; font-weight: bold;}
+.cmbx-9{ font-weight: bold;}
+.cmbx-9{ font-weight: bold;}
+.cmbx-9{ font-weight: bold;}
 p.noindent { text-indent: 0em }
 td p.noindent { text-indent: 0em; margin-top:0em; }
 p.nopar { text-indent: 0em; }
@@ -97,9 +104,8 @@ span.LATEX span.TEX{ position:relative; left: -0.4em; }
 div.float, div.figure {margin-left: auto; margin-right: auto;}
 div.float img {text-align:center;}
 div.figure img {text-align:center;}
-.marginpar,.reversemarginpar {width:20%; float:right; text-align:left; margin-left:auto; margin-top:0.5em; font-size:85%; text-decoration:underline;}
-.marginpar p,.reversemarginpar p{margin-top:0.4em; margin-bottom:0.4em;}
-.reversemarginpar{float:left;}
+.marginpar {width:20%; float:right; text-align:left; margin-left:auto; margin-top:0.5em; font-size:85%; text-decoration:underline;}
+.marginpar p{margin-top:0.4em; margin-bottom:0.4em;}
 table.equation {width:100%;}
 .equation td{text-align:center; }
 td.equation { margin-top:1em; margin-bottom:1em; } 
@@ -142,7 +148,6 @@ div.abstract {width:100%;}
 .Ovalbox-thick { padding-left:3pt; padding-right:3pt; border:solid thick; }
 .shadowbox { padding-left:3pt; padding-right:3pt; border:solid thin; border-right:solid thick; border-bottom:solid thick; }
 .doublebox { padding-left:3pt; padding-right:3pt; border-style:double; border:solid thick; }
-.rotatebox{display: inline-block;}
 .figure img.graphics {margin-left:10%;}
 .lstlisting .label{margin-right:0.5em; }
 div.lstlisting{font-family: monospace; white-space: nowrap; margin-top:0.5em; margin-bottom:0.5em; }

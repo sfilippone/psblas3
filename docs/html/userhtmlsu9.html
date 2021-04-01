@@ -10,14 +10,14 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 1314--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1389--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu8.html" >prev</a>] [<a 
 href="userhtmlsu8.html#tailuserhtmlsu8.html" >prev-tail</a>] [<a 
 href="userhtmlsu6.html#tailuserhtmlsu9.html">tail</a>] [<a 
 href="userhtmlsu7.html#userhtmlsu11.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">3.5   </span> <a 
  id="x17-540003.5"></a>Heap data structure</h4>
-<!--l. 1316--><p class="noindent" >Among the tools routines of sec.&#x00A0;<a 
+<!--l. 1391--><p class="noindent" >Among the tools routines of sec.&#x00A0;<a 
 href="userhtmlse6.html#x40-770006">6<!--tex4ht:ref: sec:toolsrout --></a>, we have a number of sorting utilities; the heap
 sort is implemented in terms of heaps having the following signatures:
      <dl class="description"><dt class="description">
@@ -25,8 +25,16 @@ sort is implemented in terms of heaps having the following signatures:
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_heap</span> </dt><dd 
-class="description">: a heap containing elements of type T, where T can be <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">i,s,c,d,z</span></span></span>
+class="description">: a heap containing elements of type T, where T can be <span class="lstinline"></span><span 
+class="cmtt-10">i</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">s</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">c</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">d</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">z</span>
      for integer, real and complex data;
      </dd><dt class="description">
 <span 
@@ -36,7 +44,7 @@ class="cmtt-10">_idx</span><span
 class="cmtt-10">_heap</span> </dt><dd 
 class="description">: a heap containing elements of type T, as above, together
      with an integer index.</dd></dl>
-<!--l. 1325--><p class="noindent" >Given a heap object, the following methods are defined on it:
+<!--l. 1400--><p class="noindent" >Given a heap object, the following methods are defined on it:
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">init</span> </dt><dd 
@@ -62,7 +70,7 @@ class="description">Print on file;
 <span 
 class="cmbx-10">free</span> </dt><dd 
 class="description">Release memory.</dd></dl>
-<!--l. 1335--><p class="noindent" >These objects are used in MLD2P4 to implement the factorization algorithms.
+<!--l. 1410--><p class="noindent" >These objects are used in AMG4PSBLAS to implement the factorization algorithms.
                                                                   
 
                                                                   

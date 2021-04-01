@@ -21,9 +21,9 @@ href="userhtmlsu59.html#userhtmlsu62.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-86">
-call&#x00A0;psb_exit(icontxt)
-&#x00A0;<br />call&#x00A0;psb_exit(icontxt,close)
+   <div class="verbatim" id="verbatim-63">
+call&#x00A0;psb_exit(ctxt)
+&#x00A0;<br />call&#x00A0;psb_exit(ctxt,close)
 </div>
 <!--l. 117--><p class="nopar" >
 <!--l. 119--><p class="indent" >   This subroutine exits from the PSBLAS parallel virtual machine.
@@ -37,7 +37,7 @@ class="cmbx-10">On Entry</span>  </dt><dd
 class="description">
      </dd><dt class="description">
 <span 
-class="cmbx-10">icontxt</span> </dt><dd 
+class="cmbx-10">ctxt</span> </dt><dd 
 class="description">the communication context identifying the virtual parallel machine.<br 
 class="newline" />Scope: <span 
 class="cmbx-10">global</span>.<br 
@@ -50,7 +50,7 @@ class="newline" />Specified as: an integer variable.
 <span 
 class="cmbx-10">close</span> </dt><dd 
 class="description">Whether  to  close  all  data  structures  related  to  the  virtual  parallel
-     machine, besides those associated with icontxt.<br 
+     machine, besides those associated with ctxt.<br 
 class="newline" />Scope: <span 
 class="cmbx-10">global</span>.<br 
 class="newline" />Type: <span 
@@ -68,7 +68,7 @@ class="cmtt-10">psb_info</span></span></span> has returned
 class="cmmi-10">iam </span>= <span 
 class="cmsy-10">-</span>1; indeed, it it is the only routine that may be called with
      argument <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">icontxt</span></span></span> in this situation.
+class="cmtt-10">ctxt</span></span></span> in this situation.
      </li>
      <li 
   class="enumerate" id="x71-108004x2">A call to this routine with <span class="obeylines-h"><span class="verb"><span 

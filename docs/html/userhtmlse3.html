@@ -22,11 +22,11 @@ href="userhtml.html#userhtmlsu7.html" >up</a>] </p></div>
 interfaces. They include data structures for sparse matrices, communication
 descriptors and preconditioners.
 <!--l. 11--><p class="indent" >   All the data types and the basic subroutine interfaces related to descriptors and
-sparse matrices are defined in the module <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_base_mod</span></span></span>; this will have to be
+sparse matrices are defined in the module <span class="lstinline"></span><span 
+class="cmtt-10">psb_base_mod</span>; this will have to be
 included by every user subroutine that makes use of the library. The preconditioners
-are defined in the module <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_prec_mod</span></span></span>
+are defined in the module <span class="lstinline"></span><span 
+class="cmtt-10">psb_prec_mod</span>
 <!--l. 17--><p class="indent" >   Integer, real and complex data types are parametrized with a kind type defined in
 the library as follows:
      <dl class="description"><dt class="description">
@@ -35,17 +35,18 @@ class="cmbx-10">psb</span><span
 class="cmbx-10">_spk</span><span 
 class="cmbx-10">_</span> </dt><dd 
 class="description">Kind  parameter  for  short  precision  real  and  complex  data;
-     corresponds to a <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">REAL</span></span></span> declaration and is normally 4 bytes;
+     corresponds to a <span class="lstinline"></span><span 
+class="cmtt-10">REAL</span> declaration and is normally 4 bytes;
      </dd><dt class="description">
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_dpk</span><span 
 class="cmbx-10">_</span> </dt><dd 
 class="description">Kind  parameter  for  long  precision  real  and  complex  data;
-     corresponds to a <span class="obeylines-h"><span class="verb"><span 
+     corresponds to a <span class="lstinline"></span><span 
 class="cmtt-10">DOUBLE</span><span 
-class="cmtt-10">&#x00A0;PRECISION</span></span></span> declaration and is normally 8 bytes;
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">PRECISION</span> declaration and is normally 8 bytes;
      </dd><dt class="description">
 <span 
 class="cmbx-10">psb</span><span 
@@ -58,8 +59,8 @@ class="cmbx-10">psb</span><span
 class="cmbx-10">_epk</span><span 
 class="cmbx-10">_</span> </dt><dd 
 class="description">Kind parameter for 8-bytes integer data, as is always used by the
-     <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">sizeof</span></span></span> methods;
+     <span class="lstinline"></span><span 
+class="cmtt-10">sizeof</span> methods;
      </dd><dt class="description">
 <span 
 class="cmbx-10">psb</span><span 

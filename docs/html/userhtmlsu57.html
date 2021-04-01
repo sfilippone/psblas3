@@ -19,8 +19,8 @@ href="userhtmlsu59.html#userhtmlsu60.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-84">
-call&#x00A0;psb_init(icontxt,&#x00A0;np,&#x00A0;basectxt,&#x00A0;ids)
+   <div class="verbatim" id="verbatim-61">
+call&#x00A0;psb_init(ctxt,&#x00A0;np,&#x00A0;basectxt,&#x00A0;ids)
 </div>
 <!--l. 11--><p class="nopar" >
 <!--l. 13--><p class="indent" >   This subroutine initializes the PSBLAS parallel environment, defining a virtual
@@ -80,12 +80,13 @@ class="cmbx-10">On Return</span> </dt><dd
 class="description">
      </dd><dt class="description">
 <span 
-class="cmbx-10">icontxt</span> </dt><dd 
-class="description">the communication context identifying the virtual parallel machine.
-     Note  that  this  is  always  a  duplicate  of  <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">basectxt</span></span></span>,  so  that  library
-     communications  are  completely  separated  from  other  communication
-     operations.<br 
+class="cmbx-10">ctxt</span> </dt><dd 
+class="description">the communication context identifying the virtual parallel machine, type
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ctxt_type</span></span></span>.  Note  that  this  is  always  a  duplicate  of  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">basectxt</span></span></span>,
+     so  that  library  communications  are  completely  separated  from  other
+     communication operations.<br 
 class="newline" />Scope: <span 
 class="cmbx-10">global</span>.<br 
 class="newline" />Type: <span 

@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 921--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 931--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu25.html" >next</a>] [<a 
 href="userhtmlsu20.html" >prev</a>] [<a 
 href="userhtmlsu20.html#tailuserhtmlsu20.html" >prev-tail</a>] [<a 
@@ -18,7 +18,7 @@ href="userhtmlsu18.html#tailuserhtmlsu21.html">tail</a>] [<a
 href="userhtmlsu12.html#userhtmlsu24.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">4.12   </span> <a 
  id="x30-670004.12"></a>psb_spmm &#8212; Sparse Matrix by Dense Matrix Product</h4>
-<!--l. 923--><p class="noindent" >This subroutine computes the Sparse Matrix by Dense Matrix Product:
+<!--l. 933--><p class="noindent" >This subroutine computes the Sparse Matrix by Dense Matrix Product:
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
@@ -26,7 +26,7 @@ class="equation"><tr><td>
 src="userhtml18x.png" alt="y &#x2190; &#x03B1;Ax + &#x03B2;y
 " class="math-display" ><a 
  id="x30-67001r1"></a></center></td><td class="equation-label">(1)</td></tr></table>
-<!--l. 928--><p class="nopar" >
+<!--l. 938--><p class="nopar" >
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
@@ -34,7 +34,7 @@ class="equation"><tr><td>
 src="userhtml19x.png" alt="y &#x2190; &#x03B1;AT x+ &#x03B2;y
 " class="math-display" ><a 
  id="x30-67002r2"></a></center></td><td class="equation-label">(2)</td></tr></table>
-<!--l. 932--><p class="nopar" >
+<!--l. 942--><p class="nopar" >
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
@@ -46,8 +46,8 @@ y &#x2190; &#x03B1;A  x+ &#x03B2;y
                                                                   
 " class="math-display" ><a 
  id="x30-67003r3"></a></center></td><td class="equation-label">(3)</td></tr></table>
-<!--l. 936--><p class="nopar" >
-<!--l. 938--><p class="indent" >   where:
+<!--l. 946--><p class="nopar" >
+<!--l. 948--><p class="indent" >   where:
      <dl class="description"><dt class="description">
 <span 
 class="cmmi-10">x</span> </dt><dd 
@@ -73,15 +73,15 @@ class="cmmi-10">A</span></dd></dl>
                                                                   
 
                                                                   
-<!--l. 945--><p class="indent" >   <a 
- id="x30-6700412"></a><hr class="float"><div class="float" 
+<!--l. 955--><p class="indent" >   <a 
+ id="x30-67004r12"></a><hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
 <div class="center" 
 >
-<!--l. 946--><p class="noindent" >
+<!--l. 956--><p class="noindent" >
 <div class="tabular"> <table id="TBL-12" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-12-1g"><col 
@@ -120,21 +120,67 @@ class="hline"><td><hr></td><td><hr></td></tr><tr
 class="td11">                     </td></tr></table></div></div>
 <br /> <div class="caption" 
 ><span class="id">Table&#x00A0;12: </span><span  
-class="content">Data types</span></div><!--tex4ht:label?: x30-6700412 -->
+class="content">Data types</span></div><!--tex4ht:label?: x30-67004r12 -->
                                                                   
 
                                                                   
    </div><hr class="endfloat" />
    </div>
-                                                                  
-
-                                                                  
-   <div class="verbatim" id="verbatim-51">
-call&#x00A0;psb_spmm(alpha,&#x00A0;a,&#x00A0;x,&#x00A0;beta,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info)
-&#x00A0;<br />call&#x00A0;psb_spmm(alpha,&#x00A0;a,&#x00A0;x,&#x00A0;beta,&#x00A0;y,desc_a,&#x00A0;info,&#x00A0;&amp;
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;trans,&#x00A0;work)
-</div>
-<!--l. 965--><p class="nopar" >
+<!--l. 971--><p class="indent" >   <span class="lstinline"></span><span 
+class="cmtt-10">call</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_spmm</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">alpha</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">x</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">beta</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">y</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">desc_a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">info</span><span 
+class="cmtt-10">)</span><br 
+class="newline" /><span class="lstinline"></span><span 
+class="cmtt-10">call</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_spmm</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">alpha</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">x</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">beta</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">y</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">desc_a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">info</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">trans</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">work</span><span 
+class="cmtt-10">)</span>
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -155,7 +201,7 @@ class="cmbx-10">required</span><br
 class="newline" />Intent: <span 
 class="cmbx-10">in</span>.<br 
 class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
-href="#x30-6700412">12<!--tex4ht:ref: tab:f90spmm --></a>.
+href="#x30-67004r12">12<!--tex4ht:ref: tab:f90spmm --></a>.
      </dd><dt class="description">
 <span 
 class="cmbx-10">a</span> </dt><dd 
@@ -190,7 +236,7 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
-href="#x30-6700412">12<!--tex4ht:ref: tab:f90spmm --></a>. The
+href="#x30-67004r12">12<!--tex4ht:ref: tab:f90spmm --></a>. The
      rank of <span 
 class="cmmi-10">x </span>must be the same of <span 
 class="cmmi-10">y</span>.
@@ -206,7 +252,7 @@ class="cmbx-10">required </span><br
 class="newline" />Intent: <span 
 class="cmbx-10">in</span>.<br 
 class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
-href="#x30-6700412">12<!--tex4ht:ref: tab:f90spmm --></a>.
+href="#x30-67004r12">12<!--tex4ht:ref: tab:f90spmm --></a>.
      </dd><dt class="description">
 <span 
 class="cmbx-10">y</span> </dt><dd 
@@ -225,13 +271,10 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
-href="#x30-6700412">12<!--tex4ht:ref: tab:f90spmm --></a>. The
+href="#x30-67004r12">12<!--tex4ht:ref: tab:f90spmm --></a>. The
      rank of <span 
 class="cmmi-10">y </span>must be the same of <span 
 class="cmmi-10">x</span>.
-                                                                  
-
-                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">desc</span><span 
@@ -267,7 +310,7 @@ href="#x30-67002r2">2<!--tex4ht:ref: eq:f90spmm_tra --></a>
 class="cmbx-10">trans = C</span> </dt><dd 
 class="description">the operation is specified by equation <a 
 href="#x30-67003r3">3<!--tex4ht:ref: eq:f90spmm_con --></a></dd></dl>
-     <!--l. 1020--><p class="noindent" >Scope: <span 
+     <!--l. 1027--><p class="noindent" >Scope: <span 
 class="cmbx-10">global </span><br 
 class="newline" />Type: <span 
 class="cmbx-10">optional</span><br 
@@ -308,7 +351,7 @@ class="newline" />Intent: <span
 class="cmbx-10">inout</span>.<br 
 class="newline" />Specified as: an array of rank one or two containing numbers of type specified
      in Table&#x00A0;<a 
-href="#x30-6700412">12<!--tex4ht:ref: tab:f90spmm --></a>.
+href="#x30-67004r12">12<!--tex4ht:ref: tab:f90spmm --></a>.
      </dd><dt class="description">
 <span 
 class="cmbx-10">info</span> </dt><dd 
@@ -326,12 +369,12 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
                                                                   
 
                                                                   
-   <!--l. 1072--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1079--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu25.html" >next</a>] [<a 
 href="userhtmlsu20.html" >prev</a>] [<a 
 href="userhtmlsu20.html#tailuserhtmlsu20.html" >prev-tail</a>] [<a 
 href="userhtmlsu21.html" >front</a>] [<a 
 href="userhtmlsu12.html#userhtmlsu24.html" >up</a>] </p></div>
-<!--l. 1072--><p class="indent" >   <a 
+<!--l. 1079--><p class="indent" >   <a 
  id="tailuserhtmlsu21.html"></a>  
 </body></html> 

@@ -37,10 +37,8 @@ Long Precision Complex & psb\_halo \\
 \caption{Data types\label{tab:f90halo}}
 \end{table}
 
-\begin{lstlisting}
-call psb_halo(x, desc_a, info)
-call psb_halo(x, desc_a, info, work, data)
-\end{lstlisting}
+\noindent\fortinline|call psb_halo(x, desc_a, info)|\\
+\fortinline|call psb_halo(x, desc_a, info, work, data)|
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -65,8 +63,8 @@ Specified as: a rank one array of the same type of $x$.
 \item[data] index list selector.\\
 Scope: {\bf global} \\
 Type: {\bf optional} \\
-Specified as: an integer. Values:\verb|psb_comm_halo_|,\verb|psb_comm_mov_|,
-\verb|psb_comm_ext_|, default: \verb|psb_comm_halo_|. Chooses the
+Specified as: an integer. Values:\fortinline|psb_comm_halo_|,\fortinline|psb_comm_mov_|,
+\fortinline|psb_comm_ext_|, default: \fortinline|psb_comm_halo_|. Chooses the
 index list on which to base the data exchange. 
 
 
@@ -102,7 +100,7 @@ distribution is such that each process will own 32 entries in the
 index space, with a halo made of 8 entries placed at local indices 33
 through 40. If process 0 assigns an initial value of 1 to its entries
 in the $x$ vector, and process 1 assigns a value of 2, then after a
-call to \verb|psb_halo| the contents of the local vectors will be the
+call to \fortinline|psb_halo| the contents of the local vectors will be the
 following: 
 \begin{table}
 \begin{center}
@@ -189,10 +187,8 @@ Long Precision Complex & psb\_ovrl \\
 \caption{Data types\label{tab:f90ovrl}}
 \end{table}
 
-\begin{lstlisting}
-call psb_ovrl(x, desc_a, info)
-call psb_ovrl(x, desc_a, info, update=update_type, work=work)
-\end{lstlisting} 
+\noindent\fortinline|call psb_ovrl(x, desc_a, info)|\\
+\fortinline|call psb_ovrl(x, desc_a, info, update=update_type, work=work)| 
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -281,8 +277,8 @@ distribution is such that each process will own 40 entries in the
 index space, with an overlap of 16  entries placed at local indices 25 
 through 40; the halo will run from local index 41 through local index 48.. If process 0 assigns an initial value of 1 to its entries
 in the $x$ vector, and process 1 assigns a value of 2, then after a
-call to \verb|psb_ovrl| with \verb|psb_avg_| and a call to
-\verb|psb_halo_| the contents of the local vectors will be the
+call to \fortinline|psb_ovrl| with \fortinline|psb_avg_| and a call to
+\fortinline|psb_halo_| the contents of the local vectors will be the
 following (showing a transition among the two subdomains)  
 
 \begin{table}
@@ -384,10 +380,9 @@ Long Precision Complex & psb\_gather \\
 \caption{Data types\label{tab:gather}}
 \end{table}
 
-\begin{lstlisting}
-call psb_gather(glob_x, loc_x, desc_a, info, root)
-call psb_gather(glob_x, loc_x, desc_a, info, root)
-\end{lstlisting}
+\noindent\fortinline|call psb_gather(glob_x, loc_x, desc_a, info, root)|
+\fortinline|call psb_gather(glob_x, loc_x, desc_a, info, root)|
+
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -439,7 +434,7 @@ Specified as: an integer variable $-1\le root\le np-1$, default $-1$.
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Intent: {\bf out}.\\
-Specified as: a rank one or two array with the \verb|ALLOCATABLE| attribute.
+Specified as: a rank one or two array with the \fortinline|ALLOCATABLE| attribute.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -484,9 +479,7 @@ Long Precision Complex & psb\_scatter \\
 \caption{Data types\label{tab:scatter}}
 \end{table}
 
-\begin{lstlisting}
-call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
-\end{lstlisting}
+\fortinline|call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)|
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -507,7 +500,7 @@ Scope: {\bf global} \\
 Type: {\bf optional}\\
 Intent: {\bf in}.\\
 Specified as: an integer variable $-1\le root\le np-1$, default
-\verb|psb_root_|, i.e. process 0. 
+\fortinline|psb_root_|, i.e. process 0. 
 \item[mold] The desired dynamic type for the internal vector storage.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\

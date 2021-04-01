@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 554--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 570--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu20.html" >next</a>] [<a 
 href="userhtmlsu15.html" >prev</a>] [<a 
 href="userhtmlsu15.html#tailuserhtmlsu15.html" >prev-tail</a>] [<a 
@@ -18,14 +18,14 @@ href="userhtmlsu13.html#tailuserhtmlsu16.html">tail</a>] [<a
 href="userhtmlsu12.html#userhtmlsu19.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">4.7   </span> <a 
  id="x25-620004.7"></a>psb_geasums &#8212; Generalized 1-Norm of Vector</h4>
-<!--l. 556--><p class="noindent" >This subroutine computes a series of 1-norms on the columns of a dense matrix
+<!--l. 572--><p class="noindent" >This subroutine computes a series of 1-norms on the columns of a dense matrix
 <span 
 class="cmmi-10">x</span>:
    <center class="math-display" >
 <img 
 src="userhtml10x.png" alt="res(i) &#x2190; makx|x(k,i)|
 " class="math-display" ></center>
-<!--l. 558--><p class="nopar" > This function computes the 1-norm of a vector <span 
+<!--l. 574--><p class="nopar" > This function computes the 1-norm of a vector <span 
 class="cmmi-10">x</span>.<br 
 class="newline" />If <span 
 class="cmmi-10">x </span>is a real vector it computes 1-norm as:
@@ -33,33 +33,42 @@ class="cmmi-10">x </span>is a real vector it computes 1-norm as:
 <img 
 src="userhtml11x.png" alt="res(i) &#x2190; &#x2225;xi&#x2225;
 " class="math-display" ></center>
-<!--l. 562--><p class="nopar" > else if <span 
+<!--l. 578--><p class="nopar" > else if <span 
 class="cmmi-10">x </span>is a complex vector then it computes 1-norm as:
    <center class="math-display" >
 <img 
 src="userhtml12x.png" alt="res(i) &#x2190; &#x2225;re(x )&#x2225;1 +&#x2225;im (x )&#x2225;1
 " class="math-display" ></center>
-<!--l. 564--><p class="nopar" >
-                                                                  
-
-                                                                  
-   <div class="verbatim" id="verbatim-46">
-call&#x00A0;psb_geasums(res,&#x00A0;x,&#x00A0;desc_a,&#x00A0;info)
-</div>
-<!--l. 569--><p class="nopar" >
+<!--l. 580--><p class="nopar" >
+<!--l. 583--><p class="indent" >   <span class="lstinline"></span><span 
+class="cmtt-10">call</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_geasums</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">res</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">x</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">desc_a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">info</span><span 
+class="cmtt-10">)</span>
    <div class="table">
                                                                   
 
                                                                   
-<!--l. 571--><p class="indent" >   <a 
- id="x25-620017"></a><hr class="float"><div class="float" 
+<!--l. 585--><p class="indent" >   <a 
+ id="x25-62001r7"></a><hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
 <div class="center" 
 >
-<!--l. 572--><p class="noindent" >
+<!--l. 586--><p class="noindent" >
 <div class="tabular"> <table id="TBL-7" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-7-1g"><col 
@@ -100,7 +109,7 @@ class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr
 class="td11">                 </td></tr></table></div></div>
 <br /> <div class="caption" 
 ><span class="id">Table&#x00A0;7: </span><span  
-class="content">Data types</span></div><!--tex4ht:label?: x25-620017 -->
+class="content">Data types</span></div><!--tex4ht:label?: x25-62001r7 -->
                                                                   
 
                                                                   
@@ -132,7 +141,7 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
-href="#x25-620017">7<!--tex4ht:ref: tab:f90asums --></a>.
+href="#x25-62001r7">7<!--tex4ht:ref: tab:f90asums --></a>.
      </dd><dt class="description">
 <span 
 class="cmbx-10">desc</span><span 
@@ -181,12 +190,12 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
                                                                   
 
                                                                   
-   <!--l. 627--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 641--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu20.html" >next</a>] [<a 
 href="userhtmlsu15.html" >prev</a>] [<a 
 href="userhtmlsu15.html#tailuserhtmlsu15.html" >prev-tail</a>] [<a 
 href="userhtmlsu16.html" >front</a>] [<a 
 href="userhtmlsu12.html#userhtmlsu19.html" >up</a>] </p></div>
-<!--l. 627--><p class="indent" >   <a 
+<!--l. 641--><p class="indent" >   <a 
  id="tailuserhtmlsu16.html"></a>  
 </body></html> 

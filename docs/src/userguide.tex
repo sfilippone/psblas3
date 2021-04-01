@@ -17,6 +17,17 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \usepackage{listings}
+\usepackage{minted}
+\usemintedstyle{friendly}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\usepackage{breakurl}
+\usepackage{mathpazo}
+\usepackage[english]{babel}
+\ifpdf
+\newmintinline[fortinline]{fortran}{}
+\else%
+\def\fortinline{\lstinline[basicstyle=\ttfamily,language=fortran]}
+\fi
 
 %\newboolean{mtc}
 %\setboolean{mtc}{true}
@@ -87,7 +98,7 @@
 \newcommand{\vbasedata}{\hypertarget{vbasedata}{{\tt psb\_T\_base\_vect\_type}}}
 
 \begin{document}
-
+{
 \pdfbookmark{PSBLAS-v3.7.0 User's Guide}{title}
 \lstset{language=Fortran}
 \newlength{\centeroffset}
@@ -105,6 +116,15 @@
 \end{minipage}}
 
 \vspace{\stretch{1}}
+\flushleft
+\begin{figure*}[htb]
+	\begin{center}
+		\includegraphics[width=0.6\textwidth]{psblaslibrary.png}
+	\end{center}
+\end{figure*}
+
+
+\vspace{\stretch{1}}
 \noindent\hspace*{\centeroffset}\makebox[0pt][l]{\begin{minipage}{\textwidth}
 \flushright
 {\bfseries 
@@ -112,7 +132,7 @@ by Salvatore Filippone\\
 and Alfredo Buttari}\\ 
 Jan 7th, 2020
 \end{minipage}}
-
+}
 %\addtolength{\textwidth}{\centeroffset}
 \vspace{\stretch{2}}
 \setcounter{tocdepth}{4}

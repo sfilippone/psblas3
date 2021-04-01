@@ -2,6 +2,7 @@
 \usepackage{pstricks}
 \usepackage{fancybox}
 \usepackage{amsfonts}
+\usepackage{ifpdf}
 % \usepackage{minitoc}
 % \setcounter{minitocdepth}{2}
 \usepackage[bookmarks=true, 
@@ -10,11 +11,24 @@
             plainpages=false,
             colorlinks, 
             linkcolor=blue]{hyperref}
+\usepackage{html}
 \usepackage{ifthen}
 \usepackage{graphicx}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \usepackage{listings}
+\usepackage{microtype}
+\ifpdf
+\newmintinline[fortinline]{fortran}{}
+\else%
+\usepackage{listings}
+\def\fortinline{\lstinline[basicstyle=\ttfamily,language=fortran]}
+\usepackage{float}
+\newfloat{listing}{htbp}{lop}
+\floatname{listing}{Listing}
+\def\lstfloatautorefname{Listing} % needed for hyperref/auroref
+
+\fi
 
 %\newboolean{mtc}
 %\setboolean{mtc}{true}

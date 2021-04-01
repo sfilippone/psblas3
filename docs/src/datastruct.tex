@@ -10,23 +10,23 @@ communication descriptors and preconditioners.%%  These data structures
 
 All the data types and the basic subroutine interfaces related to
 descriptors and sparse matrices are defined in
-the module \verb|psb_base_mod|; this will have to be included by every
+the module \fortinline|psb_base_mod|; this will have to be included by every
 user subroutine that makes use of the library. The preconditioners are
-defined in the module \verb|psb_prec_mod|
+defined in the module \fortinline|psb_prec_mod|
 
 Integer, real and complex data types are parametrized with a kind type
 defined in the library as follows: 
 \begin{description}
 \item[psb\_spk\_] Kind parameter for short precision real and complex
-  data; corresponds to a \verb|REAL| declaration and is
+  data; corresponds to a \fortinline|REAL| declaration and is
   normally 4 bytes; 
 \item[psb\_dpk\_] Kind parameter for long precision real and complex
-  data; corresponds to a \verb|DOUBLE PRECISION| declaration and is
+  data; corresponds to a \fortinline|DOUBLE PRECISION| declaration and is
   normally 8 bytes;
 \item[psb\_mpk\_] Kind parameter for 4-bytes integer data, as is
   always used by MPI; 
 \item[psb\_epk\_] Kind parameter for 8-bytes integer data, as is
-  always used by the \verb|sizeof| methods;
+  always used by the \fortinline|sizeof| methods;
 \item[psb\_ipk\_] Kind parameter for ``local'' integer indices and data;
   with default build options this is a 4 bytes integer;
 \item[psb\_lpk\_] Kind parameter for ``global'' integer indices and data;
@@ -54,13 +54,13 @@ Every structure of this type is associated with a discretization
 pattern and enables data communications and other operations that are
 necessary for implementing the various algorithms of interest to us. 
 
-The data structure itself \verb|psb_desc_type| can be treated as an
+The data structure itself \fortinline|psb_desc_type| can be treated as an
 opaque object handled via the   tools routines of
 Sec.~\ref{sec:toolsrout} or the query routines detailed below;
 nevertheless we include here a  description for the curious 
 reader. 
 
-First we describe the \verb|psb_indx_map| type. This is a data
+First we describe the \fortinline|psb_indx_map| type. This is a data
 structure that keeps track of a certain number of basic issues such
 as:
 \begin{itemize}
@@ -142,10 +142,23 @@ Specified as: an allocatable integer array of rank two.
 \item [{\bf bnd\_elem}] A list of all boundary points, i.e. points
   that have a connection with other processes.
 \end{description}
-The Fortran~2003 declaration  for \verb|psb_desc_type| structures is 
+The Fortran~2003 declaration  for \fortinline|psb_desc_type| structures is 
 as follows:
-\begin{figure}[h!]
+\begin{listing}[h!]
   % \begin{Sbox}
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+type psb_desc_type 
+    class(psb_indx_map), allocatable :: indxmap
+    type(psb_i_vect_type) :: v_halo_index
+    type(psb_i_vect_type) :: v_ext_index
+    type(psb_i_vect_type) :: v_ovrlap_index
+    type(psb_i_vect_type) :: v_ovr_mst_idx 
+    integer, allocatable  :: ovrlap_elem(:,:)
+    integer, allocatable  :: bnd_elem(:)
+end type psb_desc_type 
+\end{minted}
+\else
 \begin{center}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
@@ -161,6 +174,7 @@ end type psb_desc_type
 \end{verbatim}
     \end{minipage}
   \end{center}
+\fi
 % \end{Sbox}
 %   \setlength{\fboxsep}{8pt}
 %   \begin{center}
@@ -168,7 +182,7 @@ end type psb_desc_type
 %   \end{center}
   \caption{\label{fig:desctype}The PSBLAS defined data type that
     contains the communication descriptor.}
-\end{figure}
+\end{listing}
 A communication descriptor associated with a sparse  matrix has a
 state, which can take the following values:
 \begin{description}
@@ -291,9 +305,9 @@ myidx = desc%get_global_indices([owned])
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 \item[owned] Choose if you only want owned indices
-  (\verb|owned=.true.|) or also halo indices (\verb|owned=.false.|). 
+  (\fortinline|owned=.true.|) or also halo indices (\fortinline|owned=.false.|). 
 Scope: {\bf local}.\\
-Type: {\bf optional}; default: \verb|.true.|.\\
+Type: {\bf optional}; default: \fortinline|.true.|.\\
 % Intent: {\bf in}.\\
 % Specified as: a object of type \descdata.
 \end{description}
@@ -301,7 +315,7 @@ Type: {\bf optional}; default: \verb|.true.|.\\
 \begin{description}
 \item[\bf On Return]
 \item[Function value] The global indices, returned as an allocatable
-  integer array of kind \verb|psb_lpk_|  and rank 1. 
+  integer array of kind \fortinline|psb_lpk_|  and rank 1. 
 \end{description}
 
 
@@ -367,7 +381,7 @@ Scope: {\bf local}.\\
 % Intent: {\bf in}.\\
 Specified as: a object of type derived from (integer) \vbasedata.
 \end{description}
-The \verb|mold|  arguments may be
+The \fortinline|mold|  arguments may be
 employed to interface with special devices, such as GPUs and other
 accelerators. 
 
@@ -407,7 +421,7 @@ Intent: {\bf in}.\\
 Specified as: an integer value greater than zero.
 \end{description}
 Note: the threshold value is only queried by the library at the time a
-call to \verb|psb_cdall| is executed, therefore changing the threshold
+call to \fortinline|psb_cdall| is executed, therefore changing the threshold
 has no effect on communication descriptors that have already been
 initialized. Moreover the threshold must have the same value on all
 processes. 
@@ -443,13 +457,13 @@ call desc%set_p_adjcncy(list)
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf in}.\\
-Specified as: a one-dimensional array of integers of kind \verb|psb_ipk_|. 
+Specified as: a one-dimensional array of integers of kind \fortinline|psb_ipk_|. 
 \end{description}
-Note: this method can be called after a call  to \verb|psb_cdall| and
-before a call to \verb|psb_cdasb|. The user is specifying here some
+Note: this method can be called after a call  to \fortinline|psb_cdall| and
+before a call to \fortinline|psb_cdasb|. The user is specifying here some
 knowledge about which processes are topological neighbours of the
 current process. The availability of this information may speed up the
-execution of the assembly call \verb|psb_cdasb|. 
+execution of the assembly call \fortinline|psb_cdasb|. 
 
 
 \subsubsection{fnd\_owner --- Find the owner process of a set of indices}
@@ -466,13 +480,13 @@ call desc%fnd_owner(idx,iprc,info)
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf in}.\\
-Specified as: a one-dimensional array of integers of kind \verb|psb_lpk_|. 
+Specified as: a one-dimensional array of integers of kind \fortinline|psb_lpk_|. 
 \item[\bf On Return]
-\item[iprc] the list of processes owning the indices in \verb|idx|.\\
+\item[iprc] the list of processes owning the indices in \fortinline|idx|.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf in}.\\
-Specified as: an allocatable one-dimensional array of integers of kind \verb|psb_ipk_|. 
+Specified as: an allocatable one-dimensional array of integers of kind \fortinline|psb_ipk_|. 
 \end{description}
 Note: this method may or may not actually require communications, depending on
 the exact internal data storage; given that the choice of storage may
@@ -491,18 +505,18 @@ method is called by all processes.
 \item[psb\_halo\_]  Fetch halo elements from neighbouring processes;
 \item[psb\_sum\_] Sum overlapped elements
 \item[psb\_avg\_] Average overlapped elements
-\item[psb\_comm\_halo\_] Exchange data based on the \verb|halo_index|
+\item[psb\_comm\_halo\_] Exchange data based on the \fortinline|halo_index|
   list;
-\item[psb\_comm\_ext\_] Exchange data based on the \verb|ext_index|
+\item[psb\_comm\_ext\_] Exchange data based on the \fortinline|ext_index|
   list;
-\item[psb\_comm\_ovr\_] Exchange data based on the \verb|ovrlap_index|
+\item[psb\_comm\_ovr\_] Exchange data based on the \fortinline|ovrlap_index|
   list;
-\item[psb\_comm\_mov\_] Exchange data based on the \verb|ovr_mst_idx|
+\item[psb\_comm\_mov\_] Exchange data based on the \fortinline|ovr_mst_idx|
   list;
 
 %% \item[psb\_square\_root\_] Update with the square root of the average
 %%   of overlapped elements;
-%% \item[psb\_dec\_type\_] Entry holding decomposition type (in \verb|desc_a%matrix_data|)
+%% \item[psb\_dec\_type\_] Entry holding decomposition type (in \fortinline|desc_a%matrix_data|)
 %% \item[psb\_m\_] Entry holding total number of rows
 %% \item[psb\_n\_] Entry holding total number of columns
 %% \item[ psb\_n\_row\_] Entry holding the number of rows stored in the
@@ -524,7 +538,7 @@ contains all information about the local portion of the sparse matrix and
 its storage mode. Its design is 
 based on the STATE design pattern~\cite{DesignPatterns} as detailed
 in~\cite{Sparse03}; the type declaration is shown in
-figure~\ref{fig:spmattype} where \verb|T| is a placeholder for the
+figure~\ref{fig:spmattype} where \fortinline|T| is a placeholder for the
 data type and precision variants 
 \begin{description}
 \item[S] Single precision real;
@@ -532,14 +546,21 @@ data type and precision variants
 \item[C] Single precision complex;
 \item[Z] Double precision complex;
 \item[LS,LD,LC,LZ] Same numeric type as above, but with
-  \verb|psb_lpk_| integer indices.
+  \fortinline|psb_lpk_| integer indices.
 \end{description}
-The actual data is contained in the polymorphic component \verb|a%a|
+The actual data is contained in the polymorphic component \fortinline|a%a|
 of type  \hypertarget{spbasedata}{{\tt psb\_T\_base\_sparse\_mat}}; its
 specific layout can be chosen dynamically among the predefined types,
 or an entirely new storage layout can be implemented and passed to the
-library at runtime via the \verb|psb_spasb| routine. 
-\begin{figure}[h!]
+library at runtime via the \fortinline|psb_spasb| routine. 
+\begin{listing}[h!]
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type :: psb_Tspmat_type
+    class(psb_T_base_sparse_mat), allocatable  :: a 
+  end type  psb_Tspmat_type
+\end{minted}
+\else
   % \begin{Sbox}
 \begin{center}
     \begin{minipage}[tl]{0.85\textwidth}
@@ -555,10 +576,11 @@ library at runtime via the \verb|psb_spasb| routine.
 %   \begin{center}
 %     \fbox{\TheSbox}
 %   \end{center}
+\fi
   \caption{\label{fig:spmattype} 
     The PSBLAS defined data type that
     contains a sparse matrix.} 
-\end{figure}
+\end{listing}
 The following very common formats are precompiled in  PSBLAS and thus
 are always available: 
 \begin{description}
@@ -603,7 +625,7 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] The number of  rows  of sparse matrix \verb|a|.
+\item[Function value] The number of  rows  of sparse matrix \fortinline|a|.
 \end{description}
 
 
@@ -627,7 +649,7 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] The number of  columns  of sparse matrix \verb|a|.
+\item[Function value] The number of  columns  of sparse matrix \fortinline|a|.
 \end{description}
 
 
@@ -651,13 +673,13 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] The number of nonzero elements stored in sparse matrix \verb|a|.
+\item[Function value] The number of nonzero elements stored in sparse matrix \fortinline|a|.
 \end{description}
 
 {\par\noindent\bfseries Notes}
 \begin{enumerate}
 \item The function value is specific to the storage format of matrix
-  \verb|a|; some storage formats employ padding, thus the returned
+  \fortinline|a|; some storage formats employ padding, thus the returned
   value for the same matrix may be different for different storage choices.
 \end{enumerate}
 
@@ -682,7 +704,7 @@ Scope: {\bf local}\\
 \begin{description}
 \item[\bf On Return]
 \item[Function value] The maximum number of nonzero elements that can
-  be stored in sparse matrix \verb|a| using its current memory allocation.
+  be stored in sparse matrix \fortinline|a| using its current memory allocation.
 \end{description}
 
 \subsubsection{sizeof  --- Get memory occupation in bytes
@@ -712,9 +734,9 @@ Scope: {\bf local}\\
 \subsubsection{get\_fmt  --- Short description of the dynamic type}
 %\addcontentsline{toc}{paragraph}{get\_fmt }
 
-\begin{verbatim}
-write(*,*) a%get_fmt()
-\end{verbatim}
+
+\fortinline|write(*,*) a%get_fmt()|
+
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -729,18 +751,17 @@ Scope: {\bf local}\\
 \begin{description}
 \item[\bf On Return]
 \item[Function value] A short string describing the dynamic type of
-  the matrix. Predefined values include \verb|NULL|, \verb|COO|,
-  \verb|CSR| and \verb|CSC|. 
+  the matrix. Predefined values include \fortinline|NULL|, \fortinline|COO|,
+  \fortinline|CSR| and \fortinline|CSC|. 
 \end{description}
 
 \subsubsection{is\_bld, is\_upd, is\_asb  --- Status check}
 %\addcontentsline{toc}{paragraph}{is\_bld, is\_upd, is\_asb }
 
-\begin{verbatim}
-if (a%is_bld()) then 
-if (a%is_upd()) then 
-if (a%is_asb()) then 
-\end{verbatim}
+
+\fortinline|if (a%is_bld()) then|\\
+\fortinline|if (a%is_upd()) then|\\
+\fortinline|if (a%is_asb()) then|
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -754,7 +775,7 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] A \verb|logical| value indicating whether the
+\item[Function value] A \fortinline|logical| value indicating whether the
   matrix is in the Build, Update or Assembled state, respectively. 
 \end{description}
 
@@ -762,12 +783,21 @@ Scope: {\bf local}\\
   Format  check}
 %\addcontentsline{toc}{paragraph}{is\_lower, is\_upper, is\_triangle, is\_unit}
 
+\ifpdf
+\begin{minted}{fortran}
+if (a%is_triangle()) then 
+if (a%is_upper()) then 
+if (a%is_lower()) then 
+if (a%is_unit()) then 
+\end{minted}
+\else
 \begin{verbatim}
 if (a%is_triangle()) then 
 if (a%is_upper()) then 
 if (a%is_lower()) then 
 if (a%is_unit()) then 
 \end{verbatim}
+\fi
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -781,8 +811,8 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] A \verb|logical| value indicating whether the
-  matrix is triangular; if \verb|is_triangle()| returns \verb|.true.|
+\item[Function value] A \fortinline|logical| value indicating whether the
+  matrix is triangular; if \fortinline|is_triangle()| returns \fortinline|.true.|
   check also if it is lower, upper and with a unit (i.e. assumed)
   diagonal. 
 \end{description}
@@ -791,20 +821,27 @@ Scope: {\bf local}\\
 \subsubsection{cscnv --- Convert to a different storage format}
 %\addcontentsline{toc}{paragraph}{cscnv}
 
+\ifpdf
+\begin{minted}{fortran}
+call  a%cscnv(b,info [, type, mold, dupl])
+call  a%cscnv(info [, type, mold, dupl])
+\end{minted}
+\else
 \begin{verbatim}
 call  a%cscnv(b,info [, type, mold, dupl])
 call  a%cscnv(info [, type, mold, dupl])
 \end{verbatim}
+\fi
 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
 \item[type] a string requesting a new format.\\
 Type: optional.
-\item[mold] a variable of \verb|class(psb_T_base_sparse_mat)|  requesting a new format.\\
+\item[mold] a variable of \fortinline|class(psb_T_base_sparse_mat)|  requesting a new format.\\
 Type: optional.
 \item[dupl] an integer value specifing how to handle duplicates (see
   Named Constants below)
@@ -812,30 +849,38 @@ Type: optional.
 
 \begin{description}
 \item[\bf On Return]
-\item[b,a] A copy  of \verb|a| with a new storage format.\\
-A variable of type \verb|psb_Tspmat_type|.
+\item[b,a] A copy  of \fortinline|a| with a new storage format.\\
+A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
-The \verb|mold|  arguments may be
+The \fortinline|mold|  arguments may be
 employed to interface with special devices, such as GPUs and other
 accelerators. 
 
 
 \subsubsection{csclip --- Reduce to a submatrix}
 %\addcontentsline{toc}{paragraph}{csclip}
+
+\ifpdf
+\begin{minted}{fortran}
+    call a%csclip(b,info[,&
+       & imin,imax,jmin,jmax,rscale,cscale])
+\end{minted}
+\else
 \begin{verbatim}
     call a%csclip(b,info[,&
        & imin,imax,jmin,jmax,rscale,cscale])
 \end{verbatim}
+\fi
 
-Returns the submatrix \verb|A(imin:imax,jmin:jmax)|, optionally
+Returns the submatrix \fortinline|A(imin:imax,jmin:jmax)|, optionally
 rescaling row/col indices to the range
-\verb|1:imax-imin+1,1:jmax-jmin+1|.  
+\fortinline|1:imax-imin+1,1:jmax-jmin+1|.  
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
 \item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
 Type: optional.
@@ -844,16 +889,14 @@ Type: optional.
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[b] A copy  of a submatrix of \verb|a|.\\
-A variable of type \verb|psb_Tspmat_type|.
+\item[b] A copy  of a submatrix of \fortinline|a|.\\
+A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
 \subsubsection{clean\_zeros --- Eliminate zero coefficients}
 %\addcontentsline{toc}{paragraph}{clean\_zeros}
-\begin{verbatim}
-    call a%clean_zeros(info)
-\end{verbatim}
+\fortinline|call a%clean_zeros(info)|
 
 Eliminates zero coefficients in the input matrix. Note that depending
 on the internal storage format, there may still be some amount of
@@ -863,28 +906,26 @@ zero padding in the output.
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[a] The matrix  \verb|a| without zero coefficients.\\
-A variable of type \verb|psb_Tspmat_type|.
+\item[a] The matrix  \fortinline|a| without zero coefficients.\\
+A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
 \subsubsection{get\_diag --- Get main diagonal}
 %\addcontentsline{toc}{paragraph}{get\_diag}
-\begin{verbatim}
-    call a%get_diag(d,info)
-\end{verbatim}
+\fortinline|call a%get_diag(d,info)|
 
 Returns a copy of  the main diagonal.
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
 \end{description}
 \begin{description}
@@ -897,45 +938,51 @@ A one-dimensional array of the appropriate type.
 
 \subsubsection{clip\_diag --- Cut out main diagonal}
 %\addcontentsline{toc}{paragraph}{clip\_diag}
-\begin{verbatim}
-    call a%clip_diag(b,info)
-\end{verbatim}
+\fortinline|call a%clip_diag(b,info)|
 
-Returns a copy of \verb|a| without the main diagonal.
+Returns a copy of \fortinline|a| without the main diagonal.
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[b] A copy  of  \verb|a| without the main diagonal.\\
-A variable of type \verb|psb_Tspmat_type|.
+\item[b] A copy  of  \fortinline|a| without the main diagonal.\\
+A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
 
 \subsubsection{tril --- Return the lower triangle}
 %\addcontentsline{toc}{paragraph}{tril}
+
+\ifpdf
+\begin{minted}{fortran}
+    call a%tril(l,info[,&
+       & diag,imin,imax,jmin,jmax,rscale,cscale,u])
+\end{minted}
+\else
 \begin{verbatim}
     call a%tril(l,info[,&
        & diag,imin,imax,jmin,jmax,rscale,cscale,u])
 \end{verbatim}
+\fi 
 
 Returns the lower triangular part of submatrix
-\verb|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
-the range \verb|1:imax-imin+1,1:jmax-jmin+1| and returing the
+\fortinline|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
+the range \fortinline|1:imax-imin+1,1:jmax-jmin+1| and returing the
 complementary upper triangle. 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
-\item[diag] Include diagonals up to this one; \verb|diag=1| means the
-  first superdiagonal, \verb|diag=-1| means the first subdiagonal. 
+\item[diag] Include diagonals up to this one; \fortinline|diag=1| means the
+  first superdiagonal, \fortinline|diag=-1| means the first subdiagonal. 
 Default 0.
 \item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
 Type: optional.
@@ -944,32 +991,39 @@ Type: optional.
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[l] A copy  of the lower triangle of \verb|a|.\\
-A variable of type \verb|psb_Tspmat_type|.
-\item[u] (optional) A copy  of the upper triangle of \verb|a|.\\
-A variable of type \verb|psb_Tspmat_type|.
+\item[l] A copy  of the lower triangle of \fortinline|a|.\\
+A variable of type \fortinline|psb_Tspmat_type|.
+\item[u] (optional) A copy  of the upper triangle of \fortinline|a|.\\
+A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
 \subsubsection{triu --- Return the upper triangle}
 %\addcontentsline{toc}{paragraph}{triu}
+\ifpdf
+\begin{minted}{fortran}
+    call a%triu(u,info[,&
+       & diag,imin,imax,jmin,jmax,rscale,cscale,l])
+\end{minted}
+\else
 \begin{verbatim}
     call a%triu(u,info[,&
        & diag,imin,imax,jmin,jmax,rscale,cscale,l])
 \end{verbatim}
+\fi
 
 Returns the upper triangular part of submatrix
-\verb|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
-the range \verb|1:imax-imin+1,1:jmax-jmin+1|, and returing the
+\fortinline|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
+the range \fortinline|1:imax-imin+1,1:jmax-jmin+1|, and returing the
 complementary lower triangle. 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix.\\
-A variable of type \verb|psb_Tspmat_type|.\\
+A variable of type \fortinline|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
-\item[diag] Include diagonals up to this one; \verb|diag=1| means the
-  first superdiagonal, \verb|diag=-1| means the first subdiagonal. 
+\item[diag] Include diagonals up to this one; \fortinline|diag=1| means the
+  first superdiagonal, \fortinline|diag=-1| means the first subdiagonal. 
 Default 0.
 \item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
 Type: optional.
@@ -978,10 +1032,10 @@ Type: optional.
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[u]  A copy  of the upper triangle of \verb|a|.\\
-A variable of type \verb|psb_Tspmat_type|.
-\item[l] (optional) A copy  of the lower triangle of \verb|a|.\\
-A variable of type \verb|psb_Tspmat_type|.
+\item[u]  A copy  of the upper triangle of \fortinline|a|.\\
+A variable of type \fortinline|psb_Tspmat_type|.
+\item[l] (optional) A copy  of the lower triangle of \fortinline|a|.\\
+A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
@@ -992,14 +1046,12 @@ A variable of type \verb|psb_Tspmat_type|.
 %\addcontentsline{toc}{paragraph}{psb\_set\_mat\_default}
 
 
-\begin{verbatim}
-call  psb_set_mat_default(a)
-\end{verbatim}
+\fortinline|call  psb_set_mat_default(a)|
 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
-\item[a] a variable of \verb|class(psb_T_base_sparse_mat)|  requesting
+\item[a] a variable of \fortinline|class(psb_T_base_sparse_mat)|  requesting
   a new default storage format.\\ 
 Type: required.
 \end{description}
@@ -1011,9 +1063,7 @@ Type: required.
 \subsubsection{clone --- Clone current object}
 %\addcontentsline{toc}{paragraph}{clone}
 
-\begin{verbatim}
-call  a%clone(b,info)
-\end{verbatim}
+\fortinline|call  a%clone(b,info)|
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1063,7 +1113,7 @@ get a full copy of the part of the vector stored on the local
 process. 
 
  The type declaration is shown in
-figure~\ref{fig:vectype} where \verb|T| is a placeholder for the
+figure~\ref{fig:vectype} where \fortinline|T| is a placeholder for the
 data type and precision variants 
 \begin{description}
 \item[I] Integer;
@@ -1072,14 +1122,26 @@ data type and precision variants
 \item[C] Single precision complex;
 \item[Z] Double precision complex.
 \end{description}
-The actual data is contained in the polymorphic component \verb|v%v|; 
+The actual data is contained in the polymorphic component \fortinline|v%v|; 
 the separation between the application and the actual data is
 essential for cases where it is necessary to link to data storage made
 available elsewhere outside the direct control of the
 compiler/application, e.g. data stored in a graphics  accelerator's
 private memory. 
-\begin{figure}[h!]
+\begin{listing}[h!]
   % \begin{Sbox}
+ 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type psb_T_base_vect_type
+    TYPE(KIND_), allocatable :: v(:)
+  end type psb_T_base_vect_type
+
+  type psb_T_vect_type
+    class(psb_T_base_vect_type), allocatable :: v 
+  end type  psb_T_vect_type
+\end{minted}
+\else
 \begin{center}
     \begin{minipage}[tl]{0.85\textwidth}
 \begin{verbatim}
@@ -1094,6 +1156,7 @@ private memory.
 \end{verbatim}
     \end{minipage}
   \end{center}
+\fi
 % \end{Sbox}
 %   \setlength{\fboxsep}{8pt}
 %   \begin{center}
@@ -1102,15 +1165,13 @@ private memory.
   \caption{\label{fig:vectype} 
     The PSBLAS defined data type that
     contains a dense vector.} 
-\end{figure}
+\end{listing}
 
 \subsubsection{Vector Methods}
 \subsubsection{get\_nrows --- Get number of  rows in a dense vector}
 %\addcontentsline{toc}{paragraph}{get\_nrows}
 
-\begin{verbatim}
-nr = v%get_nrows()
-\end{verbatim}
+\fortinline|nr = v%get_nrows()|
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1124,7 +1185,7 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] The number of  rows  of dense vector \verb|v|.
+\item[Function value] The number of  rows  of dense vector \fortinline|v|.
 \end{description}
 
 
@@ -1132,9 +1193,7 @@ Scope: {\bf local}\\
 of  a dense vector}
 %\addcontentsline{toc}{paragraph}{sizeof }
 
-\begin{verbatim}
-memory_size = v%sizeof()
-\end{verbatim}
+\fortinline|memory_size = v%sizeof()|
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1155,11 +1214,19 @@ Scope: {\bf local}\\
 \subsubsection{set  --- Set contents of the vector}
 %\addcontentsline{toc}{paragraph}{set }
 
+\ifpdf
+\begin{minted}{fortran}
+ call  v%set(alpha[,first,last])
+ call  v%set(vect[,first,last])
+ call  v%zero()
+\end{minted}
+\else
 \begin{verbatim}
  call  v%set(alpha[,first,last])
  call  v%set(vect[,first,last])
  call  v%zero()
 \end{verbatim}
+\fi
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1180,8 +1247,8 @@ type indicated in Table~\ref{tab:f90axpby}.
 required} \\ Intent: {\bf in}.\\ Specified as: a number of the data
 type indicated in Table~\ref{tab:f90axpby}.
 \end{description}
-Note that a call to \verb|v%zero()| is provided as a shorthand, but
-is equivalent to a call to \verb|v%set(zero)| with  the \verb|zero|
+Note that a call to \fortinline|v%zero()| is provided as a shorthand, but
+is equivalent to a call to \fortinline|v%set(zero)| with  the \fortinline|zero|
 constant having the appropriate type and kind.
 
 \begin{description}
@@ -1251,23 +1318,30 @@ factorization ILU(0).
 
  A preconditioner is held in the \hypertarget{precdata}{{\tt
     psb\_prec\_type}} data structure reported in 
-figure~\ref{fig:prectype}. The \verb|psb_prec_type| 
+figure~\ref{fig:prectype}. The \fortinline|psb_prec_type| 
 data type may contain a simple preconditioning matrix with the
 associated communication descriptor.%%  which may be different than the
 %% system communication descriptor in the case of parallel
 %% preconditioners like the Additive Schwarz one. Then the
-%% \verb|psb_prec_type| may contain more than one preconditioning matrix
+%% \fortinline|psb_prec_type| may contain more than one preconditioning matrix
 %% like in the case of Two-Level (in general Multi-Level) preconditioners.
 %% The user can choose the type of preconditioner to be used by means of
-%% the \verb|psb_precset| subroutine; once the type of preconditioning
+%% the \fortinline|psb_precset| subroutine; once the type of preconditioning
 %% method is specified, along with all the parameters that characterize
 %% it, the preconditioner data structure can be built using the
-%% \verb|psb_precbld| subroutine.
+%% \fortinline|psb_precbld| subroutine.
 %% This data structure wants to be flexible enough to easily allow the
 %% implementation of new kind of preconditioners.
 The internal preconditioner is allocated appropriately with the
 dynamic type corresponding to the desired preconditioner. 
-\begin{figure}[h!]
+\begin{listing}[h!]
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type psb_Tprec_type
+    class(psb_T_base_prec_type), allocatable :: prec
+  end type psb_Tprec_type
+\end{minted}
+\else
   \small
   % \begin{Sbox}
 \begin{center}
@@ -1281,13 +1355,14 @@ dynamic type corresponding to the desired preconditioner.
 \end{verbatim}
     \end{minipage}
   \end{center}
+\fi
 % \end{Sbox}
 %   \setlength{\fboxsep}{8pt}
 %   \begin{center}
 %     \fbox{\TheSbox}
 %   \end{center}
   \caption{\label{fig:prectype}The PSBLAS defined data type that contains a preconditioner.}
-\end{figure}
+\end{listing}
 
 %% \subsection{Named Constants}
 %% \label{sec:prec_constants}
@@ -1318,7 +1393,7 @@ of sorting utilities; the heap sort is implemented in terms of heaps
 having the following signatures:
 \begin{description}
 \item[\tt psb\_T\_heap]: a heap containing elements of type T, where T
-  can be \verb|i,s,c,d,z| for integer, real and complex data;
+  can be \fortinline|i,s,c,d,z| for integer, real and complex data;
 \item[\tt psb\_T\_idx\_heap]: a heap containing elements of type T, as
   above, together with an integer index.
 \end{description}
@@ -1332,7 +1407,7 @@ Given a heap object, the following methods are defined on it:
 \item[dump] Print on file;
 \item[free] Release memory.
 \end{description}
-These objects are used in MLD2P4 to implement the factorization
+These objects are used in AMG4PSBLAS to implement the factorization
 algorithms. 
 
 %%% Local Variables: 

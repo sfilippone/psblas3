@@ -10,20 +10,20 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 456--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 451--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu28.html" >prev</a>] [<a 
 href="userhtmlsu28.html#tailuserhtmlsu28.html" >prev-tail</a>] [<a 
 href="userhtmlsu26.html#tailuserhtmlsu29.html">tail</a>] [<a 
 href="userhtmlsu28.html#userhtmlsu31.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">5.4   </span> <a 
  id="x39-760005.4"></a>psb_scatter &#8212; Scatter Global Dense Matrix</h4>
-<!--l. 458--><p class="noindent" >These subroutines scatters the portions of global dense matrix owned by a process to
+<!--l. 453--><p class="noindent" >These subroutines scatters the portions of global dense matrix owned by a process to
 all the processes in the processes grid.
    <center class="par-math-display" >
 <img 
 src="userhtml28x.png" alt="loc-xi &#x2190; scatter(glob-x)
 " class="par-math-display" ></center>
-<!--l. 461--><p class="nopar" > where:
+<!--l. 456--><p class="nopar" > where:
      <dl class="description"><dt class="description">
 <span 
 class="cmmi-10">glob</span>_<span 
@@ -50,15 +50,15 @@ class="description">is the scatter function.</dd></dl>
                                                                   
 
                                                                   
-<!--l. 470--><p class="indent" >   <a 
- id="x39-7600120"></a><hr class="float"><div class="float" 
+<!--l. 465--><p class="indent" >   <a 
+ id="x39-76001r20"></a><hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
 <div class="center" 
 >
-<!--l. 471--><p class="noindent" >
+<!--l. 466--><p class="noindent" >
 <div class="tabular"> <table id="TBL-22" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-22-1g"><col 
@@ -99,15 +99,13 @@ class="hline"><td><hr></td><td><hr></td></tr><tr
 class="td11">                     </td></tr></table></div></div>
 <br /> <div class="caption" 
 ><span class="id">Table&#x00A0;20: </span><span  
-class="content">Data types</span></div><!--tex4ht:label?: x39-7600120 -->
+class="content">Data types</span></div><!--tex4ht:label?: x39-76001r20 -->
                                                                   
 
                                                                   
    </div><hr class="endfloat" />
    </div>
-   <!--l. 487-->
-   <div class="lstlisting" id="listing-8"><span class="label"><a 
- id="x39-76002r1"></a></span><span 
+<!--l. 482--><p class="indent" >   <span class="lstinline"></span><span 
 class="cmtt-10">call</span><span 
 class="cmtt-10">&#x00A0;</span><span 
 class="cmtt-10">psb_scatter</span><span 
@@ -129,8 +127,6 @@ class="cmtt-10">,</span><span
 class="cmtt-10">&#x00A0;</span><span 
 class="cmtt-10">mold</span><span 
 class="cmtt-10">)</span>
-   
-   </div>
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -186,8 +182,8 @@ class="cmsy-10">&#x2264; </span><span
 class="cmmi-10">root </span><span 
 class="cmsy-10">&#x2264; </span><span 
 class="cmmi-10">np </span><span 
-class="cmsy-10">- </span>1, default <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_root_</span></span></span>,
+class="cmsy-10">- </span>1, default <span class="lstinline"></span><span 
+class="cmtt-10">psb_root_</span>,
      i.e. process 0.
      </dd><dt class="description">
 <span 
@@ -236,7 +232,10 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>&#x00A0;containing numbers of the type indicated in Table&#x00A0;<a 
-href="#x39-7600120">20<!--tex4ht:ref: tab:scatter --></a>.
+href="#x39-76001r20">20<!--tex4ht:ref: tab:scatter --></a>.
+                                                                  
+
+                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">info</span> </dt><dd 

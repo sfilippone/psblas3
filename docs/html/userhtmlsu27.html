@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 164--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 162--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu30.html" >next</a>] [<a 
 href="userhtmlsu26.html" >prev</a>] [<a 
 href="userhtmlsu26.html#tailuserhtmlsu26.html" >prev-tail</a>] [<a 
@@ -18,12 +18,12 @@ href="userhtmlsu25.html#tailuserhtmlsu27.html">tail</a>] [<a
 href="userhtmlsu28.html#userhtmlse6.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">5.2   </span> <a 
  id="x37-740005.2"></a>psb_ovrl &#8212; Overlap Update</h4>
-<!--l. 166--><p class="noindent" >These subroutines applies an overlap operator to the input vector:
+<!--l. 164--><p class="noindent" >These subroutines applies an overlap operator to the input vector:
    <center class="par-math-display" >
 <img 
 src="userhtml26x.png" alt="x &#x2190; Qx
 " class="par-math-display" ></center>
-<!--l. 168--><p class="nopar" > where:
+<!--l. 166--><p class="nopar" > where:
      <dl class="description"><dt class="description">
 <span 
 class="cmmi-10">x</span> </dt><dd 
@@ -41,15 +41,15 @@ class="cmmi-7">T</span></sup>.</dd></dl>
                                                                   
 
                                                                   
-<!--l. 176--><p class="indent" >   <a 
- id="x37-7400118"></a><hr class="float"><div class="float" 
+<!--l. 174--><p class="indent" >   <a 
+ id="x37-74001r18"></a><hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
 <div class="center" 
 >
-<!--l. 177--><p class="noindent" >
+<!--l. 175--><p class="noindent" >
 <div class="tabular"> <table id="TBL-19" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-19-1g"><col 
@@ -83,15 +83,13 @@ class="hline"><td><hr></td><td><hr></td></tr><tr
 class="td11">                     </td></tr></table></div></div>
 <br /> <div class="caption" 
 ><span class="id">Table&#x00A0;18: </span><span  
-class="content">Data types</span></div><!--tex4ht:label?: x37-7400118 -->
+class="content">Data types</span></div><!--tex4ht:label?: x37-74001r18 -->
                                                                   
 
                                                                   
    </div><hr class="endfloat" />
    </div>
-   <!--l. 192-->
-   <div class="lstlisting" id="listing-6"><span class="label"><a 
- id="x37-74002r1"></a></span><span 
+<!--l. 190--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">call</span><span 
 class="cmtt-10">&#x00A0;</span><span 
 class="cmtt-10">psb_ovrl</span><span 
@@ -103,9 +101,8 @@ class="cmtt-10">desc_a</span><span
 class="cmtt-10">,</span><span 
 class="cmtt-10">&#x00A0;</span><span 
 class="cmtt-10">info</span><span 
-class="cmtt-10">)</span><span 
-class="cmtt-10">&#x00A0;</span><br /><span class="label"><a 
- id="x37-74003r2"></a></span><span 
+class="cmtt-10">)</span><br 
+class="newline" /><span class="lstinline"></span><span 
 class="cmtt-10">call</span><span 
 class="cmtt-10">&#x00A0;</span><span 
 class="cmtt-10">psb_ovrl</span><span 
@@ -128,8 +125,6 @@ class="cmtt-10">work</span><span
 class="cmtt-10">=</span><span 
 class="cmtt-10">work</span><span 
 class="cmtt-10">)</span>
-   
-   </div>
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -156,7 +151,7 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
-href="#x37-7400118">18<!--tex4ht:ref: tab:f90ovrl --></a>.
+href="#x37-74001r18">18<!--tex4ht:ref: tab:f90ovrl --></a>.
      </dd><dt class="description">
 <span 
 class="cmbx-10">desc</span><span 
@@ -202,7 +197,7 @@ class="cmmi-10">P</span><sub><span
 class="cmmi-7">a</span></sub><span 
 class="cmmi-10">P</span><sup><span 
 class="cmmi-7">T</span></sup>;</dd></dl>
-     <!--l. 219--><p class="noindent" >Scope: <span 
+     <!--l. 215--><p class="noindent" >Scope: <span 
 class="cmbx-10">global </span><br 
 class="newline" />Intent: <span 
 class="cmbx-10">in</span>.<br 
@@ -226,13 +221,13 @@ class="newline" />Intent: <span
 class="cmbx-10">inout</span>.<br 
 class="newline" />Specified as: a one dimensional array of the same type of <span 
 class="cmmi-10">x</span>.
-                                                                  
-
-                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
 class="description">
+                                                                  
+
+                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">x</span> </dt><dd 
@@ -246,7 +241,7 @@ class="newline" />Intent: <span
 class="cmbx-10">inout</span>.<br 
 class="newline" />Specified as: an array of rank one or two containing numbers of type specified
      in Table&#x00A0;<a 
-href="#x37-7400118">18<!--tex4ht:ref: tab:f90ovrl --></a>.
+href="#x37-74001r18">18<!--tex4ht:ref: tab:f90ovrl --></a>.
      </dd><dt class="description">
 <span 
 class="cmbx-10">info</span> </dt><dd 
@@ -258,15 +253,15 @@ class="cmbx-10">required </span><br
 class="newline" />Intent: <span 
 class="cmbx-10">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 246--><p class="noindent" ><span 
+<!--l. 242--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
-  class="enumerate" id="x37-74005x1">If  there  is  no  overlap  in  the  data  distribution  associated  with  the
+  class="enumerate" id="x37-74003x1">If  there  is  no  overlap  in  the  data  distribution  associated  with  the
      descriptor, no operations are performed;
      </li>
      <li 
-  class="enumerate" id="x37-74007x2">The operator <span 
+  class="enumerate" id="x37-74005x2">The operator <span 
 class="cmmi-10">P</span><sup><span 
 class="cmmi-7">T</span></sup> performs the reduction sum of overlap elements; it is a
      &#8220;prolongation&#8221; operator <span 
@@ -275,63 +270,63 @@ class="cmmi-7">T</span></sup> that replicates overlap elements, accounting
      for the physical replication of data;
      </li>
      <li 
-  class="enumerate" id="x37-74009x3">The  operator  <span 
+  class="enumerate" id="x37-74007x3">The  operator  <span 
 class="cmmi-10">P</span><sub><span 
 class="cmmi-7">a</span></sub>  performs  a  scaling  on  the  overlap  elements  by  the
      amount of replication; thus, when combined with the reduction operator,
      it implements the average of replicated elements over all of their instances.</li></ol>
-<!--l. 265--><p class="indent" >   <hr class="figure"><div class="figure" 
+<!--l. 261--><p class="indent" >   <hr class="figure"><div class="figure" 
 >
                                                                   
 
                                                                   
 <a 
- id="x37-740108"></a>
+ id="x37-74008r4"></a>
                                                                   
 
                                                                   
 <div class="center" 
 >
-<!--l. 266--><p class="noindent" >
-<!--l. 268--><p class="noindent" ><img 
+<!--l. 262--><p class="noindent" >
+<!--l. 264--><p class="noindent" ><img 
 src="try8x8_ov.png" alt="PIC"  
 ></div>
 <br /> <div class="caption" 
-><span class="id">Figure&#x00A0;8: </span><span  
-class="content">Sample discretization mesh.</span></div><!--tex4ht:label?: x37-740108 -->
+><span class="id">Figure&#x00A0;4: </span><span  
+class="content">Sample discretization mesh.</span></div><!--tex4ht:label?: x37-74008r4 -->
                                                                   
 
                                                                   
-<!--l. 274--><p class="indent" >   </div><hr class="endfigure">
-<!--l. 275--><p class="noindent" ><span 
+<!--l. 270--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 271--><p class="noindent" ><span 
 class="cmbx-12">Example of use </span>Consider the discretization mesh depicted in fig.&#x00A0;<a 
-href="#x37-740108">8<!--tex4ht:ref: fig:try8x8_ov --></a>, partitioned
+href="#x37-74008r4">4<!--tex4ht:ref: fig:try8x8_ov --></a>, partitioned
 among two processes as shown by the dashed lines, with an overlap of 1 extra layer
 with respect to the partition of fig.&#x00A0;<a 
-href="userhtmlsu26.html#x36-730047">7<!--tex4ht:ref: fig:try8x8 --></a>; the data distribution is such that
+href="userhtmlsu26.html#x36-73002r3">3<!--tex4ht:ref: fig:try8x8 --></a>; the data distribution is such that
 each process will own 40 entries in the index space, with an overlap of 16
 entries placed at local indices 25 through 40; the halo will run from local
 index 41 through local index 48.. If process 0 assigns an initial value of 1 to
 its entries in the <span 
 class="cmmi-10">x </span>vector, and process 1 assigns a value of 2, then after a
-call to <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_ovrl</span></span></span> with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_avg_</span></span></span> and a call to <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_halo_</span></span></span> the contents of
+call to <span class="lstinline"></span><span 
+class="cmtt-10">psb_ovrl</span> with <span class="lstinline"></span><span 
+class="cmtt-10">psb_avg_</span> and a call to <span class="lstinline"></span><span 
+class="cmtt-10">psb_halo_</span> the contents of
 the local vectors will be the following (showing a transition among the two
 subdomains)
    <div class="table">
                                                                   
 
                                                                   
-<!--l. 289--><p class="indent" >   <hr class="float"><div class="float" 
+<!--l. 285--><p class="indent" >   <hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
 <div class="center" 
 >
-<!--l. 289--><p class="noindent" >
+<!--l. 285--><p class="noindent" >
 <div class="tabular"> <table id="TBL-20" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-20-1g"><col 
@@ -1035,12 +1030,12 @@ class="td11">  </td></tr></table></div></div>
                                                                   
 
                                                                   
-   <!--l. 355--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 351--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu30.html" >next</a>] [<a 
 href="userhtmlsu26.html" >prev</a>] [<a 
 href="userhtmlsu26.html#tailuserhtmlsu26.html" >prev-tail</a>] [<a 
 href="userhtmlsu27.html" >front</a>] [<a 
 href="userhtmlsu28.html#userhtmlse6.html" >up</a>] </p></div>
-<!--l. 355--><p class="indent" >   <a 
+<!--l. 351--><p class="indent" >   <a 
  id="tailuserhtmlsu27.html"></a>  
 </body></html> 
