@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,13 +27,13 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 
-subroutine psi_renum_index(iperm,idx,info)
+subroutine psi_i_renum_index(iperm,idx,info)
   use psi_mod, psi_protect_name =>  psi_renum_index
-  use psb_serial_mod 
-  implicit none 
+  use psb_serial_mod
+  implicit none
 
   integer(psb_ipk_), intent(out)   :: info
   integer(psb_ipk_), intent(in)    :: iperm(:)
@@ -43,7 +43,7 @@ subroutine psi_renum_index(iperm,idx,info)
 
   i=1
   k=idx(i)
-  do while (k /= -1) 
+  do while (k /= -1)
     i = i+1
     nh = idx(i)
     do j = i+1, i+nh
@@ -58,7 +58,7 @@ subroutine psi_renum_index(iperm,idx,info)
     k = idx(i)
   enddo
 
-end subroutine psi_renum_index
+end subroutine psi_i_renum_index
 
 subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
@@ -73,7 +73,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   integer(psb_ipk_), intent(out)     :: info
   class(psb_i_base_vect_type), optional, intent(in) :: mold
 
-  !     ....local scalars....      
+  !     ....local scalars....
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me
   integer(psb_ipk_)   :: err_act,nxch,nsnd,nrcv,j,k
@@ -165,7 +165,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   if (do_timings) call psb_tic(idx_phase2)
 
 
-  ! next  ovrlap_elem 
+  ! next  ovrlap_elem
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
   call psi_crea_ovr_elem(me,cdesc%ovrlap_index,cdesc%ovrlap_elem,info)
   if (debug_level>0) write(debug_unit,*) me,'Done crea_ovr_elem'
@@ -173,7 +173,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_ovr_elem')
     goto 9999
   end if
-  ! Extract ovr_mst_idx from ovrlap_elem 
+  ! Extract ovr_mst_idx from ovrlap_elem
   if (debug_level>0) write(debug_unit,*) me,'Calling bld_ovr_mst'
   call psi_bld_ovr_mst(me,cdesc%ovrlap_elem,tmp_mst_idx,info)
   if (info == psb_success_) call psi_crea_index(cdesc,&
@@ -207,7 +207,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   end if
   if (debug_level>0) write(debug_unit,*) me,'Done crea_bnd_elem'
   if (do_timings) call psb_toc(idx_phase3)
-    
+
   call psb_erractionrestore(err_act)
   return
 
@@ -225,7 +225,7 @@ subroutine psi_i_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
 
   !     ....scalars parameters....
   integer(psb_ipk_), intent(in)               :: me, ovrlap_elem(:,:)
-  integer(psb_ipk_), allocatable, intent(out) :: mst_idx(:) 
+  integer(psb_ipk_), allocatable, intent(out) :: mst_idx(:)
   integer(psb_ipk_), intent(out)              :: info
 
   integer(psb_ipk_) :: i, j, proc, nov,isz, ip, err_act, idx
@@ -236,7 +236,7 @@ subroutine psi_i_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
 
   nov = size(ovrlap_elem,1)
   isz = 3*nov+1
-  call psb_realloc(isz,mst_idx,info) 
+  call psb_realloc(isz,mst_idx,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='reallocate')
     goto 9999
@@ -245,7 +245,7 @@ subroutine psi_i_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
   j = 1
   do i=1, nov
     proc = ovrlap_elem(i,3)
-    if (me /= proc) then 
+    if (me /= proc) then
       idx = ovrlap_elem(i,1)
       mst_idx(j+0) = proc
       mst_idx(j+1) = 1
@@ -253,14 +253,13 @@ subroutine psi_i_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
       j = j + 3
     end if
   end do
-  mst_idx(j) = -1 
+  mst_idx(j) = -1
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(err_act)
 
   return
 
 end subroutine psi_i_bld_ovr_mst
-
