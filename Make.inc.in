@@ -6,7 +6,7 @@
 .mod=@MODEXT@
 .fh=.fh
 .SUFFIXES: 
-.SUFFIXES: .f90 .F90 .f .F .c .o
+.SUFFIXES: .f90 .F90 .f .F .c .cpp .o
 
 
 # The following ones are the variables used by the PSBLAS make scripts.
