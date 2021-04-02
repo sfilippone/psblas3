@@ -31,7 +31,7 @@
 !
 
 subroutine psi_i_renum_index(iperm,idx,info)
-  use psi_mod, psi_protect_name =>  psi_renum_index
+  use psi_mod, psi_protect_name =>  psi_i_renum_index
   use psb_serial_mod
   implicit none
 
