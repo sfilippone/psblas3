@@ -5,11 +5,11 @@ INCLUDEDIR=$(TOP)/include
 MODDIR=$(TOP)/modules/
 HERE=../..
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR)
 CINCLUDES=-I. -I$(HERE) -I$(INCLUDEDIR)
 
 PSBC_LIBS= -L$(LIBDIR) -lpsb_cbind
-PSB_LIBS=-lpsb_krylov -lpsb_prec -lpsb_base -L$(LIBDIR)
+PSB_LIBS=-lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base -L$(LIBDIR)
 
 #
 # Compilers and such
@@ -17,11 +17,15 @@ PSB_LIBS=-lpsb_krylov -lpsb_prec -lpsb_base -L$(LIBDIR)
 
 EXEDIR=./runs
 
-all: ppdec
+all: ppdec build
 
 ppdec: ppdec.o
-	$(MPFC) ppdec.o  -o ppdec $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran 
+	$(MPFC) ppdec.o  -o ppdec $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran
 	/bin/mv ppdec $(EXEDIR)
+
+build: build.o
+		$(MPFC) build.o  -o build $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran
+		/bin/mv build $(EXEDIR)
 # \
 #	-lifcore -lifcoremt -lguide -limf -lirc -lintlc -lcxaguard -L/opt/intel/fc/10.0.023/lib/ -lm
 
@@ -31,14 +35,12 @@ ppdec: ppdec.o
 	$(MPCC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
 
 
-clean: 
-	/bin/rm -f  ppdec.o  $(EXEDIR)/ppdec
-verycleanlib: 
+clean:
+	/bin/rm -f  ppdec.o build.o  $(EXEDIR)/ppdec
+verycleanlib:
 	(cd ../..; make veryclean)
 lib:
 	(cd ../../; make library)
 
 tests: all
 	cd runs ; ./ppdec < ppde.inp
-
-
