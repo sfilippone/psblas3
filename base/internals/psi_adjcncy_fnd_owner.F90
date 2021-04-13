@@ -143,6 +143,9 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
+#if defined(SERIAL_MPI)
+  iprc(:) = 0
+#else 
   iprc = -1
   xchg_alg = psi_get_adj_alg()
   !if (me == 0)   write(0,*) me,'adj_fnd_owner alg: ',xchg_alg,' Going through ',nidx,nadj
@@ -430,7 +433,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     call psb_errpush(info,name,a_err='invalid exchange alg choice')
     goto 9999      
   end select
-
+#endif
   call psb_erractionrestore(err_act)
   return
 
