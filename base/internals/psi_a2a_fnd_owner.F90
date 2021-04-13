@@ -133,11 +133,14 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
       ! Probably yes. 
       !
       gsz = nv*np
-      Allocate(rmtidx(gsz),lclidx(gsz),iprc(nv),stat=info)
+      Allocate(rmtidx(gsz),lclidx(gsz),iprc(nv),stat=info)     
       if (info /= psb_success_) then 
         call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
         goto 9999      
       end if
+#if defined(SERIAL_MPI)
+      iprc(:) = 0
+#else 
       call mpi_allgather(idx,nv,psb_mpi_lpk_,rmtidx,nv,psb_mpi_lpk_,icomm,minfo)
       call idxmap%g2l(rmtidx(1:gsz),lclidx(1:gsz),info,owned=.true.)
       !
@@ -200,6 +203,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
         write(0,*) me,' a2a_fnd: missing answers',count(iprc(1:hsz(me+1))<0),&
              & gsz,hsz(me+1)
       end if
+#endif
     end if
   end if
 

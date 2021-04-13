@@ -150,6 +150,9 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   !
   nv = size(idx)
   call psb_realloc(nv,iprc,info)
+#if defined(SERIAL_MPI)
+  iprc(:) = 0
+#else 
   if (info == psb_success_) call psb_realloc(nv,tidx,info)
   if (info == psb_success_) call psb_realloc(nv,tprc,info)
   if (info == psb_success_) call psb_realloc(nv,tsmpl,info)
@@ -279,13 +282,15 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     if (trace.and.(me == 0)) write(0,*) ' fnd_owner_loop remaining:',nqries_max
     if (do_timings) call psb_toc(idx_loop_neigh)    
   end do fnd_owner_loop
-
+#endif
+  
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(ctxt,err_act)
 
   return
+#if !defined(SERIAL_MPI)
 
 contains
 
@@ -404,5 +409,5 @@ contains
     !  if (me == 0) write(0,*)'adj_fnd_sweep: sweeps: ',isw
 
   end subroutine psi_adj_fnd_sweep
-
+#endif
 end subroutine psi_graph_fnd_owner

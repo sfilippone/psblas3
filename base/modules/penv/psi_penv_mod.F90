@@ -45,6 +45,7 @@ module mpi
   integer(psb_mpk_), parameter :: mpi_character        = 7
   integer(psb_mpk_), parameter :: mpi_logical          = 8
   integer(psb_mpk_), parameter :: mpi_integer2         = 9
+  integer(psb_mpk_), parameter :: mpi_integer4         = 10
   integer(psb_mpk_), parameter :: mpi_comm_null        = -1
   integer(psb_mpk_), parameter :: mpi_comm_world       = 1
   
@@ -823,7 +824,7 @@ contains
     call psb_set_debug_unit(psb_err_unit)
 
 #if defined(SERIAL_MPI) 
-    ctxt = nctxt
+    ctxt%ctxt = nctxt ! allocate on assignment
     nctxt = nctxt + 1
 
     call psi_register_mpi_extras(info)
