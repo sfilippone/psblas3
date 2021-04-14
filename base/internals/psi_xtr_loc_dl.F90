@@ -209,7 +209,7 @@ subroutine psi_i_xtr_loc_dl(ctxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   call psb_msort_unique(loc_dl(1:pdl),ldu)
   pdl = ldu
   call psb_realloc(pdl,loc_dl,info)
-  call psi_symm_dep_list(loc_dl,ctxt,info)       
+  if (np>1) call psi_symm_dep_list(loc_dl,ctxt,info)       
   pdl = size(loc_dl)
   length_dl     = 0
   length_dl(me) = pdl
