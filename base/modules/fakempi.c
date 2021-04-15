@@ -117,20 +117,30 @@ double mpi_wtime()
 }
 
 
-void mpi_wait()
+void mpi_wait(int *request, int* status, int *ierr)
+
 {
+  *ierr = 0;  
   return;
 }
-void mpi_send()
+void mpi_send(void* buf, int* count, int* datatype,
+	      int *dest, int *tag, int *comm, int *ierr)
 {
+  *ierr = 0;
   return;
 }
-void mpi_isend()
+void mpi_isend(void* buf, int* count, int* datatype,
+	       int *dest, int *tag, int *comm, int *request,
+	       int *ierr)
 {
+  *ierr = 0;
   return;
 }
-void mpi_irecv()
+void mpi_irecv(void* buf, int* count, int* datatype,
+	       int *src, int *tag, int *comm, int *request,
+	       int *ierr)
 {
+  *ierr = 0;
   return;
 }
 
