@@ -420,7 +420,7 @@ program d_matgen
   if (.false.) then 
     call psb_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
          & a1,a2,a3,b1,b2,b3,c,g,info,amold=acsr)  
-  else if (.false.) then 
+  else if (.true.) then 
     call psb_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
          & a1,a2,a3,b1,b2,b3,c,g,info,amold=axyz)  
   end if
