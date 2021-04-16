@@ -2244,7 +2244,7 @@ end subroutine psb_d_xyz_csgetblk
 
 
 
-subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
   use psb_error_mod
   use psb_realloc_mod
   use psb_d_xyz_mat_mod, psb_protect_name => psb_d_xyz_csput_a
@@ -2252,9 +2252,8 @@ subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   class(psb_d_xyz_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
-  integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
-  integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), intent(in), optional   :: gtl(:)
+  integer(psb_ipk_), intent(in)         :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)        :: info
 
 
   integer(psb_ipk_) :: err_act
@@ -2303,7 +2302,7 @@ subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   else  if (a%is_upd()) then 
     call  psb_d_xyz_srch_upd(nz,ia,ja,val,a,&
-         & imin,imax,jmin,jmax,info,gtl)
+         & imin,imax,jmin,jmax,info)
 
     if (info /= psb_success_) then  
 
@@ -2329,7 +2328,7 @@ subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 contains
 
   subroutine psb_d_xyz_srch_upd(nz,ia,ja,val,a,&
-       & imin,imax,jmin,jmax,info,gtl)
+       & imin,imax,jmin,jmax,info)
 
     use psb_const_mod
     use psb_realloc_mod
@@ -2342,7 +2341,6 @@ contains
     integer(psb_ipk_), intent(in) :: ia(:),ja(:)
     real(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_), intent(in), optional  :: gtl(:)
     integer(psb_ipk_) :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nr,nc,nnz,dupl,ng
     integer(psb_ipk_) :: debug_level, debug_unit
@@ -2365,161 +2363,76 @@ contains
     nr  = a%get_nrows()
     nc  = a%get_ncols()
 
-    if (present(gtl)) then 
-      ng = size(gtl)
 
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
+    select case(dupl)
+    case(psb_dupl_ovwrt_,psb_dupl_err_)
+      ! Overwrite.
+      ! Cannot test for error, should have been caught earlier.
 
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic)
-            if ((ir > 0).and.(ir <= nr)) then 
-              i1 = a%irp(ir)
-              i2 = a%irp(ir+1)
-              nc=i2-i1
+      ilr = -1 
+      ilc = -1 
+      do i=1, nz
+        ir = ia(i)
+        ic = ja(i) 
 
-              ip = psb_ibsrch(ic,nc,a%ja(i1:i2-1))    
-              if (ip>0) then 
-                a%val(i1+ip-1) = val(i)
-              else
-                if (debug_level >= psb_debug_serial_) &
-                     & write(debug_unit,*) trim(name),&
-                     & ': Was searching ',ic,' in: ',i1,i2,&
-                     & ' : ',a%ja(i1:i2-1)
-                info = i
-                return
-              end if
+        if ((ir > 0).and.(ir <= nr)) then 
 
-            else
+          i1 = a%irp(ir)
+          i2 = a%irp(ir+1)
+          nc=i2-i1
 
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Discarding row that does not belong to us.'
-            end if
-          end if
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic)
-            if ((ir > 0).and.(ir <= nr)) then 
-              i1 = a%irp(ir)
-              i2 = a%irp(ir+1)
-              nc = i2-i1
-              ip = psb_ibsrch(ic,nc,a%ja(i1:i2-1))
-              if (ip>0) then 
-                a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-              else
-                if (debug_level >= psb_debug_serial_) &
-                     & write(debug_unit,*) trim(name),&
-                     & ': Was searching ',ic,' in: ',i1,i2,&
-                     & ' : ',a%ja(i1:i2-1)
-                info = i
-                return
-              end if
-            else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Discarding row that does not belong to us.'
-            end if
-
-          end if
-        end do
-
-      case default
-        info = -3
-        if (debug_level >= psb_debug_serial_) &
-             & write(debug_unit,*) trim(name),&
-             & ': Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-
-          if ((ir > 0).and.(ir <= nr)) then 
-
-            i1 = a%irp(ir)
-            i2 = a%irp(ir+1)
-            nc=i2-i1
-
-            ip = psb_ibsrch(ic,nc,a%ja(i1:i2-1))    
-            if (ip>0) then 
-              a%val(i1+ip-1) = val(i)
-            else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Was searching ',ic,' in: ',i1,i2,&
-                   & ' : ',a%ja(i1:i2-1)
-              info = i
-              return
-            end if
-
+          ip = psb_bsrch(ic,nc,a%ja(i1:i2-1))    
+          if (ip>0) then 
+            a%val(i1+ip-1) = val(i)
           else
             if (debug_level >= psb_debug_serial_) &
                  & write(debug_unit,*) trim(name),&
-                 & ': Discarding row that does not belong to us.'
+                 & ': Was searching ',ic,' in: ',i1,i2,&
+                 & ' : ',a%ja(i1:i2-1)
+            info = i
+            return
           end if
 
-        end do
+        else
+          if (debug_level >= psb_debug_serial_) &
+               & write(debug_unit,*) trim(name),&
+               & ': Discarding row that does not belong to us.'
+        end if
 
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if ((ir > 0).and.(ir <= nr)) then 
-            i1 = a%irp(ir)
-            i2 = a%irp(ir+1)
-            nc = i2-i1
-            ip = psb_ibsrch(ic,nc,a%ja(i1:i2-1))
-            if (ip>0) then 
-              a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-            else
-              info = i
-              return
-            end if
+      end do
+
+    case(psb_dupl_add_)
+      ! Add
+      ilr = -1 
+      ilc = -1 
+      do i=1, nz
+        ir = ia(i)
+        ic = ja(i) 
+        if ((ir > 0).and.(ir <= nr)) then 
+          i1 = a%irp(ir)
+          i2 = a%irp(ir+1)
+          nc = i2-i1
+          ip = psb_bsrch(ic,nc,a%ja(i1:i2-1))
+          if (ip>0) then 
+            a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
           else
-            if (debug_level >= psb_debug_serial_) &
-                 & write(debug_unit,*) trim(name),&
-                 & ': Discarding row that does not belong to us.'
+            info = i
+            return
           end if
-        end do
+        else
+          if (debug_level >= psb_debug_serial_) &
+               & write(debug_unit,*) trim(name),&
+               & ': Discarding row that does not belong to us.'
+        end if
+      end do
 
-      case default
-        info = -3
-        if (debug_level >= psb_debug_serial_) &
-             & write(debug_unit,*) trim(name),&
-             & ': Duplicate handling: ',dupl
-      end select
+    case default
+      info = -3
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & ': Duplicate handling: ',dupl
+    end select
 
-    end if
 
   end subroutine psb_d_xyz_srch_upd
 
@@ -2606,9 +2519,9 @@ subroutine psb_d_xyz_print(iout,a,iv,head,ivr,ivc)
 
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_d_xyz_sparse_mat), intent(in) :: a   
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
