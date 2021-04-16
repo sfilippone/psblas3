@@ -160,12 +160,12 @@ module psb_d_xyz_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_print
   interface
     subroutine psb_d_xyz_print(iout,a,iv,head,ivr,ivc)
-      import :: psb_ipk_, psb_d_xyz_sparse_mat
+      import :: psb_ipk_, psb_d_xyz_sparse_mat, psb_lpk_
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_d_xyz_sparse_mat), intent(in) :: a   
-      integer(psb_ipk_), intent(in), optional     :: iv(:)
+      integer(psb_lpk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_d_xyz_print
   end interface
   
@@ -281,14 +281,13 @@ module psb_d_xyz_mat_mod
   !> \memberof psb_d_xyz_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csput
   interface 
-    subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_d_xyz_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
       import :: psb_ipk_, psb_d_xyz_sparse_mat, psb_dpk_
       class(psb_d_xyz_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: gtl(:)
     end subroutine psb_d_xyz_csput_a
   end interface
   
