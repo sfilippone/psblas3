@@ -65,8 +65,9 @@ psb_s_ainv_fact_mod.o: psb_prec_const_mod.o psb_ainv_tools_mod.o
 psb_c_ainv_fact_mod.o: psb_prec_const_mod.o psb_ainv_tools_mod.o
 psb_z_ainv_fact_mod.o: psb_prec_const_mod.o psb_ainv_tools_mod.o
 psb_ainv_tools_mod.o: psb_c_ainv_tools_mod.o psb_d_ainv_tools_mod.o psb_s_ainv_tools_mod.o psb_z_ainv_tools_mod.o
-psb_biconjg_mod.o: psb_prec_const_mod.o psb_c_biconjg_mod.o \
+psb_biconjg_mod.o: psb_c_biconjg_mod.o \
 	psb_d_biconjg_mod.o psb_s_biconjg_mod.o psb_z_biconjg_mod.o
+psb_c_biconjg_mod.o psb_d_biconjg_mod.o psb_s_biconjg_mod.o psb_z_biconjg_mod.o:  psb_prec_const_mod.o
 psb_c_invt_fact_mod.o: psb_prec_const_mod.o psb_c_ilu_fact_mod.o
 psb_d_invt_fact_mod.o: psb_prec_const_mod.o psb_d_ilu_fact_mod.o
 psb_s_invt_fact_mod.o: psb_prec_const_mod.o psb_s_ilu_fact_mod.o
