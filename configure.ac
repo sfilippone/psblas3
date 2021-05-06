@@ -140,7 +140,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FAKEMPI="fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
-   MPIXX="$CXX";	
+   MPICXX="$CXX";	
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then

@@ -207,8 +207,8 @@ An integer value; 0 means no error has been detected.
   preconditioner}
 
 \begin{verbatim}
-call prec%descr()
-call prec%descr(iout, root)
+call prec%descr(info)
+call prec%descr(info,iout, root)
 \end{verbatim}
 
 \begin{description}
@@ -231,6 +231,12 @@ Intent: {\bf in}.\\
 Specified as: an integer number between 0 and $np-1$, in which case
 the specified process will print the description, or $-1$, in which case
 all processes will print. Default: 0. 
+\item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 

@@ -3,8 +3,8 @@
 <html > 
 <head><title>Dense Vector Data Structure</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -19,18 +19,18 @@ href="userhtmlsu7.html#userhtmlse4.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
  id="x15-460003.3"></a>Dense Vector Data Structure</h4>
 <!--l. 1105--><p class="noindent" >The <a 
- id="vdata"><span 
+ id="vdata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
-class="cmtt-10">_type</span></a> data structure encapsulates the dense vectors in a way similar
+class="cmtt-10">_type </span>data structure encapsulates the dense vectors in a way similar
 to sparse matrices, i.e. including a base type <a 
- id="vbasedata"><span 
+ id="vbasedata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_base</span><span 
 class="cmtt-10">_vect</span><span 
-class="cmtt-10">_type</span></a>. The user will
+class="cmtt-10">_type</span>. The user will
 not, in general, access the vector components directly, but rather via the routines of
 sec.&#x00A0;<a 
 href="userhtmlse6.html#x40-770006">6<!--tex4ht:ref: sec:toolsrout --></a>. Among other simple things, we define here an extraction method that
@@ -77,16 +77,14 @@ memory.
 <div class="center" 
 >
 <!--l. 1145--><p class="noindent" >
-<div class="minipage"><div class="verbatim" id="verbatim-26">
+<div class="minipage"><pre class="verbatim" id="verbatim-26">
 &#x00A0;&#x00A0;type&#x00A0;psb_T_base_vect_type
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;TYPE(KIND_),&#x00A0;allocatable&#x00A0;::&#x00A0;v(:)
-&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_T_base_vect_type
-&#x00A0;<br />
-&#x00A0;<br />&#x00A0;&#x00A0;type&#x00A0;psb_T_vect_type
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_vect_type),&#x00A0;allocatable&#x00A0;::&#x00A0;v
-&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_T_vect_type
-&#x00A0;<br />
-</div>
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;TYPE(KIND_),&#x00A0;allocatable&#x00A0;::&#x00A0;v(:)
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_T_base_vect_type
+&#x00A0;&#x00A0;type&#x00A0;psb_T_vect_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_vect_type),&#x00A0;allocatable&#x00A0;::&#x00A0;v
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_T_vect_type
+</pre>
 <!--l. 1156--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 3: </span><span  
@@ -181,11 +179,11 @@ class="description">The memory occupation in bytes.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-27">
+   <pre class="verbatim" id="verbatim-27">
 &#x00A0;call&#x00A0;&#x00A0;v%set(alpha[,first,last])
-&#x00A0;<br />&#x00A0;call&#x00A0;&#x00A0;v%set(vect[,first,last])
-&#x00A0;<br />&#x00A0;call&#x00A0;&#x00A0;v%zero()
-</div>
+&#x00A0;call&#x00A0;&#x00A0;v%set(vect[,first,last])
+&#x00A0;call&#x00A0;&#x00A0;v%zero()
+</pre>
 <!--l. 1228--><p class="nopar" >
 <!--l. 1231--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -273,9 +271,9 @@ class="newline" /></dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-28">
+   <pre class="verbatim" id="verbatim-28">
 extv&#x00A0;=&#x00A0;v%get_vect([n])
-</div>
+</pre>
 <!--l. 1265--><p class="nopar" >
 <!--l. 1267--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -325,9 +323,9 @@ class="cmmi-10">n </span>is negative; otherwise, the size of the array is the sa
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-29">
+   <pre class="verbatim" id="verbatim-29">
 call&#x00A0;&#x00A0;x%clone(y,info)
-</div>
+</pre>
 <!--l. 1294--><p class="nopar" >
 <!--l. 1296--><p class="indent" >
      <dl class="description"><dt class="description">

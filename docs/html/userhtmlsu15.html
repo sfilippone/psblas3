@@ -3,8 +3,8 @@
 <html > 
 <head><title>psb_norm1 &#8212; 1-Norm of Vector</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -220,14 +220,84 @@ class="cmbx-12">Notes</span>
      multiple norms at the same time; in this case, it is possible to improve the
      runtime efficiency by using the following scheme: <!--l. 558-->
      <div class="lstlisting" id="listing-3"><span class="label"><a 
- id="x24-61004r1"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;vres(1)&#x00A0;=&#x00A0;psb_geasum(x1,desc_a,info,global=.<span 
-class="cmbx-10">false</span>.)&#x00A0;<br /><span class="label"><a 
- id="x24-61005r2"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;vres(2)&#x00A0;=&#x00A0;psb_geasum(x2,desc_a,info,global=.<span 
-class="cmbx-10">false</span>.)&#x00A0;<br /><span class="label"><a 
- id="x24-61006r3"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;vres(3)&#x00A0;=&#x00A0;psb_geasum(x3,desc_a,info,global=.<span 
-class="cmbx-10">false</span>.)&#x00A0;<br /><span class="label"><a 
- id="x24-61007r4"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;<span 
-class="cmbx-10">call</span>&#x00A0;psb_sum(ctxt,vres(1:3))
+ id="x24-61004r1"></a></span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">vres</span><span 
+class="cmtt-10">(1)</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">=</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_geasum</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">x1</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">desc_a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">info</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">global</span><span 
+class="cmtt-10">=.</span><span 
+class="cmtt-10">false</span><span 
+class="cmtt-10">.)</span><span 
+class="cmtt-10">&#x00A0;</span><br /><span class="label"><a 
+ id="x24-61005r2"></a></span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">vres</span><span 
+class="cmtt-10">(2)</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">=</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_geasum</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">x2</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">desc_a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">info</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">global</span><span 
+class="cmtt-10">=.</span><span 
+class="cmtt-10">false</span><span 
+class="cmtt-10">.)</span><span 
+class="cmtt-10">&#x00A0;</span><br /><span class="label"><a 
+ id="x24-61006r3"></a></span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">vres</span><span 
+class="cmtt-10">(3)</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">=</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_geasum</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">x3</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">desc_a</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">info</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">global</span><span 
+class="cmtt-10">=.</span><span 
+class="cmtt-10">false</span><span 
+class="cmtt-10">.)</span><span 
+class="cmtt-10">&#x00A0;</span><br /><span class="label"><a 
+ id="x24-61007r4"></a></span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">call</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">psb_sum</span><span 
+class="cmtt-10">(</span><span 
+class="cmtt-10">ctxt</span><span 
+class="cmtt-10">,</span><span 
+class="cmtt-10">vres</span><span 
+class="cmtt-10">(1:3))</span>
      
      </div>
      <!--l. 565--><p class="noindent" >In this way the global communication, which for small sizes is a latency-bound

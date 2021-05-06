@@ -763,7 +763,7 @@ program psb_d_pde3d
 
   if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-  call prec%descr()
+  call prec%descr(info)
   !
   ! iterative method parameters
   !

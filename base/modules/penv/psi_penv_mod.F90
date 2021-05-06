@@ -97,7 +97,7 @@ module psi_penv_mod
 
   type psb_buffer_node
     integer(psb_mpk_)   :: request
-    type(psb_ctxt_type) :: icontxt 
+    type(psb_ctxt_type) :: ctxt 
     integer(psb_mpk_) :: buffer_type
     integer(psb_epk_), allocatable     :: int8buf(:)
     integer(psb_i2pk_), allocatable    :: int2buf(:)
@@ -253,9 +253,9 @@ contains
   end subroutine psb_test_buffer
   
 
-  subroutine psb_close_context(mesg_queue,icontxt)
+  subroutine psb_close_context(mesg_queue,ctxt)
     type(psb_buffer_queue), intent(inout) :: mesg_queue
-    type(psb_ctxt_type), intent(in) :: icontxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_) :: info
     type(psb_buffer_node), pointer :: node, nextnode
 
@@ -263,7 +263,7 @@ contains
     do 
       if (.not.associated(node)) exit
       nextnode => node%next
-      if (psb_cmp_ctxt(node%icontxt,icontxt)) then 
+      if (psb_cmp_ctxt(node%ctxt,ctxt)) then 
         call psb_wait_buffer(node,info)
         call psb_delete_node(mesg_queue,node)
       end if
@@ -350,7 +350,7 @@ contains
   !  has already been copied. 
   !
   ! !!!!!!!!!!!!!!!!!
-  subroutine psi_msnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_msnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -358,7 +358,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     integer(psb_mpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -371,8 +371,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_int_type
     call move_alloc(buffer,node%int4buf)
     if (info /= 0) then 
@@ -389,7 +389,7 @@ contains
   end subroutine psi_msnd
 
 
-  subroutine psi_esnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_esnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -397,7 +397,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     integer(psb_epk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -410,8 +410,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_int8_type
     call move_alloc(buffer,node%int8buf)
     if (info /= 0) then 
@@ -426,7 +426,7 @@ contains
 
   end subroutine psi_esnd
 
-  subroutine psi_i2snd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_i2snd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -434,7 +434,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     integer(psb_i2pk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -447,8 +447,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_int2_type
     call move_alloc(buffer,node%int2buf)
     if (info /= 0) then 
@@ -463,7 +463,7 @@ contains
 
   end subroutine psi_i2snd
 
-  subroutine psi_ssnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_ssnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -471,7 +471,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     real(psb_spk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -484,8 +484,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_real_type
     call move_alloc(buffer,node%realbuf)
     if (info /= 0) then 
@@ -500,7 +500,7 @@ contains
     
   end subroutine psi_ssnd
 
-  subroutine psi_dsnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_dsnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -508,7 +508,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: tag, dest
     real(psb_dpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -521,8 +521,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_double_type
     call move_alloc(buffer,node%doublebuf)
     if (info /= 0) then 
@@ -537,7 +537,7 @@ contains
     
   end subroutine psi_dsnd
     
-  subroutine psi_csnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_csnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -545,7 +545,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     complex(psb_spk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -558,8 +558,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_complex_type
     call move_alloc(buffer,node%complexbuf)
     if (info /= 0) then 
@@ -574,7 +574,7 @@ contains
     
   end subroutine psi_csnd
 
-  subroutine psi_zsnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_zsnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -582,7 +582,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     complex(psb_dpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -595,8 +595,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_dcomplex_type
     call move_alloc(buffer,node%dcomplbuf)
     if (info /= 0) then 
@@ -612,7 +612,7 @@ contains
   end subroutine psi_zsnd
 
 
-  subroutine psi_logsnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_logsnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -620,7 +620,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     logical, allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -633,8 +633,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_logical_type
     call move_alloc(buffer,node%logbuf)
     if (info /= 0) then 
@@ -650,7 +650,7 @@ contains
   end subroutine psi_logsnd
 
 
-  subroutine psi_hsnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_hsnd(ctxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -658,7 +658,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     character(len=1), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
@@ -671,8 +671,8 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    node%icontxt     = icontxt
-    icomm            = psb_get_mpi_comm(icontxt)
+    node%ctxt     = ctxt
+    icomm            = psb_get_mpi_comm(ctxt)
     node%buffer_type = psb_char_type
     call move_alloc(buffer,node%charbuf)
     if (info /= 0) then 
