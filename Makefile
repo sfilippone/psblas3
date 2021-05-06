@@ -5,8 +5,9 @@ all: libd based precd kryld utild cbindd
 	@echo "PSBLAS libraries Compilation Successful."
 
 based: libd
-precd utild: based
-kryld: precd based
+precd: based
+utild: based	
+kryld: precd 
 
 cbindd: precd kryld utild 
 
@@ -15,7 +16,7 @@ libd:
 	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 	(if test ! -d modules ; then mkdir modules; fi;)	
 based:
-	$(MAKE) -C  base lib
+	$(MAKE) -C base lib
 precd:
 	$(MAKE) -C prec lib
 kryld:
