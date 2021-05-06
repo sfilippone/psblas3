@@ -3,8 +3,8 @@
 <html > 
 <head><title>Sparse Matrix class</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -19,10 +19,10 @@ href="userhtmlsu7.html#userhtmlsu9.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
  id="x14-260003.2"></a>Sparse Matrix class</h4>
 <!--l. 536--><p class="noindent" >The <a 
- id="spdata"><span 
+ id="spdata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_Tspmat</span><span 
-class="cmtt-10">_type</span></a> class contains all information about the local portion of the
+class="cmtt-10">_type </span>class contains all information about the local portion of the
 sparse matrix and its storage mode. Its design is based on the STATE design
 pattern&#x00A0;<span class="cite">[<a 
 href="userhtmlli2.html#XDesignPatterns">13</a>]</span> as detailed in&#x00A0;<span class="cite">[<a 
@@ -57,12 +57,12 @@ class="cmtt-10">a</span><span
 class="cmtt-10">%</span><span 
 class="cmtt-10">a</span> of type
 <a 
- id="spbasedata"><span 
+ id="spbasedata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_base</span><span 
 class="cmtt-10">_sparse</span><span 
-class="cmtt-10">_mat</span></a>; its specific layout can be chosen dynamically among the
+class="cmtt-10">_mat</span>; its specific layout can be chosen dynamically among the
 predefined types, or an entirely new storage layout can be implemented and passed to
 the library at runtime via the <span class="lstinline"></span><span 
 class="cmtt-10">psb_spasb</span> routine.
@@ -75,11 +75,11 @@ class="cmtt-10">psb_spasb</span> routine.
 <div class="center" 
 >
 <!--l. 565--><p class="noindent" >
-<div class="minipage"><div class="verbatim" id="verbatim-15">
+<div class="minipage"><pre class="verbatim" id="verbatim-15">
 &#x00A0;&#x00A0;type&#x00A0;::&#x00A0;psb_Tspmat_type
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_sparse_mat),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;a
-&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_Tspmat_type
-</div>
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_sparse_mat),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;a
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_Tspmat_type
+</pre>
 <!--l. 571--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 2: </span><span  
@@ -143,9 +143,9 @@ obtained by conversion to/from it.
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-16">
+   <pre class="verbatim" id="verbatim-16">
 nr&#x00A0;=&#x00A0;a%get_nrows()
-</div>
+</pre>
 <!--l. 614--><p class="nopar" >
 <!--l. 616--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -179,9 +179,9 @@ class="cmtt-10">a</span>.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-17">
+   <pre class="verbatim" id="verbatim-17">
 nc&#x00A0;=&#x00A0;a%get_ncols()
-</div>
+</pre>
 <!--l. 638--><p class="nopar" >
 <!--l. 640--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -215,9 +215,9 @@ class="cmtt-10">a</span>.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-18">
+   <pre class="verbatim" id="verbatim-18">
 nz&#x00A0;=&#x00A0;a%get_nnzeros()
-</div>
+</pre>
 <!--l. 662--><p class="nopar" >
 <!--l. 664--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -260,9 +260,9 @@ matrix</h5>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-19">
+   <pre class="verbatim" id="verbatim-19">
 maxnz&#x00A0;=&#x00A0;a%get_size()
-</div>
+</pre>
 <!--l. 692--><p class="nopar" >
 <!--l. 694--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -297,9 +297,9 @@ class="cmtt-10">a</span> using its current memory allocation.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-20">
+   <pre class="verbatim" id="verbatim-20">
 memory_size&#x00A0;=&#x00A0;a%sizeof()
-</div>
+</pre>
 <!--l. 716--><p class="nopar" >
 <!--l. 718--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -436,12 +436,12 @@ class="cmtt-10">logical</span> value indicating whether the matrix is in the Bui
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-21">
+   <pre class="verbatim" id="verbatim-21">
 if&#x00A0;(a%is_triangle())&#x00A0;then
-&#x00A0;<br />if&#x00A0;(a%is_upper())&#x00A0;then
-&#x00A0;<br />if&#x00A0;(a%is_lower())&#x00A0;then
-&#x00A0;<br />if&#x00A0;(a%is_unit())&#x00A0;then
-</div>
+if&#x00A0;(a%is_upper())&#x00A0;then
+if&#x00A0;(a%is_lower())&#x00A0;then
+if&#x00A0;(a%is_unit())&#x00A0;then
+</pre>
 <!--l. 799--><p class="nopar" >
 <!--l. 802--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -482,10 +482,10 @@ class="cmtt-10">.</span> check also if it is lower, upper and with
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-22">
+   <pre class="verbatim" id="verbatim-22">
 call&#x00A0;&#x00A0;a%cscnv(b,info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
-&#x00A0;<br />call&#x00A0;&#x00A0;a%cscnv(info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
-</div>
+call&#x00A0;&#x00A0;a%cscnv(info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
+</pre>
 <!--l. 833--><p class="nopar" >
 <!--l. 836--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -549,10 +549,10 @@ and other accelerators.
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-23">
+   <pre class="verbatim" id="verbatim-23">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%csclip(b,info[,&amp;
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;imin,imax,jmin,jmax,rscale,cscale])
-</div>
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;imin,imax,jmin,jmax,rscale,cscale])
+</pre>
 <!--l. 873--><p class="nopar" >
 <!--l. 876--><p class="indent" >   Returns the submatrix <span class="lstinline"></span><span 
 class="cmtt-10">A</span><span 
@@ -773,10 +773,10 @@ class="description">Return code.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-24">
+   <pre class="verbatim" id="verbatim-24">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%tril(l,info[,&amp;
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,u])
-</div>
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,u])
+</pre>
 <!--l. 971--><p class="nopar" >
 <!--l. 974--><p class="indent" >   Returns the lower triangular part of submatrix <span class="lstinline"></span><span 
 class="cmtt-10">A</span><span 
@@ -864,10 +864,10 @@ class="description">Return code.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-25">
+   <pre class="verbatim" id="verbatim-25">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%triu(u,info[,&amp;
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,l])
-</div>
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,l])
+</pre>
 <!--l. 1012--><p class="nopar" >
 <!--l. 1015--><p class="indent" >   Returns the upper triangular part of submatrix <span class="lstinline"></span><span 
 class="cmtt-10">A</span><span 

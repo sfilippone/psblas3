@@ -3,8 +3,8 @@
 <html > 
 <head><title>Descriptor data structure</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -21,10 +21,10 @@ href="userhtmlsu7.html#userhtmlsu8.html" >up</a>] </p></div>
  id="x13-100003.1"></a>Descriptor data structure</h4>
 <!--l. 50--><p class="noindent" >All the general matrix informations and elements to be exchanged among processes
 are stored within a data structure of the type <a 
- id="descdata"><span 
+ id="descdata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_desc</span><span 
-class="cmtt-10">_type</span></a>. Every structure of this
+class="cmtt-10">_type</span>. Every structure of this
 type is associated with a discretization pattern and enables data communications and
 other operations that are necessary for implementing the various algorithms of
 interest to us.
@@ -179,17 +179,17 @@ class="cmtt-10">psb_desc_type</span> structures is as follows:
 <div class="center" 
 >
 <!--l. 162--><p class="noindent" >
-<div class="minipage"><div class="verbatim" id="verbatim-1">
+<div class="minipage"><pre class="verbatim" id="verbatim-1">
 type&#x00A0;psb_desc_type
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_indx_map),&#x00A0;allocatable&#x00A0;::&#x00A0;indxmap
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_halo_index
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ext_index
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovrlap_index
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovr_mst_idx
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;ovrlap_elem(:,:)
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;bnd_elem(:)
-&#x00A0;<br />end&#x00A0;type&#x00A0;psb_desc_type
-</div>
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_indx_map),&#x00A0;allocatable&#x00A0;::&#x00A0;indxmap
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_halo_index
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ext_index
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovrlap_index
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovr_mst_idx
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;ovrlap_elem(:,:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;bnd_elem(:)
+end&#x00A0;type&#x00A0;psb_desc_type
+</pre>
 <!--l. 174--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 1: </span><span  
@@ -221,9 +221,9 @@ class="description">State  entered  after  the  assembly;  computations  using  
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-2">
+   <pre class="verbatim" id="verbatim-2">
 nr&#x00A0;=&#x00A0;desc%get_local_rows()
-</div>
+</pre>
 <!--l. 203--><p class="nopar" >
 <!--l. 205--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -267,9 +267,9 @@ class="cmsy-10">|</span>. The returned
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-3">
+   <pre class="verbatim" id="verbatim-3">
 nc&#x00A0;=&#x00A0;desc%get_local_cols()
-</div>
+</pre>
 <!--l. 228--><p class="nopar" >
 <!--l. 230--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -318,9 +318,9 @@ class="cmsy-10">|</span>. The returned value is specific to the
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-4">
+   <pre class="verbatim" id="verbatim-4">
 nr&#x00A0;=&#x00A0;desc%get_global_rows()
-</div>
+</pre>
 <!--l. 254--><p class="nopar" >
 <!--l. 256--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -354,9 +354,9 @@ class="description">The number of global rows, i.e. the size of the global index
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-5">
+   <pre class="verbatim" id="verbatim-5">
 nr&#x00A0;=&#x00A0;desc%get_global_cols()
-</div>
+</pre>
 <!--l. 276--><p class="nopar" >
 <!--l. 278--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -390,9 +390,9 @@ class="description">The number of global cols; usually this is equal to the numb
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-6">
+   <pre class="verbatim" id="verbatim-6">
 myidx&#x00A0;=&#x00A0;desc%get_global_indices([owned])
-</div>
+</pre>
 <!--l. 299--><p class="nopar" >
 <!--l. 301--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -449,9 +449,9 @@ class="cmtt-10">psb_lpk_</span> and rank 1.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-7">
+   <pre class="verbatim" id="verbatim-7">
 ctxt&#x00A0;=&#x00A0;desc%get_context()
-</div>
+</pre>
 <!--l. 327--><p class="nopar" >
 <!--l. 329--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -484,9 +484,9 @@ class="description">The communication context.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-8">
+   <pre class="verbatim" id="verbatim-8">
 call&#x00A0;&#x00A0;desc%clone(descout,info)
-</div>
+</pre>
 <!--l. 348--><p class="nopar" >
 <!--l. 350--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -523,9 +523,9 @@ class="description">Return code.</dd></dl>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-9">
+   <pre class="verbatim" id="verbatim-9">
 call&#x00A0;&#x00A0;desc%cnv(mold)
-</div>
+</pre>
 <!--l. 371--><p class="nopar" >
 <!--l. 373--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -551,12 +551,12 @@ class="newline" />Scope: <span
 class="cmbx-10">local</span>.<br 
 class="newline" />Specified     as:     a     object     of     type     derived     from     (integer)
      <a 
- id="vbasedata"><span 
+ id="vbasedata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_base</span><span 
 class="cmtt-10">_vect</span><span 
-class="cmtt-10">_type</span></a>.</dd></dl>
+class="cmtt-10">_type</span>.</dd></dl>
 <!--l. 384--><p class="noindent" >The <span class="lstinline"></span><span 
 class="cmtt-10">mold</span> arguments may be employed to interface with special devices, such as GPUs
 and other accelerators.
@@ -567,9 +567,9 @@ switch</h5>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-10">
+   <pre class="verbatim" id="verbatim-10">
 ith&#x00A0;=&#x00A0;psb_cd_get_large_threshold()
-</div>
+</pre>
 <!--l. 395--><p class="nopar" >
 <!--l. 397--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -592,9 +592,9 @@ switch</h5>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-11">
+   <pre class="verbatim" id="verbatim-11">
 call&#x00A0;psb_cd_set_large_threshold(ith)
-</div>
+</pre>
 <!--l. 412--><p class="nopar" >
 <!--l. 414--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -627,9 +627,9 @@ same value on all processes.
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-12">
+   <pre class="verbatim" id="verbatim-12">
 list&#x00A0;=&#x00A0;&#x00A0;desc%get_p_adjcncy()
-</div>
+</pre>
 <!--l. 435--><p class="nopar" >
 <!--l. 437--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -652,9 +652,9 @@ class="description">The  current  list  of  adjacent  processes,  i.e.  processe
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-13">
+   <pre class="verbatim" id="verbatim-13">
 call&#x00A0;desc%set_p_adjcncy(list)
-</div>
+</pre>
 <!--l. 451--><p class="nopar" >
 <!--l. 453--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -690,9 +690,9 @@ class="cmtt-10">psb_cdasb</span>.
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-14">
+   <pre class="verbatim" id="verbatim-14">
 call&#x00A0;desc%fnd_owner(idx,iprc,info)
-</div>
+</pre>
 <!--l. 474--><p class="nopar" >
 <!--l. 476--><p class="indent" >
      <dl class="description"><dt class="description">

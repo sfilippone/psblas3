@@ -197,23 +197,24 @@ contains
   !         0: normal
   !        >1: increased details 
   !
-  subroutine psb_zfile_prec_descr(prec,iout, root,verbosity)
+  subroutine psb_zfile_prec_descr(prec,info,iout, root,verbosity)
     use psb_base_mod
     implicit none
     class(psb_zprec_type), intent(in)       :: prec
+    integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_), intent(in), optional :: iout
     integer(psb_ipk_), intent(in), optional :: root
     integer(psb_ipk_), intent(in), optional :: verbosity
 
-    integer(psb_ipk_) :: iout_,info, verbosity_
+    integer(psb_ipk_) :: iout_, verbosity_
     character(len=20) :: name='prec_descr'
 
+    info = 0
     if (present(iout)) then
       iout_ = iout
     else
       iout_ = 6
     end if
-    
     if (.not.allocated(prec%prec)) then
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")

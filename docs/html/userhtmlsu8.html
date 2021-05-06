@@ -3,8 +3,8 @@
 <html > 
 <head><title>Preconditioner data structure</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -21,10 +21,10 @@ href="userhtmlsu7.html#userhtmlsu10.html" >up</a>] </p></div>
 <!--l. 1315--><p class="noindent" >Our base library offers support for simple well known preconditioners like Diagonal
 Scaling or Block Jacobi with incomplete factorization ILU(0).
 <!--l. 1319--><p class="indent" >   A preconditioner is held in the <a 
- id="precdata"><span 
+ id="precdata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_prec</span><span 
-class="cmtt-10">_type</span></a> data structure reported in
+class="cmtt-10">_type </span>data structure reported in
 figure&#x00A0;<a 
 href="#x16-53001r4">4<!--tex4ht:ref: fig:prectype --></a>. The <span class="lstinline"></span><span 
 class="cmtt-10">psb_prec_type</span> data type may contain a simple preconditioning matrix
@@ -43,12 +43,11 @@ preconditioner.
 <div class="center" 
 >
 <!--l. 1347--><p class="noindent" >
-<div class="minipage"><div class="verbatim" id="verbatim-30">
-&#x00A0;<br />&#x00A0;&#x00A0;type&#x00A0;psb_Tprec_type
-&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_prec_type),&#x00A0;allocatable&#x00A0;::&#x00A0;prec
-&#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_Tprec_type
-&#x00A0;<br />
-</div>
+<div class="minipage"><pre class="verbatim" id="verbatim-30">
+&#x00A0;&#x00A0;type&#x00A0;psb_Tprec_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_prec_type),&#x00A0;allocatable&#x00A0;::&#x00A0;prec
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_Tprec_type
+</pre>
 <!--l. 1355--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 4: </span><span  

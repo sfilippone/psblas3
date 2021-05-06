@@ -3,8 +3,8 @@
 <html > 
 <head><title>psb_cdall &#8212; Allocates a communication descriptor</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -19,13 +19,13 @@ href="userhtmlsu32.html#userhtmlsu33.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <div class="verbatim" id="verbatim-33">
+   <pre class="verbatim" id="verbatim-33">
 call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,parts=parts)
-&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vg=vg,[mg=mg,flag=flag])
-&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
-&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,nl=nl)
-&#x00A0;<br />call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,repl=.true.)
-</div>
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vg=vg,[mg=mg,flag=flag])
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,nl=nl)
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,repl=.true.)
+</pre>
 <!--l. 16--><p class="nopar" >
 <!--l. 18--><p class="indent" >   This subroutine initializes the communication descriptor associated with an index
 space. One of the optional arguments <span class="obeylines-h"><span class="verb"><span 
@@ -234,14 +234,14 @@ class="cmtt-10">mg</span></span></span> as well. The
                                                                   
 
                                                                   
-         <div class="verbatim" id="verbatim-34">
+         <pre class="verbatim" id="verbatim-34">
          &#x00A0;&#x00A0;interface
-         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;subroutine&#x00A0;psb_parts(glob_index,mg,np,pv,nv)
-         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(in)&#x00A0;&#x00A0;::&#x00A0;glob_index,np,mg
-         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(out)&#x00A0;::&#x00A0;nv,&#x00A0;pv(*)
-         &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;subroutine&#x00A0;psb_parts
-         &#x00A0;<br />&#x00A0;&#x00A0;end&#x00A0;interface
-</div>
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;subroutine&#x00A0;psb_parts(glob_index,mg,np,pv,nv)
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(in)&#x00A0;&#x00A0;::&#x00A0;glob_index,np,mg
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(out)&#x00A0;::&#x00A0;nv,&#x00A0;pv(*)
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;subroutine&#x00A0;psb_parts
+         &#x00A0;&#x00A0;end&#x00A0;interface
+</pre>
          <!--l. 118--><p class="nopar" > The input arguments are:
              <dl class="description"><dt class="description">
          <span 
