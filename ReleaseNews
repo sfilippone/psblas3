@@ -1,5 +1,8 @@
 WHAT'S NEW
 
+Version 3.7.0.1
+   1. PREC%DESCR method now requires a mandatory INFO argument. 
+
 Version 3.7.0
    1. Major change at API level: integer kinds reorganization.
       Local indices are now of kind PSB_IPK_, whereas global indices
@@ -9,7 +12,7 @@ Version 3.7.0
       large as IPK.
    2. The internals have also been reorganized heavily, with a much
       more coherent design and split of functionalities into source
-      files. 
+      files.
 
 
 Version 3.6.1
