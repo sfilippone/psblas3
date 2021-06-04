@@ -157,7 +157,7 @@ contains
 
   end function psb_c_dmat_name_print
 
-  function psb_c_dvect_set_scal(x,val) result(info)
+  function psb_c_dvect_set_scal(x,val) bind(c) result(info)
     use psb_base_mod
     implicit none
 
@@ -180,7 +180,7 @@ contains
 
   end function psb_c_dvect_set_scal
 
-  function psb_c_dvect_set_vect(x,val,n) result(info)
+  function psb_c_dvect_set_vect(x,val,n) bind(c) result(info)
     use psb_base_mod
     implicit none
 
