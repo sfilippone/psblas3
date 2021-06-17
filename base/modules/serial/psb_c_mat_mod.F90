@@ -681,7 +681,7 @@ module psb_c_mat_mod
 
   interface
     subroutine psb_c_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -692,7 +692,7 @@ module psb_c_mat_mod
       logical, intent(in), optional        :: append
       integer(psb_ipk_), intent(in), optional        :: iren(:)
       integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      logical, intent(in), optional        :: rscale,cscale,chksz
     end subroutine psb_c_csgetrow
   end interface
 
