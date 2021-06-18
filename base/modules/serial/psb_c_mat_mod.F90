@@ -947,8 +947,8 @@ module psb_c_mat_mod
   interface
     subroutine psb_c_cp_from_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_cspmat_type, psb_spk_, psb_lc_base_sparse_mat
-      class(psb_cspmat_type), intent(out) :: a
-      class(psb_lc_base_sparse_mat), intent(in) :: b
+      class(psb_cspmat_type), intent(inout) :: a
+      class(psb_lc_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_cp_from_lb
   end interface
 
@@ -1731,8 +1731,8 @@ module psb_c_mat_mod
   interface
     subroutine psb_lc_cp_from_ib(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_lcspmat_type), intent(out) :: a
-      class(psb_c_base_sparse_mat), intent(in) :: b
+      class(psb_lcspmat_type), intent(inout) :: a
+      class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_lc_cp_from_ib
   end interface
 

@@ -2371,7 +2371,7 @@ subroutine  psb_z_csc_clean_zeros(a, info)
   use psb_z_csc_mat_mod, psb_protect_name => psb_z_csc_clean_zeros
   implicit none
   class(psb_z_csc_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: info
+  integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_ipk_) :: i, j, k, nc
   integer(psb_ipk_), allocatable :: ilcp(:)
@@ -4255,7 +4255,7 @@ subroutine  psb_lz_csc_clean_zeros(a, info)
   use psb_z_csc_mat_mod, psb_protect_name => psb_lz_csc_clean_zeros
   implicit none
   class(psb_lz_csc_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: info
+  integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_lpk_) :: i, j, k, nc
   integer(psb_lpk_), allocatable :: ilcp(:)
@@ -4319,7 +4319,7 @@ subroutine  psb_lz_csc_reallocate_nz(nz,a)
   use psb_realloc_mod
   use psb_z_csc_mat_mod, psb_protect_name => psb_lz_csc_reallocate_nz
   implicit none
-  integer(psb_ipk_), intent(in) :: nz
+  integer(psb_lpk_), intent(in) :: nz
   class(psb_lz_csc_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info, ierr(5)
   character(len=20)  :: name='lz_csc_reallocate_nz'

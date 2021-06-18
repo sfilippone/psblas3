@@ -91,9 +91,9 @@ subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
 
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_base_sparse_mat), intent(in) :: a   
-  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
-  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='sparse_print'
@@ -384,7 +384,7 @@ subroutine psb_lbase_sparse_print(iout,a,iv,head,ivr,ivc)
   use psb_error_mod
   implicit none 
 
-  integer(psb_lpk_), intent(in)               :: iout
+  integer(psb_ipk_), intent(in)               :: iout
   class(psb_lbase_sparse_mat), intent(in) :: a   
   integer(psb_lpk_), intent(in), optional     :: iv(:)
   character(len=*), optional        :: head
