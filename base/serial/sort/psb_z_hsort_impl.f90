@@ -49,7 +49,8 @@ subroutine psb_zhsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: flag_, n, i, err_act,info
+  integer(psb_ipk_) :: dir_, l
   complex(psb_dpk_) :: key
   integer(psb_ipk_) :: index
 
@@ -159,7 +160,7 @@ end subroutine psb_zhsort
 
 !
 ! These are packaged so that they can be used to implement 
-! a heapsort, should the need arise
+! a heapsort.
 !
 !
 !   Programming note:
@@ -646,7 +647,8 @@ subroutine psi_z_idx_insert_heap(key,index,last,heap,idxs,dir,info)
   !   dir:  sorting direction
 
   complex(psb_dpk_), intent(in)    :: key
-  integer(psb_ipk_), intent(in)              :: index,dir
+  integer(psb_ipk_), intent(in)     :: index
+  integer(psb_ipk_), intent(in)     :: dir
   complex(psb_dpk_), intent(inout) :: heap(:)
   integer(psb_ipk_), intent(inout)           :: idxs(:)
   integer(psb_ipk_), intent(inout)           :: last

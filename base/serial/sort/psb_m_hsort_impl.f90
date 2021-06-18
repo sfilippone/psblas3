@@ -49,7 +49,8 @@ subroutine psb_mhsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: flag_, n, i, err_act,info
+  integer(psb_ipk_) :: dir_, l
   integer(psb_mpk_) :: key
   integer(psb_ipk_) :: index
 
@@ -159,7 +160,7 @@ end subroutine psb_mhsort
 
 !
 ! These are packaged so that they can be used to implement 
-! a heapsort, should the need arise
+! a heapsort.
 !
 !
 !   Programming note:
@@ -540,11 +541,12 @@ subroutine psi_m_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   use psb_sort_mod, psb_protect_name => psi_m_idx_heap_get_first
   implicit none 
 
+  integer(psb_mpk_), intent(inout)    :: key
   integer(psb_mpk_), intent(inout)    :: heap(:)
-  integer(psb_ipk_), intent(out)    :: index,info
+  integer(psb_ipk_), intent(out)    :: index
+  integer(psb_ipk_), intent(out)    :: info
   integer(psb_ipk_), intent(inout)  :: last,idxs(:)
   integer(psb_ipk_), intent(in)     :: dir
-  integer(psb_mpk_), intent(out)      :: key
 
   integer(psb_ipk_) :: i, j,itemp
   integer(psb_mpk_)   :: temp

@@ -296,7 +296,7 @@ module psb_indx_map_mod
       implicit none 
       integer(psb_lpk_), intent(in)   :: idx(:)
       integer(psb_ipk_), allocatable, intent(out)   ::  iprc(:)
-      integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
+      integer(psb_ipk_), intent(inout) :: adj(:)
       class(psb_indx_map), intent(in) :: idxmap
       integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_adjcncy_fnd_owner

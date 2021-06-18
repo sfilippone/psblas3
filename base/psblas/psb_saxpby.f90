@@ -642,7 +642,7 @@ subroutine  psb_saxpbyvout(alpha, x, beta,y, z, desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call saxpby(desc_a%get_local_cols(),ione,&
+    call saxpbyv2(desc_a%get_local_cols(),ione,&
          & alpha,x,lldx,beta,&
          & y,lldy,z,lldz,info)
   end if

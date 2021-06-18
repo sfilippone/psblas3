@@ -642,7 +642,7 @@ subroutine  psb_daxpbyvout(alpha, x, beta,y, z, desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call daxpby(desc_a%get_local_cols(),ione,&
+    call daxpbyv2(desc_a%get_local_cols(),ione,&
          & alpha,x,lldx,beta,&
          & y,lldy,z,lldz,info)
   end if

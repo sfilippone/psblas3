@@ -93,7 +93,7 @@ module psi_e_serial_mod
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_epk_), intent (in)       ::  x(:)
       integer(psb_epk_), intent (in)       ::  y(:)
-      integer(psb_epk_), intent (in)       ::  z(:)
+      integer(psb_epk_), intent (inout)    ::  z(:)
       integer(psb_epk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_eaxpbyv2
