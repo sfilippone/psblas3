@@ -133,8 +133,8 @@ Dario      Pascucci
 RELATED SOFTWARE
 ----------------
 If you are looking for more sophisticated preconditioners, you may be
-interested in the package MLD2P4 from
-<http://github.com/sfilippone/mld2p4-2>
+interested in the package AMG4PSBLAS from
+<http://github.com/sfilippone/amg4psblas>
 
 
 Contact: <https://github.com/sfilippone/psblas3>
