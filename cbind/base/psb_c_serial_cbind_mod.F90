@@ -204,5 +204,38 @@ contains
 
   end function psb_c_cvect_set_vect
 
+  function psb_c_g2l(cdh,gindex,cowned) bind(c) result(lindex)
+    use psb_base_mod
+    implicit none
+
+    integer(psb_c_lpk_), value :: gindex
+    logical(c_bool), value     :: cowned
+    type(psb_c_descriptor)     :: cdh
+    integer(psb_c_ipk_)        :: lindex
+
+    type(psb_desc_type), pointer :: descp
+    integer(psb_ipk_)            :: info, localindex, ixb, iam, np
+    logical :: owned
+
+    ixb = psb_c_get_index_base()
+    owned = cowned
+    lindex = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+
+    call psb_info(descp%get_context(),iam,np)
+    if (ixb == 1) then
+      call descp%indxmap%g2l(gindex,localindex,info,owned=owned)
+      lindex = localindex
+    else
+      call descp%indxmap%g2l(gindex+(1-ixb),localindex,info,owned=owned)
+      lindex = localindex-(1-ixb)
+    endif
+
+  end function psb_c_g2l
+
 
 end module psb_c_serial_cbind_mod
