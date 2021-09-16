@@ -34,8 +34,8 @@ extern "C" {
   typedef double psb_d_t;
 
 #ifdef  __cplusplus
-   using psb_c_t = std::complex<float>;
-   using psb_z_t = std::complex<double>;
+   typedef std::complex<float> psb_c_t;
+   typedef std::complex<double> psb_z_t;
 #else
    typedef float complex psb_c_t;
    typedef float complex psb_z_t;
