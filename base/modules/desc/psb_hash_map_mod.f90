@@ -94,8 +94,6 @@ module psb_hash_map_mod
     procedure, pass(idxmap)  :: lg2lv1_ins => hash_g2lv1_ins
     procedure, pass(idxmap)  :: lg2lv2_ins => hash_g2lv2_ins
 
-!!$    procedure, pass(idxmap)  :: hash_cpy
-!!$    generic, public          :: assignment(=) => hash_cpy
     procedure, pass(idxmap)  :: bld_g2l_map => hash_bld_g2l_map
 
   end type psb_hash_map
@@ -443,6 +441,8 @@ contains
   end subroutine hash_g2lv1
 
   subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_penv_mod
+    use psb_sort_mod
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
@@ -452,17 +452,120 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer(psb_ipk_) :: is, im
-    integer(psb_lpk_), allocatable :: tidx(:)
+    integer(psb_ipk_) :: i, lip, nrow, nrm, is, im
+    integer(psb_lpk_) :: ncol, ip, tlip, mglob
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_)   :: iam, np
+    logical :: owned_
     is = size(idxin)
     im = min(is,size(idxout))
-    call psb_realloc(im,tidx,info)
-    tidx(1:im) = idxin(1:im)
-    call idxmap%g2lip(tidx(1:im),info,mask,owned)
-    idxout(1:im) = tidx(1:im)
-    if (is > im) then 
-      write(0,*) 'g2lv2 err -3'
-      info = -3 
+
+
+    info = 0
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt,iam,np) 
+
+    if (present(mask)) then 
+      if (size(mask) < size(idxin)) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(owned)) then 
+      owned_ = owned
+    else
+      owned_ = .false.
+    end if
+
+    is = min(size(idxin), size(idxout))
+
+    mglob = idxmap%get_gr()
+    nrow  = idxmap%get_lr()
+    ncol  = idxmap%get_lc()
+    if (owned_) then 
+      nrm = nrow
+    else
+      nrm = ncol
+    end if
+    if (present(mask)) then 
+
+      if (idxmap%is_asb()) then 
+
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,&
+             & idxmap%hashv,idxmap%glb_lc,mask=mask, nrm=nrm)
+
+      else if (idxmap%is_valid()) then 
+
+        do i = 1, is
+          if (mask(i)) then 
+            ip = idxin(i) 
+            if ((ip < 1 ).or.(ip>mglob)) then 
+              idxout(i) = -1
+              cycle
+            endif
+            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                 & idxmap%glb_lc,nrm)
+            if (lip < 0) then 
+              call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+              lip = tlip
+            end if
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idxout(i) = lip
+              else 
+                idxout(i) = -1
+              endif
+            else
+              idxout(i) = lip
+            endif
+          end if
+        enddo
+
+      else 
+        write(0,*) 'Hash status: invalid ',idxmap%get_state()
+        idxout(1:is) = -1
+        info = -1
+      end if
+
+    else  if (.not.present(mask)) then 
+
+      if (idxmap%is_asb()) then 
+
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,&
+             & idxmap%hashv,idxmap%glb_lc,nrm=nrm)
+
+      else if (idxmap%is_valid()) then 
+
+        do i = 1, is
+          ip = idxin(i) 
+          if ((ip < 1 ).or.(ip>mglob)) then 
+            idxout(i) = -1
+            cycle
+          endif
+          call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+               & idxmap%hashv,idxmap%glb_lc,nrm)
+          if (lip < 0) then
+            call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+            lip = tlip
+          end if
+          if (owned_) then 
+            if (lip<=nrow) then 
+              idxout(i) = lip
+            else 
+              idxout(i) = -1
+            endif
+          else
+            idxout(i) = lip
+          endif
+        enddo
+
+      else 
+        write(0,*) 'Hash status: invalid ',idxmap%get_state()
+        idxout(1:is) = -1
+        info = -1
+
+      end if
+
     end if
 
   end subroutine hash_g2lv2
@@ -1501,32 +1604,6 @@ contains
 
   return
   end subroutine hash_clone
-
-
-!!$  subroutine hash_cpy(outmap,idxmap)
-!!$    use psb_penv_mod
-!!$    use psb_error_mod
-!!$    use psb_realloc_mod
-!!$    implicit none 
-!!$    class(psb_hash_map), intent(in) :: idxmap
-!!$    type(psb_hash_map), intent(out) :: outmap
-!!$    integer(psb_ipk_) :: info
-!!$
-!!$    info = psb_success_
-!!$    call idxmap%psb_indx_map%cpy(outmap%psb_indx_map,info)
-!!$    if (info == psb_success_) then 
-!!$      outmap%hashvsize    = idxmap%hashvsize
-!!$      outmap%hashvmask    = idxmap%hashvmask
-!!$    end if
-!!$    if (info == psb_success_)&
-!!$         &  call psb_safe_ab_cpy(idxmap%loc_to_glob,outmap%loc_to_glob,info)
-!!$    if (info == psb_success_)&
-!!$         &  call psb_safe_ab_cpy(idxmap%hashv,outmap%hashv,info)
-!!$    if (info == psb_success_)&
-!!$         &  call psb_safe_ab_cpy(idxmap%glb_lc,outmap%glb_lc,info)
-!!$    if (info == psb_success_)&
-!!$         &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
-!!$  end subroutine hash_cpy
 
   subroutine hash_reinit(idxmap,info)
     use psb_penv_mod

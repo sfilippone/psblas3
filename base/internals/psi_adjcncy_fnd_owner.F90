@@ -71,7 +71,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
 #endif
   integer(psb_lpk_), intent(in)   :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) :: iprc(:)
-  integer(psb_ipk_), intent(in)   :: adj(:)
+  integer(psb_ipk_), intent(inout) :: adj(:)
   class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out)  :: info
 

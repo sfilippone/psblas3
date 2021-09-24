@@ -107,7 +107,7 @@ module psb_i_comm_mod
       import
       implicit none
       type(psb_i_multivect_type), intent(inout) :: locx
-      integer(psb_ipk_), intent(out), allocatable :: globx(:)
+      integer(psb_ipk_), intent(out), allocatable :: globx(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root

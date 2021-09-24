@@ -32,8 +32,15 @@ extern "C" {
 
   typedef float  psb_s_t;
   typedef double psb_d_t;
-  typedef float  complex psb_c_t;
-  typedef double complex psb_z_t;
+
+#ifdef  __cplusplus
+   typedef std::complex<float> psb_c_t;
+   typedef std::complex<double> psb_z_t;
+#else
+   typedef float complex psb_c_t;
+   typedef float complex psb_z_t;
+#endif
+
 #define PSB_ERR_ERROR  -1
 #define PSB_ERR_SUCCESS 0
 
@@ -102,6 +109,8 @@ extern "C" {
   psb_i_t    psb_c_cd_get_local_cols(psb_c_descriptor *cd);
   psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_global_indices(psb_l_t idx[], psb_i_t nidx, bool owned, psb_c_descriptor *cd);
+  psb_i_t    psb_c_g2l(psb_c_descriptor *cdh,psb_l_t gindex,bool cowned);
+
 
   /*  legal values for upd argument */
 #define psb_upd_srch_   98764

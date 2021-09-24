@@ -592,7 +592,7 @@ subroutine  psb_c_coo_clean_zeros(a, info)
   use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_clean_zeros
   implicit none
   class(psb_c_coo_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: info
+  integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_ipk_) :: i,j,k, nzin
 
@@ -4616,7 +4616,7 @@ function psb_lc_coo_csnm1(a) result(res)
   use psb_c_base_mat_mod, psb_protect_name => psb_lc_coo_csnm1
 
   implicit none
-  class(psb_c_coo_sparse_mat), intent(in) :: a
+  class(psb_lc_coo_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
   integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
@@ -5264,7 +5264,7 @@ subroutine  psb_lc_coo_clean_zeros(a, info)
   use psb_c_base_mat_mod, psb_protect_name => psb_lc_coo_clean_zeros
   implicit none
   class(psb_lc_coo_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: info
+  integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_lpk_) :: i,j,k, nzin
 
@@ -6760,7 +6760,8 @@ subroutine psb_lc_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_sort_mod
   implicit none
 
-  integer(psb_lpk_), intent(in)           :: nr, nc, nzin, dupl
+  integer(psb_lpk_), intent(in)           :: nr, nc, nzin
+  integer(psb_ipk_), intent(in)           :: dupl
   integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
   complex(psb_spk_), intent(inout) :: val(:)
   integer(psb_lpk_), intent(out)          :: nzout

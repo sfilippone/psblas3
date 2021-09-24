@@ -93,7 +93,7 @@ module psi_s_serial_mod
       integer(psb_ipk_), intent(in)      :: m
       real(psb_spk_), intent (in)       ::  x(:)
       real(psb_spk_), intent (in)       ::  y(:)
-      real(psb_spk_), intent (in)       ::  z(:)
+      real(psb_spk_), intent (inout)    ::  z(:)
       real(psb_spk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_saxpbyv2

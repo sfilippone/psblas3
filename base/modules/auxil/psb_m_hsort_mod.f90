@@ -100,8 +100,8 @@ module psb_m_hsort_mod
     subroutine psi_m_heap_get_first(key,last,heap,dir,info)
       import 
       implicit none 
-      integer(psb_mpk_), intent(inout)  :: key
-      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_mpk_), intent(inout)   :: key
+      integer(psb_ipk_), intent(inout) :: last
       integer(psb_ipk_), intent(in)     :: dir
       integer(psb_mpk_), intent(inout)  :: heap(:)
       integer(psb_ipk_), intent(out)    :: info

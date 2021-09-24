@@ -295,7 +295,6 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,liasnd,ljasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem)
       if (info /= psb_success_) then
@@ -400,7 +399,6 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem) 
       if (info /= psb_success_) then
@@ -748,7 +746,6 @@ Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem)
       if (info /= psb_success_) then
@@ -756,7 +753,7 @@ Subroutine psb_lzsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
         call psb_errpush(info,name,a_err='psb_sp_getrow')
         goto 9999
       end if
-      tot_elem=tot_elem+n_elem
+      tot_elem=tot_elem+ngtz
     Enddo
     ipx = ipx + 1 
     counter   = counter+n_el_send+3
@@ -1104,7 +1101,6 @@ Subroutine psb_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem,jmax=ncg) 
       if (info /= psb_success_) then
@@ -1469,7 +1465,6 @@ Subroutine psb_z_lz_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem,jmax=ncg) 
       if (info /= psb_success_) then

@@ -49,7 +49,8 @@ subroutine psb_ehsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_epk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: flag_, n, i, err_act,info
+  integer(psb_epk_) :: dir_, l
   integer(psb_epk_) :: key
   integer(psb_epk_) :: index
 
@@ -159,7 +160,7 @@ end subroutine psb_ehsort
 
 !
 ! These are packaged so that they can be used to implement 
-! a heapsort, should the need arise
+! a heapsort.
 !
 !
 !   Programming note:
@@ -196,7 +197,7 @@ subroutine psi_e_insert_heap(key,last,heap,dir,info)
   !   dir:  sorting direction
 
   integer(psb_epk_), intent(in)    :: key
-  integer(psb_ipk_), intent(in)           :: dir
+  integer(psb_epk_), intent(in)           :: dir
   integer(psb_epk_), intent(inout) :: heap(:)
   integer(psb_epk_), intent(inout)        :: last
   integer(psb_ipk_), intent(out)          :: info
@@ -296,7 +297,7 @@ subroutine psi_e_heap_get_first(key,last,heap,dir,info)
 
   integer(psb_epk_), intent(inout)     :: key
   integer(psb_epk_), intent(inout)  :: last
-  integer(psb_ipk_), intent(in)     :: dir
+  integer(psb_epk_), intent(in)     :: dir
   integer(psb_epk_), intent(inout)     :: heap(:)
   integer(psb_ipk_), intent(out)    :: info
 
@@ -428,9 +429,9 @@ subroutine psi_e_idx_insert_heap(key,index,last,heap,idxs,dir,info)
   !   dir:  sorting direction
 
   integer(psb_epk_), intent(in)       :: key
-  integer(psb_ipk_), intent(in)     :: index,dir
+  integer(psb_epk_), intent(in)     :: index,dir
   integer(psb_epk_), intent(inout)    :: heap(:)
-  integer(psb_ipk_), intent(inout)  :: idxs(:),last
+  integer(psb_epk_), intent(inout)  :: idxs(:),last
   integer(psb_ipk_), intent(out)    :: info
   integer(psb_ipk_) :: i, i2, itemp
   integer(psb_epk_)   :: temp 
@@ -540,11 +541,12 @@ subroutine psi_e_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   use psb_sort_mod, psb_protect_name => psi_e_idx_heap_get_first
   implicit none 
 
+  integer(psb_epk_), intent(inout)    :: key
   integer(psb_epk_), intent(inout)    :: heap(:)
-  integer(psb_ipk_), intent(out)    :: index,info
-  integer(psb_ipk_), intent(inout)  :: last,idxs(:)
-  integer(psb_ipk_), intent(in)     :: dir
-  integer(psb_epk_), intent(out)      :: key
+  integer(psb_epk_), intent(out)    :: index
+  integer(psb_ipk_), intent(out)    :: info
+  integer(psb_epk_), intent(inout)  :: last,idxs(:)
+  integer(psb_epk_), intent(in)     :: dir
 
   integer(psb_ipk_) :: i, j,itemp
   integer(psb_epk_)   :: temp

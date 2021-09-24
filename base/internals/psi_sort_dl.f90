@@ -84,9 +84,10 @@ subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ctxt,info)
   use psb_sort_mod
   implicit none
   
-  integer(psb_ipk_), intent(inout) :: c_dep_list(:), dl_ptr(0:), l_dep_list(0:)
+  integer(psb_ipk_), intent(in)    :: dl_ptr(0:)
+  integer(psb_ipk_), intent(inout) :: c_dep_list(:), l_dep_list(0:)
   type(psb_ctxt_type), intent(in)  :: ctxt
-    integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   ! Local variables
   integer(psb_ipk_), allocatable  ::  dg(:), dgp(:),&
        &  idx(:), upd(:), edges(:,:), ich(:)

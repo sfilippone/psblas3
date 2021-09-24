@@ -87,10 +87,10 @@ module psi_i_mod
     subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ctxt,info)
       import
       implicit none 
-      integer(psb_ipk_), intent(in) :: c_dep_list(:), dl_ptr(0:)
-      integer(psb_ipk_), intent(inout) :: l_dep_list(0:)
-      type(psb_ctxt_type) :: ctxt
-      integer(psb_ipk_) :: info
+      integer(psb_ipk_), intent(in) :: dl_ptr(0:)
+      integer(psb_ipk_), intent(inout)  :: c_dep_list(:), l_dep_list(0:)
+      type(psb_ctxt_type), intent(in) :: ctxt
+      integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_csr_sort_dl
   end interface
 

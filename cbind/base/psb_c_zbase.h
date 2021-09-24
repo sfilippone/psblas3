@@ -55,6 +55,8 @@ psb_i_t		 psb_c_zcopy_mat(psb_c_zspmat *ah,psb_c_zspmat *bh,psb_c_descriptor *cd
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
 psb_i_t    psb_c_zsprn(psb_c_zspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_zmat_name_print(psb_c_zspmat *mh, char *name);
+psb_i_t		 psb_c_zvect_set_scal(psb_c_zvector *xh, psb_z_t val);
+psb_i_t		 psb_c_zvect_set_vect(psb_c_zvector *xh, psb_z_t *val, psb_i_t n);
 
 /* psblas computational routines */
 psb_z_t psb_c_zgedot(psb_c_zvector *xh, psb_c_zvector *yh, psb_c_descriptor *cdh);
