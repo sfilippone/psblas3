@@ -982,9 +982,26 @@ contains
     !if ((ctxt /= mpi_comm_null).and.(ctxt /= mpi_comm_world)) then
     if (allocated(ctxt%ctxt)) then
       !write(0,*) ctxt%ctxt,mpi_comm_world,mpi_comm_null
-      if ((ctxt%ctxt /= mpi_comm_world).and.(ctxt%ctxt /= mpi_comm_null)) call mpi_comm_Free(ctxt%ctxt,info)
+      if ((ctxt%ctxt /= mpi_comm_world).and.(ctxt%ctxt /= mpi_comm_null)) &
+           & call mpi_comm_Free(ctxt%ctxt,info)
     end if
-
+    if (close_) then 
+      if (info == 0) call mpi_op_free(mpi_mamx_op,info)
+      if (info == 0) call mpi_op_free(mpi_mamn_op,info)
+      if (info == 0) call mpi_op_free(mpi_eamx_op,info)
+      if (info == 0) call mpi_op_free(mpi_eamn_op,info)
+      if (info == 0) call mpi_op_free(mpi_samx_op,info)
+      if (info == 0) call mpi_op_free(mpi_samn_op,info)
+      if (info == 0) call mpi_op_free(mpi_damx_op,info)
+      if (info == 0) call mpi_op_free(mpi_damn_op,info)
+      if (info == 0) call mpi_op_free(mpi_camx_op,info)
+      if (info == 0) call mpi_op_free(mpi_camn_op,info)
+      if (info == 0) call mpi_op_free(mpi_zamx_op,info)
+      if (info == 0) call mpi_op_free(mpi_zamn_op,info)
+      if (info == 0) call mpi_op_free(mpi_snrm2_op,info)
+      if (info == 0) call mpi_op_free(mpi_dnrm2_op,info)
+    end if
+    
     if (close_) call mpi_finalize(info)
 
 #endif
