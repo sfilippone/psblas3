@@ -101,24 +101,24 @@ module psb_const_mod
   integer, parameter  :: psb_lpk_ = -1
 #endif
 
-  integer(psb_ipk_), save      :: psb_sizeof_sp
-  integer(psb_ipk_), save      :: psb_sizeof_dp
-  integer(psb_ipk_), save      :: psb_sizeof_i2p = 2
-  integer(psb_ipk_), save      :: psb_sizeof_mp  = 4
-  integer(psb_ipk_), save      :: psb_sizeof_ep  = 8
+  integer(psb_mpk_), save      :: psb_sizeof_sp
+  integer(psb_mpk_), save      :: psb_sizeof_dp
+  integer(psb_mpk_), save      :: psb_sizeof_i2p = 2
+  integer(psb_mpk_), save      :: psb_sizeof_mp  = 4
+  integer(psb_mpk_), save      :: psb_sizeof_ep  = 8
 
 #if defined(IPK4) && defined(LPK4)
-  integer(psb_ipk_), save      :: psb_sizeof_ip = 4
-  integer(psb_ipk_), save      :: psb_sizeof_lp = 4
+  integer(psb_mpk_), save      :: psb_sizeof_ip = 4
+  integer(psb_mpk_), save      :: psb_sizeof_lp = 4
 #elif  defined(IPK4) && defined(LPK8)
-  integer(psb_ipk_), save      :: psb_sizeof_ip = 4
-  integer(psb_ipk_), save      :: psb_sizeof_lp = 8
+  integer(psb_mpk_), save      :: psb_sizeof_ip = 4
+  integer(psb_mpk_), save      :: psb_sizeof_lp = 8
 #elif  defined(IPK8) && defined(LPK8)
-  integer(psb_ipk_), save      :: psb_sizeof_ip = 8
-  integer(psb_ipk_), save      :: psb_sizeof_lp = 8
+  integer(psb_mpk_), save      :: psb_sizeof_ip = 8
+  integer(psb_mpk_), save      :: psb_sizeof_lp = 8
 #else
-  integer(psb_ipk_), save      :: psb_sizeof_ip = -1
-  integer(psb_ipk_), save      :: psb_sizeof_lp = -1
+  integer(psb_mpk_), save      :: psb_sizeof_ip = -1
+  integer(psb_mpk_), save      :: psb_sizeof_lp = -1
 #endif
 
   !

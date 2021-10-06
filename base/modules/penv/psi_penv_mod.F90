@@ -696,21 +696,32 @@ contains
 
   subroutine psi_get_sizes()
     use psb_const_mod
-    real(psb_dpk_) :: dv(2) 
-    real(psb_spk_) :: sv(2) 
-    integer(psb_i2pk_):: i2v(2)
-    integer(psb_mpk_) :: mv(2)
-    integer(psb_ipk_) :: iv(2)
-    integer(psb_lpk_) :: lv(2)
-    integer(psb_epk_) :: ev(2)
-
-    call psi_c_diffadd(sv(1),sv(2),psb_sizeof_sp)
-    call psi_c_diffadd(dv(1),dv(2),psb_sizeof_dp)
-    call psi_c_diffadd(i2v(1),i2v(2),psb_sizeof_i2p)
-    call psi_c_diffadd(mv(1),mv(2),psb_sizeof_mp)
-    call psi_c_diffadd(iv(1),iv(2),psb_sizeof_ip)
-    call psi_c_diffadd(lv(1),lv(2),psb_sizeof_lp)
-    call psi_c_diffadd(ev(1),ev(2),psb_sizeof_ep)
+    use iso_c_binding
+    
+    real(psb_dpk_), target     :: dv(2) 
+    real(psb_spk_), target     :: sv(2) 
+    integer(psb_i2pk_), target :: i2v(2)
+    integer(psb_mpk_), target  :: mv(2)
+    integer(psb_ipk_), target  :: iv(2)
+    integer(psb_lpk_), target  :: lv(2)
+    integer(psb_epk_), target  :: ev(2)
+    interface
+      subroutine psi_c_diffadd(p1, p2, val) &
+           & bind(c,name="psi_c_diffadd")
+        use iso_c_binding
+        import :: psb_mpk_
+        type(c_ptr), value :: p1, p2
+        integer(psb_mpk_) :: val
+      end subroutine psi_c_diffadd
+    end interface
+    
+    call psi_c_diffadd(c_loc(sv(1)),c_loc(sv(2)),psb_sizeof_sp)
+    call psi_c_diffadd(c_loc(dv(1)),c_loc(dv(2)),psb_sizeof_dp)
+    call psi_c_diffadd(c_loc(i2v(1)),c_loc(i2v(2)),psb_sizeof_i2p)
+    call psi_c_diffadd(c_loc(mv(1)),c_loc(mv(2)),psb_sizeof_mp)
+    call psi_c_diffadd(c_loc(iv(1)),c_loc(iv(2)),psb_sizeof_ip)
+    call psi_c_diffadd(c_loc(lv(1)),c_loc(lv(2)),psb_sizeof_lp)
+    call psi_c_diffadd(c_loc(ev(1)),c_loc(ev(2)),psb_sizeof_ep)
 
   end subroutine psi_get_sizes
 
