@@ -681,7 +681,7 @@ module psb_d_mat_mod
 
   interface
     subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -692,7 +692,7 @@ module psb_d_mat_mod
       logical, intent(in), optional        :: append
       integer(psb_ipk_), intent(in), optional        :: iren(:)
       integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale,chksz
+      logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_d_csgetrow
   end interface
 
@@ -947,8 +947,8 @@ module psb_d_mat_mod
   interface
     subroutine psb_d_cp_from_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ld_base_sparse_mat
-      class(psb_dspmat_type), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
+      class(psb_dspmat_type), intent(out) :: a
+      class(psb_ld_base_sparse_mat), intent(in) :: b
     end subroutine psb_d_cp_from_lb
   end interface
 
@@ -1731,8 +1731,8 @@ module psb_d_mat_mod
   interface
     subroutine psb_ld_cp_from_ib(a,b)
       import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_ldspmat_type), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
+      class(psb_ldspmat_type), intent(out) :: a
+      class(psb_d_base_sparse_mat), intent(in) :: b
     end subroutine psb_ld_cp_from_ib
   end interface
 

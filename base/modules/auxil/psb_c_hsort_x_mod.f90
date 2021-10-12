@@ -45,8 +45,7 @@ module psb_c_hsort_x_mod
   use psb_c_hsort_mod
 
   type psb_c_heap
-    integer(psb_ipk_) :: dir
-    integer(psb_ipk_) :: last    
+    integer(psb_ipk_) :: last, dir
     complex(psb_spk_), allocatable    :: keys(:)
   contains
     procedure, pass(heap) :: init       => psb_c_init_heap
@@ -58,8 +57,7 @@ module psb_c_hsort_x_mod
   end type psb_c_heap
 
   type psb_c_idx_heap
-    integer(psb_ipk_) :: dir
-    integer(psb_ipk_) :: last
+    integer(psb_ipk_) :: last, dir
     complex(psb_spk_), allocatable    :: keys(:)
     integer(psb_ipk_), allocatable :: idxs(:)
   contains
@@ -123,7 +121,7 @@ contains
       return
     endif
 
-    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=(1_psb_ipk_)*psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
       info = -5
@@ -236,9 +234,9 @@ contains
       return
     endif
 
-    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=(1_psb_ipk_)*psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
     if (info == psb_success_) &
-         & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=(1_psb_ipk_)*psb_heap_resize)
+         & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
       info = -5
@@ -256,7 +254,7 @@ contains
     class(psb_c_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)       :: index
     integer(psb_ipk_), intent(out)       :: info
-    complex(psb_spk_), intent(inout)       :: key
+    complex(psb_spk_), intent(out)           :: key
 
 
     info = psb_success_

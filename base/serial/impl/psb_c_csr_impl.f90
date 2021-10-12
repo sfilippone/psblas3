@@ -3235,7 +3235,7 @@ subroutine  psb_c_csr_clean_zeros(a, info)
   use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_clean_zeros
   implicit none
   class(psb_c_csr_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_) :: info
   !
   integer(psb_ipk_) :: i, j, k, nr
   integer(psb_ipk_), allocatable :: ilrp(:)
@@ -5350,7 +5350,7 @@ subroutine  psb_lc_csr_clean_zeros(a, info)
   use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_clean_zeros
   implicit none
   class(psb_lc_csr_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_) :: info
   !
   integer(psb_lpk_) :: i, j, k, nr
   integer(psb_lpk_), allocatable :: ilrp(:)

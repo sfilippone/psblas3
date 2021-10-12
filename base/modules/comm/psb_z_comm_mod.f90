@@ -138,7 +138,7 @@ module psb_z_comm_mod
       import
       implicit none
       type(psb_z_multivect_type), intent(inout) :: locx
-      complex(psb_dpk_), intent(out), allocatable :: globx(:,:)
+      complex(psb_dpk_), intent(out), allocatable :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root

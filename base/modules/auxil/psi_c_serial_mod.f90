@@ -93,7 +93,7 @@ module psi_c_serial_mod
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_spk_), intent (in)       ::  x(:)
       complex(psb_spk_), intent (in)       ::  y(:)
-      complex(psb_spk_), intent (inout)    ::  z(:)
+      complex(psb_spk_), intent (in)       ::  z(:)
       complex(psb_spk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_caxpbyv2

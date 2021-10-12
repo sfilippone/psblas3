@@ -681,7 +681,7 @@ module psb_z_mat_mod
 
   interface
     subroutine psb_z_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -692,7 +692,7 @@ module psb_z_mat_mod
       logical, intent(in), optional        :: append
       integer(psb_ipk_), intent(in), optional        :: iren(:)
       integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale,chksz
+      logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_z_csgetrow
   end interface
 
@@ -947,8 +947,8 @@ module psb_z_mat_mod
   interface
     subroutine psb_z_cp_from_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_, psb_lz_base_sparse_mat
-      class(psb_zspmat_type), intent(inout) :: a
-      class(psb_lz_base_sparse_mat), intent(inout) :: b
+      class(psb_zspmat_type), intent(out) :: a
+      class(psb_lz_base_sparse_mat), intent(in) :: b
     end subroutine psb_z_cp_from_lb
   end interface
 
@@ -1731,8 +1731,8 @@ module psb_z_mat_mod
   interface
     subroutine psb_lz_cp_from_ib(a,b)
       import :: psb_ipk_, psb_lpk_, psb_lzspmat_type, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_lzspmat_type), intent(inout) :: a
-      class(psb_z_base_sparse_mat), intent(inout) :: b
+      class(psb_lzspmat_type), intent(out) :: a
+      class(psb_z_base_sparse_mat), intent(in) :: b
     end subroutine psb_lz_cp_from_ib
   end interface
 

@@ -157,52 +157,5 @@ contains
 
   end function psb_c_smat_name_print
 
-  function psb_c_svect_set_scal(x,val) bind(c) result(info)
-    use psb_base_mod
-    implicit none
-
-    type(psb_c_svector) :: x
-    type(psb_s_vect_type), pointer :: xp
-    integer(psb_c_ipk_) :: info
-    real(c_float), value :: val
-
-    info = -1;
-
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    call xp%set(val)
-
-    info = 0
-
-  end function psb_c_svect_set_scal
-
-  function psb_c_svect_set_vect(x,val,n) bind(c) result(info)
-    use psb_base_mod
-    implicit none
-
-    type(psb_c_svector) :: x
-    type(psb_s_vect_type), pointer :: xp
-    integer(psb_c_ipk_) :: info
-    integer(psb_c_ipk_), value :: n
-    real(c_float)    :: val(*)
-
-    info = -1;
-
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    call xp%set(val(1:n))
-
-    info = 0
-
-  end function psb_c_svect_set_vect
-
 
 end module psb_s_serial_cbind_mod

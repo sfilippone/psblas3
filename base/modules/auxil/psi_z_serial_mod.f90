@@ -93,7 +93,7 @@ module psi_z_serial_mod
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_dpk_), intent (in)       ::  x(:)
       complex(psb_dpk_), intent (in)       ::  y(:)
-      complex(psb_dpk_), intent (inout)    ::  z(:)
+      complex(psb_dpk_), intent (in)       ::  z(:)
       complex(psb_dpk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_zaxpbyv2

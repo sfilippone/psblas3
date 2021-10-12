@@ -64,7 +64,7 @@ subroutine  psb_sgather_vect(globx, locx, desc_a, info, iroot)
   real(psb_spk_), allocatable :: llocx(:)
   character(len=20)        :: name, ch_err
 
-  name='psb_sgatherv'
+  name='psb_cgatherv'
   info=psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
@@ -182,7 +182,7 @@ subroutine  psb_sgather_multivect(globx, locx, desc_a, info, iroot)
   real(psb_spk_), allocatable :: llocx(:,:)
   character(len=20)        :: name, ch_err
 
-  name='psb_sgatherv'
+  name='psb_cgatherv'
   info=psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then

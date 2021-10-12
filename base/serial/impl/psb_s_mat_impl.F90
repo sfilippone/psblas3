@@ -820,8 +820,7 @@ subroutine psb_s_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
 
   call a%a%csget(imin,imax,nz,ia,ja,info,&
-       & jmin=jmin,jmax=jmax,iren=iren,append=append,nzin=nzin,&
-       & rscale=rscale,cscale=cscale)
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -867,10 +866,9 @@ subroutine psb_s_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     goto 9999
   endif
 
-  call a%a%csget(imin,imax,nz,ia,ja,val,info,&
-       & jmin=jmin,jmax=jmax,iren=iren,append=append,nzin=nzin,&
-       & rscale=rscale,cscale=cscale,chksz=chksz)
 
+  call a%a%csget(imin,imax,nz,ia,ja,val,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -931,9 +929,8 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
   end if
 
   if (info == psb_success_) then
-  call a%a%csget(imin,imax,acoo,info,&
-       & jmin=jmin,jmax=jmax,iren=iren,append=append,&
-       & rscale=rscale,cscale=cscale)
+    call a%a%csget(imin,imax,acoo,info,&
+         & jmin,jmax,iren,append,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
