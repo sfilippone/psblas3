@@ -664,6 +664,7 @@ BASEMODNAME
 CDEFINES
 FDEFINES
 LAPACK_LIBS
+OPENMP_CXXFLAGS
 OPENMP_CFLAGS
 OPENMP_FCFLAGS
 EGREP
@@ -745,6 +746,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -852,6 +854,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1104,6 +1107,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1241,7 +1253,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1394,6 +1406,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -7913,6 +7926,85 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+   ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+  OPENMP_CXXFLAGS=
+  # Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then :
+  enableval=$enable_openmp;
+fi
+
+  if test "$enable_openmp" != no; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CXX option to support OpenMP" >&5
+$as_echo_n "checking for $CXX option to support OpenMP... " >&6; }
+if ${ac_cv_prog_cxx_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENMP
+ choke me
+#endif
+#include <omp.h>
+int main () { return omp_get_num_threads (); }
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_prog_cxx_openmp='none needed'
+else
+  ac_cv_prog_cxx_openmp='unsupported'
+	  	  	  	  	  	  	                                	  	  	  	  	  	  for ac_option in -fopenmp -xopenmp -openmp -mp -omp -qsmp=omp -homp \
+                           -Popenmp --openmp; do
+	    ac_save_CXXFLAGS=$CXXFLAGS
+	    CXXFLAGS="$CXXFLAGS $ac_option"
+	    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENMP
+ choke me
+#endif
+#include <omp.h>
+int main () { return omp_get_num_threads (); }
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_prog_cxx_openmp=$ac_option
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	    CXXFLAGS=$ac_save_CXXFLAGS
+	    if test "$ac_cv_prog_cxx_openmp" != unsupported; then
+	      break
+	    fi
+	  done
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_openmp" >&5
+$as_echo "$ac_cv_prog_cxx_openmp" >&6; }
+    case $ac_cv_prog_cxx_openmp in #(
+      "none needed" | unsupported)
+	;; #(
+      *)
+	OPENMP_CXXFLAGS=$ac_cv_prog_cxx_openmp ;;
+    esac
+  fi
+
+
+   pac_cv_openmp_cxxopt="$OPENMP_CXXFLAGS";
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 else
  pac_cv_openmp="no";
  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no." >&5
@@ -7925,6 +8017,7 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    CDEFINES="-DOPENMP $CDEFINES";
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+   CXXOPT="$CXXOPT $pac_cv_openmp_ccopt";
    FLINK="$FLINK $pac_cv_openmp_fcopt";
 fi
 #
@@ -11821,7 +11914,9 @@ $as_echo X/"$am_mf" |
     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Something went wrong bootstrapping makefile fragments
-    for automatic dependency tracking.  Try re-running configure with the
+    for automatic dependency tracking.  If GNU make was not used, consider
+    re-running the configure script with MAKE=\"gmake\" (or whatever is
+    necessary).  You can also try re-running configure with the
     '--disable-dependency-tracking' option to at least be able to build
     the package (albeit without support for automatic dependency tracking).
 See \`config.log' for more details" "$LINENO" 5; }

@@ -395,6 +395,10 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    AC_OPENMP() 
    pac_cv_openmp_ccopt="$OPENMP_CFLAGS";
    AC_LANG_POP()
+   AC_LANG_PUSH([C++])
+   AC_OPENMP() 
+   pac_cv_openmp_cxxopt="$OPENMP_CXXFLAGS";
+   AC_LANG_POP()
 else
  pac_cv_openmp="no";
  AC_MSG_RESULT([no.])

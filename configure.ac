@@ -546,6 +546,7 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    CDEFINES="-DOPENMP $CDEFINES";	
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+   CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";	
    FLINK="$FLINK $pac_cv_openmp_fcopt";
 fi
 #
