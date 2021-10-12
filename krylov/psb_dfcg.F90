@@ -135,6 +135,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
   character(len=*), parameter :: methdname='FCG'
+  logical, parameter :: debug = .false. 
 
 
   info = psb_success_
@@ -210,7 +211,10 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   itx = 0 
 
   restart: do 
-    if (itx>= itmax_) exit restart 
+    if (itx>= itmax_) then
+      if (debug.and.(me==0)) write(0,*) name,' Exit on  itmax '
+      exit restart
+    end if
 
     ! r=b -Ax
     call psb_geaxpby(done,b,dzero,r, desc_a,info)
@@ -222,7 +226,10 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     end if
     
 
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) then
+      if (debug.and.(me==0)) write(0,*) name,' Exit on  convergence from restart'
+      exit restart
+    end if
 
 
     ! Apply the preconditioner v=Pr
@@ -244,6 +251,13 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
     alpha = vres(1)
     beta  = vres(2)
+    if (debug.and.(me==0)) then
+      write(0,*) name,' restart AB',itx, alpha, beta
+    end if
+    if (beta == dzero) then 
+      if (debug.and.(me==0)) write(0,*) name,' Exit on  beta=0 from restart'
+      exit restart
+    end if
 
     ! d = v
     call psb_geaxpby(done, v, dzero, d, desc_a, info)   
@@ -254,17 +268,24 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     ! then 
     ! x = x + (alpha/delta)*d
     ! r = r - (alpha/delta)*q
-
+    ! DELTA==0 here would have been caught earlier
     delta = beta
     theta = alpha/delta
     call psb_geaxpby(theta, d, done, x, desc_a, info)   
     call psb_geaxpby(-theta, q, done, r, desc_a, info)   
 
+    if (debug.and.(me==0)) then
+      write(0,*) name,' restart DT',itx, delta, theta
+    end if
+
     iteration: do 
 
       itx = itx + 1
 
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) then
+        if (debug.and.(me==0)) write(0,*) name,' Exit on  convergence from iteration'
+        exit restart
+      end if
 
       ! Apply the preconditioner v = Pr
       ! Compute w = Av  
@@ -284,9 +305,10 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
       alpha = vres(1)
       beta  = vres(2)
       gamma = vres(3)
-
+    
       ! Compute d = v-(gamma/delta)*d
       !         q = w-(gamma/delta)*q
+      ! DELTA==0 here would have been caught earlier
       theta= gamma/delta
       call psb_geaxpby(done, v, -theta, d, desc_a, info)   
       call psb_geaxpby(done, w, -theta, q , desc_a, info)   
@@ -294,10 +316,17 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
       ! update delta
       delta = beta - (gamma*gamma)/delta
 
+      if (delta == dzero) then 
+        if (debug.and.(me==0)) write(0,*) name,' Exit on  delta=0 from iteration'
+        exit iteration
+      end if
       ! update u and r      
       ! u = u + (alpha/delta)*d
       ! r = r - (alpha/delta)*q
       theta= alpha/delta
+      if (debug.and.(me==0)) then
+        write(0,*) name,'  iteration ',itx, alpha,beta,gamma,delta,theta
+      end if
       call psb_geaxpby(theta, d, done, x, desc_a, info)   
       call psb_geaxpby(-theta, q, done, r, desc_a, info)   
 
