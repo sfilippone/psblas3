@@ -746,7 +746,8 @@ contains
               if (info >=0) then 
                 if (nxt == lip) then 
                   ncol = max(nxt,ncol)
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&

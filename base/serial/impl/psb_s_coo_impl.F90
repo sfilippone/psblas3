@@ -6121,7 +6121,6 @@ subroutine psb_ls_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz == 0) return
 
-
   nza  = a%get_nzeros()
   isza = a%get_size()
   if (a%is_bld()) then

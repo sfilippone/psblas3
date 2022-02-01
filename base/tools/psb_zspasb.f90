@@ -111,7 +111,15 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
     call a%set_ncols(n_col)
   end if
 
-  if (a%is_bld()) then 
+  if (a%is_bld()) then
+
+    select case(a%remote_build)
+    case (psb_matbld_noremote_)
+      !  nothing needed
+    case (psb_matbld_remote_)
+      write(0,*) 'Need to implement data movement! '
+    end select
+    
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
   else if (a%is_upd()) then 
     call a%asb(mold=mold)

@@ -429,7 +429,8 @@ contains
     end select
 
 
-    if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
+    if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz, &
+         & bldmode=psb_matbld_remote_)
     ! define  rhs from boundary conditions; also build initial guess
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info)

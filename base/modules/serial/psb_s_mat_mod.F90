@@ -85,6 +85,8 @@ module psb_s_mat_mod
   type :: psb_sspmat_type
 
     class(psb_s_base_sparse_mat), allocatable  :: a
+    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    class(psb_ls_base_sparse_mat), allocatable  :: rmta
 
   contains
     ! Getters

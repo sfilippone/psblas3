@@ -675,7 +675,12 @@ subroutine  psb_z_free(a)
     call a%a%free()
     deallocate(a%a)
   endif
-
+  if (allocated(a%rmta)) then
+    call a%rmta%free()
+    deallocate(a%rmta)
+  end if
+  a%remote_build = psb_matbld_noremote_
+  
 end subroutine psb_z_free
 
 
