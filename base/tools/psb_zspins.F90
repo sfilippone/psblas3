@@ -157,20 +157,22 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
           ! Do nothing
         case (psb_matbld_remote_)
           nnl = count(ila(1:nz)<0)
-          allocate(lila(nnl),ljla(nnl),lval(nnl))
-          k = 0
-          do i=1,nz
-            if (ila(i)<0) then
-              k=k+1
-              lila(k) = ia(k)
-              ljla(k) = ja(k)
-              lval(k) = val(k)
-            end if
-          end do
-          if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
-          call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
-               & 1_psb_lpk_,desc_a%get_global_rows(),info)
-          
+          if (nnl > 0) then 
+            write(0,*) 'Check on insert ',nnl
+            allocate(lila(nnl),ljla(nnl),lval(nnl))
+            k = 0
+            do i=1,nz
+              if (ila(i)<0) then
+                k=k+1
+                lila(k) = ia(k)
+                ljla(k) = ja(k)
+                lval(k) = val(k)
+              end if
+            end do
+            if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
+            call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+                 & 1_psb_lpk_,desc_a%get_global_rows(),info)
+          end if
         case default
           write(0,*) name,' Ignoring wrong value for %remote_build'
         end select

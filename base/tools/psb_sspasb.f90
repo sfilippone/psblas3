@@ -117,7 +117,7 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
     case (psb_matbld_noremote_)
       !  nothing needed
     case (psb_matbld_remote_)
-      write(0,*) 'Need to implement data movement! '
+      write(0,*) me,' Size of rmta:',a%rmta%get_nzeros()
     end select
     
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)

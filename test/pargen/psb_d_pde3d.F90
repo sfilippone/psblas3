@@ -208,7 +208,7 @@ contains
     type(psb_d_coo_sparse_mat)  :: acoo
     type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_, mysz
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
@@ -378,6 +378,30 @@ contains
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
 
       !
+      !  Add extra rows 
+      !
+      block
+        integer(psb_ipk_) :: ks
+        mysz = nlr
+        if (m>nlr) mysz = mysz + m/nlr
+        call psb_realloc(mysz,myidx,info)
+        ks = nlr
+        outer: do i=1,idim
+          do j=1,idim
+            do k=1,idim
+              if (outside(i,j,k,bndx,bndy,bndz,iamx,iamy,iamz)) then 
+                ks = ks + 1
+                if (ks > mysz) exit outer
+                call ijk2idx(myidx(ks),i,j,k,idim,idim,idim)
+              end if
+            end do
+          end do
+        end do outer
+        write(0,*) iam,' Check on extra nodes ',nlr,mysz,':',myidx(nlr+1:mysz)
+        
+      end block
+      
+      !
       ! Specify process topology
       !
       block
@@ -463,8 +487,9 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    do ii=1, nlr,nb
-      ib = min(nb,nlr-ii+1)
+    do ii=1, mysz, nb
+      !ib = min(nb,nlr-ii+1)
+      ib = min(nb,mysz-ii+1)
       icoeff = 1
       do k=1,ib
         i=ii+k-1
@@ -616,8 +641,15 @@ contains
 
     return
   end subroutine psb_d_gen_pde3d
+  function outside(i,j,k,bndx,bndy,bndz,iamx,iamy,iamz) result(res)
+    logical :: res
+    integer(psb_ipk_), intent(in) :: i,j,k,iamx,iamy,iamz
+    integer(psb_ipk_), intent(in) :: bndx(0:),bndy(0:),bndz(0:)
 
-
+    res = (i<bndx(iamx)).or.(i>=bndx(iamx+1)) &
+         & .or.(j<bndy(iamy)).or.(j>=bndy(iamy+1)) &
+         & .or.(k<bndz(iamz)).or.(k>=bndz(iamz+1))
+  end function outside
 end module psb_d_pde3d_mod
 
 program psb_d_pde3d
