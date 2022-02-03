@@ -158,7 +158,7 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         case (psb_matbld_remote_)
           nnl = count(ila(1:nz)<0)
           if (nnl > 0) then 
-            write(0,*) 'Check on insert ',nnl
+            !write(0,*) 'Check on insert ',nnl
             allocate(lila(nnl),ljla(nnl),lval(nnl))
             k = 0
             do i=1,nz
@@ -198,8 +198,9 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       ila(1:nz) = ia(1:nz)
       jla(1:nz) = ja(1:nz)
     else
-      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info)
-      if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
+      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+      if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info,&
+           & mask=(ila(1:nz)>0))
     end if
     call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
     if (info /= psb_success_) then
@@ -207,6 +208,31 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       call psb_errpush(info,name,a_err='a%csput')
       goto 9999
     end if
+    select case(a%remote_build)
+    case (psb_matbld_noremote_)
+      ! Do nothing
+    case (psb_matbld_remote_)
+      nnl = count(ila(1:nz)<0)
+      if (nnl > 0) then 
+        !write(0,*) 'Check on insert ',nnl
+        allocate(lila(nnl),ljla(nnl),lval(nnl))
+        k = 0
+        do i=1,nz
+          if (ila(i)<0) then
+            k=k+1
+            lila(k) = ia(k)
+            ljla(k) = ja(k)
+            lval(k) = val(k)
+          end if
+        end do
+        if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
+        call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+             & 1_psb_lpk_,desc_a%get_global_rows(),info)
+      end if
+    case default
+      write(0,*) name,' Ignoring wrong value for %remote_build'
+    end select
+    
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)

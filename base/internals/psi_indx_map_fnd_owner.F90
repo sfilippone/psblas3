@@ -72,7 +72,7 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), intent(out)     :: info
 
 
-  integer(psb_ipk_), allocatable :: hhidx(:)
+  integer(psb_ipk_), allocatable :: hhidx(:), ladj(:) 
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i, err_act, hsize
   integer(psb_lpk_) :: nv
@@ -183,7 +183,7 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
             tidx(k2) = idx(k1)
           end if
         end do
-        call psi_graph_fnd_owner(tidx,tprc,idxmap,info)
+        call psi_graph_fnd_owner(tidx,tprc,ladj,idxmap,info)
         k2  = 0
         do k1 = 1, nv
           if (iprc(k1) < 0) then
@@ -198,10 +198,10 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
         end do
       end block
     else      
-      call psi_graph_fnd_owner(idx,iprc,idxmap,info)
+      call psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
     end if
-
-
+    call idxmap%xtnd_p_adjcncy(ladj)
+    
   end if
   
   if (gettime) then 

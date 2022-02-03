@@ -124,7 +124,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz, bldmode)
     write(0,*) name,' matbld_noremote_   nothing needed'
   case (psb_matbld_remote_)
     write(0,*) name,' matbld_remote_  start '
-    allocate(psb_ls_coo_sparse_mat :: a%rmta)
+    allocate(a%rmta)
     nnzrmt_ = max(100,(nnz_/100))
     call a%rmta%allocate(m,n,nnzrmt_)
       

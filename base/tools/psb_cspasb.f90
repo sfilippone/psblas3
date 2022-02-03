@@ -50,13 +50,14 @@
 !
 subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
   use psb_base_mod, psb_protect_name => psb_cspasb
+  use psb_sort_mod
   use psi_mod
   implicit none
 
 
   !...Parameters....
   type(psb_cspmat_type), intent (inout)  :: a
-  type(psb_desc_type), intent(in)         :: desc_a
+  type(psb_desc_type), intent(inout)       :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_),optional, intent(in)            :: dupl, upd
   character(len=*), optional, intent(in)         :: afmt
@@ -117,7 +118,14 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
     case (psb_matbld_noremote_)
       !  nothing needed
     case (psb_matbld_remote_)
-      write(0,*) me,' Size of rmta:',a%rmta%get_nzeros()
+      write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
+      block
+        type(psb_lc_coo_sparse_mat) :: a_add
+
+        call psb_remote_mat(a%rmta,desc_a,a_add,info)
+        
+      end block
+
     end select
     
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)

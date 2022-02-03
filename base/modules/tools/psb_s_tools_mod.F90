@@ -254,7 +254,7 @@ Module psb_s_tools_mod
       import
       implicit none
       type(psb_sspmat_type), intent (inout)   :: a
-      type(psb_desc_type), intent(in)         :: desc_a
+      type(psb_desc_type), intent(inout)        :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
       integer(psb_ipk_),optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
@@ -262,6 +262,17 @@ Module psb_s_tools_mod
     end subroutine psb_sspasb
   end interface
 
+  interface psb_remote_mat
+    subroutine psb_ls_remote_mat(a,desc_a,b, info)
+      import
+      implicit none
+      type(psb_ls_coo_sparse_mat),Intent(inout) :: a
+      type(psb_desc_type),intent(inout)         :: desc_a
+      type(psb_ls_coo_sparse_mat),Intent(inout) :: b
+      integer(psb_ipk_), intent(out)                    :: info
+    end subroutine psb_ls_remote_mat
+  end interface psb_remote_mat
+  
   interface psb_spfree
     subroutine psb_sspfree(a, desc_a,info)
       import

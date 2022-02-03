@@ -303,11 +303,12 @@ module psb_indx_map_mod
   end interface
 
   interface 
-    subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in)      :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  ladj(:)
       class(psb_indx_map), intent(inout) :: idxmap
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_graph_fnd_owner
