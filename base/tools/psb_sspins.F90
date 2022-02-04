@@ -164,9 +164,9 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
             do i=1,nz
               if (ila(i)<0) then
                 k=k+1
-                lila(k) = ia(k)
-                ljla(k) = ja(k)
-                lval(k) = val(k)
+                lila(k) = ia(i)
+                ljla(k) = ja(i)
+                lval(k) = val(i)
               end if
             end do
             if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl

@@ -679,9 +679,9 @@ contains
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
-        call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=amold)
+        call psb_spasb(a,desc_a,info,dupl=psb_dupl_add_,mold=amold)
       else
-        call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+        call psb_spasb(a,desc_a,info,dupl=psb_dupl_add_,afmt=afmt)
       end if
     end if
     call psb_barrier(ctxt)

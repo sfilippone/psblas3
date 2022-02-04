@@ -106,26 +106,38 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
     ! First case: we come from a fresh build. 
     ! 
 
-    n_row = desc_a%get_local_rows()
-    n_col = desc_a%get_local_cols()
-    call a%set_nrows(n_row)
-    call a%set_ncols(n_col)
-  end if
-
-  if (a%is_bld()) then
-
     select case(a%remote_build)
     case (psb_matbld_noremote_)
       !  nothing needed
     case (psb_matbld_remote_)
-      write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
+      !write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
       block
         type(psb_lz_coo_sparse_mat) :: a_add
-
+        integer(psb_ipk_), allocatable :: ila(:), jla(:)
+        integer(psb_ipk_) :: nz, nzt,k
         call psb_remote_mat(a%rmta,desc_a,a_add,info)
-        
-      end block
+        nz = a_add%get_nzeros()
+!!$        write(0,*) me,name,' Nz to be added',nz
+        nzt = nz
+        call psb_sum(ctxt,nzt)
+        if (nzt>0) call psb_cd_reinit(desc_a, info)
+        if (nz > 0) then
+          !
+          ! Should we check for new indices here?
+          !
+          call psb_realloc(nz,ila,info)
+          call psb_realloc(nz,jla,info)
+          call desc_a%indxmap%g2l(a_add%ia(1:nz),ila(1:nz),info,owned=.true.)    
+          if (info == 0) call desc_a%indxmap%g2l_ins(a_add%ja(1:nz),jla(1:nz),info)
+          !write(0,*) me,name,' Check before insert',a%get_nzeros()
+          n_row = desc_a%get_local_rows()
+          n_col = desc_a%get_local_cols()
+          call a%csput(nz,ila,jla,a_add%val,ione,n_row,ione,n_col,info)
+          !write(0,*) me,name,' Check after insert',a%get_nzeros(),nz
+        end if
+        if (nzt > 0) call psb_cdasb(desc_a,info)
 
+      end block
     end select
     
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)

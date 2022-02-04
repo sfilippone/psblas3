@@ -114,16 +114,16 @@ subroutine psb_dspalloc(a, desc_a, info, nnz, bldmode)
     goto 9999
   end if
 
-  write(0,*) name,'Setting a%remote_build ',&
-       & bldmode_,psb_matbld_noremote_,psb_matbld_remote_
+!!$  write(0,*) name,'Setting a%remote_build ',&
+!!$       & bldmode_,psb_matbld_noremote_,psb_matbld_remote_
   a%remote_build = bldmode_
   
   select case(a%remote_build)
   case (psb_matbld_noremote_)
     !  nothing needed
-    write(0,*) name,' matbld_noremote_   nothing needed'
+    !write(0,*) name,' matbld_noremote_   nothing needed'
   case (psb_matbld_remote_)
-    write(0,*) name,' matbld_remote_  start '
+    !write(0,*) name,' matbld_remote_  start '
     allocate(a%rmta)
     nnzrmt_ = max(100,(nnz_/100))
     call a%rmta%allocate(m,n,nnzrmt_)

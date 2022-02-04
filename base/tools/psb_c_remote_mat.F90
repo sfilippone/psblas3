@@ -98,20 +98,19 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
   integer(psb_ipk_) :: nnp, nrcvs, nsnds
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
-       & rvsz(:), bsdindx(:),sdsz(:)
+       & rvsz(:), bsdindx(:),sdsz(:), sdsi(:), rvsi(:) 
   integer(psb_lpk_), allocatable  :: iasnd(:), jasnd(:)
   complex(psb_spk_), allocatable :: valsnd(:)
   type(psb_lc_coo_sparse_mat), allocatable :: acoo
-  integer(psb_ipk_), pointer  :: idxv(:)
   class(psb_i_base_vect_type), pointer :: pdxv
-  integer(psb_ipk_), allocatable :: ipdxv(:), ladj(:), ila(:), iprc(:)
+  integer(psb_ipk_), allocatable :: ladj(:), ila(:), iprc(:)
   logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit, err_act
   character(len=20) :: name, ch_err
 
   info=psb_success_
-  name='psb_csphalo'
+  name='psb_c_remote_mat'
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
@@ -129,9 +128,9 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
 
 
   call b%free() 
-  
-  Allocate(brvindx(np+1),&
-       & rvsz(np),sdsz(np),bsdindx(np+1), acoo,stat=info)
+
+  Allocate(rvsz(np),sdsz(np),sdsi(np),rvsi(np),brvindx(np+1),&
+       & bsdindx(np+1), acoo,stat=info)
 
   if (info /= psb_success_) then
     info=psb_err_alloc_dealloc_
@@ -140,71 +139,94 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
   end if
 
 
-        nz = a%get_nzeros()
-        allocate(ila(nz))
-        write(0,*) me,name,' size :',nz,size(ila)        
-        call desc_a%g2l(a%ia(1:nz),ila(1:nz),info,owned=.false.)
-        nouth = count(ila(1:nz)<0)
-        write(0,*) me,name,' Count out of halo :',nouth
-        call psb_max(ctxt,nouth)
-        if ((nouth/=0).and.(me==0)) &
-             & write(0,*) 'Warning: would require reinit of DESC_A'
-                  
-        call psi_graph_fnd_owner(a%ia(1:nz),iprc,ladj,desc_a%indxmap,info)
-        call psb_msort_unique(ladj,nnp)
-        write(0,*) me,name,' Processes:',ladj(1:nnp)
+  nz = a%get_nzeros()
+  allocate(ila(nz))
+  !write(0,*) me,name,' size :',nz,size(ila)        
+  call desc_a%g2l(a%ia(1:nz),ila(1:nz),info,owned=.false.)
+  nouth = count(ila(1:nz)<0)
+  !write(0,*) me,name,' Count out of halo :',nouth
+  call psb_max(ctxt,nouth)
+  if ((nouth/=0).and.(me==0)) &
+       & write(0,*) 'Warning: would require reinit of DESC_A'
 
-        icomm = desc_a%get_mpic()
-        Allocate(brvindx(np+1),&
-             & rvsz(np),sdsz(np),bsdindx(np+1), stat=info)
-        sdsz(:)=0
-        rvsz(:)=0
-        ipx = 1
-        brvindx(ipx) = 0
-        bsdindx(ipx) = 0
-        counter=1
-        idx = 0
-        idxs = 0
-        idxr = 0
-        do  i=1,nz
-          if (iprc(i) >=0) then
-            sdsz(iprc(i)+1) = sdsz(iprc(i)+1) +1
-          else
-            write(0,*)me,name,' Error from fnd_owner: ',iprc(i)
-          end if
-        end do
-        call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
-             & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-        if (minfo /= psb_success_) then
-          info=psb_err_from_subroutine_
-          call psb_errpush(info,name,a_err='mpi_alltoall')
-          goto 9999
-        end if
-        write(0,*)me,name,' sdsz ',sdsz(:),' rvsz:',rvsz(:)        
-        nsnds = count(sdsz /= 0)
-        nrcvs = count(rvsz /= 0)
-        idxs = 0
-        idxr = 0
-        counter = 1
-        
+  call psi_graph_fnd_owner(a%ia(1:nz),iprc,ladj,desc_a%indxmap,info)
+  call psb_msort_unique(ladj,nnp)
+  !write(0,*) me,name,' Processes:',ladj(1:nnp)
 
-  
-  
-  lnnz = max(iszr,iszs,lone)
-  lnc  = a%get_ncols()
-  call acoo%allocate(lnr,lnc,lnnz)
+  icomm = desc_a%get_mpic()
+  sdsz(:)=0
+  rvsz(:)=0
+  sdsi(:)=0
+  rvsi(:)=0
+  ipx = 1
+  brvindx(:) = 0
+  bsdindx(:) = 0
+  counter=1
+  idx = 0
+  idxs = 0
+  idxr = 0
+  do  i=1,nz
+    if (iprc(i) >=0) then
+      sdsz(iprc(i)+1) = sdsz(iprc(i)+1) +1
+    else
+      write(0,*)me,name,' Error from fnd_owner: ',iprc(i)
+    end if
+  end do
+  call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
+       & rvsz,1,psb_mpi_mpk_,icomm,minfo)
+  if (minfo /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='mpi_alltoall')
+    goto 9999
+  end if
+  !write(0,*)me,name,' sdsz ',sdsz(:),' rvsz:',rvsz(:)        
+  nsnds = count(sdsz /= 0)
+  nrcvs = count(rvsz /= 0)
+  idxs = 0
+  idxr = 0
+  counter = 1
+  Do proc=0,np-1
+    bsdindx(proc+1) = idxs
+    idxs            = idxs + sdsz(proc+1)
+    brvindx(proc+1) = idxr
+    idxr     = idxr + rvsz(proc+1)
+  Enddo
+
+  iszs = sum(sdsz)
+  iszr = sum(rvsz)
+  call acoo%allocate(desc_a%get_global_rows(),desc_a%get_global_cols(),iszr)
+  if (psb_errstatus_fatal()) then
+    write(0,*) 'Error from acoo%allocate '
+    info = 4010
+    goto 9999
+  end if
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
-  
+  !write(debug_unit,*) me,' ',trim(name),': ',info
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),iasnd,info)
+  !write(debug_unit,*) me,' ',trim(name),' iasnd: ',info
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
+  !write(debug_unit,*) me,' ',trim(name),' jasnd: ',info
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
+  !write(debug_unit,*) me,' ',trim(name),' valsnd: ',info
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='ensure_size')
     goto 9999
   end if
+  do k=1, nz
+    proc = iprc(k)
+    sdsi(proc+1) = sdsi(proc+1) + 1
+    !rvsi(proc) = rvsi(proc) + 1 
+    iasnd(bsdindx(proc+1)+sdsi(proc+1))  = a%ia(k)
+    jasnd(bsdindx(proc+1)+sdsi(proc+1))  = a%ja(k)
+    valsnd(bsdindx(proc+1)+sdsi(proc+1)) = a%val(k)
+  end do
+  do proc=0,np-1
+    if (sdsi(proc+1) /= sdsz(proc+1)) &
+         & write(0,*) me,name,'Send mismacth ',sdsi(proc+1),sdsz(proc+1)
+  end do
 
   select case(psb_get_sp_a2av_alg())
   case(psb_sp_a2av_smpl_triad_)
@@ -218,7 +240,7 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
     if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
          & acoo%ja,rvsz,brvindx,ctxt,info)
   case(psb_sp_a2av_mpi_)
-    
+
     call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_spk_,&
          & acoo%val,rvsz,brvindx,psb_mpi_c_spk_,icomm,minfo)
     if (minfo == mpi_success) &
@@ -239,10 +261,9 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
     call psb_errpush(info,name,a_err='alltoallv')
     goto 9999
   end if
-  
+  call acoo%set_nzeros(iszr)
   call acoo%mv_to_coo(b,info)
-
-
+  
   Deallocate(brvindx,bsdindx,rvsz,sdsz,&
        & iasnd,jasnd,valsnd,stat=info)
   if (debug_level >= psb_debug_outer_)&
