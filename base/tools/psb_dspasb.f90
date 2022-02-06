@@ -139,6 +139,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
       end block
     end select
+    call a%set_ncols(desc_a%get_local_cols())
     
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
   else if (a%is_upd()) then 
