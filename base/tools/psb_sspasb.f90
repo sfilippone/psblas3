@@ -68,6 +68,7 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
   integer(psb_ipk_) :: n_row,n_col
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
+  class(psb_i_base_vect_type), allocatable :: ivm
 
   info = psb_success_
   name = 'psb_spasb'
@@ -120,7 +121,10 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
 !!$        write(0,*) me,name,' Nz to be added',nz
         nzt = nz
         call psb_sum(ctxt,nzt)
-        if (nzt>0) call psb_cd_reinit(desc_a, info)
+        if (nzt>0) then
+          allocate(ivm, mold=desc_a%v_halo_index%v)
+          call psb_cd_reinit(desc_a, info)
+        end if
         if (nz > 0) then
           !
           ! Should we check for new indices here?
@@ -132,10 +136,11 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
           !write(0,*) me,name,' Check before insert',a%get_nzeros()
           n_row = desc_a%get_local_rows()
           n_col = desc_a%get_local_cols()
+          call a%set_ncols(desc_a%get_local_cols())
           call a%csput(nz,ila,jla,a_add%val,ione,n_row,ione,n_col,info)
           !write(0,*) me,name,' Check after insert',a%get_nzeros(),nz
         end if
-        if (nzt > 0) call psb_cdasb(desc_a,info)
+        if (nzt > 0) call psb_cdasb(desc_a,info,mold=ivm)
 
       end block
     end select
