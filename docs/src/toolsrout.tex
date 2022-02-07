@@ -547,7 +547,7 @@ An integer value; 0 means no error has been detected.
 \clearpage\subsection{psb\_spall --- Allocates a sparse matrix}
 
 \begin{verbatim}
-call psb_spall(a, desc_a, info, nnz)
+call psb_spall(a, desc_a, info, nnz, buildmode)
 \end{verbatim}
 
 \begin{description}
@@ -564,6 +564,13 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. 
+\item[buildmode] Whether to keep track of matrix entries that do not
+  belong to the current process.\\ 
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value \verb|psb_matbld_noremote_|,
+\verb|psb_matbld_remote_|.  Default:  \verb|psb_matbld_noremote_|.
 \end{description}
 
 \begin{description}
@@ -733,7 +740,7 @@ call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
-Intent: {\bf in}.\\
+Intent: {\bf in/out}.\\
 Specified as: a structured data of type \descdata.
 \item[afmt] the storage format for the sparse matrix.\\
 Scope: {\bf local}.\\
@@ -787,7 +794,13 @@ An integer value; 0 means no error has been detected.
 \item The output storage format need not be the same on all
   processes; 
 \item On exit from this routine the matrix is in the assembled state,
-  and thus is suitable for the computational routines. 
+  and thus is suitable for the computational routines;
+\item If the \verb|buildmode=psb_matbld_remote_| value was specified
+  at allocation time, contributions defined on the current process but
+  belonging to a remote process will be handled accordingly. This is
+  most likely to occur in finite element applications, with
+  \verb|dupl=psb_dupl_add_|; note that the descriptor will be updated,
+  and there will be a runtime overhead. 
 \end{enumerate}
 
 

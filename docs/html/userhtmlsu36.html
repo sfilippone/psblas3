@@ -22,7 +22,7 @@ href="userhtmlsu32.html#userhtmlsu39.html" >up</a>] </p></div>
 
                                                                   
    <pre class="verbatim" id="verbatim-40">
-call&#x00A0;psb_spall(a,&#x00A0;desc_a,&#x00A0;info,&#x00A0;nnz)
+call&#x00A0;psb_spall(a,&#x00A0;desc_a,&#x00A0;info,&#x00A0;nnz,&#x00A0;buildmode)
 </pre>
 <!--l. 551--><p class="nopar" >
 <!--l. 553--><p class="indent" >
@@ -61,8 +61,25 @@ class="newline" />Type: <span
 class="cmbx-10">optional</span>.<br 
 class="newline" />Intent: <span 
 class="cmbx-10">in</span>.<br 
-class="newline" />Specified as: an integer value.</dd></dl>
-<!--l. 569--><p class="indent" >
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">buildmode</span> </dt><dd 
+class="description">Whether to keep track of matrix entries that do not belong to the
+     current process.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified                                                                                 as:
+     an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span>. Default:
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>.</dd></dl>
+<!--l. 576--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -82,6 +99,9 @@ href="userhtmlsu6.html#spdata"><span
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_Tspmat</span><span 
 class="cmtt-10">_type</span></a>.
+                                                                  
+
+                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">info</span> </dt><dd 
@@ -93,14 +113,11 @@ class="cmbx-10">required </span><br
 class="newline" />Intent: <span 
 class="cmbx-10">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 582--><p class="noindent" ><span 
+<!--l. 589--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
   class="enumerate" id="x47-84002x1">On exit from this routine the sparse matrix is in the build state.
-                                                                  
-
-                                                                  
      </li>
      <li 
   class="enumerate" id="x47-84004x2">The descriptor may be in either the build or assembled state.
@@ -117,12 +134,12 @@ class="cmmi-10">nnz  </span>in  the
                                                                   
 
                                                                   
-   <!--l. 598--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 605--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu40.html" >next</a>] [<a 
 href="userhtmlsu35.html" >prev</a>] [<a 
 href="userhtmlsu35.html#tailuserhtmlsu35.html" >prev-tail</a>] [<a 
 href="userhtmlsu36.html" >front</a>] [<a 
 href="userhtmlsu32.html#userhtmlsu39.html" >up</a>] </p></div>
-<!--l. 598--><p class="indent" >   <a 
+<!--l. 605--><p class="indent" >   <a 
  id="tailuserhtmlsu36.html"></a>  
 </body></html> 
