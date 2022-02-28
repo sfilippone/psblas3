@@ -194,6 +194,37 @@ AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
 AC_LANG_POP([Fortran])
 ])
 
+dnl @synopsis PAC_HAVE_GFORTRAN_10( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will check if the GNU fortran version is suitable for PSBLAS.
+dnl If yes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl
+dnl Note : Will use MPIFC; if unset, will use '$FC'.
+dnl 
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_HAVE_GFORTRAN_10,
+ [AC_MSG_CHECKING([for version 10 or later of GNU Fortran])
+ AC_LANG_PUSH([Fortran])
+ ac_exeext=''
+ ac_ext='F90'
+ dnl ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+ ac_fc=${MPIFC-$FC};
+ AC_COMPILE_IFELSE([
+           program main
+#if ( __GNUC__ >= 10  ) 
+              print *, "ok"
+#else
+        this program will fail
+#endif
+           end],
+		  [  AC_MSG_RESULT([yes])
+		     ifelse([$1], , :, [ $1])],
+		  [  AC_MSG_RESULT([no])
+		     ifelse([$2], , , [ $2])])
+AC_LANG_POP([Fortran])
+])
+
 dnl @synopsis PAC_FORTRAN_CHECK_HAVE_MPI_MOD( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 dnl Will determine if the fortran compiler MPIFC needs to include mpi.h or needs

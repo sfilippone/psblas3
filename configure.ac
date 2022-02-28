@@ -412,19 +412,25 @@ fi
 # Honor FCFLAGS if they were specified explicitly, but --with-fcopt take precedence
 if test "X$FCOPT" == "X" ; then
   FCOPT="$FCFLAGS";
-fi	
+fi
+   
+
 if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   FCOPT="-g -O3  $FCOPT"
+   FCOPT="-g -O3 -frecursive $FCOPT"
+   PAC_HAVE_GFORTRAN_10(
+	[FCOPT="-fallow-argument-mismatch $FCOPT"],
+        [])  
+   
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
      FCFLAGS="-qhalt=e -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCFLAGS"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
-     FCOPT="-O3 $FCOPT"
+     FCOPT="-O3 -recursive $FCOPT"
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"

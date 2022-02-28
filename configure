@@ -7401,18 +7401,58 @@ fi
 if test "X$FCOPT" == "X" ; then
   FCOPT="$FCFLAGS";
 fi
+
+
 if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   FCOPT="-g -O3  $FCOPT"
+   FCOPT="-g -O3 -frecursive $FCOPT"
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for version 10 or later of GNU Fortran" >&5
+$as_echo_n "checking for version 10 or later of GNU Fortran... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+           program main
+#if ( __GNUC__ >= 10  )
+              print *, "ok"
+#else
+        this program will fail
+#endif
+           end
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"; then :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		      FCOPT="-fallow-argument-mismatch $FCOPT"
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
      FCFLAGS="-qhalt=e -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCFLAGS"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
-     FCOPT="-O3 $FCOPT"
+     FCOPT="-O3 -recursive $FCOPT"
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
@@ -8017,7 +8057,7 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    CDEFINES="-DOPENMP $CDEFINES";
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
-   CXXOPT="$CXXOPT $pac_cv_openmp_ccopt";
+   CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";
    FLINK="$FLINK $pac_cv_openmp_fcopt";
 fi
 #
