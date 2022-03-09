@@ -210,7 +210,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
     if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology',&
          & nsampl_in
     call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
-    !call idxmap%xtnd_p_adjcncy(ladj) 
+
     nqries     = nv - n_answers
     nqries_max = nqries
     call psb_max(ctxt,nqries_max)
