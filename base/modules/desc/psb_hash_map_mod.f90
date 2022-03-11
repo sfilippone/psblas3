@@ -629,13 +629,17 @@ contains
 
   end subroutine hash_g2ls2_ins
 
+  ! #################### THESIS ####################
 
   subroutine hash_g2lv1_ins(idx,idxmap,info,mask,lidx)
     use psb_error_mod
     use psb_realloc_mod
     use psb_sort_mod
     use psb_penv_mod
+    !$ use omp_lib
+
     implicit none 
+
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
@@ -648,6 +652,12 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: me, np
     character(len=20)   :: name,ch_err
+    logical :: use_openmp = .false.
+
+    logical, volatile :: isLoopValid
+    !$ integer(kind = OMP_lock_kind) :: ins_lck
+
+    !$ use_openmp = .true.
 
     info = psb_success_
     name = 'hash_g2l_ins'
@@ -664,6 +674,7 @@ contains
         return
       end if
     end if
+
     if (present(lidx)) then 
       if (size(lidx) < size(idx)) then 
         info = -1
@@ -671,37 +682,277 @@ contains
       end if
     end if
 
-
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
+
     if (idxmap%is_bld()) then 
+      if (use_openmp) then
+        !$ call OMP_init_lock(ins_lck)
+        isLoopValid = .true.
+        ncol = idxmap%get_lc()
+      end if
 
       if (present(lidx)) then
-        if (present(mask)) then 
-          do i = 1, is
-            ncol  = idxmap%get_lc()
-            if (mask(i)) then 
-              ip = idx(i) 
-              if ((ip < 1 ).or.(ip>mglob) ) then 
+        if (present(mask)) then
+          if (use_openmp) then
+            !$OMP PARALLEL DO default(none) schedule(STATIC) &
+            !$OMP shared(name,is,mask,lidx,idx,mglob,idxmap,ncol,nrow,ins_lck,laddsz) &
+            !$OMP private(i,ip,lip,tlip,nxt,info) &
+            !$OMP reduction(.AND.:isLoopValid)
+            do i = 1, is
+
+              if (mask(i)) then
+                ip = idx(i)
+
+                if ((ip < 1 ).or.(ip>mglob)) then
+                  idx(i) = -1
+                  cycle
+                endif
+
+                ! At first, we check the index presence in 'idxmap'. Usually
+                ! the index is found. If it is not found, we repeat the checking,
+                ! but inside a critical region.
+                call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                     & idxmap%hashv,idxmap%glb_lc,ncol)
+
+                if (lip < 0) then
+                  tlip = lip
+                  nxt = lidx(i)
+
+                  if (nxt <= nrow) then
+                    idx(i) = -1
+                    cycle
+                  endif
+
+                  ! We check again if the index is already in 'idxmap', this
+                  ! time inside a critical region (we assume that the index 
+                  ! is often already existing).
+                  !$ call OMP_set_lock(ins_lck)
+                  call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                     & idxmap%hashv,idxmap%glb_lc,ncol)
+                  ! Index not found
+                  if (lip < 0) then
+                    ! Locking system to handle concurrent hashmap read/write.
+                    call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+
+                    if (info >= 0) then
+                      ! 'nxt' is not equal to 'tlip' when the key is already inside
+                      ! the hash map. In that case 'tlip' is the value corresponding
+                      ! to the existing mapping.
+                      if (nxt == tlip) then
+
+                        ncol = MAX(ncol,nxt)
+                        !$ call OMP_unset_lock(ins_lck)
+
+                        call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                             & pad=-1_psb_lpk_,addsz=laddsz)
+
+                        if (info /= psb_success_) then
+                          call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                              &a_err='psb_ensure_size',i_err=(/info/))
+
+                          isLoopValid = .false.
+                          cycle
+                        end if
+
+                        idxmap%loc_to_glob(nxt) = ip
+                      else
+                        !$ call OMP_unset_lock(ins_lck)
+                      end if
+
+                      info = psb_success_
+
+                    else
+                      !$ call OMP_unset_lock(ins_lck)
+
+                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                           & a_err='SearchInsKeyVal',i_err=(/info/))
+
+                      isLoopValid = .false.
+                      cycle
+                    end if
+                  else
+                    !$ call OMP_unset_lock(ins_lck)
+                  end if
+                end if
+
+                idx(i) = lip
+                info = psb_success_
+              else
+                idx(i) = -1
+              end if
+            end do
+            !$OMP END PARALLEL DO
+
+            call idxmap%set_lc(ncol)
+
+            if (.not. isLoopValid) then
+               goto 9999
+            end if
+
+          else 
+            do i = 1, is
+              ncol  = idxmap%get_lc()
+              if (mask(i)) then 
+                ip = idx(i) 
+                if ((ip < 1 ).or.(ip>mglob) ) then 
+                  idx(i) = -1
+                  cycle
+                endif
+                call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                     & idxmap%hashv,idxmap%glb_lc,ncol)
+                if (lip < 0) then
+                  tlip  = lip
+                  nxt = lidx(i)
+                  if (nxt <= nrow) then 
+                    idx(i) = -1
+                    cycle
+                  endif
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  if (info >=0) then 
+                    if (nxt == tlip) then 
+                      ncol = max(ncol,nxt)
+                      call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                           & pad=-1_psb_lpk_,addsz=laddsz)
+                      if (info /= psb_success_) then
+                        call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                             &a_err='psb_ensure_size',i_err=(/info/))
+                        goto 9999
+                      end if
+                      idxmap%loc_to_glob(nxt)  = ip
+                      call idxmap%set_lc(ncol)
+                    endif
+                    info = psb_success_
+                  else
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         & a_err='SearchInsKeyVal',i_err=(/info/))
+                    goto 9999
+                  end if
+                end if
+                idx(i) = lip
+                info = psb_success_
+              else
+                idx(i) = -1
+              end if
+            enddo
+          end if
+        else if (.not.present(mask)) then 
+          if (use_openmp) then
+            !$OMP PARALLEL DO default(none) schedule(STATIC) &
+            !$OMP shared(name,is,idx,lidx,mglob,idxmap,ncol,nrow,ins_lck,laddsz) &
+            !$OMP private(i,ip,lip,tlip,nxt,info) & 
+            !$OMP reduction(.AND.:isLoopValid)
+            do i = 1, is
+              ip = idx(i)
+
+              if ((ip < 1 ).or.(ip>mglob)) then
                 idx(i) = -1
                 cycle
               endif
+
+              ! In OMP logic the index research limit is turned off. It is
+              ! a correct way to fit the subroutine?
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                    & idxmap%hashv,idxmap%glb_lc,ncol)
+
               if (lip < 0) then
-                tlip  = lip
+                tlip = lip
+                nxt = lidx(i)
+
+                if (nxt <= nrow) then
+                  idx(i) = -1
+                  cycle
+                endif
+
+                ! We check again if the index is already in 'idxmap', this
+                ! time inside a critical region (we assume that the index 
+                ! is often already existing).
+                !$ call OMP_set_lock(ins_lck)
+                call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                   & idxmap%hashv,idxmap%glb_lc,ncol)
+
+                if (lip < 0) then
+                  ! Locking system to handle concurrent write/access. Under checking!
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  !$ call OMP_unset_lock(ins_lck)
+
+                  if (info >= 0) then
+                    ! 'nxt' is not equal to 'tlip' when the key is already inside
+                    ! the hash map. In that case 'tlip' is the value corresponding
+                    ! to the existing mapping.
+                    if (nxt == tlip) then
+
+                      ncol = MAX(ncol,nxt)
+                      !$ call OMP_unset_lock(ins_lck)
+
+                      ! Under checking!
+                      call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                           & pad=-1_psb_lpk_,addsz=laddsz)
+
+                      if (info /= psb_success_) then
+                        call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                            &a_err='psb_ensure_size',i_err=(/info/))
+
+                        isLoopValid = .false.
+                        cycle
+                      end if
+
+                      idxmap%loc_to_glob(nxt) = ip
+                    else
+                      !$ call OMP_unset_lock(ins_lck)
+                    end if
+
+                    info = psb_success_
+                  else
+                    !$ call OMP_unset_lock(ins_lck)
+
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         & a_err='SearchInsKeyVal',i_err=(/info/))
+
+                    isLoopValid = .false.
+                    cycle
+                  end if
+                else
+                  !$ call OMP_unset_lock(ins_lck)
+                end if
+              end if
+
+              idx(i) = lip
+              info = psb_success_
+            end do
+            !$OMP END PARALLEL DO
+
+            call idxmap%set_lc(ncol)
+
+            if (.not. isLoopValid) then
+               goto 9999
+            end if
+
+          else
+            do i = 1, is
+              ncol  = idxmap%get_lc()
+              ip    = idx(i) 
+              if ((ip < 1 ).or.(ip>mglob)) then 
+                idx(i) = -1
+                cycle
+              endif
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                   & idxmap%glb_lc,ncol)
+              if (lip < 0) then 
                 nxt = lidx(i)
                 if (nxt <= nrow) then 
                   idx(i) = -1
                   cycle
                 endif
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                lip = tlip
+              
                 if (info >=0) then 
-                  if (nxt == tlip) then 
-                    ncol = max(ncol,nxt)
-                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=laddsz)
+                  if (nxt == lip) then 
+                    ncol = max(nxt,ncol)
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
                     if (info /= psb_success_) then
+                      info=1
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            &a_err='psb_ensure_size',i_err=(/info/))
                       goto 9999
@@ -718,64 +969,238 @@ contains
               end if
               idx(i) = lip
               info = psb_success_
-            else
-              idx(i) = -1
-            end if
-          enddo
-
-        else if (.not.present(mask)) then 
-
-          do i = 1, is
-            ncol  = idxmap%get_lc()
-            ip    = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
-              cycle
-            endif
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                 & idxmap%glb_lc,ncol)
-            if (lip < 0) then 
-              nxt = lidx(i)
-              if (nxt <= nrow) then 
-                idx(i) = -1
-                cycle
-              endif
-              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-              lip = tlip
-              
-              if (info >=0) then 
-                if (nxt == lip) then 
-                  ncol = max(nxt,ncol)
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=laddsz)
-                  if (info /= psb_success_) then
-                    info=1
-                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         &a_err='psb_ensure_size',i_err=(/info/))
-                    goto 9999
-                  end if
-                  idxmap%loc_to_glob(nxt)  = ip
-                  call idxmap%set_lc(ncol)
-                endif
-                info = psb_success_
-              else
-                call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     & a_err='SearchInsKeyVal',i_err=(/info/))
-                goto 9999
-              end if
-            end if
-            idx(i) = lip
-            info = psb_success_
-          enddo
-
+            enddo
+          end if
         end if
 
       else if (.not.present(lidx)) then 
 
-        if (present(mask)) then 
-          do i = 1, is
-            ncol  = idxmap%get_lc()
-            if (mask(i)) then 
+        if (present(mask)) then
+          if (use_openmp) then
+            !$OMP PARALLEL DO default(none) schedule(STATIC) &
+            !$OMP shared(name,is,idx,mask,mglob,idxmap,ncol,nrow,ins_lck,laddsz) &
+            !$OMP private(i,ip,lip,tlip,nxt,info) &
+            !$OMP reduction(.AND.:isLoopValid)        
+            do i = 1, is
+
+              if (mask(i)) then
+                ip = idx(i)
+
+                if ((ip < 1 ).or.(ip>mglob)) then
+                  idx(i) = -1
+                  cycle
+                endif
+
+                ! At first, we check the index presence in 'idxmap'. Usually
+                ! the index is found. If it is not found, we repeat the checking,
+                ! but inside a critical region.
+                call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                     & idxmap%hashv,idxmap%glb_lc,ncol)
+
+                if (lip < 0) then
+
+                  ! We check again if the index is already in 'idxmap', this
+                  ! time inside a critical region (we assume that the index 
+                  ! is often already existing).
+                  !$ call OMP_set_lock(ins_lck)
+                  call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                     & idxmap%hashv,idxmap%glb_lc,ncol)
+
+                  ! Index not found
+                  if (lip < 0) then
+                    ! Locking system to handle concurrent hashmap write/access.
+                    call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                    lip = tlip
+                  else
+                    !$ call OMP_unset_lock(ins_lck)
+                  end if
+
+                  idx(i) = lip
+                  info = psb_success_
+                end if
+
+                if (info >= 0) then
+                  ! 'nxt' is not equal to 'tlip' when the key is already inside
+                  ! the hash map. In that case 'tlip' is the value corresponding
+                  ! to the existing mapping.
+                  if (nxt == tlip) then
+
+                    ncol = MAX(ncol,nxt)
+                    !$ call OMP_unset_lock(ins_lck)
+
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                         & pad=-1_psb_lpk_,addsz=laddsz)
+
+                    if (info /= psb_success_) then
+                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                          &a_err='psb_ensure_size',i_err=(/info/))
+
+                      isLoopValid = .false.
+                      cycle
+                    end if
+
+                    idxmap%loc_to_glob(nxt) = ip
+                  else
+                    !$ call OMP_unset_lock(ins_lck)
+                  end if
+
+                  info = psb_success_
+                else
+                  !$ call OMP_unset_lock(ins_lck)
+
+                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                       & a_err='SearchInsKeyVal',i_err=(/info/))
+
+                  isLoopValid = .false.
+                  cycle
+                end if
+
+              else
+                idx(i) = -1
+              end if
+            end do
+            !$OMP END PARALLEL DO
+
+            call idxmap%set_lc(ncol)
+
+            if (.not. isLoopValid) then
+               goto 9999
+            end if
+
+          else 
+            do i = 1, is
+              ncol  = idxmap%get_lc()
+              if (mask(i)) then 
+                ip = idx(i) 
+                if ((ip < 1 ).or.(ip>mglob)) then 
+                  idx(i) = -1
+                  cycle
+                endif
+                nxt = ncol + 1 
+                call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                     & idxmap%glb_lc,ncol)
+                if (lip < 0) then
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  lip = tlip
+                end if
+
+                if (info >=0) then 
+                  if (nxt == lip) then 
+                    ncol = nxt
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                         & pad=-1_psb_lpk_,addsz=laddsz)
+                    if (info /= psb_success_) then
+                      info=1
+                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                           & a_err='psb_ensure_size',i_err=(/info/))
+                      goto 9999
+                    end if
+                    idxmap%loc_to_glob(nxt)  = ip
+                    call idxmap%set_lc(ncol)
+                  endif
+                  info = psb_success_
+                else
+                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                       & a_err='SearchInsKeyVal',i_err=(/info/))
+                  goto 9999
+                end if
+                idx(i) = lip
+                info = psb_success_
+              else
+                idx(i) = -1
+              end if
+            enddo
+          end if
+        else if (.not.present(mask)) then 
+          if (use_openmp) then
+            !$OMP PARALLEL DO default(none) schedule(STATIC) &
+            !$OMP shared(name,is,idx,mglob,idxmap,ncol,nrow,ins_lck,laddsz) &
+            !$OMP private(i,ip,lip,tlip,nxt,info) &
+            !$OMP reduction(.AND.:isLoopValid)
+            do i = 1, is
+
+              ip = idx(i)
+
+              if ((ip < 1 ).or.(ip>mglob)) then
+                idx(i) = -1
+                cycle
+              endif
+
+              ! At first, we check the index presence in 'idxmap'. Usually
+              ! the index is found. If it is not found, we repeat the checking,
+              ! but inside a critical region.
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                   & idxmap%hashv,idxmap%glb_lc,ncol)
+
+              if (lip < 0) then
+
+                ! We check again if the index is already in 'idxmap', this
+                ! time inside a critical region (we assume that the index 
+                ! is often already existing).
+                !$ call OMP_set_lock(ins_lck)
+                call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                   & idxmap%hashv,idxmap%glb_lc,ncol)
+
+                ! Index not found
+                if (lip < 0) then
+                  ! Locking system to handle concurrent hashmap write/access.
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  lip = tlip
+                else
+                  !$ call OMP_unset_lock(ins_lck)
+                end if
+
+                idx(i) = lip
+                info = psb_success_
+              end if
+
+              if (info >= 0) then
+                ! 'nxt' is not equal to 'tlip' when the key is already inside
+                ! the hash map. In that case 'tlip' is the value corresponding
+                ! to the existing mapping.
+                if (nxt == tlip) then
+                  ncol = MAX(ncol,nxt)
+                  !$ call OMP_unset_lock(ins_lck)
+
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_,addsz=laddsz)
+
+                  if (info /= psb_success_) then
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                        &a_err='psb_ensure_size',i_err=(/info/))
+
+                    !$ isLoopValid = .false.
+                    cycle
+                  end if
+
+                  idxmap%loc_to_glob(nxt) = ip
+                else
+                  !$ call OMP_unset_lock(ins_lck)
+                end if
+
+                info = psb_success_
+
+              else
+                !$ call OMP_unset_lock(ins_lck)
+
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err='SearchInsKeyVal',i_err=(/info/))
+
+                isLoopValid = .false.
+                cycle
+              end if
+            end do
+            !$OMP END PARALLEL DO
+
+            call idxmap%set_lc(ncol)
+
+            if (.not. isLoopValid) then
+               goto 9999
+            end if
+
+          else
+            do i = 1, is
+              ncol  = idxmap%get_lc()
               ip = idx(i) 
               if ((ip < 1 ).or.(ip>mglob)) then 
                 idx(i) = -1
@@ -796,8 +1221,9 @@ contains
                        & pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
+                    ch_err='psb_ensure_size'
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         & a_err='psb_ensure_size',i_err=(/info/))
+                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
                     goto 9999
                   end if
                   idxmap%loc_to_glob(nxt)  = ip
@@ -805,68 +1231,28 @@ contains
                 endif
                 info = psb_success_
               else
+                ch_err='SearchInsKeyVal'
                 call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     & a_err='SearchInsKeyVal',i_err=(/info/))
+                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
                 goto 9999
               end if
               idx(i) = lip
               info = psb_success_
-            else
-              idx(i) = -1
-            end if
-          enddo
-
-        else if (.not.present(mask)) then 
-
-          do i = 1, is
-            ncol  = idxmap%get_lc()
-            ip = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
-              cycle
-            endif
-            nxt = ncol + 1 
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                 & idxmap%glb_lc,ncol)
-            if (lip < 0) then
-              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-              lip = tlip
-            end if
-
-            if (info >=0) then 
-              if (nxt == lip) then 
-                ncol = nxt
-                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                     & pad=-1_psb_lpk_,addsz=laddsz)
-                if (info /= psb_success_) then
-                  info=1
-                  ch_err='psb_ensure_size'
-                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-                  goto 9999
-                end if
-                idxmap%loc_to_glob(nxt)  = ip
-                call idxmap%set_lc(ncol)
-              endif
-              info = psb_success_
-            else
-              ch_err='SearchInsKeyVal'
-              call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                   & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-              goto 9999
-            end if
-            idx(i) = lip
-            info = psb_success_
-          enddo
-
-
+            enddo
+          end if
         end if
       end if
+
+      if (use_openmp) then
+        !$ call OMP_destroy_lock(ins_lck)
+      end if
+
     else 
       ! Wrong state
       idx = -1
       info = -1
     end if
+
     call psb_erractionrestore(err_act)
     return
 
@@ -875,6 +1261,8 @@ contains
     return
 
   end subroutine hash_g2lv1_ins
+
+  ! ################## END THESIS #########################
 
   subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     use psb_realloc_mod
