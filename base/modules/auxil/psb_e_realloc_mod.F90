@@ -982,7 +982,48 @@ Contains
       goto 9999
     end if
 
+!!$    If (len > psb_size(v)) Then
+!!$      if (present(newsz)) then 
+!!$        isz = (max(len+1,newsz))
+!!$      else
+!!$        if (present(addsz)) then 
+!!$          isz = len+max(1,addsz)
+!!$        else
+!!$          isz = max(len+10, int(1.25*len))
+!!$        endif
+!!$      endif
+!!$
+!!$      call psb_realloc(isz,v,info,pad=pad)
+!!$      if (info /= psb_success_) then
+!!$        info=psb_err_from_subroutine_
+!!$        call psb_errpush(info,name,a_err='psb_realloc')
+!!$        goto 9999
+!!$      End If
+!!$    end If
     If (len > psb_size(v)) Then
+#if defined(OPENMP)
+      !$OMP CRITICAL
+      if (len > psb_size(v)) then
+        if (present(newsz)) then
+          isz = (max(len+1,newsz))
+        else
+          if (present(addsz)) then
+            isz = len+max(1,addsz)
+          else
+            isz = max(len+10, int(1.25*len))
+          endif
+        endif
+
+        call psb_realloc(isz,v,info,pad=pad)
+      end if
+      !$OMP END CRITICAL
+
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='psb_realloc')
+	goto 9999
+      end if
+#else
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
       else
@@ -999,6 +1040,7 @@ Contains
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       End If
+#endif
     end If
 
     call psb_erractionrestore(err_act)
