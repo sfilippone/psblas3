@@ -2928,6 +2928,31 @@ contains
     integer(psb_ipk_) :: i,ir,ic
 
     info = psb_success_
+#if defined(OPENMP)
+    ! The logic here is different from the one used for
+    ! the serial version: each element is stored in data
+    ! structures but the invalid ones are stored as '-1' values.
+    ! These values will be filtered in a future fixing process.
+    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
+    !$OMP private(ir,ic,i)
+    do i=1,nz
+      ir = ia(i)
+      ic = ja(i)
+      if ((ir>=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then
+        ia1(nza+i) = ir
+        ia2(nza+i) = ic
+        aspk(nza+i) = val(i)
+      else
+	ia1(nza+i) = -1
+        ia2(nza+i) = -1
+        aspk(nza+i) = -1
+      end if
+    end do
+    !$OMP END PARALLEL DO
+
+    nza = nza + nz
+#else
     do i=1, nz
       ir = ia(i)
       ic = ja(i)
@@ -2938,6 +2963,7 @@ contains
         aspk(nza) = val(i)
       end if
     end do
+#endif
 
   end subroutine psb_inner_ins
 
@@ -3517,6 +3543,9 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_string_mod
   use psb_ip_reord_mod
   use psb_sort_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   integer(psb_ipk_), intent(in)           :: nr, nc, nzin, dupl
@@ -3532,6 +3561,11 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
+#if defined(OPENMP)
+  integer(psb_ipk_) :: work,first_idx,last_idx,first_elem,last_elem,s,nthreads,ithread
+  integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
+  integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
+#endif
 
   info  = psb_success_
 
@@ -3556,6 +3590,18 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
   dupl_ = dupl
 
+#if defined(OPENMP)
+  maxthreads = omp_get_max_threads()
+  ! 'iaux' has to allow the threads to have an exclusive group
+  ! of indices as work space. Since each thread handles one
+  ! row/column at the time, we allocate this way.
+  allocate(iaux(MAX((nc+2),(nr+2))*maxthreads),stat=info)
+  if (info /= psb_success_) then
+    info = psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+#else
 
 
   allocate(iaux(nzin+2),stat=info)
@@ -3564,153 +3610,375 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
     call psb_errpush(info,name)
     goto 9999
   end if
-
+#endif
 
   select case(idir_)
 
   case(psb_row_major_)
-    !  Row major order
+    ! Row major order
     if (nr <= nzin) then
       ! Avoid strange situations with large indices
+#if defined(OPENMP)
+      ! We are not going to need 'ix2' because of the presence
+      ! of 'idxaux' as auxiliary buffer.
+      allocate(ias(nzin),jas(nzin),vs(nzin), stat=info)
+#else
       allocate(ias(nzin),jas(nzin),vs(nzin),ix2(nzin+2), stat=info)
+#endif
       use_buffers = (info == 0)
     else
       use_buffers = .false.
     end if
 
     if (use_buffers) then
-      if (.not.(  (ia(1) < 1).or.(ia(1)> nr)) ) then
-        iaux(:) = 0
-        iaux(ia(1)) = iaux(ia(1)) + 1
-        srt_inp = .true.
-        do i=2,nzin
-          if (  (ia(i) < 1).or.(ia(i)> nr)) then
-            use_buffers = .false.
-            srt_inp     = .false.
-            exit
-          end if
+      iaux(:) = 0
+#if defined(OPENMP)
+      !$OMP PARALLEL DO default(none) schedule(STATIC) &
+      !$OMP shared(nzin,ia,nr,iaux) &
+      !$OMP private(i) &
+      !$OMP reduction(.and.:use_buffers)
+      do i=1,nzin
+        if ((ia(i) < 1).or.(ia(i) > nr)) then
+          use_buffers = .false.
+          ! Invalid indices are placed outside the considered range
+          ia(i) = nr+2
+        else
+          !$OMP ATOMIC UPDATE
           iaux(ia(i)) = iaux(ia(i)) + 1
-          srt_inp = srt_inp .and.(ia(i-1)<=ia(i))
-        end do
-      else
-        use_buffers=.false.
-      end if
+        end if
+      end do
+      !$OMP END PARALLEL DO
+#else
+      !srt_inp = .true.
+      do i=1,nzin
+        if ((ia(i) < 1).or.(ia(i) > nr)) then
+          use_buffers = .false.
+          !ia(i) = nr+2
+          !srt_inp = .false.
+          exit
+        end if
+
+        iaux(ia(i)) = iaux(ia(i)) + 1
+
+        !srt_inp = srt_inp .and.(ia(i-1)<=ia(i))
+      end do
+#endif
     end if
+
+    ! Check again use_buffers. We enter here if nzin >= nr and
+    ! all the indices are valid
     ! Check again use_buffers.
     if (use_buffers) then
-      if (srt_inp) then
-        ! If input was already row-major
-        ! we can do it row-by-row here.
-        k = 0
-        i = 1
-        do j=1, nr
-          nzl = iaux(j)
-          imx = i+nzl-1
+#if defined(OPENMP)
+      allocate(kaux(nr+1),idxaux(MAX((nc+2)*maxthreads,nr)),sum(maxthreads+1),stat=info)
+      if (info /= psb_success_) then
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
 
-          if (nzl > 0) then
-            call psi_msort_up(nzl,ja(i:imx),ix2,iret)
-            if (iret == 0) &
-                 & call psb_ip_reord(nzl,val(i:imx),&
-                 & ia(i:imx),ja(i:imx),ix2)
+      kaux(:) = 0
+      sum(:) = 0
+      sum(1) = 1
+      err = 0
 
-            select case(dupl_)
-            case(psb_dupl_ovwrt_)
+      ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
+      ! index for each row. We do the same on 'kaux'
+      !$OMP PARALLEL default(none) &
+      !$OMP shared(idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl_,err) &
+      !$OMP private(s,i,j,k,ithread,first_idx,last_idx,work,nxt_val,old_val,saved_elem, &
+      !$OMP first_elem,last_elem,nzl,iret,act_row)
+
+      !$OMP SINGLE
+      nthreads = omp_get_num_threads()
+      !$OMP END SINGLE
+
+      ithread = omp_get_thread_num()
+
+      ! -------- thread-specific workload --------
+
+      work = nr/nthreads
+      if (ithread < MOD(nr,nthreads)) then
+        work = work + 1
+        first_idx = ithread*work + 1
+      else
+	first_idx = ithread*work + MOD(nr,nthreads) + 1
+      end if
+
+      last_idx = first_idx + work - 1
+
+      !-------------------------------------------
+      ! ------------ iaux composition --------------
+      ! 'iaux' will have the start index for each row
+
+      s = 0
+      do i=first_idx,last_idx
+        s = s + iaux(i)
+      end do
+      sum(ithread+2) = s
+
+      !$OMP BARRIER
+
+      !$OMP SINGLE
+      do i=2,nthreads+1
+        sum(i) = sum(i) + sum(i-1)
+      end do
+      !$OMP END SINGLE
+
+      if (work > 0) then
+        saved_elem = iaux(first_idx)
+      end if
+
+      if (ithread == 0) then
+         iaux(1) = 1
+      end if
+
+      !$OMP BARRIER
+
+      if (work > 0) then
+        old_val = iaux(first_idx+1)
+        iaux(first_idx+1) = saved_elem + sum(ithread+1)
+      end if
+
+      do i=first_idx+2,last_idx+1
+        nxt_val = iaux(i)
+        iaux(i) = iaux(i-1) + old_val
+        old_val = nxt_val
+      end do
+
+      ! --------------------------------------
+
+      !$OMP BARRIER
+
+      ! ------------------ Sorting and buffers -------------------
+
+      ! Let's use an auxiliary buffer, 'idxaux', to get indices leaving
+      ! unmodified 'iaux'
+      do j=first_idx,last_idx
+        idxaux(j) = iaux(j)
+      end do
+
+      ! Here we sort data inside the auxiliary buffers
+      do i=1,nzin
+        act_row = ia(i)
+        if ((act_row >= first_idx) .and. (act_row <= last_idx)) then
+          ias(idxaux(act_row)) = ia(i)
+          jas(idxaux(act_row)) = ja(i)
+          vs(idxaux(act_row))  = val(i)
+
+          idxaux(act_row) = idxaux(act_row) + 1
+        end if
+      end do
+
+      !$OMP BARRIER
+
+      ! Let's sort column indices and values. After that we will store
+      ! the number of unique values in 'kaux'
+      do j=first_idx,last_idx
+        first_elem = iaux(j)
+        last_elem = iaux(j+1) - 1
+        nzl = last_elem - first_elem + 1
+
+        ! The row has elements?
+        if (nzl > 0) then
+          call psi_msort_up(nzl,jas(first_elem:last_elem), &
+          & idxaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2),iret)
+          if (iret == 0) then
+               call psb_ip_reord(nzl,vs(first_elem:last_elem),&
+               & ias(first_elem:last_elem),jas(first_elem:last_elem), &
+               & idxaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2))
+          end if
+
+          ! Over each row we count the unique values
+          kaux(j) = 1
+          do i=first_elem+1,last_elem
+            if (ias(i) == ias(i-1) .and. jas(i) == jas(i-1)) then
+              cycle
+            end if
+            kaux(j) = kaux(j) + 1
+          end do
+        end if
+      end do
+
+      ! --------------------------------------------------
+      ! ---------------- kaux composition ----------------
+
+      !$OMP SINGLE
+        sum(:) = 0
+        sum(1) = 1
+      !$OMP END SINGLE
+
+      s = 0
+      do i=first_idx,last_idx
+        s = s + kaux(i)
+      end do
+      sum(ithread+2) = s
+
+      !$OMP BARRIER
+
+      !$OMP SINGLE
+      do i=2,nthreads+1
+        sum(i) = sum(i) + sum(i-1)
+      end do
+      kaux(nr+1) = sum(nthreads+1)
+      !$OMP END SINGLE
+
+      if (work > 0) then
+        saved_elem = kaux(first_idx)
+      end if
+      if (ithread == 0) then
+        kaux(1) = 1
+      end if
+
+      !$OMP BARRIER
+
+      if (work > 0) then
+        old_val = kaux(first_idx+1)
+        kaux(first_idx+1) = saved_elem + sum(ithread+1)
+      end if
+
+      do i=first_idx+2,last_idx+1
+        nxt_val = kaux(i)
+        kaux(i) = kaux(i-1) + old_val
+        old_val = nxt_val
+      end do
+
+      !$OMP BARRIER
+
+      ! ------------------------------------------------
+
+      select case(dupl_)
+      case(psb_dupl_ovwrt_)
+        !$OMP DO schedule(STATIC)
+        do j=1,nr
+          first_elem = iaux(j)
+          last_elem = iaux(j+1) - 1
+
+          if (first_elem > last_elem) then
+            cycle
+          end if
+
+          k = kaux(j)
+
+          val(k) = vs(first_elem)
+          ia(k) = ias(first_elem)
+          ja(k) = jas(first_elem)
+
+          do i=first_elem+1,last_elem
+            if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
+              val(k) = vs(i)
+            else
               k = k + 1
-              ia(k)  = ia(i)
-              ja(k)  = ja(i)
-              val(k) = val(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ia(i) == irw).and.(ja(i) == icl)) then
-                  val(k) = val(i)
-                else
-                  k = k+1
-                  val(k) = val(i)
-                  ia(k)  = ia(i)
-                  ja(k)  = ja(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-
-            case(psb_dupl_add_)
-              k = k + 1
-              ia(k)  = ia(i)
-              ja(k)  = ja(i)
-              val(k) = val(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ia(i) == irw).and.(ja(i) == icl)) then
-                  val(k) = val(k) + val(i)
-                else
-                  k = k+1
-                  val(k) = val(i)
-                  ia(k)  = ia(i)
-                  ja(k)  = ja(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-
-            case(psb_dupl_err_)
-              k = k + 1
-              ia(k)  = ia(i)
-              ja(k)  = ja(i)
-              val(k) = val(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ia(i) == irw).and.(ja(i) == icl)) then
-                  call psb_errpush(psb_err_duplicate_coo,name)
-                  goto 9999
-                else
-                  k = k+1
-                  val(k) = val(i)
-                  ia(k)  = ia(i)
-                  ja(k)  = ja(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-            case default
-              write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-              info =-7
-              return
-            end select
-
-          endif
-          !i = i + nzl
-        enddo
-
-      else  if (.not.srt_inp) then
-        ! If input was not already row-major
-        ! we have to sort all
-
-        ip     = iaux(1)
-        iaux(1) = 0
-        do i=2, nr
-          is = iaux(i)
-          iaux(i) = ip
-          ip = ip + is
+              val(k) = vs(i)
+              ia(k)  = ias(i)
+              ja(k)  = jas(i)
+            endif
+          end do
         end do
-        iaux(nr+1) = ip
+	!$OMP END DO
 
-        do i=1,nzin
-          irw = ia(i)
-          ip = iaux(irw) + 1
-          ias(ip) = ia(i)
-          jas(ip) = ja(i)
-          vs(ip)  = val(i)
-          iaux(irw) = ip
+      case(psb_dupl_add_)
+        !$OMP DO schedule(STATIC)
+        do j=1,nr
+          first_elem = iaux(j)
+          last_elem = iaux(j+1) - 1
+
+          if (first_elem > last_elem) then
+            cycle
+          end if
+
+          k = kaux(j)
+
+          val(k) = vs(first_elem)
+          ia(k) = ias(first_elem)
+          ja(k) = jas(first_elem)
+
+          do i=first_elem+1,last_elem
+            if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
+              val(k) = val(k) + vs(i)
+            else
+              k = k + 1
+              val(k) = vs(i)
+              ia(k)  = ias(i)
+              ja(k)  = jas(i)
+            endif
+          end do
         end do
+	!$OMP END DO
+
+      case(psb_dupl_err_)
+        !$OMP DO schedule(STATIC)
+        do j=1,nr
+          first_elem = iaux(j)
+          last_elem = iaux(j+1) - 1
+
+          if (first_elem > last_elem) then
+            cycle
+          end if
+
+          k = kaux(j)
+
+          val(k) = vs(first_elem)
+          ia(k) = ias(first_elem)
+          ja(k) = jas(first_elem)
+
+          do i=first_elem+1,last_elem
+            if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
+              err = 1
+            else
+              k = k + 1
+              val(k) = vs(i)
+              ia(k)  = ias(i)
+              ja(k)  = jas(i)
+            end if
+          end do
+        end do
+	!$OMP END DO
+
+      case default
+        !$OMP SINGLE
+        err = 2
+        !$OMP END SINGLE
+      end select
+
+      !$OMP END PARALLEL
+
+      if (err == 1) then
+        call psb_errpush(psb_err_duplicate_coo,name)
+        goto 9999
+      else if (err == 2) then
+        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
+        info =-7
+        return
+      end if
+
+      nzout = kaux(nr+1) - 1
+
+      deallocate(sum,kaux,idxaux,stat=info)
+#else
+      !if (.not.srt_inp) then
+        
+      ip     = iaux(1)
+      iaux(1) = 0
+      do i=2, nr
+        is = iaux(i)
+        iaux(i) = ip
+        ip = ip + is
+      end do
+      iaux(nr+1) = ip
+
+      do i=1,nzin
+        irw = ia(i)
+        ip = iaux(irw) + 1
+        ias(ip) = ia(i)
+        jas(ip) = ja(i)
+        vs(ip)  = val(i)
+        iaux(irw) = ip
+      end do
+      !end if
+
+      select case(dupl_)
+      case(psb_dupl_ovwrt_)
         k = 0
         i = 1
         do j=1, nr
@@ -3723,88 +3991,114 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
+            k = k + 1
+            ia(k)  = ias(i)
+            ja(k)  = jas(i)
+            val(k) = vs(i)
+            irw = ia(k)
+            icl = ja(k)
+            do
+              i = i + 1
+              if (i > imx) exit
+              if ((ias(i) == irw).and.(jas(i) == icl)) then
+                val(k) = vs(i)
+              else
+                k = k+1
+                val(k) = vs(i)
+                ia(k)  = ias(i)
+                ja(k)  = jas(i)
+                irw = ia(k)
+                icl = ja(k)
+              endif
+            enddo
+          end if
+        end do
 
-            select case(dupl_)
-            case(psb_dupl_ovwrt_)
-              k = k + 1
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              val(k) = vs(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ias(i) == irw).and.(jas(i) == icl)) then
-                  val(k) = vs(i)
-                else
-                  k = k+1
-                  val(k) = vs(i)
-                  ia(k)  = ias(i)
-                  ja(k)  = jas(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
+      case(psb_dupl_add_)
+        k = 0
+        i = 1
+        do j=1, nr
 
-            case(psb_dupl_add_)
-              k = k + 1
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              val(k) = vs(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ias(i) == irw).and.(jas(i) == icl)) then
-                  val(k) = val(k) + vs(i)
-                else
-                  k = k+1
-                  val(k) = vs(i)
-                  ia(k)  = ias(i)
-                  ja(k)  = jas(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
+          nzl = iaux(j)-i+1
+          imx = i+nzl-1
 
-            case(psb_dupl_err_)
-              k = k + 1
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              val(k) = vs(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ias(i) == irw).and.(jas(i) == icl)) then
-                  call psb_errpush(psb_err_duplicate_coo,name)
-                  goto 9999
-                else
-                  k = k+1
-                  val(k) = vs(i)
-                  ia(k)  = ias(i)
-                  ja(k)  = jas(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-            case default
-              write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-              info =-7
-              return
-            end select
+          if (nzl > 0) then
+            call psi_msort_up(nzl,jas(i:imx),ix2,iret)
+            if (iret == 0) &
+                 & call psb_ip_reord(nzl,vs(i:imx),&
+                 & ias(i:imx),jas(i:imx),ix2)
+            k = k + 1
+            ia(k)  = ias(i)
+            ja(k)  = jas(i)
+            val(k) = vs(i)
+            irw = ia(k)
+            icl = ja(k)
+            do
+              i = i + 1
+              if (i > imx) exit
+              if ((ias(i) == irw).and.(jas(i) == icl)) then
+                val(k) = val(k) + vs(i)
+              else
+                k = k+1
+                val(k) = vs(i)
+                ia(k)  = ias(i)
+                ja(k)  = jas(i)
+                irw = ia(k)
+                icl = ja(k)
+              endif
+            enddo
+          end if
+        end do
 
-          endif
-        enddo
+      case(psb_dupl_err_)
+        k = 0
+        i = 1
+        do j=1, nr
 
-      end if
+          nzl = iaux(j)-i+1
+          imx = i+nzl-1
 
-      i=k
+          if (nzl > 0) then
+            call psi_msort_up(nzl,jas(i:imx),ix2,iret)
+            if (iret == 0) &
+                 & call psb_ip_reord(nzl,vs(i:imx),&
+                 & ias(i:imx),jas(i:imx),ix2)
+            k = k + 1
+            ia(k)  = ias(i)
+            ja(k)  = jas(i)
+            val(k) = vs(i)
+            irw = ia(k)
+            icl = ja(k)
+            do
+              i = i + 1
+              if (i > imx) exit
+              if ((ias(i) == irw).and.(jas(i) == icl)) then
+                call psb_errpush(psb_err_duplicate_coo,name)
+                goto 9999
+              else
+                k = k+1
+                val(k) = vs(i)
+                ia(k)  = ias(i)
+                ja(k)  = jas(i)
+                irw = ia(k)
+                icl = ja(k)
+              endif
+            enddo
+          end if
+        end do
+        
+      case default
+        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
+        info =-7
+        return
+      end select
 
-      deallocate(ias,jas,vs,ix2, stat=info)
+      nzout = k
+
+      deallocate(ix2, stat=info)
+#endif 
+      
+      deallocate(ias,jas,vs, stat=info)
 
     else if (.not.use_buffers) then
 
@@ -3815,6 +4109,64 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
       call psi_msort_up(nzin,ia(1:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzin,val,ia,ja,iaux)
+#if defined(OPENMP)
+      !$OMP PARALLEL default(none) &
+      !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads) &
+      !$OMP private(i,j,first_idx,last_idx,nzl,act_row,iret,ithread, &
+      !$OMP work,first_elem,last_elem)
+
+      !$OMP SINGLE
+      nthreads = omp_get_num_threads()
+      !$OMP END SINGLE
+
+      ithread = omp_get_thread_num()
+
+      ! -------- thread-specific workload --------
+
+      work = nr/nthreads
+      if (ithread < MOD(nr,nthreads)) then
+        work = work + 1
+        first_idx = ithread*work + 1
+      else
+	first_idx = ithread*work + MOD(nr,nthreads) + 1
+      end if
+
+      last_idx = first_idx + work - 1
+
+      ! ---------------------------------------------------
+
+      first_elem = 0
+      last_elem = -1
+      act_row = first_idx
+      do j=1,nzin
+        if (ia(j) < act_row) then
+          cycle
+        else if ((ia(j) > last_idx) .or. (work < 1)) then
+          exit
+	else if (ia(j) > act_row) then
+          nzl = last_elem - first_elem + 1
+
+          if (nzl > 0) then
+            call psi_msort_up(nzl,ja(first_elem:),iaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2),iret)
+            if (iret == 0) &
+                 & call psb_ip_reord(nzl,val(first_elem:last_elem),&
+                 & ia(first_elem:last_elem),ja(first_elem:last_elem),&
+                 & iaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2))
+          end if
+
+          act_row = act_row + 1
+          first_elem = 0
+          last_elem = -1
+        else
+          if (first_elem == 0) then
+            first_elem = j
+          end if
+
+          last_elem = j
+        end if
+      end do
+      !$OMP END PARALLEL
+#else
       i    = 1
       j    = i
       do while (i <= nzin)
@@ -3830,18 +4182,19 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
              & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
         i = j
       enddo
-
-      i = 1
-      irw = ia(i)
-      icl = ja(i)
-      j = 1
+#endif
 
       select case(dupl_)
       case(psb_dupl_ovwrt_)
 
+        i = 1
+        irw = ia(i)
+        icl = ja(i)
+        j = 1
         do
           j = j + 1
           if (j > nzin) exit
+          if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
           if ((ia(j) == irw).and.(ja(j) == icl)) then
             val(i) = val(j)
           else
@@ -3856,9 +4209,14 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
       case(psb_dupl_add_)
 
+        i = 1
+        irw = ia(i)
+        icl = ja(i)
+        j = 1
         do
           j = j + 1
           if (j > nzin) exit
+          if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
           if ((ia(j) == irw).and.(ja(j) == icl)) then
             val(i) = val(i) + val(j)
           else
@@ -3872,9 +4230,14 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         enddo
 
       case(psb_dupl_err_)
+        i = 1
+        irw = ia(i)
+        icl = ja(i)
+        j = 1
         do
           j = j + 1
           if (j > nzin) exit
+          if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
           if ((ia(j) == irw).and.(ja(j) == icl)) then
             call psb_errpush(psb_err_duplicate_coo,name)
             goto 9999
@@ -3891,17 +4254,23 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
         info =-7
       end select
+
+      nzout = i
+
     endif
 
     if(debug_level >= psb_debug_serial_)&
          & write(debug_unit,*)  trim(name),': end second loop'
 
-
   case(psb_col_major_)
 
     if (nc <= nzin) then
       ! Avoid strange situations with large indices
+#if defined(OPENMP)
+      allocate(ias(nzin),jas(nzin),vs(nzin), stat=info)
+#else
       allocate(ias(nzin),jas(nzin),vs(nzin),ix2(nzin+2), stat=info)
+#endif
       use_buffers = (info == 0)
     else
       use_buffers = .false.
@@ -3909,138 +4278,351 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
     if (use_buffers) then
       iaux(:) = 0
-      if (.not.(  (ja(1) < 1).or.(ja(1)> nc)) ) then
-        iaux(ja(1)) = iaux(ja(1)) + 1
-        srt_inp = .true.
-        do i=2,nzin
-          if (  (ja(i) < 1).or.(ja(i)> nc)) then
-            use_buffers = .false.
-            srt_inp     = .false.
-            exit
-          end if
+#if defined(OPENMP)
+      !$OMP PARALLEL DO default(none) schedule(STATIC) &
+      !$OMP shared(nzin,ja,nc,iaux) &
+      !$OMP private(i) &
+      !$OMP reduction(.and.:use_buffers)
+      do i=1,nzin
+        if ((ja(i) < 1).or.(ja(i) > nc)) then
+          use_buffers = .false.
+          ! Invalid indices are placed outside the considered range
+          ja(i) = nc+2
+        else
+          !$OMP ATOMIC UPDATE
           iaux(ja(i)) = iaux(ja(i)) + 1
-          srt_inp = srt_inp .and.(ja(i-1)<=ja(i))
-        end do
-      else
-        use_buffers=.false.
-      end if
+        end if
+      end do
+      !$OMP END PARALLEL DO
+#else
+      !srt_inp = .true.
+      do i=1,nzin
+        if ((ja(i) < 1).or.(ja(i) > nc)) then
+          use_buffers = .false.
+          !ja(i) = nc+2
+          !srt_inp     = .false.
+          exit
+        end if
+
+        iaux(ja(i)) = iaux(ja(i)) + 1
+
+        !srt_inp = srt_inp .and.(ja(i-1)<=ja(i))
+      end do
+#endif
     end if
+
     !use_buffers=use_buffers.and.srt_inp
-    ! Check again use_buffers.
+
+    ! Check again use_buffers. We enter here if nzin >= nc and
+    ! all the indices are valid
     if (use_buffers) then
+#if defined(OPENMP)
+      allocate(kaux(MAX(nzin,nc)+2),idxaux(MAX((nr+2)*maxthreads,nc)),sum(maxthreads+1),stat=info)
+      if (info /= psb_success_) then
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
 
-      if (srt_inp) then
-        ! If input was already col-major
-        ! we can do it col-by-col here.
-        k = 0
-        i = 1
-        do j=1, nc
-          nzl = iaux(j)
-          imx = i+nzl-1
+      kaux(:) = 0
+      sum(:) = 0
+      sum(1) = 1
+      err = 0
 
-          if (nzl > 0) then
-            call psi_msort_up(nzl,ia(i:imx),ix2,iret)
-            if (iret == 0) &
-                 & call psb_ip_reord(nzl,val(i:imx),&
-                 & ia(i:imx),ja(i:imx),ix2)
+      ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
+      ! index for each column. We do the same on 'kaux'
+      !$OMP PARALLEL default(none) &
+      !$OMP shared(idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl_,err) &
+      !$OMP private(s,i,j,k,ithread,first_idx,last_idx,work,nxt_val,old_val,saved_elem, &
+      !$OMP first_elem,last_elem,nzl,iret,act_col)
 
-            select case(dupl_)
-            case(psb_dupl_ovwrt_)
+      !$OMP SINGLE
+      nthreads = omp_get_num_threads()
+      !$OMP END SINGLE
+
+      ithread = omp_get_thread_num()
+
+      ! -------- thread-specific workload --------
+
+      work = nc/nthreads
+      if (ithread < MOD(nc,nthreads)) then
+        work = work + 1
+        first_idx = ithread*work + 1
+      else
+        first_idx = ithread*work + MOD(nc,nthreads) + 1
+      end if
+
+      last_idx = first_idx + work - 1
+
+      !-------------------------------------------
+      ! ---------- iaux composition --------------
+
+      s = 0
+      do i=first_idx,last_idx
+        s = s + iaux(i)
+      end do
+      sum(ithread+2) = s
+
+      !$OMP BARRIER
+
+      !$OMP SINGLE
+      do i=2,nthreads+1
+        sum(i) = sum(i) + sum(i-1)
+      end do
+      !$OMP END SINGLE
+
+      if (work > 0) then
+        saved_elem = iaux(first_idx)
+      end if
+      if (ithread == 0) then
+         iaux(1) = 1
+      end if
+
+      !$OMP BARRIER
+
+      if (work > 0) then
+        old_val = iaux(first_idx+1)
+        iaux(first_idx+1) = saved_elem + sum(ithread+1)
+      end if
+
+      do i=first_idx+2,last_idx+1
+        nxt_val = iaux(i)
+        iaux(i) = iaux(i-1) + old_val
+        old_val = nxt_val
+      end do
+
+      ! --------------------------------------
+
+      !$OMP BARRIER
+
+      ! ------------------ Sorting and buffers -------------------
+
+      ! Let's use an auxiliary buffer to get indices
+      do j=first_idx,last_idx
+        idxaux(j) = iaux(j)
+      end do
+
+      ! Here we sort data inside the auxiliary buffers
+      do i=1,nzin
+        act_col = ja(i)
+        if (act_col >= first_idx .and. act_col <= last_idx) then
+          ias(idxaux(act_col)) = ia(i)
+          jas(idxaux(act_col)) = ja(i)
+          vs(idxaux(act_col))  = val(i)
+
+          idxaux(act_col) = idxaux(act_col) + 1
+        end if
+      end do
+
+      !$OMP BARRIER
+
+      ! Let's sort column indices and values. After that we will store
+      ! the number of unique values in 'kaux'
+      do j=first_idx,last_idx
+        first_elem = iaux(j)
+        last_elem = iaux(j+1) - 1
+        nzl = last_elem - first_elem + 1
+
+        ! The column has elements?
+        if (nzl > 0) then
+          call psi_msort_up(nzl,ias(first_elem:last_elem), &
+               & idxaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2),iret)
+
+          if (iret == 0) then
+               call psb_ip_reord(nzl,vs(first_elem:last_elem),&
+               & ias(first_elem:last_elem),jas(first_elem:last_elem), &
+               & idxaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2))
+          end if
+
+          ! Over each column we count the unique values
+          kaux(j) = 1
+          do i=first_elem+1,last_elem
+            if (ias(i) == ias(i-1) .and. jas(i) == jas(i-1)) then
+              cycle
+            end if
+            kaux(j) = kaux(j) + 1
+          end do
+        end if
+      end do
+
+      ! --------------------------------------------------
+
+      ! ---------------- kaux composition ----------------
+
+      !$OMP SINGLE
+      sum(:) = 0
+      sum(1) = 1
+      !$OMP END SINGLE
+
+      s = 0
+      do i=first_idx,last_idx
+        s = s + kaux(i)
+      end do
+      sum(ithread+2) = s
+
+      !$OMP BARRIER
+
+      !$OMP SINGLE
+      do i=2,nthreads+1
+        sum(i) = sum(i) + sum(i-1)
+      end do
+      !$OMP END SINGLE
+
+      if (work > 0) then
+        saved_elem = kaux(first_idx)
+      end if
+      if (ithread == 0) then
+        kaux(1) = 1
+      end if
+
+      !$OMP BARRIER
+
+      if (work > 0) then
+        old_val = kaux(first_idx+1)
+        kaux(first_idx+1) = saved_elem + sum(ithread+1)
+      end if
+
+      do i=first_idx+2,last_idx+1
+        nxt_val = kaux(i)
+        kaux(i) = kaux(i-1) + old_val
+        old_val = nxt_val
+      end do
+
+      !$OMP BARRIER
+
+     ! ------------------------------------------------
+
+     select case(dupl_)
+      case(psb_dupl_ovwrt_)
+        !$OMP DO schedule(STATIC)
+        do j=1,nc
+          first_elem = iaux(j)
+          last_elem = iaux(j+1) - 1
+
+          if (first_elem > last_elem) then
+            cycle
+          end if
+
+          k = kaux(j)
+
+          val(k) = vs(first_elem)
+          ia(k) = ias(first_elem)
+          ja(k) = jas(first_elem)
+
+          do i=first_elem+1,last_elem
+            if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
+              val(k) = vs(i)
+            else
               k = k + 1
-              ia(k)  = ia(i)
-              ja(k)  = ja(i)
-              val(k) = val(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ia(i) == irw).and.(ja(i) == icl)) then
-                  val(k) = val(i)
-                else
-                  k = k+1
-                  val(k) = val(i)
-                  ia(k)  = ia(i)
-                  ja(k)  = ja(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-
-            case(psb_dupl_add_)
-              k = k + 1
-              ia(k)  = ia(i)
-              ja(k)  = ja(i)
-              val(k) = val(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ia(i) == irw).and.(ja(i) == icl)) then
-                  val(k) = val(k) + val(i)
-                else
-                  k = k+1
-                  val(k) = val(i)
-                  ia(k)  = ia(i)
-                  ja(k)  = ja(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-
-            case(psb_dupl_err_)
-              k = k + 1
-              ia(k)  = ia(i)
-              ja(k)  = ja(i)
-              val(k) = val(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ia(i) == irw).and.(ja(i) == icl)) then
-                  call psb_errpush(psb_err_duplicate_coo,name)
-                  goto 9999
-                else
-                  k = k+1
-                  val(k) = val(i)
-                  ia(k)  = ia(i)
-                  ja(k)  = ja(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-            case default
-              write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-              info =-7
-              return
-            end select
-
-          endif
-          !i = i + nzl
-        enddo
-
-      else  if (.not.srt_inp) then
-        ! If input was not already col-major
-        ! we have to sort all
-        ip     = iaux(1)
-        iaux(1) = 0
-        do i=2, nc
-          is = iaux(i)
-          iaux(i) = ip
-          ip = ip + is
+              val(k) = vs(i)
+              ia(k)  = ias(i)
+              ja(k)  = jas(i)
+            endif
+          end do
         end do
-        iaux(nc+1) = ip
+	!$OMP END DO
 
-        do i=1,nzin
-          icl = ja(i)
-          ip = iaux(icl) + 1
-          ias(ip) = ia(i)
-          jas(ip) = ja(i)
-          vs(ip)  = val(i)
-          iaux(icl) = ip
+      case(psb_dupl_add_)
+        !$OMP DO schedule(STATIC)
+        do j=1,nc
+          first_elem = iaux(j)
+          last_elem = iaux(j+1) - 1
+
+          if (first_elem > last_elem) then
+            cycle
+          end if
+
+          k = kaux(j)
+
+          val(k) = vs(first_elem)
+          ia(k) = ias(first_elem)
+          ja(k) = jas(first_elem)
+
+          do i=first_elem+1,last_elem
+            if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
+              val(k) = val(k) + vs(i)
+            else
+              k = k + 1
+              val(k) = vs(i)
+              ia(k)  = ias(i)
+              ja(k)  = jas(i)
+            endif
+          end do
         end do
+	!$OMP END DO
+
+      case(psb_dupl_err_)
+        !$OMP DO schedule(STATIC)
+        do j=1,nc
+          first_elem = iaux(j)
+          last_elem = iaux(j+1) - 1
+
+          if (first_elem > last_elem) then
+            cycle
+          end if
+
+          k = kaux(j)
+
+          val(k) = vs(first_elem)
+          ia(k) = ias(first_elem)
+          ja(k) = jas(first_elem)
+
+          do i=first_elem+1,last_elem
+            if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
+              err = 1
+            else
+              k = k + 1
+              val(k) = vs(i)
+              ia(k)  = ias(i)
+              ja(k)  = jas(i)
+            end if
+          end do
+        end do
+	!$OMP END DO
+
+      case default
+        !$OMP SINGLE
+        err = 2
+        !$OMP END SINGLE
+      end select
+
+      !$OMP END PARALLEL
+
+      if (err == 1) then
+        call psb_errpush(psb_err_duplicate_coo,name)
+        goto 9999
+      else if (err == 2) then
+        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
+        info =-7
+        return
+      end if
+
+      nzout = kaux(nc+1) - 1
+
+      deallocate(sum,kaux,idxaux,stat=info)
+#else
+      !if (.not.srt_inp) then
+      ip     = iaux(1)
+      iaux(1) = 0
+      do i=2, nc
+        is = iaux(i)
+        iaux(i) = ip
+        ip = ip + is
+      end do
+      iaux(nc+1) = ip
+
+      do i=1,nzin
+        icl = ja(i)
+        ip = iaux(icl) + 1
+        ias(ip) = ia(i)
+        jas(ip) = ja(i)
+        vs(ip)  = val(i)
+        iaux(icl) = ip
+      end do
+      !end if
+      
+      select case(dupl_)
+      case(psb_dupl_ovwrt_)
         k = 0
         i = 1
         do j=1, nc
@@ -4052,92 +4634,176 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
-            select case(dupl_)
-            case(psb_dupl_ovwrt_)
-              k = k + 1
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              val(k) = vs(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ias(i) == irw).and.(jas(i) == icl)) then
-                  val(k) = vs(i)
-                else
-                  k = k+1
-                  val(k) = vs(i)
-                  ia(k)  = ias(i)
-                  ja(k)  = jas(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
+            k = k + 1
+            ia(k)  = ias(i)
+            ja(k)  = jas(i)
+            val(k) = vs(i)
+            irw = ia(k)
+            icl = ja(k)
+            do
+              i = i + 1
+              if (i > imx) exit
+              if ((ias(i) == irw).and.(jas(i) == icl)) then
+                val(k) = vs(i)
+              else
+                k = k+1
+                val(k) = vs(i)
+                ia(k)  = ias(i)
+                ja(k)  = jas(i)
+                irw = ia(k)
+                icl = ja(k)
+              endif
+            enddo
+          end if
+        end do
 
-            case(psb_dupl_add_)
-              k = k + 1
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              val(k) = vs(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ias(i) == irw).and.(jas(i) == icl)) then
-                  val(k) = val(k) + vs(i)
-                else
-                  k = k+1
-                  val(k) = vs(i)
-                  ia(k)  = ias(i)
-                  ja(k)  = jas(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
+      case(psb_dupl_add_)
+        k = 0
+        i = 1
+        do j=1, nc
+          nzl = iaux(j)-i+1
+          imx = i+nzl-1
 
-            case(psb_dupl_err_)
-              k = k + 1
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              val(k) = vs(i)
-              irw = ia(k)
-              icl = ja(k)
-              do
-                i = i + 1
-                if (i > imx) exit
-                if ((ias(i) == irw).and.(jas(i) == icl)) then
-                  call psb_errpush(psb_err_duplicate_coo,name)
-                  goto 9999
-                else
-                  k = k+1
-                  val(k) = vs(i)
-                  ia(k)  = ias(i)
-                  ja(k)  = jas(i)
-                  irw = ia(k)
-                  icl = ja(k)
-                endif
-              enddo
-            case default
-              write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-              info =-7
-              return
-            end select
+          if (nzl > 0) then
+            call psi_msort_up(nzl,ias(i:imx),ix2,iret)
+            if (iret == 0) &
+                 & call psb_ip_reord(nzl,vs(i:imx),&
+                 & ias(i:imx),jas(i:imx),ix2)
+            k = k + 1
+            ia(k)  = ias(i)
+            ja(k)  = jas(i)
+            val(k) = vs(i)
+            irw = ia(k)
+            icl = ja(k)
+            do
+              i = i + 1
+              if (i > imx) exit
+              if ((ias(i) == irw).and.(jas(i) == icl)) then
+                val(k) = val(k) + vs(i)
+              else
+                k = k+1
+                val(k) = vs(i)
+                ia(k)  = ias(i)
+                ja(k)  = jas(i)
+                irw = ia(k)
+                icl = ja(k)
+              endif
+            enddo
+          end if
+        end do
 
-          endif
-        enddo
+      case(psb_dupl_err_)
+        k = 0
+        i = 1
+        do j=1, nc
+          nzl = iaux(j)-i+1
+          imx = i+nzl-1
 
-      end if
+          if (nzl > 0) then
+            call psi_msort_up(nzl,ias(i:imx),ix2,iret)
+            if (iret == 0) &
+                 & call psb_ip_reord(nzl,vs(i:imx),&
+                 & ias(i:imx),jas(i:imx),ix2)
+            k = k + 1
+            ia(k)  = ias(i)
+            ja(k)  = jas(i)
+            val(k) = vs(i)
+            irw = ia(k)
+            icl = ja(k)
+            do
+              i = i + 1
+              if (i > imx) exit
+              if ((ias(i) == irw).and.(jas(i) == icl)) then
+                call psb_errpush(psb_err_duplicate_coo,name)
+                goto 9999
+              else
+                k = k+1
+                val(k) = vs(i)
+                ia(k)  = ias(i)
+                ja(k)  = jas(i)
+                irw = ia(k)
+                icl = ja(k)
+              endif
+            enddo
+          end if
+        end do
 
-      i=k
-      deallocate(ias,jas,vs,ix2, stat=info)
+      case default
+        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
+        info =-7
+        return
+      end select
+     
+      nzout = k
+
+      deallocate(ix2, stat=info)
+#endif
+
+      deallocate(ias,jas,vs, stat=info)
 
     else if (.not.use_buffers) then
 
       call psi_msort_up(nzin,ja(1:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzin,val,ia,ja,iaux)
+#if defined(OPENMP)
+      !$OMP PARALLEL default(none) &
+      !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads) &
+      !$OMP private(i,j,first_idx,last_idx,nzl,act_col, &
+      !$OMP iret,ithread,work,first_elem,last_elem)
+
+      !$OMP SINGLE
+      nthreads = omp_get_num_threads()
+      !$OMP END SINGLE
+
+      ithread = omp_get_thread_num()
+
+      ! -------- thread-specific workload --------
+
+      work = nc/nthreads
+      if (ithread < MOD(nc,nthreads)) then
+        work = work + 1
+        first_idx = ithread*work + 1
+      else
+	first_idx = ithread*work + MOD(nc,nthreads) + 1
+      end if
+
+      last_idx = first_idx + work - 1
+
+      ! ---------------------------------------------------
+
+      first_elem = 0
+      last_elem = -1
+      act_col = first_idx
+      do j=1,nzin
+        if (ja(j) < act_col) then
+          cycle
+        else if ((ja(j) > last_idx) .or. (work < 1)) then
+          exit
+	else if (ja(j) > act_col) then
+          nzl = last_elem - first_elem + 1
+
+          if (nzl > 0) then
+            call psi_msort_up(nzl,ia(first_elem:),iaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2),iret)
+            if (iret == 0) &
+               & call psb_ip_reord(nzl,val(first_elem:last_elem),&
+               & ia(first_elem:last_elem),ja(first_elem:last_elem),&
+               & iaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2))
+          end if
+
+          act_col = act_col + 1
+          first_elem = 0
+          last_elem = -1
+        else
+          if (first_elem == 0) then
+            first_elem = j
+          end if
+
+          last_elem = j
+        end if
+      end do
+      !$OMP END PARALLEL
+#else
       i    = 1
       j    = i
       do while (i <= nzin)
@@ -4152,6 +4818,7 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
              & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
         i = j
       enddo
+#endif
 
       i = 1
       irw = ia(i)
@@ -4164,6 +4831,7 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         do
           j = j + 1
           if (j > nzin) exit
+          if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
           if ((ia(j) == irw).and.(ja(j) == icl)) then
             val(i) = val(j)
           else
@@ -4180,6 +4848,7 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         do
           j = j + 1
           if (j > nzin) exit
+          if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
           if ((ia(j) == irw).and.(ja(j) == icl)) then
             val(i) = val(i) + val(j)
           else
@@ -4196,6 +4865,7 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         do
           j = j + 1
           if (j > nzin) exit
+          if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
           if ((ia(j) == irw).and.(ja(j) == icl)) then
             call psb_errpush(psb_err_duplicate_coo,name)
             goto 9999
@@ -4212,6 +4882,9 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
         info =-7
       end select
+
+      nzout = i
+
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*)  trim(name),': end second loop'
 
@@ -4223,8 +4896,6 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
     call psb_errpush(info,name)
     goto 9999
   end select
-
-  nzout = i
 
   deallocate(iaux)
 
@@ -4529,7 +5200,7 @@ function psb_lc_coo_maxval(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max: res)
     do i=1, nnz
       res = max(res,abs(a%val(i)))
     end do
@@ -4596,7 +5267,7 @@ function psb_lc_coo_csnmi(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max: res)
     do i=1, m
       res = max(res,abs(vt(i)))
     end do
@@ -4646,7 +5317,7 @@ function psb_lc_coo_csnm1(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max: res)
     do i=1, n
       res = max(res,abs(vt(i)))
     end do
