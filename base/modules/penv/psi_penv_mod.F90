@@ -1138,6 +1138,13 @@ contains
 
 
   function psb_m_get_mpi_comm(ctxt) result(comm)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: comm
     comm = mpi_comm_null
@@ -1153,6 +1160,13 @@ contains
   end function psb_m_get_mpi_rank
 
   subroutine psb_get_mpicomm(ctxt,comm)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: comm
     comm = mpi_comm_null
