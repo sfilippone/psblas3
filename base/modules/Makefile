@@ -375,7 +375,7 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 
 psb_base_mod.o: $(MODULES)
 
-penv/psi_penv_mod.o: penv/psi_penv_mod.F90 psb_const_mod.o serial/psb_vect_mod.o serial/psb_mat_mod.o
+penv/psi_penv_mod.o: penv/psi_penv_mod.F90 psb_const_mod.o serial/psb_vect_mod.o serial/psb_mat_mod.o desc/psb_desc_const_mod.o
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)
