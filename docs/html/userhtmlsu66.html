@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 325--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 345--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu70.html" >next</a>] [<a 
 href="userhtmlsu65.html" >prev</a>] [<a 
 href="userhtmlsu65.html#tailuserhtmlsu65.html" >prev-tail</a>] [<a 
@@ -22,10 +22,10 @@ href="userhtmlsu59.html#userhtmlsu69.html" >up</a>] </p></div>
 
                                                                   
    <pre class="verbatim" id="verbatim-70">
-call&#x00A0;psb_sum(ctxt,&#x00A0;dat,&#x00A0;root)
+call&#x00A0;psb_sum(ctxt,&#x00A0;dat,&#x00A0;root&#x00A0;[,&#x00A0;mode,&#x00A0;request])
 </pre>
-<!--l. 329--><p class="nopar" >
-<!--l. 331--><p class="indent" >   This subroutine implements a sum reduction operation based on the underlying
+<!--l. 349--><p class="nopar" >
+<!--l. 351--><p class="indent" >   This subroutine implements a sum reduction operation based on the underlying
 communication library.
      <dl class="description"><dt class="description">
 <span 
@@ -74,8 +74,38 @@ class="cmsy-10">-</span>1 <span
 class="cmmi-10">&#x003C;</span>= <span 
 class="cmmi-10">root &#x003C;</span>= <span 
 class="cmmi-10">np </span><span 
-class="cmsy-10">- </span>1, default -1. &#x00A0;</dd></dl>
-<!--l. 358--><p class="indent" >
+class="cmsy-10">- </span>1, default -1. &#x00A0;
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mode</span> </dt><dd 
+class="description">Whether the call is started in non-blocking mode and completed later,
+     or is executed fully.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer, with the value determined by the bitwise OR of
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected.<br 
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">request</span> </dt><dd 
+class="description">A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> does not specifies immediate completion, then this variable must
+     be present.</dd></dl>
+<!--l. 392--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -92,12 +122,22 @@ class="newline" />Intent: <span
 class="cmbx-10">inout</span>.<br 
 class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
      or a rank 1 or 2 array. <br 
-class="newline" />Type, kind, rank and size must agree on all processes.</dd></dl>
-<!--l. 369--><p class="noindent" ><span 
+class="newline" />Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">request</span> </dt><dd 
+class="description">A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> does not specifies immediate completion, then this variable must
+     be present.</dd></dl>
+<!--l. 409--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
-                                                                  
-
-                                                                  
      <ol  class="enumerate1" >
      <li 
   class="enumerate" id="x78-115002x1">The <span class="obeylines-h"><span class="verb"><span 
@@ -113,12 +153,12 @@ class="cmtt-10">dat</span></span></span> argument may also be a long integer sca
                                                                   
 
                                                                   
-   <!--l. 379--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 419--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu70.html" >next</a>] [<a 
 href="userhtmlsu65.html" >prev</a>] [<a 
 href="userhtmlsu65.html#tailuserhtmlsu65.html" >prev-tail</a>] [<a 
 href="userhtmlsu66.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlsu69.html" >up</a>] </p></div>
-<!--l. 379--><p class="indent" >   <a 
+<!--l. 419--><p class="indent" >   <a 
  id="tailuserhtmlsu66.html"></a>  
 </body></html> 

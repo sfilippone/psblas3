@@ -280,7 +280,7 @@ Specified as: an integer variable.
 \clearpage\subsection{psb\_bcast --- Broadcast data}
 
 \begin{verbatim}
-call psb_bcast(ctxt, dat, root)
+call psb_bcast(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a broadcast operation based on the
@@ -307,25 +307,45 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $0<= root <= np-1$, default 0 \
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
 \begin{description}
 \item[\bf On Return]
-\item[dat] On processes other than  root, the data to be broadcast.\\
+\item[dat] On all processes other than  root, the broadcasted data.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array, or a character or logical scalar. \
 Type, kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
 \clearpage\subsection{psb\_sum --- Global sum}
 
 \begin{verbatim}
-call psb_sum(ctxt, dat, root)
+call psb_sum(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a sum reduction  operation based on the
@@ -352,6 +372,20 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -364,6 +398,12 @@ Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \\
 Type, kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 {\par\noindent\large\bfseries Notes}
@@ -379,7 +419,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_max --- Global maximum}
 
 \begin{verbatim}
-call psb_max(ctxt, dat, root)
+call psb_max(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a maximum valuereduction
@@ -406,6 +446,20 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -418,6 +472,12 @@ Intent: {\bf in}.\\
 Specified as: an integer or  real variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -432,7 +492,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_min --- Global minimum}
 
 \begin{verbatim}
-call psb_min(ctxt, dat, root)
+call psb_min(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a minimum value reduction
@@ -459,6 +519,20 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -471,6 +545,12 @@ Intent: {\bf inout}.\\
 Specified as: an integer  or  real variable, which may be a
 scalar, or a rank 1 or 2 array. \\
 Type, kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -485,7 +565,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_amx --- Global maximum absolute value}
 
 \begin{verbatim}
-call psb_amx(ctxt, dat, root)
+call psb_amx(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a maximum absolute value reduction
@@ -512,6 +592,20 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -524,6 +618,12 @@ Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -538,7 +638,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_amn --- Global minimum absolute value}
 
 \begin{verbatim}
-call psb_amn(ctxt, dat, root)
+call psb_amn(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a minimum absolute value reduction
@@ -565,6 +665,20 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -577,6 +691,12 @@ Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \\
 Type, kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -591,7 +711,7 @@ Type, kind, rank and size must agree on all processes.
 \clearpage\subsection{psb\_nrm2 --- Global 2-norm reduction}
 
 \begin{verbatim}
-call psb_nrm2(ctxt, dat, root)
+call psb_nrm2(ctxt, dat, root [, mode, request])
 \end{verbatim}
 
 This subroutine implements a 2-norm value reduction 
@@ -618,6 +738,20 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\item[mode] Whether the call is started in non-blocking mode and completed
+  later, or is executed fully.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer, with the value determined by the bitwise OR
+of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected.\\
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
@@ -630,6 +764,12 @@ Intent: {\bf inout}.\\
 Specified as: a real variable, which may be a
 scalar, or a rank 1 array. \\
 Kind, rank and size must agree on all processes.
+\item[request] A request variable to check for operation completion.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf inout}.\\
+If \verb|mode| does not specifies immediate completion, then this
+variable must be present.
 \end{description}
 
 
