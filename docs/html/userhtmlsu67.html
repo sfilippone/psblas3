@@ -22,7 +22,7 @@ href="userhtmlsu59.html#userhtmlsu70.html" >up</a>] </p></div>
 
                                                                   
    <pre class="verbatim" id="verbatim-71">
-call&#x00A0;psb_max(ctxt,&#x00A0;dat,&#x00A0;root&#x00A0;[,&#x00A0;mode,&#x00A0;request])
+call&#x00A0;psb_max(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
 <!--l. 423--><p class="nopar" >
 <!--l. 425--><p class="indent" >   This subroutine implements a maximum valuereduction operation based on the
@@ -81,7 +81,7 @@ class="newline" />
 <span 
 class="cmbx-10">mode</span> </dt><dd 
 class="description">Whether the call is started in non-blocking mode and completed later,
-     or is executed fully.<br 
+     or is executed synchronously.<br 
 class="newline" />Scope: <span 
 class="cmbx-10">global</span>.<br 
 class="newline" />Type: <span 
@@ -92,7 +92,7 @@ class="newline" />Specified as: an integer, with the value determined by the bit
      <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
-     selected.<br 
+     selected (i.e. require synchronous completion).<br 
 class="newline" />
                                                                   
 
@@ -108,7 +108,7 @@ class="cmbx-10">optional</span>.<br
 class="newline" />Intent: <span 
 class="cmbx-10">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specifies immediate completion, then this variable must
+class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
 <!--l. 466--><p class="indent" >
      <dl class="description"><dt class="description">
@@ -138,7 +138,7 @@ class="cmbx-10">optional</span>.<br
 class="newline" />Intent: <span 
 class="cmbx-10">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specifies immediate completion, then this variable must
+class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
 <!--l. 484--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>

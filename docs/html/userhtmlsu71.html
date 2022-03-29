@@ -22,7 +22,7 @@ href="userhtmlsu59.html#userhtmlse8.html" >up</a>] </p></div>
 
                                                                   
    <pre class="verbatim" id="verbatim-75">
-call&#x00A0;psb_nrm2(ctxt,&#x00A0;dat,&#x00A0;root&#x00A0;[,&#x00A0;mode,&#x00A0;request])
+call&#x00A0;psb_nrm2(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
 <!--l. 715--><p class="nopar" >
 <!--l. 717--><p class="indent" >   This subroutine implements a 2-norm value reduction operation based on the
@@ -80,7 +80,7 @@ class="newline" />
 <span 
 class="cmbx-10">mode</span> </dt><dd 
 class="description">Whether the call is started in non-blocking mode and completed later,
-     or is executed fully.<br 
+     or is executed synchronously.<br 
 class="newline" />Scope: <span 
 class="cmbx-10">global</span>.<br 
 class="newline" />Type: <span 
@@ -91,7 +91,7 @@ class="newline" />Specified as: an integer, with the value determined by the bit
      <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
-     selected.<br 
+     selected (i.e. require synchronous completion).<br 
 class="newline" />
      </dd><dt class="description">
 <span 
@@ -104,9 +104,9 @@ class="cmbx-10">optional</span>.<br
 class="newline" />Intent: <span 
 class="cmbx-10">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specifies immediate completion, then this variable must
+class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 758--><p class="indent" >
+<!--l. 759--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -134,9 +134,9 @@ class="cmbx-10">optional</span>.<br
 class="newline" />Intent: <span 
 class="cmbx-10">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specifies immediate completion, then this variable must
+class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 776--><p class="noindent" ><span 
+<!--l. 777--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
@@ -158,7 +158,7 @@ src="userhtml29x.png" alt="     &#x2218; -------
 res =     dati,
          i
      " class="math-display" ></center>
-     <!--l. 782--><p class="nopar" > with care taken to avoid unnecessary overflow.
+     <!--l. 783--><p class="nopar" > with care taken to avoid unnecessary overflow.
      </li>
      <li 
   class="enumerate" id="x83-120006x3">The <span class="obeylines-h"><span class="verb"><span 
@@ -170,12 +170,12 @@ class="cmtt-10">dat</span></span></span> argument is both input and output, and 
                                                                   
 
                                                                   
-   <!--l. 791--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 792--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu74.html" >next</a>] [<a 
 href="userhtmlsu70.html" >prev</a>] [<a 
 href="userhtmlsu70.html#tailuserhtmlsu70.html" >prev-tail</a>] [<a 
 href="userhtmlsu71.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlse8.html" >up</a>] </p></div>
-<!--l. 791--><p class="indent" >   <a 
+<!--l. 792--><p class="indent" >   <a 
  id="tailuserhtmlsu71.html"></a>  
 </body></html> 

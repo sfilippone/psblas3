@@ -280,7 +280,7 @@ Specified as: an integer variable.
 \clearpage\subsection{psb\_bcast --- Broadcast data}
 
 \begin{verbatim}
-call psb_bcast(ctxt, dat, root [, mode, request])
+call psb_bcast(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a broadcast operation based on the
@@ -308,18 +308,18 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $0<= root <= np-1$, default 0 \
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -337,7 +337,7 @@ Type, kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -345,7 +345,7 @@ variable must be present.
 \clearpage\subsection{psb\_sum --- Global sum}
 
 \begin{verbatim}
-call psb_sum(ctxt, dat, root [, mode, request])
+call psb_sum(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a sum reduction  operation based on the
@@ -373,18 +373,18 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -402,7 +402,7 @@ Type, kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -419,7 +419,7 @@ variable must be present.
 \clearpage\subsection{psb\_max --- Global maximum}
 
 \begin{verbatim}
-call psb_max(ctxt, dat, root [, mode, request])
+call psb_max(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a maximum valuereduction
@@ -447,18 +447,18 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -476,7 +476,7 @@ Type, kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -492,7 +492,7 @@ variable must be present.
 \clearpage\subsection{psb\_min --- Global minimum}
 
 \begin{verbatim}
-call psb_min(ctxt, dat, root [, mode, request])
+call psb_min(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a minimum value reduction
@@ -520,18 +520,18 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -549,7 +549,7 @@ Type, kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -565,7 +565,7 @@ variable must be present.
 \clearpage\subsection{psb\_amx --- Global maximum absolute value}
 
 \begin{verbatim}
-call psb_amx(ctxt, dat, root [, mode, request])
+call psb_amx(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a maximum absolute value reduction
@@ -593,18 +593,18 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -622,7 +622,7 @@ Type, kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -638,7 +638,7 @@ variable must be present.
 \clearpage\subsection{psb\_amn --- Global minimum absolute value}
 
 \begin{verbatim}
-call psb_amn(ctxt, dat, root [, mode, request])
+call psb_amn(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a minimum absolute value reduction
@@ -666,18 +666,18 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -695,7 +695,7 @@ Type, kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -711,7 +711,7 @@ variable must be present.
 \clearpage\subsection{psb\_nrm2 --- Global 2-norm reduction}
 
 \begin{verbatim}
-call psb_nrm2(ctxt, dat, root [, mode, request])
+call psb_nrm2(ctxt, dat [, root, mode, request])
 \end{verbatim}
 
 This subroutine implements a 2-norm value reduction 
@@ -739,18 +739,19 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \item[mode] Whether the call is started in non-blocking mode and completed
-  later, or is executed fully.\\
+  later, or is executed synchronously.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, with the value determined by the bitwise OR
 of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected.\\
+Default:  both fields are selected (i.e. require synchronous
+completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
@@ -768,7 +769,7 @@ Kind, rank and size must agree on all processes.
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf inout}.\\
-If \verb|mode| does not specifies immediate completion, then this
+If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
 
