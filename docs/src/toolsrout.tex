@@ -594,7 +594,9 @@ An integer value; 0 means no error has been detected.
 \item Providing a good estimate for the number of nonzeroes $nnz$ in
   the assembled matrix may substantially improve performance in the
   matrix build phase, as it will reduce or eliminate the need for
-  (potentially multiple) data reallocations. 
+  (potentially multiple) data reallocations;
+\item Using \verb|psb_matbld_remote_| will cause an overhead at
+  assembly time;
 \end{enumerate}
 
 
@@ -772,6 +774,13 @@ Scope:{\bf local}\\
 Type:{\bf required}\\
 Intent: {\bf inout}.\\
 Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in/out}.\\
+Specified as: a structured data of type \descdata. If the matrix was
+allocated with \verb|buildmode=psb_matbld_remote_|, then the
+descriptor will be reassembled. 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
