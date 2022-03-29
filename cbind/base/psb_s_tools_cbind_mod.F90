@@ -212,6 +212,33 @@ contains
   end function psb_c_sspall
 
 
+ function psb_c_sspall_remote(mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      return
+    end if
+    allocate(ap)
+    call psb_spall(ap,descp,info,bldmode=psb_matbld_remote_)
+    mh%item = c_loc(ap)
+    res = min(0,info)
+
+    return
+  end function psb_c_sspall_remote
 
  function psb_c_sspasb(mh,cdh) bind(c) result(res)
 
@@ -240,7 +267,6 @@ contains
     res = min(0,info)
     return
   end function psb_c_sspasb
-
 
   function psb_c_sspfree(mh,cdh) bind(c) result(res)
 

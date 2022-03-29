@@ -35,6 +35,7 @@ psb_z_t    psb_c_zgetelem(psb_c_zvector *xh,psb_l_t index,psb_c_descriptor *cd);
 /* sparse matrices*/
 psb_c_zspmat* psb_c_new_zspmat();
 psb_i_t    psb_c_zspall(psb_c_zspmat *mh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_zspall_remote(psb_c_zspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zspasb(psb_c_zspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zspfree(psb_c_zspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zspins(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl,

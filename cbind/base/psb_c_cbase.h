@@ -35,6 +35,7 @@ psb_c_t    psb_c_cgetelem(psb_c_cvector *xh,psb_l_t index,psb_c_descriptor *cd);
 /* sparse matrices*/
 psb_c_cspmat* psb_c_new_cspmat();
 psb_i_t    psb_c_cspall(psb_c_cspmat *mh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_cspall_remote(psb_c_cspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_cspasb(psb_c_cspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_cspfree(psb_c_cspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_cspins(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl,
