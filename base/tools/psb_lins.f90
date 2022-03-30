@@ -112,7 +112,6 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
   endif
 
 
-
   allocate(irl(m),stat=info) 
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_

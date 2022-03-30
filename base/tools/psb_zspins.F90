@@ -151,11 +151,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
           call psb_errpush(info,name,a_err='a%csput')
           goto 9999
         end if
-        
-        select case(a%remote_build)
-        case (psb_matbld_noremote_)
-          ! Do nothing
-        case (psb_matbld_remote_)
+
+        if (a%is_remote_build()) then 
           nnl = count(ila(1:nz)<0)
           if (nnl > 0) then 
             !write(0,*) 'Check on insert ',nnl
@@ -173,9 +170,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
             call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
                  & 1_psb_lpk_,desc_a%get_global_rows(),info)
           end if
-        case default
-          write(0,*) name,' Ignoring wrong value for %remote_build'
-        end select
+        end if
           
       else
         info = psb_err_invalid_a_and_cd_state_
@@ -208,10 +203,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       call psb_errpush(info,name,a_err='a%csput')
       goto 9999
     end if
-    select case(a%remote_build)
-    case (psb_matbld_noremote_)
-      ! Do nothing
-    case (psb_matbld_remote_)
+    if (a%is_remote_build()) then 
       nnl = count(ila(1:nz)<0)
       if (nnl > 0) then 
         !write(0,*) 'Check on insert ',nnl
@@ -229,10 +221,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
              & 1_psb_lpk_,desc_a%get_global_rows(),info)
       end if
-    case default
-      write(0,*) name,' Ignoring wrong value for %remote_build'
-    end select
-    
+    end if
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)

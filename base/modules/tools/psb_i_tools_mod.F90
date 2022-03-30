@@ -64,13 +64,14 @@ Module psb_i_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_iasb_vect(x, desc_a, info,mold, scratch)
+    subroutine psb_iasb_vect(x, desc_a, info,mold, dupl,scratch)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
       type(psb_i_vect_type), intent(inout) :: x
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_i_base_vect_type), intent(in), optional :: mold
+      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: scratch
     end subroutine psb_iasb_vect
     subroutine psb_iasb_vect_r2(x, desc_a, info,mold, scratch)

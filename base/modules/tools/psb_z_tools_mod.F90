@@ -67,13 +67,14 @@ Module psb_z_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_zasb_vect(x, desc_a, info,mold, scratch)
+    subroutine psb_zasb_vect(x, desc_a, info,mold, dupl,scratch)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
       type(psb_z_vect_type), intent(inout) :: x
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_z_base_vect_type), intent(in), optional :: mold
+      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: scratch
     end subroutine psb_zasb_vect
     subroutine psb_zasb_vect_r2(x, desc_a, info,mold, scratch)
@@ -262,14 +263,25 @@ Module psb_z_tools_mod
     end subroutine psb_zspasb
   end interface
 
+  interface psb_remote_vect
+    subroutine psb_z_remote_vect(v,desc_a, dupl, info)
+      import
+      implicit none
+      type(psb_z_vect_type),Intent(inout)  :: v
+      type(psb_desc_type),intent(in)       :: desc_a
+      integer(psb_ipk_), intent(in)        :: dupl
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psb_z_remote_vect
+  end interface psb_remote_vect
+
   interface psb_remote_mat
     subroutine psb_lz_remote_mat(a,desc_a,b, info)
       import
       implicit none
-      type(psb_lz_coo_sparse_mat),Intent(inout) :: a
+      type(psb_lz_coo_sparse_mat),Intent(inout)  :: a
       type(psb_desc_type),intent(inout)         :: desc_a
-      type(psb_lz_coo_sparse_mat),Intent(inout) :: b
-      integer(psb_ipk_), intent(out)                    :: info
+      type(psb_lz_coo_sparse_mat),Intent(inout)  :: b
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lz_remote_mat
   end interface psb_remote_mat
   

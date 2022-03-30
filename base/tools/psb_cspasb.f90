@@ -106,11 +106,7 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
     !
     ! First case: we come from a fresh build. 
     ! 
-
-    select case(a%remote_build)
-    case (psb_matbld_noremote_)
-      !  nothing needed
-    case (psb_matbld_remote_)
+    if (a%is_remote_build()) then 
       !write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
       block
         type(psb_lc_coo_sparse_mat) :: a_add
@@ -143,11 +139,42 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
         if (nzt > 0) call psb_cdasb(desc_a,info,mold=ivm)
 
       end block
-    end select
-    call a%set_ncols(desc_a%get_local_cols())
-    
+    end if
+    call a%set_ncols(desc_a%get_local_cols())    
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
   else if (a%is_upd()) then 
+    if (a%is_remote_build()) then 
+      !write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
+      block
+        type(psb_lc_coo_sparse_mat) :: a_add
+        integer(psb_ipk_), allocatable :: ila(:), jla(:)
+        integer(psb_ipk_) :: nz, nzt,k
+        call psb_remote_mat(a%rmta,desc_a,a_add,info)
+        nz = a_add%get_nzeros()
+!!$        write(0,*) me,name,' Nz to be added',nz
+        nzt = nz
+        call psb_sum(ctxt,nzt)
+        if (nzt>0) then
+          allocate(ivm, mold=desc_a%v_halo_index%v)
+          call psb_cd_reinit(desc_a, info)
+        end if
+        if (nz > 0) then
+          !
+          ! Should we check for new indices here?
+          !
+          call psb_realloc(nz,ila,info)
+          call psb_realloc(nz,jla,info)
+          call desc_a%indxmap%g2l(a_add%ia(1:nz),ila(1:nz),info,owned=.true.)    
+          if (info == 0) call desc_a%indxmap%g2l_ins(a_add%ja(1:nz),jla(1:nz),info)
+          !write(0,*) me,name,' Check before insert',a%get_nzeros()
+          n_row = desc_a%get_local_rows()
+          n_col = desc_a%get_local_cols()
+          call a%set_ncols(desc_a%get_local_cols())
+          call a%csput(nz,ila,jla,a_add%val,ione,n_row,ione,n_col,info)
+          !write(0,*) me,name,' Check after insert',a%get_nzeros(),nz
+        end if
+      end block
+    end if
     call a%asb(mold=mold)
   else
     info = psb_err_invalid_mat_state_

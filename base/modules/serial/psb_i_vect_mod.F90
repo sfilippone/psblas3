@@ -43,10 +43,16 @@ module psb_i_vect_mod
 
   type psb_i_vect_type
     class(psb_i_base_vect_type), allocatable :: v
+    integer(psb_ipk_) :: nrmv = 0
+    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_), allocatable :: rmtv(:)
+    integer(psb_lpk_), allocatable :: rmidx(:)
   contains
     procedure, pass(x) :: get_nrows => i_vect_get_nrows
     procedure, pass(x) :: sizeof   => i_vect_sizeof
     procedure, pass(x) :: get_fmt  => i_vect_get_fmt
+    procedure, pass(x) :: is_remote_build => psb_i_is_remote_build
+    procedure, pass(x) :: set_remote_build => psb_i_set_remote_build
     procedure, pass(x) :: all      => i_vect_all
     procedure, pass(x) :: reall    => i_vect_reall
     procedure, pass(x) :: zero     => i_vect_zero
@@ -115,6 +121,25 @@ module psb_i_vect_mod
 contains
 
 
+  function psb_i_is_remote_build(x) result(res)
+    implicit none
+    class(psb_i_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%remote_build == psb_matbld_remote_)
+  end function psb_i_is_remote_build
+
+  subroutine psb_i_set_remote_build(x,val)
+    implicit none
+    class(psb_i_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%remote_build = val
+    else
+      x%remote_build = psb_matbld_remote_
+    end if
+  end subroutine psb_i_set_remote_build
+        
   subroutine  psb_i_set_vect_default(v)
     implicit none
     class(psb_i_base_vect_type), intent(in) :: v
@@ -307,13 +332,14 @@ contains
     if (allocated(x%v)) res = x%v%get_fmt()
   end function i_vect_get_fmt
 
-  subroutine i_vect_all(n, x, info, mold)
+  subroutine i_vect_all(n, x, info, mold,mode)
 
     implicit none
     integer(psb_ipk_), intent(in)           :: n
     class(psb_i_vect_type), intent(inout) :: x
-    class(psb_i_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
+    class(psb_i_base_vect_type), intent(in), optional :: mold
+    integer(psb_ipk_), intent(in), optional :: mode
 
     if (allocated(x%v)) &
          & call x%free(info)
@@ -328,7 +354,9 @@ contains
     else
       info = psb_err_alloc_dealloc_
     end if
-
+    x%nrmv = 0
+    x%remote_build = psb_matbld_noremote_ 
+    if (present(mode)) call x%set_remote_build(mode)
   end subroutine i_vect_all
 
   subroutine i_vect_reall(n, x, info)
@@ -359,13 +387,13 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_i_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)        :: info
 
-    if (allocated(x%v)) &
-         & call x%v%asb(n,info)
-
+    if (allocated(x%v)) then
+      call x%v%asb(n,info)
+    end if
   end subroutine i_vect_asb
 
   subroutine i_vect_gthab(n,idx,alpha,x,beta,y)

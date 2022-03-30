@@ -116,22 +116,28 @@ subroutine psb_sspalloc(a, desc_a, info, nnz, bldmode)
 
 !!$  write(0,*) name,'Setting a%remote_build ',&
 !!$       & bldmode_,psb_matbld_noremote_,psb_matbld_remote_
-  a%remote_build = bldmode_
-  
-  select case(a%remote_build)
-  case (psb_matbld_noremote_)
-    !  nothing needed
-    !write(0,*) name,' matbld_noremote_   nothing needed'
-  case (psb_matbld_remote_)
-    !write(0,*) name,' matbld_remote_  start '
+  call a%set_remote_build(bldmode_)
+  if (a%is_remote_build()) then
     allocate(a%rmta)
     nnzrmt_ = max(100,(nnz_/100))
     call a%rmta%allocate(m,n,nnzrmt_)
-      
-  case default
-    write(0,*) name,'Invalid value for remote_build '
-    a%remote_build = psb_matbld_noremote_
-  end select
+  end if
+
+!!$  a%remote_build = bldmode_  
+!!$  select case(a%remote_build)
+!!$  case (psb_matbld_noremote_)
+!!$    !  nothing needed
+!!$    !write(0,*) name,' matbld_noremote_   nothing needed'
+!!$  case (psb_matbld_remote_)
+!!$    !write(0,*) name,' matbld_remote_  start '
+!!$    allocate(a%rmta)
+!!$    nnzrmt_ = max(100,(nnz_/100))
+!!$    call a%rmta%allocate(m,n,nnzrmt_)
+!!$      
+!!$  case default
+!!$    write(0,*) name,'Invalid value for remote_build '
+!!$    a%remote_build = psb_matbld_noremote_
+!!$  end select
   
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',  &
