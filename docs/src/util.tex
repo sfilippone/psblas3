@@ -206,6 +206,54 @@ Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
+{\par\noindent\large\bfseries Notes}
+
+If this function is called on a matrix \lstinline|a| on a distributed communicator
+only the local part is written in output. To get a single MatrixMarket file with
+the whole matrix when appropriate, e.g. for debugging purposes, one could \emph{gather} 
+the  whole matrix on a single rank and then write it. Consider the following example
+for a \emph{double} precision matrix\vspace{-0.5em}
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+type(psb_ldspmat_type) :: aglobal
+
+call psb_gather(aglobal,a,desc_a,info)
+if (iam == psb_root_) then
+	call mm_mat_write(aglobal,mtitle,info,filename)
+end if
+call psb_spfree(aglobal, desc_a, info)
+\end{minted}
+\else
+\begin{center}
+\begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+type(psb_ldspmat_type) :: aglobal
+
+call psb_gather(aglobal,a,desc_a,info)
+if (iam == psb_root_) then
+call mm_mat_write(aglobal,mtitle,info,filename)
+end if
+call psb_spfree(aglobal, desc_a, info)
+\end{verbatim}
+\end{minipage}
+\end{center}
+\fi
+To simplify this procedure in \verb|C|, there is a utility function\vspace{-0.5em}
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{c}
+psb_i_t psb_c_<s,d,c,z>global_mat_write(ah,cdh);
+\end{minted}
+\else
+\begin{center}
+\begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim}
+psb_i_t psb_c_<s,d,c,z>global_mat_write(ah,cdh);
+\end{verbatim}
+\end{minipage}
+\end{center}
+\fi 
+that produces exactly this result.
+
 
 \clearpage\subsection{mm\_array\_write ---  Write a dense array from a
   file in the MatrixMarket format}
