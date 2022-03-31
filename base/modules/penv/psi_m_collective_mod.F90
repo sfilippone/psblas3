@@ -106,7 +106,6 @@ contains
     integer(psb_mpk_) :: iam, np, info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -172,7 +171,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 
@@ -201,17 +199,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_) &
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_max,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_max,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_max,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_max,root_,icomm,info)
       endif
     else
       if (collective_start) then
@@ -248,7 +240,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 
@@ -278,17 +269,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_)&
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_max,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_max,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_max,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_max,root_,icomm,info)
       endif
     else
       if (collective_start) then
@@ -327,7 +312,6 @@ contains
     integer(psb_mpk_) :: iam, np, info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -394,7 +378,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -422,17 +405,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_) &
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_min,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_min,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_min,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_min,root_,icomm,info)
       endif
     else
       if (collective_start) then
@@ -469,7 +446,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -498,17 +474,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_)&
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_min,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_min,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_min,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_min,root_,icomm,info)
       end if      
     else
       if (collective_start) then
@@ -549,7 +519,6 @@ contains
     integer(psb_mpk_) :: iam, np, info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
     
 #if !defined(SERIAL_MPI)
@@ -617,7 +586,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -645,32 +613,20 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_) &
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
-             & psb_mpi_mpk_,mpi_sum,icomm,info)
+         call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+              & psb_mpi_mpk_,mpi_sum,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_sum,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_sum,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_sum,root_,icomm,info)
       end if
     else
       if (collective_start) then
         if (root_ == -1) then 
-          if (iinfo == psb_success_) &
-               & call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
                & psb_mpi_mpk_,mpi_sum,icomm,request,info)
         else
-          if (iam == root_) then 
-            call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-                 & psb_mpi_mpk_,mpi_sum,root_,icomm,request,info)
-          else
-            call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-                 & psb_mpi_mpk_,mpi_sum,root_,icomm,request,info)
-          end if
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_mpk_,mpi_sum,root_,icomm,request,info)
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -698,7 +654,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
     
 #if !defined(SERIAL_MPI)
@@ -727,32 +682,20 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_) &
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_sum,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_sum,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_sum,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_sum,root_,icomm,info)
       end if
     else
       if (collective_start) then
         if (root_ == -1) then 
-          if (iinfo == psb_success_) &
-               & call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
                & psb_mpi_mpk_,mpi_sum,icomm,request,info)
         else
-          if (iam == root_) then 
-            call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-                 & psb_mpi_mpk_,mpi_sum,root_, icomm,request,info)
-          else
-            call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-                 & psb_mpi_mpk_,mpi_sum,root_,icomm,request,info)
-          end if
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_mpk_,mpi_sum,root_, icomm,request,info)
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -782,7 +725,6 @@ contains
     integer(psb_mpk_) :: iam, np, info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -851,7 +793,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -879,17 +820,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_) &
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
-             & psb_mpi_mpk_,mpi_mamx_op,icomm,info)
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+              psb_mpi_mpk_,mpi_mamx_op,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamx_op,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamx_op,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_mamx_op,root_,icomm,info)
       endif
     else
       if (collective_start) then
@@ -926,7 +861,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -955,19 +889,13 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_)&
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_mamx_op,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamx_op,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamx_op,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_mamx_op,root_,icomm,info)
       endif
-          else
+    else
       if (collective_start) then
         if (root_ == -1) then 
           call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
@@ -1003,7 +931,6 @@ contains
     integer(psb_mpk_) :: iam, np, info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -1072,7 +999,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -1100,17 +1026,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_) &
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_mamn_op,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamn_op,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamn_op,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_mamn_op,root_,icomm,info)
       endif
     else
       if (collective_start) then
@@ -1147,7 +1067,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -1176,17 +1095,11 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        if (iinfo == psb_success_)&
-             & call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_mamn_op,icomm,info)
       else
-        if (iam == root_) then 
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamn_op,root_,icomm,info)
-        else
-          call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_mpk_,mpi_mamn_op,root_,icomm,info)
-        end if
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_mpk_,mpi_mamn_op,root_,icomm,info)
       endif
           else
       if (collective_start) then
@@ -1225,7 +1138,6 @@ contains
     integer(psb_mpk_) :: iam, np, info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
     
 
@@ -1282,7 +1194,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -1339,7 +1250,6 @@ contains
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-    integer(psb_ipk_) :: iinfo
     logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
@@ -1477,7 +1387,7 @@ contains
            & psb_mpi_mpk_,mpi_sum,icomm,minfo)
     else
       if (collective_start) then
-        call mpi_exscan(MPI_IN_PLACE,dat,1,&
+        call mpi_iexscan(MPI_IN_PLACE,dat,1,&
              & psb_mpi_mpk_,mpi_sum,icomm,request,minfo)
       else if (collective_end) then
         call mpi_wait(request,status,minfo)
@@ -1529,7 +1439,7 @@ contains
            & psb_mpi_mpk_,mpi_sum,icomm,minfo)
     else
       if (collective_start) then
-        call mpi_scan(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_iscan(MPI_IN_PLACE,dat,size(dat),&
              & psb_mpi_mpk_,mpi_sum,icomm,request,info)
       else if (collective_end) then
         call mpi_wait(request,status,info)
