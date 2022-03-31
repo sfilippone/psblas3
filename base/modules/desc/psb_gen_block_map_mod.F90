@@ -1052,6 +1052,7 @@ contains
 
   subroutine block_fnd_owner(idx,iprc,idxmap,info,adj)
     use psb_penv_mod
+    use psb_realloc_mod
     implicit none 
     integer(psb_lpk_), intent(in)           :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
