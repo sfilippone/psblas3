@@ -94,7 +94,6 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
     goto 9999
   end if
 
-
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit, *) me,' ',trim(name),&
        & '   Begin matrix assembly...'

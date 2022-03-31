@@ -95,7 +95,7 @@ Subroutine psb_ld_remote_mat(a,desc_a,b,info)
   integer(psb_lpk_) :: r, k, irmin, irmax, icmin, icmax, iszs, iszr, &
        & lidx, l1, lnr, lnc, lnnz, idx, ngtz, tot_elem
   integer(psb_lpk_) :: nz,nouth
-  integer(psb_ipk_) :: nnp, nrcvs, nsnds
+  integer(psb_ipk_) :: nrcvs, nsnds
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:), sdsi(:), rvsi(:) 
@@ -103,7 +103,7 @@ Subroutine psb_ld_remote_mat(a,desc_a,b,info)
   real(psb_dpk_), allocatable :: valsnd(:)
   type(psb_ld_coo_sparse_mat), allocatable :: acoo
   class(psb_i_base_vect_type), pointer :: pdxv
-  integer(psb_ipk_), allocatable :: ladj(:), ila(:), iprc(:)
+  integer(psb_ipk_), allocatable :: ila(:), iprc(:)
   logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit, err_act
@@ -149,9 +149,7 @@ Subroutine psb_ld_remote_mat(a,desc_a,b,info)
   if ((nouth/=0).and.(me==0)) &
        & write(0,*) 'Warning: would require reinit of DESC_A'
 
-  call psi_graph_fnd_owner(a%ia(1:nz),iprc,ladj,desc_a%indxmap,info)
-  call psb_msort_unique(ladj,nnp)
-  !write(0,*) me,name,' Processes:',ladj(1:nnp)
+  call desc_a%indxmap%fnd_owner(a%ia(1:nz),iprc,info)
 
   icomm = desc_a%get_mpic()
   sdsz(:)=0
@@ -304,13 +302,13 @@ subroutine psb_d_remote_vect(v,desc_a, info, dupl)
   integer(psb_lpk_) :: r, k, irmin, irmax, icmin, icmax, iszs, iszr, &
        & lidx, l1, lnr, lnc, lnnz, idx, ngtz, tot_elem
   integer(psb_lpk_) :: nz,nouth
-  integer(psb_ipk_) :: nnp, nrcvs, nsnds
+  integer(psb_ipk_) :: nrcvs, nsnds
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:), sdsi(:), rvsi(:) 
   integer(psb_lpk_), allocatable  :: iasnd(:), jasnd(:)
   real(psb_dpk_), allocatable :: valsnd(:)
-  integer(psb_ipk_), allocatable :: ladj(:), ila(:), iprc(:)
+  integer(psb_ipk_), allocatable :: ila(:), iprc(:)
   logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit, err_act
@@ -331,7 +329,7 @@ subroutine psb_d_remote_vect(v,desc_a, info, dupl)
     if (v%is_remote_build()) then
       dupl_ = psb_dupl_add_
     else
-      dupl_ = psb_dupl_ovwrt_
+      dupl_ = psb_dupl_def_
     end if
   endif
 
@@ -366,9 +364,7 @@ subroutine psb_d_remote_vect(v,desc_a, info, dupl)
 !!$  if ((nouth/=0).and.(me==0)) &
 !!$       & write(0,*) 'Warning: would require reinit of DESC_A'
 !!$
-!!$  call psi_graph_fnd_owner(a%ia(1:nz),iprc,ladj,desc_a%indxmap,info)
-!!$  call psb_msort_unique(ladj,nnp)
-!!$  !write(0,*) me,name,' Processes:',ladj(1:nnp)
+!!$  call desc_a%indxmap%fnd_owner(a%ia(1:nz),iprc,info)
 !!$
 !!$  icomm = desc_a%get_mpic()
 !!$  sdsz(:)=0
