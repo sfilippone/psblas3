@@ -150,16 +150,20 @@ contains
    
   end subroutine glist_initvg
 
-  subroutine glist_fnd_owner(idx,iprc,idxmap,info)
+  subroutine glist_fnd_owner(idx,iprc,idxmap,info,adj)
     use psb_penv_mod
     use psb_sort_mod
+    use psb_realloc_mod
     implicit none 
     integer(psb_lpk_), intent(in)       :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)      :: info
+    integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
+    
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: iam, np
+    integer(psb_ipk_)   :: nadj
     integer(psb_lpk_)   :: nv, i, ngp
     
     ctxt = idxmap%get_ctxt()
@@ -179,6 +183,12 @@ contains
         iprc(i) = -1
       end if
     end do
+
+    if (present(adj)) then 
+      adj = iprc
+      call psb_msort_unique(adj,nadj)
+      call psb_realloc(nadj,adj,info)
+    end if
 
   end subroutine glist_fnd_owner
 

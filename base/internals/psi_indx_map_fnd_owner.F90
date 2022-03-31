@@ -51,7 +51,7 @@
 !  2. Check if TEMPVG(:) is allocated, and use it; or
 !  3. Call the general method PSI_GRAPH_FND_OWNER. 
 ! 
-subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
+subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info,adj)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -70,11 +70,11 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   class(psb_indx_map), intent(inout) :: idxmap
   integer(psb_ipk_), intent(out)     :: info
-
+  integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
 
   integer(psb_ipk_), allocatable :: hhidx(:), ladj(:) 
   integer(psb_mpk_) :: icomm, minfo
-  integer(psb_ipk_) :: i, err_act, hsize
+  integer(psb_ipk_) :: i, err_act, hsize, nadj
   integer(psb_lpk_) :: nv
   integer(psb_lpk_) :: mglob
   type(psb_ctxt_type) :: ctxt
@@ -131,7 +131,6 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
         iprc(i) = -1 
       end if
     end do
-
   else if (allocated(idxmap%tempvg)) then 
 !!$    write(0,*) me,trim(name),' indxmap%tempvg shortcut'
     ! Use temporary vector 
@@ -202,7 +201,11 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
     end if
     
   end if
-  
+  if (present(adj)) then
+    adj = iprc
+    call psb_msort_unique(adj,nadj)
+    call psb_realloc(nadj,adj,info)
+  end if
   if (gettime) then 
     call psb_barrier(ctxt)
     t1 = psb_wtime()

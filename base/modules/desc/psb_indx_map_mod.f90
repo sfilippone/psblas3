@@ -268,13 +268,14 @@ module psb_indx_map_mod
   !!
 
   interface 
-    subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info,adj)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in)      :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(inout) :: idxmap
       integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
     end subroutine psi_indx_map_fnd_owner
   end interface
 
