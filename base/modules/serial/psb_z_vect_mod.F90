@@ -46,6 +46,7 @@ module psb_z_vect_mod
     class(psb_z_base_vect_type), allocatable :: v
     integer(psb_ipk_) :: nrmv = 0
     integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_) :: dupl = psb_dupl_add_
     complex(psb_dpk_), allocatable :: rmtv(:)
     integer(psb_lpk_), allocatable :: rmidx(:)
   contains
