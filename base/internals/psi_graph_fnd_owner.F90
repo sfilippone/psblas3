@@ -255,8 +255,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
     n_answers = n_answers + nlansw
     nqries    = nv - n_answers
     !
-    ! 3. Extract the resulting adjacency list and add it to the
-    !    indxmap;
+    ! 3. Extract the resulting adjacency list ? AND ADD IT TO THE EXISTING ONE ? 
     !
     ladj = tprc(1:nlansw)
     call psb_msort_unique(ladj,nadj)

@@ -1558,6 +1558,11 @@ contains
     nr = idxmap%local_rows
     nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))
     sz = min(size(xin),size(xout))
+    if (.not.allocated(idxmap%halo_owner)) then
+      xout = -1
+      return
+    end if
+    
     do i = 1, sz
       xout(i) = -1          
       if ((nr<xin(i)).and.(xin(i) <= nc)) xout(i) = idxmap%halo_owner(xin(i)-nr)

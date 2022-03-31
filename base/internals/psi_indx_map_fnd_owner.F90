@@ -200,7 +200,6 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
     else      
       call psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
     end if
-    call idxmap%xtnd_p_adjcncy(ladj)
     
   end if
   
