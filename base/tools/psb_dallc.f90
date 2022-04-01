@@ -116,9 +116,11 @@ subroutine psb_dalloc_vect(x, desc_a,info, dupl, bldmode)
   end if
   call x%set_dupl(dupl_)
   call x%set_remote_build(bldmode_)
+  call x%set_nrmv(0)
   if (x%is_remote_build()) then
     nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
-    allocate(x%rmtv(nrmt_))
+    call psb_ensure_size(nrmt_,x%rmtv,info)
+    call psb_ensure_size(nrmt_,x%rmidx,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -129,6 +131,7 @@ subroutine psb_dalloc_vect(x, desc_a,info, dupl, bldmode)
   return
 
 end subroutine psb_dalloc_vect
+
 ! Function: psb_dalloc_vect_r2
 !    Allocates a vector of dense vectors for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.

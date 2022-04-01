@@ -39,6 +39,7 @@
 !
 module psb_z_vect_mod
 
+  use psb_realloc_mod
   use psb_z_base_vect_mod
   use psb_i_vect_mod
 
@@ -56,7 +57,9 @@ module psb_z_vect_mod
     procedure, pass(x) :: is_remote_build => z_vect_is_remote_build
     procedure, pass(x) :: set_remote_build => z_vect_set_remote_build
     procedure, pass(x) :: get_dupl => z_vect_get_dupl
-    procedure, pass(x) :: set_dupl => z_vect_set_dupl
+    procedure, pass(x) :: set_dupl => z_vect_set_dupl 
+    procedure, pass(x) :: get_nrmv => z_vect_get_nrmv
+    procedure, pass(x) :: set_nrmv => z_vect_set_nrmv
     procedure, pass(x) :: all      => z_vect_all
     procedure, pass(x) :: reall    => z_vect_reall
     procedure, pass(x) :: zero     => z_vect_zero
@@ -156,7 +159,7 @@ module psb_z_vect_mod
        & z_vect_is_dev, z_vect_is_sync, z_vect_set_host, &
        & z_vect_set_dev, z_vect_set_sync, &
        & z_vect_set_remote_build, z_is_remote_build, &
-       & z_vect_set_dupl, z_get_dupl
+       & z_vect_set_dupl, z_get_dupl, z_vect_set_nrmv, z_get_nrmv
 
   private ::  z_vect_dot_v, z_vect_dot_a, z_vect_axpby_v, z_vect_axpby_a, &
        & z_vect_mlt_v, z_vect_mlt_a, z_vect_mlt_a_2, z_vect_mlt_v_2, &
@@ -178,7 +181,6 @@ module psb_z_vect_mod
 
 contains
 
-
   function z_vect_get_dupl(x) result(res)
     implicit none
     class(psb_z_vect_type), intent(in) :: x
@@ -197,6 +199,21 @@ contains
       x%dupl = psb_dupl_def_
     end if
   end subroutine z_vect_set_dupl
+
+  function z_vect_get_nrmv(x) result(res)
+    implicit none
+    class(psb_z_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%nrmv
+  end function z_vect_get_nrmv
+
+  subroutine z_vect_set_nrmv(x,val)
+    implicit none
+    class(psb_z_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: val
+
+    x%nrmv = val
+  end subroutine z_vect_set_nrmv
         
 
   function z_vect_is_remote_build(x) result(res)
@@ -410,14 +427,13 @@ contains
     if (allocated(x%v)) res = x%v%get_fmt()
   end function z_vect_get_fmt
 
-  subroutine z_vect_all(n, x, info, mold,mode)
+  subroutine z_vect_all(n, x, info, mold)
 
     implicit none
     integer(psb_ipk_), intent(in)           :: n
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)      :: info
     class(psb_z_base_vect_type), intent(in), optional :: mold
-    integer(psb_ipk_), intent(in), optional :: mode
 
     if (allocated(x%v)) &
          & call x%free(info)
@@ -432,9 +448,6 @@ contains
     else
       info = psb_err_alloc_dealloc_
     end if
-    x%nrmv = 0
-    x%remote_build = psb_matbld_noremote_ 
-    if (present(mode)) call x%set_remote_build(mode)
   end subroutine z_vect_all
 
   subroutine z_vect_reall(n, x, info)
@@ -522,44 +535,44 @@ contains
 
   end subroutine z_vect_free
 
-  subroutine z_vect_ins_a(n,irl,val,dupl,x,info)
+  subroutine z_vect_ins_a(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_z_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n
     integer(psb_ipk_), intent(in)               :: irl(:)
     complex(psb_dpk_), intent(in)        :: val(:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, dupl
 
     info = 0
     if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
       return
     end if
-
+    dupl = x%get_dupl()
     call  x%v%ins(n,irl,val,dupl,info)
 
   end subroutine z_vect_ins_a
 
-  subroutine z_vect_ins_v(n,irl,val,dupl,x,info)
+  subroutine z_vect_ins_v(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_z_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n
     class(psb_i_vect_type), intent(inout)       :: irl
     class(psb_z_vect_type), intent(inout)       :: val
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, dupl
 
     info = 0
     if (.not.(allocated(x%v).and.allocated(irl%v).and.allocated(val%v))) then
       info = psb_err_invalid_vect_state_
       return
     end if
-
+    dupl = x%get_dupl()
     call  x%v%ins(n,irl%v,val%v,dupl,info)
 
   end subroutine z_vect_ins_v
@@ -1670,23 +1683,23 @@ contains
 
   end subroutine z_vect_free
 
-  subroutine z_vect_ins(n,irl,val,dupl,x,info)
+  subroutine z_vect_ins(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_z_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n
     integer(psb_ipk_), intent(in)               :: irl(:)
     complex(psb_dpk_), intent(in)        :: val(:,:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, dupl
 
     info = 0
     if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
       return
     end if
-
+    dupl = x%get_dupl()
     call  x%v%ins(n,irl,val,dupl,info)
 
   end subroutine z_vect_ins

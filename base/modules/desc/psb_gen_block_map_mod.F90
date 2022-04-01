@@ -1057,8 +1057,8 @@ contains
     implicit none 
     integer(psb_lpk_), intent(in)           :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_gen_block_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(out)          :: info
+    class(psb_gen_block_map), intent(in) :: idxmap
+    integer(psb_ipk_), intent(out)       :: info
     integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iam, np, nv, ip, i, nadj

@@ -104,7 +104,23 @@ subroutine psb_zasb_vect(x, desc_a, info, mold, scratch)
     call x%free(info)
     call x%bld(ncol,mold=mold)
   else
-    if (x%is_remote_build()) call psb_z_remote_vect(x,desc_a,info)
+    
+    if (x%is_remote_build()) then
+      block
+        integer(psb_lpk_), allocatable :: lvx(:)
+        complex(psb_dpk_), allocatable  :: vx(:)
+        integer(psb_ipk_), allocatable :: ivx(:) 
+        integer(psb_ipk_) :: nrmv, nx, i
+
+        nrmv = x%get_nrmv()        
+        call psb_z_remote_vect(nrmv,x%rmtv,x%rmidx,desc_a,vx,lvx,info)
+        nx  = size(vx)
+        call psb_realloc(nx,ivx,info)
+        call desc_a%g2l(lvx,ivx,info,owned=.true.)
+        call x%ins(nx,ivx,vx,info)
+      end block
+    end if
+
     call x%asb(ncol,info)
     ! ..update halo elements..
     call psb_halo(x,desc_a,info)

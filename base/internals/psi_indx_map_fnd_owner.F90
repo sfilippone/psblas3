@@ -66,9 +66,9 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info,adj)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_lpk_), intent(in)      :: idx(:)
+  integer(psb_lpk_), intent(in)    :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  class(psb_indx_map), intent(inout) :: idxmap
+  class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
 

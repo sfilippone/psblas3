@@ -90,8 +90,7 @@ Subroutine psb_lz_remote_mat(a,desc_a,b,info)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: counter, proc, i, n_el_send,n_el_recv, &
-       &     n_elem, j, ipx,mat_recv, idxs,idxr,&
-       &     data_,totxch,nxs, nxr, ncg
+       &     n_elem, j, ipx,idxs,idxr
   integer(psb_lpk_) :: r, k, irmin, irmax, icmin, icmax, iszs, iszr, &
        & lidx, l1, lnr, lnc, lnnz, idx, ngtz, tot_elem
   integer(psb_lpk_) :: nz,nouth
@@ -140,14 +139,14 @@ Subroutine psb_lz_remote_mat(a,desc_a,b,info)
 
 
   nz = a%get_nzeros()
-  allocate(ila(nz))
+  !allocate(ila(nz))
   !write(0,*) me,name,' size :',nz,size(ila)        
-  call desc_a%g2l(a%ia(1:nz),ila(1:nz),info,owned=.false.)
-  nouth = count(ila(1:nz)<0)
+  !call desc_a%g2l(a%ia(1:nz),ila(1:nz),info,owned=.false.)
+  !nouth = count(ila(1:nz)<0)
   !write(0,*) me,name,' Count out of halo :',nouth
-  call psb_max(ctxt,nouth)
-  if ((nouth/=0).and.(me==0)) &
-       & write(0,*) 'Warning: would require reinit of DESC_A'
+  !call psb_max(ctxt,nouth)
+  !if ((nouth/=0).and.(me==0)) &
+  !     & write(0,*) 'Warning: would require reinit of DESC_A'
 
   call desc_a%indxmap%fnd_owner(a%ia(1:nz),iprc,info)
 
@@ -277,7 +276,7 @@ Subroutine psb_lz_remote_mat(a,desc_a,b,info)
 End Subroutine psb_lz_remote_mat
 
 
-subroutine psb_z_remote_vect(v,desc_a, info)
+subroutine psb_z_remote_vect(n,v,iv,desc_a,x,ix, info)
   use psb_base_mod, psb_protect_name => psb_z_remote_vect
 
 #ifdef MPI_MOD
@@ -287,29 +286,25 @@ subroutine psb_z_remote_vect(v,desc_a, info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-
-  type(psb_z_vect_type),Intent(inout)    :: v
-  type(psb_desc_type),intent(in)         :: desc_a
-  integer(psb_ipk_), intent(out)         :: info
-
+  integer(psb_ipk_), intent(in)  :: n
+  complex(psb_dpk_),   Intent(in)  :: v(:)
+  integer(psb_lpk_), Intent(in)  :: iv(:)
+  type(psb_desc_type),intent(in) :: desc_a
+  complex(psb_dpk_),   allocatable, intent(out) :: x(:)
+  integer(psb_lpk_), allocatable, intent(out) :: ix(:)
+  integer(psb_ipk_), intent(out) :: info
   !     ...local scalars....
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: counter, proc, i, n_el_send,n_el_recv, &
-       &     n_elem, j, ipx,mat_recv, idxs,idxr,&
-       &     data_,totxch,nxs, nxr, ncg, dupl_
-  integer(psb_lpk_) :: r, k, irmin, irmax, icmin, icmax, iszs, iszr, &
-       & lidx, l1, lnr, lnc, lnnz, idx, ngtz, tot_elem
-  integer(psb_lpk_) :: nz,nouth
+  integer(psb_ipk_) :: counter, proc, i,  &
+       &     j,  idxs,idxr, k, iszs, iszr
   integer(psb_ipk_) :: nrcvs, nsnds
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
-       & rvsz(:), bsdindx(:),sdsz(:), sdsi(:), rvsi(:) 
-  integer(psb_lpk_), allocatable  :: iasnd(:), jasnd(:)
+       & rvsz(:), bsdindx(:), sdsz(:), sdsi(:), rvsi(:) 
+  integer(psb_lpk_), allocatable  :: lsnd(:)
   complex(psb_dpk_), allocatable :: valsnd(:)
-  integer(psb_ipk_), allocatable :: ila(:), iprc(:)
-  logical           :: rowcnv_,colcnv_,rowscale_,colscale_
-  character(len=5)  :: outfmt_
+  integer(psb_ipk_), allocatable :: iprc(:)
   integer(psb_ipk_) :: debug_level, debug_unit, err_act
   character(len=20) :: name, ch_err
 
@@ -327,150 +322,111 @@ subroutine psb_z_remote_vect(v,desc_a, info)
 
   Call psb_info(ctxt, me, np)
 
-  dupl_ = v%get_dupl()
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
   write(0,*) me, 'X_remote_vect implementation to be completed '
 
-!!$  call b%free() 
-!!$
-!!$  Allocate(rvsz(np),sdsz(np),sdsi(np),rvsi(np),brvindx(np+1),&
-!!$       & bsdindx(np+1), acoo,stat=info)
-!!$
-!!$  if (info /= psb_success_) then
-!!$    info=psb_err_alloc_dealloc_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  end if
-!!$
-!!$
-!!$  nz = a%get_nzeros()
-!!$  allocate(ila(nz))
-!!$  !write(0,*) me,name,' size :',nz,size(ila)        
-!!$  call desc_a%g2l(a%ia(1:nz),ila(1:nz),info,owned=.false.)
-!!$  nouth = count(ila(1:nz)<0)
-!!$  !write(0,*) me,name,' Count out of halo :',nouth
-!!$  call psb_max(ctxt,nouth)
-!!$  if ((nouth/=0).and.(me==0)) &
-!!$       & write(0,*) 'Warning: would require reinit of DESC_A'
-!!$
-!!$  call desc_a%indxmap%fnd_owner(a%ia(1:nz),iprc,info)
-!!$
-!!$  icomm = desc_a%get_mpic()
-!!$  sdsz(:)=0
-!!$  rvsz(:)=0
-!!$  sdsi(:)=0
-!!$  rvsi(:)=0
-!!$  ipx = 1
-!!$  brvindx(:) = 0
-!!$  bsdindx(:) = 0
-!!$  counter=1
-!!$  idx = 0
-!!$  idxs = 0
-!!$  idxr = 0
-!!$  do  i=1,nz
-!!$    if (iprc(i) >=0) then
-!!$      sdsz(iprc(i)+1) = sdsz(iprc(i)+1) +1
-!!$    else
-!!$      write(0,*)me,name,' Error from fnd_owner: ',iprc(i)
-!!$    end if
-!!$  end do
-!!$  call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
-!!$       & rvsz,1,psb_mpi_mpk_,icomm,minfo)
-!!$  if (minfo /= psb_success_) then
-!!$    info=psb_err_from_subroutine_
-!!$    call psb_errpush(info,name,a_err='mpi_alltoall')
-!!$    goto 9999
-!!$  end if
-!!$  !write(0,*)me,name,' sdsz ',sdsz(:),' rvsz:',rvsz(:)        
-!!$  nsnds = count(sdsz /= 0)
-!!$  nrcvs = count(rvsz /= 0)
-!!$  idxs = 0
-!!$  idxr = 0
-!!$  counter = 1
-!!$  Do proc=0,np-1
-!!$    bsdindx(proc+1) = idxs
-!!$    idxs            = idxs + sdsz(proc+1)
-!!$    brvindx(proc+1) = idxr
-!!$    idxr     = idxr + rvsz(proc+1)
-!!$  Enddo
-!!$
-!!$  iszs = sum(sdsz)
-!!$  iszr = sum(rvsz)
-!!$  call acoo%allocate(desc_a%get_global_rows(),desc_a%get_global_cols(),iszr)
-!!$  if (psb_errstatus_fatal()) then
-!!$    write(0,*) 'Error from acoo%allocate '
-!!$    info = 4010
-!!$    goto 9999
-!!$  end if
-!!$  if (debug_level >= psb_debug_outer_)&
-!!$       & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
-!!$       & ' Send:',sdsz(:),' Receive:',rvsz(:)
-!!$  !write(debug_unit,*) me,' ',trim(name),': ',info
-!!$  if (info == psb_success_) call psb_ensure_size(max(iszs,1),iasnd,info)
-!!$  !write(debug_unit,*) me,' ',trim(name),' iasnd: ',info
-!!$  if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
-!!$  !write(debug_unit,*) me,' ',trim(name),' jasnd: ',info
-!!$  if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
-!!$  !write(debug_unit,*) me,' ',trim(name),' valsnd: ',info
-!!$  if (info /= psb_success_) then
-!!$    info=psb_err_from_subroutine_
-!!$    call psb_errpush(info,name,a_err='ensure_size')
-!!$    goto 9999
-!!$  end if
-!!$  do k=1, nz
-!!$    proc = iprc(k)
-!!$    sdsi(proc+1) = sdsi(proc+1) + 1
-!!$    !rvsi(proc) = rvsi(proc) + 1 
-!!$    iasnd(bsdindx(proc+1)+sdsi(proc+1))  = a%ia(k)
-!!$    jasnd(bsdindx(proc+1)+sdsi(proc+1))  = a%ja(k)
-!!$    valsnd(bsdindx(proc+1)+sdsi(proc+1)) = a%val(k)
-!!$  end do
-!!$  do proc=0,np-1
-!!$    if (sdsi(proc+1) /= sdsz(proc+1)) &
-!!$         & write(0,*) me,name,'Send mismacth ',sdsi(proc+1),sdsz(proc+1)
-!!$  end do
-!!$
-!!$  select case(psb_get_sp_a2av_alg())
-!!$  case(psb_sp_a2av_smpl_triad_)
-!!$    call psb_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
-!!$         & acoo%val,acoo%ia,acoo%ja,rvsz,brvindx,ctxt,info)
-!!$  case(psb_sp_a2av_smpl_v_)
-!!$    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
-!!$         & acoo%val,rvsz,brvindx,ctxt,info)
-!!$    if (info == psb_success_) call psb_simple_a2av(iasnd,sdsz,bsdindx,&
-!!$         & acoo%ia,rvsz,brvindx,ctxt,info)
-!!$    if (info == psb_success_) call psb_simple_a2av(jasnd,sdsz,bsdindx,&
-!!$         & acoo%ja,rvsz,brvindx,ctxt,info)
-!!$  case(psb_sp_a2av_mpi_)
-!!$
-!!$    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
-!!$         & acoo%val,rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
-!!$    if (minfo == mpi_success) &
-!!$         & call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-!!$         & acoo%ia,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-!!$    if (minfo == mpi_success) &
-!!$         & call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
-!!$         & acoo%ja,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
-!!$    if (minfo /= mpi_success) info = minfo
-!!$  case default
-!!$    info = psb_err_internal_error_
-!!$    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
-!!$    goto 9999
-!!$  end select
-!!$
-!!$  if (info /= psb_success_) then
-!!$    info=psb_err_from_subroutine_
-!!$    call psb_errpush(info,name,a_err='alltoallv')
-!!$    goto 9999
-!!$  end if
-!!$  call acoo%set_nzeros(iszr)
-!!$  call acoo%mv_to_coo(b,info)
-!!$  
-!!$  Deallocate(brvindx,bsdindx,rvsz,sdsz,&
-!!$       & iasnd,jasnd,valsnd,stat=info)
-!!$  if (debug_level >= psb_debug_outer_)&
-!!$       & write(debug_unit,*) me,' ',trim(name),': Done'
+
+  Allocate(rvsz(np),sdsz(np),sdsi(np),rvsi(np),brvindx(np+1),&
+       & bsdindx(np+1), stat=info)
+
+  if (info /= psb_success_) then
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call desc_a%indxmap%fnd_owner(iv(1:n),iprc,info)
+
+  icomm   = desc_a%get_mpic()
+  sdsz(:) = 0
+  rvsz(:) = 0
+  sdsi(:) = 0
+  rvsi(:) = 0
+  brvindx(:) = 0
+  bsdindx(:) = 0
+  counter = 1
+  idxs    = 0
+  idxr    = 0
+  do  i=1,n
+    if (iprc(i) >=0) then
+      sdsz(iprc(i)+1) = sdsz(iprc(i)+1) +1
+    else
+      write(0,*)me,name,' Error from fnd_owner: ',iprc(i)
+    end if
+  end do
+  call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
+       & rvsz,1,psb_mpi_mpk_,icomm,minfo)
+  if (minfo /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='mpi_alltoall')
+    goto 9999
+  end if
+  !write(0,*)me,name,' sdsz ',sdsz(:),' rvsz:',rvsz(:)        
+  nsnds = count(sdsz /= 0)
+  nrcvs = count(rvsz /= 0)
+  idxs  = 0
+  idxr  = 0
+  counter = 1
+  Do proc=0,np-1
+    bsdindx(proc+1) = idxs
+    idxs            = idxs + sdsz(proc+1)
+    brvindx(proc+1) = idxr
+    idxr     = idxr + rvsz(proc+1)
+  Enddo
+
+  iszs = sum(sdsz)
+  iszr = sum(rvsz)
+  call psb_realloc(iszs,lsnd,info)
+  if (info == 0) call psb_realloc(iszs,valsnd,info)
+  if (info == 0) call psb_realloc(iszr,x,info)
+  if (info == 0) call psb_realloc(iszr,ix,info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='realloc')
+    goto 9999
+  end if
+  do k=1, n
+    proc           = iprc(k)
+    sdsi(proc+1)   = sdsi(proc+1) + 1
+    lsnd(bsdindx(proc+1)+sdsi(proc+1))   = iv(k)
+    valsnd(bsdindx(proc+1)+sdsi(proc+1)) = v(k)
+  end do
+  do proc=0,np-1
+    if (sdsi(proc+1) /= sdsz(proc+1)) &
+         & write(0,*) me,name,'Send mismacth ',sdsi(proc+1),sdsz(proc+1)
+  end do
+
+  select case(psb_get_sp_a2av_alg())
+  case(psb_sp_a2av_smpl_triad_,psb_sp_a2av_smpl_v_)
+    call psb_simple_a2av(valsnd,sdsz,bsdindx,&
+         & x,rvsz,brvindx,ctxt,info)
+    if (info == psb_success_) call psb_simple_a2av(lsnd,sdsz,bsdindx,&
+         & ix,rvsz,brvindx,ctxt,info)
+  case(psb_sp_a2av_mpi_)
+
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
+         & x,rvsz,brvindx,psb_mpi_c_dpk_,icomm,minfo)
+    if (minfo == mpi_success) &
+         & call mpi_alltoallv(lsnd,sdsz,bsdindx,psb_mpi_lpk_,&
+         & ix,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+    if (minfo /= mpi_success) info = minfo
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='wrong A2AV alg selector')
+    goto 9999
+  end select
+
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='alltoallv')
+    goto 9999
+  end if
+  
+  Deallocate(brvindx,bsdindx,rvsz,sdsz,&
+       & lsnd,valsnd,stat=info)
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Done'
 
   call psb_erractionrestore(err_act)
   return
@@ -480,5 +436,3 @@ subroutine psb_z_remote_vect(v,desc_a, info)
   return
 
 End Subroutine psb_z_remote_vect
-
-

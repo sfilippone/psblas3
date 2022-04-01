@@ -701,8 +701,8 @@ contains
     implicit none 
     integer(psb_lpk_), intent(in)      :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(out)     :: info
+    class(psb_repl_map), intent(in) :: idxmap
+    integer(psb_ipk_), intent(out)  :: info
     integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
     integer(psb_ipk_)   :: nv
     type(psb_ctxt_type) :: ctxt

@@ -263,11 +263,15 @@ Module psb_c_tools_mod
   end interface
 
   interface psb_remote_vect
-    subroutine psb_c_remote_vect(v,desc_a, info)
+    subroutine psb_c_remote_vect(n,v,iv,desc_a,x,ix, info)
       import
       implicit none
-      type(psb_c_vect_type),Intent(inout)  :: v
-      type(psb_desc_type),intent(in)       :: desc_a
+      integer(psb_ipk_), intent(in)  :: n
+      complex(psb_spk_),   intent(in)  :: v(:)
+      integer(psb_lpk_), intent(in)  :: iv(:)
+      type(psb_desc_type),intent(in) :: desc_a
+      complex(psb_spk_),   allocatable, intent(out)  :: x(:)
+      integer(psb_lpk_), allocatable, intent(out)  :: ix(:)
       integer(psb_ipk_), intent(out)       :: info
     end subroutine psb_c_remote_vect
   end interface psb_remote_vect

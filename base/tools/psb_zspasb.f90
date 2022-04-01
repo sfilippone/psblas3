@@ -108,8 +108,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold)
         integer(psb_ipk_), allocatable :: ila(:), jla(:)
         integer(psb_ipk_) :: nz, nzt,k
         call psb_remote_mat(a%rmta,desc_a,a_add,info)
-        nz = a_add%get_nzeros()
-!!$        write(0,*) me,name,' Nz to be added',nz
+        nz  = a_add%get_nzeros()
         nzt = nz
         call psb_sum(ctxt,nzt)
         if (nzt>0) then
