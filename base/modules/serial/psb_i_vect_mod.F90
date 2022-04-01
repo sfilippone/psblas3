@@ -52,8 +52,10 @@ module psb_i_vect_mod
     procedure, pass(x) :: get_nrows => i_vect_get_nrows
     procedure, pass(x) :: sizeof   => i_vect_sizeof
     procedure, pass(x) :: get_fmt  => i_vect_get_fmt
-    procedure, pass(x) :: is_remote_build => psb_i_is_remote_build
-    procedure, pass(x) :: set_remote_build => psb_i_set_remote_build
+    procedure, pass(x) :: is_remote_build => i_vect_is_remote_build
+    procedure, pass(x) :: set_remote_build => i_vect_set_remote_build
+    procedure, pass(x) :: get_dupl => i_vect_get_dupl
+    procedure, pass(x) :: set_dupl => i_vect_set_dupl
     procedure, pass(x) :: all      => i_vect_all
     procedure, pass(x) :: reall    => i_vect_reall
     procedure, pass(x) :: zero     => i_vect_zero
@@ -104,7 +106,9 @@ module psb_i_vect_mod
        & i_vect_cnv, i_vect_set_scal, &
        & i_vect_set_vect, i_vect_clone, i_vect_sync, i_vect_is_host, &
        & i_vect_is_dev, i_vect_is_sync, i_vect_set_host, &
-       & i_vect_set_dev, i_vect_set_sync
+       & i_vect_set_dev, i_vect_set_sync, &
+       & i_vect_set_remote_build, i_is_remote_build, &
+       & i_vect_set_dupl, i_get_dupl
 
 
   class(psb_i_base_vect_type), allocatable, target,&
@@ -122,14 +126,34 @@ module psb_i_vect_mod
 contains
 
 
-  function psb_i_is_remote_build(x) result(res)
+  function i_vect_get_dupl(x) result(res)
+    implicit none
+    class(psb_i_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%dupl
+  end function i_vect_get_dupl
+
+  subroutine i_vect_set_dupl(x,val)
+    implicit none
+    class(psb_i_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%dupl = val
+    else
+      x%dupl = psb_dupl_def_
+    end if
+  end subroutine i_vect_set_dupl
+        
+
+  function i_vect_is_remote_build(x) result(res)
     implicit none
     class(psb_i_vect_type), intent(in) :: x
     logical :: res
     res = (x%remote_build == psb_matbld_remote_)
-  end function psb_i_is_remote_build
+  end function i_vect_is_remote_build
 
-  subroutine psb_i_set_remote_build(x,val)
+  subroutine i_vect_set_remote_build(x,val)
     implicit none
     class(psb_i_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in), optional :: val
@@ -139,7 +163,7 @@ contains
     else
       x%remote_build = psb_matbld_remote_
     end if
-  end subroutine psb_i_set_remote_build
+  end subroutine i_vect_set_remote_build
         
   subroutine  psb_i_set_vect_default(v)
     implicit none
@@ -586,7 +610,6 @@ contains
 end module psb_i_vect_mod
 
 
-
 module psb_i_multivect_mod
 
   use psb_i_base_multivect_mod
@@ -598,11 +621,19 @@ module psb_i_multivect_mod
 
   type psb_i_multivect_type
     class(psb_i_base_multivect_type), allocatable :: v
+    integer(psb_ipk_) :: nrmv = 0
+    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_) :: dupl = psb_dupl_add_
+    integer(psb_ipk_), allocatable :: rmtv(:,:)
   contains
     procedure, pass(x) :: get_nrows => i_vect_get_nrows
     procedure, pass(x) :: get_ncols => i_vect_get_ncols
     procedure, pass(x) :: sizeof   => i_vect_sizeof
     procedure, pass(x) :: get_fmt  => i_vect_get_fmt
+    procedure, pass(x) :: is_remote_build => i_mvect_is_remote_build
+    procedure, pass(x) :: set_remote_build => i_mvect_set_remote_build
+    procedure, pass(x) :: get_dupl => i_mvect_get_dupl
+    procedure, pass(x) :: set_dupl => i_mvect_set_dupl
 
     procedure, pass(x) :: all      => i_vect_all
     procedure, pass(x) :: reall    => i_vect_reall
@@ -652,6 +683,46 @@ module psb_i_multivect_mod
 
 contains
 
+  
+  function i_mvect_get_dupl(x) result(res)
+    implicit none
+    class(psb_i_multivect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%dupl
+  end function i_mvect_get_dupl
+
+  subroutine i_mvect_set_dupl(x,val)
+    implicit none
+    class(psb_i_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%dupl = val
+    else
+      x%dupl = psb_dupl_def_
+    end if
+  end subroutine i_mvect_set_dupl
+        
+
+  function i_mvect_is_remote_build(x) result(res)
+    implicit none
+    class(psb_i_multivect_type), intent(in) :: x
+    logical :: res
+    res = (x%remote_build == psb_matbld_remote_)
+  end function i_mvect_is_remote_build
+
+  subroutine i_mvect_set_remote_build(x,val)
+    implicit none
+    class(psb_i_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%remote_build = val
+    else
+      x%remote_build = psb_matbld_remote_
+    end if
+  end subroutine i_mvect_set_remote_build
+        
 
   subroutine  psb_i_set_multivect_default(v)
     implicit none

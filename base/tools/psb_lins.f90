@@ -42,10 +42,7 @@
 !    x       - type(psb_l_vect_type) The destination vector
 !    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
-!    dupl    - integer               What to do with duplicates: 
-!                                     psb_dupl_ovwrt_    overwrite
-!                                     psb_dupl_add_      add         
-subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_lins_vect(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_lins_vect
   use psi_mod
   implicit none
@@ -57,14 +54,14 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_l_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
+  integer(psb_ipk_) :: dupl_
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, dupl_,err_act
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -119,11 +116,7 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
+  dupl_ = x%get_dupl()
   if (present(local)) then 
     local_ = local
   else
@@ -165,10 +158,7 @@ end subroutine psb_lins_vect
 !    x       - type(psb_l_vect_type) The destination vector
 !    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
-!    dupl    - integer               What to do with duplicates: 
-!                                     psb_dupl_ovwrt_    overwrite
-!                                     psb_dupl_add_      add         
-subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_lins_vect_v
   use psi_mod
   implicit none
@@ -184,7 +174,6 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_l_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
@@ -238,14 +227,7 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
     call psb_errpush(info,name)
     goto 9999
   endif
-
-
-
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
+  dupl_ = x%get_dupl()
   if (present(local)) then 
     local_ = local
   else
@@ -274,7 +256,7 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
 
 end subroutine psb_lins_vect_v
 
-subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_lins_vect_r2
   use psi_mod
   implicit none
@@ -290,14 +272,14 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_l_vect_type), intent(inout) :: x(:)
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols, n
   integer(psb_lpk_) :: mglob
+  integer(psb_ipk_) :: dupl_
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, dupl_, err_act
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -352,11 +334,6 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
   if (present(local)) then 
     local_ = local
   else
@@ -370,7 +347,9 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   end if
 
   do i=1,n
+
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
+    if (info == 0) dupl_ = x(i)%get_dupl()
     if (info == 0) call x(i)%ins(m,irl,val(:,i),dupl_,info) 
     if (info /= 0) exit
   end do
@@ -389,7 +368,7 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
 
 end subroutine psb_lins_vect_r2
 
-subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_lins_multivect
   use psi_mod
   implicit none
@@ -405,7 +384,6 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_l_multivect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
@@ -468,11 +446,7 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
+  dupl_ = x%get_dupl()
   if (present(local)) then 
     local_ = local
   else

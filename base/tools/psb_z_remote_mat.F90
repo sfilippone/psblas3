@@ -277,7 +277,7 @@ Subroutine psb_lz_remote_mat(a,desc_a,b,info)
 End Subroutine psb_lz_remote_mat
 
 
-subroutine psb_z_remote_vect(v,desc_a, info, dupl)
+subroutine psb_z_remote_vect(v,desc_a, info)
   use psb_base_mod, psb_protect_name => psb_z_remote_vect
 
 #ifdef MPI_MOD
@@ -291,7 +291,6 @@ subroutine psb_z_remote_vect(v,desc_a, info, dupl)
   type(psb_z_vect_type),Intent(inout)    :: v
   type(psb_desc_type),intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)         :: info
-  integer(psb_ipk_),optional, intent(in) :: dupl
 
   !     ...local scalars....
   type(psb_ctxt_type) :: ctxt
@@ -323,21 +322,12 @@ subroutine psb_z_remote_vect(v,desc_a, info, dupl)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    if (v%is_remote_build()) then
-      dupl_ = psb_dupl_add_
-    else
-      dupl_ = psb_dupl_def_
-    end if
-  endif
-
   ctxt  = desc_a%get_context()
   icomm = desc_a%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
+  dupl_ = v%get_dupl()
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
   write(0,*) me, 'X_remote_vect implementation to be completed '

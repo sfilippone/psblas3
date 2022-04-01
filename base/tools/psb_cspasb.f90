@@ -42,13 +42,9 @@
 !    upd      - character(optional).         How will the matrix be updated? 
 !                                            psb_upd_srch_    Simple strategy  
 !                                            psb_upd_perm_    Permutation(more memory)
-!    dupl     - integer(optional).           Duplicate coefficient handling:
-!                                            psb_dupl_ovwrt_     overwrite
-!                                            psb_dupl_add_       add 
-!                                            psb_dupl_err_       raise an error. 
 ! 
 !
-subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
+subroutine psb_cspasb(a,desc_a, info, afmt, upd, mold)
   use psb_base_mod, psb_protect_name => psb_cspasb
   use psb_sort_mod
   use psi_mod
@@ -56,16 +52,16 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
 
   !...Parameters....
-  type(psb_cspmat_type), intent (inout)  :: a
+  type(psb_cspmat_type), intent (inout)    :: a
   type(psb_desc_type), intent(inout)       :: desc_a
-  integer(psb_ipk_), intent(out)                    :: info
-  integer(psb_ipk_),optional, intent(in)            :: dupl, upd
-  character(len=*), optional, intent(in)         :: afmt
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), optional, intent(in)  :: upd
+  character(len=*), optional, intent(in)   :: afmt
   class(psb_c_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, err_act
-  integer(psb_ipk_) :: n_row,n_col
+  integer(psb_ipk_) :: n_row,n_col, dupl_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
   class(psb_i_base_vect_type), allocatable :: ivm
@@ -100,8 +96,8 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
   !check on errors encountered in psdspins
 
-
-  if (a%is_bld()) then 
+  if (a%is_bld()) then
+    dupl_ = a%get_dupl()
     !
     ! First case: we come from a fresh build. 
     ! 
@@ -140,7 +136,7 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
       end block
     end if
     call a%set_ncols(desc_a%get_local_cols())    
-    call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+    call a%cscnv(info,type=afmt,mold=mold,dupl=dupl_)
   else if (a%is_upd()) then 
     if (a%is_remote_build()) then 
       !write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()

@@ -51,7 +51,7 @@
 !    scratch - logical, optional       If true, allocate without checking/zeroing contents.
 !                                      default: .false.
 !    
-subroutine psb_zasb_vect(x, desc_a, info, mold, dupl,scratch)
+subroutine psb_zasb_vect(x, desc_a, info, mold, scratch)
   use psb_base_mod, psb_protect_name => psb_zasb_vect
   implicit none
 
@@ -59,7 +59,6 @@ subroutine psb_zasb_vect(x, desc_a, info, mold, dupl,scratch)
   type(psb_z_vect_type), intent(inout) ::  x
   integer(psb_ipk_), intent(out)                 ::  info
   class(psb_z_base_vect_type), intent(in), optional :: mold
-  integer(psb_ipk_), optional, intent(in)    :: dupl
   logical, intent(in), optional        :: scratch
 
   ! local variables
@@ -83,13 +82,8 @@ subroutine psb_zasb_vect(x, desc_a, info, mold, dupl,scratch)
 
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
   call psb_info(ctxt, me, np)
-
+  dupl_ = x%get_dupl()
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -110,7 +104,7 @@ subroutine psb_zasb_vect(x, desc_a, info, mold, dupl,scratch)
     call x%free(info)
     call x%bld(ncol,mold=mold)
   else
-    if (x%is_remote_build()) call psb_z_remote_vect(x,desc_a,dupl_, info)
+    if (x%is_remote_build()) call psb_z_remote_vect(x,desc_a,info)
     call x%asb(ncol,info)
     ! ..update halo elements..
     call psb_halo(x,desc_a,info)
@@ -147,7 +141,7 @@ subroutine psb_zasb_vect_r2(x, desc_a, info, mold, scratch)
   ! local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, i, n 
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, dupl_
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
@@ -166,7 +160,6 @@ subroutine psb_zasb_vect_r2(x, desc_a, info, mold, scratch)
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
   call psb_info(ctxt, me, np)
-
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -192,6 +185,7 @@ subroutine psb_zasb_vect_r2(x, desc_a, info, mold, scratch)
 
   else
     do i=1, n
+      dupl_ = x(i)%get_dupl()
       call x(i)%asb(ncol,info)
       if (info /= 0) exit
       ! ..update halo elements..
@@ -232,7 +226,7 @@ subroutine psb_zasb_multivect(x, desc_a, info, mold, scratch,n)
   ! local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_, dupl_
   logical :: scratch_
   
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -278,6 +272,7 @@ subroutine psb_zasb_multivect(x, desc_a, info, mold, scratch,n)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
 
+  dupl_ = x%get_dupl()
   if (scratch_) then 
     call x%free(info)
     call x%bld(ncol,n_,mold=mold)
