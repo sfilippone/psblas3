@@ -38,6 +38,35 @@ contains
     return
   end function psb_c_zgeall
 
+  function psb_c_zgeall_remote(xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_zvector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_z_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      return
+    end if
+    allocate(xp)
+    call psb_geall(xp,descp,info,bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+    xh%item = c_loc(xp)
+    res = min(0,info)
+
+    return
+  end function psb_c_zgeall_remote
+
   function psb_c_zgeasb(xh,cdh) bind(c) result(res)
 
     implicit none
@@ -193,7 +222,7 @@ contains
       return
     end if
     allocate(ap)
-    call psb_spall(ap,descp,info,bldmode=psb_matbld_remote_)
+    call psb_spall(ap,descp,info,bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
     mh%item = c_loc(ap)
     res = min(0,info)
 
