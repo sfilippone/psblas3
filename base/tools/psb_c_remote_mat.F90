@@ -324,8 +324,6 @@ subroutine psb_c_remote_vect(n,v,iv,desc_a,x,ix, info)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
-  write(0,*) me, 'X_remote_vect implementation to be completed '
-
 
   Allocate(rvsz(np),sdsz(np),sdsi(np),rvsi(np),brvindx(np+1),&
        & bsdindx(np+1), stat=info)
