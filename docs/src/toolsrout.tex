@@ -547,7 +547,7 @@ An integer value; 0 means no error has been detected.
 \clearpage\subsection{psb\_spall --- Allocates a sparse matrix}
 
 \begin{verbatim}
-call psb_spall(a, desc_a, info, nnz, buildmode)
+call psb_spall(a, desc_a, info [, nnz, dupl, buildmode])
 \end{verbatim}
 
 \begin{description}
@@ -564,6 +564,12 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. 
+\item[dupl] How to handle duplicate coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
+\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
 \item[buildmode] Whether to keep track of matrix entries that do not
   belong to the current process.\\ 
 Scope: {\bf global}.\\
@@ -733,7 +739,7 @@ An integer value; 0 means no error has been detected.
 \clearpage\subsection{psb\_spasb --- Sparse matrix assembly routine}
 
 \begin{verbatim}
-call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
+call psb_spasb(a, desc_a, info, afmt, upd,  mold)
 \end{verbatim}
 
 \begin{description}
@@ -754,12 +760,6 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_upd_srch_|, \verb|psb_upd_perm_|
-\item[dupl] How to handle duplicate coefficients.\\
-Scope: {\bf global}.\\
-Type: {\bf optional}.\\
-Intent: {\bf in}.\\
-Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
-\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
 \item[mold] The desired dynamic type for the internal matrix storage.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
@@ -979,7 +979,7 @@ An integer value; 0 means no error has been detected.
 %\addcontentsline{toc}{subsection}{psb\_geall}
 
 \begin{verbatim}
-call psb_geall(x, desc_a, info, n, lb)
+call psb_geall(x, desc_a, info[, dupl, bldmode, n, lb])
 \end{verbatim}
 
 \begin{description}
@@ -1002,6 +1002,19 @@ Type: {\bf optional}\\
 Intent: {\bf in}.\\
 Specified as: Integer scalar, default $1$. It is not a valid argument if $x$ is a
 rank-1 array. 
+\item[dupl] How to handle duplicate coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
+\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
+\item[buildmode] Whether to keep track of matrix entries that do not
+  belong to the current process.\\ 
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value \verb|psb_matbld_noremote_|,
+\verb|psb_matbld_remote_|.  Default:  \verb|psb_matbld_noremote_|.
 \end{description}
 
 \begin{description}
@@ -1027,7 +1040,7 @@ An integer value; 0 means no error has been detected.
 %\addcontentsline{toc}{subsection}{psb\_geins}
 
 \begin{verbatim}
-call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
+call psb_geins(m, irw, val, x, desc_a, info [,local])
 \end{verbatim}
 
 \begin{description}
@@ -1056,12 +1069,6 @@ Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
-\item[dupl] How to handle duplicate coefficients.\\
-Scope: {\bf global}.\\
-Type: {\bf optional}.\\
-Intent: {\bf in}.\\
-Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
-\verb|psb_dupl_add_|.
 \item[local] Whether the entries in the index vector \verb|irw|,
    are already in local  numbering. \\
  Scope:{\bf local}.\\

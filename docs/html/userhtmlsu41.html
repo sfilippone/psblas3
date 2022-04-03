@@ -22,7 +22,7 @@ href="userhtmlsu32.html#userhtmlsu44.html" >up</a>] </p></div>
 
                                                                   
    <pre class="verbatim" id="verbatim-45">
-call&#x00A0;psb_geall(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;n,&#x00A0;lb)
+call&#x00A0;psb_geall(x,&#x00A0;desc_a,&#x00A0;info[,&#x00A0;dupl,&#x00A0;bldmode,&#x00A0;n,&#x00A0;lb])
 </pre>
 <!--l. 983--><p class="nopar" >
 <!--l. 985--><p class="indent" >
@@ -77,8 +77,40 @@ class="newline" />Intent: <span
 class="cmbx-10">in</span>.<br 
 class="newline" />Specified as: Integer scalar, default 1. It is not a valid argument if <span 
 class="cmmi-10">x </span>is a
-     rank-1 array.</dd></dl>
-<!--l. 1007--><p class="indent" >
+     rank-1 array.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">dupl</span> </dt><dd 
+class="description">How to handle duplicate coefficients.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integer, possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_ovwrt_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_add_</span></span></span>,
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_err_</span></span></span>.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">buildmode</span> </dt><dd 
+class="description">Whether to keep track of matrix entries that do not belong to the
+     current process.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified                                                                                 as:
+     an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span>. Default:
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>.</dd></dl>
+<!--l. 1020--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -101,9 +133,6 @@ class="cmtt-10">_T</span><span
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>, of type real, complex or integer.<br 
 class="newline" />
-                                                                  
-
-                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">info</span> </dt><dd 
@@ -121,12 +150,12 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
                                                                   
 
                                                                   
-   <!--l. 1026--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1039--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu45.html" >next</a>] [<a 
 href="userhtmlsu40.html" >prev</a>] [<a 
 href="userhtmlsu40.html#tailuserhtmlsu40.html" >prev-tail</a>] [<a 
 href="userhtmlsu41.html" >front</a>] [<a 
 href="userhtmlsu32.html#userhtmlsu44.html" >up</a>] </p></div>
-<!--l. 1026--><p class="indent" >   <a 
+<!--l. 1039--><p class="indent" >   <a 
  id="tailuserhtmlsu41.html"></a>  
 </body></html> 
