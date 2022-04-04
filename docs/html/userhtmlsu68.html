@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 492--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 564--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu72.html" >next</a>] [<a 
 href="userhtmlsu67.html" >prev</a>] [<a 
 href="userhtmlsu67.html#tailuserhtmlsu67.html" >prev-tail</a>] [<a 
@@ -21,11 +21,11 @@ href="userhtmlsu59.html#userhtmlsu71.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <pre class="verbatim" id="verbatim-72">
+   <pre class="verbatim" id="verbatim-75">
 call&#x00A0;psb_min(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
-<!--l. 496--><p class="nopar" >
-<!--l. 498--><p class="indent" >   This subroutine implements a minimum value reduction operation based on the
+<!--l. 568--><p class="nopar" >
+<!--l. 570--><p class="indent" >   This subroutine implements a minimum value reduction operation based on the
 underlying communication library.
      <dl class="description"><dt class="description">
 <span 
@@ -87,12 +87,17 @@ class="newline" />Type: <span
 class="cmbx-10">optional</span>.<br 
 class="newline" />Intent: <span 
 class="cmbx-10">in</span>.<br 
-class="newline" />Specified as: an integer, with the value determined by the bitwise OR of
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its bit fields, which can be set with bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>. Basic action values are
      <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
      selected (i.e. require synchronous completion).<br 
 class="newline" />
+                                                                  
+
+                                                                  
      </dd><dt class="description">
 <span 
 class="cmbx-10">request</span> </dt><dd 
@@ -106,7 +111,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 539--><p class="indent" >
+<!--l. 612--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -137,7 +142,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 557--><p class="noindent" ><span 
+<!--l. 630--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
@@ -146,20 +151,31 @@ class="cmtt-10">dat</span></span></span> argument is both input and output, and 
      even on processes different from the final result destination.
      </li>
      <li 
-  class="enumerate" id="x80-117004x2">The <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">dat</span></span></span> argument may also be a long integer scalar.</li></ol>
+  class="enumerate" id="x80-117004x2">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument must not be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 646--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-76">
+&#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=psb_collective_start_,request=min_request)
+&#x00A0;&#x00A0;.......
+&#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=psb_collective_end_,request=min_request)
+</pre>
+<!--l. 652--><p class="nopar" ></div></div>
+     </li></ol>
                                                                   
 
                                                                   
                                                                   
 
                                                                   
-   <!--l. 565--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 658--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu72.html" >next</a>] [<a 
 href="userhtmlsu67.html" >prev</a>] [<a 
 href="userhtmlsu67.html#tailuserhtmlsu67.html" >prev-tail</a>] [<a 
 href="userhtmlsu68.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlsu71.html" >up</a>] </p></div>
-<!--l. 565--><p class="indent" >   <a 
+<!--l. 658--><p class="indent" >   <a 
  id="tailuserhtmlsu68.html"></a>  
 </body></html> 

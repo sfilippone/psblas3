@@ -312,8 +312,9 @@ Specified as: an integer value $0<= root <= np-1$, default 0 \
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
 Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
@@ -340,6 +341,36 @@ Intent: {\bf inout}.\\
 If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_bcast(ctxt,dat,mode=psb_collective_start_,&
+       & request=bcast_request)
+  .......
+  call psb_bcast(ctxt,dat,mode=psb_collective_end_,&
+       & request=bcast_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_bcast(ctxt,dat,mode=psb_collective_start_,request=bcast_request)
+  .......
+  call psb_bcast(ctxt,dat,mode=psb_collective_end_, request=bcast_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+\end{enumerate}
+
+
 
 
 \clearpage\subsection{psb\_sum --- Global sum}
@@ -377,8 +408,9 @@ Specified as: an integer value $-1<= root <= np-1$, default -1. \
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
 Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
@@ -387,7 +419,6 @@ Intent: {\bf inout}.\\
 If \verb|mode| does not specify synchronous completion, then this
 variable must be present.
 \end{description}
-
 
 \begin{description}
 \item[\bf On Return]
@@ -411,7 +442,27 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
-\item The \verb|dat| argument may also be a long integer scalar.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_sum(ctxt,dat,mode=psb_collective_start_,&
+       & request=sum_request)
+  .......
+  call psb_sum(ctxt,dat,mode=psb_collective_end_,&
+       & request=sum_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_sum(ctxt,dat,mode=psb_collective_start_,request=sum_request)
+  .......
+  call psb_sum(ctxt,dat,mode=psb_collective_end_,request=sum_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 \end{enumerate}
 
 
@@ -451,8 +502,9 @@ Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
 Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
@@ -486,7 +538,27 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
-\item The \verb|dat| argument may also be a long integer scalar.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_max(ctxt,dat,mode=psb_collective_start_,&
+       & request=max_request)
+  .......
+  call psb_max(ctxt,dat,mode=psb_collective_end_,&
+       & request=max_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_max(ctxt,dat,mode=psb_collective_start_,request=max_request)
+  .......
+  call psb_max(ctxt,dat,mode=psb_collective_end_,request=max_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 \end{enumerate}
 
 \clearpage\subsection{psb\_min --- Global minimum}
@@ -524,8 +596,9 @@ Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
 Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
@@ -559,7 +632,27 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
-\item The \verb|dat| argument may also be a long integer scalar.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_min(ctxt,dat,mode=psb_collective_start_,&
+       & request=min_request)
+  .......
+  call psb_min(ctxt,dat,mode=psb_collective_end_,&
+       & request=min_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_min(ctxt,dat,mode=psb_collective_start_,request=min_request)
+  .......
+  call psb_min(ctxt,dat,mode=psb_collective_end_,request=min_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 \end{enumerate}
 
 \clearpage\subsection{psb\_amx --- Global maximum absolute value}
@@ -597,8 +690,9 @@ Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
 Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
@@ -632,7 +726,27 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
-\item The \verb|dat| argument may also be a long integer scalar.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+call psb_amx(ctxt,dat,mode=psb_collective_start_,&
+     & request=amx_request)
+  .......
+  call psb_amx(ctxt,dat,mode=psb_collective_end_,&
+       & request=amx_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_amx(ctxt,dat,mode=psb_collective_start_,request=amx_request)
+  .......
+  call psb_amx(ctxt,dat,mode=psb_collective_end_,request=amx_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 \end{enumerate}
 
 \clearpage\subsection{psb\_amn --- Global minimum absolute value}
@@ -670,8 +784,9 @@ Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
 Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
@@ -705,7 +820,27 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
-\item The \verb|dat| argument may also be a long integer scalar.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_amn(ctxt,dat,mode=psb_collective_start_,&
+       & request=amn_request)
+  .......
+  call psb_amn(ctxt,dat,mode=psb_collective_end_,&
+       & request=amn_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_amn(ctxt,dat,mode=psb_collective_start_,request=amn_request)
+  .......
+  call psb_amn(ctxt,dat,mode=psb_collective_end_,request=amn_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 \end{enumerate}
 
 \clearpage\subsection{psb\_nrm2 --- Global 2-norm reduction}
@@ -743,10 +878,10 @@ Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer, with the value determined by the bitwise OR
-of \verb|psb_collective_start_|, \verb|psb_collective_end_|.
-Default:  both fields are selected (i.e. require synchronous
-completion).\\
+Specified as: an integer value. The action to be taken is determined
+by its bit fields, which can be set with bitwise \verb|OR|. Basic
+action values are \verb|psb_collective_start_|, \verb|psb_collective_end_|.
+Default:  both fields are selected (i.e. require synchronous completion).\\
 \item[request] A request variable to check for operation completion.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
@@ -785,6 +920,27 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item When splitting the operation in two calls, the \verb|dat|
+  argument  must not be accessed between calls:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+call psb_nrm2(ctxt,dat,mode=psb_collective_start_,&
+     & request=nrm2_request)
+  .......
+  call psb_nrm2(ctxt,dat,mode=psb_collective_end_,&
+       & request=nrm2_request)
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_nrm2(ctxt,dat,mode=psb_collective_start_,request=nrm2_request)
+  .......
+  call psb_nrm2(ctxt,dat,mode=psb_collective_end_,request=nrm2_request)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 \end{enumerate}
 
 
