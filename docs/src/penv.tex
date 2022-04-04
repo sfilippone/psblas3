@@ -347,13 +347,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_bcast(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_bcast(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   call psb_bcast(ctxt,dat,mode=psb_collective_start_,&
        & request=bcast_request)
-  .......
+  ....... ! Do not access dat 
   call psb_bcast(ctxt,dat,mode=psb_collective_end_,&
        & request=bcast_request)
 \end{minted}
@@ -362,7 +381,7 @@ variable must be present.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_bcast(ctxt,dat,mode=psb_collective_start_,request=bcast_request)
-  .......
+  ....... ! Do not access dat 
   call psb_bcast(ctxt,dat,mode=psb_collective_end_, request=bcast_request)
 \end{verbatim}
     \end{minipage}
@@ -442,13 +461,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_sum(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_sum(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   call psb_sum(ctxt,dat,mode=psb_collective_start_,&
        & request=sum_request)
-  .......
+  ....... ! Do not access dat 
   call psb_sum(ctxt,dat,mode=psb_collective_end_,&
        & request=sum_request)
 \end{minted}
@@ -457,7 +495,7 @@ variable must be present.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_sum(ctxt,dat,mode=psb_collective_start_,request=sum_request)
-  .......
+  ....... ! Do not access dat 
   call psb_sum(ctxt,dat,mode=psb_collective_end_,request=sum_request)
 \end{verbatim}
     \end{minipage}
@@ -538,13 +576,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_max(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_max(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   call psb_max(ctxt,dat,mode=psb_collective_start_,&
        & request=max_request)
-  .......
+  ....... ! Do not access dat 
   call psb_max(ctxt,dat,mode=psb_collective_end_,&
        & request=max_request)
 \end{minted}
@@ -553,7 +610,7 @@ variable must be present.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_max(ctxt,dat,mode=psb_collective_start_,request=max_request)
-  .......
+  ....... ! Do not access dat 
   call psb_max(ctxt,dat,mode=psb_collective_end_,request=max_request)
 \end{verbatim}
     \end{minipage}
@@ -632,13 +689,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_min(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_min(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   call psb_min(ctxt,dat,mode=psb_collective_start_,&
        & request=min_request)
-  .......
+  ....... ! Do not access dat 
   call psb_min(ctxt,dat,mode=psb_collective_end_,&
        & request=min_request)
 \end{minted}
@@ -647,7 +723,7 @@ variable must be present.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_min(ctxt,dat,mode=psb_collective_start_,request=min_request)
-  .......
+  ....... ! Do not access dat 
   call psb_min(ctxt,dat,mode=psb_collective_end_,request=min_request)
 \end{verbatim}
     \end{minipage}
@@ -726,13 +802,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_amx(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_amx(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
 call psb_amx(ctxt,dat,mode=psb_collective_start_,&
      & request=amx_request)
-  .......
+  ....... ! Do not access dat 
   call psb_amx(ctxt,dat,mode=psb_collective_end_,&
        & request=amx_request)
 \end{minted}
@@ -741,7 +836,7 @@ call psb_amx(ctxt,dat,mode=psb_collective_start_,&
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_amx(ctxt,dat,mode=psb_collective_start_,request=amx_request)
-  .......
+  ....... ! Do not access dat 
   call psb_amx(ctxt,dat,mode=psb_collective_end_,request=amx_request)
 \end{verbatim}
     \end{minipage}
@@ -820,13 +915,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_amn(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_amn(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   call psb_amn(ctxt,dat,mode=psb_collective_start_,&
        & request=amn_request)
-  .......
+  ....... ! Do not access dat 
   call psb_amn(ctxt,dat,mode=psb_collective_end_,&
        & request=amn_request)
 \end{minted}
@@ -835,7 +949,7 @@ variable must be present.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_amn(ctxt,dat,mode=psb_collective_start_,request=amn_request)
-  .......
+  ....... ! Do not access dat 
   call psb_amn(ctxt,dat,mode=psb_collective_end_,request=amn_request)
 \end{verbatim}
     \end{minipage}
@@ -920,13 +1034,32 @@ variable must be present.
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+\item The \verb|mode| argument can be built with the bitwise
+  \verb|IOR()| operator; in the following example, the   argument is
+  forcing immediate completion, hence the \verb|request| argument
+  needs not be specified: 
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  call psb_nrm2(ctxt,dat,&
+       & mode=ior(psb_collective_start_,psb_collective_end_))
+\end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  call psb_nrm2(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+  
 \item When splitting the operation in two calls, the \verb|dat|
-  argument  must not be accessed between calls:
+  argument  \emph{must not} be accessed between calls:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
 call psb_nrm2(ctxt,dat,mode=psb_collective_start_,&
      & request=nrm2_request)
-  .......
+  ....... ! Do not access dat 
   call psb_nrm2(ctxt,dat,mode=psb_collective_end_,&
        & request=nrm2_request)
 \end{minted}
@@ -935,7 +1068,7 @@ call psb_nrm2(ctxt,dat,mode=psb_collective_start_,&
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
   call psb_nrm2(ctxt,dat,mode=psb_collective_start_,request=nrm2_request)
-  .......
+  ....... ! Do not access dat 
   call psb_nrm2(ctxt,dat,mode=psb_collective_end_,request=nrm2_request)
 \end{verbatim}
     \end{minipage}

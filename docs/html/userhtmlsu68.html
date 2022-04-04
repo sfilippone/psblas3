@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 564--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 621--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu72.html" >next</a>] [<a 
 href="userhtmlsu67.html" >prev</a>] [<a 
 href="userhtmlsu67.html#tailuserhtmlsu67.html" >prev-tail</a>] [<a 
@@ -21,11 +21,11 @@ href="userhtmlsu59.html#userhtmlsu71.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <pre class="verbatim" id="verbatim-75">
+   <pre class="verbatim" id="verbatim-78">
 call&#x00A0;psb_min(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
-<!--l. 568--><p class="nopar" >
-<!--l. 570--><p class="indent" >   This subroutine implements a minimum value reduction operation based on the
+<!--l. 625--><p class="nopar" >
+<!--l. 627--><p class="indent" >   This subroutine implements a minimum value reduction operation based on the
 underlying communication library.
      <dl class="description"><dt class="description">
 <span 
@@ -111,7 +111,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 612--><p class="indent" >
+<!--l. 669--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -142,7 +142,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 630--><p class="noindent" ><span 
+<!--l. 687--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
@@ -151,18 +151,37 @@ class="cmtt-10">dat</span></span></span> argument is both input and output, and 
      even on processes different from the final result destination.
      </li>
      <li 
-  class="enumerate" id="x80-117004x2">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">dat</span></span></span> argument must not be
-     accessed between calls:
+  class="enumerate" id="x80-117004x2">The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
      <div class="center" 
 >
-<!--l. 646--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-76">
+<!--l. 702--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-79">
+&#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 706--><p class="nopar" ></div></div>
+     </li>
+     <li 
+  class="enumerate" id="x80-117006x3">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="cmti-10">must not </span>be
+     accessed between calls:
+                                                                  
+
+                                                                  
+     <div class="center" 
+>
+<!--l. 722--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-80">
 &#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=psb_collective_start_,request=min_request)
-&#x00A0;&#x00A0;.......
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
 &#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=psb_collective_end_,request=min_request)
 </pre>
-<!--l. 652--><p class="nopar" ></div></div>
+<!--l. 728--><p class="nopar" ></div></div>
      </li></ol>
                                                                   
 
@@ -170,12 +189,12 @@ class="cmtt-10">dat</span></span></span> argument must not be
                                                                   
 
                                                                   
-   <!--l. 658--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 734--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu72.html" >next</a>] [<a 
 href="userhtmlsu67.html" >prev</a>] [<a 
 href="userhtmlsu67.html#tailuserhtmlsu67.html" >prev-tail</a>] [<a 
 href="userhtmlsu68.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlsu71.html" >up</a>] </p></div>
-<!--l. 658--><p class="indent" >   <a 
+<!--l. 734--><p class="indent" >   <a 
  id="tailuserhtmlsu68.html"></a>  
 </body></html> 

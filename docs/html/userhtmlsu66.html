@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 376--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 395--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu70.html" >next</a>] [<a 
 href="userhtmlsu65.html" >prev</a>] [<a 
 href="userhtmlsu65.html#tailuserhtmlsu65.html" >prev-tail</a>] [<a 
@@ -21,11 +21,11 @@ href="userhtmlsu59.html#userhtmlsu69.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <pre class="verbatim" id="verbatim-71">
+   <pre class="verbatim" id="verbatim-72">
 call&#x00A0;psb_sum(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
-<!--l. 380--><p class="nopar" >
-<!--l. 382--><p class="indent" >   This subroutine implements a sum reduction operation based on the underlying
+<!--l. 399--><p class="nopar" >
+<!--l. 401--><p class="indent" >   This subroutine implements a sum reduction operation based on the underlying
 communication library.
      <dl class="description"><dt class="description">
 <span 
@@ -107,7 +107,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 423--><p class="indent" >
+<!--l. 442--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -138,7 +138,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 440--><p class="noindent" ><span 
+<!--l. 459--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
@@ -147,18 +147,37 @@ class="cmtt-10">dat</span></span></span> argument is both input and output, and 
      even on processes different from the final result destination.
      </li>
      <li 
-  class="enumerate" id="x78-115004x2">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">dat</span></span></span> argument must not be
-     accessed between calls:
+  class="enumerate" id="x78-115004x2">The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
      <div class="center" 
 >
-<!--l. 456--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-72">
+<!--l. 474--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-73">
+&#x00A0;&#x00A0;call&#x00A0;psb_sum(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 478--><p class="nopar" ></div></div>
+     </li>
+     <li 
+  class="enumerate" id="x78-115006x3">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="cmti-10">must not </span>be
+     accessed between calls:
+                                                                  
+
+                                                                  
+     <div class="center" 
+>
+<!--l. 494--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-74">
 &#x00A0;&#x00A0;call&#x00A0;psb_sum(ctxt,dat,mode=psb_collective_start_,request=sum_request)
-&#x00A0;&#x00A0;.......
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
 &#x00A0;&#x00A0;call&#x00A0;psb_sum(ctxt,dat,mode=psb_collective_end_,request=sum_request)
 </pre>
-<!--l. 462--><p class="nopar" ></div></div>
+<!--l. 500--><p class="nopar" ></div></div>
      </li></ol>
                                                                   
 
@@ -166,12 +185,12 @@ class="cmtt-10">dat</span></span></span> argument must not be
                                                                   
 
                                                                   
-   <!--l. 470--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 508--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu70.html" >next</a>] [<a 
 href="userhtmlsu65.html" >prev</a>] [<a 
 href="userhtmlsu65.html#tailuserhtmlsu65.html" >prev-tail</a>] [<a 
 href="userhtmlsu66.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlsu69.html" >up</a>] </p></div>
-<!--l. 470--><p class="indent" >   <a 
+<!--l. 508--><p class="indent" >   <a 
  id="tailuserhtmlsu66.html"></a>  
 </body></html> 

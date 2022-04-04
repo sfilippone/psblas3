@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 658--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 734--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu73.html" >next</a>] [<a 
 href="userhtmlsu68.html" >prev</a>] [<a 
 href="userhtmlsu68.html#tailuserhtmlsu68.html" >prev-tail</a>] [<a 
@@ -21,11 +21,11 @@ href="userhtmlsu59.html#userhtmlsu72.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <pre class="verbatim" id="verbatim-77">
+   <pre class="verbatim" id="verbatim-81">
 call&#x00A0;psb_amx(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
-<!--l. 662--><p class="nopar" >
-<!--l. 664--><p class="indent" >   This subroutine implements a maximum absolute value reduction operation based
+<!--l. 738--><p class="nopar" >
+<!--l. 740--><p class="indent" >   This subroutine implements a maximum absolute value reduction operation based
 on the underlying communication library.
      <dl class="description"><dt class="description">
 <span 
@@ -111,7 +111,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 706--><p class="indent" >
+<!--l. 782--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -141,7 +141,7 @@ class="cmbx-10">inout</span>.<br
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
      be present.</dd></dl>
-<!--l. 724--><p class="noindent" ><span 
+<!--l. 800--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
      <ol  class="enumerate1" >
      <li 
@@ -150,18 +150,37 @@ class="cmtt-10">dat</span></span></span> argument is both input and output, and 
      even on processes different from the final result destination.
      </li>
      <li 
-  class="enumerate" id="x81-118004x2">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">dat</span></span></span> argument must not be
-     accessed between calls:
+  class="enumerate" id="x81-118004x2">The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
      <div class="center" 
 >
-<!--l. 740--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-78">
+<!--l. 815--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-82">
+&#x00A0;&#x00A0;call&#x00A0;psb_amx(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 819--><p class="nopar" ></div></div>
+     </li>
+     <li 
+  class="enumerate" id="x81-118006x3">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="cmti-10">must not </span>be
+     accessed between calls:
+                                                                  
+
+                                                                  
+     <div class="center" 
+>
+<!--l. 835--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-83">
 &#x00A0;&#x00A0;call&#x00A0;psb_amx(ctxt,dat,mode=psb_collective_start_,request=amx_request)
-&#x00A0;&#x00A0;.......
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
 &#x00A0;&#x00A0;call&#x00A0;psb_amx(ctxt,dat,mode=psb_collective_end_,request=amx_request)
 </pre>
-<!--l. 746--><p class="nopar" ></div></div>
+<!--l. 841--><p class="nopar" ></div></div>
      </li></ol>
                                                                   
 
@@ -169,12 +188,12 @@ class="cmtt-10">dat</span></span></span> argument must not be
                                                                   
 
                                                                   
-   <!--l. 752--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 847--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu73.html" >next</a>] [<a 
 href="userhtmlsu68.html" >prev</a>] [<a 
 href="userhtmlsu68.html#tailuserhtmlsu68.html" >prev-tail</a>] [<a 
 href="userhtmlsu69.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlsu72.html" >up</a>] </p></div>
-<!--l. 752--><p class="indent" >   <a 
+<!--l. 847--><p class="indent" >   <a 
  id="tailuserhtmlsu69.html"></a>  
 </body></html> 
