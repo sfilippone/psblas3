@@ -84,5 +84,48 @@ contains
 
     end function psb_c_dglobal_mat_write
 
+  function psb_c_dglobal_vec_write(vh,cdh) bind(c) result(res)
+        use psb_base_mod
+        use psb_util_mod
+        use psb_base_string_cbind_mod
+        implicit none
+        integer(psb_c_ipk_) :: res
+
+        type(psb_c_dvector)  :: vh 
+        type(psb_c_descriptor) :: cdh
+
+	type(psb_d_vect_type), pointer :: vp
+	type(psb_desc_type), pointer :: descp
+	! Local variables
+	real(psb_dpk_), allocatable :: vglobal(:)
+        integer(psb_ipk_) :: info, iam, np
+	type(psb_ctxt_type) :: ctxt
+	character(len=40)  :: vecname
+
+	res = -1
+    	if (c_associated(cdh%item)) then
+      	  call c_f_pointer(cdh%item,descp)
+    	else
+      	  return
+    	end if
+        if (c_associated(vh%item)) then
+          call c_f_pointer(vh%item,vp)
+        else
+         return
+        end if
+
+	ctxt = descp%get_ctxt()
+	call psb_info(ctxt,iam,np)
+	call psb_gather(vglobal,vp,descp,info)
+        if (iam == psb_root_) then
+	   write(vecname,'("v-np-",I1,".mtx")') np
+      	   call mm_array_write(vglobal,"Global vector",info,filename=trim(vecname))
+	end if
+
+	deallocate(vglobal,stat=info)
+	res = info
+
+    end function psb_c_dglobal_vec_write
+
 
 end module psb_dutil_cbind_mod

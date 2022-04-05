@@ -291,7 +291,53 @@ Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
+{\par\noindent\large\bfseries Notes}
 
+If this function is called on a vector \lstinline|v| on a distributed communicator
+only the local part is written in output. To get a single MatrixMarket file with
+the whole vector when appropriate, e.g. for debugging purposes, one could \emph{gather} 
+the  whole vector on a single rank and then write it. Consider the following example
+for a \emph{double} precision vector
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+real(psb_dpk_), allocatable :: vglobal(:)
+
+call psb_gather(vglobal,v,desc,info)
+if (iam == psb_root_) then
+call mm_array_write(vglobal,vtitle,info,filename)
+end if
+call deallocate(vglobal, stat=info)
+\end{minted}
+\else
+\begin{center}
+	\begin{minipage}[tl]{0.9\textwidth}
+		\begin{verbatim} 
+		real(psb_dpk_), allocatable :: vglobal(:)
+		
+		call psb_gather(vglobal,v,desc,info)
+		if (iam == psb_root_) then
+		call mm_array_write(vglobal,vtitle,info,filename)
+		end if
+		call deallocate(vglobal, stat=info)
+		\end{verbatim}
+	\end{minipage}
+\end{center}
+\fi
+To simplify this procedure in \verb|C|, there is a utility function
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{c}
+psb_i_t psb_c_<s,d,c,z>global_vec_write(vh,cdh);
+\end{minted}
+\else
+\begin{center}
+	\begin{minipage}[tl]{0.9\textwidth}
+		\begin{verbatim}
+		psb_i_t psb_c_<s,d,c,z>global_vec_write(vh,cdh);
+		\end{verbatim}
+	\end{minipage}
+\end{center}
+\fi 
+that produces exactly this result.
 
 %%% Local Variables: 
 %%% mode: latex

@@ -9,6 +9,7 @@ extern "C" {
 /* I/O Routine */
 psb_i_t psb_c_cmm_mat_write(psb_c_cspmat *ah, char *matrixtitle, char *filename);
 psb_i_t psb_c_cglobal_mat_write(psb_c_cspmat *ah,psb_c_descriptor *cdh);
+psb_i_t psb_c_cglobal_vec_write(psb_c_cvector *vh,psb_c_descriptor *cdh);
 
 #ifdef __cplusplus
 }
