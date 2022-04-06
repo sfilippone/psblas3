@@ -96,8 +96,8 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
 #endif
   integer(psb_lpk_), intent(in)      :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:), ladj(:)
-  class(psb_indx_map), intent(inout) :: idxmap
-  integer(psb_ipk_), intent(out)     :: info
+  class(psb_indx_map), intent(in) :: idxmap
+  integer(psb_ipk_), intent(out)  :: info
 
 
   integer(psb_lpk_), allocatable :: tidx(:)
@@ -369,7 +369,7 @@ contains
     integer(psb_ipk_), intent(in)    :: n_samples
     integer(psb_ipk_), intent(inout) :: iprc(:), n_answers
     integer(psb_ipk_), intent(in)    :: adj(:)
-    class(psb_indx_map), intent(inout) :: idxmap
+    class(psb_indx_map), intent(in)  :: idxmap
     !
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw, n_reml,iend, nv
