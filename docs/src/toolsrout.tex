@@ -601,7 +601,7 @@ An integer value; 0 means no error has been detected.
   the assembled matrix may substantially improve performance in the
   matrix build phase, as it will reduce or eliminate the need for
   (potentially multiple) data reallocations;
-\item Using \verb|psb_matbld_remote_| will cause an overhead at
+\item Using \verb|psb_matbld_remote_| is likely to cause  a runtime  overhead at
   assembly time;
 \end{enumerate}
 
@@ -712,8 +712,7 @@ An integer value; 0 means no error has been detected.
 \item The input data can be passed in either COO or CSR formats;
 \item In COO format the coefficients to be inserted are represented by
   the ordered   triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$;
-  these triples  should belong to the current process, i.e. $ia(i)$
-  should be one of  the local indices, but are otherwise arbitrary;
+  these triples are arbitrary;
 \item In CSR format the coefficients to be inserted for each input row $i=1,nr$
   are represented by the ordered triples $(i+irw-1),ja(j),val(j)$, for
   $j=irp(i),\dots,irp(i+1)-1$; 
@@ -724,8 +723,11 @@ An integer value; 0 means no error has been detected.
   may be split into   as many calls as desired (even in the CSR format); 
 \item Coefficients from different rows may also be mixed up freely
   in a single call, according to the application needs; 
-\item Any coefficients from matrix rows not owned by the calling
-  process are silently ignored;
+\item Coefficients from matrix rows not owned by the calling
+  process are treated according to the value of \verb|buildmode|
+  specified at allocation time; if 
+  \verb|buildmode| was chosen as \verb|psb_matbld_remote_| the library
+  will keep track of them, otherwise they are   silently ignored;
 \item If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
   requirements are  ignored; 
@@ -739,7 +741,7 @@ An integer value; 0 means no error has been detected.
 \clearpage\subsection{psb\_spasb --- Sparse matrix assembly routine}
 
 \begin{verbatim}
-call psb_spasb(a, desc_a, info, afmt, upd,  mold)
+call psb_spasb(a, desc_a, info [, afmt, upd,  mold])
 \end{verbatim}
 
 \begin{description}
@@ -808,8 +810,9 @@ An integer value; 0 means no error has been detected.
   at allocation time, contributions defined on the current process but
   belonging to a remote process will be handled accordingly. This is
   most likely to occur in finite element applications, with
-  \verb|dupl=psb_dupl_add_|; note that the descriptor will be updated,
-  and there will be a runtime overhead. 
+  \verb|dupl=psb_dupl_add_|; it is necessary to check for possible
+  updates needed in the descriptor, hence there will be a runtime
+  overhead.  
 \end{enumerate}
 
 
@@ -1007,7 +1010,7 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
-\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
+\verb|psb_dupl_add_|; \verb|psb_dupl_err_| has no effect.
 \item[buildmode] Whether to keep track of matrix entries that do not
   belong to the current process.\\ 
 Scope: {\bf global}.\\
@@ -1032,6 +1035,11 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item Using \verb|psb_matbld_remote_| is likely to cause  a runtime  overhead at
+  assembly time;
+\end{enumerate}
 
 %
 %%   psb_ins %%
@@ -1140,7 +1148,22 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On entry to this routine the descriptor must  be in  the
+  assembled state, i.e. \verb|psb_cdasb| must already have been called.
+\item If the \verb|buildmode=psb_matbld_remote_| value was specified
+  at allocation time, contributions defined on the current process but
+  belonging to a remote process will be handled accordingly. This is
+  most likely to occur in finite element applications, with
+  \verb|dupl=psb_dupl_add_|.
+\end{enumerate}
+
+
 %
+
 %%   psb_free %%
 %
 \clearpage\subsection{psb\_gefree --- Frees a dense matrix}

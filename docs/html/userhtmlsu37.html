@@ -234,14 +234,11 @@ class="cmmi-10">,ja</span>(<span
 class="cmmi-10">i</span>)<span 
 class="cmmi-10">,val</span>(<span 
 class="cmmi-10">i</span>),  for  <span 
-class="cmmi-10">i </span>=  1<span 
+class="cmmi-10">i  </span>=  1<span 
 class="cmmi-10">,</span><span 
 class="cmmi-10">&#x2026;</span><span 
-class="cmmi-10">,nz</span>;  these  triples  should
-     belong to the current process, i.e. <span 
-class="cmmi-10">ia</span>(<span 
-class="cmmi-10">i</span>) should be one of the local indices,
-     but are otherwise arbitrary;
+class="cmmi-10">,nz</span>;  these  triples  are
+     arbitrary;
      </li>
      <li 
   class="enumerate" id="x48-85012x6">In CSR format the coefficients to be inserted for each input row <span 
@@ -280,8 +277,13 @@ class="cmsy-10">-</span>1 should be one of the local indices, but are otherwise
      call, according to the application needs;
      </li>
      <li 
-  class="enumerate" id="x48-85018x9">Any coefficients from matrix rows not owned by the calling process are
-     silently ignored;
+  class="enumerate" id="x48-85018x9">Coefficients  from  matrix  rows  not  owned  by  the  calling  process  are
+     treated according to the value of <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">buildmode</span></span></span> specified at allocation time; if
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">buildmode</span></span></span> was chosen as <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span> the library will keep track
+     of them, otherwise they are silently ignored;
                                                                   
 
                                                                   
@@ -300,12 +302,12 @@ class="cmsy-10">-</span>1 should be one of the local indices, but are otherwise
                                                                   
 
                                                                   
-   <!--l. 739--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 741--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu41.html" >next</a>] [<a 
 href="userhtmlsu36.html" >prev</a>] [<a 
 href="userhtmlsu36.html#tailuserhtmlsu36.html" >prev-tail</a>] [<a 
 href="userhtmlsu37.html" >front</a>] [<a 
 href="userhtmlsu32.html#userhtmlsu40.html" >up</a>] </p></div>
-<!--l. 739--><p class="indent" >   <a 
+<!--l. 741--><p class="indent" >   <a 
  id="tailuserhtmlsu37.html"></a>  
 </body></html> 
