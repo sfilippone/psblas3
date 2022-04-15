@@ -146,12 +146,6 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, mold)
         call psb_remote_mat(a%rmta,desc_a,a_add,info)
         nz = a_add%get_nzeros()
 !!$        write(0,*) me,name,' Nz to be added',nz
-        nzt = nz
-        call psb_sum(ctxt,nzt)
-        if (nzt>0) then
-          allocate(ivm, mold=desc_a%v_halo_index%v)
-          call psb_cd_reinit(desc_a, info)
-        end if
         if (nz > 0) then
           !
           ! Should we check for new indices here?
