@@ -154,7 +154,6 @@ contains
   end subroutine psb_mmaxs
 
   subroutine psb_mmaxv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -223,7 +222,6 @@ contains
   end subroutine psb_mmaxv
 
   subroutine psb_mmaxm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -361,7 +359,6 @@ contains
   end subroutine psb_mmins
 
   subroutine psb_mminv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -429,7 +426,6 @@ contains
   end subroutine psb_mminv
 
   subroutine psb_mminm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -569,7 +565,6 @@ contains
   end subroutine psb_msums
 
   subroutine psb_msumv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -637,7 +632,6 @@ contains
   end subroutine psb_msumv
 
   subroutine psb_msumm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -776,7 +770,6 @@ contains
   end subroutine psb_mamxs
 
   subroutine psb_mamxv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -844,7 +837,6 @@ contains
   end subroutine psb_mamxv
 
   subroutine psb_mamxm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -982,7 +974,6 @@ contains
   end subroutine psb_mamns
 
   subroutine psb_mamnv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1050,7 +1041,6 @@ contains
   end subroutine psb_mamnv
 
   subroutine psb_mamnm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1177,7 +1167,6 @@ contains
   end subroutine psb_mbcasts
 
   subroutine psb_mbcastv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1233,7 +1222,6 @@ contains
   end subroutine psb_mbcastv
 
   subroutine psb_mbcastm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1399,7 +1387,6 @@ contains
   end subroutine psb_mexscan_sums
 
   subroutine psb_mscan_sumv(ctxt,dat,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1449,7 +1436,6 @@ contains
   end subroutine psb_mscan_sumv
 
   subroutine psb_mexscan_sumv(ctxt,dat,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif

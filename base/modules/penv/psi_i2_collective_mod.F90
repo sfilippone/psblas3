@@ -154,7 +154,6 @@ contains
   end subroutine psb_i2maxs
 
   subroutine psb_i2maxv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -223,7 +222,6 @@ contains
   end subroutine psb_i2maxv
 
   subroutine psb_i2maxm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -361,7 +359,6 @@ contains
   end subroutine psb_i2mins
 
   subroutine psb_i2minv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -429,7 +426,6 @@ contains
   end subroutine psb_i2minv
 
   subroutine psb_i2minm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -569,7 +565,6 @@ contains
   end subroutine psb_i2sums
 
   subroutine psb_i2sumv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -637,7 +632,6 @@ contains
   end subroutine psb_i2sumv
 
   subroutine psb_i2summ(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -776,7 +770,6 @@ contains
   end subroutine psb_i2amxs
 
   subroutine psb_i2amxv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -844,7 +837,6 @@ contains
   end subroutine psb_i2amxv
 
   subroutine psb_i2amxm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -982,7 +974,6 @@ contains
   end subroutine psb_i2amns
 
   subroutine psb_i2amnv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1050,7 +1041,6 @@ contains
   end subroutine psb_i2amnv
 
   subroutine psb_i2amnm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1177,7 +1167,6 @@ contains
   end subroutine psb_i2bcasts
 
   subroutine psb_i2bcastv(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1233,7 +1222,6 @@ contains
   end subroutine psb_i2bcastv
 
   subroutine psb_i2bcastm(ctxt,dat,root,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1399,7 +1387,6 @@ contains
   end subroutine psb_i2exscan_sums
 
   subroutine psb_i2scan_sumv(ctxt,dat,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1449,7 +1436,6 @@ contains
   end subroutine psb_i2scan_sumv
 
   subroutine psb_i2exscan_sumv(ctxt,dat,mode,request)
-    use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
 #endif
