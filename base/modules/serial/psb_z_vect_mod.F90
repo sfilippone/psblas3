@@ -526,9 +526,11 @@ contains
       allocate(tmp,stat=info,mold=psb_z_get_base_vect_default())
     end if
     if (allocated(x%v)) then
-      call x%v%sync()
-      if (info == psb_success_) call tmp%bld(x%v%v)
-      call x%v%free(info)
+      if (allocated(x%v%v)) then 
+        call x%v%sync()
+        if (info == psb_success_) call tmp%bld(x%v%v)
+        call x%v%free(info)
+      endif
     end if
     call move_alloc(tmp,x%v)
 
