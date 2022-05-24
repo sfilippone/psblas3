@@ -39,15 +39,27 @@
 !
 module psb_l_vect_mod
 
+  use psb_realloc_mod
   use psb_l_base_vect_mod
   use psb_i_vect_mod
 
   type psb_l_vect_type
     class(psb_l_base_vect_type), allocatable :: v
+    integer(psb_ipk_) :: nrmv = 0
+    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_) :: dupl = psb_dupl_add_
+    integer(psb_lpk_), allocatable :: rmtv(:)
+    integer(psb_lpk_), allocatable :: rmidx(:)
   contains
     procedure, pass(x) :: get_nrows => l_vect_get_nrows
     procedure, pass(x) :: sizeof   => l_vect_sizeof
     procedure, pass(x) :: get_fmt  => l_vect_get_fmt
+    procedure, pass(x) :: is_remote_build => l_vect_is_remote_build
+    procedure, pass(x) :: set_remote_build => l_vect_set_remote_build
+    procedure, pass(x) :: get_dupl => l_vect_get_dupl
+    procedure, pass(x) :: set_dupl => l_vect_set_dupl 
+    procedure, pass(x) :: get_nrmv => l_vect_get_nrmv
+    procedure, pass(x) :: set_nrmv => l_vect_set_nrmv
     procedure, pass(x) :: all      => l_vect_all
     procedure, pass(x) :: reall    => l_vect_reall
     procedure, pass(x) :: zero     => l_vect_zero
@@ -98,7 +110,9 @@ module psb_l_vect_mod
        & l_vect_cnv, l_vect_set_scal, &
        & l_vect_set_vect, l_vect_clone, l_vect_sync, l_vect_is_host, &
        & l_vect_is_dev, l_vect_is_sync, l_vect_set_host, &
-       & l_vect_set_dev, l_vect_set_sync
+       & l_vect_set_dev, l_vect_set_sync, &
+       & l_vect_set_remote_build, l_is_remote_build, &
+       & l_vect_set_dupl, l_get_dupl, l_vect_set_nrmv, l_get_nrmv
 
 
   class(psb_l_base_vect_type), allocatable, target,&
@@ -115,7 +129,60 @@ module psb_l_vect_mod
 
 contains
 
+  function l_vect_get_dupl(x) result(res)
+    implicit none
+    class(psb_l_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%dupl
+  end function l_vect_get_dupl
 
+  subroutine l_vect_set_dupl(x,val)
+    implicit none
+    class(psb_l_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%dupl = val
+    else
+      x%dupl = psb_dupl_def_
+    end if
+  end subroutine l_vect_set_dupl
+
+  function l_vect_get_nrmv(x) result(res)
+    implicit none
+    class(psb_l_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%nrmv
+  end function l_vect_get_nrmv
+
+  subroutine l_vect_set_nrmv(x,val)
+    implicit none
+    class(psb_l_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: val
+
+    x%nrmv = val
+  end subroutine l_vect_set_nrmv
+        
+
+  function l_vect_is_remote_build(x) result(res)
+    implicit none
+    class(psb_l_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%remote_build == psb_matbld_remote_)
+  end function l_vect_is_remote_build
+
+  subroutine l_vect_set_remote_build(x,val)
+    implicit none
+    class(psb_l_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%remote_build = val
+    else
+      x%remote_build = psb_matbld_remote_
+    end if
+  end subroutine l_vect_set_remote_build
+        
   subroutine  psb_l_set_vect_default(v)
     implicit none
     class(psb_l_base_vect_type), intent(in) :: v
@@ -313,8 +380,8 @@ contains
     implicit none
     integer(psb_ipk_), intent(in)           :: n
     class(psb_l_vect_type), intent(inout) :: x
-    class(psb_l_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
+    class(psb_l_base_vect_type), intent(in), optional :: mold
 
     if (allocated(x%v)) &
          & call x%free(info)
@@ -329,7 +396,6 @@ contains
     else
       info = psb_err_alloc_dealloc_
     end if
-
   end subroutine l_vect_all
 
   subroutine l_vect_reall(n, x, info)
@@ -360,13 +426,13 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_l_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)        :: info
 
-    if (allocated(x%v)) &
-         & call x%v%asb(n,info)
-
+    if (allocated(x%v)) then
+      call x%v%asb(n,info)
+    end if
   end subroutine l_vect_asb
 
   subroutine l_vect_gthab(n,idx,alpha,x,beta,y)
@@ -417,44 +483,44 @@ contains
 
   end subroutine l_vect_free
 
-  subroutine l_vect_ins_a(n,irl,val,dupl,x,info)
+  subroutine l_vect_ins_a(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_l_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n
     integer(psb_ipk_), intent(in)               :: irl(:)
     integer(psb_lpk_), intent(in)        :: val(:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, dupl
 
     info = 0
     if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
       return
     end if
-
+    dupl = x%get_dupl()
     call  x%v%ins(n,irl,val,dupl,info)
 
   end subroutine l_vect_ins_a
 
-  subroutine l_vect_ins_v(n,irl,val,dupl,x,info)
+  subroutine l_vect_ins_v(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_l_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n
     class(psb_i_vect_type), intent(inout)       :: irl
     class(psb_l_vect_type), intent(inout)       :: val
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, dupl
 
     info = 0
     if (.not.(allocated(x%v).and.allocated(irl%v).and.allocated(val%v))) then
       info = psb_err_invalid_vect_state_
       return
     end if
-
+    dupl = x%get_dupl()
     call  x%v%ins(n,irl%v,val%v,dupl,info)
 
   end subroutine l_vect_ins_v
@@ -560,7 +626,6 @@ contains
 end module psb_l_vect_mod
 
 
-
 module psb_l_multivect_mod
 
   use psb_l_base_multivect_mod
@@ -572,11 +637,19 @@ module psb_l_multivect_mod
 
   type psb_l_multivect_type
     class(psb_l_base_multivect_type), allocatable :: v
+    integer(psb_ipk_) :: nrmv = 0
+    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_) :: dupl = psb_dupl_add_
+    integer(psb_lpk_), allocatable :: rmtv(:,:)
   contains
     procedure, pass(x) :: get_nrows => l_vect_get_nrows
     procedure, pass(x) :: get_ncols => l_vect_get_ncols
     procedure, pass(x) :: sizeof   => l_vect_sizeof
     procedure, pass(x) :: get_fmt  => l_vect_get_fmt
+    procedure, pass(x) :: is_remote_build => l_mvect_is_remote_build
+    procedure, pass(x) :: set_remote_build => l_mvect_set_remote_build
+    procedure, pass(x) :: get_dupl => l_mvect_get_dupl
+    procedure, pass(x) :: set_dupl => l_mvect_set_dupl
 
     procedure, pass(x) :: all      => l_vect_all
     procedure, pass(x) :: reall    => l_vect_reall
@@ -626,6 +699,46 @@ module psb_l_multivect_mod
 
 contains
 
+  
+  function l_mvect_get_dupl(x) result(res)
+    implicit none
+    class(psb_l_multivect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%dupl
+  end function l_mvect_get_dupl
+
+  subroutine l_mvect_set_dupl(x,val)
+    implicit none
+    class(psb_l_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%dupl = val
+    else
+      x%dupl = psb_dupl_def_
+    end if
+  end subroutine l_mvect_set_dupl
+        
+
+  function l_mvect_is_remote_build(x) result(res)
+    implicit none
+    class(psb_l_multivect_type), intent(in) :: x
+    logical :: res
+    res = (x%remote_build == psb_matbld_remote_)
+  end function l_mvect_is_remote_build
+
+  subroutine l_mvect_set_remote_build(x,val)
+    implicit none
+    class(psb_l_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (present(val)) then
+      x%remote_build = val
+    else
+      x%remote_build = psb_matbld_remote_
+    end if
+  end subroutine l_mvect_set_remote_build
+        
 
   subroutine  psb_l_set_multivect_default(v)
     implicit none
@@ -930,23 +1043,23 @@ contains
 
   end subroutine l_vect_free
 
-  subroutine l_vect_ins(n,irl,val,dupl,x,info)
+  subroutine l_vect_ins(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_l_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n
     integer(psb_ipk_), intent(in)               :: irl(:)
     integer(psb_lpk_), intent(in)        :: val(:,:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, dupl
 
     info = 0
     if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
       return
     end if
-
+    dupl = x%get_dupl()
     call  x%v%ins(n,irl,val,dupl,info)
 
   end subroutine l_vect_ins

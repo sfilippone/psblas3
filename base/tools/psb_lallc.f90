@@ -40,7 +40,7 @@
 !    x      - the vector to be allocated.
 !    desc_a - the communication descriptor.
 !    info   - Return code
-subroutine psb_lalloc_vect(x, desc_a,info)
+subroutine psb_lalloc_vect(x, desc_a,info, dupl, bldmode)
   use psb_base_mod, psb_protect_name => psb_lalloc_vect
   use psi_mod
   implicit none
@@ -49,9 +49,11 @@ subroutine psb_lalloc_vect(x, desc_a,info)
   type(psb_l_vect_type), intent(out)  :: x
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_),intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
+  integer(psb_ipk_) :: dupl_, bldmode_, nrmt_
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -102,6 +104,25 @@ subroutine psb_lalloc_vect(x, desc_a,info)
   endif
   call x%zero()
 
+  if (present(bldmode)) then
+    bldmode_ = bldmode
+  else
+    bldmode_ = psb_matbld_noremote_
+  end if
+  if (present(dupl)) then
+    dupl_ = dupl 
+  else
+    dupl_ = psb_dupl_def_
+  end if
+  call x%set_dupl(dupl_)
+  call x%set_remote_build(bldmode_)
+  call x%set_nrmv(0)
+  if (x%is_remote_build()) then
+    nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
+    call psb_ensure_size(nrmt_,x%rmtv,info)
+    call psb_ensure_size(nrmt_,x%rmidx,info)
+  end if
+
   call psb_erractionrestore(err_act)
   return
 
@@ -110,6 +131,7 @@ subroutine psb_lalloc_vect(x, desc_a,info)
   return
 
 end subroutine psb_lalloc_vect
+
 ! Function: psb_lalloc_vect_r2
 !    Allocates a vector of dense vectors for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.
@@ -121,7 +143,7 @@ end subroutine psb_lalloc_vect
 !    n      - optional number of columns.
 !    lb     - optional lower bound on column indices
 
-subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb)
+subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb, dupl, bldmode)
   use psb_base_mod, psb_protect_name => psb_lalloc_vect_r2
   use psi_mod
   implicit none
@@ -131,10 +153,12 @@ subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_),intent(out)             :: info
   integer(psb_ipk_), optional, intent(in)   :: n,lb
+  integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
 
   !locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
+  integer(psb_ipk_) :: dupl_, bldmode_, nrmt_
   integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
@@ -208,6 +232,26 @@ subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb)
       if (info /= 0) exit
     end do
   end if
+
+  if (present(bldmode)) then
+    bldmode_ = bldmode
+  else
+    bldmode_ = psb_matbld_noremote_
+  end if
+  if (present(dupl)) then
+    dupl_ = dupl 
+  else
+    dupl_ = psb_dupl_def_
+  end if
+  
+  do i=lb_, lb_+n_-1
+    call x(i)%set_dupl(dupl_)
+    call x(i)%set_remote_build(bldmode_)
+    if (x(i)%is_remote_build()) then
+      nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
+      allocate(x(i)%rmtv(nrmt_))
+    end if
+  end do
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
@@ -224,7 +268,7 @@ subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb)
 end subroutine psb_lalloc_vect_r2
 
 
-subroutine psb_lalloc_multivect(x, desc_a,info,n)
+subroutine psb_lalloc_multivect(x, desc_a,info,n, dupl, bldmode)
   use psb_base_mod, psb_protect_name => psb_lalloc_multivect
   use psi_mod
   implicit none
@@ -234,10 +278,12 @@ subroutine psb_lalloc_multivect(x, desc_a,info,n)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_),intent(out)             :: info
   integer(psb_ipk_), optional, intent(in)   :: n
+  integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
 
   !locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
+  integer(psb_ipk_) :: dupl_, bldmode_, nrmt_
   integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
@@ -306,6 +352,23 @@ subroutine psb_lalloc_multivect(x, desc_a,info,n)
     call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
     goto 9999
   endif
+  if (present(bldmode)) then
+    bldmode_ = bldmode
+  else
+    bldmode_ = psb_matbld_noremote_
+  end if
+  if (present(dupl)) then
+    dupl_ = dupl 
+  else
+    dupl_ = psb_dupl_def_
+  end if
+  call x%set_dupl(dupl_)
+  call x%set_remote_build(bldmode_)
+  if (x%is_remote_build()) then
+    nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
+    allocate(x%rmtv(nrmt_,n_))
+  end if
+
 
   call psb_erractionrestore(err_act)
   return

@@ -547,7 +547,7 @@ An integer value; 0 means no error has been detected.
 \clearpage\subsection{psb\_spall --- Allocates a sparse matrix}
 
 \begin{verbatim}
-call psb_spall(a, desc_a, info, nnz)
+call psb_spall(a, desc_a, info [, nnz, dupl, bldmode])
 \end{verbatim}
 
 \begin{description}
@@ -564,6 +564,19 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. 
+\item[dupl] How to handle duplicate coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
+\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
+\item[bldmode] Whether to keep track of matrix entries that do not
+  belong to the current process.\\ 
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value \verb|psb_matbld_noremote_|,
+\verb|psb_matbld_remote_|.  Default:  \verb|psb_matbld_noremote_|.
 \end{description}
 
 \begin{description}
@@ -587,7 +600,9 @@ An integer value; 0 means no error has been detected.
 \item Providing a good estimate for the number of nonzeroes $nnz$ in
   the assembled matrix may substantially improve performance in the
   matrix build phase, as it will reduce or eliminate the need for
-  (potentially multiple) data reallocations. 
+  (potentially multiple) data reallocations;
+\item Using \verb|psb_matbld_remote_| is likely to cause  a runtime  overhead at
+  assembly time;
 \end{enumerate}
 
 
@@ -697,8 +712,7 @@ An integer value; 0 means no error has been detected.
 \item The input data can be passed in either COO or CSR formats;
 \item In COO format the coefficients to be inserted are represented by
   the ordered   triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$;
-  these triples  should belong to the current process, i.e. $ia(i)$
-  should be one of  the local indices, but are otherwise arbitrary;
+  these triples are arbitrary;
 \item In CSR format the coefficients to be inserted for each input row $i=1,nr$
   are represented by the ordered triples $(i+irw-1),ja(j),val(j)$, for
   $j=irp(i),\dots,irp(i+1)-1$; 
@@ -709,8 +723,11 @@ An integer value; 0 means no error has been detected.
   may be split into   as many calls as desired (even in the CSR format); 
 \item Coefficients from different rows may also be mixed up freely
   in a single call, according to the application needs; 
-\item Any coefficients from matrix rows not owned by the calling
-  process are silently ignored;
+\item Coefficients from matrix rows not owned by the calling
+  process are treated according to the value of \verb|bldmode|
+  specified at allocation time; if 
+  \verb|bldmode| was chosen as \verb|psb_matbld_remote_| the library
+  will keep track of them, otherwise they are   silently ignored;
 \item If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
   requirements are  ignored; 
@@ -724,7 +741,7 @@ An integer value; 0 means no error has been detected.
 \clearpage\subsection{psb\_spasb --- Sparse matrix assembly routine}
 
 \begin{verbatim}
-call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
+call psb_spasb(a, desc_a, info [, afmt, upd,  mold])
 \end{verbatim}
 
 \begin{description}
@@ -733,7 +750,7 @@ call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
-Intent: {\bf in}.\\
+Intent: {\bf in/out}.\\
 Specified as: a structured data of type \descdata.
 \item[afmt] the storage format for the sparse matrix.\\
 Scope: {\bf local}.\\
@@ -745,12 +762,6 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_upd_srch_|, \verb|psb_upd_perm_|
-\item[dupl] How to handle duplicate coefficients.\\
-Scope: {\bf global}.\\
-Type: {\bf optional}.\\
-Intent: {\bf in}.\\
-Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
-\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
 \item[mold] The desired dynamic type for the internal matrix storage.\\
 Scope: {\bf local}.\\
 Type: {\bf optional}.\\
@@ -765,6 +776,13 @@ Scope:{\bf local}\\
 Type:{\bf required}\\
 Intent: {\bf inout}.\\
 Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in/out}.\\
+Specified as: a structured data of type \descdata. If the matrix was
+allocated with \verb|bldmode=psb_matbld_remote_|, then the
+descriptor will be reassembled. 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -787,7 +805,14 @@ An integer value; 0 means no error has been detected.
 \item The output storage format need not be the same on all
   processes; 
 \item On exit from this routine the matrix is in the assembled state,
-  and thus is suitable for the computational routines. 
+  and thus is suitable for the computational routines;
+\item If the \verb|bldmode=psb_matbld_remote_| value was specified
+  at allocation time, contributions defined on the current process but
+  belonging to a remote process will be handled accordingly. This is
+  most likely to occur in finite element applications, with
+  \verb|dupl=psb_dupl_add_|; it is necessary to check for possible
+  updates needed in the descriptor, hence there will be a runtime
+  overhead.  
 \end{enumerate}
 
 
@@ -957,7 +982,7 @@ An integer value; 0 means no error has been detected.
 %\addcontentsline{toc}{subsection}{psb\_geall}
 
 \begin{verbatim}
-call psb_geall(x, desc_a, info, n, lb)
+call psb_geall(x, desc_a, info[, dupl, bldmode, n, lb])
 \end{verbatim}
 
 \begin{description}
@@ -980,6 +1005,19 @@ Type: {\bf optional}\\
 Intent: {\bf in}.\\
 Specified as: Integer scalar, default $1$. It is not a valid argument if $x$ is a
 rank-1 array. 
+\item[dupl] How to handle duplicate coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
+\verb|psb_dupl_add_|; \verb|psb_dupl_err_| has no effect.
+\item[bldmode] Whether to keep track of matrix entries that do not
+  belong to the current process.\\ 
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value \verb|psb_matbld_noremote_|,
+\verb|psb_matbld_remote_|.  Default:  \verb|psb_matbld_noremote_|.
 \end{description}
 
 \begin{description}
@@ -997,6 +1035,11 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item Using \verb|psb_matbld_remote_| is likely to cause  a runtime  overhead at
+  assembly time;
+\end{enumerate}
 
 %
 %%   psb_ins %%
@@ -1005,7 +1048,7 @@ An integer value; 0 means no error has been detected.
 %\addcontentsline{toc}{subsection}{psb\_geins}
 
 \begin{verbatim}
-call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
+call psb_geins(m, irw, val, x, desc_a, info [,local])
 \end{verbatim}
 
 \begin{description}
@@ -1034,12 +1077,6 @@ Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
-\item[dupl] How to handle duplicate coefficients.\\
-Scope: {\bf global}.\\
-Type: {\bf optional}.\\
-Intent: {\bf in}.\\
-Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
-\verb|psb_dupl_add_|.
 \item[local] Whether the entries in the index vector \verb|irw|,
    are already in local  numbering. \\
  Scope:{\bf local}.\\
@@ -1111,7 +1148,22 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On entry to this routine the descriptor must  be in  the
+  assembled state, i.e. \verb|psb_cdasb| must already have been called.
+\item If the \verb|bldmode=psb_matbld_remote_| value was specified
+  at allocation time, contributions defined on the current process but
+  belonging to a remote process will be handled accordingly. This is
+  most likely to occur in finite element applications, with
+  \verb|dupl=psb_dupl_add_|.
+\end{enumerate}
+
+
 %
+
 %%   psb_free %%
 %
 \clearpage\subsection{psb\_gefree --- Frees a dense matrix}

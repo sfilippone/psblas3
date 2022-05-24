@@ -42,10 +42,7 @@
 !    x       - type(psb_c_vect_type) The destination vector
 !    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
-!    dupl    - integer               What to do with duplicates: 
-!                                     psb_dupl_ovwrt_    overwrite
-!                                     psb_dupl_add_      add         
-subroutine psb_cins_vect(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_cins_vect(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_cins_vect
   use psi_mod
   implicit none
@@ -57,14 +54,14 @@ subroutine psb_cins_vect(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_c_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
+  integer(psb_ipk_) :: dupl_
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, dupl_,err_act
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -112,7 +109,6 @@ subroutine psb_cins_vect(m, irw, val, x, desc_a, info, dupl,local)
   endif
 
 
-
   allocate(irl(m),stat=info) 
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
@@ -120,11 +116,6 @@ subroutine psb_cins_vect(m, irw, val, x, desc_a, info, dupl,local)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
   if (present(local)) then 
     local_ = local
   else
@@ -136,11 +127,33 @@ subroutine psb_cins_vect(m, irw, val, x, desc_a, info, dupl,local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  call x%ins(m,irl,val,dupl_,info) 
+  call x%ins(m,irl,val,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
   end if
+  if (x%is_remote_build()) then
+    block
+      integer(psb_ipk_) :: j,k
+      k = x%get_nrmv()
+      do j=1,m
+        if (irl(j) < 0 ) then 
+          k = k + 1
+          call psb_ensure_size(k,x%rmtv,info)
+          if (info == 0) call psb_ensure_size(k,x%rmidx,info)
+          if (info /= 0) then
+            info = psb_err_alloc_dealloc_
+            call psb_errpush(info,name)
+            goto 9999
+          end if
+          x%rmtv(k)  = val(j)
+          x%rmidx(k) = irw(j)
+          call x%set_nrmv(k)
+        end if
+      end do
+    end block
+  end if
+            
   deallocate(irl)
 
   call psb_erractionrestore(err_act)
@@ -166,10 +179,7 @@ end subroutine psb_cins_vect
 !    x       - type(psb_c_vect_type) The destination vector
 !    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
-!    dupl    - integer               What to do with duplicates: 
-!                                     psb_dupl_ovwrt_    overwrite
-!                                     psb_dupl_add_      add         
-subroutine psb_cins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_cins_vect_v(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_cins_vect_v
   use psi_mod
   implicit none
@@ -185,14 +195,13 @@ subroutine psb_cins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_c_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_) :: np, me
   integer(psb_ipk_), allocatable   :: irl(:)
   complex(psb_spk_), allocatable   :: lval(:)
   logical :: local_
@@ -239,14 +248,6 @@ subroutine psb_cins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
     call psb_errpush(info,name)
     goto 9999
   endif
-
-
-
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
   if (present(local)) then 
     local_ = local
   else
@@ -260,7 +261,7 @@ subroutine psb_cins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
     call desc_a%indxmap%g2l(irw%v%v(1:m),irl(1:m),info,owned=.true.)
   end if
 
-  call x%ins(m,irl,lval,dupl_,info) 
+  call x%ins(m,irl,lval,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
@@ -275,7 +276,7 @@ subroutine psb_cins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
 
 end subroutine psb_cins_vect_v
 
-subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_cins_vect_r2
   use psi_mod
   implicit none
@@ -291,14 +292,13 @@ subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_c_vect_type), intent(inout) :: x(:)
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols, n
   integer(psb_lpk_) :: mglob
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, dupl_, err_act
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -353,11 +353,6 @@ subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
   if (present(local)) then 
     local_ = local
   else
@@ -371,8 +366,9 @@ subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   end if
 
   do i=1,n
+
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
-    if (info == 0) call x(i)%ins(m,irl,val(:,i),dupl_,info) 
+    if (info == 0) call x(i)%ins(m,irl,val(:,i),info) 
     if (info /= 0) exit
   end do
   if (info /= 0) then 
@@ -390,7 +386,7 @@ subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
 
 end subroutine psb_cins_vect_r2
 
-subroutine psb_cins_multivect(m, irw, val, x, desc_a, info, dupl,local)
+subroutine psb_cins_multivect(m, irw, val, x, desc_a, info, local)
   use psb_base_mod, psb_protect_name => psb_cins_multivect
   use psi_mod
   implicit none
@@ -406,14 +402,13 @@ subroutine psb_cins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   type(psb_c_multivect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), optional, intent(in)        :: dupl
   logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, dupl_, err_act
+  integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -469,11 +464,6 @@ subroutine psb_cins_multivect(m, irw, val, x, desc_a, info, dupl,local)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    dupl_ = dupl
-  else
-    dupl_ = psb_dupl_ovwrt_
-  endif
   if (present(local)) then 
     local_ = local
   else
@@ -485,7 +475,7 @@ subroutine psb_cins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  call x%ins(m,irl,val,dupl_,info) 
+  call x%ins(m,irl,val,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999

@@ -5,10 +5,11 @@ module psb_c_tools_cbind_mod
   use psb_objhandle_mod
   use psb_base_string_cbind_mod
   use psb_base_tools_cbind_mod
-
+  
 contains
 
- function psb_c_cgeall(xh,cdh) bind(c) result(res)
+  ! Should define   geall_opt  with DUPL argument
+  function psb_c_cgeall(xh,cdh) bind(c) result(res)
 
     implicit none
     integer(psb_c_ipk_) :: res
@@ -36,6 +37,35 @@ contains
 
     return
   end function psb_c_cgeall
+
+  function psb_c_cgeall_remote(xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_cvector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_c_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      return
+    end if
+    allocate(xp)
+    call psb_geall(xp,descp,info,bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+    xh%item = c_loc(xp)
+    res = min(0,info)
+
+    return
+  end function psb_c_cgeall_remote
 
   function psb_c_cgeasb(xh,cdh) bind(c) result(res)
 
@@ -101,7 +131,7 @@ contains
   end function psb_c_cgefree
 
 
- function psb_c_cgeins(nz,irw,val,xh,cdh) bind(c) result(res)
+  function psb_c_cgeins(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none
     integer(psb_c_ipk_) :: res
@@ -131,57 +161,16 @@ contains
     ixb = psb_c_get_index_base()
     if (ixb == 1) then
       call psb_geins(nz,irw(1:nz),val(1:nz),&
-           & xp,descp,info, dupl=psb_dupl_ovwrt_)
+           & xp,descp,info)
     else
       call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
-           & xp,descp,info, dupl=psb_dupl_ovwrt_)
+           & xp,descp,info)
     end if
 
     res = min(0,info)
 
     return
   end function psb_c_cgeins
-
-
- function psb_c_cgeins_add(nz,irw,val,xh,cdh) bind(c) result(res)
-
-    implicit none
-    integer(psb_c_ipk_) :: res
-    integer(psb_c_ipk_), value :: nz
-    integer(psb_c_lpk_)       :: irw(*)
-    complex(c_float_complex)        :: val(*)
-    type(psb_c_cvector) :: xh
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer :: descp
-    type(psb_c_vect_type), pointer :: xp
-    integer(psb_c_ipk_)               :: ixb, info
-
-    res = -1
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,xp)
-    else
-      return
-    end if
-
-    ixb = psb_c_get_index_base()
-    if (ixb == 1) then
-      call psb_geins(nz,irw(1:nz),val(1:nz),&
-           & xp,descp,info, dupl=psb_dupl_add_)
-    else
-      call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
-           & xp,descp,info, dupl=psb_dupl_add_)
-    end if
-    res = min(0,info)
-
-    return
-  end function psb_c_cgeins_add
-
 
  function psb_c_cspall(mh,cdh) bind(c) result(res)
 
@@ -212,6 +201,33 @@ contains
   end function psb_c_cspall
 
 
+ function psb_c_cspall_remote(mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_cspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_cspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      return
+    end if
+    allocate(ap)
+    call psb_spall(ap,descp,info,bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+    mh%item = c_loc(ap)
+    res = min(0,info)
+
+    return
+  end function psb_c_cspall_remote
 
  function psb_c_cspasb(mh,cdh) bind(c) result(res)
 
@@ -240,7 +256,6 @@ contains
     res = min(0,info)
     return
   end function psb_c_cspasb
-
 
   function psb_c_cspfree(mh,cdh) bind(c) result(res)
 
@@ -275,7 +290,7 @@ contains
 
 #if 0
 
-  function psb_c_cspasb_opt(mh,cdh,afmt,upd,dupl) bind(c) result(res)
+  function psb_c_cspasb_opt(mh,cdh,afmt,upd) bind(c) result(res)
 
 #ifdef HAVE_LIBRSB
     use psb_c_rsb_mat_mod
@@ -284,7 +299,7 @@ contains
     integer(psb_c_ipk_) :: res
     integer(psb_c_ipk_), value :: cdh, mh,upd,dupl
     character(c_char)     :: afmt(*)
-    integer(psb_c_ipk_)    :: info,n, fdupl
+    integer(psb_c_ipk_)    :: info,n
     character(len=5)      :: fafmt
 #ifdef HAVE_LIBRSB
     type(psb_c_rsb_sparse_mat) :: arsb
@@ -301,11 +316,11 @@ contains
 #ifdef HAVE_LIBRSB
     case('RSB')
       call psb_spasb(double_spmat_pool(mh)%item,descriptor_pool(cdh)%item,info,&
-           & upd=upd,dupl=dupl,mold=arsb)
+           & upd=upd,mold=arsb)
 #endif
     case default
       call psb_spasb(double_spmat_pool(mh)%item,descriptor_pool(cdh)%item,info,&
-           & afmt=fafmt,upd=upd,dupl=dupl)
+           & afmt=fafmt,upd=upd)
     end select
 
     res = min(0,info)

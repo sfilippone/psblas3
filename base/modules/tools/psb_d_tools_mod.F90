@@ -40,28 +40,31 @@ Module psb_d_tools_mod
   use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
 
   interface  psb_geall
-    subroutine psb_dalloc_vect(x, desc_a,info)
+    subroutine psb_dalloc_vect(x, desc_a,info, dupl, bldmode)
       import
       implicit none
       type(psb_d_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_dalloc_vect
-    subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
+    subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb, dupl, bldmode)
       import
       implicit none
       type(psb_d_vect_type), allocatable, intent(out)  :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: n, lb
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_dalloc_vect_r2
-    subroutine psb_dalloc_multivect(x, desc_a,info,n)
+    subroutine psb_dalloc_multivect(x, desc_a,info,n, dupl, bldmode)
       import
       implicit none
       type(psb_d_multivect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: n
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_dalloc_multivect
   end interface
 
@@ -123,7 +126,7 @@ Module psb_d_tools_mod
 
 
   interface psb_geins
-    subroutine psb_dins_vect(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_dins_vect(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -132,10 +135,9 @@ Module psb_d_tools_mod
       integer(psb_lpk_), intent(in)              :: irw(:)
       real(psb_dpk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_dins_vect
-    subroutine psb_dins_vect_v(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_dins_vect_v(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -144,10 +146,9 @@ Module psb_d_tools_mod
       type(psb_l_vect_type), intent(inout)       :: irw
       type(psb_d_vect_type), intent(inout)    :: val
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_dins_vect_v
-    subroutine psb_dins_vect_r2(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_dins_vect_r2(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -156,10 +157,9 @@ Module psb_d_tools_mod
       integer(psb_lpk_), intent(in)              :: irw(:)
       real(psb_dpk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_dins_vect_r2
-    subroutine psb_dins_multivect(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_dins_multivect(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -168,7 +168,6 @@ Module psb_d_tools_mod
       integer(psb_lpk_), intent(in)              :: irw(:)
       real(psb_dpk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_dins_multivect
   end interface
@@ -239,29 +238,55 @@ Module psb_d_tools_mod
 
 
   interface psb_spall
-    subroutine psb_dspalloc(a, desc_a, info, nnz)
+    subroutine psb_dspalloc(a, desc_a, info, nnz, dupl, bldmode)
       import
       implicit none
-      type(psb_desc_type), intent(in) :: desc_a
-      type(psb_dspmat_type), intent(inout) :: a
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: nnz
+      type(psb_desc_type), intent(in)         :: desc_a
+      type(psb_dspmat_type), intent(inout)    :: a
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), optional, intent(in) :: nnz, bldmode
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_dspalloc
   end interface
 
   interface psb_spasb
-    subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl,mold)
+    subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
       import
       implicit none
       type(psb_dspmat_type), intent (inout)   :: a
-      type(psb_desc_type), intent(in)         :: desc_a
+      type(psb_desc_type), intent(inout)        :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_),optional, intent(in)            :: dupl, upd
+      integer(psb_ipk_),optional, intent(in)            :: upd
       character(len=*), optional, intent(in)  :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_dspasb
   end interface
 
+  interface psb_remote_vect
+    subroutine psb_d_remote_vect(n,v,iv,desc_a,x,ix, info)
+      import
+      implicit none
+      integer(psb_ipk_), intent(in)  :: n
+      real(psb_dpk_),   intent(in)  :: v(:)
+      integer(psb_lpk_), intent(in)  :: iv(:)
+      type(psb_desc_type),intent(in) :: desc_a
+      real(psb_dpk_),   allocatable, intent(out)  :: x(:)
+      integer(psb_lpk_), allocatable, intent(out)  :: ix(:)
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psb_d_remote_vect
+  end interface psb_remote_vect
+
+  interface psb_remote_mat
+    subroutine psb_ld_remote_mat(a,desc_a,b, info)
+      import
+      implicit none
+      type(psb_ld_coo_sparse_mat),Intent(inout)  :: a
+      type(psb_desc_type),intent(inout)         :: desc_a
+      type(psb_ld_coo_sparse_mat),Intent(inout)  :: b
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_ld_remote_mat
+  end interface psb_remote_mat
+  
   interface psb_spfree
     subroutine psb_dspfree(a, desc_a,info)
       import

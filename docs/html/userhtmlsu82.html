@@ -105,18 +105,50 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
                                                                   
 
                                                                   
+<!--l. 209--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+<!--l. 211--><p class="indent" >   If this function is called on a matrix <span class="lstinline"></span><span 
+class="cmtt-10">a</span> on a distributed communicator only the
+local part is written in output. To get a single MatrixMarket file with the whole
+matrix when appropriate, e.g. for debugging purposes, one could <span 
+class="cmti-10">gather </span>the whole
+matrix on a single rank and then write it. Consider the following example for a
+<span 
+class="cmti-10">double </span>precision matrix
+<div class="center" 
+>
+<!--l. 227--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-93">
+type(psb_ldspmat_type)&#x00A0;::&#x00A0;aglobal
+call&#x00A0;psb_gather(aglobal,a,desc_a,info)
+if&#x00A0;(iam&#x00A0;==&#x00A0;psb_root_)&#x00A0;then
+call&#x00A0;mm_mat_write(aglobal,mtitle,info,filename)
+end&#x00A0;if
+call&#x00A0;psb_spfree(aglobal,&#x00A0;desc_a,&#x00A0;info)
+</pre>
+<!--l. 237--><p class="nopar" ></div></div>
+<!--l. 241--><p class="noindent" >To simplify this procedure in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">C</span></span></span>, there is a utility function
+<div class="center" 
+>
+<!--l. 247--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-94">
+psb_i_t&#x00A0;psb_c_&#x003C;s,d,c,z&#x003E;global_mat_write(ah,cdh);
+</pre>
+<!--l. 251--><p class="nopar" ></div></div>
+<!--l. 255--><p class="noindent" >that produces exactly this result.
                                                                   
 
                                                                   
                                                                   
 
                                                                   
-   <!--l. 210--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 258--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu85.html" >next</a>] [<a 
 href="userhtmlsu81.html" >prev</a>] [<a 
 href="userhtmlsu81.html#tailuserhtmlsu81.html" >prev-tail</a>] [<a 
 href="userhtmlsu82.html" >front</a>] [<a 
 href="userhtmlsu80.html#userhtmlsu84.html" >up</a>] </p></div>
-<!--l. 210--><p class="indent" >   <a 
+<!--l. 258--><p class="indent" >   <a 
  id="tailuserhtmlsu82.html"></a>  
 </body></html> 
