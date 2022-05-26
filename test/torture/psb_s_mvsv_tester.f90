@@ -48,7 +48,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -125,7 +125,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -202,7 +202,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -279,7 +279,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -356,7 +356,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -433,7 +433,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -510,7 +510,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -587,7 +587,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -664,7 +664,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -741,7 +741,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -818,7 +818,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -895,7 +895,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -972,7 +972,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1049,7 +1049,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1126,7 +1126,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1203,7 +1203,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1280,7 +1280,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1357,7 +1357,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1434,7 +1434,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1511,7 +1511,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1588,7 +1588,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1665,7 +1665,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1742,7 +1742,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1819,7 +1819,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1898,7 +1898,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -1978,7 +1978,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2058,7 +2058,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2138,7 +2138,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2218,7 +2218,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2298,7 +2298,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2378,7 +2378,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2458,7 +2458,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2538,7 +2538,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2618,7 +2618,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2698,7 +2698,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
@@ -2778,7 +2778,7 @@ contains
     if (info /= psb_success_)goto 9996
     call psb_cdasb(desc_a,info)
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
