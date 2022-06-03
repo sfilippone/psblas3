@@ -171,7 +171,7 @@ Module psb_s_tools_mod
       logical, intent(in), optional        :: local
     end subroutine psb_sins_multivect
   end interface
-
+  
   interface psb_cdbldext
     Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info,extype)
       import
@@ -261,20 +261,6 @@ Module psb_s_tools_mod
       class(psb_s_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_sspasb
   end interface
-
-  interface psb_remote_vect
-    subroutine psb_s_remote_vect(n,v,iv,desc_a,x,ix, info)
-      import
-      implicit none
-      integer(psb_ipk_), intent(in)  :: n
-      real(psb_spk_),   intent(in)  :: v(:)
-      integer(psb_lpk_), intent(in)  :: iv(:)
-      type(psb_desc_type),intent(in) :: desc_a
-      real(psb_spk_),   allocatable, intent(out)  :: x(:)
-      integer(psb_lpk_), allocatable, intent(out)  :: ix(:)
-      integer(psb_ipk_), intent(out)       :: info
-    end subroutine psb_s_remote_vect
-  end interface psb_remote_vect
 
   interface psb_remote_mat
     subroutine psb_ls_remote_mat(a,desc_a,b, info)

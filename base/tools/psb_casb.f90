@@ -113,7 +113,7 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
         integer(psb_ipk_) :: nrmv, nx, i
 
         nrmv = x%get_nrmv()        
-        call psb_c_remote_vect(nrmv,x%rmtv,x%rmidx,desc_a,vx,lvx,info)
+        call psb_remote_vect(nrmv,x%rmtv,x%rmidx,desc_a,vx,lvx,info)
         nx  = size(vx)
         call psb_realloc(nx,ivx,info)
         call desc_a%g2l(lvx,ivx,info,owned=.true.)

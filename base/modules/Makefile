@@ -358,8 +358,8 @@ tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o	tools/psb_m_tools_a_mod.o tools/
 tools/psb_s_tools_a_mod.o tools/psb_d_tools_a_mod.o\
 tools/psb_c_tools_a_mod.o tools/psb_z_tools_a_mod.o: desc/psb_desc_mod.o psi_mod.o  serial/psb_mat_mod.o
 
-tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o
-tools/psb_l_tools_mod.o: serial/psb_l_vect_mod.o 	
+tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o tools/psb_m_tools_a_mod.o tools/psb_e_tools_a_mod.o
+tools/psb_l_tools_mod.o: serial/psb_l_vect_mod.o  tools/psb_m_tools_a_mod.o tools/psb_e_tools_a_mod.o	
 tools/psb_s_tools_mod.o: serial/psb_s_vect_mod.o 
 tools/psb_d_tools_mod.o: serial/psb_d_vect_mod.o 
 tools/psb_c_tools_mod.o: serial/psb_c_vect_mod.o 
