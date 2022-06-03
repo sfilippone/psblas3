@@ -32,6 +32,8 @@
 Module psb_i_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_success_
   use psb_i_vect_mod, only : psb_i_base_vect_type, psb_i_vect_type
+  use psb_m_tools_a_mod
+  use psb_e_tools_a_mod
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_i_multivect_mod, only : psb_i_base_multivect_type, psb_i_multivect_type
   use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
@@ -168,5 +170,5 @@ Module psb_i_tools_mod
       logical, intent(in), optional        :: local
     end subroutine psb_iins_multivect
   end interface
-
+  
 end module psb_i_tools_mod

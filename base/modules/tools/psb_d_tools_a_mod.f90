@@ -116,4 +116,19 @@ Module psb_d_tools_a_mod
     end subroutine psb_dinsvi
   end interface
 
+
+  interface psb_remote_vect
+    subroutine psb_d_remote_vect(n,v,iv,desc_a,x,ix, info)
+      import
+      implicit none
+      integer(psb_ipk_), intent(in)  :: n
+      real(psb_dpk_),   intent(in)  :: v(:)
+      integer(psb_lpk_), intent(in)  :: iv(:)
+      type(psb_desc_type),intent(in) :: desc_a
+      real(psb_dpk_),   allocatable, intent(out)  :: x(:)
+      integer(psb_lpk_), allocatable, intent(out)  :: ix(:)
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psb_d_remote_vect
+  end interface psb_remote_vect
+
 end module psb_d_tools_a_mod
