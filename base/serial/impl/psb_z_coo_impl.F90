@@ -5904,7 +5904,7 @@ contains
     integer(psb_lpk_), optional                    :: iren(:)
     integer(psb_lpk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw, nra, nca, nrd
     integer(psb_ipk_) :: debug_level, debug_unit, inza
-    character(len=20) :: name='coo_getrow'
+    character(len=20) :: name='lcoo_getrow'
 
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
