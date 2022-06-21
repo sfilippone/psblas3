@@ -27,10 +27,11 @@ OBJS=$(FOBJS) $(COBJS)
 LIBNAME=$(CBINDLIBNAME)	
 
 
-lib:  $(OBJS) $(CMOD)
+objs:  $(OBJS) $(CMOD)
+	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
+lib:  objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
 
 $(COBJS): $(CMOD)
 

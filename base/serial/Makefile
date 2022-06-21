@@ -20,18 +20,19 @@ INCDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
-lib: impld sortd lib1 $(FOBJS)
+
+objs: impld sortd $(FOBJS)
+lib: objs
+	$(MAKE) -C impl lib
+	$(MAKE) -C sort lib
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
-#cood csrd jadd
-
-lib1:	$(FOBJS)
 
 impld:
-	$(MAKE) -C impl lib
+	$(MAKE) -C impl objs
 sortd:
-	$(MAKE) -C sort lib
+	$(MAKE) -C sort objs
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)
 	($(MAKE) -C impl clean)

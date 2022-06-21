@@ -6,24 +6,31 @@ INCDIR=../include
 MODDIR=../modules
 LIBNAME=$(BASELIBNAME)
 
-lib: mods sr cm in pb tl
+objs:  mods sr cm in pb tl
+
+lib:  objs
+	$(MAKE) -C modules lib LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)"
+	$(MAKE) -C serial lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C comm lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C internals lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C psblas lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C tools lib LIBNAME=$(BASELIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 sr cm in pb tl: mods
 
 mods:
-	$(MAKE) -C modules lib LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)"
+	$(MAKE) -C modules objs LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)"
 sr:
-	$(MAKE) -C serial lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C serial objs LIBNAME=$(BASELIBNAME)
 cm:
-	$(MAKE) -C comm lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C comm objs LIBNAME=$(BASELIBNAME)
 in:
-	$(MAKE) -C internals lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C internals objs LIBNAME=$(BASELIBNAME)
 pb:
-	$(MAKE) -C psblas lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C psblas objs LIBNAME=$(BASELIBNAME)
 tl:
-	$(MAKE) -C tools lib LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C tools objs LIBNAME=$(BASELIBNAME)
 
 clean: 
 	($(MAKE) -C modules clean)

@@ -1,30 +1,38 @@
 include Make.inc
 
-all: libd based precd kryld utild cbindd
+all: dirs based precd kryld utild cbindd libd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
-based: libd
+dirs:
+	(if test ! -d lib ; then mkdir lib; fi)
+	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
+	(if test ! -d modules ; then mkdir modules; fi;)	
+
 precd: based
 utild: based	
 kryld: precd 
 
-cbindd: precd kryld utild 
+cbindd: based precd kryld utild 
 
-libd:
-	(if test ! -d lib ; then mkdir lib; fi)
-	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
-	(if test ! -d modules ; then mkdir modules; fi;)	
-based:
+libd: based precd kryld utild cbindd 
 	$(MAKE) -C base lib
-precd:
 	$(MAKE) -C prec lib
-kryld:
 	$(MAKE) -C krylov lib
-utild:
 	$(MAKE) -C util lib 
+	$(MAKE) -C cbind lib
+
+based:
+	$(MAKE) -C base objs
+precd:
+	$(MAKE) -C prec objs
+kryld:
+	$(MAKE) -C krylov objs
+utild:
+	$(MAKE) -C util objs 
 cbindd:
-	$(MAKE) -C cbind lib 
+	$(MAKE) -C cbind objs 
+
 
 install: all
 	mkdir -p  $(INSTALL_INCLUDEDIR) &&\

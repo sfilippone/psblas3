@@ -108,15 +108,18 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 
 MODULES=$(BASIC_MODS) $(SERIAL_MODS) $(UTIL_MODS)
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
-LIBDIR=..
+MODDIR=../../modules
+LIBDIR=../
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  $(LIBDIR)/$(LIBNAME) 
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
+objs:  $(MODULES) $(OBJS) $(MPFOBJS)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
-$(LIBDIR)/$(LIBNAME): $(MODULES) $(OBJS) $(MPFOBJS)
+lib: objs  $(LIBDIR)/$(LIBNAME) 
+
+$(LIBDIR)/$(LIBNAME): objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
