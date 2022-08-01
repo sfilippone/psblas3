@@ -28,14 +28,16 @@ COBJS=
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR)
 OBJS=$(F90OBJS) $(COBJS) $(MPFOBJS) $(MODOBJS)
 
-lib:  $(OBJS) impld
+objs:  $(OBJS) impld
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+lib:  objs
+	$(MAKE) -C impl lib
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 impld: $(OBJS)
-	$(MAKE) -C impl
+	$(MAKE) -C impl objs
 
 $(OBJS): $(MODDIR)/$(BASEMODNAME)$(.mod)
 

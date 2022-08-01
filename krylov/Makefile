@@ -26,11 +26,13 @@ LIBNAME=$(METHDLIBNAME)
 
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 
-lib: $(OBJS) 
+objs: $(OBJS)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+
+lib: objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 
 psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o:  psb_base_krylov_conv_mod.o

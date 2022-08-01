@@ -18,11 +18,12 @@ CMOD=psb_prec_cbind.h psb_c_sprec.h psb_c_dprec.h psb_c_cprec.h psb_c_zprec.h
 LIBNAME=$(CPRECLIBNAME)	
 
 
-lib:  $(OBJS) $(CMOD)
+objs:  $(OBJS) $(CMOD)
+	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
+lib: objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
 
 psb_prec_cbind_mod.o: psb_sprec_cbind_mod.o psb_dprec_cbind_mod.o psb_cprec_cbind_mod.o psb_zprec_cbind_mod.o
 veryclean: clean

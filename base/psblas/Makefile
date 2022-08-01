@@ -24,7 +24,9 @@ MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR)
 
 
-lib: $(OBJS)
+objs: $(OBJS)
+
+lib: objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
