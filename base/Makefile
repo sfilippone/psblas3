@@ -20,17 +20,17 @@ lib:  objs
 sr cm in pb tl: mods
 
 mods:
-	$(MAKE) -C modules objs LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)"
+	$(MAKE) -C modules objs F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)"
 sr:
-	$(MAKE) -C serial objs LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C serial objs 
 cm:
-	$(MAKE) -C comm objs LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C comm objs 
 in:
-	$(MAKE) -C internals objs LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C internals objs 
 pb:
-	$(MAKE) -C psblas objs LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C psblas objs 
 tl:
-	$(MAKE) -C tools objs LIBNAME=$(BASELIBNAME)
+	$(MAKE) -C tools objs 
 
 clean: 
 	($(MAKE) -C modules clean)
