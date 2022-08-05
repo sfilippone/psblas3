@@ -59,7 +59,7 @@ prerequisites (see also SERIAL below):
 
 4. If you have the AMD package of Davis, Duff and Amestoy, you can
    specify `--with-amd` (see `./configure --help` for more details).
-   We use the C interface to AMD.
+   We use the C interface to AMD, as it does not overwrite the input matrix. 
 
 The configure script will generate a Make.inc file suitable for building
 the library. The script is capable of recognizing the needed libraries
