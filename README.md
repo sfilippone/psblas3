@@ -58,7 +58,8 @@ prerequisites (see also SERIAL below):
    directories but only if you specify `--with-metis`.
 
 4. If you have the AMD package of Davis, Duff and Amestoy, you can
-   specify `--with-amd` (see `./configure --help` for more details). 
+   specify `--with-amd` (see `./configure --help` for more details).
+   We use the C interface to AMD.
 
 The configure script will generate a Make.inc file suitable for building
 the library. The script is capable of recognizing the needed libraries
