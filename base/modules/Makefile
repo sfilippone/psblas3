@@ -108,15 +108,18 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 
 MODULES=$(BASIC_MODS) $(SERIAL_MODS) $(UTIL_MODS)
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
-LIBDIR=..
+MODDIR=../../modules
+LIBDIR=../
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  $(LIBDIR)/$(LIBNAME) 
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
+objs:  $(MODULES) $(OBJS) $(MPFOBJS)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
-$(LIBDIR)/$(LIBNAME): $(MODULES) $(OBJS) $(MPFOBJS)
+lib: objs  $(LIBDIR)/$(LIBNAME) 
+
+$(LIBDIR)/$(LIBNAME): objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
@@ -358,8 +361,8 @@ tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o	tools/psb_m_tools_a_mod.o tools/
 tools/psb_s_tools_a_mod.o tools/psb_d_tools_a_mod.o\
 tools/psb_c_tools_a_mod.o tools/psb_z_tools_a_mod.o: desc/psb_desc_mod.o psi_mod.o  serial/psb_mat_mod.o
 
-tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o
-tools/psb_l_tools_mod.o: serial/psb_l_vect_mod.o 	
+tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o tools/psb_m_tools_a_mod.o tools/psb_e_tools_a_mod.o
+tools/psb_l_tools_mod.o: serial/psb_l_vect_mod.o  tools/psb_m_tools_a_mod.o tools/psb_e_tools_a_mod.o	
 tools/psb_s_tools_mod.o: serial/psb_s_vect_mod.o 
 tools/psb_d_tools_mod.o: serial/psb_d_vect_mod.o 
 tools/psb_c_tools_mod.o: serial/psb_c_vect_mod.o 
@@ -375,7 +378,7 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 
 psb_base_mod.o: $(MODULES)
 
-penv/psi_penv_mod.o: penv/psi_penv_mod.F90 psb_const_mod.o serial/psb_vect_mod.o serial/psb_mat_mod.o
+penv/psi_penv_mod.o: penv/psi_penv_mod.F90 psb_const_mod.o serial/psb_vect_mod.o serial/psb_mat_mod.o desc/psb_desc_const_mod.o
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)

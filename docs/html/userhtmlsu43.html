@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 1077--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1114--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu47.html" >next</a>] [<a 
 href="userhtmlsu42.html" >prev</a>] [<a 
 href="userhtmlsu42.html#tailuserhtmlsu42.html" >prev-tail</a>] [<a 
@@ -24,8 +24,8 @@ href="userhtmlsu32.html#userhtmlsu46.html" >up</a>] </p></div>
    <pre class="verbatim" id="verbatim-47">
 call&#x00A0;psb_geasb(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;mold)
 </pre>
-<!--l. 1082--><p class="nopar" >
-<!--l. 1084--><p class="indent" >
+<!--l. 1119--><p class="nopar" >
+<!--l. 1121--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -75,7 +75,7 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>.</dd></dl>
-<!--l. 1100--><p class="indent" >
+<!--l. 1137--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -109,15 +109,36 @@ class="cmbx-10">required </span><br
 class="newline" />Intent: <span 
 class="cmbx-10">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1153--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
                                                                   
 
                                                                   
-<!--l. 1117--><div class="crosslinks"><p class="noindent">[<a 
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x54-91002x1">On entry to this routine the descriptor must be in the assembled state,
+     i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span> must already have been called.
+     </li>
+     <li 
+  class="enumerate" id="x54-91004x2">If  the  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bldmode=psb_matbld_remote_</span></span></span> value  was  specified  at  allocation
+     time,  contributions  defined  on  the  current  process  but  belonging  to  a
+     remote process will be handled accordingly. This is most likely to occur in
+     finite element applications, with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dupl=psb_dupl_add_</span></span></span>.</li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1169--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu47.html" >next</a>] [<a 
 href="userhtmlsu42.html" >prev</a>] [<a 
 href="userhtmlsu42.html#tailuserhtmlsu42.html" >prev-tail</a>] [<a 
 href="userhtmlsu43.html" >front</a>] [<a 
 href="userhtmlsu32.html#userhtmlsu46.html" >up</a>] </p></div>
-<!--l. 1117--><p class="indent" >   <a 
+<!--l. 1169--><p class="indent" >   <a 
  id="tailuserhtmlsu43.html"></a>  
 </body></html> 

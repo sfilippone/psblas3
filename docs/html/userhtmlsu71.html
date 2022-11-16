@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 591--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 960--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu74.html" >next</a>] [<a 
 href="userhtmlsu70.html" >prev</a>] [<a 
 href="userhtmlsu70.html#tailuserhtmlsu70.html" >prev-tail</a>] [<a 
@@ -21,11 +21,11 @@ href="userhtmlsu59.html#userhtmlse8.html" >up</a>] </p></div>
                                                                   
 
                                                                   
-   <pre class="verbatim" id="verbatim-75">
-call&#x00A0;psb_nrm2(ctxt,&#x00A0;dat,&#x00A0;root)
+   <pre class="verbatim" id="verbatim-87">
+call&#x00A0;psb_nrm2(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
 </pre>
-<!--l. 595--><p class="nopar" >
-<!--l. 597--><p class="indent" >   This subroutine implements a 2-norm value reduction operation based on the
+<!--l. 964--><p class="nopar" >
+<!--l. 966--><p class="indent" >   This subroutine implements a 2-norm value reduction operation based on the
 underlying communication library.
      <dl class="description"><dt class="description">
 <span 
@@ -75,8 +75,43 @@ class="cmmi-10">&#x003C;</span>= <span
 class="cmmi-10">root &#x003C;</span>= <span 
 class="cmmi-10">np </span><span 
 class="cmsy-10">- </span>1, default -1. <br 
-class="newline" /></dd></dl>
-<!--l. 624--><p class="indent" >
+class="newline" />
+     </dd><dt class="description">
+<span 
+class="cmbx-10">mode</span> </dt><dd 
+class="description">Whether the call is started in non-blocking mode and completed later,
+     or is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its bit fields, which can be set with bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>. Basic action values are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+<span 
+class="cmbx-10">request</span> </dt><dd 
+class="description">A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
+     be present.</dd></dl>
+<!--l. 1008--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -92,12 +127,22 @@ class="cmbx-10">required</span>.<br
 class="newline" />Intent: <span 
 class="cmbx-10">inout</span>.<br 
 class="newline" />Specified as: a real variable, which may be a scalar, or a rank 1 array. <br 
-class="newline" />Kind, rank and size must agree on all processes.</dd></dl>
-<!--l. 636--><p class="noindent" ><span 
+class="newline" />Kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+<span 
+class="cmbx-10">request</span> </dt><dd 
+class="description">A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
+     be present.</dd></dl>
+<!--l. 1026--><p class="noindent" ><span 
 class="cmbx-12">Notes</span>
-                                                                  
-
-                                                                  
      <ol  class="enumerate1" >
      <li 
   class="enumerate" id="x83-120002x1">This reduction is appropriate to compute the results of multiple (local)
@@ -113,29 +158,62 @@ class="cmmi-10">res</span>
      is equivalent to the computation of
      <center class="math-display" >
      <img 
-src="userhtml29x.png" alt="     &#x2218; -------
-       &#x2211;     2
-res =     dati,
+src="userhtml29x.png" alt="     &#x2218; &#x2211;------
+res =     dat2i,
          i
      " class="math-display" ></center>
-     <!--l. 642--><p class="nopar" > with care taken to avoid unnecessary overflow.
+     <!--l. 1032--><p class="nopar" > with care taken to avoid unnecessary overflow.
      </li>
      <li 
   class="enumerate" id="x83-120006x3">The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
-     even on processes different from the final result destination.</li></ol>
+     even on processes different from the final result destination.
+     </li>
+     <li 
+  class="enumerate" id="x83-120008x4">The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+                                                                  
+
+                                                                  
+     <div class="center" 
+>
+<!--l. 1047--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-88">
+&#x00A0;&#x00A0;call&#x00A0;psb_nrm2(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 1051--><p class="nopar" ></div></div>
+     </li>
+     <li 
+  class="enumerate" id="x83-120010x5">When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="cmti-10">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 1067--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-89">
+&#x00A0;&#x00A0;call&#x00A0;psb_nrm2(ctxt,dat,mode=psb_collective_start_,request=nrm2_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_nrm2(ctxt,dat,mode=psb_collective_end_,request=nrm2_request)
+</pre>
+<!--l. 1073--><p class="nopar" ></div></div>
+     </li></ol>
                                                                   
 
                                                                   
                                                                   
 
                                                                   
-   <!--l. 651--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 1081--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu74.html" >next</a>] [<a 
 href="userhtmlsu70.html" >prev</a>] [<a 
 href="userhtmlsu70.html#tailuserhtmlsu70.html" >prev-tail</a>] [<a 
 href="userhtmlsu71.html" >front</a>] [<a 
 href="userhtmlsu59.html#userhtmlse8.html" >up</a>] </p></div>
-<!--l. 651--><p class="indent" >   <a 
+<!--l. 1081--><p class="indent" >   <a 
  id="tailuserhtmlsu71.html"></a>  
 </body></html> 

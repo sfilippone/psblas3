@@ -41,21 +41,23 @@
 !    nnz      - integer(optional).             The number of nonzeroes in the matrix.
 !                                              (local, user estimate)
 !
-subroutine psb_sspalloc(a, desc_a, info, nnz)
+subroutine psb_sspalloc(a, desc_a, info, nnz, dupl, bldmode)
   use psb_base_mod, psb_protect_name => psb_sspalloc
   implicit none
 
   !....parameters...
-  type(psb_desc_type), intent(in) :: desc_a
-  type(psb_sspmat_type), intent(inout) :: a
-  integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_), optional, intent(in)      :: nnz
+  type(psb_desc_type), intent(in)         :: desc_a
+  type(psb_sspmat_type), intent(inout)    :: a
+  integer(psb_ipk_), intent(out)          :: info
+  integer(psb_ipk_), optional, intent(in) :: nnz
+  integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
 
   !locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act
   integer(psb_ipk_) :: loc_row,loc_col, nnz_, dectype
-  integer(psb_lpk_) :: m, n
+  integer(psb_ipk_) :: dupl_, bldmode_
+  integer(psb_lpk_) :: m, n, nnzrmt_ 
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -96,7 +98,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   else 
     nnz_ = max(1,5*loc_row)
   endif
-
+  
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name), &
        & ':allocating size:',loc_row,loc_col,nnz_
@@ -107,6 +109,24 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='sp_all')
     goto 9999
+  end if
+
+  if (present(bldmode)) then
+    bldmode_ = bldmode
+  else
+    bldmode_ = psb_matbld_noremote_
+  end if
+  if (present(dupl)) then
+    dupl_ = dupl 
+  else
+    dupl_ = psb_dupl_def_
+  end if
+  call a%set_dupl(dupl_)
+  call a%set_remote_build(bldmode_)
+  if (a%is_remote_build()) then
+    allocate(a%rmta)
+    nnzrmt_ = max(100,(nnz_/100))
+    call a%rmta%allocate(m,n,nnzrmt_)
   end if
 
   if (debug_level >= psb_debug_ext_) &

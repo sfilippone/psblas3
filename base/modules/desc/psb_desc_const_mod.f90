@@ -48,6 +48,9 @@ module psb_desc_const_mod
   ! The following are bit fields. 
   integer(psb_ipk_), parameter :: psb_swap_send_=1, psb_swap_recv_=2
   integer(psb_ipk_), parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
+  integer(psb_ipk_), parameter :: psb_collective_start_=1, psb_collective_end_=2
+  integer(psb_ipk_), parameter :: psb_collective_sync_=4
+
   ! Choice among lists on which to base data exchange
   integer(psb_ipk_), parameter :: psb_no_comm_=-1
   integer(psb_ipk_), parameter :: psb_comm_halo_=1, psb_comm_ovr_=2

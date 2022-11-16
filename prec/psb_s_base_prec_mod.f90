@@ -161,17 +161,17 @@ module psb_s_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_s_base_precdescr(prec,iout,root, verbosity)
+    subroutine psb_s_base_precdescr(prec,iout,root, verbosity,prefix)
       import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
            & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
            & psb_s_base_sparse_mat
       Implicit None
 
-      class(psb_s_base_prec_type), intent(in)   :: prec
+      class(psb_s_base_prec_type), intent(in) :: prec
       integer(psb_ipk_), intent(in), optional   :: iout
       integer(psb_ipk_), intent(in), optional   :: root
       integer(psb_ipk_), intent(in), optional   :: verbosity
-
+      character(len=*), intent(in), optional    :: prefix
     end subroutine psb_s_base_precdescr
   end interface
 

@@ -64,7 +64,7 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
   ! local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, dupl_
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
@@ -83,7 +83,7 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
   call psb_info(ctxt, me, np)
-
+  dupl_ = x%get_dupl()
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -104,6 +104,23 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
     call x%free(info)
     call x%bld(ncol,mold=mold)
   else
+    
+    if (x%is_remote_build()) then
+      block
+        integer(psb_lpk_), allocatable :: lvx(:)
+        complex(psb_spk_), allocatable  :: vx(:)
+        integer(psb_ipk_), allocatable :: ivx(:) 
+        integer(psb_ipk_) :: nrmv, nx, i
+
+        nrmv = x%get_nrmv()        
+        call psb_remote_vect(nrmv,x%rmtv,x%rmidx,desc_a,vx,lvx,info)
+        nx  = size(vx)
+        call psb_realloc(nx,ivx,info)
+        call desc_a%g2l(lvx,ivx,info,owned=.true.)
+        call x%ins(nx,ivx,vx,info)
+      end block
+    end if
+
     call x%asb(ncol,info)
     ! ..update halo elements..
     call psb_halo(x,desc_a,info)
@@ -140,7 +157,7 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
   ! local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, i, n 
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, dupl_
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
@@ -159,7 +176,6 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
   call psb_info(ctxt, me, np)
-
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -185,6 +201,7 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
 
   else
     do i=1, n
+      dupl_ = x(i)%get_dupl()
       call x(i)%asb(ncol,info)
       if (info /= 0) exit
       ! ..update halo elements..
@@ -225,7 +242,7 @@ subroutine psb_casb_multivect(x, desc_a, info, mold, scratch,n)
   ! local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_, dupl_
   logical :: scratch_
   
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -271,6 +288,7 @@ subroutine psb_casb_multivect(x, desc_a, info, mold, scratch,n)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
 
+  dupl_ = x%get_dupl()
   if (scratch_) then 
     call x%free(info)
     call x%bld(ncol,n_,mold=mold)

@@ -41,6 +41,8 @@
 !                                       
 !    iprc(:)  - integer(psb_ipk_), allocatable   Output: process identifiers
 !                                                    for the corresponding indices
+!    ladj(:)  - integer(psb_ipk_), allocatable   Output: A list of adjacent processes
+!                                                    
 !    idxmap   - class(psb_indx_map).    The index map
 !    info     - integer.                return code.
 !
@@ -76,7 +78,7 @@
 !  thereby limiting the memory footprint to a predefined maximum
 !  (that the user can force with psb_cd_set_maxspace()).
 ! 
-subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
+subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -93,13 +95,13 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)      :: idx(:)
-  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-  class(psb_indx_map), intent(inout) :: idxmap
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:), ladj(:)
+  class(psb_indx_map), intent(in) :: idxmap
+  integer(psb_ipk_), intent(out)  :: info
 
 
   integer(psb_lpk_), allocatable :: tidx(:)
-  integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:), ladj(:)  
+  integer(psb_ipk_), allocatable :: tprc(:), tsmpl(:)
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ip,j, nsampl_out,&
        & nv, n_answers, nqries, nsampl_in, locr_max, ist, iend,&
@@ -208,7 +210,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     if (trace.and.(me == 0)) write(0,*) ' Initial sweep on user-defined topology',&
          & nsampl_in
     call psi_adj_fnd_sweep(idx,iprc,ladj,idxmap,nsampl_in,n_answers)  
-    call idxmap%xtnd_p_adjcncy(ladj) 
+
     nqries     = nv - n_answers
     nqries_max = nqries
     call psb_max(ctxt,nqries_max)
@@ -253,13 +255,12 @@ subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
     n_answers = n_answers + nlansw
     nqries    = nv - n_answers
     !
-    ! 3. Extract the resulting adjacency list and add it to the
-    !    indxmap;
+    ! 3. Extract the resulting adjacency list ? AND ADD IT TO THE EXISTING ONE ? 
     !
     ladj = tprc(1:nlansw)
     call psb_msort_unique(ladj,nadj)
     call psb_realloc(nadj,ladj,info)
-    call idxmap%xtnd_p_adjcncy(ladj) 
+    ! call idxmap%xtnd_p_adjcncy(ladj) 
     if (do_timings) call psb_toc(idx_loop_a2a)
     if (do_timings) call psb_tic(idx_loop_neigh)    
     !
@@ -368,7 +369,7 @@ contains
     integer(psb_ipk_), intent(in)    :: n_samples
     integer(psb_ipk_), intent(inout) :: iprc(:), n_answers
     integer(psb_ipk_), intent(in)    :: adj(:)
-    class(psb_indx_map), intent(inout) :: idxmap
+    class(psb_indx_map), intent(in)  :: idxmap
     !
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: ipnt, ns_in, ns_out, n_rem, me, np, isw, n_reml,iend, nv

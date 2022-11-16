@@ -208,7 +208,7 @@ contains
     type(psb_d_coo_sparse_mat)  :: acoo
     type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_, mysz
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
@@ -377,6 +377,7 @@ contains
       !
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
 
+
       !
       ! Specify process topology
       !
@@ -429,10 +430,12 @@ contains
     end select
 
 
-    if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
+    if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz, &
+         & bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
     ! define  rhs from boundary conditions; also build initial guess
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
-    if (info == psb_success_) call psb_geall(bv,desc_a,info)
+    if (info == psb_success_) call psb_geall(bv,desc_a,info,&
+         & bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
 
     call psb_barrier(ctxt)
     talc = psb_wtime()-t0
@@ -462,8 +465,9 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    do ii=1, nlr,nb
+    do ii=1, nlr, nb
       ib = min(nb,nlr-ii+1)
+      !ib = min(nb,mysz-ii+1)
       icoeff = 1
       do k=1,ib
         i=ii+k-1
@@ -559,19 +563,126 @@ contains
       goto 9999
     end if
 
-    deallocate(val,irow,icol)
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info,mold=imold)
     tcdasb = psb_wtime()-t1
+
+    if (.false.) then 
+      !
+      !  Add extra rows to test remote build.
+      !
+      block
+        integer(psb_ipk_) :: ks, i
+        ks = desc_a%get_local_cols()-desc_a%get_local_rows()
+        if (ks > 0) ks = max(1,ks / 10)
+        mysz = nlr+ks
+        call psb_realloc(mysz,myidx,info)
+        do i=nlr+1, mysz
+          myidx(i) = i
+        end do
+        call desc_a%l2gv1(myidx(nlr+1:mysz),info)
+        !write(0,*) iam,' Check on extra nodes ',nlr,mysz,':',myidx(nlr+1:mysz)
+        do ii= nlr+1, mysz, nb
+          ib = min(nb,mysz-ii+1)
+          icoeff = 1
+          do k=1,ib
+            i=ii+k-1
+            ! local matrix pointer
+            glob_row=myidx(i)
+            ! compute gridpoint coordinates
+            call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
+            ! x, y, z coordinates
+            x = (ix-1)*deltah
+            y = (iy-1)*deltah
+            z = (iz-1)*deltah
+            zt(k) = f_(x,y,z)
+            ! internal point: build discretization
+            !
+            !  term depending on   (x-1,y,z)
+            !
+            val(icoeff) = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2
+            if (ix == 1) then
+              zt(k) = g(dzero,y,z)*(-val(icoeff)) + zt(k)
+            else
+              call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
+              irow(icoeff) = glob_row
+              icoeff       = icoeff+1
+            endif
+            !  term depending on     (x,y-1,z)
+            val(icoeff)  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2
+            if (iy == 1) then
+              zt(k) = g(x,dzero,z)*(-val(icoeff))   + zt(k)
+            else
+              call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)
+              irow(icoeff) = glob_row
+              icoeff       = icoeff+1
+            endif
+            !  term depending on     (x,y,z-1)
+            val(icoeff)=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2
+            if (iz == 1) then
+              zt(k) = g(x,y,dzero)*(-val(icoeff))   + zt(k)
+            else
+              call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)
+              irow(icoeff) = glob_row
+              icoeff       = icoeff+1
+            endif
+
+            !  term depending on     (x,y,z)
+            val(icoeff)=(2*done)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
+                 & + c(x,y,z)
+            call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+            !  term depending on     (x,y,z+1)
+            val(icoeff)=-a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2
+            if (iz == idim) then
+              zt(k) = g(x,y,done)*(-val(icoeff))   + zt(k)
+            else
+              call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)
+              irow(icoeff) = glob_row
+              icoeff       = icoeff+1
+            endif
+            !  term depending on     (x,y+1,z)
+            val(icoeff)=-a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2
+            if (iy == idim) then
+              zt(k) = g(x,done,z)*(-val(icoeff))   + zt(k)
+            else
+              call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)
+              irow(icoeff) = glob_row
+              icoeff       = icoeff+1
+            endif
+            !  term depending on     (x+1,y,z)
+            val(icoeff)=-a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2
+            if (ix==idim) then
+              zt(k) = g(done,y,z)*(-val(icoeff))   + zt(k)
+            else
+              call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)
+              irow(icoeff) = glob_row
+              icoeff       = icoeff+1
+            endif
+
+          end do
+          call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
+          if(info /= psb_success_) exit
+          call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
+          if(info /= psb_success_) exit
+          zt(:)=dzero
+          call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
+          if(info /= psb_success_) exit
+        end do
+
+      end block
+    end if
+
     call psb_barrier(ctxt)
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
-        call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=amold)
+        call psb_spasb(a,desc_a,info,mold=amold)
       else
-        call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+        call psb_spasb(a,desc_a,info,afmt=afmt)
       end if
     end if
     call psb_barrier(ctxt)
@@ -608,6 +719,7 @@ contains
       write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
+    deallocate(val,irow,icol)
     call psb_erractionrestore(err_act)
     return
 
@@ -615,8 +727,15 @@ contains
 
     return
   end subroutine psb_d_gen_pde3d
+  function outside(i,j,k,bndx,bndy,bndz,iamx,iamy,iamz) result(res)
+    logical :: res
+    integer(psb_ipk_), intent(in) :: i,j,k,iamx,iamy,iamz
+    integer(psb_ipk_), intent(in) :: bndx(0:),bndy(0:),bndz(0:)
 
-
+    res = (i<bndx(iamx)).or.(i>=bndx(iamx+1)) &
+         & .or.(j<bndy(iamy)).or.(j>=bndy(iamy+1)) &
+         & .or.(k<bndz(iamz)).or.(k>=bndz(iamz+1))
+  end function outside
 end module psb_d_pde3d_mod
 
 program psb_d_pde3d

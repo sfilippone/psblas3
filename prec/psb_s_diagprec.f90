@@ -167,7 +167,7 @@ contains
   !         0: normal
   !        >1: increased details 
   !
-  subroutine psb_s_diag_precdescr(prec,iout,root, verbosity)
+  subroutine psb_s_diag_precdescr(prec,iout,root, verbosity,prefix)
     use psb_penv_mod
     use psb_error_mod
     Implicit None
@@ -176,11 +176,13 @@ contains
     integer(psb_ipk_), intent(in), optional   :: iout
     integer(psb_ipk_), intent(in), optional   :: root
     integer(psb_ipk_), intent(in), optional   :: verbosity
+    character(len=*), intent(in), optional  :: prefix
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='s_diag_precdescr'
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iout_, iam, np, root_, verbosity_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
 
@@ -201,6 +203,11 @@ contains
     else
       verbosity_ = 0
     end if
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
     if (verbosity_ < 0) goto 9998
     
     ctxt = prec%ctxt
@@ -209,7 +216,7 @@ contains
     if (root_ == -1) root_ = iam
     
     if (iam == root_) &
-         &  write(iout_,*) trim(prec%desc_prefix()),' ',&
+         &  write(iout_,*) trim(prefix_),' ', trim(prec%desc_prefix()),' ',&
          & 'Diagonal scaling'
 
     call psb_erractionsave(err_act)

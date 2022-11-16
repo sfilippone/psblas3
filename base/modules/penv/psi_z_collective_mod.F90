@@ -31,7 +31,8 @@
 !    
 module psi_z_collective_mod
   use psi_penv_mod
-
+  use psb_desc_const_mod
+  
 
   interface psb_sum
     module procedure psb_zsums, psb_zsumv, psb_zsumm
@@ -79,7 +80,7 @@ contains
   ! SUM
   !
 
-  subroutine psb_zsums(ctxt,dat,root)
+  subroutine psb_zsums(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -90,11 +91,14 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_) :: dat_
-    integer(psb_mpk_) :: iam, np, info, icomm
-    integer(psb_ipk_) :: iinfo
-
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
+    
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
@@ -104,18 +108,45 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,icomm,info)
-      dat = dat_
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
-      if (iam == root_) dat = dat_
-    endif
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_sum,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,1,&
+               & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,1,&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
 #endif    
   end subroutine psb_zsums
 
-  subroutine psb_zsumv(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zsumv(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -126,10 +157,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -140,26 +174,46 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,icomm,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
-      else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
       end if
-    endif
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+         call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+              & psb_mpi_c_dpk_,mpi_sum,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+      end if
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      endif
+    end if
+    
 #endif    
   end subroutine psb_zsumv
 
-  subroutine psb_zsumm(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zsumm(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -170,11 +224,14 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
-
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
+    
 #if !defined(SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
@@ -185,21 +242,41 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,icomm,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
-      else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
       end if
-    endif
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_sum,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+      end if
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,root_, icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      endif
+    end if
 #endif    
   end subroutine psb_zsumm
 
@@ -207,7 +284,7 @@ contains
   ! AMX: Maximum Absolute Value
   !
   
-  subroutine psb_zamxs(ctxt,dat,root)
+  subroutine psb_zamxs(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -218,10 +295,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_) :: dat_
-    integer(psb_mpk_) :: iam, np, info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -232,18 +312,46 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
-      dat = dat_
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
-      if (iam == root_) dat = dat_
-    endif
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamx_op,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+
 #endif    
   end subroutine psb_zamxs
 
-  subroutine psb_zamxv(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zamxv(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -254,10 +362,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -268,26 +379,46 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
-      else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
       end if
-    endif
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+              psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+
 #endif    
   end subroutine psb_zamxv
 
-  subroutine psb_zamxm(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zamxm(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -298,10 +429,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
 
@@ -313,29 +447,48 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
-      else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
       end if
-    endif
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
 #endif    
   end subroutine psb_zamxm
 
   !
   ! AMN: Minimum Absolute Value
   !
-  
-  subroutine psb_zamns(ctxt,dat,root)
+  subroutine psb_zamns(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -346,10 +499,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_) :: dat_
-    integer(psb_mpk_) :: iam, np, info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -360,18 +516,46 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
-      dat = dat_
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
-      if (iam == root_) dat = dat_
-    endif
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamn_op,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+
 #endif    
   end subroutine psb_zamns
 
-  subroutine psb_zamnv(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zamnv(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -382,10 +566,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -396,26 +583,46 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
-      else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
       end if
-    endif
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+
 #endif    
   end subroutine psb_zamnv
 
-  subroutine psb_zamnm(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zamnm(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -426,10 +633,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
 
@@ -441,29 +651,49 @@ contains
       root_ = -1
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
-      else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
       end if
-    endif
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
+      else
+        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+      endif
+          else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,icomm,request,info)
+        else
+          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+        end if
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
 #endif    
   end subroutine psb_zamnm
 
+
   !
   ! BCAST Broadcast
-  !
-  
-  subroutine psb_zbcasts(ctxt,dat,root)
+  !  
+  subroutine psb_zbcasts(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -474,10 +704,14 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-
-    integer(psb_mpk_) :: iam, np, info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
+    
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -488,13 +722,33 @@ contains
       root_ = psb_root_
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    call mpi_bcast(dat,1,psb_mpi_c_dpk_,root_,icomm,info)
-
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_bcast(dat,1,psb_mpi_c_dpk_,root_,icomm,info)
+    else
+      if (collective_start) then
+        call mpi_ibcast(dat,1,psb_mpi_c_dpk_,root_,icomm,request,info)
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
 #endif    
   end subroutine psb_zbcasts
 
-  subroutine psb_zbcastv(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zbcastv(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -505,9 +759,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -518,12 +776,34 @@ contains
       root_ = psb_root_
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,icomm,info)
+    else
+      if (collective_start) then
+        call mpi_ibcast(dat,size(dat),psb_mpi_c_dpk_,root_,icomm,request,info)
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+     
 #endif    
   end subroutine psb_zbcastv
 
-  subroutine psb_zbcastm(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zbcastm(ctxt,dat,root,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -534,10 +814,13 @@ contains
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_mpk_) :: root_
-
-    integer(psb_mpk_) :: iam, np,  info, icomm
-    integer(psb_ipk_) :: iinfo
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
 
@@ -549,7 +832,30 @@ contains
       root_ = psb_root_
     endif
     icomm = psb_get_mpi_comm(ctxt)
-    call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,icomm,info)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,icomm,info)
+    else
+      if (collective_start) then
+        call mpi_ibcast(dat,size(dat),psb_mpi_c_dpk_,root_,icomm,request,info)
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+      
 #endif    
   end subroutine psb_zbcastm
 
@@ -559,7 +865,7 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine psb_zscan_sums(ctxt,dat)
+  subroutine psb_zscan_sums(ctxt,dat,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -568,21 +874,48 @@ contains
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     complex(psb_dpk_), intent(inout)  :: dat
     complex(psb_dpk_) :: dat_
     integer(psb_ipk_) :: iam, np, info
-    integer(psb_mpk_) :: minfo, icomm
+    integer(psb_mpk_) :: minfo
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
-    call mpi_scan(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
-    dat = dat_
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_scan(MPI_IN_PLACE,dat,1,&
+           & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
+    else
+      if (collective_start) then
+        call mpi_iscan(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_sum,icomm,request,minfo)
+      else if (collective_end) then
+        call mpi_wait(request,status,minfo)
+      end if
+    end if
 #endif    
   end subroutine psb_zscan_sums
 
-
-  subroutine psb_zexscan_sums(ctxt,dat)
+  subroutine psb_zexscan_sums(ctxt,dat,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -592,23 +925,50 @@ contains
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     complex(psb_dpk_) :: dat_
     integer(psb_ipk_) :: iam, np, info
-    integer(psb_mpk_) :: icomm, minfo
+    integer(psb_mpk_) :: minfo
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
-    call mpi_exscan(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
-    dat = dat_
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_exscan(MPI_IN_PLACE,dat,1,&
+           & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
+    else
+      if (collective_start) then
+        call mpi_iexscan(MPI_IN_PLACE,dat,1,&
+             & psb_mpi_c_dpk_,mpi_sum,icomm,request,minfo)
+      else if (collective_end) then
+        call mpi_wait(request,status,minfo)
+      end if
+    end if
 #else
     dat = zzero
 #endif    
   end subroutine psb_zexscan_sums
 
-  subroutine psb_zscan_sumv(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zscan_sumv(ctxt,dat,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -618,24 +978,46 @@ contains
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
-    integer(psb_ipk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:)
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     integer(psb_ipk_) :: iam, np,  info
-    integer(psb_mpk_) :: minfo, icomm
+    integer(psb_mpk_) :: minfo
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
-    call psb_realloc(size(dat),dat_,info)
-    dat_ = dat
-    if (info == psb_success_) &
-         & call mpi_scan(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_scan(MPI_IN_PLACE,dat,size(dat),&
+           & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
+    else
+      if (collective_start) then
+        call mpi_iscan(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
 #endif
   end subroutine psb_zscan_sumv
 
-  subroutine psb_zexscan_sumv(ctxt,dat,root)
-    use psb_realloc_mod
+  subroutine psb_zexscan_sumv(ctxt,dat,mode,request)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -645,19 +1027,44 @@ contains
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
-    integer(psb_ipk_), intent(in), optional    :: root
-    integer(psb_mpk_) :: root_
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
     complex(psb_dpk_), allocatable :: dat_(:)
     integer(psb_ipk_) :: iam, np,  info
-    integer(psb_mpk_) :: minfo, icomm
+    integer(psb_mpk_) :: minfo
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
-    call psb_realloc(size(dat),dat_,info)
-    dat_ = dat
-    if (info == psb_success_) &
-         & call mpi_exscan(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      call mpi_exscan(MPI_IN_PLACE,dat,size(dat),&
+           & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
+    else
+      if (collective_start) then
+        call mpi_iexscan(MPI_IN_PLACE,dat,size(dat),&
+             & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+    
 #else
     dat = zzero
 #endif

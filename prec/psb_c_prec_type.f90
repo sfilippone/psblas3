@@ -197,7 +197,7 @@ contains
   !         0: normal
   !        >1: increased details 
   !
-  subroutine psb_cfile_prec_descr(prec,info,iout, root,verbosity)
+  subroutine psb_cfile_prec_descr(prec,info,iout, root,verbosity,prefix)
     use psb_base_mod
     implicit none
     class(psb_cprec_type), intent(in)       :: prec
@@ -205,6 +205,7 @@ contains
     integer(psb_ipk_), intent(in), optional :: iout
     integer(psb_ipk_), intent(in), optional :: root
     integer(psb_ipk_), intent(in), optional :: verbosity
+    character(len=*), intent(in), optional  :: prefix
 
     integer(psb_ipk_) :: iout_, verbosity_
     character(len=20) :: name='prec_descr'
@@ -219,7 +220,7 @@ contains
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
     end if
-    call prec%prec%descr(iout=iout,root=root, verbosity=verbosity)
+    call prec%prec%descr(iout=iout,root=root, verbosity=verbosity,prefix=prefix)
 
   end subroutine psb_cfile_prec_descr
 

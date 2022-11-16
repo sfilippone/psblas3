@@ -31,7 +31,8 @@ MODDIR=../../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR)
 CINCLUDES=-I. 
 
-lib: mpfobjs $(FOBJS) $(MPFOBJS) 
+objs: mpfobjs $(FOBJS) $(MPFOBJS)
+lib: objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) $(COBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 

@@ -136,9 +136,9 @@ module psb_const_mod
   !
   ! Version
   !
-  character(len=*), parameter    :: psb_version_string_ = "3.7.0"
+  character(len=*), parameter    :: psb_version_string_ = "3.8.0"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter   :: psb_version_minor_  = 7
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 8
   integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
 
   !
@@ -204,6 +204,9 @@ module psb_const_mod
   integer(psb_ipk_), parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer(psb_ipk_), parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
 
+  integer(psb_ipk_), parameter :: psb_matbld_noremote_=0, psb_matbld_remote_=1
+
+  
   integer(psb_ipk_), parameter :: psb_ireg_flgs_=10, psb_ip2_=0
   integer(psb_ipk_), parameter :: psb_iflag_=2, psb_ichk_=3
   integer(psb_ipk_), parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6

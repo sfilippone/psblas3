@@ -24,6 +24,7 @@ psb_i_t    psb_c_dvect_zero(psb_c_dvector *xh);
 psb_d_t	  *psb_c_dvect_f_get_pnt( psb_c_dvector *xh);
 
 psb_i_t    psb_c_dgeall(psb_c_dvector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_dgeall_remote(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeins(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,
 		    psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,
@@ -35,6 +36,7 @@ psb_d_t    psb_c_dgetelem(psb_c_dvector *xh,psb_l_t index,psb_c_descriptor *cd);
 /* sparse matrices*/
 psb_c_dspmat* psb_c_new_dspmat();
 psb_i_t    psb_c_dspall(psb_c_dspmat *mh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_dspall_remote(psb_c_dspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dspasb(psb_c_dspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dspfree(psb_c_dspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dspins(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl,

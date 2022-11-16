@@ -70,6 +70,10 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
+  integer(psb_ipk_)      :: i,k
+  integer(psb_lpk_)      :: nnl
+  integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
+  real(psb_spk_), allocatable     :: lval(:)
   character(len=20)  :: name
 
   info = psb_success_
@@ -147,6 +151,27 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
           call psb_errpush(info,name,a_err='a%csput')
           goto 9999
         end if
+
+        if (a%is_remote_build()) then 
+          nnl = count(ila(1:nz)<0)
+          if (nnl > 0) then 
+            !write(0,*) 'Check on insert ',nnl
+            allocate(lila(nnl),ljla(nnl),lval(nnl))
+            k = 0
+            do i=1,nz
+              if (ila(i)<0) then
+                k=k+1
+                lila(k) = ia(i)
+                ljla(k) = ja(i)
+                lval(k) = val(i)
+              end if
+            end do
+            if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
+            call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+                 & 1_psb_lpk_,desc_a%get_global_rows(),info)
+          end if
+        end if
+          
       else
         info = psb_err_invalid_a_and_cd_state_
         call psb_errpush(info,name)
@@ -168,14 +193,34 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       ila(1:nz) = ia(1:nz)
       jla(1:nz) = ja(1:nz)
     else
-      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info)
-      if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
+      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+      if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info,&
+           & mask=(ila(1:nz)>0))
     end if
     call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='a%csput')
       goto 9999
+    end if
+    if (a%is_remote_build()) then 
+      nnl = count(ila(1:nz)<0)
+      if (nnl > 0) then 
+        !write(0,*) 'Check on insert ',nnl
+        allocate(lila(nnl),ljla(nnl),lval(nnl))
+        k = 0
+        do i=1,nz
+          if (ila(i)<0) then
+            k=k+1
+            lila(k) = ia(k)
+            ljla(k) = ja(k)
+            lval(k) = val(k)
+          end if
+        end do
+        if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
+        call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+             & 1_psb_lpk_,desc_a%get_global_rows(),info)
+      end if
     end if
   else
     info = psb_err_invalid_cd_state_
