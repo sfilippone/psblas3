@@ -1,5 +1,13 @@
 WHAT'S NEW
 
+Version 3.8.0-2
+   1. CTXT is now an opaque object.
+   2. OpenMP is now better integrated.
+   3. New non-blocking collectives.
+   4. Now allowing remote builds (i.e. local contributions can
+      now be sent to the final destination process)
+   5. Restore Makefiles to work on parallel builds. 
+
 Version 3.7.0.1
    1. PREC%DESCR method now requires a mandatory INFO argument. 
 

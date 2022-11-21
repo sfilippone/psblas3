@@ -3671,6 +3671,12 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
 
+  info  = psb_success_
+
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
   ! Row major order
   if (nr <= nzin) then
     ! Avoid strange situations with large indices
@@ -4357,6 +4363,11 @@ subroutine psb_z_fix_coo_inner_colmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
   integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
+  info  = psb_success_
+
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   if (nc <= nzin) then
     ! Avoid strange situations with large indices

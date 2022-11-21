@@ -104,6 +104,11 @@ AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc 
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
 AC_PROG_CC([xlc pgcc icc gcc cc ])
+if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
+   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+else
+   C99OPT="$ac_cv_prog_cc_stdc";
+fi	
 CFLAGS="$save_CFLAGS";
 AC_PROG_CXX([CC xlc++  icpc g++])
 
@@ -118,12 +123,6 @@ fi
 if test "X$CC" == "X" ; then
 	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
 fi
-AC_PROG_CC_STDC()
-if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
-   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
-else
-   C99OPT="$ac_cv_prog_cc_stdc";
-fi	
 
  
 
@@ -148,7 +147,6 @@ if test "X$MPICC" = "X" ; then
     AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
-AC_PROG_CC_STDC
 
 AC_LANG([Fortran])
 AC_LANG([C++])
@@ -157,7 +155,6 @@ if test "X$MPICXX" = "X" ; then
     AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
-dnl AC_PROG_CC_STDC
 AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
@@ -730,7 +727,7 @@ PAC_MAKE_IS_GNUMAKE
 # Note : also umfdi_local_search, ...
 #AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
 
-AC_ARG_WITH(rsb, AC_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
+AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
 want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
 if test x"$want_rsb_libs" != x ; then
 	if test x"$want_rsb_libs" = xyes ; then
