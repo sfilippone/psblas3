@@ -1255,9 +1255,9 @@ contains
             z%v(i) = alpha*y(i)*x(i)
           end do
         else if (beta == cone) then
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)  shared(alpha)
           do i=1, n
-            z%v(i) = z%v(i) + alpha*y(i)*x(i)  shared(alpha)
+            z%v(i) = z%v(i) + alpha*y(i)*x(i)
           end do
         else
           !$omp parallel do private(i)  shared(alpha, beta)
