@@ -1328,8 +1328,8 @@ function psb_z_csr_csnmi(a) result(res)
   res = dzero
   if (a%is_dev())   call a%sync()
 
-  !$omp parallel do private(i,acc)  reduction(max: res)
-    do i = 1, a%get_nrows()
+  !$omp parallel do private(i,j,acc)  reduction(max: res)
+  do i = 1, a%get_nrows()
     acc = dzero
     do j=a%irp(i),a%irp(i+1)-1
       acc = acc + abs(a%val(j))
@@ -1562,8 +1562,12 @@ subroutine psb_z_csr_get_diag(a,d,info)
 
 
   if (a%is_unit()) then
-    d(1:mnm) = zone
+    !$omp parallel do private(i)
+    do i=1, mnm
+      d(i) = zone
+    end do
   else
+    !$omp parallel do private(i,j,k)
     do i=1, mnm
       d(i) = zzero
       do k=a%irp(i),a%irp(i+1)-1
@@ -1574,6 +1578,7 @@ subroutine psb_z_csr_get_diag(a,d,info)
       enddo
     end do
   end if
+  !$omp parallel do private(i)
   do i=mnm+1,size(d)
     d(i) = zzero
   end do
@@ -1629,6 +1634,7 @@ subroutine psb_z_csr_scal(d,a,info,side)
       goto 9999
     end if
 
+    !$omp parallel do private(i,j)
     do i=1, m
       do j = a%irp(i), a%irp(i+1) -1
         a%val(j) = a%val(j) * d(i)
@@ -1643,6 +1649,7 @@ subroutine psb_z_csr_scal(d,a,info,side)
       goto 9999
     end if
 
+    !$omp parallel do private(i,j)
     do i=1,a%get_nzeros()
       j        = a%ja(i)
       a%val(i) = a%val(i) * d(j)
@@ -1681,6 +1688,7 @@ subroutine psb_z_csr_scals(d,a,info)
     call a%make_nonunit()
   end if
 
+  !$omp parallel do private(i)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo
@@ -2851,6 +2859,13 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='z_cp_csr_from_coo'
+  logical :: use_openmp = .false.
+
+  !$ integer(psb_ipk_), allocatable :: sum(:)
+  !$ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
+  !$ integer(psb_ipk_) :: nxt_val,old_val,saved_elem,maxthreads 
+  !$ use_openmp = .true.
+
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2871,7 +2886,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     call move_alloc(tmp%ia,itemp)
     call move_alloc(tmp%ja,a%ja)
     call move_alloc(tmp%val,a%val)
-    call psb_realloc(nr+1,a%irp,info)
+    call psb_realloc(max(nr+1,nc+1),a%irp,info)
     call tmp%free()
 
   else
@@ -2889,22 +2904,97 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     call psb_safe_ab_cpy(b%ia,itemp,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
-    if (info == psb_success_) call psb_realloc(nr+1,a%irp,info)
-
+    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    
   endif
 
   a%irp(:) = 0
-  do k=1,nza
-    i = itemp(k)
-    a%irp(i) = a%irp(i) + 1
-  end do
-  ip = 1
-  do i=1,nr
-    ncl = a%irp(i)
-    a%irp(i) = ip
-    ip = ip + ncl
-  end do
-  a%irp(nr+1) = ip
+  
+!!$  if (use_openmp) then
+!!$    !$ maxthreads = omp_get_max_threads()
+!!$    !$ allocate(sum(maxthreads+1))
+!!$    !$ sum(:) = 0
+!!$    !$ sum(1) = 1
+!!$
+!!$    !$OMP PARALLEL default(none) &
+!!$    !$OMP shared(nza,itemp,a,nthreads,sum,nr) &
+!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
+!!$
+!!$    !$OMP DO schedule(STATIC) &
+!!$    !$OMP private(k,i)
+!!$    do k=1,nza
+!!$      i = itemp(k)
+!!$      a%irp(i) = a%irp(i) + 1
+!!$    end do
+!!$    !$OMP END DO
+!!$
+!!$    !$OMP SINGLE
+!!$    !$ nthreads = omp_get_num_threads()
+!!$    !$OMP END SINGLE
+!!$
+!!$    !$ ithread = omp_get_thread_num()
+!!$
+!!$    !$ work = nr/nthreads
+!!$    !$ if (ithread < MOD(nr,nthreads)) then
+!!$      !$ work = work + 1
+!!$      !$ first_idx = ithread*work + 1
+!!$    !$ else
+!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
+!!$    !$ end if
+!!$
+!!$    !$ last_idx = first_idx + work - 1
+!!$
+!!$    !$ s = 0
+!!$    !$ do i=first_idx,last_idx
+!!$      !$ s = s + a%irp(i)
+!!$    !$ end do
+!!$    !$ if (work > 0) then
+!!$      !$ sum(ithread+2) = s
+!!$    !$ end if
+!!$
+!!$    !$OMP BARRIER
+!!$
+!!$    !$OMP SINGLE
+!!$    !$ do i=2,nthreads+1
+!!$      !$ sum(i) = sum(i) + sum(i-1)
+!!$    !$ end do
+!!$    !$OMP END SINGLE
+!!$
+!!$    !$ if (work > 0) then
+!!$      !$ saved_elem = a%irp(first_idx)
+!!$    !$ end if
+!!$    !$ if (ithread == 0) then
+!!$      !$ a%irp(1) = 1
+!!$    !$ end if
+!!$
+!!$    !$OMP BARRIER
+!!$
+!!$    !$ if (work > 0) then
+!!$      !$ old_val = a%irp(first_idx+1)
+!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
+!!$    !$ end if
+!!$
+!!$    !$ do i=first_idx+2,last_idx+1
+!!$      !$ nxt_val = a%irp(i)
+!!$      !$ a%irp(i) = a%irp(i-1) + old_val
+!!$      !$ old_val = nxt_val
+!!$    !$ end do
+!!$
+!!$    !$OMP END PARALLEL
+!!$  else
+
+    do k=1,nza
+      i = itemp(k)
+      a%irp(i) = a%irp(i) + 1
+    end do
+    ip = 1
+    do i=1,nr
+      ncl = a%irp(i)
+      a%irp(i) = ip
+      ip = ip + ncl
+    end do
+    a%irp(nr+1) = ip
+!!$  end if
   call a%set_host()
 
 
@@ -3020,6 +3110,13 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
+  logical :: use_openmp = .false.
+
+  ! $ integer(psb_ipk_), allocatable :: sum(:)
+  ! $ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
+  ! $ integer(psb_ipk_) :: nxt_val,old_val,saved_elem
+  ! $ use_openmp = .true. 
+
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -3040,22 +3137,93 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
-  call psb_realloc(nr+1,a%irp,info)
+  call psb_realloc(max(nr+1,nc+1),a%irp,info)
   call b%free()
 
 
   a%irp(:) = 0
-  do k=1,nza
-    i = itemp(k)
-    a%irp(i) = a%irp(i) + 1
-  end do
-  ip = 1
-  do i=1,nr
-    ncl = a%irp(i)
-    a%irp(i) = ip
-    ip = ip + ncl
-  end do
-  a%irp(nr+1) = ip
+
+!!$  if (use_openmp) then
+!!$    !$OMP PARALLEL default(none) &
+!!$    !$OMP shared(sum,nthreads,nr,a,itemp,nza) &
+!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
+!!$
+!!$    !$OMP DO schedule(STATIC) &
+!!$    !$OMP private(k,i)
+!!$    do k=1,nza
+!!$      i = itemp(k)
+!!$      a%irp(i) = a%irp(i) + 1
+!!$    end do
+!!$    !$OMP END DO
+!!$
+!!$    !$OMP SINGLE
+!!$    !$ nthreads = omp_get_num_threads()
+!!$    !$ allocate(sum(nthreads+1))
+!!$    !$ sum(:) = 0
+!!$    !$ sum(1) = 1
+!!$    !$OMP END SINGLE
+!!$
+!!$    !$ ithread = omp_get_thread_num()
+!!$
+!!$    !$ work = nr/nthreads
+!!$    !$ if (ithread < MOD(nr,nthreads)) then
+!!$      !$ work = work + 1
+!!$      !$ first_idx = ithread*work + 1
+!!$    !$ else
+!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
+!!$    !$ end if
+!!$
+!!$    !$ last_idx = first_idx + work - 1
+!!$
+!!$    !$ s = 0
+!!$    !$ do i=first_idx,last_idx
+!!$      !$ s = s + a%irp(i)
+!!$    !$ end do
+!!$    !$ if (work > 0) then
+!!$      !$ sum(ithread+2) = s
+!!$    !$ end if
+!!$
+!!$    !$OMP BARRIER
+!!$
+!!$    !$OMP SINGLE
+!!$    !$ do i=2,nthreads+1
+!!$      !$ sum(i) = sum(i) + sum(i-1)
+!!$    !$ end do
+!!$    !$OMP END SINGLE
+!!$
+!!$    !$ if (work > 0) then 
+!!$      !$ saved_elem = a%irp(first_idx)
+!!$    !$ end if
+!!$    !$ if (ithread == 0) then
+!!$      !$ a%irp(1) = 1
+!!$    !$ end if
+!!$
+!!$    !$ if (work > 0) then
+!!$      !$ old_val = a%irp(first_idx+1)
+!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
+!!$    !$ end if
+!!$
+!!$    !$ do i=first_idx+2,last_idx+1
+!!$      !$ nxt_val = a%irp(i)
+!!$      !$ a%irp(i) = a%irp(i-1) + old_val
+!!$      !$ old_val = nxt_val
+!!$    !$ end do
+!!$
+!!$    !$OMP END PARALLEL
+!!$  else
+    do k=1,nza
+      i = itemp(k)
+      a%irp(i) = a%irp(i) + 1
+    end do
+    ip = 1
+    do i=1,nr
+      ncl = a%irp(i)
+      a%irp(i) = ip
+      ip = ip + ncl
+    end do
+    a%irp(nr+1) = ip
+!!$  end if
+  
   call a%set_host()
 
 end subroutine psb_z_mv_csr_from_coo

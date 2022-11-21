@@ -94,7 +94,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  idx2ijk3d(i,j,k,idx,nx,ny,nz,base)
+  pure subroutine  idx2ijk3d(i,j,k,idx,nx,ny,nz,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: i,j,k
@@ -111,7 +111,7 @@ contains
 
   end subroutine idx2ijk3d
   
-  subroutine  idx2ijk2d(i,j,idx,nx,ny,base)
+  pure subroutine  idx2ijk2d(i,j,idx,nx,ny,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: i,j
@@ -139,7 +139,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  idx2ijkv(coords,idx,dims,base)
+  pure subroutine  idx2ijkv(coords,idx,dims,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: coords(:)
@@ -156,7 +156,7 @@ contains
     idx_ = idx - base_
 
     if (size(coords) < size(dims)) then
-      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      !write(0,*) 'Error: size mismatch ',size(coords),size(dims)
       coords = 0
       return
     end if
@@ -181,7 +181,7 @@ contains
 
   end subroutine idx2ijkv
 
-  subroutine  lidx2ijk3d(i,j,k,idx,nx,ny,nz,base)
+  pure subroutine  lidx2ijk3d(i,j,k,idx,nx,ny,nz,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: i,j,k
@@ -199,7 +199,7 @@ contains
 
   end subroutine lidx2ijk3d
   
-  subroutine  lidx2ijk2d(i,j,idx,nx,ny,base)
+  pure subroutine  lidx2ijk2d(i,j,idx,nx,ny,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: i,j
@@ -228,7 +228,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  lidx2ijkv(coords,idx,dims,base)
+  pure subroutine  lidx2ijkv(coords,idx,dims,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: coords(:)
@@ -247,7 +247,7 @@ contains
     idx_ = idx - base_
 
     if (size(coords) < size(dims)) then
-      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      !write(0,*) 'Error: size mismatch ',size(coords),size(dims)
       coords = 0
       return
     end if
@@ -272,7 +272,7 @@ contains
 
   end subroutine lidx2ijkv
 
-  subroutine  lidx2lijk3d(i,j,k,idx,nx,ny,nz,base)
+  pure subroutine  lidx2lijk3d(i,j,k,idx,nx,ny,nz,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: i,j,k
@@ -290,7 +290,7 @@ contains
 
   end subroutine lidx2lijk3d
   
-  subroutine  lidx2lijk2d(i,j,idx,nx,ny,base)
+  pure subroutine  lidx2lijk2d(i,j,idx,nx,ny,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: i,j
@@ -319,7 +319,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  lidx2lijkv(coords,idx,dims,base)
+  pure subroutine  lidx2lijkv(coords,idx,dims,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: coords(:)
@@ -338,7 +338,7 @@ contains
     idx_ = idx - base_
 
     if (size(coords) < size(dims)) then
-      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      !write(0,*) 'Error: size mismatch ',size(coords),size(dims)
       coords = 0
       return
     end if
@@ -374,7 +374,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  ijk2idxv(idx,coords,dims,base)
+  pure subroutine  ijk2idxv(idx,coords,dims,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(in)  :: coords(:),dims(:)
@@ -389,7 +389,7 @@ contains
     end if
     sz = size(coords)
     if (sz /= size(dims)) then
-      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      !write(0,*) 'Error: size mismatch ',size(coords),size(dims)
       idx = 0
       return
     end if
@@ -420,7 +420,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  ijk2idx3d(idx,i,j,k,nx,ny,nz,base)
+  pure subroutine  ijk2idx3d(idx,i,j,k,nx,ny,nz,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: idx
@@ -431,7 +431,7 @@ contains
     call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
   end subroutine ijk2idx3d
 
-  subroutine  ijk2idx2d(idx,i,j,nx,ny,base)
+  pure subroutine  ijk2idx2d(idx,i,j,nx,ny,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(out) :: idx
@@ -442,7 +442,7 @@ contains
     call ijk2idx(idx,[i,j],[nx,ny],base)
   end subroutine ijk2idx2d
 
-  subroutine  ijk2lidxv(idx,coords,dims,base)
+  pure subroutine  ijk2lidxv(idx,coords,dims,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_mpk_), intent(in)  :: coords(:),dims(:)
@@ -457,7 +457,7 @@ contains
     end if
     sz = size(coords)
     if (sz /= size(dims)) then
-      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      !write(0,*) 'Error: size mismatch ',size(coords),size(dims)
       idx = 0
       return
     end if
@@ -489,7 +489,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  ijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
+  pure subroutine  ijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: idx
@@ -500,7 +500,7 @@ contains
     call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
   end subroutine ijk2lidx3d
 
-  subroutine  ijk2lidx2d(idx,i,j,nx,ny,base)
+  pure subroutine  ijk2lidx2d(idx,i,j,nx,ny,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: idx
@@ -512,7 +512,7 @@ contains
   end subroutine ijk2lidx2d
 
 
-  subroutine  lijk2lidxv(idx,coords,dims,base)
+  pure subroutine  lijk2lidxv(idx,coords,dims,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(in)  :: coords(:),dims(:)
@@ -527,7 +527,7 @@ contains
     end if
     sz = size(coords)
     if (sz /= size(dims)) then
-      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      !write(0,*) 'Error: size mismatch ',size(coords),size(dims)
       idx = 0
       return
     end if
@@ -559,7 +559,7 @@ contains
   !      do k=1,nz
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
-  subroutine  lijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
+  pure subroutine  lijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: idx
@@ -570,7 +570,7 @@ contains
     call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
   end subroutine lijk2lidx3d
 
-  subroutine  lijk2lidx2d(idx,i,j,nx,ny,base)
+  pure subroutine  lijk2lidx2d(idx,i,j,nx,ny,base)
     use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_epk_), intent(out) :: idx

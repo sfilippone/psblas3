@@ -239,7 +239,7 @@ subroutine psb_s_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   class(psb_s_base_sparse_mat), intent(in), optional :: amold
   class(psb_s_base_vect_type), intent(in), optional  :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold
-  integer(psb_ipk_) :: err_act, nrow,i
+  integer(psb_ipk_) :: err_act, nrow,ncol,i
   character(len=20)  :: name='s_diag_precbld'
 
   call psb_erractionsave(err_act)
@@ -247,6 +247,7 @@ subroutine psb_s_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   info = psb_success_
   call prec%set_ctxt(desc_a%get_ctxt())
   nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
   
   prec%d=a%get_diag(info) 
   if (info /= psb_success_) then 
@@ -255,13 +256,18 @@ subroutine psb_s_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
     goto 9999
   end if
 
-  call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=sone)
+  call psb_realloc(ncol,prec%d,info)
+  !$omp parallel do private(i)
   do i=1,nrow
     if (prec%d(i) == dzero) then
       prec%d(i) = sone
     else
       prec%d(i) = sone/prec%d(i)
     endif
+  end do
+  !$omp parallel do private(i)
+  do i=nrow+1,ncol
+    prec%d(i) = sone
   end do
 
   allocate(prec%dv,stat=info) 

@@ -151,6 +151,7 @@ subroutine psb_cdalv(v, ctxt, desc, info, flag)
   itmpov  = 0
   temp_ovrlap(:) = -1
 
+  !$omp parallel do private(i) reduction(+:counter)
   do i=1,m
 
     if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
@@ -158,7 +159,7 @@ subroutine psb_cdalv(v, ctxt, desc, info, flag)
       l_err(1)=3
       l_err(2)=v(i) - flag_
       l_err(3)=i
-      exit
+      !exit
     end if
 
     if ((v(i)-flag_) == me) then

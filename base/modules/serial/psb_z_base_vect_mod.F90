@@ -1208,7 +1208,7 @@ contains
       if (beta == zone) then
         return
       else
-        !$omp parallel do private(i)    
+        !$omp parallel do private(i)     shared(beta)
         do i=1, n
           z%v(i) = beta*z%v(i)
         end do
@@ -1226,7 +1226,7 @@ contains
             z%v(i) = z%v(i) + y(i)*x(i)
           end do
         else
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)     shared(beta)
           do i=1, n
             z%v(i) = beta*z%v(i) + y(i)*x(i)
           end do
@@ -1243,24 +1243,24 @@ contains
             z%v(i) = z%v(i) - y(i)*x(i)
           end do
         else
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)    shared(beta)
           do i=1, n
             z%v(i) = beta*z%v(i) - y(i)*x(i)
           end do
         end if
       else
         if (beta == zzero) then
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)    shared(alpha)
           do i=1, n
             z%v(i) = alpha*y(i)*x(i)
           end do
         else if (beta == zone) then
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)  shared(alpha)
           do i=1, n
             z%v(i) = z%v(i) + alpha*y(i)*x(i)
           end do
         else
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)  shared(alpha, beta)
           do i=1, n
             z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
           end do
