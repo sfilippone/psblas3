@@ -275,6 +275,8 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
 
     if (debug_size) &
          & write(debug_unit,*) me,' ',trim(name),': After sort ',nlu
+  else
+    nlu = loc_row
   end if
   call psb_nullify_desc(desc)
   if (do_timings) then 
