@@ -1865,18 +1865,10 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_c_fix_coo_inner
   end interface
-  interface 
-    subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,info)
-      import
-      integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
-      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:), iaux(:)
-      complex(psb_spk_), intent(inout) :: val(:)
-      integer(psb_ipk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_c_fix_coo_inner_rowmajor
-  end interface
-  interface 
-    subroutine psb_c_fix_coo_inner_colmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,info)
+
+  interface
+    subroutine psb_c_fix_coo_inner_colmajor(nr,nc,nzin,dupl,&
+         & ia,ja,val,iaux,nzout,info)
       import
       integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
       integer(psb_ipk_), intent(inout)        :: ia(:), ja(:), iaux(:)
@@ -1884,7 +1876,18 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(out)          :: nzout
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_c_fix_coo_inner_colmajor
-    
+  end interface
+
+  interface
+    subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,&
+         & ia,ja,val,iaux,nzout,info)
+      import
+      integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
+      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:), iaux(:)
+      complex(psb_spk_), intent(inout) :: val(:)
+      integer(psb_ipk_), intent(out)          :: nzout
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_c_fix_coo_inner_rowmajor
   end interface
 
   !

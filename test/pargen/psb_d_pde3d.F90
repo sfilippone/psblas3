@@ -569,112 +569,112 @@ contains
     call psb_cdasb(desc_a,info,mold=imold)
     tcdasb = psb_wtime()-t1
 
-    if (.false.) then 
-      !
-      !  Add extra rows to test remote build.
-      !
-      block
-        integer(psb_ipk_) :: ks, i
-        ks = desc_a%get_local_cols()-desc_a%get_local_rows()
-        if (ks > 0) ks = max(1,ks / 10)
-        mysz = nlr+ks
-        call psb_realloc(mysz,myidx,info)
-        do i=nlr+1, mysz
-          myidx(i) = i
-        end do
-        call desc_a%l2gv1(myidx(nlr+1:mysz),info)
-        !write(0,*) iam,' Check on extra nodes ',nlr,mysz,':',myidx(nlr+1:mysz)
-        do ii= nlr+1, mysz, nb
-          ib = min(nb,mysz-ii+1)
-          icoeff = 1
-          do k=1,ib
-            i=ii+k-1
-            ! local matrix pointer
-            glob_row=myidx(i)
-            ! compute gridpoint coordinates
-            call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
-            ! x, y, z coordinates
-            x = (ix-1)*deltah
-            y = (iy-1)*deltah
-            z = (iz-1)*deltah
-            zt(k) = f_(x,y,z)
-            ! internal point: build discretization
-            !
-            !  term depending on   (x-1,y,z)
-            !
-            val(icoeff) = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2
-            if (ix == 1) then
-              zt(k) = g(dzero,y,z)*(-val(icoeff)) + zt(k)
-            else
-              call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
-              irow(icoeff) = glob_row
-              icoeff       = icoeff+1
-            endif
-            !  term depending on     (x,y-1,z)
-            val(icoeff)  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2
-            if (iy == 1) then
-              zt(k) = g(x,dzero,z)*(-val(icoeff))   + zt(k)
-            else
-              call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)
-              irow(icoeff) = glob_row
-              icoeff       = icoeff+1
-            endif
-            !  term depending on     (x,y,z-1)
-            val(icoeff)=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2
-            if (iz == 1) then
-              zt(k) = g(x,y,dzero)*(-val(icoeff))   + zt(k)
-            else
-              call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)
-              irow(icoeff) = glob_row
-              icoeff       = icoeff+1
-            endif
-
-            !  term depending on     (x,y,z)
-            val(icoeff)=(2*done)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
-                 & + c(x,y,z)
-            call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)
+    !
+    !  Add extra rows 
+    !
+    block
+      integer(psb_ipk_) :: ks, i
+      ks = desc_a%get_local_cols()-desc_a%get_local_rows()
+      if (ks > 0) ks = max(1,ks / 10)
+      mysz = nlr+ks
+      call psb_realloc(mysz,myidx,info)
+      do i=nlr+1, mysz
+        myidx(i) = i
+      end do
+      call desc_a%l2gv1(myidx(nlr+1:mysz),info)
+      !write(0,*) iam,' Check on extra nodes ',nlr,mysz,':',myidx(nlr+1:mysz)
+      do ii= nlr+1, mysz, nb
+        ib = min(nb,mysz-ii+1)
+        icoeff = 1
+        do k=1,ib
+          i=ii+k-1
+          ! local matrix pointer
+          glob_row=myidx(i)
+          ! compute gridpoint coordinates
+          call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
+          ! x, y, z coordinates
+          x = (ix-1)*deltah
+          y = (iy-1)*deltah
+          z = (iz-1)*deltah
+          zt(k) = f_(x,y,z)
+          ! internal point: build discretization
+          !
+          !  term depending on   (x-1,y,z)
+          !
+          val(icoeff) = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2
+          if (ix == 1) then
+            zt(k) = g(dzero,y,z)*(-val(icoeff)) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
             irow(icoeff) = glob_row
             icoeff       = icoeff+1
-            !  term depending on     (x,y,z+1)
-            val(icoeff)=-a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2
-            if (iz == idim) then
-              zt(k) = g(x,y,done)*(-val(icoeff))   + zt(k)
-            else
-              call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)
-              irow(icoeff) = glob_row
-              icoeff       = icoeff+1
-            endif
-            !  term depending on     (x,y+1,z)
-            val(icoeff)=-a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2
-            if (iy == idim) then
-              zt(k) = g(x,done,z)*(-val(icoeff))   + zt(k)
-            else
-              call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)
-              irow(icoeff) = glob_row
-              icoeff       = icoeff+1
-            endif
-            !  term depending on     (x+1,y,z)
-            val(icoeff)=-a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2
-            if (ix==idim) then
-              zt(k) = g(done,y,z)*(-val(icoeff))   + zt(k)
-            else
-              call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)
-              irow(icoeff) = glob_row
-              icoeff       = icoeff+1
-            endif
+          endif
+          !  term depending on     (x,y-1,z)
+          val(icoeff)  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2
+          if (iy == 1) then
+            zt(k) = g(x,dzero,z)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          !  term depending on     (x,y,z-1)
+          val(icoeff)=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2
+          if (iz == 1) then
+            zt(k) = g(x,y,dzero)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
 
-          end do
-          call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
-          if(info /= psb_success_) exit
-          call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
-          if(info /= psb_success_) exit
-          zt(:)=dzero
-          call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
-          if(info /= psb_success_) exit
+          !  term depending on     (x,y,z)
+          val(icoeff)=(2*done)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
+               & + c(x,y,z)
+          call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)
+          irow(icoeff) = glob_row
+          icoeff       = icoeff+1
+          !  term depending on     (x,y,z+1)
+          val(icoeff)=-a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2
+          if (iz == idim) then
+            zt(k) = g(x,y,done)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          !  term depending on     (x,y+1,z)
+          val(icoeff)=-a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2
+          if (iy == idim) then
+            zt(k) = g(x,done,z)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          !  term depending on     (x+1,y,z)
+          val(icoeff)=-a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2
+          if (ix==idim) then
+            zt(k) = g(done,y,z)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+
         end do
+        call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
+        if(info /= psb_success_) exit
+        call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
+        if(info /= psb_success_) exit
+        zt(:)=dzero
+        call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
+        if(info /= psb_success_) exit
+      end do
 
-      end block
-    end if
+    end block
+
+
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()

@@ -131,7 +131,7 @@ Contains
 
     ! ...Local Variables
     integer(psb_i2pk_),allocatable  :: tmp(:)
-    integer(psb_mpk_) :: dim, lb_, lbi,ub_
+    integer(psb_mpk_) :: dim, lb_, lbi,ub_, i
     integer(psb_ipk_) :: err_act,err
     character(len=30)  :: name
     logical, parameter :: debug=.false.
@@ -179,7 +179,10 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(lb_-1+dim+1:lb_-1+len) = pad
+      !$omp parallel do private(i) shared(dim,len)
+      do i=lb_-1+dim+1,lb_-1+len
+        rrax(i) = pad
+      end do
     endif
     call psb_erractionrestore(err_act)
     return
@@ -204,7 +207,7 @@ Contains
 
     integer(psb_i2pk_),allocatable  :: tmp(:,:)
     integer(psb_ipk_) :: err_act,err
-    integer(psb_mpk_) :: dim,dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
+    integer(psb_mpk_) :: dim,dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2, i
     character(len=30)  :: name
 
     name='psb_r_m_i2_rk2'
@@ -267,8 +270,14 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
-      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
+      !$omp parallel do private(i) shared(lb1_,dim,len1)
+      do i=lb1_-1+dim+1,lb1_-1+len1
+        rrax(i,:) = pad
+      end do
+      !$omp parallel do private(i) shared(lb1_,dim,len1,lb2_,dim2,len2)
+      do i=lb1_,lb1_-1+len1
+        rrax(i,lb2_-1+dim2+1:lb2_-1+len2) = pad
+      end do
     endif
     call psb_erractionrestore(err_act)
     return
@@ -982,48 +991,7 @@ Contains
       goto 9999
     end if
 
-!!$    If (len > psb_size(v)) Then
-!!$      if (present(newsz)) then 
-!!$        isz = (max(len+1,newsz))
-!!$      else
-!!$        if (present(addsz)) then 
-!!$          isz = len+max(1,addsz)
-!!$        else
-!!$          isz = max(len+10, int(1.25*len))
-!!$        endif
-!!$      endif
-!!$
-!!$      call psb_realloc(isz,v,info,pad=pad)
-!!$      if (info /= psb_success_) then
-!!$        info=psb_err_from_subroutine_
-!!$        call psb_errpush(info,name,a_err='psb_realloc')
-!!$        goto 9999
-!!$      End If
-!!$    end If
     If (len > psb_size(v)) Then
-#if defined(OPENMP)
-      !$OMP CRITICAL
-      if (len > psb_size(v)) then
-        if (present(newsz)) then
-          isz = (max(len+1,newsz))
-        else
-          if (present(addsz)) then
-            isz = len+max(1,addsz)
-          else
-            isz = max(len+10, int(1.25*len))
-          endif
-        endif
-
-        call psb_realloc(isz,v,info,pad=pad)
-      end if
-      !$OMP END CRITICAL
-
-      if (info /= psb_success_) then
-        info=psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='psb_realloc')
-	goto 9999
-      end if
-#else
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
       else
@@ -1040,7 +1008,6 @@ Contains
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       End If
-#endif
     end If
 
     call psb_erractionrestore(err_act)

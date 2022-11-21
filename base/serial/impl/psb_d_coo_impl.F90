@@ -728,7 +728,7 @@ subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
   character(len=80)            :: frmt
   integer(psb_ipk_) :: i,j, ni, nr, nc, nz
 
-    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
   if (present(head)) write(iout,'(a,a)') '% ',head
   write(iout,'(a)') '%'
   write(iout,'(a,a)') '% COO'
@@ -3172,9 +3172,9 @@ subroutine psb_d_cp_coo_from_coo(a,b,info)
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
     do i=1, nz
-      a%ia(i)  = b%ia(i) 
-      a%ja(i)  = b%ja(i) 
-      a%val(i) = b%val(i)
+       a%ia(i)  = b%ia(i) 
+       a%ja(i)  = b%ja(i) 
+       a%val(i) = b%val(i)
     end do
   end block
 #else
@@ -5268,13 +5268,13 @@ function psb_ld_coo_maxval(a) result(res)
   implicit none
   class(psb_ld_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
-  
+
   integer(psb_lpk_)  :: i,j,k,m,n, nnz, ir, jc, nc, info
   character(len=20)  :: name='d_coo_maxval'
   logical, parameter :: debug=.false.
-  
+
   if (a%is_dev())   call a%sync()
-  
+
   if (a%is_unit()) then
     res = done
   else
@@ -5284,18 +5284,18 @@ function psb_ld_coo_maxval(a) result(res)
   if (allocated(a%val)) then
     nnz = min(nnz,size(a%val))
 #if defined(OPENMP)
-    block
-      integer(psb_ipk_) :: i
-      !$omp parallel do private(i) reduction(max: res)
-      do i=1, nnz
-        res = max(res,abs(a%val(i)))
-      end do
-    end block
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nnz
+      res = max(res,abs(a%val(i)))
+    end do
+  end block
 #else
     res = maxval(abs(a%val(1:nnz)))
 #endif
   end if
-  
+
 end function psb_ld_coo_maxval
 
 function psb_ld_coo_csnmi(a) result(res)
@@ -5351,13 +5351,13 @@ function psb_ld_coo_csnmi(a) result(res)
       vt(i) = vt(i) + abs(a%val(j))
     end do
 #if defined(OPENMP)
-    block
-      integer(psb_ipk_) :: i
-      !$omp parallel do private(i) reduction(max: res)
-      do i=1, m
-        res = max(res,abs(vt(i)))
-      end do
-    end block
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, m
+      res = max(res,abs(vt(i)))
+    end do
+  end block 
 #else
     res = maxval(vt(1:m))
 #endif
@@ -5403,11 +5403,11 @@ function psb_ld_coo_csnm1(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i) reduction(max: res)
+    !$omp parallel do private(i)
     do i=1, n
       res = max(res,abs(vt(i)))
     end do
-  end block
+  end block 
 #else
   res = maxval(vt(1:n))
 #endif
@@ -6856,7 +6856,7 @@ subroutine psb_ld_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz < 0) then
     info = psb_err_iarg_neg_
-3   call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
+3    call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
     goto 9999
   end if
   if (size(ia) < nz) then
