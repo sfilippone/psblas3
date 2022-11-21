@@ -1208,7 +1208,7 @@ contains
       if (beta == cone) then
         return
       else
-        !$omp parallel do private(i)    shared(beta)
+        !$omp parallel do private(i)     shared(beta)
         do i=1, n
           z%v(i) = beta*z%v(i)
         end do
@@ -1226,7 +1226,7 @@ contains
             z%v(i) = z%v(i) + y(i)*x(i)
           end do
         else
-          !$omp parallel do private(i)
+          !$omp parallel do private(i)     shared(beta)
           do i=1, n
             z%v(i) = beta*z%v(i) + y(i)*x(i)
           end do
@@ -1243,24 +1243,24 @@ contains
             z%v(i) = z%v(i) - y(i)*x(i)
           end do
         else
-          !$omp parallel do private(i)  shared(beta)
+          !$omp parallel do private(i)    shared(beta)
           do i=1, n
             z%v(i) = beta*z%v(i) - y(i)*x(i)
           end do
         end if
       else
         if (beta == czero) then
-          !$omp parallel do private(i)   shared(alpha)
+          !$omp parallel do private(i)    shared(alpha)
           do i=1, n
             z%v(i) = alpha*y(i)*x(i)
           end do
         else if (beta == cone) then
-          !$omp parallel do private(i) shared(alpha)
+          !$omp parallel do private(i)
           do i=1, n
-            z%v(i) = z%v(i) + alpha*y(i)*x(i)
+            z%v(i) = z%v(i) + alpha*y(i)*x(i)  shared(alpha)
           end do
         else
-          !$omp parallel do private(i) shared(alpha, beta)
+          !$omp parallel do private(i)  shared(alpha, beta)
           do i=1, n
             z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
           end do
