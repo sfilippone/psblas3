@@ -2754,8 +2754,8 @@ subroutine  psb_s_csr_trim(a)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  m   = a%get_nrows()
-  nz  = a%get_nzeros()
+  m   = max(1_psb_ipk_,a%get_nrows())
+  nz  = max(1_psb_ipk_,a%get_nzeros())
   if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
 
   if (info == psb_success_) call psb_realloc(nz,a%ja,info)
@@ -5029,8 +5029,8 @@ subroutine  psb_ls_csr_trim(a)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  m   = a%get_nrows()
-  nz  = a%get_nzeros()
+  m   = max(1_psb_lpk_,a%get_nrows())
+  nz  = max(1_psb_lpk_,a%get_nzeros())
   if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
 
   if (info == psb_success_) call psb_realloc(nz,a%ja,info)
