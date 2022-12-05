@@ -2722,7 +2722,6 @@ subroutine psb_d_csr_reinit(a,clear)
 
   if (a%is_bld() .or. a%is_upd()) then
     ! do nothing
-    return
   else if (a%is_asb()) then
     if (clear_) a%val(:) = dzero
     call a%set_upd()
