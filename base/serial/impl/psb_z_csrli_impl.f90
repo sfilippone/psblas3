@@ -1307,7 +1307,7 @@ function psb_z_csrli_maxval(a) result(res)
   class(psb_z_csrli_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
-  integer(psb_ipk_) :: nnz, nc
+  integer(psb_ipk_) :: nnz, nc, i,j,nr
   integer(psb_ipk_) :: info
   character(len=20)  :: name='z_csrli_maxval'
   logical, parameter :: debug=.false.
@@ -1316,9 +1316,17 @@ function psb_z_csrli_maxval(a) result(res)
 
   res = dzero
   nnz = a%get_nzeros()
+  nr  = a%get_nrows()
   if (allocated(a%val)) then
-    nnz = min(nnz,size(a%val))
-    res = maxval(abs(a%val(1:nnz)))
+    do i=1, nr
+      do j=a%irp(i), a%irp(i+1)-1
+        if (a%ja(j) == i) then
+          res = max(abs(a%val(j)+a%lambda),res)
+        else
+          res = max(abs(a%val(j)),res)
+        endif
+      end do
+    end do
   end if
 end function psb_z_csrli_maxval
 
@@ -1343,7 +1351,11 @@ function psb_z_csrli_csnmi(a) result(res)
   do i = 1, a%get_nrows()
     acc = dzero
     do j=a%irp(i),a%irp(i+1)-1
-      acc = acc + abs(a%val(j))
+      if (a%ja(j) == i) then
+        acc = acc + abs(a%val(j)+a%lambda)
+      else
+        acc = acc + abs(a%val(j))
+      end if
     end do
     res = max(res,acc)
   end do
@@ -1375,7 +1387,7 @@ subroutine psb_z_csrli_rowsum(d,a)
   end if
 
   do i = 1, a%get_nrows()
-    d(i) = zzero
+    d(i) = a%lambda
     do j=a%irp(i),a%irp(i+1)-1
       d(i) = d(i) + (a%val(j))
     end do
@@ -1426,7 +1438,11 @@ subroutine psb_z_csrli_arwsum(d,a)
   do i = 1, a%get_nrows()
     d(i) = dzero
     do j=a%irp(i),a%irp(i+1)-1
-      d(i) = d(i) + abs(a%val(j))
+      if (a%ja(j) == i) then
+        d(i) = d(i) + abs(a%val(j)+a%lambda)
+      else
+        d(i) = d(i) + abs(a%val(j))
+      end if
     end do
   end do
 
@@ -1470,8 +1486,8 @@ subroutine psb_z_csrli_colsum(d,a)
     goto 9999
   end if
 
-  d   = zzero
 
+  d   = a%lambda
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
@@ -1525,7 +1541,11 @@ subroutine psb_z_csrli_aclsum(d,a)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      d(k) = d(k) + abs(a%val(j))
+      if (k == i) then
+        d(k) = d(k) + abs(a%val(j)+a%lambda)
+      else
+        d(k) = d(k) + abs(a%val(j))
+      end if
     end do
   end do
 
@@ -1580,11 +1600,11 @@ subroutine psb_z_csrli_get_diag(a,d,info)
   else
     !$omp parallel do private(i,j,k)
     do i=1, mnm
-      d(i) = zzero
+      d(i) = a%lambda
       do k=a%irp(i),a%irp(i+1)-1
         j=a%ja(k)
         if ((j == i) .and.(j <= mnm )) then
-          d(i) = a%val(k)
+          d(i) = a%val(k) + a%lambda
         endif
       enddo
     end do
@@ -1620,6 +1640,10 @@ subroutine psb_z_csrli_scal(d,a,info,side)
   character :: side_
   logical   :: left
   logical, parameter :: debug=.false.
+  integer(psb_ipk_) :: debug_level, debug_unit
+
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   info  = psb_success_
   call psb_erractionsave(err_act)
@@ -1629,46 +1653,51 @@ subroutine psb_z_csrli_scal(d,a,info,side)
     call a%make_nonunit()
   end if
 
-  side_ = 'L'
-  if (present(side)) then
-    side_ = psb_toupper(side)
-  end if
-
-  left = (side_ == 'L')
-
-  if (left) then
-    m = a%get_nrows()
-    if (size(d) < m) then
-      info=psb_err_input_asize_invalid_i_
-      ierr(1) = 2; ierr(2) = size(d);
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
-    end if
-
-    !$omp parallel do private(i,j)
-    do i=1, m
-      do j = a%irp(i), a%irp(i+1) -1
-        a%val(j) = a%val(j) * d(i)
-      end do
-    enddo
-  else
-    m = a%get_ncols()
-    if (size(d) < m) then
-      info=psb_err_input_asize_invalid_i_
-      ierr(1) = 2; ierr(2) = size(d);
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
-    end if
-
-    !$omp parallel do private(i,j)
-    do i=1,a%get_nzeros()
-      j        = a%ja(i)
-      a%val(i) = a%val(i) * d(j)
-    enddo
-  end if
-
-  call a%set_host()
-
+  write(debug_unit,*) ' There is no way to scale A+lambda I and keep lambda'
+  info = psb_err_internal_error_
+  call psb_errpush(info,name)
+  goto 9999 
+  
+!!$  side_ = 'L'
+!!$  if (present(side)) then
+!!$    side_ = psb_toupper(side)
+!!$  end if
+!!$
+!!$  left = (side_ == 'L')
+!!$
+!!$  if (left) then
+!!$    m = a%get_nrows()
+!!$    if (size(d) < m) then
+!!$      info=psb_err_input_asize_invalid_i_
+!!$      ierr(1) = 2; ierr(2) = size(d);
+!!$      call psb_errpush(info,name,i_err=ierr)
+!!$      goto 9999
+!!$    end if
+!!$
+!!$    !$omp parallel do private(i,j)
+!!$    do i=1, m
+!!$      do j = a%irp(i), a%irp(i+1) -1
+!!$        a%val(j) = a%val(j) * d(i)
+!!$      end do
+!!$    enddo
+!!$  else
+!!$    m = a%get_ncols()
+!!$    if (size(d) < m) then
+!!$      info=psb_err_input_asize_invalid_i_
+!!$      ierr(1) = 2; ierr(2) = size(d);
+!!$      call psb_errpush(info,name,i_err=ierr)
+!!$      goto 9999
+!!$    end if
+!!$
+!!$    !$omp parallel do private(i,j)
+!!$    do i=1,a%get_nzeros()
+!!$      j        = a%ja(i)
+!!$      a%val(i) = a%val(i) * d(j)
+!!$    enddo
+!!$  end if
+!!$
+!!$  call a%set_host()
+!!$
   call psb_erractionrestore(err_act)
   return
 
@@ -1703,6 +1732,7 @@ subroutine psb_z_csrli_scals(d,a,info)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo
+  a%lambda = a%lambda * d 
   call a%set_host()
 
   call psb_erractionrestore(err_act)
@@ -1712,8 +1742,6 @@ subroutine psb_z_csrli_scals(d,a,info)
   return
 
 end subroutine psb_z_csrli_scals
-
-
 
 
 ! == ===================================
@@ -1727,37 +1755,6 @@ end subroutine psb_z_csrli_scals
 !
 !
 ! == ===================================
-
-
-subroutine  psb_z_csrli_reallocate_nz(nz,a)
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_z_csrli_mat_mod, psb_protect_name => psb_z_csrli_reallocate_nz
-  implicit none
-  integer(psb_ipk_), intent(in) :: nz
-  class(psb_z_csrli_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act, info
-  character(len=20)  :: name='z_csrli_reallocate_nz'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-
-  call psb_realloc(max(nz,ione),a%ja,info)
-  if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
-  if (info == psb_success_) call psb_realloc(a%get_nrows()+1,a%irp,info)
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_alloc_dealloc_,name)
-    goto 9999
-  end if
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_z_csrli_reallocate_nz
 
 subroutine psb_z_csrli_mold(a,b,info)
   use psb_z_csrli_mat_mod, psb_protect_name => psb_z_csrli_mold
@@ -1790,69 +1787,6 @@ subroutine psb_z_csrli_mold(a,b,info)
   return
 
 end subroutine psb_z_csrli_mold
-
-subroutine  psb_z_csrli_allocate_mnnz(m,n,a,nz)
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_z_csrli_mat_mod, psb_protect_name => psb_z_csrli_allocate_mnnz
-  implicit none
-  integer(psb_ipk_), intent(in) :: m,n
-  class(psb_z_csrli_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_), intent(in), optional :: nz
-  integer(psb_ipk_) :: err_act, info, nz_
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='allocate_mnz'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  info = psb_success_
-  if (m < 0) then
-    info = psb_err_iarg_neg_
-    ierr(1) = ione; ierr(2) = izero;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  endif
-  if (n < 0) then
-    info = psb_err_iarg_neg_
-    ierr(1) = 2; ierr(2) = izero;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  endif
-  if (present(nz)) then
-    nz_ = max(nz,ione)
-  else
-    nz_ = max(7*m,7*n,ione)
-  end if
-  if (nz_ < 0) then
-    info = psb_err_iarg_neg_
-    ierr(1) = 3; ierr(2) = izero;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  endif
-
-  if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
-  if (info == psb_success_) call psb_realloc(nz_,a%ja,info)
-  if (info == psb_success_) call psb_realloc(nz_,a%val,info)
-  if (info == psb_success_) then
-    a%irp=0
-    call a%set_nrows(m)
-    call a%set_ncols(n)
-    call a%set_bld()
-    call a%set_triangle(.false.)
-    call a%set_unit(.false.)
-    call a%set_dupl(psb_dupl_def_)
-    call a%set_host()
-  end if
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_z_csrli_allocate_mnnz
-
 
 subroutine psb_z_csrli_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
@@ -2016,7 +1950,11 @@ contains
           if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then
             nzin_ = nzin_ + 1
             nz    = nz + 1
-            val(nzin_) = a%val(j)
+            if (a%ja(j) == i) then
+              val(nzin_) = a%val(j) + a%lambda
+            else
+              val(nzin_) = a%val(j)
+            end if
             ia(nzin_)  = iren(i)
             ja(nzin_)  = iren(a%ja(j))
           end if
@@ -2028,7 +1966,11 @@ contains
           if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then
             nzin_ = nzin_ + 1
             nz    = nz + 1
-            val(nzin_) = a%val(j)
+            if (a%ja(j) == i) then
+              val(nzin_) = a%val(j) + a%lambda
+            else
+              val(nzin_) = a%val(j)
+            end if
             ia(nzin_)  = (i)
             ja(nzin_)  = (a%ja(j))
           end if
@@ -2132,12 +2074,20 @@ subroutine psb_z_csrli_tril(a,l,info,&
               nzlin = nzlin + 1
               l%ia(nzlin)  = i
               l%ja(nzlin)  = ja(k)
-              l%val(nzlin) = val(k)
-            else
+              if (ja(k) == i) then
+                l%val(nzlin) = val(k) + a%lambda
+              else
+                l%val(nzlin) = val(k)
+              end if
+            else                
               nzuin = nzuin + 1
               u%ia(nzuin)  = i
               u%ja(nzuin)  = ja(k)
-              u%val(nzuin) = val(k)
+              if (ja(k) == i) then
+                u%val(nzuin) = val(k) + a%lambda
+              else
+                u%val(nzuin) = val(k)
+              end if
             end if
           end if
         end do
@@ -2166,7 +2116,11 @@ subroutine psb_z_csrli_tril(a,l,info,&
               nzin = nzin + 1
               l%ia(nzin)  = i
               l%ja(nzin)  = ja(k)
-              l%val(nzin) = val(k)
+              if (ja(k) == i) then
+                l%val(nzlin) = val(k) + a%lambda
+              else
+                l%val(nzin) = val(k)
+              end if
             end if
           end if
         end do
@@ -2285,12 +2239,20 @@ subroutine psb_z_csrli_triu(a,u,info,&
               nzlin = nzlin + 1
               l%ia(nzlin)  = i
               l%ja(nzlin)  = ja(k)
-              l%val(nzlin) = val(k)
+              if (ja(k) == i) then
+                l%val(nzlin) = val(k) + a%lambda
+              else
+                l%val(nzlin) = val(k)
+              end if
             else
               nzuin = nzuin + 1
               u%ia(nzuin)  = i
               u%ja(nzuin)  = ja(k)
-              u%val(nzuin) = val(k)
+              if (ja(k) == i) then
+                u%val(nzuin) = val(k) + a%lambda
+              else
+                u%val(nzuin) = val(k)
+              end if
             end if
           end if
         end do
@@ -2318,7 +2280,11 @@ subroutine psb_z_csrli_triu(a,u,info,&
               nzin = nzin + 1
               u%ia(nzin)  = i
               u%ja(nzin)  = ja(k)
-              u%val(nzin) = val(k)
+              if (ja(k) == i) then
+                u%val(nzuin) = val(k) + a%lambda
+              else
+                u%val(nzin) = val(k)
+              end if
             end if
           end if
         end do
@@ -2433,32 +2399,52 @@ subroutine psb_z_csrli_print(iout,a,iv,head,ivr,ivc)
   if(present(iv)) then
     do i=1, nr
       do j=a%irp(i),a%irp(i+1)-1
-        write(iout,frmt) iv(i),iv(a%ja(j)),a%val(j)
+          if (a%ja(j) == i) then
+            write(iout,frmt) iv(i),(a%ja(j)),a%val(j)+a%lambda
+          else
+            write(iout,frmt) iv(i),iv(a%ja(j)),a%val(j)
+          end if
       end do
     enddo
   else
     if (present(ivr).and..not.present(ivc)) then
       do i=1, nr
         do j=a%irp(i),a%irp(i+1)-1
-          write(iout,frmt) ivr(i),(a%ja(j)),a%val(j)
+          if (a%ja(j) == i) then
+            write(iout,frmt) ivr(i),(a%ja(j)),a%val(j)+a%lambda
+          else
+            write(iout,frmt) ivr(i),(a%ja(j)),a%val(j)
+          end if
         end do
       enddo
     else if (present(ivr).and.present(ivc)) then
       do i=1, nr
         do j=a%irp(i),a%irp(i+1)-1
-          write(iout,frmt) ivr(i),ivc(a%ja(j)),a%val(j)
+          if (a%ja(j) == i) then
+            write(iout,frmt) ivr(i),ivc(a%ja(j)),a%val(j)+a%lambda
+          else
+            write(iout,frmt) ivr(i),ivc(a%ja(j)),a%val(j)
+          end if
         end do
       enddo
     else if (.not.present(ivr).and.present(ivc)) then
       do i=1, nr
         do j=a%irp(i),a%irp(i+1)-1
-          write(iout,frmt) (i),ivc(a%ja(j)),a%val(j)
+          if (a%ja(j) == i) then
+            write(iout,frmt) (i),ivc(a%ja(j)),a%val(j)+a%lambda
+          else
+            write(iout,frmt) (i),ivc(a%ja(j)),a%val(j)
+          end if
         end do
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then
       do i=1, nr
         do j=a%irp(i),a%irp(i+1)-1
-          write(iout,frmt) (i),(a%ja(j)),a%val(j)
+          if (a%ja(j) == i) then
+            write(iout,frmt) (i),(a%ja(j)),a%val(j)+a%lambda
+          else
+            write(iout,frmt) (i),(a%ja(j)),a%val(j)
+          end if
         end do
       enddo
     endif
@@ -2488,142 +2474,13 @@ subroutine psb_z_cp_csrli_from_coo(a,b,info)
   character(len=20)   :: name='z_cp_csrli_from_coo'
   logical :: use_openmp = .false.
 
-  !$ integer(psb_ipk_), allocatable :: sum(:)
-  !$ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
-  !$ integer(psb_ipk_) :: nxt_val,old_val,saved_elem,maxthreads 
-  !$ use_openmp = .true.
-
-
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  if (.not.b%is_by_rows()) then
-    ! This is to have fix_coo called behind the scenes
-    call tmp%cp_from_coo(b,info)
-    if (info /= psb_success_) return
-
-    nr  = tmp%get_nrows()
-    nc  = tmp%get_ncols()
-    nza = tmp%get_nzeros()
-
-    a%psb_z_base_sparse_mat = tmp%psb_z_base_sparse_mat
-
-    ! Dirty trick: call move_alloc to have the new data allocated just once.
-    call move_alloc(tmp%ia,itemp)
-    call move_alloc(tmp%ja,a%ja)
-    call move_alloc(tmp%val,a%val)
-    call psb_realloc(max(nr+1,nc+1),a%irp,info)
-    call tmp%free()
-
-  else
-
-    if (info /= psb_success_) return
-    if (b%is_dev())   call b%sync()
-
-    nr  = b%get_nrows()
-    nc  = b%get_ncols()
-    nza = b%get_nzeros()
-
-    a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
-
-    ! Dirty trick: call move_alloc to have the new data allocated just once.
-    call psb_safe_ab_cpy(b%ia,itemp,info)
-    if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
-    if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
-    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
-    
-  endif
-
-  a%irp(:) = 0
-  
-!!$  if (use_openmp) then
-!!$    !$ maxthreads = omp_get_max_threads()
-!!$    !$ allocate(sum(maxthreads+1))
-!!$    !$ sum(:) = 0
-!!$    !$ sum(1) = 1
-!!$
-!!$    !$OMP PARALLEL default(none) &
-!!$    !$OMP shared(nza,itemp,a,nthreads,sum,nr) &
-!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
-!!$
-!!$    !$OMP DO schedule(STATIC) &
-!!$    !$OMP private(k,i)
-!!$    do k=1,nza
-!!$      i = itemp(k)
-!!$      a%irp(i) = a%irp(i) + 1
-!!$    end do
-!!$    !$OMP END DO
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ nthreads = omp_get_num_threads()
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ ithread = omp_get_thread_num()
-!!$
-!!$    !$ work = nr/nthreads
-!!$    !$ if (ithread < MOD(nr,nthreads)) then
-!!$      !$ work = work + 1
-!!$      !$ first_idx = ithread*work + 1
-!!$    !$ else
-!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
-!!$    !$ end if
-!!$
-!!$    !$ last_idx = first_idx + work - 1
-!!$
-!!$    !$ s = 0
-!!$    !$ do i=first_idx,last_idx
-!!$      !$ s = s + a%irp(i)
-!!$    !$ end do
-!!$    !$ if (work > 0) then
-!!$      !$ sum(ithread+2) = s
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ do i=2,nthreads+1
-!!$      !$ sum(i) = sum(i) + sum(i-1)
-!!$    !$ end do
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ saved_elem = a%irp(first_idx)
-!!$    !$ end if
-!!$    !$ if (ithread == 0) then
-!!$      !$ a%irp(1) = 1
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ old_val = a%irp(first_idx+1)
-!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
-!!$    !$ end if
-!!$
-!!$    !$ do i=first_idx+2,last_idx+1
-!!$      !$ nxt_val = a%irp(i)
-!!$      !$ a%irp(i) = a%irp(i-1) + old_val
-!!$      !$ old_val = nxt_val
-!!$    !$ end do
-!!$
-!!$    !$OMP END PARALLEL
-!!$  else
-
-    do k=1,nza
-      i = itemp(k)
-      a%irp(i) = a%irp(i) + 1
-    end do
-    ip = 1
-    do i=1,nr
-      ncl = a%irp(i)
-      a%irp(i) = ip
-      ip = ip + ncl
-    end do
-    a%irp(nr+1) = ip
-!!$  end if
+  call a%psb_z_csr_sparse_mat%cp_from_coo(b,info)
+  call a%set_lambda(zzero)
   call a%set_host()
-
 
 end subroutine psb_z_cp_csrli_from_coo
 
@@ -2661,7 +2518,11 @@ subroutine psb_z_cp_csrli_to_coo(a,b,info)
     do j=a%irp(i),a%irp(i+1)-1
       b%ia(j)  = i
       b%ja(j)  = a%ja(j)
-      b%val(j) = a%val(j)
+      if (a%ja(j) == i) then
+        b%val(j) = a%val(j)+a%lambda
+      else
+        b%val(j) = a%val(j)
+      end if
     end do
   end do
   call b%set_nzeros(a%get_nzeros())
@@ -2707,6 +2568,9 @@ subroutine psb_z_mv_csrli_to_coo(a,b,info)
   do i=1, nr
     do j=a%irp(i),a%irp(i+1)-1
       b%ia(j)  = i
+      if (b%ja(j) == i) then
+        b%val(j) = b%val(j) + a%lambda
+      end if
     end do
   end do
   call a%free()
@@ -2739,291 +2603,15 @@ subroutine psb_z_mv_csrli_from_coo(a,b,info)
   character(len=20)   :: name='mv_from_coo'
   logical :: use_openmp = .false.
 
-  ! $ integer(psb_ipk_), allocatable :: sum(:)
-  ! $ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
-  ! $ integer(psb_ipk_) :: nxt_val,old_val,saved_elem
-  ! $ use_openmp = .true. 
-
-
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-
-  if (b%is_dev())   call b%sync()
-
-  if (.not.b%is_by_rows()) call b%fix(info)
-  if (info /= psb_success_) return
-
-  nr  = b%get_nrows()
-  nc  = b%get_ncols()
-  nza = b%get_nzeros()
-
-  a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
-
-  ! Dirty trick: call move_alloc to have the new data allocated just once.
-  call move_alloc(b%ia,itemp)
-  call move_alloc(b%ja,a%ja)
-  call move_alloc(b%val,a%val)
-  call psb_realloc(max(nr+1,nc+1),a%irp,info)
-  call b%free()
-
-
-  a%irp(:) = 0
-
-!!$  if (use_openmp) then
-!!$    !$OMP PARALLEL default(none) &
-!!$    !$OMP shared(sum,nthreads,nr,a,itemp,nza) &
-!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
-!!$
-!!$    !$OMP DO schedule(STATIC) &
-!!$    !$OMP private(k,i)
-!!$    do k=1,nza
-!!$      i = itemp(k)
-!!$      a%irp(i) = a%irp(i) + 1
-!!$    end do
-!!$    !$OMP END DO
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ nthreads = omp_get_num_threads()
-!!$    !$ allocate(sum(nthreads+1))
-!!$    !$ sum(:) = 0
-!!$    !$ sum(1) = 1
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ ithread = omp_get_thread_num()
-!!$
-!!$    !$ work = nr/nthreads
-!!$    !$ if (ithread < MOD(nr,nthreads)) then
-!!$      !$ work = work + 1
-!!$      !$ first_idx = ithread*work + 1
-!!$    !$ else
-!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
-!!$    !$ end if
-!!$
-!!$    !$ last_idx = first_idx + work - 1
-!!$
-!!$    !$ s = 0
-!!$    !$ do i=first_idx,last_idx
-!!$      !$ s = s + a%irp(i)
-!!$    !$ end do
-!!$    !$ if (work > 0) then
-!!$      !$ sum(ithread+2) = s
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ do i=2,nthreads+1
-!!$      !$ sum(i) = sum(i) + sum(i-1)
-!!$    !$ end do
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ if (work > 0) then 
-!!$      !$ saved_elem = a%irp(first_idx)
-!!$    !$ end if
-!!$    !$ if (ithread == 0) then
-!!$      !$ a%irp(1) = 1
-!!$    !$ end if
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ old_val = a%irp(first_idx+1)
-!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
-!!$    !$ end if
-!!$
-!!$    !$ do i=first_idx+2,last_idx+1
-!!$      !$ nxt_val = a%irp(i)
-!!$      !$ a%irp(i) = a%irp(i-1) + old_val
-!!$      !$ old_val = nxt_val
-!!$    !$ end do
-!!$
-!!$    !$OMP END PARALLEL
-!!$  else
-    do k=1,nza
-      i = itemp(k)
-      a%irp(i) = a%irp(i) + 1
-    end do
-    ip = 1
-    do i=1,nr
-      ncl = a%irp(i)
-      a%irp(i) = ip
-      ip = ip + ncl
-    end do
-    a%irp(nr+1) = ip
-!!$  end if
-  
+  call a%psb_z_csr_sparse_mat%mv_from_coo(b,info)
+  call a%set_lambda(zzero)
   call a%set_host()
 
 end subroutine psb_z_mv_csrli_from_coo
 
-
-subroutine psb_z_mv_csrli_to_fmt(a,b,info)
-  use psb_const_mod
-  use psb_z_base_mat_mod
-  use psb_z_csrli_mat_mod, psb_protect_name => psb_z_mv_csrli_to_fmt
-  implicit none
-
-  class(psb_z_csrli_sparse_mat), intent(inout) :: a
-  class(psb_z_base_sparse_mat), intent(inout)  :: b
-  integer(psb_ipk_), intent(out)                        :: info
-
-  !locals
-  type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
-  integer(psb_ipk_), Parameter  :: maxtry=8
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
-
-  info = psb_success_
-
-  select type (b)
-  type is (psb_z_coo_sparse_mat)
-    call a%mv_to_coo(b,info)
-    ! Need to fix trivial copies!
-  type is (psb_z_csrli_sparse_mat)
-    if (a%is_dev())   call a%sync()
-    b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
-    call move_alloc(a%irp, b%irp)
-    call move_alloc(a%ja,  b%ja)
-    call move_alloc(a%val, b%val)
-    call a%free()
-    call b%set_host()
-
-  class default
-    call a%mv_to_coo(tmp,info)
-    if (info == psb_success_) call b%mv_from_coo(tmp,info)
-  end select
-
-end subroutine psb_z_mv_csrli_to_fmt
-
-
-subroutine psb_z_cp_csrli_to_fmt(a,b,info)
-  use psb_const_mod
-  use psb_z_base_mat_mod
-  use psb_realloc_mod
-  use psb_z_csrli_mat_mod, psb_protect_name => psb_z_cp_csrli_to_fmt
-  implicit none
-
-  class(psb_z_csrli_sparse_mat), intent(in)   :: a
-  class(psb_z_base_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(out)                       :: info
-
-  !locals
-  type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
-  integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
-  integer(psb_ipk_), Parameter  :: maxtry=8
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
-
-  info = psb_success_
-
-
-  select type (b)
-  type is (psb_z_coo_sparse_mat)
-    call a%cp_to_coo(b,info)
-
-  type is (psb_z_csrli_sparse_mat)
-    if (a%is_dev())   call a%sync()
-    b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
-    nr = a%get_nrows()
-    nz = a%get_nzeros()
-    if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
-    if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
-    if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
-    call b%set_host()
-
-  class default
-    call a%cp_to_coo(tmp,info)
-    if (info == psb_success_) call b%mv_from_coo(tmp,info)
-  end select
-
-end subroutine psb_z_cp_csrli_to_fmt
-
-
-subroutine psb_z_mv_csrli_from_fmt(a,b,info)
-  use psb_const_mod
-  use psb_z_base_mat_mod
-  use psb_z_csrli_mat_mod, psb_protect_name => psb_z_mv_csrli_from_fmt
-  implicit none
-
-  class(psb_z_csrli_sparse_mat), intent(inout)  :: a
-  class(psb_z_base_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(out)                         :: info
-
-  !locals
-  type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
-  integer(psb_ipk_), Parameter  :: maxtry=8
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
-
-  info = psb_success_
-
-  select type (b)
-  type is (psb_z_coo_sparse_mat)
-    call a%mv_from_coo(b,info)
-
-  type is (psb_z_csrli_sparse_mat)
-    if (b%is_dev())   call b%sync()
-
-    a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
-    call move_alloc(b%irp, a%irp)
-    call move_alloc(b%ja,  a%ja)
-    call move_alloc(b%val, a%val)
-    call b%free()
-    call a%set_host()
-
-  class default
-    call b%mv_to_coo(tmp,info)
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
-  end select
-
-end subroutine psb_z_mv_csrli_from_fmt
-
-
-
-subroutine psb_z_cp_csrli_from_fmt(a,b,info)
-  use psb_const_mod
-  use psb_z_base_mat_mod
-  use psb_realloc_mod
-  use psb_z_csrli_mat_mod, psb_protect_name => psb_z_cp_csrli_from_fmt
-  implicit none
-
-  class(psb_z_csrli_sparse_mat), intent(inout) :: a
-  class(psb_z_base_sparse_mat), intent(in)   :: b
-  integer(psb_ipk_), intent(out)                        :: info
-
-  !locals
-  type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
-  integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
-  integer(psb_ipk_), Parameter  :: maxtry=8
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
-
-  info = psb_success_
-
-  select type (b)
-  type is (psb_z_coo_sparse_mat)
-    call a%cp_from_coo(b,info)
-
-  type is (psb_z_csrli_sparse_mat)
-    if (b%is_dev())   call b%sync()
-    a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
-    nr = b%get_nrows()
-    nz = b%get_nzeros()
-    if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
-    if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
-    if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
-    call a%set_host()
-
-  class default
-    call b%cp_to_coo(tmp,info)
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
-  end select
-end subroutine psb_z_cp_csrli_from_fmt
 
 !!$
 !!$subroutine psb_zcsrlispspmm(a,b,c,info)

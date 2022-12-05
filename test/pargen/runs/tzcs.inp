@@ -1,0 +1,18 @@
+17                     Number of entries below this
+BICGSTAB               Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES FCG CGR
+BJAC                   Preconditioner NONE  DIAG  BJAC 
+CSR                    Storage format for matrix A:  CSR COO 
+020                    Domain size (acutal system is this**3 (pde3d) or **2 (pde2d) )
+3                      Partition: 1 BLOCK  3 3D
+2                      Stopping criterion 1 2 
+0100                   MAXIT
+05                     ITRACE
+002                    IRST    restart for RGMRES  and BiCGSTABL
+ILU                    Block Solver ILU,ILUT,INVK,AINVT,AORTH
+NONE                   If ILU : MILU or NONE othewise ignored
+NONE                   Scaling if ILUT: NONE, MAXVAL otherwise ignored
+0                      Level of fill for forward factorization
+1                      Level of fill for inverse factorization (only INVK)
+1E-1                   Threshold for forward factorization
+1E-1                   Threshold for inverse factorization (Only INVK, AINVT)
+LLK                    What orthogonalization algorithm? (Only AINVT)

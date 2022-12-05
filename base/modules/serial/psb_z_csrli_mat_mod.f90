@@ -68,12 +68,12 @@ module psb_z_csrli_mat_mod
     procedure, pass(a) :: triu          => psb_z_csrli_triu
     procedure, pass(a) :: cp_to_coo   => psb_z_cp_csrli_to_coo
     procedure, pass(a) :: cp_from_coo => psb_z_cp_csrli_from_coo
-    procedure, pass(a) :: cp_to_fmt   => psb_z_cp_csrli_to_fmt
-    procedure, pass(a) :: cp_from_fmt => psb_z_cp_csrli_from_fmt
+    !procedure, pass(a) :: cp_to_fmt   => psb_z_cp_csrli_to_fmt
+    !procedure, pass(a) :: cp_from_fmt => psb_z_cp_csrli_from_fmt
     procedure, pass(a) :: mv_to_coo   => psb_z_mv_csrli_to_coo
     procedure, pass(a) :: mv_from_coo => psb_z_mv_csrli_from_coo
-    procedure, pass(a) :: mv_to_fmt   => psb_z_mv_csrli_to_fmt
-    procedure, pass(a) :: mv_from_fmt => psb_z_mv_csrli_from_fmt
+    !procedure, pass(a) :: mv_to_fmt   => psb_z_mv_csrli_to_fmt
+    !procedure, pass(a) :: mv_from_fmt => psb_z_mv_csrli_from_fmt
     procedure, pass(a) :: get_diag    => psb_z_csrli_get_diag
     procedure, pass(a) :: csgetrow   => psb_z_csrli_csgetrow
     procedure, pass(a) :: reinit      => psb_z_csrli_reinit
@@ -277,27 +277,27 @@ module psb_z_csrli_mat_mod
     end subroutine psb_z_cp_csrli_from_coo
   end interface
 
-  !> \memberof psb_z_csrli_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_cp_to_fmt
-  interface
-    subroutine psb_z_cp_csrli_to_fmt(a,b,info)
-      import
-      class(psb_z_csrli_sparse_mat), intent(in)   :: a
-      class(psb_z_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                       :: info
-    end subroutine psb_z_cp_csrli_to_fmt
-  end interface
-
-  !> \memberof psb_z_csrli_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_fmt
-  interface
-    subroutine psb_z_cp_csrli_from_fmt(a,b,info)
-      import
-      class(psb_z_csrli_sparse_mat), intent(inout) :: a
-      class(psb_z_base_sparse_mat), intent(in)   :: b
-      integer(psb_ipk_), intent(out)                        :: info
-    end subroutine psb_z_cp_csrli_from_fmt
-  end interface
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_cp_to_fmt
+!!$  interface
+!!$    subroutine psb_z_cp_csrli_to_fmt(a,b,info)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(in)   :: a
+!!$      class(psb_z_base_sparse_mat), intent(inout) :: b
+!!$      integer(psb_ipk_), intent(out)                       :: info
+!!$    end subroutine psb_z_cp_csrli_to_fmt
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_fmt
+!!$  interface
+!!$    subroutine psb_z_cp_csrli_from_fmt(a,b,info)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(inout) :: a
+!!$      class(psb_z_base_sparse_mat), intent(in)   :: b
+!!$      integer(psb_ipk_), intent(out)                        :: info
+!!$    end subroutine psb_z_cp_csrli_from_fmt
+!!$  end interface
 
   !> \memberof psb_z_csrli_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_mv_to_coo
@@ -321,27 +321,27 @@ module psb_z_csrli_mat_mod
     end subroutine psb_z_mv_csrli_from_coo
   end interface
 
-  !> \memberof psb_z_csrli_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_mv_to_fmt
-  interface
-    subroutine psb_z_mv_csrli_to_fmt(a,b,info)
-      import
-      class(psb_z_csrli_sparse_mat), intent(inout) :: a
-      class(psb_z_base_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)                        :: info
-    end subroutine psb_z_mv_csrli_to_fmt
-  end interface
-
-  !> \memberof psb_z_csrli_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_mv_from_fmt
-  interface
-    subroutine psb_z_mv_csrli_from_fmt(a,b,info)
-      import
-      class(psb_z_csrli_sparse_mat), intent(inout)  :: a
-      class(psb_z_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_z_mv_csrli_from_fmt
-  end interface
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_mv_to_fmt
+!!$  interface
+!!$    subroutine psb_z_mv_csrli_to_fmt(a,b,info)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(inout) :: a
+!!$      class(psb_z_base_sparse_mat), intent(inout)  :: b
+!!$      integer(psb_ipk_), intent(out)                        :: info
+!!$    end subroutine psb_z_mv_csrli_to_fmt
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_mv_from_fmt
+!!$  interface
+!!$    subroutine psb_z_mv_csrli_from_fmt(a,b,info)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(inout)  :: a
+!!$      class(psb_z_base_sparse_mat), intent(inout) :: b
+!!$      integer(psb_ipk_), intent(out)                         :: info
+!!$    end subroutine psb_z_mv_csrli_from_fmt
+!!$  end interface
 
   !> \memberof psb_z_csrli_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_cp_from
@@ -359,7 +359,7 @@ module psb_z_csrli_mat_mod
     subroutine psb_z_csrli_mv_from(a,b)
       import
       class(psb_z_csrli_sparse_mat), intent(inout)  :: a
-      type(psb_z_csrli_sparse_mat), intent(inout) :: b
+       type(psb_z_csrli_sparse_mat), intent(inout) :: b
     end subroutine psb_z_csrli_mv_from
   end interface
 

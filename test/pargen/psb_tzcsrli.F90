@@ -759,7 +759,7 @@ program psb_tzcsrli
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
   type(psb_zspmat_type) :: za
-  type(psb_z_csrli_sparse_mat) :: azcsrli
+  type(psb_z_csrli_sparse_mat) :: zacsrli
   type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -787,6 +787,7 @@ program psb_tzcsrli
   integer(psb_ipk_) :: info, i
   character(len=20) :: name,ch_err
   character(len=40) :: fname
+  logical :: dump_zcsr=.true.
 
   info=psb_success_
 
@@ -829,6 +830,17 @@ program psb_tzcsrli
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+
+  if (dump_zcsr) then
+    call a%print('areal.mtx')
+    call zacsrli%cp_from_real(a%a,info)
+    call zacsrli%set_lambda((3.d0,2.d0))
+    call za%cp_from(zacsrli)
+
+    call za%print('a_lambda.mtx')
+    
+  end if
+  
   !
   !  prepare the preconditioner.
   !
