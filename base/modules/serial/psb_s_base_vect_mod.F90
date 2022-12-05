@@ -49,7 +49,6 @@ module psb_s_base_vect_mod
   use psb_realloc_mod
   use psb_i_base_vect_mod
   use psb_l_base_vect_mod
-
   !> \namespace  psb_base_mod  \class psb_s_base_vect_type
   !! The psb_s_base_vect_type
   !! defines a middle level  real(psb_spk_) encapsulated dense vector.
@@ -88,6 +87,9 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: asb_e    => s_base_asb_e
     generic, public    :: asb      => asb_m, asb_e
     procedure, pass(x) :: free     => s_base_free
+    !
+    ! Copy from/to real vectors
+    !
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -2166,6 +2168,8 @@ contains
     if (x%is_dev()) call x%sync()
     call z%addconst(x%v,b,info)
   end subroutine s_base_addconst_v2
+
+  
 end module psb_s_base_vect_mod
 
 

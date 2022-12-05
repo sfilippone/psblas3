@@ -148,6 +148,8 @@ module psb_d_vect_mod
     procedure, pass(x) :: minquotient_a2 => d_vect_minquotient_a2
     generic, public    :: minquotient    => minquotient_v, minquotient_a2
 
+
+
   end type psb_d_vect_type
 
   public  :: psb_d_vect
@@ -387,6 +389,7 @@ contains
     if (allocated(x%v)) call x%v%set(val,first,last)
 
   end subroutine d_vect_set_vect
+
 
 
   function constructor(x) result(this)

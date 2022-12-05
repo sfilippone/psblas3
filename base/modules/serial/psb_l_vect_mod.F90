@@ -94,6 +94,8 @@ module psb_l_vect_mod
 
 
 
+
+
   end type psb_l_vect_type
 
   public  :: psb_l_vect
@@ -328,6 +330,7 @@ contains
     if (allocated(x%v)) call x%v%set(val,first,last)
 
   end subroutine l_vect_set_vect
+
 
 
   function constructor(x) result(this)

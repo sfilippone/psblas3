@@ -47,9 +47,9 @@ module psb_z_base_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
+  use psb_d_base_vect_mod
   use psb_i_base_vect_mod
   use psb_l_base_vect_mod
-
   !> \namespace  psb_base_mod  \class psb_z_base_vect_type
   !! The psb_z_base_vect_type
   !! defines a middle level  complex(psb_dpk_) encapsulated dense vector.
@@ -88,6 +88,11 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: asb_e    => z_base_asb_e
     generic, public    :: asb      => asb_m, asb_e
     procedure, pass(x) :: free     => z_base_free
+    !
+    ! Copy from/to real vectors
+    !
+    procedure, pass(y) :: copy_to_real    => z_copy_to_real
+    procedure, pass(y) :: copy_from_real  => z_copy_from_real
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -1987,6 +1992,57 @@ contains
     if (x%is_dev()) call x%sync()
     call z%addconst(x%v,b,info)
   end subroutine z_base_addconst_v2
+
+  ! Copy to and from complex vectors
+  subroutine z_copy_to_real(x,y,info)
+    use psi_serial_mod
+    use psb_d_base_vect_mod
+    implicit none
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+
+    ! Local variables
+    integer(psb_ipk_)  :: err_act
+    character(len=20)  :: name='vec_to_real'
+
+    call psb_erractionsave(err_act)
+    info = psb_success_
+
+    if (y%is_dev()) call y%sync()
+
+    x%v = real(y%v, kind=psb_dpk_) 
+
+    call x%set_host()
+
+    call psb_erractionrestore(err_act)
+    return
+
+  end subroutine z_copy_to_real
+  
+  subroutine z_copy_from_real(x,y,info)
+    use psi_serial_mod
+    use psb_d_base_vect_mod
+    implicit none
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+
+    ! Local variables
+    integer(psb_ipk_)  :: err_act
+    character(len=20)  :: name='vec_from_real'
+
+    call psb_erractionsave(err_act)
+    info = psb_success_
+
+    if (x%is_dev()) call x%sync()
+
+    y%v = x%v
+
+    call y%set_host()
+
+  end subroutine z_copy_from_real
+  
 end module psb_z_base_vect_mod
 
 

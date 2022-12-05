@@ -41,6 +41,7 @@ module psb_z_vect_mod
 
   use psb_realloc_mod
   use psb_z_base_vect_mod
+  use psb_d_vect_mod
   use psb_i_vect_mod
 
   type psb_z_vect_type
@@ -83,6 +84,11 @@ module psb_z_vect_mod
     procedure, pass(x) :: set_vect => z_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: clone    => z_vect_clone
+    !
+    ! Copy from/to real vectors
+    !
+    procedure, pass(y) :: copy_to_real    => z_vect_copy_to_real
+    procedure, pass(y) :: copy_from_real  => z_vect_copy_from_real
 
     procedure, pass(x) :: sync     => z_vect_sync
     procedure, pass(x) :: is_host  => z_vect_is_host
@@ -139,6 +145,8 @@ module psb_z_vect_mod
     procedure, pass(z) :: addconst_a2   => z_vect_addconst_a2
     procedure, pass(z) :: addconst_v2   => z_vect_addconst_v2
     generic, public    :: addconst      => addconst_a2, addconst_v2
+
+
 
 
   end type psb_z_vect_type
@@ -380,6 +388,47 @@ contains
     if (allocated(x%v)) call x%v%set(val,first,last)
 
   end subroutine z_vect_set_vect
+
+  subroutine z_vect_copy_to_real(x,y,info)
+    use psb_d_vect_mod
+    implicit none
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+
+    ! Local variables
+    integer(psb_ipk_)  :: err_act
+    character(len=20)  :: name='vec_to_real'
+
+    call psb_erractionsave(err_act)
+    info = psb_err_alloc_dealloc_
+
+    if( allocated(y%v) ) & 
+      & call y%v%copy_to_real(x%v,info)
+
+    return
+  end subroutine z_vect_copy_to_real
+
+  subroutine z_vect_copy_from_real(x,y,info)
+    use psb_d_vect_mod
+    implicit none
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+  
+    ! Local variables
+    integer(psb_ipk_)  :: err_act
+    character(len=20)  :: name='vec_to_real'
+
+    call psb_erractionsave(err_act)
+    info = psb_err_alloc_dealloc_
+
+    if( allocated(y%v) ) & 
+      & call y%v%copy_from_real(x%v,info)
+
+  return
+  
+  end subroutine z_vect_copy_from_real
 
 
   function constructor(x) result(this)

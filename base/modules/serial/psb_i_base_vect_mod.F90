@@ -47,7 +47,6 @@ module psb_i_base_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
-
   !> \namespace  psb_base_mod  \class psb_i_base_vect_type
   !! The psb_i_base_vect_type
   !! defines a middle level  integer(psb_ipk_) encapsulated dense vector.
@@ -86,6 +85,9 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: asb_e    => i_base_asb_e
     generic, public    :: asb      => asb_m, asb_e
     procedure, pass(x) :: free     => i_base_free
+    !
+    ! Copy from/to real vectors
+    !
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -1006,6 +1008,8 @@ contains
   end subroutine i_base_sctb_buf
 
 
+
+  
 end module psb_i_base_vect_mod
 
 
