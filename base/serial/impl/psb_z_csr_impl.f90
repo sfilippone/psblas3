@@ -993,7 +993,7 @@ contains
           end do
         else if (.not.unit) then
           do i=n, 1, -1
-            y(i) = y(i)/val(irp(i+1)-1)
+            y(i) = y(i)/conjg(val(irp(i+1)-1))
             acc  = y(i)
             do j=irp(i), irp(i+1)-2
               jc    = ja(j)
@@ -1013,7 +1013,7 @@ contains
           end do
         else if (.not.unit) then
           do i=1, n
-            y(i) = y(i)/val(irp(i))
+            y(i) = y(i)/conjg(val(irp(i)))
             acc  = y(i)
             do j=irp(i)+1, irp(i+1)-1
               jc    = ja(j)
