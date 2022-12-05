@@ -81,7 +81,8 @@ module psb_z_mat_mod
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod,  only : psb_z_csr_sparse_mat, psb_lz_csr_sparse_mat
   use psb_z_csc_mat_mod,  only : psb_z_csc_sparse_mat, psb_lz_csc_sparse_mat
-
+  use psb_z_csrli_mat_mod
+  
   type :: psb_zspmat_type
 
     class(psb_z_base_sparse_mat), allocatable  :: a   

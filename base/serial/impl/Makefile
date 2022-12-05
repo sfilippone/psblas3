@@ -16,7 +16,7 @@ DOBJS=psb_d_csr_impl.o psb_d_coo_impl.o psb_d_csc_impl.o psb_d_mat_impl.o
 COBJS=psb_c_csr_impl.o psb_c_coo_impl.o psb_c_csc_impl.o psb_c_mat_impl.o
 #\
  psb_c_lcoo_impl.o  psb_c_lcsr_impl.o 
-ZOBJS=psb_z_csr_impl.o psb_z_coo_impl.o psb_z_csc_impl.o psb_z_mat_impl.o
+ZOBJS=psb_z_csr_impl.o psb_z_coo_impl.o psb_z_csc_impl.o psb_z_mat_impl.o psb_z_csrli_impl.o
 #\
  psb_z_lcoo_impl.o  psb_z_lcsr_impl.o 
 

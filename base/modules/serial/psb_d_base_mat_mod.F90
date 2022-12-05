@@ -36,7 +36,6 @@ module psb_d_base_mat_mod
   use psb_base_mat_mod
   use psb_d_base_vect_mod
 
-
   !> \namespace  psb_base_mod  \class  psb_d_base_sparse_mat
   !! \extends psb_base_mat_mod::psb_base_sparse_mat
   !! The psb_d_base_sparse_mat type, extending psb_base_sparse_mat,
@@ -1070,7 +1069,6 @@ module psb_d_base_mat_mod
     end subroutine psb_d_base_mv_from_lfmt
   end interface
 
-
   !
   !>
   !! \memberof  psb_d_base_sparse_mat
@@ -1954,6 +1952,7 @@ module psb_d_base_mat_mod
     end subroutine psb_d_cp_coo_from_lcoo
   end interface
 
+  
   !>
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo

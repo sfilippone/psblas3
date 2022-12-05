@@ -16,10 +16,14 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: runsd psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
+all: runsd psb_tzcsrli psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
+
+psb_tzcsrli: psb_tzcsrli.o 
+	$(FLINK)  psb_tzcsrli.o -o psb_tzcsrli $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_tzcsrli $(EXEDIR)
 
 psb_d_pde3d: psb_d_pde3d.o 
 	$(FLINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
@@ -41,7 +45,7 @@ psb_s_pde2d: psb_s_pde2d.o
 
 
 clean: 
-	/bin/rm -f psb_d_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o  *$(.mod) \
+	/bin/rm -f psb_tzcsrli.o psb_d_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o  *$(.mod) \
 	$(EXEDIR)/psb_d_pde3d $(EXEDIR)/psb_s_pde3d $(EXEDIR)/psb_d_pde2d $(EXEDIR)/psb_s_pde2d 
 verycleanlib: 
 	(cd ../..; make veryclean)

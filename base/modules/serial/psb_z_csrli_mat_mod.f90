@@ -48,7 +48,7 @@ module psb_z_csrli_mat_mod
 
   type, extends(psb_z_csr_sparse_mat) :: psb_z_csrli_sparse_mat
 
-    complex(psb_dpk_) :: lambda
+    complex(psb_dpk_) :: lambda=zzero
     
   contains
     procedure, nopass  :: get_fmt     => z_csrli_get_fmt
@@ -57,15 +57,13 @@ module psb_z_csrli_mat_mod
     procedure, pass(a) :: inner_cssm  => psb_z_csrli_cssm
     procedure, pass(a) :: inner_cssv  => psb_z_csrli_cssv
     procedure, pass(a) :: scals       => psb_z_csrli_scals
-    !procedure, pass(a) :: scalv       => psb_z_csrli_scal
+    procedure, pass(a) :: scalv       => psb_z_csrli_scal
     procedure, pass(a) :: maxval      => psb_z_csrli_maxval
     procedure, pass(a) :: spnmi       => psb_z_csrli_csnmi
     procedure, pass(a) :: rowsum      => psb_z_csrli_rowsum
     procedure, pass(a) :: arwsum      => psb_z_csrli_arwsum
     procedure, pass(a) :: colsum      => psb_z_csrli_colsum
     procedure, pass(a) :: aclsum      => psb_z_csrli_aclsum
-!!$    procedure, pass(a) :: reallocate_nz => psb_z_csrli_reallocate_nz
-!!$    procedure, pass(a) :: allocate_mnnz => psb_z_csrli_allocate_mnnz
     procedure, pass(a) :: tril          => psb_z_csrli_tril
     procedure, pass(a) :: triu          => psb_z_csrli_triu
     procedure, pass(a) :: cp_to_coo   => psb_z_cp_csrli_to_coo
@@ -83,6 +81,9 @@ module psb_z_csrli_mat_mod
     procedure, pass(a) :: free        => z_csrli_free
     procedure, pass(a) :: mold        => psb_z_csrli_mold
 
+    procedure, pass(a) :: set_lambda  => z_csrli_set_lambda
+    procedure, pass(a) :: get_lambda  => z_csrli_get_lambda
+    
   end type psb_z_csrli_sparse_mat
 
   private :: z_csrli_get_nzeros, z_csrli_free,  z_csrli_get_fmt, &
@@ -109,14 +110,14 @@ module psb_z_csrli_mat_mod
     end subroutine psb_z_csrli_reinit
   end interface
 
-  !> \memberof psb_z_csrli_sparse_mat
-  !| \see psb_base_mat_mod::psb_base_trim
-  interface
-    subroutine  psb_z_csrli_trim(a)
-      import
-      class(psb_z_csrli_sparse_mat), intent(inout) :: a
-    end subroutine psb_z_csrli_trim
-  end interface
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !| \see psb_base_mat_mod::psb_base_trim
+!!$  interface
+!!$    subroutine  psb_z_csrli_trim(a)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(inout) :: a
+!!$    end subroutine psb_z_csrli_trim
+!!$  end interface
 
 
   !> \memberof psb_z_csrli_sparse_mat
@@ -246,14 +247,14 @@ module psb_z_csrli_mat_mod
   !! \memberof  psb_z_csrli_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_clean_zeros
   !
-  interface
-    subroutine  psb_z_csrli_clean_zeros(a, info)
-      import
-      class(psb_z_csrli_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_z_csrli_clean_zeros
-  end interface
-
+!!$  interface
+!!$    subroutine  psb_z_csrli_clean_zeros(a, info)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(inout) :: a
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_z_csrli_clean_zeros
+!!$  end interface
+!!$
   !> \memberof psb_z_csrli_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_cp_to_coo
   interface
@@ -363,36 +364,36 @@ module psb_z_csrli_mat_mod
   end interface
 
 
-  !> \memberof psb_z_csrli_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_csput_a
-  interface
-    subroutine psb_z_csrli_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
-      import
-      class(psb_z_csrli_sparse_mat), intent(inout) :: a
-      complex(psb_dpk_), intent(in)      :: val(:)
-      integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
-           &  imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psb_z_csrli_csput_a
-  end interface
-
-  !> \memberof psb_z_csrli_sparse_mat
-  !! \see psb_base_mat_mod::psb_base_csgetptn
-  interface
-    subroutine psb_z_csrli_csgetptn(imin,imax,a,nz,ia,ja,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import
-      class(psb_z_csrli_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_), intent(out)                 :: nz
-      integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_ipk_), intent(in), optional        :: iren(:)
-      integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
-    end subroutine psb_z_csrli_csgetptn
-  end interface
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_csput_a
+!!$  interface
+!!$    subroutine psb_z_csrli_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(inout) :: a
+!!$      complex(psb_dpk_), intent(in)      :: val(:)
+!!$      integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
+!!$           &  imin,imax,jmin,jmax
+!!$      integer(psb_ipk_), intent(out)            :: info
+!!$    end subroutine psb_z_csrli_csput_a
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_csrli_sparse_mat
+!!$  !! \see psb_base_mat_mod::psb_base_csgetptn
+!!$  interface
+!!$    subroutine psb_z_csrli_csgetptn(imin,imax,a,nz,ia,ja,info,&
+!!$         & jmin,jmax,iren,append,nzin,rscale,cscale)
+!!$      import
+!!$      class(psb_z_csrli_sparse_mat), intent(in) :: a
+!!$      integer(psb_ipk_), intent(in)                  :: imin,imax
+!!$      integer(psb_ipk_), intent(out)                 :: nz
+!!$      integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+!!$      integer(psb_ipk_),intent(out)                  :: info
+!!$      logical, intent(in), optional        :: append
+!!$      integer(psb_ipk_), intent(in), optional        :: iren(:)
+!!$      integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
+!!$      logical, intent(in), optional        :: rscale,cscale
+!!$    end subroutine psb_z_csrli_csgetptn
+!!$  end interface
 
   !> \memberof psb_z_csrli_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_csgetrow
@@ -579,6 +580,21 @@ contains
     character(len=5) :: res
     res = 'CSRLI'
   end function z_csrli_get_fmt
+
+
+  function z_csrli_get_lambda(a) result(res)
+    implicit none
+    class(psb_z_csrli_sparse_mat), intent(in) :: a
+    complex(psb_dpk_) :: res
+    res = a%lambda
+  end function z_csrli_get_lambda
+
+  subroutine z_csrli_set_lambda(a,val) 
+    implicit none
+    class(psb_z_csrli_sparse_mat), intent(inout) :: a
+    complex(psb_dpk_), intent(in) :: val
+    a%lambda = val
+  end subroutine z_csrli_set_lambda
 
   ! == ===================================
   !

@@ -2507,6 +2507,81 @@ subroutine psb_c_base_mv_from_lfmt(a,b,info)
 
 end subroutine psb_c_base_mv_from_lfmt
 
+subroutine psb_c_base_cp_to_real(a,b,info)
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_cp_to_real
+  use psb_s_base_mat_mod
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none
+  
+  class(psb_c_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+  !
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_real'
+  logical, parameter :: debug=.false.
+  
+  type(psb_s_coo_sparse_mat) ::  rtemp
+  type(psb_c_coo_sparse_mat)  ::  ctemp
+  
+  !
+  ! Default implementation
+  !
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  call a%sync()
+  call a%cp_to_coo(ctemp,info)
+  call ctemp%cp_to_coo_real(rtemp,info)
+  call ctemp%free()
+  call rtemp%cp_to_fmt(b,info)
+  call rtemp%free()
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine psb_c_base_cp_to_real
+
+
+subroutine psb_c_base_cp_from_real(a,b,info)
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_cp_from_real
+  use psb_s_base_mat_mod
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none
+  class(psb_c_base_sparse_mat), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+  !
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_real'
+  logical, parameter :: debug=.false.
+  
+  type(psb_s_coo_sparse_mat) ::  rtemp
+  type(psb_c_coo_sparse_mat)  ::  ctemp
+  
+  !
+  ! Default implementation
+  !
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+
+  call rtemp%cp_from_fmt(b,info)
+  call ctemp%cp_from_coo_real(rtemp,info)
+  call rtemp%free()
+  call a%mv_from_coo(ctemp,info)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine psb_c_base_cp_from_real
+
 !
 !
 ! lc implementation

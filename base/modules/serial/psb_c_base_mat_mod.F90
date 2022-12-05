@@ -35,7 +35,7 @@ module psb_c_base_mat_mod
 
   use psb_base_mat_mod
   use psb_c_base_vect_mod
-
+  use psb_s_base_mat_mod
 
   !> \namespace  psb_base_mod  \class  psb_c_base_sparse_mat
   !! \extends psb_base_mat_mod::psb_base_sparse_mat
@@ -90,6 +90,8 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: mv_from_lcoo   => psb_c_base_mv_from_lcoo
     procedure, pass(a) :: mv_to_lfmt     => psb_c_base_mv_to_lfmt
     procedure, pass(a) :: mv_from_lfmt   => psb_c_base_mv_from_lfmt
+    procedure, pass(a) :: cp_to_real     => psb_c_base_cp_to_real
+    procedure, pass(a) :: cp_from_real   => psb_c_base_cp_from_real
 
 
     !
@@ -182,6 +184,8 @@ module psb_c_base_mat_mod
     !
     procedure, pass(a) :: cp_to_lcoo     => psb_c_cp_coo_to_lcoo
     procedure, pass(a) :: cp_from_lcoo   => psb_c_cp_coo_from_lcoo
+    procedure, pass(a) :: cp_to_coo_real   => psb_c_cp_coo_to_coo_real
+    procedure, pass(a) :: cp_from_coo_real => psb_c_cp_coo_from_coo_real
 
     procedure, pass(a) :: csput_a      => psb_c_coo_csput_a
     procedure, pass(a) :: get_diag     => psb_c_coo_get_diag
@@ -1069,7 +1073,22 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_c_base_mv_from_lfmt
   end interface
-
+  interface
+    subroutine psb_c_base_cp_to_real(a,b,info)
+      import
+      class(psb_c_base_sparse_mat), intent(inout) :: a
+      class(psb_s_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_c_base_cp_to_real
+  end interface
+  interface
+    subroutine psb_c_base_cp_from_real(a,b,info)
+      import
+      class(psb_c_base_sparse_mat), intent(inout) :: a
+      class(psb_s_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_c_base_cp_from_real
+  end interface
 
   !
   !>
@@ -1954,6 +1973,23 @@ module psb_c_base_mat_mod
     end subroutine psb_c_cp_coo_from_lcoo
   end interface
 
+  interface
+    subroutine psb_c_cp_coo_to_coo_real(a,b,info)
+      import
+      class(psb_c_coo_sparse_mat), intent(inout) :: a
+      class(psb_s_coo_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_c_cp_coo_to_coo_real
+  end interface
+  interface
+    subroutine psb_c_cp_coo_from_coo_real(a,b,info)
+      import
+      class(psb_c_coo_sparse_mat), intent(inout) :: a
+      class(psb_s_coo_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_c_cp_coo_from_coo_real
+  end interface
+  
   !>
   !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_cp_from_coo

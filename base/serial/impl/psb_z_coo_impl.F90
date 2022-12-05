@@ -5114,6 +5114,92 @@ subroutine psb_z_cp_coo_from_lcoo(a,b,info)
 
 end subroutine psb_z_cp_coo_from_lcoo
 
+subroutine psb_z_cp_coo_to_coo_real(a,b,info)
+  use psb_error_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_to_coo_real
+  implicit none
+
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='to_coo_real'
+  logical, parameter :: debug=.false.
+  integer(psb_ipk_) :: m,n,nz
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  call a%sync()
+  m  = a%get_nrows()
+  n  = a%get_ncols()
+  nz = a%get_nzeros()
+  call b%set_nrows(m)
+  call b%set_ncols(n)
+  call b%reallocate(nz)
+  b%ia(1:nz)  = a%ia(1:nz)
+  b%ja(1:nz)  = a%ja(1:nz)
+  b%val(1:nz)  = real(a%val(1:nz))
+  call b%set_nzeros(nz)
+  call b%set_sorted(a%is_sorted())
+  call b%set_host()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_errpush(info,name)
+
+  call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_cp_coo_to_coo_real
+
+subroutine psb_z_cp_coo_from_coo_real(a,b,info)
+  use psb_error_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_from_coo_real
+  implicit none
+  class(psb_z_coo_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)            :: info
+
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='from_coo_real'
+  logical, parameter :: debug=.false.
+  integer(psb_ipk_) :: m,n,nz
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  call b%sync()
+  m  = b%get_nrows()
+  n  = b%get_ncols()
+  nz = b%get_nzeros()
+  call a%set_nrows(m)
+  call a%set_ncols(n)
+  call a%reallocate(nz)
+  a%ia(1:nz)  = b%ia(1:nz)
+  a%ja(1:nz)  = b%ja(1:nz)
+  a%val(1:nz)  = b%val(1:nz)
+  call a%set_nzeros(nz)
+  call a%set_sorted(b%is_sorted())
+  call a%set_host()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_errpush(info,name)
+
+  call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_cp_coo_from_coo_real
 
 !
 !
