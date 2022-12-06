@@ -58,7 +58,7 @@
 !    into subcubes, each one assigned to a process.
 !
 !
-module psb_d_pde3d_mod
+module psb_d_ptzc_mod
 
 
   use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_lpk_, psb_desc_type,&
@@ -736,14 +736,14 @@ contains
          & .or.(j<bndy(iamy)).or.(j>=bndy(iamy+1)) &
          & .or.(k<bndz(iamz)).or.(k>=bndz(iamz+1))
   end function outside
-end module psb_d_pde3d_mod
+end module psb_d_ptzc_mod
 
 program psb_tzcsrli
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
   use psb_util_mod
-  use psb_d_pde3d_mod
+  use psb_d_ptzc_mod
   implicit none
 
   ! input parameters

@@ -5132,6 +5132,7 @@ subroutine psb_c_cp_coo_to_coo_real(a,b,info)
   info = psb_success_
 
   call a%sync()
+  b%psb_base_sparse_mat = a%psb_base_sparse_mat
   m  = a%get_nrows()
   n  = a%get_ncols()
   nz = a%get_nzeros()
@@ -5175,6 +5176,7 @@ subroutine psb_c_cp_coo_from_coo_real(a,b,info)
   info = psb_success_
 
   call b%sync()
+  a%psb_base_sparse_mat = b%psb_base_sparse_mat
   m  = b%get_nrows()
   n  = b%get_ncols()
   nz = b%get_nzeros()
@@ -5185,7 +5187,7 @@ subroutine psb_c_cp_coo_from_coo_real(a,b,info)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz)  = b%val(1:nz)
   call a%set_nzeros(nz)
-  call a%set_sorted(b%is_sorted())
+  call a%set_sorted(.false.)
   call a%set_host()
   
   call psb_erractionrestore(err_act)
