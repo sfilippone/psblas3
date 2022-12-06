@@ -383,36 +383,36 @@ contains
       !
       block
         !
-        ! Use adjcncy methods 
-        ! 
+        ! Use adjcncy methods
+        !
         integer(psb_mpk_), allocatable :: neighbours(:)
         integer(psb_mpk_) :: cnt
         logical, parameter :: debug_adj=.true.
-        if (debug_adj.and.(np > 1)) then 
+        if (debug_adj.and.(np > 1)) then
           cnt = 0
           allocate(neighbours(np))
           if (iamx < npx-1) then
-            cnt = cnt + 1 
+            cnt = cnt + 1
             call ijk2idx(neighbours(cnt),iamx+1,iamy,iamz,npx,npy,npz,base=0)
           end if
           if (iamy < npy-1) then
-            cnt = cnt + 1 
+            cnt = cnt + 1
             call ijk2idx(neighbours(cnt),iamx,iamy+1,iamz,npx,npy,npz,base=0)
           end if
           if (iamz < npz-1) then
-            cnt = cnt + 1 
+            cnt = cnt + 1
             call ijk2idx(neighbours(cnt),iamx,iamy,iamz+1,npx,npy,npz,base=0)
           end if
           if (iamx >0) then
-            cnt = cnt + 1 
+            cnt = cnt + 1
             call ijk2idx(neighbours(cnt),iamx-1,iamy,iamz,npx,npy,npz,base=0)
           end if
           if (iamy >0) then
-            cnt = cnt + 1 
+            cnt = cnt + 1
             call ijk2idx(neighbours(cnt),iamx,iamy-1,iamz,npx,npy,npz,base=0)
           end if
           if (iamz >0) then
-            cnt = cnt + 1 
+            cnt = cnt + 1
             call ijk2idx(neighbours(cnt),iamx,iamy,iamz-1,npx,npy,npz,base=0)
           end if
           call psb_realloc(cnt, neighbours,info)
@@ -569,9 +569,9 @@ contains
     call psb_cdasb(desc_a,info,mold=imold)
     tcdasb = psb_wtime()-t1
 
-    if (.false.) then 
+    if (.false.) then
       !
-      !  Add extra rows to test remote build. 
+      !  Add extra rows to test remote build.
       !
       block
         integer(psb_ipk_) :: ks, i
@@ -761,19 +761,22 @@ program psb_tzcsrli
   type(psb_zspmat_type) :: za
   type(psb_z_csrli_sparse_mat) :: zacsrli
   type(psb_dprec_type)  :: prec
+  type(psb_zprec_type)  :: zprec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense vectors
   type(psb_d_vect_type) :: xxv,bv
+  type(psb_z_vect_type) :: zxxv,zbv
   ! parallel environment
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: iam, np
- 
-  
+
+
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
   integer(psb_epk_) :: amatsize, precsize, descsize, d2size
-  real(psb_dpk_)   :: err, eps
+  real(psb_dpk_)    :: err, eps
+  complex(psb_dpk_) :: lambda ! Shift parameter
 
   ! Parameters for solvers in Block-Jacobi preconditioner
   type ainvparms
@@ -813,7 +816,7 @@ program psb_tzcsrli
   !
   !  get parameters
   !
-  call get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,parms)
+  call get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,lambda,parms)
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess
   !
@@ -831,21 +834,28 @@ program psb_tzcsrli
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 
+  call psb_geall(zxxv,desc_a,info)
+  call psb_geall(zbv,desc_a,info)
+  call zxxv%copy_from_real(xxv,info)
+  call zbv%copy_from_real(bv,info)
+
   if (dump_zcsr) then
     call a%print('areal.mtx')
     call zacsrli%cp_from_real(a%a,info)
-    call zacsrli%set_lambda((3.d0,2.d0))
+    call zacsrli%set_lambda(lambda)
     call za%cp_from(zacsrli)
 
     call za%print('a_lambda.mtx')
-    
+
   end if
-  
+
   !
   !  prepare the preconditioner.
   !
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
   call prec%init(ctxt,ptype,info)
+  if(iam == psb_root_) write(psb_out_unit,'("Setting shifted preconditioner to : ",a)')ptype
+  call zprec%init(ctxt,ptype,info)
   !
   ! Set the options for the BJAC preconditioner
   !
@@ -881,6 +891,41 @@ program psb_tzcsrli
     ! nothing to set for NONE or DIAG preconditioner
   end if
 
+  !
+  ! Set the options for the BJAC preconditioner
+  !
+  if (psb_toupper(ptype) == "BJAC") then
+      call zprec%set('sub_solve',       parms%alg,   info)
+      select case (psb_toupper(parms%alg))
+      case ("ILU")
+        call zprec%set('sub_fillin',      parms%fill,       info)
+        call zprec%set('ilu_alg',         parms%ilu_alg,    info)
+      case ("ILUT")
+        call zprec%set('sub_fillin',      parms%fill,       info)
+        call zprec%set('sub_iluthrs',     parms%thresh,     info)
+        call zprec%set('ilut_scale',      parms%ilut_scale, info)
+      case ("AINV")
+        call zprec%set('inv_thresh',      parms%inv_thresh, info)
+        call zprec%set('inv_fillin',      parms%inv_fill,   info)
+        call zprec%set('ilut_scale',      parms%ilut_scale, info)
+        call zprec%set('ainv_alg',        parms%orth_alg,   info)
+      case ("INVK")
+        call zprec%set('sub_fillin',      parms%fill,       info)
+        call zprec%set('inv_fillin',      parms%inv_fill,   info)
+        call zprec%set('ilut_scale',      parms%ilut_scale, info)
+      case ("INVT")
+        call zprec%set('sub_fillin',      parms%fill,       info)
+        call zprec%set('inv_fillin',      parms%inv_fill,   info)
+        call zprec%set('sub_iluthrs',     parms%thresh,     info)
+        call zprec%set('inv_thresh',      parms%inv_thresh, info)
+        call zprec%set('ilut_scale',      parms%ilut_scale, info)
+      case default
+        ! Do nothing, use default setting in the init routine
+      end select
+  else
+    ! nothing to set for NONE or DIAG preconditioner
+  end if
+
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%build(a,desc_a,info)
@@ -896,6 +941,24 @@ program psb_tzcsrli
   call psb_amx(ctxt,tprec)
 
   if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  call prec%descr(info)
+
+  call psb_barrier(ctxt)
+  t1 = psb_wtime()
+  call zprec%build(za,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_precbld'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  tprec = psb_wtime()-t1
+
+  call psb_amx(ctxt,tprec)
+
+  if (iam == psb_root_) write(psb_out_unit,'("Shifted Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
   call prec%descr(info)
   !
@@ -942,12 +1005,58 @@ program psb_tzcsrli
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
 
+  !
+  ! iterative method parameters
+  !
+  if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method on shifted matrix ",a)')kmethd
+  call psb_barrier(ctxt)
+  t1 = psb_wtime()
+  eps   = 1.d-6
+  call psb_krylov(kmethd,za,zprec,zbv,zxxv,eps,desc_a,info,&
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)
+
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='solver routine'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  call psb_barrier(ctxt)
+  t2 = psb_wtime() - t1
+  call psb_amx(ctxt,t2)
+  amatsize = zacsrli%sizeof()
+  descsize = desc_a%sizeof()
+  precsize = zprec%sizeof()
+  system_size = desc_a%get_global_rows()
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
+  call psb_sum(ctxt,precsize)
+
+  if (iam == psb_root_) then
+    write(psb_out_unit,'(" ")')
+    write(psb_out_unit,'("Number of processes           : ",i12)')np
+    write(psb_out_unit,'("Linear system size            : ",i12)') system_size
+    write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
+    write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
+    write(psb_out_unit,'("Number of iterations          : ",i12)')iter
+    write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
+    write(psb_out_unit,'("Info  on exit                 : ",i12)')info
+    write(psb_out_unit,'("Total memory occupation for      A: ",i12)')amatsize
+    write(psb_out_unit,'("Total memory occupation for   PREC: ",i12)')precsize
+    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
+    write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
+    write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
+  end if
+
 
   !
   !  cleanup storage and exit
   !
   call psb_gefree(bv,desc_a,info)
   call psb_gefree(xxv,desc_a,info)
+  call psb_gefree(zbv,desc_a,info)
+  call psb_gefree(zxxv,desc_a,info)
   call psb_spfree(a,desc_a,info)
   call prec%free(info)
   call psb_cdfree(desc_a,info)
@@ -970,7 +1079,7 @@ contains
   ! get iteration parameters from standard input
   !
   subroutine  get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,&
-       & itmax,itrace,irst,ipart,parms)
+       & itmax,itrace,irst,ipart,lambda,parms)
     type(psb_ctxt_type) :: ctxt
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst,ipart
@@ -978,6 +1087,9 @@ contains
     integer(psb_ipk_) :: ip, inp_unit
     character(len=1024)   :: filename
     type(ainvparms)   :: parms
+    complex(psb_dpk_) :: lambda
+    ! Local variables
+    real(psb_dpk_) :: relambda,imlambda
 
     call psb_info(ctxt, iam, np)
 
@@ -1037,6 +1149,8 @@ contains
           read(inp_unit,*) parms%thresh
           read(inp_unit,*) parms%inv_thresh
           read(inp_unit,*) parms%orth_alg
+          read(inp_unit,*) relambda,imlambda
+          lambda = complex(relambda,imlambda)
         else
           parms%alg =  'ILU' ! Block Solver ILU,ILUT,INVK,AINVT,AORTH
           parms%ilu_alg = 'NONE' ! If ILU : MILU or NONE othewise ignored
@@ -1046,6 +1160,7 @@ contains
           parms%thresh = 1E-1_psb_dpk_ ! Threshold for forward factorization
           parms%inv_thresh = 1E-1_psb_dpk_ ! Threshold for inverse factorization
           parms%orth_alg = 'LLK'  ! What orthogonalization algorithm?
+          lambda = complex(0d0,0d0)
         endif
 
         write(psb_out_unit,'("Solving matrix       : ell1")')
@@ -1062,6 +1177,7 @@ contains
           ipart = 3
           write(psb_out_unit,'("Unknown data distrbution, defaulting to 3D")')
         end select
+        write(psb_out_unit,'("lambda = (",es12.5,",",es12.5,")")')lambda
         write(psb_out_unit,'("Preconditioner       : ",a)') ptype
         if( psb_toupper(ptype) == "BJAC" ) then
           write(psb_out_unit,'("Block subsolver      : ",a)') parms%alg
@@ -1122,6 +1238,7 @@ contains
     call psb_bcast(ctxt,parms%inv_thresh)
     call psb_bcast(ctxt,parms%orth_alg)
     call psb_bcast(ctxt,parms%ilut_scale)
+    call psb_bcast(ctxt,lambda)
 
     return
 
