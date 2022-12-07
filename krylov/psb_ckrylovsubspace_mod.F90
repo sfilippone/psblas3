@@ -284,6 +284,7 @@ contains
     integer(psb_lpk_) :: mglob
     character(len=20) :: name, ch_err
     complex(psb_spk_), allocatable :: vglobal(:,:)
+    complex(psb_spk_), allocatable :: w(:)
 
 
     info = psb_success_
@@ -302,30 +303,32 @@ contains
       end if
     end if
 
-    ! mglob = desc_a%get_global_rows()
-    ! allocate(vglobal(mglob,kryl%k), stat=info)
-    ! if (info /= psb_success_) then
-    !   info=psb_err_from_subroutine_non_
-    !   call psb_errpush(info,name)
-    !   goto 9999
-    ! end if
-    ! do i=1,kryl%k
-    !   call psb_gather(vglobal(:,i),kryl%v(i),desc_a,info)
-    ! end do
-    ! if (iam == psb_root_) then
-    !   call mm_array_write(vglobal,"Krylov basis",info,filename=filename//"_v")
-    !   if (info /= psb_success_) then
-    !     info=psb_err_from_subroutine_non_
-    !     call psb_errpush(info,name)
-    !     goto 9999
-    !   end if
-    ! end if
-    ! if (allocated(vglobal)) deallocate(vglobal, stat=info)
-    ! if (info /= psb_success_) then
-    !   info=psb_err_from_subroutine_non_
-    !   call psb_errpush(info,name)
-    !   goto 9999
-    ! end if
+    mglob = desc_a%get_global_rows()
+    allocate(vglobal(mglob,kryl%k), stat=info)
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    do i=1,kryl%k
+      call psb_gather(w,kryl%v(i),desc_a,info)
+      vglobal(:,i) = w
+    end do
+    if (iam == psb_root_) then
+      call mm_array_write(vglobal,"Krylov basis",info,filename=filename//"_v")
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_non_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+    if (allocated(vglobal)) deallocate(vglobal, stat=info)
+    if (allocated(w)) deallocate(w, stat=info)
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
 
     call psb_erractionrestore(err_act)
