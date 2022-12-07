@@ -1256,7 +1256,7 @@ if test $pac_blas_ok = no; then
 		[AC_LANG([C])
 		 AC_CHECK_LIB(cblas, cblas_dgemm,
 			[pac_blas_ok=yes
-			 BLAS_LIBS="-lcblas -lf77blas -latlas $BLAS_LIBDIR"],
+			 BLAS_LIBS="-lcblas -lf77blas -latlas"],
 			[], [-lf77blas -latlas])],
 			[], [-latlas])])
 
@@ -1269,7 +1269,7 @@ if test $pac_blas_ok = no; then
 		[AC_LANG([C])
 		 AC_CHECK_LIB(satlas, cblas_dgemm,
 			[pac_blas_ok=yes
-			 BLAS_LIBS="-lsatlas $BLAS_LIBDIR"],
+			 BLAS_LIBS="-lsatlas"],
 			[], [-lsatlas])],
 			[], [-lsatlas])])
 
@@ -1281,7 +1281,7 @@ if test $pac_blas_ok = no; then
 	AC_CHECK_LIB(blas, sgemm,
 		[AC_CHECK_LIB(dgemm, dgemm,
 		[AC_CHECK_LIB(sgemm, sgemm,
-			[pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas $BLAS_LIBDIR"],
+			[pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"],
 			[], [-lblas])],
 			[], [-lblas])])
 fi
@@ -1290,7 +1290,7 @@ fi
 # BLAS in OpenBLAS? 
 if test $pac_blas_ok = no; then
   AC_LANG([Fortran])
-  AC_CHECK_LIB(openblas, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"])
+  AC_CHECK_LIB(openblas, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lopenblas"])
 fi
 				# BLAS in Intel MKL library?
 sgemm="sgemm";
@@ -1300,12 +1300,12 @@ if test $pac_blas_ok = no; then
 		# 64 bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_gf_lp64, $sgemm,
-			[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+			[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
 			[-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32 bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_gf, $sgemm,
-				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"],,
 				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	# MKL for other compilers (Intel, PGI, ...?)
@@ -1313,37 +1313,37 @@ if test $pac_blas_ok = no; then
 		# 64-bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_intel_lp64, $sgemm,
-				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
 				[-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32-bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_intel, $sgemm,
-				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"],,
 				[-lmkl_intel -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	fi
 fi
 # Old versions of MKL
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(mkl, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread  $BLAS_LIBDIR"],,[-lguide -lpthread])
+	AC_CHECK_LIB(mkl, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"],,[-lguide -lpthread])
 fi
 
 # BLAS in Apple vecLib library?
 if test $pac_blas_ok = no; then
 	save_LIBS="$LIBS"; LIBS="-framework vecLib $LIBS"
 	AC_MSG_CHECKING([for $sgemm in -framework vecLib])
-	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes;BLAS_LIBS="-framework vecLib $BLAS_LIBDIR"])
+	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes;BLAS_LIBS="-framework vecLib"])
 	AC_MSG_RESULT($pac_blas_ok)
 	LIBS="$save_LIBS"
 fi
 # BLAS in Alpha CXML library? 
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(cxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lcxml $BLAS_LIBDIR"])
+	AC_CHECK_LIB(cxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lcxml"])
 fi
 
 # BLAS in Alpha DXML library? (now called CXML, see above)
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(dxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-ldxml $BLAS_LIBDIR"])
+	AC_CHECK_LIB(dxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-ldxml"])
 
 fi
 
@@ -1352,7 +1352,7 @@ if test $pac_blas_ok = no; then
 	if test "x$GCC" != xyes; then # only works with Sun CC
 		AC_CHECK_LIB(sunmath, acosp,
 			[AC_CHECK_LIB(sunperf, sgemm,
-        			[BLAS_LIBS="-xlic_lib=sunperf -lsunmath $BLAS_LIBDIR"
+        			[BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
                                  pac_blas_ok=yes],[],[-lsunmath])])
 
 	fi
@@ -1360,26 +1360,26 @@ fi
 
 # BLAS in SCSL library?  (SGI/Cray Scientific Library)
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(scs, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lscs $BLAS_LIBDIR"])
+	AC_CHECK_LIB(scs, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lscs"])
 fi
 
 # BLAS in SGIMATH library?
 if test $pac_blas_ok = no; then
 	AC_CHECK_LIB(complib.sgimath, $sgemm,
-		     [pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath $BLAS_LIBDIR"])
+		     [pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"])
 fi
 
 # BLAS in IBM ESSL library? (requires generic BLAS lib, too)
 if test $pac_blas_ok = no; then
 	AC_CHECK_LIB(blas, $sgemm,
 		[AC_CHECK_LIB(essl, sgemm,
-			[pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas $BLAS_LIBDIR"],
+			[pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas"],
 			[], [-lblas $FLIBS])])
 	fi
 # BLAS in generic BLAS library? 
 if test $pac_blas_ok = no; then
   AC_LANG([Fortran])
-  AC_CHECK_LIB(blas, sgemm, , [pac_blas_ok=yes;BLAS_LIBS="-lblas $BLAS_LIBDIR"])
+  AC_CHECK_LIB(blas, sgemm, , [pac_blas_ok=yes;BLAS_LIBS="-lblas"])
 fi
 	
 # BLAS linked to by default?  (happens on some supercomputers)
@@ -1391,7 +1391,7 @@ fi
 # Generic BLAS library?
 if test $pac_blas_ok = no; then
   AC_LANG([Fortran])
-  AC_CHECK_LIB(blas, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lblas $BLAS_LIBDIR"])
+  AC_CHECK_LIB(blas, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lblas"])
 fi
 
 dnl AC_SUBST(BLAS_LIBS)
@@ -1400,6 +1400,9 @@ LIBS="$pac_blas_save_LIBS"
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$pac_blas_ok" = xyes; then
+        if  test "x$BLAS_LIBDIR" != "x" ; then
+            BLAS_LIBS="$BLAS_LIBS $BLAS_LIBDIR";
+        fi
         ifelse([$1],,AC_DEFINE(HAVE_BLAS,1,[Define if you have a BLAS library.]),[$1])
         :
 else
@@ -1812,7 +1815,11 @@ fi
 
 if test "x$pac_amd_header_ok" == "xyes" ; then 
       psblas_cv_amd_includes="$AMD_INCLUDES"
-      AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+      if test "x$AMD_LIBDIR" == "x" ; then 
+	 AMD_LIBS="$psblas_cv_amd"
+      else
+	AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+      fi
       LIBS="$AMD_LIBS -lm $LIBS";
       AC_MSG_CHECKING([for amd_order in $AMD_LIBS])
       AC_TRY_LINK_FUNC(amd_order, 
@@ -1958,7 +1965,11 @@ fi
 
 if test "x$pac_metis_header_ok" = "xyes" ; then 
       psblas_cv_metis_includes="$METIS_INCLUDES"
-      METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      if  test "x$METIS_LIBDIR" == "x" ; then
+	  METIS_LIBS="$psblas_cv_metis"
+      else
+	METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      fi  
       LIBS="$METIS_LIBS -lm $LIBS";
       AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
       AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
