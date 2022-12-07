@@ -44,6 +44,8 @@ module psb_dkrylovsubspace_mod
   use psb_util_mod
   use psb_krylov_mod
   implicit none
+  private
+  public psb_dpolkrylov
 
   type :: psb_dpolkrylov
     type(psb_d_vect_type), allocatable, dimension(:) :: v
@@ -180,7 +182,8 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: err_act, info
     character(len=20) :: name, ch_err
-    real(psb_dpk_) :: nrm0,scal
+    real(psb_dpk_) :: nrm0
+    real(psb_dpk_) :: scal
 
     info = psb_success_
     name = 'psb_darnoldi_kryl'
@@ -251,7 +254,8 @@ contains
         goto 9999
       end if
       scal = done/kryl%h(i1,i)
-      call psb_gescal(kryl%v(i1),scal,kryl%v(i1),desc_a,info)
+      ! call psb_gescal(kryl%v(i1),scal,kryl%v(i1),desc_a,info)
+      call psb_geaxpby(scal,kryl%v(i1),dzero,kryl%v(i1),desc_a,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_non_
         call psb_errpush(info,name)
@@ -295,7 +299,7 @@ contains
     call psb_info(ctxt,iam,np)
 
     if (iam == psb_root_) then
-      call mm_array_write(kryl%h,"Projected Matrix",info,filename=filename//"_h")
+      call mm_array_write(kryl%h,"Projected Matrix",info,filename=trim(filename)//"_h")
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_non_
         call psb_errpush(info,name)
@@ -315,7 +319,7 @@ contains
       vglobal(:,i) = w
     end do
     if (iam == psb_root_) then
-      call mm_array_write(vglobal,"Krylov basis",info,filename=filename//"_v")
+      call mm_array_write(vglobal,"Krylov basis",info,filename=trim(filename)//"_v")
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_non_
         call psb_errpush(info,name)
