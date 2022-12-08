@@ -40,7 +40,7 @@ lib: objs
 
 psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o:  psb_base_krylov_conv_mod.o
 psb_krylov_conv_mod.o: psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o
-psb_krylovsubspace_mod: psb_dkrylovsubspace_mod.o psb_ckrylovsubspace_mod.o psb_skrylovsubspace_mod.o psb_zkrylovsubspace_mod.o
+psb_krylovsubspace_mod.o: psb_dkrylovsubspace_mod.o psb_ckrylovsubspace_mod.o psb_skrylovsubspace_mod.o psb_zkrylovsubspace_mod.o
 psb_dkrylovsubspace_mod.o psb_ckrylovsubspace_mod.o psb_skrylovsubspace_mod.o psb_zkrylovsubspace_mod.o: psb_krylov_mod.o
 
 $(F90OBJS): $(MODOBJS)
