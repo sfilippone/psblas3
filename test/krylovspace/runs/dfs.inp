@@ -1,0 +1,13 @@
+11                  Number of inputs
+1138_bus.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+NONE                   http://www.cise.ufl.edu/research/sparse/matrices/index.html
+MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
+BiCGSTAB            - AT THE MOMENT IS NOT USED - 
+BJAC                - AT THE MOMENT IS NOT USED - 
+CSR                 Storage format CSR COO JAD 
+GRAPH               PART: Partition method  BLOCK   GRAPH 
+10                  SIZE OF THE KRYLOV SUBSPACE
+0030                MAX SIZE OF THE KRYLOV SUBSPACE
+-1                  - AT THE MOMENT IS NOT USED -
+002                 - AT THE MOMENT IS NOT USED - 
+1.d-7               - AT THE MOMENT IS NOT USED -
