@@ -85,6 +85,7 @@ contains
 
     if (.not.allocated(kryl%h)) then
       allocate(kryl%h(maxsize+1,maxsize), stat=info)
+      kryl%h = zzero
     else
       info = -1
     end if
@@ -255,7 +256,6 @@ contains
       end if
       scal = zone/kryl%h(i1,i)
       call psb_gescal(kryl%v(i1),scal,kryl%v(i1),desc_a,info)
-      !call psb_geaxpby(scal,kryl%v(i1),zzero,kryl%v(i1),desc_a,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_non_
         call psb_errpush(info,name)
@@ -299,7 +299,7 @@ contains
     call psb_info(ctxt,iam,np)
 
     if (iam == psb_root_) then
-      call mm_array_write(kryl%h,"Projected Matrix",info,filename=trim(filename)//"_h")
+      call mm_array_write(kryl%h(1:kryl%k+1,1:kryl%k),"Projected Matrix",info,filename=trim(filename)//"_h")
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_non_
         call psb_errpush(info,name)
@@ -342,6 +342,5 @@ contains
     return
 
   end subroutine
-
 
 end module psb_zkrylovsubspace_mod
