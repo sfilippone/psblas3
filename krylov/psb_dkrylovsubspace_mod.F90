@@ -263,7 +263,7 @@ contains
       end if
       i = i1
     end do
-    kryl%k = i + 1
+    kryl%k = i
 
     call psb_erractionrestore(err_act)
     return
