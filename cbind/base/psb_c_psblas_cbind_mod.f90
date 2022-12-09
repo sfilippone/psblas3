@@ -579,7 +579,7 @@ contains
   type(psb_desc_type), pointer :: descp
   type(psb_c_vect_type), pointer :: xp,zp
   integer(psb_c_ipk_)          :: info
-  real(c_float_complex) :: ch
+  complex(c_float_complex) :: ch
 
   res = -1
 

@@ -614,7 +614,7 @@ module psb_c_psblas_mod
          & psb_c_vect_type, psb_spk_
     type(psb_c_vect_type), intent (inout) :: x
     type(psb_c_vect_type), intent (inout) :: z
-    real(psb_spk_), intent(in)            :: c
+    complex(psb_spk_), intent(in)            :: c
     type(psb_desc_type), intent (in)        :: desc_a
     integer(psb_ipk_), intent(out)          :: info
   end subroutine psb_cscal_vect

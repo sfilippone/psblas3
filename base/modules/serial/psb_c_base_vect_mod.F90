@@ -1702,7 +1702,7 @@ contains
   subroutine c_base_scal_a2(x,c,z,info)
     use psi_serial_mod
     implicit none
-    real(psb_spk_), intent(in)             :: c
+    complex(psb_spk_), intent(in)             :: c
     complex(psb_spk_), intent(inout)           :: x(:)
     class(psb_c_base_vect_type), intent(inout)  :: z
     integer(psb_ipk_), intent(out)           :: info
@@ -1731,7 +1731,7 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_c_base_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in)                  :: c
+    complex(psb_spk_), intent(in)                  :: c
     class(psb_c_base_vect_type), intent(inout)  :: z
     integer(psb_ipk_), intent(out)           :: info
 

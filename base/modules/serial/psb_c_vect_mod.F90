@@ -1111,7 +1111,7 @@ contains
   subroutine c_vect_scal_a2(x,c,z,info)
   use psi_serial_mod
   implicit none
-  real(psb_spk_), intent(in)             :: c
+  complex(psb_spk_), intent(in)             :: c
   complex(psb_spk_), intent(inout)           :: x(:)
   class(psb_c_vect_type), intent(inout)  :: z
   integer(psb_ipk_), intent(out)           :: info
@@ -1125,7 +1125,7 @@ end subroutine c_vect_scal_a2
 subroutine c_vect_scal_v2(x,c,z,info)
   use psi_serial_mod
   implicit none
-  real(psb_spk_), intent(in)             :: c
+  complex(psb_spk_), intent(in)             :: c
   class(psb_c_vect_type), intent(inout)  :: x
   class(psb_c_vect_type), intent(inout)  :: z
   integer(psb_ipk_), intent(out)           :: info
