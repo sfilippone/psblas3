@@ -191,7 +191,10 @@ module psb_c_base_vect_mod
     !
     ! Scaling and norms
     !
-    procedure, pass(x) :: scal     => c_base_scal
+    procedure, pass(x) :: scal_v   => c_base_scal
+    procedure, pass(z) :: scal_v2  => c_base_scal_v2
+    procedure, pass(z) :: scal_a2  => c_base_scal_a2
+    generic, public    :: scal     => scal_v, scal_v2, scal_a2
     procedure, pass(x) :: absval1  => c_base_absval1
     procedure, pass(x) :: absval2  => c_base_absval2
     generic, public    :: absval   => absval1, absval2
@@ -272,7 +275,7 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
     integer(psb_ipk_) :: i
-    
+
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
@@ -805,7 +808,7 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
-    if (.false.) then 
+    if (.false.) then
       res(1:isz) = x%v(1:isz)
     else
       !$omp parallel do private(i)
@@ -813,7 +816,7 @@ contains
         res(i) = x%v(i)
       end do
     end if
-    
+
   end function c_base_get_vect
 
   !
@@ -841,7 +844,7 @@ contains
     if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
     !$omp parallel do private(i)
-    do i = first_, last_        
+    do i = first_, last_
       x%v(i) = val
     end do
 #else
@@ -869,7 +872,7 @@ contains
     if (.not.allocated(x%v)) then
       call psb_realloc(size(val),x%v,info)
     end if
-    
+
     first_                     = 1
     if (present(first)) first_ = max(1,first)
     last_                      = min(psb_size(x%v),first_+size(val)-1)
@@ -923,7 +926,7 @@ contains
     class(psb_c_base_vect_type), intent(inout)  :: x
 
     integer(psb_ipk_) :: i
-    
+
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
@@ -1175,7 +1178,7 @@ contains
     info = 0
     if (y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
-    !$omp parallel do private(i)    
+    !$omp parallel do private(i)
     do i=1, n
       y%v(i) = y%v(i)*x(i)
     end do
@@ -1221,7 +1224,7 @@ contains
     else
       if (alpha == cone) then
         if (beta == czero) then
-          !$omp parallel do private(i)    
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = y(i)*x(i)
           end do
@@ -1686,7 +1689,57 @@ contains
     end if
     call x%set_host()
   end subroutine c_base_scal
-  
+
+  !
+  !> Function  base_scal_a2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Out of place scaling of the array x
+  !! \param x The array to be scaled
+  !! \param z The scaled vector z = c*x
+  !! \param c The scaling term
+  !! \param info return code
+  !
+  subroutine c_base_scal_a2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    real(psb_spk_), intent(in)             :: c
+    complex(psb_spk_), intent(inout)           :: x(:)
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    integer(psb_ipk_) :: i,n
+
+    if (z%is_dev()) call z%sync()
+
+    n = size(x)
+    do i = 1, n, 1
+      z%v(i) = c*x(i)
+    end do
+    info = 0
+
+  end subroutine c_base_scal_a2
+  !
+  !> Function  base_cmp_v2
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Out of place scaling of the vector x
+  !! \param x The vector to be scaled
+  !! \param z The scaled vector z = c*x
+  !! \param c The scaling term
+  !! \param info return code
+  !
+  subroutine c_base_scal_v2(x,c,z,info)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    real(psb_spk_), intent(in)                  :: c
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)           :: info
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call z%scal(x%v,c,info)
+  end subroutine c_base_scal_v2
+
   !
   ! Norms 1, 2 and infinity
   !
@@ -1742,7 +1795,7 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                :: res
     integer(psb_ipk_) :: i
-    
+
     if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
     res=szero
@@ -1969,7 +2022,7 @@ contains
     z%v = x + b
 #endif
     info = 0
-    
+
   end subroutine c_base_addconst_a2
   !
   !> Function  _base_addconst_v2
@@ -2011,7 +2064,7 @@ contains
 
     if (y%is_dev()) call y%sync()
 
-    x%v = real(y%v, kind=psb_spk_) 
+    x%v = real(y%v, kind=psb_spk_)
 
     call x%set_host()
 
@@ -2019,7 +2072,7 @@ contains
     return
 
   end subroutine c_copy_to_real
-  
+
   subroutine c_copy_from_real(x,y,info)
     use psi_serial_mod
     use psb_s_base_vect_mod
@@ -2042,7 +2095,7 @@ contains
     call y%set_host()
 
   end subroutine c_copy_from_real
-  
+
 end module psb_c_base_vect_mod
 
 
