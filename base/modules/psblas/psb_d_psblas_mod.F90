@@ -629,6 +629,14 @@ module psb_d_psblas_mod
     type(psb_desc_type), intent (in)        :: desc_a
     integer(psb_ipk_), intent(out)          :: info
   end subroutine psb_dscal_vect
+  subroutine psb_dscal_inplace_vect(x,c,desc_a,info)
+    import :: psb_desc_type, psb_ipk_, &
+         & psb_d_vect_type, psb_dpk_
+    type(psb_d_vect_type), intent (inout) :: x
+    real(psb_dpk_), intent(in)             :: c
+    type(psb_desc_type), intent (in)        :: desc_a
+    integer(psb_ipk_), intent(out)          :: info
+  end subroutine psb_dscal_inplace_vect
   end interface
 
   interface psb_mask

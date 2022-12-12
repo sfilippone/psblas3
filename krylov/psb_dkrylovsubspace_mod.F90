@@ -255,7 +255,7 @@ contains
         goto 9999
       end if
       scal = done/kryl%h(i1,i)
-      call psb_gescal(kryl%v(i1),scal,kryl%v(i1),desc_a,info)
+      call psb_gescal(kryl%v(i1),scal,desc_a,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_non_
         call psb_errpush(info,name)
