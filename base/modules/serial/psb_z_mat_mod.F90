@@ -85,6 +85,7 @@ module psb_z_mat_mod
   type :: psb_zspmat_type
 
     class(psb_z_base_sparse_mat), allocatable  :: a   
+    class(psb_z_base_sparse_mat), allocatable  :: ad, and    
     integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
     type(psb_lz_coo_sparse_mat), allocatable  :: rmta
 

@@ -171,7 +171,35 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, mold)
     
   end if
 
-  
+  if (.true.) then
+    block
+      character(len=1024) :: fname
+      type(psb_s_coo_sparse_mat) :: acoo
+      type(psb_s_csr_sparse_mat), allocatable :: aclip, andclip
+      allocate(aclip,andclip)
+      call a%a%csclip(acoo,info,jmax=n_row,rscale=.false.,cscale=.false.)
+      call aclip%mv_from_coo(acoo,info)
+      call a%a%csclip(acoo,info,jmin=n_row+1,jmax=n_col,rscale=.false.,cscale=.false.)
+      call andclip%mv_from_coo(acoo,info)
+      call move_alloc(aclip,a%ad)
+      call move_alloc(andclip,a%and)
+      if (.false.) then 
+        write(fname,'(a,i2.2,a)') 'adclip_',me,'.mtx'
+        open(25,file=fname)
+        call a%ad%print(25)
+        close(25)
+        write(fname,'(a,i2.2,a)') 'andclip_',me,'.mtx'
+        open(25,file=fname)
+        call a%and%print(25)
+        close(25)
+        !call andclip%set_cols(n_col)
+        write(*,*) me,' ',trim(name),' ad  ',&
+             &a%ad%get_nrows(),a%ad%get_ncols(),n_row,n_col
+        write(*,*) me,' ',trim(name),' and ',&
+             &a%and%get_nrows(),a%and%get_ncols(),n_row,n_col
+      end if
+    end block
+  end if
   if (debug_level >= psb_debug_ext_) then 
     ch_err=a%get_fmt()
     write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&

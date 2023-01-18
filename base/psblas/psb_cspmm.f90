@@ -179,13 +179,24 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   if (trans_ == 'N') then
     !  Matrix is not transposed
 
-    if (doswap_) then
-      call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+    if (.true.) then
+      call psi_swapdata(psb_swap_send_,&
            & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+      call a%ad%spmm(alpha,x%v,beta,y%v,info)
+      call psi_swapdata(psb_swap_recv_,&
+           & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+      call a%and%spmm(alpha,x%v,cone,y%v,info)
+      
+    else
+      if (doswap_) then
+        call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+             & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+      end if
+      
+      call psb_csmm(alpha,a,x,beta,y,info)
+      
     end if
-
-    call psb_csmm(alpha,a,x,beta,y,info)
-
+    
     if(info /= psb_success_) then
       info = psb_err_from_subroutine_non_
       call psb_errpush(info,name)
