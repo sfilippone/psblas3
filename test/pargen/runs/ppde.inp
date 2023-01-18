@@ -2,7 +2,7 @@
 BICGSTAB               Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES FCG CGR
 BJAC                   Preconditioner NONE  DIAG  BJAC 
 CSR                    Storage format for matrix A:  CSR COO 
-140                    Domain size (acutal system is this**3 (pde3d) or **2 (pde2d) )
+100                    Domain size (acutal system is this**3 (pde3d) or **2 (pde2d) )
 3                      Partition: 1 BLOCK  3 3D
 2                      Stopping criterion 1 2 
 0100                   MAXIT

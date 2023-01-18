@@ -175,13 +175,14 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
     block
       character(len=1024) :: fname
       type(psb_d_coo_sparse_mat) :: acoo
-      type(psb_d_csr_sparse_mat), allocatable :: aclip, andclip
+      type(psb_d_csr_sparse_mat), allocatable :: aclip
+      type(psb_d_ecsr_sparse_mat), allocatable :: andclip
       allocate(aclip,andclip)
       call a%a%csclip(acoo,info,jmax=n_row,rscale=.false.,cscale=.false.)
-      call aclip%mv_from_coo(acoo,info)
+      allocate(a%ad,mold=a%a)
+      call a%ad%mv_from_coo(acoo,info)
       call a%a%csclip(acoo,info,jmin=n_row+1,jmax=n_col,rscale=.false.,cscale=.false.)
       call andclip%mv_from_coo(acoo,info)
-      call move_alloc(aclip,a%ad)
       call move_alloc(andclip,a%and)
       if (.false.) then 
         write(fname,'(a,i2.2,a)') 'adclip_',me,'.mtx'
