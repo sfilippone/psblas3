@@ -3643,9 +3643,8 @@ subroutine psb_z_ecsr_csmv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-  if (((beta == zone).and..not.(tra.or.ctra))&
-       & .or.(a%is_triangle()).or.(a%is_unit())) then
-    
+  if ((beta == zone).and.&
+       & .not.(tra.or.ctra.or.(a%is_triangle()).or.(a%is_unit()))) then    
     call psb_z_ecsr_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
          & a%nnerws,a%nerwp,x,y)
   else
@@ -3671,9 +3670,6 @@ contains
     complex(psb_dpk_) :: acc
 
     if (alpha == zzero) return
-
-
-
 
     if (alpha == zone) then
       !$omp parallel do private(ir,i,j,acc)
@@ -3740,6 +3736,7 @@ subroutine psb_z_ecsr_cmp_nerwp(a,info)
     end if
   end do
   call psb_realloc(nnerws,a%nerwp,info)
+  a%nnerws = nnerws
 end subroutine psb_z_ecsr_cmp_nerwp
 
 subroutine psb_z_cp_ecsr_from_coo(a,b,info)

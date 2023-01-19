@@ -44,7 +44,7 @@
 !                                            psb_upd_perm_    Permutation(more memory)
 ! 
 !
-subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
+subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold, bld_and)
   use psb_base_mod, psb_protect_name => psb_dspasb
   use psb_sort_mod
   use psi_mod
@@ -58,6 +58,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
   integer(psb_ipk_), optional, intent(in)  :: upd
   character(len=*), optional, intent(in)   :: afmt
   class(psb_d_base_sparse_mat), intent(in), optional :: mold
+  logical, intent(in), optional :: bld_and
   !....Locals....
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, err_act
@@ -65,6 +66,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
   class(psb_i_base_vect_type), allocatable :: ivm
+  logical :: bld_and_
 
   info = psb_success_
   name = 'psb_spasb'
@@ -93,7 +95,11 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit, *) me,' ',trim(name),&
        & '   Begin matrix assembly...'
-
+  if (present(bld_and)) then
+    bld_and_ = bld_and
+  else
+    bld_and_ = .false.
+  end if
   !check on errors encountered in psdspins
 
   if (a%is_bld()) then
@@ -171,19 +177,26 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
     
   end if
 
-  if (.true.) then
+  if (bld_and_) then
     block
       character(len=1024) :: fname
       type(psb_d_coo_sparse_mat) :: acoo
       type(psb_d_csr_sparse_mat), allocatable :: aclip
       type(psb_d_ecsr_sparse_mat), allocatable :: andclip
-      allocate(aclip,andclip)
+      logical, parameter :: use_ecsr=.true.
+      allocate(aclip)
       call a%a%csclip(acoo,info,jmax=n_row,rscale=.false.,cscale=.false.)
       allocate(a%ad,mold=a%a)
       call a%ad%mv_from_coo(acoo,info)
       call a%a%csclip(acoo,info,jmin=n_row+1,jmax=n_col,rscale=.false.,cscale=.false.)
-      call andclip%mv_from_coo(acoo,info)
-      call move_alloc(andclip,a%and)
+      if (use_ecsr) then
+        allocate(andclip)
+        call andclip%mv_from_coo(acoo,info)
+        call move_alloc(andclip,a%and)
+      else
+        allocate(a%and,mold=a%a)
+        call a%and%mv_from_coo(acoo,info)
+      end if
       if (.false.) then 
         write(fname,'(a,i2.2,a)') 'adclip_',me,'.mtx'
         open(25,file=fname)
@@ -200,6 +213,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
              &a%and%get_nrows(),a%and%get_ncols(),n_row,n_col
       end if
     end block
+  else
+    if (allocated(a%ad)) deallocate(a%ad)
+    if (allocated(a%and)) deallocate(a%and)
   end if
   if (debug_level >= psb_debug_ext_) then 
     ch_err=a%get_fmt()

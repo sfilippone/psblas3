@@ -680,9 +680,9 @@ contains
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
-        call psb_spasb(a,desc_a,info,mold=amold)
+        call psb_spasb(a,desc_a,info,mold=amold,bld_and=.true.)
       else
-        call psb_spasb(a,desc_a,info,afmt=afmt)
+        call psb_spasb(a,desc_a,info,afmt=afmt,bld_and=.true.)
       end if
     end if
     call psb_barrier(ctxt)

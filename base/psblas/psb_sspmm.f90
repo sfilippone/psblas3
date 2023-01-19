@@ -179,11 +179,11 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   if (trans_ == 'N') then
     !  Matrix is not transposed
 
-    if (.true.) then
-      call psi_swapdata(psb_swap_send_,&
+    if (allocated(a%ad)) then
+      if (doswap_) call psi_swapdata(psb_swap_send_,&
            & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
       call a%ad%spmm(alpha,x%v,beta,y%v,info)
-      call psi_swapdata(psb_swap_recv_,&
+      if (doswap_) call psi_swapdata(psb_swap_recv_,&
            & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
       call a%and%spmm(alpha,x%v,sone,y%v,info)
       

@@ -250,7 +250,7 @@ Module psb_d_tools_mod
   end interface
 
   interface psb_spasb
-    subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold)
+    subroutine psb_dspasb(a,desc_a, info, afmt, upd, mold, bld_and)
       import
       implicit none
       type(psb_dspmat_type), intent (inout)   :: a
@@ -259,6 +259,7 @@ Module psb_d_tools_mod
       integer(psb_ipk_),optional, intent(in)            :: upd
       character(len=*), optional, intent(in)  :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
+      logical, intent(in), optional :: bld_and
     end subroutine psb_dspasb
   end interface
 
