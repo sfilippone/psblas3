@@ -1050,15 +1050,18 @@ contains
 
   end subroutine block_lg2lv2_ins
 
-  subroutine block_fnd_owner(idx,iprc,idxmap,info)
+  subroutine block_fnd_owner(idx,iprc,idxmap,info,adj)
     use psb_penv_mod
+    use psb_realloc_mod
+    use psb_sort_mod
     implicit none 
     integer(psb_lpk_), intent(in)           :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_gen_block_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(out)          :: info
+    class(psb_gen_block_map), intent(in) :: idxmap
+    integer(psb_ipk_), intent(out)       :: info
+    integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_) :: iam, np, nv, ip, i
+    integer(psb_ipk_) :: iam, np, nv, ip, i, nadj
     integer(psb_lpk_) :: tidx
     
     ctxt = idxmap%get_ctxt()
@@ -1073,7 +1076,11 @@ contains
       ip = gen_block_search(tidx-1,np+1,idxmap%vnl)
       iprc(i) = ip - 1
     end do
-
+    if (present(adj)) then 
+      adj = iprc
+      call psb_msort_unique(adj,nadj)
+      call psb_realloc(nadj,adj,info)
+    end if
   end subroutine block_fnd_owner
 
 

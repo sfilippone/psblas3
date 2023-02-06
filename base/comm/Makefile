@@ -27,12 +27,15 @@ INCDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
-lib: interns mpfobjs $(OBJS) 
+objs: interns mpfobjs $(OBJS)
+
+lib: objs
+	$(MAKE) -C internals lib LIBNAME=$(LIBNAME)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 interns:
-	$(MAKE) -C internals lib
+	$(MAKE) -C internals objs
 mpfobjs: 
 	$(MAKE) $(MPFOBJS) FC="$(MPFC)" 
 

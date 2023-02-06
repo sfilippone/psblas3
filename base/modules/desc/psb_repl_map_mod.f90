@@ -696,13 +696,14 @@ contains
   end subroutine repl_g2lv2_ins
 
 
-  subroutine repl_fnd_owner(idx,iprc,idxmap,info)
+  subroutine repl_fnd_owner(idx,iprc,idxmap,info,adj)
     use psb_penv_mod
     implicit none 
     integer(psb_lpk_), intent(in)      :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-    class(psb_repl_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(out)     :: info
+    class(psb_repl_map), intent(in) :: idxmap
+    integer(psb_ipk_), intent(out)  :: info
+    integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
     integer(psb_ipk_)   :: nv
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: iam, np
@@ -717,6 +718,9 @@ contains
       return
     end if
     iprc(1:nv) = iam 
+    if (present(adj)) then 
+      adj = (/ iam /) 
+    end if
 
   end subroutine repl_fnd_owner
 

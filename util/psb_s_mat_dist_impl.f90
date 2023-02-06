@@ -170,7 +170,7 @@ subroutine psb_smatdist(a_glob, a, ctxt, desc_a,&
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_spall(a,desc_a,info,nnz=((nnzero+np-1)/np))
+  call psb_spall(a,desc_a,info,nnz=((nnzero+np-1)/np),dupl=psb_dupl_err_)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_spall'
@@ -332,7 +332,7 @@ subroutine psb_smatdist(a_glob, a, ctxt, desc_a,&
 
   call psb_barrier(ctxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
+  call psb_spasb(a,desc_a,info,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -507,7 +507,7 @@ subroutine psb_lsmatdist(a_glob, a, ctxt, desc_a,&
     goto 9999
   end if
   inz = ((nnzero+np-1)/np)
-  call psb_spall(a,desc_a,info,nnz=inz)
+  call psb_spall(a,desc_a,info,nnz=inz,dupl=psb_dupl_err_)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_spall'
@@ -671,7 +671,7 @@ subroutine psb_lsmatdist(a_glob, a, ctxt, desc_a,&
 
   call psb_barrier(ctxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
+  call psb_spasb(a,desc_a,info,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_

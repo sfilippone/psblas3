@@ -29,11 +29,12 @@ LIBNAME=$(UTILLIBNAME)
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 
 
+objs: $(OBJS)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
-$(HERE)/$(LIBNAME): $(OBJS)
+$(HERE)/$(LIBNAME): objs 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 

@@ -30,14 +30,19 @@ FOBJS = psb_cdall.o psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt
 	psb_cgetelem.o psb_dgetelem.o psb_sgetelem.o psb_zgetelem.o   
 
 MPFOBJS = psb_icdasb.o psb_ssphalo.o  psb_dsphalo.o psb_csphalo.o psb_zsphalo.o  \
-	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o
+	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o \
+        psb_s_remote_mat.o psb_d_remote_mat.o psb_c_remote_mat.o psb_z_remote_mat.o \
+        psb_s_remote_vect.o psb_d_remote_vect.o psb_c_remote_vect.o psb_z_remote_vect.o \
+        psb_e_remote_vect.o psb_m_remote_vect.o 
 
 LIBDIR=..
 INCDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FIFLAG)$(MODDIR)
 
-lib: mpfobjs $(FOBJS)
+objs: mpfobjs $(FOBJS)
+
+lib: objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(FOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 

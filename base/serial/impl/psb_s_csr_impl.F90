@@ -1328,8 +1328,8 @@ function psb_s_csr_csnmi(a) result(res)
   res = szero
   if (a%is_dev())   call a%sync()
 
-  !$omp parallel do private(i,acc)  reduction(max: res)
-    do i = 1, a%get_nrows()
+  !$omp parallel do private(i,j,acc)  reduction(max: res)
+  do i = 1, a%get_nrows()
     acc = szero
     do j=a%irp(i),a%irp(i+1)-1
       acc = acc + abs(a%val(j))
@@ -1562,8 +1562,12 @@ subroutine psb_s_csr_get_diag(a,d,info)
 
 
   if (a%is_unit()) then
-    d(1:mnm) = sone
+    !$omp parallel do private(i)
+    do i=1, mnm
+      d(i) = sone
+    end do
   else
+    !$omp parallel do private(i,j,k)
     do i=1, mnm
       d(i) = szero
       do k=a%irp(i),a%irp(i+1)-1
@@ -1574,6 +1578,7 @@ subroutine psb_s_csr_get_diag(a,d,info)
       enddo
     end do
   end if
+  !$omp parallel do private(i)
   do i=mnm+1,size(d)
     d(i) = szero
   end do
@@ -1629,6 +1634,7 @@ subroutine psb_s_csr_scal(d,a,info,side)
       goto 9999
     end if
 
+    !$omp parallel do private(i,j)
     do i=1, m
       do j = a%irp(i), a%irp(i+1) -1
         a%val(j) = a%val(j) * d(i)
@@ -1643,6 +1649,7 @@ subroutine psb_s_csr_scal(d,a,info,side)
       goto 9999
     end if
 
+    !$omp parallel do private(i,j)
     do i=1,a%get_nzeros()
       j        = a%ja(i)
       a%val(i) = a%val(i) * d(j)
@@ -1681,6 +1688,7 @@ subroutine psb_s_csr_scals(d,a,info)
     call a%make_nonunit()
   end if
 
+  !$omp parallel do private(i)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo

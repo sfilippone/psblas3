@@ -18,7 +18,8 @@ DPGOBJS=pdgenspmv.o
 DVECOBJS=vecoperation.o
 EXEDIR=./runs
 
-all: runsd d_file_spmv s_file_spmv pdgenspmv vecoperation
+all: runsd pdgenspmv
+#d_file_spmv s_file_spmv pdgenspmv vecoperation
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
@@ -41,7 +42,7 @@ vecoperation: $(DVECOBJS)
 	/bin/mv vecoperation $(EXEDIR)
 
 clean:
-	/bin/rm -f $(DBOBJSS) $(DBOBJS) $(DTOBJS) $(STOBJS) $(DVECOBJS)
+	/bin/rm -f $(DBOBJSS) $(DPGOBJS) $(DTOBJS) $(STOBJS) $(DVECOBJS)
 
 lib:
 	(cd ../../; make library)

@@ -11,7 +11,7 @@ format</title>
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 211--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 259--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlsu82.html" >prev</a>] [<a 
 href="userhtmlsu82.html#tailuserhtmlsu82.html" >prev-tail</a>] [<a 
 href="userhtmlsu80.html#tailuserhtmlsu83.html">tail</a>] [<a 
@@ -19,7 +19,7 @@ href="userhtmlsu80.html#userhtmlsu85.html" >up</a>] </p></div>
    <h4 class="subsectionHead"><span class="titlemark">9.6   </span> <a 
  id="x97-1340009.6"></a>mm_array_write &#8212; Write a dense array from a file in the MatrixMarket
 format</h4>
-   <!--l. 213-->
+   <!--l. 261-->
    <div class="lstlisting" id="listing-15"><span class="label"><a 
  id="x97-134001r1"></a></span><span 
 class="cmtt-10">call</span><span 
@@ -42,7 +42,7 @@ class="cmtt-10">filename</span><span
 class="cmtt-10">)</span>
    
    </div>
-<!--l. 217--><p class="indent" >
+<!--l. 265--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">Type:</span> </dt><dd 
@@ -93,7 +93,7 @@ class="newline" />Type:<span
 class="cmbx-10">optional</span>.<br 
 class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">-</span></span></span>.</dd></dl>
-<!--l. 239--><p class="indent" >
+<!--l. 287--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-10">On Return</span> </dt><dd 
@@ -108,6 +108,38 @@ class="description">Error code.<br
 class="newline" />Type: <span 
 class="cmbx-10">required </span><br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 294--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+<!--l. 296--><p class="indent" >   If this function is called on a vector <span class="lstinline"></span><span 
+class="cmtt-10">v</span> on a distributed communicator only the
+local part is written in output. To get a single MatrixMarket file with the whole
+vector when appropriate, e.g. for debugging purposes, one could <span 
+class="cmti-10">gather </span>the whole
+vector on a single rank and then write it. Consider the following example for a <span 
+class="cmti-10">double</span>
+precision vector
+<div class="center" 
+>
+<!--l. 312--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-95">
+real(psb_dpk_),&#x00A0;allocatable&#x00A0;::&#x00A0;vglobal(:)
+call&#x00A0;psb_gather(vglobal,v,desc,info)
+if&#x00A0;(iam&#x00A0;==&#x00A0;psb_root_)&#x00A0;then
+call&#x00A0;mm_array_write(vglobal,vtitle,info,filename)
+end&#x00A0;if
+call&#x00A0;deallocate(vglobal,&#x00A0;stat=info)
+</pre>
+<!--l. 322--><p class="nopar" ></div></div>
+<!--l. 326--><p class="noindent" >To simplify this procedure in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">C</span></span></span>, there is a utility function
+<div class="center" 
+>
+<!--l. 332--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-96">
+psb_i_t&#x00A0;psb_c_&#x003C;s,d,c,z&#x003E;global_vec_write(vh,cdh);
+</pre>
+<!--l. 336--><p class="nopar" ></div></div>
+<!--l. 340--><p class="noindent" >that produces exactly this result.
                                                                   
 
                                                                   

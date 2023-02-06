@@ -42,31 +42,29 @@
 !    upd      - character(optional).         How will the matrix be updated? 
 !                                            psb_upd_srch_    Simple strategy  
 !                                            psb_upd_perm_    Permutation(more memory)
-!    dupl     - integer(optional).           Duplicate coefficient handling:
-!                                            psb_dupl_ovwrt_     overwrite
-!                                            psb_dupl_add_       add 
-!                                            psb_dupl_err_       raise an error. 
 ! 
 !
-subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
+subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold)
   use psb_base_mod, psb_protect_name => psb_zspasb
+  use psb_sort_mod
   use psi_mod
   implicit none
 
 
   !...Parameters....
-  type(psb_zspmat_type), intent (inout)  :: a
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer(psb_ipk_), intent(out)                    :: info
-  integer(psb_ipk_),optional, intent(in)            :: dupl, upd
-  character(len=*), optional, intent(in)         :: afmt
+  type(psb_zspmat_type), intent (inout)    :: a
+  type(psb_desc_type), intent(inout)       :: desc_a
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), optional, intent(in)  :: upd
+  character(len=*), optional, intent(in)   :: afmt
   class(psb_z_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, err_act
-  integer(psb_ipk_) :: n_row,n_col
+  integer(psb_ipk_) :: n_row,n_col, dupl_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
+  class(psb_i_base_vect_type), allocatable :: ivm
 
   info = psb_success_
   name = 'psb_spasb'
@@ -92,28 +90,79 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
     goto 9999
   end if
 
-
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit, *) me,' ',trim(name),&
        & '   Begin matrix assembly...'
 
   !check on errors encountered in psdspins
 
-
-  if (a%is_bld()) then 
+  if (a%is_bld()) then
+    dupl_ = a%get_dupl()
     !
     ! First case: we come from a fresh build. 
     ! 
+    if (a%is_remote_build()) then 
+      !write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
+      block
+        type(psb_lz_coo_sparse_mat) :: a_add
+        integer(psb_ipk_), allocatable :: ila(:), jla(:)
+        integer(psb_ipk_) :: nz, nzt,k
+        call psb_remote_mat(a%rmta,desc_a,a_add,info)
+        nz  = a_add%get_nzeros()
+        nzt = nz
+        call psb_sum(ctxt,nzt)
+        if (nzt>0) then
+          allocate(ivm, mold=desc_a%v_halo_index%v)
+          call psb_cd_reinit(desc_a, info)
+        end if
+        if (nz > 0) then
+          !
+          ! Should we check for new indices here?
+          !
+          call psb_realloc(nz,ila,info)
+          call psb_realloc(nz,jla,info)
+          call desc_a%indxmap%g2l(a_add%ia(1:nz),ila(1:nz),info,owned=.true.)    
+          if (info == 0) call desc_a%indxmap%g2l_ins(a_add%ja(1:nz),jla(1:nz),info)
+          !write(0,*) me,name,' Check before insert',a%get_nzeros()
+          n_row = desc_a%get_local_rows()
+          n_col = desc_a%get_local_cols()
+          call a%set_ncols(desc_a%get_local_cols())
+          call a%csput(nz,ila,jla,a_add%val,ione,n_row,ione,n_col,info)
+          !write(0,*) me,name,' Check after insert',a%get_nzeros(),nz
+        end if
+        if (nzt > 0) call psb_cdasb(desc_a,info,mold=ivm)
 
-    n_row = desc_a%get_local_rows()
-    n_col = desc_a%get_local_cols()
-    call a%set_nrows(n_row)
-    call a%set_ncols(n_col)
-  end if
-
-  if (a%is_bld()) then 
-    call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+      end block
+    end if
+    call a%set_ncols(desc_a%get_local_cols())    
+    call a%cscnv(info,type=afmt,mold=mold,dupl=dupl_)
   else if (a%is_upd()) then 
+    if (a%is_remote_build()) then 
+      !write(0,*) me,name,' Size of rmta:',a%rmta%get_nzeros()
+      block
+        type(psb_lz_coo_sparse_mat) :: a_add
+        integer(psb_ipk_), allocatable :: ila(:), jla(:)
+        integer(psb_ipk_) :: nz, nzt,k
+        call psb_remote_mat(a%rmta,desc_a,a_add,info)
+        nz = a_add%get_nzeros()
+!!$        write(0,*) me,name,' Nz to be added',nz
+        if (nz > 0) then
+          !
+          ! Should we check for new indices here?
+          !
+          call psb_realloc(nz,ila,info)
+          call psb_realloc(nz,jla,info)
+          call desc_a%indxmap%g2l(a_add%ia(1:nz),ila(1:nz),info,owned=.true.)    
+          if (info == 0) call desc_a%indxmap%g2l_ins(a_add%ja(1:nz),jla(1:nz),info)
+          !write(0,*) me,name,' Check before insert',a%get_nzeros()
+          n_row = desc_a%get_local_rows()
+          n_col = desc_a%get_local_cols()
+          call a%set_ncols(desc_a%get_local_cols())
+          call a%csput(nz,ila,jla,a_add%val,ione,n_row,ione,n_col,info)
+          !write(0,*) me,name,' Check after insert',a%get_nzeros(),nz
+        end if
+      end block
+    end if
     call a%asb(mold=mold)
   else
     info = psb_err_invalid_mat_state_

@@ -728,7 +728,7 @@ subroutine psb_z_coo_print(iout,a,iv,head,ivr,ivc)
   character(len=80)            :: frmt
   integer(psb_ipk_) :: i,j, ni, nr, nc, nz
 
-    write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
   if (present(head)) write(iout,'(a,a)') '% ',head
   write(iout,'(a)') '%'
   write(iout,'(a,a)') '% COO'
@@ -3172,9 +3172,9 @@ subroutine psb_z_cp_coo_from_coo(a,b,info)
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
     do i=1, nz
-      a%ia(i)  = b%ia(i) 
-      a%ja(i)  = b%ja(i) 
-      a%val(i) = b%val(i)
+       a%ia(i)  = b%ia(i) 
+       a%ja(i)  = b%ja(i) 
+       a%val(i) = b%val(i)
     end do
   end block
 #else
@@ -3670,6 +3670,12 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
   integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
+
+  info  = psb_success_
+
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ! Row major order
   if (nr <= nzin) then
@@ -4357,6 +4363,11 @@ subroutine psb_z_fix_coo_inner_colmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
   integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
+  info  = psb_success_
+
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   if (nc <= nzin) then
     ! Avoid strange situations with large indices
@@ -5268,13 +5279,13 @@ function psb_lz_coo_maxval(a) result(res)
   implicit none
   class(psb_lz_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
-  
+
   integer(psb_lpk_)  :: i,j,k,m,n, nnz, ir, jc, nc, info
   character(len=20)  :: name='z_coo_maxval'
   logical, parameter :: debug=.false.
-  
+
   if (a%is_dev())   call a%sync()
-  
+
   if (a%is_unit()) then
     res = done
   else
@@ -5284,18 +5295,18 @@ function psb_lz_coo_maxval(a) result(res)
   if (allocated(a%val)) then
     nnz = min(nnz,size(a%val))
 #if defined(OPENMP)
-    block
-      integer(psb_ipk_) :: i
-      !$omp parallel do private(i) reduction(max: res)
-      do i=1, nnz
-        res = max(res,abs(a%val(i)))
-      end do
-    end block
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, nnz
+      res = max(res,abs(a%val(i)))
+    end do
+  end block
 #else
     res = maxval(abs(a%val(1:nnz)))
 #endif
   end if
-  
+
 end function psb_lz_coo_maxval
 
 function psb_lz_coo_csnmi(a) result(res)
@@ -5351,13 +5362,13 @@ function psb_lz_coo_csnmi(a) result(res)
       vt(i) = vt(i) + abs(a%val(j))
     end do
 #if defined(OPENMP)
-    block
-      integer(psb_ipk_) :: i
-      !$omp parallel do private(i) reduction(max: res)
-      do i=1, m
-        res = max(res,abs(vt(i)))
-      end do
-    end block
+  block
+    integer(psb_ipk_) :: i
+    !$omp parallel do private(i)
+    do i=1, m
+      res = max(res,abs(vt(i)))
+    end do
+  end block 
 #else
     res = maxval(vt(1:m))
 #endif
@@ -5403,11 +5414,11 @@ function psb_lz_coo_csnm1(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i) reduction(max: res)
+    !$omp parallel do private(i)
     do i=1, n
       res = max(res,abs(vt(i)))
     end do
-  end block
+  end block 
 #else
   res = maxval(vt(1:n))
 #endif
@@ -6661,7 +6672,7 @@ contains
     integer(psb_lpk_), optional                    :: iren(:)
     integer(psb_lpk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw, nra, nca, nrd
     integer(psb_ipk_) :: debug_level, debug_unit, inza
-    character(len=20) :: name='coo_getrow'
+    character(len=20) :: name='lcoo_getrow'
 
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -6856,7 +6867,7 @@ subroutine psb_lz_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz < 0) then
     info = psb_err_iarg_neg_
-3   call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
+3    call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
     goto 9999
   end if
   if (size(ia) < nz) then
@@ -6877,7 +6888,6 @@ subroutine psb_lz_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   end if
 
   if (nz == 0) return
-
 
   nza  = a%get_nzeros()
   isza = a%get_size()

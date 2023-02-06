@@ -131,7 +131,7 @@ Contains
 
     ! ...Local Variables
     real(psb_spk_),allocatable  :: tmp(:)
-    integer(psb_mpk_) :: dim, lb_, lbi,ub_
+    integer(psb_mpk_) :: dim, lb_, lbi,ub_, i
     integer(psb_ipk_) :: err_act,err
     character(len=30)  :: name
     logical, parameter :: debug=.false.
@@ -179,7 +179,10 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(lb_-1+dim+1:lb_-1+len) = pad
+      !$omp parallel do private(i) shared(dim,len)
+      do i=lb_-1+dim+1,lb_-1+len
+        rrax(i) = pad
+      end do
     endif
     call psb_erractionrestore(err_act)
     return
@@ -204,7 +207,7 @@ Contains
 
     real(psb_spk_),allocatable  :: tmp(:,:)
     integer(psb_ipk_) :: err_act,err
-    integer(psb_mpk_) :: dim,dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2
+    integer(psb_mpk_) :: dim,dim2,lb1_, lb2_, ub1_, ub2_,lbi1, lbi2, i
     character(len=30)  :: name
 
     name='psb_r_m_s_rk2'
@@ -267,8 +270,14 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
-      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
+      !$omp parallel do private(i) shared(lb1_,dim,len1)
+      do i=lb1_-1+dim+1,lb1_-1+len1
+        rrax(i,:) = pad
+      end do
+      !$omp parallel do private(i) shared(lb1_,dim,len1,lb2_,dim2,len2)
+      do i=lb1_,lb1_-1+len1
+        rrax(i,lb2_-1+dim2+1:lb2_-1+len2) = pad
+      end do
     endif
     call psb_erractionrestore(err_act)
     return

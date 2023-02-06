@@ -93,7 +93,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   nrt     = loc_row
   call psb_sum(ctxt,nrt)
   call psb_max(ctxt,m)
-  
+
   if (present(globalcheck)) then 
     check_ = globalcheck
   else
@@ -167,7 +167,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   if (check_.or.(.not.islarge)) then
     if (debug_size) &
          & write(debug_unit,*) me,' ',trim(name),': Going for global checks'
-  
+
     allocate(tmpgidx(m,2),stat=info) 
     if (info /= psb_success_) then 
       info=psb_err_alloc_dealloc_
@@ -210,7 +210,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
         info = psb_err_inconsistent_index_lists_
       end if
     end if
-    
+
   else
     novrl   = 0
     norphan = 0
@@ -244,36 +244,40 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
     call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
-
-  ! Sort, eliminate duplicates, then
-  ! scramble back into original position.
-  ix(1) = -1 
-  if (present(idx)) then 
-    if (size(idx) >= loc_row) then 
+  if (check_) then 
+    ! Sort, eliminate duplicates, then
+    ! scramble back into original position.
+    ix(1) = -1 
+    if (present(idx)) then 
+      if (size(idx) >= loc_row) then
+        !$omp parallel do private(i) 
+        do i=1, loc_row
+          ix(i) = idx(i) 
+        end do
+      end if
+    end if
+    if (ix(1) == -1) then
+      !$omp parallel do private(i)
       do i=1, loc_row
-        ix(i) = idx(i) 
+        ix(i) = i 
       end do
     end if
-  end if
-  if (ix(1) == -1) then 
-    do i=1, loc_row
-      ix(i) = i 
+    call psb_msort(vl,ix,flag=psb_sort_keep_idx_)
+    nlu = min(1,loc_row)
+    do i=2,loc_row
+      if (vl(i) /= vl(nlu)) then
+        nlu = nlu + 1 
+        vl(nlu) = vl(i)
+        ix(nlu) = ix(i)
+      end if
     end do
+    call psb_msort(ix(1:nlu),vl(1:nlu),flag=psb_sort_keep_idx_)
+
+    if (debug_size) &
+         & write(debug_unit,*) me,' ',trim(name),': After sort ',nlu
+  else
+    nlu = loc_row
   end if
-  call psb_msort(vl,ix,flag=psb_sort_keep_idx_)
-  nlu = min(1,loc_row)
-  do i=2,loc_row
-    if (vl(i) /= vl(nlu)) then
-      nlu = nlu + 1 
-      vl(nlu) = vl(i)
-      ix(nlu) = ix(i)
-    end if
-  end do
-  call psb_msort(ix(1:nlu),vl(1:nlu),flag=psb_sort_keep_idx_)
-
-  if (debug_size) &
-       & write(debug_unit,*) me,' ',trim(name),': After sort ',nlu
-
   call psb_nullify_desc(desc)
   if (do_timings) then 
     call psb_barrier(ctxt)
@@ -289,7 +293,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   if (novrl > 0) then
     if (debug_size) &
          & write(debug_unit,*) me,' ',trim(name),': Check overlap '
-    
+
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': code for NOVRL>0',novrl,npr_ov
 
@@ -335,7 +339,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   end if
   if (debug_size) &
        & write(debug_unit,*) me,' ',trim(name),': Done overlap '
-    
+
 
   ! allocate work vector
   allocate(l_temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
@@ -393,7 +397,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   end if
   if (debug_size) &
        & write(debug_unit,*) me,' ',trim(name),': Allocate indxmap'
-    
+
   if (np == 1) then 
     allocate(psb_repl_map :: desc%indxmap, stat=info)
   else
@@ -414,7 +418,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   if (debug_size) &
        & write(debug_unit,*) me,' ',trim(name),': Done init indxmap'
 
-  
+
   if (do_timings) then 
     call psb_barrier(ctxt)
     t4 = psb_wtime()

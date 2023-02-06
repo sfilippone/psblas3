@@ -1,4 +1,4 @@
-PSBLAS library, version 3.7
+PSBLAS library, version 3.8
 ===========================
 
 The architecture of the Fortran 2003 sparse BLAS is described in:
@@ -25,7 +25,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 -------------
-See docs/psblas-3.5.pdf; an HTML version of the same document is
+See docs/psblas-3.8.pdf; an HTML version of the same document is
 available in docs/html. Please consult the sample programs, especially
 test/pargen/psb_[sd]_pde[23]d.f90
 
@@ -58,7 +58,8 @@ prerequisites (see also SERIAL below):
    directories but only if you specify `--with-metis`.
 
 4. If you have the AMD package of Davis, Duff and Amestoy, you can
-   specify `--with-amd` (see `./configure --help` for more details). 
+   specify `--with-amd` (see `./configure --help` for more details).
+   We use the C interface to AMD.
 
 The configure script will generate a Make.inc file suitable for building
 the library. The script is capable of recognizing the needed libraries
@@ -97,11 +98,15 @@ that enables running in pure serial mode; no MPI installation is needed
 in this case (but note that the fake MPI stubs are only guaranteed to
 cover what we use internally, it's not a complete replacement). 
 
-LONG INTEGERS
+INTEGER SIZES
 -------------
-We have an experimental flag `--enable-long-integers` that will enable 
-having 8-byte integer data, allowing an index space larger than 2G; some
-small cases have been tested but we do not offer full guarantee (yet).
+We have two kind of integers: IPK for local indices, and LPK for
+global indices. They can be specified independently at configure time,
+e.g.
+--with-ipk=4 --with-lpk=8
+which is asking for 4-bytes local indices, and 8-bytes global indices
+(this is the default). 
+							       
 
 
 TODO

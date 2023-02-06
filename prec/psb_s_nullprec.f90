@@ -163,7 +163,7 @@ contains
   !         0: normal
   !        >1: increased details 
   !
-  subroutine psb_s_null_precdescr(prec,iout,root, verbosity)
+  subroutine psb_s_null_precdescr(prec,iout,root, verbosity,prefix)
     use psb_penv_mod
     use psb_error_mod
     
@@ -173,6 +173,7 @@ contains
     integer(psb_ipk_), intent(in), optional   :: iout
     integer(psb_ipk_), intent(in), optional   :: root
     integer(psb_ipk_), intent(in), optional   :: verbosity
+    character(len=*), intent(in), optional  :: prefix
       
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='s_null_precset'
@@ -180,6 +181,7 @@ contains
     integer(psb_ipk_) :: ni
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: iout_, iam, np, root_, verbosity_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
 
@@ -195,6 +197,11 @@ contains
     else
       root_ = psb_root_
     end if
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
     if (present(verbosity)) then
       verbosity_ = verbosity
     else
@@ -207,7 +214,7 @@ contains
     if (root_ == -1) root_ = iam
 
     if (iam == root_) &
-         &  write(iout_,*) trim(prec%desc_prefix()),' ',&
+         &  write(iout_,*) trim(prefix_),' ', trim(prec%desc_prefix()),' ',&
          & 'No preconditioning'
 
 9998 continue

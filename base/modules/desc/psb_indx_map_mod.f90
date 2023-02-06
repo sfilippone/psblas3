@@ -268,13 +268,14 @@ module psb_indx_map_mod
   !!
 
   interface 
-    subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info,adj)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in)      :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-      class(psb_indx_map), intent(inout) :: idxmap
-      integer(psb_ipk_), intent(out)     :: info
+      class(psb_indx_map), intent(in) :: idxmap
+      integer(psb_ipk_), intent(out)  :: info
+      integer(psb_ipk_), optional, allocatable, intent(out) ::  adj(:)
     end subroutine psi_indx_map_fnd_owner
   end interface
 
@@ -303,13 +304,14 @@ module psb_indx_map_mod
   end interface
 
   interface 
-    subroutine psi_graph_fnd_owner(idx,iprc,idxmap,info)
+    subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
       import :: psb_indx_map, psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_lpk_), intent(in)      :: idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
-      class(psb_indx_map), intent(inout) :: idxmap
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), allocatable, intent(out) ::  ladj(:)
+      class(psb_indx_map), intent(in) :: idxmap
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_graph_fnd_owner
   end interface
 
@@ -1519,7 +1521,7 @@ contains
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
-    class(psb_indx_map), intent(inout) :: idxmap
+    class(psb_indx_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin
     integer(psb_ipk_), intent(out) ::  xout
     integer(psb_ipk_), intent(out)     :: info
@@ -1548,7 +1550,7 @@ contains
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
-    class(psb_indx_map), intent(inout) :: idxmap
+    class(psb_indx_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)  ::  xin(:)
     integer(psb_ipk_), intent(out) ::  xout(:)
     integer(psb_ipk_), intent(out)     :: info
@@ -1557,6 +1559,11 @@ contains
     nr = idxmap%local_rows
     nc = min(idxmap%local_cols, (nr+psb_size(idxmap%halo_owner)))
     sz = min(size(xin),size(xout))
+    if (.not.allocated(idxmap%halo_owner)) then
+      xout = -1
+      return
+    end if
+    
     do i = 1, sz
       xout(i) = -1          
       if ((nr<xin(i)).and.(xin(i) <= nc)) xout(i) = idxmap%halo_owner(xin(i)-nr)

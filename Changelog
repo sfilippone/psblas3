@@ -1,5 +1,14 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2022/05/20: Merge changes for REMOTE build. Bump v 3.8	
+2022/03/28: Introduce new non-blocking collectives.	
+2021/06/01: New CTXT object	
+2021/04/20: OpenMP integration	
+2021/04/10: Recognize MPICXX in configure	
+2021/02/10: Take out precset interface, only prec%set now.
+2020/09/20: New getelem function to extract vector entries
+2020/07/21: Fix configure for METIS sizes	
+2020/06/01: reworked bild internals for descriptors	
 2019/12/18: New internals and algorithms for FND_OWNER, faster and less
 	memory hungry.	
 2019/07/20: New SCAN collective; improve handling of SYMmetric	

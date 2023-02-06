@@ -32,33 +32,38 @@
 Module psb_l_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_success_
   use psb_l_vect_mod, only : psb_l_base_vect_type, psb_l_vect_type
+  use psb_m_tools_a_mod
+  use psb_e_tools_a_mod
 !  use psb_i_vect_mod, only : psb_i_vect_type
   use psb_l_multivect_mod, only : psb_l_base_multivect_type, psb_l_multivect_type
   use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
 
   interface  psb_geall
-    subroutine psb_lalloc_vect(x, desc_a,info)
+    subroutine psb_lalloc_vect(x, desc_a,info, dupl, bldmode)
       import
       implicit none
       type(psb_l_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_lalloc_vect
-    subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb)
+    subroutine psb_lalloc_vect_r2(x, desc_a,info,n,lb, dupl, bldmode)
       import
       implicit none
       type(psb_l_vect_type), allocatable, intent(out)  :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: n, lb
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_lalloc_vect_r2
-    subroutine psb_lalloc_multivect(x, desc_a,info,n)
+    subroutine psb_lalloc_multivect(x, desc_a,info,n, dupl, bldmode)
       import
       implicit none
       type(psb_l_multivect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: n
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_lalloc_multivect
   end interface
 
@@ -120,7 +125,7 @@ Module psb_l_tools_mod
 
 
   interface psb_geins
-    subroutine psb_lins_vect(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_lins_vect(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -129,10 +134,9 @@ Module psb_l_tools_mod
       integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_lpk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_lins_vect
-    subroutine psb_lins_vect_v(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_lins_vect_v(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -141,10 +145,9 @@ Module psb_l_tools_mod
       type(psb_l_vect_type), intent(inout)       :: irw
       type(psb_l_vect_type), intent(inout)    :: val
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_lins_vect_v
-    subroutine psb_lins_vect_r2(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_lins_vect_r2(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -153,10 +156,9 @@ Module psb_l_tools_mod
       integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_lpk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_lins_vect_r2
-    subroutine psb_lins_multivect(m,irw,val,x,desc_a,info,dupl,local)
+    subroutine psb_lins_multivect(m,irw,val,x,desc_a,info,local)
       import
       implicit none
       integer(psb_ipk_), intent(in)              :: m
@@ -165,9 +167,8 @@ Module psb_l_tools_mod
       integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_lpk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_lins_multivect
   end interface
-
+  
 end module psb_l_tools_mod

@@ -1,3 +1,39 @@
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
+! File: psb_cdall.f90
+!
+! Subroutine: psb_cdall
+!    Allocate descriptor Outer routine
+!
 subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,&
      & vg,vl,flag,nl,repl,globalcheck,lidx,usehash)
   use psb_desc_mod
@@ -62,14 +98,15 @@ subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,&
   logical            :: usehash_
   integer(psb_ipk_), allocatable :: itmpv(:)
   integer(psb_lpk_), allocatable :: lvl(:)
-
+  logical, parameter :: timings=.false.
+  real(psb_dpk_)  :: t0, t1
 
 
   if (psb_get_errstatus() /= 0) return 
   info=psb_success_
   name = 'psb_cdall'
   call psb_erractionsave(err_act)
-
+  if (timings) t0 = psb_wtime()
   call psb_info(ctxt, me, np)
   if (count((/ present(vg),present(vl),&
        &  present(parts),present(nl), present(repl) /)) < 1) then 
@@ -189,7 +226,11 @@ subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,&
   endif
 
   if (info /= psb_success_) goto 9999
-
+  if (timings) then
+    t1 = psb_wtime()
+    write(0,*) name,' 1st phase:',t1-t0
+    t0 = psb_wtime()
+  end if
   ! Finish off 
   lr = desc%indxmap%get_lr()
   call psb_realloc(max(1,lr/2),desc%halo_index, info)
@@ -203,6 +244,11 @@ subroutine psb_cdall(ctxt, desc, info,mg,ng,parts,&
   desc%ext_index(:)            = -1
   call psb_cd_set_bld(desc,info)
   if (info /= psb_success_) goto 9999
+  if (timings) then
+    t1 = psb_wtime()
+    write(0,*) name,' 2nd phase:',t1-t0
+    t0 = psb_wtime()
+  end if
 
 9998 continue
   call psb_erractionrestore(err_act)
