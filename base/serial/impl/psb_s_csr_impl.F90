@@ -2845,6 +2845,9 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
   use psb_realloc_mod
   use psb_s_base_mat_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_cp_csr_from_coo
+#if defined(OPENMP)
+  use omp_lib 
+#endif  
   implicit none
 
   class(psb_s_csr_sparse_mat), intent(inout) :: a
@@ -2859,13 +2862,11 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='s_cp_csr_from_coo'
-  logical :: use_openmp = .false.
-
-  !$ integer(psb_ipk_), allocatable :: sum(:)
-  !$ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
-  !$ integer(psb_ipk_) :: nxt_val,old_val,saved_elem,maxthreads 
-  !$ use_openmp = .true.
-
+#if defined(OPENMP)
+  integer(psb_ipk_), allocatable :: sum(:)
+  integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
+  integer(psb_ipk_) :: nxt_val,old_val,saved_elem,maxthreads 
+#endif
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2910,94 +2911,93 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
 
   a%irp(:) = 0
   
-!!$  if (use_openmp) then
-!!$    !$ maxthreads = omp_get_max_threads()
-!!$    !$ allocate(sum(maxthreads+1))
-!!$    !$ sum(:) = 0
-!!$    !$ sum(1) = 1
-!!$
-!!$    !$OMP PARALLEL default(none) &
-!!$    !$OMP shared(nza,itemp,a,nthreads,sum,nr) &
-!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
-!!$
-!!$    !$OMP DO schedule(STATIC) &
-!!$    !$OMP private(k,i)
-!!$    do k=1,nza
-!!$      i = itemp(k)
-!!$      a%irp(i) = a%irp(i) + 1
-!!$    end do
-!!$    !$OMP END DO
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ nthreads = omp_get_num_threads()
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ ithread = omp_get_thread_num()
-!!$
-!!$    !$ work = nr/nthreads
-!!$    !$ if (ithread < MOD(nr,nthreads)) then
-!!$      !$ work = work + 1
-!!$      !$ first_idx = ithread*work + 1
-!!$    !$ else
-!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
-!!$    !$ end if
-!!$
-!!$    !$ last_idx = first_idx + work - 1
-!!$
-!!$    !$ s = 0
-!!$    !$ do i=first_idx,last_idx
-!!$      !$ s = s + a%irp(i)
-!!$    !$ end do
-!!$    !$ if (work > 0) then
-!!$      !$ sum(ithread+2) = s
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ do i=2,nthreads+1
-!!$      !$ sum(i) = sum(i) + sum(i-1)
-!!$    !$ end do
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ saved_elem = a%irp(first_idx)
-!!$    !$ end if
-!!$    !$ if (ithread == 0) then
-!!$      !$ a%irp(1) = 1
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ old_val = a%irp(first_idx+1)
-!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
-!!$    !$ end if
-!!$
-!!$    !$ do i=first_idx+2,last_idx+1
-!!$      !$ nxt_val = a%irp(i)
-!!$      !$ a%irp(i) = a%irp(i-1) + old_val
-!!$      !$ old_val = nxt_val
-!!$    !$ end do
-!!$
-!!$    !$OMP END PARALLEL
-!!$  else
-
-    do k=1,nza
-      i = itemp(k)
-      a%irp(i) = a%irp(i) + 1
-    end do
-    ip = 1
-    do i=1,nr
-      ncl = a%irp(i)
-      a%irp(i) = ip
-      ip = ip + ncl
-    end do
-    a%irp(nr+1) = ip
-!!$  end if
+#if defined(OPENMP)
+  maxthreads = omp_get_max_threads()
+  allocate(sum(maxthreads+1))
+  sum(:) = 0
+  sum(1) = 1
+  
+  !$OMP PARALLEL default(none) &
+  !$OMP shared(nza,itemp,a,nthreads,sum,nr) &
+  !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
+  
+  !$OMP DO schedule(STATIC) &
+  !$OMP private(k,i)
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  !$OMP END DO
+  
+  !$OMP SINGLE
+  nthreads = omp_get_num_threads()
+  !$OMP END SINGLE
+  
+  ithread = omp_get_thread_num()
+  
+  work = nr/nthreads
+  if (ithread < MOD(nr,nthreads)) then
+    work = work + 1
+    first_idx = ithread*work + 1
+  else
+    first_idx = ithread*work + MOD(nr,nthreads) + 1
+  end if
+  
+  last_idx = first_idx + work - 1
+  
+  s = 0
+  do i=first_idx,last_idx
+    s = s + a%irp(i)
+  end do
+  if (work > 0) then
+    sum(ithread+2) = s
+  end if
+  
+  !$OMP BARRIER
+  
+  !$OMP SINGLE
+  do i=2,nthreads+1
+    sum(i) = sum(i) + sum(i-1)
+  end do
+    !$OMP END SINGLE
+  
+  if (work > 0) then
+    saved_elem = a%irp(first_idx)
+  end if
+  if (ithread == 0) then
+    a%irp(1) = 1
+  end if
+  
+  !$OMP BARRIER
+  
+  if (work > 0) then
+    old_val = a%irp(first_idx+1)
+    a%irp(first_idx+1) = saved_elem + sum(ithread+1)
+  end if
+  
+  do i=first_idx+2,last_idx+1
+    nxt_val = a%irp(i)
+    a%irp(i) = a%irp(i-1) + old_val
+    old_val = nxt_val
+  end do
+  
+  !$OMP END PARALLEL
+#else
+  
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  ip = 1
+  do i=1,nr
+    ncl = a%irp(i)
+    a%irp(i) = ip
+    ip = ip + ncl
+  end do
+  a%irp(nr+1) = ip
+#endif
   call a%set_host()
-
-
+  
 end subroutine psb_s_cp_csr_from_coo
 
 
@@ -3097,6 +3097,9 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
   use psb_error_mod
   use psb_s_base_mat_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_mv_csr_from_coo
+#if defined(OPENMP)
+  use omp_lib 
+#endif  
   implicit none
 
   class(psb_s_csr_sparse_mat), intent(inout) :: a
@@ -3110,12 +3113,12 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
-  logical :: use_openmp = .false.
 
-  ! $ integer(psb_ipk_), allocatable :: sum(:)
-  ! $ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
-  ! $ integer(psb_ipk_) :: nxt_val,old_val,saved_elem
-  ! $ use_openmp = .true. 
+#if defined(OPENMP) 
+  integer(psb_ipk_), allocatable :: sum(:)
+  integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
+  integer(psb_ipk_) :: nxt_val,old_val,saved_elem
+#endif
 
 
   info = psb_success_
@@ -3143,74 +3146,74 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
 
   a%irp(:) = 0
 
-!!$  if (use_openmp) then
-!!$    !$OMP PARALLEL default(none) &
-!!$    !$OMP shared(sum,nthreads,nr,a,itemp,nza) &
-!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
-!!$
-!!$    !$OMP DO schedule(STATIC) &
-!!$    !$OMP private(k,i)
-!!$    do k=1,nza
-!!$      i = itemp(k)
-!!$      a%irp(i) = a%irp(i) + 1
-!!$    end do
-!!$    !$OMP END DO
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ nthreads = omp_get_num_threads()
-!!$    !$ allocate(sum(nthreads+1))
-!!$    !$ sum(:) = 0
-!!$    !$ sum(1) = 1
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ ithread = omp_get_thread_num()
-!!$
-!!$    !$ work = nr/nthreads
-!!$    !$ if (ithread < MOD(nr,nthreads)) then
-!!$      !$ work = work + 1
-!!$      !$ first_idx = ithread*work + 1
-!!$    !$ else
-!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
-!!$    !$ end if
-!!$
-!!$    !$ last_idx = first_idx + work - 1
-!!$
-!!$    !$ s = 0
-!!$    !$ do i=first_idx,last_idx
-!!$      !$ s = s + a%irp(i)
-!!$    !$ end do
-!!$    !$ if (work > 0) then
-!!$      !$ sum(ithread+2) = s
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ do i=2,nthreads+1
-!!$      !$ sum(i) = sum(i) + sum(i-1)
-!!$    !$ end do
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ if (work > 0) then 
-!!$      !$ saved_elem = a%irp(first_idx)
-!!$    !$ end if
-!!$    !$ if (ithread == 0) then
-!!$      !$ a%irp(1) = 1
-!!$    !$ end if
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ old_val = a%irp(first_idx+1)
-!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
-!!$    !$ end if
-!!$
-!!$    !$ do i=first_idx+2,last_idx+1
-!!$      !$ nxt_val = a%irp(i)
-!!$      !$ a%irp(i) = a%irp(i-1) + old_val
-!!$      !$ old_val = nxt_val
-!!$    !$ end do
-!!$
-!!$    !$OMP END PARALLEL
-!!$  else
+#if defined(OPENMP) 
+  !$OMP PARALLEL default(none) &
+  !$OMP shared(sum,nthreads,nr,a,itemp,nza) &
+  !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
+  
+  !$OMP DO schedule(STATIC) &
+  !$OMP private(k,i)
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  !$OMP END DO
+  
+  !$OMP SINGLE
+  nthreads = omp_get_num_threads()
+  allocate(sum(nthreads+1))
+  sum(:) = 0
+  sum(1) = 1
+  !$OMP END SINGLE
+  
+  ithread = omp_get_thread_num()
+
+  work = nr/nthreads
+  if (ithread < MOD(nr,nthreads)) then
+    work = work + 1
+    first_idx = ithread*work + 1
+  else
+    first_idx = ithread*work + MOD(nr,nthreads) + 1
+  end if
+
+  last_idx = first_idx + work - 1
+
+  s = 0
+  do i=first_idx,last_idx
+    s = s + a%irp(i)
+  end do
+  if (work > 0) then
+    sum(ithread+2) = s
+  end if
+
+  !$OMP BARRIER
+  
+  !$OMP SINGLE
+  do i=2,nthreads+1
+    sum(i) = sum(i) + sum(i-1)
+  end do
+  !$OMP END SINGLE
+
+  if (work > 0) then 
+    saved_elem = a%irp(first_idx)
+  end if
+  if (ithread == 0) then
+    a%irp(1) = 1
+  end if
+  
+  if (work > 0) then
+    old_val = a%irp(first_idx+1)
+    a%irp(first_idx+1) = saved_elem + sum(ithread+1)
+  end if
+
+  do i=first_idx+2,last_idx+1
+    nxt_val = a%irp(i)
+    a%irp(i) = a%irp(i-1) + old_val
+    old_val = nxt_val
+  end do
+
+  !$OMP END PARALLEL
+#else
     do k=1,nza
       i = itemp(k)
       a%irp(i) = a%irp(i) + 1
@@ -3222,7 +3225,7 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
       ip = ip + ncl
     end do
     a%irp(nr+1) = ip
-!!$  end if
+#endif
   
   call a%set_host()
 
