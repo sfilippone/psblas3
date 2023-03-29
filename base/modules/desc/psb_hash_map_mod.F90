@@ -655,7 +655,7 @@ contains
     integer(psb_ipk_)   :: me, np
     character(len=20)   :: name,ch_err
     logical, allocatable :: mask_(:)
-    logical :: use_openmp = .true.
+    logical :: use_openmp = .false.
 #ifdef OPENMP
     integer(kind = OMP_lock_kind) :: ins_lck
 #endif

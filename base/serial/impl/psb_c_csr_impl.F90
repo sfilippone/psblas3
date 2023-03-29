@@ -152,6 +152,7 @@ contains
           !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -163,6 +164,7 @@ contains
           !$omp parallel do private(i,j, acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -174,6 +176,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -189,6 +192,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -200,6 +204,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -211,6 +216,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -225,6 +231,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -236,6 +243,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -247,6 +255,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -261,6 +270,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -272,6 +282,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -283,6 +294,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -2862,6 +2874,8 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='c_cp_csr_from_coo'
+  logical :: use_openmp = .false.
+
 #if defined(OPENMP)
   integer(psb_ipk_), allocatable :: sum(:)
   integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
@@ -2983,21 +2997,22 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
   
   !$OMP END PARALLEL
 #else
-  
-  do k=1,nza
-    i = itemp(k)
-    a%irp(i) = a%irp(i) + 1
-  end do
-  ip = 1
-  do i=1,nr
-    ncl = a%irp(i)
-    a%irp(i) = ip
-    ip = ip + ncl
-  end do
-  a%irp(nr+1) = ip
+
+    do k=1,nza
+      i = itemp(k)
+      a%irp(i) = a%irp(i) + 1
+    end do
+    ip = 1
+    do i=1,nr
+      ncl = a%irp(i)
+      a%irp(i) = ip
+      ip = ip + ncl
+    end do
+    a%irp(nr+1) = ip
 #endif
   call a%set_host()
-  
+
+
 end subroutine psb_c_cp_csr_from_coo
 
 
@@ -3113,13 +3128,13 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
+  logical :: use_openmp = .false.
 
 #if defined(OPENMP) 
   integer(psb_ipk_), allocatable :: sum(:)
   integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
   integer(psb_ipk_) :: nxt_val,old_val,saved_elem
 #endif
-
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -3214,6 +3229,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
 
   !$OMP END PARALLEL
 #else
+
     do k=1,nza
       i = itemp(k)
       a%irp(i) = a%irp(i) + 1

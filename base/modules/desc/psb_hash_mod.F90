@@ -388,7 +388,7 @@ contains
     info  = HashOK
     hsize = hash%hsize
     hmask = hash%hmask
-
+    val = -1 
     hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
@@ -409,6 +409,7 @@ contains
         info = HashDuplicate
         return
       end if
+      !$OMP CRITICAL
       if (hash%table(hk,1) == HashFreeEntry) then 
         if (hash%nk == hash%hsize -1) then
           !
@@ -420,19 +421,22 @@ contains
           call psb_hash_realloc(hash,info) 
           if (info /=  HashOk) then             
             info = HashOutOfMemory
-            return
+            !return
           else
             call psb_hash_searchinskey(key,val,nextval,hash,info)
-            return
+            !return
           end if
         else
           hash%nk = hash%nk + 1 
           hash%table(hk,1) = key
           hash%table(hk,2) = nextval
           val              = nextval
-          return
+          !return
         end if
       end if
+      !$OMP END CRITICAL
+      if (info /= HashOk) return
+      if (val > 0) return 
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
@@ -448,7 +452,7 @@ contains
     info  = HashOK
     hsize = hash%hsize
     hmask = hash%hmask
-
+    
     hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
@@ -460,7 +464,7 @@ contains
       info = HashOutOfMemory
       return
     end if
-
+    val = -1 
     hash%nsrch = hash%nsrch + 1
     do 
       hash%nacc = hash%nacc + 1
@@ -469,6 +473,7 @@ contains
         info = HashDuplicate
         return
       end if
+      !$OMP CRITICAL
       if (hash%table(hk,1) == HashFreeEntry) then 
         if (hash%nk == hash%hsize -1) then
           !
@@ -480,19 +485,22 @@ contains
           call psb_hash_realloc(hash,info) 
           if (info /=  HashOk) then             
             info = HashOutOfMemory
-            return
+            !return
           else
             call psb_hash_searchinskey(key,val,nextval,hash,info)
-            return
+            !return
           end if
         else
           hash%nk = hash%nk + 1 
           hash%table(hk,1) = key
           hash%table(hk,2) = nextval
           val              = nextval
-          return
+          !return
         end if
       end if
+      !$OMP END CRITICAL
+      if (info /= HashOk) return 
+      if (val > 0) return
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
