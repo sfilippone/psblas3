@@ -70,7 +70,7 @@ AC_MSG_NOTICE([
 #
 #
 AC_PROG_INSTALL
-
+INSTALL="${INSTALL} -p"
 AC_MSG_CHECKING([where to install])
 case $prefix in  
    \/* )   eval "INSTALL_DIR=$prefix";;

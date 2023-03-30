@@ -3407,7 +3407,7 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
-
+INSTALL="${INSTALL} -p"
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking where to install" >&5
 printf %s "checking where to install... " >&6; }
 case $prefix in
