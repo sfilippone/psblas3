@@ -1036,7 +1036,12 @@ contains
 
 #endif
     else if (.not.use_openmp) then 
-
+#ifdef OPENMP
+      ! $ omp parallel
+      ! $ omp critical
+      !write(0,*) 'In cnv: ',omp_get_num_threads()
+#endif
+      isLoopValid = .true.
       if (idxmap%is_bld()) then 
 
         if (present(lidx)) then
@@ -1067,7 +1072,7 @@ contains
                       if (info /= psb_success_) then
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              &a_err='psb_ensure_size',i_err=(/info/))
-                        goto 9999
+                        isLoopValid = .false.
                       end if
                       idxmap%loc_to_glob(nxt)  = ip
                       call idxmap%set_lc(ncol)
@@ -1076,7 +1081,7 @@ contains
                   else
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
                          & a_err='SearchInsKeyVal',i_err=(/info/))
-                    goto 9999
+                    isLoopValid = .false.
                   end if
                 end if
                 idx(i) = lip
@@ -1114,7 +1119,7 @@ contains
                       info=1
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            &a_err='psb_ensure_size',i_err=(/info/))
-                      goto 9999
+                    isLoopValid = .false.
                     end if
                     idxmap%loc_to_glob(nxt)  = ip
                     call idxmap%set_lc(ncol)
@@ -1123,7 +1128,7 @@ contains
                 else
                   call psb_errpush(psb_err_from_subroutine_ai_,name,&
                        & a_err='SearchInsKeyVal',i_err=(/info/))
-                  goto 9999
+                  isLoopValid = .false.
                 end if
               end if
               idx(i) = lip
@@ -1160,7 +1165,7 @@ contains
                       info=1
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            & a_err='psb_ensure_size',i_err=(/info/))
-                      goto 9999
+                      isLoopValid = .false.
                     end if
                     idxmap%loc_to_glob(nxt)  = ip
                     call idxmap%set_lc(ncol)
@@ -1169,7 +1174,7 @@ contains
                 else
                   call psb_errpush(psb_err_from_subroutine_ai_,name,&
                        & a_err='SearchInsKeyVal',i_err=(/info/))
-                  goto 9999
+                  isLoopValid = .false.
                 end if
                 idx(i) = lip
                 info = psb_success_
@@ -1205,7 +1210,8 @@ contains
                     ch_err='psb_ensure_size'
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
                          &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-                    goto 9999
+                    isLoopValid = .false.
+                    
                   end if
                   idxmap%loc_to_glob(nxt)  = ip
                   call idxmap%set_lc(ncol)
@@ -1215,7 +1221,7 @@ contains
                 ch_err='SearchInsKeyVal'
                 call psb_errpush(psb_err_from_subroutine_ai_,name,&
                      & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-                goto 9999
+                    isLoopValid = .false.
               end if
               idx(i) = lip
               info = psb_success_
@@ -1229,6 +1235,12 @@ contains
         idx = -1
         info = -1
       end if
+#ifdef OPENMP
+      ! $ omp end critical
+      ! $ omp end parallel
+      
+#endif
+      if (.not. isLoopValid) goto 9999
     end if
     call psb_erractionrestore(err_act)
     return

@@ -51,6 +51,9 @@
 subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_dspins
   use psi_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   !....parameters...
@@ -82,7 +85,9 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-
+#if defined(OPENMP)
+  !write(0,*) name,omp_get_num_threads(),omp_get_thread_num()
+#endif
   if (nz < 0) then 
     info = 1111
     call psb_errpush(info,name)
@@ -131,15 +136,26 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='allocate',i_err=(/info/))
         goto 9999
       end if
-
-      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
+#if defined(OPENMP)
+      !$omp parallel private(ila,jla,nrow,ncol)
+#endif
+      
+      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+#if defined(OPENMP)
+      !$omp critical
+#endif
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
-
+!!$      write(0,*) omp_get_thread_num(),'Check  g2l: ',ila(1:nz),':',&
+!!$           & jla(1:nz),':',ja(1:nz)
+#if defined(OPENMP)
+      !$omp end critical
+#endif
+      
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
              & a_err='psb_cdins',i_err=(/info/))
-        goto 9999
+        !goto 9999
       end if
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
@@ -149,7 +165,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='a%csput')
-          goto 9999
+          !goto 9999
         end if
 
         if (a%is_remote_build()) then 
@@ -175,8 +191,13 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       else
         info = psb_err_invalid_a_and_cd_state_
         call psb_errpush(info,name)
-        goto 9999
+        !goto 9999
       end if
+
+#if defined(OPENMP)
+      !$omp end parallel
+#endif
+
     endif
 
   else if (desc_a%is_asb()) then 
