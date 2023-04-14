@@ -207,7 +207,6 @@ contains
     integer(psb_ipk_) :: i
     logical :: owned_
     info = 0
-
     if (present(mask)) then 
       if (size(mask) < size(idx)) then 
         info = -1
@@ -249,7 +248,6 @@ contains
       end do
 
     end if
-
   end subroutine hash_l2gv1
 
   subroutine hash_l2gv2(idxin,idxout,idxmap,info,mask,owned)
@@ -334,7 +332,6 @@ contains
     info = 0
     ctxt = idxmap%get_ctxt()
     call psb_info(ctxt,iam,np) 
-
     if (present(mask)) then 
       if (size(mask) < size(idx)) then 
         info = -1
@@ -437,7 +434,6 @@ contains
       end if
 
     end if
-
   end subroutine hash_g2lv1
 
   subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
@@ -459,7 +455,6 @@ contains
     logical :: owned_
     is = size(idxin)
     im = min(is,size(idxout))
-
 
     info = 0
     ctxt = idxmap%get_ctxt()
@@ -567,7 +562,6 @@ contains
       end if
 
     end if
-
   end subroutine hash_g2lv2
 
 
@@ -688,14 +682,13 @@ contains
 
     if (use_openmp) then
 #ifdef OPENMP      
-      call OMP_init_lock(ins_lck)
+      !call OMP_init_lock(ins_lck)
 
       if (idxmap%is_bld()) then
 
         isLoopValid = .true.
         ncol = idxmap%get_lc()
         if (present(mask)) then
-          !write(0,*) 'present mask'
           mask_ = mask
         else
           allocate(mask_(size(idx)))
@@ -703,13 +696,12 @@ contains
         end if
 
         if (present(lidx)) then
-          !write(0,*) 'present lidx'
           if (present(mask)) then
 
-            !$OMP PARALLEL DO default(none) schedule(DYNAMIC) &
-            !$OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz,lidx) &
-            !$OMP private(i,ip,lip,tlip,nxt,info) &
-            !$OMP reduction(.AND.:isLoopValid)        
+            ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
+            ! $ OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz,lidx) &
+            ! $ OMP private(i,ip,lip,tlip,nxt,info) &
+            ! $ OMP reduction(.AND.:isLoopValid)        
             do i = 1, is
               info = 0
               if (mask(i)) then
@@ -718,9 +710,9 @@ contains
                   idx(i) = -1
                   cycle
                 endif
-                call OMP_set_lock(ins_lck)                
+                !call OMP_set_lock(ins_lck)                
                 ncol  = idxmap%get_lc()
-                call OMP_unset_lock(ins_lck)
+                !call OMP_unset_lock(ins_lck)
 
                 ! At first, we check the index presence in 'idxmap'. Usually
                 ! the index is found. If it is not found, we repeat the checking,
@@ -728,7 +720,7 @@ contains
                 call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                      & idxmap%hashv,idxmap%glb_lc,ncol)
                 if (lip < 0) then
-                  call OMP_set_lock(ins_lck)
+                  !call OMP_set_lock(ins_lck)
 
                   ! We check again if the index is already in 'idxmap', this
                   ! time inside a critical region (we assume that the index 
@@ -772,7 +764,7 @@ contains
                     else
                       idx(i) = -1
                     end if
-                    call OMP_unset_lock(ins_lck)
+                    !call OMP_unset_lock(ins_lck)
                   end if
                 else
                   idx(i) = lip 
@@ -782,17 +774,17 @@ contains
               end if
 
             end do
-            !$OMP END PARALLEL DO
+            ! $ OMP END PARALLEL DO
 
             if (.not. isLoopValid) then
               goto 9999
             end if
           else
 
-            !$OMP PARALLEL DO default(none) schedule(DYNAMIC) &
-            !$OMP shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz,lidx) &
-            !$OMP private(i,ip,lip,tlip,nxt,info) &
-            !$OMP reduction(.AND.:isLoopValid)        
+            ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
+            ! $ OMP shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz,lidx) &
+            ! $ OMP private(i,ip,lip,tlip,nxt,info) &
+            ! $ OMP reduction(.AND.:isLoopValid)        
             do i = 1, is
               info = 0
               ip = idx(i)
@@ -800,9 +792,9 @@ contains
                 idx(i) = -1
                 cycle
               endif
-              call OMP_set_lock(ins_lck)                
+              !call OMP_set_lock(ins_lck)                
               ncol  = idxmap%get_lc()
-              call OMP_unset_lock(ins_lck)
+              !call OMP_unset_lock(ins_lck)
 
               ! At first, we check the index presence in 'idxmap'. Usually
               ! the index is found. If it is not found, we repeat the checking,
@@ -810,7 +802,7 @@ contains
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                    & idxmap%hashv,idxmap%glb_lc,ncol)
               if (lip < 0) then
-                call OMP_set_lock(ins_lck)
+                !call OMP_set_lock(ins_lck)
                 ! We check again if the index is already in 'idxmap', this
                 ! time inside a critical region (we assume that the index 
                 ! is often already existing).
@@ -851,26 +843,25 @@ contains
                   else
                     idx(i) = -1
                   end if
-                  call OMP_unset_lock(ins_lck)
+                  !call OMP_unset_lock(ins_lck)
                 end if
               else
                 idx(i) = lip 
               end if
 
             end do
-            !$OMP END PARALLEL DO
+            ! $ OMP END PARALLEL DO
 
             if (.not. isLoopValid) then
               goto 9999
             end if
           end if
         else if (.not.present(lidx)) then 
-          !write(0,*) 'not present lidx'
           if(present(mask)) then 
-            !$OMP PARALLEL DO default(none) schedule(DYNAMIC) &
-            !$OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz) &
-            !$OMP private(i,ip,lip,tlip,nxt,info) &
-            !$OMP reduction(.AND.:isLoopValid)        
+            ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
+            ! $ OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz) &
+            ! $ OMP private(i,ip,lip,tlip,nxt,info) &
+            ! $ OMP reduction(.AND.:isLoopValid)        
             do i = 1, is
               info = 0
               if (mask(i)) then
@@ -879,9 +870,9 @@ contains
                   idx(i) = -1
                   cycle
                 endif
-                call OMP_set_lock(ins_lck)                
+                !call OMP_set_lock(ins_lck)                
                 ncol  = idxmap%get_lc()
-                call OMP_unset_lock(ins_lck)
+                !call OMP_unset_lock(ins_lck)
 
                 ! At first, we check the index presence in 'idxmap'. Usually
                 ! the index is found. If it is not found, we repeat the checking,
@@ -890,7 +881,7 @@ contains
                      & idxmap%hashv,idxmap%glb_lc,ncol)
 
                 if (lip < 0) then
-                  call OMP_set_lock(ins_lck)
+                  !call OMP_set_lock(ins_lck)
                   ! We check again if the index is already in 'idxmap', this
                   ! time inside a critical region (we assume that the index 
                   ! is often already existing, so this lock is relatively rare).
@@ -932,7 +923,7 @@ contains
                     else
                       idx(i) = -1
                     end if
-                    call OMP_unset_lock(ins_lck)
+                    !call OMP_unset_lock(ins_lck)
                   end if
                 else
                   idx(i) = lip 
@@ -942,16 +933,16 @@ contains
               end if
 
             end do
-            !$OMP END PARALLEL DO
+            ! $ OMP END PARALLEL DO
 
             if (.not. isLoopValid) then
               goto 9999
             end if
           else
-            !$OMP PARALLEL DO default(none) schedule(DYNAMIC) &
-            !$OMP shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-            !$OMP private(i,ip,lip,tlip,nxt,info) &
-            !$OMP reduction(.AND.:isLoopValid)        
+            ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
+            ! $ OMP shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+            ! $ OMP private(i,ip,lip,tlip,nxt,info) &
+            ! $ OMP reduction(.AND.:isLoopValid)        
             do i = 1, is
               info = 0
               ip = idx(i)
@@ -959,9 +950,9 @@ contains
                 idx(i) = -1
                 cycle
               endif
-              call OMP_set_lock(ins_lck)              
+              !call OMP_set_lock(ins_lck)              
               ncol  = idxmap%get_lc()
-              call OMP_unset_lock(ins_lck)
+              !call OMP_unset_lock(ins_lck)
 
               ! At first, we check the index presence in 'idxmap'. Usually
               ! the index is found. If it is not found, we repeat the checking,
@@ -969,7 +960,7 @@ contains
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                    & idxmap%hashv,idxmap%glb_lc,ncol)
               if (lip < 0) then
-                call OMP_set_lock(ins_lck)
+                !call OMP_set_lock(ins_lck)
                 ! We check again if the index is already in 'idxmap', this
                 ! time inside a critical region (we assume that the index 
                 ! is often already existing).
@@ -1011,7 +1002,7 @@ contains
                   else
                     idx(i) = -1
                   end if
-                  call OMP_unset_lock(ins_lck)
+                  !call OMP_unset_lock(ins_lck)
                 end if
 
               else
@@ -1019,7 +1010,7 @@ contains
               end if
 
             end do
-            !$OMP END PARALLEL DO
+            ! $ OMP END PARALLEL DO
 
             if (.not. isLoopValid) then
               goto 9999
@@ -1032,7 +1023,7 @@ contains
         idx = -1
         info = -1
       end if
-      call OMP_destroy_lock(ins_lck)
+      !call OMP_destroy_lock(ins_lck)
 
 #endif
     else if (.not.use_openmp) then 
@@ -1139,9 +1130,9 @@ contains
 
         else if (.not.present(lidx)) then 
 
-          if (present(mask)) then 
+          if (present(mask)) then
             do i = 1, is
-              if (mask(i)) then 
+              if (mask(i)) then
                 ip   = idx(i) 
                 if ((ip < 1 ).or.(ip>mglob)) then 
                   idx(i) = -1
@@ -1182,7 +1173,6 @@ contains
                 idx(i) = -1
               end if
             enddo
-
           else if (.not.present(mask)) then 
 
             do i = 1, is
@@ -1226,7 +1216,6 @@ contains
               idx(i) = lip
               info = psb_success_
             enddo
-
 
           end if
         end if

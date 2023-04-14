@@ -349,7 +349,6 @@ contains
     logical :: owned_
 
     info = 0
-
     if (present(mask)) then 
       if (size(mask) < size(idxin)) then 
         info = -1
@@ -644,7 +643,20 @@ contains
             if (mask(i)) then 
               if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 ix = idxmap%glob_to_loc(idxin(i))                
+                if (ix < 0) then                  
+#if defined(OPENMP)
+                !$OMP CRITICAL(LISTINS)
+                ix = idxmap%glob_to_loc(idxin(i))
                 if (ix < 0) then 
+                  ix = lidx(i)
+                  call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+                  if (info /= 0) info = -4
+                  idxmap%local_cols            = max(ix,idxmap%local_cols)
+                  idxmap%loc_to_glob(ix)       = idxin(i)
+                  idxmap%glob_to_loc(idxin(i)) = ix
+                end if
+                !$OMP END CRITICAL(LISTINS)                  
+#else
                   ix = lidx(i) 
                   call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
                   if ((ix <= idxmap%local_rows).or.(info /= 0)) then 
@@ -654,6 +666,7 @@ contains
                   idxmap%local_cols            = max(ix,idxmap%local_cols)
                   idxmap%loc_to_glob(ix)       = idxin(i)
                   idxmap%glob_to_loc(idxin(i)) = ix
+#endif
                 end if
                 idxout(i) = ix
               else 
@@ -668,6 +681,19 @@ contains
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               ix = idxmap%glob_to_loc(idxin(i))
               if (ix < 0) then 
+#if defined(OPENMP)
+                !$OMP CRITICAL(LISTINS)
+                ix = idxmap%glob_to_loc(idxin(i))
+                if (ix < 0) then 
+                  ix = lidx(i)
+                  call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+                  if (info /= 0) info = -4
+                  idxmap%local_cols            = max(ix,idxmap%local_cols)
+                  idxmap%loc_to_glob(ix)       = idxin(i)
+                  idxmap%glob_to_loc(idxin(i)) = ix
+                end if
+                !$OMP END CRITICAL(LISTINS)                  
+#else
                 ix = lidx(i) 
                 call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
                 if ((ix <= idxmap%local_rows).or.(info /= 0)) then 
@@ -677,6 +703,7 @@ contains
                 idxmap%local_cols            = max(ix,idxmap%local_cols)
                 idxmap%loc_to_glob(ix)       = idxin(i)
                 idxmap%glob_to_loc(idxin(i)) = ix
+#endif
               end if
               idxout(i) = ix
             else 
@@ -692,7 +719,20 @@ contains
             if (mask(i)) then 
               if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 ix = idxmap%glob_to_loc(idxin(i))
-                if (ix < 0) then 
+                if (ix < 0) then
+#if defined(OPENMP)
+                  !$OMP CRITICAL(LISTINS)
+                  ix = idxmap%glob_to_loc(idxin(i))
+                  if (ix < 0) then 
+                    ix = idxmap%local_cols + 1
+                    call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+                    if (info /= 0) info = -4
+                    idxmap%local_cols            = ix
+                    idxmap%loc_to_glob(ix)       = idxin(i)
+                    idxmap%glob_to_loc(idxin(i)) = ix
+                  end if
+                  !$OMP END CRITICAL(LISTINS)                  
+#else
                   ix = idxmap%local_cols + 1
                   call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
                   if (info /= 0) then 
@@ -702,6 +742,7 @@ contains
                   idxmap%local_cols            = ix
                   idxmap%loc_to_glob(ix)       = idxin(i)
                   idxmap%glob_to_loc(idxin(i)) = ix
+#endif
                 end if
                 idxout(i) = ix
               else 
@@ -716,6 +757,19 @@ contains
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               ix = idxmap%glob_to_loc(idxin(i))
               if (ix < 0) then 
+#if defined(OPENMP)
+                !$OMP CRITICAL(LISTINS)
+                ix = idxmap%glob_to_loc(idxin(i))
+                if (ix < 0) then 
+                  ix = idxmap%local_cols + 1
+                  call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
+                  if (info /= 0) info = -4
+                  idxmap%local_cols            = ix
+                  idxmap%loc_to_glob(ix)       = idxin(i)
+                  idxmap%glob_to_loc(idxin(i)) = ix
+                end if
+                !$OMP END CRITICAL(LISTINS)                  
+#else
                 ix = idxmap%local_cols + 1
                 call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
                 if (info /= 0) then 
@@ -725,6 +779,7 @@ contains
                 idxmap%local_cols            = ix
                 idxmap%loc_to_glob(ix)       = idxin(i)
                 idxmap%glob_to_loc(idxin(i)) = ix
+#endif
               end if
               idxout(i) = ix
             else 

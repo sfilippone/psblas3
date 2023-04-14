@@ -409,34 +409,39 @@ contains
         info = HashDuplicate
         return
       end if
-      !$OMP CRITICAL
-      if (hash%table(hk,1) == HashFreeEntry) then 
-        if (hash%nk == hash%hsize -1) then
-          !
-          ! Note: because of the way we allocate things at CDALL
-          ! time this is really unlikely; if we get here, we
-          ! have at least as many halo indices as internals, which
-          ! means we're already in trouble. But we try to keep going. 
-          !
-          call psb_hash_realloc(hash,info) 
-          if (info /=  HashOk) then             
-            info = HashOutOfMemory
-            !return
+      !$omp critical(hashsearchins)
+      if (hash%table(hk,1) == key) then 
+        val  = hash%table(hk,2)
+        info = HashDuplicate
+      else
+        if (hash%table(hk,1) == HashFreeEntry) then
+          if (hash%nk == hash%hsize -1) then
+            !
+            ! Note: because of the way we allocate things at CDALL
+            ! time this is really unlikely; if we get here, we
+            ! have at least as many halo indices as internals, which
+            ! means we're already in trouble. But we try to keep going. 
+            !
+            call psb_hash_realloc(hash,info) 
+            if (info /=  HashOk) then             
+              info = HashOutOfMemory
+              !return
+            else
+              call psb_hash_searchinskey(key,val,nextval,hash,info)
+              !return
+            end if
           else
-            call psb_hash_searchinskey(key,val,nextval,hash,info)
+            hash%nk = hash%nk + 1 
+            hash%table(hk,1) = key
+            hash%table(hk,2) = nextval
+            val              = nextval
             !return
           end if
-        else
-          hash%nk = hash%nk + 1 
-          hash%table(hk,1) = key
-          hash%table(hk,2) = nextval
-          val              = nextval
-          !return
         end if
       end if
-      !$OMP END CRITICAL
+      !$omp end critical(hashsearchins)
       if (info /= HashOk) return
-      if (val > 0) return 
+      if (val > 0) return
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
