@@ -73,7 +73,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  integer(psb_ipk_)      :: i,k
+  integer(psb_ipk_)      :: i,k, ith, nth 
   integer(psb_lpk_)      :: nnl
   integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
   real(psb_dpk_), allocatable     :: lval(:)
@@ -86,7 +86,11 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
 #if defined(OPENMP)
-  !write(0,*) name,omp_get_num_threads(),omp_get_thread_num()
+  nth = omp_get_num_threads()
+  ith = omp_get_thread_num()
+#else
+  nth = 1
+  ith = 0 
 #endif
   if (nz < 0) then 
     info = 1111
@@ -139,17 +143,14 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 #if defined(OPENMP)
       !$omp parallel private(ila,jla,nrow,ncol)
 #endif
-      
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
 #if defined(OPENMP)
-      !$omp critical
+      !$omp critical(dSPINS)
 #endif
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
-!!$      write(0,*) omp_get_thread_num(),'Check  g2l: ',ila(1:nz),':',&
-!!$           & jla(1:nz),':',ja(1:nz)
 #if defined(OPENMP)
-      !$omp end critical
+      !$omp end critical(dSPINS)
 #endif
       
       if (info /= psb_success_) then
@@ -171,7 +172,6 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         if (a%is_remote_build()) then 
           nnl = count(ila(1:nz)<0)
           if (nnl > 0) then 
-            !write(0,*) 'Check on insert ',nnl
             allocate(lila(nnl),ljla(nnl),lval(nnl))
             k = 0
             do i=1,nz
@@ -197,7 +197,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 #if defined(OPENMP)
       !$omp end parallel
 #endif
-
+      if (info /= 0) goto 9999
     endif
 
   else if (desc_a%is_asb()) then 

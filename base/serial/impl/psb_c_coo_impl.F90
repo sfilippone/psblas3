@@ -2818,6 +2818,9 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_realloc_mod
   use psb_sort_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_csput_a
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   class(psb_c_coo_sparse_mat), intent(inout) :: a
@@ -2829,7 +2832,7 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='c_coo_csput_a_impl'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, debug_level, debug_unit
+  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, nzaold, debug_level, debug_unit
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2861,10 +2864,11 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz == 0) return
 
-
-  nza  = a%get_nzeros()
-  isza = a%get_size()
   if (a%is_bld()) then
+
+    !$omp critical
+    nza  = a%get_nzeros()
+    isza = a%get_size()
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
       call a%reallocate(max(nza+nz,int(1.5*isza)))
@@ -2872,16 +2876,23 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     isza = a%get_size()
     if (isza < (nza+nz)) then
       info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
-      goto 9999
+    else
+      nzaold = nza
+      nza = nza + nz
+      call a%set_nzeros(nza)
+#if defined(OPENMP)
+      !write(0,*) 'From thread ',omp_get_thread_num(),nzaold,nz,nza,a%get_nzeros()
+#endif
     end if
-
-    call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
+    !$omp end critical
+    if (info /= 0)  goto 9999
+    call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
-    call a%set_nzeros(nza)
     call a%set_sorted(.false.)
-
-
+    
   else  if (a%is_upd()) then
+    nza  = a%get_nzeros()
+    isza = a%get_size()
 
     if (a%is_dev())   call a%sync()
 
@@ -2951,7 +2962,7 @@ contains
     end do
     !$OMP END PARALLEL DO
 
-    nza = nza + nz
+    !nza = nza + nz
 #else
     do i=1, nz
       ir = ia(i)

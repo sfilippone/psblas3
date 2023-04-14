@@ -451,16 +451,24 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    !$omp parallel private(i,ii,ib,icoeff,glob_row,x,y,z,zt,ix,iy,iz)
-    !  shared(deltah,myidx,a,desc_a,nb)
+    !$omp parallel shared(deltah,myidx,a,desc_a)
     ! we build an auxiliary matrix consisting of one row at a
     ! time; just a small matrix. might be extended to generate
     ! a bunch of rows per call.
     !
     block 
+      integer(psb_ipk_) :: i,j,ii,ib,icoeff, ix,iy,iz, ith,nth
+      integer(psb_lpk_) :: glob_row
       integer(psb_lpk_), allocatable     :: irow(:),icol(:)
       real(psb_dpk_), allocatable :: val(:)
-
+      real(psb_dpk_)    :: x,y,z, zt(nb)
+#if defined(OPENMP)
+      nth = omp_get_num_threads()
+      ith = omp_get_thread_num()
+#else
+      nth = 1
+      ith = 0
+#endif
       allocate(val(20*nb),irow(20*nb),&
            &icol(20*nb),stat=info)
       if (info /= psb_success_ ) then
@@ -473,7 +481,7 @@ contains
       ! loop over rows belonging to current process in a block
       ! distribution.
 
-      !$omp  do 
+      !$omp  do schedule(dynamic,4)
       !     
       do ii=1, nlr, nb
         if (info /= 0) cycle
@@ -723,7 +731,7 @@ program psb_d_pde3d
   if(psb_errstatus_fatal()) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
-  call psb_cd_set_large_threshold(2000_psb_ipk_)
+  !call psb_cd_set_large_threshold(2000_psb_ipk_)
   !
   ! Hello world
   !

@@ -2832,7 +2832,7 @@ subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='d_coo_csput_a_impl'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, debug_level, debug_unit, nzaold
+  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, nzaold, debug_level, debug_unit
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2864,7 +2864,6 @@ subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz == 0) return
 
-
   if (a%is_bld()) then
 
     !$omp critical
@@ -2890,7 +2889,7 @@ subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
     call a%set_sorted(.false.)
-
+    
   else  if (a%is_upd()) then
     nza  = a%get_nzeros()
     isza = a%get_size()
@@ -2945,9 +2944,9 @@ contains
     ! the serial version: each element is stored in data
     ! structures but the invalid ones are stored as '-1' values.
     ! These values will be filtered in a future fixing process.
-    ! $ OMP PARALLEL DO default(none) schedule(STATIC) &
-    ! $ OMP shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
-    ! $ OMP private(ir,ic,i)
+    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
+    !$OMP private(ir,ic,i)
     do i=1,nz
       ir = ia(i)
       ic = ja(i)
@@ -2961,7 +2960,7 @@ contains
         aspk(nza+i) = -1
       end if
     end do
-    ! $OMP END PARALLEL DO
+    !$OMP END PARALLEL DO
 
     !nza = nza + nz
 #else

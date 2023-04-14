@@ -51,6 +51,9 @@
 subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_zspins
   use psi_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   !....parameters...
@@ -70,7 +73,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  integer(psb_ipk_)      :: i,k
+  integer(psb_ipk_)      :: i,k, ith, nth 
   integer(psb_lpk_)      :: nnl
   integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
   complex(psb_dpk_), allocatable     :: lval(:)
@@ -82,7 +85,13 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-
+#if defined(OPENMP)
+  nth = omp_get_num_threads()
+  ith = omp_get_thread_num()
+#else
+  nth = 1
+  ith = 0 
+#endif
   if (nz < 0) then 
     info = 1111
     call psb_errpush(info,name)
@@ -131,15 +140,23 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='allocate',i_err=(/info/))
         goto 9999
       end if
-
-      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
+#if defined(OPENMP)
+      !$omp parallel private(ila,jla,nrow,ncol)
+#endif
+      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+#if defined(OPENMP)
+      !$omp critical(zSPINS)
+#endif
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
-
+#if defined(OPENMP)
+      !$omp end critical(zSPINS)
+#endif
+      
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
              & a_err='psb_cdins',i_err=(/info/))
-        goto 9999
+        !goto 9999
       end if
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
@@ -149,13 +166,12 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='a%csput')
-          goto 9999
+          !goto 9999
         end if
 
         if (a%is_remote_build()) then 
           nnl = count(ila(1:nz)<0)
           if (nnl > 0) then 
-            !write(0,*) 'Check on insert ',nnl
             allocate(lila(nnl),ljla(nnl),lval(nnl))
             k = 0
             do i=1,nz
@@ -175,8 +191,13 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       else
         info = psb_err_invalid_a_and_cd_state_
         call psb_errpush(info,name)
-        goto 9999
+        !goto 9999
       end if
+
+#if defined(OPENMP)
+      !$omp end parallel
+#endif
+      if (info /= 0) goto 9999
     endif
 
   else if (desc_a%is_asb()) then 

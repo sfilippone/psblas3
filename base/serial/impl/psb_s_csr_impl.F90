@@ -2997,22 +2997,21 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
   
   !$OMP END PARALLEL
 #else
-
-    do k=1,nza
-      i = itemp(k)
-      a%irp(i) = a%irp(i) + 1
-    end do
-    ip = 1
-    do i=1,nr
-      ncl = a%irp(i)
-      a%irp(i) = ip
-      ip = ip + ncl
-    end do
-    a%irp(nr+1) = ip
+  
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  ip = 1
+  do i=1,nr
+    ncl = a%irp(i)
+    a%irp(i) = ip
+    ip = ip + ncl
+  end do
+  a%irp(nr+1) = ip
 #endif
   call a%set_host()
-
-
+  
 end subroutine psb_s_cp_csr_from_coo
 
 
@@ -3128,7 +3127,6 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
-  logical :: use_openmp = .false.
 
 #if defined(OPENMP) 
   integer(psb_ipk_), allocatable :: sum(:)
@@ -3229,7 +3227,6 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
 
   !$OMP END PARALLEL
 #else
-
     do k=1,nza
       i = itemp(k)
       a%irp(i) = a%irp(i) + 1
