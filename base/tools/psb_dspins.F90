@@ -144,14 +144,8 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       !$omp parallel private(ila,jla,nrow,ncol)
 #endif
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
-#if defined(OPENMP)
-      !$omp critical(dspins)
-#endif
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
-#if defined(OPENMP)
-      !$omp end critical(dspins)
-#endif
       
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_ai_,name,&

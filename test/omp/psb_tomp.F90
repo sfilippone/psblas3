@@ -731,7 +731,7 @@ program psb_d_pde3d
   if(psb_errstatus_fatal()) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
-  call psb_cd_set_large_threshold(2000_psb_ipk_)
+  call psb_cd_set_large_threshold(125000_psb_ipk_)
   !
   ! Hello world
   !
