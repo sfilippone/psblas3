@@ -639,7 +639,7 @@ contains
       write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
-    !call a%print('a.mtx',head='Test')
+    call a%print('a.mtx',head='Test')
     call psb_erractionrestore(err_act)
     return
 
@@ -731,7 +731,7 @@ program psb_d_pde3d
   if(psb_errstatus_fatal()) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
-  !call psb_cd_set_large_threshold(2000_psb_ipk_)
+  call psb_cd_set_large_threshold(2000_psb_ipk_)
   !
   ! Hello world
   !

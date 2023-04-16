@@ -649,7 +649,7 @@ contains
     integer(psb_ipk_)   :: me, np
     character(len=20)   :: name,ch_err
     logical, allocatable :: mask_(:)
-    logical :: use_openmp = .false.
+    logical :: use_openmp = .true.
 #ifdef OPENMP
     integer(kind = OMP_lock_kind) :: ins_lck
 #endif
@@ -681,7 +681,7 @@ contains
     nrow  = idxmap%get_lr()
 
     if (use_openmp) then
-#ifdef OPENMP      
+#ifdef OPENMP
       !call OMP_init_lock(ins_lck)
 
       if (idxmap%is_bld()) then
@@ -697,6 +697,7 @@ contains
 
         if (present(lidx)) then
           if (present(mask)) then
+            !$omp critical(hash_g2l_ins)
 
             ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
             ! $ OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz,lidx) &
@@ -775,11 +776,13 @@ contains
 
             end do
             ! $ OMP END PARALLEL DO
+            !$omp end critical(hash_g2l_ins)
 
             if (.not. isLoopValid) then
               goto 9999
             end if
           else
+            !$omp critical(hash_g2l_ins)
 
             ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
             ! $ OMP shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz,lidx) &
@@ -851,7 +854,8 @@ contains
 
             end do
             ! $ OMP END PARALLEL DO
-
+            !$omp end critical(hash_g2l_ins)
+            
             if (.not. isLoopValid) then
               goto 9999
             end if
@@ -861,7 +865,9 @@ contains
             ! $ OMP PARALLEL DO default(none) schedule(DYNAMIC) &
             ! $ OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz) &
             ! $ OMP private(i,ip,lip,tlip,nxt,info) &
-            ! $ OMP reduction(.AND.:isLoopValid)        
+            ! $ OMP reduction(.AND.:isLoopValid)
+            !$omp critical(hash_g2l_ins)
+            
             do i = 1, is
               info = 0
               if (mask(i)) then
@@ -934,7 +940,8 @@ contains
 
             end do
             ! $ OMP END PARALLEL DO
-
+            !$omp end critical(hash_g2l_ins)
+            
             if (.not. isLoopValid) then
               goto 9999
             end if
@@ -943,6 +950,7 @@ contains
             ! $ OMP shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
             ! $ OMP private(i,ip,lip,tlip,nxt,info) &
             ! $ OMP reduction(.AND.:isLoopValid)        
+            !$omp critical(hash_g2l_ins)
             do i = 1, is
               info = 0
               ip = idx(i)
@@ -1011,6 +1019,7 @@ contains
 
             end do
             ! $ OMP END PARALLEL DO
+            !$omp end critical(hash_g2l_ins)
 
             if (.not. isLoopValid) then
               goto 9999
@@ -1024,7 +1033,6 @@ contains
         info = -1
       end if
       !call OMP_destroy_lock(ins_lck)
-
 #endif
     else if (.not.use_openmp) then 
 #ifdef OPENMP

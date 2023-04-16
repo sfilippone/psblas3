@@ -145,12 +145,12 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 #endif
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
 #if defined(OPENMP)
-      !$omp critical(sSPINS)
+      !$omp critical(sspins)
 #endif
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
 #if defined(OPENMP)
-      !$omp end critical(sSPINS)
+      !$omp end critical(sspins)
 #endif
       
       if (info /= psb_success_) then
