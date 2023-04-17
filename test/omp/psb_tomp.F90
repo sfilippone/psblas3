@@ -639,7 +639,16 @@ contains
       write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
-    call a%print('a.mtx',head='Test')
+!!$    !$omp parallel
+!!$    !$omp master
+!!$    block
+!!$      character(len=1024) :: fname
+!!$      write(fname,'(a,i4.4,a,i4.4,a)') 'a-',iam,'-',np,'.mtx'
+!!$      write(0,*) iam,' Size of A ',a%get_nrows(),a%get_ncols(),a%get_nzeros()
+!!$      call a%print(fname,head='Test')
+!!$    end block
+!!$    !$omp end master
+!!$    !$omp end parallel
     call psb_erractionrestore(err_act)
     return
 
