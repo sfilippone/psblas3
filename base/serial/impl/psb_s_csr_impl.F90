@@ -2876,12 +2876,6 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
   character(len=20)   :: name='s_cp_csr_from_coo'
   logical :: use_openmp = .false.
 
-#if defined(OPENMP)
-  integer(psb_ipk_), allocatable :: suma(:)
-  integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
-  integer(psb_ipk_) :: nxt_val,old_val,saved_elem,maxthreads 
-#endif
-
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -2927,8 +2921,8 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
 #if defined(OPENMP)
 
   !$OMP PARALLEL default(none) &
-  !$OMP shared(suma,nthreads,nr,a,itemp,nza) &
-  !$OMP private(ithread,work,i,first_idx,last_idx,s)
+  !$OMP shared(nr,a,itemp,nza) &
+  !$OMP private(i,info)
 
   !$OMP WORKSHARE
   a%irp(:) = 0
@@ -2943,51 +2937,6 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
-
-  !$OMP SINGLE
-  nthreads = omp_get_num_threads()
-  allocate(suma(nthreads+1))
-  suma(:) = 0
-  !suma(1) = 1
-  !$OMP END SINGLE
-  ithread = omp_get_thread_num()
-
-
-  work = (nr+1)/nthreads
-  if (ithread < MOD((nr+1),nthreads)) then
-    work = work + 1
-    first_idx = ithread*work + 1
-  else
-    first_idx = ithread*work + MOD((nr+1),nthreads) + 1
-  end if
-
-  last_idx = min(first_idx + work - 1,nr+1)
-  s = 0
-  if (first_idx<=last_idx) then 
-    suma(ithread+2) = suma(ithread+2) + a%irp(first_idx)
-    do i=first_idx+1,last_idx
-      suma(ithread+2) = suma(ithread+2) + a%irp(i)
-      a%irp(i) = a%irp(i)+a%irp(i-1) 
-    end do
-  end if
-  !$OMP BARRIER
-  !$OMP SINGLE
-  do i=2,nthreads+1
-    suma(i) = suma(i) + suma(i-1)
-  end do
-  !$OMP END SINGLE      
-
-  !$OMP BARRIER
-
-  !$OMP DO SCHEDULE(STATIC)
-  do i=1,nr+1
-    a%irp(i) = suma(ithread+1) + a%irp(i) +1
-  end do
-  !$OMP END DO
-  !$OMP SINGLE
-  a%irp(1) = 1
-  !$OMP END SINGLE
-
   !$OMP END PARALLEL
 #else
   a%irp(:) = 0
@@ -2995,14 +2944,8 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
     i = itemp(k)
     a%irp(i) = a%irp(i) + 1
   end do
-  ip = 1
-  do i=1,nr
-    ncl = a%irp(i)
-    a%irp(i) = ip
-    ip = ip + ncl
-  end do
-  a%irp(nr+1) = ip
 #endif
+  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
 
   call a%set_host()
   
@@ -3122,12 +3065,6 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
 
-#if defined(OPENMP) 
-  integer(psb_ipk_), allocatable :: suma(:)
-  integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
-  integer(psb_ipk_) :: nxt_val,old_val,saved_elem
-#endif
-
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -3153,8 +3090,8 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
 #if defined(OPENMP)
 
   !$OMP PARALLEL default(none) &
-  !$OMP shared(suma,nthreads,nr,a,itemp,nza) &
-  !$OMP private(ithread,work,i,first_idx,last_idx,s)
+  !$OMP shared(nr,a,itemp,nza) &
+  !$OMP private(i,info)
 
   !$OMP WORKSHARE
   a%irp(:) = 0
@@ -3169,51 +3106,6 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
-
-  !$OMP SINGLE
-  nthreads = omp_get_num_threads()
-  allocate(suma(nthreads+1))
-  suma(:) = 0
-  !suma(1) = 1
-  !$OMP END SINGLE
-  ithread = omp_get_thread_num()
-
-
-  work = (nr+1)/nthreads
-  if (ithread < MOD((nr+1),nthreads)) then
-    work = work + 1
-    first_idx = ithread*work + 1
-  else
-    first_idx = ithread*work + MOD((nr+1),nthreads) + 1
-  end if
-
-  last_idx = min(first_idx + work - 1,nr+1)
-  s = 0
-  if (first_idx<=last_idx) then 
-    suma(ithread+2) = suma(ithread+2) + a%irp(first_idx)
-    do i=first_idx+1,last_idx
-      suma(ithread+2) = suma(ithread+2) + a%irp(i)
-      a%irp(i) = a%irp(i)+a%irp(i-1) 
-    end do
-  end if
-  !$OMP BARRIER
-  !$OMP SINGLE
-  do i=2,nthreads+1
-    suma(i) = suma(i) + suma(i-1)
-  end do
-  !$OMP END SINGLE      
-
-  !$OMP BARRIER
-
-  !$OMP DO SCHEDULE(STATIC)
-  do i=1,nr+1
-    a%irp(i) = suma(ithread+1) + a%irp(i) +1
-  end do
-  !$OMP END DO
-  !$OMP SINGLE
-  a%irp(1) = 1
-  !$OMP END SINGLE
-
   !$OMP END PARALLEL
 #else
   a%irp(:) = 0
@@ -3221,14 +3113,8 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
     i = itemp(k)
     a%irp(i) = a%irp(i) + 1
   end do
-  ip = 1
-  do i=1,nr
-    ncl = a%irp(i)
-    a%irp(i) = ip
-    ip = ip + ncl
-  end do
-  a%irp(nr+1) = ip
 #endif
+  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
 
   !write(0,*) name,' Check:',a%irp(nr+1),all(a%irp(1:nr) < a%irp(nr+1))
   !write(0,*) name,a%irp(:)

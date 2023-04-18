@@ -29,6 +29,97 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
+subroutine psi_c_exscanv(n,x,info,shift,ibase)
+  use psi_c_serial_mod, psb_protect_name => psi_c_exscanv
+  use psb_const_mod
+  use psb_error_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
+  implicit none
+  integer(psb_ipk_), intent(in)      :: n
+  complex(psb_spk_), intent (inout)    :: x(:)
+  integer(psb_ipk_), intent(out)     :: info
+  complex(psb_spk_), intent(in), optional :: shift
+  integer(psb_ipk_), intent(in), optional :: ibase
+  
+  complex(psb_spk_) :: shift_, tp, ts
+  complex(psb_spk_), allocatable :: suma(:)
+  integer(psb_ipk_)  :: i,ithread,nthreads,first_idx,last_idx,wrk, ibase_
+  
+  if (present(shift)) then
+    shift_ = shift
+  else
+    shift_ = czero
+  end if
+  if (present(ibase)) then
+    ibase_ = ibase
+  else
+    ibase_ = ione
+  end if
+    
+#if defined(OPENMP)
+
+  !$OMP PARALLEL default(none) &
+  !$OMP shared(suma,nthreads,n,x,shift_,ibase_) &
+  !$OMP private(ithread,wrk,i,first_idx,last_idx)
+
+  !$OMP SINGLE
+  nthreads = omp_get_num_threads()
+  allocate(suma(nthreads+1))
+  suma(:) = 0
+  !suma(1) = 1
+  !$OMP END SINGLE
+  ithread = omp_get_thread_num()
+
+
+  wrk = (n)/nthreads
+  if (ithread < MOD((n),nthreads)) then
+    wrk = wrk + 1
+    first_idx = ithread*wrk + ibase_
+  else
+    first_idx = ithread*wrk + MOD((n),nthreads) + ibase_
+  end if
+
+  last_idx = min(first_idx + wrk - 1,n - (ibase_-ione))
+  if (first_idx<=last_idx) then 
+    suma(ithread+2) = suma(ithread+2) + x(first_idx)
+    do i=first_idx+1,last_idx
+      suma(ithread+2) = suma(ithread+2) + x(i)
+      x(i) = x(i)+x(i-1) 
+    end do
+  end if
+  !$OMP BARRIER
+  !$OMP SINGLE
+  do i=2,nthreads+1
+    suma(i) = suma(i) + suma(i-1)
+  end do
+  !$OMP END SINGLE      
+
+  !$OMP BARRIER
+
+  !$OMP DO SCHEDULE(STATIC)
+  do i=1,n
+    x(i) = suma(ithread+1) + x(i) + shift_
+  end do
+  !$OMP END DO
+  !$OMP SINGLE
+  x(1) = shift_
+  !$OMP END SINGLE
+
+  !$OMP END PARALLEL
+#else
+  tp = shift_
+  do i=1,n
+    ts = x(i)
+    x(i) = tp
+    tp = tp + ts
+  end do
+
+#endif
+  
+end subroutine psi_c_exscanv
+
 subroutine psb_m_cgelp(trans,iperm,x,info)
   use psb_serial_mod, psb_protect_name => psb_m_cgelp
   use psb_const_mod
