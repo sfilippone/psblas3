@@ -2920,16 +2920,14 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
   
 #if defined(OPENMP)
 
-  !$OMP PARALLEL default(none) &
-  !$OMP shared(nr,a,itemp,nza) &
-  !$OMP private(i,info)
+  !$OMP PARALLEL default(shared) reduction(max:info)
 
   !$OMP WORKSHARE
   a%irp(:) = 0
   !$OMP END WORKSHARE
 
   !$OMP DO schedule(STATIC) &
-  !$OMP private(k)
+  !$OMP private(k,i)
   do k=1,nza
     i = itemp(k)
     !$OMP ATOMIC UPDATE 
@@ -2937,6 +2935,7 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
+  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
   !$OMP END PARALLEL
 #else
   a%irp(:) = 0
@@ -2944,8 +2943,8 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
     i = itemp(k)
     a%irp(i) = a%irp(i) + 1
   end do
+  call psi_exscan(nr+1,a%irp,info,shift=done,ibase=ione) 
 #endif
-  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
 
   call a%set_host()
   
@@ -3089,16 +3088,14 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
 
 #if defined(OPENMP)
 
-  !$OMP PARALLEL default(none) &
-  !$OMP shared(nr,a,itemp,nza) &
-  !$OMP private(i,info)
+  !$OMP PARALLEL default(shared)  reduction(max:info)
 
   !$OMP WORKSHARE
   a%irp(:) = 0
   !$OMP END WORKSHARE
 
   !$OMP DO schedule(STATIC) &
-  !$OMP private(k)
+  !$OMP private(k,i)
   do k=1,nza
     i = itemp(k)
     !$OMP ATOMIC UPDATE 
@@ -3106,6 +3103,7 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
+  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
   !$OMP END PARALLEL
 #else
   a%irp(:) = 0
@@ -3113,11 +3111,9 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
     i = itemp(k)
     a%irp(i) = a%irp(i) + 1
   end do
-#endif
   call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
+#endif
 
-  !write(0,*) name,' Check:',a%irp(nr+1),all(a%irp(1:nr) < a%irp(nr+1))
-  !write(0,*) name,a%irp(:)
   call a%set_host()
 
 end subroutine psb_d_mv_csr_from_coo

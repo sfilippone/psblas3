@@ -44,9 +44,8 @@ subroutine psi_m_exscanv(n,x,info,shift,ibase)
   integer(psb_ipk_), intent(in), optional :: ibase
   
   integer(psb_mpk_) :: shift_, tp, ts
-  integer(psb_mpk_), allocatable :: suma(:)
-  integer(psb_ipk_)  :: i,ithread,nthreads,first_idx,last_idx,wrk, ibase_
-  logical is_nested
+  integer(psb_ipk_)  :: ibase_
+  logical is_nested, is_parallel
   
   if (present(shift)) then
     shift_ = shift
@@ -60,56 +59,14 @@ subroutine psi_m_exscanv(n,x,info,shift,ibase)
   end if
     
 #if defined(OPENMP)
-  is_nested = omp_get_nested()
-  call omp_set_nested(.true.)
-  !$OMP PARALLEL default(none) &
-  !$OMP shared(suma,nthreads,n,x,shift_,ibase_) &
-  !$OMP private(ithread,wrk,i,first_idx,last_idx)
-
-  !$OMP SINGLE
-  nthreads = omp_get_num_threads()
-  allocate(suma(nthreads+1))
-  suma(:) = 0
-  !suma(1) = 1
-  !$OMP END SINGLE
-  ithread = omp_get_thread_num()
-
-
-  wrk = (n)/nthreads
-  if (ithread < MOD((n),nthreads)) then
-    wrk = wrk + 1
-    first_idx = ithread*wrk + ibase_
+  is_parallel = omp_in_parallel()
+  if (is_parallel) then 
+    call inner_m_exscan()
   else
-    first_idx = ithread*wrk + MOD((n),nthreads) + ibase_
+    !$OMP PARALLEL default(shared) 
+    call inner_m_exscan()
+    !$OMP END PARALLEL
   end if
-
-  last_idx = min(first_idx + wrk - 1,n - (ibase_-ione))
-  if (first_idx<=last_idx) then 
-    suma(ithread+2) = suma(ithread+2) + x(first_idx)
-    do i=first_idx+1,last_idx
-      suma(ithread+2) = suma(ithread+2) + x(i)
-      x(i) = x(i)+x(i-1) 
-    end do
-  end if
-  !$OMP BARRIER
-  !$OMP SINGLE
-  do i=2,nthreads+1
-    suma(i) = suma(i) + suma(i-1)
-  end do
-  !$OMP END SINGLE      
-
-  !$OMP BARRIER
-
-  !$OMP DO SCHEDULE(STATIC)
-  do i=1,n
-    x(i) = suma(ithread+1) + x(i) + shift_
-  end do
-  !$OMP END DO
-  !$OMP SINGLE
-  x(1) = shift_
-  !$OMP END SINGLE
-  !$OMP END PARALLEL
-  call omp_set_nested(is_nested)
 #else
   tp = shift_
   do i=1,n
@@ -119,7 +76,61 @@ subroutine psi_m_exscanv(n,x,info,shift,ibase)
   end do
 
 #endif
-  
+#if defined(OPENMP)
+contains
+  subroutine inner_m_exscan()
+    ! Note: all these variables are private, but SUMB should *really* be
+    ! a pointer. The semantics of COPYPRIVATE is that the POINTER is copied
+    ! so effectively we are recovering a SHARED SUMB which is what
+    ! we need in this case. If it was an ALLOCATABLE, then it would be the contents
+    ! that would get copied, and the SHARED effect would  no longer be there. 
+    integer(psb_ipk_)  :: i,ithread,nthreads,first_idx,last_idx,wrk
+    integer(psb_mpk_), pointer :: sumb(:)    
+
+    nthreads = omp_get_num_threads()
+    ithread = omp_get_thread_num()
+    !$OMP SINGLE
+    allocate(sumb(nthreads+1))
+    sumb(:) = 0
+    !$OMP END SINGLE COPYPRIVATE(sumb)
+
+    wrk = (n)/nthreads
+    if (ithread < MOD((n),nthreads)) then
+      wrk = wrk + 1
+      first_idx = ithread*wrk + ibase_
+    else
+      first_idx = ithread*wrk + MOD((n),nthreads) + ibase_
+    end if
+
+    last_idx = min(first_idx + wrk - 1,n - (ione-ibase_))
+    if (first_idx<=last_idx) then 
+      sumb(ithread+2) = sumb(ithread+2) + x(first_idx)
+      do i=first_idx+1,last_idx
+        sumb(ithread+2) = sumb(ithread+2) + x(i)
+        x(i) = x(i)+x(i-1) 
+      end do
+    end if
+    !$OMP BARRIER
+    
+    !$OMP SINGLE
+    do i=2,nthreads+1
+      sumb(i) = sumb(i) + sumb(i-1)
+    end do
+    !$OMP END SINGLE      
+
+    !$OMP BARRIER
+
+    !$OMP DO SCHEDULE(STATIC)
+    do i=1,n
+      x(i) = sumb(ithread+1) + x(i) + shift_
+    end do
+    !$OMP END DO
+    !$OMP SINGLE
+    x(1) = shift_
+    deallocate(sumb)
+    !$OMP END SINGLE
+  end subroutine inner_m_exscan
+#endif
 end subroutine psi_m_exscanv
 
 subroutine psb_m_mgelp(trans,iperm,x,info)
