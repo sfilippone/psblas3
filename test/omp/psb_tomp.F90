@@ -452,9 +452,6 @@ contains
     call psb_barrier(ctxt)
     t1 = psb_wtime()
     !$omp parallel shared(deltah,myidx,a,desc_a)
-    ! we build an auxiliary matrix consisting of one row at a
-    ! time; just a small matrix. might be extended to generate
-    ! a bunch of rows per call.
     !
     block 
       integer(psb_ipk_) :: i,j,ii,ib,icoeff, ix,iy,iz, ith,nth
@@ -639,16 +636,7 @@ contains
       write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
-!!$    !$omp parallel
-!!$    !$omp master
-!!$    block
-!!$      character(len=1024) :: fname
-!!$      write(fname,'(a,i4.4,a,i4.4,a)') 'a-',iam,'-',np,'.mtx'
-!!$      write(0,*) iam,' Size of A ',a%get_nrows(),a%get_ncols(),a%get_nzeros()
-!!$      call a%print(fname,head='Test')
-!!$    end block
-!!$    !$omp end master
-!!$    !$omp end parallel
+
     call psb_erractionrestore(err_act)
     return
 
