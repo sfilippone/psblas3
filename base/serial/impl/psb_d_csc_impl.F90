@@ -2228,16 +2228,14 @@ subroutine psb_d_mv_csc_from_coo(a,b,info)
 
 #if defined(OPENMP)
 
-  !$OMP PARALLEL default(none) &
-  !$OMP shared(nr,a,itemp,nza) &
-  !$OMP private(i,info)
+  !$OMP PARALLEL default(shared)
 
   !$OMP WORKSHARE
   a%icp(:) = 0
   !$OMP END WORKSHARE
 
   !$OMP DO schedule(STATIC) &
-  !$OMP private(k)
+  !$OMP private(k,i)
   do k=1,nza
     i = itemp(k)
     !$OMP ATOMIC UPDATE 
@@ -2245,16 +2243,16 @@ subroutine psb_d_mv_csc_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
+  call psi_exscan(nc+1,a%icp,info,shift=ione,ibase=ione) 
   !$OMP END PARALLEL
-
 #else
   a%icp(:) = 0
   do k=1,nza
     i = itemp(k)
     a%icp(i) = a%icp(i) + 1
   end do
-#endif
   call psi_exscan(nc+1,a%icp,info,shift=ione,ibase=ione) 
+#endif
   call a%set_host()
 
 
