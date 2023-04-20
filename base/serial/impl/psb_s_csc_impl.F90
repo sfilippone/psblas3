@@ -2243,7 +2243,7 @@ subroutine psb_s_mv_csc_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
-  call psi_exscan(nc+1,a%icp,info,shift=ione,ibase=ione) 
+  call psi_exscan(nc+1,a%icp,info,shift=ione) 
   !$OMP END PARALLEL
 #else
   a%icp(:) = 0
@@ -2251,7 +2251,7 @@ subroutine psb_s_mv_csc_from_coo(a,b,info)
     i = itemp(k)
     a%icp(i) = a%icp(i) + 1
   end do
-  call psi_exscan(nc+1,a%icp,info,shift=ione,ibase=ione) 
+  call psi_exscan(nc+1,a%icp,info,shift=ione) 
 #endif
   call a%set_host()
 

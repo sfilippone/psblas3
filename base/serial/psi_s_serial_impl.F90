@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine psi_s_exscanv(n,x,info,shift,ibase)
+subroutine psi_s_exscanv(n,x,info,shift)
   use psi_s_serial_mod, psb_protect_name => psi_s_exscanv
   use psb_const_mod
   use psb_error_mod
@@ -41,21 +41,14 @@ subroutine psi_s_exscanv(n,x,info,shift,ibase)
   real(psb_spk_), intent (inout)    :: x(:)
   integer(psb_ipk_), intent(out)     :: info
   real(psb_spk_), intent(in), optional :: shift
-  integer(psb_ipk_), intent(in), optional :: ibase
   
   real(psb_spk_) :: shift_, tp, ts
-  integer(psb_ipk_)  :: ibase_
   logical is_nested, is_parallel
   
   if (present(shift)) then
     shift_ = shift
   else
     shift_ = szero
-  end if
-  if (present(ibase)) then
-    ibase_ = ibase
-  else
-    ibase_ = ione
   end if
     
 #if defined(OPENMP)
@@ -97,12 +90,12 @@ contains
     wrk = (n)/nthreads
     if (ithread < MOD((n),nthreads)) then
       wrk = wrk + 1
-      first_idx = ithread*wrk + ibase_
+      first_idx = ithread*wrk + 1
     else
-      first_idx = ithread*wrk + MOD((n),nthreads) + ibase_
+      first_idx = ithread*wrk + MOD((n),nthreads) + 1
     end if
 
-    last_idx = min(first_idx + wrk - 1,n - (ione-ibase_))
+    last_idx = min(first_idx + wrk - 1,n )
     if (first_idx<=last_idx) then 
       sumb(ithread+2) = sumb(ithread+2) + x(first_idx)
       do i=first_idx+1,last_idx

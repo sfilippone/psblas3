@@ -157,14 +157,13 @@ module psi_m_serial_mod
   end interface psi_sct
 
   interface psi_exscan
-    subroutine psi_m_exscanv(n,x,info,shift,ibase)
+    subroutine psi_m_exscanv(n,x,info,shift)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
       integer(psb_ipk_), intent(in)      :: n
       integer(psb_mpk_), intent (inout)    :: x(:)
       integer(psb_ipk_), intent(out)     :: info
       integer(psb_mpk_), intent(in), optional :: shift
-      integer(psb_ipk_), intent(in), optional :: ibase
     end subroutine psi_m_exscanv
   end interface psi_exscan
   

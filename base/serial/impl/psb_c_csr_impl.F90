@@ -2935,7 +2935,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
-  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
   !$OMP END PARALLEL
 #else
   a%irp(:) = 0
@@ -2943,7 +2943,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
     i = itemp(k)
     a%irp(i) = a%irp(i) + 1
   end do
-  call psi_exscan(nr+1,a%irp,info,shift=cone,ibase=ione) 
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
 #endif
 
   call a%set_host()
@@ -3103,7 +3103,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
     !$OMP END ATOMIC
   end do
   !$OMP END DO
-  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
   !$OMP END PARALLEL
 #else
   a%irp(:) = 0
@@ -3111,7 +3111,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
     i = itemp(k)
     a%irp(i) = a%irp(i) + 1
   end do
-  call psi_exscan(nr+1,a%irp,info,shift=ione,ibase=ione) 
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
 #endif
 
   call a%set_host()
