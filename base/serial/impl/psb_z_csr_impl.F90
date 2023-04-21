@@ -2931,7 +2931,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   do k=1,nza
     i = itemp(k)
     !$OMP ATOMIC UPDATE 
-    a%irp(i+1) = a%irp(i+1) + 1
+    a%irp(i) = a%irp(i) + 1
     !$OMP END ATOMIC
   end do
   !$OMP END DO
@@ -3099,7 +3099,7 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   do k=1,nza
     i = itemp(k)
     !$OMP ATOMIC UPDATE 
-    a%irp(i+1) = a%irp(i+1) + 1
+    a%irp(i) = a%irp(i) + 1
     !$OMP END ATOMIC
   end do
   !$OMP END DO

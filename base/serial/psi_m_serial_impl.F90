@@ -43,6 +43,7 @@ subroutine psi_m_exscanv(n,x,info,shift)
   integer(psb_mpk_), intent(in), optional :: shift
   
   integer(psb_mpk_) :: shift_, tp, ts
+  integer(psb_ipk_) :: i
   logical is_nested, is_parallel
   
   if (present(shift)) then
@@ -76,9 +77,11 @@ contains
     ! a pointer. The semantics of COPYPRIVATE is that the POINTER is copied
     ! so effectively we are recovering a SHARED SUMB which is what
     ! we need in this case. If it was an ALLOCATABLE, then it would be the contents
-    ! that would get copied, and the SHARED effect would  no longer be there. 
-    integer(psb_ipk_)  :: i,ithread,nthreads,first_idx,last_idx,wrk
-    integer(psb_mpk_), pointer :: sumb(:)    
+    ! that would get copied, and the SHARED effect would  no longer be there.
+    ! Simple parallel version of EXSCAN
+    integer(psb_ipk_)  :: i,ithread,nthreads,idxstart,idxend,wrk
+    integer(psb_mpk_), pointer :: sumb(:)
+    integer(psb_mpk_)   :: tp, ts
 
     nthreads = omp_get_num_threads()
     ithread = omp_get_thread_num()
@@ -90,19 +93,21 @@ contains
     wrk = (n)/nthreads
     if (ithread < MOD((n),nthreads)) then
       wrk = wrk + 1
-      first_idx = ithread*wrk + 1
+      idxstart = ithread*wrk + 1
     else
-      first_idx = ithread*wrk + MOD((n),nthreads) + 1
+      idxstart = ithread*wrk + MOD((n),nthreads) + 1
     end if
 
-    last_idx = min(first_idx + wrk - 1,n )
-    if (first_idx<=last_idx) then 
-      sumb(ithread+2) = sumb(ithread+2) + x(first_idx)
-      do i=first_idx+1,last_idx
-        sumb(ithread+2) = sumb(ithread+2) + x(i)
-        x(i) = x(i)+x(i-1) 
+    idxend = min(idxstart + wrk - 1,n )
+    tp = mzero
+    if (idxstart<=idxend) then
+      do i=idxstart,idxend
+        ts = x(i)
+        x(i) = tp 
+        tp = tp + ts 
       end do
     end if
+    sumb(ithread+2) = tp 
     !$OMP BARRIER
     
     !$OMP SINGLE
@@ -115,11 +120,10 @@ contains
 
     !$OMP DO SCHEDULE(STATIC)
     do i=1,n
-      x(i) = sumb(ithread+1) + x(i) + shift_
+      x(i) = x(i) + sumb(ithread+1) + shift_ 
     end do
     !$OMP END DO
     !$OMP SINGLE
-    x(1) = shift_
     deallocate(sumb)
     !$OMP END SINGLE
   end subroutine inner_m_exscan
