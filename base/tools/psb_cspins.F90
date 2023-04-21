@@ -73,7 +73,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  integer(psb_ipk_)      :: i,k, ith, nth 
+  integer(psb_ipk_)      :: i,k
   integer(psb_lpk_)      :: nnl
   integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
   complex(psb_spk_), allocatable     :: lval(:)
@@ -85,13 +85,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-#if defined(OPENMP)
-  nth = omp_get_num_threads()
-  ith = omp_get_thread_num()
-#else
-  nth = 1
-  ith = 0 
-#endif
+
   if (nz < 0) then 
     info = 1111
     call psb_errpush(info,name)
