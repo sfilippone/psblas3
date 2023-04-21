@@ -1867,18 +1867,6 @@ module psb_s_base_mat_mod
   end interface
 
   interface
-    subroutine psb_s_fix_coo_inner_colmajor(nr,nc,nzin,dupl,&
-         & ia,ja,val,iaux,nzout,info)
-      import
-      integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
-      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:), iaux(:)
-      real(psb_spk_), intent(inout) :: val(:)
-      integer(psb_ipk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_s_fix_coo_inner_colmajor
-  end interface
-
-  interface
     subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,&
          & ia,ja,val,iaux,nzout,info)
       import
