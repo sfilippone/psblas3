@@ -43,14 +43,13 @@
 module psb_e_qsort_mod
   use psb_const_mod
 
-
-
   interface psb_bsrch
-    function  psb_ebsrch(key,n,v) result(ipos)
+    function  psb_ebsrch(key,n,v,dir,find) result(ipos)
       import 
       integer(psb_ipk_) :: ipos, n
       integer(psb_epk_) :: key
       integer(psb_epk_) :: v(:)
+      integer(psb_ipk_), optional :: dir, find
     end function psb_ebsrch
   end interface psb_bsrch
 

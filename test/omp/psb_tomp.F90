@@ -736,6 +736,30 @@ program psb_d_pde3d
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
+#if 0
+  block
+    integer(psb_ipk_), parameter :: ntv=10
+    integer(psb_ipk_) :: itv(ntv+1),i
+    itv(:) = 0
+    do i=1,ntv
+      itv(i) = 2 + mod(i,2)
+    end do
+    write(0,*) 'ITV before  : ',itv(:)
+    call psi_exscan(ntv,itv,info)
+    write(0,*) 'ITV after   : ',itv(:)
+    itv(:) = 0
+    do i=1,ntv
+      itv(i) = 2 + mod(i,2)
+    end do
+    write(0,*) 'ITV before 1: ',itv(:)
+    call psi_exscan(ntv,itv,info,shift=ione)
+    write(0,*) 'ITV after  1: ',itv(:)
+    !    call a%print('a.mtx',head='Test')
+  end block
+!!$  
+!!$  call psb_exit(ctxt)
+!!$  stop
+#endif
   !
   !  get parameters
   !
@@ -756,6 +780,7 @@ program psb_d_pde3d
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  call a%print('a.mtx',head='Test')
   !
   !  prepare the preconditioner.
   !
@@ -857,7 +882,6 @@ program psb_d_pde3d
     write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
-
 
   !
   !  cleanup storage and exit

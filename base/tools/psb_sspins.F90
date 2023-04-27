@@ -135,7 +135,7 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         goto 9999
       end if
 #if defined(OPENMP)
-      !$omp parallel private(ila,jla,nrow,ncol)
+      !$omp parallel private(ila,jla,nrow,ncol,nnl,k)
 #endif
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
@@ -198,9 +198,18 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
            & a_err='allocate',i_err=(/info/))
       goto 9999
     end if
+#if defined(OPENMP)
+      !$omp parallel private(ila,jla,nrow,ncol,nnl,k)
+#endif
     if (local_) then
+#if defined(OPENMP)
+      !$omp workshare
+#endif
       ila(1:nz) = ia(1:nz)
       jla(1:nz) = ja(1:nz)
+#if defined(OPENMP)
+      !$omp end workshare
+#endif
     else
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
       if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info,&
@@ -210,7 +219,7 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='a%csput')
-      goto 9999
+      !goto 9999
     end if
     if (a%is_remote_build()) then 
       nnl = count(ila(1:nz)<0)
@@ -229,8 +238,12 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
         call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
              & 1_psb_lpk_,desc_a%get_global_rows(),info)
-      end if
+      end if      
     end if
+#if defined(OPENMP)
+      !$omp end parallel 
+#endif
+
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)

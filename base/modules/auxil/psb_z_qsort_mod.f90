@@ -44,7 +44,6 @@ module psb_z_qsort_mod
   use psb_const_mod
 
 
-
   interface psb_qsort
     subroutine psb_zqsort(x,ix,dir,flag)
       import 

@@ -3674,6 +3674,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
+  real(psb_dpk_) :: t0, t1
 #if defined(OPENMP)
   integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
@@ -3757,7 +3758,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
     ! index for each row. We do the same on 'kaux'
     !$OMP PARALLEL default(none) &
-    !$OMP shared(idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
+    !$OMP shared(t0,t1,idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
     !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
     !$OMP first_elem,last_elem,nzl,iret,act_row) reduction(max: info)
 
@@ -3782,7 +3783,10 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     !write(0,*) 'fix_coo_inner: trying with exscan'      
     call psi_exscan(nr+1,iaux,info,shift=ione)
     !$OMP BARRIER
-
+    !$OMP SINGLE
+    t0 = omp_get_wtime()
+    !$OMP END SINGLE
+    
     ! ------------------ Sorting and buffers -------------------
 
     ! Let's use an auxiliary buffer, 'idxaux', to get indices leaving
@@ -3803,7 +3807,10 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     end do
 
     !$OMP BARRIER
-
+    !$OMP SINGLE
+    t1 = omp_get_wtime()
+    write(0,*) 'Srt&Cpy :',t1-t0
+    !$OMP END SINGLE
     ! Let's sort column indices and values. After that we will store
     ! the number of unique values in 'kaux'
     do j=idxstart,idxend

@@ -43,14 +43,13 @@
 module psb_i2_qsort_mod
   use psb_const_mod
 
-
-
   interface psb_bsrch
-    function  psb_i2bsrch(key,n,v) result(ipos)
+    function  psb_i2bsrch(key,n,v,dir,find) result(ipos)
       import 
       integer(psb_ipk_) :: ipos, n
       integer(psb_i2pk_) :: key
       integer(psb_i2pk_) :: v(:)
+      integer(psb_ipk_), optional :: dir, find
     end function psb_i2bsrch
   end interface psb_bsrch
 

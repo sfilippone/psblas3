@@ -40,6 +40,128 @@
 !  Data Structures and Algorithms
 !  Addison-Wesley
 !
+function  psb_dbsrch(key,n,v,dir,find) result(ipos)
+  use psb_sort_mod, psb_protect_name => psb_dbsrch
+  implicit none
+  integer(psb_ipk_) :: ipos, n
+real(psb_dpk_) :: key
+real(psb_dpk_) :: v(:)
+  integer(psb_ipk_), optional :: dir, find
+
+  integer(psb_ipk_) :: lb, ub, m, i, k, dir_, find_
+
+  if (present(dir)) then
+    dir_ = dir
+  else
+    dir_ = psb_sort_up_
+  end if
+  if (present(find)) then
+    find_ = find
+  else
+    find_ = psb_find_any_
+  end if
+
+  ipos = -1 
+  if (dir_ == psb_sort_up_) then
+    if (n<=5) then
+      do m=1,n
+        if (key == v(m))  then
+          ipos = m
+          exit
+        end if
+      enddo
+
+    else
+
+      lb = 1 
+      ub = n
+
+      do while (lb.le.ub) 
+        m = (lb+ub)/2
+        if (key.eq.v(m))  then
+          ipos = m 
+          exit
+        else if (key < v(m))  then
+          ub = m-1
+        else 
+          lb = m + 1
+        end if
+      enddo
+    end if
+    select case(find_)
+    case (psb_find_any_ )
+      ! do nothing
+    case (psb_find_last_le_ )
+      if ((m>n) .or. (m<1)) then
+        m = n
+        do while (m>=1)
+          if (v(m)<=key) then
+            ipos = m
+            exit
+          end if
+          m = m - 1
+        end do
+      else
+        do while (m<n)
+          if (v(m)<=key) then
+            m=m+1
+          else
+            exit
+          end if
+        end do
+      end if
+    case (psb_find_first_ge_ )
+      if ((m>n) .or. (m<1)) then
+        m = 1
+        do while (m<=n)
+          if (v(m)>=key) then
+            ipos = m
+            exit
+          end if
+          m = m + 1 
+        end do
+      else
+        do while (m>n)
+          if (v(m)>=key) then
+            m=m-1
+          else
+            exit
+          end if
+        end do
+      end if
+    case default
+      write(0,*) 'Wrong FIND'
+    end select
+
+
+  else if (dir_ == psb_sort_down_) then
+    write(0,*) ' bsrch on sort down not implemented'
+  else 
+    write(0,*) ' bsrch wrong DIR ',dir_,psb_sort_up_,psb_sort_down_
+  end if
+  return
+end function psb_dbsrch
+
+function psb_dssrch(key,n,v) result(ipos)
+  use psb_sort_mod, psb_protect_name => psb_dssrch
+  implicit none
+  integer(psb_ipk_) :: ipos, n
+  real(psb_dpk_) :: key
+  real(psb_dpk_) :: v(:)
+
+  integer(psb_ipk_) :: i
+
+  ipos = -1 
+  do i=1,n
+    if (key.eq.v(i))  then
+      ipos = i
+      return
+    end if
+  enddo
+
+  return
+end function psb_dssrch
+
 subroutine psb_dqsort(x,ix,dir,flag)
   use psb_sort_mod, psb_protect_name => psb_dqsort
   use psb_error_mod
