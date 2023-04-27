@@ -356,7 +356,7 @@ function psb_znrm2_vect(x, desc_a, info,global)  result(res)
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
         dd  = dble(ndm-1)/dble(ndm)
-        res = res - sqrt(zone - dd*(abs(x%v%v(idx))/res)**2)
+        res = res * sqrt(done - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
   else
@@ -465,7 +465,7 @@ function psb_znrm2_weight_vect(x,w, desc_a, info,global,aux)  result(res)
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
         dd  = dble(ndm-1)/dble(ndm)
-        res = res - sqrt(zone - dd*(abs(x%v%v(idx))/res)**2)
+        res = res * sqrt(done - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
   else
@@ -577,7 +577,7 @@ function psb_znrm2_weightmask_vect(x,w,idv, desc_a, info,global, aux)  result(re
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
         dd  = dble(ndm-1)/dble(ndm)
-        res = res - sqrt(zone - dd*(abs(x%v%v(idx))/res)**2)
+        res = res * sqrt(done - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
   else

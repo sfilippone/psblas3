@@ -2606,7 +2606,6 @@ subroutine psb_d_csc_reinit(a,clear)
 
   if (a%is_bld() .or. a%is_upd()) then
     ! do nothing
-    return
   else if (a%is_asb()) then
     if (clear_) a%val(:) = dzero
     call a%set_upd()
@@ -2639,8 +2638,8 @@ subroutine  psb_d_csc_trim(a)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  n   = a%get_ncols()
-  nz  = a%get_nzeros()
+  n   = max(1_psb_ipk_,a%get_ncols())
+  nz  = max(1_psb_ipk_,a%get_nzeros())
   if (info == psb_success_) call psb_realloc(n+1,a%icp,info)
   if (info == psb_success_) call psb_realloc(nz,a%ia,info)
   if (info == psb_success_) call psb_realloc(nz,a%val,info)
@@ -4479,8 +4478,8 @@ subroutine  psb_ld_csc_trim(a)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  n   = a%get_ncols()
-  nz  = a%get_nzeros()
+  n   = max(1_psb_lpk_,a%get_ncols())
+  nz  = max(1_psb_lpk_,a%get_nzeros())
   if (info == psb_success_) call psb_realloc(n+1,a%icp,info)
   if (info == psb_success_) call psb_realloc(nz,a%ia,info)
   if (info == psb_success_) call psb_realloc(nz,a%val,info)

@@ -3407,7 +3407,7 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
-
+INSTALL="${INSTALL} -p"
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking where to install" >&5
 printf %s "checking where to install... " >&6; }
 case $prefix in
@@ -4676,11 +4676,11 @@ if test x$ac_prog_cxx_stdcxx = xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++11 features" >&5
 printf %s "checking for $CXX option to enable C++11 features... " >&6; }
-if test ${ac_cv_prog_cxx_11+y}
+if test ${ac_cv_prog_cxx_cxx11+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  ac_cv_prog_cxx_11=no
+  ac_cv_prog_cxx_cxx11=no
 ac_save_CXX=$CXX
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -4722,11 +4722,11 @@ if test x$ac_prog_cxx_stdcxx = xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++98 features" >&5
 printf %s "checking for $CXX option to enable C++98 features... " >&6; }
-if test ${ac_cv_prog_cxx_98+y}
+if test ${ac_cv_prog_cxx_cxx98+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  ac_cv_prog_cxx_98=no
+  ac_cv_prog_cxx_cxx98=no
 ac_save_CXX=$CXX
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8912,7 +8912,7 @@ printf "%s\n" "$ac_cv_lib_cblas_cblas_dgemm" >&6; }
 if test "x$ac_cv_lib_cblas_cblas_dgemm" = xyes
 then :
   pac_blas_ok=yes
-			 BLAS_LIBS="-lcblas -lf77blas -latlas $BLAS_LIBDIR"
+			 BLAS_LIBS="-lcblas -lf77blas -latlas"
 fi
 
 fi
@@ -9041,7 +9041,7 @@ printf "%s\n" "$ac_cv_lib_satlas_cblas_dgemm" >&6; }
 if test "x$ac_cv_lib_satlas_cblas_dgemm" = xyes
 then :
   pac_blas_ok=yes
-			 BLAS_LIBS="-lsatlas $BLAS_LIBDIR"
+			 BLAS_LIBS="-lsatlas"
 fi
 
 fi
@@ -9139,7 +9139,7 @@ fi
 printf "%s\n" "$ac_cv_lib_sgemm_sgemm" >&6; }
 if test "x$ac_cv_lib_sgemm_sgemm" = xyes
 then :
-  pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas $BLAS_LIBDIR"
+  pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"
 fi
 
 fi
@@ -9183,7 +9183,7 @@ fi
 printf "%s\n" "$ac_cv_lib_openblas_sgemm" >&6; }
 if test "x$ac_cv_lib_openblas_sgemm" = xyes
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lopenblas"
 fi
 
 fi
@@ -9223,7 +9223,7 @@ eval ac_res=\$$as_ac_Lib
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"
 fi
 
 		# 32 bit
@@ -9257,7 +9257,7 @@ eval ac_res=\$$as_ac_Lib
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"
 fi
 
 		fi
@@ -9294,7 +9294,7 @@ eval ac_res=\$$as_ac_Lib
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"
 fi
 
 		# 32-bit
@@ -9328,7 +9328,7 @@ eval ac_res=\$$as_ac_Lib
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"
 fi
 
 		fi
@@ -9365,7 +9365,7 @@ eval ac_res=\$$as_ac_Lib
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread  $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"
 fi
 
 fi
@@ -9382,7 +9382,7 @@ printf %s "checking for $sgemm in -framework vecLib... " >&6; }
 _ACEOF
 if ac_fn_fc_try_link "$LINENO"
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-framework vecLib $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-framework vecLib"
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
@@ -9419,7 +9419,7 @@ fi
 printf "%s\n" "$ac_cv_lib_cxml_sgemm" >&6; }
 if test "x$ac_cv_lib_cxml_sgemm" = xyes
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-lcxml $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lcxml"
 fi
 
 fi
@@ -9453,7 +9453,7 @@ fi
 printf "%s\n" "$ac_cv_lib_dxml_sgemm" >&6; }
 if test "x$ac_cv_lib_dxml_sgemm" = xyes
 then :
-  pac_blas_ok=yes;BLAS_LIBS="-ldxml $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-ldxml"
 fi
 
 
@@ -9516,7 +9516,7 @@ fi
 printf "%s\n" "$ac_cv_lib_sunperf_sgemm" >&6; }
 if test "x$ac_cv_lib_sunperf_sgemm" = xyes
 then :
-  BLAS_LIBS="-xlic_lib=sunperf -lsunmath $BLAS_LIBDIR"
+  BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
                                  pac_blas_ok=yes
 fi
 
@@ -9555,7 +9555,7 @@ fi
 printf "%s\n" "$ac_cv_lib_scs_sgemm" >&6; }
 if test "x$ac_cv_lib_scs_sgemm" = xyes
 then :
-  pac_blas_ok=yes; BLAS_LIBS="-lscs $BLAS_LIBDIR"
+  pac_blas_ok=yes; BLAS_LIBS="-lscs"
 fi
 
 fi
@@ -9591,7 +9591,7 @@ eval ac_res=\$$as_ac_Lib
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath $BLAS_LIBDIR"
+  pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"
 fi
 
 fi
@@ -9654,7 +9654,7 @@ fi
 printf "%s\n" "$ac_cv_lib_essl_sgemm" >&6; }
 if test "x$ac_cv_lib_essl_sgemm" = xyes
 then :
-  pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas $BLAS_LIBDIR"
+  pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas"
 fi
 
 fi
@@ -9699,7 +9699,7 @@ then :
   LIBS="-lblas $LIBS"
 
 else $as_nop
-  pac_blas_ok=yes;BLAS_LIBS="-lblas $BLAS_LIBDIR"
+  pac_blas_ok=yes;BLAS_LIBS="-lblas"
 fi
 
 fi
@@ -9755,7 +9755,7 @@ fi
 printf "%s\n" "$ac_cv_lib_blas_sgemm" >&6; }
 if test "x$ac_cv_lib_blas_sgemm" = xyes
 then :
-  pac_blas_ok=yes; BLAS_LIBS="-lblas $BLAS_LIBDIR"
+  pac_blas_ok=yes; BLAS_LIBS="-lblas"
 fi
 
 fi
@@ -9765,6 +9765,9 @@ LIBS="$pac_blas_save_LIBS"
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$pac_blas_ok" = xyes; then
+        if  test "x$BLAS_LIBDIR" != "x" ; then
+            BLAS_LIBS="$BLAS_LIBS $BLAS_LIBDIR";
+        fi
 
 printf "%s\n" "#define HAVE_BLAS 1" >>confdefs.h
 
@@ -10225,7 +10228,11 @@ fi
 
 if test "x$pac_metis_header_ok" = "xyes" ; then
       psblas_cv_metis_includes="$METIS_INCLUDES"
-      METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      if  test "x$METIS_LIBDIR" == "x" ; then
+	  METIS_LIBS="$psblas_cv_metis"
+      else
+	METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      fi
       LIBS="$METIS_LIBS -lm $LIBS";
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for METIS_PartGraphKway in $METIS_LIBS" >&5
 printf %s "checking for METIS_PartGraphKway in $METIS_LIBS... " >&6; }
@@ -10492,7 +10499,11 @@ fi
 
 if test "x$pac_amd_header_ok" == "xyes" ; then
       psblas_cv_amd_includes="$AMD_INCLUDES"
-      AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+      if test "x$AMD_LIBDIR" == "x" ; then
+	 AMD_LIBS="$psblas_cv_amd"
+      else
+	AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+      fi
       LIBS="$AMD_LIBS -lm $LIBS";
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for amd_order in $AMD_LIBS" >&5
 printf %s "checking for amd_order in $AMD_LIBS... " >&6; }

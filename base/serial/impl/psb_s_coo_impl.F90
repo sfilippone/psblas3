@@ -537,7 +537,6 @@ subroutine psb_s_coo_reinit(a,clear)
   if (a%is_dev())   call a%sync()
   if (a%is_bld() .or. a%is_upd()) then
     ! do nothing
-    return
   else if (a%is_asb()) then
     if (clear_) a%val(:) = szero
     call a%set_host()
@@ -572,7 +571,7 @@ subroutine  psb_s_coo_trim(a)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (a%is_dev())   call a%sync()
-  nz  = a%get_nzeros()
+  nz  = max(1_psb_ipk_,a%get_nzeros())
   if (info == psb_success_) call psb_realloc(nz,a%ia,info)
   if (info == psb_success_) call psb_realloc(nz,a%ja,info)
   if (info == psb_success_) call psb_realloc(nz,a%val,info)
@@ -5280,7 +5279,7 @@ subroutine  psb_ls_coo_trim(a)
   call psb_erractionsave(err_act)
   info = psb_success_
   if (a%is_dev())   call a%sync()
-  nz  = a%get_nzeros()
+  nz  = max(1_psb_lpk_,a%get_nzeros())
   if (info == psb_success_) call psb_realloc(nz,a%ia,info)
   if (info == psb_success_) call psb_realloc(nz,a%ja,info)
   if (info == psb_success_) call psb_realloc(nz,a%val,info)
