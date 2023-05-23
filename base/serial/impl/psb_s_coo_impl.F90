@@ -3669,7 +3669,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_), allocatable :: ias(:),jas(:), ix2(:)
   real(psb_spk_),  allocatable :: vs(:)
   integer(psb_ipk_) :: nza, nzl,iret
-  integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii
+  integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii, i1, i2
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
@@ -3759,7 +3759,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     !$OMP PARALLEL default(none) &
     !$OMP shared(t0,t1,idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
     !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
-    !$OMP first_elem,last_elem,nzl,iret,act_row) reduction(max: info)
+    !$OMP first_elem,last_elem,nzl,iret,act_row,i1,i2) reduction(max: info)
 
     !$OMP SINGLE
     nthreads = omp_get_num_threads()
@@ -3783,7 +3783,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     call psi_exscan(nr+1,iaux,info,shift=ione)
     !$OMP BARRIER
     !$OMP SINGLE
-    t0 = omp_get_wtime()
+    !t0 = omp_get_wtime()
     !$OMP END SINGLE
     
     ! ------------------ Sorting and buffers -------------------
@@ -3793,7 +3793,6 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     do j=idxstart,idxend
       idxaux(j) = iaux(j)
     end do
-
     ! Here we sort data inside the auxiliary buffers
     do i=1,nzin
       act_row = ia(i)
@@ -3807,8 +3806,8 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
     !$OMP BARRIER
     !$OMP SINGLE
-    t1 = omp_get_wtime()
-    write(0,*) 'Srt&Cpy :',t1-t0
+    !t1 = omp_get_wtime()
+    !write(0,*) ithread,'Srt&Cpy :',t1-t0
     !$OMP END SINGLE
     ! Let's sort column indices and values. After that we will store
     ! the number of unique values in 'kaux'

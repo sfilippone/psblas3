@@ -44,8 +44,8 @@ function  psb_sbsrch(key,n,v,dir,find) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_sbsrch
   implicit none
   integer(psb_ipk_) :: ipos, n
-real(psb_spk_) :: key
-real(psb_spk_) :: v(:)
+  real(psb_spk_) :: key
+  real(psb_spk_) :: v(:)
   integer(psb_ipk_), optional :: dir, find
 
   integer(psb_ipk_) :: lb, ub, m, i, k, dir_, find_
@@ -95,40 +95,37 @@ real(psb_spk_) :: v(:)
       if ((m>n) .or. (m<1)) then
         m = n
         do while (m>=1)
-          if (v(m)<=key) then
-            ipos = m
-            exit
-          end if
+          if (v(m)<=key) exit
           m = m - 1
         end do
       else
         do while (m<n)
-          if (v(m)<=key) then
+          if (v(m+1)<=key) then
             m=m+1
           else
             exit
           end if
         end do
       end if
+      ipos = min(m,n)
     case (psb_find_first_ge_ )
       if ((m>n) .or. (m<1)) then
         m = 1
         do while (m<=n)
-          if (v(m)>=key) then
-            ipos = m
-            exit
-          end if
+          if (v(m)>=key) exit
           m = m + 1 
         end do
       else
-        do while (m>n)
-          if (v(m)>=key) then
+        do while (m>1)
+          if (v(m-1)>=key) then
             m=m-1
           else
             exit
           end if
         end do
       end if
+      ipos = max(m,1)
+
     case default
       write(0,*) 'Wrong FIND'
     end select
