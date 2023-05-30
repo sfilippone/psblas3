@@ -137,10 +137,12 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 #if defined(OPENMP)
       !$omp parallel private(ila,jla,nrow,ncol,nnl,k)
 #endif
+      !write(0,*) me,' Before g2l ',psb_errstatus_fatal()
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+      !write(0,*) me,' Before g2l_ins ',psb_errstatus_fatal()
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
-      
+      !write(0,*) me,' after g2l_ins ',psb_errstatus_fatal(),info      
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
              & a_err='psb_cdins',i_err=(/info/))
@@ -148,7 +150,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
-
+      !write(0,*) me,' Before csput',psb_errstatus_fatal()
       if (a%is_bld()) then 
         call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
         if (info /= psb_success_) then
@@ -181,7 +183,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         call psb_errpush(info,name)
         !goto 9999
       end if
-
+      !write(0,*) me,' after csput',psb_errstatus_fatal()
 #if defined(OPENMP)
       !$omp end parallel
 #endif

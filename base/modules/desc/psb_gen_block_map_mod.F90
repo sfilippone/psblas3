@@ -488,7 +488,7 @@ contains
     integer(psb_ipk_)   :: iam, np
     logical :: owned_
 
-    write(0,*) 'block_g2lv2'
+    !write(0,*) 'block_g2lv2'
     info = 0
     ctxt = idxmap%get_ctxt()
     call psb_info(ctxt,iam,np) 

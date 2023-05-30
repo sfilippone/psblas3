@@ -737,6 +737,7 @@ program psb_d_pde3d
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess
   !
+  call psb_cd_set_large_threshold(100_psb_lpk_)
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   call psb_gen_pde3d(ctxt,idim,a,bv,xxv,desc_a,afmt,info,partition=ipart)

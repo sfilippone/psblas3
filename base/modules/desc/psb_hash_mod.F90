@@ -407,6 +407,7 @@ contains
       if (hash%table(hk,1) == key) then 
         val  = hash%table(hk,2)
         info = HashDuplicate
+        !write(0,*) 'In searchinskey 1 : ', info, HashDuplicate
         return
       end if
       !$omp critical(hashsearchins)
@@ -440,11 +441,15 @@ contains
         end if
       end if
       !$omp end critical(hashsearchins)
-      if (info /= HashOk) return
+      if (info /= HashOk) then
+        write(0,*) 'In searchinskey 2: ', info 
+        return
+      end if
       if (val > 0) return
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
+    write(0,*) 'In searchinskey 3: ', info 
   end subroutine psb_hash_lsearchinskey
     
   recursive subroutine psb_hash_isearchinskey(key,val,nextval,hash,info)

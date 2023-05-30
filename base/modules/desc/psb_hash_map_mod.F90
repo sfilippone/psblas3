@@ -515,7 +515,6 @@ contains
             endif
           end if
         enddo
-
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idxout(1:is) = -1
@@ -655,7 +654,7 @@ contains
 #endif
     logical, volatile :: isLoopValid
     info = psb_success_
-    name = 'hash_g2l_ins'
+    name = 'hash_g2lv1_ins'
     call psb_erractionsave(err_act)
 
     ctxt = idxmap%get_ctxt()
@@ -679,7 +678,7 @@ contains
 
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
-
+    !write(0,*) me,name,' before loop ',psb_errstatus_fatal()
     if (use_openmp) then
 #ifdef OPENMP
       !call OMP_init_lock(ins_lck)
@@ -751,6 +750,7 @@ contains
                              & pad=-1_psb_lpk_,addsz=laddsz)
 
                         if (info /= psb_success_) then
+                          !write(0,*) 'Error spot 1'
                           call psb_errpush(psb_err_from_subroutine_ai_,name,&
                                &a_err='psb_ensure_size',i_err=(/info/))
 
@@ -832,6 +832,7 @@ contains
                            & pad=-1_psb_lpk_,addsz=laddsz)
 
                       if (info /= psb_success_) then
+                        !write(0,*) 'Error spot 2'
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              &a_err='psb_ensure_size',i_err=(/info/))
 
@@ -883,38 +884,42 @@ contains
                 ! At first, we check the index presence in 'idxmap'. Usually
                 ! the index is found. If it is not found, we repeat the checking,
                 ! but inside a critical region.
+                !write(0,*) me,name,' b hic 1 ',psb_errstatus_fatal()      
                 call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                      & idxmap%hashv,idxmap%glb_lc,ncol)
-
+                !write(0,*) me,name,' a hic 1 ',psb_errstatus_fatal()      
                 if (lip < 0) then
                   !call OMP_set_lock(ins_lck)
                   ! We check again if the index is already in 'idxmap', this
                   ! time inside a critical region (we assume that the index 
                   ! is often already existing, so this lock is relatively rare).
                   ncol  = idxmap%get_lc()
-                  nxt   = ncol + 1 
+                  nxt   = ncol + 1
+                  !write(0,*) me,name,' b hic 2 ',psb_errstatus_fatal()                
                   call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                        & idxmap%hashv,idxmap%glb_lc,ncol)
-
+                  !write(0,*) me,name,' a hic 2 ',psb_errstatus_fatal()                
                   if (lip > 0) then
                     idx(i) = lip 
                   else if (lip < 0) then
                     ! Index not found
+                    !write(0,*) me,name,' b hsik  ',psb_errstatus_fatal()                
                     call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                    !write(0,*) me,name,' a hsik  ',psb_errstatus_fatal()                
                     lip = tlip
 
                     if (info >= 0) then
+                      !write(0,*) 'Error before spot 3', info                      
                       ! 'nxt' is not equal to 'tlip' when the key is already inside
                       ! the hash map. In that case 'tlip' is the value corresponding
                       ! to the existing mapping.
                       if (nxt == tlip) then
 
                         ncol = MAX(ncol,nxt)
-
                         call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
                              & pad=-1_psb_lpk_,addsz=laddsz)
-
                         if (info /= psb_success_) then
+                          !write(0,*) 'Error spot 3', info
                           call psb_errpush(psb_err_from_subroutine_ai_,name,&
                                &a_err='psb_ensure_size',i_err=(/info/))
 
@@ -996,6 +1001,7 @@ contains
                            & pad=-1_psb_lpk_,addsz=laddsz)
 
                       if (info /= psb_success_) then
+                        !write(0,*) 'Error spot 4'                        
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              &a_err='psb_ensure_size',i_err=(/info/))
 
@@ -1069,6 +1075,7 @@ contains
                       call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
                            & pad=-1_psb_lpk_,addsz=laddsz)
                       if (info /= psb_success_) then
+                        !write(0,*) 'Error spot'                        
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              &a_err='psb_ensure_size',i_err=(/info/))
                         isLoopValid = .false.
@@ -1113,9 +1120,11 @@ contains
                 if (info >=0) then 
                   if (nxt == lip) then 
                     ncol = max(nxt,ncol)
-                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                         & pad=-1_psb_lpk_,addsz=laddsz)
                     if (info /= psb_success_) then
                       info=1
+                      !write(0,*) 'Error spot'                      
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            &a_err='psb_ensure_size',i_err=(/info/))
                     isLoopValid = .false.
@@ -1162,6 +1171,7 @@ contains
                          & pad=-1_psb_lpk_,addsz=laddsz)
                     if (info /= psb_success_) then
                       info=1
+                      write(0,*) 'Error spot 5'
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            & a_err='psb_ensure_size',i_err=(/info/))
                       isLoopValid = .false.
@@ -1205,6 +1215,7 @@ contains
                        & pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
+                    write(0,*) 'Error spot 6'
                     ch_err='psb_ensure_size'
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
                          &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
@@ -1239,6 +1250,7 @@ contains
 #endif
       if (.not. isLoopValid) goto 9999
     end if
+    !write(0,*) me,name,' after loop ',psb_errstatus_fatal()      
     call psb_erractionrestore(err_act)
     return
 
@@ -1252,6 +1264,7 @@ contains
 
   subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     use psb_realloc_mod
+    use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(in)    :: idxin(:)
@@ -1264,7 +1277,9 @@ contains
 
     is = size(idxin)
     im = min(is,size(idxout))
+    !write(0,*) 'g2lv2_ins before realloc ',psb_errstatus_fatal()   
     call psb_realloc(im,tidx,info)
+    !write(0,*) 'g2lv2_ins after realloc ',psb_errstatus_fatal()
     tidx(1:im) = idxin(1:im)
     call idxmap%g2lip_ins(tidx(1:im),info,mask=mask,lidx=lidx)
     idxout(1:im) = tidx(1:im)
