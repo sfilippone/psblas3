@@ -375,6 +375,7 @@ contains
             if (lip < 0) then 
               call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
               lip = tlip
+              info = 0
             end if
             if (owned_) then 
               if (lip<=nrow) then 
@@ -414,6 +415,7 @@ contains
           if (lip < 0) then
             call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
             lip = tlip
+            info = 0
           end if
           if (owned_) then 
             if (lip<=nrow) then 
@@ -503,6 +505,7 @@ contains
             if (lip < 0) then 
               call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
               lip = tlip
+              info = 0
             end if
             if (owned_) then 
               if (lip<=nrow) then 
@@ -541,6 +544,7 @@ contains
           if (lip < 0) then
             call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
             lip = tlip
+            info = 0
           end if
           if (owned_) then 
             if (lip<=nrow) then 
@@ -704,6 +708,7 @@ contains
             ! $ OMP reduction(.AND.:isLoopValid)        
             do i = 1, is
               info = 0
+              if (.not. isLoopValid) cycle
               if (mask(i)) then
                 ip = idx(i)
                 if ((ip < 1 ).or.(ip>mglob)) then
@@ -790,6 +795,7 @@ contains
             ! $ OMP reduction(.AND.:isLoopValid)        
             do i = 1, is
               info = 0
+              if (.not. isLoopValid) cycle
               ip = idx(i)
               if ((ip < 1 ).or.(ip>mglob)) then
                 idx(i) = -1
@@ -867,10 +873,11 @@ contains
             ! $ OMP shared(name,me,is,idx,ins_lck,mask,mglob,idxmap,ncol,nrow,laddsz) &
             ! $ OMP private(i,ip,lip,tlip,nxt,info) &
             ! $ OMP reduction(.AND.:isLoopValid)
-            !$omp critical(hash_g2l_ins)
             
+            !$omp critical(hash_g2l_ins)          
             do i = 1, is
               info = 0
+              if (.not. isLoopValid) cycle
               if (mask(i)) then
                 ip = idx(i)
                 if ((ip < 1 ).or.(ip>mglob)) then
@@ -905,6 +912,7 @@ contains
                     ! Index not found
                     !write(0,*) me,name,' b hsik  ',psb_errstatus_fatal()                
                     call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                    if (psb_errstatus_fatal()) write(0,*) me,name,' a hsik  ',info,omp_get_thread_num()
                     !write(0,*) me,name,' a hsik  ',psb_errstatus_fatal()                
                     lip = tlip
 
@@ -918,6 +926,7 @@ contains
                         ncol = MAX(ncol,nxt)
                         call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
                              & pad=-1_psb_lpk_,addsz=laddsz)
+                        if (psb_errstatus_fatal()) write(0,*) me,name,' a esz  ',info,omp_get_thread_num() 
                         if (info /= psb_success_) then
                           !write(0,*) 'Error spot 3', info
                           call psb_errpush(psb_err_from_subroutine_ai_,name,&
@@ -958,6 +967,7 @@ contains
             !$omp critical(hash_g2l_ins)
             do i = 1, is
               info = 0
+              if (.not. isLoopValid) cycle
               ip = idx(i)
               if ((ip < 1 ).or.(ip>mglob)) then
                 idx(i) = -1

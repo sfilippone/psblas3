@@ -449,7 +449,7 @@ contains
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
-    write(0,*) 'In searchinskey 3: ', info 
+    !write(0,*) 'In searchinskey 3: ', info 
   end subroutine psb_hash_lsearchinskey
     
   recursive subroutine psb_hash_isearchinskey(key,val,nextval,hash,info)

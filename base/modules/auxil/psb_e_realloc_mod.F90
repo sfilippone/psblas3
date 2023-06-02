@@ -139,7 +139,7 @@ Contains
     name='psb_r_m_e_rk1'
     call psb_erractionsave(err_act)
     info=psb_success_ 
-    if (debug) write(psb_err_unit,*) 'e_reallocate D',len
+    if (debug) write(psb_err_unit,*) 'reallocate D',len
 
     if (present(lb)) then
       lb_ = lb
@@ -170,7 +170,7 @@ Contains
       End If
     else
       dim = 0
-      Allocate(rrax(lb_:ub_),stat=info)      
+      Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
@@ -178,7 +178,6 @@ Contains
         goto 9999
       end if
     endif
-    if (debug) write(psb_err_unit,*) 'reallocate 2 info',info
     if (present(pad)) then 
       !$omp parallel do private(i) shared(dim,len)
       do i=lb_-1+dim+1,lb_-1+len
@@ -188,9 +187,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue    
+9999 continue
     info = err
-    !write(0,*) 'e_realloc : ',info
     call psb_error_handler(err_act)
     return
 
@@ -988,8 +986,7 @@ Contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (psb_errstatus_fatal()) then
-      write(0,*) 'From ensure_size: errstatus_fatal()'
+    if (psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -1031,7 +1028,6 @@ Contains
       !$OMP END CRITICAL
 
       if (info /= psb_success_) then
-        write(0,*) 'From ensure_size: ',info,psb_err_from_subroutine_
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
 	goto 9999
