@@ -123,7 +123,7 @@ contains
       return
     endif
 
-    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=(1_psb_ipk_)*psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
       info = -5
@@ -236,9 +236,9 @@ contains
       return
     endif
 
-    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=(1_psb_ipk_)*psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info)
     if (info == psb_success_) &
-         & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=(1_psb_ipk_)*psb_heap_resize)
+         & call psb_ensure_size(heap%last+1,heap%idxs,info)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
       info = -5
