@@ -4563,7 +4563,7 @@ function psb_lz_coo_maxval(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max:res)
     do i=1, nnz
       res = max(res,abs(a%val(i)))
     end do
@@ -4630,7 +4630,7 @@ function psb_lz_coo_csnmi(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max:res)
     do i=1, m
       res = max(res,abs(vt(i)))
     end do
@@ -4680,7 +4680,7 @@ function psb_lz_coo_csnm1(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max:res)
     do i=1, n
       res = max(res,abs(vt(i)))
     end do
