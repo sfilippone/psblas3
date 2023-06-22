@@ -108,3 +108,69 @@ function psb_s_getelem(x,index,desc_a,info) result(res)
 
 end function
 
+function psb_s_getelem_vec(x,index,desc_a,info) result(res)
+  use psb_base_mod, psb_protect_name => psb_s_getelem_vec
+  use psi_mod
+  implicit none
+
+  type(psb_s_vect_type), intent(inout) :: x
+  integer(psb_lpk_), intent(in), dimension(:) :: index
+  type(psb_desc_type), intent(inout)     :: desc_a
+  integer(psb_ipk_), intent(out)         :: info
+  real(psb_spk_), allocatable, dimension(:) :: res
+  ! Local Variables
+  integer(psb_ipk_) :: nindex, i
+  integer(psb_ipk_) :: np, me, err_act
+  integer(psb_ipk_), allocatable, dimension(:) :: localindex
+  integer(psb_lpk_) :: gindex(1)
+  type(psb_ctxt_type) :: ctxt
+  character(len=20) :: name
+
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  name = 'psb_s_getelem_vec'
+
+  nindex = size(index)
+
+  if (.not.allocated(res)) then
+    allocate(res(nindex),stat=info)
+  end if
+  res = szero
+
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  do i = 1,nindex
+    gindex(1) = index(i)
+    call desc_a%indxmap%g2l(gindex,localindex,info,owned=.true.)
+    if ( localindex(1) > 1) then
+        res(i) = x%get_entry(localindex(1))
+    end if
+  end do
+
+  call psb_sum(ctxt,res,root=-1)
+
+
+  ! Error handling and closing
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end function
+

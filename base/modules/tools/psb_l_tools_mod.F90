@@ -170,5 +170,5 @@ Module psb_l_tools_mod
       logical, intent(in), optional        :: local
     end subroutine psb_lins_multivect
   end interface
-  
+
 end module psb_l_tools_mod

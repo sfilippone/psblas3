@@ -171,7 +171,7 @@ Module psb_d_tools_mod
       logical, intent(in), optional        :: local
     end subroutine psb_dins_multivect
   end interface
-  
+
   interface psb_cdbldext
     Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info,extype)
       import
@@ -272,7 +272,7 @@ Module psb_d_tools_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ld_remote_mat
   end interface psb_remote_mat
-  
+
   interface psb_spfree
     subroutine psb_dspfree(a, desc_a,info)
       import
@@ -440,6 +440,14 @@ Module psb_d_tools_mod
       integer(psb_ipk_), intent(out)         :: info
       real(psb_dpk_)                        :: res
     end function
+    function psb_d_getelem_vec(x,index,desc_a,info) result(res)
+      import
+      type(psb_d_vect_type), intent(inout) :: x
+      integer(psb_lpk_), intent(in), dimension(:) :: index
+      type(psb_desc_type), intent(inout)     :: desc_a
+      integer(psb_ipk_), intent(out)         :: info
+      real(psb_dpk_), allocatable, dimension(:) :: res
+    end function
   end interface
 
   interface psb_remap
@@ -453,7 +461,7 @@ Module psb_d_tools_mod
       type(psb_dspmat_type), intent(inout) :: a_in
       type(psb_dspmat_type), intent(out)   :: a_out
       type(psb_desc_type), intent(out)     :: desc_out
-      integer(psb_ipk_), intent(out)       :: ipd 
+      integer(psb_ipk_), intent(out)       :: ipd
       integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:), naggr(:)
       integer(psb_ipk_), intent(out)       :: info
     end subroutine psb_d_remap
