@@ -1017,7 +1017,7 @@ Contains
         if (present(newsz)) then
           isz = max(len+1,1,newsz)
         else if (present(addsz)) then
-          isz = max(len,1,isz+addsz))
+          isz = max(len,1,isz+addsz)
         else
           isz = max(len,1,int(1.25*isz))
         endif
