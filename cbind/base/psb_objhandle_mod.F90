@@ -50,7 +50,7 @@ module psb_objhandle_mod
     ! number of non zeros and dimensions
     integer(c_size_t)               :: nz, m, n
     ! value array
-    real(c_float), allocatable      :: as(:)
+    real(c_double), allocatable      :: as(:)
     ! columns array
     integer(c_size_t), allocatable  :: ja(:)
     ! row index pointers array
