@@ -3190,9 +3190,28 @@ subroutine psb_d_cp_csr_to_fmt(a,b,info)
     b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
     nr = a%get_nrows()
     nz = a%get_nzeros()
-    if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
-    if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
-    if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    if (.false.) then 
+      if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
+      if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
+      if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    else
+    ! Despite the implementation in safe_cpy, it seems better this way
+      call psb_realloc(nr+1,b%irp,info)
+      call psb_realloc(nz,b%ja,info)
+      call psb_realloc(nz,b%val,info)
+      !$omp parallel do private(i) schedule(static)
+      do i=1,nr+1
+        b%irp(i)=a%irp(i)
+      end do
+      !$omp end parallel do
+      !$omp parallel do private(j) schedule(static)
+      do j=1,nz  
+        b%ja(j)  = a%ja(j)
+        b%val(j) = a%val(j)
+      end do
+      !$omp end parallel do
+    end if
+
     call b%set_host()
 
   class default
@@ -3276,9 +3295,27 @@ subroutine psb_d_cp_csr_from_fmt(a,b,info)
     a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
     nr = b%get_nrows()
     nz = b%get_nzeros()
-    if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
-    if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
-    if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
+    if (.false.) then 
+      if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
+      if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
+      if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
+    else
+    ! Despite the implementation in safe_cpy, it seems better this way
+      call psb_realloc(nr+1,a%irp,info)
+      call psb_realloc(nz,a%ja,info)
+      call psb_realloc(nz,a%val,info)
+      !$omp parallel do private(i) schedule(static)
+      do i=1,nr+1
+        a%irp(i)=b%irp(i)
+      end do
+      !$omp end parallel do
+      !$omp parallel do private(j) schedule(static)
+      do j=1,nz  
+        a%ja(j)=b%ja(j)
+        a%val(j)=b%val(j)
+      end do
+      !$omp end parallel do
+    end if
     call a%set_host()
 
   class default

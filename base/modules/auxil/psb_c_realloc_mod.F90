@@ -768,7 +768,7 @@ Contains
     integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    integer(psb_ipk_) :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb, i
     character(len=30)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -790,9 +790,11 @@ Contains
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
       else
-        !$omp workshare
-        vout(:) = vin(:)
-        !$omp end workshare
+        !$omp parallel do private(i)
+        do i=lb,lb+isz-1
+          vout(i) = vin(i)
+        end do
+        !$omp end parallel do
       endif
     endif
 
