@@ -1,6 +1,8 @@
 #include "../include/Sp3MM_CSR_OMP_Multi.h"
 #include "../include/utils.h"
 
+enum impl_types {ROW_BY_ROW_UB};
+
 /**
  * @brief performs multiplication of two sparse matrices 
  * A and B stored in the CRS format. The resulting matrix is C
@@ -25,40 +27,43 @@
  *                      each row in b_as and b_ja
  * @param[in] b_rl          array with the lengths of each rows of B
  * @param[in] b_max_row_nz  maximum number of coefficients in a row in B
- * @param[out] c_m           number of colums of C
- * @param[out] c_n           number of rows of C
- * @param[out] c_nz          number of non zero elements in C
- * @param[out] c_as          array with the non zero coefficients of C
- * @param[out] c_ja          array with the column indices of the non
- *                      zero coefficients of C
- * @param[out] c_irp         array with the indices of the beginning of
- *                      each row in c_as and c_ja
- * @param[out] c_rl          array with the lengths of each rows of C
- * @param[out] c_max_row_nz  maximum number of coefficients in a row in C
- * @param[out] info          return value to check if the operation was successful
+ * @param[in] impl_choice   implementation choice
+ * @param[out] c_m          number of colums of C
+ * @param[out] c_n          number of rows of C
+ * @param[out] c_nz         number of non zero elements in C
+ * @param[out] c_as         array with the non zero coefficients of C
+ * @param[out] c_ja         array with the column indices of the non
+ *                          zero coefficients of C
+ * @param[out] c_irp        array with the indices of the beginning of
+ *                          each row in c_as and c_ja
+ * @param[out] c_rl         array with the lengths of each rows of C
+ * @param[out] c_max_row_nz maximum number of coefficients in a row in C
+ * @param[out] info         return value to check if the operation was successful
  */
 #ifdef ROWLENS
-void psb_f_spmm_row_by_row_ub_0(idx_t a_m, idx_t a_n, idx_t a_nz, 
+void psb_f_spmm(idx_t a_m, idx_t a_n, idx_t a_nz, 
                                 double *a_as, idx_t *a_ja, 
                                 idx_t *a_irp, idx_t *a_rl, idx_t a_max_row_nz, 
                                 idx_t b_m, idx_t b_n, idx_t b_nz, 
                                 double *b_as, idx_t *b_ja, 
                                 idx_t *b_irp, idx_t *b_rl, idx_t b_max_row_nz,
+                                enum impl_types impl_choice,
                                 idx_t *c_m, idx_t *c_n, idx_t *c_nz, 
                                 double **c_as, idx_t **c_ja, 
                                 idx_t **c_irp, idx_t **c_rl, idx_t *c_max_row_nz,
                                 int info)
 #else
-void psb_f_spmm_row_by_row_ub_0(idx_t a_m, idx_t a_n, idx_t a_nz, 
+void psb_f_spmm(idx_t a_m, idx_t a_n, idx_t a_nz, 
                                 double *a_as, idx_t *a_ja, 
                                 idx_t *a_irp, idx_t a_max_row_nz, 
                                 idx_t b_m, idx_t b_n, idx_t b_nz, 
                                 double *b_as, idx_t *b_ja, 
                                 idx_t *b_irp, idx_t b_max_row_nz,
+                                enum impl_types impl_choice,
                                 idx_t *c_m, idx_t *c_n, idx_t *c_nz, 
                                 double **c_as, idx_t **c_ja, 
                                 idx_t **c_irp,  idx_t *c_max_row_nz,
-                                int info)
+                                int *info)
 #endif                            
 {
     int rc;
@@ -92,7 +97,14 @@ void psb_f_spmm_row_by_row_ub_0(idx_t a_m, idx_t a_n, idx_t a_nz,
     b->MAX_ROW_NZ = b_max_row_nz;
 
     // performing spmm
-    c = spmmRowByRow_0(a, b, cfg);
+    switch (impl_choice)
+    {
+    case ROW_BY_ROW_UB:
+        c = spmmRowByRow_0(a, b, cfg);
+        break;
+    default:
+        break;
+    }
 
     // output result
     *(c_m) = c->M;
