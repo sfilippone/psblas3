@@ -3395,7 +3395,6 @@ contains
          & nzc,nnzre, isz, ipb, irwsz, nrc, nze
     real(psb_dpk_)                 :: cfb
 
-
     info = psb_success_
     ma = a%get_nrows()
     na = a%get_ncols()
@@ -3411,26 +3410,18 @@ contains
 
     ! conversion
 
-    ! available choices of implementation
-    enum, bind(C)
-      enumerator :: SPMM_ROW_BY_ROW_UB = 1
-      enumerator SPMM_ROW_BY_ROW_SYMB_NUM
-      enumerator SPMM_ROW_BY_ROW_1D_BLOCKS_SYMB_NUM
-      enumerator SPMM_ROW_BY_ROW_2D_BLOCKS_SYMB_NUM
-    end enum
-
-    select case (spmm_impl_id)
-    case (SPMM_ROW_BY_ROW_UB)
-      ! call spmm_row_by_row_ub
-    case (SPMM_ROW_BY_ROW_SYMB_NUM)
-      ! call spmm_row_by_row_symb_num
-    case (SPMM_ROW_BY_ROW_1D_BLOCKS_SYMB_NUM)
-      ! call spmm_row_by_row_1d_blocks_symb_num
-    case (SPMM_ROW_BY_ROW_2D_BLOCKS_SYMB_NUM)
-      ! call spmm_row_by_row_2d_blocks_symb_num
-    case default
-      ! call default choice
-    end select
+    ! select case (spmm_impl_id)
+    ! case (SPMM_ROW_BY_ROW_UB)
+    !   ! call spmm_row_by_row_ub
+    ! case (SPMM_ROW_BY_ROW_SYMB_NUM)
+    !   ! call spmm_row_by_row_symb_num
+    ! case (SPMM_ROW_BY_ROW_1D_BLOCKS_SYMB_NUM)
+    !   ! call spmm_row_by_row_1d_blocks_symb_num
+    ! case (SPMM_ROW_BY_ROW_2D_BLOCKS_SYMB_NUM)
+    !   ! call spmm_row_by_row_2d_blocks_symb_num
+    ! case default
+    !   ! call default choice
+    ! end select
 
     
     nze = min(size(c%val),size(c%ja))

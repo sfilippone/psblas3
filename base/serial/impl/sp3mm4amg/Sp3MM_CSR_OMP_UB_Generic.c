@@ -123,6 +123,98 @@ spmat* CAT(spmmRowByRow_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	return AB;
 }
 
+idx_t CAT(spmmRowByRowCalculateSize_,OFF_F)(spmat* A, spmat*B, CONFIG* cfg, void** accumul, void **rows_sizes, void** tmp_matrix){
+	DEBUG printf("spmm\trows of A,\tfull B\tM=%lu x N=%lu\n",A->M,B->N);
+	///thread aux
+	ACC_DENSE *accVects = NULL,*acc;
+	SPMM_ACC* outAccumul=NULL;
+	idx_t* rowsSizes = NULL;
+	///init AB matrix with SPMM heuristic preallocation
+	spmat* AB = allocSpMatrix(A->M,B->N);
+	if (!AB)	goto _err;
+	if (!(rowsSizes = CAT(spMMSizeUpperbound_,OFF_F) (A,B)))   goto _err;
+	///aux structures alloc 
+	if (!(accVects = _initAccVectors(cfg->threadNum,AB->N))){
+		ERRPRINT("accVects init failed\n");
+		goto _err;
+	}
+	if (!(outAccumul = initSpMMAcc(rowsSizes[AB->M],AB->M)))  goto _err;
+	#if SPARSIFY_PRE_PARTITIONING == T
+	//prepare sparse accumulators with U.Bounded rows[parts] starts
+	SPACC* accSp;
+	for( idx_t r=0,rSizeCumul=0; r<AB->M; rSizeCumul += rowsSizes[r++]){
+		accSp 		= outAccumul->accs+r;
+		accSp->JA 	= outAccumul->JA + rSizeCumul;
+		accSp->AS 	= outAccumul->AS + rSizeCumul;
+		//accSp->len	= rowsSizes[r];
+	}
+	#endif
+
+	((CHUNKS_DISTR_INTERF)	cfg->chunkDistrbFunc) (AB->M,AB,cfg);
+	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
+	#pragma omp parallel for schedule(runtime) private(acc)
+	for (ulong r=0;  r<A->M; r++){	//row-by-row formulation
+		//iterate over nz entry index c inside current row r
+		acc = accVects + omp_get_thread_num();
+		/* direct use of sparse scalar vector multiplication
+		for (idx_t ja=A->IRP[r]-OFF_F,ca,jb,bRowLen; ja<A->IRP[r+1]-OFF_F; ja++){
+			ca = A->JA[ja]  - OFF_F;
+			jb = B->IRP[ca] - OFF_F;
+			bRowLen = B->IRP[ca+1] - B->IRP[ca];
+			CAT(scSparseVectMul_,OFF_F)(A->AS[ja],B->AS+jb,B->JA+jb,bRowLen,acc);
+		}*/
+		for (ulong c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
+			CAT(scSparseRowMul_,OFF_F)(A->AS[c], B, A->JA[c]-OFF_F, acc);
+		//trasform accumulated dense vector to a CSR row
+		#if SPARSIFY_PRE_PARTITIONING == T
+		_sparsifyUB(acc,outAccumul->accs+r,0);
+		#else
+		sparsifyUBNoPartsBounds(outAccumul,acc,outAccumul->accs + r,0);
+		#endif
+		_resetAccVect(acc);   //rezero for the next A row
+	}
+
+	///calculate exact number of non zero elements
+	idx_t nnz;
+	nnz = calculateSize(outAccumul->accs,AB);
+
+	/// put the sparse accumulator into the argument so that
+	/// it can be retrived in Fortran
+	*accumul = outAccumul;
+	*rows_sizes = rowsSizes;
+	*tmp_matrix = AB;
+
+	if(accVects)	freeAccsDense(accVects,cfg->threadNum);
+
+	return nnz;
+
+	_err:
+	if(AB)  freeSpmat(AB);
+	AB=NULL;	//nothing'll be returned
+	_free:
+	if(rowsSizes)   free(rowsSizes);
+	if(accVects)	freeAccsDense(accVects,cfg->threadNum);
+	if(outAccumul)  freeSpMMAcc(outAccumul);
+}
+
+void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** tmp_matrix, double** AS, idx_t** JA, idx_t** IRP){
+	SPMM_ACC* outAccumul= *accumul;
+	idx_t* rowsSizes = *rows_sizes;
+	spmat *AB = *tmp_matrix;
+
+	mergeRowsPopulate(outAccumul->accs, AB, AS, JA, IRP);
+	
+	#if OFF_F != 0
+	C_FortranShiftIdxs(AB);
+	#endif
+	AUDIT_INTERNAL_TIMES	End=omp_get_wtime();
+	DEBUG				    checkOverallocPercent(rowsSizes,AB);
+
+	if(AB)  freeSpmat(AB);
+	if(rowsSizes)   free(rowsSizes);
+	if(outAccumul)  freeSpMMAcc(outAccumul);
+}
+
 spmat* CAT(spmmRowByRow1DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	DEBUG printf("spmm\trowBlocks of A,\tfull B\tM=%lu x N=%lu\n",A->M,B->N);
 	DEBUG printf("ompParallelizationGrid:\t%dx%d\n",cfg->gridRows,cfg->gridCols);

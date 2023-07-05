@@ -21,3 +21,5 @@ autom4te.cache
 # the executable from tests
 runs
 
+# editor generated files
+.vscode/*

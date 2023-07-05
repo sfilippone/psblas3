@@ -41,3 +41,5 @@ module psb_objhandle_mod
   type, bind(c) :: psb_c_zspmat
     type(c_ptr) :: item = c_null_ptr
   end type psb_c_zspmat
+
+end module psb_objhandle_mod

@@ -1,7 +1,0 @@
-{
-    "fortran.fortls.path": "/usr/bin/fortls",
-    "files.associations": {
-        "sp3mm_csr_omp_multi.h": "c",
-        "sp3mm_csr_omp_ub_generic.h": "c"
-    }
-}

@@ -402,5 +402,48 @@ inline int mergeRows(SPACC* rows,spmat* mat){
 	return EXIT_SUCCESS;
 } 
 
+/***************************************************************
+ * The Following code is a modified version of the mergeRows
+ * function.
+ * The function is split into two parts : 
+ * 		- the first one calculates the sizes of the arrays 
+ * 		  and returns it
+ * 		- the second one fills them accordingly
+ * This allows for allocation of the arrays as allocatables in
+ * Fortran
+*/
+
+inline idx_t calculateSize(SPACC* rows, spmat *mat){
+	ulong nzNum=0;
+	//count nnz entries and alloc arrays for them
+	for (ulong r=0;   r<mat->M;   ++r){
+		nzNum += rows[r].len;
+		mat->IRP[r+1] = nzNum;
+		#ifdef ROWLENS
+		mat->RL[r]  = rows[r].len
+		#endif
+	}
+	mat->NZ = nzNum;
+
+	return nzNum;
+}
+
+inline int mergeRowsPopulate(SPACC* rows, spmat* mat, double** AS, idx_t** JA, idx_t** IRP) {
+    // Populate with rows' non-zero values and indexes
+    // TODO PARALLEL COPY
+    #pragma omp parallel for schedule(static)
+    for (ulong r = 0; r < mat->M; r++) {
+        memcpy(*AS + mat->IRP[r], rows[r].AS, rows[r].len * sizeof(double));
+        memcpy(*JA + mat->IRP[r], rows[r].JA, rows[r].len * sizeof(idx_t));
+    }
+    
+	memcpy(*IRP, mat->IRP, (mat->M + 1) * sizeof(idx_t));
+	
+    // Consistency checks
+    // TODO: Add your consistency checks here
+    
+    return EXIT_SUCCESS;
+}
+
 #endif	//SPMMUTILS_H_SINGLE_IMPLEMENTATION
 
