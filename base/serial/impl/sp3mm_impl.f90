@@ -11,8 +11,8 @@ subroutine dspmm(a,b,c,info, impl_choice)
     implicit none
     type(psb_d_csr_sparse_mat), intent(in) :: a,b
     type(psb_d_csr_sparse_mat), intent(inout):: c
-    integer(psb_ipk_), intent(out)    :: info
-    integer(psb_ipk_), intent(in), optional :: impl_choice
+    integer(psb_ipk_), intent(out)      :: info
+    integer(psb_ipk_), intent(in)       :: impl_choice
 
     ! Internal variables
     integer(c_size_t):: a_m,a_n,a_nz
@@ -96,12 +96,6 @@ subroutine dspmm(a,b,c,info, impl_choice)
     b_ja_ptr = c_loc(b_ja)
     b_irp = b%irp
     b_irp_ptr = c_loc(b_irp)
-
-    if (present(impl_choice)) then
-        impl_choice_ = impl_choice
-    else
-        impl_choice_ = 0
-    end if
 
     ! call calculateSize
     call psb_f_spmm_build_spacc(a_m,a_n,a_nz,a_as_ptr,&
