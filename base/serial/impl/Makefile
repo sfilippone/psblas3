@@ -39,6 +39,7 @@ LIBFILE=$(LIBDIR)/$(LIBNAME)
 objs: $(OBJS)
 
 lib: objs
+	$(MAKE) -C sp3mm4amg lib
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
@@ -46,6 +47,7 @@ lib: objs
 $(OBJS): $(MODDIR)/psb_base_mod.o
 
 clean: cleanobjs
+	($(MAKE) -C sp3mm4amg clean)
 
 veryclean: cleanobjs
 
