@@ -1,5 +1,6 @@
 #include "../include/Sp3MM_CSR_OMP_Multi.h"
 #include "../include/utils.h"
+#include <stdio.h>
 
 enum impl_types
 {
@@ -71,7 +72,7 @@ void psb_f_spmm_merge_spacc(void **accumul,
     switch (impl_choice)
     {
     case ROW_BY_ROW_UB:
-        *info = spmmRowByRowPopulate_0(accumul, rows_sizes, tmp_matrix, c_as, c_ja, c_irp);
+        spmmRowByRowPopulate_0(accumul, rows_sizes, tmp_matrix, c_as, c_ja, c_irp);
         break;
     default:
         break;

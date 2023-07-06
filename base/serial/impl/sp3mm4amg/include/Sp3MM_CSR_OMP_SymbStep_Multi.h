@@ -52,7 +52,7 @@
 	///generate colParts versions
 	#define COL_PARTS	COL_PARTS_ON
 		#include "Sp3MM_CSR_OMP_SymbStep_Generic.h"
-		//generate outIdxs AND colParts ve sions
+		//generate outIdxs AND colParts versions
 		#define OUT_IDXS 	OUT_IDXS_ON
 		#include "Sp3MM_CSR_OMP_SymbStep_Generic.h"
 

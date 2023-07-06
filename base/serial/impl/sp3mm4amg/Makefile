@@ -14,7 +14,9 @@ LDFLAGS = -lm
 LIBDIR=../../../
 LIBFILE=$(LIBDIR)/$(LIBNAME)
 
-SP3MM_CORE_OBJS=commons/ompGetICV.o \
+SP3MM_CORE_OBJS=Sp3MM_CSR_OMP_Multi.o \
+				Sp3MM_CSR_OMP_SymbStep_Multi.o \
+				commons/ompGetICV.o \
 				commons/sparseUtilsMulti.o \
 				commons/utils.o \
 				lib/linuxK_rbtree_minimalized.o \

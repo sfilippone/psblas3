@@ -58,6 +58,11 @@ SPMM CAT(spmmSerial_,OFF_F); //mono thread version for debug oracle-less
  * return resulting product matrix
  */
 SPMM CAT(spmmRowByRow_,OFF_F);
+
+idx_t CAT(spmmRowByRowCalculateSize_,OFF_F) (spmat* A, spmat*B, CONFIG* cfg, void** accumul, void **rows_sizes, void** tmp_matrix);
+
+void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** tmp_matrix, double** AS, idx_t** JA, idx_t** IRP);
+
 /*
  * sparse parallel implementation of @A * @B parallelizing Gustavson 
  * with partitioning of @A in @conf->gridRows blocks of rows  
