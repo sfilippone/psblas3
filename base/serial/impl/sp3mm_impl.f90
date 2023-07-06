@@ -9,28 +9,22 @@ subroutine dspmm(a,b,c,info, impl_choice)
     use psb_d_mat_mod
     use iso_c_binding
     implicit none
-    type(psb_d_csr_sparse_mat), intent(in) :: a,b
-    type(psb_d_csr_sparse_mat), intent(inout):: c
+    type(psb_d_csr_sparse_mat), intent(in), target :: a,b
+    type(psb_d_csr_sparse_mat), intent(inout), target :: c
     integer(psb_ipk_), intent(out)      :: info
     integer(psb_ipk_), intent(in)       :: impl_choice
 
     ! Internal variables
-    integer(c_size_t):: a_m,a_n,a_nz
-    real(c_double), pointer :: a_as(:)
-    integer(c_size_t), pointer :: a_ja(:),a_irp(:)
-    type(c_ptr) :: a_as_ptr,a_ja_ptr,a_irp_ptr
-    integer(c_size_t) :: a_max_row_nz
-    integer(c_size_t) :: b_m,b_n,b_nz
-    real(c_double), pointer :: b_as(:)
-    integer(c_size_t), pointer :: b_ja(:),b_irp(:)
-    type(c_ptr) :: b_as_ptr,b_ja_ptr,b_irp_ptr
-    integer(c_size_t) :: b_max_row_nz
-    integer(c_int) :: impl_choice_
-    type(c_ptr) :: accumul, rows_sizes, tmp_matrix
-    integer(c_size_t) :: nnz
-    real(c_double), pointer :: c_as(:)
-    integer(c_size_t), pointer :: c_ja(:),c_irp(:)
-    type(c_ptr) :: c_as_ptr,c_ja_ptr,c_irp_ptr
+    integer(c_size_t)   :: a_m,a_n,a_nz
+    type(c_ptr)         :: a_as,a_ja,a_irp
+    integer(c_size_t)   :: a_max_row_nz
+    integer(c_size_t)   :: b_m,b_n,b_nz
+    type(c_ptr)         :: b_as,b_ja,b_irp
+    integer(c_size_t)   :: b_max_row_nz
+    integer(c_int)      :: impl_choice_
+    type(c_ptr)         :: accumul, rows_sizes, tmp_matrix
+    integer(c_size_t)   :: nnz
+    type(c_ptr)         :: c_as,c_ja,c_irp
 
     interface spmm_build_spacc
         subroutine psb_f_spmm_build_spacc(c_a_m,c_a_n,c_a_nz,&
@@ -65,14 +59,14 @@ subroutine dspmm(a,b,c,info, impl_choice)
                                         c_rows_sizes,&
                                         c_tmp_matrix,&
                                         c_impl_choice,&
-                                        c_as,c_ja,c_irp,&
+                                        as,ja,irp,&
                                         c_info) bind(C)
             use iso_c_binding
             use psb_base_mod
             type(c_ptr), intent(in) :: c_accumul,c_rows_sizes,c_tmp_matrix
             integer(c_int), intent(in), value :: c_impl_choice
             integer(psb_ipk_), intent(out) :: c_info
-            type(c_ptr), intent(out) :: c_as,c_ja,c_irp
+            type(c_ptr), intent(out) :: as,ja,irp
         end subroutine psb_f_spmm_merge_spacc
     end interface spmm_row_by_row_populate
 
@@ -80,28 +74,22 @@ subroutine dspmm(a,b,c,info, impl_choice)
     a_m = a%get_nrows()
     a_n = a%get_ncols()
     a_nz = a%get_nzeros()
-    a_as = a%val
-    a_as_ptr = c_loc(a_as)
-    a_ja = a%ja
-    a_ja_ptr = c_loc(a_ja)
-    a_irp = a%irp
-    a_irp_ptr = c_loc(a_irp)
+    a_as = c_loc(a%val)
+    a_ja = c_loc(a%ja)
+    a_irp = c_loc(a%irp)
     ! ! a_max_row_nz
     b_m = b%get_nrows()
     b_n = b%get_ncols()
     b_nz = b%get_nzeros()
-    b_as = b%val
-    b_as_ptr = c_loc(b_as)
-    b_ja = b%ja
-    b_ja_ptr = c_loc(b_ja)
-    b_irp = b%irp
-    b_irp_ptr = c_loc(b_irp)
+    b_as = c_loc(b%val)
+    b_ja = c_loc(b%ja)
+    b_irp = c_loc(b%irp)
 
     ! call calculateSize
-    call psb_f_spmm_build_spacc(a_m,a_n,a_nz,a_as_ptr,&
-                                a_ja_ptr,a_irp_ptr,a_max_row_nz,&
-                                b_m,b_n,b_nz,b_as_ptr,b_ja_ptr,&
-                                b_irp_ptr,b_max_row_nz,&
+    call psb_f_spmm_build_spacc(a_m,a_n,a_nz,a_as,&
+                                a_ja,a_irp,a_max_row_nz,&
+                                b_m,b_n,b_nz,b_as,b_ja,&
+                                b_irp,b_max_row_nz,&
                                 impl_choice_,accumul,&
                                 rows_sizes,tmp_matrix,&
                                 info,nnz)
@@ -111,12 +99,9 @@ subroutine dspmm(a,b,c,info, impl_choice)
     allocate(c%ja(nnz))
     allocate(c%irp(a_m + 1))
     
-    c_as = c%val
-    c_as_ptr = c_loc(c_as)
-    c_ja = c%ja
-    c_ja_ptr = c_loc(c_ja)
-    c_irp = c%irp
-    c_irp_ptr = c_loc(c_irp)
+    c_as = c_loc(c%val)
+    c_ja = c_loc(c%ja)
+    c_irp = c_loc(c%irp)
 
     ! c%set_nrows(a_m)
     ! c%set_ncols(b_n)
@@ -126,9 +111,9 @@ subroutine dspmm(a,b,c,info, impl_choice)
                                 rows_sizes,&
                                 tmp_matrix,&
                                 impl_choice_,&
-                                c_as_ptr,&
-                                c_ja_ptr,&
-                                c_irp_ptr,&
+                                c_as,&
+                                c_ja,&
+                                c_irp,&
                                 info)
 
 end subroutine dspmm

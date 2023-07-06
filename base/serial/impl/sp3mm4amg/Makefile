@@ -8,7 +8,7 @@ CWALL+=-Wno-unused-function -Wno-unused-variable       #TODO CLEAN USELESS FUNCT
 CWALL+=-Wno-unused-label -Wfatal-errors
 
 CINCL   = -Iinclude/ 
-CFLAGS  = -O2 $(CWALL) $(CINCL) -fopenmp $(RUNTIME)
+CFLAGS  = -g -O3 $(CWALL) $(CINCL) -fopenmp $(RUNTIME)
 LDFLAGS = -lm
 
 LIBDIR=../../../

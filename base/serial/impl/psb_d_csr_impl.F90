@@ -3401,7 +3401,7 @@ contains
     mb = b%get_nrows()
     nb = b%get_ncols()
 
-    if (.false.) then
+    if (.true.) then
       nze = min(size(c%val),size(c%ja))
       isz = max(ma,na,mb,nb)
       call psb_realloc(isz,row,info)
