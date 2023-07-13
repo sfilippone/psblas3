@@ -116,6 +116,7 @@ inline idx_t* CAT(spMMSizeUpperbound_,OFF_F)(spmat* A,spmat* B){
 		ERRPRINT("spMMSizeUpperbound: rowSizes calloc errd\n");
 		return NULL;
 	}
+	printf("A->IRP %ld %ld %ld %ld %ld\n", A->IRP[0], A->IRP[1], A->IRP[2], A->IRP[3], A->IRP[4]);
 	idx_t fullMatBound = 0;
 	#pragma omp parallel for schedule(static) reduction(+:fullMatBound)
 	for (idx_t r=0;  r<A->M; r++){

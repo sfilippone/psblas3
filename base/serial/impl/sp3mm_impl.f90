@@ -74,10 +74,12 @@ subroutine dspmm(a,b,c,info, impl_choice)
     a_m = a%get_nrows()
     a_n = a%get_ncols()
     a_nz = a%get_nzeros()
+    write(*,*) 'IRP(1:5) ',a%irp(1:5)
     a_as = c_loc(a%val)
     a_ja = c_loc(a%ja)
     a_irp = c_loc(a%irp)
-    ! ! a_max_row_nz
+    ! a_max_row_nz
+
     b_m = b%get_nrows()
     b_n = b%get_ncols()
     b_nz = b%get_nzeros()
@@ -99,9 +101,9 @@ subroutine dspmm(a,b,c,info, impl_choice)
     allocate(c%ja(nnz))
     allocate(c%irp(a_m + 1))
     
-    c_as = c_loc(c%val)
-    c_ja = c_loc(c%ja)
-    c_irp = c_loc(c%irp)
+    ! c_as = c_loc(c%val)
+    ! c_ja = c_loc(c%ja)
+    ! c_irp = c_loc(c%irp)
 
     ! c%set_nrows(a_m)
     ! c%set_ncols(b_n)

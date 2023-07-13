@@ -38,6 +38,7 @@
  * configuration is expected to have a valid number of threadNum setted
  */
 #include "config.h"
+#include "omp.h"
 //distribution of @rows|blocks of @matrix, exploiting @config
 typedef void (CHUNKS_DISTR )           (ulong,spmat*,CONFIG*);
 typedef void (*CHUNKS_DISTR_INTERF )   (ulong,spmat*,CONFIG*);

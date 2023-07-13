@@ -48,7 +48,7 @@ typedef struct{
 	void* chunkDistrbFunc;  //CHUNKS_DISTR_INTERF func pntr
 } CONFIG;  
 ///Smart controls
-typedef size_t 		idx_t;	//spmat indexes
+typedef int 		idx_t;	//spmat indexes
 typedef unsigned __int128	uint128;
 
 #include "macros.h"
