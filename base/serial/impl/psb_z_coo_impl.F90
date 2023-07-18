@@ -3489,6 +3489,603 @@ subroutine psb_z_coo_mv_from(a,b)
 end subroutine psb_z_coo_mv_from
 
 
+!
+! CSR implementation of tril/triu
+!
+subroutine psb_z_coo_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
+  ! Output is always in  COO format
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_tril
+  implicit none
+
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(out) :: l
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_z_coo_sparse_mat), optional, intent(out) :: u
+
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  character(len=20)  :: name='tril'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then
+    mb = imax_ - imin_ +1
+  else
+    mb = imax_
+  endif
+  if (cscale_) then
+    nb = jmax_ - jmin_ +1
+  else
+    nb = jmax_
+  endif
+
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable :: lrws(:),urws(:)
+    integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
+    call psb_realloc(mb,lrws,info)
+    !$omp workshare
+    lrws(:) = 0
+    !$omp end workshare
+    nz = a%get_nzeros()
+    call l%allocate(mb,nb,nz)
+    !write(0,*) 'Invocation of COO%TRIL', present(u),nz
+    if (present(u)) then
+      nzlin = l%get_nzeros() ! At this point it should be 0
+      call u%allocate(mb,nb,nz)
+      nzuin = u%get_nzeros() ! At this point it should be 0
+      if (info == 0) call psb_realloc(mb,urws,info)
+      !$omp workshare
+      urws(:) = 0
+      !$omp end workshare
+      !write(0,*) 'omp version of COO%TRIL/TRIU'
+      lnz = 0
+      unz = 0 
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws,urws) reduction(+: lnz,unz)
+      loop1: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic update
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            !$omp end atomic
+            lnz = lnz + 1
+          else
+            !$omp atomic update
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            !$omp end atomic
+            unz = unz + 1
+          end if
+        end if
+      end do loop1
+      !$omp end parallel do
+
+      call psi_exscan(mb,lrws,info)
+      call psi_exscan(mb,urws,info) 
+      !write(0,*) lrws(:), urws(:)
+      !$omp parallel do private(i,j,k,lpnt,upnt) shared(imin_,imax_,a)
+      loop2: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic capture
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            lpnt            = lrws(i-imin_+1)
+            !$omp end atomic
+            l%ia(lpnt)  = a%ia(k)
+            l%ja(lpnt)  = a%ja(k)
+            l%val(lpnt) = a%val(k)
+          else
+            !$omp atomic capture
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            upnt            = urws(i-imin_+1)
+            !$omp end atomic
+            u%ia(upnt)  = a%ia(k)
+            u%ja(upnt)  = a%ja(k)
+            u%val(upnt) = a%val(k)
+          end if
+        end if
+      end do loop2
+      !$omp end parallel do
+      !write(0,*) 'End of copyout',lnz,unz
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+      call u%set_nzeros(unz)
+      call u%fix(info)
+      nzout = u%get_nzeros()
+      if (rscale_) then
+        !$omp workshare
+        u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+        !$omp end workshare
+      end if
+      if (cscale_) then
+        !$omp workshare
+        u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+        !$omp end workshare
+      end if
+      if ((diag_ >=-1).and.(imin_ == jmin_)) then
+        call u%set_triangle(.true.)
+        call u%set_lower(.false.)
+      end if
+    else
+      lnz = 0
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws) reduction(+: lnz)
+      loop3: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic update
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            !$omp end atomic
+            lnz = lnz + 1
+          end if
+        end if
+      end do loop3
+      !$omp end parallel do
+      call psi_exscan(mb,lrws,info)
+      !$omp parallel do private(i,j,k,lpnt) shared(imin_,imax_,a)
+      loop4: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic capture
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            lpnt            = lrws(i-imin_+1)
+            !$omp end atomic
+            l%ia(lpnt)  = a%ia(k)
+            l%ja(lpnt)  = a%ja(k)
+            l%val(lpnt) = a%val(k)
+          end if
+        end if
+      end do loop4
+      !$omp end parallel do
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+    end if
+    nzout = l%get_nzeros()
+    if (rscale_) then
+      !$omp workshare
+      l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+      !$omp end workshare
+    end if
+    if (cscale_) then
+      !$omp workshare
+      l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+      !$omp end workshare
+    end if
+
+    if ((diag_ <= 0).and.(imin_ == jmin_)) then
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  end block
+
+#else
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop1: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            nzlin = nzlin + 1
+            l%ia(nzlin)  = i
+            l%ja(nzlin)  = ja(k)
+            l%val(nzlin) = val(k)
+          else
+            nzuin = nzuin + 1
+            u%ia(nzuin)  = i
+            u%ja(nzuin)  = ja(k)
+            u%val(nzuin) = val(k)
+          end if
+        end if
+      end do loop1
+    end associate
+
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+    if ((diag_ >=-1).and.(imin_ == jmin_)) then
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop2: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            nzin = nzin + 1
+            l%ia(nzin)  = i
+            l%ja(nzin)  = ja(k)
+            l%val(nzin) = val(k)
+          end if
+        end if
+      end do loop2
+    end associate
+    call l%set_nzeros(nzin)
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
+  if (rscale_) &
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+
+  if ((diag_ <= 0).and.(imin_ == jmin_)) then
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
+  end if
+#endif
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_coo_tril
+
+subroutine psb_z_coo_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
+  ! Output is always in  COO format
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_triu
+  implicit none
+
+  class(psb_z_coo_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(out) :: u
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_z_coo_sparse_mat), optional, intent(out) :: l
+
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  character(len=20)  :: name='triu'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then
+    mb = imax_ - imin_ +1
+  else
+    mb = imax_
+  endif
+  if (cscale_) then
+    nb = jmax_ - jmin_ +1
+  else
+    nb = jmax_
+  endif
+
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable :: lrws(:),urws(:)
+    integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
+    call psb_realloc(mb,urws,info)
+    !$omp workshare
+    urws(:) = 0
+    !$omp end workshare
+    nz = a%get_nzeros()
+    call u%allocate(mb,nb,nz)
+    !write(0,*) 'Invocation of COO%TRIL', present(u),nz
+    if (present(l)) then
+      nzuin = u%get_nzeros() ! At this point it should be 0
+      call l%allocate(mb,nb,nz)
+      nzlin = l%get_nzeros() ! At this point it should be 0
+      if (info == 0) call psb_realloc(mb,urws,info)
+      !$omp workshare
+      lrws(:) = 0
+      !$omp end workshare
+      !write(0,*) 'omp version of COO%TRIL/TRIU'
+      lnz = 0
+      unz = 0 
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws,urws) reduction(+: lnz,unz)
+      loop1: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<diag_) then
+            !$omp atomic update
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            !$omp end atomic
+            lnz = lnz + 1
+          else
+            !$omp atomic update
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            !$omp end atomic
+            unz = unz + 1
+          end if
+        end if
+      end do loop1
+      !$omp end parallel do
+
+      call psi_exscan(mb,lrws,info)
+      call psi_exscan(mb,urws,info) 
+      !write(0,*) lrws(:), urws(:)
+      !$omp parallel do private(i,j,k,lpnt,upnt) shared(imin_,imax_,a)
+      loop2: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<diag_) then
+            !$omp atomic capture
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            lpnt            = lrws(i-imin_+1)
+            !$omp end atomic
+            l%ia(lpnt)  = a%ia(k)
+            l%ja(lpnt)  = a%ja(k)
+            l%val(lpnt) = a%val(k)
+          else
+            !$omp atomic capture
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            upnt            = urws(i-imin_+1)
+            !$omp end atomic
+            u%ia(upnt)  = a%ia(k)
+            u%ja(upnt)  = a%ja(k)
+            u%val(upnt) = a%val(k)
+          end if
+        end if
+      end do loop2
+      !$omp end parallel do
+      !write(0,*) 'End of copyout',lnz,unz
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+      call u%set_nzeros(unz)
+      call u%fix(info)
+      nzout = l%get_nzeros()
+      if (rscale_) then
+        !$omp workshare
+        l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+        !$omp end workshare
+      end if
+      if (cscale_) then
+        !$omp workshare
+        l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+        !$omp end workshare
+      end if
+      if ((diag_ <=-1).and.(imin_ == jmin_)) then
+        call l%set_triangle(.true.)
+        call l%set_lower(.false.)
+      end if
+    else
+      unz = 0
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,urws) reduction(+: unz)
+      loop3: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)>=diag_) then
+            !$omp atomic update
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            !$omp end atomic
+            unz = unz + 1
+          end if
+        end if
+      end do loop3
+      !$omp end parallel do
+      call psi_exscan(mb,urws,info)
+      !$omp parallel do private(i,j,k,upnt) shared(imin_,imax_,a)
+      loop4: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)>=diag_) then
+            !$omp atomic capture
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            upnt            = urws(i-imin_+1)
+            !$omp end atomic
+            u%ia(upnt)  = a%ia(k)
+            u%ja(upnt)  = a%ja(k)
+            u%val(upnt) = a%val(k)
+          end if
+        end if
+      end do loop4
+      !$omp end parallel do
+      call u%set_nzeros(unz)      
+      call u%fix(info)
+    end if
+    nzout = u%get_nzeros()
+    if (rscale_) then
+      !$omp workshare
+      u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+      !$omp end workshare
+    end if
+    if (cscale_) then
+      !$omp workshare
+      u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+      !$omp end workshare
+    end if
+
+    if ((diag_ >= 0).and.(imin_ == jmin_)) then
+      call u%set_triangle(.true.)
+      call u%set_upper(.true.)
+    end if
+  end block
+
+  
+#else
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((ja(k)-i)<diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+    if ((diag_ <=1).and.(imin_ == jmin_)) then
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((ja(k)-i)>=diag_) then
+              nzin = nzin + 1
+              u%ia(nzin)  = i
+              u%ja(nzin)  = ja(k)
+              u%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzin)
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
+  if (rscale_) &
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+
+  if ((diag_ >= 0).and.(imin_ == jmin_)) then
+    call u%set_triangle(.true.)
+    call u%set_lower(.false.)
+  end if
+#endif
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_coo_triu
+
 
 subroutine psb_z_fix_coo(a,info,idir)
   use psb_const_mod
