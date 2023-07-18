@@ -39,10 +39,10 @@
 //hold SPMM result over a unpartitionated space among threads-row[s' blocks]
 typedef struct{
 	//space to hold SPMM output
-	ulong*  JA;
+	idx_t*  JA;
 	double* AS;
-	ulong   size;			//num of entries allocated -> only dbg checks
-	ulong   lastAssigned;	//last JA&AS assigned index to an accumulator(atom)
+	idx_t   size;			//num of entries allocated -> only dbg checks
+	idx_t   lastAssigned;	//last JA&AS assigned index to an accumulator(atom)
 	SPACC*  accs;			//SPARSIFIED ACC POINTERS
 	uint	accsNum;	
 } SPMM_ACC; //accumulator for SPMM

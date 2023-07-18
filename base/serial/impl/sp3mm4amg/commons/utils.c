@@ -145,12 +145,12 @@ int fread_wrap(FILE* fp,void* dst,size_t count){
 	return rd;
 }
 ///STRUCTURED DATA IO
-int writeDoubleVector(char* fpath,double* v,ulong size){
+int writeDoubleVector(char* fpath,double* v,idx_t size){
 	int fd,out=EXIT_FAILURE;
 	if ( (fd = createNewFile(fpath) ) < 0 ) goto _end;
 	write_wrap(fd,v,size * sizeof(*v)); //raw write of vector
 	out = EXIT_SUCCESS;
-	DEBUG printf("written double vector into %s RAW of %lu elements\n",fpath,size);
+	DEBUG printf("written double vector into %s RAW of %d elements\n",fpath,size);
 
 	_end:
 	if (close(fd) == EOF)  perror("close errd\n");
@@ -158,21 +158,21 @@ int writeDoubleVector(char* fpath,double* v,ulong size){
 }
 
 ///STRUCTURED DATA IO -- BUFFERED: FSCANF - FPRINTF
-int writeDoubleVectorAsStr(char* fpath,double* v,ulong size){
+int writeDoubleVectorAsStr(char* fpath,double* v,idx_t size){
 	int out=EXIT_FAILURE;
 	FILE* fp = fopen(fpath,"w");
 	if (!fp){
 		perror("fopen vector file write");
 		return EXIT_FAILURE;
 	}
-	for (ulong i=0; i<size; i++){
+	for (idx_t i=0; i<size; i++){
 		if (fprintf(fp,DOUBLE_STR_FORMAT,v[i]) < 0){
 			ERRPRINT("fprintf to out vector file errd\n");
 			goto _end;
 		} 
 	}
 	out = EXIT_SUCCESS;
-	DEBUG printf("written vector into %s of %lu elements\n",fpath,size);
+	DEBUG printf("written vector into %s of %d elements\n",fpath,size);
 
 	_end:
 	if (fclose(fp) == EOF)  perror("fclose errd\n");
@@ -180,10 +180,10 @@ int writeDoubleVectorAsStr(char* fpath,double* v,ulong size){
 
 }
 
-double* readDoubleVector(char* fpath,ulong* size){
+double* readDoubleVector(char* fpath,idx_t* size){
 	int rd,hleft;
 	double *out,*tmp;
-	ulong i=0,vectorSize=RNDVECTORSIZE;
+	idx_t i=0,vectorSize=RNDVECTORSIZE;
 	if (*size)   vectorSize = *size;
 	FILE* fp = fopen(fpath,"r");
 	if (!fp){
@@ -198,13 +198,13 @@ double* readDoubleVector(char* fpath,ulong* size){
 		if (i >= vectorSize ){ //realloc the array
 			vectorSize *= VECTOR_STEP_REALLOC;
 			if (!(tmp=realloc(out,vectorSize*sizeof(*out)))){
-				ERRPRINTS("realloc errd to ~~ %lu MB\n",vectorSize >> 20);
+				ERRPRINTS("realloc errd to ~~ %d MB\n",vectorSize >> 20);
 				goto _err;
 			}
 			out = tmp;
-			DEBUG   printf("reallocd to ~~ %lu MB\n",vectorSize >> 20);
+			DEBUG   printf("reallocd to ~~ %d MB\n",vectorSize >> 20);
 		}
-		ulong toRead = MIN(VECTOR_READ_BLOCK,(vectorSize-i));
+		idx_t toRead = MIN(VECTOR_READ_BLOCK,(vectorSize-i));
 		if((rd = fread_wrap(fp,out + i,sizeof(*out)*toRead)) == -2){
 			ERRPRINT("fread_wrap errd\n");
 			goto _err;
@@ -227,7 +227,7 @@ double* readDoubleVector(char* fpath,ulong* size){
 		goto _err;
 	}
 	out = tmp;
-	DEBUG printf("readed vector from %s of %lu elements\n",fpath,*size);
+	DEBUG printf("readed vector from %s of %d elements\n",fpath,*size);
 	goto _free;
 
 	_err:
@@ -238,10 +238,10 @@ double* readDoubleVector(char* fpath,ulong* size){
 	return out;
 }
 
-double* readDoubleVectorStr(char* fpath,ulong* size){
+double* readDoubleVectorStr(char* fpath,idx_t* size){
 	int fscanfOut;
 	double *out,*tmp;
-	ulong i=0,vectorSize=RNDVECTORSIZE;
+	idx_t i=0,vectorSize=RNDVECTORSIZE;
 	if (*size)   vectorSize = *size;
 	FILE* fp = fopen(fpath,"r");
 	if (!fp){
@@ -256,11 +256,11 @@ double* readDoubleVectorStr(char* fpath,ulong* size){
 		if (i >= vectorSize ){ //realloc the array
 			vectorSize *= VECTOR_STEP_REALLOC;
 			if (!(tmp=realloc(out,vectorSize*sizeof(*out)))){
-				ERRPRINTS("realloc errd to ~~ %lu MB\n",vectorSize >> 20);
+				ERRPRINTS("realloc errd to ~~ %d MB\n",vectorSize >> 20);
 				goto _err;
 			}
 			out = tmp;
-			DEBUG   printf("reallocd to ~~ %lu MB\n",vectorSize >> 20);
+			DEBUG   printf("reallocd to ~~ %d MB\n",vectorSize >> 20);
 		}
 		fscanfOut = fscanf(fp,DOUBLE_STR_FORMAT,out + i++ );
 		if ( fscanfOut == EOF && ferror(fp)){
@@ -277,7 +277,7 @@ double* readDoubleVectorStr(char* fpath,ulong* size){
 		goto _err;
 	}
 	out = tmp;
-	DEBUG printf("readed vector from %s of %lu elements\n",fpath,*size);
+	DEBUG printf("readed vector from %s of %d elements\n",fpath,*size);
 	goto _free;
 
 	_err:
@@ -292,10 +292,10 @@ double* readDoubleVectorStr(char* fpath,ulong* size){
 int getConfig(CONFIG* conf){
 	int changes=EXIT_FAILURE;
 	char *varVal,*ptr;
-	ulong val;
+	idx_t val;
 	if ((varVal = getenv(GRID_ROWS))){
 		val=strtoul(varVal,&ptr,10);
-		if (ptr==varVal || val>= UINT_MAX){
+		if (ptr==varVal || val>= INT_MAX){
 			perror("strtol errd");
 		} else {
 			conf->gridRows = val;
@@ -304,7 +304,7 @@ int getConfig(CONFIG* conf){
 	}
 	if ((varVal = getenv(GRID_COLS))){
 		val=strtoul(varVal,&ptr,10);
-		if (ptr==varVal || val>= UINT_MAX){
+		if (ptr==varVal || val>= INT_MAX){
 			perror("strtol errd");
 		} else {
 			conf->gridCols = val;
@@ -317,11 +317,11 @@ int getConfig(CONFIG* conf){
 /////LIB-SORTING -- WRAPPERS
 //comparing functions
 static inline int cmp_idx_t(const void* a, const void*b){
-	idx_t aa=*((ulong*) a), bb = *((ulong*) b);
+	idx_t aa=*((idx_t*) a), bb = *((idx_t*) b);
 	return aa==bb?0:aa>bb?1:-1;
 }
-static inline int cmpulong(const void* a, const void*b){
-	ulong aa=*((ulong*) a), bb = *((ulong*) b);
+static inline int cmpidx_t(const void* a, const void*b){
+	idx_t aa=*((idx_t*) a), bb = *((idx_t*) b);
 	return aa==bb?0:aa>bb?1:-1;
 }
 static inline int cmpuint(const void* a, const void*b){
@@ -336,8 +336,8 @@ static inline int cmpRbNode(const void* a, const void* b){
 void sort_idx_t(idx_t* arr, idx_t len){
 	qsort(arr,len,sizeof(*arr),cmp_idx_t);
 }
-void sortulong(ulong* arr, ulong len){
-	qsort(arr,len,sizeof(*arr),cmpulong);
+void sortidx_t(idx_t* arr, idx_t len){
+	qsort(arr,len,sizeof(*arr),cmpidx_t);
 }
 void sortuint(uint* arr, uint len){
 	qsort(arr,len,sizeof(*arr),cmpuint);
@@ -368,7 +368,7 @@ static inline int rndDouble_sinDecimal(double* d){
 		ERRPRINT("read_wrap failed to read holder for rnd double\n");
 		return EXIT_FAILURE;
 	}
-	*d = (_rndHold % (ulong) ceil(MAXRND)) + sin(_rndHold);
+	*d = (_rndHold % (idx_t) ceil(MAXRND)) + sin(_rndHold);
 	return EXIT_SUCCESS;
 }
    
@@ -383,8 +383,8 @@ void statsAvgVar(double* values,uint numVals, double* out){
 }
 
 /// MATRIX - VECTOR COMPUTE UTILS
-int fillRndVector(ulong size, double* v){
-	for( ulong x=0; x<size; ++x ){
+int fillRndVector(idx_t size, double* v){
+	for( idx_t x=0; x<size; ++x ){
 		if(rndDouble_sinAll( v+x )) return EXIT_FAILURE;
 		#ifdef RNDVECTMIN
 		v[x] += RNDVECTMIN;
@@ -394,18 +394,18 @@ int fillRndVector(ulong size, double* v){
 }
 
 //convention true result in @a, toCheck in @b
-int doubleVectorsDiff(double* a, double* b, ulong n,double* diffMax){
+int doubleVectorsDiff(double* a, double* b, idx_t n,double* diffMax){
 	int out = EXIT_SUCCESS;
 	double diff,diffAbs,_diffMax=0;
 	if (diffMax)	*diffMax = 0;
 	else diffMax = &_diffMax;
-	for (ulong i=0; i<n; i++){
+	for (idx_t i=0; i<n; i++){
 		diff	= a[i] - b[i];
 		diffAbs = ABS( diff );
 		if( diffAbs > DOUBLE_DIFF_THREASH ){
 			out = EXIT_FAILURE;
 			ERRPRINTS("DOUBLE VECTORS DIFF: DOUBLE_DIFF_THREASH=%lf\t<\t"
-				  "|%13lg| = %lf %% of @a[%lu]\n",
+				  "|%13lg| = %lf %% of @a[%d]\n",
 			  	  DOUBLE_DIFF_THREASH,diff,100*diffAbs/ABS(a[i]),i);
 			#ifdef DOUBLE_VECT_DIFF_EARLY_EXIT
 			/*#pragma message("DOUBLE_VECT_DIFF_EARLY_EXIT: only first diff double reported")*/
@@ -415,7 +415,7 @@ int doubleVectorsDiff(double* a, double* b, ulong n,double* diffMax){
 		if ( ABS(*diffMax) < diffAbs )   *diffMax = diff;
 	}
 	DEBUG{
-		printf("\nchecked diff %s"CEND" between 2 double vector of %lu elements"
+		printf("\nchecked diff %s"CEND" between 2 double vector of %d elements"
 			   "\tmax diff: %le %s threash: %le\n", !out?CCC"OK":CCCERR"ERR!",
 				n,*diffMax,*diffMax<DOUBLE_DIFF_THREASH?"<":">=",
 			   DOUBLE_DIFF_THREASH);
@@ -427,9 +427,9 @@ int doubleVectorsDiff(double* a, double* b, ulong n,double* diffMax){
 	return out;
 }
 
-void printMatrix(double* mat,ulong m,ulong n,char justNZMarkers){
-	printf("printing matrix: %lu x %lu\n",m,n);
-	ulong i,j;
+void printMatrix(double* mat,idx_t m,idx_t n,char justNZMarkers){
+	printf("printing matrix: %d x %d\n",m,n);
+	idx_t i,j;
 	for (i=0;i<m;i++){
 		for (j=0;j<n;j++){
 			if (justNZMarkers)  printf("%s",mat[IDX2D(i,j,n)]?".":" ");
@@ -441,8 +441,8 @@ void printMatrix(double* mat,ulong m,ulong n,char justNZMarkers){
 }
 
 
-void printVector(double* v,ulong size){
-	for( ulong i=0;i<size;i++)   printf("%1.1lf ",v[i]);
+void printVector(double* v,idx_t size){
+	for( idx_t i=0;i<size;i++)   printf("%1.1lf ",v[i]);
 	printf("\n");
 }
 
@@ -464,7 +464,7 @@ static inline char* searchPatternInStrs(char* pattern,char** strings){
 	return out;
 }
 
-inline int appendArr(ulong val,APPENDARRAY* list){
+inline int appendArr(idx_t val,APPENDARRAY* list){
 	return 0;   //TODO
 }
 

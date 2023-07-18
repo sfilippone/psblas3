@@ -40,14 +40,14 @@
 #include "config.h"
 #include "omp.h"
 //distribution of @rows|blocks of @matrix, exploiting @config
-typedef void (CHUNKS_DISTR )           (ulong,spmat*,CONFIG*);
-typedef void (*CHUNKS_DISTR_INTERF )   (ulong,spmat*,CONFIG*);
+typedef void (CHUNKS_DISTR )           (idx_t,spmat*,CONFIG*);
+typedef void (*CHUNKS_DISTR_INTERF )   (idx_t,spmat*,CONFIG*);
 
 //NOOP chunks division for manual configuration via export OMP_SCHEDULE  
-inline void chunksNOOP(ulong r,spmat* mat,CONFIG* cfg){ return; }
+inline void chunksNOOP(idx_t r,spmat* mat,CONFIG* cfg){ return; }
 #include "ompGetICV.h"
 //fair division of @r elements from matrix @mat with threads num in @cfg
-inline void chunksFair(ulong r,spmat* mat,CONFIG* cfg){
+inline void chunksFair(idx_t r,spmat* mat,CONFIG* cfg){
 	assert(cfg->threadNum > 0); //configured target thread num
 	omp_sched_t k,kind; int chunk_size,chunk_size_new=0,monotonic;
 	omp_get_schedule(&kind,&chunk_size);
@@ -75,7 +75,7 @@ inline void chunksFair(ulong r,spmat* mat,CONFIG* cfg){
 }
 //fair division of @r elements from matrix @mat of threads in @cfg
 //subdividing the fair share with a factor of @FAIR_CHUNKS_FOLDING
-inline void chunksFairFolded(ulong r,spmat* mat,CONFIG* cfg){
+inline void chunksFairFolded(idx_t r,spmat* mat,CONFIG* cfg){
 	assert(cfg->threadNum > 0); //configured target thread num
 	omp_sched_t k,kind; int chunk_size,chunk_size_new=0,monotonic;
 	omp_get_schedule(&kind,&chunk_size);

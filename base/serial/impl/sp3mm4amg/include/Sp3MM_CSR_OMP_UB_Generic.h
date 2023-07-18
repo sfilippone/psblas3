@@ -61,7 +61,7 @@ SPMM CAT(spmmRowByRow_,OFF_F);
 
 idx_t CAT(spmmRowByRowCalculateSize_,OFF_F) (spmat* A, spmat*B, CONFIG* cfg, void** accumul, void **rows_sizes, void** tmp_matrix);
 
-void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** tmp_matrix, double** AS, idx_t** JA, idx_t** IRP);
+void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** tmp_matrix, double* AS, idx_t* JA, idx_t* IRP);
 
 /*
  * sparse parallel implementation of @A * @B parallelizing Gustavson 

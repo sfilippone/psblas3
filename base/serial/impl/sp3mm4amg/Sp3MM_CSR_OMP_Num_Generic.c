@@ -122,7 +122,7 @@ spmat* CAT(spmmRowByRow_SymbNum_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 			bRowLen = B->IRP[ca+1] 	- B->IRP[ca];
 			CAT(scSparseVectMul_,OFF_F)(A->AS[ja], B->AS+jb,B->JA+jb,bRowLen,acc);
 		} */
-		for (ulong ja=A->IRP[r]-OFF_F;	ja<A->IRP[r+1]-OFF_F;	ja++) //row-by-row formul
+		for (idx_t ja=A->IRP[r]-OFF_F;	ja<A->IRP[r+1]-OFF_F;	ja++) //row-by-row formul
 			CAT(scSparseRowMul_,OFF_F)(A->AS[ja], B, A->JA[ja]-OFF_F, acc);
 		//direct sparsify: trasform accumulated dense vector to a CSR row
 		sparsifyDirect(acc,AB,r); //0,NULL);TODO COL PARTITIONING COMMON API
@@ -165,10 +165,10 @@ spmat* CAT(spmmRowByRow1DBlocks_SymbNum_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	
 	///NUMERIC STEP
 	//perform Gustavson over rows blocks -> M / @cfg->gridRows
-	ulong rowBlock = AB->M/cfg->gridRows, rowBlockRem = AB->M%cfg->gridRows;
+	idx_t rowBlock = AB->M/cfg->gridRows, rowBlockRem = AB->M%cfg->gridRows;
 	((CHUNKS_DISTR_INTERF)	cfg->chunkDistrbFunc) (cfg->gridRows,AB,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
-	ulong b,startRow,block; //omp for aux vars
+	idx_t b,startRow,block; //omp for aux vars
 	#pragma omp parallel for schedule(runtime) private(acc,startRow,block)
 	for (b=0;   b < cfg->gridRows; b++){
 		block	  = UNIF_REMINDER_DISTRI(b,rowBlock,rowBlockRem);
@@ -184,7 +184,7 @@ spmat* CAT(spmmRowByRow1DBlocks_SymbNum_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 				bRowLen = B->IRP[ca+1] 	- B->IRP[ca];
 				CAT(scSparseVectMul_,OFF_F)(A->AS[ja], B->AS+jb,B->JA+jb,bRowLen,acc);
 			} */
-			for (ulong ja=A->IRP[r]-OFF_F;	ja<A->IRP[r+1]-OFF_F;	ja++) //row-by-row formul
+			for (idx_t ja=A->IRP[r]-OFF_F;	ja<A->IRP[r+1]-OFF_F;	ja++) //row-by-row formul
 				CAT(scSparseRowMul_,OFF_F)(A->AS[ja], B, A->JA[ja]-OFF_F, acc);
 			//direct sparsify: trasform accumulated dense vector to a CSR row
 			sparsifyDirect(acc,AB,r); //0,NULL);TODO COL PARTITIONING COMMON API
@@ -209,7 +209,7 @@ spmat* CAT(spmmRowByRow1DBlocks_SymbNum_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 
 }
 spmat* CAT(spmmRowByRow2DBlocks_SymbNum_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){ 
-	DEBUG printf("spmm\trowBlocks of A ,\tcolBlocks of B\tM=%luxN=%lu\n",A->M,B->N);
+	DEBUG printf("spmm\trowBlocks of A ,\tcolBlocks of B\tM=%dxN=%d\n",A->M,B->N);
 	idx_t* bColOffsets = NULL;   //B group columns starting offset for each row
 	ACC_DENSE *accVectors=NULL,*accV;
 	SPACC* accRowPart;
@@ -218,10 +218,10 @@ spmat* CAT(spmmRowByRow2DBlocks_SymbNum_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	idx_t	*rowsPartsSizes=NULL, *rowSizes=NULL;	//for rows' cols partition, correct len
 	if (!AB)	goto _err;
 	//2D indexing aux vars
-	ulong gridSize=cfg->gridRows*cfg->gridCols, aSubRowsN=A->M*cfg->gridCols;
-	ulong _rowBlock = AB->M/cfg->gridRows, _rowBlockRem = AB->M%cfg->gridRows;
-	ulong _colBlock = AB->N/cfg->gridCols, _colBlockRem = AB->N%cfg->gridCols;
-	ulong startRow,startCol,rowBlock,colBlock; //data division aux variables
+	idx_t gridSize=cfg->gridRows*cfg->gridCols, aSubRowsN=A->M*cfg->gridCols;
+	idx_t _rowBlock = AB->M/cfg->gridRows, _rowBlockRem = AB->M%cfg->gridRows;
+	idx_t _colBlock = AB->N/cfg->gridCols, _colBlockRem = AB->N%cfg->gridCols;
+	idx_t startRow,startCol,rowBlock,colBlock; //data division aux variables
 	////get bColOffsets for B column groups 
 	if (!(bColOffsets = CAT(colsOffsetsPartitioningUnifRanges_,OFF_F)(B,cfg->gridCols)))
 		goto _err;

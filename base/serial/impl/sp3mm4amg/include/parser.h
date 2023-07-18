@@ -35,16 +35,16 @@
 #include "sparseMatrix.h" 
 
 typedef struct{
-	ulong row;
-	ulong col;
+	idx_t row;
+	idx_t col;
 	double val;
 } entry;	 //MatrixMarket COO entry
 
 typedef struct{
 	MM_typecode mcode;
 	entry* entries;
-	ulong* rowLens;
-	ulong M,N,NZ;   //spmat sizes
+	idx_t* rowLens;
+	idx_t M,N,NZ;   //spmat sizes
 } MatrixMarket;
 
 ////COO PARSE
@@ -61,7 +61,7 @@ int MMCheck(MM_typecode typecode);
  * return allocated and filled COO entries with the NNZ number into
  * NO SORT CHECKING HERE
  */
-entry* MMtoCOO(ulong* NZ, FILE *fp, MM_typecode mcode,ulong* rowLens);
+entry* MMtoCOO(idx_t* NZ, FILE *fp, MM_typecode mcode,idx_t* rowLens);
 
 ////COO -> ANYTHING ELSE CONVERSION
 /*
@@ -69,13 +69,13 @@ entry* MMtoCOO(ulong* NZ, FILE *fp, MM_typecode mcode,ulong* rowLens);
  * EXPECTED: CSR arrays allocated, @entries col sorted in (not madatory consecut) rows
  * [simmetrical parts explicitly rappresented --> not important here]
  */
-int COOtoCSR(entry* entries, spmat* mat,ulong* rowLens);
+int COOtoCSR(entry* entries, spmat* mat,idx_t* rowLens);
 /*
  * write COO entries in @entries inside sparse matrix @mat in ELL format
  * EXPECTED: @entries col sorted in (not madatory consecut) rows
  * ELL internal array allocated in this function, not freed in case of error
  */
-int COOtoELL(entry* entries, spmat* mat, ulong* rowLens);
+int COOtoELL(entry* entries, spmat* mat, idx_t* rowLens);
 ////wrapper MM -> specialized target
 /*
  * Parse MatrixMarket matrix stored in file at @matPath

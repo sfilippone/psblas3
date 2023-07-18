@@ -37,12 +37,12 @@
  * both of accumulator's dense array and nnzIdx in @aux and has to be big @vectLen
  */
 inline void CAT(scSparseVectMul_,OFF_F)
-  (double scalar,double* vectVals,ulong* vectIdxs,ulong vectLen, ACC_DENSE* aux){
-	for (ulong i=0,j; i<vectLen; i++){
+  (double scalar,double* vectVals,idx_t* vectIdxs,idx_t vectLen, ACC_DENSE* aux){
+	for (idx_t i=0,j; i<vectLen; i++){
 		j = vectIdxs[i]-OFF_F;
 		DEBUGCHECKS{
 			if (j>=aux->vLen){
-				fprintf(stderr,"index %lu outside vLen %lu\n",j,aux->vLen);
+				fprintf(stderr,"index %d outside vLen %d\n",j,aux->vLen);
 				assert(j < aux->vLen);
 			}
 		}
@@ -65,12 +65,12 @@ inline void CAT(scSparseVectMul_,OFF_F)
  * both of accumulator's dense array and nnzIdx in @aux and has to be big @vectLen
  */
 inline void CAT(scSparseVectMulPart_,OFF_F)(double scalar,double* vectVals,
-  ulong* vectIdxs,ulong vectLen,ulong startIdx,ACC_DENSE* aux){
-	for (ulong i=0,j; i<vectLen; i++){
+  idx_t* vectIdxs,idx_t vectLen,idx_t startIdx,ACC_DENSE* aux){
+	for (idx_t i=0,j; i<vectLen; i++){
 		j = vectIdxs[i]-OFF_F - startIdx;
 		DEBUGCHECKS{
 			if (j>=aux->vLen){
-				fprintf(stderr,"index %lu outside vLen %lu\n",j,aux->vLen);
+				fprintf(stderr,"index %d outside vLen %d\n",j,aux->vLen);
 				assert(j < aux->vLen);
 			}
 		}
@@ -90,9 +90,9 @@ inline void CAT(scSparseVectMulPart_,OFF_F)(double scalar,double* vectVals,
 #endif
 
 ///TODO IMPLEMENT SCALAR<->ROW MUL AS GENERIC SPARSE VECTOR<->SCALAR MUL
-//inline void scSparseRowMul(double scalar,spmat* mat,ulong trgtR, ACC_DENSE* aux){
-inline void CAT(scSparseRowMul_,OFF_F)(double scalar,spmat* mat,ulong trgtR, ACC_DENSE* aux){
-	ulong  rowStartIdx = mat->IRP[trgtR]-OFF_F,rowLen;
+//inline void scSparseRowMul(double scalar,spmat* mat,idx_t trgtR, ACC_DENSE* aux){
+inline void CAT(scSparseRowMul_,OFF_F)(double scalar,spmat* mat,idx_t trgtR, ACC_DENSE* aux){
+	idx_t  rowStartIdx = mat->IRP[trgtR]-OFF_F,rowLen;
 	#ifdef ROWLENS
 	rowLen = mat->RL[trgtR];
 	#else
@@ -116,7 +116,6 @@ inline idx_t* CAT(spMMSizeUpperbound_,OFF_F)(spmat* A,spmat* B){
 		ERRPRINT("spMMSizeUpperbound: rowSizes calloc errd\n");
 		return NULL;
 	}
-	printf("A->IRP %ld %ld %ld %ld %ld\n", A->IRP[0], A->IRP[1], A->IRP[2], A->IRP[3], A->IRP[4]);
 	idx_t fullMatBound = 0;
 	#pragma omp parallel for schedule(static) reduction(+:fullMatBound)
 	for (idx_t r=0;  r<A->M; r++){
@@ -135,7 +134,7 @@ inline idx_t* CAT(spMMSizeUpperbound_,OFF_F)(spmat* A,spmat* B){
 	rowSizes[A->M]  = fullMatBound;
 	AUDIT_INTERNAL_TIMES	End= omp_get_wtime();
 	VERBOSE 
-		printf("spMMSizeUpperbound:%lu\t%le s\n",rowSizes[A->M],End-Start);
+		printf("spMMSizeUpperbound:%d\t%le s\n",rowSizes[A->M],End-Start);
 	return rowSizes;
 }
 
@@ -170,7 +169,7 @@ inline idx_t* CAT(spMMSizeUpperboundColParts_,OFF_F)
 	rowPartsSizes[ A->M*gridCols ]  = fullMatBound;
 	AUDIT_INTERNAL_TIMES	End= omp_get_wtime();
 	VERBOSE 
-	 printf("spMMSizeUpperboundColParts_:%lu\t%le s\n",rowPartsSizes[A->M],End-Start);
+	 printf("spMMSizeUpperboundColParts_:%d\t%le s\n",rowPartsSizes[A->M],End-Start);
 	return rowPartsSizes;
 }
 
@@ -182,7 +181,7 @@ inline idx_t* CAT(spMMSizeUpperboundColParts_,OFF_F)
 #include "utils.h"
 ///Allocs - Free
 //SpMM holder of accumulats 
-inline SPMM_ACC* initSpMMAcc(ulong entriesNum, ulong accumulatorsNum){
+inline SPMM_ACC* initSpMMAcc(idx_t entriesNum, idx_t accumulatorsNum){
 	SPMM_ACC* out = calloc(1,sizeof(*out));
 	if (!out){
 		ERRPRINT("initSpMMAcc:	out calloc errd\n");
@@ -275,7 +274,7 @@ static inline void _sparsifyUB(ACC_DENSE* accV,SPACC* accSparse,idx_t startColAc
 
 //row[Part] sparsified in a thread safe (exactly long) reserved area using atomics
 static inline void sparsifyUBNoPartsBounds
-  (SPMM_ACC* acc,ACC_DENSE* accV,SPACC* accSparse, ulong startColAcc){
+  (SPMM_ACC* acc,ACC_DENSE* accV,SPACC* accSparse, idx_t startColAcc){
 	//sort nnz indexes of dense accumulator
 	idx_t nnz = accV->nnzIdxMap.len;
 	idx_t sparsifyStartV;		 //start index(inside @accSparse) of @accV to sparsify
@@ -305,11 +304,11 @@ static inline void sparsifyUBNoPartsBounds
  */
 inline int mergeRowsPartitions(SPACC* rowsParts,spmat* mat,
   CONFIG* conf){
-	ulong nzNum=0,j,rLen,idx,partsNum = mat->M * conf->gridCols;
+	idx_t nzNum=0,j,rLen,idx,partsNum = mat->M * conf->gridCols;
 	//TODO PARALLEL MERGE - SAVE STARTING offset OF EACH PARTITION IN THE OUT MATRIX
-	ulong* rowsPartsOffsets=alloca(partsNum*sizeof(*rowsPartsOffsets));
+	idx_t* rowsPartsOffsets=alloca(partsNum*sizeof(*rowsPartsOffsets));
 	///count nnz entries and alloc arrays for them
-	for (ulong r=0; r<mat->M; r++){
+	for (idx_t r=0; r<mat->M; r++){
 		//for each partition ->get len -> outMat.IRP and aux offsets  
 		for (j=0,rLen=0; j<conf->gridCols; j++){
 			idx = IDX2D(r,j,conf->gridCols);
@@ -332,20 +331,20 @@ inline int mergeRowsPartitions(SPACC* rowsParts,spmat* mat,
 		return EXIT_FAILURE;
 	}
 	///popolate with rows nnz values and indexes
-	ulong pLen; //omp for aux vars
+	idx_t pLen; //omp for aux vars
 	#pragma omp parallel for schedule(static) private(pLen)
-	for (ulong i=0;  i<partsNum; i++){
+	for (idx_t i=0;  i<partsNum; i++){
 		pLen = rowsParts[i].len;
 		memcpy(mat->AS + rowsPartsOffsets[i],rowsParts[i].AS,pLen*sizeof(*(mat->AS)));
 		memcpy(mat->JA + rowsPartsOffsets[i],rowsParts[i].JA,pLen*sizeof(*(mat->JA)));
 	}
 	CONSISTENCY_CHECKS{ //TODO REMOVE written nnz check manually
-		for (ulong i=0,w=0; i<mat->M; i++){
+		for (idx_t i=0,w=0; i<mat->M; i++){
 			if (mat->IRP[i] != w) 
 				{ERRPRINT("MERGE ROW ERR IRP\n");return -1;}
 			for (j=0; j<conf->gridCols; j++){
 				SPACC r = rowsParts[IDX2D(i,j,conf->gridCols)];
-				for (ulong jj=0; jj<r.len; jj++,w++){
+				for (idx_t jj=0; jj<r.len; jj++,w++){
 					if (mat->AS[w]!= r.AS[jj]){
 						ERRPRINT("MERGE ROW ERR AS\n"); return -1;}
 					if (mat->JA[w]!= r.JA[jj]){
@@ -363,9 +362,9 @@ inline int mergeRowsPartitions(SPACC* rowsParts,spmat* mat,
  * allocd arrays to hold non zero values and indexes into @mat
  */
 inline int mergeRows(SPACC* rows,spmat* mat){
-	ulong nzNum=0;
+	idx_t nzNum=0;
 	//count nnz entries and alloc arrays for them
-	for (ulong r=0;   r<mat->M;   ++r){
+	for (idx_t r=0;   r<mat->M;   ++r){
 		nzNum += rows[r].len;
 		mat->IRP[r+1] = nzNum;
 		#ifdef ROWLENS
@@ -384,15 +383,15 @@ inline int mergeRows(SPACC* rows,spmat* mat){
 	///POPOLATE WITH ROWS NNZ VALUES AND INDEXES
 	//TODO PARALLEL COPY
 	#pragma omp parallel for schedule(static)
-	for (ulong r=0; r<mat->M; r++){
+	for (idx_t r=0; r<mat->M; r++){
 		memcpy(mat->AS+mat->IRP[r], rows[r].AS, rows[r].len*sizeof(*(mat->AS)));
 		memcpy(mat->JA+mat->IRP[r], rows[r].JA, rows[r].len*sizeof(*(mat->JA)));
 	}
 	CONSISTENCY_CHECKS{ //TODO REMOVE written nnz check manually
-		for (ulong r=0,i=0; r<mat->M; r++){
+		for (idx_t r=0,i=0; r<mat->M; r++){
 			if (i != mat->IRP[r])
 				{ERRPRINT("MERGE ROW ERR IRP\n");return -1;}
-			for (ulong j=0; j<rows[r].len; j++,i++){
+			for (idx_t j=0; j<rows[r].len; j++,i++){
 				if (mat->AS[i]!= rows[r].AS[j]){
 					ERRPRINT("MERGE ROW ERR AS\n"); return -1;}
 				if (mat->JA[i]   != rows[r].JA[j]){
@@ -415,9 +414,9 @@ inline int mergeRows(SPACC* rows,spmat* mat){
 */
 
 inline idx_t calculateSize(SPACC* rows, spmat *mat){
-	ulong nzNum=0;
+	idx_t nzNum=0;
 	//count nnz entries and alloc arrays for them
-	for (ulong r=0;   r<mat->M;   ++r){
+	for (idx_t r=0;   r<mat->M;   ++r){
 		nzNum += rows[r].len;
 		mat->IRP[r+1] = nzNum;
 		#ifdef ROWLENS
@@ -429,16 +428,17 @@ inline idx_t calculateSize(SPACC* rows, spmat *mat){
 	return nzNum;
 }
 
-inline int mergeRowsPopulate(SPACC* rows, spmat* mat, double** AS, idx_t** JA, idx_t** IRP) {
+inline int mergeRowsPopulate(SPACC* rows, spmat* mat, double* AS, idx_t* JA, idx_t* IRP) {
     // Populate with rows' non-zero values and indexes
     // TODO PARALLEL COPY
-    #pragma omp parallel for schedule(static)
-    for (ulong r = 0; r < mat->M; r++) {
-        memcpy(*AS + mat->IRP[r], rows[r].AS, rows[r].len * sizeof(double));
-        memcpy(*JA + mat->IRP[r], rows[r].JA, rows[r].len * sizeof(idx_t));
+    // #pragma omp parallel for schedule(static)
+    for (idx_t r = 0; r < mat->M; r++) {
+		fprintf(stderr, "r %d, AS %p, mat->IRP[r] %d, rows[r].AS %p, rows[r].len %d\n", r,AS,mat->IRP[r],rows[r].AS, rows[r].len);
+        memcpy(AS + mat->IRP[r], rows[r].AS, rows[r].len * sizeof(double));
+        memcpy(JA + mat->IRP[r], rows[r].JA, rows[r].len * sizeof(idx_t));
     }
     
-	memcpy(*IRP, mat->IRP, (mat->M + 1) * sizeof(idx_t));
+	memcpy(IRP, mat->IRP, (mat->M + 1) * sizeof(idx_t));
 	
     // Consistency checks
     // TODO: Add your consistency checks here

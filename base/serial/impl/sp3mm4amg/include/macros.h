@@ -42,7 +42,7 @@
 #define IN_RANGE(i,start,end)		( (start) <= (i) && (i) <= (end) )
 
 //ceil(x/y) with integers
-#define INT_DIV_CEIL(x,y)		    ( ( (x) - 1) / (y) + 1 )
+#define INT_DIV_CEIL(x,y)	    ( ( (x) - 1) / (y) + 1 )
 //2D ROW MAJOR indexing wrap compute
 #define IDX2D(i,j,nCols)            ((j) + (i)*(nCols))
 

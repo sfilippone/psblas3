@@ -46,10 +46,10 @@
  * alloc threads' aux arrays once and split them in threads' structures
  * so free them once from the first thread struct, with the original pointers returned from the alloc
  */
-ACC_DENSE* _initAccVectors_monoalloc(ulong num,ulong size){ //TODO PERF WITH NEXT
+ACC_DENSE* _initAccVectors_monoalloc(idx_t num,idx_t size){ //TODO PERF WITH NEXT
 	ACC_DENSE* out	 = NULL;
 	double* vAll	 = NULL;
-	ulong* vAllNzIdx = NULL;
+	idx_t* vAllNzIdx = NULL;
 	if (!(out = calloc(num,sizeof(*out)))){
 		ERRPRINT("_initAccVectors aux struct alloc failed\n");
 		return NULL;
@@ -62,7 +62,7 @@ ACC_DENSE* _initAccVectors_monoalloc(ulong num,ulong size){ //TODO PERF WITH NEX
 		ERRPRINT("_initAccVectors aux dense vectors' idx alloc failed\n");
 		goto err;
 	}
-	for (ulong i=0; i<num; i++){
+	for (idx_t i=0; i<num; i++){
 		out[i].vLen	= size; //TODO USELESS INFO?
 		out[i].v	= vAll	  + i*size;  
 		out[i].nnzIdx	= vAllNzIdx + i*size;;
@@ -76,7 +76,7 @@ ACC_DENSE* _initAccVectors_monoalloc(ulong num,ulong size){ //TODO PERF WITH NEX
 	free(vAllNzIdx);
 	return NULL;
 }
-int allocAccDense(ACC_DENSE* v,ulong size){
+int allocAccDense(ACC_DENSE* v,idx_t size){
 		v->vLen = size; 
 		if (!(v->v = calloc(size,sizeof(*(v->v))))) {
 			ERRPRINT("_initAccVectors aux dense vector alloc failed\n");
@@ -91,19 +91,19 @@ int allocAccDense(ACC_DENSE* v,ulong size){
 		return EXIT_SUCCESS;
 }
 
-ACC_DENSE* _initAccVectors(ulong num,ulong size){
+ACC_DENSE* _initAccVectors(idx_t num,idx_t size){
 	ACC_DENSE* out	= NULL;
 	if (!(out = calloc(num,sizeof(*out)))){
 		ERRPRINT("_initAccVectors aux struct alloc failed\n");
 		return NULL;
 	}
-	for (ulong i=0; i<num; i++){
+	for (idx_t i=0; i<num; i++){
 		if (allocAccDense(out+i,size))   goto _err;
 	}
 	return out;
 	
 	_err:
-	for (ulong i=0; i<num; i++){
+	for (idx_t i=0; i<num; i++){
 		if (out[i].v)	   free(out[i].v);
 		if (out[i].nnzIdx)  free(out[i].nnzIdx);
 	}
@@ -111,17 +111,17 @@ ACC_DENSE* _initAccVectors(ulong num,ulong size){
 	return NULL;
 }
 
-void freeAccsDense(ACC_DENSE* vectors,ulong num){
-	for (ulong i=0; i<num; i++){
+void freeAccsDense(ACC_DENSE* vectors,idx_t num){
+	for (idx_t i=0; i<num; i++){
 		free(vectors[i].v);
 		free(vectors[i].nnzIdx);
 		free(vectors[i].nnzIdxMap.idxsMap);
 	}
 	free(vectors);
 }
-void _freeAccsDenseChecks(ACC_DENSE* vectors,ulong num){ 
+void _freeAccsDenseChecks(ACC_DENSE* vectors,idx_t num){ 
 	if (!vectors)   return;
-	for (ulong i=0; i<num; i++){
+	for (idx_t i=0; i<num; i++){
 		if(vectors[i].v)	free(vectors[i].v);
 		if(vectors[i].nnzIdx)   free(vectors[i].nnzIdx);
 	}
@@ -143,8 +143,8 @@ int initSpVectIdxDenseAcc(idx_t idxMax,SPVECT_IDX_DENSE_MAP* vectIdxsMap){
 	return EXIT_SUCCESS;
 }
 
-void checkOverallocPercent(ulong* forecastedSizes,spmat* AB){
-	for (ulong r=0,rSize,forecastedSize; r < AB->M; r++){
+void checkOverallocPercent(idx_t* forecastedSizes,spmat* AB){
+	for (idx_t r=0,rSize,forecastedSize; r < AB->M; r++){
 		forecastedSize = forecastedSizes[r];
 		#ifdef ROWLENS
 		rSize = AB->RL[r];
@@ -158,11 +158,11 @@ void checkOverallocPercent(ulong* forecastedSizes,spmat* AB){
 			}
 		}
 		DEBUGPRINT
-			printf("extra forecastedSize of row: %lu\t=\t%lf %% \n",
+			printf("extra forecastedSize of row: %d\t=\t%lf %% \n",
 			  r,100*(forecastedSize-rSize) / (double) forecastedSize);
 	}
 	idx_t extraMatrix = forecastedSizes[AB->M] - AB->NZ;
-	printf("extra forecastedSize of the matrix: \t%lu\t = %lf %% \n",
+	printf("extra forecastedSize of the matrix: \t%d\t = %lf %% \n",
 	  extraMatrix, 100*extraMatrix /(double) forecastedSizes[AB->M]);
 }
 int spmatDiff(spmat* A, spmat* B){
@@ -187,8 +187,8 @@ int spmatDiff(spmat* A, spmat* B){
 
 double* CSRToDense(spmat* sparseMat){
 	double* denseMat;
-	ulong i,j,idxNZ,denseSize;
-	if (__builtin_umull_overflow(sparseMat->M,sparseMat->N,&denseSize)){
+	idx_t i,j,idxNZ,denseSize;
+	if (__builtin_smul_overflow(sparseMat->M,sparseMat->N,&denseSize)){
 		ERRPRINT("overflow in dense allocation\n");
 		return NULL;
 	}
@@ -200,7 +200,7 @@ double* CSRToDense(spmat* sparseMat){
 		for (idxNZ=sparseMat->IRP[i]; idxNZ<sparseMat->IRP[i+1]; ++idxNZ){
 			 j = sparseMat->JA[idxNZ];
 			 //converting sparse item into dense entry
-			 denseMat[(ulong) IDX2D(i,j,sparseMat->N)] = sparseMat->AS[idxNZ]; 
+			 denseMat[(idx_t) IDX2D(i,j,sparseMat->N)] = sparseMat->AS[idxNZ]; 
 		}
 	}
 	return denseMat;
@@ -214,17 +214,17 @@ void printSparseMatrix(spmat* spMatrix,char justNZMarkers){
 
 
 
-static inline int _colsPartitioningUnifRanges_init(spmat* A,uint gridCols,
+static inline int _colsPartitioningUnifRanges_init(spmat* A,int gridCols,
   spmat** colParts,idx_t** colPartsLens){
 
 	spmat* colPart;
-	ulong _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols, *tmpJA;
+	idx_t _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols, *tmpJA;
 	///alloc/init partitions structures
 	if (!(*colParts = calloc(gridCols, sizeof(**colParts)))){
 		ERRPRINT("colsPartitioningUnifRanges\tcolumns partitions of A calloc fail\n");
 		return EXIT_FAILURE;
 	}
-	for (ulong i=0,colBlock; i<gridCols; i++){
+	for (idx_t i=0,colBlock; i<gridCols; i++){
 		colBlock = UNIF_REMINDER_DISTRI(i,_colBlock,_colBlockRem);
 		colPart  = *colParts + i;
 		if (allocSpMatrixInternal(A->M,colBlock,colPart)){
@@ -249,13 +249,13 @@ static inline int _colsPartitioningUnifRanges_init(spmat* A,uint gridCols,
 	return EXIT_SUCCESS;
 }
 
-static inline int _colsPartitioningUnifRanges_finalRealloc(spmat* A,uint gridCols,
+static inline int _colsPartitioningUnifRanges_finalRealloc(spmat* A,int gridCols,
   spmat* colParts,idx_t* colPartsLens){
 
 	spmat* colPart;
 	double* tmpAS; idx_t* tmpJA;
 	//realloc overallcd A parts NZ arrays (TODO -> downsizing -> nofails?)
-	for (ulong i=0,partLen; i<gridCols; i++){
+	for (idx_t i=0,partLen; i<gridCols; i++){
 		colPart = colParts + i;
 		partLen = colPartsLens[i];
 		if (!(tmpAS = realloc(colPart->AS,partLen*sizeof(*(colPart->AS))))){
@@ -281,22 +281,22 @@ static inline int _colsPartitioningUnifRanges_finalRealloc(spmat* A,uint gridCol
 #endif
 ////////////////////////  CSR SPECIFIC -- TODO RENAME //////////////////
 ///SPARSE MATRIX PARTITIONING
-idx_t* CAT(colsOffsetsPartitioningUnifRanges_,OFF_F)(spmat* A,uint gridCols){
-	ulong subRowsN = A->M * gridCols;
-	ulong _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols;
-	ulong* offsets = malloc( (subRowsN+1) * sizeof(*offsets) );
+idx_t* CAT(colsOffsetsPartitioningUnifRanges_,OFF_F)(spmat* A,int gridCols){
+	idx_t subRowsN = A->M * gridCols;
+	idx_t _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols;
+	idx_t* offsets = malloc( (subRowsN+1) * sizeof(*offsets) );
 	if (!offsets)  {
 		ERRPRINT("colsOffsetsPartitioningUnifRanges:\toffsets malloc errd\n");
 		return NULL;
 	}
 	///OFFSETS COMPUTE FOR COL GROUPS -> O( A.NZ )
-	for (ulong r=0, j=0;	 r<A->M;	 j=A->IRP[++r]-OFF_F){
+	for (idx_t r=0, j=0;	 r<A->M;	 j=A->IRP[++r]-OFF_F){
 		offsets[ IDX2D(r,0,gridCols) ] = j;  //row's first gc start is costrained
 		//navigate column groups inside current row
-		for (ulong gc=1,gcStartCol;  gc<gridCols;  gc++){
+		for (idx_t gc=1,gcStartCol;  gc<gridCols;  gc++){
 			gcStartCol = UNIF_REMINDER_DISTRI_STARTIDX(gc,_colBlock,_colBlockRem);
 			//goto GroupCols start entry,keeping A's nnz entries navigation (idx j)
-			//for (ulong c=A->JA[j]-OFF_F; c<gcStartCol && j < A->IRP[r+1]-OFF_F; c=A->JA[++j]-OFF_F);
+			//for (idx_t c=A->JA[j]-OFF_F; c<gcStartCol && j < A->IRP[r+1]-OFF_F; c=A->JA[++j]-OFF_F);
 			while (j < A->IRP[r+1]-OFF_F &&  A->JA[j]-OFF_F < gcStartCol)  
 				j++;
 			offsets[ IDX2D(r,gc,gridCols) ] = j;  //row's gc group startIdx
@@ -306,12 +306,12 @@ idx_t* CAT(colsOffsetsPartitioningUnifRanges_,OFF_F)(spmat* A,uint gridCols){
 	return offsets;
 }
 
-spmat* CAT(colsPartitioningUnifRangesOffsetsAux_,OFF_F)(spmat* A,uint gridCols,
+spmat* CAT(colsPartitioningUnifRangesOffsetsAux_,OFF_F)(spmat* A,int gridCols,
 	   idx_t** colPartsOffsets)
 {
 	spmat *colParts = NULL, *colPart;
-	ulong _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols;
-	ulong *colPartsLens=NULL, *tmpJA;
+	idx_t _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols;
+	idx_t *colPartsLens=NULL, *tmpJA;
 	double* tmpAS;
 
 	///alloc/init partitions structures
@@ -349,15 +349,15 @@ spmat* CAT(colsPartitioningUnifRangesOffsetsAux_,OFF_F)(spmat* A,uint gridCols,
 	return colParts;
 	_err:
 	free(*colPartsOffsets);
-	for (ulong i=0; i<gridCols; i++)   	freeSpmatInternal(colParts+i);
+	for (idx_t i=0; i<gridCols; i++)   	freeSpmatInternal(colParts+i);
 	free(colOffsets);
 	free(colParts);
 	free(colPartsLens);
 	return NULL;
 }
-spmat* CAT(colsPartitioningUnifRanges_,OFF_F)(spmat* A,uint gridCols){
+spmat* CAT(colsPartitioningUnifRanges_,OFF_F)(spmat* A,int gridCols){
 	spmat *colParts, *colPart;
-	ulong _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols, *colPartsLens=NULL, *tmpJA;
+	idx_t _colBlock = A->N/gridCols, _colBlockRem = A->N%gridCols, *colPartsLens=NULL, *tmpJA;
 	double* tmpAS;
 	///alloc/init partitions structures
 	if (_colsPartitioningUnifRanges_init(A,gridCols,&colParts,&colPartsLens))
@@ -366,9 +366,9 @@ spmat* CAT(colsPartitioningUnifRanges_,OFF_F)(spmat* A,uint gridCols){
 	 * Parallelize: 2for collapse OMP, gcEndCol -> startIdxize, ...
 	 * oppure wrappare cio in static inline 
 	 */
-	for (ulong r=0, j=0;	 r<A->M;	 j=A->IRP[++r]-OFF_F){
+	for (idx_t r=0, j=0;	 r<A->M;	 j=A->IRP[++r]-OFF_F){
 		//navigate column groups inside current row
-		for (ulong gc=0,gcEndCol=0,i;  gc<gridCols ;  gc++,j+=i){
+		for (idx_t gc=0,gcEndCol=0,i;  gc<gridCols ;  gc++,j+=i){
 			i = 0;  //@i=len current subpartition of row @r to copy
 			colPart = colParts + gc;
 			//NB: not shifting IRP because is handled as internal implementation component
@@ -376,7 +376,7 @@ spmat* CAT(colsPartitioningUnifRanges_,OFF_F)(spmat* A,uint gridCols){
 			colPart->IRP[r] = colPartsLens[gc];	
 			gcEndCol += UNIF_REMINDER_DISTRI(gc,_colBlock,_colBlockRem);
 			//goto next GroupCols,keeping A's nnz entries navigation ( index j+i )
-			//for (ulong c=A->JA[j+i]-OFF_F; c<gcEndCol && j+i  < A->IRP[r+1]-OFF_F; c=A->JA[j+ ++i]-OFF_F);
+			//for (idx_t c=A->JA[j+i]-OFF_F; c<gcEndCol && j+i  < A->IRP[r+1]-OFF_F; c=A->JA[j+ ++i]-OFF_F);
 			while ( j+i < A->IRP[r+1]-OFF_F && A->JA[j+i]-OFF_F < gcEndCol ) i++;
 			memcpy(colPart->AS+colPart->IRP[r], A->AS+j, i*sizeof(*A->AS));
 			memcpy(colPart->JA+colPart->IRP[r], A->JA+j, i*sizeof(*A->JA));
@@ -393,14 +393,14 @@ spmat* CAT(colsPartitioningUnifRanges_,OFF_F)(spmat* A,uint gridCols){
 	free(colPartsLens);
 	return colParts;
 	_err:
-	for (ulong i=0; i<gridCols; i++)   freeSpmatInternal(colParts+i);
+	for (idx_t i=0; i<gridCols; i++)   freeSpmatInternal(colParts+i);
 	if(colParts)		free(colParts);
 	if(colPartsLens)	free(colPartsLens);
 	return NULL;
 }
 
 
-void CAT(checkOverallocRowPartsPercent_,OFF_F)(ulong* forecastedSizes,spmat* AB,
+void CAT(checkOverallocRowPartsPercent_,OFF_F)(idx_t* forecastedSizes,spmat* AB,
   				   idx_t gridCols,idx_t* bColOffsets){
 	idx_t* abColOffsets = CAT(colsOffsetsPartitioningUnifRanges_,OFF_F)(AB, gridCols);
 	assert(abColOffsets);	//partitioning error
@@ -410,7 +410,7 @@ void CAT(checkOverallocRowPartsPercent_,OFF_F)(ulong* forecastedSizes,spmat* AB,
 		DEBUGCHECKS	assert(forecast >= rLen);
 	}
 	idx_t extraMatrix = forecastedSizes[AB->M] - AB->NZ;
-	printf("extra forecastedSize of the matrix: \t%lu\t = %lf %% \n",
+	printf("extra forecastedSize of the matrix: \t%d\t = %lf %% \n",
 		extraMatrix, 100*extraMatrix /(double) forecastedSizes[AB->M]);
 
 	free(abColOffsets);
@@ -422,25 +422,25 @@ void CAT(checkOverallocRowPartsPercent_,OFF_F)(ulong* forecastedSizes,spmat* AB,
 
 ///inline export here 
 //SPMV_CHUNKS_DISTR spmvChunksFair; 
-spmat* allocSpMatrix(ulong rows, ulong cols);
-int allocSpMatrixInternal(ulong rows, ulong cols, spmat* mat);
+spmat* allocSpMatrix(idx_t rows, idx_t cols);
+int allocSpMatrixInternal(idx_t rows, idx_t cols, spmat* mat);
 void freeSpmatInternal(spmat* mat);
 void freeSpmat(spmat* mat);
 
 ////INTERNAL TEST FUNCTIONS
 //test that each row's partition from colsOffsetsPartitioningUnifRanges is in the correct index range
 #include <alloca.h>
-int testColsOffsetsPartitioningUnifRanges(spmat* mat,ulong gridCols,ulong* partsOffs){
-	ulong _colBlock = mat->N/gridCols, _colBlockRem = mat->N%gridCols;
-	ulong j=0;	//CSR scanning nnz idx
-	ulong* colPartsPopulations = alloca(gridCols * sizeof(*colPartsPopulations));
+int testColsOffsetsPartitioningUnifRanges(spmat* mat,idx_t gridCols,idx_t* partsOffs){
+	idx_t _colBlock = mat->N/gridCols, _colBlockRem = mat->N%gridCols;
+	idx_t j=0;	//CSR scanning nnz idx
+	idx_t* colPartsPopulations = alloca(gridCols * sizeof(*colPartsPopulations));
 	memset(colPartsPopulations,0,gridCols * sizeof(*colPartsPopulations));
-	for (ulong r=0,pId=0; r<mat->M; r++){
-		for (ulong gc=0,pStartIdx,pEndIdx; gc<gridCols; gc++,pId++){
+	for (idx_t r=0,pId=0; r<mat->M; r++){
+		for (idx_t gc=0,pStartIdx,pEndIdx; gc<gridCols; gc++,pId++){
 			pStartIdx = UNIF_REMINDER_DISTRI_STARTIDX(gc,_colBlock,_colBlockRem);
 			pEndIdx   = UNIF_REMINDER_DISTRI_STARTIDX(gc+1,_colBlock,_colBlockRem)-1; 
 			//pId=IDX2D(r,gc,gridCols);
-			for (ulong idx=partsOffs[pId],c; idx<partsOffs[pId+1]; idx++,j++){
+			for (idx_t idx=partsOffs[pId],c; idx<partsOffs[pId+1]; idx++,j++){
 				c = mat->JA[idx];
 				assert(j == idx); //consecutive index in partitioning
 				assert(pStartIdx <= c && c <= pEndIdx);	//colRange
@@ -450,12 +450,12 @@ int testColsOffsetsPartitioningUnifRanges(spmat* mat,ulong gridCols,ulong* parts
 		}
 	}
 	assert(j == mat->NZ);
-	ulong s=0;
-	for (ulong gc=0,partSize; gc < gridCols; gc++,s+=partSize){
+	idx_t s=0;
+	for (idx_t gc=0,partSize; gc < gridCols; gc++,s+=partSize){
 		partSize = colPartsPopulations[gc];
 		double partShare=partSize/(double)mat->NZ,partsAvg=1/(double)gridCols;
 		double partShareAvgDiff = partShare - partsAvg;
-		printf("colPartition %lu has:\t%lu = %lf of NNZ\t\t .. %lf\tAVG diff\n",
+		printf("colPartition %d has:\t%d = %lf of NNZ\t\t .. %lf\tAVG diff\n",
 		  gc,partSize,partShare,partShareAvgDiff);
 	}
 	assert(s == mat->NZ); //TODO DUPLICATED
@@ -482,14 +482,14 @@ int main(int argc, char** argv){
 		return out;
 	}
 	////partitioning test
-	ulong* colsPartitions = colsOffsetsPartitioningUnifRanges_0(mat,Conf.gridCols);
+	idx_t* colsPartitions = colsOffsetsPartitioningUnifRanges_0(mat,Conf.gridCols);
 	if (!colsPartitions)	goto _free;
 	if (testColsOffsetsPartitioningUnifRanges(mat,Conf.gridCols,colsPartitions))
 		goto _free;
 
 	out=EXIT_SUCCESS;
 	printf("testColsOffsetsPartitioningUnifRanges passed with "
-		   "mat: %lux%lu-%luNNZ\tgrid: %dx%d\n",
+		   "mat: %dx%d-%dNNZ\tgrid: %dx%d\n",
 			mat->M,mat->N,mat->NZ,Conf.gridRows,Conf.gridCols);
 	_free:
 	if (colsPartitions) free(colsPartitions);

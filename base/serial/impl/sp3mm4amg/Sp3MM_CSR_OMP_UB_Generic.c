@@ -42,7 +42,7 @@ spmat* CAT(spmmSerial_,OFF_F)(spmat* A,spmat* B, CONFIG* _cfg){	//serial impleme
 	if ( allocAccDense(&acc,B->N) )			goto _free;
 	if (!(AB = allocSpMatrix(A->M,B->N)))	goto _free;
 	for( idx_t r=0; r<A->M; r++ ){
-		for (ulong c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
+		for (idx_t c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
 			CAT(scSparseRowMul_,OFF_F)(A->AS[c], B, A->JA[c]-OFF_F, &acc);
 		sparsifyDirect(&acc,AB,r); //0,NULL);TODO COL PARTITIONING COMMON API
 	}
@@ -54,7 +54,7 @@ spmat* CAT(spmmSerial_,OFF_F)(spmat* A,spmat* B, CONFIG* _cfg){	//serial impleme
 ////////Sp3MM as 2 x SpMM
 ///1D
 spmat* CAT(spmmRowByRow_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
-	DEBUG printf("spmm\trows of A,\tfull B\tM=%lu x N=%lu\n",A->M,B->N);
+	DEBUG printf("spmm\trows of A,\tfull B\tM=%d x N=%d\n",A->M,B->N);
 	///thread aux
 	ACC_DENSE *accVects = NULL,*acc;
 	SPMM_ACC* outAccumul=NULL;
@@ -83,7 +83,7 @@ spmat* CAT(spmmRowByRow_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	((CHUNKS_DISTR_INTERF)	cfg->chunkDistrbFunc) (AB->M,AB,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
 	#pragma omp parallel for schedule(runtime) private(acc)
-	for (ulong r=0;  r<A->M; r++){	//row-by-row formulation
+	for (idx_t r=0;  r<A->M; r++){	//row-by-row formulation
 		//iterate over nz entry index c inside current row r
 		acc = accVects + omp_get_thread_num();
 		/* direct use of sparse scalar vector multiplication
@@ -93,7 +93,7 @@ spmat* CAT(spmmRowByRow_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 			bRowLen = B->IRP[ca+1] - B->IRP[ca];
 			CAT(scSparseVectMul_,OFF_F)(A->AS[ja],B->AS+jb,B->JA+jb,bRowLen,acc);
 		}*/
-		for (ulong c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
+		for (idx_t c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
 			CAT(scSparseRowMul_,OFF_F)(A->AS[c], B, A->JA[c]-OFF_F, acc);
 		//trasform accumulated dense vector to a CSR row
 		#if SPARSIFY_PRE_PARTITIONING == T
@@ -124,7 +124,7 @@ spmat* CAT(spmmRowByRow_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 }
 
 idx_t CAT(spmmRowByRowCalculateSize_,OFF_F)(spmat* A, spmat*B, CONFIG* cfg, void** accumul, void **rows_sizes, void** tmp_matrix){
-	DEBUG printf("spmm\trows of A,\tfull B\tM=%lu x N=%lu\n",A->M,B->N);
+	DEBUG printf("spmm\trows of A,\tfull B\tM=%d x N=%d\n",A->M,B->N);
 	///thread aux
 	ACC_DENSE *accVects = NULL,*acc;
 	SPMM_ACC* outAccumul=NULL;
@@ -153,7 +153,7 @@ idx_t CAT(spmmRowByRowCalculateSize_,OFF_F)(spmat* A, spmat*B, CONFIG* cfg, void
 	((CHUNKS_DISTR_INTERF)	cfg->chunkDistrbFunc) (AB->M,AB,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
 	#pragma omp parallel for schedule(runtime) private(acc)
-	for (ulong r=0;  r<A->M; r++){	//row-by-row formulation
+	for (idx_t r=0;  r<A->M; r++){	//row-by-row formulation
 		//iterate over nz entry index c inside current row r
 		acc = accVects + omp_get_thread_num();
 		/* direct use of sparse scalar vector multiplication
@@ -163,7 +163,7 @@ idx_t CAT(spmmRowByRowCalculateSize_,OFF_F)(spmat* A, spmat*B, CONFIG* cfg, void
 			bRowLen = B->IRP[ca+1] - B->IRP[ca];
 			CAT(scSparseVectMul_,OFF_F)(A->AS[ja],B->AS+jb,B->JA+jb,bRowLen,acc);
 		}*/
-		for (ulong c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
+		for (idx_t c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) //row-by-row formul
 			CAT(scSparseRowMul_,OFF_F)(A->AS[c], B, A->JA[c]-OFF_F, acc);
 		//trasform accumulated dense vector to a CSR row
 		#if SPARSIFY_PRE_PARTITIONING == T
@@ -197,7 +197,7 @@ idx_t CAT(spmmRowByRowCalculateSize_,OFF_F)(spmat* A, spmat*B, CONFIG* cfg, void
 	if(outAccumul)  freeSpMMAcc(outAccumul);
 }
 
-void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** tmp_matrix, double** AS, idx_t** JA, idx_t** IRP){
+void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** tmp_matrix, double* AS, idx_t* JA, idx_t* IRP){
 	SPMM_ACC* outAccumul= *accumul;
 	idx_t* rowsSizes = *rows_sizes;
 	spmat *AB = *tmp_matrix;
@@ -216,7 +216,7 @@ void CAT(spmmRowByRowPopulate_,OFF_F)(void** accumul, void** rows_sizes, void** 
 }
 
 spmat* CAT(spmmRowByRow1DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
-	DEBUG printf("spmm\trowBlocks of A,\tfull B\tM=%lu x N=%lu\n",A->M,B->N);
+	DEBUG printf("spmm\trowBlocks of A,\tfull B\tM=%d x N=%d\n",A->M,B->N);
 	DEBUG printf("ompParallelizationGrid:\t%dx%d\n",cfg->gridRows,cfg->gridCols);
 	///thread aux
 	ACC_DENSE *accVects = NULL,*acc;
@@ -243,10 +243,10 @@ spmat* CAT(spmmRowByRow1DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	#endif
    
 	//perform Gustavson over rows blocks -> M / @cfg->gridRows
-	ulong rowBlock = AB->M/cfg->gridRows, rowBlockRem = AB->M%cfg->gridRows;
+	idx_t rowBlock = AB->M/cfg->gridRows, rowBlockRem = AB->M%cfg->gridRows;
 	((CHUNKS_DISTR_INTERF) cfg->chunkDistrbFunc) (cfg->gridRows,AB,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
-	ulong b,startRow,block; //omp for aux vars
+	idx_t b,startRow,block; //omp for aux vars
 	#pragma omp parallel for schedule(runtime) private(acc,startRow,block)
 	for (b=0;   b < cfg->gridRows; b++){
 		block	= UNIF_REMINDER_DISTRI(b,rowBlock,rowBlockRem);
@@ -255,13 +255,13 @@ spmat* CAT(spmmRowByRow1DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	   
 		DEBUGPRINT{
 			fflush(NULL);
-			printf("block %lu\t%lu:%lu(%lu)\n",b,startRow,startRow+block-1,block);
+			printf("block %d\t%d:%d(%d)\n",b,startRow,startRow+block-1,block);
 			fflush(NULL);
 		}
 		//row-by-row formulation in the given row block
-		for (ulong r=startRow;  r<startRow+block;  r++){
+		for (idx_t r=startRow;  r<startRow+block;  r++){
 			//iterate over nz entry index c inside current row r
-			for (ulong c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) 
+			for (idx_t c=A->IRP[r]-OFF_F; c<A->IRP[r+1]-OFF_F; c++) 
 				CAT(scSparseRowMul_,OFF_F)(A->AS[c], B, A->JA[c]-OFF_F, acc);
 			//trasform accumulated dense vector to a CSR row
 			#if SPARSIFY_PRE_PARTITIONING == T
@@ -295,7 +295,7 @@ spmat* CAT(spmmRowByRow1DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 ///2D
 //PARTITIONS NOT ALLOCATED
 spmat* CAT(spmmRowByRow2DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){ 
-	DEBUG printf("spmm\trowBlocks of A ,\tcolBlocks of B\tM=%luxN=%lu\n",A->M,B->N);
+	DEBUG printf("spmm\trowBlocks of A ,\tcolBlocks of B\tM=%dxN=%d\n",A->M,B->N);
 	DEBUG printf("ompParallelizationGrid:\t%dx%d\n",cfg->gridRows,cfg->gridCols);
 	idx_t* bColOffsets = NULL;   //B group columns starting offset for each row
 	ACC_DENSE *accVectors=NULL,*accV;
@@ -305,10 +305,10 @@ spmat* CAT(spmmRowByRow2DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	idx_t*	rowsPartsSizes=NULL;
 	if (!AB)	goto _err;
 	//2D indexing aux vars
-	ulong gridSize=cfg->gridRows*cfg->gridCols, aSubRowsN=A->M*cfg->gridCols;
-	ulong _rowBlock = AB->M/cfg->gridRows, _rowBlockRem = AB->M%cfg->gridRows;
-	ulong _colBlock = AB->N/cfg->gridCols, _colBlockRem = AB->N%cfg->gridCols;
-	ulong startRow,startCol,rowBlock,colBlock; //data division aux variables
+	idx_t gridSize=cfg->gridRows*cfg->gridCols, aSubRowsN=A->M*cfg->gridCols;
+	idx_t _rowBlock = AB->M/cfg->gridRows, _rowBlockRem = AB->M%cfg->gridRows;
+	idx_t _colBlock = AB->N/cfg->gridCols, _colBlockRem = AB->N%cfg->gridCols;
+	idx_t startRow,startCol,rowBlock,colBlock; //data division aux variables
 	////get bColOffsets for B column groups 
 	if (!(bColOffsets = CAT(colsOffsetsPartitioningUnifRanges_,OFF_F)(B,cfg->gridCols)))
 		goto _err;
@@ -344,8 +344,8 @@ spmat* CAT(spmmRowByRow2DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 	
 	((CHUNKS_DISTR_INTERF) cfg->chunkDistrbFunc) (gridSize,AB,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
-	ulong tileID,t_i,t_j;							//for aux vars
-	ulong bPartLen,bPartID,bPartOffset;//B partition acces aux vars
+	idx_t tileID,t_i,t_j;							//for aux vars
+	idx_t bPartLen,bPartID,bPartOffset;//B partition acces aux vars
 	#pragma omp parallel for schedule(runtime) \
 	  private(accV,accRowPart,rowBlock,colBlock,startRow,startCol,\
 	  bPartLen,bPartID,bPartOffset,t_i,t_j)
@@ -364,15 +364,15 @@ spmat* CAT(spmmRowByRow2DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 		DEBUGPRINT{
 			fflush(NULL);
 			colBlock = UNIF_REMINDER_DISTRI(t_j,_colBlock,_colBlockRem);
-			printf("rowBlock [%lu\t%lu:%lu(%lu)]\t",t_i,startRow,startRow+rowBlock-1,rowBlock);
-			printf("colBlock [%lu\t%lu:%lu(%lu)]\n",t_j,startCol,startCol+colBlock-1,colBlock);
+			printf("rowBlock [%d\t%d:%d(%d)]\t",t_i,startRow,startRow+rowBlock-1,rowBlock);
+			printf("colBlock [%d\t%d:%d(%d)]\n",t_j,startCol,startCol+colBlock-1,colBlock);
 			fflush(NULL);
 		}
 		///AB[t_i][t_j] block compute
-		for (ulong r=startRow;  r<startRow+rowBlock;  r++){
+		for (idx_t r=startRow;  r<startRow+rowBlock;  r++){
 			//iterate over nz col index j inside current row r
 			//row-by-row restricted to colsubset of B to get AB[r][:colBlock:]
-			for (ulong j=A->IRP[r]-OFF_F,c; j<A->IRP[r+1]-OFF_F; j++){
+			for (idx_t j=A->IRP[r]-OFF_F,c; j<A->IRP[r+1]-OFF_F; j++){
 				//get start of B[A->JA[j]][:colBlock:]
 				c = A->JA[j]-OFF_F; // col of nnz in A[r][:] <-> target B row
 				bPartID	 = IDX2D(c,t_j,cfg->gridCols); 
@@ -415,7 +415,7 @@ spmat* CAT(spmmRowByRow2DBlocks_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
 }
 
 spmat* CAT(spmmRowByRow2DBlocksAllocated_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg){
-	DEBUG printf("spmm\trowBlocks of A,\tcolBlocks (allcd) of B\tM=%luxN=%lu\n",A->M,B->N);
+	DEBUG printf("spmm\trowBlocks of A,\tcolBlocks (allcd) of B\tM=%dxN=%d\n",A->M,B->N);
 	DEBUG printf("ompParallelizationGrid:\t%dx%d\n",cfg->gridRows,cfg->gridCols);
 	spmat *AB = NULL, *colPartsB = NULL, *colPart;
 	idx_t*   rowsPartsSizes=NULL;
@@ -423,14 +423,14 @@ spmat* CAT(spmmRowByRow2DBlocksAllocated_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg)
 	SPMM_ACC* outAccumul=NULL;
 	ACC_DENSE *accVectors=NULL,*accV;
 	SPACC* accRowPart;
-	ulong startRow,startCol,rowBlock,colBlock; //data division aux variables
+	idx_t startRow,startCol,rowBlock,colBlock; //data division aux variables
 	//2D indexing aux vars
 	idx_t gridSize=cfg->gridRows*cfg->gridCols, aSubRowsN=A->M*cfg->gridCols;
 	idx_t* bColOffsets = NULL;
 	
 	if (!(AB = allocSpMatrix(A->M,B->N)))		   goto _err;
-	ulong _rowBlock = AB->M/cfg->gridRows, _rowBlockRem = AB->M%cfg->gridRows;
-	ulong _colBlock = AB->N/cfg->gridCols, _colBlockRem = AB->N%cfg->gridCols;
+	idx_t _rowBlock = AB->M/cfg->gridRows, _rowBlockRem = AB->M%cfg->gridRows;
+	idx_t _colBlock = AB->N/cfg->gridCols, _colBlockRem = AB->N%cfg->gridCols;
 	
 	////B cols  partition in CSRs
 	//if (!(colPartsB = CAT(colsPartitioningUnifRanges_,OFF_F)(B,cfg->gridCols)))  goto _err;
@@ -465,7 +465,7 @@ spmat* CAT(spmmRowByRow2DBlocksAllocated_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg)
 	
 	((CHUNKS_DISTR_INTERF) cfg->chunkDistrbFunc) (gridSize,AB,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
-	ulong tileID,t_i,t_j;	//for aux vars
+	idx_t tileID,t_i,t_j;	//for aux vars
 	#pragma omp parallel for schedule(runtime) \
 	  private(accV,accRowPart,colPart,rowBlock,colBlock,startRow,startCol,t_i,t_j)
 	for (tileID = 0; tileID < gridSize; tileID++){
@@ -484,17 +484,17 @@ spmat* CAT(spmmRowByRow2DBlocksAllocated_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg)
 		 
 		DEBUGPRINT{
 			fflush(NULL);
-			printf("rowBlock [%lu\t%lu:%lu(%lu)]\t",
+			printf("rowBlock [%d\t%d:%d(%d)]\t",
 				t_i,startRow,startRow+rowBlock-1,rowBlock);
-			printf("colBlock [%lu\t%lu:%lu(%lu)]\n",
+			printf("colBlock [%d\t%d:%d(%d)]\n",
 				t_j,startCol,startCol+colBlock-1,colBlock);
 			fflush(NULL);
 		}
 		///AB[t_i][t_j] block compute
-		for (ulong r=startRow;  r<startRow+rowBlock;  r++){
+		for (idx_t r=startRow;  r<startRow+rowBlock;  r++){
 			//iterate over nz col index j inside current row r
 			//row-by-row restricted to colsubset of B to get AB[r][:colBlock:]
-			for (ulong j=A->IRP[r]-OFF_F,c,bRowStart,bRowLen; j<A->IRP[r+1]-OFF_F; j++){
+			for (idx_t j=A->IRP[r]-OFF_F,c,bRowStart,bRowLen; j<A->IRP[r+1]-OFF_F; j++){
 				//get start of B[A->JA[j]][:colBlock:]
 				c = A->JA[j]-OFF_F; // column of nnz entry in A[r][:] <-> target B row
 				bRowStart = colPart->IRP[c];
@@ -532,7 +532,7 @@ spmat* CAT(spmmRowByRow2DBlocksAllocated_,OFF_F)(spmat* A,spmat* B, CONFIG* cfg)
 	AB = NULL; 
 	_free:
 	if (colPartsB){
-		for (ulong i=0; i<cfg->gridCols; i++)
+		for (idx_t i=0; i<cfg->gridCols; i++)
 			freeSpmatInternal(colPartsB+i);
 		free(colPartsB);
 	}
@@ -558,7 +558,7 @@ spmat* CAT(sp3mmRowByRowPair_,OFF_F)(spmat* R,spmat* AC,spmat* P,
 	/* TODO 
 	alloc dense aux vector, reusable over 3 product 
 	TODO arrays sovrallocati per poter essere riusati nelle 2 SpMM
-	ulong auxVectSize = MAX(R->N,AC->N);
+	idx_t auxVectSize = MAX(R->N,AC->N);
 	auxVectSize	  = MAX(auxVectSize,P->N);
 	*/
 	
@@ -590,7 +590,7 @@ spmat* CAT(sp3mmRowByRowPair_,OFF_F)(spmat* R,spmat* AC,spmat* P,
 spmat* CAT(sp3mmRowByRowMerged_,OFF_F)(spmat* R,spmat* AC,spmat* P,CONFIG* cfg,
 	   SPMM_INTERF spmm){
 	
-	ulong* rowSizes = NULL;
+	idx_t* rowSizes = NULL;
 	SPMM_ACC* outAccumul=NULL;
 	ACC_DENSE *accVectorsR_AC=NULL,*accVectorsRAC_P=NULL,*accRAC,*accRACP;
 
@@ -619,11 +619,11 @@ spmat* CAT(sp3mmRowByRowMerged_,OFF_F)(spmat* R,spmat* AC,spmat* P,CONFIG* cfg,
 		goto _err;
 	}
 
-	ulong c;
+	idx_t c;
 	((CHUNKS_DISTR_INTERF) cfg->chunkDistrbFunc) (R->M,R,cfg);
 	AUDIT_INTERNAL_TIMES	Start=omp_get_wtime();
 	#pragma omp parallel for schedule(runtime) private(accRAC,accRACP,c)
-	for (ulong r=0;  r<R->M; r++){	//row-by-row formulation
+	for (idx_t r=0;  r<R->M; r++){	//row-by-row formulation
 		//iterate over nz entry index c inside current row r
 		accRAC  = accVectorsR_AC  + omp_get_thread_num();
 		accRACP = accVectorsRAC_P + omp_get_thread_num();

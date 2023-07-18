@@ -114,7 +114,7 @@ static inline idx_t CAT4(SpMM_Row_Symb_Rbtree,OUT_IDXS,COL_PARTS,OFF_F)
  	 * sorting inplace the nodes inserted in the rbtree */
 	sortRbNode(nodes,abRowLen);
 	#elif	_OUT_IDXS == T || _COL_PARTS == T
-	uint i=0;
+	int i=0;
 	idx_t k;
 	#if _COL_PARTS == T
 	//colParts aux vars
@@ -144,7 +144,7 @@ static inline idx_t CAT4(SpMM_Row_Symb_Rbtree,OUT_IDXS,COL_PARTS,OFF_F)
 		idx_t k;
   		for (struct rb_node* n = rb_first(&root->rb_root); n; n = rb_next(n)){
 			k = rb_entry(n,rbNode,rb)->key;
-			printf("%lu, ",k);
+			printf("%d, ",k);
 		}
 		printf("\n");
 	}*/
@@ -327,7 +327,8 @@ idx_t* CAT4(SpMM_Symb_,OUT_IDXS,COL_PARTS,OFF_F)
 		goto _err;
 	}
 	#endif //_COL_PARTS
-	uint maxThreads	= omp_get_max_threads();	//TODO FROM CFG
+	int maxThreads;
+	maxThreads = omp_get_max_threads();	//TODO FROM CFG
 	//index keeping aux struct
 	//rbtree implementation or idxMap with aux of symbTree for tmp outIdx keeping
 	if ( rbTreeUsed ){
@@ -340,7 +341,7 @@ idx_t* CAT4(SpMM_Symb_,OUT_IDXS,COL_PARTS,OFF_F)
 			goto _err;
 		}
 		//init roots
-		for (uint i=0; i<maxThreads; i++)
+		for (int i=0; i<maxThreads; i++)
 			rbRoots[i] = RB_ROOT_CACHED;
 	} 
 	if (symbRowImplID == IDXMAP){  //idxMap implementation && not outIdxs via rbtree
@@ -350,7 +351,7 @@ idx_t* CAT4(SpMM_Symb_,OUT_IDXS,COL_PARTS,OFF_F)
 			goto _err;
 		}
 		//init idxs maps
-		for (uint i=0; i<maxThreads; i++){
+		for (int i=0; i<maxThreads; i++){
 			if(initSpVectIdxDenseAcc(b->N,idxsMapAccs+i))	goto _err;
 		}
 	}
@@ -409,7 +410,7 @@ idx_t* CAT4(SpMM_Symb_,OUT_IDXS,COL_PARTS,OFF_F)
 	free(rbRoots);
 	free(rbNodes);
 	if (idxsMapAccs){
-		for (uint i=0; i<maxThreads; i++)	free(idxsMapAccs[i].idxsMap);
+		for (int i=0; i<maxThreads; i++)	free(idxsMapAccs[i].idxsMap);
 		free(idxsMapAccs);
 	}
 
@@ -439,7 +440,7 @@ idx_t CAT3(Sp3MM_Row_Symb_,OUT_IDXS,OFF_F)
 	#if 	_OUT_IDXS == TRUE
 	#ifndef OUT_IDXS_RBTREE_NODES	
 	//return the mul.result nnz index inside the rbNodes
-	uint i=0;
+	int i=0;
 	//rbNodeOrderedVisit(n,root)	outIdxs[ i++ ] = rb_entry(n,rbNode,rb)->key;
   	for (struct rb_node* n = rb_first(&root->rb_root); n; n = rb_next(n)){
 		outIdxs[ i++ ] = rb_entry(n,rbNode,rb)->key;
@@ -495,7 +496,7 @@ idx_t* CAT3(Sp3MM_Symb_,OUT_IDXS,OFF_F)
 		*outIdxs[i] = upperBoundedSymMat + cumul; 
   	#endif	//#if _OUT_IDXS  == TRUE
 	//rbTrees for index keeping
-	uint maxThreads 	= omp_get_max_threads(); //TODO FROM CFG
+	int maxThreads 	= omp_get_max_threads(); //TODO FROM CFG
 	idx_t abMaxRowLen 	= reductionMaxSeq(abUpperBoundedRowsLens, a->M);
 	#ifdef 	  HEURISTICS_UB
 	idx_t maxRowLenUB 	= abMaxRowLen * SP3MM_UB_HEURISTIC; //TODO UB HEURISTC
@@ -515,7 +516,7 @@ idx_t* CAT3(Sp3MM_Symb_,OUT_IDXS,OFF_F)
 			goto _err;
 		}
 		//init roots
-		for (uint i=0; i<maxThreads; i++)	rbRoots[i] = RB_ROOT_CACHED;
+		for (int i=0; i<maxThreads; i++)	rbRoots[i] = RB_ROOT_CACHED;
 		if (!( rbNodes	= malloc(maxThreads * maxRowLenUB * sizeof(*rbNodes)) )){
 			ERRPRINT("Sp3MM_Symb_ rbNodes malloc errdn\n");
 			goto _err;
@@ -527,7 +528,7 @@ idx_t* CAT3(Sp3MM_Symb_,OUT_IDXS,OFF_F)
 			goto _err;
 		}	
 		//init idxs maps
-		for (uint i=0; i<maxThreads; i++){
+		for (int i=0; i<maxThreads; i++){
 			if(initSpVectIdxDenseAcc(c->N,idxsMapAccs+i))	goto _err;
 		}
 	}

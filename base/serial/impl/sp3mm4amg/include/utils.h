@@ -58,18 +58,18 @@ int createNewFile(char* const outFpath);
 #define DOUBLE_STR_FORMAT	"%25le\n"
 //write double vector @v as row sequence of double at @fpath
 //e.g. read with od -tf8 -w8 fpath : OCTALOFFSET:   DOUBLE FULL DIGITS
-int writeDoubleVector(char* fpath,double* v,ulong size);
+int writeDoubleVector(char* fpath,double* v,idx_t size);
 /*
  * read vector of double [Str] of arbitrary size from @fpath, true lenght in *size
  * if size point to a nnz value, the initial allocation will be of *size
  * eventual successive reallocation done multipling *size with VECTOR_STEP_REALLOC
  */
-double* readDoubleVector(char* fpath,ulong* size);
-double* readDoubleVectorStr(char* fpath,ulong* size);
+double* readDoubleVector(char* fpath,idx_t* size);
+double* readDoubleVectorStr(char* fpath,idx_t* size);
 
 ///STRUCTURED DATA IO -- BUFFERED: FSCANF - FPRINTF
 //dual of readDoubleVectorVector
-int writeDoubleVectorAsStr(char* fpath,double* v,ulong size);
+int writeDoubleVectorAsStr(char* fpath,double* v,idx_t size);
 int MPI_Dims_create(int nnodes, int ndims, int dims[]);	//commons/ompi_dims_create/ompi_dims_create.c
 
 #include "config.h"
@@ -81,16 +81,16 @@ int getConfig(CONFIG* conf);
 
 //append only list implemented with a reallocated array
 typedef struct{
-	ulong* a;
-	ulong  size;
-	ulong  lastIdx;
+	idx_t* a;
+	idx_t  size;
+	idx_t  lastIdx;
 } APPENDARRAY;
 //append @val to @list, reallocating if reached end
-//TODO inline int appendArr(ulong val,APPENDARRAY* list);
+//TODO inline int appendArr(idx_t val,APPENDARRAY* list);
 
 void sortuint(uint* arr, uint len);     //sort uint array @arr of @len elements
 void sort_idx_t(idx_t* arr, idx_t len); 
-void sortulong(ulong* arr, ulong len);
+void sortidx_t(idx_t* arr, idx_t len);
 void sortRbNode(rbNode* arr,idx_t len);
 
 ///ranges functions 
@@ -157,9 +157,9 @@ inline idx_t reductionMaxOmp(idx_t* arr,idx_t arrLen){
  *  of the 2 entries of the input vectors, signed as a[i] - b[i] (as well as dump prints)
  * CONVENTION:	@a = true result, @b vector to check with the true result 
  */
-int doubleVectorsDiff(double* a, double* b, ulong n,double* diffMax);
+int doubleVectorsDiff(double* a, double* b, idx_t n,double* diffMax);
 //fill a random vector in @v long @size doubles
-int fillRndVector(ulong size, double* v);
+int fillRndVector(idx_t size, double* v);
 //read vector as a sequence of space separated double from file at @fpath 
 #define VECTOR_STEP_MALLOC 100
 
@@ -174,8 +174,8 @@ int fillRndVector(ulong size, double* v);
 int extractInTmpFS(char* path, char* tmpFsDecompressPath);
 //compute E[@values] in @out[0] and VAR[@values] in @out[1] of @numVals values
 void statsAvgVar(double* values,uint numVals, double* out);
-void printMatrix(double* mat,ulong m,ulong n,char justNZMarkers);
-void printVector(double* v,ulong size);
+void printMatrix(double* mat,idx_t m,idx_t n,char justNZMarkers);
+void printVector(double* v,idx_t size);
 
 void assertArrNoRepetitions(idx_t* arrSorted, idx_t arrLen);
 #endif

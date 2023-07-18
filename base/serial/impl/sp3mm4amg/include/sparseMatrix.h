@@ -75,7 +75,7 @@ typedef struct{
 	idx_t    vLen;       			//size of the aux dense vector //TODO USELESS?
 	SPVECT_IDX_DENSE_MAP nnzIdxMap;	//
 } ACC_DENSE;
-int allocAccDense(ACC_DENSE* v, ulong size);
+int allocAccDense(ACC_DENSE* v, idx_t size);
 
 /*  
  **** NNZ IDXS PRESENCE FLAGS ACCESS INTERFACE:  ***
