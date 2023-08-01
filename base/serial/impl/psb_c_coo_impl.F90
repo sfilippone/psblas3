@@ -3490,7 +3490,7 @@ end subroutine psb_c_coo_mv_from
 
 
 !
-! CSR implementation of tril/triu
+! COO implementation of tril/triu
 !
 subroutine psb_c_coo_tril(a,l,info,&
      & diag,imin,imax,jmin,jmax,rscale,cscale,u)
