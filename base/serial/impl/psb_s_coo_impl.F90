@@ -4013,25 +4013,24 @@ subroutine psb_s_coo_triu(a,u,info,&
     nzuin = u%get_nzeros() ! At this point it should be 0
     call l%allocate(mb,nb,nz)
     nzlin = l%get_nzeros() ! At this point it should be 0
-    associate(val =>a%val, ja => a%ja, irp=>a%irp)
-      do i=imin_,imax_
-        do k=irp(i),irp(i+1)-1
-          j = ja(k)
-          if ((jmin_<=j).and.(j<=jmax_)) then
-            if ((ja(k)-i)<diag_) then
-              nzlin = nzlin + 1
-              l%ia(nzlin)  = i
-              l%ja(nzlin)  = ja(k)
-              l%val(nzlin) = val(k)
-            else
-              nzuin = nzuin + 1
-              u%ia(nzuin)  = i
-              u%ja(nzuin)  = ja(k)
-              u%val(nzuin) = val(k)
-            end if
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop1: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<diag_) then
+            nzlin = nzlin + 1
+            l%ia(nzlin)  = i
+            l%ja(nzlin)  = ja(k)
+            l%val(nzlin) = val(k)
+          else
+            nzuin = nzuin + 1
+            u%ia(nzuin)  = i
+            u%ja(nzuin)  = ja(k)
+            u%val(nzuin) = val(k)
           end if
-        end do
-      end do
+        end if
+      end do loop1
     end associate
     call u%set_nzeros(nzuin)
     call l%set_nzeros(nzlin)
@@ -4047,19 +4046,19 @@ subroutine psb_s_coo_triu(a,u,info,&
     end if
   else
     nzin = u%get_nzeros() ! At this point it should be 0
-    associate(val =>a%val, ja => a%ja, irp=>a%irp)
-      do i=imin_,imax_
-        do k=irp(i),irp(i+1)-1
-          if ((jmin_<=j).and.(j<=jmax_)) then
-            if ((ja(k)-i)>=diag_) then
-              nzin = nzin + 1
-              u%ia(nzin)  = i
-              u%ja(nzin)  = ja(k)
-              u%val(nzin) = val(k)
-            end if
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop2: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)>=diag_) then
+            nzin = nzin + 1
+            u%ia(nzin)  = i
+            u%ja(nzin)  = ja(k)
+            u%val(nzin) = val(k)
           end if
-        end do
-      end do
+        end if
+      end do loop2
     end associate
     call u%set_nzeros(nzin)
   end if
