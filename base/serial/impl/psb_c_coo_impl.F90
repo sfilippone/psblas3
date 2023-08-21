@@ -2875,18 +2875,14 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     isza = a%get_size()
     if (isza < (nza+nz)) then
       info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
-    else
-      nzaold = nza
-      nza = nza + nz
-      call a%set_nzeros(nza)
-#if defined(OPENMP)
-      !write(0,*) 'From thread ',omp_get_thread_num(),nzaold,nz,nza,a%get_nzeros()
-#endif
     end if
     !$omp end critical
     if (info /= 0)  goto 9999
-    call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
+    call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
+    
+    !write(0,*) 'From CSPUT :',nza,nzaold
+    call a%set_nzeros(nza)
     call a%set_sorted(.false.)
     
   else  if (a%is_upd()) then
@@ -2961,7 +2957,7 @@ contains
     end do
     !$OMP END PARALLEL DO
 
-    !nza = nza + nz
+    nza = nza + nz
 #else
     do i=1, nz
       ir = ia(i)
