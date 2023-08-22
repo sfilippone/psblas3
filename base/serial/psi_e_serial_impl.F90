@@ -29,6 +29,107 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
+subroutine psi_e_exscanv(n,x,info,shift)
+  use psi_e_serial_mod, psb_protect_name => psi_e_exscanv
+  use psb_const_mod
+  use psb_error_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
+  implicit none
+  integer(psb_ipk_), intent(in)      :: n
+  integer(psb_epk_), intent (inout)    :: x(:)
+  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_epk_), intent(in), optional :: shift
+  
+  integer(psb_epk_) :: shift_, tp, ts
+  integer(psb_ipk_) :: i
+  logical is_nested, is_parallel
+  
+  if (present(shift)) then
+    shift_ = shift
+  else
+    shift_ = ezero
+  end if
+    
+#if defined(OPENMP)
+  is_parallel = omp_in_parallel()
+  if (is_parallel) then 
+    call inner_e_exscan()
+  else
+    !$OMP PARALLEL default(shared) 
+    call inner_e_exscan()
+    !$OMP END PARALLEL
+  end if
+#else
+  tp = shift_
+  do i=1,n
+    ts = x(i)
+    x(i) = tp
+    tp = tp + ts
+  end do
+
+#endif
+#if defined(OPENMP)
+contains
+  subroutine inner_e_exscan()
+    ! Note: all these variables are private, but SUMB should *really* be
+    ! a pointer. The semantics of COPYPRIVATE is that the POINTER is copied
+    ! so effectively we are recovering a SHARED SUMB which is what
+    ! we need in this case. If it was an ALLOCATABLE, then it would be the contents
+    ! that would get copied, and the SHARED effect would  no longer be there.
+    ! Simple parallel version of EXSCAN
+    integer(psb_ipk_)  :: i,ithread,nthreads,idxstart,idxend,wrk
+    integer(psb_epk_), pointer :: sumb(:)
+    integer(psb_epk_)   :: tp, ts
+
+    nthreads = omp_get_num_threads()
+    ithread = omp_get_thread_num()
+    !$OMP SINGLE
+    allocate(sumb(nthreads+1))
+    sumb(:) = 0
+    !$OMP END SINGLE COPYPRIVATE(sumb)
+
+    wrk = (n)/nthreads
+    if (ithread < MOD((n),nthreads)) then
+      wrk = wrk + 1
+      idxstart = ithread*wrk + 1
+    else
+      idxstart = ithread*wrk + MOD((n),nthreads) + 1
+    end if
+
+    idxend = min(idxstart + wrk - 1,n )
+    tp = ezero
+    if (idxstart<=idxend) then
+      do i=idxstart,idxend
+        ts = x(i)
+        x(i) = tp 
+        tp = tp + ts 
+      end do
+    end if
+    sumb(ithread+2) = tp 
+    !$OMP BARRIER
+    
+    !$OMP SINGLE
+    do i=2,nthreads+1
+      sumb(i) = sumb(i) + sumb(i-1)
+    end do
+    !$OMP END SINGLE      
+
+    !$OMP BARRIER
+
+    !$OMP DO SCHEDULE(STATIC)
+    do i=1,n
+      x(i) = x(i) + sumb(ithread+1) + shift_ 
+    end do
+    !$OMP END DO
+    !$OMP SINGLE
+    deallocate(sumb)
+    !$OMP END SINGLE
+  end subroutine inner_e_exscan
+#endif
+end subroutine psi_e_exscanv
+
 subroutine psb_m_egelp(trans,iperm,x,info)
   use psb_serial_mod, psb_protect_name => psb_m_egelp
   use psb_const_mod
@@ -441,9 +542,9 @@ subroutine psi_eaxpby(m,n,alpha, x, beta, y, info)
   integer(psb_epk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: lx, ly, i
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)        :: name, ch_err
+  character(len=20) :: name, ch_err
 
   name='psb_geaxpby'
   info=psb_success_
@@ -502,7 +603,8 @@ subroutine psi_eaxpbyv(m,alpha, x, beta, y, info)
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_) :: i
+  character(len=20) :: name, ch_err
 
   name='psb_geaxpby'
   info=psb_success_
@@ -532,7 +634,106 @@ subroutine psi_eaxpbyv(m,alpha, x, beta, y, info)
     goto 9999
   end if
 
-  if (m>0) call eaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+!  if (m>0) call eaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+
+  if (alpha.eq.ezero) then
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = ezero
+      enddo
+    else if (beta.eq.eone) then
+      !
+      !        Do nothing!
+      !
+
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) =  beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.eone) then
+
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = x(i)
+      enddo
+    else if (beta.eq.eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = x(i) + beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.-eone) then
+
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = -x(i)
+      enddo
+    else if (beta.eq.eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = -x(i) + y(i)
+      enddo
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = -x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = -x(i) + beta*y(i)
+      enddo
+    endif
+
+  else
+
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = alpha*x(i)
+      enddo
+    else if (beta.eq.eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = alpha*x(i) + y(i)
+      enddo
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = alpha*x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        y(i) = alpha*x(i) + beta*y(i)
+      enddo
+    endif
+
+  endif
+
 
   call psb_erractionrestore(err_act)
   return
@@ -555,7 +756,7 @@ subroutine psi_eaxpbyv2(m,alpha, x, beta, y, z, info)
   integer(psb_epk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly, lz
+  integer(psb_ipk_) :: lx, ly, lz, i
   integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
@@ -594,7 +795,105 @@ subroutine psi_eaxpbyv2(m,alpha, x, beta, y, z, info)
     goto 9999
   end if
 
-  if (m>0) call eaxpbyv2(m,ione,alpha,x,lx,beta,y,ly,z,lz,info)
+  if (alpha.eq.ezero) then
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = ezero
+      enddo
+    else if (beta.eq.eone) then
+      !
+      !        Do nothing!
+      !
+
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) =  beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.eone) then
+
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = x(i)
+      enddo
+    else if (beta.eq.eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+          Z(i) = x(i) - y(i)
+        enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = x(i) + beta*y(i)
+      enddo
+    endif
+
+  else if (alpha.eq.-eone) then
+
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i)
+      enddo
+    else if (beta.eq.eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = -x(i) + beta*y(i)
+      enddo
+    endif
+
+  else
+
+    if (beta.eq.ezero) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = alpha*x(i)
+      enddo
+    else if (beta.eq.eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = alpha*x(i) + y(i)
+      enddo
+
+    else if (beta.eq.-eone) then
+      !$omp parallel do private(i)
+      do i=1,m
+        Z(i) = alpha*x(i) - y(i)
+      enddo
+    else
+      !$omp parallel do private(i)
+      do i=1,m
+          Z(i) = alpha*x(i) + beta*y(i)
+      enddo
+    endif
+
+  endif
 
   call psb_erractionrestore(err_act)
   return
@@ -942,6 +1241,7 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   if (alpha.eq.ezero) then
     if (beta.eq.ezero) then
       do j=1, n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = ezero
         enddo
@@ -953,12 +1253,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) =  beta*y(i,j)
         enddo
@@ -969,12 +1271,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.ezero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j)
         enddo
       enddo
     else if (beta.eq.eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j) + y(i,j)
         enddo
@@ -982,12 +1286,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = x(i,j) + beta*y(i,j)
         enddo
@@ -998,12 +1304,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.ezero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j)
         enddo
       enddo
     else if (beta.eq.eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j) + y(i,j)
         enddo
@@ -1011,12 +1319,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = -x(i,j) + beta*y(i,j)
         enddo
@@ -1027,12 +1337,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     if (beta.eq.ezero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
     else if (beta.eq.eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
@@ -1040,12 +1352,14 @@ subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           y(i,j) = alpha*x(i,j) + beta*y(i,j)
         enddo
@@ -1131,12 +1445,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) =  beta*y(i,j)
         enddo
@@ -1147,12 +1463,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     if (beta.eq.ezero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j)
         enddo
       enddo
     else if (beta.eq.eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j) + y(i,j)
         enddo
@@ -1160,12 +1478,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = x(i,j) + beta*y(i,j)
         enddo
@@ -1176,12 +1496,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     if (beta.eq.ezero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j)
         enddo
       enddo
     else if (beta.eq.eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j) + y(i,j)
         enddo
@@ -1189,12 +1511,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = -x(i,j) + beta*y(i,j)
         enddo
@@ -1205,12 +1529,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     if (beta.eq.ezero) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j)
         enddo
       enddo
     else if (beta.eq.eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j) + y(i,j)
         enddo
@@ -1218,12 +1544,14 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
     else if (beta.eq.-eone) then
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j) - y(i,j)
         enddo
       enddo
     else
       do j=1,n
+        !$omp parallel do private(i)
         do i=1,m
           Z(i,j) = alpha*x(i,j) + beta*y(i,j)
         enddo

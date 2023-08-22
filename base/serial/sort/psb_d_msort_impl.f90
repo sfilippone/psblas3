@@ -76,64 +76,6 @@ subroutine psb_dmsort_u(x,nout,dir)
   return
 end subroutine psb_dmsort_u
 
-
-function  psb_dbsrch(key,n,v) result(ipos)
-  use psb_sort_mod, psb_protect_name => psb_dbsrch
-  implicit none
-  integer(psb_ipk_) :: ipos, n
-  real(psb_dpk_) :: key
-  real(psb_dpk_) :: v(:)
-
-  integer(psb_ipk_) :: lb, ub, m, i
-
-  ipos = -1 
-  if (n<5) then
-    do i=1,n
-      if (key.eq.v(i))  then
-        ipos = i
-        return
-      end if
-    enddo
-    return
-  end if
-
-  lb = 1 
-  ub = n
-
-  do while (lb.le.ub) 
-    m = (lb+ub)/2
-    if (key.eq.v(m))  then
-      ipos = m 
-      lb   = ub + 1
-    else if (key < v(m))  then
-      ub = m-1
-    else 
-      lb = m + 1
-    end if
-  enddo
-  return
-end function psb_dbsrch
-
-function psb_dssrch(key,n,v) result(ipos)
-  use psb_sort_mod, psb_protect_name => psb_dssrch
-  implicit none
-  integer(psb_ipk_) :: ipos, n
-  real(psb_dpk_) :: key
-  real(psb_dpk_) :: v(:)
-
-  integer(psb_ipk_) :: i
-
-  ipos = -1 
-  do i=1,n
-    if (key.eq.v(i))  then
-      ipos = i
-      return
-    end if
-  enddo
-
-  return
-end function psb_dssrch
-
 subroutine psb_dmsort(x,ix,dir,flag)
   use psb_sort_mod, psb_protect_name => psb_dmsort
   use psb_error_mod

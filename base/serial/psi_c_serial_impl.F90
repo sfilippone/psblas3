@@ -29,6 +29,107 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
+subroutine psi_c_exscanv(n,x,info,shift)
+  use psi_c_serial_mod, psb_protect_name => psi_c_exscanv
+  use psb_const_mod
+  use psb_error_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
+  implicit none
+  integer(psb_ipk_), intent(in)      :: n
+  complex(psb_spk_), intent (inout)    :: x(:)
+  integer(psb_ipk_), intent(out)     :: info
+  complex(psb_spk_), intent(in), optional :: shift
+  
+  complex(psb_spk_) :: shift_, tp, ts
+  integer(psb_ipk_) :: i
+  logical is_nested, is_parallel
+  
+  if (present(shift)) then
+    shift_ = shift
+  else
+    shift_ = czero
+  end if
+    
+#if defined(OPENMP)
+  is_parallel = omp_in_parallel()
+  if (is_parallel) then 
+    call inner_c_exscan()
+  else
+    !$OMP PARALLEL default(shared) 
+    call inner_c_exscan()
+    !$OMP END PARALLEL
+  end if
+#else
+  tp = shift_
+  do i=1,n
+    ts = x(i)
+    x(i) = tp
+    tp = tp + ts
+  end do
+
+#endif
+#if defined(OPENMP)
+contains
+  subroutine inner_c_exscan()
+    ! Note: all these variables are private, but SUMB should *really* be
+    ! a pointer. The semantics of COPYPRIVATE is that the POINTER is copied
+    ! so effectively we are recovering a SHARED SUMB which is what
+    ! we need in this case. If it was an ALLOCATABLE, then it would be the contents
+    ! that would get copied, and the SHARED effect would  no longer be there.
+    ! Simple parallel version of EXSCAN
+    integer(psb_ipk_)  :: i,ithread,nthreads,idxstart,idxend,wrk
+    complex(psb_spk_), pointer :: sumb(:)
+    complex(psb_spk_)   :: tp, ts
+
+    nthreads = omp_get_num_threads()
+    ithread = omp_get_thread_num()
+    !$OMP SINGLE
+    allocate(sumb(nthreads+1))
+    sumb(:) = 0
+    !$OMP END SINGLE COPYPRIVATE(sumb)
+
+    wrk = (n)/nthreads
+    if (ithread < MOD((n),nthreads)) then
+      wrk = wrk + 1
+      idxstart = ithread*wrk + 1
+    else
+      idxstart = ithread*wrk + MOD((n),nthreads) + 1
+    end if
+
+    idxend = min(idxstart + wrk - 1,n )
+    tp = czero
+    if (idxstart<=idxend) then
+      do i=idxstart,idxend
+        ts = x(i)
+        x(i) = tp 
+        tp = tp + ts 
+      end do
+    end if
+    sumb(ithread+2) = tp 
+    !$OMP BARRIER
+    
+    !$OMP SINGLE
+    do i=2,nthreads+1
+      sumb(i) = sumb(i) + sumb(i-1)
+    end do
+    !$OMP END SINGLE      
+
+    !$OMP BARRIER
+
+    !$OMP DO SCHEDULE(STATIC)
+    do i=1,n
+      x(i) = x(i) + sumb(ithread+1) + shift_ 
+    end do
+    !$OMP END DO
+    !$OMP SINGLE
+    deallocate(sumb)
+    !$OMP END SINGLE
+  end subroutine inner_c_exscan
+#endif
+end subroutine psi_c_exscanv
+
 subroutine psb_m_cgelp(trans,iperm,x,info)
   use psb_serial_mod, psb_protect_name => psb_m_cgelp
   use psb_const_mod
