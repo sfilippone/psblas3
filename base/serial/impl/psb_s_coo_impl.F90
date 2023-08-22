@@ -2864,7 +2864,9 @@ subroutine psb_s_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   if (nz == 0) return
 
   if (a%is_bld()) then
-
+    ! Structure here is peculiar, because this function can be called
+    ! either within a parallel region, or outside. 
+    ! Hence the call to set_nzeros done here. 
     !$omp critical
     nza  = a%get_nzeros()
     isza = a%get_size()
@@ -2875,14 +2877,15 @@ subroutine psb_s_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     isza = a%get_size()
     if (isza < (nza+nz)) then
       info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
+    else
+      nzaold = nza
+      nza = nza + nz
+      call a%set_nzeros(nza)
     end if
     !$omp end critical
     if (info /= 0)  goto 9999
-    call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
+    call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
-    
-    !write(0,*) 'From CSPUT :',nza,nzaold
-    call a%set_nzeros(nza)
     call a%set_sorted(.false.)
     
   else  if (a%is_upd()) then
@@ -2956,7 +2959,6 @@ contains
       end if
     end do
     !$OMP END PARALLEL DO
-
     nza = nza + nz
 #else
     do i=1, nz
