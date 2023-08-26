@@ -168,6 +168,8 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: reallocate_nz => psb_d_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_d_coo_allocate_mnnz
     procedure, pass(a) :: ensure_size  => psb_d_coo_ensure_size
+    procedure, pass(a) :: tril          => psb_d_coo_tril
+    procedure, pass(a) :: triu          => psb_d_coo_triu
     procedure, pass(a) :: cp_to_coo    => psb_d_cp_coo_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_d_cp_coo_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_d_cp_coo_to_fmt
@@ -1894,6 +1896,93 @@ module psb_d_base_mat_mod
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_d_fix_coo
   end interface
+  !
+  !> Function  tril:
+  !! \memberof  psb_d_coo_sparse_mat
+  !! \brief  Copy the lower triangle, i.e. all entries
+  !!         A(I,J) such that J-I <= DIAG
+  !!         default value is DIAG=0, i.e. lower triangle up to
+  !!         the main diagonal.
+  !!         DIAG=-1 means copy the strictly lower triangle
+  !!         DIAG= 1 means copy the lower triangle plus the first diagonal
+  !!                 of the upper triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!
+  !!  \param l     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param u  [none]  copy of the complementary triangle
+  !!
+  !
+  interface
+    subroutine psb_d_coo_tril(a,l,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,u)
+      import
+      class(psb_d_coo_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: l
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out) :: u
+    end subroutine psb_d_coo_tril
+  end interface
+
+  !
+  !> Function  triu:
+  !! \memberof  psb_d_coo_sparse_mat
+  !! \brief  Copy the upper triangle, i.e. all entries
+  !!         A(I,J) such that DIAG <= J-I
+  !!         default value is DIAG=0, i.e. upper triangle from
+  !!         the main diagonal up.
+  !!         DIAG= 1 means copy the strictly upper triangle
+  !!         DIAG=-1 means copy the upper triangle plus the first diagonal
+  !!                 of the lower triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         Optionally copies the lower triangle at the same time
+  !!
+  !!  \param u     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
+  !!  \param jmin [1] minimum col index
+  !!  \param jmax [a\%get_ncols()] maximum col index
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param l  [none]  copy of the complementary triangle
+  !!
+  !
+  interface
+    subroutine psb_d_coo_triu(a,u,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,l)
+      import
+      class(psb_d_coo_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: u
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out) :: l
+    end subroutine psb_d_coo_triu
+  end interface
+
 
   !>
   !! \memberof  psb_d_coo_sparse_mat
