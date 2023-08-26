@@ -46,6 +46,14 @@ module psb_d_csr_mat_mod
 
   use psb_d_base_mat_mod
 
+  integer(psb_ipk_), parameter :: spspmm_serial = 0
+  integer(psb_ipk_), parameter :: spspmm_omp_gustavson = 1
+  integer(psb_ipk_), parameter :: spspmm_omp_gustavson_1d = 2
+  integer(psb_ipk_), parameter :: spspmm_serial_rb_tree = 3
+  integer(psb_ipk_), parameter :: spspmm_omp_rb_tree = 4
+  integer(psb_ipk_), parameter :: spspmm_omp_two_pass = 5
+  integer(psb_ipk_) :: spspmm_impl = spspmm_serial
+
   !> \namespace  psb_base_mod  \class  psb_d_csr_sparse_mat
   !! \extends psb_d_base_mat_mod::psb_d_base_sparse_mat
   !!

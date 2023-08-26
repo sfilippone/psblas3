@@ -10,7 +10,7 @@ BOBJS=psb_base_mat_impl.o \
 SOBJS=psb_s_csr_impl.o psb_s_coo_impl.o psb_s_csc_impl.o psb_s_mat_impl.o
 #\
  psb_s_lcoo_impl.o psb_s_lcsr_impl.o 
-DOBJS=psb_d_csr_impl.o psb_d_coo_impl.o psb_d_csc_impl.o psb_d_mat_impl.o
+DOBJS=psb_d_csr_impl.o psb_d_coo_impl.o psb_d_csc_impl.o psb_d_mat_impl.o psb_d_rb_idx_tree_impl.o
 #\
  psb_d_lcoo_impl.o  psb_d_lcsr_impl.o 
 COBJS=psb_c_csr_impl.o psb_c_coo_impl.o psb_c_csc_impl.o psb_c_mat_impl.o

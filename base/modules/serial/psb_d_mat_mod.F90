@@ -79,7 +79,10 @@
 module psb_d_mat_mod
 
   use psb_d_base_mat_mod
-  use psb_d_csr_mat_mod,  only : psb_d_csr_sparse_mat, psb_ld_csr_sparse_mat
+  use psb_d_csr_mat_mod,  only : psb_d_csr_sparse_mat, psb_ld_csr_sparse_mat, &
+                                spspmm_impl, spspmm_serial, spspmm_omp_gustavson, &
+                                spspmm_omp_gustavson_1d, spspmm_serial_rb_tree, &
+                                spspmm_omp_rb_tree, spspmm_omp_two_pass
   use psb_d_csc_mat_mod,  only : psb_d_csc_sparse_mat, psb_ld_csc_sparse_mat
 
   type :: psb_dspmat_type
