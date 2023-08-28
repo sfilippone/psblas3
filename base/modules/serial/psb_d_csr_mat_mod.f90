@@ -1301,4 +1301,15 @@ contains
 
   end subroutine ld_csr_free
 
+  subroutine set_d_csr_spspmm_impl(impl_id)
+    integer(psb_ipk_), intent(in) :: impl_id
+
+    if (impl_id < 0 .or. impl_id > 5) then
+      write (*,*) "Invalid implementation id, impl id set to serial"
+      spspmm_impl = spspmm_serial
+    else
+      spspmm_impl = impl_id
+    end if
+  end subroutine
+
 end module psb_d_csr_mat_mod
