@@ -3892,8 +3892,8 @@ contains
     call psb_realloc(c%irp(ma + 1), c%ja, info)
     !$omp end single
     
-    c%val(c%irp(start_idx):c%irp(start_idx) + nnz) = vals(1:nnz)
-    c%ja(c%irp(start_idx):c%irp(start_idx) + nnz) = col_inds(1:nnz)
+    c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
+    c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
     !$omp end parallel
   end subroutine spmm_omp_gustavson
 
@@ -4011,8 +4011,8 @@ contains
     call psb_realloc(c%irp(ma + 1), c%ja, info)
     !$omp end single
     
-    c%val(c%irp(start_idx):c%irp(start_idx) + nnz) = vals(1:nnz)
-    c%ja(c%irp(start_idx):c%irp(start_idx) + nnz) = col_inds(1:nnz)
+    c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
+    c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
     !$omp end parallel
   end subroutine spmm_omp_gustavson_1d
 
