@@ -226,6 +226,7 @@ subroutine psb_d_rb_idx_tree_merge(trees, mat)
 #if defined(OPENMP)
     use omp_lib
 #endif
+    use psb_realloc_mod
     use psb_d_rb_idx_tree_mod, psb_protect_name => psb_d_rb_idx_tree_merge
     use psb_d_csr_mat_mod, only : psb_d_csr_sparse_mat
     implicit none

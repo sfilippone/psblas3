@@ -271,7 +271,7 @@ serial/psb_z_vect_mod.o: serial/psb_z_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o: serial/psb_mat_mod.o auxil/psb_string_mod.o auxil/psb_sort_mod.o auxil/psi_serial_mod.o
 serial/psb_vect_mod.o: serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o serial/psb_d_vect_mod.o serial/psb_s_vect_mod.o serial/psb_c_vect_mod.o serial/psb_z_vect_mod.o
 
-serial/psb_d_rb_idx_tree_mod.o: serial/psb_d_csr_mat_mod.o
+serial/psb_d_rb_idx_tree_mod.o: serial/psb_d_csr_mat_mod.o psb_realloc_mod.o
 serial/psb_rb_idx_tree_mod.o: serial/psb_d_rb_idx_tree_mod.o
 
 error.o psb_realloc_mod.o: psb_error_mod.o 
