@@ -121,6 +121,7 @@ Salvatore Filippone
 
 Contributors (roughly reverse cronological order):
 
+Dimitri    Walther
 Andea      Di Iorio
 Stefano    Petrilli
 Soren 	   Rasmussen
