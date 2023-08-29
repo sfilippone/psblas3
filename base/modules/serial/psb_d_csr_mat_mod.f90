@@ -45,15 +45,6 @@
 module psb_d_csr_mat_mod
 
   use psb_d_base_mat_mod
-
-  integer(psb_ipk_), parameter :: spspmm_serial = 0
-  integer(psb_ipk_), parameter :: spspmm_omp_gustavson = 1
-  integer(psb_ipk_), parameter :: spspmm_omp_gustavson_1d = 2
-  integer(psb_ipk_), parameter :: spspmm_serial_rb_tree = 3
-  integer(psb_ipk_), parameter :: spspmm_omp_rb_tree = 4
-  integer(psb_ipk_), parameter :: spspmm_omp_two_pass = 5
-  integer(psb_ipk_) :: spspmm_impl = spspmm_serial
-
   !> \namespace  psb_base_mod  \class  psb_d_csr_sparse_mat
   !! \extends psb_d_base_mat_mod::psb_d_base_sparse_mat
   !!
@@ -586,8 +577,8 @@ module psb_d_csr_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_d_csr_scals
   end interface
-
-    !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
+  
+  !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
   !! \extends psb_ld_base_mat_mod::psb_ld_base_sparse_mat
   !!
   !! psb_ld_csr_sparse_mat type and the related methods.
@@ -1300,16 +1291,5 @@ contains
     return
 
   end subroutine ld_csr_free
-
-  subroutine set_d_csr_spspmm_impl(impl_id)
-    integer(psb_ipk_), intent(in) :: impl_id
-
-    if (impl_id < 0 .or. impl_id > 5) then
-      write (*,*) "Invalid implementation id, impl id set to serial"
-      spspmm_impl = spspmm_serial
-    else
-      spspmm_impl = impl_id
-    end if
-  end subroutine
 
 end module psb_d_csr_mat_mod
