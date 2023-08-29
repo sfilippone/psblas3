@@ -43,7 +43,10 @@
 ! Contributed by Dimitri Walther
 ! 
 module psb_rb_idx_tree_mod
-    use psb_const_mod
-
-    use psb_d_rb_idx_tree_mod
+  use psb_const_mod
+  
+  use psb_s_rb_idx_tree_mod
+  use psb_d_rb_idx_tree_mod
+  use psb_c_rb_idx_tree_mod
+  use psb_z_rb_idx_tree_mod
 end module psb_rb_idx_tree_mod

@@ -45,6 +45,7 @@
 module psb_d_csr_mat_mod
 
   use psb_d_base_mat_mod
+
   !> \namespace  psb_base_mod  \class  psb_d_csr_sparse_mat
   !! \extends psb_d_base_mat_mod::psb_d_base_sparse_mat
   !!
@@ -577,8 +578,8 @@ module psb_d_csr_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_d_csr_scals
   end interface
-  
-  !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
+
+    !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
   !! \extends psb_ld_base_mat_mod::psb_ld_base_sparse_mat
   !!
   !! psb_ld_csr_sparse_mat type and the related methods.
