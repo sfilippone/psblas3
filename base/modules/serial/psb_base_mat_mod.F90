@@ -80,8 +80,11 @@ module psb_base_mat_mod
   integer(psb_ipk_), parameter :: spspmm_serial_rb_tree = 3
   integer(psb_ipk_), parameter :: spspmm_omp_rb_tree = 4
   integer(psb_ipk_), parameter :: spspmm_omp_two_pass = 5
+#if defined(OPENMP)
+  integer(psb_ipk_), save :: spspmm_impl = spspmm_omp_gustavson
+#else
   integer(psb_ipk_), save :: spspmm_impl = spspmm_serial
-
+#endif
 
   !
   !> \namespace  psb_base_mod  \class  psb_base_sparse_mat
