@@ -7279,6 +7279,37 @@ if test "X$FCOPT" == "X" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
    FCOPT="-g -O3 -frecursive $FCOPT"
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+     FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
+     FCFLAGS="-qhalt=e -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCFLAGS"
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     FCOPT="-O3 -recursive $FCOPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
+   # other compilers ..
+     FCOPT="-fast $FCOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"sun" ; then
+   # other compilers ..
+     FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     FCOPT="-O3 -em -J. $FCOPT"
+ elif test "X$psblas_cv_fc" == X"nag" ; then
+   # NAG  compiler ..
+     FCOPT="-O2 "
+  # NOTE : PG & Sun use -fast instead -O3
+ else
+     FCOPT="-g -O2 $FCOPT"
+ fi
+fi
+if test "X$psblas_cv_fc" == X"nag" ; then
+   # Add needed options
+     FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
+     EXTRA_OPT="-mismatch_all"
+fi
+if test "X$psblas_cv_fc" == "Xgcc" ; then
+   FCOPT="-frecursive $FCOPT"
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for version 10 or later of GNU Fortran" >&5
 printf %s "checking for version 10 or later of GNU Fortran... " >&6; }
  ac_ext=${ac_fc_srcext-f}
@@ -7317,35 +7348,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-
- elif test "X$psblas_cv_fc" == X"xlf" ; then
-   # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
-     FCFLAGS="-qhalt=e -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCFLAGS"
- elif test "X$psblas_cv_fc" == X"ifc" ; then
-   # other compilers ..
-     FCOPT="-O3 -recursive $FCOPT"
- elif test "X$psblas_cv_fc" == X"pg" ; then
-   # other compilers ..
-     FCOPT="-fast $FCOPT"
-  # NOTE : PG & Sun use -fast instead -O3
- elif test "X$psblas_cv_fc" == X"sun" ; then
-   # other compilers ..
-     FCOPT="-fast $FCOPT"
- elif test "X$psblas_cv_fc" == X"cray" ; then
-     FCOPT="-O3 -em -J. $FCOPT"
- elif test "X$psblas_cv_fc" == X"nag" ; then
-   # NAG  compiler ..
-     FCOPT="-O2 "
-  # NOTE : PG & Sun use -fast instead -O3
- else
-     FCOPT="-g -O2 $FCOPT"
- fi
-fi
-if test "X$psblas_cv_fc" == X"nag" ; then
-   # Add needed options
-     FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
-     EXTRA_OPT="-mismatch_all"
 fi
 
 
