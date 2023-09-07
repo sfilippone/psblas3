@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,61 +27,26 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
 !
-!  The merge-sort and quicksort routines are implemented in the
-!  serial/aux directory
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
 !
-
-module psb_sort_mod
+!
+! package: psb_rb_idx_tree_mod
+! 
+! Red black tree implementation ordered by index
+!
+! Each node contains and index and a double precision value
+!
+! The tree should always be well balanced
+!
+! inserting a node with an existing index will 
+! add up the new value to the old one
+! Contributed by Dimitri Walther
+! 
+module psb_rb_idx_tree_mod
   use psb_const_mod
-  use psb_ip_reord_mod
-  use psi_serial_mod
   
-  use psb_m_hsort_mod
-  use psb_m_isort_mod
-  use psb_m_msort_mod
-  use psb_m_qsort_mod
-  
-  use psb_e_hsort_mod
-  use psb_e_isort_mod
-  use psb_e_msort_mod
-  use psb_e_qsort_mod
-  
-  use psb_s_hsort_mod
-  use psb_s_isort_mod
-  use psb_s_msort_mod
-  use psb_s_qsort_mod
-  
-  use psb_d_hsort_mod
-  use psb_d_isort_mod
-  use psb_d_msort_mod
-  use psb_d_qsort_mod
-  
-  use psb_c_hsort_mod
-  use psb_c_isort_mod
-  use psb_c_msort_mod
-  use psb_c_qsort_mod
-  
-  use psb_z_hsort_mod
-  use psb_z_isort_mod
-  use psb_z_msort_mod
-  use psb_z_qsort_mod
-
-  use psb_i_hsort_x_mod
-  use psb_l_hsort_x_mod
-  use psb_s_hsort_x_mod
-  use psb_d_hsort_x_mod
-  use psb_c_hsort_x_mod
-  use psb_z_hsort_x_mod
-  
-end module psb_sort_mod
+  use psb_s_rb_idx_tree_mod
+  use psb_d_rb_idx_tree_mod
+  use psb_c_rb_idx_tree_mod
+  use psb_z_rb_idx_tree_mod
+end module psb_rb_idx_tree_mod

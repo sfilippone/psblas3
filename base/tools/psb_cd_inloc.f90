@@ -176,7 +176,8 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
     end if
     tmpgidx = 0
     flag_   = 1
-    do i=1,loc_row
+    !$omp parallel do private(i)
+    do i=1,loc_row      
       if ((v(i)<1).or.(v(i)>m)) then 
         info = psb_err_entry_out_of_bounds_
         l_err(1) = i
@@ -215,6 +216,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
     novrl   = 0
     norphan = 0
     npr_ov  = 0
+    !$omp parallel do private(i)
     do i=1,loc_row
       if ((v(i)<1).or.(v(i)>m)) then 
         info = psb_err_entry_out_of_bounds_
@@ -222,7 +224,6 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
         l_err(2) = v(i)
         l_err(3) = loc_row
         l_err(4) = m
-        exit
       endif
       vl(i) = v(i) 
     end do

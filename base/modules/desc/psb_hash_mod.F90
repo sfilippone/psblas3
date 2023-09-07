@@ -458,7 +458,7 @@ contains
     integer(psb_ipk_), intent(out)  :: val, info 
 
     integer(psb_ipk_) :: hsize,hmask, hk, hd
-
+    logical :: redo
     info  = HashOK
     hsize = hash%hsize
     hmask = hash%hmask
@@ -483,6 +483,7 @@ contains
         info = HashDuplicate
         return
       end if
+      redo = .false.
       !$OMP CRITICAL
       if (hash%table(hk,1) == HashFreeEntry) then 
         if (hash%nk == hash%hsize -1) then
@@ -497,8 +498,9 @@ contains
             info = HashOutOfMemory
             !return
           else
-            call psb_hash_searchinskey(key,val,nextval,hash,info)
-            !return
+            redo = .true.
+!!$            call psb_hash_searchinskey(key,val,nextval,hash,info)
+!!$            return
           end if
         else
           hash%nk = hash%nk + 1 
@@ -509,6 +511,7 @@ contains
         end if
       end if
       !$OMP END CRITICAL
+      if (redo) call psb_hash_searchinskey(key,val,nextval,hash,info)
       if (info /= HashOk) return 
       if (val > 0) return
       hk = hk - hd 
