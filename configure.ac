@@ -36,11 +36,11 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.7.0, [https://github.com/sfilippone/psblas3/issues])
+AC_INIT([PSBLAS],3.8.1, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.7.0"
+psblas_cv_version="3.8.1"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -56,7 +56,8 @@ AC_MSG_NOTICE([
 	documentation, you can make your own by hand for your needs.
 
 	Be sure to specify the library paths of your interest. Examples:
-        ./configure --with-libs=-L/some/directory/LIB    <- will append to LIBS
+        ./configure --with-libs=-L/some/directory/LIB  <- will append to LIBS
+	       [ --with-spgpu=/path/to/spgpu] 
         FC=mpif90 CC=mpicc ./configure           <- will force FC,CC
 
 	See ./configure --help=short fore more info.
@@ -790,6 +791,50 @@ fi
 
 
 
+PAC_CHECK_CUDA()
+
+if test "x$pac_cv_have_cuda" == "xyes"; then
+
+PAC_CHECK_CUDA_VERSION()
+CUDA_VERSION="$pac_cv_cuda_version";
+CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+PAC_CHECK_SPGPU()
+if test "x$pac_cv_have_spgpu" == "xyes" ; then 
+   GPUD=gpud;
+   GPULD=gpuld;	
+   EXTRALDLIBS="-lstdc++";
+fi
+AC_MSG_NOTICE([At this point GPUTARGET is $GPUD $GPULD])
+
+PAC_ARG_WITH_CUDACC()
+if test "x$pac_cv_cudacc" == "x"; then
+   pac_cv_cudacc="30,35,37,50,60";
+fi
+CUDEFINES="";
+for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
+do
+  CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
+done
+if test "x$pac_cv_cuda_version" != "xunknown"; then
+   CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+   FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+   CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"    
+fi
+
+fi
+
+if test "x$pac_cv_ipk_size" != "x4"; then
+  AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
+  GPUD="";
+  GPULD="";
+  CUDEFINES="";
+  CUDA_INCLUDES="";
+  CUDA_LIBS="";
+fi
+
+
+
+
 ###############################################################################
 #		Library target directory and archive files.
 ###############################################################################
@@ -871,7 +916,23 @@ AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
-
+AC_SUBST(SPGPU_FLAGS)
+AC_SUBST(SPGPU_LIBS)
+AC_SUBST(SPGPU_DIR)
+AC_SUBST(SPGPU_DEFINES)
+AC_SUBST(SPGPU_INCLUDES)
+AC_SUBST(SPGPU_INCDIR)
+AC_SUBST(EXTRALDLIBS)
+AC_SUBST(CUDA_DIR)
+AC_SUBST(CUDA_DEFINES)
+AC_SUBST(CUDA_INCLUDES)
+AC_SUBST(CUDA_LIBS)
+AC_SUBST(CUDA_VERSION)
+AC_SUBST(CUDA_SHORT_VERSION)
+AC_SUBST(CUDA_NVCC)
+AC_SUBST(CUDEFINES)
+AC_SUBST(GPUD)
+AC_SUBST(GPULD)
 ###############################################################################
 # the following files will be created by Automake
 
