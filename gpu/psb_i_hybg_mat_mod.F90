@@ -236,7 +236,7 @@ contains
     class(psb_i_hybg_sparse_mat), intent(in) :: a
     integer(psb_epk_)                 :: res
     res = 8 
-    res = res + psb_sizeof_int  * size(a%val)
+    res = res + psb_sizeof_ip  * size(a%val)
     res = res + psb_sizeof_ip * size(a%irp)
     res = res + psb_sizeof_ip * size(a%ja)
     ! Should we account for the shadow data structure

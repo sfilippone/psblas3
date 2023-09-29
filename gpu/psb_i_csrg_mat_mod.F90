@@ -258,7 +258,7 @@ contains
     integer(psb_epk_) :: res
     if (a%is_dev()) call a%sync()
     res = 8 
-    res = res + psb_sizeof_int  * size(a%val)
+    res = res + psb_sizeof_ip  * size(a%val)
     res = res + psb_sizeof_ip * size(a%irp)
     res = res + psb_sizeof_ip * size(a%ja)
     ! Should we account for the shadow data structure

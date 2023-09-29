@@ -236,7 +236,7 @@ contains
     integer(psb_epk_) :: res
 
     res = 8 
-    res = res + psb_sizeof_int  * size(a%data)
+    res = res + psb_sizeof_ip  * size(a%data)
     res = res + psb_sizeof_ip * size(a%offset)
 
     ! Should we account for the shadow data structure
