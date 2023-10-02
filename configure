@@ -653,6 +653,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+LGPU
 GPULD
 GPUD
 CUDEFINES
@@ -11020,6 +11021,7 @@ CPPFLAGS="$SAVE_CPPFLAGS"
 if test "x$pac_cv_have_spgpu" == "xyes" ; then
    GPUD=gpud;
    GPULD=gpuld;
+   LGPU="-lpsb_gpu";
    EXTRALDLIBS="-lstdc++";
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: At this point GPUTARGET is $GPUD $GPULD" >&5
@@ -11136,6 +11138,7 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
 
 
 

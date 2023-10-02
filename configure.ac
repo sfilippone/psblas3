@@ -801,7 +801,8 @@ CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
 PAC_CHECK_SPGPU()
 if test "x$pac_cv_have_spgpu" == "xyes" ; then 
    GPUD=gpud;
-   GPULD=gpuld;	
+   GPULD=gpuld;
+   LGPU="-lpsb_gpu";	
    EXTRALDLIBS="-lstdc++";
 fi
 AC_MSG_NOTICE([At this point GPUTARGET is $GPUD $GPULD])
@@ -933,6 +934,7 @@ AC_SUBST(CUDA_NVCC)
 AC_SUBST(CUDEFINES)
 AC_SUBST(GPUD)
 AC_SUBST(GPULD)
+AC_SUBST(LGPU)
 ###############################################################################
 # the following files will be created by Automake
 
