@@ -118,7 +118,7 @@ cudaobjs: $(FOBJS)
 
 ilib: objs
 	$(MAKE) -C impl lib LIBNAME=$(LIBNAME)
-cudalib: objs
+cudalib: objs ilib
 	$(MAKE) -C CUDA lib LIBNAME=$(LIBNAME)
 
 clean: cclean iclean cudaclean
