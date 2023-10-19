@@ -267,7 +267,7 @@ contains
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
     integer(psb_ipk_) :: i
-    
+
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
@@ -800,7 +800,7 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
-    if (.false.) then 
+    if (.false.) then
       res(1:isz) = x%v(1:isz)
     else
       !$omp parallel do private(i)
@@ -808,7 +808,7 @@ contains
         res(i) = x%v(i)
       end do
     end if
-    
+
   end function z_base_get_vect
 
   !
@@ -836,7 +836,7 @@ contains
     if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
     !$omp parallel do private(i)
-    do i = first_, last_        
+    do i = first_, last_
       x%v(i) = val
     end do
 #else
@@ -864,7 +864,7 @@ contains
     if (.not.allocated(x%v)) then
       call psb_realloc(size(val),x%v,info)
     end if
-    
+
     first_                     = 1
     if (present(first)) first_ = max(1,first)
     last_                      = min(psb_size(x%v),first_+size(val)-1)
@@ -918,7 +918,7 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: x
 
     integer(psb_ipk_) :: i
-    
+
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
@@ -1170,7 +1170,7 @@ contains
     info = 0
     if (y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
-    !$omp parallel do private(i)    
+    !$omp parallel do private(i)
     do i=1, n
       y%v(i) = y%v(i)*x(i)
     end do
@@ -1216,7 +1216,7 @@ contains
     else
       if (alpha == zone) then
         if (beta == zzero) then
-          !$omp parallel do private(i)    
+          !$omp parallel do private(i)
           do i=1, n
             z%v(i) = y(i)*x(i)
           end do
@@ -1681,7 +1681,7 @@ contains
     end if
     call x%set_host()
   end subroutine z_base_scal
-  
+
   !
   ! Norms 1, 2 and infinity
   !
@@ -1737,7 +1737,7 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     integer(psb_ipk_) :: i
-    
+
     if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
     res=dzero
@@ -1964,7 +1964,7 @@ contains
     z%v = x + b
 #endif
     info = 0
-    
+
   end subroutine z_base_addconst_a2
   !
   !> Function  _base_addconst_v2
@@ -2070,8 +2070,9 @@ module psb_z_base_multivect_mod
     procedure, pass(x) :: dot_a    => z_base_mlv_dot_a
     generic, public    :: dot      => dot_v, dot_a
     procedure, pass(y) :: axpby_v  => z_base_mlv_axpby_v
+    procedure, pass(y) :: axpby_vv => z_base_mlv_axpby_vv
     procedure, pass(y) :: axpby_a  => z_base_mlv_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
+    generic, public    :: axpby    => axpby_v, axpby_a, axpby_vv
     !
     ! MultiVector by vector/multivector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -2727,6 +2728,35 @@ contains
     end select
 
   end subroutine z_base_mlv_axpby_v
+
+  !
+  ! AXPBY is invoked via Y, hence the structure below.
+  !
+  !
+  !
+  !> Function  base_mlv_axpby_v
+  !! \memberof  psb_z_base_multivect_type
+  !! \brief AXPBY  by a (base_mlv_vect) y(j)=alpha*x+beta*y(j)
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x     The class(base_v_vect) to be added
+  !! \param beta scalar alpha
+  !! \param j to what column of the multivector should we add
+  !! \param info   return code
+  !!
+  subroutine z_base_mlv_axpby_vv(m,alpha, x, beta, y, j, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                 :: m
+    class(psb_z_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_multivect_type), intent(inout)  :: y
+    complex(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(in)      :: j
+    integer(psb_ipk_), intent(out)              :: info
+
+    call psb_geaxpby(m,alpha,x%v,beta,y%v(:,j),info)
+
+  end subroutine z_base_mlv_axpby_vv
 
   !
   ! AXPBY is invoked via Y, hence the structure below.

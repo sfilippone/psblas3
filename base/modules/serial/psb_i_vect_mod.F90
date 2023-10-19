@@ -56,7 +56,7 @@ module psb_i_vect_mod
     procedure, pass(x) :: is_remote_build => i_vect_is_remote_build
     procedure, pass(x) :: set_remote_build => i_vect_set_remote_build
     procedure, pass(x) :: get_dupl => i_vect_get_dupl
-    procedure, pass(x) :: set_dupl => i_vect_set_dupl 
+    procedure, pass(x) :: set_dupl => i_vect_set_dupl
     procedure, pass(x) :: get_nrmv => i_vect_get_nrmv
     procedure, pass(x) :: set_nrmv => i_vect_set_nrmv
     procedure, pass(x) :: all      => i_vect_all
@@ -161,7 +161,7 @@ contains
 
     x%nrmv = val
   end subroutine i_vect_set_nrmv
-        
+
 
   function i_vect_is_remote_build(x) result(res)
     implicit none
@@ -181,7 +181,7 @@ contains
       x%remote_build = psb_matbld_remote_
     end if
   end subroutine i_vect_set_remote_build
-        
+
   subroutine  psb_i_set_vect_default(v)
     implicit none
     class(psb_i_base_vect_type), intent(in) :: v
@@ -539,7 +539,7 @@ contains
       allocate(tmp,stat=info,mold=psb_i_get_base_vect_default())
     end if
     if (allocated(x%v)) then
-      if (allocated(x%v%v)) then 
+      if (allocated(x%v%v)) then
         call x%v%sync()
         if (info == psb_success_) call tmp%bld(x%v%v)
         call x%v%free(info)
@@ -698,7 +698,7 @@ module psb_i_multivect_mod
 
 contains
 
-  
+
   function i_mvect_get_dupl(x) result(res)
     implicit none
     class(psb_i_multivect_type), intent(in) :: x
@@ -717,7 +717,7 @@ contains
       x%dupl = psb_dupl_def_
     end if
   end subroutine i_mvect_set_dupl
-        
+
 
   function i_mvect_is_remote_build(x) result(res)
     implicit none
@@ -737,7 +737,7 @@ contains
       x%remote_build = psb_matbld_remote_
     end if
   end subroutine i_mvect_set_remote_build
-        
+
 
   subroutine  psb_i_set_multivect_default(v)
     implicit none

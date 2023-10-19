@@ -33,6 +33,7 @@ module psb_z_psblas_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
   use psb_z_vect_mod, only : psb_z_vect_type
   use psb_z_mat_mod, only : psb_zspmat_type
+  use psb_z_multivect_mod, only: psb_z_multivect_type
 
   interface psb_gedot
     function psb_zdot_vect(x, y, desc_a,info,global) result(res)
@@ -141,6 +142,17 @@ module psb_z_psblas_mod
       integer(psb_ipk_), optional, intent(in) :: n, jx, jy
       integer(psb_ipk_), intent(out)      :: info
     end subroutine psb_zaxpby
+    subroutine psb_zaxpby_multivect_vect(alpha, x, beta, y,&
+         & j, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+              & psb_z_vect_type, psb_zspmat_type, psb_z_multivect_type
+      type(psb_z_vect_type), intent (inout) ::  x
+      type(psb_z_multivect_type), intent (inout) ::  y
+      complex(psb_dpk_), intent (in)        :: alpha, beta
+      integer(psb_ipk_), intent(in)        :: j
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)                  :: info
+    end subroutine psb_zaxpby_multivect_vect
   end interface
 
   interface psb_geamax

@@ -204,7 +204,7 @@ contains
     class(psb_l_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
     integer(psb_ipk_) :: i
-    
+
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
@@ -737,7 +737,7 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
-    if (.false.) then 
+    if (.false.) then
       res(1:isz) = x%v(1:isz)
     else
       !$omp parallel do private(i)
@@ -745,7 +745,7 @@ contains
         res(i) = x%v(i)
       end do
     end if
-    
+
   end function l_base_get_vect
 
   !
@@ -773,7 +773,7 @@ contains
     if (x%is_dev()) call x%sync()
 #if defined(OPENMP)
     !$omp parallel do private(i)
-    do i = first_, last_        
+    do i = first_, last_
       x%v(i) = val
     end do
 #else
@@ -801,7 +801,7 @@ contains
     if (.not.allocated(x%v)) then
       call psb_realloc(size(val),x%v,info)
     end if
-    
+
     first_                     = 1
     if (present(first)) first_ = max(1,first)
     last_                      = min(psb_size(x%v),first_+size(val)-1)
