@@ -1,6 +1,6 @@
 include Make.inc
 
-all: dirs based precd kryld utild cbindd extd  $(GPUD) libd
+all: dirs based precd kryld utild cbindd extd  $(CUDAD) libd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -13,18 +13,18 @@ precd: based
 utild: based	
 kryld: precd 
 extd:  based
-gpud:  extd
+cudad:  extd
 cbindd: based precd kryld utild 
 
-libd: based precd kryld utild cbindd extd $(GPULD)
+libd: based precd kryld utild cbindd extd $(CUDALD)
 	$(MAKE) -C base lib
 	$(MAKE) -C prec lib
 	$(MAKE) -C krylov lib
 	$(MAKE) -C util lib 
 	$(MAKE) -C cbind lib
 	$(MAKE) -C ext lib
-gpuld:  gpud
-	$(MAKE) -C gpu lib
+cudald:  cudad
+	$(MAKE) -C cuda lib
 
 
 based:
@@ -39,8 +39,8 @@ cbindd:
 	$(MAKE) -C cbind objs 
 extd:   based
 	$(MAKE) -C ext objs
-gpud:   based extd
-	$(MAKE) -C gpu objs
+cudad:   based extd
+	$(MAKE) -C cuda objs
 
 
 install: all
@@ -66,7 +66,7 @@ clean:
 	$(MAKE) -C util clean
 	$(MAKE) -C cbind clean
 	$(MAKE) -C ext clean
-	$(MAKE) -C gpu clean
+	$(MAKE) -C cuda clean
 
 check: all
 	make check -C test/serial
@@ -83,7 +83,7 @@ veryclean: cleanlib
 	cd util && $(MAKE) veryclean
 	cd cbind && $(MAKE) veryclean
 	cd ext && $(MAKE) veryclean
-	cd gpu && $(MAKE) veryclean
+	cd cuda && $(MAKE) veryclean
 	cd test/fileread && $(MAKE) clean
 	cd test/pargen && $(MAKE) clean
 	cd test/util && $(MAKE) clean

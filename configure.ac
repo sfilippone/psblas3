@@ -798,20 +798,22 @@ if test "x$pac_cv_have_cuda" == "xyes"; then
 PAC_CHECK_CUDA_VERSION()
 CUDA_VERSION="$pac_cv_cuda_version";
 CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-PAC_CHECK_SPGPU()
-if test "x$pac_cv_have_spgpu" == "xyes" ; then 
-   GPUD=gpud;
-   GPULD=gpuld;
-   LGPU="-lpsb_gpu";	
+dnl PAC_CHECK_SPGPU()
+if test "x$pac_cv_have_cuda" == "xyes" ; then
+   SPGPU_DEFINES="-DHAVE_SPGPU -DHAVE_GPU";
+   SPGPU_LIBS="-lspgpu";	
+   CUDAD=cudad;
+   CUDALD=cudald;
+   LCUDA="-lpsb_cuda";	
    EXTRALDLIBS="-lstdc++";
 fi
-AC_MSG_NOTICE([At this point GPUTARGET is $GPUD $GPULD])
+AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
 
 PAC_ARG_WITH_CUDACC()
 if test "x$pac_cv_cudacc" == "x"; then
    pac_cv_cudacc="30,35,37,50,60";
 fi
-CUDEFINES="";
+CUDEFINES="--dopt=on";
 for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
 do
   CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
@@ -826,8 +828,10 @@ fi
 
 if test "x$pac_cv_ipk_size" != "x4"; then
   AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
-  GPUD="";
-  GPULD="";
+  SPGPU_DEFINES="";
+  SPGPU_LIBS="";	
+  CUDAD="";
+  CUDALD="";
   CUDEFINES="";
   CUDA_INCLUDES="";
   CUDA_LIBS="";
@@ -893,9 +897,9 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)
-CDEFINES=$(PSBCDEFINES)
-FDEFINES=$(PSBFDEFINES)
+CXXDEFINES=$(PSBCXXDEFINES)  $(SPGPU_DEFINES) $(CUDA_DEFINES)
+CDEFINES=$(PSBCDEFINES) $(SPGPU_DEFINES) $(CUDA_DEFINES)
+FDEFINES=$(PSBFDEFINES) $(SPGPU_DEFINES) $(CUDA_DEFINES)
 	
 
 # These should be portable rules, arent they?
@@ -919,10 +923,10 @@ AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
 AC_SUBST(SPGPU_FLAGS)
 AC_SUBST(SPGPU_LIBS)
-AC_SUBST(SPGPU_DIR)
+dnl AC_SUBST(SPGPU_DIR)
 AC_SUBST(SPGPU_DEFINES)
-AC_SUBST(SPGPU_INCLUDES)
-AC_SUBST(SPGPU_INCDIR)
+dnl AC_SUBST(SPGPU_INCLUDES)
+dnl AC_SUBST(SPGPU_INCDIR)
 AC_SUBST(EXTRALDLIBS)
 AC_SUBST(CUDA_DIR)
 AC_SUBST(CUDA_DEFINES)
@@ -932,9 +936,9 @@ AC_SUBST(CUDA_VERSION)
 AC_SUBST(CUDA_SHORT_VERSION)
 AC_SUBST(CUDA_NVCC)
 AC_SUBST(CUDEFINES)
-AC_SUBST(GPUD)
-AC_SUBST(GPULD)
-AC_SUBST(LGPU)
+AC_SUBST(CUDAD)
+AC_SUBST(CUDALD)
+AC_SUBST(LCUDA)
 ###############################################################################
 # the following files will be created by Automake
 

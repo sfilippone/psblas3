@@ -13,8 +13,8 @@ LDLIBS=$(PSBLDLIBS)
 #
 #CCOPT= -g
 FINCLUDES=$(FMFLAG).   $(FMFLAG)$(INCDIR)  $(FMFLAG)$(MODDIR) $(FIFLAG).
-CINCLUDES=$(SPGPU_INCLUDES) $(CUDA_INCLUDES)
-LIBNAME=libpsb_gpu.a
+CINCLUDES=$(SPGPU_INCLUDES) $(CUDA_INCLUDES) -I$(INCDIR)
+LIBNAME=libpsb_cuda.a
 
 
 FOBJS=cusparse_mod.o base_cusparse_mod.o \
@@ -49,11 +49,18 @@ OBJS=$(COBJS) $(FOBJS)
 
 lib: objs
 
-objs: $(OBJS) iobjs cudaobjs
+objs: spgpuinc $(OBJS) iobjs cudaobjs spgpuobjs
 	/bin/cp -p *$(.mod) $(MODDIR)
 	/bin/cp -p *.h $(INCDIR)
 
-lib: ilib cudalib
+spgpuinc:
+	$(MAKE) -C spgpu includes	
+spgpuobjs:
+	$(MAKE) -C spgpu objs
+spgpulib:
+	$(MAKE) -C spgpu lib
+
+lib: ilib cudalib spgpulib
 	ar cur $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
@@ -121,7 +128,7 @@ ilib: objs
 cudalib: objs ilib
 	$(MAKE) -C CUDA lib LIBNAME=$(LIBNAME)
 
-clean: cclean iclean cudaclean
+clean: cclean iclean cudaclean spgpuclean
 	/bin/rm -f  $(FOBJS) *$(.mod) *.a
 
 cclean: 
@@ -130,5 +137,7 @@ iclean:
 	$(MAKE) -C impl clean
 cudaclean:
 	$(MAKE) -C CUDA clean
+spgpuclean:
+	$(MAKE) -C spgpu clean
 
 veryclean:  clean
