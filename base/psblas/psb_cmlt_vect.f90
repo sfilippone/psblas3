@@ -198,3 +198,60 @@ subroutine psb_cmlt_vect2(alpha,x,y,beta,z,desc_a,info,conjgx, conjgy)
   return
 
 end subroutine psb_cmlt_vect2
+
+subroutine psb_cmlt_mltvec_va(x,a,v,desc,info)
+  use psb_base_mod, psb_protect_name => psb_cmlt_mltvec_va
+  implicit none
+  type(psb_c_multivect_type), intent(inout) :: x
+  complex(psb_spk_), dimension(:), allocatable, intent(inout) :: a
+  type(psb_c_vect_type), intent(inout) :: v
+  type(psb_desc_type), intent(inout) :: desc
+  integer(psb_ipk_), intent(inout) :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
+       & err_act, iix, jjx, iiy, jjy, iiz, jjz
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_c_mlt_mltvec_va'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(v%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(a)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if(desc%get_local_rows() > 0) then
+    call x%mlt(a,v,info)
+  end if
+
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_cmlt_mltvec_va

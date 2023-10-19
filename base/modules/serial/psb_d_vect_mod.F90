@@ -1397,6 +1397,8 @@ module psb_d_multivect_mod
 !!$    procedure, pass(x) :: asum     => d_vect_asum
        procedure, pass(y) :: axpby_vv => d_vect_axpby_vv
        generic, public :: axpby => axpby_vv
+       procedure, pass(y) :: mlt_av   => d_vect_mltav
+       generic, public :: mlt => mlt_av
   end type psb_d_multivect_type
 
   public  :: psb_d_multivect, psb_d_multivect_type,&
@@ -2033,5 +2035,22 @@ contains
 !!$    end if
 !!$
 !!$  end function d_vect_asum
+  subroutine d_vect_mltav(y,a,v,info)
+    use psb_d_vect_mod
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: y
+    real(psb_dpk_), dimension(:), allocatable :: a
+    type(psb_d_vect_type), intent(inout) :: v
+    integer(psb_ipk_), intent(out) :: info
+
+    info = 0
+
+    if (allocated(y%v).and.allocated(a)) then
+      call y%v%mlt(a,v%v,info)
+    else
+      info = -1
+    end if
+
+  end subroutine d_vect_mltav
 
 end module psb_d_multivect_mod

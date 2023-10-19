@@ -506,6 +506,16 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       character(len=1), intent(in), optional :: conjgx, conjgy
     end subroutine psb_cmlt_vect2
+    subroutine psb_cmlt_mltvec_va(x,a,v,desc,info)
+      import :: psb_desc_type, psb_ipk_, psb_c_vect_type, &
+        & psb_c_multivect_type, psb_spk_
+      implicit none
+      type(psb_c_multivect_type), intent(inout) :: x
+      complex(psb_spk_), dimension(:), allocatable, intent(inout) :: a
+      type(psb_c_vect_type), intent(inout) :: v
+      type(psb_desc_type), intent(inout) :: desc
+      integer(psb_ipk_), intent(inout) :: info
+    end subroutine
   end interface
 
   interface psb_gediv

@@ -142,7 +142,8 @@ module psb_d_psblas_mod
       integer(psb_ipk_), optional, intent(in) :: n, jx, jy
       integer(psb_ipk_), intent(out)      :: info
     end subroutine psb_daxpby
-    subroutine psb_daxpby_multivect_vect(alpha, x, beta, y, j, desc_a, info)
+    subroutine psb_daxpby_multivect_vect(alpha, x, beta, y,&
+         & j, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
               & psb_d_vect_type, psb_dspmat_type, psb_d_multivect_type
       type(psb_d_vect_type), intent (inout) ::  x
@@ -516,6 +517,16 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       character(len=1), intent(in), optional :: conjgx, conjgy
     end subroutine psb_dmlt_vect2
+    subroutine psb_dmlt_mltvec_va(x,a,v,desc,info)
+      import :: psb_desc_type, psb_ipk_, psb_d_vect_type, &
+        & psb_d_multivect_type, psb_dpk_
+      implicit none
+      type(psb_d_multivect_type), intent(inout) :: x
+      real(psb_dpk_), dimension(:), allocatable, intent(inout) :: a
+      type(psb_d_vect_type), intent(inout) :: v
+      type(psb_desc_type), intent(inout) :: desc
+      integer(psb_ipk_), intent(inout) :: info
+    end subroutine
   end interface
 
   interface psb_gediv

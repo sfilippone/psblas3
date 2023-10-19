@@ -2085,8 +2085,9 @@ module psb_c_base_multivect_mod
     procedure, pass(z) :: mlt_v_2  => c_base_mlv_mlt_v_2
 !!$    procedure, pass(z) :: mlt_va   => c_base_mlv_mlt_va
 !!$    procedure, pass(z) :: mlt_av   => c_base_mlv_mlt_av
+    procedure, pass(y) :: mltav    => c_base_mltav
     generic, public    :: mlt      => mlt_mv, mlt_mv_v, mlt_ar1, mlt_ar2, &
-         & mlt_a_2, mlt_v_2 !, mlt_av, mlt_va
+         & mlt_a_2, mlt_v_2, mltav !, mlt_av, mlt_va
     !
     ! Scaling and norms
     !
@@ -3014,6 +3015,25 @@ contains
 !!$  end subroutine c_base_mlv_mlt_va
 !!$
 !!$
+  !> Function  base_mltav
+  !! \memberof  psb_c_base_multivect_type
+  !! \brief Linear combination of the columns of the multivector
+  !! \param y The multivector
+  !! \param a The coefficients of the linear combination
+  !! \param v The resulting vector
+  !!
+  subroutine c_base_mltav(y,a,v,info)
+    use psi_serial_mod
+    use psb_c_base_vect_mod
+    implicit none
+    class(psb_c_base_multivect_type), intent(inout)  :: y
+    complex(psb_spk_), intent(in), dimension(:) :: a
+    type(psb_c_base_vect_type), intent(inout) :: v
+    integer(psb_ipk_), intent(out) :: info
+
+    v%v = matmul(y%v,a)
+
+  end subroutine c_base_mltav
   !
   ! Simple scaling
   !
