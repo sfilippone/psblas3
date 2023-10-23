@@ -390,14 +390,14 @@ contains
           ! into lval/d(i)/uval
           !
           call ilu_copyin(i,ma,a,i,ione,m,l1,lja,lval,&
-               & d(i),l2,uja,uval,ktrw,trw,upd,shft)
+               & d(i),l2,uja,uval,ktrw,trw,upd,shft_)
         else
           !
           ! Copy the i-th local row of the matrix, stored in b
           ! (as (i-ma)-th row), into lval/d(i)/uval
           !
           call ilu_copyin(i-ma,mb,b,i,ione,m,l1,lja,lval,&
-               & d(i),l2,uja,uval,ktrw,trw,upd,shft)
+               & d(i),l2,uja,uval,ktrw,trw,upd,shft_)
         endif
 
         lirp(i+1) = l1 + 1

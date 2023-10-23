@@ -213,7 +213,7 @@ subroutine psb_dilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
   ! Compute the ILU(k,t) factorization
   !
   call psb_dilut_factint(fill_in,thres,a,blck_,&
-       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,scale,shft)
+       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,scale,shft_)
   if (info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_dilut_factint'

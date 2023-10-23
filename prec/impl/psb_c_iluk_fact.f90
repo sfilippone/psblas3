@@ -191,7 +191,7 @@ subroutine psb_ciluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
   ! Compute the ILU(k) or the MILU(k) factorization, depending on ialg
   !
   call psb_ciluk_factint(fill_in,ialg,a,blck_,&
-       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,shft)
+       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,shft_)
   if (info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_ciluk_factint'
