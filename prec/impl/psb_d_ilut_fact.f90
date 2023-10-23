@@ -143,6 +143,7 @@ subroutine psb_dilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
   !     Local Variables
   integer(psb_ipk_)   ::  l1, l2, m, err_act, iscale_
 
+  real(psb_dpk_) :: shft_
   type(psb_dspmat_type), pointer  :: blck_
   type(psb_d_csr_sparse_mat)       :: ll, uu
   real(psb_dpk_)      :: scale
@@ -177,6 +178,11 @@ subroutine psb_dilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
     iscale_ = iscale
   else
     iscale_ = psb_ilu_scale_none_
+  end if
+  if (present(shft)) then
+    shft_ = shft
+  else
+    shft_ = dzero
   end if
 
   select case(iscale_)

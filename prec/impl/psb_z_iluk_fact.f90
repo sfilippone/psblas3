@@ -145,6 +145,7 @@ subroutine psb_ziluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
   !     Local Variables
   integer(psb_ipk_)   :: l1, l2, m, err_act
 
+  complex(psb_dpk_) :: shft_
   type(psb_zspmat_type), pointer  :: blck_
   type(psb_z_csr_sparse_mat)      :: ll, uu
   character(len=20)   :: name, ch_err
@@ -168,6 +169,11 @@ subroutine psb_ziluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
       goto 9999
     end if
   endif
+  if (present(shft)) then
+    shft_ = shft
+  else
+    shft_ = zzero
+  end if
 
   m = a%get_nrows() + blck_%get_nrows()
   if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
