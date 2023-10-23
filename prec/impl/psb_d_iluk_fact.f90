@@ -127,7 +127,7 @@
 !               greater than 0. If the overlap is 0 or the matrix has been reordered
 !               (see psb_fact_bld), then blck does not contain any row.
 !
-subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck)
+subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
 
   use psb_base_mod
   use psb_d_ilu_fact_mod, psb_protect_name => psb_diluk_fact
@@ -141,6 +141,7 @@ subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck)
   type(psb_dspmat_type),intent(inout) :: l,u
   type(psb_dspmat_type),intent(in), optional, target :: blck
   real(psb_dpk_), intent(inout)    ::  d(:)
+  real(psb_dpk_), intent(in), optional :: shft
   !     Local Variables
   integer(psb_ipk_)   :: l1, l2, m, err_act
 
@@ -184,7 +185,7 @@ subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck)
   ! Compute the ILU(k) or the MILU(k) factorization, depending on ialg
   !
   call psb_diluk_factint(fill_in,ialg,a,blck_,&
-       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info)
+       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,shft)
   if (info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_diluk_factint'
@@ -298,7 +299,7 @@ contains
   !               Error code.
   !
   subroutine psb_diluk_factint(fill_in,ialg,a,b,&
-       & d,lval,lja,lirp,uval,uja,uirp,l1,l2,info)
+       & d,lval,lja,lirp,uval,uja,uirp,l1,l2,info,shft)
 
     use psb_base_mod
 
@@ -311,6 +312,7 @@ contains
     integer(psb_ipk_), allocatable, intent(inout) :: lja(:),lirp(:),uja(:),uirp(:)
     real(psb_dpk_), allocatable, intent(inout) :: lval(:),uval(:)
     real(psb_dpk_), intent(inout)              :: d(:)
+    real(psb_dpk_), intent(in)       :: shft
 
   ! Local variables
     integer(psb_ipk_) :: ma,mb,i, ktrw,err_act,nidx, m
@@ -400,13 +402,13 @@ contains
         !
         ! Copy into trw the i-th local row of the matrix, stored in a
         !
-        call iluk_copyin(i,ma,a,ione,m,row,rowlevs,heap,ktrw,trw,info)
+        call iluk_copyin(i,ma,a,ione,m,row,rowlevs,heap,ktrw,trw,info,shft)
       else
         !
         ! Copy into trw the i-th local row of the matrix, stored in b
         ! (as (i-ma)-th row)
         !
-        call iluk_copyin(i-ma,mb,b,ione,m,row,rowlevs,heap,ktrw,trw,info)
+        call iluk_copyin(i-ma,mb,b,ione,m,row,rowlevs,heap,ktrw,trw,info,shft)
       endif
 
       ! Do an elimination step on the current row. It turns out we only
@@ -516,7 +518,7 @@ contains
   !               until we empty the buffer. Thus we will make a call to psb_sp_getblk
   !               every nrb calls to copyin. If A is in CSR format it is unused.
   !
-  subroutine iluk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info)
+  subroutine iluk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,shft)
 
     use psb_base_mod
 
@@ -530,6 +532,8 @@ contains
     integer(psb_ipk_), intent(inout)        :: rowlevs(:)
     real(psb_dpk_), intent(inout)          :: row(:)
     type(psb_i_heap), intent(inout)         :: heap
+    real(psb_dpk_), intent(in)       :: shft
+
 
   ! Local variables
     integer(psb_ipk_)             :: k,j,irb,err_act,nz
@@ -554,6 +558,7 @@ contains
         k          = aa%ja(j)
         if ((jmin<=k).and.(k<=jmax)) then
           row(k)     = aa%val(j)
+          if (k==i) row(k) = row(k) + shft
           rowlevs(k) = 0
           call heap%insert(k,info)
         end if
@@ -587,6 +592,7 @@ contains
         k          = trw%ja(ktrw)
         if ((jmin<=k).and.(k<=jmax)) then
           row(k)     = trw%val(ktrw)
+          if (k==i) row(k) = row(k) + shft
           rowlevs(k) = 0
           call heap%insert(k,info)
         end if
@@ -670,7 +676,8 @@ contains
   !               Note: this argument is intent(inout) and not only intent(out)
   !               to retain its allocation, done by this routine.
   !
-  subroutine iluk_fact(fill_in,i,row,rowlevs,heap,d,uja,uirp,uval,uplevs,nidx,idxs,info)
+  subroutine iluk_fact(fill_in,i,row,rowlevs,heap,d,&
+       & uja,uirp,uval,uplevs,nidx,idxs,info)
 
     use psb_base_mod
 

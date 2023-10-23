@@ -130,7 +130,7 @@
 !               greater than 0. If the overlap is 0 or the matrix has been reordered
 !               (see psb_fact_bld), then blck is empty.
 !
-subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd)
+subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
 
   use psb_base_mod
   use psb_s_ilu_fact_mod, psb_protect_name => psb_silu0_fact
@@ -145,11 +145,13 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd)
   integer(psb_ipk_), intent(out)      :: info
   type(psb_sspmat_type),intent(in), optional, target :: blck
   character, intent(in), optional     :: upd
+  real(psb_spk_), intent(in), optional :: shft
 
   ! Local variables
   integer(psb_ipk_)   :: l1, l2, m, err_act
   type(psb_sspmat_type), pointer  :: blck_
   type(psb_s_csr_sparse_mat)      :: ll, uu
+  real(psb_spk_) :: shft_
   character                       :: upd_
   character(len=20)    :: name, ch_err
 
@@ -177,7 +179,12 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd)
   else
     upd_ = 'F'
   end if
-
+  if (present(shft)) then
+    shft_ = shft
+  else
+    shft_ = szero
+  end if
+  
   m = a%get_nrows() + blck_%get_nrows()
   if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
        & (m > size(d))    ) then
@@ -193,7 +200,7 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd)
   ! Compute the ILU(0) or the MILU(0) factorization, depending on ialg
   !
   call psb_silu0_factint(ialg,a,blck_,&
-       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,upd_,info)
+       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,upd_,shft_,info)
   if(info.ne.0) then
     info=psb_err_from_subroutine_
     ch_err='psb_silu0_factint'
@@ -314,7 +321,7 @@ contains
   !               Error code.
   !
   subroutine psb_silu0_factint(ialg,a,b,&
-       & d,lval,lja,lirp,uval,uja,uirp,l1,l2,upd,info)
+       & d,lval,lja,lirp,uval,uja,uirp,l1,l2,upd,shft,info)
 
     implicit none
 
@@ -325,6 +332,7 @@ contains
     integer(psb_ipk_), intent(inout)  :: lja(:),lirp(:),uja(:),uirp(:)
     real(psb_spk_), intent(inout)  :: lval(:),uval(:),d(:)
     character, intent(in)             :: upd
+    real(psb_spk_), intent(in)       :: shft
 
     ! Local variables
     integer(psb_ipk_) :: i,j,k,l,low1,low2,kk,jj,ll, ktrw,err_act, m
@@ -382,14 +390,14 @@ contains
           ! into lval/d(i)/uval
           !
           call ilu_copyin(i,ma,a,i,ione,m,l1,lja,lval,&
-               & d(i),l2,uja,uval,ktrw,trw,upd)
+               & d(i),l2,uja,uval,ktrw,trw,upd,shft)
         else
           !
           ! Copy the i-th local row of the matrix, stored in b
           ! (as (i-ma)-th row), into lval/d(i)/uval
           !
           call ilu_copyin(i-ma,mb,b,i,ione,m,l1,lja,lval,&
-               & d(i),l2,uja,uval,ktrw,trw,upd)
+               & d(i),l2,uja,uval,ktrw,trw,upd,shft)
         endif
 
         lirp(i+1) = l1 + 1
@@ -583,7 +591,7 @@ contains
   !               every nrb calls to copyin. If A is in CSR format it is unused.
   !
   subroutine ilu_copyin(i,m,a,jd,jmin,jmax,l1,lja,lval,&
-       & dia,l2,uja,uval,ktrw,trw,upd)
+       & dia,l2,uja,uval,ktrw,trw,upd,shft)
 
     use psb_base_mod
 
@@ -597,6 +605,7 @@ contains
     integer(psb_ipk_), intent(inout)     :: lja(:), uja(:)
     real(psb_spk_), intent(inout)       :: lval(:), uval(:), dia
     character, intent(in)                :: upd
+    real(psb_spk_), intent(in)       :: shft
     ! Local variables
     integer(psb_ipk_)             :: k,j,info,irb, nz
     integer(psb_ipk_), parameter  :: nrb=40
@@ -625,7 +634,7 @@ contains
             lval(l1) = aa%val(j)
             lja(l1) = k
           else if (k == jd) then
-            dia = aa%val(j)
+            dia = aa%val(j) + shft
           else if ((k > jd).and.(k <= jmax)) then
             l2 = l2 + 1
             uval(l2) = aa%val(j)
@@ -665,7 +674,7 @@ contains
             lval(l1) = trw%val(ktrw)
             lja(l1) = k
           else if (k == jd) then
-            dia = trw%val(ktrw)
+            dia = trw%val(ktrw) + shft
           else if ((k > jd).and.(k <= jmax)) then
             l2 = l2 + 1
             uval(l2) = trw%val(ktrw)
