@@ -39,6 +39,7 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_l_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
 	auxil/psb_ip_reord_mod.o\
+	auxil/psi_acx_mod.o auxil/psi_alcx_mod.o auxil/psi_lcx_mod.o  \
 	auxil/psb_m_ip_reord_mod.o auxil/psb_e_ip_reord_mod.o \
 	auxil/psb_s_ip_reord_mod.o auxil/psb_d_ip_reord_mod.o \
 	auxil/psb_c_ip_reord_mod.o auxil/psb_z_ip_reord_mod.o \
