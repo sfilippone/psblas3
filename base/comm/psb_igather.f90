@@ -58,10 +58,11 @@ subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank, loc_rows
   integer(psb_ipk_) :: ierr(5), err_act, jlx, ilx, lda_locx, lda_globx, i
   integer(psb_lpk_) :: m, n, k, ilocx,  jlocx, idx, iglobx, jglobx
   integer(psb_ipk_), allocatable :: llocx(:)
+  integer(psb_mpk_), allocatable :: szs(:) 
   character(len=20)        :: name, ch_err
 
   name='psb_igatherv'
@@ -125,32 +126,36 @@ subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
     goto 9999
   end if
   
-  call psb_realloc(m,globx,info)
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-  
-  globx(:) = izero
-  llocx    = locx%get_vect()
 
-  do i=1,desc_a%get_local_rows()
-    call psb_loc_to_glob(i,idx,desc_a,info)
-    globx(idx) = llocx(i)
-  end do
-  
+  llocx    = locx%get_vect()
   ! adjust overlapped elements
   do i=1, size(desc_a%ovrlap_elem,1)
     if (me /= desc_a%ovrlap_elem(i,3)) then 
       idx = desc_a%ovrlap_elem(i,1)
-      call psb_loc_to_glob(idx,desc_a,info)
-      globx(idx) = izero
+      llocx(idx) = izero
     end if
   end do
-  
-  call psb_sum(ctxt,globx(1:m),root=root)
 
+  if ((me == root).or.(root == -1)) then
+    allocate(szs(np))
+  end if
+  loc_rows = desc_a%get_local_rows()
+  call psb_gather(ctxt,loc_rows,szs,root=root)
+  if ((me == root).or.(root == -1)) then
+    if (sum(szs) /= m) then 
+      info=psb_err_internal_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_realloc(m,globx,info)
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+  call psb_gatherv(ctxt,llocx(1:loc_rows),globx,szs,root=root)
+   
   call psb_erractionrestore(err_act)
   return  
 

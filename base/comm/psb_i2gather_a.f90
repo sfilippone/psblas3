@@ -60,7 +60,7 @@ subroutine  psb_i2gatherm(globx, locx, desc_a, info, iroot)
   type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) ::  np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, lda_locx, lda_globx, lock, globk,&
-       & maxk, k, jlx, ilx, i, j
+       & maxk, k, jlx, ilx, i, j, loc_rows
   integer(psb_lpk_) :: m, n, ilocx,  jlocx, idx, iglobx, jglobx
   character(len=20) :: name, ch_err
 
@@ -232,11 +232,11 @@ subroutine  psb_i2gatherv(globx, locx, desc_a, info, iroot)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: np, me, root, iiroot, icomm, myrank, rootrank, loc_rows
   integer(psb_ipk_) :: ierr(5), err_act, lda_locx, lda_globx, lock, globk,&
        & maxk, k, jlx, ilx, i, j
   integer(psb_lpk_) :: m, n, ilocx,  jlocx, idx, iglobx, jglobx
-
+  integer(psb_mpk_), allocatable :: szs(:) 
   character(len=20)        :: name, ch_err
 
   name='psb_i2gatherv'
@@ -307,23 +307,32 @@ subroutine  psb_i2gatherv(globx, locx, desc_a, info, iroot)
     goto 9999
   end if
 
-  globx(:)=i2zero
-
-  do i=1,desc_a%get_local_rows()
-    call psb_loc_to_glob(i,idx,desc_a,info)
-    globx(idx) = locx(i)
-  end do
-
   ! adjust overlapped elements
   do i=1, size(desc_a%ovrlap_elem,1)
     if (me /= desc_a%ovrlap_elem(i,3)) then 
       idx = desc_a%ovrlap_elem(i,1)
-      call psb_loc_to_glob(idx,desc_a,info)
-      globx(idx) = i2zero
+      locx(idx) = i2zero
     end if
   end do
-
-  call psb_sum(ctxt,globx(1:m),root=root)
+  loc_rows = desc_a%get_local_rows()
+  if ((me == root).or.(root == -1)) then
+    allocate(szs(np))
+  end if
+  call psb_gather(ctxt,loc_rows,szs,root=root)
+  if ((me == root).or.(root == -1)) then
+    if (sum(szs) /= m) then 
+      info=psb_err_internal_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_realloc(m,globx,info)
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+  call psb_gatherv(ctxt,locx(1:loc_rows),globx,szs,root=root)
 
   call psb_erractionrestore(err_act)
   return  
