@@ -136,9 +136,7 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
     end if
   end do
 
-  if ((me == root).or.(root == -1)) then
-    allocate(szs(np))
-  end if
+  allocate(szs(np))
   loc_rows = desc_a%get_local_rows()
   call psb_gather(ctxt,loc_rows,szs,root=root)
   if ((me == root).or.(root == -1)) then
