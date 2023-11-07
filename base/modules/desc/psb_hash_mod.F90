@@ -388,7 +388,7 @@ contains
     info  = HashOK
     hsize = hash%hsize
     hmask = hash%hmask
-
+    val = -1 
     hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
@@ -407,35 +407,49 @@ contains
       if (hash%table(hk,1) == key) then 
         val  = hash%table(hk,2)
         info = HashDuplicate
+        !write(0,*) 'In searchinskey 1 : ', info, HashDuplicate
         return
       end if
-      if (hash%table(hk,1) == HashFreeEntry) then 
-        if (hash%nk == hash%hsize -1) then
-          !
-          ! Note: because of the way we allocate things at CDALL
-          ! time this is really unlikely; if we get here, we
-          ! have at least as many halo indices as internals, which
-          ! means we're already in trouble. But we try to keep going. 
-          !
-          call psb_hash_realloc(hash,info) 
-          if (info /=  HashOk) then             
-            info = HashOutOfMemory
-            return
+      !$omp critical(hashsearchins)
+      if (hash%table(hk,1) == key) then 
+        val  = hash%table(hk,2)
+        info = HashDuplicate
+      else
+        if (hash%table(hk,1) == HashFreeEntry) then
+          if (hash%nk == hash%hsize -1) then
+            !
+            ! Note: because of the way we allocate things at CDALL
+            ! time this is really unlikely; if we get here, we
+            ! have at least as many halo indices as internals, which
+            ! means we're already in trouble. But we try to keep going. 
+            !
+            call psb_hash_realloc(hash,info) 
+            if (info /=  HashOk) then             
+              info = HashOutOfMemory
+              !return
+            else
+              call psb_hash_searchinskey(key,val,nextval,hash,info)
+              !return
+            end if
           else
-            call psb_hash_searchinskey(key,val,nextval,hash,info)
-            return
+            hash%nk = hash%nk + 1 
+            hash%table(hk,1) = key
+            hash%table(hk,2) = nextval
+            val              = nextval
+            !return
           end if
-        else
-          hash%nk = hash%nk + 1 
-          hash%table(hk,1) = key
-          hash%table(hk,2) = nextval
-          val              = nextval
-          return
         end if
       end if
+      !$omp end critical(hashsearchins)
+      if (info /= HashOk) then
+        write(0,*) 'In searchinskey 2: ', info 
+        return
+      end if
+      if (val > 0) return
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
+    !write(0,*) 'In searchinskey 3: ', info 
   end subroutine psb_hash_lsearchinskey
     
   recursive subroutine psb_hash_isearchinskey(key,val,nextval,hash,info)
@@ -444,11 +458,11 @@ contains
     integer(psb_ipk_), intent(out)  :: val, info 
 
     integer(psb_ipk_) :: hsize,hmask, hk, hd
-
+    logical :: redo
     info  = HashOK
     hsize = hash%hsize
     hmask = hash%hmask
-
+    
     hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
@@ -460,7 +474,7 @@ contains
       info = HashOutOfMemory
       return
     end if
-
+    val = -1 
     hash%nsrch = hash%nsrch + 1
     do 
       hash%nacc = hash%nacc + 1
@@ -469,6 +483,8 @@ contains
         info = HashDuplicate
         return
       end if
+      redo = .false.
+      !$OMP CRITICAL
       if (hash%table(hk,1) == HashFreeEntry) then 
         if (hash%nk == hash%hsize -1) then
           !
@@ -480,19 +496,24 @@ contains
           call psb_hash_realloc(hash,info) 
           if (info /=  HashOk) then             
             info = HashOutOfMemory
-            return
+            !return
           else
-            call psb_hash_searchinskey(key,val,nextval,hash,info)
-            return
+            redo = .true.
+!!$            call psb_hash_searchinskey(key,val,nextval,hash,info)
+!!$            return
           end if
         else
           hash%nk = hash%nk + 1 
           hash%table(hk,1) = key
           hash%table(hk,2) = nextval
           val              = nextval
-          return
+          !return
         end if
       end if
+      !$OMP END CRITICAL
+      if (redo) call psb_hash_searchinskey(key,val,nextval,hash,info)
+      if (info /= HashOk) return 
+      if (val > 0) return
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do

@@ -2817,6 +2817,9 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_realloc_mod
   use psb_sort_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_csput_a
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   class(psb_c_coo_sparse_mat), intent(inout) :: a
@@ -2828,7 +2831,7 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='c_coo_csput_a_impl'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, debug_level, debug_unit
+  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, nzaold, debug_level, debug_unit
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2860,10 +2863,13 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   if (nz == 0) return
 
-
-  nza  = a%get_nzeros()
-  isza = a%get_size()
   if (a%is_bld()) then
+    ! Structure here is peculiar, because this function can be called
+    ! either within a parallel region, or outside. 
+    ! Hence the call to set_nzeros done here. 
+    !$omp critical
+    nza  = a%get_nzeros()
+    isza = a%get_size()
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
       call a%reallocate(max(nza+nz,int(1.5*isza)))
@@ -2871,16 +2877,20 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     isza = a%get_size()
     if (isza < (nza+nz)) then
       info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
-      goto 9999
+    else
+      nzaold = nza
+      nza = nza + nz
+      call a%set_nzeros(nza)
     end if
-
-    call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
+    !$omp end critical
+    if (info /= 0)  goto 9999
+    call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
-    call a%set_nzeros(nza)
     call a%set_sorted(.false.)
-
-
+    
   else  if (a%is_upd()) then
+    nza  = a%get_nzeros()
+    isza = a%get_size()
 
     if (a%is_dev())   call a%sync()
 
@@ -2949,7 +2959,6 @@ contains
       end if
     end do
     !$OMP END PARALLEL DO
-
     nza = nza + nz
 #else
     do i=1, nz
@@ -3478,6 +3487,602 @@ subroutine psb_c_coo_mv_from(a,b)
 end subroutine psb_c_coo_mv_from
 
 
+!
+! COO implementation of tril/triu
+!
+subroutine psb_c_coo_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
+  ! Output is always in  COO format
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_tril
+  implicit none
+
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(out) :: l
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_c_coo_sparse_mat), optional, intent(out) :: u
+
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  character(len=20)  :: name='tril'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then
+    mb = imax_ - imin_ +1
+  else
+    mb = imax_
+  endif
+  if (cscale_) then
+    nb = jmax_ - jmin_ +1
+  else
+    nb = jmax_
+  endif
+
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable :: lrws(:),urws(:)
+    integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
+    call psb_realloc(mb,lrws,info)
+    !$omp workshare
+    lrws(:) = 0
+    !$omp end workshare
+    nz = a%get_nzeros()
+    call l%allocate(mb,nb,nz)
+    !write(0,*) 'Invocation of COO%TRIL', present(u),nz
+    if (present(u)) then
+      nzlin = l%get_nzeros() ! At this point it should be 0
+      call u%allocate(mb,nb,nz)
+      nzuin = u%get_nzeros() ! At this point it should be 0
+      if (info == 0) call psb_realloc(mb,urws,info)
+      !$omp workshare
+      urws(:) = 0
+      !$omp end workshare
+      !write(0,*) 'omp version of COO%TRIL/TRIU'
+      lnz = 0
+      unz = 0 
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws,urws) reduction(+: lnz,unz)
+      loop1: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic update
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            !$omp end atomic
+            lnz = lnz + 1
+          else
+            !$omp atomic update
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            !$omp end atomic
+            unz = unz + 1
+          end if
+        end if
+      end do loop1
+      !$omp end parallel do
+
+      call psi_exscan(mb,lrws,info)
+      call psi_exscan(mb,urws,info) 
+      !write(0,*) lrws(:), urws(:)
+      !$omp parallel do private(i,j,k,lpnt,upnt) shared(imin_,imax_,a)
+      loop2: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic capture
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            lpnt            = lrws(i-imin_+1)
+            !$omp end atomic
+            l%ia(lpnt)  = a%ia(k)
+            l%ja(lpnt)  = a%ja(k)
+            l%val(lpnt) = a%val(k)
+          else
+            !$omp atomic capture
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            upnt            = urws(i-imin_+1)
+            !$omp end atomic
+            u%ia(upnt)  = a%ia(k)
+            u%ja(upnt)  = a%ja(k)
+            u%val(upnt) = a%val(k)
+          end if
+        end if
+      end do loop2
+      !$omp end parallel do
+      !write(0,*) 'End of copyout',lnz,unz
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+      call u%set_nzeros(unz)
+      call u%fix(info)
+      nzout = u%get_nzeros()
+      if (rscale_) then
+        !$omp workshare
+        u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+        !$omp end workshare
+      end if
+      if (cscale_) then
+        !$omp workshare
+        u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+        !$omp end workshare
+      end if
+      if ((diag_ >=-1).and.(imin_ == jmin_)) then
+        call u%set_triangle(.true.)
+        call u%set_lower(.false.)
+      end if
+    else
+      lnz = 0
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws) reduction(+: lnz)
+      loop3: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic update
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            !$omp end atomic
+            lnz = lnz + 1
+          end if
+        end if
+      end do loop3
+      !$omp end parallel do
+      call psi_exscan(mb,lrws,info)
+      !$omp parallel do private(i,j,k,lpnt) shared(imin_,imax_,a)
+      loop4: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            !$omp atomic capture
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            lpnt            = lrws(i-imin_+1)
+            !$omp end atomic
+            l%ia(lpnt)  = a%ia(k)
+            l%ja(lpnt)  = a%ja(k)
+            l%val(lpnt) = a%val(k)
+          end if
+        end if
+      end do loop4
+      !$omp end parallel do
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+    end if
+    nzout = l%get_nzeros()
+    if (rscale_) then
+      !$omp workshare
+      l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+      !$omp end workshare
+    end if
+    if (cscale_) then
+      !$omp workshare
+      l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+      !$omp end workshare
+    end if
+
+    if ((diag_ <= 0).and.(imin_ == jmin_)) then
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  end block
+
+#else
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop1: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            nzlin = nzlin + 1
+            l%ia(nzlin)  = i
+            l%ja(nzlin)  = ja(k)
+            l%val(nzlin) = val(k)
+          else
+            nzuin = nzuin + 1
+            u%ia(nzuin)  = i
+            u%ja(nzuin)  = ja(k)
+            u%val(nzuin) = val(k)
+          end if
+        end if
+      end do loop1
+    end associate
+
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+    if ((diag_ >=-1).and.(imin_ == jmin_)) then
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop2: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<=diag_) then
+            nzin = nzin + 1
+            l%ia(nzin)  = i
+            l%ja(nzin)  = ja(k)
+            l%val(nzin) = val(k)
+          end if
+        end if
+      end do loop2
+    end associate
+    call l%set_nzeros(nzin)
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
+  if (rscale_) &
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+
+  if ((diag_ <= 0).and.(imin_ == jmin_)) then
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
+  end if
+#endif
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_c_coo_tril
+
+subroutine psb_c_coo_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
+  ! Output is always in  COO format
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_triu
+  implicit none
+
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(out) :: u
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_c_coo_sparse_mat), optional, intent(out) :: l
+
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  character(len=20)  :: name='triu'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then
+    mb = imax_ - imin_ +1
+  else
+    mb = imax_
+  endif
+  if (cscale_) then
+    nb = jmax_ - jmin_ +1
+  else
+    nb = jmax_
+  endif
+
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable :: lrws(:),urws(:)
+    integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
+    call psb_realloc(mb,urws,info)
+    !$omp workshare
+    urws(:) = 0
+    !$omp end workshare
+    nz = a%get_nzeros()
+    call u%allocate(mb,nb,nz)
+    !write(0,*) 'Invocation of COO%TRIL', present(u),nz
+    if (present(l)) then
+      nzuin = u%get_nzeros() ! At this point it should be 0
+      call l%allocate(mb,nb,nz)
+      nzlin = l%get_nzeros() ! At this point it should be 0
+      if (info == 0) call psb_realloc(mb,urws,info)
+      !$omp workshare
+      lrws(:) = 0
+      !$omp end workshare
+      !write(0,*) 'omp version of COO%TRIL/TRIU'
+      lnz = 0
+      unz = 0 
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws,urws) reduction(+: lnz,unz)
+      loop1: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<diag_) then
+            !$omp atomic update
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            !$omp end atomic
+            lnz = lnz + 1
+          else
+            !$omp atomic update
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            !$omp end atomic
+            unz = unz + 1
+          end if
+        end if
+      end do loop1
+      !$omp end parallel do
+
+      call psi_exscan(mb,lrws,info)
+      call psi_exscan(mb,urws,info) 
+      !write(0,*) lrws(:), urws(:)
+      !$omp parallel do private(i,j,k,lpnt,upnt) shared(imin_,imax_,a)
+      loop2: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<diag_) then
+            !$omp atomic capture
+            lrws(i-imin_+1) = lrws(i-imin_+1) +1
+            lpnt            = lrws(i-imin_+1)
+            !$omp end atomic
+            l%ia(lpnt)  = a%ia(k)
+            l%ja(lpnt)  = a%ja(k)
+            l%val(lpnt) = a%val(k)
+          else
+            !$omp atomic capture
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            upnt            = urws(i-imin_+1)
+            !$omp end atomic
+            u%ia(upnt)  = a%ia(k)
+            u%ja(upnt)  = a%ja(k)
+            u%val(upnt) = a%val(k)
+          end if
+        end if
+      end do loop2
+      !$omp end parallel do
+      !write(0,*) 'End of copyout',lnz,unz
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+      call u%set_nzeros(unz)
+      call u%fix(info)
+      nzout = l%get_nzeros()
+      if (rscale_) then
+        !$omp workshare
+        l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+        !$omp end workshare
+      end if
+      if (cscale_) then
+        !$omp workshare
+        l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+        !$omp end workshare
+      end if
+      if ((diag_ <=-1).and.(imin_ == jmin_)) then
+        call l%set_triangle(.true.)
+        call l%set_lower(.false.)
+      end if
+    else
+      unz = 0
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,urws) reduction(+: unz)
+      loop3: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)>=diag_) then
+            !$omp atomic update
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            !$omp end atomic
+            unz = unz + 1
+          end if
+        end if
+      end do loop3
+      !$omp end parallel do
+      call psi_exscan(mb,urws,info)
+      !$omp parallel do private(i,j,k,upnt) shared(imin_,imax_,a)
+      loop4: do k=1,nz      
+        i = a%ia(k)
+        j = a%ja(k)
+        if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)>=diag_) then
+            !$omp atomic capture
+            urws(i-imin_+1) = urws(i-imin_+1) +1
+            upnt            = urws(i-imin_+1)
+            !$omp end atomic
+            u%ia(upnt)  = a%ia(k)
+            u%ja(upnt)  = a%ja(k)
+            u%val(upnt) = a%val(k)
+          end if
+        end if
+      end do loop4
+      !$omp end parallel do
+      call u%set_nzeros(unz)      
+      call u%fix(info)
+    end if
+    nzout = u%get_nzeros()
+    if (rscale_) then
+      !$omp workshare
+      u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+      !$omp end workshare
+    end if
+    if (cscale_) then
+      !$omp workshare
+      u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+      !$omp end workshare
+    end if
+
+    if ((diag_ >= 0).and.(imin_ == jmin_)) then
+      call u%set_triangle(.true.)
+      call u%set_upper(.true.)
+    end if
+  end block
+
+  
+#else
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop1: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)<diag_) then
+            nzlin = nzlin + 1
+            l%ia(nzlin)  = i
+            l%ja(nzlin)  = ja(k)
+            l%val(nzlin) = val(k)
+          else
+            nzuin = nzuin + 1
+            u%ia(nzuin)  = i
+            u%ja(nzuin)  = ja(k)
+            u%val(nzuin) = val(k)
+          end if
+        end if
+      end do loop1
+    end associate
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+    if ((diag_ <=1).and.(imin_ == jmin_)) then
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, ia=>a%ia)
+      loop2: do k=1,nz      
+        i = ia(k)
+        j = ja(k)
+        if ((jmin_<=j).and.(j<=jmax_)) then
+          if ((j-i)>=diag_) then
+            nzin = nzin + 1
+            u%ia(nzin)  = i
+            u%ja(nzin)  = ja(k)
+            u%val(nzin) = val(k)
+          end if
+        end if
+      end do loop2
+    end associate
+    call u%set_nzeros(nzin)
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
+  if (rscale_) &
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+
+  if ((diag_ >= 0).and.(imin_ == jmin_)) then
+    call u%set_triangle(.true.)
+    call u%set_lower(.false.)
+  end if
+#endif
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_c_coo_triu
+
 
 subroutine psb_c_fix_coo(a,info,idir)
   use psb_const_mod
@@ -3561,7 +4166,7 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
 #if defined(OPENMP)
-  integer(psb_ipk_) :: work,first_idx,last_idx,first_elem,last_elem,s,nthreads,ithread
+  integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
   integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
@@ -3620,8 +4225,6 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
     ! Dirty trick: call ROWMAJOR with rows <-> columns
     call psb_c_fix_coo_inner_rowmajor(nc,nr,nzin,dupl,&
          & ja,ia,val,iaux,nzout,info)   
-!!$    call psb_c_fix_coo_inner_colmajor(nr,nc,nzin,dupl,&
-!!$         & ia,ja,val,iaux,nzout,info)
   case default
     write(debug_unit,*) trim(name),': unknown direction ',idir_
     info = psb_err_internal_error_
@@ -3660,12 +4263,13 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   integer(psb_ipk_), allocatable :: ias(:),jas(:), ix2(:)
   complex(psb_spk_),  allocatable :: vs(:)
   integer(psb_ipk_) :: nza, nzl,iret
-  integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii
+  integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii, i1, i2
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
+  real(psb_dpk_) :: t0, t1
 #if defined(OPENMP)
-  integer(psb_ipk_) :: work,first_idx,last_idx,first_elem,last_elem,s,nthreads,ithread
+  integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
   integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
@@ -3747,9 +4351,9 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
     ! index for each row. We do the same on 'kaux'
     !$OMP PARALLEL default(none) &
-    !$OMP shared(idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
-    !$OMP private(s,i,j,k,ithread,first_idx,last_idx,work,nxt_val,old_val,saved_elem, &
-    !$OMP first_elem,last_elem,nzl,iret,act_row)
+    !$OMP shared(t0,t1,idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
+    !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
+    !$OMP first_elem,last_elem,nzl,iret,act_row,i1,i2) reduction(max: info)
 
     !$OMP SINGLE
     nthreads = omp_get_num_threads()
@@ -3762,81 +4366,46 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     work = nr/nthreads
     if (ithread < MOD(nr,nthreads)) then
       work = work + 1
-      first_idx = ithread*work + 1
+      idxstart = ithread*work + 1
     else
-      first_idx = ithread*work + MOD(nr,nthreads) + 1
+      idxstart = ithread*work + MOD(nr,nthreads) + 1
     end if
 
-    last_idx = first_idx + work - 1
+    idxend = idxstart + work - 1
 
-    !-------------------------------------------
-    ! ------------ iaux composition --------------
-    ! 'iaux' will have the start index for each row
-
-    s = 0
-    do i=first_idx,last_idx
-      s = s + iaux(i)
-    end do
-    sum(ithread+2) = s
-
+    !write(0,*) 'fix_coo_inner: trying with exscan'      
+    call psi_exscan(nr+1,iaux,info,shift=ione)
     !$OMP BARRIER
-
     !$OMP SINGLE
-    do i=2,nthreads+1
-      sum(i) = sum(i) + sum(i-1)
-    end do
+    !t0 = omp_get_wtime()
     !$OMP END SINGLE
-
-    if (work > 0) then
-      saved_elem = iaux(first_idx)
-    end if
-
-    if (ithread == 0) then
-      iaux(1) = 1
-    end if
-
-    !$OMP BARRIER
-
-    if (work > 0) then
-      old_val = iaux(first_idx+1)
-      iaux(first_idx+1) = saved_elem + sum(ithread+1)
-    end if
-
-    do i=first_idx+2,last_idx+1
-      nxt_val = iaux(i)
-      iaux(i) = iaux(i-1) + old_val
-      old_val = nxt_val
-    end do
-
-    ! --------------------------------------
-
-    !$OMP BARRIER
-
+    
     ! ------------------ Sorting and buffers -------------------
 
     ! Let's use an auxiliary buffer, 'idxaux', to get indices leaving
     ! unmodified 'iaux'
-    do j=first_idx,last_idx
+    do j=idxstart,idxend
       idxaux(j) = iaux(j)
     end do
-
     ! Here we sort data inside the auxiliary buffers
     do i=1,nzin
       act_row = ia(i)
-      if ((act_row >= first_idx) .and. (act_row <= last_idx)) then
+      if ((act_row >= idxstart) .and. (act_row <= idxend)) then
         ias(idxaux(act_row)) = ia(i)
         jas(idxaux(act_row)) = ja(i)
         vs(idxaux(act_row))  = val(i)
-
         idxaux(act_row) = idxaux(act_row) + 1
       end if
     end do
 
     !$OMP BARRIER
-
+    !$OMP SINGLE
+    !t1 = omp_get_wtime()
+    !write(0,*) ithread,'Srt&Cpy :',t1-t0
+    !$OMP END SINGLE
     ! Let's sort column indices and values. After that we will store
     ! the number of unique values in 'kaux'
-    do j=first_idx,last_idx
+    do j=idxstart,idxend
       first_elem = iaux(j)
       last_elem = iaux(j+1) - 1
       nzl = last_elem - first_elem + 1
@@ -3865,45 +4434,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     ! --------------------------------------------------
     ! ---------------- kaux composition ----------------
 
-    !$OMP SINGLE
-    sum(:) = 0
-    sum(1) = 1
-    !$OMP END SINGLE
-
-    s = 0
-    do i=first_idx,last_idx
-      s = s + kaux(i)
-    end do
-    sum(ithread+2) = s
-
-    !$OMP BARRIER
-
-    !$OMP SINGLE
-    do i=2,nthreads+1
-      sum(i) = sum(i) + sum(i-1)
-    end do
-    kaux(nr+1) = sum(nthreads+1)
-    !$OMP END SINGLE
-
-    if (work > 0) then
-      saved_elem = kaux(first_idx)
-    end if
-    if (ithread == 0) then
-      kaux(1) = 1
-    end if
-
-    !$OMP BARRIER
-
-    if (work > 0) then
-      old_val = kaux(first_idx+1)
-      kaux(first_idx+1) = saved_elem + sum(ithread+1)
-    end if
-
-    do i=first_idx+2,last_idx+1
-      nxt_val = kaux(i)
-      kaux(i) = kaux(i-1) + old_val
-      old_val = nxt_val
-    end do
+    call psi_exscan(nr+1,kaux,i,shift=ione)
 
     !$OMP BARRIER
 
@@ -3911,7 +4442,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
     select case(dupl)
     case(psb_dupl_ovwrt_)
-      !$OMP DO schedule(STATIC)
+      !$OMP DO schedule(dynamic,32)
       do j=1,nr
         first_elem = iaux(j)
         last_elem = iaux(j+1) - 1
@@ -3940,7 +4471,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
       !$OMP END DO
 
     case(psb_dupl_add_)
-      !$OMP DO schedule(STATIC)
+      !$OMP DO schedule(dynamic,32)
       do j=1,nr
         first_elem = iaux(j)
         last_elem = iaux(j+1) - 1
@@ -3969,7 +4500,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
       !$OMP END DO
 
     case(psb_dupl_err_)
-      !$OMP DO schedule(STATIC)
+      !$OMP DO schedule(dynamic,32)
       do j=1,nr
         first_elem = iaux(j)
         last_elem = iaux(j+1) - 1
@@ -4174,7 +4705,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 #if defined(OPENMP)
     !$OMP PARALLEL default(none) &
     !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads) &
-    !$OMP private(i,j,first_idx,last_idx,nzl,act_row,iret,ithread, &
+    !$OMP private(i,j,idxstart,idxend,nzl,act_row,iret,ithread, &
     !$OMP work,first_elem,last_elem)
 
     !$OMP SINGLE
@@ -4188,22 +4719,22 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     work = nr/nthreads
     if (ithread < MOD(nr,nthreads)) then
       work = work + 1
-      first_idx = ithread*work + 1
+      idxstart = ithread*work + 1
     else
-      first_idx = ithread*work + MOD(nr,nthreads) + 1
+      idxstart = ithread*work + MOD(nr,nthreads) + 1
     end if
 
-    last_idx = first_idx + work - 1
+    idxend = idxstart + work - 1
 
     ! ---------------------------------------------------
 
     first_elem = 0
     last_elem = -1
-    act_row = first_idx
+    act_row = idxstart
     do j=1,nzin
       if (ia(j) < act_row) then
         cycle
-      else if ((ia(j) > last_idx) .or. (work < 1)) then
+      else if ((ia(j) > idxend) .or. (work < 1)) then
         exit
       else if (ia(j) > act_row) then
         nzl = last_elem - first_elem + 1
@@ -4332,676 +4863,6 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   return
 
 end subroutine psb_c_fix_coo_inner_rowmajor
-
-subroutine psb_c_fix_coo_inner_colmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,info)
-  use psb_const_mod
-  use psb_error_mod
-  use psb_c_base_mat_mod, psb_protect_name => psb_c_fix_coo_inner_colmajor
-  use psb_string_mod
-  use psb_ip_reord_mod
-  use psb_sort_mod
-#if defined(OPENMP)
-  use omp_lib
-#endif
-  implicit none
-
-  integer(psb_ipk_), intent(in)           :: nr, nc, nzin, dupl
-  integer(psb_ipk_), intent(inout)        :: ia(:), ja(:), iaux(:)
-  complex(psb_spk_), intent(inout) :: val(:)
-  integer(psb_ipk_), intent(out)          :: nzout, info
-  !locals
-  integer(psb_ipk_), allocatable :: ias(:),jas(:), ix2(:)
-  complex(psb_spk_),  allocatable :: vs(:)
-  integer(psb_ipk_) :: nza, nzl,iret
-  integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name = 'psb_fixcoo'
-  logical :: srt_inp, use_buffers
-#if defined(OPENMP)
-  integer(psb_ipk_) :: work,first_idx,last_idx,first_elem,last_elem,s,nthreads,ithread
-  integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
-  integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
-#endif
-  info  = psb_success_
-
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
-
-  if (nc <= nzin) then
-    ! Avoid strange situations with large indices
-#if defined(OPENMP)
-    allocate(ias(nzin),jas(nzin),vs(nzin), stat=info)
-#else
-    allocate(ias(nzin),jas(nzin),vs(nzin),ix2(nzin+2), stat=info)
-#endif
-    use_buffers = (info == 0)
-  else
-    use_buffers = .false.
-  end if
-
-  if (use_buffers) then
-    iaux(:) = 0
-#if defined(OPENMP)
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
-    !$OMP shared(nzin,ja,nc,iaux) &
-    !$OMP private(i) &
-    !$OMP reduction(.and.:use_buffers)
-    do i=1,nzin
-      if ((ja(i) < 1).or.(ja(i) > nc)) then
-        use_buffers = .false.
-        ! Invalid indices are placed outside the considered range
-        ja(i) = nc+2
-      else
-        !$OMP ATOMIC UPDATE
-        iaux(ja(i)) = iaux(ja(i)) + 1
-      end if
-    end do
-    !$OMP END PARALLEL DO
-#else
-    !srt_inp = .true.
-    do i=1,nzin
-      if ((ja(i) < 1).or.(ja(i) > nc)) then
-        use_buffers = .false.
-        !ja(i) = nc+2
-        !srt_inp     = .false.
-        exit
-      end if
-
-      iaux(ja(i)) = iaux(ja(i)) + 1
-
-      !srt_inp = srt_inp .and.(ja(i-1)<=ja(i))
-    end do
-#endif
-  end if
-
-  !use_buffers=use_buffers.and.srt_inp
-
-  ! Check again use_buffers. We enter here if nzin >= nc and
-  ! all the indices are valid
-  if (use_buffers) then
-#if defined(OPENMP)
-    allocate(kaux(MAX(nzin,nc)+2),idxaux(MAX((nr+2)*maxthreads,nc)),sum(maxthreads+1),stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    kaux(:) = 0
-    sum(:) = 0
-    sum(1) = 1
-    err = 0
-
-    ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
-    ! index for each column. We do the same on 'kaux'
-    !$OMP PARALLEL default(none) &
-    !$OMP shared(idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
-    !$OMP private(s,i,j,k,ithread,first_idx,last_idx,work,nxt_val,old_val,saved_elem, &
-    !$OMP first_elem,last_elem,nzl,iret,act_col)
-
-    !$OMP SINGLE
-    nthreads = omp_get_num_threads()
-    !$OMP END SINGLE
-
-    ithread = omp_get_thread_num()
-
-    ! -------- thread-specific workload --------
-
-    work = nc/nthreads
-    if (ithread < MOD(nc,nthreads)) then
-      work = work + 1
-      first_idx = ithread*work + 1
-    else
-      first_idx = ithread*work + MOD(nc,nthreads) + 1
-    end if
-
-    last_idx = first_idx + work - 1
-
-    !-------------------------------------------
-    ! ---------- iaux composition --------------
-
-    s = 0
-    do i=first_idx,last_idx
-      s = s + iaux(i)
-    end do
-    sum(ithread+2) = s
-
-    !$OMP BARRIER
-
-    !$OMP SINGLE
-    do i=2,nthreads+1
-      sum(i) = sum(i) + sum(i-1)
-    end do
-    !$OMP END SINGLE
-
-    if (work > 0) then
-      saved_elem = iaux(first_idx)
-    end if
-    if (ithread == 0) then
-      iaux(1) = 1
-    end if
-
-    !$OMP BARRIER
-
-    if (work > 0) then
-      old_val = iaux(first_idx+1)
-      iaux(first_idx+1) = saved_elem + sum(ithread+1)
-    end if
-
-    do i=first_idx+2,last_idx+1
-      nxt_val = iaux(i)
-      iaux(i) = iaux(i-1) + old_val
-      old_val = nxt_val
-    end do
-
-    ! --------------------------------------
-
-    !$OMP BARRIER
-
-    ! ------------------ Sorting and buffers -------------------
-
-    ! Let's use an auxiliary buffer to get indices
-    do j=first_idx,last_idx
-      idxaux(j) = iaux(j)
-    end do
-
-    ! Here we sort data inside the auxiliary buffers
-    do i=1,nzin
-      act_col = ja(i)
-      if (act_col >= first_idx .and. act_col <= last_idx) then
-        ias(idxaux(act_col)) = ia(i)
-        jas(idxaux(act_col)) = ja(i)
-        vs(idxaux(act_col))  = val(i)
-
-        idxaux(act_col) = idxaux(act_col) + 1
-      end if
-    end do
-
-    !$OMP BARRIER
-
-    ! Let's sort column indices and values. After that we will store
-    ! the number of unique values in 'kaux'
-    do j=first_idx,last_idx
-      first_elem = iaux(j)
-      last_elem = iaux(j+1) - 1
-      nzl = last_elem - first_elem + 1
-
-      ! The column has elements?
-      if (nzl > 0) then
-        call psi_msort_up(nzl,ias(first_elem:last_elem), &
-             & idxaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2),iret)
-
-        if (iret == 0) then
-          call psb_ip_reord(nzl,vs(first_elem:last_elem),&
-               & ias(first_elem:last_elem),jas(first_elem:last_elem), &
-               & idxaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2))
-        end if
-
-        ! Over each column we count the unique values
-        kaux(j) = 1
-        do i=first_elem+1,last_elem
-          if (ias(i) == ias(i-1) .and. jas(i) == jas(i-1)) then
-            cycle
-          end if
-          kaux(j) = kaux(j) + 1
-        end do
-      end if
-    end do
-
-    ! --------------------------------------------------
-
-    ! ---------------- kaux composition ----------------
-
-    !$OMP SINGLE
-    sum(:) = 0
-    sum(1) = 1
-    !$OMP END SINGLE
-
-    s = 0
-    do i=first_idx,last_idx
-      s = s + kaux(i)
-    end do
-    sum(ithread+2) = s
-
-    !$OMP BARRIER
-
-    !$OMP SINGLE
-    do i=2,nthreads+1
-      sum(i) = sum(i) + sum(i-1)
-    end do
-    !$OMP END SINGLE
-
-    if (work > 0) then
-      saved_elem = kaux(first_idx)
-    end if
-    if (ithread == 0) then
-      kaux(1) = 1
-    end if
-
-    !$OMP BARRIER
-
-    if (work > 0) then
-      old_val = kaux(first_idx+1)
-      kaux(first_idx+1) = saved_elem + sum(ithread+1)
-    end if
-
-    do i=first_idx+2,last_idx+1
-      nxt_val = kaux(i)
-      kaux(i) = kaux(i-1) + old_val
-      old_val = nxt_val
-    end do
-
-    !$OMP BARRIER
-
-    ! ------------------------------------------------
-
-    select case(dupl)
-    case(psb_dupl_ovwrt_)
-      !$OMP DO schedule(STATIC)
-      do j=1,nc
-        first_elem = iaux(j)
-        last_elem = iaux(j+1) - 1
-
-        if (first_elem > last_elem) then
-          cycle
-        end if
-
-        k = kaux(j)
-
-        val(k) = vs(first_elem)
-        ia(k) = ias(first_elem)
-        ja(k) = jas(first_elem)
-
-        do i=first_elem+1,last_elem
-          if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
-            val(k) = vs(i)
-          else
-            k = k + 1
-            val(k) = vs(i)
-            ia(k)  = ias(i)
-            ja(k)  = jas(i)
-          endif
-        end do
-      end do
-      !$OMP END DO
-
-    case(psb_dupl_add_)
-      !$OMP DO schedule(STATIC)
-      do j=1,nc
-        first_elem = iaux(j)
-        last_elem = iaux(j+1) - 1
-
-        if (first_elem > last_elem) then
-          cycle
-        end if
-
-        k = kaux(j)
-
-        val(k) = vs(first_elem)
-        ia(k) = ias(first_elem)
-        ja(k) = jas(first_elem)
-
-        do i=first_elem+1,last_elem
-          if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
-            val(k) = val(k) + vs(i)
-          else
-            k = k + 1
-            val(k) = vs(i)
-            ia(k)  = ias(i)
-            ja(k)  = jas(i)
-          endif
-        end do
-      end do
-      !$OMP END DO
-
-    case(psb_dupl_err_)
-      !$OMP DO schedule(STATIC)
-      do j=1,nc
-        first_elem = iaux(j)
-        last_elem = iaux(j+1) - 1
-
-        if (first_elem > last_elem) then
-          cycle
-        end if
-
-        k = kaux(j)
-
-        val(k) = vs(first_elem)
-        ia(k) = ias(first_elem)
-        ja(k) = jas(first_elem)
-
-        do i=first_elem+1,last_elem
-          if ((ias(i) == ias(i-1)).and.(jas(i) == jas(i-1))) then
-            err = 1
-          else
-            k = k + 1
-            val(k) = vs(i)
-            ia(k)  = ias(i)
-            ja(k)  = jas(i)
-          end if
-        end do
-      end do
-      !$OMP END DO
-
-    case default
-      !$OMP SINGLE
-      err = 2
-      !$OMP END SINGLE
-    end select
-
-    !$OMP END PARALLEL
-
-    if (err == 1) then
-      call psb_errpush(psb_err_duplicate_coo,name)
-      goto 9999
-    else if (err == 2) then
-      write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl
-      info =-7
-      return
-    end if
-
-    nzout = kaux(nc+1) - 1
-
-    deallocate(sum,kaux,idxaux,stat=info)
-#else
-    !if (.not.srt_inp) then
-    ip     = iaux(1)
-    iaux(1) = 0
-    do i=2, nc
-      is = iaux(i)
-      iaux(i) = ip
-      ip = ip + is
-    end do
-    iaux(nc+1) = ip
-
-    do i=1,nzin
-      icl = ja(i)
-      ip = iaux(icl) + 1
-      ias(ip) = ia(i)
-      jas(ip) = ja(i)
-      vs(ip)  = val(i)
-      iaux(icl) = ip
-    end do
-    !end if
-
-    select case(dupl)
-    case(psb_dupl_ovwrt_)
-      k = 0
-      i = 1
-      do j=1, nc
-        nzl = iaux(j)-i+1
-        imx = i+nzl-1
-
-        if (nzl > 0) then
-          call psi_msort_up(nzl,ias(i:imx),ix2,iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,vs(i:imx),&
-               & ias(i:imx),jas(i:imx),ix2)
-          k = k + 1
-          ia(k)  = ias(i)
-          ja(k)  = jas(i)
-          val(k) = vs(i)
-          irw = ia(k)
-          icl = ja(k)
-          do
-            i = i + 1
-            if (i > imx) exit
-            if ((ias(i) == irw).and.(jas(i) == icl)) then
-              val(k) = vs(i)
-            else
-              k = k+1
-              val(k) = vs(i)
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              irw = ia(k)
-              icl = ja(k)
-            endif
-          enddo
-        end if
-      end do
-
-    case(psb_dupl_add_)
-      k = 0
-      i = 1
-      do j=1, nc
-        nzl = iaux(j)-i+1
-        imx = i+nzl-1
-
-        if (nzl > 0) then
-          call psi_msort_up(nzl,ias(i:imx),ix2,iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,vs(i:imx),&
-               & ias(i:imx),jas(i:imx),ix2)
-          k = k + 1
-          ia(k)  = ias(i)
-          ja(k)  = jas(i)
-          val(k) = vs(i)
-          irw = ia(k)
-          icl = ja(k)
-          do
-            i = i + 1
-            if (i > imx) exit
-            if ((ias(i) == irw).and.(jas(i) == icl)) then
-              val(k) = val(k) + vs(i)
-            else
-              k = k+1
-              val(k) = vs(i)
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              irw = ia(k)
-              icl = ja(k)
-            endif
-          enddo
-        end if
-      end do
-
-    case(psb_dupl_err_)
-      k = 0
-      i = 1
-      do j=1, nc
-        nzl = iaux(j)-i+1
-        imx = i+nzl-1
-
-        if (nzl > 0) then
-          call psi_msort_up(nzl,ias(i:imx),ix2,iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,vs(i:imx),&
-               & ias(i:imx),jas(i:imx),ix2)
-          k = k + 1
-          ia(k)  = ias(i)
-          ja(k)  = jas(i)
-          val(k) = vs(i)
-          irw = ia(k)
-          icl = ja(k)
-          do
-            i = i + 1
-            if (i > imx) exit
-            if ((ias(i) == irw).and.(jas(i) == icl)) then
-              call psb_errpush(psb_err_duplicate_coo,name)
-              goto 9999
-            else
-              k = k+1
-              val(k) = vs(i)
-              ia(k)  = ias(i)
-              ja(k)  = jas(i)
-              irw = ia(k)
-              icl = ja(k)
-            endif
-          enddo
-        end if
-      end do
-
-    case default
-      write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl
-      info =-7
-      return
-    end select
-
-    nzout = k
-
-    deallocate(ix2, stat=info)
-#endif
-
-    deallocate(ias,jas,vs, stat=info)
-
-  else if (.not.use_buffers) then
-
-    call psi_msort_up(nzin,ja(1:),iaux(1:),iret)
-    if (iret == 0) &
-         & call psb_ip_reord(nzin,val,ia,ja,iaux)
-#if defined(OPENMP)
-    !$OMP PARALLEL default(none) &
-    !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads) &
-    !$OMP private(i,j,first_idx,last_idx,nzl,act_col, &
-    !$OMP iret,ithread,work,first_elem,last_elem)
-
-    !$OMP SINGLE
-    nthreads = omp_get_num_threads()
-    !$OMP END SINGLE
-
-    ithread = omp_get_thread_num()
-
-    ! -------- thread-specific workload --------
-
-    work = nc/nthreads
-    if (ithread < MOD(nc,nthreads)) then
-      work = work + 1
-      first_idx = ithread*work + 1
-    else
-      first_idx = ithread*work + MOD(nc,nthreads) + 1
-    end if
-
-    last_idx = first_idx + work - 1
-
-    ! ---------------------------------------------------
-
-    first_elem = 0
-    last_elem = -1
-    act_col = first_idx
-    do j=1,nzin
-      if (ja(j) < act_col) then
-        cycle
-      else if ((ja(j) > last_idx) .or. (work < 1)) then
-        exit
-      else if (ja(j) > act_col) then
-        nzl = last_elem - first_elem + 1
-
-        if (nzl > 0) then
-          call psi_msort_up(nzl,ia(first_elem:),iaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2),iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,val(first_elem:last_elem),&
-               & ia(first_elem:last_elem),ja(first_elem:last_elem),&
-               & iaux((ithread*(nr+2))+1:(ithread*(nr+2))+nzl+2))
-        end if
-
-        act_col = act_col + 1
-        first_elem = 0
-        last_elem = -1
-      else
-        if (first_elem == 0) then
-          first_elem = j
-        end if
-
-        last_elem = j
-      end if
-    end do
-    !$OMP END PARALLEL
-#else
-    i    = 1
-    j    = i
-    do while (i <= nzin)
-      do while ((ja(j) == ja(i)))
-        j = j+1
-        if (j > nzin) exit
-      enddo
-      nzl = j - i
-      call psi_msort_up(nzl,ia(i:),iaux(1:),iret)
-      if (iret == 0) &
-           & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-           & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
-      i = j
-    enddo
-#endif
-
-    i = 1
-    irw = ia(i)
-    icl = ja(i)
-    j = 1
-
-
-    select case(dupl)
-    case(psb_dupl_ovwrt_)
-      do
-        j = j + 1
-        if (j > nzin) exit
-        if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
-        if ((ia(j) == irw).and.(ja(j) == icl)) then
-          val(i) = val(j)
-        else
-          i = i+1
-          val(i) = val(j)
-          ia(i) = ia(j)
-          ja(i) = ja(j)
-          irw = ia(i)
-          icl = ja(i)
-        endif
-      enddo
-
-    case(psb_dupl_add_)
-      do
-        j = j + 1
-        if (j > nzin) exit
-        if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
-        if ((ia(j) == irw).and.(ja(j) == icl)) then
-          val(i) = val(i) + val(j)
-        else
-          i = i+1
-          val(i) = val(j)
-          ia(i) = ia(j)
-          ja(i) = ja(j)
-          irw = ia(i)
-          icl = ja(i)
-        endif
-      enddo
-
-    case(psb_dupl_err_)
-      do
-        j = j + 1
-        if (j > nzin) exit
-        if ((ia(j) < 1 .or. ia(j) > nr) .or. (ja(j) < 1 .or. ja(j) > nc)) cycle
-        if ((ia(j) == irw).and.(ja(j) == icl)) then
-          call psb_errpush(psb_err_duplicate_coo,name)
-          goto 9999
-        else
-          i = i+1
-          val(i) = val(j)
-          ia(i) = ia(j)
-          ja(i) = ja(j)
-          irw = ia(i)
-          icl = ja(i)
-        endif
-      enddo
-    case default
-      write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl
-      info =-7
-    end select
-
-    nzout = i
-
-    if (debug_level >= psb_debug_serial_)&
-         & write(debug_unit,*)  trim(name),': end second loop'
-
-  end if
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_c_fix_coo_inner_colmajor
 
 
 subroutine psb_c_cp_coo_to_lcoo(a,b,info)
@@ -5296,7 +5157,7 @@ function psb_lc_coo_maxval(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max:res)
     do i=1, nnz
       res = max(res,abs(a%val(i)))
     end do
@@ -5363,7 +5224,7 @@ function psb_lc_coo_csnmi(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max:res)
     do i=1, m
       res = max(res,abs(vt(i)))
     end do
@@ -5413,7 +5274,7 @@ function psb_lc_coo_csnm1(a) result(res)
 #if defined(OPENMP)
   block
     integer(psb_ipk_) :: i
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) reduction(max:res)
     do i=1, n
       res = max(res,abs(vt(i)))
     end do
@@ -8335,3 +8196,4 @@ subroutine psb_lc_cp_coo_from_icoo(a,b,info)
   return
 
 end subroutine psb_lc_cp_coo_from_icoo
+ 

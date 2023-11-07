@@ -34,6 +34,14 @@ module psi_z_collective_mod
   use psb_desc_const_mod
   
 
+  interface psb_gather
+    module procedure psb_zgather_s, psb_zgather_v
+  end interface psb_gather
+  
+  interface psb_gatherv
+    module procedure psb_zgatherv_v
+  end interface
+
   interface psb_sum
     module procedure psb_zsums, psb_zsumv, psb_zsumm
   end interface
@@ -73,6 +81,250 @@ contains
   ! Reduction operations
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
+
+
+
+  !
+  ! gather
+  !
+  subroutine psb_zgather_s(ctxt,dat,resv,root,mode,request)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type), intent(in)              :: ctxt
+    complex(psb_dpk_), intent(inout)  :: dat, resv(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
+    
+#if defined(SERIAL_MPI)
+    resv(0) = dat
+#else
+    call psb_info(ctxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    icomm = psb_get_mpi_comm(ctxt)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allgather(dat,1,psb_mpi_c_dpk_,&
+             & resv,1,psb_mpi_c_dpk_,icomm,info)
+      else
+        call mpi_gather(dat,1,psb_mpi_c_dpk_,&
+             & resv,1,psb_mpi_c_dpk_,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallgather(dat,1,psb_mpi_c_dpk_,&
+               & resv,1,psb_mpi_c_dpk_,icomm,request,info)
+        else
+          call mpi_igather(dat,1,psb_mpi_c_dpk_,&
+               & resv,1,psb_mpi_c_dpk_,root_,icomm,request,info)
+        endif
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+#endif    
+  end subroutine psb_zgather_s
+
+    subroutine psb_zgather_v(ctxt,dat,resv,root,mode,request)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type), intent(in)              :: ctxt
+    complex(psb_dpk_), intent(inout)  :: dat(:), resv(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    logical :: collective_start, collective_end, collective_sync
+    
+#if defined(SERIAL_MPI)
+    resv(0) = dat
+#else
+    call psb_info(ctxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    icomm = psb_get_mpi_comm(ctxt)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        call mpi_allgather(dat,size(dat),psb_mpi_c_dpk_,&
+             & resv,size(dat),psb_mpi_c_dpk_,icomm,info)
+      else
+        call mpi_gather(dat,size(dat),psb_mpi_c_dpk_,&
+             & resv,size(dat),psb_mpi_c_dpk_,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          call mpi_iallgather(dat,size(dat),psb_mpi_c_dpk_,&
+               & resv,size(dat),psb_mpi_c_dpk_,icomm,request,info)
+        else
+          call mpi_igather(dat,size(dat),psb_mpi_c_dpk_,&
+               & resv,size(dat),psb_mpi_c_dpk_,root_,icomm,request,info)
+        endif
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+#endif    
+  end subroutine psb_zgather_v
+
+    subroutine psb_zgatherv_v(ctxt,dat,resv,szs,root,mode,request)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    type(psb_ctxt_type), intent(in)              :: ctxt
+    complex(psb_dpk_), intent(inout)  :: dat(:), resv(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_), intent(in), optional    :: szs(:)
+    integer(psb_ipk_), intent(in), optional    :: mode
+    integer(psb_mpk_), intent(inout), optional :: request
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_) :: iam, np, info,i
+    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_) :: status(mpi_status_size)
+    integer(psb_mpk_), allocatable  :: displs(:)
+    logical :: collective_start, collective_end, collective_sync
+    
+#if defined(SERIAL_MPI)
+    resv(0) = dat
+#else
+    call psb_info(ctxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    icomm = psb_get_mpi_comm(ctxt)
+    if (present(mode)) then
+      collective_sync = .false.
+      collective_start = iand(mode,psb_collective_start_) /= 0
+      collective_end = iand(mode,psb_collective_end_) /= 0
+      if (.not.present(request)) then
+        collective_sync = .true.
+        collective_start = .false.
+        collective_end = .false.
+      end if
+    else
+      collective_sync = .true.
+      collective_start = .false.
+      collective_end = .false.      
+    end if
+    if (collective_sync) then 
+      if (root_ == -1) then 
+        if (size(szs) < np) write(0,*) 'Error: bad input sizes'
+        allocate(displs(np))
+        displs(1) = 0
+        do i=2, np
+          displs(i) = displs(i-1) + szs(i-1)
+        end do
+        call mpi_allgatherv(dat,size(dat),psb_mpi_c_dpk_,&
+             & resv,szs,displs,psb_mpi_c_dpk_,icomm,info)
+      else
+        if (iam == root_) then
+          if (size(szs) < np) write(0,*) 'Error: bad input sizes'
+          allocate(displs(np))
+          displs(1) = 0
+          do i=2, np
+            displs(i) = displs(i-1) + szs(i-1)
+          end do
+        else
+          allocate(displs(0))
+        end if
+        call mpi_gatherv(dat,size(dat),psb_mpi_c_dpk_,&
+             & resv,szs,displs,psb_mpi_c_dpk_,root_,icomm,info)
+      endif
+    else
+      if (collective_start) then
+        if (root_ == -1) then 
+          if (size(szs) < np) write(0,*) 'Error: bad input sizes'
+          allocate(displs(np))
+          displs(1) = 0
+          do i=2, np
+            displs(i) = displs(i-1) + szs(i-1)
+          end do
+          call mpi_iallgatherv(dat,size(dat),psb_mpi_c_dpk_,&
+               & resv,szs,displs,psb_mpi_c_dpk_,icomm,request,info)
+        else
+          if (iam == root_) then
+            if (size(szs) < np) write(0,*) 'Error: bad input sizes'
+            allocate(displs(np))
+            displs(1) = 0
+            do i=2, np
+              displs(i) = displs(i-1) + szs(i-1)
+            end do
+          else
+            allocate(displs(0))
+          end if
+          call mpi_igatherv(dat,size(dat),psb_mpi_c_dpk_,&
+               & resv,szs,displs,psb_mpi_c_dpk_,root_,icomm,request,info)
+        endif
+
+      else if (collective_end) then
+        call mpi_wait(request,status,info)
+      end if
+    end if
+#endif    
+  end subroutine psb_zgatherv_v
 
 
 
@@ -124,20 +376,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,1,&
+        call mpi_allreduce(mpi_in_place,dat,1,&
              & psb_mpi_c_dpk_,mpi_sum,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,1,&
-             & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,1,&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,1,&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        end if
       endif
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,1,&
+          call mpi_iallreduce(mpi_in_place,dat,1,&
                & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,1,&
-               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+          if(iam==root_) then                     
+            call mpi_ireduce(mpi_in_place,dat,1,&
+                 & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,1,&
+                 & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -190,20 +452,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-         call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+         call mpi_allreduce(mpi_in_place,dat,size(dat),&
               & psb_mpi_c_dpk_,mpi_sum,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-             & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        end if
       end if
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_sum,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -258,20 +530,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(mpi_in_place,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_sum,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-             & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_sum,root_,icomm,info)
+        end if
       end if
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_c_dpk_,mpi_sum,root_, icomm,request,info)
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_sum,root_, icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_sum,root_, icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -328,20 +610,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,1,&
+        call mpi_allreduce(mpi_in_place,dat,1,&
              & psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,1,&
-             & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        end if
       endif
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,1,&
+          call mpi_iallreduce(mpi_in_place,dat,1,&
                & psb_mpi_c_dpk_,mpi_zamx_op,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,1,&
-               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,1,&
+                 & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,1,&
+                 & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -395,20 +687,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(mpi_in_place,dat,size(dat),&
               psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        end if
       endif
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_zamx_op,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -463,20 +765,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(mpi_in_place,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_zamx_op,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-             & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,info)
+        end if
       endif
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_zamx_op,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_zamx_op,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -532,20 +844,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,1,&
+        call mpi_allreduce(mpi_in_place,dat,1,&
              & psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,1,&
-             & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,1,&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        end if
       endif
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,1,&
+          call mpi_iallreduce(mpi_in_place,dat,1,&
                & psb_mpi_c_dpk_,mpi_zamn_op,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,1,&
-               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,1,&
+                 & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,1,&
+                 & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -599,20 +921,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(mpi_in_place,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        end if
       endif
     else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_zamn_op,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -667,20 +999,30 @@ contains
     end if
     if (collective_sync) then 
       if (root_ == -1) then 
-        call mpi_allreduce(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_allreduce(mpi_in_place,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_zamn_op,icomm,info)
       else
-        call mpi_reduce(MPI_IN_PLACE,dat,size(dat),&
-             & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        if(iam==root_) then 
+          call mpi_reduce(mpi_in_place,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        else
+          call mpi_reduce(dat,dat,size(dat),&
+               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,info)
+        end if
       endif
           else
       if (collective_start) then
         if (root_ == -1) then 
-          call mpi_iallreduce(MPI_IN_PLACE,dat,size(dat),&
+          call mpi_iallreduce(mpi_in_place,dat,size(dat),&
                & psb_mpi_c_dpk_,mpi_zamn_op,icomm,request,info)
         else
-          call mpi_ireduce(MPI_IN_PLACE,dat,size(dat),&
-               & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          if(iam==root_) then 
+            call mpi_ireduce(mpi_in_place,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          else
+            call mpi_ireduce(dat,dat,size(dat),&
+                 & psb_mpi_c_dpk_,mpi_zamn_op,root_,icomm,request,info)
+          end if
         end if
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -901,12 +1243,13 @@ contains
       collective_start = .false.
       collective_end = .false.      
     end if
+    dat_ = dat
     if (collective_sync) then 
-      call mpi_scan(MPI_IN_PLACE,dat,1,&
+      call mpi_scan(dat_,dat,1,&
            & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
     else
       if (collective_start) then
-        call mpi_iscan(MPI_IN_PLACE,dat,1,&
+        call mpi_iscan(dat_,dat,1,&
              & psb_mpi_c_dpk_,mpi_sum,icomm,request,minfo)
       else if (collective_end) then
         call mpi_wait(request,status,minfo)
@@ -952,12 +1295,13 @@ contains
       collective_start = .false.
       collective_end = .false.      
     end if
+    dat_ = dat
     if (collective_sync) then 
-      call mpi_exscan(MPI_IN_PLACE,dat,1,&
+      call mpi_exscan(dat_,dat,1,&
            & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
     else
       if (collective_start) then
-        call mpi_iexscan(MPI_IN_PLACE,dat,1,&
+        call mpi_iexscan(dat_,dat,1,&
              & psb_mpi_c_dpk_,mpi_sum,icomm,request,minfo)
       else if (collective_end) then
         call mpi_wait(request,status,minfo)
@@ -980,12 +1324,13 @@ contains
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_ipk_), intent(in), optional    :: mode
     integer(psb_mpk_), intent(inout), optional :: request
+
     integer(psb_ipk_) :: iam, np,  info
     integer(psb_mpk_) :: minfo
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
-
+    complex(psb_dpk_), allocatable :: dat_(:)
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
@@ -1003,12 +1348,13 @@ contains
       collective_start = .false.
       collective_end = .false.      
     end if
+    dat_ = dat
     if (collective_sync) then 
-      call mpi_scan(MPI_IN_PLACE,dat,size(dat),&
+      call mpi_scan(dat_,dat,size(dat),&
            & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
     else
       if (collective_start) then
-        call mpi_iscan(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_iscan(dat_,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -1029,12 +1375,13 @@ contains
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_ipk_), intent(in), optional    :: mode
     integer(psb_mpk_), intent(inout), optional :: request
-    complex(psb_dpk_), allocatable :: dat_(:)
+
     integer(psb_ipk_) :: iam, np,  info
     integer(psb_mpk_) :: minfo
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
+    complex(psb_dpk_), allocatable :: dat_(:)
 
 #if !defined(SERIAL_MPI)
     call psb_info(ctxt,iam,np)
@@ -1053,12 +1400,13 @@ contains
       collective_start = .false.
       collective_end = .false.      
     end if
+    dat_ = dat
     if (collective_sync) then 
-      call mpi_exscan(MPI_IN_PLACE,dat,size(dat),&
+      call mpi_exscan(dat_,dat,size(dat),&
            & psb_mpi_c_dpk_,mpi_sum,icomm,minfo)
     else
       if (collective_start) then
-        call mpi_iexscan(MPI_IN_PLACE,dat,size(dat),&
+        call mpi_iexscan(dat_,dat,size(dat),&
              & psb_mpi_c_dpk_,mpi_sum,icomm,request,info)
       else if (collective_end) then
         call mpi_wait(request,status,info)
@@ -1271,6 +1619,5 @@ contains
     Enddo
 
   end subroutine psb_z_e_simple_triad_a2av
-
   
 end module psi_z_collective_mod

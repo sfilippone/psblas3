@@ -152,6 +152,7 @@ contains
           !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -163,6 +164,7 @@ contains
           !$omp parallel do private(i,j, acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -174,6 +176,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -189,6 +192,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -200,6 +204,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -211,6 +216,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -225,6 +231,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -236,6 +243,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -247,6 +255,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -261,6 +270,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -272,6 +282,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -283,6 +294,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = zzero
+            !$omp  simd
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -2277,7 +2289,155 @@ subroutine psb_z_csr_tril(a,l,info,&
     nb = jmax_
   endif
 
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable :: lrws(:),urws(:)
+    integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
+    call psb_realloc(mb,lrws,info)
+    !$omp workshare
+    lrws(:) = 0
+    !$omp end workshare
+    nz = a%get_nzeros()
+    call l%allocate(mb,nb,nz)
+    !write(0,*) 'Invocation of COO%TRIL', present(u),nz
+    if (present(u)) then
+      nzlin = l%get_nzeros() ! At this point it should be 0
+      call u%allocate(mb,nb,nz)
+      nzuin = u%get_nzeros() ! At this point it should be 0
+      if (info == 0) call psb_realloc(mb,urws,info)
+      !$omp workshare
+      urws(:) = 0
+      !$omp end workshare
+      !write(0,*) 'omp version of COO%TRIL/TRIU'
+      lnz = 0
+      unz = 0 
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws,urws) reduction(+: lnz,unz)
+      loop1: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)<=diag_) then
+              !$omp atomic update
+              lrws(i-imin_+1) = lrws(i-imin_+1) +1
+              !$omp end atomic
+              lnz = lnz + 1
+            else
+              !$omp atomic update
+              urws(i-imin_+1) = urws(i-imin_+1) +1
+              !$omp end atomic
+              unz = unz + 1
+            end if
+          end if
+        end do
+      end do loop1
+      !$omp end parallel do
 
+      call psi_exscan(mb,lrws,info)
+      call psi_exscan(mb,urws,info) 
+      !write(0,*) lrws(:), urws(:)
+      !$omp parallel do private(i,j,k,lpnt,upnt) shared(imin_,imax_,a)
+      loop2: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)<=diag_) then
+              !$omp atomic capture
+              lrws(i-imin_+1) = lrws(i-imin_+1) +1
+              lpnt            = lrws(i-imin_+1)
+              !$omp end atomic
+              l%ia(lpnt)  = i
+              l%ja(lpnt)  = a%ja(k)
+              l%val(lpnt) = a%val(k)
+            else
+              !$omp atomic capture
+              urws(i-imin_+1) = urws(i-imin_+1) +1
+              upnt            = urws(i-imin_+1)
+              !$omp end atomic
+              u%ia(upnt)  = i
+              u%ja(upnt)  = a%ja(k)
+              u%val(upnt) = a%val(k)
+            end if
+          end if
+        end do
+      end do loop2
+      !$omp end parallel do
+      !write(0,*) 'End of copyout',lnz,unz
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+      call u%set_nzeros(unz)
+      call u%fix(info)
+      nzout = u%get_nzeros()
+      if (rscale_) then
+        !$omp workshare
+        u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+        !$omp end workshare
+      end if
+      if (cscale_) then
+        !$omp workshare
+        u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+        !$omp end workshare
+      end if
+      if ((diag_ >=-1).and.(imin_ == jmin_)) then
+        call u%set_triangle(.true.)
+        call u%set_lower(.false.)
+      end if
+    else
+      lnz = 0
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws) reduction(+: lnz)
+      loop3: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)<=diag_) then
+              !$omp atomic update
+              lrws(i-imin_+1) = lrws(i-imin_+1) +1
+              !$omp end atomic
+              lnz = lnz + 1
+            end if
+          end if
+        end do
+      end do loop3
+      !$omp end parallel do
+      call psi_exscan(mb,lrws,info)
+      !$omp parallel do private(i,j,k,lpnt) shared(imin_,imax_,a)
+      loop4: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)<=diag_) then
+              !$omp atomic capture
+              lrws(i-imin_+1) = lrws(i-imin_+1) +1
+              lpnt            = lrws(i-imin_+1)
+              !$omp end atomic
+              l%ia(lpnt)  = i
+              l%ja(lpnt)  = a%ja(k)
+              l%val(lpnt) = a%val(k)
+            end if
+          end if
+        end do
+      end do loop4
+      !$omp end parallel do
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+    end if
+    nzout = l%get_nzeros()
+    if (rscale_) then
+      !$omp workshare
+      l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+      !$omp end workshare
+    end if
+    if (cscale_) then
+      !$omp workshare
+      l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+      !$omp end workshare
+    end if
+
+    if ((diag_ <= 0).and.(imin_ == jmin_)) then
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  end block
+#else
   nz = a%get_nzeros()
   call l%allocate(mb,nb,nz)
 
@@ -2347,7 +2507,7 @@ subroutine psb_z_csr_tril(a,l,info,&
     call l%set_triangle(.true.)
     call l%set_lower(.true.)
   end if
-
+#endif
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -2431,6 +2591,158 @@ subroutine psb_z_csr_triu(a,u,info,&
   endif
 
 
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable :: lrws(:),urws(:)
+    integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
+    call psb_realloc(mb,urws,info)
+    !$omp workshare
+    urws(:) = 0
+    !$omp end workshare
+    nz = a%get_nzeros()
+    call u%allocate(mb,nb,nz)
+    !write(0,*) 'Invocation of COO%TRIL', present(u),nz
+    if (present(l)) then
+      nzuin = u%get_nzeros() ! At this point it should be 0
+      call l%allocate(mb,nb,nz)
+      nzlin = l%get_nzeros() ! At this point it should be 0
+      if (info == 0) call psb_realloc(mb,urws,info)
+      !$omp workshare
+      lrws(:) = 0
+      !$omp end workshare
+      !write(0,*) 'omp version of COO%TRIL/TRIU'
+      lnz = 0
+      unz = 0 
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,lrws,urws) reduction(+: lnz,unz)
+      loop1: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)<diag_) then
+              !$omp atomic update
+              lrws(i-imin_+1) = lrws(i-imin_+1) +1
+              !$omp end atomic
+              lnz = lnz + 1
+            else
+              !$omp atomic update
+              urws(i-imin_+1) = urws(i-imin_+1) +1
+              !$omp end atomic
+              unz = unz + 1
+            end if
+          end if
+        end do
+      end do loop1
+      !$omp end parallel do
+
+      call psi_exscan(mb,lrws,info)
+      call psi_exscan(mb,urws,info) 
+      !write(0,*) lrws(:), urws(:)
+      !$omp parallel do private(i,j,k,lpnt,upnt) shared(imin_,imax_,a)
+      loop2: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)<diag_) then
+              !$omp atomic capture
+              lrws(i-imin_+1) = lrws(i-imin_+1) +1
+              lpnt            = lrws(i-imin_+1)
+              !$omp end atomic
+              l%ia(lpnt)  = i
+              l%ja(lpnt)  = a%ja(k)
+              l%val(lpnt) = a%val(k)
+            else
+              !$omp atomic capture
+              urws(i-imin_+1) = urws(i-imin_+1) +1
+              upnt            = urws(i-imin_+1)
+              !$omp end atomic
+              u%ia(upnt)  = i
+              u%ja(upnt)  = a%ja(k)
+              u%val(upnt) = a%val(k)
+            end if
+          end if
+        end do
+      end do loop2
+      !$omp end parallel do
+      !write(0,*) 'End of copyout',lnz,unz
+      call l%set_nzeros(lnz)      
+      call l%fix(info)
+      call u%set_nzeros(unz)
+      call u%fix(info)
+      nzout = l%get_nzeros()
+      if (rscale_) then
+        !$omp workshare
+        l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+        !$omp end workshare
+      end if
+      if (cscale_) then
+        !$omp workshare
+        l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+        !$omp end workshare
+      end if
+      if ((diag_ <=-1).and.(imin_ == jmin_)) then
+        call l%set_triangle(.true.)
+        call l%set_lower(.false.)
+      end if
+    else
+      unz = 0
+      !$omp parallel do private(i,j,k) shared(imin_,imax_,a,urws) reduction(+: unz)
+      loop3: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)>=diag_) then
+              !$omp atomic update
+              urws(i-imin_+1) = urws(i-imin_+1) +1
+              !$omp end atomic
+              unz = unz + 1
+            end if
+          end if
+        end do
+      end do loop3
+      !$omp end parallel do
+      call psi_exscan(mb,urws,info)
+      !$omp parallel do private(i,j,k,upnt) shared(imin_,imax_,a)
+      loop4: do i=imin_,imax_
+        do k = a%irp(i),a%irp(i+1)-1
+          j = a%ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then
+            if ((j-i)>=diag_) then
+              !$omp atomic capture
+              urws(i-imin_+1) = urws(i-imin_+1) +1
+              upnt            = urws(i-imin_+1)
+              !$omp end atomic
+              u%ia(upnt)  = i
+              u%ja(upnt)  = a%ja(k)
+              u%val(upnt) = a%val(k)
+            end if
+          end if
+        end do
+      end do loop4
+      !$omp end parallel do
+      call u%set_nzeros(unz)      
+      call u%fix(info)
+    end if
+    nzout = u%get_nzeros()
+    if (rscale_) then
+      !$omp workshare
+      u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+      !$omp end workshare
+    end if
+    if (cscale_) then
+      !$omp workshare
+      u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+      !$omp end workshare
+    end if
+
+    if ((diag_ >= 0).and.(imin_ == jmin_)) then
+      call u%set_triangle(.true.)
+      call u%set_upper(.true.)
+    end if
+  end block
+
+
+#else
+
   nz = a%get_nzeros()
   call u%allocate(mb,nb,nz)
 
@@ -2499,7 +2811,7 @@ subroutine psb_z_csr_triu(a,u,info,&
     call u%set_triangle(.true.)
     call u%set_upper(.true.)
   end if
-
+#endif
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -2844,6 +3156,9 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   use psb_realloc_mod
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod, psb_protect_name => psb_z_cp_csr_from_coo
+#if defined(OPENMP)
+  use omp_lib 
+#endif  
   implicit none
 
   class(psb_z_csr_sparse_mat), intent(inout) :: a
@@ -2859,12 +3174,6 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='z_cp_csr_from_coo'
   logical :: use_openmp = .false.
-
-  !$ integer(psb_ipk_), allocatable :: sum(:)
-  !$ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s,j
-  !$ integer(psb_ipk_) :: nxt_val,old_val,saved_elem,maxthreads 
-  !$ use_openmp = .true.
-
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2904,98 +3213,39 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
     if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
     if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
-    
+
   endif
 
+
+#if defined(OPENMP)
+
+  !$OMP PARALLEL default(shared) reduction(max:info)
+
+  !$OMP WORKSHARE
   a%irp(:) = 0
-  
-!!$  if (use_openmp) then
-!!$    !$ maxthreads = omp_get_max_threads()
-!!$    !$ allocate(sum(maxthreads+1))
-!!$    !$ sum(:) = 0
-!!$    !$ sum(1) = 1
-!!$
-!!$    !$OMP PARALLEL default(none) &
-!!$    !$OMP shared(nza,itemp,a,nthreads,sum,nr) &
-!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
-!!$
-!!$    !$OMP DO schedule(STATIC) &
-!!$    !$OMP private(k,i)
-!!$    do k=1,nza
-!!$      i = itemp(k)
-!!$      a%irp(i) = a%irp(i) + 1
-!!$    end do
-!!$    !$OMP END DO
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ nthreads = omp_get_num_threads()
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ ithread = omp_get_thread_num()
-!!$
-!!$    !$ work = nr/nthreads
-!!$    !$ if (ithread < MOD(nr,nthreads)) then
-!!$      !$ work = work + 1
-!!$      !$ first_idx = ithread*work + 1
-!!$    !$ else
-!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
-!!$    !$ end if
-!!$
-!!$    !$ last_idx = first_idx + work - 1
-!!$
-!!$    !$ s = 0
-!!$    !$ do i=first_idx,last_idx
-!!$      !$ s = s + a%irp(i)
-!!$    !$ end do
-!!$    !$ if (work > 0) then
-!!$      !$ sum(ithread+2) = s
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ do i=2,nthreads+1
-!!$      !$ sum(i) = sum(i) + sum(i-1)
-!!$    !$ end do
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ saved_elem = a%irp(first_idx)
-!!$    !$ end if
-!!$    !$ if (ithread == 0) then
-!!$      !$ a%irp(1) = 1
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ old_val = a%irp(first_idx+1)
-!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
-!!$    !$ end if
-!!$
-!!$    !$ do i=first_idx+2,last_idx+1
-!!$      !$ nxt_val = a%irp(i)
-!!$      !$ a%irp(i) = a%irp(i-1) + old_val
-!!$      !$ old_val = nxt_val
-!!$    !$ end do
-!!$
-!!$    !$OMP END PARALLEL
-!!$  else
+  !$OMP END WORKSHARE
 
-    do k=1,nza
-      i = itemp(k)
-      a%irp(i) = a%irp(i) + 1
-    end do
-    ip = 1
-    do i=1,nr
-      ncl = a%irp(i)
-      a%irp(i) = ip
-      ip = ip + ncl
-    end do
-    a%irp(nr+1) = ip
-!!$  end if
+  !$OMP DO schedule(STATIC) &
+  !$OMP private(k,i)
+  do k=1,nza
+    i = itemp(k)
+    !$OMP ATOMIC UPDATE 
+    a%irp(i) = a%irp(i) + 1
+    !$OMP END ATOMIC
+  end do
+  !$OMP END DO
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
+  !$OMP END PARALLEL
+#else
+  a%irp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
+#endif
+
   call a%set_host()
-
 
 end subroutine psb_z_cp_csr_from_coo
 
@@ -3096,6 +3346,9 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   use psb_error_mod
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod, psb_protect_name => psb_z_mv_csr_from_coo
+#if defined(OPENMP)
+  use omp_lib 
+#endif  
   implicit none
 
   class(psb_z_csr_sparse_mat), intent(inout) :: a
@@ -3109,13 +3362,6 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
-  logical :: use_openmp = .false.
-
-  ! $ integer(psb_ipk_), allocatable :: sum(:)
-  ! $ integer(psb_ipk_) :: first_idx,last_idx,work,ithread,nthreads,s
-  ! $ integer(psb_ipk_) :: nxt_val,old_val,saved_elem
-  ! $ use_openmp = .true. 
-
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -3139,90 +3385,34 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
   call b%free()
 
+#if defined(OPENMP)
 
+  !$OMP PARALLEL default(shared)  reduction(max:info)
+
+  !$OMP WORKSHARE
   a%irp(:) = 0
+  !$OMP END WORKSHARE
 
-!!$  if (use_openmp) then
-!!$    !$OMP PARALLEL default(none) &
-!!$    !$OMP shared(sum,nthreads,nr,a,itemp,nza) &
-!!$    !$OMP private(ithread,work,first_idx,last_idx,s,saved_elem,nxt_val,old_val)
-!!$
-!!$    !$OMP DO schedule(STATIC) &
-!!$    !$OMP private(k,i)
-!!$    do k=1,nza
-!!$      i = itemp(k)
-!!$      a%irp(i) = a%irp(i) + 1
-!!$    end do
-!!$    !$OMP END DO
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ nthreads = omp_get_num_threads()
-!!$    !$ allocate(sum(nthreads+1))
-!!$    !$ sum(:) = 0
-!!$    !$ sum(1) = 1
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ ithread = omp_get_thread_num()
-!!$
-!!$    !$ work = nr/nthreads
-!!$    !$ if (ithread < MOD(nr,nthreads)) then
-!!$      !$ work = work + 1
-!!$      !$ first_idx = ithread*work + 1
-!!$    !$ else
-!!$      !$ first_idx = ithread*work + MOD(nr,nthreads) + 1
-!!$    !$ end if
-!!$
-!!$    !$ last_idx = first_idx + work - 1
-!!$
-!!$    !$ s = 0
-!!$    !$ do i=first_idx,last_idx
-!!$      !$ s = s + a%irp(i)
-!!$    !$ end do
-!!$    !$ if (work > 0) then
-!!$      !$ sum(ithread+2) = s
-!!$    !$ end if
-!!$
-!!$    !$OMP BARRIER
-!!$
-!!$    !$OMP SINGLE
-!!$    !$ do i=2,nthreads+1
-!!$      !$ sum(i) = sum(i) + sum(i-1)
-!!$    !$ end do
-!!$    !$OMP END SINGLE
-!!$
-!!$    !$ if (work > 0) then 
-!!$      !$ saved_elem = a%irp(first_idx)
-!!$    !$ end if
-!!$    !$ if (ithread == 0) then
-!!$      !$ a%irp(1) = 1
-!!$    !$ end if
-!!$
-!!$    !$ if (work > 0) then
-!!$      !$ old_val = a%irp(first_idx+1)
-!!$      !$ a%irp(first_idx+1) = saved_elem + sum(ithread+1)
-!!$    !$ end if
-!!$
-!!$    !$ do i=first_idx+2,last_idx+1
-!!$      !$ nxt_val = a%irp(i)
-!!$      !$ a%irp(i) = a%irp(i-1) + old_val
-!!$      !$ old_val = nxt_val
-!!$    !$ end do
-!!$
-!!$    !$OMP END PARALLEL
-!!$  else
-    do k=1,nza
-      i = itemp(k)
-      a%irp(i) = a%irp(i) + 1
-    end do
-    ip = 1
-    do i=1,nr
-      ncl = a%irp(i)
-      a%irp(i) = ip
-      ip = ip + ncl
-    end do
-    a%irp(nr+1) = ip
-!!$  end if
-  
+  !$OMP DO schedule(STATIC) &
+  !$OMP private(k,i)
+  do k=1,nza
+    i = itemp(k)
+    !$OMP ATOMIC UPDATE 
+    a%irp(i) = a%irp(i) + 1
+    !$OMP END ATOMIC
+  end do
+  !$OMP END DO
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
+  !$OMP END PARALLEL
+#else
+  a%irp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  call psi_exscan(nr+1,a%irp,info,shift=ione) 
+#endif
+
   call a%set_host()
 
 end subroutine psb_z_mv_csr_from_coo
@@ -3300,9 +3490,28 @@ subroutine psb_z_cp_csr_to_fmt(a,b,info)
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     nr = a%get_nrows()
     nz = a%get_nzeros()
-    if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
-    if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
-    if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    if (.false.) then 
+      if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
+      if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
+      if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    else
+      ! Despite the implementation in safe_cpy, it seems better this way
+      call psb_realloc(nr+1,b%irp,info)
+      call psb_realloc(nz,b%ja,info)
+      call psb_realloc(nz,b%val,info)
+      !$omp parallel do private(i) schedule(static)
+      do i=1,nr+1
+        b%irp(i)=a%irp(i)
+      end do
+      !$omp end parallel do
+      !$omp parallel do private(j) schedule(static)
+      do j=1,nz  
+        b%ja(j)  = a%ja(j)
+        b%val(j) = a%val(j)
+      end do
+      !$omp end parallel do
+    end if
+
     call b%set_host()
 
   class default
@@ -3386,9 +3595,27 @@ subroutine psb_z_cp_csr_from_fmt(a,b,info)
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     nr = b%get_nrows()
     nz = b%get_nzeros()
-    if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
-    if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
-    if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
+    if (.false.) then 
+      if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
+      if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
+      if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
+    else
+      ! Despite the implementation in safe_cpy, it seems better this way
+      call psb_realloc(nr+1,a%irp,info)
+      call psb_realloc(nz,a%ja,info)
+      call psb_realloc(nz,a%val,info)
+      !$omp parallel do private(i) schedule(static)
+      do i=1,nr+1
+        a%irp(i)=b%irp(i)
+      end do
+      !$omp end parallel do
+      !$omp parallel do private(j) schedule(static)
+      do j=1,nz  
+        a%ja(j)=b%ja(j)
+        a%val(j)=b%val(j)
+      end do
+      !$omp end parallel do
+    end if
     call a%set_host()
 
   class default
@@ -3426,6 +3653,540 @@ subroutine  psb_z_csr_clean_zeros(a, info)
   call a%trim()
   call a%set_host()
 end subroutine psb_z_csr_clean_zeros
+
+#if defined(OPENMP)
+subroutine psb_zcsrspspmm(a,b,c,info)
+  use psb_z_mat_mod
+  use psb_serial_mod, psb_protect_name => psb_zcsrspspmm
+
+  implicit none
+
+  class(psb_z_csr_sparse_mat), intent(in) :: a,b
+  type(psb_z_csr_sparse_mat), intent(out)  :: c
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_ipk_) :: ma,na,mb,nb, nzc, nza, nzb
+  character(len=20) :: name
+  integer(psb_ipk_) :: err_act
+  name='psb_csrspspmm'
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (a%is_dev())   call a%sync()
+  if (b%is_dev())   call b%sync()
+
+  ma = a%get_nrows()
+  na = a%get_ncols()
+  mb = b%get_nrows()
+  nb = b%get_ncols()
+
+
+  if ( mb /= na ) then
+    write(psb_err_unit,*) 'Mismatch in SPSPMM: ',ma,na,mb,nb
+    info = psb_err_invalid_matrix_sizes_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  select case(spspmm_impl)
+  case (spspmm_serial)
+    ! Estimate number of nonzeros on output.
+    nza = a%get_nzeros()
+    nzb = b%get_nzeros()
+    nzc = 2*(nza+nzb)
+    call c%allocate(ma,nb,nzc)
+
+    call csr_spspmm(a,b,c,info)
+  case (spspmm_omp_gustavson)
+    call spmm_omp_gustavson(a,b,c,info)
+  case (spspmm_omp_gustavson_1d)
+    call spmm_omp_gustavson_1d(a,b,c,info)
+  case (spspmm_serial_rb_tree)
+    call spmm_serial_rb_tree(a,b,c,info)
+  case (spspmm_omp_rb_tree)
+    call spmm_omp_rb_tree(a,b,c,info)
+  case (spspmm_omp_two_pass)
+    call spmm_omp_two_pass(a,b,c,info)
+  case default
+    write(psb_err_unit,*) 'Unknown spspmm implementation'
+    ! push error
+    goto 9999
+  end select
+
+  call c%set_asb()
+  call c%set_host()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+
+  subroutine csr_spspmm(a,b,c,info)
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in)  :: a,b
+    type(psb_z_csr_sparse_mat), intent(inout) :: c
+    integer(psb_ipk_), intent(out)          :: info
+    integer(psb_ipk_)              :: ma,na,mb,nb
+    integer(psb_ipk_), allocatable :: irow(:), idxs(:)
+    complex(psb_dpk_), allocatable    :: row(:)
+    integer(psb_ipk_)              :: i,j,k,irw,icl,icf, iret, &
+         & nzc,nnzre, isz, ipb, irwsz, nrc, nze
+    complex(psb_dpk_)                 :: cfb
+
+
+    info = psb_success_
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+
+    nze = min(size(c%val),size(c%ja))
+    isz = max(ma,na,mb,nb)
+    call psb_realloc(isz,row,info)
+    if (info == 0) call psb_realloc(isz,idxs,info)
+    if (info == 0) call psb_realloc(isz,irow,info)
+    if (info /= 0) return
+    row  = dzero
+    irow = 0
+    nzc  = 1
+    do j = 1,ma
+      c%irp(j) = nzc
+      nrc = 0
+      do k = a%irp(j), a%irp(j+1)-1
+        irw = a%ja(k)
+        cfb = a%val(k)
+        irwsz = b%irp(irw+1)-b%irp(irw)
+        do i = b%irp(irw),b%irp(irw+1)-1
+          icl = b%ja(i)
+          if (irow(icl)<j) then
+            nrc = nrc + 1
+            idxs(nrc) = icl
+            irow(icl) = j
+          end if
+          row(icl)  = row(icl)  + cfb*b%val(i)
+        end do
+      end do
+      if (nrc > 0 ) then
+        if ((nzc+nrc)>nze) then
+          nze = max(ma*((nzc+j-1)/j),nzc+2*nrc)
+          call psb_realloc(nze,c%val,info)
+          if (info == 0) call psb_realloc(nze,c%ja,info)
+          if (info /= 0) return
+        end if
+
+        call psb_qsort(idxs(1:nrc))
+        do i=1, nrc
+          irw        = idxs(i)
+          c%ja(nzc)  = irw
+          c%val(nzc) = row(irw)
+          row(irw)   = dzero
+          nzc        = nzc + 1
+        end do
+      end if
+    end do
+
+    c%irp(ma+1) = nzc
+  end subroutine csr_spspmm
+
+  ! gustavson's algorithm using perfect hashing 
+  ! and OpenMP parallelisation
+  subroutine spmm_omp_gustavson(a,b,c,info)
+    use omp_lib
+
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in) :: a,b
+    type(psb_z_csr_sparse_mat), intent(out):: c
+    integer(psb_ipk_), intent(out) :: info
+
+    complex(psb_dpk_), allocatable :: vals(:), acc(:)
+    integer(psb_ipk_)   :: ma, nb
+    integer(psb_ipk_), allocatable :: col_inds(:), offsets(:)
+    integer(psb_ipk_)   :: irw, jj, j, k, nnz, rwnz, thread_upperbound, start_idx, end_idx
+
+    ma = a%get_nrows()
+    nb = b%get_ncols()
+
+    call c%allocate(ma, nb)
+    c%irp(1) = 1
+
+    ! dense accumulator
+    ! https://sc18.supercomputing.org/proceedings/workshops/workshop_files/ws_lasalss115s2-file1.pdf
+    call psb_realloc(nb, acc, info)
+
+    allocate(offsets(omp_get_max_threads()))
+    !$omp parallel private(vals,col_inds,nnz,rwnz,thread_upperbound,acc,start_idx,end_idx) &
+    !$omp shared(a,b,c,offsets) 
+    thread_upperbound = 0
+    start_idx = 0
+    !$omp do schedule(static) private(irw, jj, j)
+    do irw = 1, ma
+      if (start_idx == 0) then
+        start_idx = irw
+      end if
+      end_idx = irw
+      do jj = a%irp(irw), a%irp(irw + 1) - 1
+        j = a%ja(jj)
+        thread_upperbound = thread_upperbound + b%irp(j+1) - b%irp(j)
+      end do
+    end do
+    !$omp end do
+
+    call psb_realloc(thread_upperbound, vals, info)
+    call psb_realloc(thread_upperbound, col_inds, info)
+
+    ! possible bottleneck
+    acc = 0
+
+    nnz = 0
+    !$omp do schedule(static) private(irw, jj, j, k)
+    do irw = 1, ma
+      rwnz = 0
+      do jj = a%irp(irw), a%irp(irw + 1) - 1
+        j = a%ja(jj)
+        do k = b%irp(j), b%irp(j + 1) - 1
+          if (acc(b%ja(k)) == 0) then
+            nnz = nnz + 1
+            rwnz = rwnz + 1
+            col_inds(nnz) =  b%ja(k)
+          end if
+          acc(b%ja(k)) = acc(b%ja(k)) + a%val(jj) * b%val(k) 
+        end do
+      end do
+      call psb_qsort(col_inds(nnz - rwnz + 1:nnz))
+
+      do k = nnz - rwnz + 1, nnz
+        vals(k) = acc(col_inds(k))
+        acc(col_inds(k)) = 0
+      end do
+      c%irp(irw + 1) = rwnz
+    end do
+    !$omp end do
+
+    offsets(omp_get_thread_num() + 1) = nnz
+    !$omp barrier
+
+    ! possible bottleneck
+    !$omp single
+    do k = 1, omp_get_num_threads() - 1
+      offsets(k + 1) = offsets(k + 1) + offsets(k)
+    end do
+    !$omp end single
+
+    !$omp barrier
+
+    if (omp_get_thread_num() /= 0) then
+      c%irp(start_idx) = offsets(omp_get_thread_num()) + 1
+    end if
+
+    do irw = start_idx, end_idx - 1
+      c%irp(irw + 1) = c%irp(irw + 1) + c%irp(irw)
+    end do
+
+    !$omp barrier
+
+    !$omp single
+    c%irp(ma + 1) = c%irp(ma + 1) + c%irp(ma)
+    call psb_realloc(c%irp(ma + 1), c%val, info)        
+    call psb_realloc(c%irp(ma + 1), c%ja, info)
+    !$omp end single
+
+    c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
+    c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
+    !$omp end parallel
+  end subroutine spmm_omp_gustavson
+
+  subroutine spmm_omp_gustavson_1d(a,b,c,info)
+    use omp_lib
+
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in) :: a,b
+    type(psb_z_csr_sparse_mat), intent(out):: c
+    integer(psb_ipk_), intent(out) :: info
+
+    complex(psb_dpk_), allocatable :: vals(:), acc(:)
+    integer(psb_ipk_)   :: ma, nb
+    integer(psb_ipk_), allocatable :: col_inds(:), offsets(:)
+    integer(psb_ipk_)   :: irw, jj, j, k, nnz, rwnz, thread_upperbound, &
+         start_idx, end_idx , blk, blk_size, rwstart,&
+         rwblk, rwblkrem, nblks
+
+    ma = a%get_nrows()
+    nb = b%get_ncols()
+
+    call c%allocate(ma, nb)
+    c%irp(1) = 1
+
+    ! dense accumulator
+    ! https://sc18.supercomputing.org/proceedings/workshops/workshop_files/ws_lasalss115s2-file1.pdf
+    call psb_realloc(nb, acc, info)
+    allocate(offsets(omp_get_max_threads()))
+
+    nblks = 4 * omp_get_max_threads()
+    rwblk = (ma / nblks)
+    rwblkrem = modulo(ma, nblks)
+    !$omp parallel private(vals,col_inds,nnz,thread_upperbound,acc,start_idx,end_idx) shared(a,b,c,offsets)
+    thread_upperbound = 0
+    start_idx = 0
+    !$omp do schedule(static) private(irw, jj, j)
+    do irw = 1, ma
+      do jj = a%irp(irw), a%irp(irw + 1) - 1
+        j = a%ja(jj)
+        thread_upperbound = thread_upperbound + b%irp(j+1) - b%irp(j)
+      end do
+    end do
+    !$omp end do
+
+    call psb_realloc(thread_upperbound, vals, info)
+    call psb_realloc(thread_upperbound, col_inds, info)
+
+    ! possible bottleneck
+    acc = 0
+
+    nnz = 0
+    !$omp do schedule(static) private(irw,jj,j,k,rwnz,blk,blk_size,rwstart)
+    do blk = 0, nblks - 1
+      if (blk < rwblkrem) then
+        blk_size = rwblk + 1
+        rwstart = blk * rwblk + blk + 1
+      else
+        blk_size = rwblk
+        rwstart = blk * rwblk &
+             + rwblkrem + 1
+      end if
+      do irw = rwstart, rwstart + blk_size - 1
+        if (start_idx == 0) then
+          start_idx = irw
+        end if
+        end_idx = irw
+        rwnz = 0
+        do jj = a%irp(irw), a%irp(irw + 1) - 1
+          j = a%ja(jj)
+          do k = b%irp(j), b%irp(j + 1) - 1
+            if (acc(b%ja(k)) == 0) then
+              nnz = nnz + 1
+              rwnz = rwnz + 1
+              col_inds(nnz) =  b%ja(k)
+            end if
+            acc(b%ja(k)) = acc(b%ja(k)) + a%val(jj) * b%val(k) 
+          end do
+        end do
+        call psb_qsort(col_inds(nnz - rwnz + 1:nnz))
+
+        do k = nnz - rwnz + 1, nnz
+          vals(k) = acc(col_inds(k))
+          acc(col_inds(k)) = 0
+        end do
+        c%irp(irw + 1) = rwnz
+      end do
+    end do
+    !$omp end do
+
+    offsets(omp_get_thread_num() + 1) = nnz
+    !$omp barrier
+
+    ! possible bottleneck
+    !$omp single
+    do k = 1, omp_get_num_threads() - 1
+      offsets(k + 1) = offsets(k + 1) + offsets(k)
+    end do
+    !$omp end single
+
+    !$omp barrier
+
+    if (omp_get_thread_num() /= 0) then
+      c%irp(start_idx) = offsets(omp_get_thread_num()) + 1
+    end if
+
+    do irw = start_idx, end_idx - 1
+      c%irp(irw + 1) = c%irp(irw + 1) + c%irp(irw)
+    end do
+
+    !$omp barrier
+
+    !$omp single
+    c%irp(ma + 1) = c%irp(ma + 1) + c%irp(ma)
+    call psb_realloc(c%irp(ma + 1), c%val, info)        
+    call psb_realloc(c%irp(ma + 1), c%ja, info)
+    !$omp end single
+
+    c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
+    c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
+    !$omp end parallel
+  end subroutine spmm_omp_gustavson_1d
+
+  subroutine spmm_serial_rb_tree(a,b,c,info)
+    use psb_rb_idx_tree_mod
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in) :: a,b
+    type(psb_z_csr_sparse_mat), intent(out):: c
+    integer(psb_ipk_), intent(out) :: info
+
+    integer(psb_ipk_)   :: a_m, b_n
+    integer(psb_ipk_)   :: row, col
+    type(psb_z_rb_idx_tree), allocatable :: row_accs(:)
+
+    a_m = a%get_nrows()
+    b_n = b%get_ncols()
+
+    allocate(row_accs(a_m))
+    call c%allocate(a_m, b_n)
+
+    do row = 1, a_m
+      row_accs(row)%nnz = 0
+      nullify(row_accs(row)%root)
+      do col = a%irp(row), a%irp(row + 1) - 1
+        call psb_rb_idx_tree_scalar_sparse_row_mul(row_accs(row), a%val(col), b, a%ja(col))
+      end do
+    end do
+    call psb_rb_idx_tree_merge(row_accs, c)
+
+    deallocate(row_accs)
+
+    info = 0
+  end subroutine spmm_serial_rb_tree
+
+  subroutine spmm_omp_rb_tree(a,b,c,info)
+    use omp_lib
+    use psb_rb_idx_tree_mod
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in) :: a,b
+    type(psb_z_csr_sparse_mat), intent(out):: c
+    integer(psb_ipk_), intent(out) :: info
+
+    integer(psb_ipk_)   :: a_m, b_n
+    integer(psb_ipk_)   :: row, col
+    type(psb_z_rb_idx_tree), allocatable :: row_accs(:)
+    real(8) :: tic, toc
+
+    a_m = a%get_nrows()
+    b_n = b%get_ncols()
+
+    call c%allocate(a_m, b_n)
+
+    allocate(row_accs(a_m))
+    call c%allocate(a_m, b_n)
+
+    !$omp parallel do schedule(static)
+    do row = 1, a_m
+      row_accs(row)%nnz = 0
+      nullify(row_accs(row)%root)
+      do col = a%irp(row), a%irp(row + 1) - 1
+        call psb_rb_idx_tree_scalar_sparse_row_mul(row_accs(row), a%val(col), b, a%ja(col))
+      end do
+    end do
+    !$omp end parallel do
+
+    call psb_rb_idx_tree_merge(row_accs, c)
+
+    deallocate(row_accs)
+    info = 0
+  end subroutine spmm_omp_rb_tree
+
+  subroutine compute_indices(a, b, c, info)
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in) :: a,b
+    type(psb_z_csr_sparse_mat), intent(out):: c
+    integer(psb_ipk_), intent(out) :: info
+
+    integer :: full_mat_bound
+    integer :: row, col, i, j, k, nnz
+
+    full_mat_bound = 0
+    !omp parallel do schedule(static) reduction(+:full_mat_bound)
+    do row = 1, a%get_nrows()
+      do col = a%irp(row), a%irp(row + 1) - 1
+        j = a%ja(col)
+        full_mat_bound = full_mat_bound + b%irp(j+1) - b%irp(j)
+      end do
+    end do
+    !omp end parallel do
+
+    call psb_realloc(a%get_nrows() + 1, c%irp, info)
+    call psb_realloc(full_mat_bound, c%ja, info)
+    c%ja = 0
+    c%irp(1) = 1
+
+    nnz = 0
+
+    do row = 1, a%get_nrows()
+      do col = a%irp(row), a%irp(row + 1) - 1
+        do i = b%irp(a%ja(col)), b%irp(a%ja(col) + 1) - 1
+          k = 0
+          do while(c%ja(c%irp(row) + k) /= 0 .and. c%ja(c%irp(row) + k) /= b%ja(i))
+            k = k + 1
+          end do
+          if (c%ja(c%irp(row) + k) == 0) then
+            c%ja(c%irp(row)+k) = b%ja(i)
+            nnz = nnz + 1
+          end if
+        end do
+      end do
+      c%irp(row + 1) = nnz + 1
+      call psb_qsort(c%ja(c%irp(row):c%irp(row + 1)-1))
+    end do
+
+
+    call psb_realloc(nnz, c%ja, info)
+    call psb_realloc(nnz, c%val, info)
+
+    c%val = 0
+  end subroutine compute_indices
+
+  subroutine direct_scalar_sparse_row_mul(out_mat, out_row_num, scalar, mat, trgt_row_num)
+    type(psb_z_csr_sparse_mat), intent(inout) :: out_mat
+    integer(psb_ipk_), intent(in) :: out_row_num
+    complex(psb_dpk_), intent(in) :: scalar
+    type(psb_z_csr_sparse_mat), intent(in) :: mat
+    integer(psb_ipk_), intent(in) :: trgt_row_num
+
+    integer(psb_ipk_) :: i, k, row_start, row_end
+
+    row_start = out_mat%irp(out_row_num)
+    row_end = out_mat%irp(out_row_num + 1) - 1
+
+    do i = mat%irp(trgt_row_num), mat%irp(trgt_row_num + 1) - 1
+      do k = out_mat%irp(out_row_num), out_mat%irp(out_row_num + 1) - 1
+        if (out_mat%ja(k) == mat%ja(i)) then
+          out_mat%val(k) = out_mat%val(k) + scalar * mat%val(i)
+          exit
+        end if
+      end do
+    end do
+
+  end subroutine direct_scalar_sparse_row_mul
+
+  subroutine spmm_omp_two_pass(a,b,c,info)
+    use omp_lib
+
+    implicit none
+    type(psb_z_csr_sparse_mat), intent(in) :: a,b
+    type(psb_z_csr_sparse_mat), intent(out):: c
+    integer(psb_ipk_), intent(out) :: info
+
+    integer(psb_ipk_)   :: a_m, b_n, row, col
+
+    a_m = a%get_nrows()
+    b_n = b%get_ncols()
+
+    call c%allocate(a_m, b_n)
+
+    call compute_indices(a, b, c, info)
+
+    !$omp parallel do schedule(static)
+    do row = 1, a_m
+      do col = a%irp(row), a%irp(row + 1) - 1
+        call direct_scalar_sparse_row_mul(c, row, a%val(col), b, a%ja(col))
+      end do
+    end do
+    !$omp end parallel do
+  end subroutine spmm_omp_two_pass
+
+end subroutine psb_zcsrspspmm
+
+#else
 
 subroutine psb_zcsrspspmm(a,b,c,info)
   use psb_z_mat_mod
@@ -3809,7 +4570,6 @@ subroutine psb_z_cp_ecsr_from_fmt(a,b,info)
   if (info == psb_success_) call a%cmp_nerwp(info)
 
 end subroutine psb_z_cp_ecsr_from_fmt
-
 
 !
 !

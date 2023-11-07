@@ -104,6 +104,7 @@ subroutine psi_bld_tmphalo(desc,info)
 
   call desc%indxmap%l2gip(helem(1:nh),info)
   if (info == psb_success_) call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
+  !write(0,*) 'bld_tmphalo calling set_owner',hproc(:)
   if (info == psb_success_) call desc%indxmap%set_halo_owner(hproc,info)
   if (info == psb_success_) call desc%indxmap%xtnd_p_adjcncy(hproc)
       

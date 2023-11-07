@@ -2189,6 +2189,9 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   use psb_error_mod
   use psb_c_base_mat_mod
   use psb_c_csc_mat_mod, psb_protect_name => psb_c_mv_csc_from_coo
+#if defined(OPENMP)
+  use omp_lib 
+#endif  
   implicit none
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
@@ -2223,18 +2226,33 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   call psb_realloc(nc+1,a%icp,info)
   call b%free()
 
+#if defined(OPENMP)
+
+  !$OMP PARALLEL default(shared)
+
+  !$OMP WORKSHARE
+  a%icp(:) = 0
+  !$OMP END WORKSHARE
+
+  !$OMP DO schedule(STATIC) &
+  !$OMP private(k,i)
+  do k=1,nza
+    i = itemp(k)
+    !$OMP ATOMIC UPDATE 
+    a%icp(i+1) = a%icp(i+1) + 1
+    !$OMP END ATOMIC
+  end do
+  !$OMP END DO
+  call psi_exscan(nc+1,a%icp,info,shift=ione) 
+  !$OMP END PARALLEL
+#else
   a%icp(:) = 0
   do k=1,nza
     i = itemp(k)
     a%icp(i) = a%icp(i) + 1
   end do
-  ip = 1
-  do i=1,nc
-    nrl = a%icp(i)
-    a%icp(i) = ip
-    ip = ip + nrl
-  end do
-  a%icp(nc+1) = ip
+  call psi_exscan(nc+1,a%icp,info,shift=ione) 
+#endif
   call a%set_host()
 
 
@@ -2311,9 +2329,28 @@ subroutine psb_c_cp_csc_to_fmt(a,b,info)
     b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
     nc = a%get_ncols()
     nz = a%get_nzeros()
-    if (info == 0) call psb_safe_cpy( a%icp(1:nc+1), b%icp , info)
-    if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
-    if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    if (.false.) then 
+      if (info == 0) call psb_safe_cpy( a%icp(1:nc+1), b%icp , info)
+      if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
+      if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    else
+    ! Despite the implementation in safe_cpy, it seems better this way
+      call psb_realloc(nc+1,b%icp,info)
+      call psb_realloc(nz,b%ia,info)
+      call psb_realloc(nz,b%val,info)
+      !$omp parallel do private(i) schedule(static)
+      do i=1,nc+1
+        b%icp(i)=a%icp(i)
+      end do
+      !$omp end parallel do
+      !$omp parallel do private(j) schedule(static)
+      do j=1,nz  
+        b%ia(j)  = a%ia(j)
+        b%val(j) = a%val(j)
+      end do
+      !$omp end parallel do
+    end if
+      
     call b%set_host()
 
   class default
@@ -2425,9 +2462,27 @@ subroutine psb_c_cp_csc_from_fmt(a,b,info)
     a%psb_c_base_sparse_mat = b%psb_c_base_sparse_mat
     nc = b%get_ncols()
     nz = b%get_nzeros()
-    if (info == 0) call psb_safe_cpy( b%icp(1:nc+1), a%icp , info)
-    if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
-    if (info == 0) call psb_safe_cpy( b%val(1:nz),   a%val , info)
+    if (.false.) then 
+      if (info == 0) call psb_safe_cpy( b%icp(1:nc+1), a%icp , info)
+      if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
+      if (info == 0) call psb_safe_cpy( b%val(1:nz),   a%val , info)
+    else
+    ! Despite the implementation in safe_cpy, it seems better this way
+      call psb_realloc(nc+1,a%icp,info)
+      call psb_realloc(nz,a%ia,info)
+      call psb_realloc(nz,a%val,info)
+      !$omp parallel do private(i) schedule(static)
+      do i=1,nc+1
+        a%icp(i)=b%icp(i)
+      end do
+      !$omp end parallel do
+      !$omp parallel do private(j) schedule(static)
+      do j=1,nz  
+        a%ia(j)=b%ia(j)
+        a%val(j)=b%val(j)
+      end do
+      !$omp end parallel do
+    end if
     call a%set_host()
 
   class default

@@ -45,7 +45,8 @@
 module psb_sort_mod
   use psb_const_mod
   use psb_ip_reord_mod
-
+  use psi_serial_mod
+  
   use psb_m_hsort_mod
   use psb_m_isort_mod
   use psb_m_msort_mod

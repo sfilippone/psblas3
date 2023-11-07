@@ -488,7 +488,11 @@ contains
     implicit none
     class(psb_s_base_vect_type), intent(inout)    :: x
 
-    if (allocated(x%v)) x%v=szero
+    if (allocated(x%v)) then
+      !$omp workshare
+      x%v(:)=szero
+      !$omp end workshare
+    end if
     call x%set_host()
   end subroutine s_base_zero
 

@@ -39,6 +39,7 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_l_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
 	auxil/psb_ip_reord_mod.o\
+	auxil/psi_acx_mod.o auxil/psi_alcx_mod.o auxil/psi_lcx_mod.o  \
 	auxil/psb_m_ip_reord_mod.o auxil/psb_e_ip_reord_mod.o \
 	auxil/psb_s_ip_reord_mod.o auxil/psb_d_ip_reord_mod.o \
 	auxil/psb_c_ip_reord_mod.o auxil/psb_z_ip_reord_mod.o \
@@ -60,11 +61,16 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	auxil/psb_d_hsort_x_mod.o \
 	auxil/psb_c_hsort_x_mod.o \
 	auxil/psb_z_hsort_x_mod.o \
+	auxil/psb_s_rb_idx_tree_mod.o \
+	auxil/psb_d_rb_idx_tree_mod.o \
+	auxil/psb_c_rb_idx_tree_mod.o \
+	auxil/psb_z_rb_idx_tree_mod.o \
+	auxil/psb_rb_idx_tree_mod.o \
 	serial/psb_base_mat_mod.o   serial/psb_mat_mod.o\
 	serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_mat_mod.o \
 	serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_mat_mod.o \
 	serial/psb_c_base_mat_mod.o serial/psb_c_csr_mat_mod.o serial/psb_c_csc_mat_mod.o serial/psb_c_mat_mod.o \
-	serial/psb_z_base_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_z_csc_mat_mod.o serial/psb_z_mat_mod.o
+	serial/psb_z_base_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_z_csc_mat_mod.o serial/psb_z_mat_mod.o 
 #\
 #	serial/psb_ls_csr_mat_mod.o serial/psb_ld_csr_mat_mod.o serial/psb_lc_csr_mat_mod.o serial/psb_lz_csr_mat_mod.o 
 #\
@@ -165,6 +171,7 @@ penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_m
 	penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o
 
 
+auxil/psi_acx_mod.o auxil/psi_alcx_mod.o auxil/psi_lcx_mod.o \
 auxil/psb_string_mod.o auxil/psb_m_realloc_mod.o auxil/psb_e_realloc_mod.o auxil/psb_s_realloc_mod.o \
 auxil/psb_d_realloc_mod.o auxil/psb_c_realloc_mod.o auxil/psb_z_realloc_mod.o \
 desc/psb_desc_const_mod.o psi_penv_mod.o: psb_const_mod.o
@@ -173,6 +180,7 @@ desc/psb_desc_const_mod.o psi_penv_mod.o: psb_const_mod.o
 desc/psb_indx_map_mod.o desc/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o  desc/psb_desc_const_mod.o
 auxil/psb_i_sort_mod.o auxil/psb_s_sort_mod.o auxil/psb_d_sort_mod.o auxil/psb_c_sort_mod.o auxil/psb_z_sort_mod.o \
 auxil/psb_ip_reord_mod.o auxil/psi_serial_mod.o auxil/psb_sort_mod.o: $(BASIC_MODS)
+
 
 auxil/psb_sort_mod.o: 	auxil/psb_m_hsort_mod.o auxil/psb_m_isort_mod.o \
 	auxil/psb_m_msort_mod.o auxil/psb_m_qsort_mod.o \
@@ -192,7 +200,8 @@ auxil/psb_sort_mod.o: 	auxil/psb_m_hsort_mod.o auxil/psb_m_isort_mod.o \
 	auxil/psb_d_hsort_x_mod.o \
 	auxil/psb_c_hsort_x_mod.o \
 	auxil/psb_z_hsort_x_mod.o \
-	auxil/psb_ip_reord_mod.o auxil/psi_serial_mod.o
+	auxil/psb_ip_reord_mod.o \
+	auxil/psi_serial_mod.o
 
 auxil/psb_m_hsort_mod.o auxil/psb_m_isort_mod.o \
 auxil/psb_m_msort_mod.o auxil/psb_m_qsort_mod.o \
@@ -225,7 +234,10 @@ auxil/psb_c_hsort_x_mod.o: auxil/psb_c_hsort_mod.o
 auxil/psb_z_hsort_x_mod.o: auxil/psb_z_hsort_mod.o 
 
 auxil/psi_serial_mod.o:  auxil/psi_m_serial_mod.o auxil/psi_e_serial_mod.o \
-	auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o 
+	auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o\
+	auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o \
+	auxil/psi_acx_mod.o auxil/psi_alcx_mod.o auxil/psi_lcx_mod.o 
+
 auxil/psi_m_serial_mod.o auxil/psi_e_serial_mod.o auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o: psb_const_mod.o
 
 auxil/psb_ip_reord_mod.o:  auxil/psb_m_ip_reord_mod.o auxil/psb_e_ip_reord_mod.o \
@@ -269,6 +281,12 @@ serial/psb_c_vect_mod.o: serial/psb_c_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_z_vect_mod.o: serial/psb_z_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o: serial/psb_mat_mod.o auxil/psb_string_mod.o auxil/psb_sort_mod.o auxil/psi_serial_mod.o
 serial/psb_vect_mod.o: serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o serial/psb_d_vect_mod.o serial/psb_s_vect_mod.o serial/psb_c_vect_mod.o serial/psb_z_vect_mod.o
+
+auxil/psb_s_rb_idx_tree_mod.o: serial/psb_s_csr_mat_mod.o psb_realloc_mod.o
+auxil/psb_d_rb_idx_tree_mod.o: serial/psb_d_csr_mat_mod.o psb_realloc_mod.o
+auxil/psb_c_rb_idx_tree_mod.o: serial/psb_c_csr_mat_mod.o psb_realloc_mod.o
+auxil/psb_z_rb_idx_tree_mod.o: serial/psb_z_csr_mat_mod.o psb_realloc_mod.o
+auxil/psb_rb_idx_tree_mod.o: auxil/psb_s_rb_idx_tree_mod.o auxil/psb_d_rb_idx_tree_mod.o auxil/psb_c_rb_idx_tree_mod.o auxil/psb_z_rb_idx_tree_mod.o
 
 error.o psb_realloc_mod.o: psb_error_mod.o 
 psb_error_impl.o: psb_penv_mod.o

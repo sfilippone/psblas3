@@ -156,4 +156,15 @@ module psi_i2_serial_mod
     end subroutine psi_i2sctv
   end interface psi_sct
 
+  interface psi_exscan
+    subroutine psi_i2_exscanv(n,x,info,shift)
+      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: n
+      integer(psb_i2pk_), intent (inout)    :: x(:)
+      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_i2pk_), intent(in), optional :: shift
+    end subroutine psi_i2_exscanv
+  end interface psi_exscan
+  
 end module psi_i2_serial_mod

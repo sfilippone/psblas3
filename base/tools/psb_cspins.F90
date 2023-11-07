@@ -51,6 +51,9 @@
 subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_cspins
   use psi_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   !....parameters...
@@ -131,11 +134,117 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='allocate',i_err=(/info/))
         goto 9999
       end if
+#if defined(OPENMP)
+      block
+        logical :: is_in_parallel
+        is_in_parallel = omp_in_parallel()
+        if (is_in_parallel) then 
+          !$omp parallel private(ila,jla,nrow,ncol,nnl,k)
+          call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+          !$omp critical(spins)
+          if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
+               & mask=(ila(1:nz)>0))
+          !$omp end critical(spins)
+          !write(0,*) me,' after g2l_ins ',psb_errstatus_fatal(),info      
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                 & a_err='psb_cdins',i_err=(/info/))
+            goto 9998
+          end if
+          nrow = desc_a%get_local_rows()
+          ncol = desc_a%get_local_cols()
+          !write(0,*) me,' Before csput',psb_errstatus_fatal()
+          if (a%is_bld()) then 
+            call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
+            if (info /= psb_success_) then
+              info=psb_err_from_subroutine_
+              call psb_errpush(info,name,a_err='a%csput')
+              goto 9998
+            end if
+            
+            if (a%is_remote_build()) then 
+              nnl = count(ila(1:nz)<0)
+              if (nnl > 0) then 
+                allocate(lila(nnl),ljla(nnl),lval(nnl))
+                k = 0
+                do i=1,nz
+                  if (ila(i)<0) then
+                    k=k+1
+                    lila(k) = ia(i)
+                    ljla(k) = ja(i)
+                    lval(k) = val(i)
+                  end if
+                end do
+                if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
+                call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+                     & 1_psb_lpk_,desc_a%get_global_rows(),info)
+              end if
+            end if
+            
+          else
+            info = psb_err_invalid_a_and_cd_state_
+            call psb_errpush(info,name)
+          end if
+9998      continue
+          !write(0,*) me,' after csput',psb_errstatus_fatal()
+          !$omp end parallel
+        else
+          call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
+          !write(0,*) me,' Before g2l_ins ',psb_errstatus_fatal()
+          if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
+               & mask=(ila(1:nz)>0))
+          !write(0,*) me,' after g2l_ins ',psb_errstatus_fatal(),info      
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                 & a_err='psb_cdins',i_err=(/info/))
+            goto 9999
+          end if
+          nrow = desc_a%get_local_rows()
+          ncol = desc_a%get_local_cols()
+          !write(0,*) me,' Before csput',psb_errstatus_fatal()
+          if (a%is_bld()) then 
+            call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
+            if (info /= psb_success_) then
+              info=psb_err_from_subroutine_
+              call psb_errpush(info,name,a_err='a%csput')
+              goto 9999
+            end if
+            
+            if (a%is_remote_build()) then 
+              nnl = count(ila(1:nz)<0)
+              if (nnl > 0) then 
+                allocate(lila(nnl),ljla(nnl),lval(nnl))
+                k = 0
+                do i=1,nz
+                  if (ila(i)<0) then
+                    k=k+1
+                    lila(k) = ia(i)
+                    ljla(k) = ja(i)
+                    lval(k) = val(i)
+                  end if
+                end do
+                if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
+                call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+                     & 1_psb_lpk_,desc_a%get_global_rows(),info)
+              end if
+            end if
+            
+          else
+            info = psb_err_invalid_a_and_cd_state_
+            call psb_errpush(info,name)
+            goto 9999
+          end if
+        end if
+      end block
+#else
+          
+      !write(0,*) me,' Before g2l ',psb_errstatus_fatal()
+      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
 
-      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
 
+      !write(0,*) me,' after g2l_ins ',psb_errstatus_fatal(),info      
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
              & a_err='psb_cdins',i_err=(/info/))
@@ -143,7 +252,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
-
+      !write(0,*) me,' Before csput',psb_errstatus_fatal()
       if (a%is_bld()) then 
         call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
         if (info /= psb_success_) then
@@ -151,11 +260,10 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
           call psb_errpush(info,name,a_err='a%csput')
           goto 9999
         end if
-
+        
         if (a%is_remote_build()) then 
           nnl = count(ila(1:nz)<0)
           if (nnl > 0) then 
-            !write(0,*) 'Check on insert ',nnl
             allocate(lila(nnl),ljla(nnl),lval(nnl))
             k = 0
             do i=1,nz
@@ -177,6 +285,8 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         call psb_errpush(info,name)
         goto 9999
       end if
+#endif
+      if (info /= 0) goto 9999
     endif
 
   else if (desc_a%is_asb()) then 
@@ -189,9 +299,18 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
            & a_err='allocate',i_err=(/info/))
       goto 9999
     end if
+#if defined(OPENMP)
+      !$omp parallel private(ila,jla,nrow,ncol,nnl,k)
+#endif
     if (local_) then
+#if defined(OPENMP)
+      !$omp workshare
+#endif
       ila(1:nz) = ia(1:nz)
       jla(1:nz) = ja(1:nz)
+#if defined(OPENMP)
+      !$omp end workshare
+#endif
     else
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
       if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info,&
@@ -201,7 +320,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='a%csput')
-      goto 9999
+      !goto 9999
     end if
     if (a%is_remote_build()) then 
       nnl = count(ila(1:nz)<0)
@@ -220,8 +339,12 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
         call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
              & 1_psb_lpk_,desc_a%get_global_rows(),info)
-      end if
+      end if      
     end if
+#if defined(OPENMP)
+      !$omp end parallel 
+#endif
+
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)

@@ -8,7 +8,7 @@ CSR                    Storage format for matrix A:  CSR COO
 0008                   MAXIT
 10                     ITRACE
 002                    IRST    restart for RGMRES  and BiCGSTABL
-ILU                    Block Solver ILU,ILUT,INVK,AINVT,AORTH
+INVK                   Block Solver ILU,ILUT,INVK,AINVT,AORTH
 NONE                   If ILU : MILU or NONE othewise ignored
 NONE                   Scaling if ILUT: NONE, MAXVAL otherwise ignored
 0                      Level of fill for forward factorization

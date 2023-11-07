@@ -156,6 +156,9 @@ contains
        & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
+#if defined(OPENMP)
+    use omp_lib
+#endif
     !
     !   Discretizes the partial differential equation
     !
@@ -192,7 +195,7 @@ contains
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
     real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_, mysz
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 2D partition
@@ -204,8 +207,7 @@ contains
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
-    real(psb_spk_), allocatable :: val(:)
+    integer(psb_lpk_), allocatable     :: myidx(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_spk_)            :: deltah, sqdeltah, deltah2
@@ -391,7 +393,6 @@ contains
         end if
       end block
 
-      
     case default
       write(psb_err_unit,*) iam, 'Initialization error: should not get here'
       info = -1
@@ -418,94 +419,114 @@ contains
       goto 9999
     end if
 
-    ! we build an auxiliary matrix consisting of one row at a
-    ! time; just a small matrix. might be extended to generate
-    ! a bunch of rows per call.
-    !
-    allocate(val(20*nb),irow(20*nb),&
-         &icol(20*nb),stat=info)
-    if (info /= psb_success_ ) then
-      info=psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-
-    ! loop over rows belonging to current process in a block
-    ! distribution.
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    do ii=1, nlr,nb
-      ib = min(nb,nlr-ii+1)
-      icoeff = 1
-      do k=1,ib
-        i=ii+k-1
-        ! local matrix pointer
-        glob_row=myidx(i)
-        ! compute gridpoint coordinates
-        call idx2ijk(ix,iy,glob_row,idim,idim)
-        ! x, y coordinates
-        x = (ix-1)*deltah
-        y = (iy-1)*deltah
-
-        zt(k) = f_(x,y)
-        ! internal point: build discretization
-        !
-        !  term depending on   (x-1,y)
-        !
-        val(icoeff) = -a1(x,y)/sqdeltah-b1(x,y)/deltah2
-        if (ix == 1) then
-          zt(k) = g(szero,y)*(-val(icoeff)) + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix-1,iy,idim,idim)
+    !$omp parallel shared(deltah,myidx,a,desc_a)
+    !
+    block 
+      integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy, ith,nth
+      integer(psb_lpk_) :: glob_row
+      integer(psb_lpk_), allocatable     :: irow(:),icol(:)
+      real(psb_spk_), allocatable :: val(:)
+      real(psb_spk_)    :: x,y, zt(nb)
+#if defined(OPENMP)
+      nth = omp_get_num_threads()
+      ith = omp_get_thread_num()
+#else
+      nth = 1
+      ith = 0
+#endif
+      allocate(val(20*nb),irow(20*nb),&
+           &icol(20*nb),stat=info)
+      if (info /= psb_success_ ) then
+        info=psb_err_alloc_dealloc_
+        call psb_errpush(info,name)
+        !goto 9999
+      endif
+      
+      !$omp  do schedule(dynamic)
+      !     
+      do ii=1, nlr,nb
+        if(info /= psb_success_) cycle
+        ib = min(nb,nlr-ii+1)
+        icoeff = 1
+        do k=1,ib
+          i=ii+k-1
+          ! local matrix pointer
+          glob_row=myidx(i)
+          ! compute gridpoint coordinates
+          call idx2ijk(ix,iy,glob_row,idim,idim)
+          ! x, y coordinates
+          x = (ix-1)*deltah
+          y = (iy-1)*deltah
+          
+          zt(k) = f_(x,y)
+          ! internal point: build discretization
+          !
+          !  term depending on   (x-1,y)
+          !
+          val(icoeff) = -a1(x,y)/sqdeltah-b1(x,y)/deltah2
+          if (ix == 1) then
+            zt(k) = g(szero,y)*(-val(icoeff)) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix-1,iy,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          !  term depending on     (x,y-1)
+          val(icoeff)  = -a2(x,y)/sqdeltah-b2(x,y)/deltah2
+          if (iy == 1) then
+            zt(k) = g(x,szero)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy-1,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          
+          !  term depending on     (x,y)
+          val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
+          call ijk2idx(icol(icoeff),ix,iy,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
-        endif
-        !  term depending on     (x,y-1)
-        val(icoeff)  = -a2(x,y)/sqdeltah-b2(x,y)/deltah2
-        if (iy == 1) then
-          zt(k) = g(x,szero)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix,iy-1,idim,idim)
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-
-        !  term depending on     (x,y)
-        val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
-        call ijk2idx(icol(icoeff),ix,iy,idim,idim)
-        irow(icoeff) = glob_row
-        icoeff       = icoeff+1
-        !  term depending on     (x,y+1)
-        val(icoeff)=-a2(x,y)/sqdeltah+b2(x,y)/deltah2
-        if (iy == idim) then
-          zt(k) = g(x,sone)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix,iy+1,idim,idim)
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-        !  term depending on     (x+1,y)
-        val(icoeff)=-a1(x,y)/sqdeltah+b1(x,y)/deltah2
-        if (ix==idim) then
-          zt(k) = g(sone,y)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix+1,iy,idim,idim)
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-
+          !  term depending on     (x,y+1)
+          val(icoeff)=-a2(x,y)/sqdeltah+b2(x,y)/deltah2
+          if (iy == idim) then
+            zt(k) = g(x,sone)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy+1,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          !  term depending on     (x+1,y)
+          val(icoeff)=-a1(x,y)/sqdeltah+b1(x,y)/deltah2
+          if (ix==idim) then
+            zt(k) = g(sone,y)*(-val(icoeff))   + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix+1,iy,idim,idim)
+            irow(icoeff) = glob_row
+            icoeff       = icoeff+1
+          endif
+          
+        end do
+#if defined(OPENMP)
+!!$        write(0,*) omp_get_thread_num(),' Check insertion ',&
+!!$             & irow(1:icoeff-1),':',icol(1:icoeff-1)
+#endif
+        call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
+        if(info /= psb_success_) cycle
+        call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
+        if(info /= psb_success_) cycle
+        zt(:)=szero
+        call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
+        if(info /= psb_success_) cycle
       end do
-      call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
-      if(info /= psb_success_) exit
-      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
-      if(info /= psb_success_) exit
-      zt(:)=szero
-      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
-      if(info /= psb_success_) exit
-    end do
-
+      !$omp end do
+      deallocate(val,irow,icol)
+    end block
+    !$omp end parallel
+    
+    
     tgen = psb_wtime()-t1
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -513,8 +534,6 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
-    deallocate(val,irow,icol)
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
@@ -579,6 +598,9 @@ program psb_s_pde2d
   use psb_krylov_mod
   use psb_util_mod
   use psb_s_pde2d_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   ! input parameters
@@ -600,7 +622,7 @@ program psb_s_pde2d
   type(psb_s_vect_type) :: xxv,bv
   ! parallel environment
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: iam, np
+  integer(psb_ipk_)   :: iam, np, nth
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
@@ -625,7 +647,16 @@ program psb_s_pde2d
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
-
+#if defined(OPENMP)
+  !$OMP parallel shared(nth)
+  !$OMP master
+  nth = omp_get_num_threads()
+  !$OMP end master
+  !$OMP end parallel
+#else
+  nth = 1
+#endif
+  
   if (iam < 0) then
     ! This should not happen, but just in case
     call psb_exit(ctxt)
@@ -750,6 +781,8 @@ program psb_s_pde2d
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
     write(psb_out_unit,'("Number of processes           : ",i12)')np
+    write(psb_out_unit,'("Number of threads             : ",i12)')nth
+    write(psb_out_unit,'("Total number of tasks         : ",i12)')nth*np
     write(psb_out_unit,'("Linear system size            : ",i12)') system_size
     write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
     write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
@@ -790,7 +823,8 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ipart,parms)
+  subroutine  get_parms(ctxt,kmethd,ptype,afmt,idim,istopc,&
+       & itmax,itrace,irst,ipart,parms)
     type(psb_ctxt_type) :: ctxt
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst,ipart

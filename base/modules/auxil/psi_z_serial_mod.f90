@@ -156,4 +156,15 @@ module psi_z_serial_mod
     end subroutine psi_zsctv
   end interface psi_sct
 
+  interface psi_exscan
+    subroutine psi_z_exscanv(n,x,info,shift)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: n
+      complex(psb_dpk_), intent (inout)    :: x(:)
+      integer(psb_ipk_), intent(out)     :: info
+      complex(psb_dpk_), intent(in), optional :: shift
+    end subroutine psi_z_exscanv
+  end interface psi_exscan
+  
 end module psi_z_serial_mod

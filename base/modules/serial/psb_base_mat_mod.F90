@@ -73,6 +73,19 @@ module psb_base_mat_mod
   use psb_const_mod
   use psi_serial_mod
 
+  ! Algs for SPSPMM
+  integer(psb_ipk_), parameter :: spspmm_serial = 0
+  integer(psb_ipk_), parameter :: spspmm_omp_gustavson = 1
+  integer(psb_ipk_), parameter :: spspmm_omp_gustavson_1d = 2
+  integer(psb_ipk_), parameter :: spspmm_serial_rb_tree = 3
+  integer(psb_ipk_), parameter :: spspmm_omp_rb_tree = 4
+  integer(psb_ipk_), parameter :: spspmm_omp_two_pass = 5
+#if defined(OPENMP)
+  integer(psb_ipk_), save :: spspmm_impl = spspmm_omp_gustavson
+#else
+  integer(psb_ipk_), save :: spspmm_impl = spspmm_serial
+#endif
+
   !
   !> \namespace  psb_base_mod  \class  psb_base_sparse_mat
   !!  The basic data about your matrix.
@@ -1903,5 +1916,23 @@ contains
     ib%repeatable_updates = lb%repeatable_updates
 
   end subroutine psb_base_from_lbase
+
+  function  psb_get_spspmm_impl() result(impl_id)
+    integer(psb_ipk_) :: impl_id
+    impl_id = spspmm_impl
+  end function psb_get_spspmm_impl
+  
+  subroutine psb_set_spspmm_impl(impl_id)
+    integer(psb_ipk_), intent(in) :: impl_id
+
+    select case(impl_id)
+    case (spspmm_serial,spspmm_omp_gustavson,spspmm_omp_gustavson_1d,&
+         & spspmm_serial_rb_tree,spspmm_omp_rb_tree, spspmm_omp_two_pass)
+      spspmm_impl = impl_id
+    case default
+
+      write (*,*) "Invalid implementation id",impl_id
+    end select
+  end subroutine psb_set_spspmm_impl
 
 end module psb_base_mat_mod
