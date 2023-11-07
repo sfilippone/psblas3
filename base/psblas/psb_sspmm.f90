@@ -180,12 +180,23 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     !  Matrix is not transposed
 
     if (allocated(a%ad)) then
-      if (doswap_) call psi_swapdata(psb_swap_send_,&
-           & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
-      call a%ad%spmm(alpha,x%v,beta,y%v,info)
-      if (doswap_) call psi_swapdata(psb_swap_recv_,&
-           & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
-      call a%and%spmm(alpha,x%v,sone,y%v,info)
+      block
+          logical, parameter :: do_timings=.true.
+          real(psb_dpk_) :: t1, t2, t3, t4, t5
+          if (do_timings) call psb_barrier(ctxt)
+          if (do_timings) t1= psb_wtime()
+          if (doswap_) call psi_swapdata(psb_swap_send_,&
+               & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+          if (do_timings) t2= psb_wtime()
+          call a%ad%spmm(alpha,x%v,beta,y%v,info)
+          if (do_timings) t3= psb_wtime()          
+          if (doswap_) call psi_swapdata(psb_swap_recv_,&
+               & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+          if (do_timings) t4= psb_wtime()
+          call a%and%spmm(alpha,x%v,sone,y%v,info)
+          if (do_timings) t5= psb_wtime()
+          if (do_timings) write(0,*) me,' SPMM:',t2-t1,t3-t2,t4-t3,t5-t4
+        end block
       
     else
       if (doswap_) then

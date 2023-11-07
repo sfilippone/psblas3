@@ -183,7 +183,7 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, mold, bld_and)
       type(psb_s_coo_sparse_mat) :: acoo
       type(psb_s_csr_sparse_mat), allocatable :: aclip
       type(psb_s_ecsr_sparse_mat), allocatable :: andclip
-      logical, parameter :: use_ecsr=.false.
+      logical, parameter :: use_ecsr=.true.
       allocate(aclip)
       call a%a%csclip(acoo,info,jmax=n_row,rscale=.false.,cscale=.false.)
       allocate(a%ad,mold=a%a)
