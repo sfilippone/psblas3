@@ -638,7 +638,7 @@ contains
     use mpi
 #endif
     implicit none 
-#ifdef MP.I_H
+#ifdef MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
