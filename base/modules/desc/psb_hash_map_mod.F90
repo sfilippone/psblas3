@@ -683,7 +683,7 @@ contains
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
     !write(0,*) me,name,' before loop ',psb_errstatus_fatal()
-#ifdef OPENMP
+#if 0 && defined(OPENMP)
     !call OMP_init_lock(ins_lck)
 
     if (idxmap%is_bld()) then
@@ -714,9 +714,9 @@ contains
                 idx(i) = -1
                 cycle
               endif
-              !call OMP_set_lock(ins_lck)                
+              call OMP_set_lock(ins_lck)                
               ncol  = idxmap%get_lc()
-              !call OMP_unset_lock(ins_lck)
+              call OMP_unset_lock(ins_lck)
 
               ! At first, we check the index presence in 'idxmap'. Usually
               ! the index is found. If it is not found, we repeat the checking,
@@ -724,7 +724,7 @@ contains
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                    & idxmap%hashv,idxmap%glb_lc,ncol)
               if (lip < 0) then
-                !call OMP_set_lock(ins_lck)
+                call OMP_set_lock(ins_lck)
 
                 ! We check again if the index is already in 'idxmap', this
                 ! time inside a critical region (we assume that the index 
@@ -738,9 +738,9 @@ contains
                   idx(i) = lip 
                 else if (lip < 0) then
                   ! Index not found
-                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)                  
                   lip = tlip
-
+                  if (info /= 0) write(0,*) ' inskey 1  info:',info
 
                   if (info >= 0) then
                     ! 'nxt' is not equal to 'tlip' when the key is already inside
@@ -766,10 +766,11 @@ contains
                         call idxmap%set_lc(ncol)
                       end if
                     end if
+                    if (isLoopValid) info = 0 
                   else
                     idx(i) = -1
                   end if
-                  !call OMP_unset_lock(ins_lck)
+                  call OMP_unset_lock(ins_lck)
                 end if
               else
                 idx(i) = lip 
@@ -800,9 +801,9 @@ contains
               idx(i) = -1
               cycle
             endif
-            !call OMP_set_lock(ins_lck)                
+            call OMP_set_lock(ins_lck)                
             ncol  = idxmap%get_lc()
-            !call OMP_unset_lock(ins_lck)
+            call OMP_unset_lock(ins_lck)
 
             ! At first, we check the index presence in 'idxmap'. Usually
             ! the index is found. If it is not found, we repeat the checking,
@@ -810,7 +811,7 @@ contains
             call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
                  & idxmap%hashv,idxmap%glb_lc,ncol)
             if (lip < 0) then
-              !call OMP_set_lock(ins_lck)
+              call OMP_set_lock(ins_lck)
               ! We check again if the index is already in 'idxmap', this
               ! time inside a critical region (we assume that the index 
               ! is often already existing).
@@ -824,7 +825,7 @@ contains
               else if (lip < 0) then
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                 lip = tlip
-
+!!$                if (info /= 0) write(0,*) ' inskey 2  info:',info
                 if (info >= 0) then
                   ! 'nxt' is not equal to 'tlip' when the key is already inside
                   ! the hash map. In that case 'tlip' is the value corresponding
@@ -849,10 +850,11 @@ contains
                       call idxmap%set_lc(ncol)
                     end if
                   end if
+                  if (isLoopValid) info = 0 
                 else
                   idx(i) = -1
                 end if
-                !call OMP_unset_lock(ins_lck)
+                call OMP_unset_lock(ins_lck)
               end if
             else
               idx(i) = lip 
@@ -911,6 +913,7 @@ contains
                   ! Index not found
                   !write(0,*) me,name,' b hsik  ',psb_errstatus_fatal()                
                   call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+!!$                  if (info /= 0) write(0,*) ' inskey 3  info:',info
                   if (psb_errstatus_fatal()) write(0,*) me,name,' a hsik  ',info,omp_get_thread_num()
                   !write(0,*) me,name,' a hsik  ',psb_errstatus_fatal()                
                   lip = tlip
@@ -927,7 +930,7 @@ contains
                            & pad=-1_psb_lpk_,addsz=laddsz)
                       if (psb_errstatus_fatal()) write(0,*) me,name,' a esz  ',info,omp_get_thread_num() 
                       if (info /= psb_success_) then
-                        !write(0,*) 'Error spot 3', info
+                        write(0,*) 'Error spot 3', info
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              &a_err='psb_ensure_size',i_err=(/info/))
 
@@ -939,9 +942,11 @@ contains
                         call idxmap%set_lc(ncol)
                       end if
                     end if
+                    if (isLoopValid) info = 0 
                   else
                     idx(i) = -1
                   end if
+!!$                  if (info /= 0) write(0,*) ' inskey 3.5  info:',info, isLoopValid
                   !call OMP_unset_lock(ins_lck)
                 end if
               else
@@ -997,7 +1002,8 @@ contains
                 ! Index not found
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                 lip = tlip
-
+!!$                if (info /= 0) write(0,*) ' inskey 4  info:',info
+                
                 if (info >= 0) then
                   ! 'nxt' is not equal to 'tlip' when the key is already inside
                   ! the hash map. In that case 'tlip' is the value corresponding
@@ -1022,6 +1028,7 @@ contains
                       call idxmap%set_lc(ncol)
                     end if
                   end if
+                  if (isLoopValid) info = 0 
                 else
                   idx(i) = -1
                 end if
