@@ -513,6 +513,7 @@ fi
 # Custom test : do we have a module or include for MPI Fortran interface?
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+   CDEFINES="-DSERIAL_MPI $CDEFINES"
 else 
  PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
@@ -847,9 +848,9 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
+CXXDEFINES=$(PSBCXXDEFINES)
 	
 
 # These should be portable rules, arent they?
