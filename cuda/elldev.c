@@ -158,7 +158,7 @@ void sspmdmm_gpu(float *z,int s, int vPitch, float *y, float alpha, float* cM, i
 		 int avgRowSize, int maxRowSize, int rows, int pitch, float *x, float beta, int firstIndex)
 {
   int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   for (i=0; i<s; i++)
     {
@@ -208,7 +208,7 @@ dspmdmm_gpu (double *z,int s, int vPitch, double *y, double alpha, double* cM, i
 	     double *x, double beta, int firstIndex)
 {
   int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   for (i=0; i<s; i++)
     {
       if (PASS_RS) {
@@ -258,7 +258,7 @@ cspmdmm_gpu (cuFloatComplex *z, int s, int vPitch, cuFloatComplex *y,
 	     cuFloatComplex *x, cuFloatComplex beta, int firstIndex)
 {
   int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   for (i=0; i<s; i++)
     {
       if (PASS_RS) {
@@ -300,7 +300,7 @@ zspmdmm_gpu (cuDoubleComplex *z, int s, int vPitch, cuDoubleComplex *y, cuDouble
 	     cuDoubleComplex *x, cuDoubleComplex beta, int firstIndex)
 {
   int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   for (i=0; i<s; i++)
     {
       if (PASS_RS) {
@@ -520,7 +520,7 @@ int psiCopyCooToElgFloat(int nr, int nc, int nza, int hacksz, int ldv, int nzm, 
   float *devVal;
   int *devIdisp, *devJa;
   spgpuHandle_t handle; 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
 
   allocRemoteBuffer((void **)&(devIdisp), (nr+1)*sizeof(int));
   allocRemoteBuffer((void **)&(devJa), (nza)*sizeof(int));
@@ -563,7 +563,7 @@ int psiCopyCooToElgDouble(int nr, int nc, int nza, int hacksz, int ldv, int nzm,
   double *devVal;
   int *devIdisp, *devJa;
   spgpuHandle_t handle; 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
 
   allocRemoteBuffer((void **)&(devIdisp), (nr+1)*sizeof(int));
   allocRemoteBuffer((void **)&(devJa), (nza)*sizeof(int));
@@ -605,7 +605,7 @@ int psiCopyCooToElgFloatComplex(int nr, int nc, int nza, int hacksz, int ldv, in
   float complex *devVal;
   int *devIdisp, *devJa;
   spgpuHandle_t handle; 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
 
   allocRemoteBuffer((void **)&(devIdisp), (nr+1)*sizeof(int));
   allocRemoteBuffer((void **)&(devJa), (nza)*sizeof(int));
@@ -648,7 +648,7 @@ int psiCopyCooToElgDoubleComplex(int nr, int nc, int nza, int hacksz, int ldv, i
   double complex *devVal;
   int *devIdisp, *devJa;
   spgpuHandle_t handle; 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
 
   allocRemoteBuffer((void **)&(devIdisp), (nr+1)*sizeof(int));
   allocRemoteBuffer((void **)&(devJa), (nza)*sizeof(int));
@@ -690,7 +690,7 @@ int dev_csputEllDeviceFloat(void* deviceMat, int nnz, void *ia, void *ja, void *
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
   struct MultiVectDevice *devJa = (struct MultiVectDevice *) ja;
   float  alpha=1.0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if (nnz <=0) return SPGPU_SUCCESS; 
   //fprintf(stderr,"Going through csputEllDeviceDouble %d %p %d\n",nnz,devUpdIdx,cnt);
@@ -711,7 +711,7 @@ int dev_csputEllDeviceDouble(void* deviceMat, int nnz, void *ia, void *ja, void 
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
   struct MultiVectDevice *devJa = (struct MultiVectDevice *) ja;
   double  alpha=1.0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if (nnz <=0) return SPGPU_SUCCESS; 
   //fprintf(stderr,"Going through csputEllDeviceDouble %d %p %d\n",nnz,devUpdIdx,cnt);
@@ -734,7 +734,7 @@ int dev_csputEllDeviceFloatComplex(void* deviceMat, int nnz,
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
   struct MultiVectDevice *devJa = (struct MultiVectDevice *) ja;
   cuFloatComplex alpha =  make_cuFloatComplex(1.0, 0.0);
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if (nnz <=0) return SPGPU_SUCCESS; 
   //fprintf(stderr,"Going through csputEllDeviceDouble %d %p %d\n",nnz,devUpdIdx,cnt);
@@ -756,7 +756,7 @@ int dev_csputEllDeviceDoubleComplex(void* deviceMat, int nnz,
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
   struct MultiVectDevice *devJa = (struct MultiVectDevice *) ja;
   cuDoubleComplex alpha =  make_cuDoubleComplex(1.0, 0.0);
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if (nnz <=0) return SPGPU_SUCCESS; 
   //fprintf(stderr,"Going through csputEllDeviceDouble %d %p %d\n",nnz,devUpdIdx,cnt);

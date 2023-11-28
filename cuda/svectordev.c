@@ -88,7 +88,7 @@ int setscalMultiVecDeviceFloat(float val, int first, int last,
 { int i=0;
   int pitch = 0;
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   spgpuSsetscal(handle, first, last, indexBase, val, (float *) devVecX->v_);
   
@@ -103,7 +103,7 @@ int geinsMultiVecDeviceFloat(int n, void* devMultiVecIrl, void* devMultiVecVal,
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
   struct MultiVectDevice *devVecIrl = (struct MultiVectDevice *) devMultiVecIrl;
   struct MultiVectDevice *devVecVal = (struct MultiVectDevice *) devMultiVecVal;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   pitch = devVecIrl->pitch_;
   if ((n > devVecIrl->size_) || (n>devVecVal->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -142,7 +142,7 @@ int igathMultiVecDeviceFloat(void* deviceVec, int vectorId, int n,
   int i, *idx =(int *) indexes;;
   float *hv = (float *) host_values;;  
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   
   i=0; 
   hv  = &(hv[hfirst-indexBase]);
@@ -167,7 +167,7 @@ int iscatMultiVecDeviceFloat(void* deviceVec, int vectorId, int n, int first, vo
   float *hv  = (float *) host_values;
   int *idx=(int *) indexes;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   idx = &(idx[first-indexBase]);
   hv  = &(hv[hfirst-indexBase]);
@@ -179,7 +179,7 @@ int iscatMultiVecDeviceFloat(void* deviceVec, int vectorId, int n, int first, vo
 
 int nrm2MultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
 
   spgpuSmnrm2(handle, y_res, n,(float *)devVecA->v_, devVecA->count_, devVecA->pitch_);
@@ -188,7 +188,7 @@ int nrm2MultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA)
 
 int amaxMultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
 
   spgpuSmamax(handle, y_res, n,(float *)devVecA->v_, devVecA->count_, devVecA->pitch_);
@@ -197,7 +197,7 @@ int amaxMultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA)
 
 int asumMultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
 
   spgpuSmasum(handle, y_res, n,(float *)devVecA->v_, devVecA->count_, devVecA->pitch_);
@@ -207,7 +207,7 @@ int asumMultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA)
 
 int scalMultiVecDeviceFloat(float alpha, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
   // Note: inner kernel can handle aliased input/output
   spgpuSscal(handle, (float *)devVecA->v_, devVecA->pitch_, 
@@ -219,7 +219,7 @@ int dotMultiVecDeviceFloat(float* y_res, int n, void* devMultiVecA, void* devMul
 {int i=0;
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   spgpuSmdot(handle, y_res, n, (float*)devVecA->v_, (float*)devVecB->v_,devVecA->count_,devVecB->pitch_);
   return(i);
@@ -231,7 +231,7 @@ int axpbyMultiVecDeviceFloat(int n,float alpha, void* devMultiVecX,
   int pitch = 0;
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
   struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   pitch = devVecY->pitch_;
   if ((n > devVecY->size_) || (n>devVecX->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -246,7 +246,7 @@ int axyMultiVecDeviceFloat(int n, float alpha, void *deviceVecA, void *deviceVec
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) deviceVecB;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   if ((n > devVecA->size_) || (n>devVecB->size_ )) 
     return SPGPU_UNSUPPORTED;
 
@@ -262,7 +262,7 @@ int axybzMultiVecDeviceFloat(int n, float alpha, void *deviceVecA,
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) deviceVecB;
   struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) deviceVecZ;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if ((n > devVecA->size_) || (n>devVecB->size_ ) || (n>devVecZ->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -278,7 +278,7 @@ int absMultiVecDeviceFloat2(int n, float alpha, void *deviceVecA,
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) deviceVecB;
 
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if ((n > devVecA->size_) || (n>devVecB->size_ ))
     return SPGPU_UNSUPPORTED;
@@ -291,7 +291,7 @@ int absMultiVecDeviceFloat2(int n, float alpha, void *deviceVecA,
 int absMultiVecDeviceFloat(int n, float alpha, void *deviceVecA)
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   if (n > devVecA->size_)
     return SPGPU_UNSUPPORTED;
 

@@ -573,8 +573,8 @@ program pdgenmv
   ! dense matrices
   type(psb_d_vect_type), target :: xv, bv, xg, bg  
 #ifdef HAVE_GPU
-  type(psb_d_vect_gpu)  :: vmold
-  type(psb_i_vect_gpu)  :: imold
+  type(psb_d_vect_cuda)  :: vmold
+  type(psb_i_vect_cuda)  :: imold 
 #endif
   real(psb_dpk_), allocatable :: x1(:), x2(:), x0(:)
   ! blacs parameters
@@ -595,14 +595,14 @@ program pdgenmv
   type(psb_d_rsb_sparse_mat), target   :: arsb
 #endif
 #ifdef HAVE_GPU
-  type(psb_d_elg_sparse_mat), target   :: aelg
-  type(psb_d_csrg_sparse_mat), target  :: acsrg
+  type(psb_d_cuda_elg_sparse_mat), target   :: aelg
+  type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
 #if CUDA_SHORT_VERSION <= 10
-  type(psb_d_hybg_sparse_mat), target  :: ahybg
+  type(psb_d_cuda_hybg_sparse_mat), target  :: ahybg
 #endif
-  type(psb_d_hlg_sparse_mat), target   :: ahlg
-  type(psb_d_hdiag_sparse_mat), target   :: ahdiag
-  type(psb_d_dnsg_sparse_mat), target   :: adnsg
+  type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
+  type(psb_d_cuda_hdiag_sparse_mat), target   :: ahdiag
+  type(psb_d_cuda_dnsg_sparse_mat), target   :: adnsg
 #endif
   class(psb_d_base_sparse_mat), pointer :: agmold, acmold
   ! other variables

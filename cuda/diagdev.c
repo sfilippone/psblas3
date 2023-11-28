@@ -186,7 +186,7 @@ int spmvDiagDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   struct DiagDevice *devMat = (struct DiagDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef HAVE_SPGPU
 #ifdef VERBOSE
@@ -268,7 +268,7 @@ int spmvDiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   struct DiagDevice *devMat = (struct DiagDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef HAVE_SPGPU
 #ifdef VERBOSE

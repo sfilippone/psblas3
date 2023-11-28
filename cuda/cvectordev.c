@@ -89,7 +89,7 @@ int setscalMultiVecDeviceFloatComplex(cuFloatComplex val, int first, int last,
 { int i=0;
   int pitch = 0;
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   spgpuCsetscal(handle, first, last, indexBase, val, (cuFloatComplex *) devVecX->v_);
   
@@ -104,7 +104,7 @@ int geinsMultiVecDeviceFloatComplex(int n, void* devMultiVecIrl, void* devMultiV
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
   struct MultiVectDevice *devVecIrl = (struct MultiVectDevice *) devMultiVecIrl;
   struct MultiVectDevice *devVecVal = (struct MultiVectDevice *) devMultiVecVal;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   pitch = devVecIrl->pitch_;
   if ((n > devVecIrl->size_) || (n>devVecVal->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -144,7 +144,7 @@ int igathMultiVecDeviceFloatComplex(void* deviceVec, int vectorId, int n,
   int i, *idx =(int *) indexes;;
   cuFloatComplex *hv = (cuFloatComplex *) host_values;;  
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   
   i=0; 
   hv  = &(hv[hfirst-indexBase]);
@@ -175,7 +175,7 @@ int iscatMultiVecDeviceFloatComplex(void* deviceVec, int vectorId, int n,
   cuFloatComplex *hv  = (cuFloatComplex *) host_values;
   int *idx=(int *) indexes;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   idx = &(idx[first-indexBase]);
   hv  = &(hv[hfirst-indexBase]);
@@ -187,7 +187,7 @@ int iscatMultiVecDeviceFloatComplex(void* deviceVec, int vectorId, int n,
 
 int nrm2MultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
 
   spgpuCmnrm2(handle, y_res, n,(cuFloatComplex *)devVecA->v_, 
@@ -197,7 +197,7 @@ int nrm2MultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devMultiV
 
 int amaxMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
 
   spgpuCmamax(handle, y_res, n,(cuFloatComplex *)devVecA->v_, 
@@ -207,7 +207,7 @@ int amaxMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devMultiV
 
 int asumMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
 
   spgpuCmasum(handle, y_res, n,(cuFloatComplex *)devVecA->v_, 
@@ -218,7 +218,7 @@ int asumMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devMultiV
 
 int scalMultiVecDeviceFloatComplex(cuFloatComplex alpha, void* devMultiVecA)
 { int i=0;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
   // Note: inner kernel can handle aliased input/output
   spgpuCscal(handle, (cuFloatComplex *)devVecA->v_, devVecA->pitch_, 
@@ -231,7 +231,7 @@ int dotMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n,
 {int i=0;
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   spgpuCmdot(handle, y_res, n, (cuFloatComplex*)devVecA->v_, 
 	     (cuFloatComplex*)devVecB->v_,devVecA->count_,devVecB->pitch_);
@@ -244,7 +244,7 @@ int axpbyMultiVecDeviceFloatComplex(int n,cuFloatComplex alpha, void* devMultiVe
   int pitch = 0;
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
   struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   pitch = devVecY->pitch_;
   if ((n > devVecY->size_) || (n>devVecX->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -261,7 +261,7 @@ int axyMultiVecDeviceFloatComplex(int n, cuFloatComplex alpha,
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) deviceVecB;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   if ((n > devVecA->size_) || (n>devVecB->size_ )) 
     return SPGPU_UNSUPPORTED;
 
@@ -279,7 +279,7 @@ int axybzMultiVecDeviceFloatComplex(int n, cuFloatComplex alpha, void *deviceVec
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) deviceVecB;
   struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) deviceVecZ;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if ((n > devVecA->size_) || (n>devVecB->size_ ) || (n>devVecZ->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -297,7 +297,7 @@ int absMultiVecDeviceFloatComplex2(int n, cuFloatComplex alpha, void *deviceVecA
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) deviceVecB;
 
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   if ((n > devVecA->size_) || (n>devVecB->size_ ))
     return SPGPU_UNSUPPORTED;
@@ -311,7 +311,7 @@ int absMultiVecDeviceFloatComplex2(int n, cuFloatComplex alpha, void *deviceVecA
 int absMultiVecDeviceFloatComplex(int n, cuFloatComplex alpha, void *deviceVecA)
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   if (n > devVecA->size_)
     return SPGPU_UNSUPPORTED;
 

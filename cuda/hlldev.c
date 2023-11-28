@@ -168,7 +168,7 @@ int spmvHllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef HAVE_SPGPU
 #ifdef VERBOSE
@@ -197,7 +197,7 @@ int spmvHllDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef HAVE_SPGPU
 #ifdef VERBOSE
@@ -225,7 +225,7 @@ int spmvHllDeviceFloatComplex(void *deviceMat, float complex alpha, void* device
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef HAVE_SPGPU
   cuFloatComplex a = make_cuFloatComplex(crealf(alpha),cimagf(alpha));
@@ -255,7 +255,7 @@ int spmvHllDeviceDoubleComplex(void *deviceMat, double complex alpha, void* devi
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef HAVE_SPGPU
   cuDoubleComplex a = make_cuDoubleComplex(creal(alpha),cimag(alpha));
@@ -454,7 +454,7 @@ int psiCopyCooToHlgFloat(int nr, int nc, int nza, int hacksz, int noffs, int isz
   if (i==0) i = writeRemoteBuffer((void*) idisp, (void *) devIdisp, (devMat->rows+1)*sizeof(int));
   //cudaSync();
 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
   psi_cuda_s_CopyCooToHlg(handle, nr,nc,nza,devMat->baseIndex,hacksz,noffs,isz,
 			  (int *) devMat->rS, (int *) devMat->hackOffs,
 			  devIdisp,devJa,devVal,
@@ -502,7 +502,7 @@ int psiCopyCooToHlgDouble(int nr, int nc, int nza, int hacksz, int noffs, int is
   //fprintf(stderr,"WriteRemoteBuffer   idisp  %d\n",i);
   //cudaSync();
   //fprintf(stderr," hacksz: %d \n",hacksz);
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
   psi_cuda_d_CopyCooToHlg(handle, nr,nc,nza,devMat->baseIndex,hacksz,noffs,isz,
 			  (int *) devMat->rS, (int *) devMat->hackOffs,
 			  devIdisp,devJa,devVal,
@@ -545,7 +545,7 @@ int psiCopyCooToHlgFloatComplex(int nr, int nc, int nza, int hacksz, int noffs, 
   if (i==0) i = writeRemoteBuffer((void*) idisp, (void *) devIdisp, (devMat->rows+1)*sizeof(int));
   //cudaSync();
 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
   psi_cuda_c_CopyCooToHlg(handle, nr,nc,nza,devMat->baseIndex,hacksz,noffs,isz,
 			  (int *) devMat->rS, (int *) devMat->hackOffs,
 			  devIdisp,devJa,devVal,
@@ -588,7 +588,7 @@ int psiCopyCooToHlgDoubleComplex(int nr, int nc, int nza, int hacksz, int noffs,
   if (i==0) i = writeRemoteBuffer((void*) idisp, (void *) devIdisp, (devMat->rows+1)*sizeof(int));
   //cudaSync();
 
-  handle = psb_gpuGetHandle();
+  handle = psb_cudaGetHandle();
   psi_cuda_z_CopyCooToHlg(handle, nr,nc,nza,devMat->baseIndex,hacksz,noffs,isz,
 			  (int *) devMat->rS, (int *) devMat->hackOffs,
 			  devIdisp,devJa,devVal,

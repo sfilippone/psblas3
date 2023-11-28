@@ -37,7 +37,7 @@
 
 static int hasUVA=-1;
 static struct cudaDeviceProp *prop=NULL;
-static spgpuHandle_t psb_gpu_handle = NULL;
+static spgpuHandle_t psb_cuda_handle = NULL;
 static cublasHandle_t psb_cublas_handle = NULL;
 
 
@@ -228,7 +228,7 @@ int gpuInit(int dev)
     return SPGPU_UNSPECIFIED;
   }
   if (!psb_cublas_handle)
-    psb_gpuCreateCublasHandle();
+    psb_cudaCreateCublasHandle();
   hasUVA=getDeviceHasUVA();
   
   return err;
@@ -238,14 +238,14 @@ int gpuInit(int dev)
 void gpuClose()
 {
   cudaStream_t st1, st2;
-  if (! psb_gpu_handle)
-    st1=spgpuGetStream(psb_gpu_handle);
+  if (! psb_cuda_handle)
+    st1=spgpuGetStream(psb_cuda_handle);
   if (! psb_cublas_handle)
     cublasGetStream(psb_cublas_handle,&st2);
 
-  psb_gpuDestroyHandle();
+  psb_cudaDestroyHandle();
   if (st1 != st2) 
-    psb_gpuDestroyCublasHandle();
+    psb_cudaDestroyCublasHandle();
   free(prop);
   prop=NULL;
   hasUVA=-1;
@@ -391,49 +391,49 @@ void cudaReset()
 }
 
 
-spgpuHandle_t psb_gpuGetHandle()
+spgpuHandle_t psb_cudaGetHandle()
 {
-  return psb_gpu_handle;
+  return psb_cuda_handle;
 }
 
-void psb_gpuCreateHandle()
+void psb_cudaCreateHandle()
 {
-  if (!psb_gpu_handle)
-    spgpuCreate(&psb_gpu_handle, getDevice());
+  if (!psb_cuda_handle)
+    spgpuCreate(&psb_cuda_handle, getDevice());
   
 }
 
-void psb_gpuDestroyHandle()
+void psb_cudaDestroyHandle()
 {
-  if (!psb_gpu_handle)
-    spgpuDestroy(psb_gpu_handle);
-  psb_gpu_handle = NULL; 
+  if (!psb_cuda_handle)
+    spgpuDestroy(psb_cuda_handle);
+  psb_cuda_handle = NULL; 
 }
 
-cudaStream_t psb_gpuGetStream()
+cudaStream_t psb_cudaGetStream()
 {
-  return spgpuGetStream(psb_gpu_handle);
+  return spgpuGetStream(psb_cuda_handle);
 }
 
-void  psb_gpuSetStream(cudaStream_t stream)
+void  psb_cudaSetStream(cudaStream_t stream)
 {
-  spgpuSetStream(psb_gpu_handle, stream);
+  spgpuSetStream(psb_cuda_handle, stream);
   return ;
 }
 
 
 
-cublasHandle_t psb_gpuGetCublasHandle()
+cublasHandle_t psb_cudaGetCublasHandle()
 {
   if (!psb_cublas_handle)
-    psb_gpuCreateCublasHandle();
+    psb_cudaCreateCublasHandle();
   return psb_cublas_handle;
 }
-void psb_gpuCreateCublasHandle()
+void psb_cudaCreateCublasHandle()
 {  if (!psb_cublas_handle)
     cublasCreate(&psb_cublas_handle);
 }
-void psb_gpuDestroyCublasHandle()
+void psb_cudaDestroyCublasHandle()
 {
   if (!psb_cublas_handle)
     cublasDestroy(psb_cublas_handle);

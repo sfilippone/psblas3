@@ -71,15 +71,15 @@ void cudaReset();
 void gpuClose();
 
 
-spgpuHandle_t psb_gpuGetHandle(); 
-void psb_gpuCreateHandle();
-void psb_gpuDestroyHandle();
-cudaStream_t psb_gpuGetStream();
-void  psb_gpuSetStream(cudaStream_t stream);
+spgpuHandle_t psb_cudaGetHandle(); 
+void psb_cudaCreateHandle();
+void psb_cudaDestroyHandle();
+cudaStream_t psb_cudaGetStream();
+void  psb_cudaSetStream(cudaStream_t stream);
 
-cublasHandle_t psb_gpuGetCublasHandle(); 
-void psb_gpuCreateCublasHandle();
-void psb_gpuDestroyCublasHandle();
+cublasHandle_t psb_cudaGetCublasHandle(); 
+void psb_cudaCreateCublasHandle();
+void psb_cudaDestroyCublasHandle();
 
 
 int allocateInt(void **, int);

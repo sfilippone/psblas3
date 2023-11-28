@@ -126,7 +126,7 @@ int spmvDnsDeviceFloat(char transa, int m, int n, int k, float *alpha,
   int status;
 #ifdef HAVE_SPGPU
 
-  cublasHandle_t handle=psb_gpuGetCublasHandle();
+  cublasHandle_t handle=psb_cudaGetCublasHandle();
   cublasOperation_t trans=((transa == 'N')? CUBLAS_OP_N:((transa=='T')? CUBLAS_OP_T:CUBLAS_OP_C));
   /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
   if (n == 1) {
@@ -157,7 +157,7 @@ int spmvDnsDeviceDouble(char transa, int m, int n, int k, double *alpha,
   int status;
 #ifdef HAVE_SPGPU
 
-  cublasHandle_t handle=psb_gpuGetCublasHandle();
+  cublasHandle_t handle=psb_cudaGetCublasHandle();
   cublasOperation_t trans=((transa == 'N')? CUBLAS_OP_N:((transa=='T')? CUBLAS_OP_T:CUBLAS_OP_C));
   /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
   if (n == 1) {
@@ -188,7 +188,7 @@ int spmvDnsDeviceFloatComplex(char transa, int m, int n, int k, float complex *a
   int status;
 #ifdef HAVE_SPGPU
 
-  cublasHandle_t handle=psb_gpuGetCublasHandle();
+  cublasHandle_t handle=psb_cudaGetCublasHandle();
   cublasOperation_t trans=((transa == 'N')? CUBLAS_OP_N:((transa=='T')? CUBLAS_OP_T:CUBLAS_OP_C));
   /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
   if (n == 1) {
@@ -219,7 +219,7 @@ int spmvDnsDeviceDoubleComplex(char transa, int m, int n, int k, double complex 
   int status;
 #ifdef HAVE_SPGPU
 
-  cublasHandle_t handle=psb_gpuGetCublasHandle();
+  cublasHandle_t handle=psb_cudaGetCublasHandle();
   cublasOperation_t trans=((transa == 'N')? CUBLAS_OP_N:((transa=='T')? CUBLAS_OP_T:CUBLAS_OP_C));
   /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
   if (n == 1) {

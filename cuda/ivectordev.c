@@ -90,7 +90,7 @@ int setscalMultiVecDeviceInt(int val, int first, int last,
 { int i=0;
   int pitch = 0;
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   spgpuIsetscal(handle, first, last, indexBase, val, (int *) devVecX->v_);
   
@@ -105,7 +105,7 @@ int geinsMultiVecDeviceInt(int n, void* devMultiVecIrl, void* devMultiVecVal,
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
   struct MultiVectDevice *devVecIrl = (struct MultiVectDevice *) devMultiVecIrl;
   struct MultiVectDevice *devVecVal = (struct MultiVectDevice *) devMultiVecVal;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   pitch = devVecIrl->pitch_;
   if ((n > devVecIrl->size_) || (n>devVecVal->size_ )) 
     return SPGPU_UNSUPPORTED;
@@ -144,7 +144,7 @@ int igathMultiVecDeviceInt(void* deviceVec, int vectorId, int n,
   int i, *idx =(int *) indexes;;
   int *hv = (int *) host_values;;  
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
   
   i=0; 
   hv  = &(hv[hfirst-indexBase]);
@@ -169,7 +169,7 @@ int iscatMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void
   int *hv  = (int *) host_values;
   int *idx=(int *) indexes;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  spgpuHandle_t handle=psb_gpuGetHandle();
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
   idx = &(idx[first-indexBase]);
   hv  = &(hv[hfirst-indexBase]);
