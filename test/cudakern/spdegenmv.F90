@@ -548,7 +548,7 @@ program pdgenmv
   use psb_util_mod 
   use psb_ext_mod
 #ifdef HAVE_GPU
-  use psb_gpu_mod
+  use psb_cuda_mod
 #endif
   use psb_s_pde3d_mod
   implicit none
@@ -570,8 +570,8 @@ program pdgenmv
   ! dense matrices
   type(psb_s_vect_type), target :: xv,bv, xg, bg 
 #ifdef HAVE_GPU
-  type(psb_s_vect_gpu)  :: vmold
-  type(psb_i_vect_gpu)  :: imold
+  type(psb_s_vect_cuda)  :: vmold
+  type(psb_i_vect_cuda)  :: imold 
 #endif
   real(psb_spk_), allocatable :: x1(:), x2(:), x0(:)
   ! blacs parameters
@@ -589,14 +589,14 @@ program pdgenmv
   type(psb_s_dia_sparse_mat), target   :: adia
   type(psb_s_hdia_sparse_mat), target   :: ahdia
 #ifdef HAVE_GPU
-  type(psb_s_elg_sparse_mat), target   :: aelg
-  type(psb_s_csrg_sparse_mat), target  :: acsrg
+  type(psb_s_cuda_elg_sparse_mat), target   :: aelg
+  type(psb_s_cuda_csrg_sparse_mat), target  :: acsrg
 #if CUDA_SHORT_VERSION <= 10
-  type(psb_s_hybg_sparse_mat), target  :: ahybg
+  type(psb_s_cuda_hybg_sparse_mat), target  :: ahybg
 #endif
-  type(psb_s_hlg_sparse_mat), target   :: ahlg
-  type(psb_s_dnsg_sparse_mat), target   :: adnsg
-  type(psb_s_hdiag_sparse_mat), target   :: ahdiag
+  type(psb_s_cuda_hlg_sparse_mat), target   :: ahlg
+  type(psb_s_cuda_hdiag_sparse_mat), target   :: ahdiag
+  type(psb_s_cuda_dnsg_sparse_mat), target   :: adnsg
 #endif
   class(psb_s_base_sparse_mat), pointer :: agmold, acmold
   ! other variables
@@ -613,7 +613,10 @@ program pdgenmv
   call psb_info(ctxt,iam,np)
 
 #ifdef HAVE_GPU
-  call psb_gpu_init(ctxt)
+  call psb_cuda_init(ctxt)
+#endif
+#ifdef HAVE_RSB
+  call psb_rsb_init()
 #endif
 
   if (iam < 0) then 
@@ -622,7 +625,7 @@ program pdgenmv
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='pdegenmv-gpu'
+  name='pdegenmv-cuda'
   !
   ! Hello world
   !
@@ -632,7 +635,7 @@ program pdgenmv
   end if
 #ifdef HAVE_GPU
   write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
-  write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_gpu_DeviceName())  
+  write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())  
 #endif
   !
   !  get parameters
@@ -752,7 +755,7 @@ program pdgenmv
     call psb_barrier(ctxt)
     t1 = psb_wtime()
     call agpu%cscnv(info,mold=agmold)
-    call psb_gpu_DeviceSync()
+    call psb_cuda_DeviceSync()
     t2 = psb_Wtime() -t1
     call psb_amx(ctxt,t2)
     if (j==1) tcnvg1 = t2
@@ -789,7 +792,7 @@ program pdgenmv
     end if
 
   end do
-  call psb_gpu_DeviceSync()
+  call psb_cuda_DeviceSync()
   call psb_barrier(ctxt)
   tt2 = psb_wtime() - tt1
   call psb_amx(ctxt,tt2)
@@ -817,7 +820,7 @@ program pdgenmv
     end if
     
   end do
-  call psb_gpu_DeviceSync()
+  call psb_cuda_DeviceSync()
   call psb_barrier(ctxt)
   gt2 = psb_wtime() - gt1
   call psb_amx(ctxt,gt2)
@@ -919,7 +922,7 @@ program pdgenmv
 #ifdef HAVE_GPU
     bdwdth = ngpu*ntests*nbytes/(gt2*1.d6)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
-    bdwdth = psb_gpu_MemoryPeakBandwidth()
+    bdwdth = psb_cuda_MemoryPeakBandwidth()
     write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth
 #endif
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
@@ -941,7 +944,7 @@ program pdgenmv
     goto 9999
   end if
 #ifdef HAVE_GPU
-  call psb_gpu_exit()
+  call psb_cuda_exit()
 #endif
   call psb_exit(ctxt)
   stop
@@ -965,7 +968,7 @@ contains
     if (iam == 0) then
       write(*,*) 'CPU side format?'
       read(psb_inp_unit,*) acfmt
-      write(*,*) 'GPU side format?'
+      write(*,*) 'CUDA side format?'
       read(psb_inp_unit,*) agfmt
       write(*,*) 'Size of discretization cube?'
       read(psb_inp_unit,*) idim

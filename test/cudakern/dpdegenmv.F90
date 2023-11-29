@@ -631,7 +631,7 @@ program pdgenmv
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='pdegenmv-gpu'
+  name='pdegenmv-cuda'
   !
   ! Hello world
   !
@@ -974,7 +974,7 @@ contains
     if (iam == 0) then
       write(*,*) 'CPU side format?'
       read(psb_inp_unit,*) acfmt
-      write(*,*) 'GPU side format?'
+      write(*,*) 'CUDA side format?'
       read(psb_inp_unit,*) agfmt
       write(*,*) 'Size of discretization cube?'
       read(psb_inp_unit,*) idim
