@@ -2869,6 +2869,7 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     ! Hence the call to set_nzeros done here. 
     !$omp critical
     nza  = a%get_nzeros()
+    nzaold = nza
     isza = a%get_size()
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
@@ -2879,7 +2880,6 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
       info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
     else
 #if defined(OPENMP)      
-      nzaold = nza
       nza = nza + nz
 #endif
       call a%set_nzeros(nza)
