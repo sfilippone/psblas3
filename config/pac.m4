@@ -2160,7 +2160,7 @@ AC_DEFUN([PAC_ARG_WITH_CUDACC],
 [
 AC_ARG_WITH(cudacc,
 AC_HELP_STRING([--with-cudacc], [A comma-separated list of CCs to compile to, for example,
- --with-cudacc=30,35,37,50,60]),
+ --with-cudacc=50,60,70,75]),
 [pac_cv_cudacc=$withval],
 [pac_cv_cudacc=''])
 ])

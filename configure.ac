@@ -57,7 +57,6 @@ AC_MSG_NOTICE([
 
 	Be sure to specify the library paths of your interest. Examples:
         ./configure --with-libs=-L/some/directory/LIB  <- will append to LIBS
-	       [ --with-spgpu=/path/to/spgpu] 
         FC=mpif90 CC=mpicc ./configure           <- will force FC,CC
 
 	See ./configure --help=short fore more info.
@@ -730,23 +729,23 @@ PAC_MAKE_IS_GNUMAKE
 # Note : also umfdi_local_search, ...
 #AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
 
-AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
-want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
-if test x"$want_rsb_libs" != x ; then
-	if test x"$want_rsb_libs" = xyes ; then
-		want_rsb_libs="`librsb-config --static --ldflags`"
-	else
-		if test -d "$want_rsb_libs" ; then
-			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
-		else
-			true;
-			# we assume want_rsb_libs are linkage parameters
-		fi
-	fi
-	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
-fi
-RSB_LIBS="$want_rsb_libs"
-LIBS="$RSB_LIBS ${LIBS}"
+dnl AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
+dnl want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
+dnl if test x"$want_rsb_libs" != x ; then
+dnl 	if test x"$want_rsb_libs" = xyes ; then
+dnl 		want_rsb_libs="`librsb-config --static --ldflags`"
+dnl 	else
+dnl 		if test -d "$want_rsb_libs" ; then
+dnl 			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
+dnl 		else
+dnl 			true;
+dnl 			# we assume want_rsb_libs are linkage parameters
+dnl 		fi
+dnl 	fi
+dnl 	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
+dnl fi
+dnl RSB_LIBS="$want_rsb_libs"
+dnl LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS

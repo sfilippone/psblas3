@@ -830,7 +830,6 @@ enable_openmp
 with_blas
 with_blasdir
 with_lapack
-with_rsb
 with_metis
 with_metisincfile
 with_metisdir
@@ -1522,12 +1521,6 @@ Optional Packages:
   --with-blas=<lib>       use BLAS library <lib>
   --with-blasdir=<dir>    search for BLAS library in <dir>
   --with-lapack=<lib>     use LAPACK library <lib>
-  --with-rsb              Specify Recursive Sparse BLAS library linkage info
-                          (that is, the output of librsb-config --static
-                          --ldflags, or a directory where the usual
-                          bin/include/lib subdirs with a regular RSB
-                          installation resides, or nothing to make the
-                          configure script invoke librsb-config)
   --with-metis=LIBNAME    Specify the library name for METIS library. Default:
                           "-lmetis"
   --with-metisincfile=DIR Specify the name for METIS include file.
@@ -1542,7 +1535,7 @@ Optional Packages:
   --with-amdlibdir=DIR    Specify the directory for AMD library.
   --with-cuda=DIR         Specify the directory for CUDA library and includes.
   --with-cudacc           A comma-separated list of CCs to compile to, for
-                          example, --with-cudacc=30,35,37,50,60
+                          example, --with-cudacc=50,60,70,75
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -3301,7 +3294,6 @@ psblas_cv_version="3.8.1"
 
 	Be sure to specify the library paths of your interest. Examples:
         ./configure --with-libs=-L/some/directory/LIB  <- will append to LIBS
-	        --with-spgpu=/path/to/spgpu
         FC=mpif90 CC=mpicc ./configure           <- will force FC,CC
 
 	See ./configure --help=short fore more info.
@@ -3316,7 +3308,6 @@ printf "%s\n" "$as_me:
 
 	Be sure to specify the library paths of your interest. Examples:
         ./configure --with-libs=-L/some/directory/LIB  <- will append to LIBS
-	        --with-spgpu=/path/to/spgpu
         FC=mpif90 CC=mpicc ./configure           <- will force FC,CC
 
 	See ./configure --help=short fore more info.
@@ -10020,31 +10011,6 @@ fi
 # Note : also umfdi_local_search, ...
 #AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
 
-
-# Check whether --with-rsb was given.
-if test ${with_rsb+y}
-then :
-  withval=$with_rsb; if test x"$withval" = xno; then
-want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi
-else $as_nop
-  want_rsb_libs=""
-fi
-
-if test x"$want_rsb_libs" != x ; then
-	if test x"$want_rsb_libs" = xyes ; then
-		want_rsb_libs="`librsb-config --static --ldflags`"
-	else
-		if test -d "$want_rsb_libs" ; then
-			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
-		else
-			true;
-			# we assume want_rsb_libs are linkage parameters
-		fi
-	fi
-	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
-fi
-RSB_LIBS="$want_rsb_libs"
-LIBS="$RSB_LIBS ${LIBS}"
 
 
 # Check whether --with-metis was given.
