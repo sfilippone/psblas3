@@ -793,41 +793,40 @@ fi
 PAC_CHECK_CUDA()
 
 if test "x$pac_cv_have_cuda" == "xyes"; then
-
-PAC_CHECK_CUDA_VERSION()
-CUDA_VERSION="$pac_cv_cuda_version";
-CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-dnl PAC_CHECK_SPGPU()
-if test "x$pac_cv_have_cuda" == "xyes" ; then
-   SPGPU_DEFINES="-DHAVE_SPGPU -DHAVE_GPU";
+   
+   PAC_CHECK_CUDA_VERSION()
+   CUDA_VERSION="$pac_cv_cuda_version";
+   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+   dnl PAC_CHECK_SPGPU()
+   HAVE_CUDA="yes";
    SPGPU_LIBS="-lspgpu";	
    CUDAD=cudad;
    CUDALD=cudald;
    LCUDA="-lpsb_cuda";	
    EXTRALDLIBS="-lstdc++";
-fi
-AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
+   AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
 
-PAC_ARG_WITH_CUDACC()
-if test "x$pac_cv_cudacc" == "x"; then
-   pac_cv_cudacc="30,35,37,50,60";
-fi
-CUDEFINES="--dopt=on";
-for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
-do
-  CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
-done
-if test "x$pac_cv_cuda_version" != "xunknown"; then
-   CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-   FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-   CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"    
-fi
-
+   PAC_ARG_WITH_CUDACC()
+   if test "x$pac_cv_cudacc" == "x"; then
+      pac_cv_cudacc="50,60,70,75";
+      CUDA_CC="$pac_cv_cudacc";
+   fi
+   CUDEFINES="--dopt=on";
+   for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
+   do
+	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
+   done
+   if test "x$pac_cv_cuda_version" != "xunknown"; then
+     CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+     FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+     CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"    
+   fi
 fi
 
 if test "x$pac_cv_ipk_size" != "x4"; then
   AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
-  SPGPU_DEFINES="";
+  HAVE_CUDA="no";
+  CUDA_CC="";	
   SPGPU_LIBS="";	
   CUDAD="";
   CUDALD="";
@@ -896,9 +895,9 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)  $(SPGPU_DEFINES) $(CUDA_DEFINES)
-CDEFINES=$(PSBCDEFINES) $(SPGPU_DEFINES) $(CUDA_DEFINES)
-FDEFINES=$(PSBFDEFINES) $(SPGPU_DEFINES) $(CUDA_DEFINES)
+CXXDEFINES=$(PSBCXXDEFINES)  $(CUDA_DEFINES)
+CDEFINES=$(PSBCDEFINES) $(CUDA_DEFINES)
+FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
 	
 
 # These should be portable rules, arent they?
@@ -923,7 +922,6 @@ AC_SUBST(METISINCFILE)
 AC_SUBST(SPGPU_FLAGS)
 AC_SUBST(SPGPU_LIBS)
 dnl AC_SUBST(SPGPU_DIR)
-AC_SUBST(SPGPU_DEFINES)
 dnl AC_SUBST(SPGPU_INCLUDES)
 dnl AC_SUBST(SPGPU_INCDIR)
 AC_SUBST(EXTRALDLIBS)
@@ -961,6 +959,9 @@ AC_MSG_NOTICE([
 	FMFLAG                : ${FMFLAG}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
+
+	CUDA 		      : ${HAVE_CUDA}
+	CUDA_CC               : ${CUDA_CC}
 
 	BLAS                  : ${BLAS_LIBS}
 

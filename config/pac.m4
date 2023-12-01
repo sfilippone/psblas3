@@ -2104,7 +2104,7 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_CUDA,
-[AC_ARG_WITH(cuda, AC_HELP_STRING([--with-cuda=DIR], [Specify the directory for CUDA library and includes.]),
+[AC_ARG_WITH(cuda, AC_HELP_STRING([--with-cuda=DIR], [Specify the CUDA install directory.]),
         [pac_cv_cuda_dir=$withval],
         [pac_cv_cuda_dir=''])
 
