@@ -29,29 +29,21 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_s_cuda_hdiag_to_gpu(a,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hdiagdev_mod
   use psb_vectordev_mod
   use psb_s_cuda_hdiag_mat_mod, psb_protect_name => psb_s_cuda_hdiag_to_gpu
-#else 
-  use psb_s_cuda_hdiag_mat_mod
-#endif
   use iso_c_binding
   implicit none 
   class(psb_s_cuda_hdiag_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)             :: info
   integer(psb_ipk_) :: nr, nc, hacksize, hackcount, allocheight 
-#ifdef HAVE_SPGPU
   type(hdiagdev_parms) :: gpu_parms
-#endif
 
   info = 0
 
-#ifdef HAVE_SPGPU
   nr = a%get_nrows()
   nc = a%get_ncols()
   hacksize  = a%hackSize
@@ -80,7 +72,5 @@ subroutine psb_s_cuda_hdiag_to_gpu(a,info)
        & allocheight,hacksize,hackCount,spgpu_type_double)
   if (info == 0) info = &
        & writeHdiagDevice(a%deviceMat,a%val,a%diaOffsets,a%hackOffsets)
-
-#endif
 
 end subroutine psb_s_cuda_hdiag_to_gpu

@@ -32,12 +32,8 @@
 subroutine psb_s_cuda_cp_csrg_from_fmt(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_s_cuda_csrg_mat_mod, psb_protect_name => psb_s_cuda_cp_csrg_from_fmt
-#else 
-  use psb_s_cuda_csrg_mat_mod
-#endif
   !use iso_c_binding
   implicit none 
 
@@ -53,9 +49,7 @@ subroutine psb_s_cuda_cp_csrg_from_fmt(a,b,info)
   class default
     call a%psb_s_csr_sparse_mat%cp_from_fmt(b,info) 
     if (info /= 0) return
-#ifdef HAVE_SPGPU
     call a%to_gpu(info)
-#endif
   end select
 
 end subroutine psb_s_cuda_cp_csrg_from_fmt

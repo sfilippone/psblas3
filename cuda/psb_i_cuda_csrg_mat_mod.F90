@@ -48,7 +48,6 @@ module psb_i_cuda_csrg_mat_mod
     ! 
     ! 
     ! 
-#ifdef HAVE_SPGPU
     type(i_Cmat)    :: deviceMat
     integer(psb_ipk_) :: devstate  = is_host
     
@@ -81,13 +80,8 @@ module psb_i_cuda_csrg_mat_mod
     procedure, pass(a) :: to_gpu        => psb_i_cuda_csrg_to_gpu
     procedure, pass(a) :: from_gpu      => psb_i_cuda_csrg_from_gpu
     final              :: i_cuda_csrg_finalize
-#else 
-  contains
-    procedure, pass(a) :: mold         => psb_i_cuda_csrg_mold
-#endif
   end type psb_i_cuda_csrg_sparse_mat
 
-#ifdef HAVE_SPGPU
   private :: i_cuda_csrg_get_nzeros, i_cuda_csrg_free,  i_cuda_csrg_get_fmt, &
        & i_cuda_csrg_get_size, i_cuda_csrg_sizeof, i_cuda_csrg_get_nz_row
 
@@ -377,17 +371,5 @@ contains
     return
 
   end subroutine i_cuda_csrg_finalize
-
-#else 
-  interface 
-    subroutine psb_i_cuda_csrg_mold(a,b,info) 
-      import :: psb_i_cuda_csrg_sparse_mat, psb_i_base_sparse_mat, psb_ipk_
-      class(psb_i_cuda_csrg_sparse_mat), intent(in)               :: a
-      class(psb_i_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_i_cuda_csrg_mold
-  end interface
-
-#endif
 
 end module psb_i_cuda_csrg_mat_mod

@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_c_cuda_elg_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
 
   use psb_base_mod
   use iso_c_binding
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_c_cuda_elg_mat_mod, psb_protect_name => psb_c_cuda_elg_csput_a
-#else 
-  use psb_c_cuda_elg_mat_mod
-#endif
   implicit none 
 
   class(psb_c_cuda_elg_sparse_mat), intent(inout) :: a
@@ -128,13 +123,9 @@ subroutine psb_c_cuda_elg_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
 
   use psb_base_mod
   use iso_c_binding
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_c_cuda_elg_mat_mod, psb_protect_name => psb_c_cuda_elg_csput_v
   use psb_c_cuda_vect_mod
-#else 
-  use psb_c_cuda_elg_mat_mod
-#endif
   implicit none 
 
   class(psb_c_cuda_elg_sparse_mat), intent(inout) :: a

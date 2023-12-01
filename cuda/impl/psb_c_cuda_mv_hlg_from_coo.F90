@@ -28,19 +28,13 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 subroutine psb_c_cuda_mv_hlg_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_cuda_env_mod
   use psb_c_cuda_hlg_mat_mod, psb_protect_name => psb_c_cuda_mv_hlg_from_coo
-#else 
-  use psb_c_cuda_hlg_mat_mod
-#endif
   implicit none 
 
   class(psb_c_cuda_hlg_sparse_mat), intent(inout) :: a

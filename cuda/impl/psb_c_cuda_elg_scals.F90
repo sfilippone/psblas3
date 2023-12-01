@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_c_cuda_elg_scals(d,a,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_elg_mat_mod, psb_protect_name => psb_c_cuda_elg_scals 
-#else 
-  use psb_c_cuda_elg_mat_mod
-#endif
   implicit none 
   class(psb_c_cuda_elg_sparse_mat), intent(inout) :: a
   complex(psb_spk_), intent(in)      :: d
@@ -59,10 +54,8 @@ subroutine psb_c_cuda_elg_scals(d,a,info)
 
   a%val(:,:) = a%val(:,:) * d
 
-#ifdef HAVE_SPGPU
   call a%to_gpu(info)
   if (info /= 0) goto 9999
-#endif
 
   return
 

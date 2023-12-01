@@ -29,7 +29,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_z_cuda_elg_asb(a)
   
   use psb_base_mod

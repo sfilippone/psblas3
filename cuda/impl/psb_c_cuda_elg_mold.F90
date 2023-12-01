@@ -28,8 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 subroutine psb_c_cuda_elg_mold(a,b,info) 
   
   use psb_base_mod

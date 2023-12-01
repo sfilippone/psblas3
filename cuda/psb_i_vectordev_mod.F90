@@ -34,8 +34,6 @@ module psb_i_vectordev_mod
 
   use psb_base_vectordev_mod
  
-#ifdef HAVE_SPGPU  
-  
   interface registerMapped
     function registerMappedInt(buf,d_p,n,dummy) &
          & result(res) bind(c,name='registerMappedInt')
@@ -277,7 +275,5 @@ contains
 
     call  unregisterMapped(c_loc(buffer))
   end subroutine inner_unregisterInt
-
-#endif  
 
 end module psb_i_vectordev_mod

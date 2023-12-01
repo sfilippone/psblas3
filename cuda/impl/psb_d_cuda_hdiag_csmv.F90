@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_d_cuda_hdiag_csmv(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hdiagdev_mod
   use psb_vectordev_mod
   use psb_d_cuda_hdiag_mat_mod, psb_protect_name => psb_d_cuda_hdiag_csmv
-#else 
-  use psb_d_cuda_hdiag_mat_mod
-#endif
   implicit none 
   class(psb_d_cuda_hdiag_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
@@ -94,7 +89,6 @@ subroutine psb_d_cuda_hdiag_csmv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-#ifdef HAVE_SPGPU
   if (tra) then 
     call a%psb_d_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans)
   else
@@ -121,9 +115,6 @@ subroutine psb_d_cuda_hdiag_csmv(alpha,a,x,beta,y,info,trans)
     call freeMultiVecDevice(gpX)
     call freeMultiVecDevice(gpY)
   endif
-#else
-  call a%psb_d_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
-#endif
 
   call psb_erractionrestore(err_act)
   return
@@ -131,6 +122,5 @@ subroutine psb_d_cuda_hdiag_csmv(alpha,a,x,beta,y,info,trans)
 9999 call psb_error_handler(err_act)
 
   return
-
 
 end subroutine psb_d_cuda_hdiag_csmv

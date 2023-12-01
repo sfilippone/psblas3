@@ -31,8 +31,6 @@
 #include <sys/time.h>
 #include "elldev.h"
 
-#if defined(HAVE_SPGPU)
-
 #define PASS_RS  0
 
 EllDeviceParams getEllDeviceParams(unsigned int rows, unsigned int maxRowSize,
@@ -140,7 +138,6 @@ int FallocEllDevice(void** deviceMat,unsigned int rows, unsigned int maxRowSize,
 		    unsigned int columns, unsigned int elementType, 
 		    unsigned int firstIndex)
 { int i;
-#ifdef HAVE_SPGPU
   EllDeviceParams p;
 
   p = getEllDeviceParams(rows, maxRowSize, nnzeros, columns, elementType, firstIndex);
@@ -149,9 +146,6 @@ int FallocEllDevice(void** deviceMat,unsigned int rows, unsigned int maxRowSize,
     fprintf(stderr,"From routine : %s : %d \n","FallocEllDevice",i);
   }
   return(i);
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 void sspmdmm_gpu(float *z,int s, int vPitch, float *y, float alpha, float* cM, int* rP, int* rS, 
@@ -182,7 +176,6 @@ int spmvEllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY; 
 
-#ifdef HAVE_SPGPU
 #ifdef VERBOSE
   __assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");
   __assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");
@@ -196,9 +189,6 @@ int spmvEllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
 		devMat->avgRowSize, devMat->maxRowSize, devMat->rows, devMat->pitch,
 		(float *)x->v_, beta, devMat->baseIndex);
   return(i);
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
@@ -234,7 +224,6 @@ int spmvEllDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
 
-#ifdef HAVE_SPGPU
   /*spgpuDellspmv (handle, (double*) y->v_, (double*)y->v_, alpha, (double*) devMat->cM, devMat->rP, devMat->cMPitch, devMat->rPPitch, devMat->rS, devMat->rows, (double*)x->v_, beta, devMat->baseIndex);*/
   /* fprintf(stderr,"From spmvEllDouble: mat %d %d %d %d y %d %d \n", */
   /* 	  devMat->avgRowSize, devMat->maxRowSize, devMat->rows, */
@@ -246,9 +235,6 @@ int spmvEllDeviceDouble(void *deviceMat, double alpha, void* deviceX,
 	       (double *)x->v_, beta, devMat->baseIndex);
   
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 void
@@ -281,7 +267,6 @@ int spmvEllDeviceFloatComplex(void *deviceMat, float complex alpha, void* device
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
 
-#ifdef HAVE_SPGPU
   cuFloatComplex a = make_cuFloatComplex(crealf(alpha),cimagf(alpha));
   cuFloatComplex b = make_cuFloatComplex(crealf(beta),cimagf(beta));
   cspmdmm_gpu ((cuFloatComplex *)y->v_, y->count_, y->pitch_, (cuFloatComplex *)y->v_, a, (cuFloatComplex *)devMat->cM, 
@@ -289,9 +274,6 @@ int spmvEllDeviceFloatComplex(void *deviceMat, float complex alpha, void* device
 	       (cuFloatComplex *)x->v_, b, devMat->baseIndex);
   
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 void
@@ -323,7 +305,6 @@ int spmvEllDeviceDoubleComplex(void *deviceMat, double complex alpha, void* devi
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
 
-#ifdef HAVE_SPGPU
   cuDoubleComplex a = make_cuDoubleComplex(creal(alpha),cimag(alpha));
   cuDoubleComplex b = make_cuDoubleComplex(creal(beta),cimag(beta));
   zspmdmm_gpu ((cuDoubleComplex *)y->v_, y->count_, y->pitch_, (cuDoubleComplex *)y->v_, a, (cuDoubleComplex *)devMat->cM, 
@@ -331,14 +312,10 @@ int spmvEllDeviceDoubleComplex(void *deviceMat, double complex alpha, void* devi
 	       devMat->pitch, (cuDoubleComplex *)x->v_, b, devMat->baseIndex);
   
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int writeEllDeviceFloat(void* deviceMat, float* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   // Ex updateFromHost function
   i = writeRemoteBuffer((void*) val, (void *)devMat->cM, devMat->allocsize*sizeof(float));
@@ -350,14 +327,10 @@ int writeEllDeviceFloat(void* deviceMat, float* val, int* ja, int ldj, int* irn,
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceFloat",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int writeEllDeviceDouble(void* deviceMat, double* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   // Ex updateFromHost function
   i = writeRemoteBuffer((void*) val, (void *)devMat->cM, devMat->allocsize*sizeof(double));
@@ -370,14 +343,10 @@ int writeEllDeviceDouble(void* deviceMat, double* val, int* ja, int ldj, int* ir
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceDouble",i);
   }
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int writeEllDeviceFloatComplex(void* deviceMat, float complex* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   // Ex updateFromHost function
   i = writeRemoteBuffer((void*) val, (void *)devMat->cM, devMat->allocsize*sizeof(cuFloatComplex));
@@ -390,14 +359,10 @@ int writeEllDeviceFloatComplex(void* deviceMat, float complex* val, int* ja, int
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int writeEllDeviceDoubleComplex(void* deviceMat, double complex* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   // Ex updateFromHost function
   i = writeRemoteBuffer((void*) val, (void *)devMat->cM, devMat->allocsize*sizeof(cuDoubleComplex));
@@ -410,14 +375,10 @@ int writeEllDeviceDoubleComplex(void* deviceMat, double complex* val, int* ja, i
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int readEllDeviceFloat(void* deviceMat, float* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   i = readRemoteBuffer((void *) val, (void *)devMat->cM, devMat->allocsize*sizeof(float));
   i = readRemoteBuffer((void *) ja, (void *)devMat->rP, devMat->allocsize*sizeof(int));
@@ -428,14 +389,10 @@ int readEllDeviceFloat(void* deviceMat, float* val, int* ja, int ldj, int* irn, 
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceFloat",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int readEllDeviceDouble(void* deviceMat, double* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   i = readRemoteBuffer((void *) val, (void *)devMat->cM, devMat->allocsize*sizeof(double));
   i = readRemoteBuffer((void *) ja, (void *)devMat->rP, devMat->allocsize*sizeof(int));
@@ -445,14 +402,10 @@ int readEllDeviceDouble(void* deviceMat, double* val, int* ja, int ldj, int* irn
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int readEllDeviceFloatComplex(void* deviceMat, float complex* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   i = readRemoteBuffer((void *) val, (void *)devMat->cM, devMat->allocsize*sizeof(cuFloatComplex));
   i = readRemoteBuffer((void *) ja, (void *)devMat->rP, devMat->allocsize*sizeof(int));
@@ -462,14 +415,10 @@ int readEllDeviceFloatComplex(void* deviceMat, float complex* val, int* ja, int 
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int readEllDeviceDoubleComplex(void* deviceMat, double complex* val, int* ja, int ldj, int* irn, int *idiag)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   i = readRemoteBuffer((void *) val, (void *)devMat->cM, devMat->allocsize*sizeof(cuDoubleComplex));
   i = readRemoteBuffer((void *) ja, (void *)devMat->rP, devMat->allocsize*sizeof(int));
@@ -479,32 +428,21 @@ int readEllDeviceDoubleComplex(void* deviceMat, double complex* val, int* ja, in
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int getEllDevicePitch(void* deviceMat)
 { int i;
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
-#ifdef HAVE_SPGPU
   i = devMat->pitch; //old
   //i = getPitchEllDevice(deviceMat);
   return(i);
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int getEllDeviceMaxRowSize(void* deviceMat)
 { int i;
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
-#ifdef HAVE_SPGPU
   i = devMat->maxRowSize;
   return(i);
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
@@ -515,7 +453,6 @@ int getEllDeviceMaxRowSize(void* deviceMat)
 int psiCopyCooToElgFloat(int nr, int nc, int nza, int hacksz, int ldv, int nzm, int *irn,
 			  int *idisp, int *ja, float *val, void *deviceMat)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   float *devVal;
   int *devIdisp, *devJa;
@@ -548,9 +485,6 @@ int psiCopyCooToElgFloat(int nr, int nc, int nza, int hacksz, int ldv, int nzm, 
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceFloat",i);
   }
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
@@ -558,7 +492,6 @@ int psiCopyCooToElgFloat(int nr, int nc, int nza, int hacksz, int ldv, int nzm, 
 int psiCopyCooToElgDouble(int nr, int nc, int nza, int hacksz, int ldv, int nzm, int *irn,
 			  int *idisp, int *ja, double *val, void *deviceMat)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   double *devVal;
   int *devIdisp, *devJa;
@@ -591,16 +524,12 @@ int psiCopyCooToElgDouble(int nr, int nc, int nza, int hacksz, int ldv, int nzm,
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceDouble",i);
   }
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
 int psiCopyCooToElgFloatComplex(int nr, int nc, int nza, int hacksz, int ldv, int nzm, int *irn,
 			  int *idisp, int *ja, float complex *val, void *deviceMat)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   float complex *devVal;
   int *devIdisp, *devJa;
@@ -633,9 +562,6 @@ int psiCopyCooToElgFloatComplex(int nr, int nc, int nza, int hacksz, int ldv, in
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceFloatComplex",i);
   }
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
@@ -643,7 +569,6 @@ int psiCopyCooToElgFloatComplex(int nr, int nc, int nza, int hacksz, int ldv, in
 int psiCopyCooToElgDoubleComplex(int nr, int nc, int nza, int hacksz, int ldv, int nzm, int *irn,
 			  int *idisp, int *ja, double complex *val, void *deviceMat)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   double complex *devVal;
   int *devIdisp, *devJa;
@@ -676,15 +601,11 @@ int psiCopyCooToElgDoubleComplex(int nr, int nc, int nza, int hacksz, int ldv, i
     fprintf(stderr,"From routine : %s : %d \n","writeEllDeviceDoubleComplex",i);
   }
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
 int dev_csputEllDeviceFloat(void* deviceMat, int nnz, void *ia, void *ja, void *val)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   struct MultiVectDevice *devVal = (struct MultiVectDevice *) val;
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
@@ -699,13 +620,11 @@ int dev_csputEllDeviceFloat(void* deviceMat, int nnz, void *ia, void *ja, void *
 		 devMat->rP,devMat->pitch, devMat->pitch, devMat->rS,
 		 nnz, devIa->v_, devJa->v_, (float *) devVal->v_, 1);
 
-#endif
   return SPGPU_SUCCESS; 
 }
 
 int dev_csputEllDeviceDouble(void* deviceMat, int nnz, void *ia, void *ja, void *val)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   struct MultiVectDevice *devVal = (struct MultiVectDevice *) val;
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
@@ -720,7 +639,6 @@ int dev_csputEllDeviceDouble(void* deviceMat, int nnz, void *ia, void *ja, void 
 		 devMat->rP,devMat->pitch, devMat->pitch, devMat->rS,
 		 nnz, devIa->v_, devJa->v_, (double *) devVal->v_, 1);
 
-#endif
   return SPGPU_SUCCESS; 
 }
 
@@ -728,7 +646,6 @@ int dev_csputEllDeviceDouble(void* deviceMat, int nnz, void *ia, void *ja, void 
 int dev_csputEllDeviceFloatComplex(void* deviceMat, int nnz,
 				   void *ia, void *ja, void *val)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   struct MultiVectDevice *devVal = (struct MultiVectDevice *) val;
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
@@ -743,14 +660,12 @@ int dev_csputEllDeviceFloatComplex(void* deviceMat, int nnz,
 		 devMat->rP,devMat->pitch, devMat->pitch, devMat->rS,
 		 nnz, devIa->v_, devJa->v_, (cuFloatComplex *) devVal->v_, 1);
 
-#endif
   return SPGPU_SUCCESS; 
 }
 
 int dev_csputEllDeviceDoubleComplex(void* deviceMat, int nnz,
 				   void *ia, void *ja, void *val)
 { int i;
-#ifdef HAVE_SPGPU
   struct EllDevice *devMat = (struct EllDevice *) deviceMat;
   struct MultiVectDevice *devVal = (struct MultiVectDevice *) val;
   struct MultiVectDevice *devIa = (struct MultiVectDevice *) ia;
@@ -765,9 +680,7 @@ int dev_csputEllDeviceDoubleComplex(void* deviceMat, int nnz,
 		 devMat->rP,devMat->pitch, devMat->pitch, devMat->rS,
 		 nnz, devIa->v_, devJa->v_, (cuDoubleComplex *) devVal->v_, 1);
 
-#endif
   return SPGPU_SUCCESS; 
 }
 
-#endif
 

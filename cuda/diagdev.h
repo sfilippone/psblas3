@@ -32,7 +32,6 @@
 #ifndef _DIAGDEV_H_
 #define _DIAGDEV_H_
 
-#ifdef HAVE_SPGPU
 #include "cintrf.h"
 #include "dia.h"
 
@@ -87,9 +86,5 @@ int spmvDiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
 			float beta, void* deviceY);
 
 
-
-#else
-#define CINTRF_UNSUPPORTED   -1
-#endif
 
 #endif

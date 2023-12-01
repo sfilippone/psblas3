@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_d_cuda_hlg_to_gpu(a,info,nzrm) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_d_cuda_hlg_mat_mod, psb_protect_name => psb_d_cuda_hlg_to_gpu
-#else 
-  use psb_d_cuda_hlg_mat_mod
-#endif
   use iso_c_binding
   implicit none 
   class(psb_d_cuda_hlg_sparse_mat), intent(inout) :: a
@@ -50,7 +45,6 @@ subroutine psb_d_cuda_hlg_to_gpu(a,info,nzrm)
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if ((.not.allocated(a%val)).or.(.not.allocated(a%ja))) return
   
   n   = a%get_nrows()
@@ -63,6 +57,5 @@ subroutine psb_d_cuda_hlg_to_gpu(a,info,nzrm)
   if (info == 0)  info = &
        & writehllDevice(a%deviceMat,a%val,a%ja,a%hkoffs,a%irn,a%idiag)
 !  if (info /= 0) goto 9999
-#endif
 
 end subroutine psb_d_cuda_hlg_to_gpu

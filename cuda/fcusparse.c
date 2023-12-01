@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef HAVE_SPGPU
 #include <cuda_runtime.h>
 #include "cintrf.h"
 #include "fcusparse.h"
@@ -72,6 +71,3 @@ cusparseHandle_t *getHandle()
   return(cusparse_handle);
 }
 
-
-
-#endif 

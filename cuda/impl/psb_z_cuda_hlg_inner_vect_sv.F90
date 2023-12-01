@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_z_cuda_hlg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_hlg_mat_mod, psb_protect_name => psb_z_cuda_hlg_inner_vect_sv
-#else 
-  use psb_z_cuda_hlg_mat_mod
-#endif
   use psb_z_cuda_vect_mod
   implicit none 
   class(psb_z_cuda_hlg_sparse_mat), intent(in) :: a
@@ -69,10 +64,8 @@ subroutine psb_z_cuda_hlg_inner_vect_sv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-
   call psb_erractionrestore(err_act)
   return
-
 
 9999 call psb_error_handler(err_act)
 

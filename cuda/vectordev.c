@@ -32,7 +32,6 @@
 
 #include <stdio.h>
 #include <complex.h>
-#if defined(HAVE_SPGPU)
 #include "cuComplex.h"
 #include "vectordev.h"
 #include "cuda_runtime.h"
@@ -193,6 +192,4 @@ int getMultiVecDevicePitch(void* deviceVec)
   i = dev->pitch_;
   return(i);
 }
-
-#endif
 

@@ -33,13 +33,9 @@
 subroutine psb_c_cuda_diag_to_gpu(a,info,nzrm) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use diagdev_mod
   use psb_vectordev_mod
   use psb_c_cuda_diag_mat_mod, psb_protect_name => psb_c_cuda_diag_to_gpu
-#else 
-  use psb_c_cuda_diag_mat_mod
-#endif
   use iso_c_binding
   implicit none 
   class(psb_c_cuda_diag_sparse_mat), intent(inout) :: a
@@ -47,13 +43,10 @@ subroutine psb_c_cuda_diag_to_gpu(a,info,nzrm)
   integer(psb_ipk_), intent(in), optional    :: nzrm
 
   integer(psb_ipk_) :: m, nzm, n, c,pitch,maxrowsize,d
-#ifdef HAVE_SPGPU
   type(diagdev_parms) :: gpu_parms
-#endif
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if ((.not.allocated(a%data)).or.(.not.allocated(a%offset))) return
   
   n   = size(a%data,1)
@@ -69,6 +62,5 @@ subroutine psb_c_cuda_diag_to_gpu(a,info,nzrm)
   if (info == 0)  info = &
        & writeDiagDevice(a%deviceMat,a%data,a%offset,n)
 !  if (info /= 0) goto 9999
-#endif
 
 end subroutine psb_c_cuda_diag_to_gpu

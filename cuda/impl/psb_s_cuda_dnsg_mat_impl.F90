@@ -32,13 +32,9 @@
 subroutine psb_s_cuda_dnsg_vect_mv(alpha,a,x,beta,y,info,trans) 
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_vect_mv
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   implicit none 
   class(psb_s_cuda_dnsg_sparse_mat), intent(in)    :: a
   real(psb_spk_), intent(in)                 :: alpha, beta
@@ -123,13 +119,9 @@ end subroutine psb_s_cuda_dnsg_vect_mv
 subroutine psb_s_cuda_dnsg_mold(a,b,info) 
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_mold
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   implicit none 
   class(psb_s_cuda_dnsg_sparse_mat), intent(in)                  :: a
   class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
@@ -190,17 +182,12 @@ end subroutine psb_s_cuda_dnsg_mold
 !!$    end subroutine psb_s_cuda_dnsg_allocate_mnnz
 !!$  end interface
 
-
 subroutine psb_s_cuda_dnsg_to_gpu(a,info) 
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_to_gpu
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   class(psb_s_cuda_dnsg_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)             :: info
   Integer(Psb_ipk_) :: err_act, pitch, lda
@@ -209,15 +196,12 @@ subroutine psb_s_cuda_dnsg_to_gpu(a,info)
   
   call psb_erractionsave(err_act)
   info = psb_success_
-#ifdef HAVE_SPGPU
   if (debug) write(0,*) 'DNS_TO_GPU',size(a%val,1),size(a%val,2)
   info = FallocDnsDevice(a%deviceMat,a%get_nrows(),a%get_ncols(),&
        & spgpu_type_float,1)
   if (info == 0) info = writeDnsDevice(a%deviceMat,a%val,size(a%val,1),size(a%val,2))
   if (debug) write(0,*) 'DNS_TO_GPU: From writeDnsDEvice',info
-    
   
-#endif 
   if (info /= 0) goto 9999
   call psb_erractionrestore(err_act)
   return
@@ -233,13 +217,9 @@ end subroutine psb_s_cuda_dnsg_to_gpu
 subroutine psb_s_cuda_cp_dnsg_from_coo(a,b,info)
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_cp_dnsg_from_coo
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   implicit none 
 
   class(psb_s_cuda_dnsg_sparse_mat), intent(inout) :: a
@@ -272,13 +252,9 @@ end subroutine psb_s_cuda_cp_dnsg_from_coo
 subroutine psb_s_cuda_cp_dnsg_from_fmt(a,b,info)
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_cp_dnsg_from_fmt
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   implicit none 
 
   class(psb_s_cuda_dnsg_sparse_mat), intent(inout) :: a
@@ -348,13 +324,9 @@ end subroutine psb_s_cuda_cp_dnsg_from_fmt
 subroutine psb_s_cuda_mv_dnsg_from_coo(a,b,info)
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_mv_dnsg_from_coo
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   implicit none 
   
   class(psb_s_cuda_dnsg_sparse_mat), intent(inout) :: a
@@ -383,18 +355,13 @@ subroutine psb_s_cuda_mv_dnsg_from_coo(a,b,info)
   return
   
 end subroutine psb_s_cuda_mv_dnsg_from_coo
-
-  
+ 
 subroutine psb_s_cuda_mv_dnsg_from_fmt(a,b,info)
   use psb_base_mod
   use psb_s_cuda_vect_mod
-#ifdef HAVE_SPGPU
   use dnsdev_mod
   use psb_s_vectordev_mod
   use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_mv_dnsg_from_fmt
-#else
-  use psb_s_cuda_dnsg_mat_mod
-#endif
   implicit none 
   class(psb_s_cuda_dnsg_sparse_mat), intent(inout)  :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b

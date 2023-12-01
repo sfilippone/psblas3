@@ -31,7 +31,6 @@
   
 
 #pragma once
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 #include "vectordev.h"
 #include "cuda_runtime.h"
@@ -75,4 +74,3 @@ int absMultiVecDeviceFloat(int n, float alpha, void *deviceVecA);
 int absMultiVecDeviceFloat2(int n, float alpha, void *deviceVecA, void *deviceVecB);
 
 
-#endif

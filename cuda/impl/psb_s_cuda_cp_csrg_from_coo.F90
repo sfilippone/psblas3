@@ -32,12 +32,8 @@
 subroutine psb_s_cuda_cp_csrg_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_s_cuda_csrg_mat_mod, psb_protect_name => psb_s_cuda_cp_csrg_from_coo
-#else 
-  use psb_s_cuda_csrg_mat_mod
-#endif
   implicit none 
 
   class(psb_s_cuda_csrg_sparse_mat), intent(inout) :: a
@@ -48,10 +44,8 @@ subroutine psb_s_cuda_cp_csrg_from_coo(a,b,info)
 
   call a%psb_s_csr_sparse_mat%cp_from_coo(b,info) 
   if (info /= 0) goto 9999
-#ifdef HAVE_SPGPU
   call a%to_gpu(info)
   if (info /= 0) goto 9999
-#endif
 
   return
 

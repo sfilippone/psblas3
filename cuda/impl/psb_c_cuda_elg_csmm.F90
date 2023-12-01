@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_c_cuda_elg_csmm(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_elg_mat_mod, psb_protect_name => psb_c_cuda_elg_csmm
-#else 
-  use psb_c_cuda_elg_mat_mod
-#endif
   implicit none 
   class(psb_c_cuda_elg_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
@@ -92,8 +87,6 @@ subroutine psb_c_cuda_elg_csmm(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-
-#ifdef HAVE_SPGPU
   if (tra) then 
     if (a%is_dev()) call a%sync()
     call a%psb_c_ell_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
@@ -119,9 +112,6 @@ subroutine psb_c_cuda_elg_csmm(alpha,a,x,beta,y,info,trans)
     call freeMultiVecDevice(gpX)
     call freeMultiVecDevice(gpY)
   endif
-#else
-  call a%psb_c_ell_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
-#endif
 
   call psb_erractionrestore(err_act)
   return

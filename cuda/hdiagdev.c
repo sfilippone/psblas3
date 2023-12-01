@@ -34,10 +34,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#if defined(HAVE_SPGPU)
 #define DEBUG 0
-
-
 void freeHdiagDevice(void* remoteMatrix)
 {
   struct HdiagDevice *devMat = (struct HdiagDevice *) remoteMatrix;  
@@ -138,7 +135,6 @@ int FallocHdiagDevice(void** deviceMat, unsigned int rows, unsigned int cols,
 		      unsigned int allocationHeight, unsigned int hackSize,
 		      unsigned int hackCount, unsigned int elementType)
 { int i=0;
-#ifdef HAVE_SPGPU
   HdiagDeviceParams p;
  
   p = getHdiagDeviceParams(rows, cols, allocationHeight, hackSize, hackCount,elementType);
@@ -152,17 +148,12 @@ int FallocHdiagDevice(void** deviceMat, unsigned int rows, unsigned int cols,
     fprintf(stderr,"From routine : %s : %d \n","FallocEllDevice",i);
   }
   return(i);
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
-  
 
 }
 
 int writeHdiagDeviceDouble(void* deviceMat, double* val, int* hdiaOffsets, int *hackOffsets)
 { int i=0,fo,fa,j,k,p;
   char buf_a[255], buf_o[255],tmp[255];
-#ifdef HAVE_SPGPU
   struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
   
   i=SPGPU_SUCCESS; 
@@ -216,9 +207,6 @@ int writeHdiagDeviceDouble(void* deviceMat, double* val, int* hdiaOffsets, int *
     return SPGPU_SUCCESS;
   else
     return SPGPU_UNSUPPORTED;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
@@ -227,15 +215,12 @@ long long int sizeofHdiagDeviceDouble(void* deviceMat)
 { int i=0,fo,fa;
   int *hoff=NULL,*hackoff=NULL;
   long long int memsize=0;
-#ifdef HAVE_SPGPU
   struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
   
   
   memsize += (devMat->hackCount+1)*sizeof(int);
   memsize += devMat->allocationHeight*sizeof(int);
   memsize += devMat->allocationHeight*devMat->hackSize*sizeof(double);
-  
-#endif
   return(memsize);
 }
 
@@ -243,7 +228,6 @@ long long int sizeofHdiagDeviceDouble(void* deviceMat)
 
 int readHdiagDeviceDouble(void* deviceMat, double* a, int* off)
 { int i;
-#ifdef HAVE_SPGPU
   struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
   /* i = readRemoteBuffer((void *) a, (void *)devMat->cM,devMat->rows*devMat->diags*sizeof(double)); */
   /* i = readRemoteBuffer((void *) off, (void *)devMat->off, devMat->diags*sizeof(int)); */
@@ -253,9 +237,6 @@ int readHdiagDeviceDouble(void* deviceMat, double* a, int* off)
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int spmvHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
@@ -266,7 +247,6 @@ int spmvHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-#ifdef HAVE_SPGPU
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
@@ -285,15 +265,11 @@ int spmvHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   //cudaSync();
 
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int writeHdiagDeviceFloat(void* deviceMat, float* val, int* hdiaOffsets, int *hackOffsets)
 { int i=0,fo,fa,j,k,p;
   char buf_a[255], buf_o[255],tmp[255];
-#ifdef HAVE_SPGPU
   struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
   
   i=SPGPU_SUCCESS; 
@@ -347,9 +323,6 @@ int writeHdiagDeviceFloat(void* deviceMat, float* val, int* hdiaOffsets, int *ha
     return SPGPU_SUCCESS;
   else
     return SPGPU_UNSUPPORTED;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
@@ -358,7 +331,6 @@ long long int sizeofHdiagDeviceFloat(void* deviceMat)
 { int i=0,fo,fa;
   int *hoff=NULL,*hackoff=NULL;
   long long int memsize=0;
-#ifdef HAVE_SPGPU
   struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
   
   
@@ -366,7 +338,6 @@ long long int sizeofHdiagDeviceFloat(void* deviceMat)
   memsize += devMat->allocationHeight*sizeof(int);
   memsize += devMat->allocationHeight*devMat->hackSize*sizeof(float);
   
-#endif
   return(memsize);
 }
 
@@ -374,7 +345,6 @@ long long int sizeofHdiagDeviceFloat(void* deviceMat)
 
 int readHdiagDeviceFloat(void* deviceMat, float* a, int* off)
 { int i;
-#ifdef HAVE_SPGPU
   struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
   /* i = readRemoteBuffer((void *) a, (void *)devMat->cM,devMat->rows*devMat->diags*sizeof(float)); */
   /* i = readRemoteBuffer((void *) off, (void *)devMat->off, devMat->diags*sizeof(int)); */
@@ -384,9 +354,6 @@ int readHdiagDeviceFloat(void* deviceMat, float* a, int* off)
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceFloat",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int spmvHdiagDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
@@ -397,7 +364,6 @@ int spmvHdiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-#ifdef HAVE_SPGPU
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
@@ -416,10 +382,5 @@ int spmvHdiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   //cudaSync();
 
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
-
-#endif

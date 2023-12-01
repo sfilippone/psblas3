@@ -33,13 +33,9 @@
 subroutine psb_z_cuda_cp_elg_from_fmt(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_cp_elg_from_fmt
-#else 
-  use psb_z_cuda_elg_mat_mod
-#endif
   implicit none 
 
   class(psb_z_cuda_elg_sparse_mat), intent(inout) :: a
@@ -51,9 +47,7 @@ subroutine psb_z_cuda_cp_elg_from_fmt(a,b,info)
   Integer(Psb_ipk_)   :: nza, nr, i,j,irw, idl,err_act, nc, ld, nzm, m
   integer(psb_ipk_)   :: debug_level, debug_unit
   character(len=20)   :: name
-#ifdef HAVE_SPGPU
   type(elldev_parms) :: gpu_parms
-#endif
 
   info = psb_success_
   if (b%is_dev()) call b%sync()
@@ -67,13 +61,9 @@ subroutine psb_z_cuda_cp_elg_from_fmt(a,b,info)
     m   = b%get_nrows()
     nc  = b%get_ncols()
     nza = b%get_nzeros()
-#ifdef HAVE_SPGPU
     gpu_parms = FgetEllDeviceParams(m,nzm,nza,nc,spgpu_type_double,1)
     ld  = gpu_parms%pitch
     nzm = gpu_parms%maxRowSize
-#else
-    ld  = m 
-#endif
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     if (info == 0) call psb_safe_cpy( b%idiag, a%idiag , info)
     if (info == 0) call psb_safe_cpy( b%irn,   a%irn , info)
@@ -88,9 +78,7 @@ subroutine psb_z_cuda_cp_elg_from_fmt(a,b,info)
       a%val(1:m,1:nzm) = b%val(1:m,1:nzm)
     end if
     a%nzt = nza
-#ifdef HAVE_SPGPU
     call a%to_gpu(info)
-#endif
 
   class default
   

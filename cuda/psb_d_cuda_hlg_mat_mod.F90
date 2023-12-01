@@ -49,7 +49,6 @@ module psb_d_cuda_hlg_mat_mod
     ! If HAVE_SPGPU is undefined this is just
     ! a copy of HLL, indistinguishable.
     ! 
-#ifdef HAVE_SPGPU
     type(c_ptr) :: deviceMat = c_null_ptr
     integer     :: devstate  = is_host
 
@@ -82,13 +81,8 @@ module psb_d_cuda_hlg_mat_mod
     procedure, pass(a) :: from_gpu      => psb_d_cuda_hlg_from_gpu
     procedure, pass(a) :: to_gpu        => psb_d_cuda_hlg_to_gpu
     final              :: d_cuda_hlg_finalize
-#else 
-  contains
-    procedure, pass(a) :: mold         => psb_d_cuda_hlg_mold
-#endif
   end type psb_d_cuda_hlg_sparse_mat
 
-#ifdef HAVE_SPGPU
   private :: d_cuda_hlg_get_nzeros, d_cuda_hlg_free,  d_cuda_hlg_get_fmt, &
        & d_cuda_hlg_get_size, d_cuda_hlg_sizeof, d_cuda_hlg_get_nz_row
 
@@ -381,18 +375,5 @@ contains
     
     return
   end subroutine d_cuda_hlg_finalize
-
-#else 
-
-  interface 
-    subroutine psb_d_cuda_hlg_mold(a,b,info) 
-      import :: psb_d_cuda_hlg_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
-      class(psb_d_cuda_hlg_sparse_mat), intent(in)                :: a
-      class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_d_cuda_hlg_mold
-  end interface
-
-#endif
 
 end module psb_d_cuda_hlg_mat_mod

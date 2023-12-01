@@ -36,7 +36,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#if defined(HAVE_SPGPU) && defined(HAVE_CUDA)
 #include "core.h"
 #include "cuda_util.h"
 #include "vector.h"
@@ -44,8 +43,5 @@
 
 #define ELL_PITCH_ALIGN_S 32
 #define ELL_PITCH_ALIGN_D 16
-
-
-#endif
 
 #endif

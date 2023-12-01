@@ -32,7 +32,6 @@
 
 #include <stdio.h>
 #include <complex.h>
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 //#include "common.h"
 #include "ivectordev.h"
@@ -177,6 +176,3 @@ int iscatMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void
   return SPGPU_SUCCESS;
   
 }
-
-#endif
-

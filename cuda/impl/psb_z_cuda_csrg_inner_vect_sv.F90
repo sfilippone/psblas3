@@ -32,13 +32,9 @@
 subroutine psb_z_cuda_csrg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_csrg_mat_mod, psb_protect_name => psb_z_cuda_csrg_inner_vect_sv
-#else 
-  use psb_z_cuda_csrg_mat_mod
-#endif
   use psb_z_cuda_vect_mod
   implicit none 
   class(psb_z_cuda_csrg_sparse_mat), intent(in) :: a
@@ -75,7 +71,6 @@ subroutine psb_z_cuda_csrg_inner_vect_sv(alpha,a,x,beta,y,info,trans)
 
   tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
 
-#ifdef HAVE_SPGPU  
   if (tra.or.(beta/=dzero)) then 
     call x%sync()
     call y%sync()
@@ -112,12 +107,6 @@ subroutine psb_z_cuda_csrg_inner_vect_sv(alpha,a,x,beta,y,info,trans)
       call y%bld(ry)
     end select
   end if
-#else
-  call x%sync()
-  call y%sync()
-  call a%psb_z_csr_sparse_mat%inner_spsm(alpha,x,beta,y,info,trans)
-  call y%set_host()
-#endif
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='csrg_vect_sv')

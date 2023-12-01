@@ -27,19 +27,14 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-  
+!     
 
 subroutine psb_d_cuda_elg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_d_cuda_elg_mat_mod, psb_protect_name => psb_d_cuda_elg_inner_vect_sv
-#else 
-  use psb_d_cuda_elg_mat_mod
-#endif
   use psb_d_cuda_vect_mod
   implicit none 
   class(psb_d_cuda_elg_sparse_mat), intent(in) :: a

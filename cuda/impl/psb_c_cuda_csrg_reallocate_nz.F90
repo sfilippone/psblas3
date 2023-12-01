@@ -33,12 +33,8 @@
 subroutine  psb_c_cuda_csrg_reallocate_nz(nz,a) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_c_cuda_csrg_mat_mod, psb_protect_name => psb_c_cuda_csrg_reallocate_nz
-#else 
-  use psb_c_cuda_csrg_mat_mod
-#endif
   implicit none 
   integer(psb_ipk_), intent(in) :: nz
   class(psb_c_cuda_csrg_sparse_mat), intent(inout) :: a
@@ -55,10 +51,8 @@ subroutine  psb_c_cuda_csrg_reallocate_nz(nz,a)
   ! 
   call a%psb_c_csr_sparse_mat%reallocate(nz)
 
-#ifdef HAVE_SPGPU
   call a%to_gpu(info,nzrm=nz)
   if (info /= 0) goto 9999
-#endif
 
   call psb_erractionrestore(err_act)
   return

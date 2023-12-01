@@ -37,7 +37,6 @@ module psb_cuda_env_mod
 !  interface psb_cuda_init
 !    module procedure  psb_cuda_init
 !  end interface
-#if defined(HAVE_CUDA)
   use core_mod
   
   interface 
@@ -126,7 +125,6 @@ module psb_cuda_env_mod
       use iso_c_binding   
     end subroutine psb_cuda_innerClose
   end interface
-#endif
 
   interface 
     function psb_C_DeviceHasUVA() &
@@ -209,7 +207,6 @@ Contains
 
     info = psb_success_
     call psb_erractionsave(err_act)
-#if defined (HAVE_CUDA)
 #if defined(SERIAL_MPI) 
     iam = 0
 #else
@@ -234,7 +231,6 @@ Contains
       goto 9999
     end if
     call psb_cudaCreateHandle()
-#endif
     call psb_erractionrestore(err_act)
     return
 9999 call psb_error_handler(ctxt,err_act)
@@ -245,18 +241,12 @@ Contains
 
 
   subroutine psb_cuda_DeviceSync()
-#if defined(HAVE_CUDA)
     call psb_cudaSync()
-#endif
   end subroutine psb_cuda_DeviceSync
 
   function psb_cuda_getDeviceCount() result(res)
     integer :: res
-#if defined(HAVE_CUDA)
     res = psb_cuda_inner_getDeviceCount()
-#else 
-    res = 0
-#endif
   end function psb_cuda_getDeviceCount
 
   subroutine psb_cuda_exit()

@@ -33,7 +33,6 @@
 #ifndef _DNSDEV_H_
 #define _DNSDEV_H_
 
-#if defined(HAVE_SPGPU)
 #include "cintrf.h"
 #include "cuComplex.h"
 #include "cublas_v2.h"
@@ -114,9 +113,5 @@ int getDnsDevicePitch(void* deviceMat);
 // sparse Dns matrix-vector product
 //int spmvDnsDeviceFloat(void *deviceMat, float* alpha, void* deviceX, float* beta, void* deviceY);
 //int spmvDnsDeviceDouble(void *deviceMat, double* alpha, void* deviceX, double* beta, void* deviceY);
-
-#else
-#define CINTRF_UNSUPPORTED   -1
-#endif
 
 #endif

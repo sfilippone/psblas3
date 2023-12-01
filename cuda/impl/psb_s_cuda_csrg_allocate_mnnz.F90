@@ -33,12 +33,8 @@
 subroutine  psb_s_cuda_csrg_allocate_mnnz(m,n,a,nz) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_s_cuda_csrg_mat_mod, psb_protect_name => psb_s_cuda_csrg_allocate_mnnz
-#else 
-  use psb_s_cuda_csrg_mat_mod
-#endif
   implicit none 
   integer(psb_ipk_), intent(in) :: m,n
   class(psb_s_cuda_csrg_sparse_mat), intent(inout) :: a
@@ -52,11 +48,9 @@ subroutine  psb_s_cuda_csrg_allocate_mnnz(m,n,a,nz)
 
   call a%psb_s_csr_sparse_mat%allocate(m,n,nz)
   
-#ifdef HAVE_SPGPU
   info =  initFcusparse()
   if (info == 0) call a%to_gpu(info,nzrm=nz)
   if (info /= 0) goto 9999
-#endif
 
   call psb_erractionrestore(err_act)
   return

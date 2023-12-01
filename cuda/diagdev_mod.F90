@@ -41,8 +41,6 @@ module diagdev_mod
     integer(c_int) :: firstIndex
  end type diagdev_parms
 
-#ifdef HAVE_SPGPU  
-
   interface 
     function FgetDiagDeviceParams(rows, columns, elementType, firstIndex) &
          & result(res) bind(c,name='getDiagDeviceParams')
@@ -64,7 +62,6 @@ module diagdev_mod
       type(c_ptr)           :: deviceMat
     end function FallocDiagDevice
   end interface
-
 
   interface writeDiagDevice
  
@@ -174,7 +171,6 @@ module diagdev_mod
     end function getDiagTimer
   end interface
 
-
   interface 
     function  getDiagDevicePitch(deviceMat) &
          & bind(c,name='getDiagDevicePitch') result(res)
@@ -225,7 +221,4 @@ module diagdev_mod
     end function spmvDiagDeviceDoubleComplex
   end interface spmvDiagDevice
     
-#endif  
-
-
 end module diagdev_mod

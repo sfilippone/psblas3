@@ -29,7 +29,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_z_cuda_hdiag_mold(a,b,info) 
   
   use psb_base_mod

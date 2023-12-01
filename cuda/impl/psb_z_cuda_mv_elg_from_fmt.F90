@@ -28,18 +28,13 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
+ 
 subroutine psb_z_cuda_mv_elg_from_fmt(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_mv_elg_from_fmt
-#else 
-  use psb_z_cuda_elg_mat_mod
-#endif
   implicit none 
 
   class(psb_z_cuda_elg_sparse_mat), intent(inout)  :: a
@@ -49,9 +44,7 @@ subroutine psb_z_cuda_mv_elg_from_fmt(a,b,info)
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
   Integer(Psb_ipk_)          :: nza, nr, i,j,irw, idl,err_act, nc, ld, nzm, m
-#ifdef HAVE_SPGPU
   type(elldev_parms) :: gpu_parms
-#endif
 
   info = psb_success_
 
@@ -65,13 +58,9 @@ subroutine psb_z_cuda_mv_elg_from_fmt(a,b,info)
     m   = b%get_nrows()
     nc  = b%get_ncols()
     nza = b%get_nzeros()
-#ifdef HAVE_SPGPU
     gpu_parms = FgetEllDeviceParams(m,nzm,nza,nc,spgpu_type_double,1)
     ld  = gpu_parms%pitch
     nzm = gpu_parms%maxRowSize
-#else
-    ld  = m 
-#endif
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     call move_alloc(b%irn,   a%irn)
     call move_alloc(b%idiag, a%idiag)
@@ -87,9 +76,7 @@ subroutine psb_z_cuda_mv_elg_from_fmt(a,b,info)
     end if
     a%nzt = nza
     call b%free()
-#ifdef HAVE_SPGPU
     call a%to_gpu(info)
-#endif
 
   class default
     call b%mv_to_coo(tmp,info)

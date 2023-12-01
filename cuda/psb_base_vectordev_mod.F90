@@ -40,9 +40,6 @@ module psb_base_vectordev_mod
     integer(c_int) :: pitch
     integer(c_int) :: size
   end type multivec_dev_parms
- 
-#ifdef HAVE_SPGPU  
-
 
   interface 
     function FallocMultiVecDevice(deviceVec,count,Size,elementType) &
@@ -53,7 +50,6 @@ module psb_base_vectordev_mod
       type(c_ptr)           :: deviceVec
     end function FallocMultiVecDevice
   end interface
-
 
   interface 
     subroutine  unregisterMapped(buf) &
@@ -97,8 +93,5 @@ module psb_base_vectordev_mod
       integer(c_int)      :: res
     end function getMultiVecDevicePitch
   end interface
-
-#endif  
-
 
 end module psb_base_vectordev_mod

@@ -31,7 +31,6 @@
   
 
 #pragma once
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 #include "vectordev.h"
 #include "cuda_runtime.h"
@@ -74,5 +73,3 @@ int axybzMultiVecDeviceDouble(int n, double alpha, void *deviceVecA,
 int absMultiVecDeviceDouble(int n, double alpha, void *deviceVecA);
 int absMultiVecDeviceDouble2(int n, double alpha, void *deviceVecA, void *deviceVecB);
 
-
-#endif

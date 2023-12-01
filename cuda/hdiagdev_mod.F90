@@ -43,8 +43,6 @@ module hdiagdev_mod
     integer(c_int) :: allocationHeight    
  end type hdiagdev_parms
 
-#ifdef HAVE_SPGPU  
-
  ! interface computeHdiaHacksCount
  !    function computeHdiaHacksCountDouble(allocationHeight,hackOffsets,hackSize, &
  !         & diaValues,diaValuesPitch,diags,rows)&
@@ -197,7 +195,5 @@ module hdiagdev_mod
 !!$      complex(c_double_complex),value :: alpha,  beta
 !!$    end function spmvHdiagDeviceDoubleComplex
   end interface spmvHdiagDevice
-    
-#endif  
 
 end module hdiagdev_mod

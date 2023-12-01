@@ -33,13 +33,9 @@
 subroutine psb_d_cuda_cp_hlg_from_fmt(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_d_cuda_hlg_mat_mod, psb_protect_name => psb_d_cuda_cp_hlg_from_fmt
-#else 
-  use psb_d_cuda_hlg_mat_mod
-#endif
   implicit none 
 
   class(psb_d_cuda_hlg_sparse_mat), intent(inout) :: a
@@ -53,9 +49,7 @@ subroutine psb_d_cuda_cp_hlg_from_fmt(a,b,info)
     call a%cp_from_coo(b,info) 
   class default
     call a%psb_d_hll_sparse_mat%cp_from_fmt(b,info)
-#ifdef HAVE_SPGPU
     if (info == 0) call a%to_gpu(info)
-#endif
   end select
   if (info /= 0) goto 9999
 

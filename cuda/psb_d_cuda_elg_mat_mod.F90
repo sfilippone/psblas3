@@ -49,7 +49,6 @@ module psb_d_cuda_elg_mat_mod
     ! If HAVE_SPGPU is undefined this is just
     ! a copy of ELL, indistinguishable.
     ! 
-#ifdef HAVE_SPGPU
     type(c_ptr)       :: deviceMat = c_null_ptr
     integer(psb_ipk_) :: devstate  = is_host
 
@@ -86,14 +85,8 @@ module psb_d_cuda_elg_mat_mod
     procedure, pass(a) :: to_gpu        => psb_d_cuda_elg_to_gpu
     procedure, pass(a) :: asb           => psb_d_cuda_elg_asb
     final              :: d_cuda_elg_finalize
-#else 
-  contains
-    procedure, pass(a) :: mold         => psb_d_cuda_elg_mold
-    procedure, pass(a) :: asb          => psb_d_cuda_elg_asb
-#endif
   end type psb_d_cuda_elg_sparse_mat
 
-#ifdef HAVE_SPGPU
   private :: d_cuda_elg_get_nzeros, d_cuda_elg_free,  d_cuda_elg_get_fmt, &
        & d_cuda_elg_get_size, d_cuda_elg_sizeof, d_cuda_elg_get_nz_row, d_cuda_elg_sync
 
@@ -459,25 +452,5 @@ contains
     return
 
   end subroutine d_cuda_elg_finalize
-
-#else 
-
-  interface 
-    subroutine psb_d_cuda_elg_asb(a)
-      import :: psb_d_cuda_elg_sparse_mat
-      class(psb_d_cuda_elg_sparse_mat), intent(inout) :: a   
-    end subroutine psb_d_cuda_elg_asb
-  end interface
-
-  interface 
-    subroutine psb_d_cuda_elg_mold(a,b,info) 
-      import :: psb_d_cuda_elg_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
-      class(psb_d_cuda_elg_sparse_mat), intent(in)                :: a
-      class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_d_cuda_elg_mold
-  end interface
-
-#endif
 
 end module psb_d_cuda_elg_mat_mod

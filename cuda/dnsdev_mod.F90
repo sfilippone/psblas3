@@ -44,8 +44,6 @@ module dnsdev_mod
     integer(c_int) :: firstIndex
   end type dnsdev_parms
 
-#ifdef HAVE_SPGPU  
-
   interface 
     function FgetDnsDeviceParams(rows, columns, elementType, firstIndex) &
          & result(res) bind(c,name='getDnsDeviceParams')
@@ -268,8 +266,5 @@ module dnsdev_mod
     end function spmvDnsDeviceDoubleComplex
 
   end interface
-
-#endif  
-
 
 end module dnsdev_mod

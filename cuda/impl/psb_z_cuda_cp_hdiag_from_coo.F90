@@ -28,19 +28,13 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 subroutine psb_z_cuda_cp_hdiag_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hdiagdev_mod
   use psb_vectordev_mod
   use psb_z_cuda_hdiag_mat_mod, psb_protect_name => psb_z_cuda_cp_hdiag_from_coo
   use psb_cuda_env_mod
-#else 
-  use psb_z_cuda_hdiag_mat_mod
-#endif
   implicit none 
 
   class(psb_z_cuda_hdiag_sparse_mat), intent(inout) :: a
@@ -53,16 +47,12 @@ subroutine psb_z_cuda_cp_hdiag_from_coo(a,b,info)
 
   info = psb_success_
 
-#ifdef HAVE_SPGPU
   a%hacksize = psb_cuda_WarpSize()
-#endif
 
   call a%psb_z_hdia_sparse_mat%cp_from_coo(b,info)
 
-#ifdef HAVE_SPGPU
   call a%to_gpu(info)
   if (info /= 0) goto 9999
-#endif
   
   return
 

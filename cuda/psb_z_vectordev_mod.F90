@@ -34,8 +34,6 @@ module psb_z_vectordev_mod
 
   use psb_base_vectordev_mod
  
-#ifdef HAVE_SPGPU  
-  
   interface registerMapped
     function registerMappedDoubleComplex(buf,d_p,n,dummy) &
          & result(res) bind(c,name='registerMappedDoubleComplex')
@@ -384,7 +382,5 @@ contains
 
     call  unregisterMapped(c_loc(buffer))
   end subroutine inner_unregisterDoubleComplex
-
-#endif  
 
 end module psb_z_vectordev_mod

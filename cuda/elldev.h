@@ -33,11 +33,9 @@
 #ifndef _ELLDEV_H_
 #define _ELLDEV_H_
 
-#if defined(HAVE_SPGPU)
 #include "cintrf.h"
 #include "cuComplex.h"
 #include "ell.h"
-
 
 struct EllDevice
 {
@@ -175,9 +173,5 @@ int getEllDevicePitch(void* deviceMat);
 // sparse Ell matrix-vector product
 //int spmvEllDeviceFloat(void *deviceMat, float* alpha, void* deviceX, float* beta, void* deviceY);
 //int spmvEllDeviceDouble(void *deviceMat, double* alpha, void* deviceX, double* beta, void* deviceY);
-
-#else
-#define CINTRF_UNSUPPORTED   -1
-#endif
 
 #endif

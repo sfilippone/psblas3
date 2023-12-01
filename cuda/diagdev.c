@@ -34,7 +34,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#if defined(HAVE_SPGPU)
 //new
 DiagDeviceParams getDiagDeviceParams(unsigned int rows, unsigned int columns, unsigned int diags, unsigned int elementType)
 {
@@ -111,7 +110,6 @@ void freeDiagDevice(void* remoteMatrix)
 //new
 int FallocDiagDevice(void** deviceMat, unsigned int rows, unsigned int columns,unsigned int diags,unsigned int elementType)
 { int i;
-#ifdef HAVE_SPGPU
   DiagDeviceParams p;
   
   p = getDiagDeviceParams(rows, columns, diags,elementType);
@@ -120,15 +118,11 @@ int FallocDiagDevice(void** deviceMat, unsigned int rows, unsigned int columns,u
     fprintf(stderr,"From routine : %s : %d \n","FallocEllDevice",i);
   }
   return(i);
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int writeDiagDeviceDouble(void* deviceMat, double* a, int* off, int n)
 { int i,fo,fa;
   char buf_a[255], buf_o[255],tmp[255];
-#ifdef HAVE_SPGPU
   struct DiagDevice *devMat = (struct DiagDevice *) deviceMat;
   // Ex updateFromHost function
   /* memset(buf_a,'\0',255); */
@@ -159,14 +153,10 @@ int writeDiagDeviceDouble(void* deviceMat, double* a, int* off, int n)
     return SPGPU_SUCCESS;
   else
     return SPGPU_UNSUPPORTED;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int readDiagDeviceDouble(void* deviceMat, double* a, int* off)
 { int i;
-#ifdef HAVE_SPGPU
   struct DiagDevice *devMat = (struct DiagDevice *) deviceMat;
   i = readRemoteBuffer((void *) a, (void *)devMat->cM,devMat->rows*devMat->diags*sizeof(double));
   i = readRemoteBuffer((void *) off, (void *)devMat->off, devMat->diags*sizeof(int));
@@ -174,9 +164,6 @@ int readDiagDeviceDouble(void* deviceMat, double* a, int* off)
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceDouble",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 //new
@@ -188,7 +175,6 @@ int spmvDiagDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-#ifdef HAVE_SPGPU
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
@@ -201,16 +187,12 @@ int spmvDiagDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   //cudaSync();
 
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 
 int writeDiagDeviceFloat(void* deviceMat, float* a, int* off, int n)
 { int i,fo,fa;
   char buf_a[255], buf_o[255],tmp[255];
-#ifdef HAVE_SPGPU
   struct DiagDevice *devMat = (struct DiagDevice *) deviceMat;
   // Ex updateFromHost function
   /* memset(buf_a,'\0',255); */
@@ -241,14 +223,10 @@ int writeDiagDeviceFloat(void* deviceMat, float* a, int* off, int n)
     return SPGPU_SUCCESS;
   else
     return SPGPU_UNSUPPORTED;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 int readDiagDeviceFloat(void* deviceMat, float* a, int* off)
 { int i;
-#ifdef HAVE_SPGPU
   struct DiagDevice *devMat = (struct DiagDevice *) deviceMat;
   i = readRemoteBuffer((void *) a, (void *)devMat->cM,devMat->rows*devMat->diags*sizeof(float));
   i = readRemoteBuffer((void *) off, (void *)devMat->off, devMat->diags*sizeof(int));
@@ -256,9 +234,6 @@ int readDiagDeviceFloat(void* deviceMat, float* a, int* off)
     fprintf(stderr,"From routine : %s : %d \n","readEllDeviceFloat",i);
   }*/
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
 //new
@@ -270,7 +245,6 @@ int spmvDiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-#ifdef HAVE_SPGPU
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
@@ -283,9 +257,5 @@ int spmvDiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   //cudaSync();
 
   return SPGPU_SUCCESS;
-#else
-  return SPGPU_UNSUPPORTED;
-#endif
 }
 
-#endif

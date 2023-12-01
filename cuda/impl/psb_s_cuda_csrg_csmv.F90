@@ -33,14 +33,10 @@
 subroutine psb_s_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use elldev_mod
   use psb_vectordev_mod
   use psb_s_cuda_csrg_mat_mod, psb_protect_name => psb_s_cuda_csrg_csmv
-#else 
-  use psb_s_cuda_csrg_mat_mod
-#endif
   implicit none 
   class(psb_s_cuda_csrg_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)          :: alpha, beta, x(:)
@@ -96,7 +92,6 @@ subroutine psb_s_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-#ifdef HAVE_SPGPU
   if (tra) then 
     call a%psb_s_csr_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
   else
@@ -124,9 +119,6 @@ subroutine psb_s_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans)
     call freeMultiVecDevice(gpX)
     call freeMultiVecDevice(gpY)
   endif
-#else
-  call a%psb_s_csr_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
-#endif
 
   call psb_erractionrestore(err_act)
   return

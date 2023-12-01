@@ -35,20 +35,17 @@ module psb_z_cuda_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_z_vect_mod
-  use psb_i_vect_mod
-#ifdef HAVE_SPGPU
   use psb_cuda_env_mod
+  use psb_i_vect_mod
   use psb_i_cuda_vect_mod
   use psb_i_vectordev_mod
   use psb_z_vectordev_mod
-#endif
 
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
   
   type, extends(psb_z_base_vect_type) ::  psb_z_vect_cuda
-#ifdef HAVE_SPGPU
     integer     :: state      = is_host
     type(c_ptr) :: deviceVect = c_null_ptr
     complex(c_double_complex), allocatable :: pinned_buffer(:)
@@ -105,7 +102,6 @@ module psb_z_cuda_vect_mod
     procedure, pass(x) :: absval2  => z_cuda_absval2
 
     final              :: z_cuda_vect_finalize
-#endif
   end type psb_z_vect_cuda
 
   public  :: psb_z_vect_cuda_
@@ -126,8 +122,6 @@ contains
 
   end function constructor
     
-#ifdef HAVE_SPGPU
-
   subroutine z_cuda_device_wait()
     call psb_cudaSync()
   end subroutine z_cuda_device_wait
@@ -1204,8 +1198,6 @@ contains
 
   end subroutine z_cuda_ins_a
 
-#endif
-
 end module psb_z_cuda_vect_mod
 
 
@@ -1221,20 +1213,16 @@ module psb_z_cuda_multivect_mod
   use psb_error_mod
   use psb_z_multivect_mod
   use psb_z_base_multivect_mod
-
+  use psb_cuda_env_mod
   use psb_i_multivect_mod
-#ifdef HAVE_SPGPU
   use psb_i_cuda_multivect_mod
   use psb_z_vectordev_mod
-#endif
 
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
   
   type, extends(psb_z_base_multivect_type) ::  psb_z_multivect_cuda
-#ifdef HAVE_SPGPU
-    
     integer(psb_ipk_)  :: state      = is_host, m_nrows=0, m_ncols=0
     type(c_ptr) :: deviceVect = c_null_ptr
     real(c_double), allocatable :: buffer(:,:)
@@ -1276,7 +1264,6 @@ module psb_z_cuda_multivect_mod
 !!$    procedure, pass(y) :: sctb     => z_cuda_multi_sctb
 !!$    procedure, pass(y) :: sctb_x   => z_cuda_multi_sctb_x
     final              :: z_cuda_multi_vect_finalize
-#endif
   end type psb_z_multivect_cuda
 
   public  :: psb_z_multivect_cuda
@@ -1297,7 +1284,6 @@ contains
 
   end function constructor
     
-#ifdef HAVE_SPGPU
 
 !!$  subroutine z_cuda_multi_gthzv_x(i,n,idx,x,y)
 !!$    use psi_serial_mod
@@ -1980,8 +1966,6 @@ contains
     call x%set_host()
 
   end subroutine z_cuda_multi_ins
-
-#endif
 
 end module psb_z_cuda_multivect_mod
 

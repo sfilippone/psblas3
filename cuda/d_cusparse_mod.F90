@@ -43,9 +43,6 @@ module d_cusparse_mod
   end type d_Hmat
 #endif
   
-  
-#if defined(HAVE_CUDA) && defined(HAVE_SPGPU)
-  
   interface CSRGDeviceFree
     function d_CSRGDeviceFree(Mat) &
          & bind(c,name="d_CSRGDeviceFree") result(res)
@@ -298,8 +295,7 @@ module d_cusparse_mod
       integer(c_int)        :: res
     end function d_HYBGHost2Device
   end interface
-#endif
-  
+ 
 #endif
   
 end module d_cusparse_mod

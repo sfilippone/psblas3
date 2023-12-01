@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_z_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hdiagdev_mod
   use psb_vectordev_mod
   use psb_z_cuda_hdiag_mat_mod, psb_protect_name => psb_z_cuda_hdiag_vect_mv
-#else 
-  use psb_z_cuda_hdiag_mat_mod
-#endif
   use psb_z_cuda_vect_mod
   implicit none 
   class(psb_z_cuda_hdiag_sparse_mat), intent(in) :: a
@@ -71,7 +66,6 @@ subroutine psb_z_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans)
 
 
   tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
-#ifdef HAVE_SPGPU
   if (tra) then 
     if (.not.x%is_host()) call x%sync()
     if (beta /= dzero) then 
@@ -112,9 +106,6 @@ subroutine psb_z_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans)
     end select
 
   end if
-#else
-  call a%psb_z_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
-#endif
   if (info /= 0) goto 9999
   call psb_erractionrestore(err_act)
   return

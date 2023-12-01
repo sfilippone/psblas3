@@ -32,7 +32,6 @@
 #ifndef _HLLDEV_H_
 #define _HLLDEV_H_
 
-#ifdef HAVE_SPGPU
 #include "cintrf.h"
 #include "hell.h"
 
@@ -153,9 +152,5 @@ int psi_cuda_z_CopyCooToHlg(spgpuHandle_t handle,int nr, int nc, int nza,
 			    int *ja, double complex *val,
 			    int *idiag, int *rP, double complex *cM);
 
-
-#else
-#define CINTRF_UNSUPPORTED   -1
-#endif
 
 #endif

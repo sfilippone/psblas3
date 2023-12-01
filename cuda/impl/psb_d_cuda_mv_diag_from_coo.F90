@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_d_cuda_mv_diag_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use diagdev_mod
   use psb_vectordev_mod
   use psb_d_cuda_diag_mat_mod, psb_protect_name => psb_d_cuda_mv_diag_from_coo
-#else 
-  use psb_d_cuda_diag_mat_mod
-#endif
 
   implicit none 
 

@@ -38,7 +38,6 @@
 #include <sys/time.h>
 #include <string.h>
 
-#if defined(HAVE_CUDA)
 #include "cuda_runtime.h"
 #include "core.h" 
 #include "cuComplex.h"
@@ -134,6 +133,5 @@ void freeDoubleComplex(void *);
 
 double etime();
 
-#endif
 
 #endif

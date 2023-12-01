@@ -33,13 +33,9 @@
 subroutine psb_z_cuda_csrg_from_gpu(a,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_csrg_mat_mod, psb_protect_name => psb_z_cuda_csrg_from_gpu
-#else 
-  use psb_z_cuda_csrg_mat_mod
-#endif
   implicit none 
   class(psb_z_cuda_csrg_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)             :: info
@@ -48,7 +44,6 @@ subroutine psb_z_cuda_csrg_from_gpu(a,info)
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if (.not.(c_associated(a%deviceMat%mat))) then 
     call a%free()
     return
@@ -68,6 +63,5 @@ subroutine psb_z_cuda_csrg_from_gpu(a,info)
 #endif
 
   call a%set_sync()
-#endif
 
 end subroutine psb_z_cuda_csrg_from_gpu

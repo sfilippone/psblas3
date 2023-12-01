@@ -31,7 +31,6 @@
   
 
 #pragma once
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 #include <complex.h>
 #include "cuComplex.h"
@@ -87,5 +86,3 @@ int absMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, void *deviceVec
 int absMultiVecDeviceDoubleComplex2(int n, cuDoubleComplex alpha, 
 				    void *deviceVecA, void *deviceVecB);
 
-
-#endif

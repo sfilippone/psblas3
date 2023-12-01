@@ -32,7 +32,6 @@
 
 #include <stdio.h>
 #include <complex.h>
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 //#include "common.h"
 #include "dvectordev.h"
@@ -299,7 +298,4 @@ int absMultiVecDeviceDouble(int n, double alpha, void *deviceVecA)
 
   return(i);
 }
-
-
-#endif
 

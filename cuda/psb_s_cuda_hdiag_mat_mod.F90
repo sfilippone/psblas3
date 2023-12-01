@@ -38,7 +38,6 @@ module psb_s_cuda_hdiag_mat_mod
 
   type, extends(psb_s_hdia_sparse_mat) :: psb_s_cuda_hdiag_sparse_mat
     !
-#ifdef HAVE_SPGPU
     type(c_ptr) :: deviceMat = c_null_ptr
 
   contains
@@ -62,13 +61,8 @@ module psb_s_cuda_hdiag_mat_mod
     procedure, pass(a) :: mold          => psb_s_cuda_hdiag_mold
     procedure, pass(a) :: to_gpu        => psb_s_cuda_hdiag_to_gpu
     final              :: s_cuda_hdiag_finalize
-#else 
-  contains
-    procedure, pass(a) :: mold         => psb_s_cuda_hdiag_mold
-#endif
   end type psb_s_cuda_hdiag_sparse_mat
 
-#ifdef HAVE_SPGPU
   private :: s_cuda_hdiag_get_nzeros, s_cuda_hdiag_free,  s_cuda_hdiag_get_fmt, &
        & s_cuda_hdiag_get_size, s_cuda_hdiag_sizeof, s_cuda_hdiag_get_nz_row
 
@@ -270,18 +264,5 @@ contains
     
     return
   end subroutine s_cuda_hdiag_finalize
-
-#else 
-
-  interface 
-    subroutine psb_s_cuda_hdiag_mold(a,b,info) 
-      import :: psb_s_cuda_hdiag_sparse_mat, psb_s_base_sparse_mat, psb_ipk_
-      class(psb_s_cuda_hdiag_sparse_mat), intent(in)                :: a
-      class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_s_cuda_hdiag_mold
-  end interface
-
-#endif
 
 end module psb_s_cuda_hdiag_mat_mod

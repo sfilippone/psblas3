@@ -32,7 +32,6 @@
 
 #include <stdio.h>
 #include <complex.h>
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 //#include "common.h"
 #include "zvectordev.h"
@@ -316,6 +315,4 @@ int absMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, void *deviceVec
 
   return(i);
 }
-
-#endif
 

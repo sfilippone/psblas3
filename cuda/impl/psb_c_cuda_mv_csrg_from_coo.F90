@@ -29,16 +29,11 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_c_cuda_mv_csrg_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_c_cuda_csrg_mat_mod, psb_protect_name => psb_c_cuda_mv_csrg_from_coo
-#else 
-  use psb_c_cuda_csrg_mat_mod
-#endif
   implicit none 
 
   class(psb_c_cuda_csrg_sparse_mat), intent(inout) :: a
@@ -51,9 +46,7 @@ subroutine psb_c_cuda_mv_csrg_from_coo(a,b,info)
 
   call a%psb_c_csr_sparse_mat%mv_from_coo(b,info) 
   if (info /= 0) goto 9999
-#ifdef HAVE_SPGPU
   call a%to_gpu(info)
-#endif
   if (info /= 0) goto 9999
 
   return

@@ -35,17 +35,14 @@ module psb_i_cuda_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_i_vect_mod
-#ifdef HAVE_SPGPU
   use psb_cuda_env_mod
   use psb_i_vectordev_mod
-#endif
 
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
   
   type, extends(psb_i_base_vect_type) ::  psb_i_vect_cuda
-#ifdef HAVE_SPGPU
     integer     :: state      = is_host
     type(c_ptr) :: deviceVect = c_null_ptr
     integer(c_int), allocatable :: pinned_buffer(:)
@@ -88,7 +85,6 @@ module psb_i_cuda_vect_mod
     procedure, pass(x) :: maybe_free_buffer  => i_cuda_maybe_free_buffer
 
     final              :: i_cuda_vect_finalize
-#endif
   end type psb_i_vect_cuda
 
   public  :: psb_i_vect_cuda_
@@ -109,8 +105,6 @@ contains
 
   end function constructor
     
-#ifdef HAVE_SPGPU
-
   subroutine i_cuda_device_wait()
     call psb_cudaSync()
   end subroutine i_cuda_device_wait
@@ -888,8 +882,6 @@ contains
 
   end subroutine i_cuda_ins_a
 
-#endif
-
 end module psb_i_cuda_vect_mod
 
 
@@ -905,18 +897,14 @@ module psb_i_cuda_multivect_mod
   use psb_error_mod
   use psb_i_multivect_mod
   use psb_i_base_multivect_mod
-
-#ifdef HAVE_SPGPU
+  use psb_cuda_env_mod
   use psb_i_vectordev_mod
-#endif
 
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
   
   type, extends(psb_i_base_multivect_type) ::  psb_i_multivect_cuda
-#ifdef HAVE_SPGPU
-    
     integer(psb_ipk_)  :: state      = is_host, m_nrows=0, m_ncols=0
     type(c_ptr) :: deviceVect = c_null_ptr
     real(c_double), allocatable :: buffer(:,:)
@@ -958,7 +946,6 @@ module psb_i_cuda_multivect_mod
 !!$    procedure, pass(y) :: sctb     => i_cuda_multi_sctb
 !!$    procedure, pass(y) :: sctb_x   => i_cuda_multi_sctb_x
     final              :: i_cuda_multi_vect_finalize
-#endif
   end type psb_i_multivect_cuda
 
   public  :: psb_i_multivect_cuda
@@ -979,7 +966,6 @@ contains
 
   end function constructor
     
-#ifdef HAVE_SPGPU
 
 !!$  subroutine i_cuda_multi_gthzv_x(i,n,idx,x,y)
 !!$    use psi_serial_mod
@@ -1662,8 +1648,6 @@ contains
     call x%set_host()
 
   end subroutine i_cuda_multi_ins
-
-#endif
 
 end module psb_i_cuda_multivect_mod
 

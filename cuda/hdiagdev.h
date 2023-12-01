@@ -32,7 +32,6 @@
 #ifndef _HDIAGDEV_H_
 #define _HDIAGDEV_H_
 
-#ifdef HAVE_SPGPU
 #include "cintrf.h"
 #include "hdia.h"
 
@@ -103,9 +102,5 @@ int writeHdiagDeviceDouble(void* deviceMat, double* val, int* hdiaOffsets, int *
 int spmvHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
 			  double beta, void* deviceY);
 
-
-#else
-#define CINTRF_UNSUPPORTED   -1
-#endif
 
 #endif

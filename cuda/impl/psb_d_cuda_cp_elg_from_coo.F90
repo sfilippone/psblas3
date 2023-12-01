@@ -28,20 +28,14 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 subroutine psb_d_cuda_cp_elg_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_d_cuda_elg_mat_mod, psb_protect_name => psb_d_cuda_cp_elg_from_coo
   use psi_ext_util_mod
   use psb_cuda_env_mod
-#else 
-  use psb_d_cuda_elg_mat_mod
-#endif
   implicit none 
 
   class(psb_d_cuda_elg_sparse_mat), intent(inout) :: a
@@ -57,16 +51,11 @@ subroutine psb_d_cuda_cp_elg_from_coo(a,b,info)
   integer(psb_ipk_), allocatable  :: idisp(:)
 
   info = psb_success_
-#ifdef HAVE_SPGPU
   hacksize = max(1,psb_cuda_WarpSize())
-#else
-  hacksize = 1
-#endif
   if (b%is_dev()) call b%sync()
 
   if (b%is_by_rows()) then
 
-#ifdef HAVE_SPGPU
     call psi_d_count_ell_from_coo(a,b,idisp,ldv,nzm,info,hacksize=hacksize)
 
     
@@ -82,15 +71,8 @@ subroutine psb_d_cuda_cp_elg_from_coo(a,b,info)
     if (info == 0) info = psi_CopyCooToElg(nr,nc,nza, hacksize,ldv,nzm, &
          & a%irn,idisp,b%ja,b%val, a%deviceMat)
     call a%set_dev()
-#else
-
-    call psi_d_convert_ell_from_coo(a,b,info,hacksize=hacksize)
-    call a%set_host()
-#endif
-
   else
     call b%cp_to_coo(tmp,info)
-#ifdef HAVE_SPGPU
     call psi_d_count_ell_from_coo(a,tmp,idisp,ldv,nzm,info,hacksize=hacksize)
 
     
@@ -107,11 +89,6 @@ subroutine psb_d_cuda_cp_elg_from_coo(a,b,info)
          & a%irn,idisp,tmp%ja,tmp%val, a%deviceMat)
 
     call a%set_dev()
-#else
-
-    call psi_d_convert_ell_from_coo(a,tmp,info,hacksize=hacksize)
-    call a%set_host()
-#endif
   end if
 
   if (info /= psb_success_) goto 9999

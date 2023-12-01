@@ -43,8 +43,6 @@ module hlldev_mod
     integer(c_int) :: firstIndex
   end type hlldev_parms
 
-#ifdef HAVE_SPGPU  
-
   interface 
     function bldHllDeviceParams(hksize, rows, nzeros, allocsize, elementType, firstIndex) &
          & result(res) bind(c,name='bldHllDeviceParams')
@@ -266,8 +264,5 @@ module hlldev_mod
     end function spmvHllDeviceDoubleComplex
 
   end interface
-
-#endif  
-
 
 end module hlldev_mod

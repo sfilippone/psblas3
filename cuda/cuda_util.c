@@ -32,8 +32,6 @@
 
 #include "cuda_util.h"
 
-#if defined(HAVE_CUDA)
-
 
 static int hasUVA=-1;
 static struct cudaDeviceProp *prop=NULL;
@@ -440,10 +438,6 @@ void psb_cudaDestroyCublasHandle()
   psb_cublas_handle=NULL;
 }
 
-
-
-
-
 /* Simple memory tools */ 
 
 int allocateInt(void **d_int, int n)
@@ -803,6 +797,3 @@ double etime()
 }
 
 
-
-
-#endif

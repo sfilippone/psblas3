@@ -31,7 +31,6 @@
   
 
 #pragma once
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 #include "cuda_runtime.h"
 //#include "common.h"
@@ -86,5 +85,3 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 int getMultiVecDeviceSize(void* deviceVec);
 int getMultiVecDeviceCount(void* deviceVec);
 int getMultiVecDevicePitch(void* deviceVec);
-
-#endif

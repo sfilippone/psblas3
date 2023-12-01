@@ -31,7 +31,6 @@
   
 
 #pragma once
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 #include "vectordev.h"
 #include "cuda_runtime.h"
@@ -60,5 +59,3 @@ int iscatMultiVecDeviceIntVecIdx(void* deviceVec, int vectorId, int n, int first
 				 int indexBase, int beta);
 int iscatMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void *indexes,
 			   int hfirst, void* host_values, int indexBase, int beta);
-
-#endif

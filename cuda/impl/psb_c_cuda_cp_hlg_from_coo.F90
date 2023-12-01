@@ -33,14 +33,10 @@
 subroutine psb_c_cuda_cp_hlg_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_cuda_env_mod
   use psb_c_cuda_hlg_mat_mod, psb_protect_name => psb_c_cuda_cp_hlg_from_coo
-#else 
-  use psb_c_cuda_hlg_mat_mod
-#endif
   implicit none 
 
   class(psb_c_cuda_hlg_sparse_mat), intent(inout) :: a
@@ -61,11 +57,7 @@ subroutine psb_c_cuda_cp_hlg_from_coo(a,b,info)
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-#ifdef HAVE_SPGPU
   hksz = max(1,psb_cuda_WarpSize())
-#else
-  hksz = psi_get_hksz()
-#endif
 
   if (b%is_by_rows()) then
 

@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_z_cuda_mv_elg_from_coo(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_mv_elg_from_coo
-#else 
-  use psb_z_cuda_elg_mat_mod
-#endif
   implicit none 
 
   class(psb_z_cuda_elg_sparse_mat), intent(inout) :: a
@@ -56,6 +51,5 @@ subroutine psb_z_cuda_mv_elg_from_coo(a,b,info)
   call b%free()
 
   return
-
 
 end subroutine psb_z_cuda_mv_elg_from_coo

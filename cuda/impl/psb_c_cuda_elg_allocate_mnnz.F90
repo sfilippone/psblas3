@@ -28,18 +28,12 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 subroutine  psb_c_cuda_elg_allocate_mnnz(m,n,a,nz) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_elg_mat_mod, psb_protect_name => psb_c_cuda_elg_allocate_mnnz
-#else 
-  use psb_c_cuda_elg_mat_mod
-#endif
   implicit none 
   integer(psb_ipk_), intent(in) :: m,n
   class(psb_c_cuda_elg_sparse_mat), intent(inout) :: a
@@ -47,9 +41,7 @@ subroutine  psb_c_cuda_elg_allocate_mnnz(m,n,a,nz)
   Integer(Psb_ipk_) :: err_act, info, nz_,ld
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
-#ifdef HAVE_SPGPU
   type(elldev_parms) :: gpu_parms
-#endif
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -74,13 +66,9 @@ subroutine  psb_c_cuda_elg_allocate_mnnz(m,n,a,nz)
     goto 9999
   endif
 
-#ifdef HAVE_SPGPU
   gpu_parms = FgetEllDeviceParams(m,nz_,nz_*m,n,spgpu_type_complex_float,1)
   ld  = gpu_parms%pitch
   nz_ = gpu_parms%maxRowSize
-#else
-  ld = m
-#endif
 
   if (info == psb_success_) call psb_realloc(m,a%irn,info)
   if (info == psb_success_) call psb_realloc(m,a%idiag,info)
@@ -98,10 +86,8 @@ subroutine  psb_c_cuda_elg_allocate_mnnz(m,n,a,nz)
     call a%set_dupl(psb_dupl_def_)
   end if
 
-#ifdef HAVE_SPGPU
   call a%to_gpu(info,nzrm=nz_)
   if (info /= 0) goto 9999
-#endif
 
   call psb_erractionrestore(err_act)
   return

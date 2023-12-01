@@ -45,7 +45,6 @@ module psb_s_cuda_hybg_mat_mod
     ! 
     ! 
     ! 
-#ifdef HAVE_SPGPU
     type(s_Hmat) :: deviceMat
 
   contains
@@ -69,13 +68,8 @@ module psb_s_cuda_hybg_mat_mod
     procedure, pass(a) :: mold          => psb_s_cuda_hybg_mold
     procedure, pass(a) :: to_gpu        => psb_s_cuda_hybg_to_gpu
     final              :: s_cuda_hybg_finalize
-#else 
-  contains
-    procedure, pass(a) :: mold    => psb_s_cuda_hybg_mold
-#endif
   end type psb_s_cuda_hybg_sparse_mat
 
-#ifdef HAVE_SPGPU
   private :: s_cuda_hybg_get_nzeros, s_cuda_hybg_free,  s_cuda_hybg_get_fmt, &
        & s_cuda_hybg_get_size, s_cuda_hybg_sizeof, s_cuda_hybg_get_nz_row
 
@@ -288,19 +282,6 @@ contains
     
     return
   end subroutine s_cuda_hybg_finalize
-
-#else 
-
-  interface 
-    subroutine psb_s_cuda_hybg_mold(a,b,info) 
-      import :: psb_s_cuda_hybg_sparse_mat, psb_s_base_sparse_mat, psb_ipk_
-      class(psb_s_cuda_hybg_sparse_mat), intent(in)               :: a
-      class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_s_cuda_hybg_mold
-  end interface
-
-#endif
 
 end module psb_s_cuda_hybg_mat_mod
 #endif

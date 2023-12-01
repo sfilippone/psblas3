@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine  psb_c_cuda_hlg_reallocate_nz(nz,a) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_hlg_mat_mod, psb_protect_name => psb_c_cuda_hlg_reallocate_nz
-#else 
-  use psb_c_cuda_hlg_mat_mod
-#endif
   use iso_c_binding
   implicit none 
   integer(psb_ipk_), intent(in) :: nz
@@ -52,10 +47,8 @@ subroutine  psb_c_cuda_hlg_reallocate_nz(nz,a)
 
   call a%psb_c_hll_sparse_mat%reallocate(nz)
 
-#ifdef HAVE_SPGPU
   call a%to_gpu(info)
   if (info /= 0) goto 9999
-#endif
 
   call psb_erractionrestore(err_act)
   return

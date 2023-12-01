@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_c_cuda_hlg_from_gpu(a,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_hlg_mat_mod, psb_protect_name => psb_c_cuda_hlg_from_gpu
-#else 
-  use psb_c_cuda_hlg_mat_mod
-#endif
   implicit none 
   class(psb_c_cuda_hlg_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)             :: info
@@ -48,7 +43,6 @@ subroutine psb_c_cuda_hlg_from_gpu(a,info)
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if (a%is_sync()) return
   if (a%is_host()) return
   if (.not.(c_associated(a%deviceMat))) then 
@@ -71,6 +65,5 @@ subroutine psb_c_cuda_hlg_from_gpu(a,info)
   if (info == 0) info = &
        & readHllDevice(a%deviceMat,a%val,a%ja,a%hkoffs,a%irn,a%idiag)
   call a%set_sync()
-#endif
 
 end subroutine psb_c_cuda_hlg_from_gpu

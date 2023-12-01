@@ -29,30 +29,22 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_d_cuda_elg_to_gpu(a,info,nzrm) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_d_cuda_elg_mat_mod, psb_protect_name => psb_d_cuda_elg_to_gpu
-#else 
-  use psb_d_cuda_elg_mat_mod
-#endif
   implicit none 
   class(psb_d_cuda_elg_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)             :: info
   integer(psb_ipk_), intent(in), optional    :: nzrm
 
   integer(psb_ipk_)  :: m, nzm, n, pitch,maxrowsize, nzt 
-#ifdef HAVE_SPGPU
   type(elldev_parms) :: gpu_parms
-#endif
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if ((.not.allocated(a%val)).or.(.not.allocated(a%ja))) return
   
   m   = a%get_nrows()
@@ -88,6 +80,5 @@ subroutine psb_d_cuda_elg_to_gpu(a,info,nzrm)
   if (info == 0)  info = &
        & writeEllDevice(a%deviceMat,a%val,a%ja,size(a%ja,1),a%irn,a%idiag)
   call a%set_sync()
-#endif
 
 end subroutine psb_d_cuda_elg_to_gpu

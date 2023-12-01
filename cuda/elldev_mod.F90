@@ -44,8 +44,6 @@ module elldev_mod
     integer(c_int) :: firstIndex
   end type elldev_parms
 
-#ifdef HAVE_SPGPU  
-
   interface 
     function FgetEllDeviceParams(rows, maxRowSize, nnzeros, columns, elementType, firstIndex) &
          & result(res) bind(c,name='getEllDeviceParams')
@@ -319,8 +317,5 @@ module elldev_mod
       complex(c_double_complex),value :: alpha,  beta
     end function spmvEllDeviceDoubleComplex
   end interface
-
-#endif  
-
 
 end module elldev_mod

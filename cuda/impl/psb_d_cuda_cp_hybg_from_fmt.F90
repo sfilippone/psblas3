@@ -33,12 +33,8 @@
 subroutine psb_d_cuda_cp_hybg_from_fmt(a,b,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_d_cuda_hybg_mat_mod, psb_protect_name => psb_d_cuda_cp_hybg_from_fmt
-#else 
-  use psb_d_cuda_hybg_mat_mod
-#endif
   implicit none 
 
   class(psb_d_cuda_hybg_sparse_mat), intent(inout) :: a
@@ -53,9 +49,7 @@ subroutine psb_d_cuda_cp_hybg_from_fmt(a,b,info)
   class default
     call a%psb_d_csr_sparse_mat%cp_from_fmt(b,info) 
     if (info /= 0) return
-#ifdef HAVE_SPGPU
     call a%to_gpu(info)
-#endif
   end select
 
 end subroutine psb_d_cuda_cp_hybg_from_fmt

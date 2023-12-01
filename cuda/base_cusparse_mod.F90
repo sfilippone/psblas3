@@ -79,9 +79,6 @@ module base_cusparse_mod
     enumerator cusparse_direction_column
   end enum
 
-
-#if defined(HAVE_CUDA) && defined(HAVE_SPGPU)
-  
   interface 
     function FcusparseCreate() &
          & bind(c,name="FcusparseCreate") result(res)
@@ -113,5 +110,4 @@ contains
     res = FcusparseDestroy()
   end function closeFcusparse
 
-#endif
 end module base_cusparse_mod

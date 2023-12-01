@@ -28,18 +28,13 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
+ 
 subroutine psb_s_cuda_elg_from_gpu(a,info) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use elldev_mod
   use psb_vectordev_mod
   use psb_s_cuda_elg_mat_mod, psb_protect_name => psb_s_cuda_elg_from_gpu
-#else 
-  use psb_s_cuda_elg_mat_mod
-#endif
   implicit none 
   class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)             :: info
@@ -48,7 +43,6 @@ subroutine psb_s_cuda_elg_from_gpu(a,info)
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if (.not.(c_associated(a%deviceMat))) then 
     call a%free()
     return
@@ -69,6 +63,5 @@ subroutine psb_s_cuda_elg_from_gpu(a,info)
   if (info == 0)  info = &
        & readEllDevice(a%deviceMat,a%val,a%ja,pitch,a%irn,a%idiag)
   call a%set_sync()
-#endif
 
 end subroutine psb_s_cuda_elg_from_gpu

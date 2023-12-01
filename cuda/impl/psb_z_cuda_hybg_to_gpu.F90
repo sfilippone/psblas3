@@ -33,12 +33,8 @@
 subroutine psb_z_cuda_hybg_to_gpu(a,info,nzrm) 
 
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use cusparse_mod
   use psb_z_cuda_hybg_mat_mod, psb_protect_name => psb_z_cuda_hybg_to_gpu
-#else 
-  use psb_z_cuda_hybg_mat_mod
-#endif
   implicit none 
   class(psb_z_cuda_hybg_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)              :: info
@@ -51,7 +47,6 @@ subroutine psb_z_cuda_hybg_to_gpu(a,info,nzrm)
 
   info = 0
 
-#ifdef HAVE_SPGPU
   if ((.not.allocated(a%val)).or.(.not.allocated(a%ja))) return
 
   m   = a%get_nrows()
@@ -148,7 +143,6 @@ subroutine psb_z_cuda_hybg_to_gpu(a,info,nzrm)
   if (info /= 0) then 
     write(0,*) 'Error in HYBG_TO_GPU ',info
   end if
-#endif
 
 end subroutine psb_z_cuda_hybg_to_gpu
 #endif

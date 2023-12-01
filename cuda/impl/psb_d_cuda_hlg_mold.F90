@@ -29,7 +29,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine psb_d_cuda_hlg_mold(a,b,info) 
   
   use psb_base_mod

@@ -45,7 +45,6 @@ module psb_i_cuda_dnsg_mat_mod
     ! If HAVE_SPGPU is undefined this is just
     ! a copy of DNS, indistinguishable.
     ! 
-#ifdef HAVE_SPGPU
     type(c_ptr) :: deviceMat = c_null_ptr
 
   contains
@@ -69,13 +68,8 @@ module psb_i_cuda_dnsg_mat_mod
     procedure, pass(a) :: mold          => psb_i_cuda_dnsg_mold
     procedure, pass(a) :: to_gpu        => psb_i_cuda_dnsg_to_gpu
     final              :: i_cuda_dnsg_finalize
-#else 
-  contains
-    procedure, pass(a) :: mold         => psb_i_cuda_dnsg_mold
-#endif
   end type psb_i_cuda_dnsg_sparse_mat
 
-#ifdef HAVE_SPGPU
   private :: i_cuda_dnsg_get_nzeros, i_cuda_dnsg_free,  i_cuda_dnsg_get_fmt, &
        & i_cuda_dnsg_get_size, i_cuda_dnsg_get_nz_row
 
@@ -277,18 +271,5 @@ contains
     
     return
   end subroutine i_cuda_dnsg_finalize
-
-#else 
-
-  interface 
-    subroutine psb_i_cuda_dnsg_mold(a,b,info) 
-      import :: psb_i_cuda_dnsg_sparse_mat, psb_i_base_sparse_mat, psb_ipk_
-      class(psb_i_cuda_dnsg_sparse_mat), intent(in)                :: a
-      class(psb_i_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_i_cuda_dnsg_mold
-  end interface
-
-#endif
 
 end module psb_i_cuda_dnsg_mat_mod

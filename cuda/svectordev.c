@@ -32,7 +32,6 @@
 
 #include <stdio.h>
 #include <complex.h>
-#if defined(HAVE_SPGPU)
 //#include "utils.h"
 //#include "common.h"
 #include "svectordev.h"
@@ -299,6 +298,4 @@ int absMultiVecDeviceFloat(int n, float alpha, void *deviceVecA)
 
   return(i);
 }
-
-#endif
 

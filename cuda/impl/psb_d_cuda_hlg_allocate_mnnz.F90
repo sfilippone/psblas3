@@ -29,17 +29,12 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-
 subroutine  psb_d_cuda_hlg_allocate_mnnz(m,n,a,nz) 
   
   use psb_base_mod
-#ifdef HAVE_SPGPU
   use hlldev_mod
   use psb_vectordev_mod
   use psb_d_cuda_hlg_mat_mod, psb_protect_name => psb_d_cuda_hlg_allocate_mnnz
-#else 
-  use psb_d_cuda_hlg_mat_mod
-#endif
   implicit none 
   integer(psb_ipk_), intent(in) :: m,n
   class(psb_d_cuda_hlg_sparse_mat), intent(inout) :: a
@@ -47,19 +42,15 @@ subroutine  psb_d_cuda_hlg_allocate_mnnz(m,n,a,nz)
   Integer(psb_ipk_)  :: err_act, info, nz_,ld
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
-#ifdef HAVE_SPGPU
   type(hlldev_parms) :: gpu_parms
-#endif
 
   call psb_erractionsave(err_act)
   info = psb_success_
 
   call a%psb_d_hll_sparse_mat%allocate(m,n,nz)
 
-#ifdef HAVE_SPGPU
   call a%to_gpu(info,nzrm=nz_)
   if (info /= 0) goto 9999
-#endif
 
   call psb_erractionrestore(err_act)
   return

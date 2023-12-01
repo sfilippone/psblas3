@@ -33,7 +33,6 @@
 #ifndef FCUSPARSE_
 #define FCUSPARSE_
 
-#ifdef HAVE_SPGPU
 #include <cuda_runtime.h>
 #if CUDA_SHORT_VERSION <= 10
 #include <cusparse_v2.h>
@@ -66,5 +65,4 @@ cusparseHandle_t *getHandle();
     }                                                                          \
 }
 
-#endif
 #endif
