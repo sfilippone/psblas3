@@ -547,7 +547,7 @@ program pdgenmv
   use psb_base_mod
   use psb_util_mod 
   use psb_ext_mod
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   use psb_cuda_mod
 #endif
 #ifdef HAVE_RSB
@@ -572,7 +572,7 @@ program pdgenmv
   type(psb_desc_type)   :: desc_a
   ! dense matrices
   type(psb_d_vect_type), target :: xv, bv, xg, bg  
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   type(psb_d_vect_cuda)  :: vmold
   type(psb_i_vect_cuda)  :: imold 
 #endif
@@ -594,7 +594,7 @@ program pdgenmv
 #ifdef HAVE_RSB
   type(psb_d_rsb_sparse_mat), target   :: arsb
 #endif
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
   type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
 #if CUDA_SHORT_VERSION <= 10
@@ -618,7 +618,7 @@ program pdgenmv
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
 
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   call psb_cuda_init(ctxt)
 #endif
 #ifdef HAVE_RSB
@@ -639,7 +639,7 @@ program pdgenmv
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
   write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())  
 #endif
@@ -698,7 +698,7 @@ program pdgenmv
     stop
   end if
 
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   select case(psb_toupper(agfmt))
   case('ELG')
     agmold => aelg
@@ -753,7 +753,7 @@ program pdgenmv
     call xv%bld(x0)
     call psb_geasb(bv,desc_a,info,scratch=.true.)
     
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
     
     call aux_a%cscnv(agpu,info,mold=acoo)
     call xg%bld(x0,mold=vmold)
@@ -780,7 +780,7 @@ program pdgenmv
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
 
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   call xg%set(x0)
 
   ! FIXME: cache flush needed here
@@ -870,7 +870,7 @@ program pdgenmv
     tflops = flops
     gflops = flops * ngpu
     write(psb_out_unit,'("Storage type for    A: ",a)') a%get_fmt()
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
     write(psb_out_unit,'("Storage type for AGPU: ",a)') agpu%get_fmt()
     write(psb_out_unit,'("Time to convert A from COO to CPU (1): ",F20.9)')&
          & tcnvc1
@@ -900,7 +900,7 @@ program pdgenmv
          & t2*1.d3/(1.d0*ntests)
     write(psb_out_unit,'("MFLOPS                       (CPU)   : ",F20.3)')&
          & flops/1.d6
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
     write(psb_out_unit,'("Time for ",i6," products (s) (xGPU)  : ",F20.3)')&
          & ntests, tt2
     write(psb_out_unit,'("Time per product    (ms)     (xGPU)  : ",F20.3)')&
@@ -925,7 +925,7 @@ program pdgenmv
     bdwdth = ntests*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (CPU)  : ",F20.3)') bdwdth
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
     bdwdth = ngpu*ntests*nbytes/(gt2*1.d6)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
     bdwdth = psb_cuda_MemoryPeakBandwidth()
@@ -949,7 +949,7 @@ program pdgenmv
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-#ifdef HAVE_GPU
+#ifdef HAVE_CUDA
   call psb_cuda_exit()
 #endif
   call psb_exit(ctxt)
