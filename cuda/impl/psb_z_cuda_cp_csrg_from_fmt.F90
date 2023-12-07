@@ -38,7 +38,7 @@ subroutine psb_z_cuda_cp_csrg_from_fmt(a,b,info)
   implicit none 
 
   class(psb_z_cuda_csrg_sparse_mat), intent(inout) :: a
-  class(psb_z_base_sparse_mat), intent(inout) :: b
+  class(psb_z_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_), intent(out)              :: info
 
 

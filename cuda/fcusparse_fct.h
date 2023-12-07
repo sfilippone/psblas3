@@ -187,7 +187,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 				 (void *) vY, CUSPARSE_BASE_TYPE,
 				 CUSPARSE_BASE_TYPE, (void *) cMat->mvbuffer));
 
-#else
+#elif CUDA_VERSION <=  12030
   cusparseDnVecDescr_t vecX, vecY;
   size_t bfsz;
   vX=x->v_;
@@ -212,6 +212,8 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 			      cMat->mvbuffer));
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecX) );
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
+#else
+  fprintf(stderr,"Unsupported CUSPARSE version\n");  
 #endif
 }
 
@@ -244,7 +246,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 				       (const TYPE *) vX,  (TYPE *) vY,
 				       CUSPARSE_SOLVE_POLICY_USE_LEVEL,
 				       (void *) cMat->svbuffer));  
-#else
+#elif CUDA_VERSION <=  12030
   cusparseDnVecDescr_t vecX, vecY;
   size_t bfsz;
   vX=x->v_;
@@ -285,6 +287,8 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 				    *(cMat->spsvDescr)));
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecX) );
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
+#else
+  fprintf(stderr,"Unsupported CUSPARSE version\n");  
 #endif
 }
 

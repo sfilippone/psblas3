@@ -89,7 +89,7 @@ GEN_PSI_FUNC_NAME(TYPE_SYMBOL)
   (spgpuHandle_t handle, int nr, int nc, int nza, int baseIdx, int hacksz, int ldv, int nzm,
    int *rS,int *devIdisp, int *devJa, VALUE_TYPE *devVal,
    int *idiag, int *rP, VALUE_TYPE *cM)
-{ int i,j,k, nrws;
+{ int i,j, nrws;
   //int maxNForACall = THREAD_BLOCK*handle->maxGridSizeX;
   int maxNForACall = max(handle->maxGridSizeX, THREAD_BLOCK*handle->maxGridSizeX);
   
