@@ -10834,7 +10834,10 @@ fi
       pac_cv_cudacc="50,60,70,75";
       CUDA_CC="$pac_cv_cudacc";
    fi
-   CUDEFINES="--dopt=on";
+   if (( $pac_cv_cuda_version >= 11070  ))
+   then
+     CUDEFINES="--dopt=on";
+   fi
    for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
    do
 	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
