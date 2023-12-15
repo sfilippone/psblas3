@@ -313,7 +313,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 #endif
 }
 
-
+#if CUDA_VERSION >=  11030
 T_CSRGCreateSpMVDescr(T_CSRGDeviceMat *cMat)
 {
   int64_t tr,tc,tz;
@@ -330,7 +330,7 @@ T_CSRGCreateSpMVDescr(T_CSRGDeviceMat *cMat)
 				   CUSPARSE_INDEX_BASE_ONE,
 				   CUSPARSE_BASE_TYPE) );
 }
-
+#endif
 int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
 {
   T_CSRGDeviceMat *cMat;
