@@ -263,42 +263,45 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   vY=y->v_;
   CHECK_CUSPARSE( cusparseCreateDnVec(&vecY, cMat->m, vY, CUSPARSE_BASE_TYPE) );
   CHECK_CUSPARSE( cusparseCreateDnVec(&vecX, cMat->n, vX, CUSPARSE_BASE_TYPE) );
+  if (T_CSRGIsNullMvDescr(cMat)) {
+    cMat->spmvDescr = (cusparseSpMatDescr_t  *) malloc(sizeof(cusparseSpMatDescr_t  *));
+  }
+  T_CSRGCreateSpMVDescr(cMat);
   //  fprintf(stderr,"Entry to SpSVDevice:   %d   %p\n",
   //	  T_CSRGIsNullSvDescr(cMat),cMat->spsvDescr);
   if (T_CSRGIsNullSvDescr(cMat)) {
     cMat->spsvDescr=(cusparseSpSVDescr_t  *) malloc(sizeof(cusparseSpSVDescr_t  *));
     cMat->svbsize=0;
     CHECK_CUSPARSE( cusparseSpSV_createDescr(cMat->spsvDescr) );
-  }
-  //fprintf(stderr,"Entry to SpSVDevice:   %d   %p  %d\n",
-  //	  T_CSRGIsNullSvDescr(cMat),cMat->spsvDescr,cMat->svbsize);
-  CHECK_CUSPARSE(cusparseSpSV_bufferSize(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-					 &alpha,*(cMat->spmvDescr),vecX,vecY,
-					 CUSPARSE_BASE_TYPE,
-					 CUSPARSE_SPSV_ALG_DEFAULT,
-					 *(cMat->spsvDescr),
-					 &bfsz));
-  if (bfsz > cMat->svbsize) {
-    if (cMat->svbuffer != NULL) {
-      CHECK_CUDA(cudaFree(cMat->svbuffer));
-      cMat->svbuffer = NULL;
+    //fprintf(stderr,"Entry to SpSVDevice:   %d   %p  %d\n",
+    //	  T_CSRGIsNullSvDescr(cMat),cMat->spsvDescr,cMat->svbsize);
+    CHECK_CUSPARSE(cusparseSpSV_bufferSize(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
+					   &alpha,*(cMat->spmvDescr),vecX,vecY,
+					   CUSPARSE_BASE_TYPE,
+					   CUSPARSE_SPSV_ALG_DEFAULT,
+					   *(cMat->spsvDescr),
+					   &bfsz));
+    if (bfsz > cMat->svbsize) {
+      if (cMat->svbuffer != NULL) {
+	CHECK_CUDA(cudaFree(cMat->svbuffer));
+	cMat->svbuffer = NULL;
+      }
+      CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
+      cMat->svbsize=bfsz;
+      CHECK_CUSPARSE(cusparseSpSV_analysis(*my_handle,
+					   CUSPARSE_OPERATION_NON_TRANSPOSE,
+					   &alpha,
+					   *(cMat->spmvDescr),
+					   vecX, vecY,
+					   CUSPARSE_BASE_TYPE,
+					   CUSPARSE_SPSV_ALG_DEFAULT,
+					   *(cMat->spsvDescr),
+					   cMat->svbuffer));
     }
-    CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
-    cMat->svbsize=bfsz;
-    CHECK_CUSPARSE(cusparseSpSV_analysis(*my_handle,
-					 CUSPARSE_OPERATION_NON_TRANSPOSE,
-					 &alpha,
-					 *(cMat->spmvDescr),
-					 vecX, vecY,
-					 CUSPARSE_BASE_TYPE,
-					 CUSPARSE_SPSV_ALG_DEFAULT,
-					 *(cMat->spsvDescr),
-					 cMat->svbuffer));
+    if (T_CSRGIsNullSvBuffer(cMat)) {
+      fprintf(stderr,"SpSV_SOLVE NULL spsv-buffer\n");
+    }
   }
-  if (T_CSRGIsNullSvBuffer(cMat)) {
-    fprintf(stderr,"SpSV_SOLVE NULL spsv-buffer\n");
-  }
-  T_CSRGCreateSpMVDescr(cMat);
   CHECK_CUSPARSE(cusparseSpSV_solve(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
 				    &alpha,*(cMat->spmvDescr),vecX,vecY,
 				    CUSPARSE_BASE_TYPE,
