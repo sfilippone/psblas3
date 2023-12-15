@@ -97,6 +97,7 @@ module s_cusparse_mod
     end function s_CSRGDeviceSetMatIndexBase
   end interface
   
+#if CUDA_SHORT_VERSION <= 10  
   interface CSRGDeviceCsrsmAnalysis
     function s_CSRGDeviceCsrsmAnalysis(Mat) &
          & bind(c,name="s_CSRGDeviceCsrsmAnalysis") result(res)
@@ -106,7 +107,18 @@ module s_cusparse_mod
       integer(c_int)        :: res
     end function s_CSRGDeviceCsrsmAnalysis
   end interface
-  
+#else
+  interface CSRGIsNullSvBuffer
+    function s_CSRGIsNullSvBuffer(Mat) &
+         & bind(c,name="s_CSRGIsNullSvBuffer") result(res)
+      use iso_c_binding
+      import  s_Cmat
+      type(s_Cmat)          :: Mat
+      integer(c_int)        :: res
+    end function s_CSRGIsNullSvBuffer
+  end interface
+#endif
+
   interface CSRGDeviceAlloc
     function s_CSRGDeviceAlloc(Mat,nr,nc,nz) &
          & bind(c,name="s_CSRGDeviceAlloc") result(res)

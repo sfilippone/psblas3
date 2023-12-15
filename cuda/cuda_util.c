@@ -228,7 +228,7 @@ int gpuInit(int dev)
   if (!psb_cublas_handle)
     psb_cudaCreateCublasHandle();
   hasUVA=getDeviceHasUVA();
-  
+  FcusparseCreate();
   return err;
   
 }
@@ -240,7 +240,7 @@ void gpuClose()
     st1=spgpuGetStream(psb_cuda_handle);
   if (! psb_cublas_handle)
     cublasGetStream(psb_cublas_handle,&st2);
-
+  FcusparseDestroy();
   psb_cudaDestroyHandle();
   if (st1 != st2) 
     psb_cudaDestroyCublasHandle();

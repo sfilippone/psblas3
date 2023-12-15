@@ -38,8 +38,9 @@
 #include "cintrf.h"
 #include "fcusparse.h"
 
-/*    Double precision complex   */ 
-#define TYPE 			       double complex                    
+
+/*    Double precision real   */ 
+#define TYPE 			       double complex
 #define CUSPARSE_BASE_TYPE             CUDA_C_64F
 #define T_CSRGDeviceMat		       z_CSRGDeviceMat
 #define T_Cmat			       z_Cmat
@@ -85,8 +86,14 @@
 #define cusparseTcsrsv2_bufferSize     cusparseZcsrsv2_bufferSize
 #define cusparseTcsrsv2_analysis       cusparseZcsrsv2_analysis
 #define cusparseTcsrsv2_solve	       cusparseZcsrsv2_solve
+#else
+
+#define T_CSRGIsNullSvBuffer	       z_CSRGIsNullSvBuffer
+#define T_CSRGIsNullSvDescr	       z_CSRGIsNullSvDescr
+#define T_CSRGIsNullMvDescr	       z_CSRGIsNullMvDescr
+#define T_CSRGCreateSpMVDescr	       z_CSRGCreateSpMVDescr
+
 #endif
 
 #include "fcusparse_fct.h"
-
 

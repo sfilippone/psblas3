@@ -38,8 +38,9 @@
 #include "cintrf.h"
 #include "fcusparse.h"
 
-/*    Single precision real   */ 
-#define TYPE                      float
+
+/*    Double precision real   */ 
+#define TYPE 			       float 
 #define CUSPARSE_BASE_TYPE             CUDA_R_32F
 #define T_CSRGDeviceMat		       s_CSRGDeviceMat
 #define T_Cmat			       s_Cmat
@@ -60,7 +61,6 @@
 #define cusparseTcsrmv		       cusparseScsrmv
 #define cusparseTcsrsv_solve	       cusparseScsrsv_solve
 #define cusparseTcsrsv_analysis	       cusparseScsrsv_analysis
-
 #define T_HYBGDeviceMat		       s_HYBGDeviceMat
 #define T_Hmat			       s_Hmat
 #define T_HYBGDeviceFree	       s_HYBGDeviceFree
@@ -78,7 +78,6 @@
 #define cusparseThybsv_analysis	       cusparseShybsv_analysis
 #define cusparseTcsr2hyb               cusparseScsr2hyb               
 
-
 #elif CUDA_VERSION <  11030
 
 #define T_CSRGDeviceSetMatType	       s_CSRGDeviceSetMatType
@@ -87,6 +86,13 @@
 #define cusparseTcsrsv2_bufferSize     cusparseScsrsv2_bufferSize
 #define cusparseTcsrsv2_analysis       cusparseScsrsv2_analysis
 #define cusparseTcsrsv2_solve	       cusparseScsrsv2_solve
+#else
+
+#define T_CSRGIsNullSvBuffer	       s_CSRGIsNullSvBuffer
+#define T_CSRGIsNullSvDescr	       s_CSRGIsNullSvDescr
+#define T_CSRGIsNullMvDescr	       s_CSRGIsNullMvDescr
+#define T_CSRGCreateSpMVDescr	       s_CSRGCreateSpMVDescr
+
 #endif
 
 #include "fcusparse_fct.h"

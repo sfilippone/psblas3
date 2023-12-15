@@ -107,8 +107,18 @@ module d_cusparse_mod
       integer(c_int)        :: res
     end function d_CSRGDeviceCsrsmAnalysis
   end interface
+#else
+  interface CSRGIsNullSvBuffer
+    function d_CSRGIsNullSvBuffer(Mat) &
+         & bind(c,name="d_CSRGIsNullSvBuffer") result(res)
+      use iso_c_binding
+      import  d_Cmat
+      type(d_Cmat)          :: Mat
+      integer(c_int)        :: res
+    end function d_CSRGIsNullSvBuffer
+  end interface
 #endif
-  
+
   interface CSRGDeviceAlloc
     function d_CSRGDeviceAlloc(Mat,nr,nc,nz) &
          & bind(c,name="d_CSRGDeviceAlloc") result(res)

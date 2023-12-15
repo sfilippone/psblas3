@@ -53,14 +53,17 @@ int FcusparseCreate()
     if (ret == CUSPARSE_STATUS_SUCCESS)
       cusparse_handle = handle;
   }
+  fprintf(stderr,"Created cusparses_handle\n");
   return (ret);
 }
 
 int FcusparseDestroy() 
 {
   int val;
-  val = (int) cusparseDestroy(*cusparse_handle);
-  free(cusparse_handle);
+  if (cusparse_handle!=NULL){
+    val = (int) cusparseDestroy(*cusparse_handle);
+    free(cusparse_handle);
+  }
   cusparse_handle=NULL;
   return(val);
 }

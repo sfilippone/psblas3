@@ -86,6 +86,12 @@
 #define cusparseTcsrsv2_bufferSize     cusparseDcsrsv2_bufferSize
 #define cusparseTcsrsv2_analysis       cusparseDcsrsv2_analysis
 #define cusparseTcsrsv2_solve	       cusparseDcsrsv2_solve
+#else
+
+#define T_CSRGIsNullSvBuffer	       d_CSRGIsNullSvBuffer
+#define T_CSRGIsNullSvDescr	       d_CSRGIsNullSvDescr
+#define T_CSRGIsNullMvDescr	       d_CSRGIsNullMvDescr
+#define T_CSRGCreateSpMVDescr	       d_CSRGCreateSpMVDescr
 
 #endif
 
