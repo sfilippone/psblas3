@@ -55,7 +55,7 @@ subroutine psb_z_cuda_csrg_to_gpu(a,info,nzrm)
   if (c_associated(a%deviceMat%Mat)) then 
     info = CSRGDeviceFree(a%deviceMat)
   end if
-#if CUDA_SHORT_VERSION <= 10 
+#if (CUDA_SHORT_VERSION <= 10 )
   if (a%is_unit()) then 
     !
     ! CUSPARSE has the habit of storing the diagonal and then ignoring,
@@ -74,7 +74,7 @@ subroutine psb_z_cuda_csrg_to_gpu(a,info,nzrm)
     !!! We are explicitly adding the diagonal 
     !! info = CSRGDeviceSetMatDiagType(a%deviceMat,cusparse_diag_type_non_unit)
     if ((info == 0) .and. a%is_triangle()) then 
-      info = CSRGDeviceSetMatType(a%deviceMat,cusparse_matrix_type_triangular)
+      !info = CSRGDeviceSetMatType(a%deviceMat,cusparse_matrix_type_triangular)
       if ((info == 0).and.a%is_upper()) then 
         info = CSRGDeviceSetMatFillMode(a%deviceMat,cusparse_fill_mode_upper)
       else
@@ -114,15 +114,15 @@ subroutine psb_z_cuda_csrg_to_gpu(a,info,nzrm)
 
     if (info == 0) info = CSRGDeviceAlloc(a%deviceMat,m,n,nz)
     if (info == 0) info = CSRGDeviceSetMatIndexBase(a%deviceMat,cusparse_index_base_one)
-    if (info == 0) then 
-      if (a%is_unit()) then 
-        info = CSRGDeviceSetMatDiagType(a%deviceMat,cusparse_diag_type_unit)
-      else 
-        info = CSRGDeviceSetMatDiagType(a%deviceMat,cusparse_diag_type_non_unit)
-      end if
-    end if
+!!$    if (info == 0) then 
+!!$      if (a%is_unit()) then 
+!!$        info = CSRGDeviceSetMatDiagType(a%deviceMat,cusparse_diag_type_unit)
+!!$      else 
+!!$        info = CSRGDeviceSetMatDiagType(a%deviceMat,cusparse_diag_type_non_unit)
+!!$      end if
+!!$    end if
     if ((info == 0) .and. a%is_triangle()) then 
-      info = CSRGDeviceSetMatType(a%deviceMat,cusparse_matrix_type_triangular)
+      !info = CSRGDeviceSetMatType(a%deviceMat,cusparse_matrix_type_triangular)
       if ((info == 0).and.a%is_upper()) then 
         info = CSRGDeviceSetMatFillMode(a%deviceMat,cusparse_fill_mode_upper)
       else

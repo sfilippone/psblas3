@@ -141,15 +141,16 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   cusparseHandle_t *my_handle=getHandle();
   TYPE   ealpha=alpha, ebeta=beta;
 #if CUDA_SHORT_VERSION <= 10
-  /*getAddrMultiVecDevice(deviceX, &vX);
-    getAddrMultiVecDevice(deviceY, &vY); */
+  /* getAddrMultiVecDevice(deviceX, &vX); */
+  /*   getAddrMultiVecDevice(deviceY, &vY);  */
   vX=x->v_;
   vY=y->v_;
 
-  return cusparseTcsrmv(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-			cMat->m,cMat->n,cMat->nz,(const TYPE *) &alpha,cMat->descr,
-			cMat->val, cMat->irp, cMat->ja,
-			(const TYPE *) vX, (const TYPE *) &beta, (TYPE *) vY);
+  CHECK_CUSPARSE(cusparseTcsrmv(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
+				cMat->m,cMat->n,cMat->nz,(const TYPE *) &alpha,cMat->descr,
+				cMat->val, cMat->irp, cMat->ja,
+				(const TYPE *) vX, (const TYPE *) &beta, (TYPE *) vY));
+  
 #elif CUDA_VERSION <  11030
   size_t bfsz;
   vX=x->v_;
