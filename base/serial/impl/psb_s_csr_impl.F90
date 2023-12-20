@@ -4310,6 +4310,7 @@ contains
   end subroutine csr_spspmm
 
 end subroutine psb_scsrspspmm
+#endif
 
 subroutine psb_s_ecsr_mold(a,b,info)
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_ecsr_mold
