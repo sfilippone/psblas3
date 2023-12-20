@@ -5,7 +5,7 @@ CSR                    Storage format for matrix A:  CSR COO
 200                    Domain size (acutal system is this**3 (pde3d) or **2 (pde2d) )
 3                      Partition: 1 BLOCK  3 3D
 2                      Stopping criterion 1 2 
-0008                   MAXIT
+0200                   MAXIT
 10                     ITRACE
 002                    IRST    restart for RGMRES  and BiCGSTABL
 INVK                   Block Solver ILU,ILUT,INVK,AINVT,AORTH

@@ -868,8 +868,8 @@ program psb_d_pde3d
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-
-  call psb_exit(ctxt)
+  call psb_print_timers(ctxt)
+  call psb_exit(ctxt) 
   stop
 
 9999 call psb_error(ctxt)
