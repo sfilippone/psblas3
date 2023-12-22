@@ -1246,54 +1246,66 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
-  if (present(mold)) then
-
-    allocate(altmp, mold=mold,stat=info)
-
-  else if (present(type)) then
-
-    select case (psb_toupper(type))
-    case ('CSR')
-      allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
-    case ('COO')
-      allocate(psb_d_coo_sparse_mat :: altmp, stat=info)
-    case ('CSC')
-      allocate(psb_d_csc_sparse_mat :: altmp, stat=info)
-    case default
-      info = psb_err_format_unknown_
-      call psb_errpush(info,name,a_err=type)
-      goto 9999
-    end select
-  else
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
+!!$  if (present(mold)) then
+!!$
+!!$    allocate(altmp, mold=mold,stat=info)
+!!$
+!!$  else if (present(type)) then
+!!$
+!!$    select case (psb_toupper(type))
+!!$    case ('CSR')
+!!$      allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
+!!$    case ('COO')
+!!$      allocate(psb_d_coo_sparse_mat :: altmp, stat=info)
+!!$    case ('CSC')
+!!$      allocate(psb_d_csc_sparse_mat :: altmp, stat=info)
+!!$    case default
+!!$      info = psb_err_format_unknown_
+!!$      call psb_errpush(info,name,a_err=type)
+!!$      goto 9999
+!!$    end select
+!!$  else
+!!$    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
+!!$  end if
+!!$
+!!$  if (info /= psb_success_) then
+!!$    info = psb_err_alloc_dealloc_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$
+!!$  if (present(dupl)) then
+!!$    call altmp%set_dupl(dupl)
+!!$  else if (a%is_bld()) then
+!!$    ! Does this make sense at all?? Who knows..
+!!$    call altmp%set_dupl(psb_dupl_def_)
+!!$  end if
+!!$
+!!$  if (debug) write(psb_err_unit,*) 'Converting from ',&
+!!$       & a%get_fmt(),' to ',altmp%get_fmt()
+!!$
+!!$  call altmp%cp_from_fmt(a%a, info)
+!!$
+!!$  if (info /= psb_success_) then
+!!$    info = psb_err_from_subroutine_
+!!$    call psb_errpush(info,name,a_err="mv_from")
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  call move_alloc(altmp,b%a)
+  call inner_cp_alloc(a%a,b%a,info,type,mold)
+  if (info /= 0) goto 9999
+  if (allocated(a%ad)) then
+    call inner_cp_alloc(a%ad,b%ad,info,type,mold)
+    if (info /= 0) goto 9999
+  end if
+  if (allocated(a%and)) then
+    call inner_cp_alloc(a%and,b%and,info,type,mold)
+    if (info /= 0) goto 9999
   end if
 
-  if (info /= psb_success_) then
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
-
-  if (present(dupl)) then
-    call altmp%set_dupl(dupl)
-  else if (a%is_bld()) then
-    ! Does this make sense at all?? Who knows..
-    call altmp%set_dupl(psb_dupl_def_)
-  end if
-
-  if (debug) write(psb_err_unit,*) 'Converting from ',&
-       & a%get_fmt(),' to ',altmp%get_fmt()
-
-  call altmp%cp_from_fmt(a%a, info)
-
-  if (info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err="mv_from")
-    goto 9999
-  end if
-
-  call move_alloc(altmp,b%a)
   call b%trim()
   call b%set_asb()
   call psb_erractionrestore(err_act)
@@ -1303,6 +1315,69 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
 9999 call psb_error_handler(err_act)
 
   return
+contains
+  subroutine inner_cp_alloc(a,b,info,type,mold)
+    class(psb_d_base_sparse_mat), intent(in) :: a
+    class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+    integer(psb_ipk_), intent(out)                   :: info
+    character(len=*), optional, intent(in) :: type
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    
+    class(psb_d_base_sparse_mat), allocatable  :: altmp
+
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    
+    if (present(mold)) then
+      
+      allocate(altmp, mold=mold,stat=info)
+      
+    else if (present(type)) then
+      
+      select case (psb_toupper(type))
+      case ('CSR')
+        allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
+      case ('COO')
+        allocate(psb_d_coo_sparse_mat :: altmp, stat=info)
+      case ('CSC')
+        allocate(psb_d_csc_sparse_mat :: altmp, stat=info)
+      case default
+        info = psb_err_format_unknown_
+        call psb_errpush(info,name,a_err=type)
+        goto 9999
+      end select
+    else
+!!$      allocate(altmp, mold=psb_get_mat_default(a),stat=info)
+      allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
+    end if
+    
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
+         & a%get_fmt(),' to ',altmp%get_fmt()
+    
+    call altmp%cp_from_fmt(a, info)
+    
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err="mv_from")
+      goto 9999
+    end if
+    
+    call move_alloc(altmp,b)
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+    
+9999 call psb_error_handler(err_act)
+    
+    return
+  end subroutine inner_cp_alloc
 
 end subroutine psb_d_cscnv
 
@@ -1345,46 +1420,57 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
     goto 9999
   end if
 
-  if (present(mold)) then
+!!$  if (present(mold)) then
+!!$
+!!$    allocate(altmp, mold=mold,stat=info)
+!!$
+!!$  else if (present(type)) then
+!!$
+!!$    select case (psb_toupper(type))
+!!$    case ('CSR')
+!!$      allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
+!!$    case ('COO')
+!!$      allocate(psb_d_coo_sparse_mat :: altmp, stat=info)
+!!$    case ('CSC')
+!!$      allocate(psb_d_csc_sparse_mat :: altmp, stat=info)
+!!$    case default
+!!$      info = psb_err_format_unknown_
+!!$      call psb_errpush(info,name,a_err=type)
+!!$      goto 9999
+!!$    end select
+!!$  else
+!!$    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
+!!$  end if
+!!$
+!!$  if (info /= psb_success_) then
+!!$    info = psb_err_alloc_dealloc_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
+!!$       & a%get_fmt(),' to ',altmp%get_fmt()
+!!$
+!!$  call altmp%mv_from_fmt(a%a, info)
+!!$
+!!$  if (info /= psb_success_) then
+!!$    info = psb_err_from_subroutine_
+!!$    call psb_errpush(info,name,a_err="mv_from")
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  call move_alloc(altmp,a%a)
 
-    allocate(altmp, mold=mold,stat=info)
-
-  else if (present(type)) then
-
-    select case (psb_toupper(type))
-    case ('CSR')
-      allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
-    case ('COO')
-      allocate(psb_d_coo_sparse_mat :: altmp, stat=info)
-    case ('CSC')
-      allocate(psb_d_csc_sparse_mat :: altmp, stat=info)
-    case default
-      info = psb_err_format_unknown_
-      call psb_errpush(info,name,a_err=type)
-      goto 9999
-    end select
-  else
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info)
+  call inner_mv_alloc(a%a,info,type,mold)
+  if (info /= 0) goto 9999
+  if (allocated(a%ad)) then
+    call inner_mv_alloc(a%ad,info,type,mold)
+    if (info /= 0) goto 9999
   end if
-
-  if (info /= psb_success_) then
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
+  if (allocated(a%and)) then
+    call inner_mv_alloc(a%and,info,type,mold)
+    if (info /= 0) goto 9999
   end if
-
-  if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
-       & a%get_fmt(),' to ',altmp%get_fmt()
-
-  call altmp%mv_from_fmt(a%a, info)
-
-  if (info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err="mv_from")
-    goto 9999
-  end if
-
-  call move_alloc(altmp,a%a)
   call a%trim()
   call a%set_asb()
   call psb_erractionrestore(err_act)
@@ -1394,7 +1480,68 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
 9999 call psb_error_handler(err_act)
 
   return
+contains
+  subroutine inner_mv_alloc(a,info,type,mold)
+    class(psb_d_base_sparse_mat), intent(inout), allocatable :: a
+    integer(psb_ipk_), intent(out)                   :: info
+    character(len=*), optional, intent(in) :: type
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    
+    class(psb_d_base_sparse_mat), allocatable  :: altmp
 
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    
+    if (present(mold)) then
+      
+      allocate(altmp, mold=mold,stat=info)
+      
+    else if (present(type)) then
+      
+      select case (psb_toupper(type))
+      case ('CSR')
+        allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
+      case ('COO')
+        allocate(psb_d_coo_sparse_mat :: altmp, stat=info)
+      case ('CSC')
+        allocate(psb_d_csc_sparse_mat :: altmp, stat=info)
+      case default
+        info = psb_err_format_unknown_
+        call psb_errpush(info,name,a_err=type)
+        goto 9999
+      end select
+    else
+!!$      allocate(altmp, mold=psb_get_mat_default(a),stat=info)
+      allocate(psb_d_csr_sparse_mat :: altmp, stat=info)
+    end if
+    
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
+         & a%get_fmt(),' to ',altmp%get_fmt()
+    
+    call altmp%mv_from_fmt(a, info)
+    
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err="mv_from")
+      goto 9999
+    end if
+    
+    call move_alloc(altmp,a)
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+    
+9999 call psb_error_handler(err_act)
+    
+    return
+  end subroutine inner_mv_alloc
 end subroutine psb_d_cscnv_ip
 
 

@@ -199,6 +199,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
       block
           logical, parameter :: do_timings=.true.
           real(psb_dpk_) :: t1, t2, t3, t4, t5
+          !write(0,*) 'Going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
           if (do_timings) call psb_barrier(ctxt)
           if (do_timings) call psb_tic(mv_phase1)
           if (doswap_) call psi_swapdata(psb_swap_send_,&
