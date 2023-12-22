@@ -24,9 +24,12 @@ DPGOBJS=dpdegenmv.o
 SPGOBJS=spdegenmv.o
 EXEDIR=./runs
 
-all: pgen file
+all: dir pgen file
 pgen: dpdegenmv spdegenmv 
 file: s_file_spmv c_file_spmv d_file_spmv z_file_spmv
+dpdegenmv spdegenmv s_file_spmv c_file_spmv d_file_spmv z_file_spmv: dir
+dir:
+	(if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi)
 
 dpdegenmv: $(DPGOBJS)
 	$(FLINK) $(LOPT) $(DPGOBJS) -fopenmp -o dpdegenmv $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS) 
