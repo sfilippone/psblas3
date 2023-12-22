@@ -36,11 +36,11 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.7.0, [https://github.com/sfilippone/psblas3/issues])
+AC_INIT([PSBLAS],3.8.1, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.7.0"
+psblas_cv_version="3.8.1"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -56,7 +56,7 @@ AC_MSG_NOTICE([
 	documentation, you can make your own by hand for your needs.
 
 	Be sure to specify the library paths of your interest. Examples:
-        ./configure --with-libs=-L/some/directory/LIB    <- will append to LIBS
+        ./configure --with-libs=-L/some/directory/LIB  <- will append to LIBS
         FC=mpif90 CC=mpicc ./configure           <- will force FC,CC
 
 	See ./configure --help=short fore more info.
@@ -729,23 +729,23 @@ PAC_MAKE_IS_GNUMAKE
 # Note : also umfdi_local_search, ...
 #AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
 
-AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
-want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
-if test x"$want_rsb_libs" != x ; then
-	if test x"$want_rsb_libs" = xyes ; then
-		want_rsb_libs="`librsb-config --static --ldflags`"
-	else
-		if test -d "$want_rsb_libs" ; then
-			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
-		else
-			true;
-			# we assume want_rsb_libs are linkage parameters
-		fi
-	fi
-	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
-fi
-RSB_LIBS="$want_rsb_libs"
-LIBS="$RSB_LIBS ${LIBS}"
+dnl AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
+dnl want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
+dnl if test x"$want_rsb_libs" != x ; then
+dnl 	if test x"$want_rsb_libs" = xyes ; then
+dnl 		want_rsb_libs="`librsb-config --static --ldflags`"
+dnl 	else
+dnl 		if test -d "$want_rsb_libs" ; then
+dnl 			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
+dnl 		else
+dnl 			true;
+dnl 			# we assume want_rsb_libs are linkage parameters
+dnl 		fi
+dnl 	fi
+dnl 	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
+dnl fi
+dnl RSB_LIBS="$want_rsb_libs"
+dnl LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS
@@ -787,6 +787,57 @@ if test "x$psblas_cv_have_amd" == "xyes" ; then
    FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
    CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
 fi
+
+
+
+PAC_CHECK_CUDA()
+
+if test "x$pac_cv_have_cuda" == "xyes"; then
+   
+   PAC_CHECK_CUDA_VERSION()
+   CUDA_VERSION="$pac_cv_cuda_version";
+   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+   dnl PAC_CHECK_SPGPU()
+   HAVE_CUDA="yes";
+   SPGPU_LIBS="-lspgpu";	
+   CUDAD=cudad;
+   CUDALD=cudald;
+   LCUDA="-lpsb_cuda";	
+   EXTRALDLIBS="-lstdc++";
+   AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
+
+   PAC_ARG_WITH_CUDACC()
+   if test "x$pac_cv_cudacc" == "x"; then
+      pac_cv_cudacc="50,60,70,75";
+      CUDA_CC="$pac_cv_cudacc";
+   fi
+   if (( $pac_cv_cuda_version >= 11070  ))
+   then 
+     CUDEFINES="--dopt=on";
+   fi	
+   for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
+   do
+	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
+   done
+   if test "x$pac_cv_cuda_version" != "xunknown"; then
+     CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+     FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+     CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"    
+   fi
+fi
+
+if test "x$pac_cv_ipk_size" != "x4"; then
+  AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
+  HAVE_CUDA="no";
+  CUDA_CC="";	
+  SPGPU_LIBS="";	
+  CUDAD="";
+  CUDALD="";
+  CUDEFINES="";
+  CUDA_INCLUDES="";
+  CUDA_LIBS="";
+fi
+
 
 
 
@@ -847,9 +898,9 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)
-CDEFINES=$(PSBCDEFINES)
-FDEFINES=$(PSBFDEFINES)
+CXXDEFINES=$(PSBCXXDEFINES)  $(CUDA_DEFINES)
+CDEFINES=$(PSBCDEFINES) $(CUDA_DEFINES)
+FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
 	
 
 # These should be portable rules, arent they?
@@ -871,7 +922,23 @@ AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
-
+AC_SUBST(SPGPU_FLAGS)
+AC_SUBST(SPGPU_LIBS)
+dnl AC_SUBST(SPGPU_DIR)
+dnl AC_SUBST(SPGPU_INCLUDES)
+dnl AC_SUBST(SPGPU_INCDIR)
+AC_SUBST(EXTRALDLIBS)
+AC_SUBST(CUDA_DIR)
+AC_SUBST(CUDA_DEFINES)
+AC_SUBST(CUDA_INCLUDES)
+AC_SUBST(CUDA_LIBS)
+AC_SUBST(CUDA_VERSION)
+AC_SUBST(CUDA_SHORT_VERSION)
+AC_SUBST(CUDA_NVCC)
+AC_SUBST(CUDEFINES)
+AC_SUBST(CUDAD)
+AC_SUBST(CUDALD)
+AC_SUBST(LCUDA)
 ###############################################################################
 # the following files will be created by Automake
 
@@ -895,6 +962,9 @@ AC_MSG_NOTICE([
 	FMFLAG                : ${FMFLAG}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
+
+	CUDA 		      : ${HAVE_CUDA}
+	CUDA_CC               : ${CUDA_CC}
 
 	BLAS                  : ${BLAS_LIBS}
 

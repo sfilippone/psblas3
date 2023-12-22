@@ -1,6 +1,6 @@
 include Make.inc
 
-all: dirs based precd kryld utild cbindd libd
+all: dirs based precd kryld utild cbindd extd  $(CUDAD) libd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -12,15 +12,20 @@ dirs:
 precd: based
 utild: based	
 kryld: precd 
-
+extd:  based
+cudad:  extd
 cbindd: based precd kryld utild 
 
-libd: based precd kryld utild cbindd 
+libd: based precd kryld utild cbindd extd $(CUDALD)
 	$(MAKE) -C base lib
 	$(MAKE) -C prec lib
 	$(MAKE) -C krylov lib
 	$(MAKE) -C util lib 
 	$(MAKE) -C cbind lib
+	$(MAKE) -C ext lib
+cudald:  cudad
+	$(MAKE) -C cuda lib
+
 
 based:
 	$(MAKE) -C base objs
@@ -32,6 +37,10 @@ utild:
 	$(MAKE) -C util objs 
 cbindd:
 	$(MAKE) -C cbind objs 
+extd:   based
+	$(MAKE) -C ext objs
+cudad:   based extd
+	$(MAKE) -C cuda objs
 
 
 install: all
@@ -56,6 +65,8 @@ clean:
 	$(MAKE) -C krylov clean
 	$(MAKE) -C util clean
 	$(MAKE) -C cbind clean
+	$(MAKE) -C ext clean
+	$(MAKE) -C cuda clean
 
 check: all
 	make check -C test/serial
@@ -71,6 +82,8 @@ veryclean: cleanlib
 	cd krylov && $(MAKE) veryclean
 	cd util && $(MAKE) veryclean
 	cd cbind && $(MAKE) veryclean
+	cd ext && $(MAKE) veryclean
+	cd cuda && $(MAKE) veryclean
 	cd test/fileread && $(MAKE) clean
 	cd test/pargen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
