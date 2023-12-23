@@ -204,6 +204,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: cscnv_ip    => psb_d_cscnv_ip
     procedure, pass(a) :: cscnv_base  => psb_d_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
+    procedure, pass(a) :: split_nd    => psb_d_split_nd
     procedure, pass(a) :: clone       => psb_dspmat_clone
     procedure, pass(a) :: move_alloc  => psb_dspmat_type_move
     !
@@ -842,6 +843,18 @@ module psb_d_mat_mod
   !
   !
 
+  interface
+    subroutine psb_d_split_nd(a,n_rows,n_cols,info)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+      integer(psb_ipk_), intent(out)          :: info
+!!$      integer(psb_ipk_),optional, intent(in)           :: dupl
+!!$      character(len=*), optional, intent(in) :: type
+!!$      class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    end subroutine psb_d_split_nd
+  end interface
+
   !
   ! CSCNV: switches to a different internal derived type.
   !   3 versions: copying to target
@@ -861,7 +874,6 @@ module psb_d_mat_mod
     end subroutine psb_d_cscnv
   end interface
 
-
   interface
     subroutine psb_d_cscnv_ip(a,iinfo,type,mold,dupl)
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
@@ -872,7 +884,6 @@ module psb_d_mat_mod
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_d_cscnv_ip
   end interface
-
 
   interface
     subroutine psb_d_cscnv_base(a,b,info,dupl)
