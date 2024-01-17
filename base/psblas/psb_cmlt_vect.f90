@@ -220,6 +220,8 @@ subroutine psb_cmlt_mltvec_va(x,a,v,desc,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
+  ctxt = desc%get_ctxt()
+
   call psb_info(ctxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
