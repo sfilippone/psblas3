@@ -47,7 +47,10 @@ COBJS= elldev.o hlldev.o diagdev.o hdiagdev.o vectordev.o  ivectordev.o dnsdev.o
 
 OBJS=$(COBJS) $(FOBJS)
 
-lib: objs
+lib: objs ilib cudalib spgpulib
+	ar cur $(LIBNAME) $(OBJS)
+	/bin/cp -p $(LIBNAME) $(LIBDIR)
+
 
 objs: spgpuinc $(OBJS) iobjs cudaobjs spgpuobjs
 	/bin/cp -p *$(.mod) $(MODDIR)
@@ -60,9 +63,6 @@ spgpuobjs:
 spgpulib:
 	$(MAKE) -C spgpu lib
 
-lib: ilib cudalib spgpulib
-	ar cur $(LIBNAME) $(OBJS)
-	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 dnsdev_mod.o hlldev_mod.o elldev_mod.o psb_base_vectordev_mod.o: core_mod.o
 psb_d_cuda_vect_mod.o psb_s_cuda_vect_mod.o psb_z_cuda_vect_mod.o psb_c_cuda_vect_mod.o: psb_i_cuda_vect_mod.o
