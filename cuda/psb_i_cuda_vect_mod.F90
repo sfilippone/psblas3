@@ -651,8 +651,7 @@ contains
     implicit none 
     class(psb_i_vect_cuda), intent(inout) :: x
     
-    if (allocated(x%v)) x%v=izero
-    call x%set_host()
+    call x%set_scal(izero)
   end subroutine i_cuda_zero
 
   subroutine i_cuda_asb_m(n, x, info)
@@ -790,7 +789,6 @@ contains
     if (present(first)) first_ = max(1,first)
     if (present(last))  last_  = min(last,last_)
     
-    if (x%is_host()) call x%sync()
     info = setScalDevice(val,first_,last_,1,x%deviceVect)
     call x%set_dev()
     
