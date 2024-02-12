@@ -155,6 +155,8 @@ module psb_s_base_vect_mod
     procedure, pass(z) :: axpby_v2  => s_base_axpby_v2
     procedure, pass(z) :: axpby_a2  => s_base_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
+    procedure, pass(z) :: abgdxyz  => s_base_abgdxyz
+    
     !
     ! Vector by vector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -1132,6 +1134,23 @@ contains
     call z%set_host()
 
   end subroutine s_base_axpby_a2
+
+  subroutine s_base_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    class(psb_s_base_vect_type), intent(inout)  :: z
+    real(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (x%is_dev()) call x%sync()
+
+    call y%axpby(m,alpha,x,beta,info)
+    call z%axpby(m,gamma,y,delta,info)
+    
+  end subroutine s_base_abgdxyz
 
 
   !

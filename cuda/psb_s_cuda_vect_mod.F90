@@ -90,6 +90,7 @@ module psb_s_cuda_vect_mod
     procedure, pass(x) :: dot_a    => s_cuda_dot_a
     procedure, pass(y) :: axpby_v  => s_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => s_cuda_axpby_a
+    procedure, pass(z) :: abgdxyz  => s_cuda_abgdxyz
     procedure, pass(y) :: mlt_v    => s_cuda_mlt_v
     procedure, pass(y) :: mlt_a    => s_cuda_mlt_a
     procedure, pass(z) :: mlt_a_2  => s_cuda_mlt_a_2
@@ -911,6 +912,27 @@ contains
 
   end subroutine s_cuda_axpby_v
 
+  
+  subroutine s_cuda_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    class(psb_s_vect_cuda), intent(inout)  :: z
+    real(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)              :: info
+
+    call z%psb_s_base_vect_type(m,alpha,beta,gamma,delta,x,y,info)
+!!$
+!!$    if (x%is_dev()) call x%sync()
+!!$
+!!$    call y%axpby(m,alpha,x,beta,info)
+!!$    call z%axpby(m,gamma,y,delta,info)
+    
+  end subroutine s_cuda_abgdxyz
+
+  
   subroutine s_cuda_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 

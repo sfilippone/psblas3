@@ -102,6 +102,8 @@ module psb_z_vect_mod
     procedure, pass(z) :: axpby_v2  => z_vect_axpby_v2
     procedure, pass(z) :: axpby_a2  => z_vect_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
+    procedure, pass(z) :: abgdxyz  => z_vect_abgdxyz
+    
     procedure, pass(y) :: mlt_v    => z_vect_mlt_v
     procedure, pass(y) :: mlt_a    => z_vect_mlt_a
     procedure, pass(z) :: mlt_a_2  => z_vect_mlt_a_2
@@ -770,6 +772,22 @@ contains
          & call z%v%axpby(m,alpha,x,beta,y,info)
 
   end subroutine z_vect_axpby_a2
+
+  subroutine z_vect_abgdxyz(m,alpha,beta,gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)            :: m
+    class(psb_z_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: y
+    class(psb_z_vect_type), intent(inout)  :: z
+    complex(psb_dpk_), intent (in)     :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)   :: info
+
+    if (allocated(z%v)) &
+         call z%abgdxyz(m,alpha,beta,gamma,delta,x,y,info)
+    
+  end subroutine z_vect_abgdxyz
+
 
   subroutine z_vect_mlt_v(x, y, info)
     use psi_serial_mod

@@ -592,9 +592,9 @@ contains
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
-        call psb_spasb(a,desc_a,info,mold=amold,bld_and=.false.)
+        call psb_spasb(a,desc_a,info,mold=amold)
       else
-        call psb_spasb(a,desc_a,info,afmt=afmt,bld_and=.false.)
+        call psb_spasb(a,desc_a,info,afmt=afmt)
       end if
     end if
     call psb_barrier(ctxt)
@@ -868,8 +868,8 @@ program psb_d_pde3d
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_print_timers(ctxt)
-  call psb_exit(ctxt) 
+
+  call psb_exit(ctxt)
   stop
 
 9999 call psb_error(ctxt)
