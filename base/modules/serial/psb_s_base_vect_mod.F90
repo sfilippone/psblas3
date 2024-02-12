@@ -1027,7 +1027,7 @@ contains
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x     The class(base_vect) to be added
-  !! \param beta scalar alpha
+  !! \param beta scalar beta
   !! \param info   return code
   !!
   subroutine s_base_axpby_v(m,alpha, x, beta, y, info)
@@ -1056,7 +1056,7 @@ contains
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x     The class(base_vect) to be added
-  !! \param beta scalar alpha
+  !! \param beta scalar beta
   !! \param y     The class(base_vect) to be added
   !! \param z     The class(base_vect) to be returned
   !! \param info   return code
@@ -1087,7 +1087,7 @@ contains
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x(:) The array to be added
-  !! \param beta scalar alpha
+  !! \param beta scalar beta
   !! \param info   return code
   !!
   subroutine s_base_axpby_a(m,alpha, x, beta, y, info)
@@ -1135,6 +1135,23 @@ contains
 
   end subroutine s_base_axpby_a2
 
+  !
+  ! ABGDXYZ is invoked via Z, hence the structure below.
+  !
+  !
+  !> Function  base_abgdxyz
+  !! \memberof  psb_s_base_vect_type
+  !! \brief ABGDXYZ combines two AXPBYS y=alpha*x+beta*y, z=gamma*y+delta*zeta
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param beta scalar beta 
+  !! \param gamma scalar gamma
+  !! \param delta scalar delta
+  !! \param x     The class(base_vect) to be added
+  !! \param y     The class(base_vect) to be added
+  !! \param z     The class(base_vect) to be added
+  !! \param info   return code
+  !!
   subroutine s_base_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
     use psi_serial_mod
     implicit none
