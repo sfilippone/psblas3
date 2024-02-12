@@ -923,7 +923,7 @@ contains
     complex(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
 
-    call z%psb_z_base_vect_type(m,alpha,beta,gamma,delta,x,y,info)
+    call z%psb_z_base_vect_type%abgdxyz(m,alpha,beta,gamma,delta,x,y,info)
 !!$
 !!$    if (x%is_dev()) call x%sync()
 !!$
