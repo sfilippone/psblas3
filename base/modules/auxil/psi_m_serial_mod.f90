@@ -99,6 +99,19 @@ module psi_m_serial_mod
     end subroutine psi_maxpbyv2
   end interface psb_geaxpby
 
+  interface psi_abgdxyz
+    subroutine psi_mabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      integer(psb_mpk_), intent (in)       ::  x(:)
+      integer(psb_mpk_), intent (inout)    ::  y(:)
+      integer(psb_mpk_), intent (inout)    ::  z(:)
+      integer(psb_mpk_), intent (in)       :: alpha, beta,gamma,delta
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_mabgdxyz
+  end interface psi_abgdxyz
+  
   interface psi_gth
     subroutine psi_mgthmv(n,k,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
