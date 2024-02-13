@@ -1567,3 +1567,228 @@ subroutine  saxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
   return
 
 end subroutine saxpbyv2
+
+subroutine psi_sabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)      :: m
+  real(psb_spk_), intent (in)       ::  x(:)
+  real(psb_spk_), intent (inout)    ::  y(:)
+  real(psb_spk_), intent (inout)    ::  z(:)
+  real(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
+  integer(psb_ipk_), intent(out)     :: info
+
+  integer(psb_ipk_) :: i
+  integer(psb_ipk_) :: int_err(5)
+  character  name*20
+  name='sabgdxyz'
+
+  info = psb_success_
+  if (m.lt.0) then
+    info=psb_err_iarg_neg_
+    int_err(1)=1
+    int_err(2)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(x).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=6
+    int_err(2)=1
+    int_err(3)=size(x)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(y).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=7
+    int_err(2)=1
+    int_err(3)=size(y)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(z).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=8
+    int_err(2)=1
+    int_err(3)=size(z)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  endif
+
+  if (beta == szero) then
+    if (gamma == szero) then
+      if (alpha == szero) then
+        if (delta == szero) then
+          !  a 0   b 0 g 0 d 0 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = szero
+            z(i) = szero
+          end do
+        else if (delta /= szero) then
+          !  a 0   b 0 g 0 d n 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = szero
+            z(i) = delta*z(i)
+          end do
+        end if
+      else if (alpha /= szero) then
+        if (delta == szero) then
+          !  a n   b 0 g 0 d 0 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = szero
+          end do
+        else if (delta /= szero) then
+          !  a n   b 0 g 0 d n 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      end if
+
+    else  if (gamma /= szero) then
+
+      if (alpha == szero) then
+      
+        if (delta == szero) then
+          !  a 0   b 0 g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = szero
+            z(i) = szero  ! gamma*y(i)
+          end do
+          
+        else if (delta /= szero) then
+          !  a 0   b 0 g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = szero
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      else if (alpha /= szero) then
+        
+        if (delta == szero) then
+          !  a n   b 0 g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = gamma*y(i)
+          end do
+          
+        else if (delta /= szero) then
+          !  a n   b 0 g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = gamma*y(i)+delta*z(i)
+          end do
+          
+        end if
+
+      end if
+
+    end if
+
+  else  if (beta /= szero) then
+    
+    if (gamma == szero) then
+      if (alpha == szero) then
+        if (delta == szero) then
+          !  a 0   b n g 0 d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = szero
+          end do
+          
+        else  if (delta /= szero) then
+          !  a 0   b n g 0 d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      else  if (alpha /= szero) then
+        if (delta == szero) then
+          !  a n  b n g 0 d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = szero
+          end do
+          
+        else if (delta /= szero) then
+          !  a n  b n g 0 d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      end if
+    else  if (gamma /= szero) then
+      if (alpha == szero) then
+        if (delta == szero) then
+          !  a 0  b n g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = gamma*y(i)
+          end do
+          
+        else if (delta /= szero) then
+          !  a 0  b n g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = gamma*y(i)+delta*z(i)
+          end do
+
+        end if
+
+      else if (alpha /= szero) then
+        if (delta == szero) then
+          !  a n b n g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = gamma*y(i)
+          end do
+          
+        else if (delta /= szero) then
+          !  a n b n g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = gamma*y(i)+delta*z(i)
+          end do
+          
+        end if
+      end if
+    end if
+  end if
+
+  return
+
+9999 continue
+  call fcpsb_serror()
+  return
+
+end subroutine psi_sabgdxyz

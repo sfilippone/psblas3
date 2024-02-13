@@ -99,6 +99,19 @@ module psi_z_serial_mod
     end subroutine psi_zaxpbyv2
   end interface psb_geaxpby
 
+  interface psi_abgdxyz
+    subroutine psi_zabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      complex(psb_dpk_), intent (in)       ::  x(:)
+      complex(psb_dpk_), intent (inout)    ::  y(:)
+      complex(psb_dpk_), intent (inout)    ::  z(:)
+      complex(psb_dpk_), intent (in)       :: alpha, beta,gamma,delta
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_zabgdxyz
+  end interface psi_abgdxyz
+  
   interface psi_gth
     subroutine psi_zgthmv(n,k,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_dpk_
