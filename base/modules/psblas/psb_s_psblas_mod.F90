@@ -143,7 +143,7 @@ module psb_s_psblas_mod
     end subroutine psb_saxpby
   end interface
 
-  interface psb_abgdxyx
+  interface psb_abgdxyz
     subroutine psb_sabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
          & desc_a, info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
@@ -155,7 +155,7 @@ module psb_s_psblas_mod
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_sabgdxyz_vect
-  end interface psb_abgdxyx
+  end interface psb_abgdxyz
   
   interface psb_geamax
     function psb_samax(x, desc_a, info, jx,global)
