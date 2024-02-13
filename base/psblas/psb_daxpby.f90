@@ -745,8 +745,8 @@ end subroutine psb_daddconst_vect
 
 subroutine psb_dabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
      & desc_a, info)
-  import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-       & psb_d_vect_type, psb_dspmat_type
+  use psb_base_mod, psb_protect_name => psb_dabgdxyz_vect
+  implicit none 
   type(psb_d_vect_type), intent (inout) :: x
   type(psb_d_vect_type), intent (inout) :: y
   type(psb_d_vect_type), intent (inout) :: z
