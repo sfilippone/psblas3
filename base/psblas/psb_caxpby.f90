@@ -757,7 +757,7 @@ subroutine psb_cabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iiy, jjy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, nr
   character(len=20)        :: name, ch_err
 
   name='psb_c_addconst_vect'
@@ -792,7 +792,8 @@ subroutine psb_cabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
   ix = ione
   iy = ione
 
-  m = desc_a%get_global_rows()
+  m  = desc_a%get_global_rows()
+  nr = desc_a%get_local_rows()
 
   ! check vector correctness
   call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
@@ -811,7 +812,7 @@ subroutine psb_cabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call z%abgdxyz(alpha,beta,gamma,delta,x,y,info)
+    call z%abgdxyz(nr,alpha,beta,gamma,delta,x,y,info)
   end if
 
   call psb_erractionrestore(err_act)
