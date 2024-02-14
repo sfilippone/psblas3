@@ -784,7 +784,7 @@ contains
     integer(psb_ipk_), intent(out)   :: info
 
     if (allocated(z%v)) &
-         call z%abgdxyz(m,alpha,beta,gamma,delta,x,y,info)
+         call z%v%abgdxyz(m,alpha,beta,gamma,delta,x%v,y%v,info)
     
   end subroutine z_vect_abgdxyz
 
