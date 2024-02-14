@@ -1152,7 +1152,7 @@ contains
     end if
 
   end function z_vect_nrm2_weight
-
+ 
   function z_vect_nrm2_weight_mask(n,x,w,id,info,aux) result(res)
     use psi_serial_mod
     implicit none

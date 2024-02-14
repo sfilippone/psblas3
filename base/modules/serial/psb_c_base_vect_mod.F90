@@ -1155,10 +1155,17 @@ contains
     complex(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
 
-    if (x%is_dev()) call x%sync()
-
-    call y%axpby(m,alpha,x,beta,info)
-    call z%axpby(m,gamma,y,delta,info)
+    if (.false.) then 
+      if (x%is_dev()) call x%sync()
+      
+      call y%axpby(m,alpha,x,beta,info)
+      call z%axpby(m,gamma,y,delta,info)
+    else
+      if (x%is_dev().and.(alpha/=czero))) call x%sync()
+      if (y%is_dev().and.(beta/=czero))   call y%sync()
+      if (z%is_dev().and.(delta/=czero))  call z%sync()
+      call psi_cabgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+    end if
     
   end subroutine c_base_abgdxyz
 

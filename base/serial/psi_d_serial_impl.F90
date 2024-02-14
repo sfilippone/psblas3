@@ -1616,7 +1616,7 @@ subroutine psi_dabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
     call fcpsb_errpush(info,name,int_err)
     goto 9999
   endif
-
+ 
   if (beta == dzero) then
     if (gamma == dzero) then
       if (alpha == dzero) then
@@ -1773,7 +1773,7 @@ subroutine psi_dabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
           end do
           
         else if (delta /= dzero) then
-          !  a n b n g n d 0
+          !  a n b n g n d n
           !$omp parallel do private(i)
           do i=1,m
             y(i) = alpha*x(i)+beta*y(i)

@@ -1162,10 +1162,17 @@ contains
     real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
 
-    if (x%is_dev()) call x%sync()
-
-    call y%axpby(m,alpha,x,beta,info)
-    call z%axpby(m,gamma,y,delta,info)
+    if (.false.) then 
+      if (x%is_dev()) call x%sync()
+      
+      call y%axpby(m,alpha,x,beta,info)
+      call z%axpby(m,gamma,y,delta,info)
+    else
+      if (x%is_dev().and.(alpha/=dzero))) call x%sync()
+      if (y%is_dev().and.(beta/=dzero))   call y%sync()
+      if (z%is_dev().and.(delta/=dzero))  call z%sync()
+      call psi_dabgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+    end if
     
   end subroutine d_base_abgdxyz
 
