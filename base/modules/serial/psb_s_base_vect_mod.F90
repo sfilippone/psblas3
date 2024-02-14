@@ -1168,7 +1168,7 @@ contains
       call y%axpby(m,alpha,x,beta,info)
       call z%axpby(m,gamma,y,delta,info)
     else
-      if (x%is_dev().and.(alpha/=szero))) call x%sync()
+      if (x%is_dev().and.(alpha/=szero)) call x%sync()
       if (y%is_dev().and.(beta/=szero))   call y%sync()
       if (z%is_dev().and.(delta/=szero))  call z%sync()
       call psi_sabgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
