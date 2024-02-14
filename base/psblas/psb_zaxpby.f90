@@ -756,8 +756,8 @@ subroutine psb_zabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iiy, jjy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, nr
+       & err_act, iix, jjx, iiy, jjy, nr
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_z_addconst_vect'
