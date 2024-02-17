@@ -463,7 +463,20 @@ void spgpuDaxpby(spgpuHandle_t handle,
 	double alpha,
 	__device double* x);
 	
-/** 
+
+void spgpuDabgdxyz(spgpuHandle_t handle,
+		   int n,
+		   double alpha,
+		   double beta,
+		   double gamma,
+		   double delta,
+		   __device double* x,
+		   __device double *y,
+		   __device double *z)
+;
+	
+
+  /** 
 * \fn void spgpuDmaxpby(spgpuHandle_t handle, __device double *z, int n, double beta, __device double *y, double alpha, __device double* x, int count, int pitch)
  * Computes the double precision z = beta * y + alpha * x of x and y multivectors. z could be exactly x or y (without offset) or another vector.
  * \param handle the spgpu handle used to call this routine

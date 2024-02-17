@@ -923,13 +923,40 @@ contains
     real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
 
-    call z%psb_d_base_vect_type%abgdxyz(m,alpha,beta,gamma,delta,x,y,info)
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$
-!!$    call y%axpby(m,alpha,x,beta,info)
-!!$    call z%axpby(m,gamma,y,delta,info)
+
+    info = psb_success_
     
+    if (.false.) then
+      
+      select type(xx => x)
+      type is (psb_d_vect_cuda)
+        ! Do something different here 
+        if ((beta /= dzero).and.y%is_host())&
+             &  call y%sync()
+        if (xx%is_host()) call xx%sync()
+        nx = getMultiVecDeviceSize(xx%deviceVect)
+        ny = getMultiVecDeviceSize(y%deviceVect)
+        if ((nx<m).or.(ny<m)) then
+          info = psb_err_internal_error_
+        else
+          info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
+        end if
+        call y%set_dev()
+      class default
+        ! Do it on the host side
+        if ((alpha /= dzero).and.(x%is_dev()))&
+             & call x%sync()
+        call y%axpby(m,alpha,x%v,beta,info)
+      end select
+      
+    else
+
+      if (x%is_host()) call x%sync()
+      if (y%is_host()) call y%sync()
+      if (z%is_host()) call z%sync()
+      call y%axpby(m,alpha,x,beta,info)
+      call z%axpby(m,gamma,y,delta,info)
+    end if
   end subroutine d_cuda_abgdxyz
 
   
