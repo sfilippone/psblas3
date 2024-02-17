@@ -1165,6 +1165,8 @@ contains
       if (y%is_dev().and.(beta/=czero))   call y%sync()
       if (z%is_dev().and.(delta/=czero))  call z%sync()
       call psi_cabgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+      call y%set_host()
+      call z%set_host()
     end if
     
   end subroutine c_base_abgdxyz
