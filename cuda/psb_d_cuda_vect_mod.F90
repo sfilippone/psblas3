@@ -927,7 +927,7 @@ contains
 
     info = psb_success_
     
-    if (.false.) then
+    if (.true.) then
       gpu_done = .false.
       select type(xx => x)
       class is (psb_d_vect_cuda)
