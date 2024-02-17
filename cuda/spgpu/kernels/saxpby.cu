@@ -30,8 +30,9 @@ extern "C"
 __global__ void spgpuSaxpby_krn(float *z, int n, float beta, float *y, float alpha, float* x)
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
-	
-	if (id < n)
+	unsigned int gridSize = blockDim.x * gridDim.x;
+	for ( ; id < n; id +=gridSize)
+		//if (id,n) 
 	{
 		// Since z, x and y are accessed with the same offset by the same thread,
 		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
@@ -44,6 +45,29 @@ __global__ void spgpuSaxpby_krn(float *z, int n, float beta, float *y, float alp
 }
 
 
+#if 1
+void spgpuSaxpby(spgpuHandle_t handle,
+	__device float *z,
+	int n,
+	float beta,
+	__device float *y,
+	float alpha,
+	__device float* x)
+{
+	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
+	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
+	dim3 block(BLOCK_SIZE);
+        cudaDeviceProp deviceProp;
+        cudaGetDeviceProperties(&deviceProp, 0);
+	num_mp         = deviceProp.multiProcessorCount;
+	max_threads_mp = deviceProp.maxThreadsPerMultiProcessor;
+	num_blocks_mp  = max_threads_mp/BLOCK_SIZE;
+	num_blocks     = num_blocks_mp*num_mp;
+	dim3 grid(num_blocks);
+
+	spgpuSaxpby_krn<<<grid, block, 0, handle->currentStream>>>(z, n, beta, y, alpha, x);
+}
+#else
 void spgpuSaxpby_(spgpuHandle_t handle,
 	__device float *z,
 	int n,
@@ -83,7 +107,7 @@ void spgpuSaxpby(spgpuHandle_t handle,
 
 	cudaCheckError("CUDA error on saxpby");
 }
-
+#endif
 void spgpuSmaxpby(spgpuHandle_t handle,
 		  __device float *z,
 		  int n,
