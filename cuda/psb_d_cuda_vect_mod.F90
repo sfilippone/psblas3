@@ -947,7 +947,8 @@ contains
             if ((nx<m).or.(ny<m).or.(nz<m)) then
               info = psb_err_internal_error_
             else
-              !info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
+              info = abgdxyzMultiVecDevice(m,alpha,beta,gamma,delta,&
+                   & xx%deviceVect,yy%deviceVect,zz%deviceVect)
             end if
             call yy%set_dev()
             call zz%set_dev()

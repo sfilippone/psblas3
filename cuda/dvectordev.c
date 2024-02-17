@@ -241,6 +241,30 @@ int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX,
   return(i);
 }
  
+
+int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, double delta, 
+				void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+#if 1
+  spgpuDabgdxyz(handle,n, alpha,beta,gamma,delta, 
+	      (double*)devVecX->v_,(double*) devVecY->v_,(double*) devVecZ->v_);
+#else
+  for(j=0;j<devVecY->count_;j++)
+    spgpuDaxpby(handle,(double*)devVecY->v_+pitch*j, n, beta, 
+		(double*)devVecY->v_+pitch*j, alpha,(double*) devVecX->v_+pitch*j);
+#endif
+  return(i);
+}
+ 
 int axyMultiVecDeviceDouble(int n, double alpha, void *deviceVecA, void *deviceVecB)
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;
