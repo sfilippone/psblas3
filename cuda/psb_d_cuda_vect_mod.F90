@@ -922,33 +922,47 @@ contains
     class(psb_d_vect_cuda), intent(inout)  :: z
     real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
-
+    integer(psb_ipk_) :: nx, ny, nz
+    logical :: gpu_done
 
     info = psb_success_
     
     if (.false.) then
-      
+      gpu_done = .false.
       select type(xx => x)
-      type is (psb_d_vect_cuda)
-        ! Do something different here 
-        if ((beta /= dzero).and.y%is_host())&
-             &  call y%sync()
-        if (xx%is_host()) call xx%sync()
-        nx = getMultiVecDeviceSize(xx%deviceVect)
-        ny = getMultiVecDeviceSize(y%deviceVect)
-        if ((nx<m).or.(ny<m)) then
-          info = psb_err_internal_error_
-        else
-          info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
-        end if
-        call y%set_dev()
-      class default
-        ! Do it on the host side
-        if ((alpha /= dzero).and.(x%is_dev()))&
-             & call x%sync()
-        call y%axpby(m,alpha,x%v,beta,info)
+      class is (psb_d_vect_cuda)
+        select type(yy => y)
+        class is (psb_d_vect_cuda)
+          select type(zz => z)
+          class is (psb_d_vect_cuda)
+            ! Do something different here 
+            if ((beta /= dzero).and.yy%is_host())&
+                 &  call yy%sync()
+            if ((delta /= dzero).and.zz%is_host())&
+                 &  call zz%sync()
+            if (xx%is_host()) call xx%sync()
+            nx = getMultiVecDeviceSize(xx%deviceVect)
+            ny = getMultiVecDeviceSize(yy%deviceVect)
+            nz = getMultiVecDeviceSize(zz%deviceVect)
+            if ((nx<m).or.(ny<m).or.(nz<m)) then
+              info = psb_err_internal_error_
+            else
+              !info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
+            end if
+            call yy%set_dev()
+            call zz%set_dev()
+            gpu_done = .true.
+          end select
+        end select
       end select
       
+      if (.not.gpu_done) then 
+        if (x%is_host()) call x%sync()
+        if (y%is_host()) call y%sync()
+        if (z%is_host()) call z%sync()
+        call y%axpby(m,alpha,x,beta,info)
+        call z%axpby(m,gamma,y,delta,info)
+      end if
     else
 
       if (x%is_host()) call x%sync()
