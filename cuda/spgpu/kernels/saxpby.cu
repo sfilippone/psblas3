@@ -20,6 +20,9 @@ extern "C"
 {
 #include "core.h"
 #include "vector.h"
+  int getGPUMultiProcessors();
+  int getGPUMaxThreadsPerMP();
+  //#include "cuda_util.h"
 }
 
 
@@ -27,6 +30,8 @@ extern "C"
 
 #define BLOCK_SIZE 512
 
+
+#if 1
 __global__ void spgpuSaxpby_krn(float *z, int n, float beta, float *y, float alpha, float* x)
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
@@ -49,8 +54,6 @@ __global__ void spgpuSaxpby_krn(float *z, int n, float beta, float *y, float alp
 	}
 }
 
-
-#if 1
 void spgpuSaxpby(spgpuHandle_t handle,
 	__device float *z,
 	int n,
@@ -62,17 +65,35 @@ void spgpuSaxpby(spgpuHandle_t handle,
 	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
 	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
 	dim3 block(BLOCK_SIZE);
-        cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, 0);
-	num_mp         = deviceProp.multiProcessorCount;
-	max_threads_mp = deviceProp.maxThreadsPerMultiProcessor;
+	num_mp         = getGPUMultiProcessors();
+	max_threads_mp = getGPUMaxThreadsPerMP();
 	num_blocks_mp  = max_threads_mp/BLOCK_SIZE;
 	num_blocks     = num_blocks_mp*num_mp;
 	dim3 grid(num_blocks);
 
 	spgpuSaxpby_krn<<<grid, block, 0, handle->currentStream>>>(z, n, beta, y, alpha, x);
 }
+
 #else
+
+__global__ void spgpuSaxpby_krn(float *z, int n, float beta, float *y, float alpha, float* x)
+{
+	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
+	
+	if (id < n)
+	{
+		// Since z, x and y are accessed with the same offset by the same thread,
+		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+
+		if (beta == 0.0f)
+			z[id] = PREC_FMUL(alpha,x[id]);
+		else
+			z[id] = PREC_FADD(PREC_FMUL(alpha, x[id]), PREC_FMUL(beta,y[id]));
+	}
+}
+
+
+
 void spgpuSaxpby_(spgpuHandle_t handle,
 	__device float *z,
 	int n,

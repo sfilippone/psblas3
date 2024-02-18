@@ -22,6 +22,9 @@ extern "C"
 {
 #include "core.h"
 #include "vector.h"
+  int getGPUMultiProcessors();
+  int getGPUMaxThreadsPerMP();
+  //#include "cuda_util.h"
 }
 
 
@@ -29,6 +32,8 @@ extern "C"
 
 #define BLOCK_SIZE 512
 
+
+#if 1
 __global__ void spgpuDaxpby_krn(double *z, int n, double beta, double *y, double alpha, double* x)
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
@@ -36,22 +41,16 @@ __global__ void spgpuDaxpby_krn(double *z, int n, double beta, double *y, double
 	if (beta == 0.0) {
 	  for ( ; id < n; id +=gridSize)
 	    {
-	      // Since z, x and y are accessed with the same offset by the same thread,
-	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
 	      
 	      z[id] = PREC_DMUL(alpha,x[id]);
 	    }
 	} else {
 	  for ( ; id < n; id +=gridSize)
 	    {
-	      // Since z, x and y are accessed with the same offset by the same thread,
-	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
 	      z[id] = PREC_DADD(PREC_DMUL(alpha, x[id]), PREC_DMUL(beta,y[id]));
 	    }
 	}
 }
-
-#if 1
 
 void spgpuDaxpby(spgpuHandle_t handle,
 	__device double *z,
@@ -64,10 +63,8 @@ void spgpuDaxpby(spgpuHandle_t handle,
 	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
 	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
 	dim3 block(BLOCK_SIZE);
-        cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, 0);
-	num_mp         = deviceProp.multiProcessorCount;
-	max_threads_mp = deviceProp.maxThreadsPerMultiProcessor;
+	num_mp         = getGPUMultiProcessors();
+	max_threads_mp = getGPUMaxThreadsPerMP();
 	num_blocks_mp  = max_threads_mp/BLOCK_SIZE;
 	num_blocks     = num_blocks_mp*num_mp;
 	dim3 grid(num_blocks);
@@ -75,6 +72,23 @@ void spgpuDaxpby(spgpuHandle_t handle,
 	spgpuDaxpby_krn<<<grid, block, 0, handle->currentStream>>>(z, n, beta, y, alpha, x);
 }
 #else
+
+__global__ void spgpuDaxpby_krn(double *z, int n, double beta, double *y, double alpha, double* x)
+{
+	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
+	
+	if (id < n)
+	{
+		// Since z, x and y are accessed with the same offset by the same thread,
+		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+
+		if (beta == 0.0)
+			z[id] = PREC_DMUL(alpha,x[id]);
+		else
+			z[id] = PREC_DADD(PREC_DMUL(alpha, x[id]), PREC_DMUL(beta,y[id]));
+	}
+}
+
 void spgpuDaxpby_(spgpuHandle_t handle,
 	__device double *z,
 	int n,
