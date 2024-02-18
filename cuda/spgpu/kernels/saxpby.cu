@@ -31,16 +31,21 @@ __global__ void spgpuSaxpby_krn(float *z, int n, float beta, float *y, float alp
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
 	unsigned int gridSize = blockDim.x * gridDim.x;
-	for ( ; id < n; id +=gridSize)
-		//if (id,n) 
-	{
-		// Since z, x and y are accessed with the same offset by the same thread,
-		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
-
-		if (beta == 0.0f)
-			z[id] = PREC_FMUL(alpha,x[id]);
-		else
-			z[id] = PREC_FADD(PREC_FMUL(alpha, x[id]), PREC_FMUL(beta,y[id]));
+	if (beta == 0.0f) {
+	  for ( ; id < n; id +=gridSize)
+	    {
+	      // Since z, x and y are accessed with the same offset by the same thread,
+	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+	      
+	      z[id] = PREC_FMUL(alpha,x[id]);
+	    }
+	} else {
+	  for ( ; id < n; id +=gridSize)
+	    {
+	      // Since z, x and y are accessed with the same offset by the same thread,
+	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+	      z[id] = PREC_FADD(PREC_FMUL(alpha, x[id]), PREC_FMUL(beta,y[id]));
+	    }
 	}
 }
 

@@ -33,16 +33,21 @@ __global__ void spgpuCaxpby_krn(cuFloatComplex *z, int n, cuFloatComplex beta, c
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
 	unsigned int gridSize = blockDim.x * gridDim.x;
-	for ( ; id < n; id +=gridSize)
-		//if (id,n) 
-	{
-		// Since z, x and y are accessed with the same offset by the same thread,
-		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
-
-		if (cuFloatComplex_isZero(beta))
-			z[id] = cuCmulf(alpha,x[id]);
-		else
-			z[id] = cuCfmaf(beta, y[id], cuCmulf(alpha, x[id]));
+	if (cuFloatComplex_isZero(beta)) {
+	  for ( ; id < n; id +=gridSize)
+	    //if (id,n) 
+	    {
+	      // Since z, x and y are accessed with the same offset by the same thread,
+	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+	      
+	      z[id] = cuCmulf(alpha,x[id]);
+	    }
+	} else {
+	  for ( ; id < n; id +=gridSize)
+	    //if (id,n) 
+	    {
+	      z[id] = cuCfmaf(beta, y[id], cuCmulf(alpha, x[id]));
+	    }
 	}
 }
 

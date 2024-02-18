@@ -34,16 +34,21 @@ __global__ void spgpuZaxpby_krn(cuDoubleComplex *z, int n, cuDoubleComplex beta,
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
 	unsigned int gridSize = blockDim.x * gridDim.x;
-	for ( ; id < n; id +=gridSize)
-		//if (id,n) 
-	{
-		// Since z, x and y are accessed with the same offset by the same thread,
-		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
-
-		if (cuDoubleComplex_isZero(beta))
-			z[id] = cuCmul(alpha,x[id]);
-		else
-			z[id] = cuCfma(alpha, x[id], cuCmul(beta,y[id]));
+	if (cuDoubleComplex_isZero(beta)) {
+	  for ( ; id < n; id +=gridSize)
+	    //if (id,n) 
+	    {
+	      // Since z, x and y are accessed with the same offset by the same thread,
+	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+	      
+	      z[id] = cuCmul(alpha,x[id]);
+	    }
+	} else {
+	  for ( ; id < n; id +=gridSize)
+	    //if (id,n) 
+	    {
+	      z[id] = cuCfma(beta, y[id], cuCmul(alpha, x[id]));
+	    }
 	}
 }
 

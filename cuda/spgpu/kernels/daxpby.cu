@@ -33,16 +33,21 @@ __global__ void spgpuDaxpby_krn(double *z, int n, double beta, double *y, double
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
 	unsigned int gridSize = blockDim.x * gridDim.x;
-	for ( ; id < n; id +=gridSize)
-		//if (id,n) 
-	{
-		// Since z, x and y are accessed with the same offset by the same thread,
-		// and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
-
-		if (beta == 0.0)
-			z[id] = PREC_DMUL(alpha,x[id]);
-		else
-			z[id] = PREC_DADD(PREC_DMUL(alpha, x[id]), PREC_DMUL(beta,y[id]));
+	if (beta == 0.0) {
+	  for ( ; id < n; id +=gridSize)
+	    {
+	      // Since z, x and y are accessed with the same offset by the same thread,
+	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+	      
+	      z[id] = PREC_DMUL(alpha,x[id]);
+	    }
+	} else {
+	  for ( ; id < n; id +=gridSize)
+	    {
+	      // Since z, x and y are accessed with the same offset by the same thread,
+	      // and the write to z follows the x and y read, x, y and z can share the same base address (in-place computing).
+	      z[id] = PREC_DADD(PREC_DMUL(alpha, x[id]), PREC_DMUL(beta,y[id]));
+	    }
 	}
 }
 
