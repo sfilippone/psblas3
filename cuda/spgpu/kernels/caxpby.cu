@@ -78,6 +78,7 @@ void spgpuCaxpby(spgpuHandle_t handle,
 
 #else
 
+
 __global__ void spgpuCaxpby_krn(cuFloatComplex *z, int n, cuFloatComplex beta, cuFloatComplex *y, cuFloatComplex alpha, cuFloatComplex* x)
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
@@ -94,6 +95,7 @@ __global__ void spgpuCaxpby_krn(cuFloatComplex *z, int n, cuFloatComplex beta, c
 	}
 }
 
+
 void spgpuCaxpby_(spgpuHandle_t handle,
 	__device cuFloatComplex *z,
 	int n,
@@ -103,15 +105,9 @@ void spgpuCaxpby_(spgpuHandle_t handle,
 	__device cuFloatComplex* x)
 {
 	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
-	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
+
 	dim3 block(BLOCK_SIZE);
-        cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, 0);
-	num_mp         = deviceProp.multiProcessorCount;
-	max_threads_mp = deviceProp.maxThreadsPerMultiProcessor;
-	num_blocks_mp  = max_threads_mp/BLOCK_SIZE;
-	num_blocks     = num_blocks_mp*num_mp;
-	dim3 grid(num_blocks);
+	dim3 grid(msize);
 
 	spgpuCaxpby_krn<<<grid, block, 0, handle->currentStream>>>(z, n, beta, y, alpha, x);
 }

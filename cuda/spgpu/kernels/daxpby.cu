@@ -89,6 +89,7 @@ __global__ void spgpuDaxpby_krn(double *z, int n, double beta, double *y, double
 	}
 }
 
+
 void spgpuDaxpby_(spgpuHandle_t handle,
 	__device double *z,
 	int n,
@@ -98,15 +99,9 @@ void spgpuDaxpby_(spgpuHandle_t handle,
 	__device double* x)
 {
 	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
-	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
+
 	dim3 block(BLOCK_SIZE);
-        cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, 0);
-	num_mp         = deviceProp.multiProcessorCount;
-	max_threads_mp = deviceProp.maxThreadsPerMultiProcessor;
-	num_blocks_mp  = max_threads_mp/BLOCK_SIZE;
-	num_blocks     = num_blocks_mp*num_mp;
-	dim3 grid(num_blocks);
+	dim3 grid(msize);
 
 	spgpuDaxpby_krn<<<grid, block, 0, handle->currentStream>>>(z, n, beta, y, alpha, x);
 }
@@ -134,6 +129,7 @@ void spgpuDaxpby(spgpuHandle_t handle,
 
 	cudaCheckError("CUDA error on daxpby");
 }
+
 #endif
 void spgpuDmaxpby(spgpuHandle_t handle,
 		  __device double *z,
