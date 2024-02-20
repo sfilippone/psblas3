@@ -67,6 +67,8 @@ int asumMultiVecDeviceFloat(float* y_res, int n, void* devVecA);
 int dotMultiVecDeviceFloat(float* y_res, int n, void* devVecA, void* devVecB);
 
 int axpbyMultiVecDeviceFloat(int n, float alpha, void* devVecX, float beta, void* devVecY);
+int abgdxyzMultiVecDeviceFloat(int n,float alpha,float beta, float gamma, float delta, 
+			       void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ);
 int axyMultiVecDeviceFloat(int n, float alpha, void *deviceVecA, void *deviceVecB);
 int axybzMultiVecDeviceFloat(int n, float alpha, void *deviceVecA,
 			      void *deviceVecB, float beta, void *deviceVecZ);

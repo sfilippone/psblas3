@@ -241,7 +241,6 @@ int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX,
   return(i);
 }
  
-
 int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, double delta, 
 				void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
 { int j=0, i=0;
@@ -254,14 +253,8 @@ int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, do
   if ((n > devVecY->size_) || (n>devVecX->size_ )) 
     return SPGPU_UNSUPPORTED;
 
-#if 1
   spgpuDabgdxyz(handle,n, alpha,beta,gamma,delta, 
 	      (double*)devVecX->v_,(double*) devVecY->v_,(double*) devVecZ->v_);
-#else
-  for(j=0;j<devVecY->count_;j++)
-    spgpuDaxpby(handle,(double*)devVecY->v_+pitch*j, n, beta, 
-		(double*)devVecY->v_+pitch*j, alpha,(double*) devVecX->v_+pitch*j);
-#endif
   return(i);
 }
  

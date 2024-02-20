@@ -181,6 +181,18 @@ void spgpuSaxpby(spgpuHandle_t handle,
 	float alpha,
 	__device float* x);
 
+
+void spgpuSabgdxyz(spgpuHandle_t handle,
+		   int n,
+		   float alpha,
+		   float beta,
+		   float gamma,
+		   float delta,
+		   __device float* x,
+		   __device float *y,
+		   __device float *z)
+;
+	
 /** 
 * \fn void spgpuSmaxpby(spgpuHandle_t handle, __device float *z, int n, float beta, __device float *y, float alpha, __device float* x, int count, int pitch)
  * Computes the single precision z = beta * y + alpha * x of x and y multivectors. z could be exactly x or y (without offset) or another vector.
@@ -755,6 +767,18 @@ void spgpuCaxpby(spgpuHandle_t handle,
 	cuFloatComplex alpha,
 	__device cuFloatComplex* x);
 
+
+void spgpuCabgdxyz(spgpuHandle_t handle,
+		   int n,
+		   cuFloatComplex alpha,
+		   cuFloatComplex beta,
+		   cuFloatComplex gamma,
+		   cuFloatComplex delta,
+		   __device cuFloatComplex* x,
+		   __device cuFloatComplex *y,
+		   __device cuFloatComplex *z)
+;
+	
 /** 
 * \fn void spgpuCmaxpby(spgpuHandle_t handle, __device cuFloatComplex *z, int n, cuFloatComplex beta, __device cuFloatComplex *y, cuFloatComplex alpha, __device cuFloatComplex* x, int count, int pitch)
  * Computes the single precision complex z = beta * y + alpha * x of x and y multivectors. z could be exactly x or y (without offset) or another vector.
@@ -1033,6 +1057,18 @@ void spgpuZaxpby(spgpuHandle_t handle,
 	__device cuDoubleComplex *y,
 	cuDoubleComplex alpha,
 	__device cuDoubleComplex* x);
+	
+
+void spgpuZabgdxyz(spgpuHandle_t handle,
+		   int n,
+		   cuDoubleComplex alpha,
+		   cuDoubleComplex beta,
+		   cuDoubleComplex gamma,
+		   cuDoubleComplex delta,
+		   __device cuDoubleComplex* x,
+		   __device cuDoubleComplex *y,
+		   __device cuDoubleComplex *z)
+;
 	
 /** 
 * \fn void spgpuZmaxpby(spgpuHandle_t handle, __device cuDoubleComplex *z, int n, cuDoubleComplex beta, __device cuDoubleComplex *y, cuDoubleComplex alpha, __device cuDoubleComplex* x, int count, int pitch)

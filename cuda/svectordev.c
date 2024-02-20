@@ -241,6 +241,23 @@ int axpbyMultiVecDeviceFloat(int n,float alpha, void* devMultiVecX,
   return(i);
 }
 
+int abgdxyzMultiVecDeviceFloat(int n,float alpha,float beta, float gamma, float delta, 
+				void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuSabgdxyz(handle,n, alpha,beta,gamma,delta, 
+	      (float*)devVecX->v_,(float*) devVecY->v_,(float*) devVecZ->v_);
+  return(i);
+}
+ 
 int axyMultiVecDeviceFloat(int n, float alpha, void *deviceVecA, void *deviceVecB)
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;

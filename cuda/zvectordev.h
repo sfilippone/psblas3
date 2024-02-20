@@ -77,6 +77,9 @@ int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n,
 
 int axpbyMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, void* devVecX, 
 				     cuDoubleComplex beta, void* devVecY);
+int abgdxyzMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  alpha,
+				       cuDoubleComplex  beta, cuDoubleComplex  gamma, cuDoubleComplex  delta, 
+				       void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ);
 int axyMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, 
 				   void *deviceVecA, void *deviceVecB);
 int axybzMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, void *deviceVecA,
