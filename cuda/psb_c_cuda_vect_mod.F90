@@ -668,9 +668,9 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_c_vect_cuda), intent(inout) :: x
-    
-    if (allocated(x%v)) x%v=czero
-    call x%set_host()
+
+    call x%set_scal(czero)
+
   end subroutine c_cuda_zero
 
   subroutine c_cuda_asb_m(n, x, info)

@@ -668,9 +668,9 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_cuda), intent(inout) :: x
-    
-    if (allocated(x%v)) x%v=dzero
-    call x%set_host()
+
+    call x%set_scal(dzero)
+
   end subroutine d_cuda_zero
 
   subroutine d_cuda_asb_m(n, x, info)
@@ -922,56 +922,14 @@ contains
     class(psb_d_vect_cuda), intent(inout)  :: z
     real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: nx, ny, nz
-    logical :: gpu_done
 
-    info = psb_success_
+    call z%psb_d_base_vect_type%abgdxyz(m,alpha,beta,gamma,delta,x,y,info)
+!!$
+!!$    if (x%is_dev()) call x%sync()
+!!$
+!!$    call y%axpby(m,alpha,x,beta,info)
+!!$    call z%axpby(m,gamma,y,delta,info)
     
-    if (.true.) then
-      gpu_done = .false.
-      select type(xx => x)
-      class is (psb_d_vect_cuda)
-        select type(yy => y)
-        class is (psb_d_vect_cuda)
-          select type(zz => z)
-          class is (psb_d_vect_cuda)
-            ! Do something different here 
-            if ((beta /= dzero).and.yy%is_host())&
-                 &  call yy%sync()
-            if ((delta /= dzero).and.zz%is_host())&
-                 &  call zz%sync()
-            if (xx%is_host()) call xx%sync()
-            nx = getMultiVecDeviceSize(xx%deviceVect)
-            ny = getMultiVecDeviceSize(yy%deviceVect)
-            nz = getMultiVecDeviceSize(zz%deviceVect)
-            if ((nx<m).or.(ny<m).or.(nz<m)) then
-              info = psb_err_internal_error_
-            else
-              info = abgdxyzMultiVecDevice(m,alpha,beta,gamma,delta,&
-                   & xx%deviceVect,yy%deviceVect,zz%deviceVect)
-            end if
-            call yy%set_dev()
-            call zz%set_dev()
-            gpu_done = .true.
-          end select
-        end select
-      end select
-      
-      if (.not.gpu_done) then 
-        if (x%is_host()) call x%sync()
-        if (y%is_host()) call y%sync()
-        if (z%is_host()) call z%sync()
-        call y%axpby(m,alpha,x,beta,info)
-        call z%axpby(m,gamma,y,delta,info)
-      end if
-    else
-
-      if (x%is_host()) call x%sync()
-      if (y%is_host()) call y%sync()
-      if (z%is_host()) call z%sync()
-      call y%axpby(m,alpha,x,beta,info)
-      call z%axpby(m,gamma,y,delta,info)
-    end if
   end subroutine d_cuda_abgdxyz
 
   
