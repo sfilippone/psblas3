@@ -49,7 +49,7 @@ __global__ void spgpuCabgdxyz_krn(int n, cuFloatComplex  alpha, cuFloatComplex  
 	  if (cuFloatComplex_isZero(delta))
 	    z[id] = cuCmulf(gamma, t);
 	  else
-	    z[id] = cuCfmafmulf(gamma, t, cuCmulf(delta,z[id]));
+	    z[id] = cuCfmaf(gamma, t, cuCmulf(delta,z[id]));
 	  y[id] = t;
 	}
 }
