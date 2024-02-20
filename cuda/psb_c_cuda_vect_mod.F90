@@ -668,7 +668,9 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_c_vect_cuda), intent(inout) :: x
-
+    ! Since we are overwriting, make sure to do it
+    ! on the GPU side
+    call x%set_dev()
     call x%set_scal(czero)
 
   end subroutine c_cuda_zero
