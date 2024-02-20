@@ -28,8 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 module psb_z_vectordev_mod
 
   use psb_base_vectordev_mod
@@ -322,7 +320,7 @@ module psb_z_vectordev_mod
       use iso_c_binding
       integer(c_int)      :: res
       integer(c_int), value :: n
-      type(c_double_complex), value :: alpha, beta,gamma,delta
+      complex(c_double_complex), value :: alpha, beta,gamma,delta
       type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ
     end function abgdxyzMultiVecDeviceDoubleComplex
   end interface
