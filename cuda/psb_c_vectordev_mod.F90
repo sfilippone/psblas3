@@ -304,7 +304,6 @@ module psb_c_vectordev_mod
     end function asumMultiVecDeviceFloatComplex
   end interface
 
-
   interface axpbyMultiVecDevice
     function axpbyMultiVecDeviceFloatComplex(n,alpha,deviceVecA,beta,deviceVecB) &
          & result(res) bind(c,name='axpbyMultiVecDeviceFloatComplex')
@@ -314,6 +313,18 @@ module psb_c_vectordev_mod
       complex(c_float_complex), value :: alpha, beta
       type(c_ptr), value  :: deviceVecA, deviceVecB
     end function axpbyMultiVecDeviceFloatComplex
+  end interface
+
+  interface abgdxyzMultiVecDevice
+    function abgdxyzMultiVecDeviceFloatComplex(n,alpha,beta,gamma,delta,deviceVecX,&
+         & deviceVecY,deviceVecZ) &
+         & result(res) bind(c,name='abgdxyzMultiVecDeviceFloatComplex')
+      use iso_c_binding
+      integer(c_int)      :: res
+      integer(c_int), value :: n
+      type(c_float_complex), value :: alpha, beta,gamma,delta
+      type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ
+    end function abgdxyzMultiVecDeviceFloatComplex
   end interface
 
   interface axyMultiVecDevice
