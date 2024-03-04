@@ -156,6 +156,7 @@ module psb_c_base_vect_mod
     procedure, pass(z) :: axpby_a2  => c_base_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
     procedure, pass(z) :: abgdxyz  => c_base_abgdxyz
+    procedure, pass(w) :: xyzw     => c_base_xyzw
     
     !
     ! Vector by vector multiplication. Need all variants
@@ -1155,21 +1156,36 @@ contains
     complex(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
 
-    if (.false.) then 
-      if (x%is_dev()) call x%sync()
-      
-      call y%axpby(m,alpha,x,beta,info)
-      call z%axpby(m,gamma,y,delta,info)
-    else
-      if (x%is_dev().and.(alpha/=czero)) call x%sync()
-      if (y%is_dev().and.(beta/=czero))   call y%sync()
-      if (z%is_dev().and.(delta/=czero))  call z%sync()
-      call psi_cabgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
-      call y%set_host()
-      call z%set_host()
-    end if
-    
+    if (x%is_dev().and.(alpha/=czero)) call x%sync()
+    if (y%is_dev().and.(beta/=czero))   call y%sync()
+    if (z%is_dev().and.(delta/=czero))  call z%sync()
+    call psi_abgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+    call y%set_host()
+    call z%set_host()
+        
   end subroutine c_base_abgdxyz
+
+  subroutine c_base_xyzw(m,a,b,c,d,e,f,x, y, z, w,info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    class(psb_c_base_vect_type), intent(inout)  :: w
+    complex(psb_spk_), intent (in)                :: a,b,c,d,e,f
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (x%is_dev().and.(a/=czero)) call x%sync()
+    if (y%is_dev().and.(b/=czero)) call y%sync()
+    if (z%is_dev().and.(d/=czero)) call z%sync()
+    if (w%is_dev().and.(f/=czero)) call w%sync()
+    call psi_xyzw(m,a,b,c,d,e,f,x%v, y%v, z%v, w%v, info)
+    call y%set_host()
+    call z%set_host()
+    call w%set_host()
+    
+  end subroutine c_base_xyzw
 
 
   !

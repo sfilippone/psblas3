@@ -112,6 +112,20 @@ module psi_e_serial_mod
     end subroutine psi_eabgdxyz
   end interface psi_abgdxyz
   
+  interface psi_xyzw
+    subroutine psi_exyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      integer(psb_epk_), intent (in)       :: x(:)
+      integer(psb_epk_), intent (inout)    :: y(:)
+      integer(psb_epk_), intent (inout)    :: z(:)
+      integer(psb_epk_), intent (inout)    :: w(:)
+      integer(psb_epk_), intent (in)       :: a,b,c,d,e,f
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_exyzw
+  end interface psi_xyzw
+  
   interface psi_gth
     subroutine psi_egthmv(n,k,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_

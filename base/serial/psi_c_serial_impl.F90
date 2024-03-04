@@ -1792,3 +1792,75 @@ subroutine psi_cabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
   return
 
 end subroutine psi_cabgdxyz
+
+subroutine psi_cxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)      :: m
+  complex(psb_spk_), intent (in)       :: x(:)
+  complex(psb_spk_), intent (inout)    :: y(:)
+  complex(psb_spk_), intent (inout)    :: z(:)
+  complex(psb_spk_), intent (inout)    :: w(:)
+  complex(psb_spk_), intent (in)       :: a,b,c,d,e,f
+  integer(psb_ipk_), intent(out)     :: info
+
+  integer(psb_ipk_) :: i
+  integer(psb_ipk_) :: int_err(5)
+  character  name*20
+  name='cabgdxyz'
+
+  info = psb_success_
+  if (m.lt.0) then
+    info=psb_err_iarg_neg_
+    int_err(1)=1
+    int_err(2)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(x).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=6
+    int_err(2)=1
+    int_err(3)=size(x)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(y).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=7
+    int_err(2)=1
+    int_err(3)=size(y)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(z).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=8
+    int_err(2)=1
+    int_err(3)=size(z)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  endif
+
+  if ((a==czero).or.(b==czero).or. &
+       & (c==czero).or.(d==czero).or.&
+       & (e==czero).or.(f==czero)) then
+    write(0,*) 'XYZW assumes  a,b,c,d,e,f are all nonzero'
+  else
+    !$omp parallel do private(i)
+    do i=1,m
+      y(i) = a*x(i)+b*y(i)
+      z(i) = c*y(i)+d*z(i)
+      w(i) = e*z(i)+f*w(i)
+    end do
+    
+  end if
+
+  return
+
+9999 continue
+  call fcpsb_serror()
+  return
+
+end subroutine psi_cxyzw

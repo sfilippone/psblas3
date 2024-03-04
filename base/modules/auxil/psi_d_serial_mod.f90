@@ -112,6 +112,20 @@ module psi_d_serial_mod
     end subroutine psi_dabgdxyz
   end interface psi_abgdxyz
   
+  interface psi_xyzw
+    subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      real(psb_dpk_), intent (in)       :: x(:)
+      real(psb_dpk_), intent (inout)    :: y(:)
+      real(psb_dpk_), intent (inout)    :: z(:)
+      real(psb_dpk_), intent (inout)    :: w(:)
+      real(psb_dpk_), intent (in)       :: a,b,c,d,e,f
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_dxyzw
+  end interface psi_xyzw
+  
   interface psi_gth
     subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_dpk_
