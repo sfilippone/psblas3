@@ -914,7 +914,6 @@ contains
 
   end subroutine s_cuda_axpby_v
 
-  
   subroutine s_cuda_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
     use psi_serial_mod
     implicit none
@@ -975,9 +974,70 @@ contains
       call z%axpby(m,gamma,y,delta,info)
     end if
 
-    
   end subroutine s_cuda_abgdxyz
 
+  subroutine s_cuda_xyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    class(psb_s_base_vect_type), intent(inout)  :: z
+    class(psb_s_vect_cuda), intent(inout)  :: w
+    real(psb_spk_), intent (in)       :: a,b,c,d,e,f
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: nx, ny, nz, nw
+    logical :: gpu_done
+
+    info = psb_success_
+
+    gpu_done = .false.
+    if ((a==szero).or.(b==szero).or. &
+         & (c==szero).or.(d==szero).or.&
+         & (e==szero).or.(f==szero)) then
+      write(0,*) 'XYZW assumes  a,b,c,d,e,f are all nonzero'
+    else
+      select type(xx => x)
+      class is (psb_s_vect_cuda)
+        select type(yy => y)
+        class is (psb_s_vect_cuda)
+          select type(zz => z)
+          class is (psb_s_vect_cuda)
+            ! Do something different here 
+            if (xx%is_host()) call xx%sync()
+            if (yy%is_host()) call yy%sync()
+            if (zz%is_host()) call zz%sync()
+            if (w%is_host())  call w%sync()
+            nx = getMultiVecDeviceSize(xx%deviceVect)
+            ny = getMultiVecDeviceSize(yy%deviceVect)
+            nz = getMultiVecDeviceSize(zz%deviceVect)
+            nw = getMultiVecDeviceSize(w%deviceVect)
+            if ((nx<m).or.(ny<m).or.(nz<m).or.(nw<m)) then
+              info = psb_err_internal_error_
+            else
+              info = xyzwMultiVecDevice(m,a,b,c,d,e,f,&
+                   & xx%deviceVect,yy%deviceVect,zz%deviceVect,w%deviceVect)
+            end if
+            call yy%set_dev()
+            call zz%set_dev()
+            call w%set_dev()
+            gpu_done = .true.
+          end select
+        end select
+      end select
+      
+      if (.not.gpu_done) then 
+        if (x%is_host()) call x%sync()
+        if (y%is_host()) call y%sync()
+        if (z%is_host()) call z%sync()
+        if (w%is_host()) call w%sync()
+        call y%axpby(m,a,x,b,info)
+        call z%axpby(m,c,y,d,info)
+        call w%axpby(m,e,z,f,info)
+      end if
+    end if
+
+  end subroutine s_cuda_xyzw
   
   subroutine s_cuda_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod

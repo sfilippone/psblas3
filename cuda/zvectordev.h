@@ -80,6 +80,11 @@ int axpbyMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, void* devVecX
 int abgdxyzMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  alpha,
 				       cuDoubleComplex  beta, cuDoubleComplex  gamma, cuDoubleComplex  delta, 
 				       void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ);
+int xyzwMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  a, cuDoubleComplex  b,
+				    cuDoubleComplex  c, cuDoubleComplex  d,
+				    cuDoubleComplex  e, cuDoubleComplex  f, 
+				    void* devMultiVecX, void* devMultiVecY,
+				    void* devMultiVecZ, void* devMultiVecW);
 int axyMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, 
 				   void *deviceVecA, void *deviceVecB);
 int axybzMultiVecDeviceDoubleComplex(int n, cuDoubleComplex alpha, void *deviceVecA,

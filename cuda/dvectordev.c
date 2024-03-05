@@ -258,6 +258,25 @@ int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, do
   return(i);
 }
  
+int xyzwMultiVecDeviceDouble(int n,double a, double b, double c, double d, double e, double f, 
+			     void* devMultiVecX, void* devMultiVecY,
+			     void* devMultiVecZ, void* devMultiVecW)
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  struct MultiVectDevice *devVecW = (struct MultiVectDevice *) devMultiVecW;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuDxyzw(handle,n, a,b,c,d,e,f,
+	      (double*)devVecX->v_,(double*) devVecY->v_,(double*) devVecZ->v_,(double*) devVecW->v_);
+  return(i);
+}
+ 
 int axyMultiVecDeviceDouble(int n, double alpha, void *deviceVecA, void *deviceVecB)
 { int i = 0; 
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) deviceVecA;

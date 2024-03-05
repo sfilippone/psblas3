@@ -19,7 +19,8 @@ OBJS=cabs.o  camax.o  casum.o  caxpby.o  caxy.o  cdot.o  cgath.o \
   hdia_cspmv.o hdia_dspmv.o hdia_sspmv.o hdia_zspmv.o hell_cspmv.o hell_dspmv.o \
   hell_sspmv.o hell_zspmv.o igath.o iscat.o isetscal.o sabs.o samax.o sasum.o \
   saxpby.o saxy.o sdot.o sgath.o snrm2.o sscal.o sscat.o ssetscal.o zabs.o zamax.o sabgdxyz.o\
-  zasum.o zaxpby.o zaxy.o zdot.o zgath.o znrm2.o zscal.o zscat.o zsetscal.o zabgdxyz.o
+  zasum.o zaxpby.o zaxy.o zdot.o zgath.o znrm2.o zscal.o zscat.o zsetscal.o zabgdxyz.o \
+  sxyzw.o cxyzw.o dxyzw.o zxyzw.o
 
 objs: $(OBJS)
 lib: objs
