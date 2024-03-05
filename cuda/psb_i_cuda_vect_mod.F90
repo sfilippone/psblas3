@@ -650,7 +650,9 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_i_vect_cuda), intent(inout) :: x
-    
+    ! Since we are overwriting, make sure to do it
+    ! on the GPU side
+    call x%set_dev()
     call x%set_scal(izero)
   end subroutine i_cuda_zero
 
@@ -1170,7 +1172,7 @@ contains
 !!$    integer(psb_ipk_), external      :: ddot
 !!$    integer(psb_ipk_) :: info
 !!$    
-!!$    res = dzero
+!!$    res = izero
 !!$    !
 !!$    ! Note: this is the gpu implementation.
 !!$    !  When we get here, we are sure that X is of
@@ -1224,13 +1226,13 @@ contains
 !!$
 !!$    select type(xx => x)
 !!$    type is (psb_i_base_multivect_type)
-!!$      if ((beta /= dzero).and.(y%is_dev()))&
+!!$      if ((beta /= izero).and.(y%is_dev()))&
 !!$           & call y%sync()
 !!$      call psb_geaxpby(m,alpha,xx%v,beta,y%v,info)
 !!$      call y%set_host()
 !!$    type is (psb_i_multivect_cuda)
 !!$      ! Do something different here 
-!!$      if ((beta /= dzero).and.y%is_host())&
+!!$      if ((beta /= izero).and.y%is_host())&
 !!$           &  call y%sync()
 !!$      if (xx%is_host()) call xx%sync()
 !!$      nx = getMultiVecDeviceSize(xx%deviceVect)
@@ -1475,7 +1477,7 @@ contains
     implicit none 
     class(psb_i_multivect_cuda), intent(inout) :: x
     
-    if (allocated(x%v)) x%v=dzero
+    if (allocated(x%v)) x%v=izero
     call x%set_host()
   end subroutine i_cuda_multi_zero
 

@@ -234,6 +234,46 @@ int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMulti
   return(i);
 }
 
+int abgdxyzMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  alpha,
+				       cuDoubleComplex  beta, cuDoubleComplex  gamma, cuDoubleComplex  delta, 
+				       void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuZabgdxyz(handle,n, alpha,beta,gamma,delta, 
+	      (cuDoubleComplex *)devVecX->v_,(cuDoubleComplex *) devVecY->v_,(cuDoubleComplex *) devVecZ->v_);
+  return(i);
+}
+
+int xyzwMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  a,   cuDoubleComplex  b,
+				    cuDoubleComplex  c, cuDoubleComplex  d,
+				    cuDoubleComplex  e, cuDoubleComplex  f, 
+				    void* devMultiVecX, void* devMultiVecY,
+				    void* devMultiVecZ, void* devMultiVecW)  
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  struct MultiVectDevice *devVecW = (struct MultiVectDevice *) devMultiVecW;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuZxyzw(handle,n, a,b,c,d,e,f,
+	      (cuDoubleComplex *)devVecX->v_,(cuDoubleComplex *) devVecY->v_,
+	      (cuDoubleComplex *) devVecZ->v_,(cuDoubleComplex *) devVecW->v_);
+  return(i);
+}
+
 int axpbyMultiVecDeviceDoubleComplex(int n,cuDoubleComplex alpha, void* devMultiVecX, 
 			      cuDoubleComplex beta, void* devMultiVecY)
 { int j=0, i=0;

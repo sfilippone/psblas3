@@ -255,6 +255,46 @@ int axpbyMultiVecDeviceFloatComplex(int n,cuFloatComplex alpha, void* devMultiVe
   return(i);
 }
 
+int abgdxyzMultiVecDeviceFloatComplex(int n,cuFloatComplex  alpha,cuFloatComplex  beta,
+				      cuFloatComplex  gamma, cuFloatComplex  delta, 
+				      void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuCabgdxyz(handle,n, alpha,beta,gamma,delta, 
+		(cuFloatComplex *)devVecX->v_,(cuFloatComplex *) devVecY->v_,(cuFloatComplex *) devVecZ->v_);
+  return(i);
+}
+
+int xyzwMultiVecDeviceFloatComplex(int n,cuFloatComplex  a,cuFloatComplex  b,
+				   cuFloatComplex c, cuFloatComplex  d,
+				   cuFloatComplex e, cuFloatComplex  f, 
+				   void* devMultiVecX, void* devMultiVecY,
+				   void* devMultiVecZ, void* devMultiVecW)
+{ int j=0, i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  struct MultiVectDevice *devVecZ = (struct MultiVectDevice *) devMultiVecZ;
+  struct MultiVectDevice *devVecW = (struct MultiVectDevice *) devMultiVecW;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuCxyzw(handle,n, a,b,c,d,e,f,
+	     (cuFloatComplex *)devVecX->v_,(cuFloatComplex *) devVecY->v_,
+	     (cuFloatComplex *) devVecZ->v_,(cuFloatComplex *) devVecW->v_);
+  return(i);
+}
+
 int axyMultiVecDeviceFloatComplex(int n, cuFloatComplex alpha, 
 				  void *deviceVecA, void *deviceVecB)
 { int i = 0; 

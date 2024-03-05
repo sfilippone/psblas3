@@ -123,7 +123,7 @@
 !               greater than 0. If the overlap is 0 or the matrix has been reordered
 !               (see psb_fact_bld), then blck does not contain any row.
 !
-subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
+subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
 
   use psb_base_mod
   use psb_s_ilu_fact_mod, psb_protect_name => psb_silut_fact
@@ -139,9 +139,11 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
   real(psb_spk_), intent(inout)        ::  d(:)
   type(psb_sspmat_type),intent(in), optional, target :: blck
   integer(psb_ipk_), intent(in), optional       :: iscale
+  real(psb_spk_), intent(in), optional :: shft
   !     Local Variables
   integer(psb_ipk_)   ::  l1, l2, m, err_act, iscale_
 
+  real(psb_spk_) :: shft_
   type(psb_sspmat_type), pointer  :: blck_
   type(psb_s_csr_sparse_mat)       :: ll, uu
   real(psb_spk_)      :: scale
@@ -177,6 +179,11 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
   else
     iscale_ = psb_ilu_scale_none_
   end if
+  if (present(shft)) then
+    shft_ = shft
+  else
+    shft_ = szero
+  end if
 
   select case(iscale_)
   case(psb_ilu_scale_none_)
@@ -206,7 +213,7 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
   ! Compute the ILU(k,t) factorization
   !
   call psb_silut_factint(fill_in,thres,a,blck_,&
-       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,scale)
+       & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,scale,shft_)
   if (info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_silut_factint'
@@ -316,7 +323,7 @@ contains
   !               Error code.
   !
   subroutine psb_silut_factint(fill_in,thres,a,b,&
-       & d,lval,lja,lirp,uval,uja,uirp,l1,l2,info,scale)
+       & d,lval,lja,lirp,uval,uja,uirp,l1,l2,info,scale,shft)
 
     use psb_base_mod
 
@@ -331,6 +338,7 @@ contains
     real(psb_spk_), allocatable, intent(inout)   :: lval(:),uval(:)
     real(psb_spk_), intent(inout)                :: d(:)
     real(psb_spk_), intent(in), optional          :: scale
+    real(psb_spk_), intent(in)       :: shft
 
     ! Local Variables
     integer(psb_ipk_) :: i, ktrw,err_act,nidx,nlw,nup,jmaxup, ma, mb, m
@@ -401,10 +409,10 @@ contains
       d(i) = czero
       if (i<=ma) then
         call ilut_copyin(i,ma,a,i,ione,m,nlw,nup,jmaxup,nrmi,weight,&
-             & row,heap,ktrw,trw,info)
+             & row,heap,ktrw,trw,info,shft)
       else
         call ilut_copyin(i-ma,mb,b,i,ione,m,nlw,nup,jmaxup,nrmi,weight,&
-             & row,heap,ktrw,trw,info)
+             & row,heap,ktrw,trw,info,shft)
       endif
 
       !
@@ -540,7 +548,7 @@ contains
   !               every nrb calls to copyin. If A is in CSR format it is unused.
   !
   subroutine ilut_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,&
-       & nrmi,weight,row,heap,ktrw,trw,info)
+       & nrmi,weight,row,heap,ktrw,trw,info,shft)
     use psb_base_mod
     implicit none
     type(psb_sspmat_type), intent(in)         :: a
@@ -551,6 +559,7 @@ contains
     real(psb_spk_), intent(inout)              :: row(:)
     real(psb_spk_), intent(in)                 :: weight
     type(psb_i_heap), intent(inout)             :: heap
+    real(psb_spk_), intent(in)       :: shft
 
     integer(psb_ipk_)               :: k,j,irb,kin,nz
     integer(psb_ipk_), parameter    :: nrb=40
@@ -597,6 +606,7 @@ contains
           call heap%insert(k,info)
           if (info /= psb_success_) exit
           if (k<jd) nlw = nlw + 1
+          if (k == jd) row(k) = row(k) + (shft*weight)
           if (k>jd) then
             nup = nup + 1
             if (abs(row(k))>dmaxup) then
@@ -648,6 +658,7 @@ contains
           call heap%insert(k,info)
           if (info /= psb_success_) exit
           if (k<jd) nlw = nlw + 1
+          if (k == jd) row(k) = row(k) + (shft*weight)
           if (k>jd) then
             nup = nup + 1
             if (abs(row(k))>dmaxup) then

@@ -28,8 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 module psb_z_vectordev_mod
 
   use psb_base_vectordev_mod
@@ -304,7 +302,6 @@ module psb_z_vectordev_mod
     end function asumMultiVecDeviceDoubleComplex
   end interface
 
-
   interface axpbyMultiVecDevice
     function axpbyMultiVecDeviceDoubleComplex(n,alpha,deviceVecA,beta,deviceVecB) &
          & result(res) bind(c,name='axpbyMultiVecDeviceDoubleComplex')
@@ -314,6 +311,30 @@ module psb_z_vectordev_mod
       complex(c_double_complex), value :: alpha, beta
       type(c_ptr), value  :: deviceVecA, deviceVecB
     end function axpbyMultiVecDeviceDoubleComplex
+  end interface
+
+  interface abgdxyzMultiVecDevice
+    function abgdxyzMultiVecDeviceDoubleComplex(n,alpha,beta,gamma,delta,deviceVecX,&
+         & deviceVecY,deviceVecZ) &
+         & result(res) bind(c,name='abgdxyzMultiVecDeviceDoubleComplex')
+      use iso_c_binding
+      integer(c_int)      :: res
+      integer(c_int), value :: n
+      complex(c_double_complex), value :: alpha, beta,gamma,delta
+      type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ
+    end function abgdxyzMultiVecDeviceDoubleComplex
+  end interface
+
+  interface xyzwMultiVecDevice
+    function xyzwMultiVecDeviceDoubleComplex(n,a,b,c,d,e,f,deviceVecX,&
+         & deviceVecY,deviceVecZ,deviceVecW) &
+         & result(res) bind(c,name='xyzwMultiVecDeviceDoubleComplex')
+      use iso_c_binding
+      integer(c_int)      :: res
+      integer(c_int), value :: n
+      complex(c_double_complex), value :: a,b,c,d,e,f
+      type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ, deviceVecW
+    end function xyzwMultiVecDeviceDoubleComplex
   end interface
 
   interface axyMultiVecDevice

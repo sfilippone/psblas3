@@ -90,6 +90,7 @@ module psb_d_cuda_vect_mod
     procedure, pass(x) :: dot_a    => d_cuda_dot_a
     procedure, pass(y) :: axpby_v  => d_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => d_cuda_axpby_a
+    procedure, pass(z) :: abgdxyz  => d_cuda_abgdxyz
     procedure, pass(y) :: mlt_v    => d_cuda_mlt_v
     procedure, pass(y) :: mlt_a    => d_cuda_mlt_a
     procedure, pass(z) :: mlt_a_2  => d_cuda_mlt_a_2
@@ -667,7 +668,9 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_cuda), intent(inout) :: x
-    
+    ! Since we are overwriting, make sure to do it
+    ! on the GPU side
+    call x%set_dev()
     call x%set_scal(dzero)
   end subroutine d_cuda_zero
 
@@ -909,6 +912,131 @@ contains
 
   end subroutine d_cuda_axpby_v
 
+  subroutine d_cuda_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_d_vect_cuda), intent(inout)  :: z
+    real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: nx, ny, nz
+    logical :: gpu_done
+
+    info = psb_success_
+    
+    if (.true.) then
+      gpu_done = .false.
+      select type(xx => x)
+      class is (psb_d_vect_cuda)
+        select type(yy => y)
+        class is (psb_d_vect_cuda)
+          select type(zz => z)
+          class is (psb_d_vect_cuda)
+            ! Do something different here 
+            if ((beta /= dzero).and.yy%is_host())&
+                 &  call yy%sync()
+            if ((delta /= dzero).and.zz%is_host())&
+                 &  call zz%sync()
+            if (xx%is_host()) call xx%sync()
+            nx = getMultiVecDeviceSize(xx%deviceVect)
+            ny = getMultiVecDeviceSize(yy%deviceVect)
+            nz = getMultiVecDeviceSize(zz%deviceVect)
+            if ((nx<m).or.(ny<m).or.(nz<m)) then
+              info = psb_err_internal_error_
+            else
+              info = abgdxyzMultiVecDevice(m,alpha,beta,gamma,delta,&
+                   & xx%deviceVect,yy%deviceVect,zz%deviceVect)
+            end if
+            call yy%set_dev()
+            call zz%set_dev()
+            gpu_done = .true.
+          end select
+        end select
+      end select
+      
+      if (.not.gpu_done) then 
+        if (x%is_host()) call x%sync()
+        if (y%is_host()) call y%sync()
+        if (z%is_host()) call z%sync()
+        call y%axpby(m,alpha,x,beta,info)
+        call z%axpby(m,gamma,y,delta,info)
+      end if
+    else
+
+      if (x%is_host()) call x%sync()
+      if (y%is_host()) call y%sync()
+      if (z%is_host()) call z%sync()
+      call y%axpby(m,alpha,x,beta,info)
+      call z%axpby(m,gamma,y,delta,info)
+    end if
+
+  end subroutine d_cuda_abgdxyz
+
+  subroutine d_cuda_xyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_d_base_vect_type), intent(inout)  :: z
+    class(psb_d_vect_cuda), intent(inout)  :: w
+    real(psb_dpk_), intent (in)       :: a,b,c,d,e,f
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: nx, ny, nz, nw
+    logical :: gpu_done
+
+    info = psb_success_
+
+    gpu_done = .false.
+    if ((a==dzero).or.(b==dzero).or. &
+         & (c==dzero).or.(d==dzero).or.&
+         & (e==dzero).or.(f==dzero)) then
+      write(0,*) 'XYZW assumes  a,b,c,d,e,f are all nonzero'
+    else
+      select type(xx => x)
+      class is (psb_d_vect_cuda)
+        select type(yy => y)
+        class is (psb_d_vect_cuda)
+          select type(zz => z)
+          class is (psb_d_vect_cuda)
+            ! Do something different here 
+            if (xx%is_host()) call xx%sync()
+            if (yy%is_host()) call yy%sync()
+            if (zz%is_host()) call zz%sync()
+            if (w%is_host())  call w%sync()
+            nx = getMultiVecDeviceSize(xx%deviceVect)
+            ny = getMultiVecDeviceSize(yy%deviceVect)
+            nz = getMultiVecDeviceSize(zz%deviceVect)
+            nw = getMultiVecDeviceSize(w%deviceVect)
+            if ((nx<m).or.(ny<m).or.(nz<m).or.(nw<m)) then
+              info = psb_err_internal_error_
+            else
+              info = xyzwMultiVecDevice(m,a,b,c,d,e,f,&
+                   & xx%deviceVect,yy%deviceVect,zz%deviceVect,w%deviceVect)
+            end if
+            call yy%set_dev()
+            call zz%set_dev()
+            call w%set_dev()
+            gpu_done = .true.
+          end select
+        end select
+      end select
+      
+      if (.not.gpu_done) then 
+        if (x%is_host()) call x%sync()
+        if (y%is_host()) call y%sync()
+        if (z%is_host()) call z%sync()
+        if (w%is_host()) call w%sync()
+        call y%axpby(m,a,x,b,info)
+        call z%axpby(m,c,y,d,info)
+        call w%axpby(m,e,z,f,info)
+      end if
+    end if
+
+  end subroutine d_cuda_xyzw
+  
   subroutine d_cuda_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 

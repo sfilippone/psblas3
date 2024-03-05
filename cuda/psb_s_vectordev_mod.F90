@@ -28,8 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
 module psb_s_vectordev_mod
 
   use psb_base_vectordev_mod
@@ -304,7 +302,6 @@ module psb_s_vectordev_mod
     end function asumMultiVecDeviceFloat
   end interface
 
-
   interface axpbyMultiVecDevice
     function axpbyMultiVecDeviceFloat(n,alpha,deviceVecA,beta,deviceVecB) &
          & result(res) bind(c,name='axpbyMultiVecDeviceFloat')
@@ -314,6 +311,30 @@ module psb_s_vectordev_mod
       real(c_float), value :: alpha, beta
       type(c_ptr), value  :: deviceVecA, deviceVecB
     end function axpbyMultiVecDeviceFloat
+  end interface
+
+  interface abgdxyzMultiVecDevice
+    function abgdxyzMultiVecDeviceFloat(n,alpha,beta,gamma,delta,deviceVecX,&
+         & deviceVecY,deviceVecZ) &
+         & result(res) bind(c,name='abgdxyzMultiVecDeviceFloat')
+      use iso_c_binding
+      integer(c_int)      :: res
+      integer(c_int), value :: n
+      real(c_float), value :: alpha, beta,gamma,delta
+      type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ
+    end function abgdxyzMultiVecDeviceFloat
+  end interface
+
+  interface xyzwMultiVecDevice
+    function xyzwMultiVecDeviceFloat(n,a,b,c,d,e,f,deviceVecX,&
+         & deviceVecY,deviceVecZ,deviceVecW) &
+         & result(res) bind(c,name='xyzwMultiVecDeviceFloat')
+      use iso_c_binding
+      integer(c_int)      :: res
+      integer(c_int), value :: n
+      real(c_float), value :: a,b,c,d,e,f
+      type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ, deviceVecW
+    end function xyzwMultiVecDeviceFloat
   end interface
 
   interface axyMultiVecDevice

@@ -99,6 +99,33 @@ module psi_c_serial_mod
     end subroutine psi_caxpbyv2
   end interface psb_geaxpby
 
+  interface psi_abgdxyz
+    subroutine psi_cabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+      import :: psb_ipk_, psb_spk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      complex(psb_spk_), intent (in)       ::  x(:)
+      complex(psb_spk_), intent (inout)    ::  y(:)
+      complex(psb_spk_), intent (inout)    ::  z(:)
+      complex(psb_spk_), intent (in)       :: alpha, beta,gamma,delta
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_cabgdxyz
+  end interface psi_abgdxyz
+  
+  interface psi_xyzw
+    subroutine psi_cxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+      import :: psb_ipk_, psb_spk_
+      implicit none
+      integer(psb_ipk_), intent(in)      :: m
+      complex(psb_spk_), intent (in)       :: x(:)
+      complex(psb_spk_), intent (inout)    :: y(:)
+      complex(psb_spk_), intent (inout)    :: z(:)
+      complex(psb_spk_), intent (inout)    :: w(:)
+      complex(psb_spk_), intent (in)       :: a,b,c,d,e,f
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psi_cxyzw
+  end interface psi_xyzw
+  
   interface psi_gth
     subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_spk_
