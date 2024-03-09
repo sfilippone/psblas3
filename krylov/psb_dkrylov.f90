@@ -225,4 +225,132 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   return
 
 end subroutine psb_dkrylov_vect
+!
+!
+! Subroutine: psb_dkrylov_multivect
+! 
+!    Front-end for the Krylov subspace iterations, realversion
+!    
+! Arguments:
+!
+!    methd  -  character                    The specific method; can take the values:
+!                                           BGMRES
+!                                           
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  class(psb_dprec_type)       Input: preconditioner
+!    b      -  real,dimension(:,:)         Input: multivector containing the
+!                                           right hand side B
+!    x      -  real,dimension(:,:)         Input/Output: multivector containing the
+!                                           initial guess and final solution X.
+!    eps    -  real                         Input: Stopping tolerance; the iteration is
+!                                           stopped when the error
+!                                           estimate |err| <= eps
+!                                           
+!    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
+!    info   -  integer.                     Output: Return code
+!
+!    itmax  -  integer(optional)            Input: maximum number of iterations to be
+!                                           performed.
+!    iter   -  integer(optional)            Output: how many iterations have been
+!                                           performed.
+!    err    -  real   (optional)            Output: error estimate on exit
+!    itrace -  integer(optional)            Input: print an informational message
+!                                           with the error estimate every itrace
+!                                           iterations
+!    itrs   -  integer(optional)            Input: number of iterations
+!    istop  -  integer(optional)            Input: stopping criterion, or how
+!                                           to estimate the error. 
+!                                           1: err =  |r|/(|a||x|+|b|)
+!                                           2: err =  |r|/|b|
+!                                           where r is the (preconditioned, recursive
+!                                           estimate of) residual 
+!
+Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
+     & itmax,iter,err,itrace,itrs,istop)
 
+  use psb_base_mod
+  use psb_prec_mod,only : psb_dprec_type
+  use psb_krylov_mod, psb_protect_name => psb_dkrylov_multivect
+
+  character(len=*)                          :: method
+  Type(psb_dspmat_type), Intent(in)         :: a
+  Type(psb_desc_type), Intent(in)           :: desc_a
+  class(psb_dprec_type), intent(inout)      :: prec 
+  type(psb_d_multivect_type), Intent(inout) :: b
+  type(psb_d_multivect_type), Intent(inout) :: x
+  Real(psb_dpk_), Intent(in)                :: eps
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), Optional, Intent(in)   :: itmax, itrace, itrs, istop
+  integer(psb_ipk_), Optional, Intent(out)  :: iter
+  Real(psb_dpk_), Optional, Intent(out)     :: err
+
+  abstract interface
+    subroutine psb_dkryl_multivect(a,prec,b,x,eps,desc_a,&
+          &info,itmax,iter,err,itrace,itrs,istop)
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+          & psb_dspmat_type, psb_dprec_type, psb_d_multivect_type
+      type(psb_dspmat_type), intent(in)         :: a
+      type(psb_desc_type), intent(in)           :: desc_a
+      type(psb_d_multivect_type), Intent(inout) :: b
+      type(psb_d_multivect_type), Intent(inout) :: x
+      real(psb_dpk_), intent(in)                :: eps
+      class(psb_dprec_type), intent(inout)      :: prec
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: itmax,itrace,itrs,istop
+      integer(psb_ipk_), optional, intent(out)  :: iter
+      real(psb_dpk_), optional, intent(out)     :: err
+    end subroutine psb_dkryl_multivect
+  end interface
+
+  procedure(psb_dkryl_multivect) :: psb_dbgmres_multivect
+
+  logical             :: do_alloc_wrk
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np, err_act, itrace_
+  character(len=20)   :: name
+
+  info = psb_success_
+  name = 'psb_krylov'
+  call psb_erractionsave(err_act)
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+
+  if (present(itrace)) then
+    itrace_ = itrace
+  else
+    itrace_ = -1
+  end if
+
+  do_alloc_wrk = .not.prec%is_allocated_wrk()
+  if (do_alloc_wrk) call prec%mv_allocate_wrk(info,vmold=x%v,desc=desc_a)
+
+  select case(psb_toupper(method))
+  case('BGMRES','GMRES')
+    call psb_dbgmres_multivect(a,prec,b,x,eps,desc_a,info,&
+        & itmax,iter,err,itrace=itrace_,itrs=itrs,istop=istop)
+  case default
+    if (me == 0) write(psb_err_unit,*) trim(name),&
+         & ': Warning: Unknown method  ',method,&
+         & ', defaulting to BGMRES'
+    call psb_dbgmres_multivect(a,prec,b,x,eps,desc_a,info,&
+         & itmax,iter,err,itrace=itrace_,itrs=itrs,istop=istop)
+  end select
+
+  if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)
+
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err=trim(method))
+    goto 9999
+  end if 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_dkrylov_multivect

@@ -2230,9 +2230,9 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: set_host => d_base_mlv_set_host
     procedure, pass(x) :: set_dev  => d_base_mlv_set_dev
     procedure, pass(x) :: set_sync => d_base_mlv_set_sync
-
     !
     ! Basic info
+    !
     procedure, pass(x) :: get_nrows => d_base_mlv_get_nrows
     procedure, pass(x) :: get_ncols => d_base_mlv_get_ncols
     procedure, pass(x) :: sizeof    => d_base_mlv_sizeof
@@ -2245,7 +2245,6 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: set_scal => d_base_mlv_set_scal
     procedure, pass(x) :: set_vect => d_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
-
     !
     ! Dot product and AXPBY
     !
@@ -2279,7 +2278,7 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: absval1  => d_base_mlv_absval1
     procedure, pass(x) :: absval2  => d_base_mlv_absval2
     generic, public    :: absval   => absval1, absval2
-
+    procedure, pass(x) :: qr_fact  => d_base_mlv_qr_fact
     !
     ! These are for handling gather/scatter in new
     ! comm internals implementation.
@@ -2291,7 +2290,6 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: free_buffer  => d_base_mlv_free_buffer
     procedure, pass(x) :: new_comid    => d_base_mlv_new_comid
     procedure, pass(x) :: free_comid   => d_base_mlv_free_comid
-
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -2807,22 +2805,29 @@ contains
   ! Dot products
   !
   !
-  !> Function  base_mlv_dot_v
+  !> Function   base_mlv_dot_v
   !! \memberof  psb_d_base_multivect_type
-  !! \brief  Dot product by another base_mlv_vector
-  !! \param n    Number of entries to be considered
-  !! \param y    The other (base_mlv_vect) to be multiplied by
+  !! \brief     Dot product by another base_mlv_vector
+  !! \param y   The other (base_mlv_vect) to be multiplied by
+  !! \param res Result matrix
+  !! \param t   If true, x is transposed
   !!
-  function d_base_mlv_dot_v(n,x,y) result(res)
+  subroutine d_base_mlv_dot_v(x,y,res,t)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable   :: res(:)
-    real(psb_dpk_), external      :: ddot
-    integer(psb_ipk_) :: j,nc
+    real(psb_dpk_), intent(inout)                   :: res(:,:)
+    logical, optional, intent(in)                   :: t
+    logical                                         :: t_
+    external                                        :: dgemm
+    integer(psb_ipk_)                               :: x_m, x_n, y_m, y_n
+
+    if (present(t)) then
+      t_ = t
+    else
+      t_ = .false.
+    end if
 
     if (x%is_dev()) call x%sync()
-    res = dzero
     !
     ! Note: this is the base implementation.
     !  When we get here, we are sure that X is of
@@ -2830,47 +2835,65 @@ contains
     !  If Y is not, throw the burden on it, implicitly
     !  calling dot_a
     !
+    x_m = x%get_nrows()
+    x_n = x%get_ncols()
+    y_m = y%get_nrows()
+    y_n = y%get_ncols()
     select type(yy => y)
     type is (psb_d_base_multivect_type)
       if (y%is_dev()) call y%sync()
-      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
-      allocate(res(nc))
-      do j=1,nc
-        res(j) = ddot(n,x%v(:,j),1,y%v(:,j),1)
-      end do
-      class default
-      res = y%dot(n,x%v)
+      if (t_) then
+        call dgemm('T','N',x_n,y_n,x_n,done,x%v,x_n,y%v,y_m,dzero,res,x_n)
+      else
+        call dgemm('N','N',x_m,y_n,x_n,done,x%v,x_m,y%v,y_m,dzero,res,x_m)
+      end if
+    class default
+      call x%dot(y%v,res,t)
     end select
 
-  end function d_base_mlv_dot_v
+  end subroutine d_base_mlv_dot_v
 
   !
   ! Base workhorse is good old BLAS1
   !
   !
-  !> Function  base_mlv_dot_a
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief  Dot product by a normal array
-  !! \param n    Number of entries to be considered
-  !! \param y(:) The array to be multiplied by
+  !> Function       base_mlv_dot_a
+  !! \memberof      psb_d_base_multivect_type
+  !! \brief         Dot product by a normal array
+  !! \param n       Number of entries to be considered
+  !! \param y(:,:)  The array to be multiplied by
+  !! \param res     Result matrix
+  !! \param t       If true, x is transposed
   !!
-  function d_base_mlv_dot_a(n,x,y) result(res)
-    implicit none
+  subroutine d_base_mlv_dot_a(x,y,res,t)
     class(psb_d_base_multivect_type), intent(inout) :: x
-    real(psb_dpk_), intent(in)    :: y(:,:)
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable     :: res(:)
-    real(psb_dpk_), external      :: ddot
-    integer(psb_ipk_) :: j,nc
+    real(psb_dpk_), intent(in)                      :: y(:,:)
+    real(psb_dpk_), intent(inout)                   :: res(:,:)
+    logical, optional, intent(in)                   :: t
+    logical                                         :: t_
+    external                                        :: dgemm
+    integer(psb_ipk_)                               :: x_m, x_n, y_m, y_n
+
+    if (present(t)) then
+      t_ = t
+    else
+      t_ = .false.
+    end if
 
     if (x%is_dev()) call x%sync()
-    nc = min(psb_size(x%v,2_psb_ipk_),size(y,2_psb_ipk_))
-    allocate(res(nc))
-    do j=1,nc
-      res(j) = ddot(n,x%v(:,j),1,y(:,j),1)
-    end do
 
-  end function d_base_mlv_dot_a
+    x_m = x%get_nrows()
+    x_n = x%get_ncols()
+    y_m = size(y,dim=1)
+    y_n = size(y,dim=2)
+
+    if (t_) then
+      call dgemm('T','N',x_n,y_n,x_n,done,x%v,x_n,y,y_m,dzero,res,x_n)
+    else
+      call dgemm('N','N',x_m,y_n,x_n,done,x%v,x_m,y,y_m,dzero,res,x_m)
+    end if
+
+  end subroutine d_base_mlv_dot_a
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -2920,7 +2943,7 @@ contains
   !! \brief AXPBY  by a normal array y=alpha*x+beta*y
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
-  !! \param x(:) The array to be added
+  !! \param x(:,:) The array to be added
   !! \param beta scalar alpha
   !! \param info   return code
   !!
@@ -3192,21 +3215,18 @@ contains
   !> Function  base_mlv_nrm2
   !! \memberof  psb_d_base_multivect_type
   !! \brief 2-norm |x(1:n)|_2
-  !! \param n  how many entries to consider
-  function d_base_mlv_nrm2(n,x) result(res)
+  !! \param nc  how many entries to consider
+  function d_base_mlv_nrm2(nc,x) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
-    real(psb_dpk_), external      :: dnrm2
-    integer(psb_ipk_) :: j, nc
+    integer(psb_ipk_), intent(in) :: nc
+    real(psb_dpk_), allocatable :: res
+    real(psb_dpk_), external :: dnrm2
+    integer(psb_ipk_) :: j, nr
 
     if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  dnrm2(n,x%v(:,j),1)
-    end do
+    nr = x%get_nrows()
+    res = dnrm2(nc*nr,x%v,1)
 
   end function d_base_mlv_nrm2
 
@@ -3214,19 +3234,19 @@ contains
   !> Function  base_mlv_amax
   !! \memberof  psb_d_base_multivect_type
   !! \brief infinity-norm |x(1:n)|_\infty
-  !! \param n  how many entries to consider
-  function d_base_mlv_amax(n,x) result(res)
+  !! \param nc  how many entries to consider
+  function d_base_mlv_amax(nc,x) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
-    integer(psb_ipk_) :: j, nc
+    integer(psb_ipk_), intent(in) :: nc
+    real(psb_dpk_) :: res
+    integer(psb_ipk_) :: i, nr
 
     if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  maxval(abs(x%v(1:n,j)))
+    nr = x%get_nrows()
+    res = 0
+    do i=1,nr
+      res = max(res,sum(abs(x%v(i,1:nc))))
     end do
 
   end function d_base_mlv_amax
@@ -3235,19 +3255,19 @@ contains
   !> Function  base_mlv_asum
   !! \memberof  psb_d_base_multivect_type
   !! \brief 1-norm |x(1:n)|_1
-  !! \param n  how many entries to consider
-  function d_base_mlv_asum(n,x) result(res)
+  !! \param nc  how many entries to consider
+  function d_base_mlv_asum(nc,x) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
-    integer(psb_ipk_) :: j, nc
+    integer(psb_ipk_), intent(in) :: nc
+    real(psb_dpk_), allocatable :: res
+    integer(psb_ipk_) :: j, nr
 
     if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
+    nr = x%get_nrows()
+    res = 0
     do j=1,nc
-      res(j) =  sum(abs(x%v(1:n,j)))
+      res = max(res,sum(abs(x%v(1:nr,j))))
     end do
 
   end function d_base_mlv_asum
@@ -3285,6 +3305,50 @@ contains
 
   end subroutine d_base_mlv_absval2
 
+  !
+  ! QR factorization
+  !
+  !> Function     base_mlv_qr_fact
+  !! \memberof    psb_d_base_multivect_type
+  !! \param res   Result array
+  !! \param info  Return code
+  !! \brief       QR factorization
+  !
+  subroutine d_base_mlv_qr_fact(x, res, info)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(inout)                   :: res(:,:)
+    real(psb_dpk_), allocatable                     :: tau(:), work(:)
+    integer(psb_ipk_)                               :: i, j, m, n, lda, lwork
+    integer(psb_ipk_), intent(out)                  :: info
+    external                                        :: dgeqrf, dorgqr
+
+    if (x%is_dev()) call x%sync()
+
+    ! Initialize params
+    m = x%get_nrows()
+    n = x%get_ncols()
+    lda = m
+    lwork = n
+    allocate(tau(n), work(lwork))
+
+    ! Perform QR factorization
+    call dgeqrf(m, n, x%v, lda, tau, work, lwork, info)
+
+    ! Set R
+    res = x%v(1:n,1:n)
+    do i = 2, n
+      do j = 1, i-1
+        res(i,j) = dzero
+      enddo
+    enddo
+
+    ! Generate Q matrix
+    call dorgqr(m, n, n, x%v, lda, tau, work, lwork, info)
+
+    deallocate(tau, work)
+
+  end subroutine d_base_mlv_qr_fact
 
   function d_base_mlv_use_buffer() result(res)
     implicit none

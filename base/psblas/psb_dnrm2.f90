@@ -373,6 +373,112 @@ function psb_dnrm2_vect(x, desc_a, info,global)  result(res)
   return
 end function psb_dnrm2_vect
 
+! Function: psb_dnrm2_multivect
+!    Computes the norm2 of a distributed multivector,
+!
+!    norm2 := sqrt ( X**C * X)
+!
+! Arguments:
+!    x      -  type(psb_d_multivect_type) The input vector containing the entries of X.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    global -  logical(optional)    Whether to perform the global reduction, default: .true.
+!
+function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_d_multivect_mod
+  implicit none
+
+  real(psb_dpk_)                             :: res
+  type(psb_d_multivect_type), intent (inout) :: x
+  type(psb_desc_type), intent(in)            :: desc_a
+  integer(psb_ipk_), intent(out)             :: info
+  logical, intent(in), optional              :: global
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx
+  integer(psb_lpk_) :: ix, jx, m, n
+  logical :: global_
+  character(len=20) :: name, ch_err
+
+  name='psb_dnrm2mv'
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  info=psb_success_
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
+
+  ix = 1
+  jx = 1
+
+  m = x%get_nrows()
+  n = x%get_ncols()
+
+  call psb_chkvect(m,n,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (desc_a%get_local_rows() > 0) then
+    res  = x%nrm2(x%get_ncols())
+    ! TODO adjust  because overlapped elements are computed more than once
+    ! if (size(desc_a%ovrlap_elem,1)>0) then
+    !   if (x%is_dev()) call x%sync()
+    !   do i=1,size(desc_a%ovrlap_elem,1)
+    !     idx = desc_a%ovrlap_elem(i,1)
+    !     ndm = desc_a%ovrlap_elem(i,2)
+    !     dd  = dble(ndm-1)/dble(ndm)
+    !     res = res * sqrt(done - dd*(abs(x%v%v(idx))/res)**2)
+    !   end do
+    ! end if
+  else
+    res = dzero
+  end if
+
+  if (global_) call psb_nrm2(ctxt,res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end function psb_dnrm2_multivect
+
 ! Function: psb_dnrm2_weight_vect
 !    Computes the weighted norm2 of a distributed vector,
 !

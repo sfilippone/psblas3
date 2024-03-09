@@ -42,7 +42,8 @@ module psb_d_base_prec_mod
        & psb_erractionsave, psb_erractionrestore, psb_error, &
        & psb_errstatus_fatal, psb_success_,&
        & psb_d_base_sparse_mat, psb_dspmat_type, psb_d_csr_sparse_mat,& 
-       & psb_d_base_vect_type, psb_d_vect_type, psb_i_base_vect_type
+       & psb_d_base_vect_type, psb_d_vect_type, psb_i_base_vect_type,&
+       & psb_d_base_multivect_type, psb_d_multivect_type, psb_i_base_multivect_type
 
   use psb_prec_const_mod
 
@@ -62,7 +63,8 @@ module psb_d_base_prec_mod
     generic, public       :: build     => precbld
     generic, public       :: descr     => precdescr
     procedure, pass(prec) :: desc_prefix => psb_d_base_desc_prefix
-    procedure, pass(prec) :: allocate_wrk => psb_d_base_allocate_wrk
+    procedure, pass(prec) :: allocate_wrk => psb_d_base_allocate_wrk_vect
+    procedure, pass(prec) :: mv_allocate_wrk => psb_d_base_allocate_wrk_multivect
     procedure, pass(prec) :: free_wrk     => psb_d_base_free_wrk
     procedure, pass(prec) :: is_allocated_wrk => psb_d_base_is_allocated_wrk
     procedure(psb_d_base_precbld), pass(prec), deferred :: precbld    
@@ -263,7 +265,7 @@ contains
 
   end subroutine psb_d_base_precsetc
 
-  subroutine psb_d_base_allocate_wrk(prec,info,vmold,desc)
+  subroutine psb_d_base_allocate_wrk_vect(prec,info,vmold,desc)
     use psb_base_mod
     implicit none
     
@@ -295,7 +297,41 @@ contains
 9999 call psb_error_handler(err_act)
     return
     
-  end subroutine psb_d_base_allocate_wrk
+  end subroutine psb_d_base_allocate_wrk_vect
+
+  subroutine psb_d_base_allocate_wrk_multivect(prec,info,vmold,desc)
+    use psb_base_mod
+    implicit none
+    
+    ! Arguments
+    class(psb_d_base_prec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+    class(psb_d_base_multivect_type), intent(in), optional  :: vmold
+    type(psb_desc_type), intent(in), optional :: desc
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act
+    character(len=20)   :: name
+    
+    info=psb_success_
+    name = 'psb_d_allocate_wrk'
+    call psb_erractionsave(err_act)
+    
+    if (psb_get_errstatus().ne.0) goto 9999
+
+    !
+    ! Base version does nothing.
+    !
+
+    info = psb_success_ 
+
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 call psb_error_handler(err_act)
+    return
+    
+  end subroutine psb_d_base_allocate_wrk_multivect
 
   subroutine psb_d_base_free_wrk(prec,info)
     use psb_base_mod

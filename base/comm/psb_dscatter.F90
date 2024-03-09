@@ -98,3 +98,71 @@ subroutine  psb_dscatter_vect(globx, locx, desc_a, info, root, mold)
   return
   
 end subroutine psb_dscatter_vect
+
+! Subroutine: psb_dscatter_multivect
+!   This subroutine scatters a global vector locally owned by one process
+!   into pieces that are local to all the processes.
+!
+! Arguments:
+!   globx     -  real,dimension(:,:)           The global matrix to scatter.
+!   locx      -  type(psb_d_multivect_type)    The local piece of the distributed matrix.
+!   desc_a    -  type(psb_desc_type).          The communication descriptor.
+!   info      -  integer.                      Error code.
+!   iroot     -  integer(optional).            The process that owns the global matrix. 
+!                                              If -1 all the processes have a copy. 
+!                                              Default -1
+subroutine  psb_dscatter_multivect(globx, locx, desc_a, info, root, mold)
+  use psb_base_mod, psb_protect_name => psb_dscatter_multivect
+  implicit none
+  type(psb_d_multivect_type), intent(inout) :: locx
+  real(psb_dpk_), intent(in)     :: globx(:,:)
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: root
+  class(psb_d_base_multivect_type), intent(in), optional :: mold
+  
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_) :: np, me, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+       & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
+  real(psb_dpk_), allocatable  :: vlocx(:,:)
+  character(len=20)        :: name, ch_err
+  integer(psb_ipk_) :: debug_level, debug_unit
+
+  name='psb_scatter_multivect'
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  ctxt=desc_a%get_context()
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+
+  ! check on blacs grid 
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  if (info == psb_success_) call psb_scatter(globx, vlocx, desc_a, info, root=root)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='psb_scatterv')
+    goto 9999
+  endif
+  
+  call locx%bld(vlocx,mold=mold)
+  
+  call psb_erractionrestore(err_act)
+  return  
+  
+9999 call psb_error_handler(ctxt,err_act)
+  
+  return
+  
+end subroutine psb_dscatter_multivect

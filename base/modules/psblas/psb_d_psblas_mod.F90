@@ -32,6 +32,7 @@
 module psb_d_psblas_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
   use psb_d_vect_mod, only : psb_d_vect_type
+  use psb_d_multivect_mod, only: psb_d_multivect_type
   use psb_d_mat_mod, only : psb_dspmat_type
 
   interface psb_gedot
@@ -44,6 +45,27 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)       :: info
       logical, intent(in), optional        :: global
     end function psb_ddot_vect
+    function psb_ddot_multivect(x, y, desc_a,info,t,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), allocatable               :: res(:,:)
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      logical, optional, intent(in)             :: t
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: global
+    end function psb_ddot_multivect
+    function psb_ddot_multivect_1(x, y, desc_a,info,t,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), allocatable               :: res(:,:)
+      type(psb_d_multivect_type), intent(inout) :: x
+      real(psb_dpk_), intent(in)                :: y(:,:)
+      logical, optional, intent(in)             :: t
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: global
+    end function psb_ddot_multivect_1
     function psb_ddotv(x, y, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
@@ -98,6 +120,24 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_daxpby_vect
+    subroutine psb_daxpby_multivect(alpha, x, beta, y, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      type(psb_d_multivect_type), intent (inout) :: x
+      type(psb_d_multivect_type), intent (inout) :: y
+      real(psb_dpk_), intent (in) :: alpha, beta
+      type(psb_desc_type), intent (in) :: desc_a
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_daxpby_multivect
+    subroutine psb_daxpby_multivect_1(alpha, x, beta, y, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), intent(in) :: x(:,:)
+      type(psb_d_multivect_type), intent (inout) :: y
+      real(psb_dpk_), intent (in) :: alpha, beta
+      type(psb_desc_type), intent (in) :: desc_a
+      integer(psb_ipk_), intent(out) :: info
+    end subroutine psb_daxpby_multivect_1
     subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
          & z, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
@@ -143,6 +183,17 @@ module psb_d_psblas_mod
     end subroutine psb_daxpby
   end interface
 
+  interface psb_geqrfact
+    function psb_dqrfact(x, desc_a, info) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), allocatable                :: res(:,:)
+      type(psb_d_multivect_type), intent (inout) :: x
+      type(psb_desc_type), intent (in)           :: desc_a
+      integer(psb_ipk_), intent(out)             :: info
+    end function psb_dqrfact
+  end interface
+
   interface psb_geamax
     function psb_damax(x, desc_a, info, jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
@@ -172,14 +223,23 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)       :: info
       logical, intent(in), optional        :: global
     end function psb_damax_vect
+    function psb_damax_multivect(x, desc_a, info, global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_)                             :: res
+      type(psb_d_multivect_type), intent (inout) :: x
+      type(psb_desc_type), intent (in)           :: desc_a
+      integer(psb_ipk_), intent(out)             :: info
+      logical, intent(in), optional              :: global
+    end function psb_damax_multivect
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrmi
-    procedure psb_damax, psb_damaxv, psb_damax_vect
+    procedure psb_damax, psb_damaxv, psb_damax_vect, psb_damax_multivect
   end interface
   interface psb_normi
-    procedure psb_damax, psb_damaxv, psb_damax_vect
+    procedure psb_damax, psb_damaxv, psb_damax_vect, psb_damax_multivect
   end interface
 #endif
 
@@ -330,11 +390,20 @@ module psb_d_psblas_mod
       logical, intent(in), optional       :: global
       type(psb_d_vect_type), intent (inout), optional :: aux
     end function psb_dnrm2_weightmask_vect
+    function psb_dnrm2_multivect(x, desc_a, info,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_)                             :: res
+      type(psb_d_multivect_type), intent (inout) :: x
+      type(psb_desc_type), intent (in)           :: desc_a
+      integer(psb_ipk_), intent(out)             :: info
+      logical, intent(in), optional              :: global
+    end function psb_dnrm2_multivect
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
-    procedure psb_dnrm2, psb_dnrm2v, psb_dnrm2_vect, psb_dnrm2_weight_vect, psb_dnrm2_weightmask_vect
+    procedure psb_dnrm2, psb_dnrm2v, psb_dnrm2_vect, psb_dnrm2_weight_vect, psb_dnrm2_weightmask_vect, psb_dnrm2_multivect
   end interface
 #endif
 
@@ -431,6 +500,20 @@ module psb_d_psblas_mod
       logical, optional, intent(in)        :: doswap
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_dspmv_vect
+    subroutine psb_dspmv_multivect(alpha, a, x, beta, y,&
+         & desc_a, info, trans, work,doswap)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      type(psb_dspmat_type), intent(in)    :: a
+      type(psb_d_multivect_type), intent(inout) :: x
+      type(psb_d_multivect_type), intent(inout) :: y
+      real(psb_dpk_), intent(in)        :: alpha, beta
+      type(psb_desc_type), intent(in)      :: desc_a
+      character, optional, intent(in)      :: trans
+      real(psb_dpk_), optional, intent(inout),target :: work(:)
+      logical, optional, intent(in)        :: doswap
+      integer(psb_ipk_), intent(out)                 :: info
+    end subroutine psb_dspmv_multivect
   end interface
 
   interface psb_spsm

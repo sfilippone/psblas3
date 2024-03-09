@@ -58,7 +58,8 @@ module psb_d_prec_type
     procedure, pass(prec)               :: csetc  => psb_dcprecsetc
     procedure, pass(prec)               :: csetr  => psb_dcprecsetr
     generic, public                     :: set => cseti, csetc, csetr
-    procedure, pass(prec)               :: allocate_wrk => psb_d_allocate_wrk
+    procedure, pass(prec)               :: allocate_wrk => psb_d_allocate_wrk_vect
+    procedure, pass(prec)               :: mv_allocate_wrk => psb_d_allocate_wrk_multivect
     procedure, pass(prec)               :: free_wrk => psb_d_free_wrk
     procedure, pass(prec)               :: is_allocated_wrk => psb_d_is_allocated_wrk
   end type psb_dprec_type
@@ -244,7 +245,7 @@ contains
 
   end subroutine psb_d_prec_dump
 
-  subroutine psb_d_allocate_wrk(prec,info,vmold,desc)
+  subroutine psb_d_allocate_wrk_vect(prec,info,vmold,desc)
     use psb_base_mod
     implicit none
 
@@ -278,7 +279,43 @@ contains
 9999 call psb_error_handler(err_act)
     return
 
-  end subroutine psb_d_allocate_wrk
+  end subroutine psb_d_allocate_wrk_vect
+
+  subroutine psb_d_allocate_wrk_multivect(prec,info,vmold,desc)
+    use psb_base_mod
+    implicit none
+
+    ! Arguments
+    class(psb_dprec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+    class(psb_d_base_multivect_type), intent(in), optional  :: vmold
+    type(psb_desc_type), intent(in), optional :: desc
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act
+    character(len=20)   :: name
+
+    info=psb_success_
+    name = 'psb_d_allocate_wrk'
+    call psb_erractionsave(err_act)
+
+    if (psb_get_errstatus().ne.0) goto 9999
+
+    if (.not.allocated(prec%prec)) then
+      info = -1
+      write(psb_err_unit,*) 'Trying to allocate wrk to a non-built preconditioner'
+      return
+    end if
+
+    call prec%prec%mv_allocate_wrk(info,vmold=vmold,desc=desc)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(err_act)
+    return
+
+  end subroutine psb_d_allocate_wrk_multivect
 
   subroutine psb_d_free_wrk(prec,info)
     use psb_base_mod

@@ -2012,6 +2012,26 @@ subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans)
   call y%set_host()
 end subroutine psb_d_base_vect_mv
 
+subroutine psb_d_base_multivect_mv(alpha,a,x,beta,y,info,trans)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_multivect_mv
+  implicit none
+  class(psb_d_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(in)       :: alpha, beta
+  class(psb_d_base_multivect_type), intent(inout) :: x
+  class(psb_d_base_multivect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(out)             :: info
+  character, optional, intent(in)  :: trans
+
+  ! For the time being we just throw everything back
+  ! onto the normal routines.
+  call x%sync()
+  call y%sync()
+  call a%spmm(alpha,x%v,beta,y%v,info,trans)
+  call y%set_host()
+end subroutine psb_d_base_multivect_mv
+
 subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_d_base_mat_mod, psb_protect_name => psb_d_base_vect_cssv
   use psb_d_base_vect_mod

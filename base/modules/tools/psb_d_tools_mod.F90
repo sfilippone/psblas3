@@ -66,6 +66,15 @@ Module psb_d_tools_mod
       integer(psb_ipk_), optional, intent(in)   :: n
       integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
     end subroutine psb_dalloc_multivect
+    subroutine psb_dalloc_multivect_r2(x, desc_a,info,m,n,lb, dupl, bldmode)
+      import
+      implicit none
+      type(psb_d_multivect_type), intent(out)  :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)   :: m, n, lb
+      integer(psb_ipk_), optional, intent(in) :: dupl, bldmode
+    end subroutine psb_dalloc_multivect_r2
   end interface
 
 
@@ -98,6 +107,16 @@ Module psb_d_tools_mod
       logical, intent(in), optional        :: scratch
       integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_dasb_multivect
+    subroutine psb_dasb_multivect_r2(x, desc_a, info,mold, scratch, n)
+      import
+      implicit none
+      type(psb_desc_type), intent(in)      ::  desc_a
+      type(psb_d_multivect_type), intent(inout) :: x(:)
+      integer(psb_ipk_), intent(out)                 ::  info
+      class(psb_d_base_multivect_type), intent(in), optional :: mold
+      logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in)   :: n
+    end subroutine psb_dasb_multivect_r2
   end interface
 
   interface psb_gefree
@@ -122,6 +141,13 @@ Module psb_d_tools_mod
       type(psb_d_multivect_type), intent(inout) :: x
       integer(psb_ipk_), intent(out)             ::  info
     end subroutine psb_dfree_multivect
+    subroutine psb_dfree_multivect_r2(x, desc_a, info)
+      import
+      implicit none
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_d_multivect_type), allocatable, intent(inout) :: x(:)
+      integer(psb_ipk_), intent(out)             ::  info
+    end subroutine psb_dfree_multivect_r2
   end interface
 
 

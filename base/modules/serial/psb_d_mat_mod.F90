@@ -230,6 +230,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: colsum   => psb_d_colsum
     procedure, pass(a) :: aclsum   => psb_d_aclsum
     procedure, pass(a) :: csmv_v   => psb_d_csmv_vect
+    procedure, pass(a) :: csmv_mv  => psb_d_csmv_multivect
     procedure, pass(a) :: csmv     => psb_d_csmv
     procedure, pass(a) :: csmm     => psb_d_csmm
     generic, public    :: spmm     => csmm, csmv, csmv_v
@@ -1069,6 +1070,16 @@ module psb_d_mat_mod
       integer(psb_ipk_), intent(out)                 :: info
       character, optional, intent(in)      :: trans
     end subroutine psb_d_csmv_vect
+    subroutine psb_d_csmv_multivect(alpha,a,x,beta,y,info,trans)
+      use psb_d_multivect_mod, only : psb_d_multivect_type
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in)   :: a
+      real(psb_dpk_), intent(in)        :: alpha, beta
+      type(psb_d_multivect_type), intent(inout) :: x
+      type(psb_d_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)                 :: info
+      character, optional, intent(in)      :: trans
+    end subroutine psb_d_csmv_multivect
   end interface
 
   interface psb_cssm

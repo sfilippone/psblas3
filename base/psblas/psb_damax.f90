@@ -354,6 +354,104 @@ function psb_damax_vect(x, desc_a, info,global) result(res)
 
 end function psb_damax_vect
 
+! Function: psb_damax_multivect
+!    Computes the maximum absolute value of X.
+!
+!    normi := max(abs(X(i))
+!
+! Arguments:
+!    x      -  type(psb_d_multivect_type) The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!
+function psb_damax_multivect(x, desc_a, info, global) result(res)
+  use psb_penv_mod
+  use psb_serial_mod
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_d_multivect_mod
+  implicit none
+
+  real(psb_dpk_)                             :: res
+  type(psb_d_multivect_type), intent (inout) :: x
+  type(psb_desc_type), intent (in)           :: desc_a
+  integer(psb_ipk_), intent(out)             :: info
+  logical, intent(in), optional              :: global
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx
+  integer(psb_lpk_) :: ix, jx, m, n
+  logical :: global_
+  character(len=20) :: name, ch_err
+
+  name='psb_damaxmv'
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
+
+  ix = 1
+  jx = 1
+
+  m = x%get_nrows()
+  n = x%get_ncols()
+
+  call psb_chkvect(m,n,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
+    res = x%amax(x%get_ncols())
+  else
+    res = dzero
+  end if
+
+  ! compute global max
+  if (global_) call psb_amx(ctxt, res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end function psb_damax_multivect
 
 !!$
 !!$              Parallel Sparse BLAS  version 3.5

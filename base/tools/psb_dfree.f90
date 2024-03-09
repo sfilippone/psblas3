@@ -200,3 +200,55 @@ subroutine psb_dfree_multivect(x, desc_a, info)
   return
 
 end subroutine psb_dfree_multivect
+
+subroutine psb_dfree_multivect_r2(x, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_dfree_multivect_r2
+  implicit none
+  !....parameters...
+  type(psb_d_multivect_type), allocatable, intent(inout) :: x(:)
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)             :: info 
+  !...locals....
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np,me,err_act, i
+  character(len=20)   :: name
+
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  call psb_erractionsave(err_act)
+  name='psb_dfreev'
+
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  do i=lbound(x,1),ubound(x,1)
+    call x(i)%free(info)
+    if (info /= 0) exit
+  end do
+  if (info == 0) deallocate(x,stat=info)
+  if (info /= psb_no_err_) then
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_dfree_multivect_r2

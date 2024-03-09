@@ -124,6 +124,27 @@ Module psb_krylov_mod
 
     end Subroutine psb_zkrylov_vect
 
+    Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
+         & itmax,iter,err,itrace,itrs,istop)
+      
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_dspmat_type, &
+           & psb_dpk_, psb_d_multivect_type
+      use psb_prec_mod, only : psb_dprec_type
+      
+      character(len=*)                          :: method
+      Type(psb_dspmat_type), Intent(in)         :: a
+      Type(psb_desc_type), Intent(in)           :: desc_a
+      class(psb_dprec_type), intent(inout)      :: prec 
+      type(psb_d_multivect_type), Intent(inout) :: b
+      type(psb_d_multivect_type), Intent(inout) :: x
+      Real(psb_dpk_), Intent(in)                :: eps
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), Optional, Intent(in)   :: itmax, itrace, itrs, istop
+      integer(psb_ipk_), Optional, Intent(out)  :: iter
+      Real(psb_dpk_), Optional, Intent(out)     :: err
+
+    end Subroutine psb_dkrylov_multivect
+
   end interface
 
 

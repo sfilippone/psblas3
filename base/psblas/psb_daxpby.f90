@@ -131,6 +131,191 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
 end subroutine psb_daxpby_vect
 
 !
+! Subroutine: psb_daxpby_multivect
+!    Adds one distributed multivector to another,
+!
+!    Y := beta * Y + alpha * X
+!
+! Arguments:
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x      - type(psb_d_multivect_type) The input multivector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y      - type(psb_d_multivect_type)  The input/output multivector Y
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
+!  Note: from a functional point of view, X is input, but here
+!        it's declared INOUT because of the sync() methods.
+!
+subroutine psb_daxpby_multivect(alpha, x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_multivect
+  implicit none
+  type(psb_d_multivect_type), intent (inout) :: x
+  type(psb_d_multivect_type), intent (inout) :: y
+  real(psb_dpk_), intent (in) :: alpha, beta
+  type(psb_desc_type), intent (in) :: desc_a
+  integer(psb_ipk_), intent(out) :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, x_m, x_n, y_m, y_n
+  character(len=20) :: name, ch_err
+
+  name='psb_dgeaxpby'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  ijx = ione
+
+  iy = ione
+  ijy = ione
+
+  x_m = x%get_nrows()
+  x_n = x%get_ncols()
+
+  y_m = y%get_nrows()
+  y_n = y%get_ncols()
+
+  ! check vector correctness
+  call psb_chkvect(x_m,x_n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(y_m,y_n,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione).or.(iiy /= ione)) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(),alpha,x,beta,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_daxpby_multivect
+
+!
+! Subroutine: psb_daxpby_multivect
+!    Adds one distributed multivector to another,
+!
+!    Y := beta * Y + alpha * X
+!
+! Arguments:
+!    alpha  -  real,input                  The scalar used to multiply each component of X
+!    x      -  real(psb_dpk_)(:,:)         The input multivector containing the entries of X
+!    beta   -  real,input                  The scalar used to multiply each component of Y
+!    y      -  type(psb_d_multivect_type)  The input/output multivector Y
+!    desc_a -  type(psb_desc_type)         The communication descriptor.
+!    info   -  integer                     Return code
+!
+!  Note: from a functional point of view, X is input, but here
+!        it's declared INOUT because of the sync() methods.
+!
+subroutine psb_daxpby_multivect_1(alpha, x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_multivect_1
+  implicit none
+  real(psb_dpk_), intent(in) :: x(:,:)
+  type(psb_d_multivect_type), intent (inout) :: y
+  real(psb_dpk_), intent (in) :: alpha, beta
+  type(psb_desc_type), intent (in) :: desc_a
+  integer(psb_ipk_), intent(out) :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iiy, jjy
+  integer(psb_lpk_) :: iy, ijy, y_m, y_n
+  character(len=20) :: name, ch_err
+
+  name='psb_dgeaxpby'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  iy = ione
+  ijy = ione
+
+  y_m = y%get_nrows()
+  y_n = y%get_ncols()
+
+  call psb_chkvect(y_m,y_n,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if (iiy /= ione) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(),alpha,x,beta,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_daxpby_multivect_1
+
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
 !        Salvatore Filippone
