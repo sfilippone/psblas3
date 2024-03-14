@@ -417,10 +417,9 @@ function psb_damax_multivect(x, desc_a, info, global) result(res)
   ix = 1
   jx = 1
 
-  m = x%get_nrows()
-  n = x%get_ncols()
+  m = desc_a%get_global_rows()
 
-  call psb_chkvect(m,n,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -436,7 +435,7 @@ function psb_damax_multivect(x, desc_a, info, global) result(res)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    res = x%amax(x%get_ncols())
+    res = x%amax(desc_a%get_local_rows())
   else
     res = dzero
   end if

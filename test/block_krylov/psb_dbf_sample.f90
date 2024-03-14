@@ -117,7 +117,7 @@ program psb_dbf_sample
          b_mv_glob =>aux_b(:,:)
       else
          write(psb_out_unit,'("Generating an rhs...")')
-         write(psb_out_unit,'("Number of RHS: ",i1)') nrhs
+         write(psb_out_unit,'("Number of RHS: ",i3)') nrhs
          write(psb_out_unit,'(" ")')
          call psb_realloc(m,nrhs,aux_b,ircode)
          if (ircode /= 0) then
@@ -197,16 +197,27 @@ program psb_dbf_sample
    if(iam == psb_root_) then
       write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
       write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Starting algorithm")')
+      write(psb_out_unit,'(" ")')
    end if
 
    call psb_barrier(ctxt)
    t1 = psb_wtime()
+
    call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
    & itmax=itmax,iter=iter,err=err,itrace=itrace,&
    & itrs=itrs,istop=istopc)
+
    call psb_barrier(ctxt)
    t2 = psb_wtime() - t1
    call psb_amx(ctxt,t2)
+
+   if(iam == psb_root_) then
+      write(psb_out_unit,'("Finished algorithm")')
+      write(psb_out_unit,'(" ")')
+   end if
+   
+   ! TODO spmm cambia X (che senso ha?)
    call psb_geaxpby(done,b_mv,dzero,r_mv,desc_a,info)
    call psb_spmm(-done,a,x_mv,done,r_mv,desc_a,info)
 
@@ -220,6 +231,10 @@ program psb_dbf_sample
    call psb_sum(ctxt,amatsize)
    call psb_sum(ctxt,descsize)
    call psb_sum(ctxt,precsize)
+
+   call psb_gather(x_mv_glob,x_mv,desc_a,info,root=psb_root_)
+   if (info == psb_success_) call psb_gather(r_mv_glob,r_mv,desc_a,info,root=psb_root_)
+   if (info /= psb_success_) goto 9999
 
    if (iam == psb_root_) then
       call prec%descr(info)
@@ -240,11 +255,11 @@ program psb_dbf_sample
       write(psb_out_unit,'("Residual norm 2:                    ",es12.5)')resmx
       write(psb_out_unit,'("Residual norm inf:                  ",es12.5)')resmxp
       write(psb_out_unit,'(" ")')
+      ! TODO
+      ! do i=1,m
+      !    write(psb_out_unit,993) i, x_mv_glob(i,:), r_mv_glob(i,:), b_mv_glob(i,:)
+      ! enddo
    end if
-
-   call psb_gather(x_mv_glob,x_mv,desc_a,info,root=psb_root_)
-   if (info == psb_success_) call psb_gather(r_mv_glob,r_mv,desc_a,info,root=psb_root_)
-   if (info /= psb_success_) goto 9999
 
 998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))

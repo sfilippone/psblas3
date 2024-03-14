@@ -21,7 +21,7 @@ function psb_dqrfact(x, desc_a, info) result(res)
    ! locals
    type(psb_ctxt_type) :: ctxt
    integer(psb_ipk_) :: np, me, err_act, iix, jjx
-   integer(psb_lpk_) :: ix, ijx, x_m, x_n
+   integer(psb_lpk_) :: ix, ijx, m
    character(len=20) :: name, ch_err
 
    name='psb_dgqrfact'
@@ -46,10 +46,9 @@ function psb_dqrfact(x, desc_a, info) result(res)
    ix = ione
    ijx = ione
 
-   x_m = x%get_nrows()
-   x_n = x%get_ncols()
+   m = desc_a%get_global_rows()
 
-   call psb_chkvect(x_m,x_n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+   call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
    if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -62,9 +61,9 @@ function psb_dqrfact(x, desc_a, info) result(res)
       call psb_errpush(info,name)
    end if
 
+   ! TODO serial?
    if(desc_a%get_local_rows() > 0) then
-      allocate(res(x_n,x_n))
-      call x%qr_fact(res, info)
+      res = x%qr_fact(info)
    end if
 
    call psb_erractionrestore(err_act)

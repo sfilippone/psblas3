@@ -128,12 +128,12 @@ contains
 
         write(psb_out_unit,'(" ")')
         write(psb_out_unit,'("Solving matrix       : ",a)') mtrx_file      
-        write(psb_out_unit,'("Number of processors : ",i1)') np
+        write(psb_out_unit,'("Number of processors : ",i3)') np
         write(psb_out_unit,'("Data distribution    : ",a)') part
         write(psb_out_unit,'("Iterative method     : ",a)') kmethd
         write(psb_out_unit,'("Preconditioner       : ",a)') ptype
-        write(psb_out_unit,'("Number of RHS        : ",i1)') nrhs
-        write(psb_out_unit,'("Number of iterations : ",i1)') itrs
+        write(psb_out_unit,'("Number of RHS        : ",i3)') nrhs
+        write(psb_out_unit,'("Number of iterations : ",i3)') itrs
         write(psb_out_unit,'("Storage format       : ",a)') afmt(1:3)
         write(psb_out_unit,'(" ")')
       else

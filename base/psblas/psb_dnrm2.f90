@@ -400,7 +400,8 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, iix, jjx
+  integer(psb_ipk_) :: np, me, err_act, idx, i, j, iix, jjx, ldx, ndm
+  real(psb_dpk_)    :: dd
   integer(psb_lpk_) :: ix, jx, m, n
   logical :: global_
   character(len=20) :: name, ch_err
@@ -436,10 +437,11 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
   ix = 1
   jx = 1
 
-  m = x%get_nrows()
+  m = desc_a%get_global_rows()
   n = x%get_ncols()
+  ldx = x%get_nrows()
 
-  call psb_chkvect(m,n,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,n,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -453,21 +455,25 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
   end if
 
   if (desc_a%get_local_rows() > 0) then
-    res  = x%nrm2(x%get_ncols())
+    res  = x%nrm2(desc_a%get_local_rows())
+
     ! TODO adjust  because overlapped elements are computed more than once
-    ! if (size(desc_a%ovrlap_elem,1)>0) then
-    !   if (x%is_dev()) call x%sync()
-    !   do i=1,size(desc_a%ovrlap_elem,1)
-    !     idx = desc_a%ovrlap_elem(i,1)
-    !     ndm = desc_a%ovrlap_elem(i,2)
-    !     dd  = dble(ndm-1)/dble(ndm)
-    !     res = res * sqrt(done - dd*(abs(x%v%v(idx))/res)**2)
-    !   end do
-    ! end if
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%v%is_dev()) call x%sync()
+      do j=1,x%get_ncols()
+        do i=1,size(desc_a%ovrlap_elem,1)
+          idx = desc_a%ovrlap_elem(i,1)
+          ndm = desc_a%ovrlap_elem(i,2)
+          dd  = dble(ndm-1)/dble(ndm)
+          res = res * sqrt(done - dd*(abs(x%v%v(idx,j))/res)**2)
+        end do
+      end do
+    end if
   else
     res = dzero
   end if
 
+  ! TODO
   if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)

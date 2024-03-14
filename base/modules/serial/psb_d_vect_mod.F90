@@ -1389,12 +1389,15 @@ module psb_d_multivect_mod
     !
     ! Dot product and AXPBY
     !
-    procedure, pass(x) :: dot_v => d_vect_dot_v
-    procedure, pass(x) :: dot_a => d_vect_dot_a
-    generic, public    :: dot   => dot_v, dot_a
-    procedure, pass(y) :: axpby_v  => d_vect_axpby_v
-    procedure, pass(y) :: axpby_a  => d_vect_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
+    procedure, pass(x) :: dot_col_v => d_vect_dot_col_v
+    procedure, pass(x) :: dot_col_a => d_vect_dot_col_a
+    generic, public    :: dot_col   => dot_col_v, dot_col_a
+    procedure, pass(x) :: dot_row_v => d_vect_dot_row_v
+    procedure, pass(x) :: dot_row_a => d_vect_dot_row_a
+    generic, public    :: dot_row   => dot_row_v, dot_row_a
+    procedure, pass(y) :: axpby_v   => d_vect_axpby_v
+    procedure, pass(y) :: axpby_a   => d_vect_axpby_a
+    generic, public    :: axpby     => axpby_v, axpby_a
     !
     ! MultiVector by vector/multivector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -1548,9 +1551,11 @@ contains
     class(psb_d_multivect_type), intent(out) :: x
     class(psb_d_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-    class(psb_d_base_multivect_type), pointer :: mld
 
     info = psb_success_
+    if (allocated(x%v)) &
+         & call x%free(info)
+
     if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
@@ -1837,41 +1842,67 @@ contains
     class(psb_d_base_multivect_type), allocatable :: tmp
     integer(psb_ipk_) :: info
 
+    info = psb_success_
     if (present(mold)) then
       allocate(tmp,stat=info,mold=mold)
     else
-      allocate(tmp,stat=info, mold=psb_d_get_base_multivect_default())
+      allocate(tmp,stat=info,mold=psb_d_get_base_multivect_default())
     endif
     if (allocated(x%v)) then
-      call x%v%sync()
-      if (info == psb_success_) call tmp%bld(x%v%v)
-      call x%v%free(info)
+      if (allocated(x%v%v)) then
+        call x%v%sync()
+        if (info == psb_success_) call tmp%bld(x%v%v)
+        call x%v%free(info)
+      endif
     end if
     call move_alloc(tmp,x%v)
   end subroutine d_vect_cnv
 
-  subroutine d_vect_dot_v(x,y,res,t)
+  function d_vect_dot_col_v(nr,x,y) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x, y
-    real(psb_dpk_), intent(inout)              :: res(:,:)
-    logical, optional, intent(in)              :: t
+    integer(psb_ipk_), intent(in)              :: nr
+    real(psb_dpk_), allocatable                :: res(:,:)
 
     if (allocated(x%v).and.allocated(y%v)) &
-         & call x%v%dot(y%v,res,t)
+         & res = x%v%dot_col(nr,y%v)
 
-  end subroutine d_vect_dot_v
+  end function d_vect_dot_col_v
 
-  subroutine d_vect_dot_a(x,y,res,t)
+  function d_vect_dot_col_a(nr,x,y) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)                 :: y(:,:)
-    real(psb_dpk_), intent(inout)              :: res(:,:)
-    logical, optional, intent(in)              :: t
+    integer(psb_ipk_), intent(in)              :: nr
+    real(psb_dpk_), allocatable                :: res(:,:)
 
     if (allocated(x%v)) &
-         & call x%v%dot(y,res,t)
+         & res = x%v%dot_col(nr,y)
 
-  end subroutine d_vect_dot_a
+  end function d_vect_dot_col_a
+
+  function d_vect_dot_row_v(nr,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)              :: nr
+    real(psb_dpk_), allocatable                :: res(:,:)
+
+    if (allocated(x%v).and.allocated(y%v)) &
+         & res = x%v%dot_row(nr,y%v)
+
+  end function d_vect_dot_row_v
+
+  function d_vect_dot_row_a(nr,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)                 :: y(:,:)
+    integer(psb_ipk_), intent(in)              :: nr
+    real(psb_dpk_), allocatable                :: res(:,:)
+
+    if (allocated(x%v)) &
+         & res = x%v%dot_row(nr,y)
+
+  end function d_vect_dot_row_a
 
   subroutine d_vect_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod
@@ -2014,57 +2045,57 @@ contains
 !!$
 !!$
 
-  function d_vect_nrm2(nc,x) result(res)
+  function d_vect_nrm2(nr,x) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: nc
+    integer(psb_ipk_), intent(in) :: nr
     real(psb_dpk_), allocatable :: res
 
     if (allocated(x%v)) then
-      res = x%v%nrm2(nc)
+      res = x%v%nrm2(nr)
     else
       res = dzero
     end if
 
   end function d_vect_nrm2
 
-  function d_vect_amax(nc,x) result(res)
+  function d_vect_amax(nr,x) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: nc
+    integer(psb_ipk_), intent(in) :: nr
     real(psb_dpk_) :: res
 
     if (allocated(x%v)) then
-      res = x%v%amax(nc)
+      res = x%v%amax(nr)
     else
       res = dzero
     end if
 
   end function d_vect_amax
 
-  function d_vect_asum(nc,x) result(res)
+  function d_vect_asum(nr,x) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: nc
+    integer(psb_ipk_), intent(in) :: nr
     real(psb_dpk_) :: res
 
     if (allocated(x%v)) then
-      res = x%v%asum(nc)
+      res = x%v%asum(nr)
     else
       res = dzero
     end if
 
   end function d_vect_asum
 
-  subroutine d_vect_qr_fact(x, res, info)
+  function d_vect_qr_fact(x, info) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
-    real(psb_dpk_), intent(inout)              :: res(:,:)
+    real(psb_dpk_), allocatable                :: res(:,:)
     integer(psb_ipk_), intent(out)             :: info
 
     if (allocated(x%v)) then
-      call x%v%qr_fact(res, info)
+      res = x%v%qr_fact(info)
     endif
-  end subroutine d_vect_qr_fact
+  end function d_vect_qr_fact
 
 end module psb_d_multivect_mod

@@ -159,7 +159,7 @@ subroutine psb_daxpby_multivect(alpha, x, beta, y, desc_a, info)
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, x_m, x_n, y_m, y_n
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20) :: name, ch_err
 
   name='psb_dgeaxpby'
@@ -192,21 +192,17 @@ subroutine psb_daxpby_multivect(alpha, x, beta, y, desc_a, info)
   iy = ione
   ijy = ione
 
-  x_m = x%get_nrows()
-  x_n = x%get_ncols()
-
-  y_m = y%get_nrows()
-  y_n = y%get_ncols()
+  m = desc_a%get_global_rows()
 
   ! check vector correctness
-  call psb_chkvect(x_m,x_n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(y_m,y_n,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,y%get_ncols(),y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 2'
@@ -249,8 +245,8 @@ end subroutine psb_daxpby_multivect
 !  Note: from a functional point of view, X is input, but here
 !        it's declared INOUT because of the sync() methods.
 !
-subroutine psb_daxpby_multivect_1(alpha, x, beta, y, desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_daxpby_multivect_1
+subroutine psb_daxpby_multivect_a(alpha, x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_multivect_a
   implicit none
   real(psb_dpk_), intent(in) :: x(:,:)
   type(psb_d_multivect_type), intent (inout) :: y
@@ -261,7 +257,7 @@ subroutine psb_daxpby_multivect_1(alpha, x, beta, y, desc_a, info)
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, iiy, jjy
-  integer(psb_lpk_) :: iy, ijy, y_m, y_n
+  integer(psb_lpk_) :: iy, ijy, m
   character(len=20) :: name, ch_err
 
   name='psb_dgeaxpby'
@@ -286,10 +282,9 @@ subroutine psb_daxpby_multivect_1(alpha, x, beta, y, desc_a, info)
   iy = ione
   ijy = ione
 
-  y_m = y%get_nrows()
-  y_n = y%get_ncols()
+  m = desc_a%get_global_rows()
 
-  call psb_chkvect(y_m,y_n,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,y%get_ncols(),y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 2'
@@ -313,7 +308,7 @@ subroutine psb_daxpby_multivect_1(alpha, x, beta, y, desc_a, info)
 
   return
 
-end subroutine psb_daxpby_multivect_1
+end subroutine psb_daxpby_multivect_a
 
 !
 !                Parallel Sparse BLAS  version 3.5

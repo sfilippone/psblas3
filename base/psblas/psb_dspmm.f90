@@ -365,8 +365,8 @@ subroutine psb_dspmv_multivect(alpha, a, x, beta, y, desc_a, info, trans, work,d
   ncol = desc_a%get_local_cols()
   lldx = x%get_nrows()
   lldy = y%get_nrows()
-  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,nrow,info)
-  if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,nrow,info)
+  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,x%get_ncols(),info)
+  if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,y%get_ncols(),info)
 
   if (psb_errstatus_fatal()) then 
     info=psb_err_from_subroutine_

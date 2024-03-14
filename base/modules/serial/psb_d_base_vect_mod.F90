@@ -2246,14 +2246,17 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: set_vect => d_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
     !
-    ! Dot product and AXPBY
+    ! TODO Dot product (col-by-col and row-by-col) and AXPBY
     !
-    procedure, pass(x) :: dot_v    => d_base_mlv_dot_v
-    procedure, pass(x) :: dot_a    => d_base_mlv_dot_a
-    generic, public    :: dot      => dot_v, dot_a
-    procedure, pass(y) :: axpby_v  => d_base_mlv_axpby_v
-    procedure, pass(y) :: axpby_a  => d_base_mlv_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
+    procedure, pass(x) :: dot_col_v => d_base_mlv_dot_col_v
+    procedure, pass(x) :: dot_col_a => d_base_mlv_dot_col_a
+    generic, public    :: dot_col   => dot_col_v, dot_col_a
+    procedure, pass(x) :: dot_row_v => d_base_mlv_dot_row_v
+    procedure, pass(x) :: dot_row_a => d_base_mlv_dot_row_a
+    generic, public    :: dot_row   => dot_row_v, dot_row_a
+    procedure, pass(y) :: axpby_v   => d_base_mlv_axpby_v
+    procedure, pass(y) :: axpby_a   => d_base_mlv_axpby_a
+    generic, public    :: axpby     => axpby_v, axpby_a
     !
     ! MultiVector by vector/multivector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -2358,14 +2361,22 @@ contains
     real(psb_dpk_), intent(in) :: this(:,:)
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: i
 
     call psb_realloc(size(this,1),size(this,2),x%v,info)
     if (info /= 0) then
       call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_vect_bld')
       return
     end if
-    x%v(:,:)  = this(:,:)
 
+#if defined (OPENMP)
+    !$omp parallel do private(i)
+    do i = 1, size(this,1)
+      x%v(i,:) = this(i,:)
+    end do
+#else
+    x%v(:,:)  = this(:,:)
+#endif
   end subroutine d_base_mlv_bld_x
 
   !
@@ -2801,31 +2812,24 @@ contains
 
   end subroutine d_base_mlv_set_vect
 
+  ! TODO
+  ! Col Dot products
   !
-  ! Dot products
   !
-  !
-  !> Function   base_mlv_dot_v
+  !> Function   base_mlv_dot_col_v
   !! \memberof  psb_d_base_multivect_type
-  !! \brief     Dot product by another base_mlv_vector
+  !! \brief     Col-by-col mult using dot product by a mlv
+  !! \param nr  Number of rows to be considered
   !! \param y   The other (base_mlv_vect) to be multiplied by
-  !! \param res Result matrix
-  !! \param t   If true, x is transposed
+  !! \param res Result vector
   !!
-  subroutine d_base_mlv_dot_v(x,y,res,t)
+  function d_base_mlv_dot_col_v(nr,x,y) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x, y
-    real(psb_dpk_), intent(inout)                   :: res(:,:)
-    logical, optional, intent(in)                   :: t
-    logical                                         :: t_
-    external                                        :: dgemm
-    integer(psb_ipk_)                               :: x_m, x_n, y_m, y_n
-
-    if (present(t)) then
-      t_ = t
-    else
-      t_ = .false.
-    end if
+    integer(psb_ipk_), intent(in)                   :: nr
+    real(psb_dpk_), allocatable                     :: res(:,:)
+    real(psb_dpk_), external                        :: ddot
+    integer(psb_ipk_)                               :: i, j, n_x, n_y
 
     if (x%is_dev()) call x%sync()
     !
@@ -2835,65 +2839,126 @@ contains
     !  If Y is not, throw the burden on it, implicitly
     !  calling dot_a
     !
-    x_m = x%get_nrows()
-    x_n = x%get_ncols()
-    y_m = y%get_nrows()
-    y_n = y%get_ncols()
     select type(yy => y)
     type is (psb_d_base_multivect_type)
       if (y%is_dev()) call y%sync()
-      if (t_) then
-        call dgemm('T','N',x_n,y_n,x_n,done,x%v,x_n,y%v,y_m,dzero,res,x_n)
-      else
-        call dgemm('N','N',x_m,y_n,x_n,done,x%v,x_m,y%v,y_m,dzero,res,x_m)
-      end if
+      n_x = psb_size(x%v,2_psb_ipk_)
+      n_y = psb_size(y%v,2_psb_ipk_)
+      allocate(res(n_x,n_y))
+      do i=1,n_x
+        do j=1,n_y
+          res(i,j) = ddot(nr,x%v(1:nr,i),1,y%v(1:nr,j),1)
+        end do
+      end do
     class default
-      call x%dot(y%v,res,t)
+      res = x%dot_col(nr,y%v)
     end select
 
-  end subroutine d_base_mlv_dot_v
+  end function d_base_mlv_dot_col_v
 
   !
   ! Base workhorse is good old BLAS1
   !
   !
-  !> Function       base_mlv_dot_a
+  !> Function       base_mlv_dot_col_a
   !! \memberof      psb_d_base_multivect_type
-  !! \brief         Dot product by a normal array
-  !! \param n       Number of entries to be considered
+  !! \brief         Col-by-col mult using dot product by a normal array
+  !! \param nr      Number of rows to be considered
   !! \param y(:,:)  The array to be multiplied by
-  !! \param res     Result matrix
-  !! \param t       If true, x is transposed
+  !! \param res     Result vector
   !!
-  subroutine d_base_mlv_dot_a(x,y,res,t)
+  function d_base_mlv_dot_col_a(nr,x,y) result(res)
     class(psb_d_base_multivect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)                      :: y(:,:)
-    real(psb_dpk_), intent(inout)                   :: res(:,:)
-    logical, optional, intent(in)                   :: t
-    logical                                         :: t_
-    external                                        :: dgemm
-    integer(psb_ipk_)                               :: x_m, x_n, y_m, y_n
-
-    if (present(t)) then
-      t_ = t
-    else
-      t_ = .false.
-    end if
+    real(psb_dpk_), allocatable                     :: res(:,:)
+    real(psb_dpk_), external                        :: ddot
+    integer(psb_ipk_)                               :: i, j, n_x, n_y
 
     if (x%is_dev()) call x%sync()
+    n_x = psb_size(x%v,2_psb_ipk_)
+    n_y = size(y,2_psb_ipk_)
+    allocate(res(n_x,n_y))
+    do i=1,n_x
+      do j=1,n_y
+        res(i,j) = ddot(nr,x%v(1:nr,i),1,y(1:nr,j),1)
+      end do
+    end do
 
-    x_m = x%get_nrows()
-    x_n = x%get_ncols()
-    y_m = size(y,dim=1)
-    y_n = size(y,dim=2)
+  end function d_base_mlv_dot_col_a
 
-    if (t_) then
-      call dgemm('T','N',x_n,y_n,x_n,done,x%v,x_n,y,y_m,dzero,res,x_n)
-    else
-      call dgemm('N','N',x_m,y_n,x_n,done,x%v,x_m,y,y_m,dzero,res,x_m)
-    end if
+  !
+  ! Row Dot products
+  !
+  !
+  !> Function   base_mlv_dot_col_v
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief     Row-by-col mult using dot product by mlv
+  !! \param nr  Number of rows to be considered
+  !! \param y   The other (base_mlv_vect) to be multiplied by
+  !! \param res Result vector
+  !!
+  function d_base_mlv_dot_row_v(nr,x,y) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: nr
+    real(psb_dpk_), allocatable                     :: res(:,:)
+    real(psb_dpk_), external                        :: ddot
+    integer(psb_ipk_)                               :: i, j, n_x, n_y
 
-  end subroutine d_base_mlv_dot_a
+    if (x%is_dev()) call x%sync()
+    !
+    ! Note: this is the base implementation.
+    !  When we get here, we are sure that X is of
+    !  TYPE psb_d_base_mlv_vect (or its class does not care).
+    !  If Y is not, throw the burden on it, implicitly
+    !  calling dot_a
+    !
+    select type(yy => y)
+    type is (psb_d_base_multivect_type)
+      if (y%is_dev()) call y%sync()
+      n_x = psb_size(x%v,2_psb_ipk_)
+      n_y = psb_size(y%v,2_psb_ipk_)
+      allocate(res(nr,n_y))
+      do i=1,nr
+        do j=1,n_y
+          res(i,j) = ddot(n_x,x%v(i,:),1,y%v(:,j),1)
+        end do
+      end do
+    class default
+      res = x%dot_row(nr,y%v)
+    end select
+
+  end function d_base_mlv_dot_row_v
+
+  !
+  ! Base workhorse is good old BLAS1
+  !
+  !
+  !> Function       base_mlv_dot_row_a
+  !! \memberof      psb_d_base_multivect_type
+  !! \brief         Row-by-col mult using dot product by a normal array
+  !! \param nr      Number of rows to be considered
+  !! \param y(:,:)  The array to be multiplied by
+  !! \param res     Result vector
+  !!
+  function d_base_mlv_dot_row_a(nr,x,y) result(res)
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)                      :: y(:,:)
+    real(psb_dpk_), allocatable                     :: res(:,:)
+    real(psb_dpk_), external                        :: ddot
+    integer(psb_ipk_)                               :: i, j, n_x, n_y
+
+    if (x%is_dev()) call x%sync()
+    n_x = psb_size(x%v,2_psb_ipk_)
+    n_y = size(y,2_psb_ipk_)
+    allocate(res(psb_size(x%v,1_psb_ipk_),n_y))
+    do i=1,nr
+      do j=1,n_y
+        res(i,j) = ddot(n_x,x%v(i,:),1,y(:,j),1)
+      end do
+    end do
+
+  end function d_base_mlv_dot_row_a
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -2928,7 +2993,7 @@ contains
     select type(xx => x)
     type is (psb_d_base_multivect_type)
       call psb_geaxpby(m,nc,alpha,x%v,beta,y%v,info)
-      class default
+    class default
       call y%axpby(m,alpha,x%v,beta,info,n=n)
     end select
 
@@ -3215,17 +3280,17 @@ contains
   !> Function  base_mlv_nrm2
   !! \memberof  psb_d_base_multivect_type
   !! \brief 2-norm |x(1:n)|_2
-  !! \param nc  how many entries to consider
-  function d_base_mlv_nrm2(nc,x) result(res)
+  !! \param nr  how many rows to consider
+  function d_base_mlv_nrm2(nr,x) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: nc
+    integer(psb_ipk_), intent(in) :: nr
     real(psb_dpk_), allocatable :: res
     real(psb_dpk_), external :: dnrm2
-    integer(psb_ipk_) :: j, nr
+    integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
-    nr = x%get_nrows()
+    nc = x%get_ncols()
     res = dnrm2(nc*nr,x%v,1)
 
   end function d_base_mlv_nrm2
@@ -3234,16 +3299,16 @@ contains
   !> Function  base_mlv_amax
   !! \memberof  psb_d_base_multivect_type
   !! \brief infinity-norm |x(1:n)|_\infty
-  !! \param nc  how many entries to consider
-  function d_base_mlv_amax(nc,x) result(res)
+  !! \param nr  how many rows to consider
+  function d_base_mlv_amax(nr,x) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: nc
+    integer(psb_ipk_), intent(in) :: nr
     real(psb_dpk_) :: res
-    integer(psb_ipk_) :: i, nr
+    integer(psb_ipk_) :: i, nc
 
     if (x%is_dev()) call x%sync()
-    nr = x%get_nrows()
+    nc = x%get_ncols()
     res = 0
     do i=1,nr
       res = max(res,sum(abs(x%v(i,1:nc))))
@@ -3255,16 +3320,16 @@ contains
   !> Function  base_mlv_asum
   !! \memberof  psb_d_base_multivect_type
   !! \brief 1-norm |x(1:n)|_1
-  !! \param nc  how many entries to consider
-  function d_base_mlv_asum(nc,x) result(res)
+  !! \param nr  how many rows to consider
+  function d_base_mlv_asum(nr,x) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: nc
+    integer(psb_ipk_), intent(in) :: nr
     real(psb_dpk_), allocatable :: res
-    integer(psb_ipk_) :: j, nr
+    integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
-    nr = x%get_nrows()
+    nc = x%get_ncols()
     res = 0
     do j=1,nc
       res = max(res,sum(abs(x%v(1:nr,j))))
@@ -3314,10 +3379,10 @@ contains
   !! \param info  Return code
   !! \brief       QR factorization
   !
-  subroutine d_base_mlv_qr_fact(x, res, info)
+  function d_base_mlv_qr_fact(x, info) result(res)
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
-    real(psb_dpk_), intent(inout)                   :: res(:,:)
+    real(psb_dpk_), allocatable                     :: res(:,:)
     real(psb_dpk_), allocatable                     :: tau(:), work(:)
     integer(psb_ipk_)                               :: i, j, m, n, lda, lwork
     integer(psb_ipk_), intent(out)                  :: info
@@ -3330,7 +3395,7 @@ contains
     n = x%get_ncols()
     lda = m
     lwork = n
-    allocate(tau(n), work(lwork))
+    allocate(tau(n), work(lwork), res(n,n))
 
     ! Perform QR factorization
     call dgeqrf(m, n, x%v, lda, tau, work, lwork, info)
@@ -3348,7 +3413,7 @@ contains
 
     deallocate(tau, work)
 
-  end subroutine d_base_mlv_qr_fact
+  end function d_base_mlv_qr_fact
 
   function d_base_mlv_use_buffer() result(res)
     implicit none

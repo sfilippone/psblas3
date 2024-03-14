@@ -282,7 +282,7 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n, dupl, bldmode)
 
   !locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
+  integer(psb_ipk_) :: np,me,nr,i,err_act, n_
   integer(psb_ipk_) :: dupl_, bldmode_, nrmt_
   integer(psb_ipk_) :: exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -333,9 +333,9 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n, dupl, bldmode)
   ! As this is a rank-1 array, optional parameter N is actually ignored.
 
   !....allocate x .....
-  if (desc_a%is_asb().or.desc_a%is_upd()) then
+  if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
     nr = max(1,desc_a%get_local_cols())
-  else if (desc_a%is_bld()) then
+  else if (psb_is_bld_desc(desc_a)) then
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
@@ -346,12 +346,12 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n, dupl, bldmode)
   allocate(psb_d_base_multivect_type :: x%v, stat=info) 
   if (info == 0) call x%all(nr,n_,info)
   if (info == 0) call x%zero()
-  
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
     goto 9999
   endif
+
   if (present(bldmode)) then
     bldmode_ = bldmode
   else
@@ -364,6 +364,7 @@ subroutine psb_dalloc_multivect(x, desc_a,info,n, dupl, bldmode)
   end if
   call x%set_dupl(dupl_)
   call x%set_remote_build(bldmode_)
+  call x%set_nrmv(0)
   if (x%is_remote_build()) then
     nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
     allocate(x%rmtv(nrmt_,n_))
@@ -451,6 +452,19 @@ subroutine psb_dalloc_multivect_r2(x, desc_a,info,m,n,lb, dupl, bldmode)
     lb_ = 1
   endif
 
+  !global check on m parameters
+  if (me == psb_root_) then
+    exch(1)=m_
+    call psb_bcast(ctxt,exch(1),root=psb_root_)
+  else
+    call psb_bcast(ctxt,exch(1),root=psb_root_)
+    if (exch(1) /= m_) then
+      info=psb_err_parm_differs_among_procs_
+      call psb_errpush(info,name,i_err=(/ione/))
+      goto 9999
+    endif
+  endif
+
   !global check on n parameters
   if (me == psb_root_) then
     exch(1)=n_
@@ -466,9 +480,9 @@ subroutine psb_dalloc_multivect_r2(x, desc_a,info,m,n,lb, dupl, bldmode)
   ! As this is a rank-1 array, optional parameter N is actually ignored.
 
   !....allocate x .....
-  if (desc_a%is_asb().or.desc_a%is_upd()) then
+  if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
     nr = max(1,desc_a%get_local_cols())
-  else if (desc_a%is_bld()) then
+  else if (psb_is_bld_desc(desc_a)) then
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
@@ -500,6 +514,7 @@ subroutine psb_dalloc_multivect_r2(x, desc_a,info,m,n,lb, dupl, bldmode)
   do i=lb_, lb_+m_-1
     call x(i)%set_dupl(dupl_)
     call x(i)%set_remote_build(bldmode_)
+    call x(i)%set_nrmv(0)
     if (x(i)%is_remote_build()) then
       nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
       allocate(x(i)%rmtv(nrmt_,n_))

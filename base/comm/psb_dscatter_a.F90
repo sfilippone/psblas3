@@ -63,7 +63,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, root)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, iroot, icomm, myrank, rootrank, iam, nlr
+  integer(psb_mpk_) :: np, iam, iroot, icomm, myrank, rootrank, nlr
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
@@ -102,28 +102,23 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, root)
     iroot = psb_root_
   end if
 
+  icomm  = psb_get_mpi_comm(ctxt)
+  myrank = psb_get_mpi_rank(ctxt,iam)
+
   iglobx = 1
   jglobx = 1
-  lda_globx = size(globx,1)
 
-  m = desc_a%get_global_rows()
-  n = desc_a%get_global_cols()
-  icomm  = psb_get_mpi_comm(ctxt)
-  myrank = psb_get_mpi_rank(ctxt,me)
-
-  if  (iroot==-1) then
-    lda_globx = size(globx, 1)
+  ! Get col number K and broadcast to other processes
+  if ((iroot==-1).or.(iam==iroot)) then
+    lda_globx = size(globx,1)
     k = size(globx,2)
+    call psb_bcast(ctxt,k,root=iroot)
   else 
-    if (iam==iroot) then  
-      k = size(globx,2)
-      lda_globx = size(globx, 1)
-    end if
+    call psb_bcast(ctxt,k,root=iroot)
   end if
-      
+
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-
 
   !  there should be a global check on k here!!!
   if ((iroot==-1).or.(iam==iroot)) &
@@ -211,7 +206,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, root)
 
       ! scatter 
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & psb_mpi_r_dpk_,locx(1,col),nrow,&
+           & psb_mpi_r_dpk_,locx(:,col),nrow,&
            & psb_mpi_r_dpk_,rootrank,icomm,info)
 
     end do
