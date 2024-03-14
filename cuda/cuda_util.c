@@ -37,11 +37,19 @@ static int hasUVA=-1;
 static struct cudaDeviceProp *prop=NULL;
 static spgpuHandle_t psb_cuda_handle = NULL;
 static cublasHandle_t psb_cublas_handle = NULL;
-
+#if defined(TRACK_CUDA_MALLOC)
+static long long total_cuda_mem = 0;
+#endif
 
 int allocRemoteBuffer(void** buffer, int count)
 {
   cudaError_t err = cudaMalloc(buffer, count);
+#if defined(TRACK_CUDA_MALLOC)
+  total_cuda_mem += count;
+  fprintf(stderr,"Tracking CUDA allocRemoteBuffer for %ld bytes total  %ld  address %p\n",
+	  count, total_cuda_mem, *buffer);
+#endif
+    
   if (err == cudaSuccess)
     {
       return SPGPU_SUCCESS;

@@ -178,7 +178,8 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
       CHECK_CUDA(cudaFree(cMat->mvbuffer));
       cMat->mvbuffer = NULL;
     }
-    CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
+    //CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
+    allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);
     cMat->mvbsize = bfsz;
   }
   CHECK_CUSPARSE(cusparseCsrmvEx(*my_handle,
@@ -215,7 +216,9 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
       CHECK_CUDA(cudaFree(cMat->mvbuffer));
       cMat->mvbuffer = NULL;
     }
-    CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
+    //CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
+    allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);
+    
     cMat->mvbsize = bfsz;
   }
   CHECK_CUSPARSE(cusparseSpMV(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -287,7 +290,9 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 	CHECK_CUDA(cudaFree(cMat->svbuffer));
 	cMat->svbuffer = NULL;
       }
-      CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
+      //CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
+      allocRemoteBuffer((void **) &(cMat->svbuffer), bfsz);
+    
       cMat->svbsize=bfsz;
       CHECK_CUSPARSE(cusparseSpSV_analysis(*my_handle,
 					   CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -382,7 +387,9 @@ int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
   /*   cMat->svbuffer = NULL; */
   /* } */
   if (bfsz > 0) {
-    CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
+    //CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
+    allocRemoteBuffer((void **) &(cMat->svbuffer), bfsz);
+
   } else {
     cMat->svbuffer=NULL;
   }
