@@ -32,6 +32,7 @@
 subroutine psb_c_cuda_hlg_to_gpu(a,info,nzrm) 
   
   use psb_base_mod
+  use psb_cuda_env_mod
   use hlldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_hlg_mat_mod, psb_protect_name => psb_c_cuda_hlg_to_gpu
@@ -51,11 +52,13 @@ subroutine psb_c_cuda_hlg_to_gpu(a,info,nzrm)
   allocsize = a%get_size()
   nza = a%get_nzeros()
   if (c_associated(a%deviceMat)) then 
-     call freehllDevice(a%deviceMat)
+    call trackCudaFree(' to_gpu  c_hlg ',a%sizeof())
+    call freehllDevice(a%deviceMat)
   endif
   info       = FallochllDevice(a%deviceMat,a%hksz,n,nza,allocsize,spgpu_type_complex_float,1)
   if (info == 0)  info = &
        & writehllDevice(a%deviceMat,a%val,a%ja,a%hkoffs,a%irn,a%idiag)
+  call trackCudaAlloc(' c_hlg ',a%sizeof())
 !  if (info /= 0) goto 9999
 
 end subroutine psb_c_cuda_hlg_to_gpu

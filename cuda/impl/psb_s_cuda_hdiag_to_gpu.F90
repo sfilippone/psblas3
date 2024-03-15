@@ -32,6 +32,7 @@
 subroutine psb_s_cuda_hdiag_to_gpu(a,info) 
   
   use psb_base_mod
+  use psb_cuda_env_mod
   use hdiagdev_mod
   use psb_vectordev_mod
   use psb_s_cuda_hdiag_mat_mod, psb_protect_name => psb_s_cuda_hdiag_to_gpu
@@ -65,12 +66,13 @@ subroutine psb_s_cuda_hdiag_to_gpu(a,info)
   end if
 
   if (c_associated(a%deviceMat)) then 
-     call freeHdiagDevice(a%deviceMat)
+    call trackCudaFree(' s_hdiag ',a%sizeof())
+    call freeHdiagDevice(a%deviceMat)
   endif
 
   info = FAllocHdiagDevice(a%deviceMat,nr,nc,&
        & allocheight,hacksize,hackCount,spgpu_type_double)
   if (info == 0) info = &
        & writeHdiagDevice(a%deviceMat,a%val,a%diaOffsets,a%hackOffsets)
-
+  call trackCudaAlloc(' s_hdiag ',a%sizeof())
 end subroutine psb_s_cuda_hdiag_to_gpu

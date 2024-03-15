@@ -73,12 +73,14 @@ subroutine psb_s_cuda_cp_hlg_from_coo(a,b,info)
     if (debug)write(0,*) ' From psi_compute_hckoff:',noffs,isz,a%hkoffs(1:min(10,noffs+1))
 
     if (c_associated(a%deviceMat)) then 
+      call trackCudafree(' s_hlg ',a%sizeof())
       call freeHllDevice(a%deviceMat)
     endif
     info = FallochllDevice(a%deviceMat,hksz,nr,nza,isz,spgpu_type_double,1)
     if (info == 0) info = psi_CopyCooToHlg(nr,nc,nza, hksz,noffs,isz,&
          &  a%irn,a%hkoffs,idisp,b%ja, b%val, a%deviceMat)
     call a%set_dev()
+    call trackCudaAlloc(' s_hlg ',a%sizeof())
   else
     ! This is to guarantee tmp%is_by_rows()
     call b%cp_to_coo(tmp,info)
@@ -95,7 +97,8 @@ subroutine psb_s_cuda_cp_hlg_from_coo(a,b,info)
     end if
     if (debug)write(0,*) ' From psi_compute_hckoff:',noffs,isz,a%hkoffs(1:min(10,noffs+1))
 
-    if (c_associated(a%deviceMat)) then 
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' s_hlg ',a%sizeof())
       call freeHllDevice(a%deviceMat)
     endif
     info = FallochllDevice(a%deviceMat,hksz,nr,nza,isz,spgpu_type_double,1)
@@ -104,6 +107,7 @@ subroutine psb_s_cuda_cp_hlg_from_coo(a,b,info)
 
     call tmp%free()
     call a%set_dev()
+    call trackCudaAlloc(' s_hlg ',a%sizeof())
   end if
   if (info /= 0) goto 9999
 

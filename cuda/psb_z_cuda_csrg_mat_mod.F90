@@ -35,7 +35,8 @@ module psb_z_cuda_csrg_mat_mod
   use iso_c_binding
   use psb_z_mat_mod
   use cusparse_mod
-
+  use psb_cuda_env_mod
+  
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
@@ -352,6 +353,7 @@ contains
 
     class(psb_z_cuda_csrg_sparse_mat), intent(inout) :: a
 
+    call trackCudaFree(' z_csrg ',a%sizeof())
     info = CSRGDeviceFree(a%deviceMat)
     call a%psb_z_csr_sparse_mat%free()
     
@@ -366,6 +368,7 @@ contains
     
     type(psb_z_cuda_csrg_sparse_mat), intent(inout) :: a
 
+    call trackCudaFree(' z_csrg ',a%sizeof())
     info = CSRGDeviceFree(a%deviceMat)
     
     return

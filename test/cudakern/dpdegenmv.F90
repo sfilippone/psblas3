@@ -594,7 +594,7 @@ program pdgenmv
 
   ! solver parameters
   integer(psb_epk_) :: amatsize, precsize, descsize, annz, nbytes
-  real(psb_dpk_)   :: err, eps
+  real(psb_dpk_)   :: err, eps, td
   integer, parameter :: ntests=200, ngpu=50, ncnv=20
   type(psb_d_coo_sparse_mat), target   :: acoo
   type(psb_d_csr_sparse_mat), target   :: acsr
@@ -823,6 +823,28 @@ program pdgenmv
   ! FIXME: cache flush needed here
   call xg%set(x0)
   call xg%sync()
+
+  call psb_barrier(ctxt)
+  gt1 = psb_wtime()
+  do i=1,ntests*ngpu
+    td = psb_gedot(xg,bg,desc_a,info)
+     ! For timing purposes we need to make sure all threads
+    ! in the device are done. 
+    if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
+      write(0,*) 'From 1 gedot',info,i,ntests
+      call psb_error()
+      stop
+    end if
+
+  end do
+  call psb_cuda_DeviceSync()
+  call psb_barrier(ctxt)
+  gt2 = psb_wtime() - gt1
+  call psb_amx(ctxt,gt2)
+  write(0,*) 'DOT time : ',gt2,gt2/(ntests*ngpu)
+
+
+
   call psb_barrier(ctxt)
   gt1 = psb_wtime()
   do i=1,ntests*ngpu

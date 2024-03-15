@@ -34,6 +34,7 @@ module psb_s_cuda_hdiag_mat_mod
 
   use iso_c_binding
   use psb_base_mod
+  use psb_cuda_env_mod  
   use psb_s_hdia_mat_mod
 
   type, extends(psb_s_hdia_sparse_mat) :: psb_s_cuda_hdiag_sparse_mat
@@ -243,8 +244,10 @@ contains
     integer(psb_ipk_) :: info
     class(psb_s_cuda_hdiag_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         & call freeHdiagDevice(a%deviceMat)
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' s_hdiag ',a%sizeof())      
+      call freeHdiagDevice(a%deviceMat)
+    end if
     a%deviceMat = c_null_ptr
     call a%psb_s_hdia_sparse_mat%free()
     

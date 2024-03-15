@@ -32,6 +32,7 @@
 subroutine psb_z_cuda_elg_to_gpu(a,info,nzrm) 
   
   use psb_base_mod
+  use psb_cuda_env_mod
   use elldev_mod
   use psb_vectordev_mod
   use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_elg_to_gpu
@@ -64,7 +65,8 @@ subroutine psb_z_cuda_elg_to_gpu(a,info,nzrm)
   end if
 
   if ((pitch /= gpu_parms%pitch).or.(maxrowsize /= gpu_parms%maxRowSize)) then 
-    if (c_associated(a%deviceMat)) then 
+    if (c_associated(a%deviceMat)) then
+      call trackCudaAlloc(' z_elg ',a%sizeof())  
       call freeEllDevice(a%deviceMat)
     endif
     info       = FallocEllDevice(a%deviceMat,m,nzm,nzt,n,spgpu_type_complex_double,1)
@@ -79,6 +81,7 @@ subroutine psb_z_cuda_elg_to_gpu(a,info,nzrm)
   end if
   if (info == 0)  info = &
        & writeEllDevice(a%deviceMat,a%val,a%ja,size(a%ja,1),a%irn,a%idiag)
+  call trackCudaAlloc(' z_elg ',a%sizeof())
   call a%set_sync()
 
 end subroutine psb_z_cuda_elg_to_gpu

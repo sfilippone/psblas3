@@ -728,12 +728,14 @@ contains
       end if
       if (c_associated(x%deviceVect)) then 
         nd  = getMultiVecDeviceSize(x%deviceVect)
-        if (nd < nh ) then 
+        if (nd < nh ) then
+          call trackCudaFree(' d_vect_cuda ',x%sizeof())
           call freeMultiVecDevice(x%deviceVect)
           x%deviceVect=c_null_ptr
         end if
       end if
-      if (.not.c_associated(x%deviceVect)) then 
+      if (.not.c_associated(x%deviceVect)) then
+        call trackCudaAlloc(' d_vect_cuda ',x%sizeof())
         info = FallocMultiVecDevice(x%deviceVect,1,nh,spgpu_type_double)
         if  (info /= 0) then 
           if (info == spgpu_outofmem) then 
@@ -755,6 +757,7 @@ contains
     if (x%is_host()) then 
       if (.not.c_associated(x%deviceVect)) then 
         n    = size(x%v)
+        call trackCudaAlloc(' d_vect_cuda ',x%sizeof())        
         info = FallocMultiVecDevice(x%deviceVect,1,n,spgpu_type_double)
       end if
       if (info == 0) &
@@ -790,6 +793,7 @@ contains
     if (allocated(x%v)) deallocate(x%v, stat=info)
     if (c_associated(x%deviceVect)) then
 !!$      write(0,*)'d_cuda_free Calling freeMultiVecDevice'
+      call trackCudaFree(' d_vect_cuda ',x%sizeof())
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect=c_null_ptr
     end if
@@ -1972,12 +1976,14 @@ contains
         md  = getMultiVecDevicePitch(x%deviceVect)
         nd  = getMultiVecDeviceCount(x%deviceVect)
         if ((md < mh).or.(nd<nh)) then 
+          call trackCudaFree(' d_multivect_cuda ',x%sizeof())
           call freeMultiVecDevice(x%deviceVect)
           x%deviceVect=c_null_ptr
         end if
       end if
 
-      if (.not.c_associated(x%deviceVect)) then 
+      if (.not.c_associated(x%deviceVect)) then
+        call trackCudaAlloc(' d_multivect_cuda ',x%sizeof())        
         info = FallocMultiVecDevice(x%deviceVect,nh,mh,spgpu_type_double)
         if (info == 0) &
              & call psb_realloc(getMultiVecDevicePitch(x%deviceVect),&
@@ -2042,6 +2048,7 @@ contains
     
     info = 0
     if (c_associated(x%deviceVect)) then 
+      call trackCudaFree(' d_multivect_cuda ',x%sizeof())
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect=c_null_ptr
     end if
@@ -2063,6 +2070,7 @@ contains
     
     info = 0
     if (c_associated(x%deviceVect)) then 
+      call trackCudaFree(' d_multivect_cuda ',x%sizeof())
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect=c_null_ptr
     end if

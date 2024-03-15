@@ -97,7 +97,7 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
       else
 	tmp->pitch_ = (((params->size*sizeof(int) + 255)/256)*256)/sizeof(int);
       //fprintf(stderr,"Allocating  an INT vector %ld\n",tmp->pitch_*tmp->count_*sizeof(double));
-      
+      tmp->msize_ = tmp->pitch_*params->count*sizeof(int);
       return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*params->count*sizeof(int));
     }
   else if (params->elementType == SPGPU_TYPE_FLOAT)
@@ -106,7 +106,7 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = params->size;
       else
 	tmp->pitch_ = (((params->size*sizeof(float) + 255)/256)*256)/sizeof(float);
-
+      tmp->msize_ = tmp->pitch_*params->count*sizeof(float);
       return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*params->count*sizeof(float));
     }
   else if (params->elementType == SPGPU_TYPE_DOUBLE)
@@ -117,7 +117,7 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
       else
 	tmp->pitch_ = (int)(((params->size*sizeof(double) + 255)/256)*256)/sizeof(double);
       //fprintf(stderr,"Allocating  a DOUBLE vector %ld\n",tmp->pitch_*tmp->count_*sizeof(double));
- 
+      tmp->msize_ = tmp->pitch_*params->count*sizeof(double); 
       return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*tmp->count_*sizeof(double));
     }
   else if (params->elementType == SPGPU_TYPE_COMPLEX_FLOAT)
@@ -126,6 +126,7 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = params->size;
       else
 	tmp->pitch_ = (int)(((params->size*sizeof(cuFloatComplex) + 255)/256)*256)/sizeof(cuFloatComplex);
+      tmp->msize_ = tmp->pitch_*params->count*sizeof(cuFloatComplex);
       return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*tmp->count_*sizeof(cuFloatComplex));
     }
   else if (params->elementType == SPGPU_TYPE_COMPLEX_DOUBLE)
@@ -134,6 +135,7 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = params->size;
       else
 	tmp->pitch_ = (int)(((params->size*sizeof(cuDoubleComplex) + 255)/256)*256)/sizeof(cuDoubleComplex);
+      tmp->msize_ = tmp->pitch_*params->count*sizeof(cuDoubleComplex);
       return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*tmp->count_*sizeof(cuDoubleComplex));
     }
   else
@@ -153,7 +155,11 @@ void freeMultiVecDevice(void* deviceVec)
   // fprintf(stderr,"freeMultiVecDevice\n");
   if (devVec != NULL) {
     //fprintf(stderr,"Before freeMultiVecDevice% ld\n",devVec->pitch_*devVec->count_*sizeof(double));
+#if 0&& defined(TRACK_CUDA_MALLOC)
+    freeAndTrackRemoteBuffer(devVec->v_,devVec->msize_);
+#else
     freeRemoteBuffer(devVec->v_);
+#endif
     free(deviceVec);
   }
 }

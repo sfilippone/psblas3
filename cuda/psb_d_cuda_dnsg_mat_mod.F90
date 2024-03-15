@@ -35,6 +35,7 @@ module psb_d_cuda_dnsg_mat_mod
   use iso_c_binding
   use psb_d_mat_mod 
   use psb_d_dns_mat_mod
+  use psb_cuda_env_mod  
   use dnsdev_mod
   
   type, extends(psb_d_dns_sparse_mat) :: psb_d_cuda_dnsg_sparse_mat
@@ -251,8 +252,10 @@ contains
     integer(psb_ipk_) :: info
     class(psb_d_cuda_dnsg_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         & call freeDnsDevice(a%deviceMat)
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' d_dnsg ',a%sizeof())         
+      call freeDnsDevice(a%deviceMat)
+    end if
     a%deviceMat = c_null_ptr
     call a%psb_d_dns_sparse_mat%free()
     

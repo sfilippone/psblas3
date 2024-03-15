@@ -35,6 +35,7 @@ module psb_d_cuda_hybg_mat_mod
 
   use iso_c_binding
   use psb_d_mat_mod
+  use psb_cuda_env_mod  
   use cusparse_mod
 
   type, extends(psb_d_csr_sparse_mat) :: psb_d_cuda_hybg_sparse_mat
@@ -265,6 +266,7 @@ contains
     integer(psb_ipk_)                           :: info
     class(psb_d_cuda_hybg_sparse_mat), intent(inout) :: a
 
+    call trackCudaFree(' d_hybg ',a%sizeof())
     info = HYBGDeviceFree(a%deviceMat)
     call a%psb_d_csr_sparse_mat%free()
     

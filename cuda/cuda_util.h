@@ -51,6 +51,9 @@ int unregisterMappedMemory(void *buffer);
 int writeRemoteBuffer(void* hostSrc, void* buffer, int count);
 int readRemoteBuffer(void* hostDest, void* buffer, int count);
 int freeRemoteBuffer(void* buffer);
+#if 0&&defined(TRACK_CUDA_MALLOC)
+int freeAndTrackRemoteBuffer(void* buffer,int size);
+#endif
 int gpuInit(int dev);
 int getDeviceCount();
 int getDevice();

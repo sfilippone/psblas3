@@ -72,7 +72,7 @@ int allocHllDevice(void ** remoteMatrix, HllDeviceParams* params)
   HllDevice *tmp = (HllDevice *)malloc(sizeof(HllDevice));
   int ret=SPGPU_SUCCESS;
   *remoteMatrix = (void *)tmp;
-
+  fprintf(stderr,"Allocated HllDevice %p\n",tmp);
   tmp->hackSize = params->hackSize;
 
   tmp->allocsize = params->allocsize;
@@ -131,13 +131,16 @@ int allocHllDevice(void ** remoteMatrix, HllDeviceParams* params)
 void freeHllDevice(void* remoteMatrix)
 {
   HllDevice *devMat = (HllDevice *) remoteMatrix;  
-  //fprintf(stderr,"freeHllDevice\n");
+  fprintf(stderr,"freeHllDevice: %p  \n",devMat);
   if (devMat != NULL) {
+    fprintf(stderr,"freeHllDevice: doing free(s)  %p\n",devMat);
     freeRemoteBuffer(devMat->rS);
     freeRemoteBuffer(devMat->diag);
     freeRemoteBuffer(devMat->rP);
     freeRemoteBuffer(devMat->cM);
     free(remoteMatrix);
+  } else {
+    fprintf(stderr,"Just called FreeHllDevice on a NULL pointer!\n");
   }
 }
 

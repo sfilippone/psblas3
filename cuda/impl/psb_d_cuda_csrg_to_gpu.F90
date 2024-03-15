@@ -33,6 +33,7 @@
 subroutine psb_d_cuda_csrg_to_gpu(a,info,nzrm) 
 
   use psb_base_mod
+  use psb_cuda_env_mod
   use cusparse_mod
   use psb_d_cuda_csrg_mat_mod, psb_protect_name => psb_d_cuda_csrg_to_gpu
   implicit none 
@@ -52,7 +53,8 @@ subroutine psb_d_cuda_csrg_to_gpu(a,info,nzrm)
   m   = a%get_nrows()
   n   = a%get_ncols()
   nz  = a%get_nzeros()
-  if (c_associated(a%deviceMat%Mat)) then 
+  if (c_associated(a%deviceMat%Mat)) then
+    call trackCudaFree(' d_csrg ',a%sizeof())
     info = CSRGDeviceFree(a%deviceMat)
   end if
 #if (CUDA_SHORT_VERSION <= 10 )
@@ -369,6 +371,7 @@ subroutine psb_d_cuda_csrg_to_gpu(a,info,nzrm)
   endif
 
 #endif
+  call trackCudaAlloc(' d_csrg ',a%sizeof())
   call a%set_sync()
 
   if (info /= 0) then 

@@ -35,6 +35,7 @@ module psb_c_cuda_elg_mat_mod
   use iso_c_binding
   use psb_c_mat_mod
   use psb_c_ell_mat_mod
+  use psb_cuda_env_mod  
   use psb_i_cuda_vect_mod
 
   integer(psb_ipk_), parameter, private :: is_host = -1
@@ -369,8 +370,10 @@ contains
 
     class(psb_c_cuda_elg_sparse_mat), intent(inout) :: a
     
-    if (c_associated(a%deviceMat)) &
-         & call freeEllDevice(a%deviceMat)
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' c_elg ',a%sizeof())     
+      call freeEllDevice(a%deviceMat)
+    end if
     a%deviceMat = c_null_ptr
     call a%psb_c_ell_sparse_mat%free()
     call a%set_sync()

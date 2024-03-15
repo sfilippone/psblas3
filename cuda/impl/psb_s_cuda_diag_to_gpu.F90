@@ -33,6 +33,7 @@
 subroutine psb_s_cuda_diag_to_gpu(a,info,nzrm) 
   
   use psb_base_mod
+  use psb_cuda_env_mod
   use diagdev_mod
   use psb_vectordev_mod
   use psb_s_cuda_diag_mat_mod, psb_protect_name => psb_s_cuda_diag_to_gpu
@@ -55,12 +56,14 @@ subroutine psb_s_cuda_diag_to_gpu(a,info,nzrm)
   !allocsize = a%get_size()
   !write(*,*) 'Create the DIAG matrix'
   gpu_parms = FgetDiagDeviceParams(n,c,d,spgpu_type_float)
-  if (c_associated(a%deviceMat)) then 
-     call freeDiagDevice(a%deviceMat)
+  if (c_associated(a%deviceMat)) then
+    call trackCudaFree(' s_diag ',a%sizeof())
+    call freeDiagDevice(a%deviceMat)
   endif
   info       = FallocDiagDevice(a%deviceMat,n,c,d,spgpu_type_float)
   if (info == 0)  info = &
        & writeDiagDevice(a%deviceMat,a%data,a%offset,n)
+  call trackCudaAlloc(' s_diag ',a%sizeof())
 !  if (info /= 0) goto 9999
 
 end subroutine psb_s_cuda_diag_to_gpu

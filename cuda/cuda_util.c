@@ -37,14 +37,14 @@ static int hasUVA=-1;
 static struct cudaDeviceProp *prop=NULL;
 static spgpuHandle_t psb_cuda_handle = NULL;
 static cublasHandle_t psb_cublas_handle = NULL;
-#if defined(TRACK_CUDA_MALLOC)
+#if 0&& defined(TRACK_CUDA_MALLOC)
 static long long total_cuda_mem = 0;
 #endif
 
 int allocRemoteBuffer(void** buffer, int count)
 {
   cudaError_t err = cudaMalloc(buffer, count);
-#if defined(TRACK_CUDA_MALLOC)
+#if 0&& defined(TRACK_CUDA_MALLOC)
   total_cuda_mem += count;
   fprintf(stderr,"Tracking CUDA allocRemoteBuffer for %ld bytes total  %ld  address %p\n",
 	  count, total_cuda_mem, *buffer);
@@ -205,6 +205,21 @@ int readRemoteBuffer(void* hostDest, void* buffer, int count)
     return SPGPU_UNSPECIFIED;
   }
 }
+#if 0&& defined(TRACK_CUDA_MALLOC)
+int freeAndTrackRemoteBuffer(void* buffer,int size)
+{
+  cudaError_t err = cudaFree(buffer);
+  total_cuda_mem -= size;
+  fprintf(stderr,"Tracking CUDA free for %ld bytes total  %ld  address %p\n",
+	  size, total_cuda_mem, buffer);
+  if (err == cudaSuccess)
+    return SPGPU_SUCCESS;	
+  else {
+    fprintf(stderr,"CUDA Error freeRemoteBuffer: %s  %p\n", cudaGetErrorString(err),buffer);
+    return SPGPU_UNSPECIFIED;
+  }
+}
+#endif
 
 int freeRemoteBuffer(void* buffer)
 {

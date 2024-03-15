@@ -176,7 +176,27 @@ module psb_cuda_env_mod
 
   logical, private :: gpu_do_maybe_free_buffer = .false.
 
+  integer(psb_epk_), save :: total_cuda_mem=0
+  
 Contains
+
+  subroutine trackCudaAlloc(data,size)
+    integer(psb_epk_), intent(in) :: size
+    character(len=*), intent(in)  :: data
+
+    total_cuda_mem = total_cuda_mem + size
+    write(0,*) 'Tracking cuda Alloc  for data ',&
+         & data,'  size ',size,' total ',total_cuda_mem
+  end subroutine trackCudaAlloc
+
+  subroutine trackCudaFree(data,size)
+    integer(psb_epk_), intent(in) :: size
+    character(len=*), intent(in)  :: data
+
+    total_cuda_mem = total_cuda_mem - size
+    write(0,*) 'Tracking cuda Free  for data ',&
+         & data,'  size ',size,' total ',total_cuda_mem
+  end subroutine trackCudaFree
   
   function psb_cuda_get_maybe_free_buffer() result(res)
     logical :: res

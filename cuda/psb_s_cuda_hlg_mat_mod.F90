@@ -34,6 +34,7 @@ module psb_s_cuda_hlg_mat_mod
 
   use iso_c_binding
   use psb_s_mat_mod 
+  use psb_cuda_env_mod  
   use psb_s_hll_mat_mod
 
 
@@ -291,8 +292,10 @@ contains
     integer(psb_ipk_) :: info
     class(psb_s_cuda_hlg_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         & call freeHllDevice(a%deviceMat)
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' hlg_free  s_hlg ',a%sizeof())
+      call freeHllDevice(a%deviceMat)
+    end if
     a%deviceMat = c_null_ptr
     call a%psb_s_hll_sparse_mat%free()
     

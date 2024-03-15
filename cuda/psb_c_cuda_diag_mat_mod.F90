@@ -34,6 +34,7 @@ module psb_c_cuda_diag_mat_mod
 
   use iso_c_binding
   use psb_base_mod
+  use psb_cuda_env_mod  
   use psb_c_dia_mat_mod
 
   type, extends(psb_c_dia_sparse_mat) :: psb_c_cuda_diag_sparse_mat
@@ -265,8 +266,10 @@ contains
     integer(psb_ipk_) :: info
     class(psb_c_cuda_diag_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         & call freeDiagDevice(a%deviceMat)
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' c_diag ',a%sizeof())
+      call freeDiagDevice(a%deviceMat)
+    end if
     a%deviceMat = c_null_ptr
     call a%psb_c_dia_sparse_mat%free()
     

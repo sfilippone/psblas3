@@ -45,9 +45,12 @@ struct MultiVectDevice
   //number of elements for a single vector
   int size_;
 
-  //pithc in number of elements
+  //pitch in number of elements
   int pitch_;
 
+  // malloc size
+  int msize_;
+  
   // Vectors in device memory (single allocation)
   void *v_;
 };

@@ -33,6 +33,7 @@
 subroutine psb_d_cuda_hybg_to_gpu(a,info,nzrm) 
 
   use psb_base_mod
+  use psb_cuda_env_mod
   use cusparse_mod
   use psb_d_cuda_hybg_mat_mod, psb_protect_name => psb_d_cuda_hybg_to_gpu
   implicit none 
@@ -53,6 +54,7 @@ subroutine psb_d_cuda_hybg_to_gpu(a,info,nzrm)
   n   = a%get_ncols()
   nz  = a%get_nzeros()
   if (c_associated(a%deviceMat%Mat)) then 
+    call trackCudaFree(' d_hybg ',a%sizeof())
     info = HYBGDeviceFree(a%deviceMat)
   end if
   if (a%is_unit()) then 
@@ -139,6 +141,7 @@ subroutine psb_d_cuda_hybg_to_gpu(a,info,nzrm)
     info = HYBGDeviceHybsmAnalysis(a%deviceMat)
   end if
 
+  call trackCudaAlloc(' d_hybg ',a%sizeof())
 
   if (info /= 0) then 
     write(0,*) 'Error in HYBG_TO_GPU ',info
