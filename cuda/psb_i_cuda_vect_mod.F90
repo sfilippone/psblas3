@@ -711,7 +711,7 @@ contains
       if (c_associated(x%deviceVect)) then 
         nd  = getMultiVecDeviceSize(x%deviceVect)
         if (nd < nh ) then
-          call trackCudaFree(' i_vect_cuda ',x%sizeof())
+          call trackCudaFree(' i_vect_cuda 1',x%sizeof())
           call freeMultiVecDevice(x%deviceVect)
           x%deviceVect=c_null_ptr
         end if
@@ -772,13 +772,13 @@ contains
     integer(psb_ipk_), intent(out)        :: info
     
     info = 0  
-    if (allocated(x%v)) deallocate(x%v, stat=info)
     if (c_associated(x%deviceVect)) then
 !!$      write(0,*)'d_cuda_free Calling freeMultiVecDevice'
-      call trackCudaFree(' i_vect_cuda ',x%sizeof())
+      call trackCudaFree(' i_vect_cuda 2',x%sizeof())
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect=c_null_ptr
     end if
+    if (allocated(x%v)) deallocate(x%v, stat=info)
     call x%free_buffer(info)
     call x%set_sync()
   end subroutine i_cuda_free
