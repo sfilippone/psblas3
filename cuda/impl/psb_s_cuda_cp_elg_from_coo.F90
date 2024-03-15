@@ -60,6 +60,7 @@ subroutine psb_s_cuda_cp_elg_from_coo(a,b,info)
 
     
     if (c_associated(a%deviceMat)) then 
+      call trackCudafree(' s_elg ',a%sizeof())
       call freeEllDevice(a%deviceMat)
     endif
     
@@ -71,12 +72,14 @@ subroutine psb_s_cuda_cp_elg_from_coo(a,b,info)
     if (info == 0) info = psi_CopyCooToElg(nr,nc,nza, hacksize,ldv,nzm, &
          & a%irn,idisp,b%ja,b%val, a%deviceMat)
     call a%set_dev()
+    call trackCudaAlloc(' s_elg ',a%sizeof())
   else
     call b%cp_to_coo(tmp,info)
     call psi_s_count_ell_from_coo(a,tmp,idisp,ldv,nzm,info,hacksize=hacksize)
 
     
     if (c_associated(a%deviceMat)) then 
+      call trackCudafree(' s_elg ',a%sizeof())
       call freeEllDevice(a%deviceMat)
     endif
     
@@ -89,6 +92,7 @@ subroutine psb_s_cuda_cp_elg_from_coo(a,b,info)
          & a%irn,idisp,tmp%ja,tmp%val, a%deviceMat)
 
     call a%set_dev()
+    call trackCudaAlloc(' s_elg ',a%sizeof())
   end if
 
   if (info /= psb_success_) goto 9999

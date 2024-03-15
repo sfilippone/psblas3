@@ -66,7 +66,7 @@ subroutine psb_c_cuda_elg_to_gpu(a,info,nzrm)
 
   if ((pitch /= gpu_parms%pitch).or.(maxrowsize /= gpu_parms%maxRowSize)) then 
     if (c_associated(a%deviceMat)) then
-      call trackCudaAlloc(' c_elg ',a%sizeof())  
+      call trackCudaFree(' c_elg ',a%sizeof())  
       call freeEllDevice(a%deviceMat)
     endif
     info       = FallocEllDevice(a%deviceMat,m,nzm,nzt,n,spgpu_type_complex_float,1)

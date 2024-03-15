@@ -53,7 +53,7 @@ subroutine psb_c_cuda_hybg_to_gpu(a,info,nzrm)
   m   = a%get_nrows()
   n   = a%get_ncols()
   nz  = a%get_nzeros()
-  if (c_associated(a%deviceMat%Mat)) then 
+  if (c_associated(a%deviceMat)) then 
     call trackCudaFree(' c_hybg ',a%sizeof())
     info = HYBGDeviceFree(a%deviceMat)
   end if

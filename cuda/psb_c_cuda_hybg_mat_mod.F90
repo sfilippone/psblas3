@@ -266,8 +266,10 @@ contains
     integer(psb_ipk_)                           :: info
     class(psb_c_cuda_hybg_sparse_mat), intent(inout) :: a
 
-    call trackCudaFree(' c_hybg ',a%sizeof())
-    info = HYBGDeviceFree(a%deviceMat)
+    if (c_associated(a%deviceMat)) then
+      call trackCudaFree(' c_hybg ',a%sizeof())
+      info = HYBGDeviceFree(a%deviceMat)
+    end if
     call a%psb_c_csr_sparse_mat%free()
     
     return

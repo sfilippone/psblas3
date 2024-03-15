@@ -595,7 +595,7 @@ program pdgenmv
   ! solver parameters
   integer(psb_epk_) :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)   :: err, eps, td
-  integer, parameter :: ntests=200, ngpu=50, ncnv=20
+  integer, parameter :: ntests=200, ngpu=50, ncnv=10
   type(psb_d_coo_sparse_mat), target   :: acoo
   type(psb_d_csr_sparse_mat), target   :: acsr
   type(psb_d_ell_sparse_mat), target   :: aell

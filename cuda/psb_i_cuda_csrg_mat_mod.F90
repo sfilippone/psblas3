@@ -353,8 +353,10 @@ contains
 
     class(psb_i_cuda_csrg_sparse_mat), intent(inout) :: a
 
-    call trackCudaFree(' i_csrg ',a%sizeof())
-    info = CSRGDeviceFree(a%deviceMat)
+    if (c_associated(a%deviceMat%Mat)) then
+      call trackCudaFree(' i_csrg ',a%sizeof())
+      info = CSRGDeviceFree(a%deviceMat)
+    end if
     call a%psb_i_csr_sparse_mat%free()
     
     return
@@ -368,7 +370,6 @@ contains
     
     type(psb_i_cuda_csrg_sparse_mat), intent(inout) :: a
 
-    call trackCudaFree(' i_csrg ',a%sizeof())
     info = CSRGDeviceFree(a%deviceMat)
     
     return

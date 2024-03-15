@@ -269,7 +269,7 @@ contains
     type(psb_c_cuda_dnsg_sparse_mat), intent(inout) :: a
 
     if (c_associated(a%deviceMat)) &
-         &  call freeDnsDevice(a%deviceMat)
+         & call freeDnsDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
     
     return
