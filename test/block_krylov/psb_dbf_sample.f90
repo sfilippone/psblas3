@@ -26,6 +26,8 @@ program psb_dbf_sample
    integer(psb_ipk_)                   :: m, nrhs
    real(psb_dpk_)                      :: random_value
 
+   real(psb_dpk_), allocatable :: test(:,:)
+
    ! communications data structure
    type(psb_desc_type) :: desc_a
    type(psb_ctxt_type) :: ctxt
@@ -128,9 +130,9 @@ program psb_dbf_sample
          b_mv_glob => aux_b(:,:)
          do i=1, m
             do j=1, nrhs
-               !b_mv_glob(i,j) = done
-               call random_number(random_value)
-               b_mv_glob(i,j) = random_value
+               b_mv_glob(i,j) = done
+               !call random_number(random_value)
+               !b_mv_glob(i,j) = random_value
             enddo
          enddo
       endif
@@ -255,7 +257,6 @@ program psb_dbf_sample
       write(psb_out_unit,'("Residual norm 2:                    ",es12.5)')resmx
       write(psb_out_unit,'("Residual norm inf:                  ",es12.5)')resmxp
       write(psb_out_unit,'(" ")')
-      ! TODO
       ! do i=1,m
       !    write(psb_out_unit,993) i, x_mv_glob(i,:), r_mv_glob(i,:), b_mv_glob(i,:)
       ! enddo

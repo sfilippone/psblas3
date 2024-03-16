@@ -158,7 +158,7 @@ function psb_ddot_vect(x, y, desc_a,info,global) result(res)
 
 end function psb_ddot_vect
 !
-! Function: psb_ddot_multivect_col_v
+! Function: psb_ddot_multivect
 !    psb_ddot computes the col-by-col dot product of two distributed vectors,
 !
 !    dot := ( X )**C * ( Y )
@@ -175,14 +175,14 @@ end function psb_ddot_vect
 !        they are declared INOUT because of the sync() methods. 
 !
 !
-function psb_ddot_multivect_col_v(x, y, desc_a,info,global) result(res)
+function psb_ddot_multivect(x, y, desc_a,info,global) result(res)
   use psb_desc_mod
   use psb_d_base_mat_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_d_vect_mod
-  use psb_d_psblas_mod, psb_protect_name => psb_ddot_multivect_col_v
+  use psb_d_psblas_mod, psb_protect_name => psb_ddot_multivect
   implicit none 
   real(psb_dpk_), allocatable               :: res(:,:)
   type(psb_d_multivect_type), intent(inout) :: x, y
@@ -193,7 +193,7 @@ function psb_ddot_multivect_col_v(x, y, desc_a,info,global) result(res)
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, iiy, jjy, i, j, k, nr
+       & err_act, iix, jjx, iiy, jjy, i, j, nr
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   logical :: global_
   character(len=20)      :: name, ch_err
@@ -235,7 +235,6 @@ function psb_ddot_multivect_col_v(x, y, desc_a,info,global) result(res)
   iy = ione
   ijy = ione
 
-  ! TODO
   m = desc_a%get_global_rows()
 
   ! check vector correctness
@@ -268,16 +267,16 @@ function psb_ddot_multivect_col_v(x, y, desc_a,info,global) result(res)
         do i=1,size(desc_a%ovrlap_elem,1)
           idx = desc_a%ovrlap_elem(i,1)
           ndm = desc_a%ovrlap_elem(i,2)
-          res(idx,j) = res(idx,j) - (real(ndm-1)/real(ndm))*(x%v%v(idx,j)*y%v%v(idx,j))
+          res(j,:) = res(j,:) - (real(ndm-1)/real(ndm))*(x%v%v(idx,:)*y%v%v(idx,:))
         end do
       end do
     end if
   else
-    allocate(res(size(x%v%v,2_psb_ipk_),size(y%v%v,2_psb_ipk_)))
+    allocate(res(x%get_ncols(),y%get_ncols()))
     res = dzero
   end if
 
-  ! TODO compute global sum
+  ! compute global sum
   if (global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
@@ -287,127 +286,7 @@ function psb_ddot_multivect_col_v(x, y, desc_a,info,global) result(res)
 
   return
 
-end function psb_ddot_multivect_col_v
-!
-! Function: psb_ddot_multivect_row_a
-!    psb_ddot computes the row-by-col dot product of two distributed vectors,
-!
-!    dot := ( X )**C * ( Y )
-!
-!
-! Arguments:
-!    x      -  type(psb_d_multivect_type) The input vector containing the entries of sub( X ).
-!    y      -  real(psb_dpk_)(:,:)        The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).       The communication descriptor.
-!    info   -  integer.                   Return code
-!    global -  logical(optional)          Whether to perform the global sum, default: .true.
-!
-!  Note: from a functional point of view, X and Y are input, but here
-!        they are declared INOUT because of the sync() methods. 
-!
-!
-function psb_ddot_multivect_row_a(x, y, desc_a, info, global) result(res)
-  use psb_desc_mod
-  use psb_d_base_mat_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_d_vect_mod
-  use psb_d_psblas_mod, psb_protect_name => psb_ddot_multivect_row_a
-  implicit none 
-  real(psb_dpk_), allocatable               :: res(:,:)
-  type(psb_d_multivect_type), intent(inout) :: x
-  real(psb_dpk_), intent(in)                :: y(:,:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-  logical, intent(in), optional             :: global
-
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, i, j, nr
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  logical :: global_
-  character(len=20)      :: name, ch_err
-
-  name='psb_ddot_multivect'
-  info=psb_success_
-  call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-
-  ctxt=desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -ione) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.allocated(x%v)) then 
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
-
-  ix = ione
-  ijx = ione
-
-  m = desc_a%get_global_rows()
-
-  ! check vector correctness
-  call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  if (iix /= ione) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  nr = desc_a%get_local_rows() 
-  if(nr > 0) then
-
-    res = x%dot_row(nr,y)
-
-    ! TODO adjust dot_local because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem,1)>0) then
-      if (x%v%is_dev()) call x%sync()
-      do j=1,x%get_ncols()
-        do i=1,size(desc_a%ovrlap_elem,1)
-          idx = desc_a%ovrlap_elem(i,1)
-          ndm = desc_a%ovrlap_elem(i,2)
-          res(idx,j) = res(idx,j) - (real(ndm-1)/real(ndm))*(x%v%v(idx,j)*y(idx,j))
-        end do
-      end do
-    end if
-  else
-    allocate(res(nr,size(y,2_psb_ipk_)))
-    res = dzero
-  end if
-
-  ! TODO compute global sum
-  if (global_) call psb_sum(ctxt, res)
-
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-
-end function psb_ddot_multivect_row_a
+end function psb_ddot_multivect
 !
 ! Function: psb_ddot
 !    psb_ddot computes the dot product of two distributed vectors,

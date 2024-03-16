@@ -45,7 +45,7 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)       :: info
       logical, intent(in), optional        :: global
     end function psb_ddot_vect
-    function psb_ddot_multivect_col_v(x, y, desc_a,info,global) result(res)
+    function psb_ddot_multivect(x, y, desc_a,info,global) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_multivect_type, psb_dspmat_type
       real(psb_dpk_), allocatable               :: res(:,:)
@@ -53,17 +53,7 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent(in)           :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       logical, intent(in), optional             :: global
-    end function psb_ddot_multivect_col_v
-    function psb_ddot_multivect_row_a(x, y, desc_a,info,global) result(res)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_), allocatable               :: res(:,:)
-      type(psb_d_multivect_type), intent(inout) :: x
-      real(psb_dpk_), intent(in)                :: y(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-      logical, intent(in), optional             :: global
-    end function psb_ddot_multivect_row_a
+    end function psb_ddot_multivect
     function psb_ddotv(x, y, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
@@ -105,6 +95,30 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
       logical, intent(in), optional      :: global
     end subroutine psb_dmdots
+  end interface
+
+  interface psb_geprod
+    function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), allocatable               :: res(:,:)
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: trans
+      logical, intent(in), optional             :: global
+    end function psb_dprod_multivect
+    function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), allocatable               :: res(:,:)
+      type(psb_d_multivect_type), intent(inout) :: x
+      real(psb_dpk_), intent(in)                :: y(:,:)
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: trans
+      logical, intent(in), optional             :: global
+    end function psb_dprod_multivect_a
   end interface
 
   interface psb_geaxpby

@@ -61,7 +61,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    integer(psb_ipk_), Optional, Intent(out)  :: iter
    real(psb_dpk_), Optional, Intent(out)     :: err
 
-   real(psb_dpk_), allocatable               :: aux(:), h(:,:), beta(:,:), temp(:,:)
+   real(psb_dpk_), allocatable               :: aux(:), h(:,:), beta(:,:), beta_e1(:,:)
 
    type(psb_d_multivect_type), allocatable   :: v(:)
    type(psb_d_multivect_type)                :: v_tot, w
@@ -72,7 +72,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    integer(psb_ipk_)                         :: litmax, naux, itrace_, n_row, n_col, nrhs, nrep
    integer(psb_lpk_)                         :: mglob, n_add
 
-   integer(psb_ipk_)                         :: i, j, istop_, err_act, idx_i, idx_j, idx
+   integer(psb_ipk_)                         :: i, j, k, istop_, err_act, idx_i, idx_j, idx
    integer(psb_ipk_)                         :: debug_level, debug_unit
 
    type(psb_ctxt_type)                       :: ctxt
@@ -165,14 +165,14 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       goto 9999
    end if
 
-   naux=4*n_col
+   naux = 4*n_col
    nrhs = x%get_ncols()
    allocate(aux(naux),h((nrep+1)*nrhs,nrep*nrhs),stat=info)
    if (info == psb_success_) call psb_geall(v,desc_a,info,m=nrep+1,n=nrhs)
-   if (info == psb_success_) call psb_geall(v_tot,desc_a,info,n=(nrep+1)*nrhs)
+   if (info == psb_success_) call psb_geall(v_tot,desc_a,info,n=nrep*nrhs)
    if (info == psb_success_) call psb_geall(w,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geasb(v,desc_a,info,mold=x%v,n=nrhs)
-   if (info == psb_success_) call psb_geasb(v_tot,desc_a,info,mold=x%v,n=(nrep+1)*nrhs)
+   if (info == psb_success_) call psb_geasb(v_tot,desc_a,info,mold=x%v,n=nrep*nrhs)
    if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v,n=nrhs)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
@@ -208,7 +208,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! BGMRES algorithm
 
-   ! TODO inserire timer operazioni tra mlv
+   ! TODO QR fact seriale per ora
 
    ! STEP 1: Compute R(0) = B - A*X(0)
 
@@ -228,7 +228,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       goto 9999
    end if
 
-   ! TODO gather su root e poi scatter
    ! STEP 2: Compute QR_fact(R(0))
    beta = psb_geqrfact(v(1),desc_a,info)
    if (info /= psb_success_) then
@@ -279,41 +278,31 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       ! STEP 5: Inner loop
       inner: do i=1,j
 
-         write(*,*) 'PROC ', me, ' LOOOP 1', i
-
          ! Compute i index for H operations
          idx_i = (i-1)*nrhs+1
 
          ! STEP 6: Compute H(i,j) = V(i)_T*W
-         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_gedot(v(i),w,desc_a,info)
+         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_geprod(v(i),w,desc_a,info,trans=.true.)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
             goto 9999
          end if
-
-         write(*,*) 'PROC ', me, ' LOOOP 2', i
 
          ! STEP 7: Compute W = W - V(i)*H(i,j)
-         temp = psb_gedot(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info)
-         !call psb_geaxpby(-done,psb_gedot(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info),done,w,desc_a,info)
-         
-         write(*,*) 'PROC ', me, ' LOOOP 3', i
 
-         call psb_geaxpby(-done,temp,done,w,desc_a,info)
+         ! TODO si blocca con NRHS grandi?
+         !temp = psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info,global=.false.)
+         call psb_geaxpby(-done,psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info,global=.false.),done,w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
             goto 9999
          end if
-
-         write(*,*) 'PROC ', me, ' LOOOP 4', i
 
       end do inner
 
       ! STEP 8: Compute QR_fact(W)
-
-      !write(*,*) 'PROC ', me, ' BBBB ', j
 
       ! Store R in H(j+1,j)
       h(idx_j+nrhs:idx_j+nrhs+n_add,idx_j:idx_j+n_add) = psb_geqrfact(w,desc_a,info)
@@ -331,8 +320,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          goto 9999
       end if
 
-      write(*,*) 'PROC ', me, ' AAAA'
-
    end do outer
 
    ! STEP 9: Compute Y(m)
@@ -343,15 +330,15 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       goto 9999
    end if
 
-   ! TODO Va vene che ci siano altre righe perchè poi si passa localrows
+   ! TODO V_tot comprende V(nrep+1)?
    ! STEP 10: Compute V = {V(1),...,V(m)}
-   do i=1,nrep+1
+   do i=1,nrep
       idx = (i-1)*nrhs+1
       v_tot%v%v(1:n_row,idx:idx+n_add) = v(i)%v%v(1:n_row,1:nrhs)
    enddo
 
    ! STEP 11: X(m) = X(0) + V*Y(m)
-   call psb_geaxpby(done,psb_gedot(v_tot,h,desc_a,info),done,x,desc_a,info)
+   call psb_geaxpby(done,psb_geprod(v_tot,beta_e1,desc_a,info,global=.false.),done,x,desc_a,info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -389,7 +376,7 @@ contains
       implicit none
 
       integer(psb_ipk_)           :: lwork
-      real(psb_dpk_), allocatable :: work(:), beta_e1(:,:)
+      real(psb_dpk_), allocatable :: work(:), beta_temp(:,:)
 
       integer(psb_ipk_) :: m_h, n_h, mn
 
@@ -401,14 +388,19 @@ contains
       allocate(work(lwork))
 
       ! Compute E1*beta
-      allocate(beta_e1(m_h,nrhs))
-      beta_e1 = dzero
-      beta_e1(1:nrhs,1:nrhs) = beta
+      allocate(beta_temp(m_h,nrhs))
+      beta_temp = dzero
+      beta_temp(1:nrhs,1:nrhs) = beta
 
       ! Compute min Frobenius norm
-      call dgels('N',m_h,n_h,nrhs,h,m_h,beta_e1,m_h,work,lwork,info)
+      call dgels('N',m_h,n_h,nrhs,h,m_h,beta_temp,m_h,work,lwork,info)
 
-      deallocate(work,beta_e1)
+      ! Set solution
+      allocate(beta_e1(n_h,nrhs))
+      beta_e1 = beta_temp(1:n_h,1:nrhs)
+
+      ! Deallocate
+      deallocate(work,beta,beta_temp)
 
       return
 

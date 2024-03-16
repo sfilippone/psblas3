@@ -1387,11 +1387,14 @@ module psb_d_multivect_mod
     procedure, pass(x) :: set_vect => d_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     !
-    ! Dot product and AXPBY
+    ! Produc, dot-product and AXPBY
     !
-    procedure, pass(x) :: dot_col_v => d_vect_dot_col_v
-    procedure, pass(x) :: dot_col_a => d_vect_dot_col_a
-    generic, public    :: dot_col   => dot_col_v, dot_col_a
+    procedure, pass(x) :: prod_v    => d_vect_prod_v
+    procedure, pass(x) :: prod_a    => d_vect_prod_a
+    generic, public    :: prod      => prod_v, prod_a
+    procedure, pass(x) :: dot_v     => d_vect_dot_v
+    procedure, pass(x) :: dot_a     => d_vect_dot_a
+    generic, public    :: dot       => dot_v, dot_a
     procedure, pass(x) :: dot_row_v => d_vect_dot_row_v
     procedure, pass(x) :: dot_row_a => d_vect_dot_row_a
     generic, public    :: dot_row   => dot_row_v, dot_row_a
@@ -1858,18 +1861,43 @@ contains
     call move_alloc(tmp,x%v)
   end subroutine d_vect_cnv
 
-  function d_vect_dot_col_v(nr,x,y) result(res)
+  function d_vect_prod_v(nr,x,y,trans) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)              :: nr
+    logical, optional, intent(in)              :: trans
+    real(psb_dpk_), allocatable                :: res(:,:)
+
+    if (allocated(x%v).and.allocated(y%v)) &
+         & res = x%v%prod(nr,y%v,trans)
+
+  end function d_vect_prod_v
+
+  function d_vect_prod_a(nr,x,y,trans) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)                 :: y(:,:)
+    integer(psb_ipk_), intent(in)              :: nr
+    logical, optional, intent(in)              :: trans
+    real(psb_dpk_), allocatable                :: res(:,:)
+
+    if (allocated(x%v)) &
+         & res = x%v%prod(nr,y,trans)
+
+  end function d_vect_prod_a
+
+  function d_vect_dot_v(nr,x,y) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x, y
     integer(psb_ipk_), intent(in)              :: nr
     real(psb_dpk_), allocatable                :: res(:,:)
 
     if (allocated(x%v).and.allocated(y%v)) &
-         & res = x%v%dot_col(nr,y%v)
+         & res = x%v%dot(nr,y%v)
 
-  end function d_vect_dot_col_v
+  end function d_vect_dot_v
 
-  function d_vect_dot_col_a(nr,x,y) result(res)
+  function d_vect_dot_a(nr,x,y) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)                 :: y(:,:)
@@ -1877,32 +1905,9 @@ contains
     real(psb_dpk_), allocatable                :: res(:,:)
 
     if (allocated(x%v)) &
-         & res = x%v%dot_col(nr,y)
+         & res = x%v%dot(nr,y)
 
-  end function d_vect_dot_col_a
-
-  function d_vect_dot_row_v(nr,x,y) result(res)
-    implicit none
-    class(psb_d_multivect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)              :: nr
-    real(psb_dpk_), allocatable                :: res(:,:)
-
-    if (allocated(x%v).and.allocated(y%v)) &
-         & res = x%v%dot_row(nr,y%v)
-
-  end function d_vect_dot_row_v
-
-  function d_vect_dot_row_a(nr,x,y) result(res)
-    implicit none
-    class(psb_d_multivect_type), intent(inout) :: x
-    real(psb_dpk_), intent(in)                 :: y(:,:)
-    integer(psb_ipk_), intent(in)              :: nr
-    real(psb_dpk_), allocatable                :: res(:,:)
-
-    if (allocated(x%v)) &
-         & res = x%v%dot_row(nr,y)
-
-  end function d_vect_dot_row_a
+  end function d_vect_dot_a
 
   subroutine d_vect_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod

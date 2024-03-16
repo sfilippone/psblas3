@@ -473,7 +473,6 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
     res = dzero
   end if
 
-  ! TODO
   if (global_) call psb_nrm2(ctxt,res)
 
   call psb_erractionrestore(err_act)

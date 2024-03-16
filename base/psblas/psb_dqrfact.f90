@@ -20,9 +20,10 @@ function psb_dqrfact(x, desc_a, info) result(res)
 
    ! locals
    type(psb_ctxt_type) :: ctxt
-   integer(psb_ipk_) :: np, me, err_act, iix, jjx
-   integer(psb_lpk_) :: ix, ijx, m
+   integer(psb_ipk_) :: np, me, err_act, iix, jjx, i
+   integer(psb_lpk_) :: ix, ijx, m, n
    character(len=20) :: name, ch_err
+   real(psb_dpk_), allocatable :: temp(:,:)
 
    name='psb_dgqrfact'
    if (psb_errstatus_fatal()) return
@@ -47,8 +48,9 @@ function psb_dqrfact(x, desc_a, info) result(res)
    ijx = ione
 
    m = desc_a%get_global_rows()
+   n = x%get_ncols()
 
-   call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+   call psb_chkvect(m,n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
    if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -61,10 +63,19 @@ function psb_dqrfact(x, desc_a, info) result(res)
       call psb_errpush(info,name)
    end if
 
-   ! TODO serial?
-   if(desc_a%get_local_rows() > 0) then
+   call psb_gather(temp,x,desc_a,info,root=psb_root_)
+
+   if (me == psb_root_) then
+      call x%set(temp)
       res = x%qr_fact(info)
+      call psb_bcast(ctxt,res)
+   else
+      allocate(res(n,n))
+      call psb_bcast(ctxt,res)
    end if
+
+   temp = x%get_vect()
+   call psb_scatter(temp,x,desc_a,info,root=psb_root_)
 
    call psb_erractionrestore(err_act)
    return
