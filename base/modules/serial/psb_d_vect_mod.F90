@@ -1395,9 +1395,6 @@ module psb_d_multivect_mod
     procedure, pass(x) :: dot_v     => d_vect_dot_v
     procedure, pass(x) :: dot_a     => d_vect_dot_a
     generic, public    :: dot       => dot_v, dot_a
-    procedure, pass(x) :: dot_row_v => d_vect_dot_row_v
-    procedure, pass(x) :: dot_row_a => d_vect_dot_row_a
-    generic, public    :: dot_row   => dot_row_v, dot_row_a
     procedure, pass(y) :: axpby_v   => d_vect_axpby_v
     procedure, pass(y) :: axpby_a   => d_vect_axpby_a
     generic, public    :: axpby     => axpby_v, axpby_a

@@ -130,9 +130,9 @@ program psb_dbf_sample
          b_mv_glob => aux_b(:,:)
          do i=1, m
             do j=1, nrhs
-               b_mv_glob(i,j) = done
-               !call random_number(random_value)
-               !b_mv_glob(i,j) = random_value
+               !b_mv_glob(i,j) = done
+               call random_number(random_value)
+               b_mv_glob(i,j) = random_value
             enddo
          enddo
       endif
@@ -219,7 +219,6 @@ program psb_dbf_sample
       write(psb_out_unit,'(" ")')
    end if
    
-   ! TODO spmm cambia X (che senso ha?)
    call psb_geaxpby(done,b_mv,dzero,r_mv,desc_a,info)
    call psb_spmm(-done,a,x_mv,done,r_mv,desc_a,info)
 

@@ -2936,7 +2936,7 @@ contains
         end do
       end do
     class default
-      res = x%dot_col(nr,y%v)
+      res = x%dot(nr,y%v)
     end select
 
   end function d_base_mlv_dot_v

@@ -24,6 +24,7 @@ function psb_dqrfact(x, desc_a, info) result(res)
    integer(psb_lpk_) :: ix, ijx, m, n
    character(len=20) :: name, ch_err
    real(psb_dpk_), allocatable :: temp(:,:)
+   type(psb_d_base_multivect_type) :: qr_temp
 
    name='psb_dgqrfact'
    if (psb_errstatus_fatal()) return
@@ -66,15 +67,15 @@ function psb_dqrfact(x, desc_a, info) result(res)
    call psb_gather(temp,x,desc_a,info,root=psb_root_)
 
    if (me == psb_root_) then
-      call x%set(temp)
-      res = x%qr_fact(info)
+      call qr_temp%bld(temp)
+      res = qr_temp%qr_fact(info)
+      temp = qr_temp%get_vect()
       call psb_bcast(ctxt,res)
    else
       allocate(res(n,n))
       call psb_bcast(ctxt,res)
    end if
 
-   temp = x%get_vect()
    call psb_scatter(temp,x,desc_a,info,root=psb_root_)
 
    call psb_erractionrestore(err_act)

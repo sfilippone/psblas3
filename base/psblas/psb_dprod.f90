@@ -139,8 +139,7 @@ function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
    nr = desc_a%get_local_rows()
    if (nr > 0) then
       res = x%prod(nr,y,trans_)
-
-      ! TODO adjust dot_local because overlapped elements are computed more than once
+      ! adjust dot_local because overlapped elements are computed more than once
       if (size(desc_a%ovrlap_elem,1)>0) then
          if (x%v%is_dev()) call x%sync()
          if (y%v%is_dev()) call y%sync()
@@ -156,7 +155,6 @@ function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
       res = dzero
    end if
 
-   ! TODO forse è meglio global false di default
    ! compute global sum
    if (global_) call psb_sum(ctxt, res)
 
@@ -268,8 +266,7 @@ function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
     nr = desc_a%get_local_rows()
     if (nr > 0) then
        res = x%prod(nr,y,trans_)
- 
-       ! TODO adjust dot_local because overlapped elements are computed more than once
+       ! adjust dot_local because overlapped elements are computed more than once
        if (size(desc_a%ovrlap_elem,1)>0) then
           if (x%v%is_dev()) call x%sync()
           do j=1,x%get_ncols()
@@ -284,7 +281,6 @@ function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
        res = dzero
     end if
  
-    ! TODO
     ! compute global sum
     if (global_) call psb_sum(ctxt, res)
  

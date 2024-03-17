@@ -456,8 +456,7 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
 
   if (desc_a%get_local_rows() > 0) then
     res  = x%nrm2(desc_a%get_local_rows())
-
-    ! TODO adjust  because overlapped elements are computed more than once
+    ! adjust  because overlapped elements are computed more than once
     if (size(desc_a%ovrlap_elem,1)>0) then
       if (x%v%is_dev()) call x%sync()
       do j=1,x%get_ncols()

@@ -256,10 +256,8 @@ function psb_ddot_multivect(x, y, desc_a,info,global) result(res)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-
-    res = x%dot_col(nr,y)
-
-    ! TODO adjust dot_local because overlapped elements are computed more than once
+    res = x%dot(nr,y)
+    ! adjust dot_local because overlapped elements are computed more than once
     if (size(desc_a%ovrlap_elem,1)>0) then
       if (x%v%is_dev()) call x%sync()
       if (y%v%is_dev()) call y%sync()

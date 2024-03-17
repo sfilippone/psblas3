@@ -209,6 +209,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    ! BGMRES algorithm
 
    ! TODO QR fact seriale per ora
+   ! TODO Con tanti ITRS NaN (forse genera righe dipendenti (vedere pargen))
 
    ! STEP 1: Compute R(0) = B - A*X(0)
 
@@ -290,10 +291,9 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          end if
 
          ! STEP 7: Compute W = W - V(i)*H(i,j)
-
-         ! TODO si blocca con NRHS grandi?
-         !temp = psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info,global=.false.)
-         call psb_geaxpby(-done,psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info,global=.false.),done,w,desc_a,info)
+         call psb_geaxpby(-done,&
+            & psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info,global=.false.),&
+            & done,w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -330,7 +330,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       goto 9999
    end if
 
-   ! TODO V_tot comprende V(nrep+1)?
    ! STEP 10: Compute V = {V(1),...,V(m)}
    do i=1,nrep
       idx = (i-1)*nrhs+1
