@@ -585,7 +585,7 @@ contains
     logical :: collective_start, collective_end, collective_sync
     
 #if defined(SERIAL_MPI)
-    resv(0) = dat
+    resv(1) = dat
 #else
     call psb_info(ctxt,iam,np)
 
@@ -653,7 +653,7 @@ contains
     logical :: collective_start, collective_end, collective_sync
     
 #if defined(SERIAL_MPI)
-    resv(0) = dat
+    resv(:) = dat(:)
 #else
     call psb_info(ctxt,iam,np)
 
@@ -723,7 +723,7 @@ contains
     logical :: collective_start, collective_end, collective_sync
     
 #if defined(SERIAL_MPI)
-    resv(0) = dat
+    resv(:) = dat(:)
 #else
     call psb_info(ctxt,iam,np)
 
