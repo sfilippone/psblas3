@@ -195,7 +195,7 @@ subroutine psi_stranidxm(ctxt,icomm,flag,n,beta,y,idx,&
   logical, parameter :: usersend=.false.
 
   real(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-  volatile :: sndbuf, rcvbuf
+  !volatile :: sndbuf, rcvbuf
   character(len=20)  :: name
 
   info=psb_success_
@@ -688,7 +688,7 @@ subroutine psi_stranidxv(ctxt,icomm,flag,beta,y,idx,&
   logical, parameter :: usersend=.false.
 
   real(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-  volatile :: sndbuf, rcvbuf
+  !volatile :: sndbuf, rcvbuf
   character(len=20)  :: name
 
   info=psb_success_

@@ -30,7 +30,7 @@
 !   
   
 
-module psb_c_cuda_vect_mod 
+module psb_c_cuda_vect_mod
   use iso_c_binding
   use psb_const_mod
   use psb_error_mod

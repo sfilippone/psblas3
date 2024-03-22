@@ -94,6 +94,7 @@ module psb_c_ell_mat_mod
     procedure, pass(a) :: print        => psb_c_ell_print
     procedure, pass(a) :: free         => c_ell_free
     procedure, pass(a) :: mold         => psb_c_ell_mold
+    procedure, pass(a) :: get_nrm      => c_ell_get_nrm
 
   end type psb_c_ell_sparse_mat
 
@@ -458,6 +459,13 @@ contains
     character(len=5) :: res
     res = 'ELL'
   end function c_ell_get_fmt
+  
+  function c_ell_get_nrm(a) result(res)
+    implicit none 
+    class(psb_c_ell_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: res
+    res = size(a%val,2)
+  end function c_ell_get_nrm
   
   function c_ell_get_nzeros(a) result(res)
     implicit none 
