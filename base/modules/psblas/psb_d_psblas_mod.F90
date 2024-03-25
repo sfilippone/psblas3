@@ -119,6 +119,16 @@ module psb_d_psblas_mod
       logical, intent(in), optional             :: trans
       logical, intent(in), optional             :: global
     end function psb_dprod_multivect_a
+    function psb_dprod_m(x,y,desc_a,info,trans,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), allocatable               :: res(:,:)
+      real(psb_dpk_), intent(in)                :: x(:,:), y(:,:)
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: trans
+      logical, intent(in), optional             :: global
+    end function psb_dprod_m
   end interface
 
   interface psb_geaxpby
@@ -402,10 +412,10 @@ module psb_d_psblas_mod
       logical, intent(in), optional       :: global
       type(psb_d_vect_type), intent (inout), optional :: aux
     end function psb_dnrm2_weightmask_vect
-    function psb_dnrm2_multivect(x, desc_a, info,global) result(res)
+    function psb_dnrm2_multivect(x, desc_a, info, global) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_)                             :: res
+      real(psb_dpk_), allocatable                :: res(:)
       type(psb_d_multivect_type), intent (inout) :: x
       type(psb_desc_type), intent (in)           :: desc_a
       integer(psb_ipk_), intent(out)             :: info

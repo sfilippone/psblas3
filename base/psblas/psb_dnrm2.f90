@@ -384,7 +384,7 @@ end function psb_dnrm2_vect
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
+function psb_dnrm2_multivect(x, desc_a, info, global)  result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -392,7 +392,7 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
   use psb_d_multivect_mod
   implicit none
 
-  real(psb_dpk_)                             :: res
+  real(psb_dpk_), allocatable                :: res(:)
   type(psb_d_multivect_type), intent (inout) :: x
   type(psb_desc_type), intent(in)            :: desc_a
   integer(psb_ipk_), intent(out)             :: info
@@ -402,7 +402,7 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, idx, i, j, iix, jjx, ldx, ndm
   real(psb_dpk_)    :: dd
-  integer(psb_lpk_) :: ix, jx, m, n
+  integer(psb_lpk_) :: ix, jx, m
   logical :: global_
   character(len=20) :: name, ch_err
 
@@ -438,10 +438,9 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-  n = x%get_ncols()
   ldx = x%get_nrows()
 
-  call psb_chkvect(m,n,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,x%get_ncols(),ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -455,7 +454,7 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
   end if
 
   if (desc_a%get_local_rows() > 0) then
-    res  = x%nrm2(desc_a%get_local_rows())
+    res = x%nrm2(desc_a%get_local_rows())
     ! adjust  because overlapped elements are computed more than once
     if (size(desc_a%ovrlap_elem,1)>0) then
       if (x%v%is_dev()) call x%sync()
@@ -464,11 +463,12 @@ function psb_dnrm2_multivect(x, desc_a, info,global)  result(res)
           idx = desc_a%ovrlap_elem(i,1)
           ndm = desc_a%ovrlap_elem(i,2)
           dd  = dble(ndm-1)/dble(ndm)
-          res = res * sqrt(done - dd*(abs(x%v%v(idx,j))/res)**2)
+          res(j) = res(j) * sqrt(done - dd*(abs(x%v%v(idx,j))/res(j))**2)
         end do
       end do
     end if
   else
+    allocate(res(x%get_ncols()))
     res = dzero
   end if
 

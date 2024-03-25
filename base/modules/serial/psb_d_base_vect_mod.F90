@@ -3296,13 +3296,16 @@ contains
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: nr
-    real(psb_dpk_), allocatable :: res
+    real(psb_dpk_), allocatable :: res(:)
+    integer(psb_ipk_) :: nc, col
     real(psb_dpk_), external :: dnrm2
-    integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
     nc = x%get_ncols()
-    res = dnrm2(nc*nr,x%v,1)
+    allocate(res(nc))
+    do col=1,nc
+      res(col) = dnrm2(nr,x%v(:,col),1)
+    end do
 
   end function d_base_mlv_nrm2
 

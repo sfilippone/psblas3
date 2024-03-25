@@ -2051,7 +2051,7 @@ contains
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: nr
-    real(psb_dpk_), allocatable :: res
+    real(psb_dpk_), allocatable :: res(:)
 
     if (allocated(x%v)) then
       res = x%v%nrm2(nr)
