@@ -49,24 +49,25 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    implicit none
 
    type(psb_dspmat_type), intent(in)         :: a
-   type(psb_desc_type), Intent(in)           :: desc_a
+   type(psb_desc_type), intent(in)           :: desc_a
    class(psb_dprec_type), intent(inout)      :: prec
 
-   type(psb_d_multivect_type), Intent(inout) :: b
-   type(psb_d_multivect_type), Intent(inout) :: x
+   type(psb_d_multivect_type), intent(inout) :: b
+   type(psb_d_multivect_type), intent(inout) :: x
 
-   real(psb_dpk_), Intent(in)                :: eps
+   real(psb_dpk_), intent(in)                :: eps
    integer(psb_ipk_), intent(out)            :: info
-   integer(psb_ipk_), Optional, Intent(in)   :: itmax, itrace, itrs, istop
-   integer(psb_ipk_), Optional, Intent(out)  :: iter
-   real(psb_dpk_), Optional, Intent(out)     :: err
+   integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, itrs, istop
+   integer(psb_ipk_), optional, intent(out)  :: iter
+   real(psb_dpk_), optional, intent(out)     :: err
 
    real(psb_dpk_), allocatable               :: aux(:), h(:,:), vt(:,:), beta(:,:), y(:,:)
 
    type(psb_d_multivect_type), allocatable   :: v(:)
-   type(psb_d_multivect_type)                :: w, xt, r
+   type(psb_d_multivect_type)                :: w, r0, rm
 
    real(psb_dpk_)                            :: t1, t2
+   logical                                   :: solution = .false.
 
    real(psb_dpk_)                            :: rti, rti1
    integer(psb_ipk_)                         :: litmax, naux, itrace_, n_row, n_col, nrhs, nrep
@@ -173,12 +174,12 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          & errnum(nrhs),errden(nrhs),stat=info)
    if (info == psb_success_) call psb_geall(v,desc_a,info,m=nrep+1,n=nrhs)
    if (info == psb_success_) call psb_geall(w,desc_a,info,n=nrhs)
-   if (info == psb_success_) call psb_geall(xt,desc_a,info,n=nrhs)
-   if (info == psb_success_) call psb_geall(r,desc_a,info,n=nrhs)
+   if (info == psb_success_) call psb_geall(r0,desc_a,info,n=nrhs)
+   if (info == psb_success_) call psb_geall(rm,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geasb(v,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v,n=nrhs)
-   if (info == psb_success_) call psb_geasb(xt,desc_a,info,mold=x%v,n=nrhs)
-   if (info == psb_success_) call psb_geasb(r,desc_a,info,mold=x%v,n=nrhs)
+   if (info == psb_success_) call psb_geasb(r0,desc_a,info,mold=x%v,n=nrhs)
+   if (info == psb_success_) call psb_geasb(rm,desc_a,info,mold=x%v,n=nrhs)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -192,19 +193,19 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! Compute norm2 of R(0)
    if (istop_ == 1) then
-      call psb_geaxpby(done,b,dzero,r,desc_a,info)
+      call psb_geaxpby(done,b,dzero,r0,desc_a,info)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
          goto 9999
       end if
-      call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+      call psb_spmm(-done,a,x,done,r0,desc_a,info,work=aux)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
          goto 9999
       end if
-      r0n2 = psb_genrm2(r,desc_a,info)
+      r0n2 = psb_genrm2(r0,desc_a,info)
    endif
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
@@ -226,8 +227,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! TODO Con tanti ITRS e tanti NRHS si ottengono NaN
    ! TODO Deflazione e restart dopo aver trovato una colonna, difficile...
-
-   ! TODO L'algo converge abbastanza bene. Capire come fare check residui
 
    ! STEP 1: Compute R(0) = B - A*X(0)
 
@@ -335,65 +334,26 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       ! Compute residues
       if (istop_ == 1) then
 
-         ! TODO Compute R(j) = R(0) - VT(j+1)*H(j)*Y(j)
+         ! Copy R(0) in R(j)
+         call psb_geaxpby(done,r0,dzero,rm,desc_a,info)
+         if (info /= psb_success_) then
+            info=psb_err_from_subroutine_non_
+            call psb_errpush(info,name)
+            goto 9999
+         end if
+
+         ! Compute R(j) = R(0) - VT(j+1)*H(j)*Y(j)
          call psb_geaxpby(-done,psb_geprod(psb_geprod(vt(:,1:(j+1)*nrhs),h(1:(j+1)*nrhs,1:j*nrhs),&
                            & desc_a,info,global=.false.),&
-                           & y(1:j*nrhs,1:nrhs),desc_a,info,global=.false.),done,r,desc_a,info)
+                           & y(1:j*nrhs,1:nrhs),desc_a,info,global=.false.),done,rm,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
             goto 9999
          end if
-
-         write(*,*)
-         do col=1,r%get_nrows()
-            write(*,*) r%v%v(col,:)
-         end do
-         write(*,*)
-
-         ! TODO Calcolo soluzione al passo J e vedo i residui (se minore esco dal ciclo)
-         ! TODO Compute R(j) = B - A*X(j)
-
-         ! Copy X in XT
-         call psb_geaxpby(done,x,dzero,xt,desc_a,info)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         ! Compute current solution X(j) = X(0) + VT(j)*Y(j)
-         call psb_geaxpby(done,psb_geprod(vt(:,1:j*nrhs),y(1:j*nrhs,:),desc_a,info,global=.false.),done,xt,desc_a,info)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         ! Copy B in R
-         call psb_geaxpby(done,b,dzero,r,desc_a,info)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         ! Compute R(j) = B - A*X(j)
-         call psb_spmm(-done,a,xt,done,r,desc_a,info,work=aux)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         write(*,*)
-         do col=1,r%get_nrows()
-            write(*,*) r%v%v(col,:)
-         end do
-         write(*,*)
 
          ! Compute nrm2 of each column of R(j)
-         rmn2 = psb_genrm2(r,desc_a,info)
+         rmn2 = psb_genrm2(rm,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -404,34 +364,26 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          errnum = rmn2
          errden = r0n2
 
-         ! TODO Ogni entrata della norma2 di R(m) deve essere più piccola di tolleranza*nrm2(r0)
          do col=1,nrhs
             write(*,*) rmn2(col), r0n2(col)
          end do
       end if
 
-      ! TODO Norma dei residui con Xm devono essere minori di tolleranza * nrm2(R0)?
       ! Check convergence
       if (maxval(errnum) <= eps*maxval(errden)) then
 
          ! Compute result and exit
          if (istop_ == 1) then
 
-            ! Compute X(j) = X(0) + VT(j)*Y(j)
-            ! call psb_geaxpby(done,psb_geprod(vt(:,1:j*nrhs),y(1:j*nrhs,:),desc_a,info,global=.false.),done,x,desc_a,info)
-            ! if (info /= psb_success_) then
-            !    info=psb_err_from_subroutine_non_
-            !    call psb_errpush(info,name)
-            !    goto 9999
-            ! end if
-
-            ! Copy current solution XT in X
-            call psb_geaxpby(done,xt,dzero,x,desc_a,info)
+            !Compute X(j) = X(0) + VT(j)*Y(j)
+            call psb_geaxpby(done,psb_geprod(vt(:,1:j*nrhs),y(1:j*nrhs,:),desc_a,info,global=.false.),done,x,desc_a,info)
             if (info /= psb_success_) then
                info=psb_err_from_subroutine_non_
                call psb_errpush(info,name)
                goto 9999
             end if
+
+            solution = .true.
 
          end if
 
@@ -446,17 +398,17 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end do outer
 
    ! STEP 10: X(m) = X(0) + VT(m)*Y(m)
-   ! call psb_geaxpby(done,psb_geprod(vt(:,1:nrep*nrhs),y,desc_a,info,global=.false.),done,x,desc_a,info)
-   ! if (info /= psb_success_) then
-   !    info=psb_err_from_subroutine_non_
-   !    call psb_errpush(info,name)
-   !    goto 9999
-   ! end if
+   if (.not.solution) then
+      call psb_geaxpby(done,psb_geprod(vt(:,1:nrep*nrhs),y,desc_a,info,global=.false.),done,x,desc_a,info)
+      if (info /= psb_success_) then
+         info=psb_err_from_subroutine_non_
+         call psb_errpush(info,name)
+         goto 9999
+      end if
+   end if
 
    ! END algorithm
 
-   ! TODO log_conv passa scalari errnum,errden,deps (servono vettori)
-   ! TODO Inizialmente versione verbosa che stampa errore per tutte le colonne
    ! TODO Versione finale che stampa errore massimo (si può usare log_conv con questo)
    if (itrace_ > 0) call log_conv(methdname,me,itx,ione,maxval(errnum),maxval(errden),deps)
 
@@ -465,8 +417,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    if (info == psb_success_) call psb_gefree(v,desc_a,info)
    if (info == psb_success_) call psb_gefree(w,desc_a,info)
-   if (info == psb_success_) call psb_gefree(xt,desc_a,info)
-   if (info == psb_success_) call psb_gefree(r,desc_a,info)
+   if (info == psb_success_) call psb_gefree(r0,desc_a,info)
+   if (info == psb_success_) call psb_gefree(rm,desc_a,info)
    if (info == psb_success_) deallocate(aux,h,y,vt,stat=info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_

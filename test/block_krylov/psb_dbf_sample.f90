@@ -225,7 +225,6 @@ program psb_dbf_sample
    call psb_geaxpby(done,b_mv,dzero,r_mv,desc_a,info)
    call psb_spmm(-done,a,x_mv,done,r_mv,desc_a,info)
 
-   ! TODO resmx vettore ogni entrata è più piccola della tolleranza (per* norma di r0)
    resmx  = psb_genrm2(r_mv,desc_a,info)   
    resmxp = psb_geamax(r_mv,desc_a,info)
 
@@ -262,7 +261,7 @@ program psb_dbf_sample
       write(psb_out_unit,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
       if (print_matrix) then
          do i=1,m
-            write(psb_out_unit,993) i, x_mv_glob(i,:)!, ' ', r_mv_glob(i,:), ' ', b_mv_glob(i,:)
+            write(psb_out_unit,993) i, x_mv_glob(i,:), r_mv_glob(i,:), b_mv_glob(i,:)
          end do
       end if
    end if
