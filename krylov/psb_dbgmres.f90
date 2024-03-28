@@ -67,7 +67,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    type(psb_d_multivect_type)                :: w, r0, rm
 
    real(psb_dpk_)                            :: t1, t2
-   logical                                   :: solution = .false.
 
    real(psb_dpk_)                            :: rti, rti1
    integer(psb_ipk_)                         :: litmax, naux, itrace_, n_row, n_col, nrhs, nrep
@@ -225,8 +224,9 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! BGMRES algorithm
 
-   ! TODO Con tanti ITRS e tanti NRHS si ottengono NaN
-   ! TODO Deflazione e restart dopo aver trovato una colonna, difficile...
+   ! TODO Con tanti ITRS e tanti NRHS si ottengono NaN, deflazione e restart dopo aver trovato una colonna, difficile...
+
+   ! TODO Provare a compilare su GPU remota (Vedere REC)
 
    ! STEP 1: Compute R(0) = B - A*X(0)
 
@@ -369,23 +369,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          end do
       end if
 
-      ! Check convergence
-      if (maxval(errnum) <= eps*maxval(errden)) then
-
-         ! Compute result and exit
-         if (istop_ == 1) then
-
-            !Compute X(j) = X(0) + VT(j)*Y(j)
-            call psb_geaxpby(done,psb_geprod(vt(:,1:j*nrhs),y(1:j*nrhs,:),desc_a,info,global=.false.),done,x,desc_a,info)
-            if (info /= psb_success_) then
-               info=psb_err_from_subroutine_non_
-               call psb_errpush(info,name)
-               goto 9999
-            end if
-
-            solution = .true.
-
-         end if
+      ! TODO Check convergence (max o media)
+      if (all(errnum.le.(eps*errden))) then
 
          ! Exit algorithm
          exit outer
@@ -398,13 +383,11 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end do outer
 
    ! STEP 10: X(m) = X(0) + VT(m)*Y(m)
-   if (.not.solution) then
-      call psb_geaxpby(done,psb_geprod(vt(:,1:nrep*nrhs),y,desc_a,info,global=.false.),done,x,desc_a,info)
-      if (info /= psb_success_) then
-         info=psb_err_from_subroutine_non_
-         call psb_errpush(info,name)
-         goto 9999
-      end if
+   call psb_geaxpby(done,psb_geprod(vt(:,1:j*nrhs),y(1:j*nrhs,:),desc_a,info,global=.false.),done,x,desc_a,info)
+   if (info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
    end if
 
    ! END algorithm
@@ -459,6 +442,8 @@ contains
       allocate(beta_e1(m_h,nrhs))
       beta_e1 = dzero
       beta_e1(1:nrhs,1:nrhs) = beta
+
+      ! TODO DGELS ha anche i residui (con i residui fai come MATLAB e poi si prova se esce uguale)
 
       ! Compute min Frobenius norm
       call dgels('N',m_h,n_h,nrhs,h_temp(1:m_h,1:n_h),m_h,beta_e1,m_h,work,lwork,info)

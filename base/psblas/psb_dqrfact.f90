@@ -69,14 +69,6 @@ function psb_dqrfact(x, desc_a, info) result(res)
    if (me == psb_root_) then
       call qr_temp%bld(temp)
       res = qr_temp%qr_fact(info)
-
-      ! TODO Check sulla diagonale di R
-      do i=1,n
-         if (res(i,i) == dzero) then
-            write(*,*) 'DIAGONAL 0'
-         end if
-      end do
-
       temp = qr_temp%get_vect()
       call psb_bcast(ctxt,res)
    else
