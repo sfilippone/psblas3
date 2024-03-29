@@ -73,7 +73,7 @@ subroutine  psi_dovrl_save_vect(x,xs,desc_a,info)
     goto 9999
   endif
 
-  call x%gth(isz,desc_a%ovrlap_elem(:,1),xs)
+  call x%gthzv(isz,desc_a%ovrlap_elem(:,1),xs)
 
   call psb_erractionrestore(err_act)
   return  

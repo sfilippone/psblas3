@@ -1,4 +1,6 @@
-include ../../Make.inc
+TOP=../..
+include $(TOP)/Make.inc
+SMODDIR=$(TOP)/submodules
 
 
 FOBJS = psb_lsame.o psi_m_serial_impl.o psi_e_serial_impl.o \
@@ -22,6 +24,8 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR)
 
 
 objs: impld sortd $(FOBJS)
+	/bin/cp -p $(CPUPDFLAG) *smod $(SMODDIR)	
+
 lib: objs
 	$(MAKE) -C impl lib
 	$(MAKE) -C sort lib

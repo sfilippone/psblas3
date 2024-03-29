@@ -2122,7 +2122,7 @@ subroutine psb_d_cp_csc_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  call b%alloc(nr,nc,nza)
   b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
 
   do i=1, nc
@@ -2859,7 +2859,8 @@ subroutine psb_dcscspspmm(a,b,c,info)
   nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
   ! Estimate number of nonzeros on output.
   ! Turns out this is often a large  overestimate.
-  call c%allocate(ma,nb,nzc)
+  !call c%alloc(ma,nb,nzc)
+  call psb_ld_coo_allocate_mnnz(ma,nb,c,nzc)
 
 
   call csc_spspmm(a,b,c,info)
@@ -4017,7 +4018,9 @@ subroutine psb_ld_cp_csc_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  !call b%alloc(nr,nc,nza)
+  call psb_ld_coo_allocate_mnnz(nr,nc,b,nza)
+  
   b%psb_ld_base_sparse_mat = a%psb_ld_base_sparse_mat
 
   do i=1, nc
@@ -4436,9 +4439,13 @@ subroutine psb_ld_csc_csgetblk(imin,imax,a,b,info,&
     nzin = 0
   endif
 
-  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
-       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
+  write(0,*) 'ERROR: unimplemented in NVFORTRAN '
+!!$  call psb_ld_csc_getrow(imin,imax,a,nzout,b%ia,b%ja,b%val,info,&
+!!$       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
+!!$       & nzin=nzin, rscale=rscale, cscale=cscale)
+!!$  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
+!!$       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
+!!$       & nzin=nzin, rscale=rscale, cscale=cscale)
 
   if (info /= psb_success_) goto 9999
 
@@ -4698,7 +4705,8 @@ subroutine psb_ldcscspspmm(a,b,c,info)
   nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
   ! Estimate number of nonzeros on output.
   ! Turns out this is often a large  overestimate.
-  call c%allocate(ma,nb,nzc)
+  !call c%alloc(ma,nb,nzc)
+  call psb_ld_coo_allocate_mnnz(ma,nb,c,nzc)
 
 
   call csc_spspmm(a,b,c,info)

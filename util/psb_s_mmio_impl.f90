@@ -365,7 +365,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
   allocate(acoo, stat=ircode)
   if (ircode /= 0)   goto 993    
   if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
-    call acoo%allocate(nrow,ncol,nnzero)
+    call acoo%allocate_mnnz(nrow,ncol,nnzero)
     do i=1,nnzero
       read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
@@ -377,7 +377,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
   else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
     ! we are generally working with non-symmetric matrices, so
     ! we de-symmetrize what we are about to read
-    call acoo%allocate(nrow,ncol,2*nnzero)
+    call acoo%allocate_mnnz(nrow,ncol,2*nnzero)
     do i=1,nnzero
       read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
@@ -516,7 +516,7 @@ subroutine lsmm_mat_read(a, info, iunit, filename)
   allocate(acoo, stat=ircode)
   if (ircode /= 0)   goto 993    
   if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
-    call acoo%allocate(nrow,ncol,nnzero)
+    call acoo%allocate_mnnz(nrow,ncol,nnzero)
     do i=1,nnzero
       read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
@@ -528,7 +528,7 @@ subroutine lsmm_mat_read(a, info, iunit, filename)
   else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
     ! we are generally working with non-symmetric matrices, so
     ! we de-symmetrize what we are about to read
-    call acoo%allocate(nrow,ncol,2*nnzero)
+    call acoo%allocate_mnnz(nrow,ncol,2*nnzero)
     do i=1,nnzero
       read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do

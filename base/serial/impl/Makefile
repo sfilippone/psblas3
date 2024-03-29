@@ -1,4 +1,6 @@
-include ../../../Make.inc
+TOP=../../..
+include $(TOP)/Make.inc
+SMODDIR=$(TOP)/submodules
 
 #
 # The object files
@@ -41,6 +43,7 @@ LIBFILE=$(LIBDIR)/$(LIBNAME)
 
 
 objs: $(OBJS)
+	/bin/cp -p $(CPUPDFLAG) *smod $(SMODDIR)	
 
 lib: objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)

@@ -49,7 +49,7 @@ subroutine  psb_c_cuda_csrg_reallocate_nz(nz,a)
   !
   ! What should this really do??? 
   ! 
-  call a%psb_c_csr_sparse_mat%reallocate(nz)
+  call a%psb_c_csr_sparse_mat%realloc(nz)
 
   call a%to_gpu(info,nzrm=nz)
   if (info /= 0) goto 9999

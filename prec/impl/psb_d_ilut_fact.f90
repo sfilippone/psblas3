@@ -166,7 +166,7 @@ subroutine psb_dilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
     blck_ => blck
   else
     allocate(blck_,stat=info)
-    if (info == psb_success_) call blck_%allocate(izero,izero,info,ione,type='CSR')
+    if (info == psb_success_) call blck_%csall(izero,izero,info,ione,type='CSR')
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='allocate'
@@ -365,7 +365,7 @@ contains
     !
     ! Allocate a temporary buffer for the ilut_copyin function
     !
-    call trw%allocate(izero,izero,ione)
+    call trw%alloc(izero,izero,ione)
     if (info == psb_success_) call psb_ensure_size(m+1,lirp,info)
     if (info == psb_success_) call psb_ensure_size(m+1,uirp,info)
 

@@ -166,7 +166,7 @@ subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
     blck_ => blck
   else
     allocate(blck_,stat=info)
-    if (info == psb_success_) call blck_%allocate(izero,izero,info,ione,type='CSR')
+    if (info == psb_success_) call blck_%csall(izero,izero,info,ione,type='CSR')
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='allocate'
@@ -362,7 +362,7 @@ contains
       goto 9999
     end select
 
-    call trw%allocate(izero,izero,ione)
+    call trw%alloc(izero,izero,ione)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_sp_all'

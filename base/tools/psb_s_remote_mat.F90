@@ -191,7 +191,7 @@ Subroutine psb_ls_remote_mat(a,desc_a,b,info)
 
   iszs = sum(sdsz)
   iszr = sum(rvsz)
-  call acoo%allocate(desc_a%get_global_rows(),desc_a%get_global_cols(),iszr)
+  call acoo%allocate_mnnz(desc_a%get_global_rows(),desc_a%get_global_cols(),iszr)
   if (psb_errstatus_fatal()) then
     write(0,*) 'Error from acoo%allocate '
     info = 4010

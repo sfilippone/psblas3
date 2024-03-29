@@ -50,7 +50,7 @@ subroutine psb_s_cp_ell_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  call b%alloc(nr,nc,nza)
   b%psb_s_base_sparse_mat = a%psb_s_base_sparse_mat
 
   k=0

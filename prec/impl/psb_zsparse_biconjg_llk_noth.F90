@@ -95,7 +95,7 @@ subroutine psb_zsparse_biconjg_llk_noth(n,a,p,z,w,nzrmax,sp_thresh,info)
   q(1) = p(1)
   !
   !
-  call z%allocate(n,n,n*nzrmax)
+  call z%allocate_mnnz(n,n,n*nzrmax)
 
   z%icp(1)  = 1
   z%icp(2)  = 2
@@ -103,7 +103,7 @@ subroutine psb_zsparse_biconjg_llk_noth(n,a,p,z,w,nzrmax,sp_thresh,info)
   z%val(1) = done
   nzz       = 1
 
-  call w%allocate(n,n,n*nzrmax)
+  call w%allocate_mnnz(n,n,n*nzrmax)
   w%icp(1)  = 1
   w%icp(2)  = 2
   w%ia(1)  = 1
@@ -209,7 +209,8 @@ subroutine psb_zsparse_biconjg_llk_noth(n,a,p,z,w,nzrmax,sp_thresh,info)
         end if
       end if
     end do outer
-    call a%csget(i,i,nzra,ia,ja,val,info)
+    !call a%csget(i,i,nzra,ia,ja,val,info)
+    call psb_z_csr_csgetrow(i,i,a,nzra,ia,ja,val,info)
     call rwclip(nzra,ia,ja,val,ione,n,ione,n)
     p(i) = psb_spge_dot(nzra,ja,val,zval)
     if (abs(p(i)) < d_epstol) &

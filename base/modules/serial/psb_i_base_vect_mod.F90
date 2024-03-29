@@ -867,7 +867,7 @@ contains
     class(psb_i_base_vect_type) :: x
 
     if (idx%is_dev()) call idx%sync()
-    call x%gth(n,idx%v(i:),y)
+    call x%gthzv(n,idx%v(i:),y)
 
   end subroutine i_base_gthzv_x
 
@@ -887,7 +887,7 @@ contains
     end if
     if (idx%is_dev()) call idx%sync()
     if (x%is_dev()) call x%sync()
-    call x%gth(n,idx%v(i:),x%combuf(i:))
+    call x%gthzv(n,idx%v(i:),x%combuf(i:))
 
   end subroutine i_base_gthzbuf
   !
@@ -1721,7 +1721,7 @@ contains
     class(psb_i_base_multivect_type) :: x
 
     if (x%is_dev()) call x%sync()
-    call x%gth(n,idx%v(i:),y)
+    call x%gthzv(n,idx%v(i:),y)
 
   end subroutine i_base_mlv_gthzv_x
 

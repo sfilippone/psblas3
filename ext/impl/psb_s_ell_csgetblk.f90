@@ -63,9 +63,8 @@ subroutine psb_s_ell_csgetblk(imin,imax,a,b,info,&
     nzin = 0
   endif
 
-  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
-       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
+  call psb_s_ell_csgetrow(imin,imax,a,nzout,b%ia,b%ja,b%val,info,&
+       & jmin, jmax, iren, append_,  nzin, rscale, cscale)
 
   if (info /= psb_success_) goto 9999
 

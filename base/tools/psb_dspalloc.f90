@@ -104,7 +104,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz, dupl, bldmode)
        & ':allocating size:',loc_row,loc_col,nnz_
   call a%free()
   !....allocate aspk, ia1, ia2.....
-  call a%allocate(loc_row,loc_col,info,nz=nnz_)
+  call psb_d_allocate_mnnz(loc_row,loc_col,a,info,nnz_)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='sp_all')
@@ -126,7 +126,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz, dupl, bldmode)
   if (a%is_remote_build()) then
     allocate(a%rmta)
     nnzrmt_ = max(100,(nnz_/100))
-    call a%rmta%allocate(m,n,nnzrmt_)
+    call a%rmta%allocate_mnnz(m,n,nnzrmt_)
   end if
 
   if (debug_level >= psb_debug_ext_) &

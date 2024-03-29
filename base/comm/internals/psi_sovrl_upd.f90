@@ -78,7 +78,7 @@ subroutine  psi_sovrl_upd_vect(x,desc_a,update,info)
   end if
 
   if (update /= psb_sum_) then 
-    call x%gth(nx,desc_a%ovrlap_elem(:,1),xs)
+    call x%gthzv(nx,desc_a%ovrlap_elem(:,1),xs)
     ! switch on update type
 
     select case (update)

@@ -52,7 +52,7 @@ subroutine psb_c_cp_hdia_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  call b%alloc(nr,nc,nza)
   b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
   call b%set_nzeros(nza)
   call b%set_sort_status(psb_unsorted_)

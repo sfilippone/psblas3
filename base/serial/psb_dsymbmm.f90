@@ -162,7 +162,7 @@ contains
     nb = b%get_ncols()
     
     nze = max(ma+1,2*ma)
-    call c%allocate(ma,nb,nze)
+    call c%allocate_mnnz(ma,nb,nze)
     call symbmm(ma,na,nb,a%irp,a%ja,izero,&
          & b%irp,b%ja,izero,&
          & c%irp,c%ja,izero,itemp)
@@ -182,7 +182,7 @@ contains
     nb = b%get_ncols()
 
     nze = max(ma+1,2*ma)
-    call c%allocate(ma,nb,nze)
+    call c%allocate_mnnz(ma,nb,nze)
 
     n = ma
     m = na 
@@ -381,7 +381,8 @@ contains
     nb = b%get_ncols()
     
     nze = max(ma+1,2*ma)
-    call c%allocate(ma,nb,nze)
+    !call c%allocate_mnnz(ma,nb,nze)
+    call psb_ld_csr_allocate_mnnz(ma,nb,c,nze)
     call lsymbmm(ma,na,nb,a%irp,a%ja,lzero,&
          & b%irp,b%ja,lzero,&
          & c%irp,c%ja,lzero,itemp)
@@ -402,8 +403,9 @@ contains
     nb = b%get_ncols()
 
     nze = max(ma+1,2*ma)
-    call c%allocate(ma,nb,nze)
-
+    !call c%allocate_mnnz(ma,nb,nze)
+    call psb_ld_csr_allocate_mnnz(ma,nb,c,nze)
+    
     n = ma
     m = na 
     l = nb 

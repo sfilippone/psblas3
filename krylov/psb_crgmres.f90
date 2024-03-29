@@ -129,7 +129,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type), allocatable :: v(:)
   type(psb_c_vect_type)              :: w, w1, xt
   real(psb_spk_) :: tmp 
-  complex(psb_spk_) :: scal, gm, rti, rti1
+  complex(psb_spk_) :: scalf, gm, rti, rti1
   integer(psb_ipk_) ::litmax, naux, it, k, itrace_,&
        & n_row, n_col, nl
   integer(psb_lpk_) :: mglob
@@ -315,11 +315,11 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_errpush(info,name)
       goto 9999
     end if
-    scal=cone/rs(1)  ! rs(1) MIGHT BE VERY SMALL - USE DSCAL TO DEAL WITH IT?
+    scalf=cone/rs(1)  ! rs(1) MIGHT BE VERY SMALL - USE DSCAL TO DEAL WITH IT?
 
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
-         & ' on entry to amax: b: ',b%get_nrows(),rs(1),scal
+         & ' on entry to amax: b: ',b%get_nrows(),rs(1),scalf
 
     !
     ! check convergence
@@ -349,7 +349,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
     if (itrace_ > 0) &
          & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
      
-    call v(1)%scal(scal) !v(1) = v(1) * scal
+    call v(1)%scal(scalf) !v(1) = v(1) * scal
 
     if (itx >= litmax) exit restart  
 
@@ -369,8 +369,8 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
         call psb_geaxpby(-h(k,i),v(k),cone,w,desc_a,info)
       end do
       h(i+1,i) = psb_genrm2(w,desc_a,info)
-      scal=cone/h(i+1,i)
-      call psb_geaxpby(scal,w,czero,v(i+1),desc_a,info)
+      scalf=cone/h(i+1,i)
+      call psb_geaxpby(scalf,w,czero,v(i+1),desc_a,info)
       do k=2,i
         call crot(1,h(k-1,i),1,h(k,i),1,real(c(k-1),kind=psb_spk_),s(k-1))
       enddo

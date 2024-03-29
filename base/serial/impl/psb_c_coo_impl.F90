@@ -254,7 +254,7 @@ subroutine psb_c_coo_spaxpby(alpha,a,beta,b,info)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   ! Allocate (temporary) space for the solution
-  call tcoo%allocate(M,N,(nza+nzb))
+  call tcoo%alloc(M,N,(nza+nzb))
   ! Compute the sum
 #if defined (OPENMP)
   block
@@ -365,7 +365,7 @@ function psb_c_coo_cmpmat(a,b,tol,info) result(res)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   ! Allocate (temporary) space for the solution
-  call tcoo%allocate(M,N,(nza+nzb))
+  call tcoo%alloc(M,N,(nza+nzb))
   ! Compute the sum
 #if defined (OPENMP)
   block
@@ -2873,7 +2873,7 @@ subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     isza = a%get_size()
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
-      call a%reallocate(max(nza+nz,int(1.5*isza)))
+      call a%realloc(max(nza+nz,int(1.5*isza)))
     endif
     isza = a%get_size()
     if (isza < (nza+nz)) then
@@ -3126,7 +3126,7 @@ subroutine psb_c_cp_coo_to_coo(a,b,info)
   call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
-  call b%reallocate(nz)
+  call b%realloc(nz)
 
 #if defined(OPENMP)
   block
@@ -3179,7 +3179,7 @@ subroutine psb_c_cp_coo_from_coo(a,b,info)
   call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
-  call a%reallocate(nz)
+  call a%realloc(nz)
 
 #if defined(OPENMP)
   block
@@ -3576,11 +3576,11 @@ subroutine psb_c_coo_tril(a,l,info,&
     lrws(:) = 0
     !$omp end workshare
     nz = a%get_nzeros()
-    call l%allocate(mb,nb,nz)
+    call l%alloc(mb,nb,nz)
     !write(0,*) 'Invocation of COO%TRIL', present(u),nz
     if (present(u)) then
       nzlin = l%get_nzeros() ! At this point it should be 0
-      call u%allocate(mb,nb,nz)
+      call u%alloc(mb,nb,nz)
       nzuin = u%get_nzeros() ! At this point it should be 0
       if (info == 0) call psb_realloc(mb,urws,info)
       !$omp workshare
@@ -3714,10 +3714,10 @@ subroutine psb_c_coo_tril(a,l,info,&
 
 #else
   nz = a%get_nzeros()
-  call l%allocate(mb,nb,nz)
+  call l%alloc(mb,nb,nz)
   if (present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
-    call u%allocate(mb,nb,nz)
+    call u%alloc(mb,nb,nz)
     nzuin = u%get_nzeros() ! At this point it should be 0
     associate(val =>a%val, ja => a%ja, ia=>a%ia)
       loop1: do k=1,nz      
@@ -3872,11 +3872,11 @@ subroutine psb_c_coo_triu(a,u,info,&
     urws(:) = 0
     !$omp end workshare
     nz = a%get_nzeros()
-    call u%allocate(mb,nb,nz)
+    call u%alloc(mb,nb,nz)
     !write(0,*) 'Invocation of COO%TRIL', present(u),nz
     if (present(l)) then
       nzuin = u%get_nzeros() ! At this point it should be 0
-      call l%allocate(mb,nb,nz)
+      call l%alloc(mb,nb,nz)
       nzlin = l%get_nzeros() ! At this point it should be 0
       if (info == 0) call psb_realloc(mb,urws,info)
       !$omp workshare
@@ -4011,11 +4011,11 @@ subroutine psb_c_coo_triu(a,u,info,&
   
 #else
   nz = a%get_nzeros()
-  call u%allocate(mb,nb,nz)
+  call u%alloc(mb,nb,nz)
 
   if (present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
-    call l%allocate(mb,nb,nz)
+    call l%alloc(mb,nb,nz)
     nzlin = l%get_nzeros() ! At this point it should be 0
     associate(val =>a%val, ja => a%ja, ia=>a%ia)
       loop1: do k=1,nz      
@@ -4893,7 +4893,7 @@ subroutine psb_c_cp_coo_to_lcoo(a,b,info)
   call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
-  call b%reallocate(nz)
+  call b%reallocate_nz(nz)
 
 #if defined(OPENMP)
   block
@@ -4945,7 +4945,7 @@ subroutine psb_c_cp_coo_from_lcoo(a,b,info)
   call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
-  call a%reallocate(nz)
+  call a%realloc(nz)
 
 #if defined(OPENMP)
   block
@@ -5558,7 +5558,7 @@ subroutine psb_lc_coo_spaxpby(alpha,a,beta,b,info)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   ! Allocate (temporary) space for the solution
-  call tcoo%allocate(M,N,(nza+nzb))
+  call psb_lc_coo_allocate_mnnz(M,N,tcoo,(nza+nzb))
   ! Compute the sum
 #if defined(OPENMP)
   block
@@ -5669,7 +5669,8 @@ function psb_lc_coo_cmpmat(a,b,tol,info) result(res)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   ! Allocate (temporary) space for the solution
-  call tcoo%allocate(M,N,(nza+nzb))
+  !call tcoo%alloc(M,N,(nza+nzb))
+  call psb_lc_coo_allocate_mnnz(M,N,tcoo,(nza+nzb))
   ! Compute the sum
 #if defined(OPENMP)
   block
@@ -6760,7 +6761,8 @@ subroutine psb_lc_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   if (a%is_bld()) then
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
-      call a%reallocate(max(nza+nz,int(1.5*isza)))
+      !call a%realloc(max(nza+nz,int(1.5*isza)))
+      call psb_lc_coo_reallocate_nz(max(nza+nz,int(1.5*isza)),a)
     endif
     isza = a%get_size()
     if (isza < (nza+nz)) then
@@ -6980,8 +6982,9 @@ subroutine psb_lc_cp_coo_to_coo(a,b,info)
   call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
-  call b%reallocate(nz)
-
+  !call b%realloc(nz)
+  call psb_lc_coo_reallocate_nz(nz,b)
+  
   b%ia(1:nz)  = a%ia(1:nz)
   b%ja(1:nz)  = a%ja(1:nz)
   b%val(1:nz) = a%val(1:nz)
@@ -7022,7 +7025,9 @@ subroutine psb_lc_cp_coo_from_coo(a,b,info)
   call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
-  call a%reallocate(nz)
+  !call a%realloc(nz)
+  call psb_lc_coo_reallocate_nz(nz,a)
+  
 
   a%ia(1:nz)  = b%ia(1:nz)
   a%ja(1:nz)  = b%ja(1:nz)
@@ -8138,7 +8143,7 @@ subroutine psb_lc_cp_coo_to_icoo(a,b,info)
   call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
-  call b%reallocate(nz)
+  call b%realloc(nz)
 
   b%ia(1:nz)  = a%ia(1:nz)
   b%ja(1:nz)  = a%ja(1:nz)
@@ -8179,8 +8184,10 @@ subroutine psb_lc_cp_coo_from_icoo(a,b,info)
   call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
-  call a%reallocate(nz)
+  !call a%realloc(nz)
+  call psb_lc_coo_reallocate_nz(nz,a)
 
+  
   a%ia(1:nz)  = b%ia(1:nz)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)

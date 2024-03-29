@@ -98,15 +98,15 @@ subroutine psb_c_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
   end if
 
 
-  call lmat%allocate(n_row,n_row,info,nz=nztota)
-  if (info == psb_success_) call umat%allocate(n_row,n_row,info,nz=nztota)
+  call lmat%csall(n_row,n_row,info,nz=nztota)
+  if (info == psb_success_) call umat%csall(n_row,n_row,info,nz=nztota)
 
 
   call psb_iluk_fact(fill1,psb_ilu_n_,a,lmat,umat,pd,info,blck=blck)
        !,uplevs=uplevs)
   !call psb_ciluk_fact(fill1,psb_ilu_n_,a,lmat,umat,pd,info,blck=blck)
 
-  if (info == psb_success_) call atmp%allocate(n_row,n_row,info,nz=nztota)
+  if (info == psb_success_) call atmp%csall(n_row,n_row,info,nz=nztota)
   if(info/=0) then
     info=psb_err_from_subroutine_
     ch_err='psb_sp_all'
@@ -187,7 +187,7 @@ subroutine psb_csparse_invk(n,a,z,fill_in,info,inlevs)
     goto 9999
   end if
   call a%cp_to(acsr)
-  call trw%allocate(izero,izero,ione)
+  call trw%alloc(izero,izero,ione)
   if (info == psb_success_) allocate(zw(n),iz(n),valz(n),&
        & row(n),rowlevs(n),stat=info)
   if (info /= psb_success_) then
@@ -205,7 +205,7 @@ subroutine psb_csparse_invk(n,a,z,fill_in,info,inlevs)
   row(:)     = czero
   rowlevs(:) = -(n+1)
 
-  call zcsr%allocate(n,n,n*fill_in)
+  call zcsr%allocate_mnnz(n,n,n*fill_in)
   call zcsr%set_triangle()
   call zcsr%set_unit(.false.)
   call zcsr%set_upper()

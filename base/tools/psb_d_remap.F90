@@ -208,7 +208,7 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
         nzl = nzl + nzsrc(ip)
       end do
 !!$      write(0,*) rme,' Check on NR:',newnl(rme+1),sum(nrsrc)
-      call acoo_rcv%allocate(newnl(rme+1),newnl(rme+1),nzl)
+      call acoo_rcv%allocate_imnnz(newnl(rme+1),newnl(rme+1),nzl)
       nrl = acoo_rcv%get_nrows()
       ncl = acoo_rcv%get_ncols()
       nzp = 0

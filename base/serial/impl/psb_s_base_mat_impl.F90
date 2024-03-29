@@ -587,7 +587,7 @@ subroutine psb_s_base_csclip(a,b,info,&
   else
     nb = a%get_ncols()  ! Should this be jmax_ ??
   endif
-  call b%allocate(mb,nb)
+  call b%alloc(mb,nb)
   call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin_, jmax=jmax_, append=.false., &
        & nzin=nzin, rscale=rscale_, cscale=cscale_)
@@ -688,11 +688,11 @@ subroutine psb_s_base_tril(a,l,info,&
 
 
   nz = a%get_nzeros()
-  call l%allocate(mb,nb,nz)
+  call l%alloc(mb,nb,nz)
 
   if (present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
-    call u%allocate(mb,nb,nz)
+    call u%alloc(mb,nb,nz)
     nzuin = u%get_nzeros() ! At this point it should be 0
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
@@ -841,11 +841,11 @@ subroutine psb_s_base_triu(a,u,info,&
 
 
   nz = a%get_nzeros()
-  call u%allocate(mb,nb,nz)
+  call u%alloc(mb,nb,nz)
 
   if (present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
-    call l%allocate(mb,nb,nz)
+    call l%alloc(mb,nb,nz)
     nzlin = l%get_nzeros() ! At this point it should be 0
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
@@ -960,7 +960,7 @@ subroutine psb_s_base_make_nonunit(a)
     n = tmp%get_ncols()
     mnm = min(m,n)
     nz = tmp%get_nzeros()
-    call tmp%reallocate(nz+mnm)
+    call tmp%realloc(nz+mnm)
     !$omp parallel do private(i) shared(nz)
     do i=1, mnm
       tmp%val(nz+i) = sone
@@ -3075,7 +3075,7 @@ subroutine psb_ls_base_csclip(a,b,info,&
   else
     nb = a%get_ncols()  ! Should this be jmax_ ??
   endif
-  call b%allocate(mb,nb)
+  call psb_ls_allocate_mnnz(mb,nb,b)
   call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin_, jmax=jmax_, append=.false., &
        & nzin=nzin, rscale=rscale_, cscale=cscale_)
@@ -3177,11 +3177,13 @@ subroutine psb_ls_base_tril(a,l,info,&
 
 
   nz = a%get_nzeros()
-  call l%allocate(mb,nb,nz)
+  call psb_ls_allocate_mnnz(mb,nb,l,nz)
+  !call l%allocate_mnnz(mb,nb,nz)
 
   if (present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
-    call u%allocate(mb,nb,nz)
+    !call u%allocate_mnnz(mb,nb,nz)
+    call psb_ls_allocate_mnnz(mb,nb,u,nz)      
     nzuin = u%get_nzeros() ! At this point it should be 0
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
@@ -3331,11 +3333,14 @@ subroutine psb_ls_base_triu(a,u,info,&
 
 
   nz = a%get_nzeros()
-  call u%allocate(mb,nb,nz)
+  !call u%allocate_mnnz(mb,nb,nz)
+  call psb_ls_allocate_mnnz(mb,nb,u,nz)
 
   if (present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
-    call l%allocate(mb,nb,nz)
+    !call l%allocate_mnnz(mb,nb,nz)
+    call psb_ls_allocate_mnnz(mb,nb,l,nz)
+      
     nzlin = l%get_nzeros() ! At this point it should be 0
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
@@ -3453,7 +3458,7 @@ subroutine psb_ls_base_make_nonunit(a)
     n = tmp%get_ncols()
     mnm = min(m,n)
     nz = tmp%get_nzeros()
-    call tmp%reallocate(nz+mnm)
+    call tmp%reallocate_nz(nz+mnm)
     !$omp parallel do private(i) shared(nz)
     do i=1, mnm
       tmp%val(nz+i) = sone

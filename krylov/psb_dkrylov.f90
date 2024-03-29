@@ -179,34 +179,34 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   select case(psb_toupper(method))
   case('CG') 
     call  psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
+         &itmax,iter,err,itrace_,istop,cond)
   case('FCG') 
     call  psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
+         &itmax,iter,err,itrace_,istop,cond)
   case('GCR') 
     call  psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace_,istop)
   case('CGS') 
     call  psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace_,istop)
   case('BICG') 
     call  psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace_,istop)
   case('BICGSTAB') 
     call  psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace_,istop)
   case('RGMRES','GMRES')
     call  psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
+         &itmax,iter,err,itrace_,irst,istop)
   case('BICGSTABL')
     call  psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
+         &itmax,iter,err,itrace_,irst,istop)
   case default
     if (me == 0) write(psb_err_unit,*) trim(name),&
          & ': Warning: Unknown method  ',method,&
          & ', defaulting to BiCGSTAB'
     call  psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace_,istop)
   end select
 
   if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)

@@ -167,6 +167,8 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: sizeof       => s_coo_sizeof
     procedure, pass(a) :: reallocate_nz => psb_s_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_s_coo_allocate_mnnz
+    generic,   public  :: alloc   => allocate_mnnz
+    generic,   public  :: realloc => reallocate_nz
     procedure, pass(a) :: ensure_size  => psb_s_coo_ensure_size
     procedure, pass(a) :: tril          => psb_s_coo_tril
     procedure, pass(a) :: triu          => psb_s_coo_triu
@@ -364,6 +366,16 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: sizeof       => ls_coo_sizeof
     procedure, pass(a) :: reallocate_nz => psb_ls_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_ls_coo_allocate_mnnz
+!!$#if defined(IPK4) && defined(LPK8)
+!!$    procedure, pass(a) :: allocate_imnnz => psb_lbase_allocate_imnnz
+!!$    procedure, pass(a) :: reallocate_inz => psb_lbase_reallocate_inz
+!!$    generic,   public  :: alloc   => allocate_mnnz, allocate_imnnz
+!!$    generic,   public  :: realloc => reallocate_nz, reallocate_inz
+!!$#else
+!!$    generic,   public  :: alloc   => allocate_mnnz
+!!$    generic,   public  :: realloc => reallocate_nz
+!!$#endif    
+
     procedure, pass(a) :: ensure_size  => psb_ls_coo_ensure_size
     procedure, pass(a) :: cp_to_coo    => psb_ls_cp_coo_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_ls_cp_coo_from_coo

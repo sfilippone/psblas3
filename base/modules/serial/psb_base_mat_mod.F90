@@ -215,10 +215,10 @@ module psb_base_mat_mod
     procedure, pass(a) :: asb        => psb_base_mat_asb
     procedure, pass(a) :: trim       => psb_base_trim
     procedure, pass(a) :: reinit     => psb_base_reinit
-    procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
-    procedure, pass(a) :: reallocate_nz => psb_base_reallocate_nz
-    generic,   public  :: allocate   => allocate_mnnz
-    generic,   public  :: reallocate => reallocate_nz
+!!$    procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
+!!$    procedure, pass(a) :: reallocate_nz => psb_base_reallocate_nz
+!!$    generic,   public  :: alloc   => allocate_mnnz
+!!$    generic,   public  :: realloc => reallocate_nz
 
 
     procedure, pass(a) :: csgetptn => psb_base_csgetptn
@@ -604,11 +604,11 @@ module psb_base_mat_mod
 #if defined(IPK4) && defined(LPK8)
     procedure, pass(a) :: allocate_imnnz => psb_lbase_allocate_imnnz
     procedure, pass(a) :: reallocate_inz => psb_lbase_reallocate_inz
-    generic,   public  :: allocate   => allocate_mnnz, allocate_imnnz
-    generic,   public  :: reallocate => reallocate_nz, reallocate_inz
+    generic,   public  :: alloc   => allocate_mnnz, allocate_imnnz
+    generic,   public  :: realloc => reallocate_nz, reallocate_inz
 #else
-    generic,   public  :: allocate   => allocate_mnnz
-    generic,   public  :: reallocate => reallocate_nz
+    generic,   public  :: alloc   => allocate_mnnz
+    generic,   public  :: realloc => reallocate_nz
 #endif    
     
 
@@ -1444,9 +1444,9 @@ contains
     ln = n
     if (present(nz)) then
       lnz = nz
-      call a%allocate(lm,ln,lnz)
+      call a%allocate_mnnz(lm,ln,lnz)
     else
-      call a%allocate(lm,ln)
+      call a%allocate_mnnz(lm,ln)
     end if
   end subroutine psb_lbase_allocate_imnnz
   
@@ -1455,7 +1455,7 @@ contains
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_) :: lnz
     lnz = nz
-    call a%reallocate(lnz)
+    call a%reallocate_nz(lnz)
   end subroutine psb_lbase_reallocate_inz
   
   subroutine  psb_lbase_set_inrows(m,a)

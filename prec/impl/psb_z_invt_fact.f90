@@ -134,13 +134,13 @@ subroutine psb_z_invt_bld(a,fillin,invfill,thresh,invthresh,&
   nzrmax    = fillin
   sp_thresh = thresh
 
-  call lmat%allocate(n_row,n_row,info,nz=nztota)
-  if (info == psb_success_) call umat%allocate(n_row,n_row,info,nz=nztota)
+  call lmat%csall(n_row,n_row,info,nz=nztota)
+  if (info == psb_success_) call umat%csall(n_row,n_row,info,nz=nztota)
 
   if (info == 0) call psb_ilut_fact(nzrmax,sp_thresh,&
        & a,lmat,umat,pd,info,blck=blck,iscale=psb_ilu_scale_maxval_)
 
-  if (info == psb_success_) call atmp%allocate(n_row,n_row,info,nz=nztota)
+  if (info == psb_success_) call atmp%csall(n_row,n_row,info,nz=nztota)
   if(info/=0) then
     info=psb_err_from_subroutine_
     ch_err='psb_sp_all'
@@ -229,7 +229,7 @@ subroutine psb_zsparse_invt(n,a,z,nzrmax,sp_thresh,info)
     goto 9999
   end if
   call a%cp_to(acsr)
-  call trw%allocate(izero,izero,ione)
+  call trw%alloc(izero,izero,ione)
   if (info == psb_success_) allocate(zw(n),iz(n),valz(n),&
        & row(n),rowlevs(n),stat=info)
   if (info /= psb_success_) then
@@ -237,7 +237,7 @@ subroutine psb_zsparse_invt(n,a,z,nzrmax,sp_thresh,info)
     goto 9999
   end if
 
-  call zcsr%allocate(n,n,n*nzrmax)
+  call zcsr%allocate_mnnz(n,n,n*nzrmax)
   call zcsr%set_triangle()
   call zcsr%set_unit(.false.)
   call zcsr%set_upper()

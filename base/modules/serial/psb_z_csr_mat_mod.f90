@@ -580,107 +580,107 @@ module psb_z_csr_mat_mod
   end interface
 
   
-  type, extends(psb_z_csr_sparse_mat) :: psb_z_ecsr_sparse_mat
-    
-    !> Number of non-empty rows
-    integer(psb_ipk_) :: nnerws
-    !> Indices of non-empty rows
-    integer(psb_ipk_), allocatable :: nerwp(:)
-
-  contains
-    procedure, nopass  :: get_fmt     => z_ecsr_get_fmt
-
-    !    procedure, pass(a) :: csmm        => psb_z_ecsr_csmm
-    procedure, pass(a) :: csmv        => psb_z_ecsr_csmv
-
-    procedure, pass(a) :: cp_from_coo => psb_z_cp_ecsr_from_coo
-    procedure, pass(a) :: cp_from_fmt => psb_z_cp_ecsr_from_fmt
-    procedure, pass(a) :: mv_from_coo => psb_z_mv_ecsr_from_coo
-    procedure, pass(a) :: mv_from_fmt => psb_z_mv_ecsr_from_fmt
-
-    procedure, pass(a) :: cmp_nerwp   => psb_z_ecsr_cmp_nerwp
-    procedure, pass(a) :: free        => z_ecsr_free
-    procedure, pass(a) :: mold        => psb_z_ecsr_mold
-
-  end type psb_z_ecsr_sparse_mat
-  !> \memberof psb_z_ecsr_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_csmv
-  interface
-    subroutine psb_z_ecsr_csmv(alpha,a,x,beta,y,info,trans)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-      complex(psb_dpk_), intent(inout)       :: y(:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
-    end subroutine psb_z_ecsr_csmv
-  end interface
-
-  !> \memberof psb_z_ecsr_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_coo
-  interface
-    subroutine psb_z_ecsr_cmp_nerwp(a,info)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine psb_z_ecsr_cmp_nerwp
-  end interface
-
-  !> \memberof psb_z_ecsr_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_coo
-  interface
-    subroutine psb_z_cp_ecsr_from_coo(a,b,info)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
-      class(psb_z_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine psb_z_cp_ecsr_from_coo
-  end interface
-
-  !> \memberof psb_z_ecsr_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_fmt
-  interface
-    subroutine psb_z_cp_ecsr_from_fmt(a,b,info)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
-      class(psb_z_base_sparse_mat), intent(in)   :: b
-      integer(psb_ipk_), intent(out)                        :: info
-    end subroutine psb_z_cp_ecsr_from_fmt
-  end interface
-
-  !> \memberof psb_z_ecsr_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_mv_from_coo
-  interface
-    subroutine psb_z_mv_ecsr_from_coo(a,b,info)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
-      class(psb_z_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                        :: info
-    end subroutine psb_z_mv_ecsr_from_coo
-  end interface
-
-  !> \memberof psb_z_ecsr_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_mv_from_fmt
-  interface
-    subroutine psb_z_mv_ecsr_from_fmt(a,b,info)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(inout)  :: a
-      class(psb_z_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                         :: info
-    end subroutine psb_z_mv_ecsr_from_fmt
-  end interface
-
-  !> \memberof psb_z_ecsr_sparse_mat
-  !| \see psb_base_mat_mod::psb_base_mold
-  interface
-    subroutine psb_z_ecsr_mold(a,b,info)
-      import
-      class(psb_z_ecsr_sparse_mat), intent(in)                  :: a
-      class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
-    end subroutine psb_z_ecsr_mold
-  end interface
-
+!!$  type, extends(psb_z_csr_sparse_mat) :: psb_z_ecsr_sparse_mat
+!!$    
+!!$    !> Number of non-empty rows
+!!$    integer(psb_ipk_) :: nnerws
+!!$    !> Indices of non-empty rows
+!!$    integer(psb_ipk_), allocatable :: nerwp(:)
+!!$
+!!$  contains
+!!$    procedure, nopass  :: get_fmt     => z_ecsr_get_fmt
+!!$
+!!$    !    procedure, pass(a) :: csmm        => psb_z_ecsr_csmm
+!!$    procedure, pass(a) :: csmv        => psb_z_ecsr_csmv
+!!$
+!!$    procedure, pass(a) :: cp_from_coo => psb_z_cp_ecsr_from_coo
+!!$    procedure, pass(a) :: cp_from_fmt => psb_z_cp_ecsr_from_fmt
+!!$    procedure, pass(a) :: mv_from_coo => psb_z_mv_ecsr_from_coo
+!!$    procedure, pass(a) :: mv_from_fmt => psb_z_mv_ecsr_from_fmt
+!!$
+!!$    procedure, pass(a) :: cmp_nerwp   => psb_z_ecsr_cmp_nerwp
+!!$    procedure, pass(a) :: free        => z_ecsr_free
+!!$    procedure, pass(a) :: mold        => psb_z_ecsr_mold
+!!$
+!!$  end type psb_z_ecsr_sparse_mat
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_csmv
+!!$  interface
+!!$    subroutine psb_z_ecsr_csmv(alpha,a,x,beta,y,info,trans)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(in) :: a
+!!$      complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+!!$      complex(psb_dpk_), intent(inout)       :: y(:)
+!!$      integer(psb_ipk_), intent(out)                :: info
+!!$      character, optional, intent(in)     :: trans
+!!$    end subroutine psb_z_ecsr_csmv
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_coo
+!!$  interface
+!!$    subroutine psb_z_ecsr_cmp_nerwp(a,info)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$    end subroutine psb_z_ecsr_cmp_nerwp
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_coo
+!!$  interface
+!!$    subroutine psb_z_cp_ecsr_from_coo(a,b,info)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
+!!$      class(psb_z_coo_sparse_mat), intent(in)    :: b
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$    end subroutine psb_z_cp_ecsr_from_coo
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_cp_from_fmt
+!!$  interface
+!!$    subroutine psb_z_cp_ecsr_from_fmt(a,b,info)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
+!!$      class(psb_z_base_sparse_mat), intent(in)   :: b
+!!$      integer(psb_ipk_), intent(out)                        :: info
+!!$    end subroutine psb_z_cp_ecsr_from_fmt
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_mv_from_coo
+!!$  interface
+!!$    subroutine psb_z_mv_ecsr_from_coo(a,b,info)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(inout) :: a
+!!$      class(psb_z_coo_sparse_mat), intent(inout) :: b
+!!$      integer(psb_ipk_), intent(out)                        :: info
+!!$    end subroutine psb_z_mv_ecsr_from_coo
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !! \see psb_z_base_mat_mod::psb_z_base_mv_from_fmt
+!!$  interface
+!!$    subroutine psb_z_mv_ecsr_from_fmt(a,b,info)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(inout)  :: a
+!!$      class(psb_z_base_sparse_mat), intent(inout) :: b
+!!$      integer(psb_ipk_), intent(out)                         :: info
+!!$    end subroutine psb_z_mv_ecsr_from_fmt
+!!$  end interface
+!!$
+!!$  !> \memberof psb_z_ecsr_sparse_mat
+!!$  !| \see psb_base_mat_mod::psb_base_mold
+!!$  interface
+!!$    subroutine psb_z_ecsr_mold(a,b,info)
+!!$      import
+!!$      class(psb_z_ecsr_sparse_mat), intent(in)                  :: a
+!!$      class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
+!!$      integer(psb_ipk_), intent(out)                           :: info
+!!$    end subroutine psb_z_ecsr_mold
+!!$  end interface
+!!$
 
   
   !> \namespace  psb_base_mod  \class  psb_lz_csr_sparse_mat
@@ -1281,25 +1281,24 @@ contains
   end subroutine z_csr_free
 
 
-
-  function z_ecsr_get_fmt() result(res)
-    implicit none
-    character(len=5) :: res
-    res = 'ECSR'
-  end function z_ecsr_get_fmt
-
-  subroutine  z_ecsr_free(a)
-    implicit none
-
-    class(psb_z_ecsr_sparse_mat), intent(inout) :: a
-
-    
-    if (allocated(a%nerwp)) deallocate(a%nerwp)
-    a%nnerws = 0
-    call a%psb_z_csr_sparse_mat%free()
-
-    return
-  end subroutine z_ecsr_free
+!!$  function z_ecsr_get_fmt() result(res)
+!!$    implicit none
+!!$    character(len=5) :: res
+!!$    res = 'ECSR'
+!!$  end function z_ecsr_get_fmt
+!!$
+!!$  subroutine  z_ecsr_free(a)
+!!$    implicit none
+!!$
+!!$    class(psb_z_ecsr_sparse_mat), intent(inout) :: a
+!!$
+!!$    
+!!$    if (allocated(a%nerwp)) deallocate(a%nerwp)
+!!$    a%nnerws = 0
+!!$    call a%psb_z_csr_sparse_mat%free()
+!!$
+!!$    return
+!!$  end subroutine z_ecsr_free
 
 
   ! == ===================================

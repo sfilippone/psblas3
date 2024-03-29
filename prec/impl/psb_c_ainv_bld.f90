@@ -152,7 +152,8 @@ subroutine psb_c_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   case(psb_ilu_scale_maxval_)
     weight = acsr%maxval()
     weight = cone/weight
-    call acsr%scal(weight,info)
+    !call acsr%scal(weight,info)
+    call psb_c_csr_scals(weight,a,info)
 
   case(psb_ilu_scale_arcsum_)
     allocate(arws(n_row),acls(n_row),ad(n_row),stat=info)
@@ -160,12 +161,16 @@ subroutine psb_c_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999
     end if
-    call acsr%arwsum(arws)
-    call acsr%aclsum(acls)
+    !call acsr%arwsum(arws)
+    !call acsr%aclsum(acls)
+    call psb_c_csr_arwsum(arws,acsr)
+    call psb_c_csr_aclsum(acls,acsr)
     ad(1:n_row) = sqrt(sqrt(arws(1:n_row)*acls(1:n_row)))
     ad(1:n_row) = cone/ad(1:n_row)
-    call acsr%scal(ad,info,side='L')
-    call acsr%scal(ad,info,side='R')
+    !call acsr%scal(ad,info,side='L')
+    !call acsr%scal(ad,info,side='R')
+    call psb_c_csr_scal(ad,acsr,info,'L')
+    call psb_c_csr_scal(ad,acsr,info,'R')
   case default
     call psb_errpush(psb_err_from_subroutine_,name,a_err='wrong iscale')
     goto 9999

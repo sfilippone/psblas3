@@ -50,7 +50,7 @@ subroutine psb_z_cp_dia_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  call b%alloc(nr,nc,nza)
   b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
 
   call psi_z_xtr_coo_from_dia(nr,nc,&

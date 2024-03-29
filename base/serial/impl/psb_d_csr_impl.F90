@@ -2298,11 +2298,11 @@ subroutine psb_d_csr_tril(a,l,info,&
     lrws(:) = 0
     !$omp end workshare
     nz = a%get_nzeros()
-    call l%allocate(mb,nb,nz)
+    call l%alloc(mb,nb,nz)
     !write(0,*) 'Invocation of COO%TRIL', present(u),nz
     if (present(u)) then
       nzlin = l%get_nzeros() ! At this point it should be 0
-      call u%allocate(mb,nb,nz)
+      call u%alloc(mb,nb,nz)
       nzuin = u%get_nzeros() ! At this point it should be 0
       if (info == 0) call psb_realloc(mb,urws,info)
       !$omp workshare
@@ -2439,11 +2439,11 @@ subroutine psb_d_csr_tril(a,l,info,&
   end block
 #else
   nz = a%get_nzeros()
-  call l%allocate(mb,nb,nz)
+  call l%alloc(mb,nb,nz)
 
   if (present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
-    call u%allocate(mb,nb,nz)
+    call u%alloc(mb,nb,nz)
     nzuin = u%get_nzeros() ! At this point it should be 0
     associate(val =>a%val, ja => a%ja, irp=>a%irp)
       do i=imin_,imax_
@@ -2600,11 +2600,11 @@ subroutine psb_d_csr_triu(a,u,info,&
     urws(:) = 0
     !$omp end workshare
     nz = a%get_nzeros()
-    call u%allocate(mb,nb,nz)
+    call u%alloc(mb,nb,nz)
     !write(0,*) 'Invocation of COO%TRIL', present(u),nz
     if (present(l)) then
       nzuin = u%get_nzeros() ! At this point it should be 0
-      call l%allocate(mb,nb,nz)
+      call l%alloc(mb,nb,nz)
       nzlin = l%get_nzeros() ! At this point it should be 0
       if (info == 0) call psb_realloc(mb,urws,info)
       !$omp workshare
@@ -2744,11 +2744,11 @@ subroutine psb_d_csr_triu(a,u,info,&
 #else
 
   nz = a%get_nzeros()
-  call u%allocate(mb,nb,nz)
+  call u%alloc(mb,nb,nz)
 
   if (present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
-    call l%allocate(mb,nb,nz)
+    call l%alloc(mb,nb,nz)
     nzlin = l%get_nzeros() ! At this point it should be 0
     associate(val =>a%val, ja => a%ja, irp=>a%irp)
       do i=imin_,imax_
@@ -3276,7 +3276,7 @@ subroutine psb_d_cp_csr_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  call b%alloc(nr,nc,nza)
   b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
 
   do i=1, nr
@@ -3693,7 +3693,7 @@ subroutine psb_dcsrspspmm(a,b,c,info)
     nza = a%get_nzeros()
     nzb = b%get_nzeros()
     nzc = 2*(nza+nzb)
-    call c%allocate(ma,nb,nzc)
+    call c%alloc(ma,nb,nzc)
 
     call csr_spspmm(a,b,c,info)
   case (spspmm_omp_gustavson)
@@ -3809,7 +3809,7 @@ contains
     ma = a%get_nrows()
     nb = b%get_ncols()
 
-    call c%allocate(ma, nb)
+    call c%alloc(ma, nb)
     c%irp(1) = 1
 
     ! dense accumulator
@@ -3916,7 +3916,7 @@ contains
     ma = a%get_nrows()
     nb = b%get_ncols()
 
-    call c%allocate(ma, nb)
+    call c%alloc(ma, nb)
     c%irp(1) = 1
 
     ! dense accumulator
@@ -4032,7 +4032,7 @@ contains
     b_n = b%get_ncols()
 
     allocate(row_accs(a_m))
-    call c%allocate(a_m, b_n)
+    call c%alloc(a_m, b_n)
 
     do row = 1, a_m
       row_accs(row)%nnz = 0
@@ -4064,10 +4064,10 @@ contains
     a_m = a%get_nrows()
     b_n = b%get_ncols()
 
-    call c%allocate(a_m, b_n)
+    call c%alloc(a_m, b_n)
 
     allocate(row_accs(a_m))
-    call c%allocate(a_m, b_n)
+    call c%alloc(a_m, b_n)
 
     !$omp parallel do schedule(static)
     do row = 1, a_m
@@ -4171,7 +4171,7 @@ contains
     a_m = a%get_nrows()
     b_n = b%get_ncols()
 
-    call c%allocate(a_m, b_n)
+    call c%alloc(a_m, b_n)
 
     call compute_indices(a, b, c, info)
 
@@ -4224,7 +4224,7 @@ subroutine psb_dcsrspspmm(a,b,c,info)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   nzc = 2*(nza+nzb)
-  call c%allocate(ma,nb,nzc)
+  call c%allocate_mnnz(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
 
@@ -4312,265 +4312,265 @@ contains
 end subroutine psb_dcsrspspmm
 #endif
 
-subroutine psb_d_ecsr_mold(a,b,info)
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_ecsr_mold
-  use psb_error_mod
-  implicit none
-  class(psb_d_ecsr_sparse_mat), intent(in)                 :: a
-  class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
-  integer(psb_ipk_), intent(out)                    :: info
-  integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='ecsr_mold'
-  logical, parameter :: debug=.false.
-
-  call psb_get_erraction(err_act)
-
-  info = 0
-  if (allocated(b)) then
-    call b%free()
-    deallocate(b,stat=info)
-  end if
-  if (info == 0) allocate(psb_d_ecsr_sparse_mat :: b, stat=info)
-
-  if (info /= 0) then
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info, name)
-    goto 9999
-  end if
-  return
-
-9999 call psb_error_handler(err_act)
-  return
-
-end subroutine psb_d_ecsr_mold
-
-subroutine psb_d_ecsr_csmv(alpha,a,x,beta,y,info,trans)
-  use psb_error_mod
-  use psb_string_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_ecsr_csmv
-  implicit none
-  class(psb_d_ecsr_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
-  integer(psb_ipk_), intent(out)                :: info
-  character, optional, intent(in)     :: trans
-
-  character :: trans_
-  integer(psb_ipk_) :: m, n
-  logical   :: tra, ctra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='d_csr_csmv'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  info = psb_success_
-  if (a%is_dev())   call a%sync()
-
-  if (present(trans)) then
-    trans_ = trans
-  else
-    trans_ = 'N'
-  end if
-
-  if (.not.a%is_asb()) then
-    info = psb_err_invalid_mat_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  tra  = (psb_toupper(trans_) == 'T')
-  ctra = (psb_toupper(trans_) == 'C')
-
-  if (tra.or.ctra) then
-    m = a%get_ncols()
-    n = a%get_nrows()
-  else
-    n = a%get_ncols()
-    m = a%get_nrows()
-  end if
-
-  if (size(x,1)<n) then
-    info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = size(x); ierr(3) = n;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  end if
-
-  if (size(y,1)<m) then
-    info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = size(y); ierr(3) =m;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  end if
-
-  if ((beta == done).and.&
-       & .not.(tra.or.ctra.or.(a%is_triangle()).or.(a%is_unit()))) then    
-    call psb_d_ecsr_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
-         & a%nnerws,a%nerwp,x,y)
-  else
-    call a%psb_d_csr_sparse_mat%csmv(alpha,x,beta,y,info,trans)
-  end if
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-contains
-  subroutine psb_d_ecsr_csmv_inner(m,n,alpha,irp,ja,val,&
-       & nnerws,nerwp,x,y)
-    integer(psb_ipk_), intent(in)    :: m,n,nnerws,irp(*),ja(*),nerwp(*)
-    real(psb_dpk_), intent(in)      :: alpha, x(*),val(*)
-    real(psb_dpk_), intent(inout)   :: y(*)
-
-
-    integer(psb_ipk_) :: i,j,ir
-    real(psb_dpk_) :: acc
-
-    if (alpha == dzero) return
-
-    if (alpha == done) then
-      !$omp parallel do private(ir,i,j,acc)
-      do ir=1,nnerws
-        i = nerwp(ir)
-        acc  = dzero
-        do j=irp(i), irp(i+1)-1
-          acc  = acc + val(j) * x(ja(j))
-        enddo
-        y(i) = y(i) + acc
-      end do
-      
-    else if (alpha == -done) then
-      
-      !$omp parallel do private(ir,i,j,acc)
-      do ir=1,nnerws
-        i = nerwp(ir)
-        acc  = dzero
-        do j=irp(i), irp(i+1)-1
-          acc  = acc + val(j) * x(ja(j))
-        enddo
-        y(i) = y(i) -acc
-      end do
-      
-    else
-      
-      !$omp parallel do private(ir,i,j,acc)
-      do ir=1,nnerws
-        i = nerwp(ir)
-        acc  = dzero
-        do j=irp(i), irp(i+1)-1
-          acc  = acc + val(j) * x(ja(j))
-        enddo
-        y(i) = y(i) + alpha*acc
-      end do
-      
-    end if
-
-  end subroutine psb_d_ecsr_csmv_inner
-
-end subroutine psb_d_ecsr_csmv
-
-
-subroutine psb_d_ecsr_cmp_nerwp(a,info)
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_d_base_mat_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_ecsr_cmp_nerwp
-  implicit none
-
-  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_), intent(out)               :: info
-
-  integer(psb_ipk_) :: nnerws, i, nr, nzr
-  info = psb_success_
-  nr = a%get_nrows()
-  call psb_realloc(nr,a%nerwp,info)
-  nnerws = 0 
-  do i=1, nr
-    nzr = a%irp(i+1)-a%irp(i)
-    if (nzr>0) then 
-      nnerws = nnerws + 1
-      a%nerwp(nnerws) = i
-    end if
-  end do
-  call psb_realloc(nnerws,a%nerwp,info)
-  a%nnerws = nnerws
-end subroutine psb_d_ecsr_cmp_nerwp
-
-subroutine psb_d_cp_ecsr_from_coo(a,b,info)
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_d_base_mat_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_ecsr_from_coo
-  implicit none
-
-  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(in)    :: b
-  integer(psb_ipk_), intent(out)               :: info
-  
-  info = psb_success_
-  call a%psb_d_csr_sparse_mat%cp_from_coo(b,info)
-  if (info == psb_success_) call a%cmp_nerwp(info)
-
-end subroutine psb_d_cp_ecsr_from_coo
-
-subroutine psb_d_mv_ecsr_from_coo(a,b,info)
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_d_base_mat_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_mv_ecsr_from_coo
-  implicit none
-
-  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(out)                        :: info
-
-  
-  info = psb_success_
-  call a%psb_d_csr_sparse_mat%mv_from_coo(b,info)
-  if (info == psb_success_) call a%cmp_nerwp(info)
-
-end subroutine psb_d_mv_ecsr_from_coo
-
-subroutine psb_d_mv_ecsr_from_fmt(a,b,info)
-  use psb_const_mod
-  use psb_d_base_mat_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_mv_ecsr_from_fmt
-  implicit none
-
-  class(psb_d_ecsr_sparse_mat), intent(inout)  :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(out)                         :: info
-
-  
-  info = psb_success_
-  call a%psb_d_csr_sparse_mat%mv_from_fmt(b,info)
-  if (info == psb_success_) call a%cmp_nerwp(info)
-
-end subroutine psb_d_mv_ecsr_from_fmt
-
-subroutine psb_d_cp_ecsr_from_fmt(a,b,info)
-  use psb_const_mod
-  use psb_d_base_mat_mod
-  use psb_realloc_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_ecsr_from_fmt
-  implicit none
-
-  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(in)   :: b
-  integer(psb_ipk_), intent(out)                        :: info
-
-  
-  info = psb_success_
-  call a%psb_d_csr_sparse_mat%cp_from_fmt(b,info)
-  if (info == psb_success_) call a%cmp_nerwp(info)
-
-end subroutine psb_d_cp_ecsr_from_fmt
+!!$subroutine psb_d_ecsr_mold(a,b,info)
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_ecsr_mold
+!!$  use psb_error_mod
+!!$  implicit none
+!!$  class(psb_d_ecsr_sparse_mat), intent(in)                 :: a
+!!$  class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+!!$  integer(psb_ipk_), intent(out)                    :: info
+!!$  integer(psb_ipk_) :: err_act
+!!$  character(len=20)  :: name='ecsr_mold'
+!!$  logical, parameter :: debug=.false.
+!!$
+!!$  call psb_get_erraction(err_act)
+!!$
+!!$  info = 0
+!!$  if (allocated(b)) then
+!!$    call b%free()
+!!$    deallocate(b,stat=info)
+!!$  end if
+!!$  if (info == 0) allocate(psb_d_ecsr_sparse_mat :: b, stat=info)
+!!$
+!!$  if (info /= 0) then
+!!$    info = psb_err_alloc_dealloc_
+!!$    call psb_errpush(info, name)
+!!$    goto 9999
+!!$  end if
+!!$  return
+!!$
+!!$9999 call psb_error_handler(err_act)
+!!$  return
+!!$
+!!$end subroutine psb_d_ecsr_mold
+!!$
+!!$subroutine psb_d_ecsr_csmv(alpha,a,x,beta,y,info,trans)
+!!$  use psb_error_mod
+!!$  use psb_string_mod
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_ecsr_csmv
+!!$  implicit none
+!!$  class(psb_d_ecsr_sparse_mat), intent(in) :: a
+!!$  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+!!$  real(psb_dpk_), intent(inout)       :: y(:)
+!!$  integer(psb_ipk_), intent(out)                :: info
+!!$  character, optional, intent(in)     :: trans
+!!$
+!!$  character :: trans_
+!!$  integer(psb_ipk_) :: m, n
+!!$  logical   :: tra, ctra
+!!$  integer(psb_ipk_) :: err_act
+!!$  integer(psb_ipk_) :: ierr(5)
+!!$  character(len=20)  :: name='d_csr_csmv'
+!!$  logical, parameter :: debug=.false.
+!!$
+!!$  call psb_erractionsave(err_act)
+!!$  info = psb_success_
+!!$  if (a%is_dev())   call a%sync()
+!!$
+!!$  if (present(trans)) then
+!!$    trans_ = trans
+!!$  else
+!!$    trans_ = 'N'
+!!$  end if
+!!$
+!!$  if (.not.a%is_asb()) then
+!!$    info = psb_err_invalid_mat_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
+!!$
+!!$
+!!$  tra  = (psb_toupper(trans_) == 'T')
+!!$  ctra = (psb_toupper(trans_) == 'C')
+!!$
+!!$  if (tra.or.ctra) then
+!!$    m = a%get_ncols()
+!!$    n = a%get_nrows()
+!!$  else
+!!$    n = a%get_ncols()
+!!$    m = a%get_nrows()
+!!$  end if
+!!$
+!!$  if (size(x,1)<n) then
+!!$    info = psb_err_input_asize_small_i_
+!!$    ierr(1) = 3; ierr(2) = size(x); ierr(3) = n;
+!!$    call psb_errpush(info,name,i_err=ierr)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  if (size(y,1)<m) then
+!!$    info = psb_err_input_asize_small_i_
+!!$    ierr(1) = 5; ierr(2) = size(y); ierr(3) =m;
+!!$    call psb_errpush(info,name,i_err=ierr)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  if ((beta == done).and.&
+!!$       & .not.(tra.or.ctra.or.(a%is_triangle()).or.(a%is_unit()))) then    
+!!$    call psb_d_ecsr_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
+!!$         & a%nnerws,a%nerwp,x,y)
+!!$  else
+!!$    call a%psb_d_csr_sparse_mat%csmv(alpha,x,beta,y,info,trans)
+!!$  end if
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 call psb_error_handler(err_act)
+!!$
+!!$  return
+!!$
+!!$contains
+!!$  subroutine psb_d_ecsr_csmv_inner(m,n,alpha,irp,ja,val,&
+!!$       & nnerws,nerwp,x,y)
+!!$    integer(psb_ipk_), intent(in)    :: m,n,nnerws,irp(*),ja(*),nerwp(*)
+!!$    real(psb_dpk_), intent(in)      :: alpha, x(*),val(*)
+!!$    real(psb_dpk_), intent(inout)   :: y(*)
+!!$
+!!$
+!!$    integer(psb_ipk_) :: i,j,ir
+!!$    real(psb_dpk_) :: acc
+!!$
+!!$    if (alpha == dzero) return
+!!$
+!!$    if (alpha == done) then
+!!$      !$omp parallel do private(ir,i,j,acc)
+!!$      do ir=1,nnerws
+!!$        i = nerwp(ir)
+!!$        acc  = dzero
+!!$        do j=irp(i), irp(i+1)-1
+!!$          acc  = acc + val(j) * x(ja(j))
+!!$        enddo
+!!$        y(i) = y(i) + acc
+!!$      end do
+!!$      
+!!$    else if (alpha == -done) then
+!!$      
+!!$      !$omp parallel do private(ir,i,j,acc)
+!!$      do ir=1,nnerws
+!!$        i = nerwp(ir)
+!!$        acc  = dzero
+!!$        do j=irp(i), irp(i+1)-1
+!!$          acc  = acc + val(j) * x(ja(j))
+!!$        enddo
+!!$        y(i) = y(i) -acc
+!!$      end do
+!!$      
+!!$    else
+!!$      
+!!$      !$omp parallel do private(ir,i,j,acc)
+!!$      do ir=1,nnerws
+!!$        i = nerwp(ir)
+!!$        acc  = dzero
+!!$        do j=irp(i), irp(i+1)-1
+!!$          acc  = acc + val(j) * x(ja(j))
+!!$        enddo
+!!$        y(i) = y(i) + alpha*acc
+!!$      end do
+!!$      
+!!$    end if
+!!$
+!!$  end subroutine psb_d_ecsr_csmv_inner
+!!$
+!!$end subroutine psb_d_ecsr_csmv
+!!$
+!!$
+!!$subroutine psb_d_ecsr_cmp_nerwp(a,info)
+!!$  use psb_const_mod
+!!$  use psb_realloc_mod
+!!$  use psb_d_base_mat_mod
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_ecsr_cmp_nerwp
+!!$  implicit none
+!!$
+!!$  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$
+!!$  integer(psb_ipk_) :: nnerws, i, nr, nzr
+!!$  info = psb_success_
+!!$  nr = a%get_nrows()
+!!$  call psb_realloc(nr,a%nerwp,info)
+!!$  nnerws = 0 
+!!$  do i=1, nr
+!!$    nzr = a%irp(i+1)-a%irp(i)
+!!$    if (nzr>0) then 
+!!$      nnerws = nnerws + 1
+!!$      a%nerwp(nnerws) = i
+!!$    end if
+!!$  end do
+!!$  call psb_realloc(nnerws,a%nerwp,info)
+!!$  a%nnerws = nnerws
+!!$end subroutine psb_d_ecsr_cmp_nerwp
+!!$
+!!$subroutine psb_d_cp_ecsr_from_coo(a,b,info)
+!!$  use psb_const_mod
+!!$  use psb_realloc_mod
+!!$  use psb_d_base_mat_mod
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_ecsr_from_coo
+!!$  implicit none
+!!$
+!!$  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+!!$  class(psb_d_coo_sparse_mat), intent(in)    :: b
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$  
+!!$  info = psb_success_
+!!$  call a%psb_d_csr_sparse_mat%cp_from_coo(b,info)
+!!$  if (info == psb_success_) call a%cmp_nerwp(info)
+!!$
+!!$end subroutine psb_d_cp_ecsr_from_coo
+!!$
+!!$subroutine psb_d_mv_ecsr_from_coo(a,b,info)
+!!$  use psb_const_mod
+!!$  use psb_realloc_mod
+!!$  use psb_error_mod
+!!$  use psb_d_base_mat_mod
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_mv_ecsr_from_coo
+!!$  implicit none
+!!$
+!!$  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+!!$  class(psb_d_coo_sparse_mat), intent(inout) :: b
+!!$  integer(psb_ipk_), intent(out)                        :: info
+!!$
+!!$  
+!!$  info = psb_success_
+!!$  call a%psb_d_csr_sparse_mat%mv_from_coo(b,info)
+!!$  if (info == psb_success_) call a%cmp_nerwp(info)
+!!$
+!!$end subroutine psb_d_mv_ecsr_from_coo
+!!$
+!!$subroutine psb_d_mv_ecsr_from_fmt(a,b,info)
+!!$  use psb_const_mod
+!!$  use psb_d_base_mat_mod
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_mv_ecsr_from_fmt
+!!$  implicit none
+!!$
+!!$  class(psb_d_ecsr_sparse_mat), intent(inout)  :: a
+!!$  class(psb_d_base_sparse_mat), intent(inout) :: b
+!!$  integer(psb_ipk_), intent(out)                         :: info
+!!$
+!!$  
+!!$  info = psb_success_
+!!$  call a%psb_d_csr_sparse_mat%mv_from_fmt(b,info)
+!!$  if (info == psb_success_) call a%cmp_nerwp(info)
+!!$
+!!$end subroutine psb_d_mv_ecsr_from_fmt
+!!$
+!!$subroutine psb_d_cp_ecsr_from_fmt(a,b,info)
+!!$  use psb_const_mod
+!!$  use psb_d_base_mat_mod
+!!$  use psb_realloc_mod
+!!$  use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_ecsr_from_fmt
+!!$  implicit none
+!!$
+!!$  class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+!!$  class(psb_d_base_sparse_mat), intent(in)   :: b
+!!$  integer(psb_ipk_), intent(out)                        :: info
+!!$
+!!$  
+!!$  info = psb_success_
+!!$  call a%psb_d_csr_sparse_mat%cp_from_fmt(b,info)
+!!$  if (info == psb_success_) call a%cmp_nerwp(info)
+!!$
+!!$end subroutine psb_d_cp_ecsr_from_fmt
 
 !
 !
@@ -5568,11 +5568,13 @@ subroutine psb_ld_csr_tril(a,l,info,&
 
 
   nz = a%get_nzeros()
-  call l%allocate(mb,nb,nz)
+  !call l%allocate_mnnz(mb,nb,nz)
+  call psb_ld_coo_allocate_mnnz(mb,nb,l,nz)
 
   if (present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
-    call u%allocate(mb,nb,nz)
+    !call u%allocate_mnnz(mb,nb,nz)
+    call psb_ld_coo_allocate_mnnz(mb,nb,u,nz)
     nzuin = u%get_nzeros() ! At this point it should be 0
     associate(val =>a%val, ja => a%ja, irp=>a%irp)
       do i=imin_,imax_
@@ -5723,11 +5725,12 @@ subroutine psb_ld_csr_triu(a,u,info,&
 
 
   nz = a%get_nzeros()
-  call u%allocate(mb,nb,nz)
-
+  !call u%alloc(mb,nb,nz)
+  call psb_ld_coo_allocate_mnnz(mb,nb,u,nz)
   if (present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
-    call l%allocate(mb,nb,nz)
+    !call l%alloc(mb,nb,nz)
+    call psb_ld_coo_allocate_mnnz(mb,nb,l,nz)    
     nzlin = l%get_nzeros() ! At this point it should be 0
     associate(val =>a%val, ja => a%ja, irp=>a%irp)
       do i=imin_,imax_
@@ -6239,7 +6242,8 @@ subroutine psb_ld_cp_csr_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  !call b%alloc(nr,nc,nza)
+  call psb_ld_coo_allocate_mnnz(nr,nc,b,nza)
   b%psb_ld_base_sparse_mat = a%psb_ld_base_sparse_mat
 
   do i=1, nr
@@ -6598,7 +6602,7 @@ subroutine psb_ldcsrspspmm(a,b,c,info)
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   nzc = 2*(nza+nzb)
-  call c%allocate(ma,nb,nzc)
+  call psb_ld_csr_allocate_mnnz(ma,nb,c,nzc)
 
   call csr_spspmm(a,b,c,info)
 

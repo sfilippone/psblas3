@@ -76,7 +76,7 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
        & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
   if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
-  call acsc%allocate(nrow,ncol,nnzero)
+  call acsc%allocate_mnnz(nrow,ncol,nnzero)
   if (ircode /= 0 ) then 
     write(psb_err_unit,*) 'Memory allocation failed'
     goto 993
@@ -145,7 +145,7 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
 
       call acoo%mv_from_fmt(acsc,info)
-      call acoo%reallocate(2*nnzero)
+      call acoo%reallocate_nz(2*nnzero)
       ! A is now in COO format
       nzr = nnzero
       do i=1,nnzero
@@ -363,7 +363,7 @@ subroutine lshb_read(a, iret, iunit, filename,b,g,x,mtitle)
        & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
   if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
-  call acsc%allocate(nrow,ncol,nnzero)
+  call psb_ls_csc_allocate_mnnz(nrow,ncol,nnzero)
   if (ircode /= 0 ) then 
     write(psb_err_unit,*) 'Memory allocation failed'
     goto 993
@@ -432,7 +432,7 @@ subroutine lshb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
 
       call acoo%mv_from_fmt(acsc,info)
-      call acoo%reallocate(2*nnzero)
+      call acoo%reallocate_nz(2*nnzero)
       ! A is now in COO format
       nzr = nnzero
       do i=1,nnzero

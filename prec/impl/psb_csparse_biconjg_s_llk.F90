@@ -94,7 +94,7 @@ subroutine psb_csparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
 
   !
   !
-  call z%allocate(n,n,n*nzrmax)
+  call z%allocate_mnnz(n,n,n*nzrmax)
 
   z%icp(1) = 1
   z%icp(2) = 2
@@ -205,7 +205,8 @@ subroutine psb_csparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
         end if
       end if
     end do outer
-    call a%csget(i,i,nzra,ia,ja,val,info)
+    !call a%csget(i,i,nzra,ia,ja,val,info)
+    call psb_c_csr_csgetrow(i,i,a,nzra,ia,ja,val,info)
     call rwclip(nzra,ia,ja,val,ione,n,ione,n)
     p(i) = psb_spge_dot(nzra,ja,val,zval)
 !!$    if ((1761<=i).and.(i<=1780)) then

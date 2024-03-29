@@ -256,7 +256,7 @@ subroutine psb_zdiv_vect_check(x,y,desc_a,info,flag)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call x%div(y,info,flag)
+    call x%div_v_check(y,info,flag)
   end if
 
   call psb_erractionrestore(err_act)

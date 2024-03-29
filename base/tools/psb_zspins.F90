@@ -275,7 +275,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
               end if
             end do
             if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
-            call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+            call a%rmta%csput_a(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
                  & 1_psb_lpk_,desc_a%get_global_rows(),info)
           end if
         end if
@@ -337,7 +337,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
           end if
         end do
         if (k /= nnl) write(0,*) name,' Wrong conversion?',k,nnl
-        call a%rmta%csput(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
+        call a%rmta%csput_a(nnl,lila,ljla,lval,1_psb_lpk_,desc_a%get_global_rows(),&
              & 1_psb_lpk_,desc_a%get_global_rows(),info)
       end if      
     end if

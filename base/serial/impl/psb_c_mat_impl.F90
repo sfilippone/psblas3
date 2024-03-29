@@ -625,7 +625,8 @@ subroutine psb_c_csall(nr,nc,a,info,nz,type,mold)
     call psb_errpush(info, name)
     goto 9999
   end if
-  call a%a%allocate(nr,nc,nz)
+!!$    call a%a%alloc(nr,nc,nz)
+    write(0,*) 'Internal error c_csall'
   call a%set_bld()
 
   return
@@ -654,7 +655,8 @@ subroutine  psb_c_reallocate_nz(nz,a)
     goto 9999
   endif
 
-  call a%a%reallocate(nz)
+  write(0,*) 'Internal error c_csrealloc'
+!!$  call a%a%reallocate_nz(nz)
 
   return
 
@@ -1226,8 +1228,8 @@ subroutine psb_c_split_nd(a,n_rows,n_cols,info)
 !!$      class(psb_c_base_sparse_mat), intent(in), optional :: mold
   type(psb_c_coo_sparse_mat) :: acoo
   type(psb_c_csr_sparse_mat), allocatable :: aclip
-  type(psb_c_ecsr_sparse_mat), allocatable :: andclip
-  logical, parameter :: use_ecsr=.true.
+!!$  type(psb_c_ecsr_sparse_mat), allocatable :: andclip
+!!$  logical, parameter :: use_ecsr=.true.
   character(len=20)     :: name, ch_err
   integer(psb_ipk_) :: err_act
 
@@ -1239,14 +1241,14 @@ subroutine psb_c_split_nd(a,n_rows,n_cols,info)
   allocate(a%ad,mold=a%a)
   call a%ad%mv_from_coo(acoo,info)
   call a%a%csclip(acoo,info,jmin=n_rows+1,jmax=n_cols,rscale=.false.,cscale=.false.)
-  if (use_ecsr) then
-    allocate(andclip)
-    call andclip%mv_from_coo(acoo,info)
-    call move_alloc(andclip,a%and)
-  else
+!!$  if (use_ecsr) then
+!!$    allocate(andclip)
+!!$    call andclip%mv_from_coo(acoo,info)
+!!$    call move_alloc(andclip,a%and)
+!!$  else
     allocate(a%and,mold=a%a)
     call a%and%mv_from_coo(acoo,info)
-  end if
+!!$  end if
 
   if (psb_errstatus_fatal()) then    
     info=psb_err_from_subroutine_
@@ -3661,7 +3663,7 @@ subroutine psb_lc_csall(nr,nc,a,info,nz,type,mold)
     call psb_errpush(info, name)
     goto 9999
   end if
-  call a%a%allocate(nr,nc,nz)
+  call a%a%alloc(nr,nc,nz)
   call a%set_bld()
 
   return
@@ -3690,7 +3692,7 @@ subroutine  psb_lc_reallocate_nz(nz,a)
     goto 9999
   endif
 
-  call a%a%reallocate(nz)
+  call a%a%realloc(nz)
 
   return
 

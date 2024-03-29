@@ -260,7 +260,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   lnnz = max(iszr,iszs,ione)
   lnc  = a%get_ncols()
-  call acoo%allocate(lnr,lnc,lnnz)
+  call acoo%alloc(lnr,lnc,lnnz)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
@@ -716,7 +716,7 @@ Subroutine psb_lssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   
   lnnz = max(iszr,iszs,lone)
   lnc  = a%get_ncols()
-  call acoo%allocate(lnr,lnc,lnnz)
+  call acoo%allocate_mnnz(lnr,lnc,lnnz)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
@@ -1067,7 +1067,7 @@ Subroutine psb_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   lnnz = max(iszr,iszs,ione)
   lnc  = a%get_ncols()
-  call acoo%allocate(lnr,lnc,lnnz)
+  call acoo%allocate_mnnz(lnr,lnc,lnnz)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
@@ -1101,8 +1101,9 @@ Subroutine psb_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
-           &  append=.true.,nzin=tot_elem,jmax=ncg) 
+      write(0,*) 'INTERNAL ERROR '
+!!$      call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
+!!$           &  append=.true.,nzin=tot_elem,jmax=ncg) 
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_sp_getrow')
@@ -1429,7 +1430,7 @@ Subroutine psb_s_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   lnnz = max(iszr,iszs,ione)
   lnc  = a%get_ncols()
-  call acoo%allocate(lnr,lnc,lnnz)
+  call acoo%allocate_mnnz(lnr,lnc,lnnz)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
@@ -1465,8 +1466,9 @@ Subroutine psb_s_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = ipdxv(counter+psb_elem_send_+j)
-      call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
-           &  append=.true.,nzin=tot_elem,jmax=ncg) 
+      write(0,*) 'INTERNAL ERROR '
+!!$      call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
+!!$           &  append=.true.,nzin=tot_elem,jmax=ncg) 
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_sp_getrow')

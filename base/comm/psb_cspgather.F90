@@ -142,11 +142,11 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     if ((root_ == -1).or.(root_ == me)) then  
       if (info == psb_success_) call psb_realloc(nzg,glbia,info)
       if (info == psb_success_) call psb_realloc(nzg,glbja,info)    
-      if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
+      if (info == psb_success_) call glob_coo%alloc(nrg,ncg,nzg)
     else
       if (info == psb_success_) call psb_realloc(ione,glbia,info)
       if (info == psb_success_) call psb_realloc(ione,glbja,info)    
-      if (info == psb_success_) call glob_coo%allocate(ione,ione,ione)
+      if (info == psb_success_) call glob_coo%alloc(ione,ione,ione)
     end if
     
     if (info /= psb_success_) goto 9999
@@ -323,9 +323,9 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
       call psb_errpush(info,name); goto 9999      
     end if
     if ((root_ == -1).or.(root_ == me)) then  
-      if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
+      if (info == psb_success_) call glob_coo%allocate_mnnz(nrg,ncg,nzg)
     else
-      if (info == psb_success_) call glob_coo%allocate(1_psb_lpk_,1_psb_lpk_,1_psb_lpk_)
+      if (info == psb_success_) call glob_coo%allocate_mnnz(1_psb_lpk_,1_psb_lpk_,1_psb_lpk_)
     end if
     if (info /= psb_success_) goto 9999
     !
@@ -495,9 +495,9 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
       call psb_errpush(info,name); goto 9999      
     end if
     if ((root_ == -1).or.(root_ == me)) then  
-      if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
+      if (info == psb_success_) call glob_coo%allocate_mnnz(nrg,ncg,nzg)
     else
-      if (info == psb_success_) call glob_coo%allocate(1_psb_lpk_,1_psb_lpk_,1_psb_lpk_)
+      if (info == psb_success_) call glob_coo%allocate_mnnz(1_psb_lpk_,1_psb_lpk_,1_psb_lpk_)
     end if
     if (info /= psb_success_) goto 9999
 

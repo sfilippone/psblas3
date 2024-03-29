@@ -53,7 +53,7 @@ subroutine psb_d_cp_hll_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nc,nza)
+  call b%alloc(nr,nc,nza)
   b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
   
   j    = 1

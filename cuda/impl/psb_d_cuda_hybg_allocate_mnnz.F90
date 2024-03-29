@@ -46,7 +46,7 @@ subroutine  psb_d_cuda_hybg_allocate_mnnz(m,n,a,nz)
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  call a%psb_d_csr_sparse_mat%allocate(m,n,nz)
+  call a%psb_d_csr_sparse_mat%alloc(m,n,nz)
   
   info = initFcusparse()
   call a%to_gpu(info,nzrm=nz)
