@@ -191,7 +191,9 @@ subroutine psi_cswapidxm(ctxt,icomm,flag,n,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   complex(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-  !volatile :: sndbuf, rcvbuf
+#if !defined(FLANG)
+  volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info=psb_success_
@@ -676,7 +678,9 @@ subroutine psi_cswapidxv(ctxt,icomm,flag,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   complex(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-  !volatile :: sndbuf, rcvbuf
+#if !defined(FLANG)
+  volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info=psb_success_
