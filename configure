@@ -3452,7 +3452,7 @@ ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran
+  for ac_prog in ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang-new ifort ifc  nagfor gfortran
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -3501,7 +3501,7 @@ fi
 fi
 if test -z "$FC"; then
   ac_ct_FC=$FC
-  for ac_prog in ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran
+  for ac_prog in ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang-new ifort ifc  nagfor gfortran
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3928,7 +3928,7 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in xlc pgcc icc gcc cc
+  for ac_prog in xlc pgcc clang icc gcc cc
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -3977,7 +3977,7 @@ fi
 fi
 if test -z "$CC"; then
   ac_ct_CC=$CC
-  for ac_prog in xlc pgcc icc gcc cc
+  for ac_prog in xlc pgcc clang icc gcc cc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4424,7 +4424,7 @@ if test -z "$CXX"; then
     CXX=$CCC
   else
     if test -n "$ac_tool_prefix"; then
-  for ac_prog in CC xlc++  icpc g++
+  for ac_prog in CC xlc++  clang++ icpc g++
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -4473,7 +4473,7 @@ fi
 fi
 if test -z "$CXX"; then
   ac_ct_CXX=$CXX
-  for ac_prog in CC xlc++  icpc g++
+  for ac_prog in CC xlc++  clang++ icpc g++
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -6874,10 +6874,12 @@ if test x"$psblas_cv_fc" == "x" ; then
    # Sun compiler detection
 
    psblas_cv_fc="sun"
- elif eval "$MPIFC -V  2>&1 | grep Portland 2>/dev/null" ; then
+ elif eval "$MPIFC --version  2>&1 | grep flang-new 2>/dev/null" ; then
    # Portland group compiler detection
 
-   psblas_cv_fc="pg"
+   psblas_cv_fc="flang"
+   psblas_cv_define_prepend=""
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
 
@@ -7301,6 +7303,9 @@ if test "X$FCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"flang" ; then
+   # other compilers ..
+     FCOPT="-O3"
   # NOTE : PG & Sun use -fast instead -O3
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..

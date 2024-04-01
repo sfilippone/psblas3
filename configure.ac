@@ -100,17 +100,17 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang-new ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([xlc pgcc icc gcc cc ])
+AC_PROG_CC([xlc pgcc clang icc gcc cc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
    C99OPT="$ac_cv_prog_cc_stdc";
 fi	
 CFLAGS="$save_CFLAGS";
-AC_PROG_CXX([CC xlc++  icpc g++])
+AC_PROG_CXX([CC xlc++  clang++ icpc g++])
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
 dnl AC_PROG_F90
@@ -248,10 +248,12 @@ if test x"$psblas_cv_fc" == "x" ; then
    # Sun compiler detection
   
    psblas_cv_fc="sun"
- elif eval "$MPIFC -V  2>&1 | grep Portland 2>/dev/null" ; then
+ elif eval "$MPIFC --version  2>&1 | grep flang-new 2>/dev/null" ; then
    # Portland group compiler detection
    
-   psblas_cv_fc="pg"
+   psblas_cv_fc="flang"
+   psblas_cv_define_prepend=""
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"		  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
     
@@ -427,6 +429,9 @@ if test "X$FCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"flang" ; then
+   # other compilers ..
+     FCOPT="-O3"
   # NOTE : PG & Sun use -fast instead -O3
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
