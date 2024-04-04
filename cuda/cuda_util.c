@@ -378,22 +378,36 @@ void cudaSync()
 {
   cudaError_t err;
   err = cudaDeviceSynchronize();
+#if 0
   if (err == cudaSuccess)
     return SPGPU_SUCCESS;	
   else {
     fprintf(stderr,"CUDA Error cudaSync: %s\n", cudaGetErrorString(err));
     return SPGPU_UNSPECIFIED;
   }
+#else
+  if (err != cudaSuccess) {
+    fprintf(stderr,"CUDA Error cudaSync: %s\n", cudaGetErrorString(err));
+  }
+  return ;
+#endif
 }
 
 void cudaReset()
 {
   cudaError_t err;
   err = cudaDeviceReset();
+#if 0
   if (err != cudaSuccess) {
     fprintf(stderr,"CUDA Error Reset: %s\n", cudaGetErrorString(err));
     return SPGPU_UNSPECIFIED;
   }
+#else
+  if (err != cudaSuccess) {
+    fprintf(stderr,"CUDA Error Reset: %s\n", cudaGetErrorString(err));
+  }
+  return ;
+#endif
 }
 
 
