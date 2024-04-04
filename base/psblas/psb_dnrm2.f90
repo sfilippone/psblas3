@@ -402,7 +402,7 @@ function psb_dnrm2_multivect(x, desc_a, info, global)  result(res)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, idx, i, j, iix, jjx, ldx, ndm
   real(psb_dpk_)    :: dd
-  integer(psb_lpk_) :: ix, jx, m
+  integer(psb_lpk_) :: ix, jx, m, n
   logical :: global_
   character(len=20) :: name, ch_err
 
@@ -438,9 +438,9 @@ function psb_dnrm2_multivect(x, desc_a, info, global)  result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
+  n = x%get_ncols()
   ldx = x%get_nrows()
-
-  call psb_chkvect(m,x%get_ncols(),ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,n,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

@@ -102,6 +102,9 @@ module psb_z_vect_mod
     procedure, pass(z) :: axpby_v2  => z_vect_axpby_v2
     procedure, pass(z) :: axpby_a2  => z_vect_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
+    procedure, pass(z) :: abgdxyz  => z_vect_abgdxyz
+    procedure, pass(z) :: xyzw     => z_vect_xyzw
+    
     procedure, pass(y) :: mlt_v    => z_vect_mlt_v
     procedure, pass(y) :: mlt_a    => z_vect_mlt_a
     procedure, pass(z) :: mlt_a_2  => z_vect_mlt_a_2
@@ -771,6 +774,38 @@ contains
 
   end subroutine z_vect_axpby_a2
 
+  subroutine z_vect_abgdxyz(m,alpha,beta,gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)            :: m
+    class(psb_z_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: y
+    class(psb_z_vect_type), intent(inout)  :: z
+    complex(psb_dpk_), intent (in)     :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)   :: info
+
+    if (allocated(z%v)) &
+         call z%v%abgdxyz(m,alpha,beta,gamma,delta,x%v,y%v,info)
+    
+  end subroutine z_vect_abgdxyz
+
+  subroutine z_vect_xyzw(m,a,b,c,d,e,f,x, y, z, w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)            :: m
+    class(psb_z_vect_type), intent(inout)  :: x
+    class(psb_z_vect_type), intent(inout)  :: y
+    class(psb_z_vect_type), intent(inout)  :: z
+    class(psb_z_vect_type), intent(inout)  :: w
+    complex(psb_dpk_), intent (in)     :: a, b, c, d, e, f
+    integer(psb_ipk_), intent(out)   :: info
+
+    if (allocated(w%v)) &
+         call w%v%xyzw(m,a,b,c,d,e,f,x%v,y%v,z%v,info)
+    
+  end subroutine z_vect_xyzw
+
+
   subroutine z_vect_mlt_v(x, y, info)
     use psi_serial_mod
     implicit none
@@ -1134,7 +1169,7 @@ contains
     end if
 
   end function z_vect_nrm2_weight
-
+ 
   function z_vect_nrm2_weight_mask(n,x,w,id,info,aux) result(res)
     use psi_serial_mod
     implicit none

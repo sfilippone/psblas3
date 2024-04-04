@@ -70,7 +70,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    real(psb_dpk_)                            :: rti, rti1
    integer(psb_ipk_)                         :: litmax, naux, itrace_, n_row, n_col, nrhs, nrep
-   integer(psb_lpk_)                         :: mglob, n_add
+   integer(psb_lpk_)                         :: mglob, n_add, ncv
 
    integer(psb_ipk_)                         :: i, j, k, col, istop_, err_act, idx_i, idx_j, idx
    integer(psb_ipk_)                         :: debug_level, debug_unit
@@ -153,13 +153,15 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       goto 9999
    endif
 
-   call psb_chkvect(mglob,x%get_ncols(),x%get_nrows(),lone,lone,desc_a,info)
+   ncv = x%get_ncols()
+   call psb_chkvect(mglob,ncv,x%get_nrows(),lone,lone,desc_a,info)
    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='psb_chkvect on X')
-      goto 9999
+     info=psb_err_from_subroutine_
+     call psb_errpush(info,name,a_err='psb_chkvect on X')
+     goto 9999
    end if
-   call psb_chkvect(mglob,b%get_ncols(),b%get_nrows(),lone,lone,desc_a,info)
+   ncv = b%get_ncols()
+   call psb_chkvect(mglob,ncv,b%get_nrows(),lone,lone,desc_a,info)
    if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='psb_chkvect on B')

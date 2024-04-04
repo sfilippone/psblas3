@@ -79,12 +79,14 @@
 module psb_z_mat_mod
 
   use psb_z_base_mat_mod
-  use psb_z_csr_mat_mod,  only : psb_z_csr_sparse_mat, psb_lz_csr_sparse_mat
+  use psb_z_csr_mat_mod,  only : psb_z_csr_sparse_mat, psb_lz_csr_sparse_mat,&
+       & psb_z_ecsr_sparse_mat
   use psb_z_csc_mat_mod,  only : psb_z_csc_sparse_mat, psb_lz_csc_sparse_mat
 
   type :: psb_zspmat_type
 
     class(psb_z_base_sparse_mat), allocatable  :: a   
+    class(psb_z_base_sparse_mat), allocatable  :: ad, and    
     integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
     type(psb_lz_coo_sparse_mat), allocatable  :: rmta
 
@@ -202,6 +204,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: cscnv_ip    => psb_z_cscnv_ip
     procedure, pass(a) :: cscnv_base  => psb_z_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
+    procedure, pass(a) :: split_nd    => psb_z_split_nd
     procedure, pass(a) :: clone       => psb_zspmat_clone
     procedure, pass(a) :: move_alloc  => psb_zspmat_type_move
     !
@@ -840,6 +843,18 @@ module psb_z_mat_mod
   !
   !
 
+  interface
+    subroutine psb_z_split_nd(a,n_rows,n_cols,info)
+      import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+      integer(psb_ipk_), intent(out)          :: info
+!!$      integer(psb_ipk_),optional, intent(in)           :: dupl
+!!$      character(len=*), optional, intent(in) :: type
+!!$      class(psb_z_base_sparse_mat), intent(in), optional :: mold
+    end subroutine psb_z_split_nd
+  end interface
+
   !
   ! CSCNV: switches to a different internal derived type.
   !   3 versions: copying to target
@@ -859,7 +874,6 @@ module psb_z_mat_mod
     end subroutine psb_z_cscnv
   end interface
 
-
   interface
     subroutine psb_z_cscnv_ip(a,iinfo,type,mold,dupl)
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
@@ -870,7 +884,6 @@ module psb_z_mat_mod
       class(psb_z_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_z_cscnv_ip
   end interface
-
 
   interface
     subroutine psb_z_cscnv_base(a,b,info,dupl)

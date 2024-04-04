@@ -2018,3 +2018,252 @@ CPPFLAGS="$SAVE_CPPFLAGS";
 ])dnl 
 
 
+dnl @synopsis PAC_CHECK_SPGPU
+dnl
+dnl Will try to find the spgpu library and headers.
+dnl
+dnl Will use $CC
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_CHECK_SPGPU,
+	 [SAVE_LIBS="$LIBS"
+	  SAVE_CPPFLAGS="$CPPFLAGS"
+	  if test "x$pac_cv_have_cuda" == "x"; then  
+             PAC_CHECK_CUDA()
+          fi
+dnl AC_MSG_NOTICE([From CUDA: $pac_cv_have_cuda ])
+	  if test "x$pac_cv_have_cuda" == "xyes"; then  
+	  AC_ARG_WITH(spgpu, AC_HELP_STRING([--with-spgpu=DIR], [Specify the directory for SPGPU library and includes.]),
+		      [pac_cv_spgpudir=$withval],
+		      [pac_cv_spgpudir=''])
+	  
+	  AC_LANG([C])
+	  if test "x$pac_cv_spgpudir" != "x"; then 
+	  LIBS="-L$pac_cv_spgpudir/lib $LIBS"
+	  GPU_INCLUDES="-I$pac_cv_spgpudir/include"
+	  CPPFLAGS="$GPU_INCLUDES $CUDA_INCLUDES $CPPFLAGS"
+	  GPU_LIBDIR="-L$pac_cv_spgpudir/lib"
+	  fi
+	  AC_MSG_CHECKING([spgpu dir $pac_cv_spgpudir])
+	  AC_CHECK_HEADER([core.h],
+			  [pac_gpu_header_ok=yes],
+			  [pac_gpu_header_ok=no; GPU_INCLUDES=""])
+	  
+	  if test "x$pac_gpu_header_ok" == "xyes" ; then 
+	  GPU_LIBS="-lspgpu $GPU_LIBDIR"
+	  LIBS="$GPU_LIBS $CUDA_LIBS -lm $LIBS";
+	  AC_MSG_CHECKING([for spgpuCreate in $GPU_LIBS])
+	  AC_TRY_LINK_FUNC(spgpuCreate, 
+			   [pac_cv_have_spgpu=yes;pac_gpu_lib_ok=yes; ],
+			   [pac_cv_have_spgpu=no;pac_gpu_lib_ok=no; GPU_LIBS=""])
+	  AC_MSG_RESULT($pac_gpu_lib_ok)
+	  if test "x$pac_cv_have_spgpu" == "xyes" ; then 
+	  AC_MSG_NOTICE([Have found SPGPU])
+	  SPGPULIBNAME="libpsbgpu.a";
+	  SPGPU_DIR="$pac_cv_spgpudir";
+	  SPGPU_DEFINES="-DHAVE_SPGPU";
+	  SPGPU_INCDIR="$SPGPU_DIR/include";
+	  SPGPU_INCLUDES="-I$SPGPU_INCDIR";
+	  SPGPU_LIBS="-lspgpu -L$SPGPU_DIR/lib";
+	  LGPU=-lpsb_gpu
+	  CUDA_DIR="$pac_cv_cuda_dir";
+	  CUDA_DEFINES="-DHAVE_CUDA";
+	  CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
+	  CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+	  FDEFINES="$psblas_cv_define_prepend-DHAVE_GPU $psblas_cv_define_prepend-DHAVE_SPGPU $psblas_cv_define_prepend-DHAVE_CUDA $FDEFINES";
+	  CDEFINES="-DHAVE_SPGPU -DHAVE_CUDA $CDEFINES" ;
+	  fi
+  fi
+fi
+LIBS="$SAVE_LIBS"
+CPPFLAGS="$SAVE_CPPFLAGS"
+])dnl 
+
+
+
+
+dnl @synopsis PAC_CHECK_CUDA
+dnl
+dnl Will try to find the cuda library and headers.
+dnl
+dnl Will use $CC
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_CHECK_CUDA,
+[AC_ARG_WITH(cuda, AC_HELP_STRING([--with-cuda=DIR], [Specify the CUDA install directory.]),
+        [pac_cv_cuda_dir=$withval],
+        [pac_cv_cuda_dir=''])
+
+AC_LANG([C])
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$pac_cv_cuda_dir" != "x"; then 
+   CUDA_DIR="$pac_cv_cuda_dir"
+   LIBS="-L$pac_cv_cuda_dir/lib $LIBS"
+   CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
+   CUDA_DEFINES="-DHAVE_CUDA"
+   CPPFLAGS="$CUDA_INCLUDES $CPPFLAGS"
+   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+   if test -f "$pac_cv_cuda_dir/bin/nvcc"; then
+     CUDA_NVCC="$pac_cv_cuda_dir/bin/nvcc"
+   else
+     CUDA_NVCC="nvcc"
+   fi
+fi
+AC_MSG_CHECKING([cuda dir $pac_cv_cuda_dir])
+AC_CHECK_HEADER([cuda_runtime.h],
+ [pac_cuda_header_ok=yes],
+ [pac_cuda_header_ok=no; CUDA_INCLUDES=""])
+
+if test "x$pac_cuda_header_ok" == "xyes" ; then 
+ CUDA_LIBS="-lcusparse -lcublas -lcudart $CUDA_LIBDIR"
+ LIBS="$CUDA_LIBS -lm $LIBS";
+ AC_MSG_CHECKING([for cudaMemcpy in $CUDA_LIBS])
+ AC_TRY_LINK_FUNC(cudaMemcpy, 
+		  [pac_cv_have_cuda=yes;pac_cuda_lib_ok=yes; ],
+		  [pac_cv_have_cuda=no;pac_cuda_lib_ok=no; CUDA_LIBS=""])
+ AC_MSG_RESULT($pac_cuda_lib_ok)
+
+fi
+LIBS="$SAVE_LIBS"
+CPPFLAGS="$SAVE_CPPFLAGS"
+])dnl 
+
+dnl @synopsis PAC_ARG_WITH_CUDACC
+dnl
+dnl Test for --with-cudacc="set_of_cc".
+dnl 
+dnl Defines the CC to compile for
+dnl
+dnl
+dnl Example use:
+dnl
+dnl PAC_ARG_WITH_CUDACC
+dnl 
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_CUDACC],
+[
+AC_ARG_WITH(cudacc,
+AC_HELP_STRING([--with-cudacc], [A comma-separated list of CCs to compile to, for example,
+ --with-cudacc=50,60,70,75]),
+[pac_cv_cudacc=$withval],
+[pac_cv_cudacc=''])
+])
+
+AC_DEFUN(PAC_ARG_WITH_LIBRSB,
+	 [SAVE_LIBS="$LIBS"
+	  SAVE_CPPFLAGS="$CPPFLAGS"
+
+	  AC_ARG_WITH(librsb,
+	  AC_HELP_STRING([--with-librsb], [The directory for LIBRSB, for example,
+ 	  --with-librsb=/opt/packages/librsb]),
+	  [pac_cv_librsb_dir=$withval],
+	  [pac_cv_librsb_dir=''])
+	  
+	  if test "x$pac_cv_librsb_dir" != "x"; then 
+	  LIBS="-L$pac_cv_librsb_dir $LIBS"
+	  RSB_INCLUDES="-I$pac_cv_librsb_dir"
+	  # CPPFLAGS="$GPU_INCLUDES $CUDA_INCLUDES $CPPFLAGS"
+	  RSB_LIBDIR="-L$pac_cv_librsb_dir"
+	  fi
+	  #AC_MSG_CHECKING([librsb dir $pac_cv_librsb_dir])
+	  AC_CHECK_HEADER([$pac_cv_librsb_dir/rsb.h],
+			  [pac_rsb_header_ok=yes],
+			  [pac_rsb_header_ok=no; RSB_INCLUDES=""])
+	  
+	  if test "x$pac_rsb_header_ok" == "xyes" ; then 
+	  RSB_LIBS="-lrsb $RSB_LIBDIR"
+	  # LIBS="$GPU_LIBS $CUDA_LIBS -lm $LIBS";
+	  # AC_MSG_CHECKING([for spgpuCreate in $GPU_LIBS])
+	  # AC_TRY_LINK_FUNC(spgpuCreate, 
+	  # 		   [pac_cv_have_spgpu=yes;pac_gpu_lib_ok=yes; ],
+	  # 		   [pac_cv_have_spgpu=no;pac_gpu_lib_ok=no; GPU_LIBS=""])
+	  # AC_MSG_RESULT($pac_gpu_lib_ok)
+	  # if test "x$pac_cv_have_spgpu" == "xyes" ; then 
+	  # AC_MSG_NOTICE([Have found SPGPU])
+	  RSBLIBNAME="librsb.a";
+	  LIBRSB_DIR="$pac_cv_librsb_dir";
+	  # SPGPU_DEFINES="-DHAVE_SPGPU";
+	  LIBRSB_INCDIR="$LIBRSB_DIR";
+	  LIBRSB_INCLUDES="-I$LIBRSB_INCDIR";
+	  LIBRSB_LIBS="-lrsb -L$LIBRSB_DIR";
+	  # CUDA_DIR="$pac_cv_cuda_dir";
+	  LIBRSB_DEFINES="-DHAVE_RSB";
+	  LRSB=-lpsb_rsb
+	  # CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
+	  # CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+	  FDEFINES="$LIBRSB_DEFINES $psblas_cv_define_prepend $FDEFINES";
+	  CDEFINES="$LIBRSB_DEFINES $CDEFINES";#CDEFINES="-DHAVE_SPGPU -DHAVE_CUDA $CDEFINES";
+	  fi
+#  fi
+LIBS="$SAVE_LIBS"
+CPPFLAGS="$SAVE_CPPFLAGS"
+])
+dnl
+
+dnl @synopsis PAC_CHECK_CUDA_VERSION
+dnl
+dnl Will try to find the cuda version
+dnl
+dnl Will use $CC
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_CHECK_CUDA_VERSION,
+[AC_LANG_PUSH([C])
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$pac_cv_have_cuda" == "x"; then  
+        PAC_CHECK_CUDA()
+fi
+if test "x$pac_cv_have_cuda" == "xyes"; then
+   CUDA_DIR="$pac_cv_cuda_dir"
+   LIBS="-L$pac_cv_cuda_dir/lib $LIBS"
+   CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
+   CUDA_DEFINES="-DHAVE_CUDA"
+   CPPFLAGS="$CUDA_INCLUDES $CPPFLAGS"
+   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+  CUDA_LIBS="-lcusparse -lcublas -lcudart $CUDA_LIBDIR"
+  LIBS="$CUDA_LIBS -lm $LIBS";
+  AC_MSG_CHECKING([for CUDA version])
+  AC_LINK_IFELSE([AC_LANG_SOURCE([
+#include <stdio.h>
+#include <cuda.h>
+
+int main(int argc, char **argv)
+{
+  printf("%d",CUDA_VERSION);
+  return(0);
+} ])],
+	[pac_cv_cuda_version=`./conftest${ac_exeext} | sed 's/^ *//'`;],
+	[pac_cv_cuda_version="unknown";])
+ 
+ AC_MSG_RESULT($pac_cv_cuda_version)
+ fi
+AC_LANG_POP([C]) 
+LIBS="$SAVE_LIBS"
+CPPFLAGS="$SAVE_CPPFLAGS"
+])dnl 
+
+

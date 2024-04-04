@@ -418,8 +418,8 @@ function psb_damax_multivect(x, desc_a, info, global) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  n = x%get_ncols()
+  call psb_chkvect(m,n,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

@@ -216,6 +216,20 @@ module psb_d_psblas_mod
     end function psb_dqrfact
   end interface
 
+  interface psb_abgdxyz
+    subroutine psb_dabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
+         & desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_vect_type, psb_dspmat_type
+      type(psb_d_vect_type), intent (inout) :: x
+      type(psb_d_vect_type), intent (inout) :: y
+      type(psb_d_vect_type), intent (inout) :: z
+      real(psb_dpk_), intent (in)        :: alpha, beta, gamma, delta
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_dabgdxyz_vect
+  end interface psb_abgdxyz
+  
   interface psb_geamax
     function psb_damax(x, desc_a, info, jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &

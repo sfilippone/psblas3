@@ -70,7 +70,7 @@ function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
    type(psb_ctxt_type) :: ctxt
    integer(psb_ipk_) :: np, me, idx, ndm,&
    & err_act, iix, jjx, iiy, jjy, i, j, nr
-   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n
    logical :: global_, trans_
    character(len=20)      :: name, ch_err
 
@@ -118,11 +118,13 @@ function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
    ijy = ione
 
    m = desc_a%get_global_rows()
+   n = x%get_ncols()
 
    ! check vector correctness
-   call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+   call psb_chkvect(m,n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+   n = y%get_ncols()
    if (info == psb_success_) &
-   & call psb_chkvect(m,y%get_ncols(),y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+   & call psb_chkvect(m,n,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
    if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -207,7 +209,7 @@ function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
    type(psb_ctxt_type) :: ctxt
    integer(psb_ipk_) :: np, me, idx, ndm,&
    & err_act, iix, jjx, iiy, jjy, i, j, nr
-   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n
    logical :: global_, trans_
    character(len=20)      :: name, ch_err
 
@@ -249,7 +251,8 @@ function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
    m = desc_a%get_global_rows()
 
    ! check vector correctness
-   call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+   n = x%get_ncols()
+   call psb_chkvect(m,n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
    if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -332,7 +335,7 @@ function psb_dprod_m(x,y,desc_a,info,trans,global) result(res)
    type(psb_ctxt_type) :: ctxt
    integer(psb_ipk_) :: np, me, idx, ndm,&
    & err_act, iix, jjx, iiy, jjy, i, j, nr, x_n, y_n, lda, ldb
-   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n
    logical :: global_, trans_
    character(len=20)      :: name, ch_err
 
@@ -369,7 +372,8 @@ function psb_dprod_m(x,y,desc_a,info,trans,global) result(res)
    m = desc_a%get_global_rows()
 
    ! check vector correctness
-   call psb_chkvect(m,size(x,2),size(x,1),ix,ijx,desc_a,info,iix,jjx)
+   n = size(x,2)
+   call psb_chkvect(m,n,size(x,1),ix,ijx,desc_a,info,iix,jjx)
    if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
