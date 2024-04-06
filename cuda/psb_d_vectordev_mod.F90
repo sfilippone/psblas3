@@ -267,6 +267,15 @@ module psb_d_vectordev_mod
       real(c_double) :: res
       type(c_ptr), value    :: deviceVecA, deviceVecB
     end function dotMultiVecDeviceDouble
+    function dotMultiVecDeviceDoubleR2(res, n,deviceVecA,deviceVecB,ld) &
+         & result(val) bind(c,name='dotMultiVecDeviceDouble')
+      use iso_c_binding
+      integer(c_int)        :: val
+      integer(c_int), value :: n
+      real(c_double)        :: res(ld,*)
+      integer(c_int), value :: ld
+      type(c_ptr), value    :: deviceVecA, deviceVecB
+    end function dotMultiVecDeviceDoubleR2
   end interface
     
   interface nrm2MultiVecDevice
@@ -278,6 +287,14 @@ module psb_d_vectordev_mod
       real(c_double)         :: res
       type(c_ptr), value    :: deviceVecA
     end function nrm2MultiVecDeviceDouble
+    function nrm2MultiVecDeviceDoubleR2(res,n,deviceVecA) &
+        & result(val) bind(c,name='nrm2MultiVecDeviceDouble')
+     use iso_c_binding
+     integer(c_int)        :: val
+     integer(c_int), value :: n
+     real(c_double)         :: res(*)
+     type(c_ptr), value    :: deviceVecA
+   end function nrm2MultiVecDeviceDoubleR2
   end interface
 
   interface amaxMultiVecDevice

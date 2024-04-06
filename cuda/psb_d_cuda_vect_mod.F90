@@ -1357,17 +1357,18 @@ module psb_d_cuda_multivect_mod
     procedure, pass(x) :: get_nrows => d_cuda_multi_get_nrows
     procedure, pass(x) :: get_ncols => d_cuda_multi_get_ncols
     procedure, nopass  :: get_fmt   => d_cuda_multi_get_fmt
+    ! TODO
 !!$    procedure, pass(x) :: dot_v    => d_cuda_multi_dot_v
 !!$    procedure, pass(x) :: dot_a    => d_cuda_multi_dot_a
-!!$    procedure, pass(y) :: axpby_v  => d_cuda_multi_axpby_v
-!!$    procedure, pass(y) :: axpby_a  => d_cuda_multi_axpby_a
+    procedure, pass(y) :: axpby_v  => d_cuda_multi_axpby_v
+    procedure, pass(y) :: axpby_a  => d_cuda_multi_axpby_a
 !!$    procedure, pass(y) :: mlt_v    => d_cuda_multi_mlt_v
 !!$    procedure, pass(y) :: mlt_a    => d_cuda_multi_mlt_a
 !!$    procedure, pass(z) :: mlt_a_2  => d_cuda_multi_mlt_a_2
 !!$    procedure, pass(z) :: mlt_v_2  => d_cuda_multi_mlt_v_2
 !!$    procedure, pass(x) :: scal     => d_cuda_multi_scal
-!!$    procedure, pass(x) :: nrm2     => d_cuda_multi_nrm2
-!!$    procedure, pass(x) :: amax     => d_cuda_multi_amax
+    procedure, pass(x) :: nrm2     => d_cuda_multi_nrm2
+    procedure, pass(x) :: amax     => d_cuda_multi_amax
 !!$    procedure, pass(x) :: asum     => d_cuda_multi_asum
     procedure, pass(x) :: all      => d_cuda_multi_all
     procedure, pass(x) :: zero     => d_cuda_multi_zero
@@ -1607,108 +1608,109 @@ contains
     res = 'dGPU'
   end function d_cuda_multi_get_fmt
 
-!!$  function d_cuda_multi_dot_v(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_d_multivect_cuda), intent(inout)       :: x
-!!$    class(psb_d_base_multivect_type), intent(inout) :: y
-!!$    integer(psb_ipk_), intent(in)              :: n
-!!$    real(psb_dpk_)                :: res
-!!$    real(psb_dpk_), external      :: ddot
-!!$    integer(psb_ipk_) :: info
-!!$    
-!!$    res = dzero
-!!$    !
-!!$    ! Note: this is the gpu implementation.
-!!$    !  When we get here, we are sure that X is of
-!!$    !  TYPE psb_d_vect
-!!$    !
-!!$    select type(yy => y)
-!!$    type is (psb_d_base_multivect_type)
-!!$      if (x%is_dev()) call x%sync()
-!!$      res = ddot(n,x%v,1,yy%v,1)
-!!$    type is (psb_d_multivect_cuda)
-!!$      if (x%is_host()) call x%sync()
-!!$      if (yy%is_host()) call yy%sync()
-!!$      info = dotMultiVecDevice(res,n,x%deviceVect,yy%deviceVect)
-!!$      if (info /= 0) then 
-!!$        info = psb_err_internal_error_
-!!$        call psb_errpush(info,'d_cuda_multi_dot_v')
-!!$      end if
-!!$
-!!$    class default
-!!$      ! y%sync is done in dot_a
-!!$      call x%sync()      
-!!$      res = y%dot(n,x%v)
-!!$    end select
-!!$
-!!$  end function d_cuda_multi_dot_v
-!!$
-!!$  function d_cuda_multi_dot_a(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_d_multivect_cuda), intent(inout) :: x
-!!$    real(psb_dpk_), intent(in)           :: y(:)
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_dpk_)                :: res
-!!$    real(psb_dpk_), external      :: ddot
-!!$    
-!!$    if (x%is_dev()) call x%sync()
-!!$    res = ddot(n,y,1,x%v,1)
-!!$
-!!$  end function d_cuda_multi_dot_a
-!!$    
-!!$  subroutine d_cuda_multi_axpby_v(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)              :: m
-!!$    class(psb_d_base_multivect_type), intent(inout) :: x
-!!$    class(psb_d_multivect_cuda), intent(inout)       :: y
-!!$    real(psb_dpk_), intent (in)                :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)             :: info
-!!$    integer(psb_ipk_) :: nx, ny
-!!$
-!!$    info = psb_success_
-!!$
-!!$    select type(xx => x)
-!!$    type is (psb_d_base_multivect_type)
-!!$      if ((beta /= dzero).and.(y%is_dev()))&
-!!$           & call y%sync()
-!!$      call psb_geaxpby(m,alpha,xx%v,beta,y%v,info)
-!!$      call y%set_host()
-!!$    type is (psb_d_multivect_cuda)
-!!$      ! Do something different here 
-!!$      if ((beta /= dzero).and.y%is_host())&
-!!$           &  call y%sync()
-!!$      if (xx%is_host()) call xx%sync()
-!!$      nx = getMultiVecDeviceSize(xx%deviceVect)
-!!$      ny = getMultiVecDeviceSize(y%deviceVect)
-!!$      if ((nx<m).or.(ny<m)) then
-!!$        info = psb_err_internal_error_
-!!$        info = psb_err_internal_error_
-!!$      else
-!!$        info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
-!!$      end if
-!!$      call y%set_dev()
-!!$    class default
-!!$      call x%sync()
-!!$      call y%axpby(m,alpha,x%v,beta,info)
-!!$    end select
-!!$
-!!$  end subroutine d_cuda_multi_axpby_v
-!!$
-!!$  subroutine d_cuda_multi_axpby_a(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: m
-!!$    real(psb_dpk_), intent(in)           :: x(:)
-!!$    class(psb_d_multivect_cuda), intent(inout) :: y
-!!$    real(psb_dpk_), intent (in)          :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)       :: info
-!!$
-!!$    if (y%is_dev()) call y%sync()
-!!$    call psb_geaxpby(m,alpha,x,beta,y%v,info)
-!!$    call y%set_host()
-!!$  end subroutine d_cuda_multi_axpby_a
-!!$
+  function d_cuda_multi_dot_v(n,x,y) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout)       :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)              :: n
+    real(psb_dpk_), allocatable   :: res(:,:)
+    real(psb_dpk_), external      :: ddot
+    integer(psb_ipk_) :: info
+    
+    res = dzero
+    !
+    ! Note: this is the gpu implementation.
+    !  When we get here, we are sure that X is of
+    !  TYPE psb_d_vect
+    !
+    ! TODO tra
+    select type(yy => y)
+    type is (psb_d_multivect_cuda)
+      if (x%is_host()) call x%sync()
+      if (yy%is_host()) call yy%sync()
+      info = dotMultiVecDevice(res,n,x%deviceVect,yy%deviceVect,x%get_ncols())
+      if (info /= 0) then 
+        info = psb_err_internal_error_
+        call psb_errpush(info,'d_cuda_multi_dot_v')
+      end if
+
+    ! TODO
+    class default
+      ! y%sync is done in dot_a
+      call x%sync()      
+      res = y%dot(n,x%v)
+    end select
+
+  end function d_cuda_multi_dot_v
+
+  ! TODO
+  function d_cuda_multi_dot_a(n,x,y) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout) :: x
+    real(psb_dpk_), intent(in)           :: y(:)
+    integer(psb_ipk_), intent(in)        :: n
+    real(psb_dpk_), allocatable   :: res(:,:)
+    real(psb_dpk_), external      :: ddot
+    
+    if (x%is_dev()) call x%sync()
+    allocate(res(2,2))
+    res = ddot(n,y,1,x%v,1)
+
+  end function d_cuda_multi_dot_a
+   
+  subroutine d_cuda_multi_axpby_v(m,alpha, x, beta, y, info, n)
+    use psi_serial_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)              :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    class(psb_d_multivect_cuda), intent(inout)       :: y
+    real(psb_dpk_), intent (in)                :: alpha, beta
+    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(in), optional    :: n
+    integer(psb_ipk_) :: nc, nx, ny
+
+    info = psb_success_
+    select type(xx => x)
+    type is (psb_d_multivect_cuda)
+      if ((beta /= dzero).and.(y%is_host())) call y%sync()
+      if (xx%is_host()) call xx%sync()
+      nx = getMultiVecDeviceSize(xx%deviceVect)
+      ny = getMultiVecDeviceSize(y%deviceVect)
+      if ((nx<m).or.(ny<m)) then
+        info = psb_err_internal_error_
+      else
+        info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
+      end if
+      call y%set_dev()
+    class default
+      ! Do it on the host side
+      if ((alpha /= dzero).and.(x%is_dev())) call x%sync()
+      call y%axpby(m,alpha,x%v,beta,info,n=n)
+    end select
+
+  end subroutine d_cuda_multi_axpby_v
+
+  subroutine d_cuda_multi_axpby_a(m,alpha, x, beta, y, info, n)
+    use psi_serial_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)        :: m
+    real(psb_dpk_), intent(in)           :: x(:,:)
+    class(psb_d_multivect_cuda), intent(inout) :: y
+    real(psb_dpk_), intent (in)          :: alpha, beta
+    integer(psb_ipk_), intent(out)       :: info
+    integer(psb_ipk_), intent(in), optional :: n
+    integer(psb_ipk_)  :: nc
+
+    if (present(n)) then
+        nc = n
+    else
+        nc = min(size(x,2),size(y%v,2))
+    end if
+    if ((beta /= dzero).and.(y%is_dev())) call y%sync()
+    call psb_geaxpby(m,nc,alpha,x,beta,y%v,info)
+    call y%set_host()
+  end subroutine d_cuda_multi_axpby_a
+
 !!$  subroutine d_cuda_multi_mlt_v(x, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none 
@@ -1860,41 +1862,50 @@ contains
 !!$    call x%psb_d_base_multivect_type%scal(alpha)
 !!$    call x%set_host()
 !!$  end subroutine d_cuda_multi_scal
-!!$
-!!$
-!!$  function d_cuda_multi_nrm2(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_d_multivect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_dpk_)                       :: res
-!!$    integer(psb_ipk_) :: info
-!!$    ! WARNING: this should be changed. 
-!!$    if (x%is_host()) call x%sync()
-!!$    info = nrm2MultiVecDevice(res,n,x%deviceVect)
-!!$    
-!!$  end function d_cuda_multi_nrm2
-!!$  
-!!$  function d_cuda_multi_amax(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_d_multivect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_dpk_)                :: res
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$    res =  maxval(abs(x%v(1:n)))
-!!$
-!!$  end function d_cuda_multi_amax
-!!$
-!!$  function d_cuda_multi_asum(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_d_multivect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_dpk_)                :: res
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$    res =  sum(abs(x%v(1:n)))
-!!$
-!!$  end function d_cuda_multi_asum
+
+  function d_cuda_multi_nrm2(nr,x) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: nr
+    real(psb_dpk_), allocatable          :: res(:)
+    integer(psb_ipk_) :: info
+    ! WARNING: this should be changed. 
+    if (x%is_host()) call x%sync()
+    allocate(res(x%get_ncols()))
+    info = nrm2MultiVecDevice(res,nr,x%deviceVect)
+    
+  end function d_cuda_multi_nrm2
+ 
+  function d_cuda_multi_amax(nr,x) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: nr
+    real(psb_dpk_)                :: res
+    integer(psb_ipk_) :: i, nc
+
+    if (x%is_dev()) call x%sync()
+    nc = x%get_ncols()
+    res = 0
+    do i=1,nr
+        res = max(res,sum(abs(x%v(i,1:nc))))
+    end do
+
+  end function d_cuda_multi_amax
+
+  function d_cuda_multi_asum(nr,x) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: nr
+    real(psb_dpk_)                :: res
+    integer(psb_ipk_) :: j
+
+    if (x%is_dev()) call x%sync()
+    res = 0
+    do j=1,x%get_ncols()
+        res = max(res,sum(abs(x%v(1:nr,j))))
+    end do
+
+  end function d_cuda_multi_asum
   
   subroutine d_cuda_multi_all(m,n, x, info)
     use psi_serial_mod
