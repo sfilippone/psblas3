@@ -166,6 +166,19 @@ module d_cusparse_mod
       integer(c_int)        :: res
     end function d_spmvCSRGDevice
   end interface
+
+  interface spmmCSRGDevice
+    function d_spmmCSRGDevice(Mat,alpha,x,beta,y) &
+         &  bind(c,name="d_spmmCSRGDevice") result(res)
+      use iso_c_binding
+      import  d_Cmat
+      type(d_Cmat)          :: Mat
+      type(c_ptr), value    :: x
+      type(c_ptr), value    :: y
+      real(c_double), value :: alpha,beta
+      integer(c_int)        :: res
+    end function d_spmmCSRGDevice
+  end interface
   
   interface CSRGHost2Device
     function d_CSRGHost2Device(Mat,m,n,nz,irp,ja,val) &

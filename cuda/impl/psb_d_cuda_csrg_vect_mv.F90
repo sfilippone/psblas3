@@ -172,12 +172,11 @@ subroutine psb_d_cuda_csrg_multivect_mv(alpha,a,x,beta,y,info,trans)
         if (beta /= dzero) then 
           if (yy%is_host()) call yy%sync()
         end if
-        ! TODO
-        info = spmvCSRGDevice(a%deviceMat,alpha,xx%deviceVect,&
+        info = spmmCSRGDevice(a%deviceMat,alpha,xx%deviceVect,&
              & beta,yy%deviceVect)
         if (info /= 0) then 
           call psb_errpush(psb_err_from_subroutine_ai_,name,&
-               & a_err='spmvCSRGDevice',i_err=(/info,izero,izero,izero,izero/))
+               & a_err='spmmCSRGDevice',i_err=(/info,izero,izero,izero,izero/))
           info = psb_err_from_subroutine_ai_
           goto 9999
         end if

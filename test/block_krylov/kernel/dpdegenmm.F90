@@ -789,7 +789,6 @@ program pdegenmm
 #endif
   end do
 
-  call x_mv%set(done)
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   do i=1,ntests 
@@ -805,6 +804,7 @@ program pdegenmm
   ! FIXME: cache flush needed here
   x1 = b_mv%get_vect()
   x2 = b_mv_g%get_vect()
+  write(*,*)
   do i=1,8
     write(*,*) x1(i,:)
   end do
@@ -817,9 +817,6 @@ program pdegenmm
 !   call psb_geall(bg,desc_a,info)
 !   call psb_geasb(bg,desc_a,info,mold=tmold)
 !   call bg%set(done+done)
-
-!   call psb_spmm(done,agpu,xg,dzero,bg,desc_a,info)
-!   call psb_cuda_DeviceSync()
 
 !   ! TODO: Non funziona spgpuDaxpby (axpbyMultiVecDeviceDouble)
 !   call psb_geaxpby(done,xg,dzero,bg,desc_a,info)
@@ -835,52 +832,10 @@ program pdegenmm
 
 !   return
 
-
-  ! TODO Test NRM2 AMAX
-!   call b_mv_g%set(done)
-!   test = psb_genrm2(b_mv_g,desc_a,info)
-!   write(*,*) 'AMAX ', psb_geamax(b_mv_g,desc_a,info)
-!   do i=1,nrhs
-!     write(*,*) test(i)
-!   end do
-
-  ! TODO SpMM da fare con vettori GPU su mod csrg
-  ! TODO SpMM da fare a parte dopo
-  ! TODO Da cambiare WRITE READ R2 devono usare Memcopy 2D
-  ! TODO Test DDOT
-!   call x_mv_g%set(done)
-!   call b_mv_g%set(done+done)
-!   test = psb_gedot(b_mv_g,test2,desc_a,info)
-!   write(*,*) 'SIZE ', size(test,1), size(test,2)
-!   do i=1,size(test,1)
-!     write(*,*) test(i,:)
-!   end do
-
-! TODO
-!   allocate(test(8,2),test1(8,2),test2(8))
-!   do i=1,size(test,1)
-!     test(i,:) = i*done
-!   end do
-!   info = FallocMultiVecDevice(gpx,nrhs,size(test,1),spgpu_type_double)
-!   info = writeMultiVecDevice(gpx,test,size(test,1))
-!   !info = FallocMultiVecDevice(gpy,nrhs,size(test1,1),spgpu_type_double)
-!   info = readMultiVecDevice(gpx,test1,size(test1,1))
-
-!   do i=1,size(test1,1)
-!     write(*,*) test1(i,:)
-!   end do
-
-!   return
-
-  call x_mv_g%set(done)
-  call x_mv_g%sync()
-
-  call b_mv_g%set(done)
-  call b_mv_g%sync()
   call psb_barrier(ctxt)
   tt1 = psb_wtime()
   do i=1,ntests 
-    call psb_spmm(done,agpu,x_mv_g,dzero,b_mv_g,desc_a,info)
+    call psb_spmm(done,agpu,x_mv,dzero,b_mv_g,desc_a,info)
     if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
       write(0,*) 'From 1 spmm',info,i,ntests
       call psb_error()
@@ -893,16 +848,14 @@ program pdegenmm
   call psb_amx(ctxt,tt2)
   x1 = b_mv%get_vect()
   x2 = b_mv_g%get_vect()
-  write(*,*) 'X1 ', x1(1,:), ' X2 ', x2(1,:)
-  do i=1,size(b_mv_g%v%v,1)
-    write(*,*) b_mv_g%v%v(i,:)
+  write(*,*)
+  do i=1,size(x2,1)
+    write(*,*) x2(i,:)
   end do
   nr = desc_a%get_local_rows()
   eps = maxval(abs(x1(1:nr,1:nrhs)-x2(1:nr,1:nrhs)))
   call psb_amx(ctxt,eps)
   if (iam==0) write(*,*) 'Max diff on xGPU',eps
-
-  return
 
   ! FIXME: cache flush needed here
   call x_mv_g%set(x0)
@@ -926,11 +879,12 @@ program pdegenmm
   call b_mv_g%sync()
   x1 = b_mv%get_vect()
   x2 = b_mv_g%get_vect()
-  write(*,*) 'X1 ', x1(1,:), ' X2 ', x2(1,:)
+  write(*,*)
+  do i=1,size(x2,1)
+    write(*,*) x2(i,:)
+  end do
   call psb_geaxpby(-done,b_mv_g,+done,b_mv,desc_a,info)
   eps = psb_geamax(b_mv,desc_a,info)
-
-  return
 
   call psb_amx(ctxt,t2)
   eps = maxval(abs(x1(1:nr,1:nrhs)-x2(1:nr,1:nrhs)))
