@@ -181,6 +181,20 @@ int writeRemoteBuffer(void* hostSrc, void* buffer, int count)
   }
 }
 
+// TODO
+int writeRemoteBufferR2(void* hostSrc, void* buffer, int count, int pitch, int size)
+{
+  cudaError_t err = cudaMemcpy2D(buffer, pitch, hostSrc, count, count, size, cudaMemcpyHostToDevice);
+
+  if (err == cudaSuccess)
+    return SPGPU_SUCCESS;	
+  else {
+    fprintf(stderr,"CUDA Error writeRemoteBuffer: %s  %p %p %d %d %d\n", 
+	    cudaGetErrorString(err),buffer, hostSrc, count, pitch, size);
+    return SPGPU_UNSPECIFIED;
+  }
+}
+
 int readRemoteBuffer(void* hostDest, void* buffer, int count)
 {
 
@@ -196,6 +210,20 @@ int readRemoteBuffer(void* hostDest, void* buffer, int count)
   
 #endif
   err = cudaMemcpy(hostDest, buffer, count, cudaMemcpyDeviceToHost);
+
+  if (err == cudaSuccess)
+    return SPGPU_SUCCESS;	
+  else {
+    fprintf(stderr,"CUDA Error readRemoteBuffer: %s %p  %p %d %d\n", 
+	    cudaGetErrorString(err),hostDest,buffer,count,err);
+    return SPGPU_UNSPECIFIED;
+  }
+}
+
+// TODO sistemare pitch e size (si possono gestire senza realloc su fortran)
+int readRemoteBufferR2(void* hostDest, void* buffer, int count, int pitch, int size)
+{
+  cudaError_t err = cudaMemcpy2D(hostDest, count, buffer, pitch, count, size, cudaMemcpyDeviceToHost);
 
   if (err == cudaSuccess)
     return SPGPU_SUCCESS;	

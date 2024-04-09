@@ -226,10 +226,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! BGMRES algorithm
 
-   ! TODO Con tanti ITRS e tanti NRHS si ottengono NaN, deflazione e restart dopo aver trovato una colonna, difficile...
-
-   ! TODO Provare a compilare su GPU remota (Vedere REC)
-
    ! STEP 1: Compute R(0) = B - A*X(0)
 
    ! Store B in V(1)
@@ -284,7 +280,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          idx_i = (i-1)*nrhs+1
 
          ! STEP 6: Compute H(i,j) = (V(i)**T)*W
-         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_geprod(v(i),w,desc_a,info,trans=.true.)
+         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_gedot(v(i),w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -366,13 +362,13 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          errnum = rmn2
          errden = r0n2
 
-         do col=1,nrhs
-            write(*,*) rmn2(col), r0n2(col)
-         end do
+        !  do col=1,nrhs
+        !     write(*,*) rmn2(col), r0n2(col)
+        !  end do
       end if
 
-      ! TODO Check convergence (max o media)
-      if (all(errnum.le.(eps*errden))) then
+      ! Check convergence (max o media)
+      if (maxval(errnum).le.(eps*maxval(errden))) then
 
          ! Exit algorithm
          exit outer
@@ -394,7 +390,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! END algorithm
 
-   ! TODO Versione finale che stampa errore massimo (si può usare log_conv con questo)
    if (itrace_ > 0) call log_conv(methdname,me,itx,ione,maxval(errnum),maxval(errden),deps)
 
    call log_end(methdname,me,itx,itrace_,maxval(errnum),maxval(errden),deps,err=derr,iter=iter)
@@ -444,8 +439,6 @@ contains
       allocate(beta_e1(m_h,nrhs))
       beta_e1 = dzero
       beta_e1(1:nrhs,1:nrhs) = beta
-
-      ! TODO DGELS ha anche i residui (con i residui fai come MATLAB e poi si prova se esce uguale)
 
       ! Compute min Frobenius norm
       call dgels('N',m_h,n_h,nrhs,h_temp(1:m_h,1:n_h),m_h,beta_e1,m_h,work,lwork,info)

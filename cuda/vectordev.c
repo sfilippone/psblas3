@@ -165,6 +165,7 @@ int FallocMultiVecDevice(void** deviceMultiVec, unsigned int count,
 
   p = getMultiVectorDeviceParams(count, size, elementType);
   i = allocMultiVecDevice(deviceMultiVec, &p);
+  fprintf(stderr,"From ALLOC: %d %d \n", p.pitch, p.size);
   //cudaSync();
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d, %d %d \n","FallocMultiVecDevice",i, count, size);

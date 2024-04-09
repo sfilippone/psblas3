@@ -1357,9 +1357,8 @@ module psb_d_cuda_multivect_mod
     procedure, pass(x) :: get_nrows => d_cuda_multi_get_nrows
     procedure, pass(x) :: get_ncols => d_cuda_multi_get_ncols
     procedure, nopass  :: get_fmt   => d_cuda_multi_get_fmt
-    ! TODO
-!!$    procedure, pass(x) :: dot_v    => d_cuda_multi_dot_v
-!!$    procedure, pass(x) :: dot_a    => d_cuda_multi_dot_a
+    procedure, pass(x) :: dot_v    => d_cuda_multi_dot_v
+    procedure, pass(x) :: dot_a    => d_cuda_multi_dot_a
     procedure, pass(y) :: axpby_v  => d_cuda_multi_axpby_v
     procedure, pass(y) :: axpby_a  => d_cuda_multi_axpby_a
 !!$    procedure, pass(y) :: mlt_v    => d_cuda_multi_mlt_v
@@ -1369,7 +1368,7 @@ module psb_d_cuda_multivect_mod
 !!$    procedure, pass(x) :: scal     => d_cuda_multi_scal
     procedure, pass(x) :: nrm2     => d_cuda_multi_nrm2
     procedure, pass(x) :: amax     => d_cuda_multi_amax
-!!$    procedure, pass(x) :: asum     => d_cuda_multi_asum
+    procedure, pass(x) :: asum     => d_cuda_multi_asum
     procedure, pass(x) :: all      => d_cuda_multi_all
     procedure, pass(x) :: zero     => d_cuda_multi_zero
     procedure, pass(x) :: asb      => d_cuda_multi_asb
@@ -1608,11 +1607,11 @@ contains
     res = 'dGPU'
   end function d_cuda_multi_get_fmt
 
-  function d_cuda_multi_dot_v(n,x,y) result(res)
+  function d_cuda_multi_dot_v(nr,x,y) result(res)
     implicit none 
     class(psb_d_multivect_cuda), intent(inout)       :: x
     class(psb_d_base_multivect_type), intent(inout) :: y
-    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(in)              :: nr
     real(psb_dpk_), allocatable   :: res(:,:)
     real(psb_dpk_), external      :: ddot
     integer(psb_ipk_) :: info
@@ -1623,38 +1622,41 @@ contains
     !  When we get here, we are sure that X is of
     !  TYPE psb_d_vect
     !
-    ! TODO tra
     select type(yy => y)
     type is (psb_d_multivect_cuda)
       if (x%is_host()) call x%sync()
       if (yy%is_host()) call yy%sync()
-      info = dotMultiVecDevice(res,n,x%deviceVect,yy%deviceVect,x%get_ncols())
+      info = dotMultiVecDevice(res,nr,x%deviceVect,yy%deviceVect,x%get_ncols())
       if (info /= 0) then 
         info = psb_err_internal_error_
         call psb_errpush(info,'d_cuda_multi_dot_v')
       end if
-
-    ! TODO
     class default
       ! y%sync is done in dot_a
       call x%sync()      
-      res = y%dot(n,x%v)
+      res = y%dot(nr,x%v)
     end select
 
   end function d_cuda_multi_dot_v
 
-  ! TODO
-  function d_cuda_multi_dot_a(n,x,y) result(res)
+  function d_cuda_multi_dot_a(nr,x,y) result(res)
     implicit none 
     class(psb_d_multivect_cuda), intent(inout) :: x
-    real(psb_dpk_), intent(in)           :: y(:)
-    integer(psb_ipk_), intent(in)        :: n
+    real(psb_dpk_), intent(in)           :: y(:,:)
+    integer(psb_ipk_), intent(in)        :: nr
     real(psb_dpk_), allocatable   :: res(:,:)
     real(psb_dpk_), external      :: ddot
-    
+    integer(psb_ipk_)             :: i, j, n_x, n_y
+
     if (x%is_dev()) call x%sync()
-    allocate(res(2,2))
-    res = ddot(n,y,1,x%v,1)
+    n_x = size(x%v,2)
+    n_y = size(y,2_psb_ipk_)
+    allocate(res(n_x,n_y))
+    do i=1,n_x
+      do j=1,n_y
+        res(i,j) = ddot(nr,x%v(1:nr,i),1,y(1:nr,j),1)
+      end do
+    end do
 
   end function d_cuda_multi_dot_a
    
@@ -1980,7 +1982,7 @@ contains
         nh=0
       end if
       if (c_associated(x%deviceVect)) then 
-        md  = getMultiVecDevicePitch(x%deviceVect)
+        md  = getMultiVecDeviceSize(x%deviceVect)
         nd  = getMultiVecDeviceCount(x%deviceVect)
         if ((md < mh).or.(nd<nh)) then 
           call freeMultiVecDevice(x%deviceVect)
@@ -1991,7 +1993,7 @@ contains
       if (.not.c_associated(x%deviceVect)) then 
         info = FallocMultiVecDevice(x%deviceVect,nh,mh,spgpu_type_double)
         if (info == 0) &
-             & call psb_realloc(getMultiVecDevicePitch(x%deviceVect),&
+             & call psb_realloc(getMultiVecDeviceSize(x%deviceVect),&
              & getMultiVecDeviceCount(x%deviceVect),x%v,info,pad=dzero)
         if  (info /= 0) then 
 !!$          write(0,*) 'Error from FallocMultiVecDevice',info,n
@@ -2010,10 +2012,10 @@ contains
         mh=0
         nh=0
       end if
-      md  = getMultiVecDevicePitch(x%deviceVect)
+      md  = getMultiVecDeviceSize(x%deviceVect)
       nd  = getMultiVecDeviceCount(x%deviceVect)
       if ((mh /= md).or.(nh /= nd)) then 
-        call psb_realloc(getMultiVecDevicePitch(x%deviceVect),&
+        call psb_realloc(getMultiVecDeviceSize(x%deviceVect),&
              & getMultiVecDeviceCount(x%deviceVect),x%v,info,pad=dzero)
       end if
       

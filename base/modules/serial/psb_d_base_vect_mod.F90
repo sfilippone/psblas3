@@ -3400,7 +3400,7 @@ contains
     implicit none
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: nr
-    real(psb_dpk_), allocatable :: res
+    real(psb_dpk_)    :: res
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()

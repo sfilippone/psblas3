@@ -624,7 +624,9 @@ program pdegenmm
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
 
-  real(psb_dpk_), allocatable :: test(:,:)
+  real(psb_dpk_), allocatable :: test(:,:), test1(:,:), test2(:,:)
+
+  type(c_ptr) :: gpx, gpy
 
   info=psb_success_
 
@@ -787,7 +789,7 @@ program pdegenmm
 #endif
   end do
 
-  call x_mv%set(x0)
+  call x_mv%set(done)
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   do i=1,ntests 
@@ -803,7 +805,11 @@ program pdegenmm
   ! FIXME: cache flush needed here
   x1 = b_mv%get_vect()
   x2 = b_mv_g%get_vect()
+  do i=1,8
+    write(*,*) x1(i,:)
+  end do
 
+  ! TODO test AXPBY e SPMM
 !   call psb_geall(xg,desc_a,info)
 !   call psb_geasb(xg,desc_a,info,mold=tmold)
 !   call xg%set(done)
@@ -838,21 +844,26 @@ program pdegenmm
 !     write(*,*) test(i)
 !   end do
 
+  ! TODO SpMM da fare con vettori GPU su mod csrg
+  ! TODO SpMM da fare a parte dopo
+  ! TODO Da cambiare WRITE READ R2 devono usare Memcopy 2D
   ! TODO Test DDOT
-  call x_mv_g%set(done)
-  call b_mv_g%set(done+done)
-  test = b_mv_g%dot(8,x_mv_g)
-  write(*,*) 'SIZE ', size(test,1), size(test,2)
-  do i=1,nrhs
-    write(*,*) test(i,:)
-  end do
+!   call x_mv_g%set(done)
+!   call b_mv_g%set(done+done)
+!   test = psb_gedot(b_mv_g,test2,desc_a,info)
+!   write(*,*) 'SIZE ', size(test,1), size(test,2)
+!   do i=1,size(test,1)
+!     write(*,*) test(i,:)
+!   end do
 
-  return
+  write(*,*) 'TEST'
+  call x_mv_g%set(done)
+  call x_mv_g%sync()
 
   call psb_barrier(ctxt)
   tt1 = psb_wtime()
   do i=1,ntests 
-    call psb_spmm(done,agpu,x_mv,dzero,b_mv_g,desc_a,info)
+    call psb_spmm(done,agpu,x_mv_g,dzero,b_mv_g,desc_a,info)
     if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
       write(0,*) 'From 1 spmm',info,i,ntests
       call psb_error()
@@ -902,6 +913,8 @@ program pdegenmm
   write(*,*) 'X1 ', x1(1,:), ' X2 ', x2(1,:)
   call psb_geaxpby(-done,b_mv_g,+done,b_mv,desc_a,info)
   eps = psb_geamax(b_mv,desc_a,info)
+
+  return
 
   call psb_amx(ctxt,t2)
   eps = maxval(abs(x1(1:nr,1:nrhs)-x2(1:nr,1:nrhs)))
