@@ -624,7 +624,7 @@ program pdegenmm
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
 
-  real(psb_dpk_), allocatable :: test(:,:), test1(:,:), test2(:,:)
+  real(psb_dpk_), allocatable :: test(:,:), test1(:,:), test2(:)
 
   type(c_ptr) :: gpx, gpy
 
@@ -856,10 +856,27 @@ program pdegenmm
 !     write(*,*) test(i,:)
 !   end do
 
-  write(*,*) 'TEST'
+! TODO
+!   allocate(test(8,2),test1(8,2),test2(8))
+!   do i=1,size(test,1)
+!     test(i,:) = i*done
+!   end do
+!   info = FallocMultiVecDevice(gpx,nrhs,size(test,1),spgpu_type_double)
+!   info = writeMultiVecDevice(gpx,test,size(test,1))
+!   !info = FallocMultiVecDevice(gpy,nrhs,size(test1,1),spgpu_type_double)
+!   info = readMultiVecDevice(gpx,test1,size(test1,1))
+
+!   do i=1,size(test1,1)
+!     write(*,*) test1(i,:)
+!   end do
+
+!   return
+
   call x_mv_g%set(done)
   call x_mv_g%sync()
 
+  call b_mv_g%set(done)
+  call b_mv_g%sync()
   call psb_barrier(ctxt)
   tt1 = psb_wtime()
   do i=1,ntests 
@@ -876,7 +893,6 @@ program pdegenmm
   call psb_amx(ctxt,tt2)
   x1 = b_mv%get_vect()
   x2 = b_mv_g%get_vect()
-  write(*,*) 'MHANZ ', b_mv_g%get_nrows(), size(b_mv_g%v%v,1)
   write(*,*) 'X1 ', x1(1,:), ' X2 ', x2(1,:)
   do i=1,size(b_mv_g%v%v,1)
     write(*,*) b_mv_g%v%v(i,:)

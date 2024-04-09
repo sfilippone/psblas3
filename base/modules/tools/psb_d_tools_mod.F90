@@ -69,7 +69,7 @@ Module psb_d_tools_mod
     subroutine psb_dalloc_multivect_r2(x, desc_a,info,m,n,lb, dupl, bldmode)
       import
       implicit none
-      type(psb_d_multivect_type), intent(out)  :: x(:)
+      type(psb_d_multivect_type), allocatable, intent(out)  :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: m, n, lb

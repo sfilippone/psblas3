@@ -173,7 +173,6 @@ subroutine psb_d_cuda_csrg_multivect_mv(alpha,a,x,beta,y,info,trans)
           if (yy%is_host()) call yy%sync()
         end if
         ! TODO
-        write(*,*) 'AAAAAAAAA'
         info = spmvCSRGDevice(a%deviceMat,alpha,xx%deviceVect,&
              & beta,yy%deviceVect)
         if (info /= 0) then 

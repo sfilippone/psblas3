@@ -100,16 +100,16 @@ subroutine psb_d_cuda_csrg_csmm(alpha,a,x,beta,y,info,trans)
     if (info == 0) &
          & info = FallocMultiVecDevice(gpX,nxy,size(x,1),spgpu_type_double)
     if (info == 0) &
-         & info = writeMultiVecDevice(gpX,x,nxy)
+         & info = writeMultiVecDevice(gpX,x,size(x,1))
     if (info == 0) &
          & info = FallocMultiVecDevice(gpY,nxy,size(y,1),spgpu_type_double)
     if (info == 0) &
-         & info = writeMultiVecDevice(gpY,y,nxy)
+         & info = writeMultiVecDevice(gpY,y,size(y,1))
 
     if (info == 0)  &
          & info = spmvCSRGDevice(a%deviceMat,alpha,gpX,beta,gpY)
     if (info == 0) &
-         & info = readMultiVecDevice(gpY,y,nxy)
+         & info = readMultiVecDevice(gpY,y,size(y,1))
     if (info /= 0) goto 9999
     call freeMultiVecDevice(gpX)
     call freeMultiVecDevice(gpY)
