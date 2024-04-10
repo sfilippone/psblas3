@@ -238,7 +238,7 @@ int T_spmmCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY; 
   void *vX, *vY;
-  int j,r,n;
+  int r,n;
   cusparseHandle_t *my_handle=getHandle();
   TYPE   ealpha=alpha, ebeta=beta;
   cusparseDnMatDescr_t vecX, vecY;
@@ -248,67 +248,64 @@ int T_spmmCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
     cMat->spmvDescr = (cusparseSpMatDescr_t  *) malloc(sizeof(cusparseSpMatDescr_t  *));
   }
   T_CSRGCreateSpMVDescr(cMat);
-  //   vX=x->v_;
-  //   vY=y->v_;
-  //   fprintf(stderr,"CUDA ENTERED %p %d %d %d %d %d\n", vX, pitch, y->size_, x->count_, alpha, beta);
-  //   CHECK_CUSPARSE(cusparseCreateDnMat(&vecX, cMat->n, x->count_, pitch, vX, CUSPARSE_BASE_TYPE, CUSPARSE_ORDER_COL));
-  //   CHECK_CUSPARSE(cusparseCreateDnMat(&vecY, cMat->m, y->count_, pitch, vY, CUSPARSE_BASE_TYPE, CUSPARSE_ORDER_COL));
-  //   CHECK_CUSPARSE(cusparseSpMM_bufferSize(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-  //                         CUSPARSE_OPERATION_NON_TRANSPOSE,&alpha,
-  //                         (*(cMat->spmvDescr)),vecX,&beta,vecY,
-  //                         CUSPARSE_BASE_TYPE,CUSPARSE_SPMM_ALG_DEFAULT,
-  //                         &bfsz));
-  //     if (bfsz > cMat->mvbsize) {
-  //         if (cMat->mvbuffer != NULL) {
-  //         CHECK_CUDA(cudaFree(cMat->mvbuffer));
-  //         cMat->mvbuffer = NULL;
-  //         }
-  //         //CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
-  //         allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);
-  
-  //         cMat->mvbsize = bfsz;
-  //     }
-  
-  //     CHECK_CUSPARSE(cusparseSpMM(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-  //                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-  //                         &alpha,(*(cMat->spmvDescr)),vecX,&beta,vecY,CUSPARSE_BASE_TYPE,
-  //                         CUSPARSE_SPMM_ALG_DEFAULT,cMat->mvbuffer));
-  //     CHECK_CUSPARSE(cusparseDestroyDnMat(vecX));
-  //     CHECK_CUSPARSE(cusparseDestroyDnMat(vecY));
-  for(j=0;j<y->count_;j++) {
-#if 0
-    vX=(x->v_)+(x->pitch_)*j*sizeof(TYPE);
-    vY=(y->v_)+(y->pitch_)*j*sizeof(TYPE);
-#else
-    vX=(void*)(((TYPE *)(x->v_))+(x->pitch_)*j) ;
-    vY=(void*)(((TYPE *)(y->v_))+(y->pitch_)*j) ;
-#endif
-    
-    //    fprintf(stderr,"CUDA ENTERED 1 %d %p %p %d %d %d %d\n",j, vX, vY, pitch, y->size_, cMat->m, cMat->n);
-    CHECK_CUSPARSE( cusparseCreateDnVec(&vecY, cMat->m, vY, CUSPARSE_BASE_TYPE) );
-    CHECK_CUSPARSE( cusparseCreateDnVec(&vecX, cMat->n, vX, CUSPARSE_BASE_TYPE) );
-    CHECK_CUSPARSE(cusparseSpMV_bufferSize(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-					   &alpha,(*(cMat->spmvDescr)),vecX,&beta,vecY,
-					   CUSPARSE_BASE_TYPE,CUSPARSE_SPMV_ALG_DEFAULT,
-					   &bfsz));
-    
-    if (bfsz > cMat->mvbsize) {
+  vX=x->v_;
+  vY=y->v_;
+  CHECK_CUSPARSE(cusparseCreateDnMat(&vecX, cMat->n, x->count_, x->pitch_, vX, CUSPARSE_BASE_TYPE, CUSPARSE_ORDER_COL));
+  CHECK_CUSPARSE(cusparseCreateDnMat(&vecY, cMat->m, y->count_, y->pitch_, vY, CUSPARSE_BASE_TYPE, CUSPARSE_ORDER_COL));
+  CHECK_CUSPARSE(cusparseSpMM_bufferSize(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
+                     CUSPARSE_OPERATION_NON_TRANSPOSE,&alpha,
+                     (*(cMat->spmvDescr)),vecX,&beta,vecY,
+                     CUSPARSE_BASE_TYPE,CUSPARSE_SPMM_ALG_DEFAULT,
+                     &bfsz));
+  if (bfsz > cMat->mvbsize) {
       if (cMat->mvbuffer != NULL) {
-	CHECK_CUDA(cudaFree(cMat->mvbuffer));
-	cMat->mvbuffer = NULL;
+        CHECK_CUDA(cudaFree(cMat->mvbuffer));
+        cMat->mvbuffer = NULL;
       }
-      allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);    
+      allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);
       cMat->mvbsize = bfsz;
-    }
-    CHECK_CUSPARSE(cusparseSpMV(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-				&alpha,(*(cMat->spmvDescr)),vecX,&beta,vecY,
-				CUSPARSE_BASE_TYPE,CUSPARSE_SPMV_ALG_DEFAULT,
-				cMat->mvbuffer));
-    //fprintf(stderr,"CUDA ENTERED 2 %d %p %p %d %d %d %d\n",j, vX, vY, *((double*)vX), *((double*)vY), pitch, y->size_);
-    CHECK_CUSPARSE(cusparseDestroyDnVec(vecX) );
-    CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
   }
-  return(0);
+  
+  CHECK_CUSPARSE(cusparseSpMM(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
+                     CUSPARSE_OPERATION_NON_TRANSPOSE,
+                     &alpha,(*(cMat->spmvDescr)),vecX,&beta,vecY,CUSPARSE_BASE_TYPE,
+                     CUSPARSE_SPMM_ALG_DEFAULT,cMat->mvbuffer));
+  CHECK_CUSPARSE(cusparseDestroyDnMat(vecX));
+  CHECK_CUSPARSE(cusparseDestroyDnMat(vecY));
+  CHECK_CUSPARSE(cusparseDestroySpMat(*(cMat->spmvDescr)));
+
+// SpMV iteration implementation
+//   for(j=0;j<y->count_;j++) {
+// #if 0
+//     vX=(x->v_)+(x->pitch_)*j*sizeof(TYPE);
+//     vY=(y->v_)+(y->pitch_)*j*sizeof(TYPE);
+// #else
+//     vX=(void*)(((TYPE *)(x->v_))+(x->pitch_)*j) ;
+//     vY=(void*)(((TYPE *)(y->v_))+(y->pitch_)*j) ;
+// #endif
+//     //    fprintf(stderr,"CUDA ENTERED 1 %d %p %p %d %d %d %d\n",j, vX, vY, pitch, y->size_, cMat->m, cMat->n);
+//     CHECK_CUSPARSE( cusparseCreateDnVec(&vecY, cMat->m, vY, CUSPARSE_BASE_TYPE) );
+//     CHECK_CUSPARSE( cusparseCreateDnVec(&vecX, cMat->n, vX, CUSPARSE_BASE_TYPE) );
+//     CHECK_CUSPARSE(cusparseSpMV_bufferSize(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
+// 					   &alpha,(*(cMat->spmvDescr)),vecX,&beta,vecY,
+// 					   CUSPARSE_BASE_TYPE,CUSPARSE_SPMV_ALG_DEFAULT,
+// 					   &bfsz));
+//     if (bfsz > cMat->mvbsize) {
+//       if (cMat->mvbuffer != NULL) {
+// 	CHECK_CUDA(cudaFree(cMat->mvbuffer));
+// 	cMat->mvbuffer = NULL;
+//       }
+//       allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);    
+//       cMat->mvbsize = bfsz;
+//     }
+//     CHECK_CUSPARSE(cusparseSpMV(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
+// 				&alpha,(*(cMat->spmvDescr)),vecX,&beta,vecY,
+// 				CUSPARSE_BASE_TYPE,CUSPARSE_SPMV_ALG_DEFAULT,
+// 				cMat->mvbuffer));
+//     //fprintf(stderr,"CUDA ENTERED 2 %d %p %p %d %d %d %d\n",j, vX, vY, *((double*)vX), *((double*)vY), pitch, y->size_);
+//     CHECK_CUSPARSE(cusparseDestroyDnVec(vecX) );
+//     CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
+//   }
 }
   
 int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
