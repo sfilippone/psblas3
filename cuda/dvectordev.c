@@ -56,7 +56,6 @@ int writeMultiVecDeviceDouble(void* deviceVec, double* hostVec)
 int writeMultiVecDeviceDoubleR2(void* deviceVec, double* hostVec, int ld)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  double *hv, *dv;
   i = writeRemoteBufferR2((void*) hostVec, ld*sizeof(double),
 			  (void *)devVec->v_, (devVec->count_),
 			  sizeof(double)*(devVec->pitch_), (devVec->size_)*sizeof(double));
@@ -81,7 +80,6 @@ int readMultiVecDeviceDouble(void* deviceVec, double* hostVec)
 
 int readMultiVecDeviceDoubleR2(void* deviceVec, double* hostVec, int ld)
 { int i;
-  double *hv, *dv;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
 
   i = readRemoteBufferR2((void *) hostVec,  ld*sizeof(double),

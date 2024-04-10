@@ -45,6 +45,7 @@
 #define T_CSRGDeviceMat		       d_CSRGDeviceMat
 #define T_Cmat			       d_Cmat
 #define T_spmvCSRGDevice	       d_spmvCSRGDevice
+#define T_spmmCSRGDevice           d_spmmCSRGDevice
 #define T_spsvCSRGDevice	       d_spsvCSRGDevice
 #define T_CSRGDeviceAlloc	       d_CSRGDeviceAlloc
 #define T_CSRGDeviceFree	       d_CSRGDeviceFree
