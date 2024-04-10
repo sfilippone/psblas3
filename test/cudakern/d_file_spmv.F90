@@ -245,7 +245,7 @@ program d_file_spmv
       write(psb_out_unit,'("Partition type: graph")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
-      call build_mtpart(aux_a,np)
+      call build_mtpart(aux_a,int(np,psb_lpk_))
     endif
     call psb_barrier(ctxt)
     call distr_mtpart(psb_root_,ctxt)
@@ -274,7 +274,7 @@ program d_file_spmv
   nrg      = desc_a%get_global_rows() 
   call psb_geall(x_col,desc_a,info)
   do i=1, nr
-    call desc_a%l2g(i,ig,info)
+    call desc_a%l2g(int(i,psb_ipk_),ig,info)
     call psb_geins(ione,(/ig/),(/(done + (done*ig)/nrg)/),x_col,desc_a,info)
   end do
   call psb_geasb(x_col,desc_a,info)

@@ -184,13 +184,15 @@ subroutine psb_d_cuda_csrg_multivect_mv(alpha,a,x,beta,y,info,trans)
       class default
         rx = xx%get_vect()
         ry = y%get_vect()
-        call a%psb_d_csr_sparse_mat%spmm(alpha,rx,beta,ry,info)
+        if (a%is_dev()) call a%sync()
+        call a%spmm(alpha,rx,beta,ry,info)
         call y%bld(ry)
       end select
     class default
       rx = x%get_vect()
       ry = y%get_vect()
-      call a%psb_d_csr_sparse_mat%spmm(alpha,rx,beta,ry,info)
+      if (a%is_dev()) call a%sync()
+      call a%spmm(alpha,rx,beta,ry,info)
       call y%bld(ry)
     end select
   end if

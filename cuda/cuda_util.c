@@ -181,7 +181,6 @@ int writeRemoteBuffer(void* hostSrc, void* buffer, int count)
   }
 }
 
-// TODO
 int writeRemoteBufferR2(void* hostSrc, int hpitch, void* buffer, int count, int pitch, int size)
 {
   cudaError_t err = cudaMemcpy2D(buffer, pitch, hostSrc, hpitch, size, count, cudaMemcpyHostToDevice);
@@ -220,7 +219,6 @@ int readRemoteBuffer(void* hostDest, void* buffer, int count)
   }
 }
 
-// TODO sistemare pitch e size (si possono gestire senza realloc su fortran)
 int readRemoteBufferR2(void* hostDest, int hpitch, void* buffer, int count, int pitch, int size)
 {
   cudaError_t err = cudaMemcpy2D(hostDest, hpitch, buffer, pitch, size, count, cudaMemcpyDeviceToHost);
