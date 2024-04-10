@@ -181,6 +181,23 @@ int spmvHllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   return SPGPU_SUCCESS;
 }
 
+void
+dspmdmmhll_gpu (double *z, int s, int vPitch, double *y, double alpha, double* cM, int* rP,
+	     int* rS, int hackSize, int* hackOffs, int avgNnzPerRow, int rows, double *x, double beta, int firstIndex)
+{
+  int i=0;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  for (i=0; i<s; i++)
+    {
+      spgpuDhellspmv (handle, (double*) z, (double*)y, alpha, (double*) cM, rP,
+		       hackSize, hackOffs, rS, NULL,
+               avgNnzPerRow, rows, (double*)x, beta, firstIndex);
+      z += vPitch;
+      y += vPitch;
+      x += vPitch;		
+    }
+}
+
 //new
 int spmvHllDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
 		       double beta, void* deviceY)
@@ -188,21 +205,18 @@ int spmvHllDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
-  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  /*dspmdmm_gpu ((double *)z->v_, y->count_, y->pitch_, (double *)y->v_, alpha, (double *)devMat->cM, 
-	       devMat->rP, devMat->rS, devMat->rows, devMat->pitch, (double *)x->v_, beta,
-	       devMat->baseIndex);*/
+  dspmdmmhll_gpu ((double *)y->v_, y->count_, y->pitch_, (double *)y->v_,
+           alpha, (double *)devMat->cM, 
+	       devMat->rP, devMat->rS, devMat->hackSize, devMat->hackOffs,
+           devMat->avgNzr, devMat->rows,
+           (double *)x->v_, beta, devMat->baseIndex);
 
-  spgpuDhellspmv (handle, (double *)y->v_, (double *)y->v_, alpha, (double*)devMat->cM, 
-		  devMat->rP,devMat->hackSize,devMat->hackOffs, devMat->rS, NULL,
-		  devMat->avgNzr, devMat->rows, (double *)x->v_, beta, devMat->baseIndex);
-  //cudaSync();
   return SPGPU_SUCCESS;
 }
 

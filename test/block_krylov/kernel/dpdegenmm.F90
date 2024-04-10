@@ -612,7 +612,6 @@ program pdegenmm
 #if CUDA_SHORT_VERSION <= 10
   type(psb_d_cuda_hybg_sparse_mat), target  :: ahybg
 #endif
-  ! TODO HLG da fare (complesso)
   type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
   ! TODO HDIAG E DNSG non hanno nemmeno CSMM
   type(psb_d_cuda_hdiag_sparse_mat), target   :: ahdiag
@@ -663,7 +662,7 @@ program pdegenmm
   !call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
   nrhs=2
   acfmt='CSR'
-  agfmt='CSRG'
+  agfmt='HLG'
   idim=2
   tnd=.false.
   call psb_init_timers()
@@ -806,26 +805,26 @@ program pdegenmm
   x2 = b_mv_g%get_vect()
 
 !   ! TODO test AXPBY
-  call psb_geall(xg,desc_a,info)
-  call psb_geasb(xg,desc_a,info,mold=tmold)
-  call xg%set(done)
-  call xg%sync()
-  call psb_geall(bg,desc_a,info)
-  call psb_geasb(bg,desc_a,info,mold=tmold)
-  !call bg%set(done+done)
+!   call psb_geall(xg,desc_a,info)
+!   call psb_geasb(xg,desc_a,info,mold=tmold)
+!   call xg%set(done)
+!   call xg%sync()
+!   call psb_geall(bg,desc_a,info)
+!   call psb_geasb(bg,desc_a,info,mold=tmold)
+!   !call bg%set(done+done)
 
-!   ! TODO: Non funziona spgpuDaxpby (axpbyMultiVecDeviceDouble)
-  call psb_geaxpby(done,xg,dzero,bg,desc_a,info)
-  call psb_cuda_DeviceSync()
+! !   ! TODO: Non funziona spgpuDaxpby (axpbyMultiVecDeviceDouble)
+!   call psb_geaxpby(done,xg,dzero,bg,desc_a,info)
+!   call psb_cuda_DeviceSync()
 
-  write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
-  call bg%sync()
-  write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
-  do i=1,8
-    write(*,*) bg%v%v(i)
-  end do
+!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
+!   call bg%sync()
+!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
+!   do i=1,8
+!     write(*,*) bg%v%v(i)
+!   end do
 
-  return
+!   return
 
 !   call x_mv_g%set(done)
 !   call x_mv_g%sync()
