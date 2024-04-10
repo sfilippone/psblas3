@@ -165,7 +165,7 @@ subroutine psb_d_cuda_hlg_multivect_mv(alpha,a,x,beta,y,info,trans)
     else
       if (a%is_host()) call a%sync()    
       select type (xx => x) 
-      type is (psb_d_multivectcuda)
+      type is (psb_d_multivect_cuda)
         select type(yy => y) 
         type is (psb_d_multivect_cuda)
           if (xx%is_host()) call xx%sync()
