@@ -56,9 +56,12 @@ int writeMultiVecDeviceDouble(void* deviceVec, double* hostVec)
 int writeMultiVecDeviceDoubleR2(void* deviceVec, double* hostVec, int ld)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  i = writeRemoteBufferR2((void*) hostVec, (void *)devVec->v_, devVec->count_*sizeof(double), devVec->pitch_, devVec->size_);
+  double *hv, *dv;
+  i = writeRemoteBufferR2((void*) hostVec, ld*sizeof(double),
+			  (void *)devVec->v_, (devVec->count_),
+			  sizeof(double)*(devVec->pitch_), (devVec->size_)*sizeof(double));
 //   i = writeMultiVecDeviceDouble(deviceVec, (void *) hostVec);
-  fprintf(stderr,"From routine : %s : %p %p\n","writeMultiVecDeviceDoubleR2",devVec->v_,devVec->v_+devVec->pitch_);
+  //fprintf(stderr,"From routine : %s : %p %p\n","writeMultiVecDeviceDoubleR2",devVec->v_,devVec->v_+devVec->pitch_);
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","writeMultiVecDeviceDoubleR2",i);
   }
@@ -78,10 +81,14 @@ int readMultiVecDeviceDouble(void* deviceVec, double* hostVec)
 
 int readMultiVecDeviceDoubleR2(void* deviceVec, double* hostVec, int ld)
 { int i;
+  double *hv, *dv;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
-  i = readRemoteBufferR2((void *) hostVec, (void *)devVec->v_, devVec->count_*sizeof(double), devVec->pitch_, devVec->size_);
+
+  i = readRemoteBufferR2((void *) hostVec,  ld*sizeof(double),
+			 (void *)devVec->v_, devVec->count_,
+			 sizeof(double)*(devVec->pitch_), (devVec->size_)*sizeof(double));
 //   i = readMultiVecDeviceDouble(deviceVec, hostVec);
-  fprintf(stderr,"From routine : %s : %p \n","readMultiVecDeviceDoubleR2",devVec->v_);
+//  fprintf(stderr,"From routine : %s : %p \n","readMultiVecDeviceDoubleR2",devVec->v_);
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","readMultiVecDeviceDoubleR2",i);
   }
@@ -242,7 +249,7 @@ int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX,
     return SPGPU_UNSUPPORTED;
 
   for(j=0;j<devVecY->count_;j++)
-    fprintf(stderr,"CUDA ENTERED %d %d %d %d \n",j, n, pitch, devVecY->size_);
+    //fprintf(stderr,"CUDA ENTERED %d %d %d %d \n",j, n, pitch, devVecY->size_);
     spgpuDaxpby(handle,(double*)devVecY->v_+pitch*j, n, beta, 
 		(double*)devVecY->v_+pitch*j, alpha,(double*) devVecX->v_+pitch*j);
   return(i);

@@ -182,9 +182,9 @@ int writeRemoteBuffer(void* hostSrc, void* buffer, int count)
 }
 
 // TODO
-int writeRemoteBufferR2(void* hostSrc, void* buffer, int count, int pitch, int size)
+int writeRemoteBufferR2(void* hostSrc, int hpitch, void* buffer, int count, int pitch, int size)
 {
-  cudaError_t err = cudaMemcpy2D(buffer, pitch, hostSrc, count, count, size, cudaMemcpyHostToDevice);
+  cudaError_t err = cudaMemcpy2D(buffer, pitch, hostSrc, hpitch, size, count, cudaMemcpyHostToDevice);
 
   if (err == cudaSuccess)
     return SPGPU_SUCCESS;	
@@ -221,9 +221,9 @@ int readRemoteBuffer(void* hostDest, void* buffer, int count)
 }
 
 // TODO sistemare pitch e size (si possono gestire senza realloc su fortran)
-int readRemoteBufferR2(void* hostDest, void* buffer, int count, int pitch, int size)
+int readRemoteBufferR2(void* hostDest, int hpitch, void* buffer, int count, int pitch, int size)
 {
-  cudaError_t err = cudaMemcpy2D(hostDest, count, buffer, pitch, count, size, cudaMemcpyDeviceToHost);
+  cudaError_t err = cudaMemcpy2D(hostDest, hpitch, buffer, pitch, size, count, cudaMemcpyDeviceToHost);
 
   if (err == cudaSuccess)
     return SPGPU_SUCCESS;	
