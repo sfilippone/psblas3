@@ -276,8 +276,14 @@ int T_spmmCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   //     CHECK_CUSPARSE(cusparseDestroyDnMat(vecX));
   //     CHECK_CUSPARSE(cusparseDestroyDnMat(vecY));
   for(j=0;j<y->count_;j++) {
+#if 0
     vX=(x->v_)+(x->pitch_)*j*sizeof(TYPE);
     vY=(y->v_)+(y->pitch_)*j*sizeof(TYPE);
+#else
+    vX=(void*)(((TYPE *)(x->v_))+(x->pitch_)*j) ;
+    vY=(void*)(((TYPE *)(y->v_))+(y->pitch_)*j) ;
+#endif
+    
     //    fprintf(stderr,"CUDA ENTERED 1 %d %p %p %d %d %d %d\n",j, vX, vY, pitch, y->size_, cMat->m, cMat->n);
     CHECK_CUSPARSE( cusparseCreateDnVec(&vecY, cMat->m, vY, CUSPARSE_BASE_TYPE) );
     CHECK_CUSPARSE( cusparseCreateDnVec(&vecX, cMat->n, vX, CUSPARSE_BASE_TYPE) );
