@@ -4,6 +4,9 @@ program psb_dbf_sample
    use psb_prec_mod
    use psb_krylov_mod
    use psb_util_mod
+#ifdef HAVE_CUDA
+   use psb_cuda_mod
+#endif
    use getp
 
    implicit none
@@ -12,7 +15,7 @@ program psb_dbf_sample
    character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
    ! sparse matrices
-   type(psb_dspmat_type)  :: a
+   type(psb_dspmat_type)  :: a, agpu
    type(psb_ldspmat_type) :: aux_a
 
    ! preconditioner data
@@ -23,11 +26,16 @@ program psb_dbf_sample
    real(psb_dpk_), allocatable, save   :: x_mv_glob(:,:), r_mv_glob(:,:)
    real(psb_dpk_), pointer             :: b_mv_glob(:,:)
    type(psb_d_multivect_type)          :: b_mv, x_mv, r_mv
+   type(psb_d_multivect_cuda)          :: gpumold
+   type(psb_i_vect_cuda)               :: imold
    integer(psb_ipk_)                   :: m, nrhs
    real(psb_dpk_)                      :: random_value
 
-   real(psb_dpk_), allocatable :: test(:)
-
+   ! molds
+   type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
+  type(psb_d_cuda_hlg_sparse_mat), target    :: ahlg
+   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
+   class(psb_d_base_sparse_mat), pointer     :: agmold, acmold
 
    ! communications data structure
    type(psb_desc_type) :: desc_a
@@ -41,7 +49,7 @@ program psb_dbf_sample
    real(psb_dpk_)    :: err, eps
 
    ! input parameters
-   character(len=5)             :: afmt
+   character(len=5)             :: afmt, agfmt = "ELG"
    character(len=20)            :: name, part
    character(len=2)             :: filefmt
    integer(psb_ipk_), parameter :: iunit=12
@@ -49,13 +57,14 @@ program psb_dbf_sample
    ! other variables
    integer(psb_ipk_)              :: i, j, info
    real(psb_dpk_)                 :: t1, t2, tprec
-   real(psb_dpk_), allocatable    :: resmx(:)
+   real(psb_dpk_), allocatable    :: resmx(:), res(:,:)
    real(psb_dpk_)                 :: resmxp
    integer(psb_ipk_), allocatable :: ivg(:)
-   logical                        :: print_matrix = .false.
+   logical                        :: print_matrix = .true.
 
    call psb_init(ctxt)
    call psb_info(ctxt,iam,np)
+   call psb_cuda_init(ctxt)
 
    if (iam < 0) then
       ! This should not happen, but just in case
@@ -76,11 +85,27 @@ program psb_dbf_sample
       write(psb_out_unit,'("This is the ",a," sample program")') trim(name)
       write(psb_out_unit,'(" ")')
    end if
+#ifdef HAVE_CUDA
+  write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
+  write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())  
+#endif
    !
    !  get parameters
    !
    call get_parms(ctxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,&
    & part,afmt,nrhs,istopc,itmax,itrace,itrs,eps)
+
+   select case(psb_toupper(agfmt))
+   case('ELG')
+     agmold => aelg
+   case('HLG')
+     agmold => ahlg
+   case('CSRG')
+     agmold => acsrg
+   case default
+     write(*,*) 'Unknown format defaulting to CSRG'
+     agmold => acsrg
+   end select
 
    call psb_barrier(ctxt)
    t1 = psb_wtime()
@@ -133,9 +158,9 @@ program psb_dbf_sample
          b_mv_glob => aux_b(:,:)
          do i=1, m
             do j=1, nrhs
-               !b_mv_glob(i,j) = done
-               call random_number(random_value)
-               b_mv_glob(i,j) = random_value
+               b_mv_glob(i,j) = done
+               !call random_number(random_value)
+               !b_mv_glob(i,j) = random_value
             enddo
          enddo
       endif
@@ -170,10 +195,18 @@ program psb_dbf_sample
       call psb_matdist(aux_a,a,ctxt,desc_a,info,fmt=afmt,parts=part_block)
    end select
 
-   call psb_scatter(b_mv_glob,b_mv,desc_a,info,root=psb_root_)
+   call a%cscnv(agpu,info,mold=agmold)
+   if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
+     write(0,*) 'From cscnv ',info
+     call psb_error()
+     stop
+   end if
+   call desc_a%cnv(mold=imold)
+
+   call psb_scatter(b_mv_glob,b_mv,desc_a,info,root=psb_root_,mold=gpumold)
    call psb_geall(x_mv,desc_a,info,nrhs)
    call x_mv%zero()
-   call psb_geasb(x_mv,desc_a,info)
+   call psb_geasb(x_mv,desc_a,info,mold=gpumold)
    call psb_geall(r_mv,desc_a,info,nrhs)
    call r_mv%zero()
    call psb_geasb(r_mv,desc_a,info)
@@ -209,7 +242,7 @@ program psb_dbf_sample
    call psb_barrier(ctxt)
    t1 = psb_wtime()
 
-   call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
+   call psb_krylov(kmethd,agpu,prec,b_mv,x_mv,eps,desc_a,info,&
    & itmax=itmax,iter=iter,err=err,itrace=itrace,&
    & itrs=itrs,istop=istopc)
 
@@ -269,11 +302,12 @@ program psb_dbf_sample
 998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))
 
-   call psb_gefree(b_mv, desc_a,info)
-   call psb_gefree(x_mv, desc_a,info)
-   call psb_spfree(a, desc_a,info)
+   call psb_gefree(b_mv,desc_a,info)
+   call psb_gefree(x_mv,desc_a,info)
+   call psb_spfree(a,desc_a,info)
    call prec%free(info)
    call psb_cdfree(desc_a,info)
+   call psb_cuda_exit()
    call psb_exit(ctxt)
 
    return
