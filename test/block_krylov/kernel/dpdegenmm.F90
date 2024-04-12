@@ -596,7 +596,7 @@ program pdegenmm
   ! solver parameters
   integer(psb_epk_)  :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)     :: err, eps
-  integer, parameter :: ntests=50, ngpu=50, ncnv=20
+  integer, parameter :: ntests=50, ngpu=10, ncnv=20
   type(psb_d_coo_sparse_mat), target  :: acoo
   type(psb_d_csr_sparse_mat), target  :: acsr
   type(psb_d_ell_sparse_mat), target  :: aell
@@ -659,12 +659,12 @@ program pdegenmm
   !
   !  get parameters
   !
-  !call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
-  nrhs=2
-  acfmt='CSR'
-  agfmt='HLG'
-  idim=2
-  tnd=.false.
+  call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
+  !nrhs=8
+  !acfmt='CSR'
+  !agfmt='CSRG'
+  !idim=100
+  !tnd=.false.
   call psb_init_timers()
   !
   !  allocate and fill in the coefficient matrix and initial vectors
@@ -911,7 +911,7 @@ program pdegenmm
     write(psb_out_unit,'("Size of matrix:     ",i20)') nr
     write(psb_out_unit,'("Number of nonzeros: ",i20)') annz
     write(psb_out_unit,'("Memory occupation:  ",i20)') amatsize
-    flops  = ntests*(2.d0*annz)
+    flops  = ntests*(2.d0*annz)*nrhs
     tflops = flops
     gflops = flops * ngpu
     write(psb_out_unit,'("Storage type for A:    ",a)') a%get_fmt()
@@ -970,7 +970,7 @@ program pdegenmm
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (CPU)  : ",F20.3)') bdwdth
 #ifdef HAVE_CUDA
-    bdwdth = ngpu*ntests*nbytes/(gt2*1.d6)
+    bdwdth = nrhs*ngpu*ntests*nbytes/(gt2*1.d6)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
     bdwdth = psb_cuda_MemoryPeakBandwidth()
     write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth

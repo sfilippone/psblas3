@@ -38,8 +38,10 @@
 #include "core.h"
 
 //new
-MultiVectorDeviceParams getMultiVectorDeviceParams(unsigned int count, unsigned int size, 
-						   unsigned int elementType)
+MultiVectorDeviceParams getMultiVectorDeviceParams(unsigned int count,
+						   unsigned int size, 
+						   unsigned int elementType,
+						   unsigned int storage2d)
 {
   struct MultiVectorDeviceParams params;
 
@@ -75,6 +77,7 @@ MultiVectorDeviceParams getMultiVectorDeviceParams(unsigned int count, unsigned 
 	
   params.count = count;
   params.size = size;
+  params.storage2d = storage2d ;
 
   return params;
 
@@ -87,8 +90,9 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
   
   struct MultiVectDevice *tmp = (struct MultiVectDevice *)malloc(sizeof(struct MultiVectDevice));
   *remoteMultiVec = (void *)tmp;
-  tmp->size_ = params->size;
-  tmp->count_ = params->count;
+  tmp->size_      = params->size;
+  tmp->count_     = params->count;
+  tmp->storage2d_ = params->storage2d;
 
   if (params->elementType == SPGPU_TYPE_INT)
     {
@@ -163,9 +167,9 @@ int FallocMultiVecDevice(void** deviceMultiVec, unsigned int count,
 { int i;
   struct MultiVectorDeviceParams p;
 
-  p = getMultiVectorDeviceParams(count, size, elementType);
+  p = getMultiVectorDeviceParams(count, size, elementType, PSB_VECT_STOR_BY_COLS);
   i = allocMultiVecDevice(deviceMultiVec, &p);
-  //fprintf(stderr,"From ALLOC: %d %d \n", p.pitch, p.size);
+  //fprintf(stderr,"From ALLOC: %d %d \n", p.pitch, p.count);
   //cudaSync();
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d, %d %d \n","FallocMultiVecDevice",i, count, size);
@@ -194,3 +198,9 @@ int getMultiVecDevicePitch(void* deviceVec)
   return(i);
 }
 
+int getMultiVecDeviceStorage2d(void* deviceVec)
+{ int i;
+  struct MultiVectDevice *dev = (struct MultiVectDevice *) deviceVec;
+  i = dev->storage2d_;
+  return(i);
+}

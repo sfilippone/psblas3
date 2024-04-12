@@ -104,7 +104,26 @@ void spgpuDhellspmv (spgpuHandle_t handle,
 	const __device double *x, 
 	double beta,
 	int baseIndex);
-
+#if defined(NEW_MM)
+void spgpuDhellspmm(spgpuHandle_t handle,
+		     int count,
+		     __device double *z,
+		     int zpitch,
+		     const __device double *y,
+		     int ypitch,
+		     double alpha, 
+		     const __device double* cM, 
+		     const __device int* rP,
+		     int hackSize,
+		     const __device int* hackOffsets, 
+		     const __device int* rS,
+		     const __device int* rIdx, 
+		     int rows, 
+		     const __device double *x,
+		     int xpitch,
+		     double beta,
+		     int baseIndex);
+#endif
 
 /** 
 * \fn void spgpuChellspmv (spgpuHandle_t handle,__device cuFloatComplex *z,const __device cuFloatComplex *y, cuFloatComplex alpha, const __device cuFloatComplex* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS, const __device int* rIdx, int avgNnzPerRow, int rows, const __device cuFloatComplex *x, cuFloatComplex beta, int baseIndex)

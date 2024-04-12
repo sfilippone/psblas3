@@ -14,7 +14,6 @@
  * GNU General Public License for more details.
  */
 
-
 #define PRE_CONCAT(A, B) A ## B
 #define CONCAT(A, B) PRE_CONCAT(A, B)
 
@@ -156,4 +155,3 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 	
 	cudaCheckError("CUDA error on hell_spmv");
 }
-

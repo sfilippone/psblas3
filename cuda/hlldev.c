@@ -182,20 +182,27 @@ int spmvHllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
 }
 
 void
-dspmdmmhll_gpu (double *z, int s, int vPitch, double *y, double alpha, double* cM, int* rP,
-	     int* rS, int hackSize, int* hackOffs, int avgNnzPerRow, int rows, double *x, double beta, int firstIndex)
+dspmdmmhll_gpu (double *z, int count, int zPitch, double alpha, double* cM, int* rP,
+		int* rS, int hackSize, int* hackOffs, int avgNnzPerRow, int rows,
+		double *x, int xPitch, double beta, int firstIndex)
 {
   int i=0;
   spgpuHandle_t handle=psb_cudaGetHandle();
-  for (i=0; i<s; i++)
-    {
-      spgpuDhellspmv (handle, (double*) z, (double*)y, alpha, (double*) cM, rP,
-		       hackSize, hackOffs, rS, NULL,
-               avgNnzPerRow, rows, (double*)x, beta, firstIndex);
-      z += vPitch;
-      y += vPitch;
-      x += vPitch;		
-    }
+#if defined(NEW_MM)
+  spgpuDhellspmm(handle, count, (double*) z, zPitch, (double*)z, zPitch,
+		  alpha, (double*) cM, rP,hackSize, hackOffs, rS, NULL,
+		  rows, (double*)x, xPitch, beta, firstIndex);
+#else
+  
+  for (i=0; i<count; i++) {
+    spgpuDhellspmv (handle, (double*) z, (double*)z, alpha,
+		    (double*) cM, rP,
+		    hackSize, hackOffs, rS, NULL,
+		    avgNnzPerRow, rows, (double*)x, beta, firstIndex);
+    z += zPitch;
+    x += xPitch;		
+  }
+#endif
 }
 
 //new
@@ -211,11 +218,11 @@ int spmvHllDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  dspmdmmhll_gpu ((double *)y->v_, y->count_, y->pitch_, (double *)y->v_,
-           alpha, (double *)devMat->cM, 
-	       devMat->rP, devMat->rS, devMat->hackSize, devMat->hackOffs,
-           devMat->avgNzr, devMat->rows,
-           (double *)x->v_, beta, devMat->baseIndex);
+  dspmdmmhll_gpu ((double *)y->v_, y->count_, y->pitch_,
+		  alpha, (double *)devMat->cM, 
+		  devMat->rP, devMat->rS, devMat->hackSize, devMat->hackOffs,
+		  devMat->avgNzr, devMat->rows,
+		  (double *)x->v_, x->pitch_, beta, devMat->baseIndex);
 
   return SPGPU_SUCCESS;
 }
