@@ -33,7 +33,7 @@ program psb_dbf_sample
 
    ! molds
    type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
-  type(psb_d_cuda_hlg_sparse_mat), target    :: ahlg
+   type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
    type(psb_d_cuda_elg_sparse_mat), target   :: aelg
    class(psb_d_base_sparse_mat), pointer     :: agmold, acmold
 
@@ -60,7 +60,7 @@ program psb_dbf_sample
    real(psb_dpk_), allocatable    :: resmx(:), res(:,:)
    real(psb_dpk_)                 :: resmxp
    integer(psb_ipk_), allocatable :: ivg(:)
-   logical                        :: print_matrix = .true.
+   logical                        :: print_matrix = .false.
 
    call psb_init(ctxt)
    call psb_info(ctxt,iam,np)

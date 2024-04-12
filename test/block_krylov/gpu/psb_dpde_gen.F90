@@ -526,14 +526,14 @@ program dpdegen
    character(len=40) :: kmethd 	  = "GMRES"
    character(len=40) :: ptype     = "NONE"
    character(len=5)  :: agfmt     = "CSRG"
-   integer(psb_ipk_) :: nrhs      = 50
+   integer(psb_ipk_) :: nrhs      = 5
    integer(psb_ipk_) :: istopbg   = 1
    integer(psb_ipk_) :: istoprg   = 2
    integer(psb_ipk_) :: itmax     = 500
    integer(psb_ipk_) :: itrace	  = -1
    integer(psb_ipk_) :: itrs	  = 100
    real(psb_dpk_)    :: eps	      = 1.d-7
-   integer(psb_ipk_) :: idim      = 10
+   integer(psb_ipk_) :: idim      = 20
    logical           :: tnd       = .false.
 
 

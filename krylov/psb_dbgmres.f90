@@ -279,8 +279,10 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          ! Compute i index for H operations
          idx_i = (i-1)*nrhs+1
 
+         ! TODO
          ! STEP 6: Compute H(i,j) = (V(i)**T)*W
-         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_gedot(v(i),w,desc_a,info)
+         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_geprod(v(i),w,desc_a,info,trans=.true.)
+         !h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_gedot(v(i),w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -362,12 +364,9 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          errnum = rmn2
          errden = r0n2
 
-        !  do col=1,nrhs
-        !     write(*,*) rmn2(col), r0n2(col)
-        !  end do
       end if
 
-      ! Check convergence (max o media)
+      ! TODO Check convergence (max o media)
       if (maxval(errnum).le.(eps*maxval(errden))) then
 
          ! Exit algorithm

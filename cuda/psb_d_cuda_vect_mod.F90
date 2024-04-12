@@ -1616,7 +1616,6 @@ contains
     real(psb_dpk_), external      :: ddot
     integer(psb_ipk_) :: info
     
-    res = dzero
     !
     ! Note: this is the gpu implementation.
     !  When we get here, we are sure that X is of
@@ -1626,7 +1625,8 @@ contains
     type is (psb_d_multivect_cuda)
       if (x%is_host()) call x%sync()
       if (yy%is_host()) call yy%sync()
-      info = dotMultiVecDevice(res,nr,x%deviceVect,yy%deviceVect,x%get_ncols())
+      allocate(res(size(x%v,2),size(y%v,2)))
+      info = dotMultiVecDevice(res,nr,x%deviceVect,yy%deviceVect,size(x%v,2))
       if (info /= 0) then 
         info = psb_err_internal_error_
         call psb_errpush(info,'d_cuda_multi_dot_v')
@@ -1878,6 +1878,7 @@ contains
     
   end function d_cuda_multi_nrm2
  
+  ! TODO CUDA
   function d_cuda_multi_amax(nr,x) result(res)
     implicit none 
     class(psb_d_multivect_cuda), intent(inout) :: x
@@ -1894,6 +1895,7 @@ contains
 
   end function d_cuda_multi_amax
 
+  ! TODO CUDA
   function d_cuda_multi_asum(nr,x) result(res)
     implicit none 
     class(psb_d_multivect_cuda), intent(inout) :: x

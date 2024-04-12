@@ -227,7 +227,11 @@ int dotMultiVecDeviceDouble(double* y_res, int n, void* devMultiVecA, void* devM
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-  spgpuDmdot(handle, y_res, n, (double*)devVecA->v_, (double*)devVecB->v_,devVecA->count_,devVecB->pitch_);
+  for (int j=0; j<devVecA->count_; j++) {
+    spgpuDmdot(handle, y_res+devVecA->count_*j, n,
+                ((double*)devVecA->v_)+devVecA->pitch_*j,(double*)devVecB->v_,
+                devVecB->count_,devVecB->pitch_);
+  }
   return(i);
 }
 
@@ -243,7 +247,6 @@ int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX,
     return SPGPU_UNSUPPORTED;
 
   for(j=0;j<devVecY->count_;j++)
-    fprintf(stderr,"CUDA ENTERED %d %p %d %d %d \n",j, (((double *)(devVecX->v_))+(pitch)*j), n, pitch, devVecY->size_);
     spgpuDaxpby(handle,(((double *)(devVecY->v_))+(pitch)*j), n, beta, 
 		(((double *)(devVecY->v_))+(pitch)*j), alpha,(((double *)(devVecX->v_))+(pitch)*j));
   return(i);
