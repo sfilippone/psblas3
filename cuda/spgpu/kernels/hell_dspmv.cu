@@ -21,6 +21,7 @@ extern "C"
 {
 #include "core.h"
 #include "hell.h"
+  int  getGPUSharedMemPerBlock();
 }
 
 #include "debug.h"
@@ -34,7 +35,7 @@ extern "C"
 
 #if defined(NEW_MM)
 
-#define MMBSZ   12
+#define MMBSZ 8
 
 #undef GEN_SPGPU_HELL_NAME
 #define GEN_SPGPU_HELL_NAME(x) CONCAT(CONCAT(spgpu,x),hellspmm)
@@ -53,7 +54,7 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
   VALUE_TYPE *pz,*px,*py;
   VALUE_TYPE zProd = CONCAT(zero_,VALUE_TYPE)();
   VALUE_TYPE yVal; 
-  __shared__ VALUE_TYPE temp[THREAD_BLOCK][MMBSZ];
+  __shared__ VALUE_TYPE temp[MMBSZ][THREAD_BLOCK];
         
   int i = threadIdx.x + blockIdx.x * (THREAD_BLOCK);
     
@@ -74,7 +75,7 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
     
     int rowSize = rS[i];
     for (int k=0; k<count; k++) {
-      temp[threadIdx.x][k] = CONCAT(zero_,VALUE_TYPE)();
+      temp[k][threadIdx.x] = CONCAT(zero_,VALUE_TYPE)();
     }      
     
     for (int j = 0; j < rowSize; j++) {
@@ -91,8 +92,8 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
       px = (VALUE_TYPE *) x;
       for (int k=0; k<count; k++) {
 	fetch = px[pointer]; 
-	temp[threadIdx.x][k] =
-	  CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[threadIdx.x][k]);
+	temp[k][threadIdx.x] =
+	  CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
 	px = px + xPitch;
       }
     }
@@ -103,13 +104,13 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
     if (CONCAT(VALUE_TYPE, _isNotZero(beta)))
       for (int k=0; k<count; k++) {
 	yVal = py[i];
-	pz[i] = CONCAT(VALUE_TYPE, _fma)(beta, yVal, CONCAT(VALUE_TYPE, _mul) (alpha,  temp[threadIdx.x][k]));
+	pz[i] = CONCAT(VALUE_TYPE, _fma)(beta, yVal, CONCAT(VALUE_TYPE, _mul) (alpha,  temp[k][threadIdx.x]));
 	py += yPitch;
 	pz += zPitch;
       }
     else
       for (int k=0; k<count; k++) {
-	pz[i] = CONCAT(VALUE_TYPE, _mul) (alpha,  temp[threadIdx.x][k]);
+	pz[i] = CONCAT(VALUE_TYPE, _mul) (alpha,  temp[k][threadIdx.x]);
 	pz += zPitch;
       }
   }
@@ -127,7 +128,8 @@ CONCAT(_,GEN_SPGPU_HELL_NAME_VANILLA(TYPE_SYMBOL))
   dim3 grid ((rows + THREAD_BLOCK - 1) / THREAD_BLOCK);
   // Should we generalize the code to 1/2/4/8 threads per row?
   // And maybe adjust THREAD_BLOCK size? 
-  int shrMemSize;
+  int shrMemSize,maxShmemSz;
+  maxShmemSz=getGPUSharedMemPerBlock();
   shrMemSize=MMBSZ*THREAD_BLOCK*sizeof(VALUE_TYPE);
   CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn) 
     <<< grid, block, shrMemSize, handle->currentStream >>> (count, z, zPitch,y, yPitch,
@@ -229,3 +231,4 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 }
 
 #endif
+

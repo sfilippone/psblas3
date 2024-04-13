@@ -165,6 +165,11 @@ module psb_cuda_env_mod
       use iso_c_binding
       integer(c_int) :: res
     end function psb_C_get_MaxRegistersPerBlock
+    function psb_C_get_SharedMemPerBlock() &
+         & result(res) bind(c,name='getGPUSharedMemsPerBlock')
+      use iso_c_binding
+      integer(c_int) :: res
+    end function psb_C_get_SharedMemPerBlock
   end interface
   interface 
     subroutine psb_C_cpy_NameString(cstring) &

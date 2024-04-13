@@ -65,6 +65,7 @@ int getGPUWarpSize();
 int getGPUMaxThreadsPerBlock();
 int getGPUMaxThreadsPerMP();
 int getGPUMaxRegistersPerBlock();
+int getGPUSharedMemPerBlock();
 void cpyGPUNameString(char *cstring);
 
 
