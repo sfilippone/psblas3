@@ -10786,7 +10786,7 @@ printf %s "checking for CUDA version... " >&6; }
 #include <stdio.h>
 #include <cuda.h>
 
-int main(int argc, char *argv)
+int main(int argc, char **argv)
 {
   printf("%d",CUDA_VERSION);
   return(0);
@@ -12296,7 +12296,7 @@ fi
    	CCOPT                 : ${CCOPT}
 
 	CUDA 		      : ${HAVE_CUDA}
-	CUDA_CC               : ${CUDA_CC}
+	CUDA_CC               : ${pac_cv_cudacc}
 
 	BLAS                  : ${BLAS_LIBS}
 
@@ -12329,7 +12329,7 @@ printf "%s\n" "$as_me:
    	CCOPT                 : ${CCOPT}
 
 	CUDA 		      : ${HAVE_CUDA}
-	CUDA_CC               : ${CUDA_CC}
+	CUDA_CC               : ${pac_cv_cudacc}
 
 	BLAS                  : ${BLAS_LIBS}
 

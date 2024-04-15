@@ -54,6 +54,7 @@ int freeRemoteBuffer(void* buffer);
 int gpuInit(int dev);
 int getDeviceCount();
 int getDevice();
+int getDeviceHasUVA();
 int setDevice(int dev);
 int getGPUMultiProcessors();
 int getGPUMemoryBusWidth();

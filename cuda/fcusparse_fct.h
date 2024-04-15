@@ -320,7 +320,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 }
 
 #if CUDA_VERSION >=  11030
-T_CSRGCreateSpMVDescr(T_CSRGDeviceMat *cMat)
+int T_CSRGCreateSpMVDescr(T_CSRGDeviceMat *cMat)
 {
   int64_t tr,tc,tz;
   tr = cMat->m;

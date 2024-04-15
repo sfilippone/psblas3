@@ -112,7 +112,7 @@ void zeroEllDevice(void *remoteMatrix)
   else if (tmp->dataType == SPGPU_TYPE_COMPLEX_DOUBLE)
     cudaMemset((void  *)tmp->cM, 0, tmp->allocsize*sizeof(cuDoubleComplex));
   else
-    return SPGPU_UNSUPPORTED; // Unsupported params
+    return ; // Unsupported params
   //fprintf(stderr,"From allocEllDevice: %d %d %d %p %p %p\n",tmp->maxRowSize,
   //	  tmp->avgRowSize,tmp->allocsize,tmp->rS,tmp->rP,tmp->cM);
 

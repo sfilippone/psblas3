@@ -95,6 +95,7 @@ typedef struct EllDeviceParams
 	unsigned int firstIndex;
 } EllDeviceParams;
 
+int computeEllAllocPitch(int rowsCount);
 int FallocEllDevice(void** deviceMat, unsigned int rows, unsigned int maxRowSize, 
 		    unsigned int nnzeros,
 		    unsigned int columns, unsigned int elementType, 

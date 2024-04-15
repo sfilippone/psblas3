@@ -2251,7 +2251,7 @@ if test "x$pac_cv_have_cuda" == "xyes"; then
 #include <stdio.h>
 #include <cuda.h>
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
   printf("%d",CUDA_VERSION);
   return(0);
