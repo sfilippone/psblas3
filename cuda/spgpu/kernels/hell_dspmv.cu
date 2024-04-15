@@ -164,7 +164,9 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
   
   // maxNForACall should be a multiple of hackSize
   maxNForACall = (maxNForACall/hackSize)*hackSize;
-  //fprintf(stderr,"Entering kernel  %d maxNForACall\n",maxNForACall);
+  int maxShmemSz;
+  maxShmemSz=getGPUSharedMemPerBlock();
+  //fprintf(stderr,"MaxSHmemSz  %d \n",maxShmemSz);
   while (rows > maxNForACall) {//managing large vectors
     cnt = count;
     px = (VALUE_TYPE *) x;
