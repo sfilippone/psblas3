@@ -205,6 +205,7 @@ module psb_s_mat_mod
     procedure, pass(a) :: cscnv_base  => psb_s_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
     procedure, pass(a) :: split_nd    => psb_s_split_nd
+    procedure, pass(a) :: merge_nd    => psb_s_merge_nd
     procedure, pass(a) :: clone       => psb_sspmat_clone
     procedure, pass(a) :: move_alloc  => psb_sspmat_type_move
     !
@@ -849,10 +850,16 @@ module psb_s_mat_mod
       class(psb_sspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in)           :: n_rows, n_cols
       integer(psb_ipk_), intent(out)          :: info
-!!$      integer(psb_ipk_),optional, intent(in)           :: dupl
-!!$      character(len=*), optional, intent(in) :: type
-!!$      class(psb_s_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_s_split_nd
+  end interface
+  
+  interface
+    subroutine psb_s_merge_nd(a,n_rows,n_cols,info)
+      import :: psb_ipk_, psb_lpk_, psb_sspmat_type, psb_spk_, psb_s_base_sparse_mat
+      class(psb_sspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_s_merge_nd
   end interface
 
   !

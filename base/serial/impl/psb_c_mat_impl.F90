@@ -1263,6 +1263,56 @@ subroutine psb_c_split_nd(a,n_rows,n_cols,info)
   
 end subroutine psb_c_split_nd
 
+subroutine psb_c_merge_nd(a,n_rows,n_cols,info)
+  use psb_error_mod
+  use psb_string_mod
+  use psb_c_mat_mod, psb_protect_name => psb_c_merge_nd
+  implicit none
+  class(psb_cspmat_type), intent(inout) :: a
+  integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+  integer(psb_ipk_), intent(out)          :: info
+!!$      integer(psb_ipk_),optional, intent(in)           :: dupl
+!!$      character(len=*), optional, intent(in) :: type
+!!$      class(psb_c_base_sparse_mat), intent(in), optional :: mold
+  type(psb_c_coo_sparse_mat) :: acoo1,acoo2
+  integer(psb_ipk_) :: nz
+  logical, parameter :: use_ecsr=.true.
+  character(len=20)     :: name, ch_err
+  integer(psb_ipk_) :: err_act
+
+  info = psb_success_
+  name = 'psb_split'
+  call psb_erractionsave(err_act)
+
+  call a%ad%mv_to_coo(acoo1,info)
+  call acoo1%set_bld()
+  call acoo1%set_nrows(n_rows)
+  call acoo1%set_ncols(n_cols)
+  call a%and%mv_to_coo(acoo2,info)
+  nz=acoo2%get_nzeros()
+  call acoo1%csput(nz,acoo2%ia,acoo2%ja,acoo2%val,ione,n_rows,ione,n_cols,info)
+  if (allocated(a%a)) then
+    call a%a%free()
+    deallocate(a%a)
+  end if
+  allocate(a%a,mold=a%ad)
+  call a%a%mv_from_coo(acoo1,info)
+
+  if (psb_errstatus_fatal()) then    
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='cscnv')
+    goto 9999
+  endif
+  
+  call psb_erractionrestore(err_act)
+  return
+  
+9999 call psb_error_handler(err_act)
+  
+  return
+  
+end subroutine psb_c_merge_nd
+
 subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_error_mod
   use psb_string_mod
