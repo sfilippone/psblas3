@@ -53,7 +53,7 @@ int FcusparseCreate()
     if (ret == CUSPARSE_STATUS_SUCCESS)
       cusparse_handle = handle;
   }
-  fprintf(stderr,"Created cusparses_handle\n");
+  //fprintf(stderr,"Created cusparses_handle\n");
   return (ret);
 }
 
