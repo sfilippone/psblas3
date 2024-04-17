@@ -137,7 +137,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
        & idxr, idxs, iszs, iszr, nesd, nerv, ixp, idx
   integer(psb_mpk_) :: icomm, minfo
 
-  logical, parameter :: do_timings=.true., oldstyle=.false., debug=.false. 
+  logical, parameter :: do_timings=.false., oldstyle=.false., debug=.false. 
   integer(psb_ipk_), save :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1, idx_phase4=-1
   logical, parameter :: usempi=.false.
   integer(psb_ipk_) :: debug_level, debug_unit
