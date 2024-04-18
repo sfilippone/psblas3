@@ -35,6 +35,7 @@ module psb_z_base_mat_mod
 
   use psb_base_mat_mod
   use psb_z_base_vect_mod
+  use psb_z_base_multivect_mod
 
 
   !> \namespace  psb_base_mod  \class  psb_z_base_sparse_mat

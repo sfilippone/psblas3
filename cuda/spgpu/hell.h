@@ -68,7 +68,46 @@ void spgpuShellspmv (spgpuHandle_t handle,
 	float beta,
 	int baseIndex);
 
-
+/** 
+* \fn void spgpuShellspmm (spgpuHandle_t handle,int count,__device float *z,int zpitch,const __device float *y,int ypitch,float alpha, const __device float* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS,const __device int* rIdx, int rows, const __device float *x,int xpitch,float beta,int baseIndex)
+ * Computes single precision z = alpha*A*x + beta*y, with A stored in Hacked ELLpack Format on GPU.
+ * \param handle The spgpu handle used to call this routine
+ * \param count The cols count
+ * \param z The output vector of the routine. z could be y, but not y + k (i.e. an overlapping area over y, but starting from a base index different from y).
+ * \param zpitch The pitch of the output vector
+ * \param y The y input vector
+ * \param ypitch The pitch of the y input vector
+ * \param alpha The alpha scalar
+ * \param cM The HELL non zero values allocation pointer
+ * \param rP The HELL column indices allocation pointer
+ * \param hackSize The constant size of every hack (must be a multiple of 32).
+ * \param hackOffsets the array of base index offset for every hack of HELL non zero values allocation and HELL indices allocation.
+ * \param rS the array containing the row sized (in non zero elements)
+ * \param rIdx (optional) An array containing the row index per every row (i.e. the reorder array) of the Hell matrix. Pass NULL if you don't use a reorder array (i.e. the k-th row is stored in the k-th position in the HELL format).
+ * \param rows the rows count
+ * \param x the x vector
+ * \param xpitch The pitch of the x input vector
+ * \param beta the beta scalar
+ * \param baseIndex the ELL format base index used (i.e. 0 for C, 1 for Fortran).
+ */
+void spgpuShellspmm(spgpuHandle_t handle,
+	int count,
+	__device float *z,
+	int zpitch,
+	const __device float *y,
+	int ypitch,
+	float alpha, 
+	const __device float* cM, 
+	const __device int* rP,
+	int hackSize,
+	const __device int* hackOffsets, 
+	const __device int* rS,
+	const __device int* rIdx, 
+	int rows, 
+	const __device float *x,
+	int xpitch,
+	float beta,
+	int baseIndex);
 
 /** 
 * \fn void spgpuDhellspmv (spgpuHandle_t handle,__device double *z,const __device double *y, double alpha, const __device double* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS,const __device int* rIdx, int avgNnzPerRow, int rows, const __device double *x, double beta,int baseIndex)
@@ -104,26 +143,47 @@ void spgpuDhellspmv (spgpuHandle_t handle,
 	const __device double *x, 
 	double beta,
 	int baseIndex);
-#if defined(NEW_MM)
+
+/** 
+* \fn void spgpuShellspmm (spgpuHandle_t handle,int count,__device double *z,int zpitch,const __device double *y,int ypitch,double alpha, const __device double* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS,const __device int* rIdx, int rows, const __device double *x,int xpitch,double beta,int baseIndex)
+ * Computes single precision z = alpha*A*x + beta*y, with A stored in Hacked ELLpack Format on GPU.
+ * \param handle The spgpu handle used to call this routine
+ * \param count The cols count
+ * \param z The output vector of the routine. z could be y, but not y + k (i.e. an overlapping area over y, but starting from a base index different from y).
+ * \param zpitch The pitch of the output vector
+ * \param y The y input vector
+ * \param ypitch The pitch of the y input vector
+ * \param alpha The alpha scalar
+ * \param cM The HELL non zero values allocation pointer
+ * \param rP The HELL column indices allocation pointer
+ * \param hackSize The constant size of every hack (must be a multiple of 32).
+ * \param hackOffsets the array of base index offset for every hack of HELL non zero values allocation and HELL indices allocation.
+ * \param rS the array containing the row sized (in non zero elements)
+ * \param rIdx (optional) An array containing the row index per every row (i.e. the reorder array) of the Hell matrix. Pass NULL if you don't use a reorder array (i.e. the k-th row is stored in the k-th position in the HELL format).
+ * \param rows the rows count
+ * \param x the x vector
+ * \param xpitch The pitch of the x input vector
+ * \param beta the beta scalar
+ * \param baseIndex the ELL format base index used (i.e. 0 for C, 1 for Fortran).
+ */
 void spgpuDhellspmm(spgpuHandle_t handle,
-		     int count,
-		     __device double *z,
-		     int zpitch,
-		     const __device double *y,
-		     int ypitch,
-		     double alpha, 
-		     const __device double* cM, 
-		     const __device int* rP,
-		     int hackSize,
-		     const __device int* hackOffsets, 
-		     const __device int* rS,
-		     const __device int* rIdx, 
-		     int rows, 
-		     const __device double *x,
-		     int xpitch,
-		     double beta,
-		     int baseIndex);
-#endif
+	int count,
+	__device double *z,
+	int zpitch,
+	const __device double *y,
+	int ypitch,
+	double alpha, 
+	const __device double* cM, 
+	const __device int* rP,
+	int hackSize,
+	const __device int* hackOffsets, 
+	const __device int* rS,
+	const __device int* rIdx, 
+	int rows, 
+	const __device double *x,
+	int xpitch,
+	double beta,
+	int baseIndex);
 
 /** 
 * \fn void spgpuChellspmv (spgpuHandle_t handle,__device cuFloatComplex *z,const __device cuFloatComplex *y, cuFloatComplex alpha, const __device cuFloatComplex* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS, const __device int* rIdx, int avgNnzPerRow, int rows, const __device cuFloatComplex *x, cuFloatComplex beta, int baseIndex)
@@ -160,7 +220,46 @@ void spgpuChellspmv (spgpuHandle_t handle,
 	cuFloatComplex beta,
 	int baseIndex);
 
-
+/** 
+* \fn void spgpuShellspmm (spgpuHandle_t handle,int count,__device cuFloatComplex *z,int zpitch,const __device cuFloatComplex *y,int ypitch,cuFloatComplex alpha, const __device cuFloatComplex* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS,const __device int* rIdx, int rows, const __device cuFloatComplex *x,int xpitch,cuFloatComplex beta,int baseIndex)
+ * Computes single precision z = alpha*A*x + beta*y, with A stored in Hacked ELLpack Format on GPU.
+ * \param handle The spgpu handle used to call this routine
+ * \param count The cols count
+ * \param z The output vector of the routine. z could be y, but not y + k (i.e. an overlapping area over y, but starting from a base index different from y).
+ * \param zpitch The pitch of the output vector
+ * \param y The y input vector
+ * \param ypitch The pitch of the y input vector
+ * \param alpha The alpha scalar
+ * \param cM The HELL non zero values allocation pointer
+ * \param rP The HELL column indices allocation pointer
+ * \param hackSize The constant size of every hack (must be a multiple of 32).
+ * \param hackOffsets the array of base index offset for every hack of HELL non zero values allocation and HELL indices allocation.
+ * \param rS the array containing the row sized (in non zero elements)
+ * \param rIdx (optional) An array containing the row index per every row (i.e. the reorder array) of the Hell matrix. Pass NULL if you don't use a reorder array (i.e. the k-th row is stored in the k-th position in the HELL format).
+ * \param rows the rows count
+ * \param x the x vector
+ * \param xpitch The pitch of the x input vector
+ * \param beta the beta scalar
+ * \param baseIndex the ELL format base index used (i.e. 0 for C, 1 for Fortran).
+ */
+void spgpuChellspmm(spgpuHandle_t handle,
+	int count,
+	__device cuFloatComplex *z,
+	int zpitch,
+	const __device cuFloatComplex *y,
+	int ypitch,
+	cuFloatComplex alpha, 
+	const __device cuFloatComplex* cM, 
+	const __device int* rP,
+	int hackSize,
+	const __device int* hackOffsets, 
+	const __device int* rS,
+	const __device int* rIdx, 
+	int rows, 
+	const __device cuFloatComplex *x,
+	int xpitch,
+	cuFloatComplex beta,
+	int baseIndex);
 
 /** 
 * \fn void spgpuZhellspmv (spgpuHandle_t handle,__device cuDoubleComplex *z,const __device cuDoubleComplex *y, cuDoubleComplex alpha, const __device cuDoubleComplex* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS,const __device int* rIdx, int avgNnzPerRow, int rows, const __device cuDoubleComplex *x, cuDoubleComplex beta, int baseIndex)
@@ -197,6 +296,46 @@ void spgpuZhellspmv (spgpuHandle_t handle,
 	cuDoubleComplex beta,
 	int baseIndex);
 
+/** 
+* \fn void spgpuShellspmm (spgpuHandle_t handle,int count,__device cuDoubleComplex *z,int zpitch,const __device cuDoubleComplex *y,int ypitch,cuDoubleComplex alpha, const __device cuDoubleComplex* cM, const __device int* rP,int hackSize,const __device int* hackOffsets, const __device int* rS,const __device int* rIdx, int rows, const __device cuDoubleComplex *x,int xpitch,cuDoubleComplex beta,int baseIndex)
+ * Computes single precision z = alpha*A*x + beta*y, with A stored in Hacked ELLpack Format on GPU.
+ * \param handle The spgpu handle used to call this routine
+ * \param count The cols count
+ * \param z The output vector of the routine. z could be y, but not y + k (i.e. an overlapping area over y, but starting from a base index different from y).
+ * \param zpitch The pitch of the output vector
+ * \param y The y input vector
+ * \param ypitch The pitch of the y input vector
+ * \param alpha The alpha scalar
+ * \param cM The HELL non zero values allocation pointer
+ * \param rP The HELL column indices allocation pointer
+ * \param hackSize The constant size of every hack (must be a multiple of 32).
+ * \param hackOffsets the array of base index offset for every hack of HELL non zero values allocation and HELL indices allocation.
+ * \param rS the array containing the row sized (in non zero elements)
+ * \param rIdx (optional) An array containing the row index per every row (i.e. the reorder array) of the Hell matrix. Pass NULL if you don't use a reorder array (i.e. the k-th row is stored in the k-th position in the HELL format).
+ * \param rows the rows count
+ * \param x the x vector
+ * \param xpitch The pitch of the x input vector
+ * \param beta the beta scalar
+ * \param baseIndex the ELL format base index used (i.e. 0 for C, 1 for Fortran).
+ */
+void spgpuZhellspmm(spgpuHandle_t handle,
+	int count,
+	__device cuDoubleComplex *z,
+	int zpitch,
+	const __device cuDoubleComplex *y,
+	int ypitch,
+	cuDoubleComplex alpha, 
+	const __device cuDoubleComplex* cM, 
+	const __device int* rP,
+	int hackSize,
+	const __device int* hackOffsets, 
+	const __device int* rS,
+	const __device int* rIdx, 
+	int rows, 
+	const __device cuDoubleComplex *x,
+	int xpitch,
+	cuDoubleComplex beta,
+	int baseIndex);
 
 /** @}*/
 
