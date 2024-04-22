@@ -264,7 +264,7 @@ int spmvHllDeviceFloatComplex(void *deviceMat, cuFloatComplex alpha, void* devic
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  spgpuShellspmv (handle, (cuFloatComplex *)y->v_, (cuFloatComplex *)y->v_, alpha,
+  spgpuChellspmv (handle, (cuFloatComplex *)y->v_, (cuFloatComplex *)y->v_, alpha,
           (cuFloatComplex *)devMat->cM, devMat->rP,
           devMat->hackSize, devMat->hackOffs, devMat->rS, NULL,
 		  devMat->avgNzr, devMat->rows, (cuFloatComplex *)x->v_, beta, devMat->baseIndex);
@@ -285,7 +285,7 @@ int spmmHllDeviceFloatComplex(void *deviceMat, cuFloatComplex alpha, void* devic
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  spgpuShellspmm(handle, y->count_, (cuFloatComplex *)y->v_, y->pitch_,
+  spgpuChellspmm(handle, y->count_, (cuFloatComplex *)y->v_, y->pitch_,
           (cuFloatComplex*)y->v_, y->pitch_, alpha, (cuFloatComplex*)devMat->cM,
           devMat->rP, devMat->hackSize, devMat->hackOffs,
           devMat->rS, NULL, devMat->rows, (cuFloatComplex*)x->v_,
@@ -310,7 +310,7 @@ int spmvHllDeviceDoubleComplex(void *deviceMat, cuDoubleComplex alpha, void* dev
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  spgpuShellspmv (handle, (cuDoubleComplex *)y->v_, (cuDoubleComplex *)y->v_, alpha,
+  spgpuZhellspmv (handle, (cuDoubleComplex *)y->v_, (cuDoubleComplex *)y->v_, alpha,
           (cuDoubleComplex *)devMat->cM, devMat->rP,
           devMat->hackSize, devMat->hackOffs, devMat->rS, NULL,
 		  devMat->avgNzr, devMat->rows, (cuDoubleComplex *)x->v_, beta, devMat->baseIndex);
@@ -331,7 +331,7 @@ int spmmHllDeviceDoubleComplex(void *deviceMat, cuDoubleComplex alpha, void* dev
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  spgpuShellspmm(handle, y->count_, (cuDoubleComplex *)y->v_, y->pitch_,
+  spgpuZhellspmm(handle, y->count_, (cuDoubleComplex *)y->v_, y->pitch_,
           (cuDoubleComplex*)y->v_, y->pitch_, alpha, (cuDoubleComplex*)devMat->cM,
           devMat->rP, devMat->hackSize, devMat->hackOffs,
           devMat->rS, NULL, devMat->rows, (cuDoubleComplex*)x->v_,

@@ -318,4 +318,35 @@ module elldev_mod
     end function spmvEllDeviceDoubleComplex
   end interface
 
+  interface spmmEllDevice
+    function spmmEllDeviceFloat(deviceMat,alpha,x,beta,y) &
+         & result(res) bind(c,name='spmmEllDeviceFloat')
+      use iso_c_binding
+      integer(c_int)		:: res
+      type(c_ptr), value 	:: deviceMat, x, y
+      real(c_float),value     	:: alpha, beta
+    end function spmmEllDeviceFloat
+    function spmmEllDeviceDouble(deviceMat,alpha,x,beta,y) &
+         & result(res) bind(c,name='spmmEllDeviceDouble')
+      use iso_c_binding
+      integer(c_int)		:: res
+      type(c_ptr), value	:: deviceMat, x, y 
+      real(c_double),value     	:: alpha,  beta
+    end function spmmEllDeviceDouble
+    function spmmEllDeviceFloatComplex(deviceMat,alpha,x,beta,y) &
+         & result(res) bind(c,name='spmmEllDeviceFloatComplex')
+      use iso_c_binding
+      integer(c_int)		     :: res
+      type(c_ptr), value	     :: deviceMat, x, y 
+      complex(c_float_complex),value :: alpha,  beta
+    end function spmmEllDeviceFloatComplex
+    function spmmEllDeviceDoubleComplex(deviceMat,alpha,x,beta,y) &
+         & result(res) bind(c,name='spmmEllDeviceDoubleComplex')
+      use iso_c_binding
+      integer(c_int)		      :: res
+      type(c_ptr), value	      :: deviceMat, x, y 
+      complex(c_double_complex),value :: alpha,  beta
+    end function spmmEllDeviceDoubleComplex
+  end interface
+
 end module elldev_mod

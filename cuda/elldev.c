@@ -148,6 +148,9 @@ int FallocEllDevice(void** deviceMat,unsigned int rows, unsigned int maxRowSize,
   return(i);
 }
 
+//
+// Single Precision Float
+//
 void sspmdmm_gpu(float *z,int s, int vPitch, float *y, float alpha, float* cM, int* rP, int* rS, 
 		 int avgRowSize, int maxRowSize, int rows, int pitch, float *x, float beta, int firstIndex)
 {
@@ -168,7 +171,7 @@ void sspmdmm_gpu(float *z,int s, int vPitch, float *y, float alpha, float* cM, i
       x += vPitch;		
     }
 }
-//new
+
 int spmvEllDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
 		       float beta, void* deviceY)
 { int i=SPGPU_SUCCESS;
@@ -191,7 +194,31 @@ int spmvEllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   return(i);
 }
 
+int spmmEllDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
+			float beta, void* deviceY)
+{
+  struct EllDevice *devMat = (struct EllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuSellspmm(handle, y->count_, (float *)y->v_, y->pitch_,
+          (float*)y->v_, y->pitch_, alpha, (float*)devMat->cM,
+          devMat->rP, devMat->cMPitch, devMat->rPPitch,
+          devMat->rS, NULL, devMat->avgRowSize, devMat->maxRowSize,
+          devMat->rows, (float*)x->v_, x->pitch_, beta, devMat->baseIndex);
+
+  return SPGPU_SUCCESS;
+}
+
+//
+// Double Precision
+//
 void
 dspmdmm_gpu (double *z,int s, int vPitch, double *y, double alpha, double* cM, int* rP,
 	     int* rS, int avgRowSize, int maxRowSize, int rows, int pitch, 
@@ -237,6 +264,31 @@ int spmvEllDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   return SPGPU_SUCCESS;
 }
 
+int spmmEllDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
+			double beta, void* deviceY)
+{
+  struct EllDevice *devMat = (struct EllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuDellspmm(handle, y->count_, (double *)y->v_, y->pitch_,
+          (double*)y->v_, y->pitch_, alpha, (double*)devMat->cM,
+          devMat->rP, devMat->cMPitch, devMat->rPPitch,
+          devMat->rS, NULL, devMat->avgRowSize, devMat->maxRowSize,
+          devMat->rows, (double*)x->v_, x->pitch_, beta, devMat->baseIndex);
+
+  return SPGPU_SUCCESS;
+}
+
+//
+// Single Precision Float Complex
+//
 void
 cspmdmm_gpu (cuFloatComplex *z, int s, int vPitch, cuFloatComplex *y,  
 	     cuFloatComplex alpha, cuFloatComplex* cM,
@@ -276,6 +328,31 @@ int spmvEllDeviceFloatComplex(void *deviceMat, float complex alpha, void* device
   return SPGPU_SUCCESS;
 }
 
+int spmmEllDeviceFloatComplex(void *deviceMat, cuFloatComplex alpha, void* deviceX, 
+			cuFloatComplex beta, void* deviceY)
+{
+  struct EllDevice *devMat = (struct EllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuCellspmm(handle, y->count_, (cuFloatComplex *)y->v_, y->pitch_,
+          (cuFloatComplex*)y->v_, y->pitch_, alpha, (cuFloatComplex*)devMat->cM,
+          devMat->rP, devMat->cMPitch, devMat->rPPitch,
+          devMat->rS, NULL, devMat->avgRowSize, devMat->maxRowSize,
+          devMat->rows, (cuFloatComplex*)x->v_, x->pitch_, beta, devMat->baseIndex);
+
+  return SPGPU_SUCCESS;
+}
+
+//
+// Double Precision Complex
+//
 void
 zspmdmm_gpu (cuDoubleComplex *z, int s, int vPitch, cuDoubleComplex *y, cuDoubleComplex alpha, cuDoubleComplex* cM,
 	     int* rP, int* rS, int avgRowSize, int maxRowSize, int rows, int pitch,
@@ -311,6 +388,28 @@ int spmvEllDeviceDoubleComplex(void *deviceMat, double complex alpha, void* devi
 	       devMat->rP, devMat->rS, devMat->avgRowSize, devMat->maxRowSize, devMat->rows,
 	       devMat->pitch, (cuDoubleComplex *)x->v_, b, devMat->baseIndex);
   
+  return SPGPU_SUCCESS;
+}
+
+int spmmEllDeviceDoubleComplex(void *deviceMat, cuDoubleComplex alpha, void* deviceX, 
+			cuDoubleComplex beta, void* deviceY)
+{
+  struct EllDevice *devMat = (struct EllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuZellspmm(handle, y->count_, (cuDoubleComplex *)y->v_, y->pitch_,
+          (cuDoubleComplex*)y->v_, y->pitch_, alpha, (cuDoubleComplex*)devMat->cM,
+          devMat->rP, devMat->cMPitch, devMat->rPPitch,
+          devMat->rS, NULL, devMat->avgRowSize, devMat->maxRowSize,
+          devMat->rows, (cuDoubleComplex*)x->v_, x->pitch_, beta, devMat->baseIndex);
+
   return SPGPU_SUCCESS;
 }
 

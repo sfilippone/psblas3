@@ -113,16 +113,6 @@ int readEllDeviceDouble(void* deviceMat, double* val, int* ja, int ldj, int* irn
 int readEllDeviceFloatComplex(void* deviceMat, float complex* val, int* ja, int ldj, int* irn, int *idiag);
 int readEllDeviceDoubleComplex(void* deviceMat, double complex* val, int* ja, int ldj, int* irn, int *idiag);
 
-int spmvEllDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
-		       float beta, void* deviceY);
-int spmvEllDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
-			double beta, void* deviceY);
-int spmvEllDeviceFloatComplex(void *deviceMat, float complex alpha, void* deviceX,
-			      float complex beta, void* deviceY);
-int spmvEllDeviceDoubleComplex(void *deviceMat, double complex alpha, void* deviceX,
-			       double complex beta, void* deviceY);
-
-
 
 int psiCopyCooToElgFloat(int nr, int nc, int nza, int hacksz, int ldv, int nzm, int *irn,
 			  int *idisp, int *ja, float *val, void *deviceMat);

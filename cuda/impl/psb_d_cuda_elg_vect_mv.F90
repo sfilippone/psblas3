@@ -176,7 +176,7 @@ subroutine psb_d_cuda_elg_multivect_mv(alpha,a,x,beta,y,info,trans)
           if (beta /= dzero) then 
             if (yy%is_host()) call yy%sync()
           end if
-          info = spmvEllDevice(a%deviceMat,alpha,xx%deviceVect,&
+          info = spmmEllDevice(a%deviceMat,alpha,xx%deviceVect,&
                & beta,yy%deviceVect)
           if (info /= 0) then 
             call psb_errpush(psb_err_from_subroutine_ai_,name,&
