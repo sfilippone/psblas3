@@ -21,7 +21,7 @@
 extern "C"
 {
 #include "core.h"
-#include "hell.h"
+#include "ell.h"
   int getGPUSharedMemPerBlock();
   int getGPUMultiProcessors();
   int getGPUMaxThreadsPerMP();

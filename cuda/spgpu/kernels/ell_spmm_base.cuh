@@ -171,7 +171,6 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
   py = (VALUE_TYPE *) y;
   pz = (VALUE_TYPE *) z;	  
   while (cnt > MMBSZ) {
-    fprintf(stderr,"counts %d %d %d :  pointers: %p %p %p\n",rows,cnt,MMBSZ,px,py,pz);
     CONCAT(_,GEN_SPGPU_ELL_NAME_VANILLA(TYPE_SYMBOL)) (handle, MMBSZ, pz, zPitch,
 							  py, yPitch,
 							  alpha, cM, rP,
@@ -185,8 +184,6 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
     cnt -= MMBSZ;
   }
   if (cnt >0) {
-    fprintf(stderr,"counts %d %d %d :  pointers: %p %p %p\n",rows,cnt,MMBSZ,px,py,pz);
-
     CONCAT(_,GEN_SPGPU_ELL_NAME_VANILLA(TYPE_SYMBOL)) (handle, cnt, pz, zPitch,
 							  py, yPitch,
 							  alpha, cM, rP,
@@ -196,5 +193,5 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
 							  px, xPitch, beta, baseIndex);
   }
   
-  cudaCheckError("CUDA error on hell_spmm");
+  cudaCheckError("CUDA error on ell_spmm");
 }
