@@ -134,7 +134,7 @@ subroutine psb_cilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
   integer(psb_ipk_), intent(in)         :: fill_in
   real(psb_spk_), intent(in)             :: thres
   integer(psb_ipk_), intent(out)        :: info
-  type(psb_cspmat_type),intent(in)    :: a
+  type(psb_cspmat_type),intent(inout) :: a
   type(psb_cspmat_type),intent(inout) :: l,u
   complex(psb_spk_), intent(inout)        ::  d(:)
   type(psb_cspmat_type),intent(in), optional, target :: blck
@@ -145,7 +145,7 @@ subroutine psb_cilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
 
   complex(psb_spk_) :: shft_
   type(psb_cspmat_type), pointer  :: blck_
-  type(psb_c_csr_sparse_mat)       :: ll, uu
+  type(psb_c_csr_sparse_mat)       :: ll, uu, aa, bb
   real(psb_spk_)      :: scale
   character(len=20)   :: name, ch_err
 
@@ -208,11 +208,12 @@ subroutine psb_cilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
 
   call l%mv_to(ll)
   call u%mv_to(uu)
-
+  call a%cp_to(aa)
+  call blck_%cp_to(bb)
   !
   ! Compute the ILU(k,t) factorization
   !
-  call psb_cilut_factint(fill_in,thres,a,blck_,&
+  call psb_cilut_factint(fill_in,thres,aa,bb,&
        & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,scale,shft_)
   if (info /= psb_success_) then
      info=psb_err_from_subroutine_
@@ -332,7 +333,7 @@ contains
   ! Arguments
     integer(psb_ipk_), intent(in)                 :: fill_in
     real(psb_spk_), intent(in)                     :: thres
-    type(psb_cspmat_type),intent(in)            :: a,b
+    class(psb_c_base_sparse_mat),intent(inout)  :: a,b
     integer(psb_ipk_),intent(inout)               :: l1,l2,info
     integer(psb_ipk_), allocatable, intent(inout) :: lja(:),lirp(:),uja(:),uirp(:)
     complex(psb_spk_), allocatable, intent(inout)   :: lval(:),uval(:)
@@ -547,11 +548,11 @@ contains
   !               until we empty the buffer. Thus we will make a call to psb_sp_getblk
   !               every nrb calls to copyin. If A is in CSR format it is unused.
   !
-  subroutine ilut_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,&
+  subroutine ilut_copyin(i,m,aa,jd,jmin,jmax,nlw,nup,jmaxup,&
        & nrmi,weight,row,heap,ktrw,trw,info,shft)
     use psb_base_mod
     implicit none
-    type(psb_cspmat_type), intent(in)         :: a
+    class(psb_c_base_sparse_mat),intent(inout)  :: aa
     type(psb_c_coo_sparse_mat), intent(inout) :: trw
     integer(psb_ipk_), intent(in)               :: i, m,jmin,jmax,jd
     integer(psb_ipk_), intent(inout)            :: ktrw,nlw,nup,jmaxup,info
@@ -593,7 +594,7 @@ contains
     dmaxup = szero
     nrmi   = szero
 
-    select type (aa=> a%a)
+    select type (aa)
     type is (psb_c_csr_sparse_mat)
       !
       ! Take a fast shortcut if the matrix is stored in CSR format

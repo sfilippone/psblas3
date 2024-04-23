@@ -137,7 +137,7 @@ subroutine psb_siluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
   ! Arguments
   integer(psb_ipk_), intent(in)       :: fill_in, ialg
   integer(psb_ipk_), intent(out)      :: info
-  type(psb_sspmat_type),intent(in)    :: a
+  type(psb_sspmat_type),intent(inout) :: a
   type(psb_sspmat_type),intent(inout) :: l,u
   type(psb_sspmat_type),intent(in), optional, target :: blck
   real(psb_spk_), intent(inout)    ::  d(:)
@@ -147,7 +147,7 @@ subroutine psb_siluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
 
   real(psb_spk_) :: shft_
   type(psb_sspmat_type), pointer  :: blck_
-  type(psb_s_csr_sparse_mat)      :: ll, uu
+  type(psb_s_csr_sparse_mat)      :: ll, uu, aa, bb
   character(len=20)   :: name, ch_err
 
   name='psb_siluk_fact'
@@ -186,11 +186,12 @@ subroutine psb_siluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
 
   call l%mv_to(ll)
   call u%mv_to(uu)
-
+  call a%cp_to(aa)
+  call blck_%cp_to(bb)
   !
   ! Compute the ILU(k) or the MILU(k) factorization, depending on ialg
   !
-  call psb_siluk_factint(fill_in,ialg,a,blck_,&
+  call psb_siluk_factint(fill_in,ialg,aa,bb,&
        & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,info,shft_)
   if (info /= psb_success_) then
      info=psb_err_from_subroutine_
@@ -313,7 +314,7 @@ contains
 
   ! Arguments
     integer(psb_ipk_), intent(in)                 :: fill_in, ialg
-    type(psb_sspmat_type),intent(in)              :: a,b
+    class(psb_s_base_sparse_mat),intent(inout)  :: a,b
     integer(psb_ipk_),intent(inout)               :: l1,l2,info
     integer(psb_ipk_), allocatable, intent(inout) :: lja(:),lirp(:),uja(:),uirp(:)
     real(psb_spk_), allocatable, intent(inout) :: lval(:),uval(:)
@@ -524,14 +525,14 @@ contains
   !               until we empty the buffer. Thus we will make a call to psb_sp_getblk
   !               every nrb calls to copyin. If A is in CSR format it is unused.
   !
-  subroutine iluk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,shft)
+  subroutine iluk_copyin(i,m,aa,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,shft)
 
     use psb_base_mod
 
     implicit none
 
   ! Arguments
-    type(psb_sspmat_type), intent(in)         :: a
+    class(psb_s_base_sparse_mat),intent(inout)  :: aa
     type(psb_s_coo_sparse_mat), intent(inout) :: trw
     integer(psb_ipk_), intent(in)           :: i,m,jmin,jmax
     integer(psb_ipk_), intent(inout)        :: ktrw,info
@@ -554,7 +555,7 @@ contains
     end if
     call heap%init(info)
 
-    select type (aa=> a%a)
+    select type (aa)
     type is (psb_s_csr_sparse_mat)
       !
       ! Take a fast shortcut if the matrix is stored in CSR format

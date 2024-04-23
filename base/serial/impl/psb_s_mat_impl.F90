@@ -446,9 +446,9 @@ subroutine psb_s_set_upper(a,val)
 
   call psb_erractionsave(err_act)
   if (allocated(a%a)) then
-    call a%a%set_lower(val)
+    call a%a%set_upper(val)
   else if (allocated(a%ad)) then
-    call a%ad%set_lower(val)    
+    call a%ad%set_upper(val)    
   else      
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)

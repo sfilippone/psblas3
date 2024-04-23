@@ -139,7 +139,7 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
 
   ! Arguments
   integer(psb_ipk_), intent(in)       :: ialg
-  type(psb_sspmat_type),intent(in)    :: a
+  type(psb_sspmat_type),intent(inout) :: a
   type(psb_sspmat_type),intent(inout) :: l,u
   real(psb_spk_), intent(inout)    :: d(:)
   integer(psb_ipk_), intent(out)      :: info
@@ -150,7 +150,7 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
   ! Local variables
   integer(psb_ipk_)   :: l1, l2, m, err_act
   type(psb_sspmat_type), pointer  :: blck_
-  type(psb_s_csr_sparse_mat)      :: ll, uu
+  type(psb_s_csr_sparse_mat)      :: ll, uu, aa, bb
   real(psb_spk_) :: shft_
   character                       :: upd_
   character(len=20)    :: name, ch_err
@@ -196,10 +196,12 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
 
   call l%mv_to(ll)
   call u%mv_to(uu)
+  call a%cp_to(aa)
+  call blck_%cp_to(bb)
   !
   ! Compute the ILU(0) or the MILU(0) factorization, depending on ialg
   !
-  call psb_silu0_factint(ialg,a,blck_,&
+  call psb_silu0_factint(ialg,aa,bb,&
        & d,ll%val,ll%ja,ll%irp,uu%val,uu%ja,uu%irp,l1,l2,upd_,shft_,info)
   if(info.ne.0) then
     info=psb_err_from_subroutine_
@@ -327,7 +329,7 @@ contains
 
     ! Arguments
     integer(psb_ipk_), intent(in)     :: ialg
-    type(psb_sspmat_type),intent(in)  :: a,b
+    class(psb_s_base_sparse_mat),intent(inout) :: a,b
     integer(psb_ipk_),intent(inout)   :: l1,l2,info
     integer(psb_ipk_), intent(inout)  :: lja(:),lirp(:),uja(:),uirp(:)
     real(psb_spk_), intent(inout)  :: lval(:),uval(:),d(:)
@@ -590,7 +592,7 @@ contains
   !               until we empty the buffer. Thus we will make a call to psb_sp_getblk
   !               every nrb calls to copyin. If A is in CSR format it is unused.
   !
-  subroutine ilu_copyin(i,m,a,jd,jmin,jmax,l1,lja,lval,&
+  subroutine ilu_copyin(i,m,aa,jd,jmin,jmax,l1,lja,lval,&
        & dia,l2,uja,uval,ktrw,trw,upd,shft)
 
     use psb_base_mod
@@ -598,7 +600,7 @@ contains
     implicit none
 
     ! Arguments
-    type(psb_sspmat_type), intent(in)    :: a
+    class(psb_s_base_sparse_mat),intent(inout)  :: aa
     type(psb_s_coo_sparse_mat), intent(inout) :: trw
     integer(psb_ipk_), intent(in)        :: i,m,jd,jmin,jmax
     integer(psb_ipk_), intent(inout)     :: ktrw,l1,l2
@@ -619,7 +621,7 @@ contains
     end if
     if (psb_toupper(upd) == 'F') then
 
-      select type(aa => a%a)
+      select type(aa)
       type is (psb_s_csr_sparse_mat)
 
         !

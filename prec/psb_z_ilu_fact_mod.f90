@@ -84,7 +84,7 @@ module psb_z_ilu_fact_mod
       import psb_zspmat_type, psb_dpk_, psb_ipk_
       integer(psb_ipk_), intent(in)         :: ialg
       integer(psb_ipk_), intent(out)        :: info
-      type(psb_zspmat_type),intent(in)      :: a
+      type(psb_zspmat_type),intent(inout)   :: a
       type(psb_zspmat_type),intent(inout)   :: l,u
       type(psb_zspmat_type),intent(in), optional, target :: blck
       character, intent(in), optional       :: upd
@@ -98,7 +98,7 @@ module psb_z_ilu_fact_mod
       import psb_zspmat_type, psb_dpk_, psb_ipk_
       integer(psb_ipk_), intent(in)        :: fill_in,ialg
       integer(psb_ipk_), intent(out)       :: info
-      type(psb_zspmat_type),intent(in)     :: a
+      type(psb_zspmat_type),intent(inout)  :: a
       type(psb_zspmat_type),intent(inout)  :: l,u
       type(psb_zspmat_type),intent(in), optional, target :: blck
       complex(psb_dpk_), intent(inout)     ::  d(:)
@@ -112,7 +112,7 @@ module psb_z_ilu_fact_mod
       integer(psb_ipk_), intent(in)        :: fill_in
       real(psb_dpk_), intent(in)           :: thres
       integer(psb_ipk_), intent(out)       :: info
-      type(psb_zspmat_type),intent(in)     :: a
+      type(psb_zspmat_type),intent(inout)  :: a
       type(psb_zspmat_type),intent(inout)  :: l,u
       complex(psb_dpk_), intent(inout)     :: d(:)
       type(psb_zspmat_type),intent(in), optional, target :: blck
