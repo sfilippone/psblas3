@@ -3318,7 +3318,7 @@ subroutine psb_z_mv_csr_to_coo(a,b,info)
   if (a%is_dev())   call a%sync()
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
@@ -3489,7 +3489,7 @@ subroutine psb_z_cp_csr_to_fmt(a,b,info)
     if (a%is_dev())   call a%sync()
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     nr = a%get_nrows()
-    nz = a%get_nzeros()
+    nz = max(a%get_nzeros(),ione)
     if (.false.) then 
       if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
       if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
@@ -3594,7 +3594,7 @@ subroutine psb_z_cp_csr_from_fmt(a,b,info)
     if (b%is_dev())   call b%sync()
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     nr = b%get_nrows()
-    nz = b%get_nzeros()
+    nz = max(b%get_nzeros(),ione)
     if (.false.) then 
       if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
       if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
@@ -6281,7 +6281,7 @@ subroutine psb_lz_mv_csr_to_coo(a,b,info)
   if (a%is_dev())   call a%sync()
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_lz_base_sparse_mat = a%psb_lz_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
