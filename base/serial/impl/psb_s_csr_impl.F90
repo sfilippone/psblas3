@@ -43,7 +43,7 @@
 !
 ! == ===================================
 
-subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
+subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_error_mod
   use psb_string_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_csmv
@@ -53,9 +53,10 @@ subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
-  integer(psb_ipk_) :: m, n
+  integer(psb_ipk_) :: m, n, ivshft_
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -70,6 +71,12 @@ subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
     trans_ = trans
   else
     trans_ = 'N'
+  end if
+
+  if (present(ivshft)) then
+    ivshft_ = ivshft
+  else
+    ivshft_ = 0
   end if
 
   if (.not.a%is_asb()) then
@@ -107,7 +114,7 @@ subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
 
   call psb_s_csr_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
        & a%is_triangle(),a%is_unit(),&
-       & x,beta,y,tra,ctra)
+       & x(ivshft_+1:),beta,y,tra,ctra)
 
   call psb_erractionrestore(err_act)
   return
@@ -416,7 +423,7 @@ contains
 
 end subroutine psb_s_csr_csmv
 
-subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
+subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_error_mod
   use psb_string_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_csmm
@@ -426,9 +433,10 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), intent(inout)       :: y(:,:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
-  integer(psb_ipk_) :: j,m,n, nc
+  integer(psb_ipk_) :: j,m,n, nc, ivshft_
   real(psb_spk_), allocatable  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
@@ -444,6 +452,12 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
     trans_ = trans
   else
     trans_ = 'N'
+  end if
+
+  if (present(ivshft)) then
+    ivshft_ = ivshft
+  else
+    ivshft_ = 0
   end if
 
   if (.not.a%is_asb()) then
@@ -486,7 +500,7 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
   call  psb_s_csr_csmm_inner(m,n,nc,alpha,a%irp,a%ja,a%val, &
-       & a%is_triangle(),a%is_unit(),x,size(x,1,kind=psb_ipk_), &
+       & a%is_triangle(),a%is_unit(),x(ivshft+1:,:),size(x,1,kind=psb_ipk_), &
        & beta,y,size(y,1,kind=psb_ipk_),tra,ctra,acc)
 
 
@@ -4344,7 +4358,7 @@ subroutine psb_s_ecsr_mold(a,b,info)
 
 end subroutine psb_s_ecsr_mold
 
-subroutine psb_s_ecsr_csmv(alpha,a,x,beta,y,info,trans)
+subroutine psb_s_ecsr_csmv(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_error_mod
   use psb_string_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_ecsr_csmv
@@ -4354,6 +4368,7 @@ subroutine psb_s_ecsr_csmv(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
   integer(psb_ipk_) :: m, n

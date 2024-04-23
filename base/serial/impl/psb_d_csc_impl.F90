@@ -43,7 +43,7 @@
 !
 ! == ===================================
 
-subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans)
+subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_error_mod
   use psb_string_mod
   use psb_d_csc_mat_mod, psb_protect_name => psb_d_csc_csmv
@@ -53,9 +53,10 @@ subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, ivshft_
   real(psb_dpk_) :: acc
   logical   :: tra
   integer(psb_ipk_) :: err_act
@@ -70,6 +71,12 @@ subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans)
     trans_ = trans
   else
     trans_ = 'N'
+  end if
+
+  if (present(ivshft)) then
+    ivshft_ = ivshft
+  else
+    ivshft_ = 0
   end if
 
   if (.not.a%is_asb()) then
@@ -320,7 +327,7 @@ subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans)
 
 end subroutine psb_d_csc_csmv
 
-subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans)
+subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_error_mod
   use psb_string_mod
   use psb_d_csc_mat_mod, psb_protect_name => psb_d_csc_csmm
@@ -330,6 +337,7 @@ subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), intent(inout)       :: y(:,:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc

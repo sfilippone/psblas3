@@ -30,7 +30,7 @@
 !   
 #if CUDA_SHORT_VERSION <= 10 
   
-subroutine psb_z_cuda_hybg_vect_mv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_z_cuda_hybg_vect_mv(alpha,a,x,beta,y,info,trans,ivshft) 
 
   use psb_base_mod
   use cusparse_mod
@@ -45,6 +45,8 @@ subroutine psb_z_cuda_hybg_vect_mv(alpha,a,x,beta,y,info,trans)
   class(psb_z_base_vect_type), intent(inout) :: y
   integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)            :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
+
   complex(psb_dpk_), allocatable  :: rx(:), ry(:)
   logical           :: tra
   character         :: trans_

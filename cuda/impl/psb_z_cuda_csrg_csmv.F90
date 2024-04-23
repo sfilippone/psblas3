@@ -28,9 +28,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
-
-subroutine psb_z_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_z_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
   
   use psb_base_mod
   use cusparse_mod
@@ -43,6 +41,7 @@ subroutine psb_z_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans)
   complex(psb_dpk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)       :: info
   character, optional, intent(in)      :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc

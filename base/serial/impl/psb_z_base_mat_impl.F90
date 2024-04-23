@@ -607,6 +607,51 @@ subroutine psb_z_base_csclip(a,b,info,&
 end subroutine psb_z_base_csclip
 
 
+subroutine psb_z_base_merge(a,a2,acoo,n_rows,n_cols,info)
+  ! Output is always in  COO format
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_base_merge
+  implicit none
+  
+  class(psb_z_base_sparse_mat), intent(inout) :: a,a2
+  class(psb_z_coo_sparse_mat), intent(out)    :: acoo
+  integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+  integer(psb_ipk_), intent(out)          :: info
+  type(psb_z_coo_sparse_mat) :: acoo2
+  integer(psb_ipk_) :: nz
+  logical, parameter :: use_ecsr=.true.
+  character(len=20)     :: name, ch_err
+  integer(psb_ipk_) :: err_act
+
+  info = psb_success_
+  name = 'psb_split'
+  call psb_erractionsave(err_act)
+
+  call a%cp_to_coo(acoo,info)
+  call acoo%set_bld()
+  call acoo%set_nrows(n_rows)
+  call acoo%set_ncols(n_cols)
+  call a2%cp_to_coo(acoo2,info)
+  nz=acoo2%get_nzeros()
+  call acoo%csput(nz,acoo2%ia,acoo2%ja,acoo2%val,ione,n_rows,ione,n_cols,info)
+
+  if (psb_errstatus_fatal()) then    
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='cscnv')
+    goto 9999
+  endif
+  
+  call psb_erractionrestore(err_act)
+  return
+  
+9999 call psb_error_handler(err_act)
+  
+  return
+    
+end subroutine psb_z_base_merge
+
+
 !
 ! Here we have the base implementation of tril and triu
 ! this is just based on the getrow.

@@ -284,13 +284,14 @@ module psb_z_dns_mat_mod
   !!
   !
   interface 
-    subroutine psb_z_dns_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_z_dns_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_z_dns_sparse_mat, psb_dpk_, psb_ipk_
       class(psb_z_dns_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)       :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout)    :: y(:)
       integer(psb_ipk_), intent(out)    :: info
       character, optional, intent(in)   :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_dns_csmv
   end interface
   
@@ -312,13 +313,14 @@ module psb_z_dns_mat_mod
   !!
   !
   interface 
-    subroutine psb_z_dns_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_z_dns_csmm(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_z_dns_sparse_mat, psb_dpk_, psb_ipk_
       class(psb_z_dns_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
       integer(psb_ipk_), intent(out)      :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_dns_csmm
   end interface
   

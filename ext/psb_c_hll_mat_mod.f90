@@ -303,21 +303,23 @@ module psb_c_hll_mat_mod
   end interface
   
   interface 
-    subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_c_hll_sparse_mat, psb_spk_, psb_ipk_
       class(psb_c_hll_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)              :: alpha, beta, x(:)
       complex(psb_spk_), intent(inout)           :: y(:)
       integer(psb_ipk_), intent(out)          :: info
       character, optional, intent(in)         :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_hll_csmv
-    subroutine psb_c_hll_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_hll_csmm(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_c_hll_sparse_mat, psb_spk_, psb_ipk_
       class(psb_c_hll_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)              :: alpha, beta, x(:,:)
       complex(psb_spk_), intent(inout)           :: y(:,:)
       integer(psb_ipk_), intent(out)          :: info
       character, optional, intent(in)         :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_hll_csmm
   end interface
   

@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-subroutine psb_c_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_c_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans,ivshft) 
   
   use psb_base_mod
   use hdiagdev_mod
@@ -43,6 +43,8 @@ subroutine psb_c_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans)
   class(psb_c_base_vect_type), intent(inout) :: y
   integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
+
   complex(psb_spk_), allocatable      :: rx(:), ry(:)
   logical           :: tra
   character         :: trans_

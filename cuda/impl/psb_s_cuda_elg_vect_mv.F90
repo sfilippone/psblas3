@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-subroutine psb_s_cuda_elg_vect_mv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_s_cuda_elg_vect_mv(alpha,a,x,beta,y,info,trans,ivshft) 
   
   use psb_base_mod
   use elldev_mod
@@ -43,6 +43,8 @@ subroutine psb_s_cuda_elg_vect_mv(alpha,a,x,beta,y,info,trans)
   class(psb_s_base_vect_type), intent(inout) :: y
   integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
+
   real(psb_spk_), allocatable      :: rx(:), ry(:)
   logical           :: tra
   character         :: trans_

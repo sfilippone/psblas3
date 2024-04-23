@@ -305,21 +305,23 @@ module psb_d_ell_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_ell_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_d_ell_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_d_ell_sparse_mat, psb_dpk_, psb_ipk_
       class(psb_d_ell_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
       integer(psb_ipk_), intent(out)       :: info
       character, optional, intent(in)      :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_d_ell_csmv
-    subroutine psb_d_ell_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_d_ell_csmm(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_d_ell_sparse_mat, psb_dpk_, psb_ipk_
       class(psb_d_ell_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout)       :: y(:,:)
       integer(psb_ipk_), intent(out)       :: info
       character, optional, intent(in)      :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_d_ell_csmm
   end interface
   

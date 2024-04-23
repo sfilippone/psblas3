@@ -30,7 +30,7 @@
 !   
   
 
-subroutine psb_s_cuda_diag_csmv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_s_cuda_diag_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
   
   use psb_base_mod
   use diagdev_mod
@@ -42,6 +42,7 @@ subroutine psb_s_cuda_diag_csmv(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), intent(inout)       :: y(:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc

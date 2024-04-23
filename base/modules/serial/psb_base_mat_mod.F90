@@ -388,14 +388,14 @@ module psb_base_mat_mod
   !!               i.e. when lev=2 find neighours of neighbours, etc.
   !
   interface
-    subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
+    subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev,nin)
       import :: psb_ipk_, psb_epk_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                :: idx
       integer(psb_ipk_), intent(out)               :: n
       integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
       integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: lev
+      integer(psb_ipk_), optional, intent(in)      :: lev, nin
     end subroutine psb_base_get_neigh
   end interface
 

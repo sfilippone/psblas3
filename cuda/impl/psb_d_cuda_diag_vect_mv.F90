@@ -28,7 +28,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-subroutine psb_d_cuda_diag_vect_mv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_d_cuda_diag_vect_mv(alpha,a,x,beta,y,info,trans,ivshft) 
   
   use psb_base_mod
   use diagdev_mod
@@ -42,6 +42,8 @@ subroutine psb_d_cuda_diag_vect_mv(alpha,a,x,beta,y,info,trans)
   class(psb_d_base_vect_type), intent(inout) :: y
   integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
+
   real(psb_dpk_), allocatable      :: rx(:), ry(:)
   logical           :: tra
   character         :: trans_

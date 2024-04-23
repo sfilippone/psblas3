@@ -100,7 +100,7 @@ module psb_z_cuda_csrg_mat_mod
 
 
   interface 
-    subroutine psb_z_cuda_csrg_vect_mv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_z_cuda_csrg_vect_mv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_z_cuda_csrg_sparse_mat, psb_dpk_, psb_z_base_vect_type, psb_ipk_
       class(psb_z_cuda_csrg_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)       :: alpha, beta
@@ -108,6 +108,7 @@ module psb_z_cuda_csrg_mat_mod
       class(psb_z_base_vect_type), intent(inout) :: y
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)  :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_cuda_csrg_vect_mv
   end interface
 
@@ -191,23 +192,25 @@ module psb_z_cuda_csrg_mat_mod
   end interface
   
   interface 
-    subroutine psb_z_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_z_cuda_csrg_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_z_cuda_csrg_sparse_mat, psb_dpk_, psb_ipk_
       class(psb_z_cuda_csrg_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
       integer(psb_ipk_), intent(out)      :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_cuda_csrg_csmv
   end interface
   interface 
-    subroutine psb_z_cuda_csrg_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_z_cuda_csrg_csmm(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_z_cuda_csrg_sparse_mat, psb_dpk_, psb_ipk_
       class(psb_z_cuda_csrg_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
       integer(psb_ipk_), intent(out)      :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_cuda_csrg_csmm
   end interface
   

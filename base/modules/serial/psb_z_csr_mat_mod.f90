@@ -461,26 +461,28 @@ module psb_z_csr_mat_mod
   !> \memberof psb_z_csr_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_csmv
   interface
-    subroutine psb_z_csr_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_z_csr_csmv(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_csr_csmv
   end interface
 
   !> \memberof psb_z_csr_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_csmm
   interface
-    subroutine psb_z_csr_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_z_csr_csmm(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_csr_csmm
   end interface
 
@@ -606,13 +608,14 @@ module psb_z_csr_mat_mod
   !> \memberof psb_z_ecsr_sparse_mat
   !! \see psb_z_base_mat_mod::psb_z_base_csmv
   interface
-    subroutine psb_z_ecsr_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_z_ecsr_csmv(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_z_ecsr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_z_ecsr_csmv
   end interface
 

@@ -1512,7 +1512,7 @@ contains
 
 end subroutine psb_d_coo_cssv
 
-subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
+subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
@@ -1524,9 +1524,10 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), intent(inout)       :: y(:)
   integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
-
+  integer(psb_ipk_), optional, intent(in) :: ivshft
+      
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, ivshft_
   real(psb_dpk_) :: acc
   logical   :: tra, ctra
   integer(psb_ipk_)  :: err_act
@@ -1548,6 +1549,12 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
     trans_ = trans
   else
     trans_ = 'N'
+  end if
+
+  if (present(ivshft)) then
+    ivshft_ = ivshft
+  else
+    ivshft_ = 0
   end if
 
   tra  = (psb_toupper(trans_) == 'T')
@@ -1633,7 +1640,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
           ir    = a%ia(i)
           acc   = dzero
         endif
-        acc     = acc + a%val(i) * x(a%ja(i))
+        acc     = acc + a%val(i) * x(ivshft_+a%ja(i))
         i       = i + 1
       enddo
     end if
@@ -1645,7 +1652,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) +  a%val(i)*x(jc)
+        y(ir) = y(ir) +  a%val(i)*x(ivshft_+jc)
       enddo
 
     else if (alpha == -done) then
@@ -1653,7 +1660,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) - a%val(i)*x(jc)
+        y(ir) = y(ir) - a%val(i)*x(ivshft_+jc)
       enddo
 
     else
@@ -1661,7 +1668,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) + alpha*a%val(i)*x(jc)
+        y(ir) = y(ir) + alpha*a%val(i)*x(ivshft_+jc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -1673,7 +1680,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) +  (a%val(i))*x(jc)
+        y(ir) = y(ir) +  (a%val(i))*x(ivshft_+jc)
       enddo
 
     else if (alpha == -done) then
@@ -1681,7 +1688,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) - (a%val(i))*x(jc)
+        y(ir) = y(ir) - (a%val(i))*x(ivshft_+jc)
       enddo
 
     else
@@ -1689,7 +1696,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir) = y(ir) + alpha*(a%val(i))*x(jc)
+        y(ir) = y(ir) + alpha*(a%val(i))*x(ivshft_+jc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -1705,7 +1712,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
 end subroutine psb_d_coo_csmv
 
-subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
+subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans,ivshft)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
@@ -1716,9 +1723,10 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), intent(inout)       :: y(:,:)
   integer(psb_ipk_), intent(out)       :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, ivshft_
   real(psb_dpk_), allocatable  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_)  :: err_act
@@ -1741,6 +1749,12 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
     trans_ = trans
   else
     trans_ = 'N'
+  end if
+
+  if (present(ivshft)) then
+    ivshft_ = ivshft
+  else
+    ivshft_ = 0
   end if
 
   tra  = (psb_toupper(trans_) == 'T')
@@ -1834,7 +1848,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
           ir    = a%ia(i)
           acc   = dzero
         endif
-        acc     = acc + a%val(i) * x(a%ja(i),1:nc)
+        acc     = acc + a%val(i) * x(ivshft_+a%ja(i),1:nc)
         i       = i + 1
       enddo
     end if
@@ -1846,7 +1860,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) +  a%val(i)*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) +  a%val(i)*x(ivshft_+jc,1:nc)
       enddo
 
     else if (alpha == -done) then
@@ -1854,7 +1868,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) - a%val(i)*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) - a%val(i)*x(ivshft_+jc,1:nc)
       enddo
 
     else
@@ -1862,7 +1876,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) + alpha*a%val(i)*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) + alpha*a%val(i)*x(ivshft_+jc,1:nc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -1874,7 +1888,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) +  (a%val(i))*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) +  (a%val(i))*x(ivshft_+jc,1:nc)
       enddo
 
     else if (alpha == -done) then
@@ -1882,7 +1896,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) - (a%val(i))*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) - (a%val(i))*x(ivshft_+jc,1:nc)
       enddo
 
     else
@@ -1890,7 +1904,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,1:nc) = y(ir,1:nc) + alpha*(a%val(i))*x(jc,1:nc)
+        y(ir,1:nc) = y(ir,1:nc) + alpha*(a%val(i))*x(ivshft_+jc,1:nc)
       enddo
 
     end if                  !.....end testing on alpha

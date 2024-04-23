@@ -68,7 +68,7 @@ module psb_c_cuda_hdiag_mat_mod
 
 
   interface 
-    subroutine psb_c_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_cuda_hdiag_vect_mv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_c_cuda_hdiag_sparse_mat, psb_spk_, psb_c_base_vect_type, psb_ipk_
       class(psb_c_cuda_hdiag_sparse_mat), intent(in)    :: a
       complex(psb_spk_), intent(in)                 :: alpha, beta
@@ -76,6 +76,7 @@ module psb_c_cuda_hdiag_mat_mod
       class(psb_c_base_vect_type), intent(inout) :: y
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)            :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_cuda_hdiag_vect_mv
   end interface
 
@@ -162,24 +163,26 @@ module psb_c_cuda_hdiag_mat_mod
 !!$  end interface
 !!$  
   interface 
-    subroutine psb_c_cuda_hdiag_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_c_cuda_hdiag_csmv(alpha,a,x,beta,y,info,trans,ivshft) 
       import :: psb_c_cuda_hdiag_sparse_mat, psb_spk_, psb_ipk_
       class(psb_c_cuda_hdiag_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)              :: alpha, beta, x(:)
       complex(psb_spk_), intent(inout)           :: y(:)
       integer(psb_ipk_), intent(out)          :: info
       character, optional, intent(in)         :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_cuda_hdiag_csmv
   end interface
 
 !!$  interface 
-!!$    subroutine psb_c_cuda_hdiag_csmm(alpha,a,x,beta,y,info,trans) 
+!!$    subroutine psb_c_cuda_hdiag_csmm(alpha,a,x,beta,y,info,trans,ivshft) 
 !!$      import :: psb_c_cuda_hdiag_sparse_mat, psb_spk_, psb_ipk_
 !!$      class(psb_c_cuda_hdiag_sparse_mat), intent(in) :: a
 !!$      complex(psb_spk_), intent(in)              :: alpha, beta, x(:,:)
 !!$      complex(psb_spk_), intent(inout)           :: y(:,:)
 !!$      integer(psb_ipk_), intent(out)          :: info
 !!$      character, optional, intent(in)         :: trans
+!!$      integer(psb_ipk_), optional, intent(in) :: ivshft
 !!$    end subroutine psb_c_cuda_hdiag_csmm
 !!$  end interface
 !!$  

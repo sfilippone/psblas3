@@ -443,26 +443,28 @@ module psb_s_csc_mat_mod
   !> \memberof psb_s_csc_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csmv
   interface
-    subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_s_csc_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)          :: alpha, beta, x(:)
       real(psb_spk_), intent(inout)       :: y(:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_s_csc_csmv
   end interface
 
   !> \memberof psb_s_csc_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_csmm
   interface
-    subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_s_csc_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
       real(psb_spk_), intent(inout)       :: y(:,:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_s_csc_csmm
   end interface
 

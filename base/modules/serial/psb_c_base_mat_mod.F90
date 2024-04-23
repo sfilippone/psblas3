@@ -67,6 +67,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: tril          => psb_c_base_tril
     procedure, pass(a) :: triu          => psb_c_base_triu
     procedure, pass(a) :: csclip        => psb_c_base_csclip
+    procedure, pass(a) :: csmerge       => psb_c_base_merge
     procedure, pass(a) :: cp_to_coo     => psb_c_base_cp_to_coo
     procedure, pass(a) :: cp_from_coo   => psb_c_base_cp_from_coo
     procedure, pass(a) :: cp_to_fmt     => psb_c_base_cp_to_fmt
@@ -626,6 +627,19 @@ module psb_c_base_mat_mod
       logical, intent(in), optional            :: rscale,cscale
     end subroutine psb_c_base_csclip
   end interface
+
+  interface
+    subroutine psb_c_base_merge(a,a2,acoo,n_rows,n_cols,info)
+      import :: psb_ipk_, psb_lpk_, psb_spk_, &
+           & psb_c_base_sparse_mat, psb_c_coo_sparse_mat
+      class(psb_c_base_sparse_mat), intent(inout) :: a,a2
+      class(psb_c_coo_sparse_mat), intent(out)    :: acoo
+      integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_c_base_merge
+  end interface
+  
+
   !
   !> Function  tril:
   !! \memberof  psb_c_base_sparse_mat
@@ -1165,13 +1179,14 @@ module psb_c_base_mat_mod
   !!
   !
   interface
-    subroutine psb_c_base_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_c_base_csmm(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_c_base_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
       complex(psb_spk_), intent(inout) :: y(:,:)
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_base_csmm
   end interface
 
@@ -1193,13 +1208,14 @@ module psb_c_base_mat_mod
   !!
   !
   interface
-    subroutine psb_c_base_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_c_base_csmv(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_c_base_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
       complex(psb_spk_), intent(inout) :: y(:)
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_base_csmv
   end interface
 
@@ -1228,7 +1244,7 @@ module psb_c_base_mat_mod
   !!
   !
   interface
-    subroutine psb_c_base_vect_mv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_c_base_vect_mv(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_c_base_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)       :: alpha, beta
@@ -1236,6 +1252,7 @@ module psb_c_base_mat_mod
       class(psb_c_base_vect_type), intent(inout) :: y
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)  :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_base_vect_mv
   end interface
 
@@ -2219,13 +2236,14 @@ module psb_c_base_mat_mod
   !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_csmv
   interface
-    subroutine psb_c_coo_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_c_coo_csmv(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_c_coo_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)          :: alpha, beta, x(:)
       complex(psb_spk_), intent(inout)       :: y(:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_coo_csmv
   end interface
 
@@ -2233,13 +2251,14 @@ module psb_c_base_mat_mod
   !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_csmm
   interface
-    subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans,ivshft)
       import
       class(psb_c_coo_sparse_mat), intent(in) :: a
       complex(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
       complex(psb_spk_), intent(inout)       :: y(:,:)
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
+      integer(psb_ipk_), optional, intent(in) :: ivshft
     end subroutine psb_c_coo_csmm
   end interface
 

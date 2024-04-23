@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
   
-subroutine psb_c_cuda_elg_csmm(alpha,a,x,beta,y,info,trans) 
+subroutine psb_c_cuda_elg_csmm(alpha,a,x,beta,y,info,trans,ivshft) 
   
   use psb_base_mod
   use elldev_mod
@@ -41,6 +41,7 @@ subroutine psb_c_cuda_elg_csmm(alpha,a,x,beta,y,info,trans)
   complex(psb_spk_), intent(inout)       :: y(:,:)
   integer(psb_ipk_), intent(out)      :: info
   character, optional, intent(in)     :: trans
+  integer(psb_ipk_), optional, intent(in) :: ivshft
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nxy

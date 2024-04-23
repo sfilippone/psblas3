@@ -140,21 +140,21 @@ subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
   call psb_error_handler(err_act)
 end subroutine psb_base_csgetptn
 
-subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
+subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev,nin)
   use psb_base_mat_mod, psb_protect_name => psb_base_get_neigh
   use psb_error_mod
   use psb_realloc_mod
   use psb_sort_mod
   implicit none 
   class(psb_base_sparse_mat), intent(in) :: a   
-  integer(psb_ipk_), intent(in)                :: idx 
-  integer(psb_ipk_), intent(out)               :: n   
-  integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
-  integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_), optional, intent(in)      :: lev 
+  integer(psb_ipk_), intent(in)                 :: idx 
+  integer(psb_ipk_), intent(out)                :: n   
+  integer(psb_ipk_), allocatable, intent(inout) :: neigh(:)
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_), optional, intent(in)       :: lev, nin
 
   integer(psb_ipk_) :: lev_, i, nl, ifl,ill,&
-       &  n1, err_act, nn, nidx,ntl,ma
+       &  n1, err_act, nn, nidx,ntl,ma,nin_
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   character(len=20)  :: name='get_neigh'
   logical, parameter :: debug=.false.
@@ -166,19 +166,24 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
   else
     lev_=1
   end if
+  if(present(nin)) then 
+    nin_ = nin
+  else
+    nin_ = 0
+  end if
   ! Turns out we can write get_neigh at this
   ! level 
-  n = 0
+  n  = 0
   ma = a%get_nrows()
   call a%csget(idx,idx,n,ia,ja,info)
-  if (info == psb_success_) call psb_realloc(n,neigh,info)
+  if (info == psb_success_) call psb_realloc(nin_+n,neigh,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
-  neigh(1:n) = ja(1:n)
-  ifl = 1
-  ill = n
+  neigh(nin_+1:nin_+n) = ja(nin_+1:nin_+n)
+  ifl = nin_+1
+  ill = nin_+n
   do nl = 2, lev_ 
     n1 = ill - ifl + 1
     call psb_ensure_size(ill+n1*n1,neigh,info)
