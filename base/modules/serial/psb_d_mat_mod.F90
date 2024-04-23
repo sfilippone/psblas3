@@ -854,11 +854,13 @@ module psb_d_mat_mod
   end interface
   
   interface
-    subroutine psb_d_merge_nd(a,n_rows,n_cols,info)
-      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+    subroutine psb_d_merge_nd(a,n_rows,n_cols,info,acoo)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, &
+           & psb_d_base_sparse_mat, psb_d_coo_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in)           :: n_rows, n_cols
       integer(psb_ipk_), intent(out)          :: info
+      class(psb_d_coo_sparse_mat), intent(out), optional :: acoo
     end subroutine psb_d_merge_nd
   end interface
 
@@ -988,7 +990,7 @@ module psb_d_mat_mod
   interface
     subroutine psb_d_cp_to_lb(a,b)
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ld_base_sparse_mat
-      class(psb_dspmat_type), intent(in) :: a
+      class(psb_dspmat_type), intent(inout) :: a
       class(psb_ld_base_sparse_mat), intent(inout) :: b
     end subroutine psb_d_cp_to_lb
   end interface
@@ -2024,6 +2026,8 @@ contains
     res = 0
     if (allocated(a%a)) then
       res = a%a%sizeof()
+    else if (allocated(a%ad).and.allocated(a%and)) then
+      res = a%ad%sizeof()+a%and%sizeof()
     end if
 
   end function psb_d_sizeof
@@ -2036,6 +2040,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%get_fmt()
+    elseif (allocated(a%ad)) then
+      res = a%ad%get_fmt()
     else
       res = 'NULL'
     end if
@@ -2050,6 +2056,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%get_dupl()
+    else if (allocated(a%ad)) then
+      res = a%ad%get_dupl()
     else
       res = psb_invalid_
     end if
@@ -2062,6 +2070,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%get_nrows()
+    else if (allocated(a%ad)) then
+      res = a%ad%get_nrows()
     else
       res = 0
     end if
@@ -2075,7 +2085,9 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%get_ncols()
-    else
+    else if (allocated(a%ad)) then
+      res = a%ad%get_ncols() + a%and%get_ncols()
+    else 
       res = 0
     end if
 
@@ -2088,7 +2100,9 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_triangle()
-    else
+    else if (allocated(a%ad)) then
+      res = a%ad%is_triangle()
+    else 
       res = .false.
     end if
 
@@ -2101,6 +2115,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_symmetric()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_symmetric()
     else
       res = .false.
     end if
@@ -2114,6 +2130,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_unit()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_unit()
     else
       res = .false.
     end if
@@ -2127,7 +2145,9 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_upper()
-    else
+    else if (allocated(a%ad)) then
+      res = a%ad%is_upper()
+    else 
       res = .false.
     end if
 
@@ -2140,7 +2160,9 @@ contains
 
     if (allocated(a%a)) then
       res = .not. a%a%is_upper()
-    else
+    else if (allocated(a%ad)) then
+      res = .not. a%ad%is_upper()
+    else 
       res = .false.
     end if
 
@@ -2153,12 +2175,15 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_null()
-    else
+    else if (allocated(a%ad)) then
+      res = a%ad%is_null()
+    else 
       res = .true.
     end if
 
   end function psb_d_is_null
 
+  ! Note: in the build state we should always have A%A 
   function psb_d_is_bld(a) result(res)
     implicit none
     class(psb_dspmat_type), intent(in) :: a
@@ -2179,7 +2204,9 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_upd()
-    else
+    else if (allocated(a%ad)) then
+      res = a%ad%is_upd()
+    else 
       res = .false.
     end if
 
@@ -2192,7 +2219,9 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_asb()
-    else
+    else if (allocated(a%ad)) then
+      res = a%ad%is_asb()
+    else 
       res = .false.
     end if
 
@@ -2205,6 +2234,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_sorted()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_sorted()
     else
       res = .false.
     end if
@@ -2218,6 +2249,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_by_rows()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_by_rows()
     else
       res = .false.
     end if
@@ -2231,6 +2264,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_by_cols()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_by_cols()
     else
       res = .false.
     end if
@@ -2243,7 +2278,9 @@ contains
     implicit none
     class(psb_dspmat_type), target, intent(in) :: a
 
-    if (allocated(a%a))  call a%a%sync()
+    if (allocated(a%a))    call a%a%sync()
+    if (allocated(a%ad))   call a%ad%sync()
+    if (allocated(a%and))  call a%and%sync()
 
   end subroutine d_mat_sync
 
@@ -2252,7 +2289,9 @@ contains
     implicit none
     class(psb_dspmat_type), intent(inout) :: a
 
-    if (allocated(a%a))  call a%a%set_host()
+    if (allocated(a%a))    call a%a%set_host()
+    if (allocated(a%ad))   call a%ad%set_host()
+    if (allocated(a%and))  call a%and%set_host()
 
   end subroutine d_mat_set_host
 
@@ -2262,7 +2301,9 @@ contains
     implicit none
     class(psb_dspmat_type), intent(inout) :: a
 
-    if (allocated(a%a))  call a%a%set_dev()
+    if (allocated(a%a))    call a%a%set_dev()
+    if (allocated(a%ad))   call a%ad%set_dev()
+    if (allocated(a%and))  call a%and%set_dev()
 
   end subroutine d_mat_set_dev
 
@@ -2271,7 +2312,9 @@ contains
     implicit none
     class(psb_dspmat_type), intent(inout) :: a
 
-    if (allocated(a%a))  call a%a%set_sync()
+    if (allocated(a%a))    call a%a%set_sync()
+    if (allocated(a%ad))   call a%ad%set_sync()
+    if (allocated(a%and))  call a%and%set_sync()
 
   end subroutine d_mat_set_sync
 
@@ -2283,6 +2326,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_dev()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_dev()
     else
       res = .false.
     end if
@@ -2297,6 +2342,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_host()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_host()
     else
       res = .true.
     end if
@@ -2311,6 +2358,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_sync()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_sync()
     else
       res = .true.
     end if
@@ -2343,6 +2392,8 @@ contains
 
     if (allocated(a%a)) then
       res = a%a%is_repeatable_updates()
+    else if (allocated(a%ad)) then
+      res = a%ad%is_repeatable_updates()
     else
       res = .false.
     end if
@@ -2356,6 +2407,9 @@ contains
 
     if (allocated(a%a)) then
       call a%a%set_repeatable_updates(val)
+    else if (allocated(a%ad)) then
+      call a%ad%set_repeatable_updates(val)
+      call a%and%set_repeatable_updates(val)
     end if
 
   end subroutine psb_d_set_repeatable_updates
@@ -2369,6 +2423,8 @@ contains
     res = 0
     if (allocated(a%a)) then
       res = a%a%get_nzeros()
+    else if (allocated(a%ad)) then
+      res = a%ad%get_nzeros() + a%and%get_nzeros()
     end if
 
   end function psb_d_get_nzeros
@@ -2383,6 +2439,8 @@ contains
     res = 0
     if (allocated(a%a)) then
       res = a%a%get_size()
+    else if (allocated(a%ad)) then
+      res = a%ad%get_size() + a%and%get_size()
     end if
 
   end function psb_d_get_size
@@ -2396,8 +2454,12 @@ contains
 
     res = 0
 
-    if (allocated(a%a)) res = a%a%get_nz_row(idx)
-
+    if (allocated(a%a)) then 
+      res = res + a%a%get_nz_row(idx)
+    else
+      if (allocated(a%ad)) res = res + a%ad%get_nz_row(idx)
+      if (allocated(a%and)) res = res + a%and%get_nz_row(idx)
+    end if
   end function psb_d_get_nz_row
 
   subroutine psb_d_clean_zeros(a,info)
@@ -2406,7 +2468,9 @@ contains
     class(psb_dspmat_type), intent(inout) :: a
 
     info = 0
-    if (allocated(a%a)) call a%a%clean_zeros(info)
+    if (allocated(a%a))   call a%a%clean_zeros(info)
+    if (allocated(a%ad))  call a%ad%clean_zeros(info)
+    if (allocated(a%and)) call a%and%clean_zeros(info)
 
   end subroutine psb_d_clean_zeros
 
