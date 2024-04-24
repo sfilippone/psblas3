@@ -2797,7 +2797,7 @@ function psb_s_rowsum(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,a%a%get_nrows())), stat=info)
+  allocate(d(max(1,a%get_nrows())), stat=info)
   if (info /= psb_success_) goto 9999
   if (allocated(a%a)) then
     call a%a%rowsum(d)
@@ -2840,7 +2840,7 @@ function psb_s_arwsum(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,a%a%get_nrows())), stat=info)
+  allocate(d(max(1,a%get_nrows())), stat=info)
   if (info /= psb_success_) goto 9999
 
   if (allocated(a%a)) then
@@ -2884,7 +2884,7 @@ function psb_s_colsum(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,a%a%get_ncols())), stat=info)
+  allocate(d(max(1,a%get_ncols())), stat=info)
   if (info /= psb_success_) goto 9999
 
   if (allocated(a%a)) then
@@ -2928,7 +2928,7 @@ function psb_s_aclsum(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,a%a%get_ncols())), stat=info)
+  allocate(d(max(1,a%get_ncols())), stat=info)
   if (info /= psb_success_) goto 9999
 
   if (allocated(a%a)) then
@@ -2973,7 +2973,7 @@ function psb_s_get_diag(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,min(a%a%get_nrows(),a%a%get_ncols()))), stat=info)
+  allocate(d(max(1,min(a%get_nrows(),a%get_ncols()))), stat=info)
   if (info /= 0) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
