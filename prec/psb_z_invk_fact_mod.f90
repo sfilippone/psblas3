@@ -81,7 +81,7 @@ module psb_z_invk_fact_mod
       ! import
       import psb_zspmat_type, psb_ipk_, psb_dpk_, psb_desc_type
       ! Arguments
-      type(psb_zspmat_type), intent(in), target   :: a
+      type(psb_zspmat_type), intent(inout), target   :: a
       integer(psb_ipk_), intent(in)               :: fill1, fill2
       type(psb_zspmat_type), intent(inout)        :: lmat, umat
       complex(psb_dpk_), allocatable                 :: d(:)
@@ -98,7 +98,7 @@ module psb_z_invk_fact_mod
       import psb_ipk_, psb_zspmat_type
       ! Arguments
       integer(psb_ipk_), intent(in)           :: n
-      type(psb_zspmat_type), intent(in)       :: a
+      type(psb_zspmat_type), intent(inout)  :: a
       type(psb_zspmat_type), intent(inout)    :: z
       integer(psb_ipk_), intent(in)           :: fill_in
       integer(psb_ipk_), intent(out)          :: info

@@ -79,7 +79,7 @@
 module psb_z_ilu_fact_mod
   use psb_base_mod
   use psb_prec_const_mod
-  interface psb_ilu0_fact
+  interface psb_ilu0_fact 
     subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck,upd,shft)
       import psb_zspmat_type, psb_dpk_, psb_ipk_
       integer(psb_ipk_), intent(in)         :: ialg

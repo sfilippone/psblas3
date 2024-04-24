@@ -211,8 +211,7 @@ subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
   call u%set_triangle()
   call u%set_unit()
   call u%set_upper()
-  write(0,*) 'In iluk__fact:',&
-       & l%is_triangle(),l%is_lower(),u%is_triangle(),u%is_upper()
+
   !
   ! Nullify pointer / deallocate memory
   !

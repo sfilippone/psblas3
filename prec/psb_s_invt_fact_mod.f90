@@ -82,7 +82,7 @@ module psb_s_invt_fact_mod
          ! Import
          import psb_sspmat_type, psb_spk_, psb_ipk_, psb_desc_type
          ! Arguments
-         type(psb_sspmat_type), intent(in), target   :: a
+         type(psb_sspmat_type), intent(inout), target   :: a
          integer(psb_ipk_), intent(in)               :: fillin,invfill
          real(psb_spk_), intent(in)                :: thresh
          real(psb_spk_), intent(in)                  :: invthresh
@@ -102,7 +102,7 @@ module psb_s_invt_fact_mod
          import psb_sspmat_type, psb_spk_, psb_ipk_
          ! Arguments
          integer(psb_ipk_), intent(in)        :: n
-         type(psb_sspmat_type), intent(in)    :: a
+         type(psb_sspmat_type), intent(inout) :: a
          type(psb_sspmat_type), intent(inout) :: z
          integer(psb_ipk_), intent(in)        :: nzrmax
          real(psb_spk_), intent(in)           :: sp_thresh

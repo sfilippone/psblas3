@@ -41,7 +41,7 @@ subroutine psb_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
   implicit none
 
   ! Arguments
-  type(psb_dspmat_type), intent(in), target   :: a
+  type(psb_dspmat_type), intent(inout), target   :: a
   integer(psb_ipk_), intent(in)               :: fill1, fill2
   type(psb_dspmat_type), intent(inout)        :: lmat, umat
   real(psb_dpk_), allocatable                 :: d(:)
@@ -155,7 +155,7 @@ subroutine psb_dsparse_invk(n,a,z,fill_in,info,inlevs)
   use psb_d_invk_fact_mod, psb_protect_name => psb_dsparse_invk
 
   integer(psb_ipk_), intent(in)           :: n
-  type(psb_dspmat_type), intent(in)       :: a
+  type(psb_dspmat_type), intent(inout)   :: a
   type(psb_dspmat_type), intent(inout)    :: z
   integer(psb_ipk_), intent(in)           :: fill_in
   integer(psb_ipk_), intent(out)          :: info

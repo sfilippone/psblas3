@@ -495,7 +495,7 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   use psb_d_bjacprec, psb_protect_name => psb_d_bjac_precbld
   Implicit None
 
-  type(psb_dspmat_type), intent(in), target :: a
+  type(psb_dspmat_type), intent(inout), target :: a
   type(psb_desc_type), intent(inout), target   :: desc_a
   class(psb_d_bjac_prec_type),intent(inout) :: prec
   integer(psb_ipk_), intent(out)                      :: info

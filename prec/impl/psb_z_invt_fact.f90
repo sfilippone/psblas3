@@ -73,7 +73,7 @@ subroutine psb_z_invt_bld(a,fillin,invfill,thresh,invthresh,&
   implicit none
 
   ! Arguments
-  type(psb_zspmat_type), intent(in), target   :: a
+  type(psb_zspmat_type), intent(inout), target   :: a
   integer(psb_ipk_), intent(in)               :: fillin,invfill
   real(psb_dpk_), intent(in)                :: thresh
   real(psb_dpk_), intent(in)                  :: invthresh
@@ -198,7 +198,7 @@ subroutine psb_zsparse_invt(n,a,z,nzrmax,sp_thresh,info)
 
   implicit none
   integer(psb_ipk_), intent(in)        :: n
-  type(psb_zspmat_type), intent(in)    :: a
+  type(psb_zspmat_type), intent(inout) :: a
   type(psb_zspmat_type), intent(inout) :: z
   integer(psb_ipk_), intent(in)        :: nzrmax
   real(psb_dpk_), intent(in)           :: sp_thresh
