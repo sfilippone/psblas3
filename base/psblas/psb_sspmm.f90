@@ -212,7 +212,7 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
              & szero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase3)
         if (do_timings) call psb_tic(mv_phase4)          
-        call a%and%spmm(alpha,x%v,sone,y%v,info)
+        call a%and%spmm(alpha,x%v,sone,y%v,info,ivshft=a%ad%get_ncols())
         if (do_timings) call psb_toc(mv_phase4)
       end block
       
