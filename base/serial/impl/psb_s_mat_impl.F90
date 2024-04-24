@@ -2789,6 +2789,7 @@ function psb_s_rowsum(a,info) result(d)
     call a%a%rowsum(d)
   else if (allocated(a%ad)) then 
     call a%ad%rowsum(d)
+    allocate(d1(max(1,a%get_nrows())), stat=info)
     call a%and%rowsum(d1)
     d=d+d1
   else
@@ -2833,6 +2834,7 @@ function psb_s_arwsum(a,info) result(d)
     call a%a%arwsum(d)
   else if (allocated(a%ad)) then 
     call a%ad%arwsum(d)
+    allocate(d1(max(1,a%get_nrows())), stat=info)
     call a%and%arwsum(d1)
     d=d+d1
   else
@@ -2870,13 +2872,14 @@ function psb_s_colsum(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,a%get_ncols())), stat=info)
-  if (info /= psb_success_) goto 9999
 
   if (allocated(a%a)) then
+    allocate(d(max(1,a%get_ncols())), stat=info)
     call a%a%colsum(d)
-  else if (allocated(a%ad)) then 
+  else if (allocated(a%ad)) then
+    allocate(d(max(1,a%ad%get_ncols())), stat=info)
     call a%ad%colsum(d)
+    allocate(d1(max(1,a%and%get_ncols())), stat=info)
     call a%and%colsum(d1)
     d = [d,d1]
   else
@@ -2914,13 +2917,14 @@ function psb_s_aclsum(a,info) result(d)
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(d(max(1,a%get_ncols())), stat=info)
-  if (info /= psb_success_) goto 9999
 
   if (allocated(a%a)) then
+    allocate(d(max(1,a%get_ncols())), stat=info)
     call a%a%aclsum(d)
   else if (allocated(a%ad)) then 
+    allocate(d(max(1,a%ad%get_ncols())), stat=info)
     call a%ad%aclsum(d)
+    allocate(d1(max(1,a%and%get_ncols())), stat=info)
     call a%and%aclsum(d1)
     d = [d,d1]
   else
