@@ -178,44 +178,7 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, mold, bld_and)
   end if
 
   if (bld_and_) then
-!!$    allocate(a%ad,mold=a%a)
-!!$    allocate(a%and,mold=a%a)o    
     call a%split_nd(n_row,n_col,info)
-!!$    block
-!!$      character(len=1024) :: fname
-!!$      type(psb_c_coo_sparse_mat) :: acoo
-!!$      type(psb_c_csr_sparse_mat), allocatable :: aclip
-!!$      type(psb_c_ecsr_sparse_mat), allocatable :: andclip
-!!$      logical, parameter :: use_ecsr=.true.
-!!$      allocate(aclip)
-!!$      call a%a%csclip(acoo,info,jmax=n_row,rscale=.false.,cscale=.false.)
-!!$      allocate(a%ad,mold=a%a)
-!!$      call a%ad%mv_from_coo(acoo,info)
-!!$      call a%a%csclip(acoo,info,jmin=n_row+1,jmax=n_col,rscale=.false.,cscale=.false.)
-!!$      if (use_ecsr) then
-!!$        allocate(andclip)
-!!$        call andclip%mv_from_coo(acoo,info)
-!!$        call move_alloc(andclip,a%and)
-!!$      else
-!!$        allocate(a%and,mold=a%a)
-!!$        call a%and%mv_from_coo(acoo,info)
-!!$      end if
-!!$      if (.false.) then 
-!!$        write(fname,'(a,i2.2,a)') 'adclip_',me,'.mtx'
-!!$        open(25,file=fname)
-!!$        call a%ad%print(25)
-!!$        close(25)
-!!$        write(fname,'(a,i2.2,a)') 'andclip_',me,'.mtx'
-!!$        open(25,file=fname)
-!!$        call a%and%print(25)
-!!$        close(25)
-!!$        !call andclip%set_cols(n_col)
-!!$        write(*,*) me,' ',trim(name),' ad  ',&
-!!$             &a%ad%get_nrows(),a%ad%get_ncols(),n_row,n_col
-!!$        write(*,*) me,' ',trim(name),' and ',&
-!!$             &a%and%get_nrows(),a%and%get_ncols(),n_row,n_col
-!!$      end if
-!!$    end block
   else
     if (allocated(a%ad)) deallocate(a%ad)
     if (allocated(a%and)) deallocate(a%and)
