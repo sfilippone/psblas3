@@ -2006,8 +2006,8 @@ subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  call x%sync()
-  call y%sync()
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
   call a%spmm(alpha,x%v,beta,y%v,info,trans)
   call y%set_host()
 end subroutine psb_d_base_vect_mv
