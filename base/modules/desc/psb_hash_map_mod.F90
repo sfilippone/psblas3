@@ -683,7 +683,7 @@ contains
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
     !write(0,*) me,name,' before loop ',psb_errstatus_fatal()
-#ifdef OPENMP
+#if 0 && defined(OPENMP)
     !call OMP_init_lock(ins_lck)
 
     if (idxmap%is_bld()) then
