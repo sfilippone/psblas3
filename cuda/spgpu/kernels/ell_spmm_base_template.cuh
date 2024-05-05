@@ -34,12 +34,9 @@ CONCAT(GEN_SPGPU_ELL_NAME(TYPE_SYMBOL), _krn)
   int i = threadIdx.x + blockIdx.x * (THREAD_BLOCK);
     
   if (i < rows) {
-    int j;
+    rS += i; rP += i; cM += i;
 
-    rP += rPPitch;
-    cM += cMPitch;
-
-    int rowSize = rS[i];
+    int rowSize = rS[0];
     for (int k=0; k<count; k++) {
       temp[k][threadIdx.x] = CONCAT(zero_,VALUE_TYPE)();
     }

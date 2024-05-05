@@ -122,14 +122,13 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
 	VALUE_TYPE beta,
 	int baseIndex)
 {
-// TODO
   VALUE_TYPE *px,*py,*pz;
   int cnt;
   int maxNForACall = max(handle->maxGridSizeX, THREAD_BLOCK*handle->maxGridSizeX);
 
   int maxShmemSz;
   maxShmemSz=getGPUSharedMemPerBlock();
-
+  //fprintf(stderr,"MaxSHmemSz  %d \n",maxShmemSz);
   while (rows > maxNForACall) {//managing large vectors
     cnt = count;
     px = (VALUE_TYPE *) x;
@@ -176,7 +175,7 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
 							  alpha, cM, rP,
 							  cMPitch, rPPitch,
 							  rS, rIdx, avgNnzPerRow,
-							  maxNnzPerRow, maxNForACall,
+							  maxNnzPerRow, rows,
 							  px, xPitch, beta, baseIndex);
     px += xPitch*MMBSZ;
     py += yPitch*MMBSZ;
@@ -189,7 +188,7 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
 							  alpha, cM, rP,
 							  cMPitch, rPPitch,
 							  rS, rIdx, avgNnzPerRow,
-							  maxNnzPerRow, maxNForACall,
+							  maxNnzPerRow, rows,
 							  px, xPitch, beta, baseIndex);
   }
   
