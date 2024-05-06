@@ -44,7 +44,8 @@ module psb_z_cuda_hdiag_mat_mod
     procedure, nopass  :: get_fmt       => z_cuda_hdiag_get_fmt
     !  procedure, pass(a) :: sizeof        => z_cuda_hdiag_sizeof
     procedure, pass(a) :: vect_mv       => psb_z_cuda_hdiag_vect_mv
-    ! procedure, pass(a) :: csmm          => psb_z_cuda_hdiag_csmm
+    procedure, pass(a) :: multivect_mv  => psb_z_cuda_hdiag_multivect_mv
+    procedure, pass(a) :: csmm          => psb_z_cuda_hdiag_csmm
     procedure, pass(a) :: csmv          => psb_z_cuda_hdiag_csmv
     !    procedure, pass(a) :: in_vect_sv    => psb_z_cuda_hdiag_inner_vect_sv
     !    procedure, pass(a) :: scals         => psb_z_cuda_hdiag_scals
@@ -77,6 +78,15 @@ module psb_z_cuda_hdiag_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)            :: trans
     end subroutine psb_z_cuda_hdiag_vect_mv
+		subroutine psb_z_cuda_hdiag_multivect_mv(alpha,a,x,beta,y,info,trans) 
+      import :: psb_z_cuda_hdiag_sparse_mat, psb_dpk_, psb_z_base_multivect_type, psb_ipk_
+      class(psb_z_cuda_hdiag_sparse_mat), intent(in) :: a
+			complex(psb_dpk_), intent(in)                 :: alpha, beta
+      class(psb_z_base_multivect_type), intent(inout) :: x
+      class(psb_z_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)             :: info
+      character, optional, intent(in)  :: trans
+    end subroutine psb_z_cuda_hdiag_multivect_mv
   end interface
 
 !!$  interface 
@@ -172,17 +182,17 @@ module psb_z_cuda_hdiag_mat_mod
     end subroutine psb_z_cuda_hdiag_csmv
   end interface
 
-!!$  interface 
-!!$    subroutine psb_z_cuda_hdiag_csmm(alpha,a,x,beta,y,info,trans) 
-!!$      import :: psb_z_cuda_hdiag_sparse_mat, psb_dpk_, psb_ipk_
-!!$      class(psb_z_cuda_hdiag_sparse_mat), intent(in) :: a
-!!$      complex(psb_dpk_), intent(in)              :: alpha, beta, x(:,:)
-!!$      complex(psb_dpk_), intent(inout)           :: y(:,:)
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$      character, optional, intent(in)         :: trans
-!!$    end subroutine psb_z_cuda_hdiag_csmm
-!!$  end interface
-!!$  
+  interface 
+    subroutine psb_z_cuda_hdiag_csmm(alpha,a,x,beta,y,info,trans) 
+      import :: psb_z_cuda_hdiag_sparse_mat, psb_dpk_, psb_ipk_
+      class(psb_z_cuda_hdiag_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(in)              :: alpha, beta, x(:,:)
+      complex(psb_dpk_), intent(inout)           :: y(:,:)
+      integer(psb_ipk_), intent(out)          :: info
+      character, optional, intent(in)         :: trans
+    end subroutine psb_z_cuda_hdiag_csmm
+  end interface
+  
 !!$  interface 
 !!$    subroutine psb_z_cuda_hdiag_scal(d,a,info, side) 
 !!$      import :: psb_z_cuda_hdiag_sparse_mat, psb_dpk_, psb_ipk_

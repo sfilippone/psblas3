@@ -25,7 +25,6 @@ CONCAT(GEN_SPGPU_ELL_NAME(TYPE_SYMBOL), _krn)
    const VALUE_TYPE *x, int xPitch, 
    VALUE_TYPE beta, int baseIndex)
 {
- // TODO
   VALUE_TYPE *pz,*px,*py;
   VALUE_TYPE zProd = CONCAT(zero_,VALUE_TYPE)();
   VALUE_TYPE yVal; 

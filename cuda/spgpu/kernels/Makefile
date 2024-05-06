@@ -17,8 +17,10 @@ OBJS=cabs.o  camax.o  casum.o  caxpby.o  caxy.o  cdot.o  cgath.o \
   dscal.o dscat.o dsetscal.o ell_ccsput.o ell_cspmv.o ell_dcsput.o \
   ell_dspmv.o ell_scsput.o ell_sspmv.o ell_zcsput.o ell_zspmv.o \
   ell_cspmm.o ell_dspmm.o ell_sspmm.o ell_zspmm.o \
-  hdia_cspmv.o hdia_dspmv.o hdia_sspmv.o hdia_zspmv.o hell_cspmv.o hell_dspmv.o \
-  hell_sspmv.o hell_zspmv.o hell_cspmm.o hell_dspmm.o hell_sspmm.o hell_zspmm.o \
+  hdia_cspmv.o hdia_cspmm.o hdia_dspmv.o hdia_dspmm.o \
+  hdia_sspmv.o hdia_sspmm.o hdia_zspmv.o hdia_zspmm.o \
+  hell_cspmv.o hell_dspmv.o hell_sspmv.o hell_zspmv.o \
+  hell_cspmm.o hell_dspmm.o hell_sspmm.o hell_zspmm.o \
   igath.o iscat.o isetscal.o sabs.o samax.o sasum.o \
   saxpby.o saxy.o sdot.o sgath.o snrm2.o sscal.o sscat.o ssetscal.o zabs.o zamax.o sabgdxyz.o\
   zasum.o zaxpby.o zaxy.o zdot.o zgath.o znrm2.o zscal.o zscat.o zsetscal.o zabgdxyz.o \
