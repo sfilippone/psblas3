@@ -3819,6 +3819,7 @@ contains
     integer(psb_ipk_)   :: ma, nb
     integer(psb_ipk_), allocatable :: col_inds(:), offsets(:)
     integer(psb_ipk_)   :: irw, jj, j, k, nnz, rwnz, thread_upperbound, start_idx, end_idx
+    integer(psb_ipk_) :: nth, lth,ith
 
     ma = a%get_nrows()
     nb = b%get_ncols()
@@ -3829,12 +3830,19 @@ contains
     ! dense accumulator
     ! https://sc18.supercomputing.org/proceedings/workshops/workshop_files/ws_lasalss115s2-file1.pdf
     call psb_realloc(nb, acc, info)
+    !$omp parallel shared(nth,lth)
+    !$omp single
+    nth = omp_get_num_threads()
+    lth = min(nth, ma)
+    !$omp end single
+    !$omp end parallel
 
     allocate(offsets(omp_get_max_threads()))
     !$omp parallel private(vals,col_inds,nnz,rwnz,thread_upperbound,acc,start_idx,end_idx) &
-    !$omp shared(a,b,c,offsets) 
+    !$omp num_threads(lth) shared(a,b,c,offsets) 
     thread_upperbound = 0
     start_idx = 0
+    end_idx   = 0
     !$omp do schedule(static) private(irw, jj, j)
     do irw = 1, ma
       if (start_idx == 0) then
@@ -3890,15 +3898,14 @@ contains
     !$omp end single
 
     !$omp barrier
-
-    if (omp_get_thread_num() /= 0) then
-      c%irp(start_idx) = offsets(omp_get_thread_num()) + 1
+    if ((start_idx /= 0).and.(start_idx <= end_idx) ) then 
+      if (omp_get_thread_num() /= 0) then
+        c%irp(start_idx) = offsets(omp_get_thread_num()) + 1
+      end if
+      do irw = start_idx, end_idx - 1
+        c%irp(irw + 1) = c%irp(irw + 1) + c%irp(irw)
+      end do
     end if
-
-    do irw = start_idx, end_idx - 1
-      c%irp(irw + 1) = c%irp(irw + 1) + c%irp(irw)
-    end do
-
     !$omp barrier
 
     !$omp single
@@ -3906,9 +3913,10 @@ contains
     call psb_realloc(c%irp(ma + 1), c%val, info)        
     call psb_realloc(c%irp(ma + 1), c%ja, info)
     !$omp end single
-
-    c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
-    c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
+    if ((start_idx /= 0).and.(start_idx <= end_idx) ) then 
+      c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
+      c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
+    end if
     !$omp end parallel
   end subroutine spmm_omp_gustavson
 
@@ -3944,6 +3952,7 @@ contains
     !$omp parallel private(vals,col_inds,nnz,thread_upperbound,acc,start_idx,end_idx) shared(a,b,c,offsets)
     thread_upperbound = 0
     start_idx = 0
+    end_idx   = 0 
     !$omp do schedule(static) private(irw, jj, j)
     do irw = 1, ma
       do jj = a%irp(irw), a%irp(irw + 1) - 1
@@ -4010,14 +4019,14 @@ contains
 
     !$omp barrier
 
-    if (omp_get_thread_num() /= 0) then
-      c%irp(start_idx) = offsets(omp_get_thread_num()) + 1
+    if ((start_idx /= 0).and.(start_idx <= end_idx) ) then 
+      if (omp_get_thread_num() /= 0) then
+        c%irp(start_idx) = offsets(omp_get_thread_num()) + 1
+      end if
+      do irw = start_idx, end_idx - 1
+        c%irp(irw + 1) = c%irp(irw + 1) + c%irp(irw)
+      end do
     end if
-
-    do irw = start_idx, end_idx - 1
-      c%irp(irw + 1) = c%irp(irw + 1) + c%irp(irw)
-    end do
-
     !$omp barrier
 
     !$omp single
@@ -4025,9 +4034,10 @@ contains
     call psb_realloc(c%irp(ma + 1), c%val, info)        
     call psb_realloc(c%irp(ma + 1), c%ja, info)
     !$omp end single
-
-    c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
-    c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
+    if ((start_idx /= 0).and.(start_idx <= end_idx) ) then 
+      c%val(c%irp(start_idx):c%irp(end_idx + 1) - 1) = vals(1:nnz)
+      c%ja(c%irp(start_idx):c%irp(end_idx + 1) - 1) = col_inds(1:nnz)
+    end if
     !$omp end parallel
   end subroutine spmm_omp_gustavson_1d
 
@@ -6296,7 +6306,7 @@ subroutine psb_lz_mv_csr_to_coo(a,b,info)
   if (a%is_dev())   call a%sync()
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_lz_base_sparse_mat = a%psb_lz_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())

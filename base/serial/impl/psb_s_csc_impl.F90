@@ -2171,7 +2171,7 @@ subroutine psb_s_mv_csc_to_coo(a,b,info)
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_s_base_sparse_mat = a%psb_s_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
@@ -2336,7 +2336,7 @@ subroutine psb_s_cp_csc_to_fmt(a,b,info)
     if (a%is_dev())   call a%sync()
     b%psb_s_base_sparse_mat = a%psb_s_base_sparse_mat
     nc = a%get_ncols()
-    nz = a%get_nzeros()
+    nz = max(a%get_nzeros(),ione)
     if (.false.) then 
       if (info == 0) call psb_safe_cpy( a%icp(1:nc+1), b%icp , info)
       if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
@@ -2469,7 +2469,7 @@ subroutine psb_s_cp_csc_from_fmt(a,b,info)
     if (b%is_dev())   call b%sync()
     a%psb_s_base_sparse_mat = b%psb_s_base_sparse_mat
     nc = b%get_ncols()
-    nz = b%get_nzeros()
+    nz = max(b%get_nzeros(),ione)
     if (.false.) then 
       if (info == 0) call psb_safe_cpy( b%icp(1:nc+1), a%icp , info)
       if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
@@ -4066,7 +4066,7 @@ subroutine psb_ls_mv_csc_to_coo(a,b,info)
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_ls_base_sparse_mat = a%psb_ls_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())

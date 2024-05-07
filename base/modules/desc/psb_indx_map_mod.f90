@@ -158,6 +158,7 @@ module psb_indx_map_mod
     
     procedure, pass(idxmap)  :: set_lr    => base_set_lr
     procedure, pass(idxmap)  :: set_lc    => base_set_lc
+    procedure, pass(idxmap)  :: inc_lc    => base_inc_lc
 
     procedure, pass(idxmap)  :: set_p_adjcncy   => base_set_p_adjcncy
     procedure, pass(idxmap)  :: xtnd_p_adjcncy  => base_xtnd_p_adjcncy
@@ -235,7 +236,7 @@ module psb_indx_map_mod
        & base_get_gr, base_get_gc, base_get_lr, base_get_lc, base_get_ctxt,&
        & base_get_mpic, base_sizeof, base_set_null, &
        & base_set_grl, base_set_gcl, &
-       & base_set_lr, base_set_lc, base_set_ctxt,&
+       & base_set_lr, base_set_lc, base_inc_lc, base_set_ctxt,&
        & base_set_mpic, base_get_fmt, base_asb, base_free,&
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
@@ -572,6 +573,14 @@ contains
 
     idxmap%local_cols = val
   end subroutine base_set_lc
+
+  subroutine base_inc_lc(idxmap)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    !$omp atomic
+    idxmap%local_cols = idxmap%local_cols + 1
+    !$omp end atomic
+  end subroutine base_inc_lc
 
   subroutine base_set_p_adjcncy(idxmap,val)
     use psb_realloc_mod

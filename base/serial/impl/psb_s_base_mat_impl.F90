@@ -2051,8 +2051,8 @@ subroutine psb_s_base_vect_mv(alpha,a,x,beta,y,info,trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  call x%sync()
-  call y%sync()
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
   call a%spmm(alpha,x%v,beta,y%v,info,trans)
   call y%set_host()
 end subroutine psb_s_base_vect_mv
@@ -2105,8 +2105,6 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     goto 9999
   end if
 
-  call x%sync()
-  call y%sync()
   if (present(d)) then
     call d%sync()
     if (present(scale)) then
@@ -2206,8 +2204,11 @@ subroutine psb_s_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
 
   call a%inner_spsm(alpha,x%v,beta,y%v,info,trans)
+  call y%set_host()
 
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_
