@@ -63,7 +63,7 @@ module psb_hash_map_mod
     integer(psb_lpk_) :: hashvsize, hashvmask
     integer(psb_ipk_), allocatable :: hashv(:)
     integer(psb_lpk_), allocatable :: glb_lc(:,:), loc_to_glob(:)
-    type(psb_hash_type)  :: hash
+    type(psb_hash_type)  :: hash 
 
   contains
 
