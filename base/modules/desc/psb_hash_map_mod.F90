@@ -733,10 +733,11 @@ contains
                   if (lip > 0) then
                     idx(i) = lip
                   else
-                    call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                    call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                    lip = tlip 
                     if (info >=0) then 
                       if (nxt == lip) then 
-                        call psb_ensure_size(nxt,idxmap%loc_to_glob,info,&
+                        call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
                              & pad=-1_psb_lpk_,addsz=laddsz)
                         if (info /= psb_success_) then
                           info=1
@@ -745,7 +746,8 @@ contains
                           isLoopValid = .false.
                         end if
                         idxmap%loc_to_glob(nxt)  = ip
-                        call idxmap%set_lc(max(ncol,nxt))
+                        ncol = max(ncol,nxt)
+                        call idxmap%set_lc(ncol)
                       endif
                       idx(i) = lip
                       info = psb_success_
@@ -794,10 +796,11 @@ contains
                 if (lip > 0) then
                   idx(i) = lip
                 else
-                  call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  lip = tlip
                   if (info >=0) then 
                     if (nxt == lip) then 
-                      call psb_ensure_size(nxt,idxmap%loc_to_glob,info,&
+                      call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
                            & pad=-1_psb_lpk_,addsz=laddsz)
                       if (info /= psb_success_) then
                         info=1
@@ -806,7 +809,8 @@ contains
                         isLoopValid = .false.
                       end if
                       idxmap%loc_to_glob(nxt)  = ip
-                      call idxmap%set_lc(max(ncol,nxt))
+                      ncol = max(ncol,nxt)
+                      call idxmap%set_lc(ncol)
                     endif
                     idx(i) = lip
                     info = psb_success_
@@ -852,10 +856,11 @@ contains
                 if (lip > 0) then
                   idx(i) = lip
                 else
-                  call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                  lip = tlip
                   if (info >=0) then 
                     if (nxt == lip) then 
-                      call psb_ensure_size(nxt,idxmap%loc_to_glob,info,&
+                      call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
                            & pad=-1_psb_lpk_,addsz=laddsz)
                       if (info /= psb_success_) then
                         info=1
@@ -863,8 +868,9 @@ contains
                              & a_err='psb_ensure_size',i_err=(/info/))
                         isLoopValid = .false.
                       end if
-                      idxmap%loc_to_glob(nxt)  = ip
-                      call idxmap%set_lc(nxt)
+                      ncol = nxt
+                      idxmap%loc_to_glob(ncol)  = ip
+                      call idxmap%set_lc(ncol)
                     endif
                     idx(i) = lip
                     info = psb_success_
@@ -909,10 +915,11 @@ contains
               if (lip > 0) then
                 idx(i) = lip
               else
-                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                lip = tlip
                 if (info >=0) then 
                   if (nxt == lip) then 
-                    call psb_ensure_size(nxt,idxmap%loc_to_glob,info,&
+                    call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
                          & pad=-1_psb_lpk_,addsz=laddsz)
                     if (info /= psb_success_) then
                       info=1
@@ -920,8 +927,9 @@ contains
                            & a_err='psb_ensure_size',i_err=(/info/))
                       isLoopValid = .false.
                     end if
-                    idxmap%loc_to_glob(nxt)  = ip
-                    call idxmap%set_lc(nxt)
+                    ncol = nxt
+                    idxmap%loc_to_glob(ncol)  = ip
+                    call idxmap%set_lc(ncol)
                   endif
                   idx(i) = lip
                   info = psb_success_
