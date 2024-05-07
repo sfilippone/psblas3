@@ -221,6 +221,9 @@ contains
 
     if (present(mask)) then 
 
+      !$omp parallel do default(none) schedule(dynamic) &
+      !$omp shared(mask,idx,idxmap,owned_) &
+      !$omp private(i) 
       do i=1, size(idx)
         if (mask(i)) then 
           if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
@@ -233,9 +236,12 @@ contains
           end if
         end if
       end do
-
+      !$omp end parallel do 
     else  if (.not.present(mask)) then 
 
+      !$omp parallel do default(none) schedule(dynamic) &
+      !$omp shared(idx,idxmap,owned_) &
+      !$omp private(i) 
       do i=1, size(idx)
         if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
           idx(i) = idxmap%loc_to_glob(idx(i))
@@ -246,7 +252,7 @@ contains
           idx(i) = -1
         end if
       end do
-
+      !$omp end parallel do
     end if
   end subroutine hash_l2gv1
 
