@@ -660,7 +660,7 @@ contains
     logical, intent(in), optional    :: mask(:)
     integer(psb_ipk_), intent(in), optional    :: lidx(:)
 
-    integer(psb_ipk_) :: i, is, lip, nrow, ncol, &
+    integer(psb_ipk_) :: i, is, lip, nrow, ncol, inxt,&
          & err_act
     integer(psb_lpk_) :: mglob, ip, nxt, tlip
     type(psb_ctxt_type) :: ctxt
@@ -706,7 +706,7 @@ contains
         if (present(mask)) then 
           !$omp parallel do default(none) schedule(dynamic) &
           !$omp shared(lidx,mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
+          !$omp private(i,ip,lip,tlip,nxt,inxt,info) &
           !$omp reduction(.AND.:isLoopValid)          
           do i = 1, is
             if (mask(i)) then 
@@ -746,8 +746,8 @@ contains
                           isLoopValid = .false.
                         end if
                         idxmap%loc_to_glob(nxt)  = ip
-                        ncol = max(ncol,nxt)
-                        call idxmap%set_lc(ncol)
+                        inxt = max(ncol,nxt)
+                        call idxmap%set_lc(inxt)
                       endif
                       idx(i) = lip
                       info = psb_success_
@@ -770,7 +770,7 @@ contains
 
           !$omp parallel do default(none) schedule(dynamic) &
           !$omp shared(lidx,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
+          !$omp private(i,ip,lip,tlip,nxt,inxt,info) &
           !$omp reduction(.AND.:isLoopValid)          
           do i = 1, is
             ip = idx(i) 
@@ -809,8 +809,8 @@ contains
                         isLoopValid = .false.
                       end if
                       idxmap%loc_to_glob(nxt)  = ip
-                      ncol = max(ncol,nxt)
-                      call idxmap%set_lc(ncol)
+                      inxt = max(ncol,nxt)
+                      call idxmap%set_lc(inxt)
                     endif
                     idx(i) = lip
                     info = psb_success_
@@ -832,7 +832,7 @@ contains
         if (present(mask)) then
           !$omp parallel do default(none) schedule(dynamic) &
           !$omp shared(mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
+          !$omp private(i,ip,lip,tlip,nxt,inxt,info) &
           !$omp reduction(.AND.:isLoopValid)          
           do i = 1, is
             if (mask(i)) then
@@ -868,9 +868,9 @@ contains
                              & a_err='psb_ensure_size',i_err=(/info/))
                         isLoopValid = .false.
                       end if
-                      ncol = nxt
-                      idxmap%loc_to_glob(ncol)  = ip
-                      call idxmap%set_lc(ncol)
+                      inxt = nxt
+                      idxmap%loc_to_glob(inxt)  = ip
+                      call idxmap%set_lc(inxt)
                     endif
                     idx(i) = lip
                     info = psb_success_
@@ -892,7 +892,7 @@ contains
 
           !$omp parallel do default(none) schedule(dynamic) &
           !$omp shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
+          !$omp private(i,ip,lip,tlip,nxt,inxt,info) &
           !$omp reduction(.AND.:isLoopValid)          
           do i = 1, is
             ip   = idx(i) 
@@ -927,9 +927,9 @@ contains
                            & a_err='psb_ensure_size',i_err=(/info/))
                       isLoopValid = .false.
                     end if
-                    ncol = nxt
-                    idxmap%loc_to_glob(ncol)  = ip
-                    call idxmap%set_lc(ncol)
+                    inxt = nxt
+                    idxmap%loc_to_glob(inxt)  = ip
+                    call idxmap%set_lc(inxt)
                   endif
                   idx(i) = lip
                   info = psb_success_
