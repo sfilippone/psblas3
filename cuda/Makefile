@@ -64,7 +64,7 @@ spgpulib:
 	$(MAKE) -C spgpu lib
 
 
-dnsdev_mod.o hlldev_mod.o elldev_mod.o psb_base_vectordev_mod.o: core_mod.o
+diagdev_mod.o dnsdev_mod.o hlldev_mod.o elldev_mod.o psb_base_vectordev_mod.o: core_mod.o
 psb_d_cuda_vect_mod.o psb_s_cuda_vect_mod.o psb_z_cuda_vect_mod.o psb_c_cuda_vect_mod.o: psb_i_cuda_vect_mod.o
 psb_i_cuda_vect_mod.o : psb_vectordev_mod.o psb_cuda_env_mod.o
 cusparse_mod.o:  s_cusparse_mod.o  d_cusparse_mod.o  c_cusparse_mod.o  z_cusparse_mod.o 
