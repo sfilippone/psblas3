@@ -153,12 +153,25 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: set_gci   => base_set_gci
     procedure, pass(idxmap)  :: set_grl   => base_set_grl
     procedure, pass(idxmap)  :: set_gcl   => base_set_gcl
+#if defined(IPK4) && defined(LPK8)
+    generic, public          :: set_gr => set_grl, set_gri
+    generic, public          :: set_gc => set_gcl, set_gci
+#else
     generic, public          :: set_gr => set_grl
     generic, public          :: set_gc => set_gcl
-    
-    procedure, pass(idxmap)  :: set_lr    => base_set_lr
-    procedure, pass(idxmap)  :: set_lc    => base_set_lc
+#endif
+    procedure, pass(idxmap)  :: set_lri   => base_set_lri
+    procedure, pass(idxmap)  :: set_lrl   => base_set_lrl
+    procedure, pass(idxmap)  :: set_lci   => base_set_lci
+    procedure, pass(idxmap)  :: set_lcl   => base_set_lcl
     procedure, pass(idxmap)  :: inc_lc    => base_inc_lc
+#if defined(IPK4) && defined(LPK8)
+    generic, public          :: set_lr => set_lrl, set_lri
+    generic, public          :: set_lc => set_lcl, set_lci
+#else
+    generic, public          :: set_lr => set_lri
+    generic, public          :: set_lc => set_lci
+#endif
 
     procedure, pass(idxmap)  :: set_p_adjcncy   => base_set_p_adjcncy
     procedure, pass(idxmap)  :: xtnd_p_adjcncy  => base_xtnd_p_adjcncy
@@ -236,7 +249,8 @@ module psb_indx_map_mod
        & base_get_gr, base_get_gc, base_get_lr, base_get_lc, base_get_ctxt,&
        & base_get_mpic, base_sizeof, base_set_null, &
        & base_set_grl, base_set_gcl, &
-       & base_set_lr, base_set_lc, base_inc_lc, base_set_ctxt,&
+       & base_set_lri, base_set_lci, base_set_lrl, base_set_lcl, &
+       & base_inc_lc, base_set_ctxt,&
        & base_set_mpic, base_get_fmt, base_asb, base_free,&
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
@@ -558,21 +572,39 @@ contains
     idxmap%global_cols = val
   end subroutine base_set_gcl
 
-  subroutine base_set_lr(idxmap,val)
+  subroutine base_set_lri(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  :: val
 
     idxmap%local_rows = val
-  end subroutine base_set_lr
+  end subroutine base_set_lri
 
-  subroutine base_set_lc(idxmap,val)
+  subroutine base_set_lci(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  :: val
-
+    !$omp critical
     idxmap%local_cols = val
-  end subroutine base_set_lc
+    !$omp end critical
+  end subroutine base_set_lci
+
+  subroutine base_set_lrl(idxmap,val)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)  :: val
+
+    idxmap%local_rows = val
+  end subroutine base_set_lrl
+
+  subroutine base_set_lcl(idxmap,val)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)  :: val
+    !$omp critical
+    idxmap%local_cols = val
+    !$omp end critical
+  end subroutine base_set_lcl
 
   subroutine base_inc_lc(idxmap)
     implicit none 
