@@ -124,7 +124,7 @@ subroutine psb_s_cuda_hdiag_multivect_mv(alpha,a,x,beta,y,info,trans)
 	use psb_s_cuda_hdiag_mat_mod, psb_protect_name => psb_s_cuda_hdiag_multivect_mv
 	use psb_s_cuda_multivect_mod
 	implicit none 
-	class(psb_s_cuda_hdiag_mat_mod), intent(in) :: a
+	class(psb_s_cuda_hdiag_sparse_mat), intent(in) :: a
 	real(psb_spk_), intent(in)       :: alpha, beta
 	class(psb_s_base_multivect_type), intent(inout) :: x
 	class(psb_s_base_multivect_type), intent(inout) :: y
@@ -159,7 +159,7 @@ subroutine psb_s_cuda_hdiag_multivect_mv(alpha,a,x,beta,y,info,trans)
 		if (beta /= dzero) then 
 			if (.not.y%is_host()) call y%sync()
 		end if
-		call a%psb_d_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
+		call a%psb_s_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
 		call y%set_host()
 	else
 		if (a%is_host()) call a%sync()    

@@ -17,6 +17,75 @@
 #define THREAD_BLOCK 128
 #define MMBSZ 8
 
+#if 0
+
+__global__ void
+CONCAT(GEN_SPGPU_ELL_NAME(TYPE_SYMBOL), _krn)
+  (int count, VALUE_TYPE *z, int zPitch, const VALUE_TYPE *y, int yPitch,
+   VALUE_TYPE alpha, const VALUE_TYPE* cM, const int* rP,
+   int cMPitch, int rPPitch, const int* rS, int rows,
+   const VALUE_TYPE *x, int xPitch, 
+   VALUE_TYPE beta, int baseIndex)
+{
+  VALUE_TYPE *pz,*px,*py;
+  VALUE_TYPE zProd = CONCAT(zero_,VALUE_TYPE)();
+  VALUE_TYPE yVal; 
+  __shared__ VALUE_TYPE temp[MMBSZ][THREAD_BLOCK];
+  
+  unsigned int i = threadIdx.x + blockIdx.x * blockDim.x;
+  unsigned int gridSize =  gridDim.x * blockDim.x;
+  
+  while (i < rows) {
+
+    rS += i; rP += i; cM += i;
+    
+    int rowSize = rS[i];
+    for (int k=0; k<count; k++) {
+      temp[k][threadIdx.x] = CONCAT(zero_,VALUE_TYPE)();
+    }      
+    
+    for (int j = 0; j < rowSize; j++) {
+      int pointer;
+      VALUE_TYPE value;
+      VALUE_TYPE fetch;
+      
+      pointer = rP[0] - baseIndex;
+      rP += rPPitch;
+      
+      value = cM[0];
+      cM += cMPitch;
+
+      px = (VALUE_TYPE *) x;
+      for (int k=0; k<count; k++) {
+	      fetch = px[pointer]; 
+	      temp[k][threadIdx.x] = CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
+	      px = px + xPitch;
+      }
+    }
+    // Since z and y are accessed with the same offset by the same thread,
+    // and the write to z follows the y read, y and z can share the same base address (in-place computing).
+    py = (VALUE_TYPE *) y;
+    pz = z;
+    if (CONCAT(VALUE_TYPE, _isNotZero(beta))) {
+      for (int k=0; k<count; k++) {
+        yVal = py[i];
+        pz[i] = CONCAT(VALUE_TYPE, _fma)(beta, yVal, CONCAT(VALUE_TYPE, _mul)(alpha, temp[k][threadIdx.x]));
+        py += yPitch;
+        pz += zPitch;
+      }
+    } else {
+      for (int k=0; k<count; k++) {
+        pz[i] = CONCAT(VALUE_TYPE, _mul)(alpha, temp[k][threadIdx.x]);
+        pz += zPitch;
+      }
+    }
+    
+    i += gridSize;
+  }
+}
+
+#endif
+
 __global__ void
 CONCAT(GEN_SPGPU_ELL_NAME(TYPE_SYMBOL), _krn)
   (int count, VALUE_TYPE *z, int zPitch, const VALUE_TYPE *y, int yPitch,
@@ -53,9 +122,9 @@ CONCAT(GEN_SPGPU_ELL_NAME(TYPE_SYMBOL), _krn)
 
       px = (VALUE_TYPE *) x;
       for (int k=0; k<count; k++) {
-	    fetch = px[pointer]; 
-	    temp[k][threadIdx.x] = CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
-	    px = px + xPitch;
+        fetch = px[pointer]; 
+        temp[k][threadIdx.x] = CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
+        px = px + xPitch;
       }
     }
 

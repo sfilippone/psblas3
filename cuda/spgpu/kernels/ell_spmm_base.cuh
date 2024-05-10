@@ -99,6 +99,8 @@ fetchTex (int pointer)
 #undef GEN_SPGPU_ELL_NAME
 #define GEN_SPGPU_ELL_NAME(x) CONCAT(CONCAT(spgpu,x),ellspmm)
 
+#if 0
+
 void
 GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
 (spgpuHandle_t handle,
@@ -110,12 +112,90 @@ GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
 	VALUE_TYPE alpha, 
 	const VALUE_TYPE* cM, 
 	const int* rP,
-    int cMPitch,
-    int rPPitch,
+  int cMPitch,
+  int rPPitch,
 	const __device int* rS,
 	const __device int* rIdx, 
-    int avgNnzPerRow,
-    int maxNnzPerRow,
+  int avgNnzPerRow,
+  int maxNnzPerRow,
+	int rows, 
+	const VALUE_TYPE *x,
+	int xPitch,
+	VALUE_TYPE beta,
+	int baseIndex)
+{
+  VALUE_TYPE *px,*py, *pz;
+  int cnt, c1;
+
+  dim3 block (THREAD_BLOCK, 1);
+  //  dim3 grid ((rows + THREAD_BLOCK - 1) / THREAD_BLOCK);
+  // Should we generalize the code to 1/2/4/8 threads per row?
+  // And maybe adjust THREAD_BLOCK size? 
+  int shrMemSize,maxShmemSz;
+  int numMp=getGPUMultiProcessors();
+  int maxThMp=getGPUMaxThreadsPerMP();
+  int nmblksMp=maxThMp/THREAD_BLOCK;
+  int nmblk=nmblksMp*numMp;
+  dim3 grid (nmblk);
+
+  maxShmemSz=getGPUSharedMemPerBlock();
+  shrMemSize=MMBSZ*THREAD_BLOCK*sizeof(VALUE_TYPE);
+  if (shrMemSize > maxShmemSz) {
+    fprintf(stderr,"Fatal error: SHMEM size too large %ld %ld\n",shrMemSize,maxShmemSz);
+    return;
+  }
+  cnt = count;
+  px = (VALUE_TYPE *) x;
+  py = (VALUE_TYPE *) y;
+  pz = (VALUE_TYPE *) z;	  
+  while (cnt > 2*MMBSZ) {
+    CONCAT(GEN_SPGPU_ELL_NAME_VANILLA(TYPE_SYMBOL), _krn) 
+      <<< grid, block, shrMemSize, handle->currentStream >>> (MMBSZ, pz, zPitch, py, yPitch,
+							      alpha, cM, rP, cMPitch, rPPitch,
+							      rS, rows, px, xPitch, beta, baseIndex);
+    px += xPitch*MMBSZ;
+    py += yPitch*MMBSZ;
+    pz += zPitch*MMBSZ;
+    cnt -= MMBSZ;
+  }
+  if (cnt > MMBSZ) {
+    c1 = cnt/2;
+    CONCAT(GEN_SPGPU_ELL_NAME_VANILLA(TYPE_SYMBOL), _krn) 
+      <<< grid, block, shrMemSize, handle->currentStream >>> (c1, pz, zPitch, py, yPitch,
+							      alpha, cM, rP, cMPitch, rPPitch,
+							      rS, rows, px, xPitch, beta, baseIndex);
+    cnt -= c1;
+  }
+  if (cnt > MMBSZ) {
+    fprintf(stderr,"Invalid residual count %d\n",cnt);
+  } else if (cnt > 0){
+    CONCAT(GEN_SPGPU_ELL_NAME_VANILLA(TYPE_SYMBOL), _krn) 
+      <<< grid, block, shrMemSize, handle->currentStream >>> (cnt, pz, zPitch, py, yPitch,
+							      alpha, cM, rP, cMPitch, rPPitch,
+							      rS, rows, px, xPitch, beta, baseIndex);
+  }
+  cudaCheckError("CUDA error on ell_spmm");
+}
+
+#endif
+
+void
+GEN_SPGPU_ELL_NAME(TYPE_SYMBOL)
+(spgpuHandle_t handle,
+	int count,
+	VALUE_TYPE* z,
+	int zPitch,
+	const VALUE_TYPE *y,
+	int yPitch,
+	VALUE_TYPE alpha, 
+	const VALUE_TYPE* cM, 
+	const int* rP,
+  int cMPitch,
+  int rPPitch,
+	const __device int* rS,
+	const __device int* rIdx, 
+  int avgNnzPerRow,
+  int maxNnzPerRow,
 	int rows, 
 	const VALUE_TYPE *x,
 	int xPitch,

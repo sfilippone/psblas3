@@ -71,10 +71,9 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
 
       px = (VALUE_TYPE *) x;
       for (int k=0; k<count; k++) {
-	fetch = px[pointer]; 
-	temp[k][threadIdx.x] =
-	  CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
-	px = px + xPitch;
+        fetch = px[pointer]; 
+        temp[k][threadIdx.x] = CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
+	      px = px + xPitch;
       }
     }
     // Since z and y are accessed with the same offset by the same thread,
@@ -83,16 +82,15 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
     pz = z;
     if (CONCAT(VALUE_TYPE, _isNotZero(beta))) {
       for (int k=0; k<count; k++) {
-	yVal = py[i];
-	pz[i] = CONCAT(VALUE_TYPE, _fma)(beta,
-					 yVal, CONCAT(VALUE_TYPE, _mul) (alpha,  temp[k][threadIdx.x]));
-	py += yPitch;
-	pz += zPitch;
+        yVal = py[i];
+        pz[i] = CONCAT(VALUE_TYPE, _fma)(beta, yVal, CONCAT(VALUE_TYPE, _mul)(alpha, temp[k][threadIdx.x]));
+        py += yPitch;
+        pz += zPitch;
       }
     } else {
       for (int k=0; k<count; k++) {
-	pz[i] = CONCAT(VALUE_TYPE, _mul) (alpha,  temp[k][threadIdx.x]);
-	pz += zPitch;
+        pz[i] = CONCAT(VALUE_TYPE, _mul)(alpha, temp[k][threadIdx.x]);
+        pz += zPitch;
       }
     }
     
@@ -150,10 +148,9 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
 
       px = (VALUE_TYPE *) x;
       for (int k=0; k<count; k++) {
-	fetch = px[pointer]; 
-	temp[k][threadIdx.x] =
-	  CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
-	px = px + xPitch;
+        fetch = px[pointer]; 
+        temp[k][threadIdx.x] = CONCAT(VALUE_TYPE, _fma)(value, fetch, temp[k][threadIdx.x]);
+        px = px + xPitch;
       }
     }
     // Since z and y are accessed with the same offset by the same thread,
@@ -162,15 +159,15 @@ CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn)
     pz = z;
     if (CONCAT(VALUE_TYPE, _isNotZero(beta)))
       for (int k=0; k<count; k++) {
-	yVal = py[i];
-	pz[i] = CONCAT(VALUE_TYPE, _fma)(beta, yVal, CONCAT(VALUE_TYPE, _mul) (alpha,  temp[k][threadIdx.x]));
-	py += yPitch;
-	pz += zPitch;
+        yVal = py[i];
+        pz[i] = CONCAT(VALUE_TYPE, _fma)(beta, yVal, CONCAT(VALUE_TYPE, _mul)(alpha, temp[k][threadIdx.x]));
+        py += yPitch;
+        pz += zPitch;
       }
     else
       for (int k=0; k<count; k++) {
-	pz[i] = CONCAT(VALUE_TYPE, _mul) (alpha,  temp[k][threadIdx.x]);
-	pz += zPitch;
+        pz[i] = CONCAT(VALUE_TYPE, _mul)(alpha, temp[k][threadIdx.x]);
+        pz += zPitch;
       }
   }
 }

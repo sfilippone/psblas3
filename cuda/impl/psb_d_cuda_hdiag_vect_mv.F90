@@ -124,7 +124,7 @@ subroutine psb_d_cuda_hdiag_multivect_mv(alpha,a,x,beta,y,info,trans)
     use psb_d_cuda_hdiag_mat_mod, psb_protect_name => psb_d_cuda_hdiag_multivect_mv
     use psb_d_cuda_multivect_mod
     implicit none 
-    class(psb_d_cuda_hdiag_mat_mod), intent(in) :: a
+    class(psb_d_cuda_hdiag_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)       :: alpha, beta
     class(psb_d_base_multivect_type), intent(inout) :: x
     class(psb_d_base_multivect_type), intent(inout) :: y

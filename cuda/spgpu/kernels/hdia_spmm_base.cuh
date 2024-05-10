@@ -74,27 +74,115 @@ fetchTex (int pointer)
 	return CONCAT(readValue_,VALUE_TYPE) (fetch);
 }
 #endif
-#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_vanilla)
-#define GEN_SPGPU_HDIA_NAME_VANILLA(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_vanilla)
-#include "hdia_spmv_base_template.cuh"
+#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_vanilla)
+#define GEN_SPGPU_HDIA_NAME_VANILLA(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_vanilla)
+#include "hdia_spmm_base_template.cuh"
 #if 0 
 #undef GEN_SPGPU_HDIA_NAME
-#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_prefetch)
-#define GEN_SPGPU_HDIA_NAME_PREFETCH(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_prefetch)
+#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_prefetch)
+#define GEN_SPGPU_HDIA_NAME_PREFETCH(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_prefetch)
 #undef USE_PREFETCHING
 #define USE_PREFETCHING
-#include "hdia_spmv_base_template.cuh"
+#include "hdia_spmm_base_template.cuh"
 #define ENABLE_CACHE
 #undef GEN_SPGPU_HDIA_NAME
-#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_texcache_prefetch)
-#define GEN_SPGPU_HDIA_NAME_TEX_PREFETCH(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_texcache_prefetch)
-#include "hdia_spmv_base_template.cuh"
+#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_texcache_prefetch)
+#define GEN_SPGPU_HDIA_NAME_TEX_PREFETCH(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_texcache_prefetch)
+#include "hdia_spmm_base_template.cuh"
 #undef GEN_SPGPU_HDIA_NAME
 #undef USE_PREFETCHING
-#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_texcache)
-#define GEN_SPGPU_HDIA_NAME_TEX(x) CONCAT(CONCAT(spgpu,x),hdiaspmv_texcache)
-#include "hdia_spmv_base_template.cuh"
+#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_texcache)
+#define GEN_SPGPU_HDIA_NAME_TEX(x) CONCAT(CONCAT(spgpu,x),hdiaspmm_texcache)
+#include "hdia_spmm_base_template.cuh"
 #endif
 #undef GEN_SPGPU_HDIA_NAME
-#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmv)
+#define GEN_SPGPU_HDIA_NAME(x) CONCAT(CONCAT(spgpu,x),hdiaspmm)
 
+void
+GEN_SPGPU_HDIA_NAME(TYPE_SYMBOL)
+(spgpuHandle_t handle,
+	int count,
+	VALUE_TYPE* z,
+	int zPitch,
+	const VALUE_TYPE *y,
+	int yPitch,
+	VALUE_TYPE alpha, 
+	const VALUE_TYPE* cM, 
+	const int* hdiaOffsets,
+  int hackSize,
+	const __device int* hackOffsets,
+	int rows, 
+  int cols,
+	const VALUE_TYPE *x,
+	int xPitch,
+	VALUE_TYPE beta)
+{
+  VALUE_TYPE *px,*py, *pz;
+  int cnt;
+  int maxNForACall = max(handle->maxGridSizeX, THREAD_BLOCK*handle->maxGridSizeX);
+  
+  // maxNForACall should be a multiple of hackSize
+  maxNForACall = (maxNForACall/hackSize)*hackSize;
+  int maxShmemSz;
+  maxShmemSz=getGPUSharedMemPerBlock();
+  //fprintf(stderr,"MaxSHmemSz  %d \n",maxShmemSz);
+  while (rows > maxNForACall) {//managing large vectors
+    cnt = count;
+    px = (VALUE_TYPE *) x;
+    py = (VALUE_TYPE *) y;
+    pz = (VALUE_TYPE *) z;	  
+    while (cnt > MMBSZ) {
+      //fprintf(stderr,"counts %d %d %d :  pointers: %p %p %p\n",rows,cnt,MMBSZ,px,py,pz);    
+      CONCAT(_,GEN_SPGPU_HDIA_NAME_VANILLA(TYPE_SYMBOL)) (handle, MMBSZ, pz, zPitch,
+							  py, yPitch,
+							  alpha, cM, hdiaOffsets,
+							  hackSize, hackOffsets,
+							  maxNForACall, cols,
+							  px, xPitch, beta);
+      px += xPitch*MMBSZ;
+      py += yPitch*MMBSZ;
+      pz += zPitch*MMBSZ;
+      cnt -= MMBSZ;
+    }
+    if (cnt >0) {
+      CONCAT(_,GEN_SPGPU_HDIA_NAME_VANILLA(TYPE_SYMBOL)) (handle, cnt, pz, zPitch,
+							  py, yPitch,
+							  alpha, cM, hdiaOffsets,
+							  hackSize, hackOffsets,
+							  maxNForACall, cols,
+							  px, xPitch, beta);
+    }
+
+    y = y + maxNForACall;
+    z = z + maxNForACall;
+    hackOffsets = hackOffsets + maxNForACall/hackSize;
+    rows -= maxNForACall;
+  }
+  cnt = count;
+  px = (VALUE_TYPE *) x;
+  py = (VALUE_TYPE *) y;
+  pz = (VALUE_TYPE *) z;	  
+  while (cnt > MMBSZ) {
+    //fprintf(stderr,"counts %d %d %d :  pointers: %p %p %p\n",rows,cnt,MMBSZ,px,py,pz);    
+    CONCAT(_,GEN_SPGPU_HDIA_NAME_VANILLA(TYPE_SYMBOL)) (handle, MMBSZ, pz, zPitch,
+							  py, yPitch,
+							  alpha, cM, hdiaOffsets,
+							  hackSize, hackOffsets,
+							  rows, cols,
+							  px, xPitch, beta);
+    px += xPitch*MMBSZ;
+    py += yPitch*MMBSZ;
+    pz += zPitch*MMBSZ;
+    cnt -= MMBSZ;
+  }
+  if (cnt >0) {
+    CONCAT(_,GEN_SPGPU_HDIA_NAME_VANILLA(TYPE_SYMBOL)) (handle, cnt, pz, zPitch,
+							  py, yPitch,
+							  alpha, cM, hdiaOffsets,
+							  hackSize, hackOffsets,
+							  rows, cols,
+							  px, xPitch, beta);
+  }
+  
+  cudaCheckError("CUDA error on hdiag_spmm");
+}

@@ -288,13 +288,7 @@ psb_s_cuda_hdiag_vect_mv.o \
 psb_s_cuda_dnsg_mat_impl.o \
 psb_d_cuda_dnsg_mat_impl.o \
 psb_c_cuda_dnsg_mat_impl.o \
-psb_z_cuda_dnsg_mat_impl.o \
-psb_z_cuda_hdiag_csmv.o \
-psb_z_cuda_hdiag_csmm.o \
-psb_z_cuda_hdiag_vect_mv.o \
-psb_c_cuda_hdiag_csmv.o \
-psb_c_cuda_hdiag_csmm.o \
-psb_c_cuda_hdiag_vect_mv.o
+psb_z_cuda_dnsg_mat_impl.o
 
 objs: $(OBJS)
 lib:  objs

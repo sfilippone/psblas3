@@ -106,11 +106,11 @@ extern __shared__ int dynShrMem[];
 void
 GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 (spgpuHandle_t handle,
-    int count, 
-    VALUE_TYPE* z,
-    int zPitch,
+  int count, 
+  VALUE_TYPE* z,
+  int zPitch,
 	const VALUE_TYPE *y,
-    int  yPitch,
+  int  yPitch,
 	VALUE_TYPE alpha, 
 	const VALUE_TYPE* cM, 
 	const int* rP, 
@@ -120,9 +120,9 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 	const __device int* rIdx, 
 	int rows, 
 	const VALUE_TYPE *x,
-    int xPitch,
+  int xPitch,
 	VALUE_TYPE beta, 
-    int baseIndex)
+  int baseIndex)
 {
   VALUE_TYPE *px,*py, *pz;
   int cnt, c1;
@@ -149,7 +149,7 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
   py = (VALUE_TYPE *) y;
   pz = (VALUE_TYPE *) z;	  
   while (cnt > 2*MMBSZ) {
-    CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn) 
+    CONCAT(GEN_SPGPU_HELL_NAME_VANILLA(TYPE_SYMBOL), _krn) 
       <<< grid, block, shrMemSize, handle->currentStream >>> (MMBSZ, pz, zPitch,py, yPitch,
 							      alpha, cM, rP, hackSize, hackOffsets,
 							      rS, rows, px, xPitch, beta, baseIndex);
@@ -160,7 +160,7 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
   }
   if (cnt > MMBSZ) {
     c1 = cnt/2;
-    CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn) 
+    CONCAT(GEN_SPGPU_HELL_NAME_VANILLA(TYPE_SYMBOL), _krn) 
       <<< grid, block, shrMemSize, handle->currentStream >>> (c1, pz, zPitch,py, yPitch,
 							      alpha, cM, rP, hackSize, hackOffsets,
 							      rS, rows, px, xPitch, beta, baseIndex);
@@ -169,7 +169,7 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
   if (cnt > MMBSZ) {
     fprintf(stderr,"Invalid residual count %d\n",cnt);
   } else if (cnt > 0){
-    CONCAT(GEN_SPGPU_HELL_NAME(TYPE_SYMBOL), _krn) 
+    CONCAT(GEN_SPGPU_HELL_NAME_VANILLA(TYPE_SYMBOL), _krn) 
       <<< grid, block, shrMemSize, handle->currentStream >>> (cnt, pz, zPitch,py, yPitch,
 							      alpha, cM, rP, hackSize, hackOffsets,
 							      rS, rows, px, xPitch, beta, baseIndex);
@@ -182,11 +182,11 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 void
 GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 (spgpuHandle_t handle,
-    int count, 
-    VALUE_TYPE* z,
-    int zPitch,
+  int count, 
+  VALUE_TYPE* z,
+  int zPitch,
 	const VALUE_TYPE *y,
-    int  yPitch,
+  int  yPitch,
 	VALUE_TYPE alpha, 
 	const VALUE_TYPE* cM, 
 	const int* rP, 
@@ -196,9 +196,9 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 	const __device int* rIdx, 
 	int rows, 
 	const VALUE_TYPE *x,
-    int xPitch,
+  int xPitch,
 	VALUE_TYPE beta, 
-    int baseIndex)
+  int baseIndex)
 {
   VALUE_TYPE *px,*py, *pz;
   int cnt;
@@ -269,7 +269,6 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 							rows,
 							px, xPitch, beta, baseIndex);
   }
-  
   
   cudaCheckError("CUDA error on hell_spmm");
 }

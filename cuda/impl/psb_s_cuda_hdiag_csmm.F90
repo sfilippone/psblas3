@@ -89,7 +89,7 @@ subroutine psb_s_cuda_hdiag_csmm(alpha,a,x,beta,y,info,trans)
 
   if (tra) then 
     if (a%is_dev()) call a%sync()
-    call a%psb_d_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
+    call a%psb_s_hdia_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
   else
     !
     ! Just to test, move X/Y to/from the GPU.
