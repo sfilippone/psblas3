@@ -4205,7 +4205,7 @@ subroutine psb_s_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   ! 'iaux' has to allow the threads to have an exclusive group
   ! of indices as work space. Since each thread handles one
   ! row/column at the time, we allocate this way.
-  allocate(iaux(MAX((nc+2),(nr+2))*maxthreads),stat=info)
+  allocate(iaux(MAX((nc+2),(nr+2))),stat=info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
