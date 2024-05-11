@@ -196,4 +196,35 @@ module hdiagdev_mod
 !!$    end function spmvHdiagDeviceDoubleComplex
   end interface spmvHdiagDevice
 
+  interface spmmHdiagDevice
+    function spmmHdiagDeviceFloat(deviceMat,alpha,x,beta,y) &
+         & result(res) bind(c,name='spmmHdiagDeviceFloat')
+      use iso_c_binding
+      integer(c_int)		:: res
+      type(c_ptr), value 	:: deviceMat, x, y
+      real(c_float),value     	:: alpha, beta
+    end function spmmHdiagDeviceFloat
+    function spmmHdiagDeviceDouble(deviceMat,alpha,x,beta,y) &
+         & result(res) bind(c,name='spmmHdiagDeviceDouble')
+      use iso_c_binding
+      integer(c_int)		:: res
+      type(c_ptr), value	:: deviceMat, x, y 
+      real(c_double),value     	:: alpha,  beta
+    end function spmmHdiagDeviceDouble
+!!$    function spmmHdiagDeviceFloatComplex(deviceMat,alpha,x,beta,y) &
+!!$         & result(res) bind(c,name='spmmHdiagDeviceFloatComplex')
+!!$      use iso_c_binding
+!!$      integer(c_int)		     :: res
+!!$      type(c_ptr), value	     :: deviceMat, x, y 
+!!$      complex(c_float_complex),value :: alpha,  beta
+!!$    end function spmmHdiagDeviceFloatComplex
+!!$    function spmmHdiagDeviceDoubleComplex(deviceMat,alpha,x,beta,y) &
+!!$         & result(res) bind(c,name='spmmHdiagDeviceDoubleComplex')
+!!$      use iso_c_binding
+!!$      integer(c_int)		      :: res
+!!$      type(c_ptr), value	      :: deviceMat, x, y 
+!!$      complex(c_double_complex),value :: alpha,  beta
+!!$    end function spmmHdiagDeviceDoubleComplex
+  end interface spmmHdiagDevice
+  
 end module hdiagdev_mod

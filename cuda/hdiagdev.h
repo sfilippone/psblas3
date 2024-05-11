@@ -95,12 +95,13 @@ int allocHdiagDevice(void ** remoteMatrix, HdiagDeviceParams* params);
 void freeHdiagDevice(void* remoteMatrix);
 
 int writeHdiagDeviceFloat(void* deviceMat, float* val, int* hdiaOffsets, int *hackOffsets);
-int spmvHdiagDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
-			  float beta, void* deviceY);
-
 int writeHdiagDeviceDouble(void* deviceMat, double* val, int* hdiaOffsets, int *hackOffsets);
-int spmvHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
-			  double beta, void* deviceY);
+//int writeHdiagDeviceFloatComplex(void* deviceMat, float complex* val, int* hdiaOffsets, int *hackOffsets);
+//int writeHdiagDeviceDoubleComplex(void* deviceMat, double complex* val, int* hdiaOffsets, int *hackOffsets);
 
+//int readHdiagDeviceFloat(void* deviceMat, float* val, int* hdiaOffsets, int *hackOffsets);
+//int readHdiagDeviceDouble(void* deviceMat, double* val, int* hdiaOffsets, int *hackOffsets);
+//int readHdiagDeviceFloatComplex(void* deviceMat, float complex* val, int* hdiaOffsets, int *hackOffsets);
+//int readHdiagDeviceDoubleComplex(void* deviceMat, double complex* val, int* hdiaOffsets, int *hackOffsets);
 
 #endif

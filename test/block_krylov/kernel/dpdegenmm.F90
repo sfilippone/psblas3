@@ -596,7 +596,7 @@ program pdegenmm
   ! solver parameters
   integer(psb_epk_)  :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)     :: err, eps
-  integer, parameter :: ntests=50, ngpu=50, ncnv=20
+  integer, parameter :: ntests=50, ngpu=10, ncnv=20
   type(psb_d_coo_sparse_mat), target  :: acoo
   type(psb_d_csr_sparse_mat), target  :: acsr
   type(psb_d_ell_sparse_mat), target  :: aell
@@ -613,6 +613,7 @@ program pdegenmm
   type(psb_d_cuda_hybg_sparse_mat), target  :: ahybg
 #endif
   type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
+  ! TODO HDIAG E DNSG non hanno nemmeno CSMM
   type(psb_d_cuda_hdiag_sparse_mat), target   :: ahdiag
   type(psb_d_cuda_dnsg_sparse_mat), target   :: adnsg
 #endif
@@ -658,12 +659,12 @@ program pdegenmm
   !
   !  get parameters
   !
-  !call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
-  nrhs=2
-  acfmt='CSR'
-  agfmt='CSRG'
-  idim=2
-  tnd=.false.
+  call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
+  !nrhs=8
+  !acfmt='CSR'
+  !agfmt='CSRG'
+  !idim=100
+  !tnd=.false.
   call psb_init_timers()
   !
   !  allocate and fill in the coefficient matrix and initial vectors
@@ -803,6 +804,40 @@ program pdegenmm
   x1 = b_mv%get_vect()
   x2 = b_mv_g%get_vect()
 
+!   ! TODO test AXPBY
+!   call psb_geall(xg,desc_a,info)
+!   call psb_geasb(xg,desc_a,info,mold=tmold)
+!   call xg%set(done)
+!   call xg%sync()
+!   call psb_geall(bg,desc_a,info)
+!   call psb_geasb(bg,desc_a,info,mold=tmold)
+!   !call bg%set(done+done)
+
+! !   ! TODO: Non funziona spgpuDaxpby (axpbyMultiVecDeviceDouble)
+!   call psb_geaxpby(done,xg,dzero,bg,desc_a,info)
+!   call psb_cuda_DeviceSync()
+
+!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
+!   call bg%sync()
+!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
+!   do i=1,8
+!     write(*,*) bg%v%v(i)
+!   end do
+
+!   return
+
+!   call x_mv_g%set(done)
+!   call x_mv_g%sync()
+
+!   call psb_geaxpby(done,x_mv_g,dzero,b_mv_g,desc_a,info)
+
+!   call b_mv_g%sync()
+!   do i=1,size(b_mv_g%v%v,1)
+!     write(*,*) b_mv_g%v%v(i,:)
+!   end do
+
+!   return
+
   call psb_barrier(ctxt)
   tt1 = psb_wtime()
   do i=1,ntests 
@@ -876,7 +911,7 @@ program pdegenmm
     write(psb_out_unit,'("Size of matrix:     ",i20)') nr
     write(psb_out_unit,'("Number of nonzeros: ",i20)') annz
     write(psb_out_unit,'("Memory occupation:  ",i20)') amatsize
-    flops  = ntests*(2.d0*annz)
+    flops  = ntests*(2.d0*annz)*nrhs
     tflops = flops
     gflops = flops * ngpu
     write(psb_out_unit,'("Storage type for A:    ",a)') a%get_fmt()
@@ -935,7 +970,7 @@ program pdegenmm
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (CPU)  : ",F20.3)') bdwdth
 #ifdef HAVE_CUDA
-    bdwdth = ngpu*ntests*nbytes/(gt2*1.d6)
+    bdwdth = nrhs*ngpu*ntests*nbytes/(gt2*1.d6)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
     bdwdth = psb_cuda_MemoryPeakBandwidth()
     write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth

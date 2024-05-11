@@ -37,8 +37,14 @@
 #include "cintrf.h"
 #include <complex.h>
 
+#define PSB_VECT_STOR_BY_COLS  0
+#define PSB_VECT_STOR_BY_ROWS  1
+
 struct MultiVectDevice
 {
+  // storage of 2d data
+  int storage2d_;
+  
   // number of vectors
   int count_;
 
@@ -54,17 +60,19 @@ struct MultiVectDevice
 
 typedef struct MultiVectorDeviceParams
 {			
-	// number on vectors
-	unsigned int count; //1 for a simple vector
-
-	// The resulting allocation will be pitch*s*(size of the elementType)
-	unsigned int elementType;
-	
-	// Pitch (in number of elements)
-	unsigned int pitch;
-
-	// Size of a single vector (in number of elements).
-	unsigned int size; 
+  // storage of 2d data
+  unsigned int storage2d;
+  // number on vectors
+  unsigned int count; //1 for a simple vector
+  
+  // The resulting allocation will be pitch*s*(size of the elementType)
+  unsigned int elementType;
+  
+  // Pitch (in number of elements)
+  unsigned int pitch;
+  
+  // Size of a single vector (in number of elements).
+  unsigned int size; 
 } MultiVectorDeviceParams;
 
 
@@ -76,7 +84,8 @@ int unregisterMapped(void *);
 
 MultiVectorDeviceParams getMultiVectorDeviceParams(unsigned int count,
 						   unsigned int size,  
-						   unsigned int elementType);
+						   unsigned int elementType,
+						   unsigned int storage2d);
 
 int FallocMultiVecDevice(void** deviceMultiVec, unsigned count, 
 			 unsigned int size, unsigned int elementType);
@@ -85,3 +94,4 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 int getMultiVecDeviceSize(void* deviceVec);
 int getMultiVecDeviceCount(void* deviceVec);
 int getMultiVecDevicePitch(void* deviceVec);
+int getMultiVecDeviceStorage2d(void* deviceVec);

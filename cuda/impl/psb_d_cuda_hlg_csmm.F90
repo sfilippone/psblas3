@@ -105,7 +105,7 @@ subroutine psb_d_cuda_hlg_csmm(alpha,a,x,beta,y,info,trans)
          & info = writeMultiVecDevice(gpY,y,size(y,1))
 
     if (info == 0)  &
-         & info = spmvhllDevice(a%deviceMat,alpha,gpX,beta,gpY)
+         & info = spmmhllDevice(a%deviceMat,alpha,gpX,beta,gpY)
     if (info == 0) &
          & info = readMultiVecDevice(gpY,y,size(y,1))
     if (info /= 0) goto 9999

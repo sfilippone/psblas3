@@ -375,6 +375,13 @@ int getGPUMaxRegistersPerBlock()
   return(count);
 }
 
+int getGPUSharedMemPerBlock()
+{ int count=0;
+  if (prop!=NULL) 
+    count = prop->sharedMemPerBlock;
+  return(count);
+}
+
 void cpyGPUNameString(char *cstring)
 {
   *cstring='\0';

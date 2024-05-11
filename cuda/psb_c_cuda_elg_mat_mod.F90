@@ -56,6 +56,7 @@ module psb_c_cuda_elg_mat_mod
     procedure, nopass  :: get_fmt       => c_cuda_elg_get_fmt
     procedure, pass(a) :: sizeof        => c_cuda_elg_sizeof
     procedure, pass(a) :: vect_mv       => psb_c_cuda_elg_vect_mv
+    procedure, pass(a) :: multivect_mv  => psb_c_cuda_elg_multivect_mv
     procedure, pass(a) :: csmm          => psb_c_cuda_elg_csmm
     procedure, pass(a) :: csmv          => psb_c_cuda_elg_csmv
     procedure, pass(a) :: in_vect_sv    => psb_c_cuda_elg_inner_vect_sv
@@ -101,6 +102,15 @@ module psb_c_cuda_elg_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)  :: trans
     end subroutine psb_c_cuda_elg_vect_mv
+    subroutine psb_c_cuda_elg_multivect_mv(alpha,a,x,beta,y,info,trans) 
+      import :: psb_c_cuda_elg_sparse_mat, psb_spk_, psb_c_base_multivect_type, psb_ipk_
+      class(psb_c_cuda_elg_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(in)       :: alpha, beta
+      class(psb_c_base_multivect_type), intent(inout) :: x
+      class(psb_c_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)             :: info
+      character, optional, intent(in)  :: trans
+    end subroutine psb_c_cuda_elg_multivect_mv
   end interface
 
   interface 

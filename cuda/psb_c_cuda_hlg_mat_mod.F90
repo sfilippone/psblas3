@@ -55,6 +55,7 @@ module psb_c_cuda_hlg_mat_mod
   contains
     procedure, nopass  :: get_fmt       => c_cuda_hlg_get_fmt
     procedure, pass(a) :: sizeof        => c_cuda_hlg_sizeof
+    procedure, pass(a) :: multivect_mv  => psb_c_cuda_hlg_multivect_mv
     procedure, pass(a) :: vect_mv       => psb_c_cuda_hlg_vect_mv
     procedure, pass(a) :: csmm          => psb_c_cuda_hlg_csmm
     procedure, pass(a) :: csmv          => psb_c_cuda_hlg_csmv
@@ -97,6 +98,15 @@ module psb_c_cuda_hlg_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)            :: trans
     end subroutine psb_c_cuda_hlg_vect_mv
+    subroutine psb_c_cuda_hlg_multivect_mv(alpha,a,x,beta,y,info,trans) 
+      import :: psb_c_cuda_hlg_sparse_mat, psb_spk_, psb_c_base_multivect_type, psb_ipk_
+      class(psb_c_cuda_hlg_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(in)       :: alpha, beta
+      class(psb_c_base_multivect_type), intent(inout) :: x
+      class(psb_c_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)             :: info
+      character, optional, intent(in)  :: trans
+    end subroutine psb_c_cuda_hlg_multivect_mv
   end interface
 
   interface 

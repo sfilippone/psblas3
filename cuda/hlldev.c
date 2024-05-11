@@ -156,7 +156,9 @@ int FallocHllDevice(void** deviceMat,unsigned int hksize, unsigned int rows,  un
   return(i);
 }
 
-
+//
+// Single Precision Float
+//
 int spmvHllDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
 			float beta, void* deviceY)
 {
@@ -170,101 +172,170 @@ int spmvHllDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  /*dspmdmm_gpu ((double *)z->v_, y->count_, y->pitch_, (double *)y->v_, alpha, (double *)devMat->cM, 
-	       devMat->rP, devMat->rS, devMat->rows, devMat->pitch, (double *)x->v_, beta,
-	       devMat->baseIndex);*/
-
-  spgpuShellspmv (handle, (float *)y->v_, (float *)y->v_, alpha, (float *)devMat->cM, 
-		  devMat->rP,devMat->hackSize,devMat->hackOffs, devMat->rS, NULL,
+  spgpuShellspmv (handle, (float *)y->v_, (float *)y->v_, alpha,
+          (float *)devMat->cM, devMat->rP,
+          devMat->hackSize, devMat->hackOffs, devMat->rS, NULL,
 		  devMat->avgNzr, devMat->rows, (float *)x->v_, beta, devMat->baseIndex);
 
   return SPGPU_SUCCESS;
 }
 
-void
-dspmdmmhll_gpu (double *z, int s, int vPitch, double *y, double alpha, double* cM, int* rP,
-	     int* rS, int hackSize, int* hackOffs, int avgNnzPerRow, int rows, double *x, double beta, int firstIndex)
+int spmmHllDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
+			float beta, void* deviceY)
 {
-  int i=0;
+  HllDevice *devMat = (HllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
-  for (i=0; i<s; i++)
-    {
-      spgpuDhellspmv (handle, (double*) z, (double*)y, alpha, (double*) cM, rP,
-		       hackSize, hackOffs, rS, NULL,
-               avgNnzPerRow, rows, (double*)x, beta, firstIndex);
-      z += vPitch;
-      y += vPitch;
-      x += vPitch;		
-    }
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuShellspmm(handle, y->count_, (float *)y->v_, y->pitch_,
+          (float*)y->v_, y->pitch_, alpha, (float*)devMat->cM,
+          devMat->rP, devMat->hackSize, devMat->hackOffs,
+          devMat->rS, NULL, devMat->rows, (float*)x->v_,
+          x->pitch_, beta, devMat->baseIndex);
+
+  return SPGPU_SUCCESS;
 }
 
-//new
+//
+// Double Precision
+//
 int spmvHllDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
 		       double beta, void* deviceY)
 {
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
 
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  dspmdmmhll_gpu ((double *)y->v_, y->count_, y->pitch_, (double *)y->v_,
-           alpha, (double *)devMat->cM, 
-	       devMat->rP, devMat->rS, devMat->hackSize, devMat->hackOffs,
-           devMat->avgNzr, devMat->rows,
-           (double *)x->v_, beta, devMat->baseIndex);
+  spgpuDhellspmv (handle, (double *)y->v_, (double *)y->v_, alpha,
+		  (double *)devMat->cM, devMat->rP,
+		  devMat->hackSize, devMat->hackOffs, devMat->rS, NULL,
+		  devMat->avgNzr, devMat->rows, (double *)x->v_, beta, devMat->baseIndex);
 
   return SPGPU_SUCCESS;
 }
 
-int spmvHllDeviceFloatComplex(void *deviceMat, float complex alpha, void* deviceX, 
-		       float complex beta, void* deviceY)
+int spmmHllDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
+		       double beta, void* deviceY)
 {
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-  cuFloatComplex a = make_cuFloatComplex(crealf(alpha),cimagf(alpha));
-  cuFloatComplex b = make_cuFloatComplex(crealf(beta),cimagf(beta));
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
-  /*dspmdmm_gpu ((double *)z->v_, y->count_, y->pitch_, (double *)y->v_, alpha, (double *)devMat->cM, 
-	       devMat->rP, devMat->rS, devMat->rows, devMat->pitch, (double *)x->v_, beta,
-	       devMat->baseIndex);*/
+  spgpuDhellspmm(handle, y->count_, (double *)y->v_, y->pitch_,
+          (double *)y->v_, y->pitch_, alpha, (double *)devMat->cM,
+          devMat->rP, devMat->hackSize, devMat->hackOffs,
+          devMat->rS, NULL, devMat->rows, (double *)x->v_,
+          x->pitch_, beta, devMat->baseIndex);
 
-  spgpuChellspmv (handle, (cuFloatComplex *)y->v_, (cuFloatComplex *)y->v_, a, (cuFloatComplex *)devMat->cM, 
-		  devMat->rP,devMat->hackSize,devMat->hackOffs, devMat->rS, NULL,
-		  devMat->avgNzr, devMat->rows, (cuFloatComplex *)x->v_, b, devMat->baseIndex);
-  
   return SPGPU_SUCCESS;
 }
 
-int spmvHllDeviceDoubleComplex(void *deviceMat, double complex alpha, void* deviceX, 
-		       double complex beta, void* deviceY)
+//
+// Single Precision Float Complex
+//
+int spmvHllDeviceFloatComplex(void *deviceMat, cuFloatComplex alpha, void* deviceX, 
+			cuFloatComplex beta, void* deviceY)
 {
   HllDevice *devMat = (HllDevice *) deviceMat;
   struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
   struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-  cuDoubleComplex a = make_cuDoubleComplex(creal(alpha),cimag(alpha));
-  cuDoubleComplex b = make_cuDoubleComplex(creal(beta),cimag(beta));
 #ifdef VERBOSE
   /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
   /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
   /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
 #endif
+  spgpuChellspmv (handle, (cuFloatComplex *)y->v_, (cuFloatComplex *)y->v_, alpha,
+          (cuFloatComplex *)devMat->cM, devMat->rP,
+          devMat->hackSize, devMat->hackOffs, devMat->rS, NULL,
+		  devMat->avgNzr, devMat->rows, (cuFloatComplex *)x->v_, beta, devMat->baseIndex);
 
-  spgpuZhellspmv (handle, (cuDoubleComplex *)y->v_, (cuDoubleComplex *)y->v_, a, (cuDoubleComplex *)devMat->cM, 
-		  devMat->rP,devMat->hackSize,devMat->hackOffs, devMat->rS, NULL,
-		  devMat->avgNzr,devMat->rows, (cuDoubleComplex *)x->v_, b, devMat->baseIndex);
+  return SPGPU_SUCCESS;
+}
+
+int spmmHllDeviceFloatComplex(void *deviceMat, cuFloatComplex alpha, void* deviceX, 
+			cuFloatComplex beta, void* deviceY)
+{
+  HllDevice *devMat = (HllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuChellspmm(handle, y->count_, (cuFloatComplex *)y->v_, y->pitch_,
+          (cuFloatComplex*)y->v_, y->pitch_, alpha, (cuFloatComplex*)devMat->cM,
+          devMat->rP, devMat->hackSize, devMat->hackOffs,
+          devMat->rS, NULL, devMat->rows, (cuFloatComplex*)x->v_,
+          x->pitch_, beta, devMat->baseIndex);
+
+  return SPGPU_SUCCESS;
+}
+
+//
+// Double Precision Complex
+//
+int spmvHllDeviceDoubleComplex(void *deviceMat, cuDoubleComplex alpha, void* deviceX, 
+			cuDoubleComplex beta, void* deviceY)
+{
+  HllDevice *devMat = (HllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuZhellspmv (handle, (cuDoubleComplex *)y->v_, (cuDoubleComplex *)y->v_, alpha,
+          (cuDoubleComplex *)devMat->cM, devMat->rP,
+          devMat->hackSize, devMat->hackOffs, devMat->rS, NULL,
+		  devMat->avgNzr, devMat->rows, (cuDoubleComplex *)x->v_, beta, devMat->baseIndex);
+
+  return SPGPU_SUCCESS;
+}
+
+int spmmHllDeviceDoubleComplex(void *deviceMat, cuDoubleComplex alpha, void* deviceX, 
+			cuDoubleComplex beta, void* deviceY)
+{
+  HllDevice *devMat = (HllDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuZhellspmm(handle, y->count_, (cuDoubleComplex *)y->v_, y->pitch_,
+          (cuDoubleComplex*)y->v_, y->pitch_, alpha, (cuDoubleComplex*)devMat->cM,
+          devMat->rP, devMat->hackSize, devMat->hackOffs,
+          devMat->rS, NULL, devMat->rows, (cuDoubleComplex*)x->v_,
+          x->pitch_, beta, devMat->baseIndex);
 
   return SPGPU_SUCCESS;
 }

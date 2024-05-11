@@ -275,19 +275,20 @@ psb_d_cuda_cp_hdiag_from_coo.o \
 psb_d_cuda_mv_hdiag_from_coo.o \
 psb_d_cuda_hdiag_to_gpu.o \
 psb_d_cuda_hdiag_csmv.o \
+psb_d_cuda_hdiag_csmm.o \
 psb_d_cuda_hdiag_mold.o \
 psb_d_cuda_hdiag_vect_mv.o \
 psb_s_cuda_cp_hdiag_from_coo.o \
 psb_s_cuda_mv_hdiag_from_coo.o \
 psb_s_cuda_hdiag_to_gpu.o \
 psb_s_cuda_hdiag_csmv.o \
+psb_s_cuda_hdiag_csmm.o \
 psb_s_cuda_hdiag_mold.o \
 psb_s_cuda_hdiag_vect_mv.o \
 psb_s_cuda_dnsg_mat_impl.o \
 psb_d_cuda_dnsg_mat_impl.o \
 psb_c_cuda_dnsg_mat_impl.o \
-psb_z_cuda_dnsg_mat_impl.o 
-
+psb_z_cuda_dnsg_mat_impl.o
 
 objs: $(OBJS)
 lib:  objs

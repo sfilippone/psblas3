@@ -16,11 +16,14 @@
 
 #include "cudadebug.h"
 #include "cudalang.h"
-
+#include <stdio.h>
 extern "C"
 {
 #include "core.h"
 #include "hell.h"
+  int getGPUSharedMemPerBlock();
+  int getGPUMultiProcessors();
+  int getGPUMaxThreadsPerMP();
 }
 
 #include "debug.h"
@@ -29,4 +32,3 @@ extern "C"
 #define TYPE_SYMBOL D
 #define TEX_FETCH_TYPE int2
 #include "hell_spmv_base.cuh"
-

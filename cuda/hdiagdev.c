@@ -267,6 +267,27 @@ int spmvHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX,
   return SPGPU_SUCCESS;
 }
 
+int spmmHdiagDeviceDouble(void *deviceMat, double alpha, void* deviceX, 
+			  double beta, void* deviceY)
+{
+  struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuDhdiaspmm (handle, y->count_, (double*)y->v_, y->pitch_,
+      (double *)y->v_, y->pitch_, alpha, (double *)devMat->cM,
+      devMat->hdiaOffsets, devMat->hackSize, devMat->hackOffsets, 
+      devMat->rows, devMat->cols, (double *)x->v_, x->pitch_, beta);
+
+  return SPGPU_SUCCESS;
+}
+
 int writeHdiagDeviceFloat(void* deviceMat, float* val, int* hdiaOffsets, int *hackOffsets)
 { int i=0,fo,fa,j,k,p;
   char buf_a[255], buf_o[255],tmp[255];
@@ -384,3 +405,23 @@ int spmvHdiagDeviceFloat(void *deviceMat, float alpha, void* deviceX,
   return SPGPU_SUCCESS;
 }
 
+int spmmHdiagDeviceFloat(void *deviceMat, float alpha, void* deviceX, 
+			  float beta, void* deviceY)
+{
+  struct HdiagDevice *devMat = (struct HdiagDevice *) deviceMat;
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+#ifdef VERBOSE
+  /*__assert(x->count_ == x->count_, "ERROR: x and y don't share the same number of vectors");*/
+  /*__assert(x->size_ >= devMat->columns, "ERROR: x vector's size is not >= to matrix size (columns)");*/
+  /*__assert(y->size_ >= devMat->rows, "ERROR: y vector's size is not >= to matrix size (rows)");*/
+#endif
+  spgpuShdiaspmm (handle, y->count_, (float*)y->v_, y->pitch_,
+      (float *)y->v_, y->pitch_, alpha, (float *)devMat->cM,
+      devMat->hdiaOffsets, devMat->hackSize, devMat->hackOffsets, 
+      devMat->rows, devMat->cols, (float *)x->v_, x->pitch_, beta);
+
+  return SPGPU_SUCCESS;
+}

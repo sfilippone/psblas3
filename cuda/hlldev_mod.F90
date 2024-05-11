@@ -265,4 +265,40 @@ module hlldev_mod
 
   end interface
 
+interface spmmHllDevice
+
+  function spmmHllDeviceFloat(deviceMat,alpha,x,beta,y) &
+       & result(res) bind(c,name='spmmHllDeviceFloat')
+    use iso_c_binding
+    integer(c_int)		:: res
+    type(c_ptr), value	:: deviceMat, x, y 
+    real(c_float),value     	:: alpha, beta
+  end function spmmHllDeviceFloat
+
+  function spmmHllDeviceDouble(deviceMat,alpha,x,beta,y) &
+       & result(res) bind(c,name='spmmHllDeviceDouble')
+    use iso_c_binding
+    integer(c_int)		:: res
+    type(c_ptr), value	:: deviceMat, x, y 
+    real(c_double),value     	:: alpha,  beta
+  end function spmmHllDeviceDouble
+
+  function spmmHllDeviceFloatComplex(deviceMat,alpha,x,beta,y) &
+       & result(res) bind(c,name='spmmHllDeviceFloatComplex')
+    use iso_c_binding
+    integer(c_int)		:: res
+    type(c_ptr), value	:: deviceMat, x, y 
+    complex(c_float_complex),value :: alpha,  beta
+  end function spmmHllDeviceFloatComplex
+
+  function spmmHllDeviceDoubleComplex(deviceMat,alpha,x,beta,y) &
+       & result(res) bind(c,name='spmmHllDeviceDoubleComplex')
+    use iso_c_binding
+    integer(c_int)		:: res
+    type(c_ptr), value	:: deviceMat, x, y 
+    complex(c_double_complex),value :: alpha,  beta
+  end function spmmHllDeviceDoubleComplex
+
+end interface
+
 end module hlldev_mod

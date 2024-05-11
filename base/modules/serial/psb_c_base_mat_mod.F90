@@ -35,6 +35,7 @@ module psb_c_base_mat_mod
 
   use psb_base_mat_mod
   use psb_c_base_vect_mod
+  use psb_c_base_multivect_mod
 
 
   !> \namespace  psb_base_mod  \class  psb_c_base_sparse_mat
@@ -103,33 +104,34 @@ module psb_c_base_mat_mod
     !
     ! Computational methods: defined here but not implemented.
     !
-    procedure, pass(a) :: vect_mv     => psb_c_base_vect_mv
-    procedure, pass(a) :: csmv        => psb_c_base_csmv
-    procedure, pass(a) :: csmm        => psb_c_base_csmm
-    generic, public    :: spmm        => csmm, csmv, vect_mv
-    procedure, pass(a) :: in_vect_sv  => psb_c_base_inner_vect_sv
-    procedure, pass(a) :: inner_cssv  => psb_c_base_inner_cssv
-    procedure, pass(a) :: inner_cssm  => psb_c_base_inner_cssm
-    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv
-    procedure, pass(a) :: vect_cssv   => psb_c_base_vect_cssv
-    procedure, pass(a) :: cssv        => psb_c_base_cssv
-    procedure, pass(a) :: cssm        => psb_c_base_cssm
-    generic, public    :: spsm        => cssm, cssv, vect_cssv
-    procedure, pass(a) :: scals       => psb_c_base_scals
-    procedure, pass(a) :: scalv       => psb_c_base_scal
-    generic, public    :: scal        => scals, scalv
-    procedure, pass(a) :: maxval      => psb_c_base_maxval
-    procedure, pass(a) :: spnmi       => psb_c_base_csnmi
-    procedure, pass(a) :: spnm1       => psb_c_base_csnm1
-    procedure, pass(a) :: rowsum      => psb_c_base_rowsum
-    procedure, pass(a) :: arwsum      => psb_c_base_arwsum
-    procedure, pass(a) :: colsum      => psb_c_base_colsum
-    procedure, pass(a) :: aclsum      => psb_c_base_aclsum
-    procedure, pass(a) :: scalpid     => psb_c_base_scalplusidentity
-    procedure, pass(a) :: spaxpby     => psb_c_base_spaxpby
-    procedure, pass(a) :: cmpval      => psb_c_base_cmpval
-    procedure, pass(a) :: cmpmat      => psb_c_base_cmpmat
-    generic, public    :: spcmp       => cmpval, cmpmat
+    procedure, pass(a) :: vect_mv      => psb_c_base_vect_mv
+    procedure, pass(a) :: multivect_mv => psb_c_base_multivect_mv
+    procedure, pass(a) :: csmv         => psb_c_base_csmv
+    procedure, pass(a) :: csmm         => psb_c_base_csmm
+    generic, public    :: spmm         => csmm, csmv, vect_mv, multivect_mv
+    procedure, pass(a) :: in_vect_sv   => psb_c_base_inner_vect_sv
+    procedure, pass(a) :: inner_cssv   => psb_c_base_inner_cssv
+    procedure, pass(a) :: inner_cssm   => psb_c_base_inner_cssm
+    generic, public    :: inner_spsm   => inner_cssm, inner_cssv, in_vect_sv
+    procedure, pass(a) :: vect_cssv    => psb_c_base_vect_cssv
+    procedure, pass(a) :: cssv         => psb_c_base_cssv
+    procedure, pass(a) :: cssm         => psb_c_base_cssm
+    generic, public    :: spsm         => cssm, cssv, vect_cssv
+    procedure, pass(a) :: scals        => psb_c_base_scals
+    procedure, pass(a) :: scalv        => psb_c_base_scal
+    generic, public    :: scal         => scals, scalv
+    procedure, pass(a) :: maxval       => psb_c_base_maxval
+    procedure, pass(a) :: spnmi        => psb_c_base_csnmi
+    procedure, pass(a) :: spnm1        => psb_c_base_csnm1
+    procedure, pass(a) :: rowsum       => psb_c_base_rowsum
+    procedure, pass(a) :: arwsum       => psb_c_base_arwsum
+    procedure, pass(a) :: colsum       => psb_c_base_colsum
+    procedure, pass(a) :: aclsum       => psb_c_base_aclsum
+    procedure, pass(a) :: scalpid      => psb_c_base_scalplusidentity
+    procedure, pass(a) :: spaxpby      => psb_c_base_spaxpby
+    procedure, pass(a) :: cmpval       => psb_c_base_cmpval
+    procedure, pass(a) :: cmpmat       => psb_c_base_cmpmat
+    generic, public    :: spcmp        => cmpval, cmpmat
   end type psb_c_base_sparse_mat
 
   private :: c_base_mat_sync, c_base_mat_is_host, c_base_mat_is_dev, &
@@ -1237,6 +1239,42 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)  :: trans
     end subroutine psb_c_base_vect_mv
+  end interface
+
+  !> Function  multivect_mv:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Product by an encapsulated array type(psb_c_multivect_type)
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A)*X + beta*Y
+  !!        Usually the unwrapping of the encapsulated multivector is done
+  !!        here, so that all the derived classes need only the
+  !!        versions with the standard arrays.
+  !!        Must be overridden explicitly in case of non standard memory
+  !!        management; an example would be external memory allocation
+  !!        in attached processors such as GPUs.
+  !!
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x      the input X
+  !! \param beta   Scaling factor for y
+  !! \param y      the input/output  Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !!
+  !
+  interface
+    subroutine psb_c_base_multivect_mv(alpha,a,x,beta,y,info,trans)
+      import
+      class(psb_c_base_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(in)       :: alpha, beta
+      class(psb_c_base_multivect_type), intent(inout) :: x
+      class(psb_c_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(out)             :: info
+      character, optional, intent(in)  :: trans
+    end subroutine psb_c_base_multivect_mv
   end interface
 
   !

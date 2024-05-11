@@ -970,7 +970,7 @@ AC_MSG_NOTICE([
    	CCOPT                 : ${CCOPT}
 
 	CUDA 		      : ${HAVE_CUDA}
-	CUDA_CC               : ${CUDA_CC}
+	CUDA_CC               : ${pac_cv_cudacc}
 
 	BLAS                  : ${BLAS_LIBS}
 
