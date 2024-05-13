@@ -124,15 +124,15 @@ subroutine psb_c_cuda_hlg_multivect_mv(alpha,a,x,beta,y,info,trans)
   use hlldev_mod
   use psb_vectordev_mod
   use psb_c_cuda_hlg_mat_mod, psb_protect_name => psb_c_cuda_hlg_multivect_mv
-  use psb_c_cuda_vect_mod
+  use psb_c_cuda_multivect_mod
   implicit none 
   class(psb_c_cuda_hlg_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(in)       :: alpha, beta
-  class(psb_c_base_vect_type), intent(inout) :: x
-  class(psb_c_base_vect_type), intent(inout) :: y
+  class(psb_c_base_multivect_type), intent(inout) :: x
+  class(psb_c_base_multivect_type), intent(inout) :: y
   integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
-  complex(psb_spk_), allocatable      :: rx(:), ry(:)
+  complex(psb_spk_), allocatable   :: rx(:,:), ry(:,:)
   logical           :: tra
   character         :: trans_
   Integer(Psb_ipk_) :: err_act
@@ -165,9 +165,9 @@ subroutine psb_c_cuda_hlg_multivect_mv(alpha,a,x,beta,y,info,trans)
   else
     if (a%is_host()) call a%sync()    
     select type (xx => x) 
-    type is (psb_c_vect_cuda)
+    type is (psb_c_multivect_cuda)
       select type(yy => y) 
-      type is (psb_c_vect_cuda)
+      type is (psb_c_multivect_cuda)
         if (xx%is_host()) call xx%sync()
         if (beta /= dzero) then 
           if (yy%is_host()) call yy%sync()
