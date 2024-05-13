@@ -160,7 +160,7 @@ subroutine psb_s_cuda_hlg_multivect_mv(alpha,a,x,beta,y,info,trans)
       if (.not.y%is_host()) call y%sync()
     end if
     if (a%is_dev()) call a%sync()    
-    call a%psb_d_hll_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
+    call a%psb_s_hll_sparse_mat%spmm(alpha,x,beta,y,info,trans) 
     call y%set_host()
   else
     if (a%is_host()) call a%sync()    
