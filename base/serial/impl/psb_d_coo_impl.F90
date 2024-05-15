@@ -4174,7 +4174,6 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 #if defined(OPENMP)
   integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
-  integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
 #endif
 
   info  = psb_success_
@@ -4205,7 +4204,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   ! 'iaux' has to allow the threads to have an exclusive group
   ! of indices as work space. Since each thread handles one
   ! row/column at the time, we allocate this way.
-  allocate(iaux(MAX((nc+2),(nr+2))*maxthreads),stat=info)
+  allocate(iaux(MAX((nc+2),(nr+2))),stat=info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
@@ -4268,7 +4267,7 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   !locals
   integer(psb_ipk_), allocatable :: ias(:),jas(:), ix2(:)
   real(psb_dpk_),  allocatable :: vs(:)
-  integer(psb_ipk_) :: nza, nzl,iret
+  integer(psb_ipk_) :: nza, nzl,iret, maxnr
   integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii, i1, i2
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
@@ -4277,7 +4276,7 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 #if defined(OPENMP)
   integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
-  integer(psb_ipk_), allocatable :: sum(:),kaux(:),idxaux(:)
+  integer(psb_ipk_), allocatable :: kaux(:),idxaux(:)
 #endif
 
   info  = psb_success_
@@ -4301,11 +4300,14 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     use_buffers = .false.
   end if
 
-  if (use_buffers) then
-    iaux(:) = 0
+  !if (use_buffers) then
 #if defined(OPENMP)
+    !$omp workshare
+    iaux(:) = 0
+    !$omp end workshare
+    maxnr = 0   
     !$OMP PARALLEL DO default(none) schedule(STATIC) &
-    !$OMP shared(nzin,ia,nr,iaux) &
+    !$OMP shared(nzin,ia,nr,iaux,maxnr) &
     !$OMP private(i) &
     !$OMP reduction(.and.:use_buffers)
     do i=1,nzin
@@ -4319,7 +4321,16 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
       end if
     end do
     !$OMP END PARALLEL DO
+    maxnr = 0
+    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP private(i) shared(nr,iaux)&
+    !$OMP reduction(max:maxnr)
+    do i=1,nr
+      maxnr = max(maxnr,iaux(i))
+    end do
+    !$OMP END PARALLEL DO
 #else
+    iaux(:) = 0
     !srt_inp = .true.
     do i=1,nzin
       if ((ia(i) < 1).or.(ia(i) > nr)) then
@@ -4333,8 +4344,12 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
       !srt_inp = srt_inp .and.(ia(i-1)<=ia(i))
     end do
+    maxnr = 0
+    do i=1,nr
+      maxnr = max(maxnr,iaux(i))
+    end do
 #endif
-  end if
+  !end if
 
   ! Check again use_buffers. We enter here if nzin >= nr and
   ! all the indices are valid
@@ -4342,22 +4357,21 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   if (use_buffers) then
 #if defined(OPENMP)
     maxthreads = omp_get_max_threads()
-    allocate(kaux(nr+1),idxaux(MAX((nc+2)*maxthreads,nr)),sum(maxthreads+1),stat=info)
+    allocate(kaux(nr+1),idxaux(MAX(nc+2,nr+2)),stat=info)
     if (info /= psb_success_) then
       info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     end if
 
+    !$omp workshare
     kaux(:) = 0
-    sum(:) = 0
-    sum(1) = 1
+    !$omp end workshare
     err = 0
-
     ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
     ! index for each row. We do the same on 'kaux'
     !$OMP PARALLEL default(none) &
-    !$OMP shared(t0,t1,idxaux,ia,ja,val,ias,jas,vs,nthreads,sum,nr,nc,nzin,iaux,kaux,dupl,err) &
+    !$OMP shared(maxnr,idxaux,ia,ja,val,ias,jas,vs,nthreads,nr,nc,nzin,iaux,kaux,dupl,err) &
     !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
     !$OMP first_elem,last_elem,nzl,iret,act_row,i1,i2) reduction(max: info)
 
@@ -4382,60 +4396,67 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     !write(0,*) 'fix_coo_inner: trying with exscan'      
     call psi_exscan(nr+1,iaux,info,shift=ione)
     !$OMP BARRIER
-    !$OMP SINGLE
-    !t0 = omp_get_wtime()
-    !$OMP END SINGLE
-    
+
+
     ! ------------------ Sorting and buffers -------------------
 
     ! Let's use an auxiliary buffer, 'idxaux', to get indices leaving
     ! unmodified 'iaux'
-    do j=idxstart,idxend
+
+    !$omp do private(j) 
+    do j=1,nr+1
       idxaux(j) = iaux(j)
     end do
+    !$omp end do
+
     ! Here we sort data inside the auxiliary buffers
+    !$omp do private(act_row,i,i1) 
     do i=1,nzin
       act_row = ia(i)
-      if ((act_row >= idxstart) .and. (act_row <= idxend)) then
-        ias(idxaux(act_row)) = ia(i)
-        jas(idxaux(act_row)) = ja(i)
-        vs(idxaux(act_row))  = val(i)
-        idxaux(act_row) = idxaux(act_row) + 1
-      end if
+      !$omp atomic capture
+      i1 =idxaux(act_row)
+      idxaux(act_row) = idxaux(act_row) + 1
+      !$omp end atomic
+      ias(i1) = ia(i)
+      jas(i1) = ja(i)
+      vs(i1)  = val(i)
     end do
+    !$omp end do
 
-    !$OMP BARRIER
-    !$OMP SINGLE
-    !t1 = omp_get_wtime()
-    !write(0,*) ithread,'Srt&Cpy :',t1-t0
-    !$OMP END SINGLE
     ! Let's sort column indices and values. After that we will store
     ! the number of unique values in 'kaux'
-    do j=idxstart,idxend
-      first_elem = iaux(j)
-      last_elem = iaux(j+1) - 1
-      nzl = last_elem - first_elem + 1
+    block
+      integer(psb_ipk_), allocatable :: ixt(:)
+      allocate(ixt(2*maxnr+2))
+      !$omp do private(j,first_elem,last_elem,nzl,iret) schedule(dynamic,256)
+      do j=1,nr
+        first_elem = iaux(j)
+        last_elem = iaux(j+1) - 1
+        nzl = last_elem - first_elem + 1
 
-      ! The row has elements?
-      if (nzl > 0) then
-        call psi_msort_up(nzl,jas(first_elem:last_elem), &
-             & idxaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2),iret)
-        if (iret == 0) then
-          call psb_ip_reord(nzl,vs(first_elem:last_elem),&
-               & ias(first_elem:last_elem),jas(first_elem:last_elem), &
-               & idxaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2))
-        end if
-
-        ! Over each row we count the unique values
-        kaux(j) = 1
-        do i=first_elem+1,last_elem
-          if (ias(i) == ias(i-1) .and. jas(i) == jas(i-1)) then
-            cycle
+        ! The row has elements?
+        if (nzl > 0) then
+          call psi_msort_up(nzl,jas(first_elem:last_elem), &
+               & ixt,iret)
+          if (iret == 0) then
+            call psb_ip_reord(nzl,vs(first_elem:last_elem),&
+                 & ias(first_elem:last_elem),jas(first_elem:last_elem), &
+                 & ixt)
           end if
-          kaux(j) = kaux(j) + 1
-        end do
-      end if
-    end do
+
+          ! Over each row we count the unique values
+          kaux(j) = 1
+          do i=first_elem+1,last_elem
+            if (ias(i) == ias(i-1) .and. jas(i) == jas(i-1)) then
+              cycle
+            end if
+            kaux(j) = kaux(j) + 1
+          end do
+        end if
+      end do
+      !$omp end do
+      deallocate(ixt)
+    end block
 
     ! --------------------------------------------------
     ! ---------------- kaux composition ----------------
@@ -4553,7 +4574,7 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
     nzout = kaux(nr+1) - 1
 
-    deallocate(sum,kaux,idxaux,stat=info)
+    deallocate(kaux,idxaux,stat=info)
 #else
     !if (.not.srt_inp) then
 
@@ -4710,7 +4731,7 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
 #if defined(OPENMP)
     !$OMP PARALLEL default(none) &
-    !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads) &
+    !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads,maxnr) &
     !$OMP private(i,j,idxstart,idxend,nzl,act_row,iret,ithread, &
     !$OMP work,first_elem,last_elem)
 
@@ -4732,38 +4753,41 @@ subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
     idxend = idxstart + work - 1
 
-    ! ---------------------------------------------------
+    block
+      integer(psb_ipk_), allocatable :: ixt(:)
+      allocate(ixt(2*maxnr+2))
+      ! ---------------------------------------------------
 
-    first_elem = 0
-    last_elem = -1
-    act_row = idxstart
-    do j=1,nzin
-      if (ia(j) < act_row) then
-        cycle
-      else if ((ia(j) > idxend) .or. (work < 1)) then
-        exit
-      else if (ia(j) > act_row) then
-        nzl = last_elem - first_elem + 1
+      first_elem = 0
+      last_elem = -1
+      act_row = idxstart
+      do j=1,nzin
+        if (ia(j) < act_row) then
+          cycle
+        else if ((ia(j) > idxend) .or. (work < 1)) then
+          exit
+        else if (ia(j) > act_row) then
+          nzl = last_elem - first_elem + 1
 
-        if (nzl > 0) then
-          call psi_msort_up(nzl,ja(first_elem:),iaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2),iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,val(first_elem:last_elem),&
-               & ia(first_elem:last_elem),ja(first_elem:last_elem),&
-               & iaux((ithread*(nc+2))+1:(ithread*(nc+2))+nzl+2))
+          if (nzl > 0) then
+            call psi_msort_up(nzl,ja(first_elem:last_elem),ixt,iret)
+            if (iret == 0) &
+                 & call psb_ip_reord(nzl,val(first_elem:last_elem),&
+                 & ia(first_elem:last_elem),ja(first_elem:last_elem),ixt)
+          end if
+
+          act_row = act_row + 1
+          first_elem = 0
+          last_elem = -1
+        else
+          if (first_elem == 0) then
+            first_elem = j
+          end if
+
+          last_elem = j
         end if
-
-        act_row = act_row + 1
-        first_elem = 0
-        last_elem = -1
-      else
-        if (first_elem == 0) then
-          first_elem = j
-        end if
-
-        last_elem = j
-      end if
-    end do
+      end do
+    end block
     !$OMP END PARALLEL
 #else
     i    = 1
