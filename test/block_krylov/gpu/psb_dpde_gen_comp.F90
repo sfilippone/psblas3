@@ -1,42 +1,3 @@
-!    
-!                Parallel Sparse BLAS  GPU plugin
-!      (C) Copyright 2013
-!                         Salvatore Filippone
-!                         Alessandro Fanfarillo
-!   
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the PSBLAS group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!   
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
-! File: dpdegenmm.f90
-!
-! Program: pdegenmm
-! This sample program measures the performance of the matrix-multivector product.
-! The matrix is generated in the same way as for the pdegen test case of
-! the main PSBLAS library.
-!
-!
 module psb_d_pde3d_mod
 
    use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_lpk_, psb_desc_type,&
@@ -550,506 +511,252 @@ contains
       return
    end subroutine psb_d_gen_pde3d
 
-
 end module psb_d_pde3d_mod
 
-program pdegenmm
-  use psb_base_mod
-  use psb_util_mod 
-  use psb_ext_mod
-#ifdef HAVE_CUDA
-  use psb_cuda_mod
-#endif
-#ifdef HAVE_RSB
-  use psb_rsb_mod
-#endif
-  use psb_d_pde3d_mod
-  implicit none
+program dpdegen
+   use psb_base_mod
+   use psb_util_mod
+   use psb_prec_mod
+   use psb_krylov_mod
+   use psb_ext_mod
+   use psb_cuda_mod
+   use psb_d_pde3d_mod
 
-  ! input parameters
-  character(len=5)  :: acfmt, agfmt
-  integer   :: nrhs, idim
-  logical   :: tnd
-  ! miscellaneous 
-  real(psb_dpk_), parameter :: one = 1.d0
-  real(psb_dpk_) :: t1, t2, tprec, flops, tflops,&
-       & tt1, tt2, gt1, gt2, gflops, bdwdth,&
-       & tcnvcsr, tcnvc1, tcnvgpu, tcnvg1
+   ! input parameters
+   character(len=40) :: kmethd 	  = "GMRES"
+   character(len=40) :: ptype     = "NONE"
+   character(len=5)  :: agfmt     = "CSRG"
+   integer(psb_ipk_) :: nrhs      = 5
+   integer(psb_ipk_) :: istopbg   = 1
+   integer(psb_ipk_) :: istoprg   = 2
+   integer(psb_ipk_) :: itmax     = 500
+   integer(psb_ipk_) :: itrace	  = -1
+   integer(psb_ipk_) :: itrs	  = 100
+   real(psb_dpk_)    :: eps	      = 1.d-7
+   integer(psb_ipk_) :: idim      = 20
+   logical           :: tnd       = .false.
 
-  ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a, agpu, aux_a
-  ! descriptor
-  type(psb_desc_type)   :: desc_a
-  ! dense matrices
-  type(psb_d_multivect_type), target :: x_mv, b_mv, x_mv_g, b_mv_g
-  type(psb_d_vect_type) :: xg,bg
-#ifdef HAVE_CUDA
-  type(psb_d_multivect_cuda)  :: vmold
-  type(psb_d_vect_cuda) :: tmold
-  type(psb_i_vect_cuda)       :: imold 
-#endif
-  real(psb_dpk_), allocatable :: x1(:,:), x2(:,:), x0(:,:)
-  ! blacs parameters
-  type(psb_ctxt_type) :: ctxt
-  integer             :: iam, np
 
-  ! solver parameters
-  integer(psb_epk_)  :: amatsize, precsize, descsize, annz, nbytes
-  real(psb_dpk_)     :: err, eps
-  integer, parameter :: ntests=50, ngpu=10, ncnv=20
-  type(psb_d_coo_sparse_mat), target  :: acoo
-  type(psb_d_csr_sparse_mat), target  :: acsr
-  type(psb_d_ell_sparse_mat), target  :: aell
-  type(psb_d_hll_sparse_mat), target  :: ahll
-  type(psb_d_dia_sparse_mat), target  :: adia
-  type(psb_d_hdia_sparse_mat), target :: ahdia
-#ifdef HAVE_RSB
-  type(psb_d_rsb_sparse_mat), target  :: arsb
-#endif
-#ifdef HAVE_CUDA
-  type(psb_d_cuda_elg_sparse_mat), target   :: aelg
-  type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
-#if CUDA_SHORT_VERSION <= 10
-  type(psb_d_cuda_hybg_sparse_mat), target  :: ahybg
-#endif
-  type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
-  type(psb_d_cuda_hdiag_sparse_mat), target   :: ahdiag
-  type(psb_d_cuda_dnsg_sparse_mat), target   :: adnsg
-#endif
-  class(psb_d_base_sparse_mat), pointer :: agmold, acmold
-  ! other variables
-  logical, parameter :: dump=.false.
-  integer(psb_ipk_)  :: info, i, j, nr, nrg
-  integer(psb_lpk_)  :: ig
-  character(len=20)  :: name,ch_err
-  character(len=40)  :: fname
+   ! sparse matrix
+   type(psb_dspmat_type) :: a, aux_a
 
-  real(psb_dpk_) :: random_value
+   ! preconditioner data
+   type(psb_dprec_type) :: prec
 
-  info=psb_success_
+   ! miscellaneous
+   real(psb_dpk_)               :: tb1, tb2, tr1, tr2
+   real(psb_dpk_), allocatable  :: tb(:), tr(:)
 
-  call psb_init(ctxt)
-  call psb_info(ctxt,iam,np)
-#ifdef HAVE_CUDA
-  call psb_cuda_init(ctxt)
-#endif
-#ifdef HAVE_RSB
-  call psb_rsb_init()
-#endif
+   ! descriptor
+   type(psb_desc_type)   :: desc_a
 
-  if (iam < 0) then 
-    ! This should not happen, but just in case
-    call psb_exit(ctxt)
-    stop
-  endif
-  if(psb_get_errstatus() /= 0) goto 9999
-  name='pdegenmm-cuda'
-  !
-  ! Hello world
-  !
-  if (iam == psb_root_) then 
-    write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
-    write(*,*) 'This is the ',trim(name),' sample program'
-  end if
-#ifdef HAVE_CUDA
-  write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
-  write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())  
-#endif
-  !
-  !  get parameters
-  !
-  call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
-  !nrhs=8
-  !acfmt='CSR'
-  !agfmt='CSRG'
-  !idim=100
-  !tnd=.false.
-  call psb_init_timers()
-  !
-  !  allocate and fill in the coefficient matrix and initial vectors
-  !
-  call psb_barrier(ctxt)
-  t1 = psb_wtime()
-  call psb_gen_pde3d(ctxt,idim,a,b_mv,x_mv,nrhs,desc_a,'CSR  ',info,partition=3,tnd=tnd)  
-  call psb_barrier(ctxt)
-  t2 = psb_wtime() - t1
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='create_matrix'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
-  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+   ! dense matrices
+   type(psb_d_multivect_type), target :: x_mv, b_mv
+   type(psb_d_vect_type), target      :: x_col, b_col
+   type(psb_d_multivect_cuda)  :: gpumold_mv
+   type(psb_d_vect_cuda)       :: gpumold_col
+   type(psb_i_vect_cuda)       :: imold
+   real(psb_dpk_), allocatable :: b_mv_glob(:,:)
+   real(psb_dpk_), allocatable :: b_col_glob(:)
 
-  if (dump) then 
-    write(fname,'(a,i3.3,a,i3.3,a,i3.3,a)')  'pde',idim,'-',iam,'-',np,'.mtx'
-    call a%print(fname,head='PDEGEN test matrix')
-  end if
+   ! blacs parameters
+   type(psb_ctxt_type) :: ctxt
+   integer             :: iam, np
 
-  select case(psb_toupper(acfmt))
-  case('ELL')
-    acmold => aell
-  case('HLL')
-    acmold => ahll
-  case('DIA')
-    acmold => adia
-  case('HDIA')
-    acmold => ahdia
-  case('CSR')
-    acmold => acsr
-  case('COO')
-    acmold => acoo
-#ifdef HAVE_RSB
-  case('RSB')
-    acmold => arsb
-#endif
-  case default
-    write(*,*) 'Unknown format defaulting to HLL'
-    acmold => ahll
-  end select
-  call a%cscnv(info,mold=acmold)
-  if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-    write(0,*) 'From cscnv ',info
-    call psb_error()
-    stop
-  end if
+   ! solver parameters
+   real(psb_dpk_)     :: err, cond
+   integer(psb_ipk_)  :: reps = 2
 
-#ifdef HAVE_CUDA
-  select case(psb_toupper(agfmt))
-  case('ELG')
-    agmold => aelg
-  case('HLG')
-    agmold => ahlg
-  case('HDIAG')
-    agmold => ahdiag
-  case('CSRG')
-    agmold => acsrg
-  case('DNSG')
-    agmold => adnsg
-#if CUDA_SHORT_VERSION <= 10
-  case('HYBG')
-    agmold => ahybg
-#endif
-  case default
-    write(*,*) 'Unknown format defaulting to HLG'
-    agmold => ahlg
-  end select
-  call a%cscnv(agpu,info,mold=agmold)
-  if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-    write(0,*) 'From cscnv ',info
-    call psb_error()
-    stop
-  end if
-  call desc_a%cnv(mold=imold)
+   ! molds
+   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
+   type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
+   type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
+   class(psb_d_base_sparse_mat), pointer     :: agmold
 
-  call psb_geasb(b_mv_g,desc_a,info,n=nrhs,scratch=.true.,mold=vmold)
-  call psb_geasb(x_mv_g,desc_a,info,n=nrhs,scratch=.true.,mold=vmold)
+   ! other variables
+   integer(psb_ipk_)  :: info, i, j, m_problem, iter, rep
+   character(len=20)  :: name, ch_err
+   real(psb_dpk_)     :: random_value
 
-#endif
+   ! Init environment
+   info=psb_success_
+   call psb_init(ctxt)
+   call psb_info(ctxt,iam,np)
+   call psb_cuda_init(ctxt)
+   if (iam < 0) then
+      ! This should not happen, but just in case
+      call psb_exit(ctxt)
+      stop
+   endif
+   if(psb_get_errstatus() /= 0) goto 9999
+   name='pdegenmm-cuda'
+   !
+   ! Hello world
+   !
+   if (iam == psb_root_) then
+      write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
+      write(*,*) 'This is the ',trim(name),' sample program'
+      write(psb_out_unit,'("Number of processors: ",i8)')np
+   end if
+   write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
+   write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())
 
-  nr  = desc_a%get_local_rows()
-  nrg = desc_a%get_global_rows() 
-  call psb_geall(x0,desc_a,info,n=nrhs)
-  do i=1, nr
-    call desc_a%l2g(i,ig,info)
-    x0(i,:) = 1.0 + (1.0*ig)/nrg
-  end do
-  call a%cscnv(aux_a,info,mold=acoo)
-  tcnvcsr = 0
-  tcnvgpu = 0
-  call psb_geall(x1,desc_a,info,n=nrhs)
-  do j=1, ncnv
-    call aux_a%cscnv(a,info,mold=acoo)
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    call a%cscnv(info,mold=acmold)
-    t2 = psb_Wtime() -t1
-    call psb_amx(ctxt,t2)
-    tcnvcsr = tcnvcsr + t2
-    if (j==1) tcnvc1 = t2
-    call psb_geasb(x1,desc_a,info)
-    call x_mv%bld(x0)
-    call psb_geasb(b_mv,desc_a,info,scratch=.true.)
+   !  allocate and fill in the coefficient matrix and initial vectors
+   !
+   call psb_barrier(ctxt)
+   t1 = psb_wtime()
+   call psb_gen_pde3d(ctxt,idim,a,b_mv,x_mv,nrhs,desc_a,'CSR  ',info,partition=3,tnd=tnd)
+   call psb_barrier(ctxt)
+   t2 = psb_wtime() - t1
+   if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='create_matrix'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+   end if
+   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
+   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 
-#ifdef HAVE_CUDA
-    call aux_a%cscnv(agpu,info,mold=acoo)
-    call x_mv_g%bld(x0,mold=vmold)
-    call psb_geasb(b_mv_g,desc_a,info,n=nrhs,scratch=.true.,mold=vmold)
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    call agpu%cscnv(info,mold=agmold)
-    call psb_cuda_DeviceSync()
-    t2 = psb_Wtime() -t1
-    call psb_amx(ctxt,t2)
-    if (j==1) tcnvg1 = t2
-    tcnvgpu = tcnvgpu + t2
-#endif
-  end do
+   ! building the preconditioner
+   call prec%init(ctxt,ptype,info)
+   call prec%build(a,desc_a,info)
+   if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
+      goto 9999
+   end if
 
-  call psb_barrier(ctxt)
-  t1 = psb_wtime()
-  do i=1,ntests 
-    call psb_spmm(done,a,x_mv,dzero,b_mv,desc_a,info)
-  end do
-  call psb_barrier(ctxt)
-  t2 = psb_wtime() - t1
-  call psb_amx(ctxt,t2)
-
-#ifdef HAVE_CUDA
-  call x_mv_g%set(x0)
-
-  ! FIXME: cache flush needed here
-  x1 = b_mv%get_vect()
-  x2 = b_mv_g%get_vect()
-
-!   ! TODO test AXPBY
-!   call psb_geall(xg,desc_a,info)
-!   call psb_geasb(xg,desc_a,info,mold=tmold)
-!   call xg%set(done)
-!   call xg%sync()
-!   call psb_geall(bg,desc_a,info)
-!   call psb_geasb(bg,desc_a,info,mold=tmold)
-!   !call bg%set(done+done)
-
-! !   ! TODO: Non funziona spgpuDaxpby (axpbyMultiVecDeviceDouble)
-!   call psb_geaxpby(done,xg,dzero,bg,desc_a,info)
-!   call psb_cuda_DeviceSync()
-
-!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
-!   call bg%sync()
-!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
-!   do i=1,8
-!     write(*,*) bg%v%v(i)
-!   end do
-
-!   return
-
-!   call x_mv_g%set(done)
-!   call x_mv_g%sync()
-
-!   call psb_geaxpby(done,x_mv_g,dzero,b_mv_g,desc_a,info)
-
-!   call b_mv_g%sync()
-!   do i=1,size(b_mv_g%v%v,1)
-!     write(*,*) b_mv_g%v%v(i,:)
-!   end do
-
-!   return
-
-  call psb_barrier(ctxt)
-  tt1 = psb_wtime()
-  do i=1,ntests 
-    call psb_spmm(done,agpu,x_mv,dzero,b_mv_g,desc_a,info)
-    if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-      write(0,*) 'From 1 spmm',info,i,ntests
+   select case(psb_toupper(agfmt))
+    case('ELG')
+      agmold => aelg
+    case('HLG')
+      agmold => ahlg
+    case('CSRG')
+      agmold => acsrg
+    case default
+      write(*,*) 'Unknown format defaulting to HLG'
+      agmold => ahlg
+   end select
+   call a%cscnv(info,mold=agmold)
+   call desc_a%cnv(mold=imold)
+   if ((info /= 0).or.(psb_get_errstatus()/=0)) then
+      write(0,*) 'From cscnv ',info
       call psb_error()
       stop
-    end if
-  end do
-  call psb_cuda_DeviceSync()
-  call psb_barrier(ctxt)
-  tt2 = psb_wtime() - tt1
-  call psb_amx(ctxt,tt2)
-  x1 = b_mv%get_vect()
-  x2 = b_mv_g%get_vect()
-  nr = desc_a%get_local_rows()
-  eps = maxval(abs(x1(1:nr,1:nrhs)-x2(1:nr,1:nrhs)))
-  call psb_amx(ctxt,eps)
-  if (iam==0) write(*,*) 'Max diff on xGPU',eps
+   end if
 
-  ! FIXME: cache flush needed here
-  call x_mv_g%set(x0)
-  call x_mv_g%sync()
-  call psb_barrier(ctxt)
-  gt1 = psb_wtime()
-  do i=1,ntests*ngpu
-    call psb_spmm(done,agpu,x_mv_g,dzero,b_mv_g,desc_a,info)
-    ! For timing purposes we need to make sure all threads
-    ! in the device are done. 
-    if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-      write(0,*) 'From 2 spmm',info,i,ntests
-      call psb_error()
-      stop
-    end if
-  end do
-  call psb_cuda_DeviceSync()
-  call psb_barrier(ctxt)
-  gt2 = psb_wtime() - gt1
-  call psb_amx(ctxt,gt2)
-  call b_mv_g%sync()
-  x1 = b_mv%get_vect()
-  x2 = b_mv_g%get_vect()
-  call psb_geaxpby(-done,b_mv_g,+done,b_mv,desc_a,info)
-  eps = psb_geamax(b_mv,desc_a,info)
+   ! Set RHS
+   call psb_geall(b_mv_glob,desc_a,info,n=nrhs)
+   do i=1,b_mv%get_nrows()
+      do j=1,b_mv%get_ncols()
+         call random_number(random_value)
+         b_mv_glob(i,j) = random_value
+      end do
+   end do
 
-  call psb_amx(ctxt,t2)
-  eps = maxval(abs(x1(1:nr,1:nrhs)-x2(1:nr,1:nrhs)))
-  call psb_amx(ctxt,eps)
-  if (iam==0) write(*,*) 'Max diff on GPU',eps
-  if (dump) then 
-    write(fname,'(a,i3.3,a,i3.3,a)')'XCPU-out-',iam,'-',np,'.mtx'
-    call mm_array_write(x1(1:nr,1:nrhs),'Local part CPU',info,filename=fname)
-    write(fname,'(a,i3.3,a,i3.3,a)')'XGPU-out-',iam,'-',np,'.mtx'
-    call mm_array_write(x2(1:nr,1:nrhs),'Local part GPU',info,filename=fname)
-  end if
-#endif
+   if (iam == psb_root_) then
+      allocate(tb(reps),tr(reps))
+      tb = dzero
+      tr = dzero
+   end if
 
-  annz     = a%get_nzeros()
-  amatsize = a%sizeof()
-  descsize = psb_sizeof(desc_a)
-  call psb_sum(ctxt,nr)
-  call psb_sum(ctxt,annz)
-  call psb_sum(ctxt,amatsize)
-  call psb_sum(ctxt,descsize)
+   do rep=1,reps
+      call psb_scatter(b_mv_glob,b_mv,desc_a,info,root=psb_root_,mold=gpumold_mv)
+      call psb_geall(x_mv,desc_a,info,nrhs)
+      call x_mv%zero()
+      call psb_geasb(x_mv,desc_a,info,mold=gpumold_mv)
 
-  if (iam == psb_root_) then
-    write(psb_out_unit,*)
-    write(psb_out_unit,'("Matrix:                           ell1 ",i0)') idim
-    write(psb_out_unit,'("Test on:            ",i20," processors")') np
-    write(psb_out_unit,'("Size of matrix:     ",i20)') nr
-    write(psb_out_unit,'("Number of nonzeros: ",i20)') annz
-    write(psb_out_unit,'("Memory occupation:  ",i20)') amatsize
-    flops  = ntests*(2.d0*annz)*nrhs
-    tflops = flops
-    gflops = flops * ngpu
-    write(psb_out_unit,'("Storage type for A:    ",a)') a%get_fmt()
-#ifdef HAVE_CUDA
-    write(psb_out_unit,'("Storage type for AGPU: ",a)') agpu%get_fmt()
-    write(psb_out_unit,'("Time to convert A from COO to CPU (1): ",F20.9)')&
-         & tcnvc1
-    write(psb_out_unit,'("Time to convert A from COO to CPU (t): ",F20.9)')&
-         & tcnvcsr
-    write(psb_out_unit,'("Time to convert A from COO to CPU (a): ",F20.9)')&
-         & tcnvcsr/ncnv
-    write(psb_out_unit,'("Time to convert A from COO to GPU (1): ",F20.9)')&
-         & tcnvg1
-    write(psb_out_unit,'("Time to convert A from COO to GPU (t): ",F20.9)')&
-         & tcnvgpu
-    write(psb_out_unit,'("Time to convert A from COO to GPU (a): ",F20.9)')&
-         & tcnvgpu/ncnv
-#endif
-    write(psb_out_unit,&
-         & '("Number of flops (",i0," prod)           : ",F20.0,"           ")') &
-         &  ntests,flops
+      call psb_barrier(ctxt)
+      tb1 = psb_wtime()
 
-    flops  = flops / (t2)
-    tflops = tflops / (tt2)
-    gflops = gflops / (gt2)
+      call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
+      & itmax=itmax,iter=iter,err=err,itrace=itrace,&
+      & itrs=itrs,istop=istopbg)
 
-    write(psb_out_unit,'("Time for ",i6," products (s) (CPU)   : ",F20.3)')&
-         &  ntests,t2
-    write(psb_out_unit,'("Time per product    (ms)     (CPU)   : ",F20.3)')&
-         & t2*1.d3/(1.d0*ntests)
-    write(psb_out_unit,'("MFLOPS                       (CPU)   : ",F20.3)')&
-         & flops/1.d6
-#ifdef HAVE_CUDA
-    write(psb_out_unit,'("Time for ",i6," products (s) (xGPU)  : ",F20.3)')&
-         & ntests, tt2
-    write(psb_out_unit,'("Time per product    (ms)     (xGPU)  : ",F20.3)')&
-         & tt2*1.d3/(1.d0*ntests)
-    write(psb_out_unit,'("MFLOPS                       (xGPU)  : ",F20.3)')&
-         & tflops/1.d6
+      call psb_barrier(ctxt)
+      tb2 = psb_wtime() - tb1
+      call psb_amx(ctxt,tb2)
 
-    write(psb_out_unit,'("Time for ",i6," products (s) (GPU.)  : ",F20.3)')&
-         & ngpu*ntests,gt2
-    write(psb_out_unit,'("Time per product    (ms)     (GPU.)  : ",F20.3)')&
-         & gt2*1.d3/(1.d0*ntests*ngpu)
-    write(psb_out_unit,'("MFLOPS                       (GPU.)  : ",F20.3)')&
-         & gflops/1.d6
-#endif
-    !
-    ! This computation assumes the data movement associated with CSR:
-    ! it is minimal in terms of coefficients. Other formats may either move
-    ! more data (padding etc.) or less data (if they can save on the indices). 
-    !
-    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_ip)+&
-         & annz*(psb_sizeof_dp + psb_sizeof_ip)
-    bdwdth = ntests*nbytes/(t2*1.d6)
-    write(psb_out_unit,*)
-    write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (CPU)  : ",F20.3)') bdwdth
-#ifdef HAVE_CUDA
-    bdwdth = nrhs*ngpu*ntests*nbytes/(gt2*1.d6)
-    write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
-    bdwdth = psb_cuda_MemoryPeakBandwidth()
-    write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth
-#endif
-    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
-    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
+      if (iam == psb_root_) then
+         tb(rep) = tb2
+         write(*,*) 'Time', rep, tb(rep), iter
+      end if
+      call psb_barrier(ctxt)
 
-  end if
+      call psb_gefree(b_mv,desc_a,info)
+      call psb_gefree(x_mv,desc_a,info)
+   end do
 
-  call psb_print_timers(ctxt)
+   if(iam == psb_root_) then
+      write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Finished BGMRES")')
+      write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Starting sGMRES")')
+      write(psb_out_unit,'(" ")')
+   end if
 
-  !  
-  !  cleanup storage and exit
-  !
-  call psb_gefree(b_mv,desc_a,info)
-  call psb_gefree(x_mv,desc_a,info)
-  call psb_spfree(a,desc_a,info)
-  call psb_cdfree(desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='free routine'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
+   call psb_barrier(ctxt)
 
-#ifdef HAVE_CUDA
-  call psb_cuda_exit()
-#endif
-  call psb_exit(ctxt)
-  
-  return
+   do rep=1,reps
+      do i=1,nrhs
+         b_col_glob = b_mv_glob(:,i)
+         call psb_scatter(b_col_glob,b_col,desc_a,info,root=psb_root_,mold=gpumold_col)
+         call psb_geall(x_col,desc_a,info)
+         call x_col%zero()
+         call psb_geasb(x_col,desc_a,info,mold=gpumold_col)
+
+         cond = dzero
+
+         call psb_barrier(ctxt)
+         tr1 = psb_wtime()
+
+         call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,&
+         & itmax=itmax,iter=iter,err=err,itrace=itrace,&
+         & istop=istoprg,irst=itrs,cond=cond)
+
+         call psb_barrier(ctxt)
+         tr2 = psb_wtime() - tr1
+         call psb_amx(ctxt,tr2)
+
+         if (iam == psb_root_) then
+            tr(rep) = tr(rep) + tr2
+         end if
+         call psb_barrier(ctxt)
+
+         call psb_gefree(b_col, desc_a,info)
+         call psb_gefree(x_col, desc_a,info)
+      end do
+
+      if (iam == psb_root_) then
+         write(*,*) 'Time', rep, tr(rep), iter
+      end if
+   end do
+
+   call psb_barrier(ctxt)
+
+   if(iam == psb_root_) then
+      write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Finished sGMRES")')
+      write(psb_out_unit,'(" ")')
+   end if
+
+   !
+   !  cleanup storage and exit
+   !
+   call psb_spfree(a,desc_a,info)
+   call psb_cdfree(desc_a,info)
+   if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='free routine'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+   end if
+
+   call psb_cuda_exit()
+   call psb_exit(ctxt)
+   return
 
 9999 continue
 
-  call psb_error(ctxt)
+   call psb_error(ctxt)
 
-contains
-  !
-  ! get iteration parameters from standard input
-  !
-  subroutine  get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
-    type(psb_ctxt_type) :: ctxt
-    character(len=*) :: agfmt, acfmt
-    integer      :: nrhs, idim
-    logical      :: tnd
-    integer      :: np, iam
-    integer      :: intbuf(10), ip
-
-    call psb_info(ctxt, iam, np)
-
-    if (iam == 0) then
-      write(*,*) 'Number of RHS?'
-      read(psb_inp_unit,*) nrhs
-      write(*,*) 'CPU side format?'
-      read(psb_inp_unit,*) acfmt
-      write(*,*) 'CUDA side format?'
-      read(psb_inp_unit,*) agfmt
-      write(*,*) 'Size of discretization cube?'
-      read(psb_inp_unit,*) idim
-      write(*,*) 'Try comm/comp overlap?'
-      read(psb_inp_unit,*) tnd
-    endif
-    call psb_bcast(ctxt,nrhs)
-    call psb_bcast(ctxt,acfmt)
-    call psb_bcast(ctxt,agfmt)
-    call psb_bcast(ctxt,idim)
-    call psb_bcast(ctxt,tnd)
-    
-    if (iam == 0) then
-      write(psb_out_unit,'("Testing matrix       : ell1")')      
-      write(psb_out_unit,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
-      write(psb_out_unit,'("Number of processors : ",i0)')np
-      write(psb_out_unit,'("Data distribution    : BLOCK")')
-      write(psb_out_unit,'(" ")')
-      write(psb_out_unit,'("Number of RHS          ",i4)')nrhs
-      write(psb_out_unit,'("Storage formats        ",a)') acfmt,' ',agfmt
-      write(psb_out_unit,'("Testing overlap ND     ",l8)') tnd
-    end if
-    return
-
-  end subroutine get_parms
-
-end program pdegenmm
+end program dpdegen

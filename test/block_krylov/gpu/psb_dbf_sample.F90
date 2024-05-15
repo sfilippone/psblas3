@@ -49,7 +49,7 @@ program psb_dbf_sample
    real(psb_dpk_)    :: err, eps
 
    ! input parameters
-   character(len=5)             :: afmt, agfmt = "ELG"
+   character(len=5)             :: afmt, agfmt = "HLG"
    character(len=20)            :: name, part
    character(len=2)             :: filefmt
    integer(psb_ipk_), parameter :: iunit=12

@@ -523,60 +523,52 @@ program dpdegen
    use psb_d_pde3d_mod
 
    ! input parameters
-   character(len=40) :: kmethd 	  = "GMRES"
-   character(len=40) :: ptype     = "NONE"
-   character(len=5)  :: agfmt     = "CSRG"
-   integer(psb_ipk_) :: nrhs      = 5
-   integer(psb_ipk_) :: istopbg   = 1
-   integer(psb_ipk_) :: istoprg   = 2
-   integer(psb_ipk_) :: itmax     = 500
-   integer(psb_ipk_) :: itrace	  = -1
-   integer(psb_ipk_) :: itrs	  = 100
-   real(psb_dpk_)    :: eps	      = 1.d-7
-   integer(psb_ipk_) :: idim      = 20
-   logical           :: tnd       = .false.
-
+   character(len=40) :: kmethd, ptype
+   character(len=5)  :: afmt
+   integer(psb_ipk_) :: idim, nrhs, istopc, itmax, itrace, itrs
+   real(psb_dpk_)    :: eps
 
    ! sparse matrix
-   type(psb_dspmat_type) :: a, aux_a
+   type(psb_dspmat_type) :: a
 
    ! preconditioner data
    type(psb_dprec_type) :: prec
 
-   ! miscellaneous
-   real(psb_dpk_)               :: tb1, tb2, tr1, tr2
-   real(psb_dpk_), allocatable  :: tb(:), tr(:)
-
-   ! descriptor
-   type(psb_desc_type)   :: desc_a
-
    ! dense matrices
-   type(psb_d_multivect_type), target :: x_mv, b_mv
-   type(psb_d_vect_type), target      :: x_col, b_col
-   type(psb_d_multivect_cuda)  :: gpumold_mv
-   type(psb_d_vect_cuda)       :: gpumold_col
-   type(psb_i_vect_cuda)       :: imold
+   real(psb_dpk_), allocatable :: x_mv_glob(:,:), r_mv_glob(:,:)
    real(psb_dpk_), allocatable :: b_mv_glob(:,:)
-   real(psb_dpk_), allocatable :: b_col_glob(:)
+   type(psb_d_multivect_type)  :: b_mv, x_mv, r_mv
+   type(psb_d_multivect_cuda)  :: gpumold
+   type(psb_i_vect_cuda)       :: imold
+   integer(psb_ipk_)           :: m
 
    ! blacs parameters
+   type(psb_desc_type) :: desc_a
    type(psb_ctxt_type) :: ctxt
    integer             :: iam, np
 
    ! solver parameters
    real(psb_dpk_)     :: err, cond
    integer(psb_ipk_)  :: reps = 2
+   integer(psb_epk_)  :: amatsize, precsize, descsize
+   integer(psb_ipk_)  :: iter, ierr, ircode
 
    ! molds
-   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
    type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
    type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
+   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
+   type(psb_d_cuda_hdiag_sparse_mat), target :: ahdiag
    class(psb_d_base_sparse_mat), pointer     :: agmold
 
    ! other variables
-   integer(psb_ipk_)  :: info, i, j, m_problem, iter, rep
-   character(len=20)  :: name, ch_err
-   real(psb_dpk_)     :: random_value
+   integer(psb_ipk_)           :: info, i, j, rep
+   real(psb_dpk_)              :: t1, t2, tprec
+   character(len=20)           :: name, ch_err
+   real(psb_dpk_)              :: random_value
+   real(psb_dpk_)              :: resmxp
+   real(psb_dpk_), allocatable :: resmx(:)
+   logical                     :: tnd = .false.
+   logical                     :: print_matrix = .false.
 
    ! Init environment
    info=psb_success_
@@ -589,7 +581,7 @@ program dpdegen
       stop
    endif
    if(psb_get_errstatus() /= 0) goto 9999
-   name='pdegenmm-cuda'
+   name='pdegenmm_cuda'
    !
    ! Hello world
    !
@@ -600,7 +592,11 @@ program dpdegen
    end if
    write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
    write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())
-
+   !
+   !  get parameters
+   !
+   call get_parms(ctxt,kmethd,ptype,idim,afmt,nrhs,istopc,itmax,itrace,itrs,eps)
+   !
    !  allocate and fill in the coefficient matrix and initial vectors
    !
    call psb_barrier(ctxt)
@@ -625,11 +621,13 @@ program dpdegen
       goto 9999
    end if
 
-   select case(psb_toupper(agfmt))
+   select case(psb_toupper(afmt))
     case('ELG')
       agmold => aelg
     case('HLG')
       agmold => ahlg
+    case('HDIAG')
+      agmold => ahdiag
     case('CSRG')
       agmold => acsrg
     case default
@@ -653,110 +651,207 @@ program dpdegen
       end do
    end do
 
+   !call psb_scatter(b_mv_glob,b_mv,desc_a,info,root=psb_root_,mold=gpumold)
+   call psb_geall(x_mv,desc_a,info,nrhs)
+   call x_mv%zero()
+   call psb_geasb(x_mv,desc_a,info,mold=gpumold)
+   call psb_geall(r_mv,desc_a,info,nrhs)
+   call r_mv%zero()
+   call psb_geasb(r_mv,desc_a,info)
+
+   t2 = psb_wtime() - t1
+   call psb_amx(ctxt, t2)
+
    if (iam == psb_root_) then
-      allocate(tb(reps),tr(reps))
-      tb = dzero
-      tr = dzero
+      write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+      write(psb_out_unit,'(" ")')
    end if
 
-   do rep=1,reps
-      call psb_scatter(b_mv_glob,b_mv,desc_a,info,root=psb_root_,mold=gpumold_mv)
-      call psb_geall(x_mv,desc_a,info,nrhs)
-      call x_mv%zero()
-      call psb_geasb(x_mv,desc_a,info,mold=gpumold_mv)
+   ! building the preconditioner
+   call prec%init(ctxt,ptype,info)
+   t1 = psb_wtime()
+   call prec%build(a,desc_a,info)
+   tprec = psb_wtime()-t1
+   if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
+      goto 9999
+   end if
 
-      call psb_barrier(ctxt)
-      tb1 = psb_wtime()
-
-      call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
-      & itmax=itmax,iter=iter,err=err,itrace=itrace,&
-      & itrs=itrs,istop=istopbg)
-
-      call psb_barrier(ctxt)
-      tb2 = psb_wtime() - tb1
-      call psb_amx(ctxt,tb2)
-
-      if (iam == psb_root_) then
-         tb(rep) = tb2
-         write(*,*) 'Time', rep, tb(rep), iter
-      end if
-      call psb_barrier(ctxt)
-
-      call psb_gefree(b_mv,desc_a,info)
-      call psb_gefree(x_mv,desc_a,info)
-   end do
+   call psb_amx(ctxt,tprec)
 
    if(iam == psb_root_) then
+      write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
       write(psb_out_unit,'(" ")')
-      write(psb_out_unit,'("Finished BGMRES")')
-      write(psb_out_unit,'(" ")')
-      write(psb_out_unit,'("Starting sGMRES")')
+      write(psb_out_unit,'("Starting algorithm")')
       write(psb_out_unit,'(" ")')
    end if
 
    call psb_barrier(ctxt)
+   t1 = psb_wtime()
 
-   do rep=1,reps
-      do i=1,nrhs
-         b_col_glob = b_mv_glob(:,i)
-         call psb_scatter(b_col_glob,b_col,desc_a,info,root=psb_root_,mold=gpumold_col)
-         call psb_geall(x_col,desc_a,info)
-         call x_col%zero()
-         call psb_geasb(x_col,desc_a,info,mold=gpumold_col)
-
-         cond = dzero
-
-         call psb_barrier(ctxt)
-         tr1 = psb_wtime()
-
-         call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,&
-         & itmax=itmax,iter=iter,err=err,itrace=itrace,&
-         & istop=istoprg,irst=itrs,cond=cond)
-
-         call psb_barrier(ctxt)
-         tr2 = psb_wtime() - tr1
-         call psb_amx(ctxt,tr2)
-
-         if (iam == psb_root_) then
-            tr(rep) = tr(rep) + tr2
-         end if
-         call psb_barrier(ctxt)
-
-         call psb_gefree(b_col, desc_a,info)
-         call psb_gefree(x_col, desc_a,info)
-      end do
-
-      if (iam == psb_root_) then
-         write(*,*) 'Time', rep, tr(rep), iter
-      end if
-   end do
+   call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
+   & itmax=itmax,iter=iter,err=err,itrace=itrace,&
+   & itrs=itrs,istop=istopc)
 
    call psb_barrier(ctxt)
+   t2 = psb_wtime() - t1
+   call psb_amx(ctxt,t2)
 
    if(iam == psb_root_) then
-      write(psb_out_unit,'(" ")')
-      write(psb_out_unit,'("Finished sGMRES")')
+      write(psb_out_unit,'("Finished algorithm")')
       write(psb_out_unit,'(" ")')
    end if
+
+   call psb_geaxpby(done,b_mv,dzero,r_mv,desc_a,info)
+   call psb_spmm(-done,a,x_mv,done,r_mv,desc_a,info)
+
+   resmx  = psb_genrm2(r_mv,desc_a,info)
+   resmxp = psb_geamax(r_mv,desc_a,info)
+
+   amatsize = a%sizeof()
+   descsize = desc_a%sizeof()
+   precsize = prec%sizeof()
+
+   call psb_sum(ctxt,amatsize)
+   call psb_sum(ctxt,descsize)
+   call psb_sum(ctxt,precsize)
+
+   call psb_gather(x_mv_glob,x_mv,desc_a,info,root=psb_root_)
+   if (info == psb_success_) call psb_gather(r_mv_glob,r_mv,desc_a,info,root=psb_root_)
+   if (info /= psb_success_) goto 9999
+
+   if (iam == psb_root_) then
+      call prec%descr(info)
+      write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Computed solution on:         ",i8," processors")')np
+      write(psb_out_unit,'("Storage format for A:                ",a)')a%get_fmt()
+      write(psb_out_unit,'("Storage format for DESC_A:           ",a)')desc_a%get_fmt()
+      write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
+      write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
+      write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
+      write(psb_out_unit,'("Iterations to convergence:          ",i12)')iter
+      write(psb_out_unit,'("Error estimate on exit:             ",es12.5)')err
+      write(psb_out_unit,'("Time to buil prec.:                 ",es12.5)')tprec
+      write(psb_out_unit,'("Time to solve system:               ",es12.5)')t2
+      write(psb_out_unit,'("Time per iteration:                 ",es12.5)')t2/(iter)
+      write(psb_out_unit,'("Total time:                         ",es12.5)')t2+tprec
+      write(psb_out_unit,'("Residual norm 2:                    ",es12.5)')maxval(resmx)
+      write(psb_out_unit,'("Residual norm inf:                  ",es12.5)')resmxp
+      write(psb_out_unit,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
+      if (print_matrix) then
+         do i=1,m
+            write(psb_out_unit,993) i, x_mv_glob(i,:), r_mv_glob(i,:), b_mv_glob(i,:)
+         end do
+      end if
+   end if
+
+998 format(i8,4(2x,g20.14))
+993 format(i6,4(1x,e12.6))
 
    !
    !  cleanup storage and exit
    !
+   call psb_gefree(b_mv,desc_a,info)
+   call psb_gefree(x_mv,desc_a,info)
    call psb_spfree(a,desc_a,info)
+   call prec%free(info)
    call psb_cdfree(desc_a,info)
-   if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='free routine'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-   end if
-
    call psb_cuda_exit()
    call psb_exit(ctxt)
+
    return
 
-9999 continue
+9999 call psb_error(ctxt)
 
-   call psb_error(ctxt)
+   return
+
+contains
+   !
+   ! get iteration parameters from standard input
+   !
+   subroutine get_parms(ctxt,kmethd,ptype,idim,afmt,nrhs,istopc,itmax,itrace,itrs,eps)
+      type(psb_ctxt_type) :: ctxt
+      character(len=40)   :: kmethd, ptype
+      character(len=5)    :: afmt
+      integer(psb_ipk_)   :: idim, nrhs, istopc, itmax, itrace, itrs
+      real(psb_dpk_)      :: eps
+
+      integer(psb_ipk_)   :: np, iam
+      integer(psb_ipk_)   :: ip, inp_unit
+      character(len=1024) :: filename
+
+      call psb_info(ctxt, iam, np)
+
+      if (iam == 0) then
+         if (command_argument_count()>0) then
+            call get_command_argument(1, filename)
+            inp_unit = 30
+            open(inp_unit, file=filename, action='read', iostat=info)
+            if (info /= 0) then
+               write(psb_err_unit,*) 'Could not open file ',filename,' for input'
+               call psb_abort(ctxt)
+               stop
+            else
+               write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
+            end if
+         else
+            inp_unit = psb_inp_unit
+         end if
+
+         ! Read Input Parameters
+         read(inp_unit,*) kmethd
+         read(inp_unit,*) ptype
+         read(inp_unit,*) idim
+         read(inp_unit,*) afmt
+         read(inp_unit,*) nrhs
+         read(inp_unit,*) istopc
+         read(inp_unit,*) itmax
+         read(inp_unit,*) itrace
+         read(inp_unit,*) itrs
+         read(inp_unit,*) eps
+
+         call psb_bcast(ctxt,kmethd)
+         call psb_bcast(ctxt,ptype)
+         call psb_bcast(ctxt,idim)
+         call psb_bcast(ctxt,afmt)
+         call psb_bcast(ctxt,nrhs)
+         call psb_bcast(ctxt,istopc)
+         call psb_bcast(ctxt,itmax)
+         call psb_bcast(ctxt,itrace)
+         call psb_bcast(ctxt,itrs)
+         call psb_bcast(ctxt,eps)
+
+         if (inp_unit /= psb_inp_unit) then
+            close(inp_unit)
+         end if
+      else
+         ! Receive Parameters
+         call psb_bcast(ctxt,kmethd)
+         call psb_bcast(ctxt,ptype)
+         call psb_bcast(ctxt,idim)
+         call psb_bcast(ctxt,afmt)
+         call psb_bcast(ctxt,nrhs)
+         call psb_bcast(ctxt,istopc)
+         call psb_bcast(ctxt,itmax)
+         call psb_bcast(ctxt,itrace)
+         call psb_bcast(ctxt,itrs)
+         call psb_bcast(ctxt,eps)
+      end if
+
+      if (iam == 0) then
+         write(psb_out_unit,'(" ")')
+         write(psb_out_unit,'("Grid dimensions      : ",i4,"x",i4,"x",i4)') idim,idim,idim
+         write(psb_out_unit,'("Iterative method     : ",a)') kmethd
+         write(psb_out_unit,'("Number of processors : ",i0)') np
+         write(psb_out_unit,'("Number of RHS        : ",i4)') nrhs
+         write(psb_out_unit,'("Number of iterations : ",i3)') itrs
+         write(psb_out_unit,'("Storage format       : ",a)') afmt
+         write(psb_out_unit,'(" ")')
+      end if
+
+      return
+
+   end subroutine get_parms
 
 end program dpdegen
