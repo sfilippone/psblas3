@@ -165,7 +165,8 @@ subroutine psb_d_coo_scals(d,a,info)
   if (a%is_unit()) then
     call a%make_nonunit()
   end if
-
+  
+  !$omp parallel do private(i)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo
