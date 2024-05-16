@@ -4267,7 +4267,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   !locals
   integer(psb_ipk_), allocatable :: ias(:),jas(:), ix2(:)
   complex(psb_dpk_),  allocatable :: vs(:)
-  integer(psb_ipk_) :: nza, nzl,iret, maxnr
+  integer(psb_ipk_) :: nza, nzl,iret, maxnzr
   integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii, i1, i2
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
@@ -4305,9 +4305,9 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     !$omp workshare
     iaux(:) = 0
     !$omp end workshare
-    maxnr = 0   
+    maxnzr = 0   
     !$OMP PARALLEL DO default(none) schedule(STATIC) &
-    !$OMP shared(nzin,ia,nr,iaux,maxnr) &
+    !$OMP shared(nzin,ia,nr,iaux,maxnzr) &
     !$OMP private(i) &
     !$OMP reduction(.and.:use_buffers)
     do i=1,nzin
@@ -4321,12 +4321,12 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
       end if
     end do
     !$OMP END PARALLEL DO
-    maxnr = 0
+    maxnzr = 0
     !$OMP PARALLEL DO default(none) schedule(STATIC) &
     !$OMP private(i) shared(nr,iaux)&
-    !$OMP reduction(max:maxnr)
+    !$OMP reduction(max:maxnzr)
     do i=1,nr
-      maxnr = max(maxnr,iaux(i))
+      maxnzr = max(maxnzr,iaux(i))
     end do
     !$OMP END PARALLEL DO
 #else
@@ -4344,9 +4344,9 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
       !srt_inp = srt_inp .and.(ia(i-1)<=ia(i))
     end do
-    maxnr = 0
+    maxnzr = 0
     do i=1,nr
-      maxnr = max(maxnr,iaux(i))
+      maxnzr = max(maxnzr,iaux(i))
     end do
 #endif
   !end if
@@ -4371,7 +4371,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
     ! index for each row. We do the same on 'kaux'
     !$OMP PARALLEL default(none) &
-    !$OMP shared(maxnr,idxaux,ia,ja,val,ias,jas,vs,nthreads,nr,nc,nzin,iaux,kaux,dupl,err) &
+    !$OMP shared(maxnzr,idxaux,ia,ja,val,ias,jas,vs,nthreads,nr,nc,nzin,iaux,kaux,dupl,err) &
     !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
     !$OMP first_elem,last_elem,nzl,iret,act_row,i1,i2) reduction(max: info)
 
@@ -4427,7 +4427,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     ! the number of unique values in 'kaux'
     block
       integer(psb_ipk_), allocatable :: ixt(:)
-      allocate(ixt(2*maxnr+2))
+      allocate(ixt(2*maxnzr+2))
       !$omp do private(j,first_elem,last_elem,nzl,iret) schedule(dynamic,256)
       do j=1,nr
         first_elem = iaux(j)
@@ -4731,7 +4731,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
 #if defined(OPENMP)
     !$OMP PARALLEL default(none) &
-    !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads,maxnr) &
+    !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads,maxnzr) &
     !$OMP private(i,j,idxstart,idxend,nzl,act_row,iret,ithread, &
     !$OMP work,first_elem,last_elem)
 
@@ -4755,7 +4755,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
 
     block
       integer(psb_ipk_), allocatable :: ixt(:)
-      allocate(ixt(2*maxnr+2))
+      allocate(ixt(2*maxnzr+2))
       ! ---------------------------------------------------
 
       first_elem = 0
