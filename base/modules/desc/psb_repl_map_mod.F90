@@ -228,7 +228,7 @@ contains
 
     if (present(mask)) then 
       !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(mask,idxin,idxout,idxmap) &
+      !$omp shared(mask,idxin,idxout,idxmap,im) &
       !$omp private(i) 
       do i=1, im
         if (mask(i)) then 
@@ -242,7 +242,7 @@ contains
       !$omp end parallel do
     else  if (.not.present(mask)) then 
       !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(idxin,idxout,idxmap) &
+      !$omp shared(idxin,idxout,idxmap,im) &
       !$omp private(i) 
       do i=1, im
           if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
@@ -333,7 +333,7 @@ contains
 
       if (idxmap%is_asb()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,idx,idxmap) &
+        !$omp shared(mask,idx,idxmap,is) &
         !$omp private(i) 
         do i=1, is
           if (mask(i)) then 
@@ -347,7 +347,7 @@ contains
         !$omp end parallel do
       else if (idxmap%is_valid()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,idx,idxmap) &
+        !$omp shared(mask,idx,idxmap,is) &
         !$omp private(i) 
         do i=1,is
           if (mask(i)) then 
@@ -369,7 +369,7 @@ contains
 
       if (idxmap%is_asb()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(idx,idxmap) &
+        !$omp shared(idx,idxmap,is) &
         !$omp private(i) 
         do i=1, is
           if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
@@ -381,7 +381,7 @@ contains
         !$omp end parallel do
       else if (idxmap%is_valid()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(idx,idxmap) &
+        !$omp shared(idx,idxmap,is) &
         !$omp private(i) 
         do i=1,is
           if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
@@ -434,7 +434,7 @@ contains
 
       if (idxmap%is_asb()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,idxin,idxout,idxmap) &
+        !$omp shared(mask,idxin,idxout,idxmap,im) &
         !$omp private(i) 
         do i=1, im
           if (mask(i)) then 
@@ -448,7 +448,7 @@ contains
         !$omp end parallel do
       else if (idxmap%is_valid()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,idxin,idxout,idxmap) &
+        !$omp shared(mask,idxin,idxout,idxmap,im) &
         !$omp private(i) 
         do i=1,im
           if (mask(i)) then 
@@ -469,7 +469,7 @@ contains
 
       if (idxmap%is_asb()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(idxin,idxout,idxmap) &
+        !$omp shared(idxin,idxout,idxmap,im) &
         !$omp private(i) 
         do i=1, im
           if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
@@ -481,7 +481,7 @@ contains
         !$omp end parallel do
       else if (idxmap%is_valid()) then 
         !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(idxin,idxout,idxmap) &
+        !$omp shared(idxin,idxout,idxmap,im) &
         !$omp private(i) 
         do i=1,im
           if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then

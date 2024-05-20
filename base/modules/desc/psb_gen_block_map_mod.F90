@@ -282,7 +282,7 @@ contains
 
     if (present(mask)) then 
       !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(mask,idxin,idxout,idxmap,owned_,info) &
+      !$omp shared(mask,idxin,idxout,idxmap,owned_,info,im) &
       !$omp private(i) 
       do i=1, im
         if (mask(i)) then 
@@ -300,7 +300,7 @@ contains
       !$omp end parallel do
     else  if (.not.present(mask)) then 
       !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(idxin,idxout,idxmap,owned_,info) &
+      !$omp shared(idxin,idxout,idxmap,owned_,info,im) &
       !$omp private(i) 
       do i=1, im
         if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
