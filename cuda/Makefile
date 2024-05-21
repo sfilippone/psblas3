@@ -39,7 +39,8 @@ FOBJS=cusparse_mod.o base_cusparse_mod.o \
 	psb_d_cuda_hdiag_mat_mod.o psb_s_cuda_hdiag_mat_mod.o\
 	psb_s_cuda_dnsg_mat_mod.o psb_d_cuda_dnsg_mat_mod.o \
 	psb_c_cuda_dnsg_mat_mod.o psb_z_cuda_dnsg_mat_mod.o \
-	dnsdev_mod.o
+	dnsdev_mod.o \
+	psb_d_cuda_csga_mat_mod.o
 
 COBJS= elldev.o hlldev.o diagdev.o hdiagdev.o vectordev.o  ivectordev.o dnsdev.o\
 	svectordev.o dvectordev.o cvectordev.o zvectordev.o cuda_util.o \
@@ -73,6 +74,7 @@ psb_d_cuda_hlg_mat_mod.o: hlldev_mod.o psb_d_cuda_vect_mod.o  psb_cuda_env_mod.o
 psb_d_cuda_elg_mat_mod.o: elldev_mod.o psb_d_cuda_vect_mod.o
 psb_d_cuda_diag_mat_mod.o: diagdev_mod.o psb_d_cuda_vect_mod.o
 psb_d_cuda_hdiag_mat_mod.o: hdiagdev_mod.o psb_d_cuda_vect_mod.o
+psb_d_cuda_csga_mat_mod.o: psb_d_cuda_csrg_mat_mod.o psb_d_cuda_vect_mod.o
 psb_s_cuda_dnsg_mat_mod.o: dnsdev_mod.o psb_s_cuda_vect_mod.o
 psb_d_cuda_dnsg_mat_mod.o: dnsdev_mod.o psb_d_cuda_vect_mod.o
 psb_c_cuda_dnsg_mat_mod.o: dnsdev_mod.o psb_c_cuda_vect_mod.o
@@ -113,7 +115,7 @@ psb_cuda_mod.o:  psb_cuda_env_mod.o psb_i_cuda_vect_mod.o\
 	psb_c_cuda_hybg_mat_mod.o  psb_c_cuda_csrg_mat_mod.o\
         psb_z_cuda_elg_mat_mod.o   psb_z_cuda_hlg_mat_mod.o \
 	psb_z_cuda_hybg_mat_mod.o  psb_z_cuda_csrg_mat_mod.o\
-	psb_d_cuda_diag_mat_mod.o \
+	psb_d_cuda_diag_mat_mod.o  psb_d_cuda_csga_mat_mod.o\
 	psb_d_cuda_hdiag_mat_mod.o psb_s_cuda_hdiag_mat_mod.o\
 	psb_s_cuda_dnsg_mat_mod.o psb_d_cuda_dnsg_mat_mod.o \
 	psb_c_cuda_dnsg_mat_mod.o psb_z_cuda_dnsg_mat_mod.o 
