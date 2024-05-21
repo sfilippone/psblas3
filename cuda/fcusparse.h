@@ -65,4 +65,7 @@ cusparseHandle_t *getHandle();
     }                                                                          \
 }
 
+
 #endif
+
+

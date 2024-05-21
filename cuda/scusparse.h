@@ -31,7 +31,6 @@
 #ifndef SCUSPARSE_
 #define SCUSPARSE_
   
-  
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,8 +38,6 @@
 #include <cuda_runtime.h>
 #include <cusparse_v2.h>
 #include "cintrf.h"
-#include "fcusparse.h"
-
 
 /*    Double precision real   */ 
 #define TYPE 			       float 
@@ -98,5 +95,6 @@
 
 #endif
 
-#endif
+#include "fcusparse.h"
 
+#endif
