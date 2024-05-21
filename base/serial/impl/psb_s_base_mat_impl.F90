@@ -2060,6 +2060,8 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     goto 9999
   end if
 
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
   if (present(d)) then
     call d%sync()
     if (present(scale)) then
@@ -2080,6 +2082,7 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       if (info == psb_success_)&
            & call a%inner_spsm(alpha,tmpv,beta,y,info,trans)
 
+      call y%set_host()
       if (info == psb_success_) then
         call tmpv%free(info)
         if (info == psb_success_) deallocate(tmpv,stat=info)

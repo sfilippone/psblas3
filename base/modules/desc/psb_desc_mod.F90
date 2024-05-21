@@ -409,7 +409,7 @@ contains
     ! 
     ! Since the hashed lists take up (somewhat) more than 2*N_COL integers,
     ! it makes no sense to use them if you don't have at least 
-    ! 3 processes, no matter what the size of the process. 
+    ! 3 processes, no matter what the size of the index space. 
     !
     val = psb_cd_is_large_size(m) .and. (np > 2)
   end function psb_cd_choose_large_state
