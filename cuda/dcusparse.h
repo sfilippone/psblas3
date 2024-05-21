@@ -38,8 +38,6 @@
 #include <cuda_runtime.h>
 #include <cusparse_v2.h>
 #include "cintrf.h"
-#include "fcusparse.h"
-
 
 /*    Double precision real   */ 
 #define TYPE 			       double
@@ -96,6 +94,8 @@
 #define T_CSRGCreateSpMVDescr	       d_CSRGCreateSpMVDescr
 
 #endif
+
+#include "fcusparse.h"
 
 #endif
 

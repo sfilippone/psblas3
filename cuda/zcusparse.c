@@ -39,4 +39,5 @@
 #include "fcusparse.h"
 
 #include "zcusparse.h"
+#include "fcusparse_dat.h"
 #include "fcusparse_fct.h"
