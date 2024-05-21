@@ -36,6 +36,16 @@ module d_csga_mod
   type, bind(c) :: d_CAmat
     type(c_ptr) :: Mat = c_null_ptr
   end type d_CAmat
-  
+
+  interface CSGADeviceFree
+    function d_CSGADeviceFree(Mat) &
+         & bind(c,name="d_CSGADeviceFree") result(res)
+      use iso_c_binding
+      import  d_CAmat
+      type(d_CAmat)  :: Mat
+      integer(c_int) :: res
+    end function d_CSGADeviceFree
+  end interface
+
   
 end module d_csga_mod
