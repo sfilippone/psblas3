@@ -35,11 +35,13 @@ module psb_d_cuda_csga_mat_mod
   use iso_c_binding
   use psb_d_mat_mod
   use psb_d_cuda_csrg_mat_mod
+  use d_csga_mod
 
   type, extends(psb_d_cuda_csrg_sparse_mat) :: psb_d_cuda_csga_sparse_mat
     !
     ! Format for CSR Adaptive. 
-    ! 
+    !
+    type(d_CAmat)    :: deviceAMat
     integer(psb_ipk_), allocatable :: rowBlocks(:)
   contains
     procedure, nopass  :: get_fmt       => d_cuda_csga_get_fmt
@@ -336,13 +338,12 @@ contains
 !!$  end subroutine d_cuda_csga_sync
 
   subroutine  d_cuda_csga_free(a) 
-    use cusparse_mod
     implicit none 
     integer(psb_ipk_) :: info
 
     class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
 
-    info = 0 !CSGADeviceFree(a%deviceMat)
+    info = CSGADeviceFree(a%deviceAMat)
     call a%psb_d_csr_sparse_mat%free()
     
     return
@@ -350,13 +351,12 @@ contains
   end subroutine d_cuda_csga_free
 
   subroutine  d_cuda_csga_finalize(a) 
-    use cusparse_mod
     implicit none 
     integer(psb_ipk_) :: info
     
     type(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
 
-    info = 0 !CSGADeviceFree(a%deviceMat)
+    info = CSGADeviceFree(a%deviceAMat)
     
     return
 
