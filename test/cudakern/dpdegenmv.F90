@@ -608,6 +608,7 @@ program pdgenmv
 #ifdef HAVE_CUDA
   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
   type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
+  type(psb_d_cuda_csga_sparse_mat), target  :: acsga
 #if CUDA_SHORT_VERSION <= 10
   type(psb_d_cuda_hybg_sparse_mat), target  :: ahybg
 #endif
@@ -719,6 +720,8 @@ program pdgenmv
     agmold => ahdiag
   case('CSRG')
     agmold => acsrg
+  case('CSGA')
+    agmold => acsga
   case('DNSG')
     agmold => adnsg
 #if CUDA_SHORT_VERSION <= 10

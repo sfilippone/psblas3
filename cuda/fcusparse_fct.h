@@ -96,7 +96,6 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 #else
   cusparseDnVecDescr_t vecX, vecY;
   size_t bfsz;
-
   if (T_CSRGIsNullMvDescr(cMat)) {
     cMat->spmvDescr = (cusparseSpMatDescr_t  *) malloc(sizeof(cusparseSpMatDescr_t  *));
   }
@@ -246,9 +245,13 @@ int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
     return((int) CUSPARSE_STATUS_INVALID_VALUE);
   if ((cMat=(T_CSRGDeviceMat *) malloc(sizeof(T_CSRGDeviceMat)))==NULL)
     return((int) CUSPARSE_STATUS_ALLOC_FAILED);
+
+  cMat->numBlocks = 0;
+  cMat->rowBlocks = NULL;
   cMat->m  = nr;
   cMat->n  = nc;
   cMat->nz = nz;
+  fprintf(stderr,"Setting M %d  N %d \n",cMat->m,cMat->n);
   if (nr1 == 0) nr1 = 1;
   if (nz1 == 0) nz1 = 1;
   if ((rc= allocRemoteBuffer(((void **) &(cMat->irp)), ((nr1+1)*sizeof(int)))) != 0)
@@ -344,6 +347,8 @@ int T_CSRGDeviceFree(T_Cmat *Matrix)
     cMat->svbuffer=NULL;
     cMat->svbsize=0;
 #endif
+    if (cMat->rowBlocks != NULL) freeRemoteBuffer(cMat->rowBlocks);
+    cMat->numBlocks = 0;
     free(cMat);
     Matrix->mat = NULL;
   }

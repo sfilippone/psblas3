@@ -63,6 +63,8 @@ module psb_cuda_mod
   use psb_c_cuda_hlg_mat_mod
   use psb_z_hll_mat_mod
   use psb_z_cuda_hlg_mat_mod
+
+  use psb_d_cuda_csga_mat_mod
   
   use psb_s_cuda_csrg_mat_mod
   use psb_d_cuda_csrg_mat_mod

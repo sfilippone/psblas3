@@ -120,7 +120,8 @@ psb_cuda_mod.o:  psb_cuda_env_mod.o psb_i_cuda_vect_mod.o\
 	psb_d_cuda_diag_mat_mod.o  psb_d_cuda_csga_mat_mod.o\
 	psb_d_cuda_hdiag_mat_mod.o psb_s_cuda_hdiag_mat_mod.o\
 	psb_s_cuda_dnsg_mat_mod.o psb_d_cuda_dnsg_mat_mod.o \
-	psb_c_cuda_dnsg_mat_mod.o psb_z_cuda_dnsg_mat_mod.o 
+	psb_c_cuda_dnsg_mat_mod.o psb_z_cuda_dnsg_mat_mod.o  \
+        psb_d_cuda_csga_mat_mod.o
 
 iobjs: $(FOBJS)
 	$(MAKE) -C impl objs

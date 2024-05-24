@@ -286,7 +286,11 @@ psb_s_cuda_hdiag_vect_mv.o \
 psb_s_cuda_dnsg_mat_impl.o \
 psb_d_cuda_dnsg_mat_impl.o \
 psb_c_cuda_dnsg_mat_impl.o \
-psb_z_cuda_dnsg_mat_impl.o 
+psb_z_cuda_dnsg_mat_impl.o \
+psb_d_cuda_csga_to_gpu.o \
+psb_d_cuda_csga_from_gpu.o \
+psb_d_cuda_csga_mold.o \
+psb_d_cuda_csga_vect_mv.o 
 
 
 objs: $(OBJS)

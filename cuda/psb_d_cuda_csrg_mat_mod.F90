@@ -49,6 +49,8 @@ module psb_d_cuda_csrg_mat_mod
     ! 
     ! 
     type(d_Cmat)    :: deviceMat
+    integer(psb_ipk_), allocatable :: rowBlocks(:)
+    integer(psb_ipk_) :: numBlocks=0
     integer(psb_ipk_) :: devstate  = is_host
     
   contains
@@ -252,9 +254,10 @@ contains
     integer(psb_epk_) :: res
     if (a%is_dev()) call a%sync()
     res = 8 
-    res = res + psb_sizeof_dp  * size(a%val)
-    res = res + psb_sizeof_ip * size(a%irp)
-    res = res + psb_sizeof_ip * size(a%ja)
+    res = res + psb_sizeof_dp * psb_size(a%val)
+    res = res + psb_sizeof_ip * psb_size(a%irp)
+    res = res + psb_sizeof_ip * psb_size(a%ja)
+    res = res + psb_sizeof_ip * psb_size(a%rowBlocks)
     ! Should we account for the shadow data structure
     ! on the GPU device side? 
     ! res = 2*res
@@ -353,6 +356,8 @@ contains
     class(psb_d_cuda_csrg_sparse_mat), intent(inout) :: a
 
     info = CSRGDeviceFree(a%deviceMat)
+    if (allocated(a%rowBlocks)) deallocate(a%rowBlocks)
+    a%numBlocks=0
     call a%psb_d_csr_sparse_mat%free()
     
     return

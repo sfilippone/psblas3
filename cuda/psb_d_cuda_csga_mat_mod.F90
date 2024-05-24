@@ -41,11 +41,8 @@ module psb_d_cuda_csga_mat_mod
     !
     ! Format for CSR Adaptive. 
     !
-    type(d_CAmat)    :: deviceAMat
-    integer(psb_ipk_), allocatable :: rowBlocks(:)
   contains
     procedure, nopass  :: get_fmt       => d_cuda_csga_get_fmt
-    procedure, pass(a) :: sizeof        => d_cuda_csga_sizeof
     procedure, pass(a) :: vect_mv       => psb_d_cuda_csga_vect_mv
 !!$    procedure, pass(a) :: in_vect_sv    => psb_d_cuda_csga_inner_vect_sv
 !!$    procedure, pass(a) :: csmm          => psb_d_cuda_csga_csmm
@@ -56,11 +53,11 @@ module psb_d_cuda_csga_mat_mod
 !!$    procedure, pass(a) :: allocate_mnnz => psb_d_cuda_csga_allocate_mnnz
     ! Note: we do *not* need the TO methods, because the parent type
     ! methods will work. 
-    procedure, pass(a) :: cp_from_coo   => psb_d_cuda_cp_csga_from_coo
-    procedure, pass(a) :: cp_from_fmt   => psb_d_cuda_cp_csga_from_fmt
-    procedure, pass(a) :: mv_from_coo   => psb_d_cuda_mv_csga_from_coo
-    procedure, pass(a) :: mv_from_fmt   => psb_d_cuda_mv_csga_from_fmt
-    procedure, pass(a) :: free          => d_cuda_csga_free
+!!$    procedure, pass(a) :: cp_from_coo   => psb_d_cuda_cp_csga_from_coo
+!!$    procedure, pass(a) :: cp_from_fmt   => psb_d_cuda_cp_csga_from_fmt
+!!$    procedure, pass(a) :: mv_from_coo   => psb_d_cuda_mv_csga_from_coo
+!!$    procedure, pass(a) :: mv_from_fmt   => psb_d_cuda_mv_csga_from_fmt
+!!$    procedure, pass(a) :: free          => d_cuda_csga_free
     procedure, pass(a) :: mold          => psb_d_cuda_csga_mold
 !!$    procedure, pass(a) :: is_host       => d_cuda_csga_is_host
 !!$    procedure, pass(a) :: is_dev        => d_cuda_csga_is_dev
@@ -74,7 +71,7 @@ module psb_d_cuda_csga_mat_mod
     final              :: d_cuda_csga_finalize
   end type psb_d_cuda_csga_sparse_mat
 
-  private :: d_cuda_csga_free,  d_cuda_csga_get_fmt, d_cuda_csga_sizeof
+  private :: d_cuda_csga_get_fmt
 
 !!$
 !!$  interface 
@@ -145,41 +142,41 @@ module psb_d_cuda_csga_mat_mod
     end subroutine psb_d_cuda_csga_from_gpu
   end interface
 
-  interface 
-    subroutine psb_d_cuda_cp_csga_from_coo(a,b,info) 
-      import :: psb_d_cuda_csga_sparse_mat, psb_d_coo_sparse_mat, psb_ipk_
-      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(in)     :: b
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_cuda_cp_csga_from_coo
-  end interface
-  
-  interface 
-    subroutine psb_d_cuda_cp_csga_from_fmt(a,b,info) 
-      import :: psb_d_cuda_csga_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
-      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_cuda_cp_csga_from_fmt
-  end interface
-  
-  interface 
-    subroutine psb_d_cuda_mv_csga_from_coo(a,b,info) 
-      import :: psb_d_cuda_csga_sparse_mat, psb_d_coo_sparse_mat, psb_ipk_
-      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_cuda_mv_csga_from_coo
-  end interface
-  
-  interface 
-    subroutine psb_d_cuda_mv_csga_from_fmt(a,b,info) 
-      import :: psb_d_cuda_csga_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
-      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_cuda_mv_csga_from_fmt
-  end interface
+!!$  interface 
+!!$    subroutine psb_d_cuda_cp_csga_from_coo(a,b,info) 
+!!$      import :: psb_d_cuda_csga_sparse_mat, psb_d_coo_sparse_mat, psb_ipk_
+!!$      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
+!!$      class(psb_d_coo_sparse_mat), intent(in)     :: b
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_d_cuda_cp_csga_from_coo
+!!$  end interface
+!!$  
+!!$  interface 
+!!$    subroutine psb_d_cuda_cp_csga_from_fmt(a,b,info) 
+!!$      import :: psb_d_cuda_csga_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
+!!$      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
+!!$      class(psb_d_base_sparse_mat), intent(in)    :: b
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_d_cuda_cp_csga_from_fmt
+!!$  end interface
+!!$  
+!!$  interface 
+!!$    subroutine psb_d_cuda_mv_csga_from_coo(a,b,info) 
+!!$      import :: psb_d_cuda_csga_sparse_mat, psb_d_coo_sparse_mat, psb_ipk_
+!!$      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
+!!$      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_d_cuda_mv_csga_from_coo
+!!$  end interface
+!!$  
+!!$  interface 
+!!$    subroutine psb_d_cuda_mv_csga_from_fmt(a,b,info) 
+!!$      import :: psb_d_cuda_csga_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
+!!$      class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
+!!$      class(psb_d_base_sparse_mat), intent(inout) :: b
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_d_cuda_mv_csga_from_fmt
+!!$  end interface
   
 !!$  interface 
 !!$    subroutine psb_d_cuda_csga_csmv(alpha,a,x,beta,y,info,trans) 
@@ -237,22 +234,6 @@ contains
   ! == ===================================
 
   
-  function d_cuda_csga_sizeof(a) result(res)
-    implicit none 
-    class(psb_d_cuda_csga_sparse_mat), intent(in) :: a
-    integer(psb_epk_) :: res
-    if (a%is_dev()) call a%sync()
-    res = 8 
-    res = res + psb_sizeof_dp  * size(a%val)
-    res = res + psb_sizeof_ip * size(a%irp)
-    res = res + psb_sizeof_ip * size(a%ja)
-    res = res + psb_sizeof_ip * size(a%rowBlocks)
-    ! Should we account for the shadow data structure
-    ! on the GPU device side? 
-    ! res = 2*res
-      
-  end function d_cuda_csga_sizeof
-
   function d_cuda_csga_get_fmt() result(res)
     implicit none 
     character(len=5) :: res
@@ -337,18 +318,18 @@ contains
 !!$
 !!$  end subroutine d_cuda_csga_sync
 
-  subroutine  d_cuda_csga_free(a) 
-    implicit none 
-    integer(psb_ipk_) :: info
-
-    class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
-
-    info = CSGADeviceFree(a%deviceAMat)
-    call a%psb_d_csr_sparse_mat%free()
-    
-    return
-
-  end subroutine d_cuda_csga_free
+!!$  subroutine  d_cuda_csga_free(a) 
+!!$    implicit none 
+!!$    integer(psb_ipk_) :: info
+!!$
+!!$    class(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
+!!$
+!!$    info = CSGADeviceFree(a%deviceMat)
+!!$    call a%psb_d_csr_sparse_mat%free()
+!!$    
+!!$    return
+!!$
+!!$  end subroutine d_cuda_csga_free
 
   subroutine  d_cuda_csga_finalize(a) 
     implicit none 
@@ -356,7 +337,7 @@ contains
     
     type(psb_d_cuda_csga_sparse_mat), intent(inout) :: a
 
-    info = CSGADeviceFree(a%deviceAMat)
+    info = CSRGDeviceFree(a%deviceMat)
     
     return
 

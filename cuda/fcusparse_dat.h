@@ -51,6 +51,8 @@ typedef struct T_CSRGDeviceMat
   TYPE               *val;
   int                *irp;
   int                *ja;
+  int                *rowBlocks;
+  int                 numBlocks;
 } T_CSRGDeviceMat;
 
 /* Interoperability: type coming from Fortran side to distinguish D/S/C/Z. */

@@ -21,7 +21,9 @@
 __device__ void
 CONCAT(GEN_SPGPU_ELL_NAME(TYPE_SYMBOL), _ridx_4)
 (int i, VALUE_TYPE yVal, int outRow,
-	VALUE_TYPE *z, const VALUE_TYPE *y, VALUE_TYPE alpha, const VALUE_TYPE* cM, const int* rP, int cMPitch, int rPPitch, const int* rS, int rows, const VALUE_TYPE *x, VALUE_TYPE beta, int baseIndex)
+ VALUE_TYPE *z, const VALUE_TYPE *y, VALUE_TYPE alpha, const VALUE_TYPE* cM,
+ const int* rP, int cMPitch, int rPPitch, const int* rS, int rows,
+ const VALUE_TYPE *x, VALUE_TYPE beta, int baseIndex)
 {
 	VALUE_TYPE zProd = CONCAT(zero_,VALUE_TYPE)();
 
