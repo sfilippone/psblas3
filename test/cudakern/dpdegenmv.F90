@@ -596,6 +596,7 @@ program pdgenmv
   integer(psb_epk_) :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)   :: err, eps
   integer, parameter :: ntests=200, ngpu=50, ncnv=20
+  !integer, parameter :: ntests=1, ngpu=1, ncnv=1
   type(psb_d_coo_sparse_mat), target   :: acoo
   type(psb_d_csr_sparse_mat), target   :: acsr
   type(psb_d_ell_sparse_mat), target   :: aell
@@ -853,6 +854,11 @@ program pdgenmv
   eps = maxval(abs(x1(1:nr)-x2(1:nr)))
   call psb_amx(ctxt,eps)
   if (iam==0) write(*,*) 'Max diff on GPU',eps
+  if (.false.) then
+    do i=1,nr
+      write(0,*) i,x1(i),x2(i)
+    end do
+  end if
   if (dump) then 
     write(fname,'(a,i3.3,a,i3.3,a)')'XCPU-out-',iam,'-',np,'.mtx'
     call mm_array_write(x1(1:nr),'Local part CPU',info,filename=fname)

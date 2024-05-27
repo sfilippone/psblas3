@@ -93,7 +93,7 @@ module d_csga_mod
   end interface
  
   interface spmvCSGADevice
-    function d_spmvCSGADevice(Mat,alpha,x,beta,y) &
+    function d_spmvCSGADevice(Mat,alpha,x,beta,y,rb) &
          &  bind(c,name="d_spmvCSGADevice") result(res)
       use iso_c_binding
       import  d_Cmat
@@ -101,6 +101,7 @@ module d_csga_mod
       type(c_ptr), value    :: x
       type(c_ptr), value    :: y
       real(c_double), value :: alpha,beta
+      integer(c_int)        :: rb(*)
       integer(c_int)        :: res
     end function d_spmvCSGADevice
   end interface

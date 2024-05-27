@@ -251,7 +251,7 @@ int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
   cMat->m  = nr;
   cMat->n  = nc;
   cMat->nz = nz;
-  fprintf(stderr,"Setting M %d  N %d \n",cMat->m,cMat->n);
+  //fprintf(stderr,"Setting M %d  N %d \n",cMat->m,cMat->n);
   if (nr1 == 0) nr1 = 1;
   if (nz1 == 0) nz1 = 1;
   if ((rc= allocRemoteBuffer(((void **) &(cMat->irp)), ((nr1+1)*sizeof(int)))) != 0)

@@ -23,9 +23,9 @@ __device__ double warp_reduce(double val){
   return val;
 }
 
-__global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
-			     int m, int n, int col_multivector,
-			     int* rowBlocks, double* resultData, int baseIndex){
+__global__ void dCSGAmvINNER(double alpha, const double* as, const int* ja, const int* irp,
+			     const double* multivector, int m, int n, int col_multivector,
+			     const int* rowBlocks, double beta, double* resultData, int baseIndex){
   __shared__ double vals[MAX_NNZ_PER_WG];
   __shared__ int cols[MAX_NNZ_PER_WG];
   
@@ -34,6 +34,7 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
   long int numRows = stopRow - startRow;
   int nnz = irp[stopRow]-irp[startRow];
   int tid = threadIdx.x; // indice del thread nel blocco
+
   if (numRows > 1){
     //CSR-Stream
     //printf("csr stream\n");
@@ -46,6 +47,7 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
       //vals[i] *= multivector[ja[localCol]*col_multivector+j];
       cols[i] = ja[localCol];
     }
+    //return;
     int firstCol = irp[startRow];
     
     __syncthreads();
@@ -56,7 +58,11 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
       for (int i = irp[localRow]-firstCol; i < irp[localRow+1]-firstCol; i++){
 	temp += vals[i]*multivector[cols[i]*col_multivector + j];
       }
-      resultData[localRow*col_multivector +j] = temp;
+      if (beta == 0.0) {
+	resultData[localRow*col_multivector +j] = alpha*temp;
+      } else {
+	resultData[localRow*col_multivector +j] = alpha*temp + 	beta*resultData[localRow*col_multivector +j];
+      }
     }
     
     __syncthreads();    
@@ -65,7 +71,7 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
     //CSR-Vector
     //printf("csr vector\n");
     int warpId = tid / 32; // Global warp index
-    int lane = tid &(32-1); // thread index within the warp
+    int lane = tid &(0xFFFF); // thread index within the warp
     //one warp per row
     double val; 
     int col;
@@ -78,6 +84,7 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
 	cols[i] = ja[localCol];
       }
     }
+    //return;
     __syncthreads();
     if (warpId < col_multivector){
       for (int col_m = warpId; col_m < col_multivector; col_m +=32){
@@ -93,7 +100,12 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
 	}
 	sum[col_m] = warp_reduce(sum[col_m]);
 	if (lane == 0){
-	  resultData[startRow*col_multivector + col_m] = sum[col_m];   
+	  if (beta == 0.0) {
+	    resultData[startRow*col_multivector + col_m] = alpha*sum[col_m];   
+	  } else {
+	    resultData[startRow*col_multivector + col_m] = alpha*sum[col_m] +
+	      beta*resultData[startRow*col_multivector + col_m];
+	  }	  
 	}
       }
     }
@@ -102,44 +114,51 @@ __global__ void dCSGAmvINNER(double* as, int* ja, int* irp, double* multivector,
 
 
 __host__ int dCSGAMV(spgpuHandle_t handle, 
-	    double beta,
-	    double* y, 
-	    double alpha, 
-	    const double* as, 
-	    const int* ja,
-	    const int* irp,
-	    int m,
-	    int n,
-	    int  numBlocks,
-	    const int* rowBlocks,
-	    const double *x,
-	    int baseIndex)
-{
-  int maxBForACall = max(handle->maxGridSizeX, numBlocks);
+		     double beta,
+		     double* y, 
+		     double alpha, 
+		     const double* as, 
+		     const int* ja,
+		     const int* irp,
+		     int m,
+		     int n,
+		     int ncol,
+		     int  numBlocks,
+		     const int* rowBlocks,
+		     const double *x,
+		     int baseIndex,
+		     int *rb)
+{ 
+  //  fprintf(stderr," dcsgamv  %d   \n",numBlocks);
+  int maxBForACall = min(handle->maxGridSizeX, numBlocks);
+  //int maxBForACall = 1024;
   int blockX = THREAD_BLOCK;
   int gridX = maxBForACall;
   int rp,rows, blcks, bp, numb;
   dim3 blockSize(blockX);
   dim3 gridSize(gridX);
-
-  fprintf(stderr," dcsgamv  %d  %d \n",numBlocks,rowBlocks[0],rowBlocks[1]);
+  //fprintf(stderr," dcsgamv  start %d %d %d  \n",m,n,ncol);
 
   bp = 0;
   rp = 0;
   numb = numBlocks;  
   while (numb > maxBForACall) {//managing large vectors
     blcks = maxBForACall;
-    rp = rowBlocks[bp];
-    rows = rowBlocks[bp+blcks]-rp;
-    fprintf(stderr,"  rp %d  rows %d  bp %d  \n",rp,rows,bp);
+    rp = rb[bp]-baseIndex;
+    rows = rb[bp+blcks]-rp;
+    fprintf(stderr,"  rp %d  rows %d  bp %d  blcks %d\n",rp,rows,bp,blcks);
+    dCSGAmvINNER<<<gridSize,blockSize>>>(alpha,as,ja,irp,x,rows,n,ncol,
+					 &(rowBlocks[bp]),beta,&(y[rp]),baseIndex);
     bp   += blcks;
     numb -= blcks;
   }
   blcks = numb;
-  rp = rowBlocks[bp];
-  rows = rowBlocks[bp+blcks]-rp;
-  fprintf(stderr,"  rp %d  rows %d  bp %d  \n",rp,rows,bp);
+  rp = rb[bp]-baseIndex;
+  rows = rb[bp+blcks]-rp;
+  //fprintf(stderr,"  rp %d  rows %d  bp %d  blcks %d\n",rp,rows,bp,blcks);
+  dCSGAmvINNER<<<gridSize,blockSize>>>(alpha,as,ja,irp,x,rows,n,ncol,
+				       &(rowBlocks[bp]),beta,&(y[rp]),baseIndex);
   rp += rows;
-  fprintf(stderr,"  Final  rows %d    \n",rows);
+  //fprintf(stderr,"  Final  rows %d  %d  \n",rows,rp);
   return(SPGPU_SUCCESS);
 }
