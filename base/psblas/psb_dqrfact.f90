@@ -76,7 +76,7 @@ function psb_dqrfact(x, desc_a, info) result(res)
       call psb_bcast(ctxt,res)
    end if
 
-   call psb_scatter(temp,x,desc_a,info,root=psb_root_)
+   call psb_scatter(temp,x,desc_a,info,root=psb_root_,mold=x%v)
 
    call psb_erractionrestore(err_act)
    return

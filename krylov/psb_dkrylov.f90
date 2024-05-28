@@ -257,7 +257,8 @@ end subroutine psb_dkrylov_vect
 !    itrace -  integer(optional)            Input: print an informational message
 !                                           with the error estimate every itrace
 !                                           iterations
-!    itrs   -  integer(optional)            Input: number of iterations
+!    irst   -  integer(optional)            Input: restart parameter for RGMRES and 
+!                                           BICGSTAB(L) methods
 !    istop  -  integer(optional)            Input: stopping criterion, or how
 !                                           to estimate the error. 
 !                                           1: err =  |r|/(|a||x|+|b|)
@@ -266,7 +267,7 @@ end subroutine psb_dkrylov_vect
 !                                           estimate of) residual 
 !
 Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,itrs,istop)
+     & itmax,iter,err,itrace,irst,istop)
 
   use psb_base_mod
   use psb_prec_mod,only : psb_dprec_type
@@ -280,13 +281,13 @@ Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
   type(psb_d_multivect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)                :: eps
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), Optional, Intent(in)   :: itmax, itrace, itrs, istop
+  integer(psb_ipk_), Optional, Intent(in)   :: itmax, itrace, irst, istop
   integer(psb_ipk_), Optional, Intent(out)  :: iter
   Real(psb_dpk_), Optional, Intent(out)     :: err
 
   abstract interface
     subroutine psb_dkryl_multivect(a,prec,b,x,eps,desc_a,&
-          &info,itmax,iter,err,itrace,itrs,istop)
+          &info,itmax,iter,err,itrace,istop)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
           & psb_dspmat_type, psb_dprec_type, psb_d_multivect_type
       type(psb_dspmat_type), intent(in)         :: a
@@ -296,10 +297,25 @@ Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
       real(psb_dpk_), intent(in)                :: eps
       class(psb_dprec_type), intent(inout)      :: prec
       integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), optional, intent(in)   :: itmax,itrace,itrs,istop
+      integer(psb_ipk_), optional, intent(in)   :: itmax,itrace,istop
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_dpk_), optional, intent(out)     :: err
     end subroutine psb_dkryl_multivect
+    subroutine psb_dkryl_rest_multivect(a,prec,b,x,eps,desc_a,&
+          &info,itmax,iter,err,itrace,irst,istop)
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+          & psb_dspmat_type, psb_dprec_type, psb_d_multivect_type
+      type(psb_dspmat_type), intent(in)         :: a
+      type(psb_desc_type), intent(in)           :: desc_a
+      type(psb_d_multivect_type), Intent(inout) :: b
+      type(psb_d_multivect_type), Intent(inout) :: x
+      real(psb_dpk_), intent(in)                :: eps
+      class(psb_dprec_type), intent(inout)      :: prec
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: itmax,itrace,irst,istop
+      integer(psb_ipk_), optional, intent(out)  :: iter
+      real(psb_dpk_), optional, intent(out)     :: err
+    end subroutine psb_dkryl_rest_multivect
   end interface
 
   procedure(psb_dkryl_multivect) :: psb_dbgmres_multivect
@@ -313,7 +329,7 @@ Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
   name = 'psb_krylov'
   call psb_erractionsave(err_act)
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
 
@@ -329,13 +345,13 @@ Subroutine psb_dkrylov_multivect(method,a,prec,b,x,eps,desc_a,info,&
   select case(psb_toupper(method))
   case('BGMRES','GMRES')
     call psb_dbgmres_multivect(a,prec,b,x,eps,desc_a,info,&
-        & itmax,iter,err,itrace=itrace_,itrs=itrs,istop=istop)
+        & itmax,iter,err,itrace=itrace_,istop=istop)
   case default
     if (me == 0) write(psb_err_unit,*) trim(name),&
          & ': Warning: Unknown method  ',method,&
          & ', defaulting to BGMRES'
     call psb_dbgmres_multivect(a,prec,b,x,eps,desc_a,info,&
-         & itmax,iter,err,itrace=itrace_,itrs=itrs,istop=istop)
+         & itmax,iter,err,itrace=itrace_,istop=istop)
   end select
 
   if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)

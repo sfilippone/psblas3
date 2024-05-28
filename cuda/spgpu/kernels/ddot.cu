@@ -153,8 +153,12 @@ void spgpuDmdot(spgpuHandle_t handle, double* y, int n, __device double* a, __de
 {
 	for (int i=0; i<count; ++i)
 	{
-		y[i] = spgpuDdot(handle, n, a, b);
-		//a += pitch;
-		b += pitch;
+    for (int j=0; j<count; ++j)
+    {
+      y[i+j*count] = spgpuDdot(handle, n, a, b);
+		  b += pitch;
+    }
+    b -= pitch*count;
+    a += pitch;
 	}
 }

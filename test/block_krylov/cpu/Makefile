@@ -1,4 +1,4 @@
-INSTALLDIR=../..
+INSTALLDIR=../../..
 INCDIR=$(INSTALLDIR)/include/
 MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
@@ -11,27 +11,27 @@ LDLIBS=$(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG). 
 
-DBFOBJS=getp.o psb_dbf_sample.o
+DBFOBJS=psb_dbf_sample.o
+DPDEGEN=psb_dpde_gen.o
 
 EXEDIR=./runs
 
-all: runsd psb_dbf_sample
+all: runsd psb_dbf_sample psb_dpde_gen
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
 
-psb_dbf_sample.o: getp.o
-
-psb_dbf_sample: $(DBFOBJS)
+psb_dbf_sample: runsd $(DBFOBJS)
 	$(FLINK) $(LOPT) $(DBFOBJS) -o psb_dbf_sample $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_dbf_sample $(EXEDIR)
 
-.f90.o:
-	$(MPFC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
+psb_dpde_gen: runsd $(DPDEGEN)
+	$(FLINK) $(LOPT) $(DPDEGEN) -o psb_dpde_gen $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_dpde_gen $(EXEDIR)
 
 clean: 
-	/bin/rm -f $(DBFOBJS)\
-        *$(.mod) $(EXEDIR)/psb_*f_sample 
+	/bin/rm -f $(DBFOBJS) $(DPDEGEN)\
+        *$(.mod) $(EXEDIR)/psb_*
 
 lib:
 	(cd ../../; make library)

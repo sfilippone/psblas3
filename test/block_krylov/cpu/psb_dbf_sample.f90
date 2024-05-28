@@ -4,7 +4,6 @@ program psb_dbf_sample
    use psb_prec_mod
    use psb_krylov_mod
    use psb_util_mod
-   use getp
 
    implicit none
 
@@ -36,7 +35,7 @@ program psb_dbf_sample
    integer(psb_lpk_)   :: lnp
 
    ! solver paramters
-   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, methd, istopc, itrs
+   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, methd, istopc
    integer(psb_epk_) :: amatsize, precsize, descsize
    real(psb_dpk_)    :: err, eps
 
@@ -52,7 +51,7 @@ program psb_dbf_sample
    real(psb_dpk_), allocatable    :: resmx(:)
    real(psb_dpk_)                 :: resmxp
    integer(psb_ipk_), allocatable :: ivg(:)
-   logical                        :: print_matrix = .false.
+   logical                        :: print_matrix = .true.
 
    call psb_init(ctxt)
    call psb_info(ctxt,iam,np)
@@ -80,7 +79,7 @@ program psb_dbf_sample
    !  get parameters
    !
    call get_parms(ctxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,&
-   & part,afmt,nrhs,istopc,itmax,itrace,itrs,eps)
+   & part,afmt,nrhs,istopc,itmax,itrace,eps)
 
    call psb_barrier(ctxt)
    t1 = psb_wtime()
@@ -133,9 +132,9 @@ program psb_dbf_sample
          b_mv_glob => aux_b(:,:)
          do i=1, m
             do j=1, nrhs
-               !b_mv_glob(i,j) = done
-               call random_number(random_value)
-               b_mv_glob(i,j) = random_value
+               b_mv_glob(i,j) = done
+               !call random_number(random_value)
+               !b_mv_glob(i,j) = random_value
             enddo
          enddo
       endif
@@ -210,8 +209,7 @@ program psb_dbf_sample
    t1 = psb_wtime()
 
    call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
-   & itmax=itmax,iter=iter,err=err,itrace=itrace,&
-   & itrs=itrs,istop=istopc)
+   & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc)
 
    call psb_barrier(ctxt)
    t2 = psb_wtime() - t1
@@ -221,11 +219,11 @@ program psb_dbf_sample
       write(psb_out_unit,'("Finished algorithm")')
       write(psb_out_unit,'(" ")')
    end if
-   
+
    call psb_geaxpby(done,b_mv,dzero,r_mv,desc_a,info)
    call psb_spmm(-done,a,x_mv,done,r_mv,desc_a,info)
 
-   resmx  = psb_genrm2(r_mv,desc_a,info)   
+   resmx  = psb_genrm2(r_mv,desc_a,info)
    resmxp = psb_geamax(r_mv,desc_a,info)
 
    amatsize = a%sizeof()
@@ -256,18 +254,18 @@ program psb_dbf_sample
       write(psb_out_unit,'("Time to solve system:               ",es12.5)')t2
       write(psb_out_unit,'("Time per iteration:                 ",es12.5)')t2/(iter)
       write(psb_out_unit,'("Total time:                         ",es12.5)')t2+tprec
-      write(psb_out_unit,'("Residual norm 2:                    ",es12.5)')maxval(resmx)
+      write(psb_out_unit,'("Residual norm 2:                    ",es12.5)')sum(resmx)/size(resmx)
       write(psb_out_unit,'("Residual norm inf:                  ",es12.5)')resmxp
-      write(psb_out_unit,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
       if (print_matrix) then
+         write(psb_out_unit,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
          do i=1,m
             write(psb_out_unit,993) i, x_mv_glob(i,:), r_mv_glob(i,:), b_mv_glob(i,:)
          end do
       end if
    end if
 
-998 format(i8,4(2x,g20.14))
-993 format(i6,4(1x,e12.6))
+998 format(i8,10(2x,g20.14))
+993 format(i6,10(1x,e12.6))
 
    call psb_gefree(b_mv, desc_a,info)
    call psb_gefree(x_mv, desc_a,info)
@@ -281,5 +279,102 @@ program psb_dbf_sample
 9999 call psb_error(ctxt)
 
    return
+
+contains
+   !
+   ! get iteration parameters from standard input
+   !
+   subroutine get_parms(ctxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,part,afmt,nrhs,istopc,itmax,itrace,eps)
+      type(psb_ctxt_type) :: ctxt
+      character(len=2)    :: filefmt
+      character(len=40)   :: kmethd, mtrx_file, rhs_file, ptype
+      character(len=20)   :: part
+      character(len=5)    :: afmt
+      integer(psb_ipk_)   :: nrhs, istopc, itmax, itrace
+      real(psb_dpk_)      :: eps
+
+      integer(psb_ipk_)   :: np, iam
+      integer(psb_ipk_)   :: ip, inp_unit
+      character(len=1024) :: filename
+
+      call psb_info(ctxt, iam, np)
+
+      if (iam == 0) then
+         if (command_argument_count()>0) then
+            call get_command_argument(1, filename)
+            inp_unit = 30
+            open(inp_unit, file=filename, action='read', iostat=info)
+            if (info /= 0) then
+               write(psb_err_unit,*) 'Could not open file ',filename,' for input'
+               call psb_abort(ctxt)
+               stop
+            else
+               write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
+            end if
+         else
+            inp_unit = psb_inp_unit
+         end if
+
+         ! Read Input Parameters
+         read(inp_unit,*) mtrx_file
+         read(inp_unit,*) rhs_file
+         read(inp_unit,*) filefmt
+         read(inp_unit,*) kmethd
+         read(inp_unit,*) ptype
+         read(inp_unit,*) afmt
+         read(inp_unit,*) part
+         read(inp_unit,*) nrhs
+         read(inp_unit,*) istopc
+         read(inp_unit,*) itmax
+         read(inp_unit,*) itrace
+         read(inp_unit,*) eps
+
+         call psb_bcast(ctxt,mtrx_file)
+         call psb_bcast(ctxt,rhs_file)
+         call psb_bcast(ctxt,filefmt)
+         call psb_bcast(ctxt,kmethd)
+         call psb_bcast(ctxt,ptype)
+         call psb_bcast(ctxt,afmt)
+         call psb_bcast(ctxt,part)
+         call psb_bcast(ctxt,nrhs)
+         call psb_bcast(ctxt,istopc)
+         call psb_bcast(ctxt,itmax)
+         call psb_bcast(ctxt,itrace)
+         call psb_bcast(ctxt,eps)
+
+         if (inp_unit /= psb_inp_unit) then
+            close(inp_unit)
+         end if
+      else
+         ! Receive Parameters
+         call psb_bcast(ctxt,mtrx_file)
+         call psb_bcast(ctxt,rhs_file)
+         call psb_bcast(ctxt,filefmt)
+         call psb_bcast(ctxt,kmethd)
+         call psb_bcast(ctxt,ptype)
+         call psb_bcast(ctxt,afmt)
+         call psb_bcast(ctxt,part)
+         call psb_bcast(ctxt,nrhs)
+         call psb_bcast(ctxt,istopc)
+         call psb_bcast(ctxt,itmax)
+         call psb_bcast(ctxt,itrace)
+         call psb_bcast(ctxt,eps)
+      end if
+
+      if (iam == 0) then
+         write(psb_out_unit,'(" ")')
+         write(psb_out_unit,'("Solving matrix           : ",a)') mtrx_file
+         write(psb_out_unit,'("Data distribution        : ",a)') part
+         write(psb_out_unit,'("Iterative method         : ",a)') kmethd
+         write(psb_out_unit,'("Number of processors     : ",i0)') np
+         write(psb_out_unit,'("Number of RHS            : ",i4)') nrhs
+         write(psb_out_unit,'("Max number of iterations : ",i3)') itmax
+         write(psb_out_unit,'("Storage format           : ",a)') afmt
+         write(psb_out_unit,'(" ")')
+      end if
+
+      return
+
+   end subroutine get_parms
 
 end program psb_dbf_sample

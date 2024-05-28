@@ -1627,14 +1627,9 @@ contains
       if (yy%is_host()) call yy%sync()
       allocate(res(size(x%v,2),size(y%v,2)))
       info = dotMultiVecDevice(res,nr,x%deviceVect,yy%deviceVect,size(x%v,2))
-      if (info /= 0) then 
-        info = psb_err_internal_error_
-        call psb_errpush(info,'d_cuda_multi_dot_v')
-      end if
     class default
-      ! y%sync is done in dot_a
-      call x%sync()      
-      res = y%dot(nr,x%v)
+      call y%sync()
+      res = x%dot(nr,y%v)
     end select
 
   end function d_cuda_multi_dot_v

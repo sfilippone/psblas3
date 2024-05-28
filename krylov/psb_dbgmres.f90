@@ -28,7 +28,6 @@
 !    itrace -  integer(optional)          Input: print an informational message
 !                                         with the error estimate every itrace
 !                                         iterations
-!    itrs   -  integer(optional)          Input: iteration number parameter
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error.
 !                                         1: err =  |r|/(|a||x|+|b|);  here the iteration is
@@ -39,7 +38,7 @@
 !                                         estimate of) residual.
 !
 
-subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, err, itrace, itrs, istop)
+subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, err, itrace, istop)
 
    use psb_base_mod
    use psb_prec_mod
@@ -57,28 +56,25 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    real(psb_dpk_), intent(in)                :: eps
    integer(psb_ipk_), intent(out)            :: info
-   integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, itrs, istop
+   integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
    integer(psb_ipk_), optional, intent(out)  :: iter
    real(psb_dpk_), optional, intent(out)     :: err
 
-   real(psb_dpk_), allocatable               :: aux(:), h(:,:), vt(:,:), beta(:,:), y(:,:)
+   real(psb_dpk_), allocatable               :: aux(:), h(:,:), beta(:,:), y(:,:)
 
    type(psb_d_multivect_type), allocatable   :: v(:)
-   type(psb_d_multivect_type)                :: w, r0, rm
+   type(psb_d_multivect_type)                :: w, r0, rm, temp
 
-   real(psb_dpk_)                            :: t1, t2
-
-   real(psb_dpk_)                            :: rti, rti1
-   integer(psb_ipk_)                         :: litmax, naux, itrace_, n_row, n_col, nrhs, nrep
+   integer(psb_ipk_)                         :: naux, itrace_, n_row, n_col, nrhs, nrep
    integer(psb_lpk_)                         :: mglob, n_add, ncv
 
-   integer(psb_ipk_)                         :: i, j, k, col, istop_, err_act, idx_i, idx_j, idx
+   integer(psb_ipk_)                         :: i, j, istop_, err_act, idx_i, idx_j, idx
    integer(psb_ipk_)                         :: debug_level, debug_unit
 
    type(psb_ctxt_type)                       :: ctxt
    integer(psb_ipk_)                         :: np, me, itx
    real(psb_dpk_), allocatable               :: r0n2(:), rmn2(:)
-   real(psb_dpk_), allocatable               :: errnum(:), errden(:)
+   real(psb_dpk_)                            :: errnum, errden
    real(psb_dpk_)                            :: deps, derr
    character(len=20)                         :: name
    character(len=*), parameter               :: methdname='BGMRES'
@@ -124,9 +120,9 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    endif
 
    if (present(itmax)) then
-      litmax = itmax
+      nrep = itmax
    else
-      litmax = 1000
+      nrep = 10
    endif
 
    if (present(itrace)) then
@@ -135,30 +131,12 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       itrace_ = 0
    end if
 
-   if (present(itrs)) then
-      nrep = itrs
-      if (debug_level >= psb_debug_ext_) &
-      & write(debug_unit,*) me,' ',trim(name),&
-      & ' present: itrs: ',itrs,nrep
-   else
-      nrep = 10
-      if (debug_level >= psb_debug_ext_) &
-      & write(debug_unit,*) me,' ',trim(name),&
-      & ' not present: itrs: ',itrs,nrep
-   endif
-   if (nrep <=0 ) then
-      info=psb_err_invalid_irst_
-      err=info
-      call psb_errpush(info,name,i_err=(/nrep/))
-      goto 9999
-   endif
-
    ncv = x%get_ncols()
    call psb_chkvect(mglob,ncv,x%get_nrows(),lone,lone,desc_a,info)
    if(info /= psb_success_) then
-     info=psb_err_from_subroutine_
-     call psb_errpush(info,name,a_err='psb_chkvect on X')
-     goto 9999
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='psb_chkvect on X')
+      goto 9999
    end if
    ncv = b%get_ncols()
    call psb_chkvect(mglob,ncv,b%get_nrows(),lone,lone,desc_a,info)
@@ -170,17 +148,17 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    naux = 4*n_col
    nrhs = x%get_ncols()
-   allocate(aux(naux),h((nrep+1)*nrhs,nrep*nrhs),y(nrep*nrhs,nrhs),&
-         & vt(n_row,(nrep+1)*nrhs),r0n2(nrhs),rmn2(nrhs),&
-         & errnum(nrhs),errden(nrhs),stat=info)
+   allocate(aux(naux),h((nrep+1)*nrhs,nrep*nrhs),y(nrep*nrhs,nrhs),r0n2(nrhs),rmn2(nrhs),stat=info)
    if (info == psb_success_) call psb_geall(v,desc_a,info,m=nrep+1,n=nrhs)
    if (info == psb_success_) call psb_geall(w,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(r0,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(rm,desc_a,info,n=nrhs)
+   if (info == psb_success_) call psb_geall(temp,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geasb(v,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(r0,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(rm,desc_a,info,mold=x%v,n=nrhs)
+   if (info == psb_success_) call psb_geasb(temp,desc_a,info,mold=x%v,n=nrhs)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -214,13 +192,11 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       goto 9999
    end if
 
-   h      = dzero
-   y      = dzero
-   errnum = dzero
-   errden = done
-   deps   = eps
-   itx    = 0
-   n_add  = nrhs-1
+   h     = dzero
+   y     = dzero
+   deps  = eps
+   itx   = 0
+   n_add = nrhs-1
 
    if ((itrace_ > 0).and.(me == psb_root_)) call log_header(methdname)
 
@@ -245,22 +221,18 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end if
 
    ! STEP 2: Compute QR_fact(R(0))
-   beta = psb_geqrfact(v(1),desc_a,info)
+   beta = qr_fact(v(1))
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
    end if
 
-   ! Add V(1) to VT
-   vt(:,1:nrhs) = v(1)%get_vect()
-
    ! STEP 3: Outer loop
    outer: do j=1,nrep
 
       ! Update itx counter
       itx = itx + 1
-      if (itx >= litmax) exit outer
 
       ! Compute j index for H operations
       idx_j = (j-1)*nrhs+1
@@ -279,10 +251,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          ! Compute i index for H operations
          idx_i = (i-1)*nrhs+1
 
-         ! TODO
          ! STEP 6: Compute H(i,j) = (V(i)**T)*W
-         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_geprod(v(i),w,desc_a,info,trans=.true.)
-         !h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_gedot(v(i),w,desc_a,info)
+         h(idx_i:idx_i+n_add,idx_j:idx_j+n_add) = psb_gedot(v(i),w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -290,9 +260,17 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          end if
 
          ! STEP 7: Compute W = W - V(i)*H(i,j)
-         call psb_geaxpby(-done,&
-         & psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),desc_a,info,global=.false.),&
-         & done,w,desc_a,info)
+
+         ! Compute temp product V(i)*H(i,j)
+         call mv_prod(v(i)%get_vect(),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add))
+         if (info /= psb_success_) then
+            info=psb_err_from_subroutine_non_
+            call psb_errpush(info,name)
+            goto 9999
+         end if
+
+         ! Compute W
+         call psb_geaxpby(-done,temp,done,w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -304,7 +282,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       ! STEP 8: Compute QR_fact(W)
 
       ! Store R in H(j+1,j)
-      h(idx_j+nrhs:idx_j+nrhs+n_add,idx_j:idx_j+n_add) = psb_geqrfact(w,desc_a,info)
+      h(idx_j+nrhs:idx_j+nrhs+n_add,idx_j:idx_j+n_add) = qr_fact(w)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
@@ -319,12 +297,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          goto 9999
       end if
 
-      ! Add V(j+1) to VT
-      idx = j*nrhs+1
-      vt(:,idx:idx+n_add) = v(j+1)%get_vect()
-
       ! STEP 9: Compute Y(j)
-      call frobenius_norm_min(j)
+      rmn2 = frobenius_norm_min(j)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
@@ -333,72 +307,56 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
       ! Compute residues
       if (istop_ == 1) then
-
-         ! Copy R(0) in R(j)
-         call psb_geaxpby(done,r0,dzero,rm,desc_a,info)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         ! Compute R(j) = R(0) - VT(j+1)*H(j)*Y(j)
-         call psb_geaxpby(-done,psb_geprod(psb_geprod(vt(:,1:(j+1)*nrhs),h(1:(j+1)*nrhs,1:j*nrhs),&
-                           & desc_a,info,global=.false.),&
-                           & y(1:j*nrhs,1:nrhs),desc_a,info,global=.false.),done,rm,desc_a,info)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         ! Compute nrm2 of each column of R(j)
-         rmn2 = psb_genrm2(rm,desc_a,info)
-         if (info /= psb_success_) then
-            info=psb_err_from_subroutine_non_
-            call psb_errpush(info,name)
-            goto 9999
-         end if
-
-         ! Set error num and den
-         errnum = rmn2
-         errden = r0n2
-
+         errnum = sum(rmn2)/size(rmn2)
+         errden = sum(r0n2)/size(r0n2)
       end if
 
-      ! TODO Check convergence (max o media)
-      if (maxval(errnum).le.(eps*maxval(errden))) then
-
-         ! Exit algorithm
+      ! Check convergence
+      if (errnum <= eps*errden) then
          exit outer
-
       end if
 
       ! Log update
-      if (itrace_ > 0) call log_conv(methdname,me,itx,ione,maxval(errnum),maxval(errden),deps)
+      if (itrace_ > 0) call log_conv(methdname,me,itx,ione,errnum,errden,deps)
 
    end do outer
 
    ! STEP 10: X(m) = X(0) + VT(m)*Y(m)
-   call psb_geaxpby(done,psb_geprod(vt(:,1:j*nrhs),y(1:j*nrhs,:),desc_a,info,global=.false.),done,x,desc_a,info)
-   if (info /= psb_success_) then
-      info=psb_err_from_subroutine_non_
-      call psb_errpush(info,name)
-      goto 9999
-   end if
+   do i=1,j
+
+      ! Compute index for Y products
+      idx = (i-1)*nrhs+1
+
+      ! Compute temp product V(i)*Y(i)
+      call mv_prod(v(i)%get_vect(),y(idx:idx+n_add,:))
+      if (info /= psb_success_) then
+         info=psb_err_from_subroutine_non_
+         call psb_errpush(info,name)
+         goto 9999
+      end if
+
+      ! Add temp to X(m)
+      call psb_geaxpby(done,temp,done,x,desc_a,info)
+      if (info /= psb_success_) then
+         info=psb_err_from_subroutine_non_
+         call psb_errpush(info,name)
+         goto 9999
+      end if
+
+   end do
 
    ! END algorithm
 
-   if (itrace_ > 0) call log_conv(methdname,me,itx,ione,maxval(errnum),maxval(errden),deps)
+   if (itrace_ > 0) call log_conv(methdname,me,itx,ione,errnum,errden,deps)
 
-   call log_end(methdname,me,itx,itrace_,maxval(errnum),maxval(errden),deps,err=derr,iter=iter)
+   call log_end(methdname,me,itx,itrace_,errnum,errden,deps,err=derr,iter=iter)
    if (present(err)) err = derr
 
    if (info == psb_success_) call psb_gefree(v,desc_a,info)
    if (info == psb_success_) call psb_gefree(w,desc_a,info)
    if (info == psb_success_) call psb_gefree(r0,desc_a,info)
    if (info == psb_success_) call psb_gefree(rm,desc_a,info)
-   if (info == psb_success_) deallocate(aux,h,y,vt,stat=info)
+   if (info == psb_success_) deallocate(aux,h,y,r0n2,rmn2,stat=info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -413,43 +371,127 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
 contains
 
-   ! Minimize Frobenius norm
-   subroutine frobenius_norm_min(rep)
-
+   ! QR factorization
+   function qr_fact(mv) result(res)
       implicit none
 
-      integer(psb_ipk_), intent(in) :: rep
+      ! I/O parameters
+      type(psb_d_multivect_type), intent(inout)  :: mv
+      real(psb_dpk_), allocatable                :: res(:,:)
 
-      integer(psb_ipk_)           :: lwork
-      real(psb_dpk_), allocatable :: work(:), beta_e1(:,:)
+      ! Utils
+      real(psb_dpk_), allocatable :: vec(:,:)
+      real(psb_dpk_), allocatable :: tau(:), work(:)
+      integer(psb_ipk_)           :: ii, jj, m, lda, lwork
 
-      real(psb_dpk_), allocatable :: h_temp(:,:)
-      integer(psb_ipk_)           :: m_h, n_h, mn
+      ! Allocate output
+      allocate(res(nrhs,nrhs))
+
+      ! Gather multivector to factorize
+      call psb_gather(vec,mv,desc_a,info,root=psb_root_)
+
+      ! If root
+      if (me == psb_root_) then
+
+         ! Initialize params
+         m = size(vec,1)
+         lda = m
+         lwork = nrhs
+         allocate(tau(nrhs),work(lwork))
+
+         ! Perform QR factorization
+         call dgeqrf(m,nrhs,vec,lda,tau,work,lwork,info)
+
+         ! Set R
+         res = vec(1:nrhs,1:nrhs)
+         do ii = 2, nrhs
+            do jj = 1, ii-1
+               res(ii,jj) = dzero
+            enddo
+         enddo
+
+         ! Generate Q matrix
+         call dorgqr(m,nrhs,nrhs,vec,lda,tau,work,lwork,info)
+
+         ! Deallocate
+         deallocate(tau,work)
+
+      end if
+
+      ! Share R
+      call psb_bcast(ctxt,res)
+
+      ! Scatter Q
+      call psb_scatter(vec,mv,desc_a,info,root=psb_root_,mold=mv%v)
+
+   end function qr_fact
+
+   ! Multivectors product
+   subroutine mv_prod(x_mv,y_mv)
+      implicit none
+
+      ! I/O parameters
+      real(psb_dpk_), intent(in) :: x_mv(:,:), y_mv(:,:)
+
+      ! Utils
+      real(psb_dpk_), allocatable :: res(:,:)
+      integer(psb_ipk_)           :: lda, ldb
 
       ! Initialize params
-      h_temp = h
+      lda = size(x_mv,1)
+      ldb = size(y_mv,2)
+      allocate(res(lda,ldb))
+      res = dzero
+
+      ! Compute product
+      if (n_row > 0) then
+         call dgemm('N','N',n_row,nrhs,nrhs,done,x_mv,lda,y_mv,ldb,dzero,res,lda)
+      end if
+
+      ! Set temp multivector
+      call temp%set(res)
+
+      ! Deallocate
+      deallocate(res)
+
+   end subroutine mv_prod
+
+   ! Minimize Frobenius norm
+   function frobenius_norm_min(rep) result(res)
+      implicit none
+
+      ! I/O parameters
+      real(psb_dpk_), allocatable   :: res(:)
+      integer(psb_ipk_), intent(in) :: rep
+
+      ! Utils
+      integer(psb_ipk_)           :: lwork, m_h, n_h, mn
+      real(psb_dpk_), allocatable :: work(:), beta_e1(:,:), h_temp(:,:)
+
+      ! Initialize params
       m_h    = (rep+1)*nrhs
       n_h    = rep*nrhs
+      h_temp = h(1:m_h,1:n_h)
       mn     = min(m_h,n_h)
       lwork  = max(1,mn+max(mn,nrhs))
-      allocate(work(lwork))
+      allocate(work(lwork),beta_e1(m_h,nrhs),res(nrhs))
 
       ! Compute E1*beta
-      allocate(beta_e1(m_h,nrhs))
       beta_e1 = dzero
       beta_e1(1:nrhs,1:nrhs) = beta
 
       ! Compute min Frobenius norm
-      call dgels('N',m_h,n_h,nrhs,h_temp(1:m_h,1:n_h),m_h,beta_e1,m_h,work,lwork,info)
+      call dgels('N',m_h,n_h,nrhs,h_temp,m_h,beta_e1,m_h,work,lwork,info)
 
       ! Set solution
       y = beta_e1(1:n_h,1:nrhs)
 
+      ! Set residues
+      res = sum(beta_e1(n_h+1:m_h,:)**2,dim=1)
+
       ! Deallocate
       deallocate(work,h_temp,beta_e1)
 
-      return
-
-   end subroutine frobenius_norm_min
+   end function frobenius_norm_min
 
 end subroutine psb_dbgmres_multivect

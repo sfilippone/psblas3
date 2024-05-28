@@ -108,7 +108,7 @@ function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
    if (present(global)) then
       global_ = global
    else
-      global_ = .true.
+      global_ = .false.
    end if
 
    ix = ione
@@ -242,7 +242,7 @@ function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
    if (present(global)) then
       global_ = global
    else
-      global_ = .true.
+      global_ = .false.
    end if
 
    ix = ione
@@ -363,7 +363,7 @@ function psb_dprod_m(x,y,desc_a,info,trans,global) result(res)
    if (present(global)) then
       global_ = global
    else
-      global_ = .true.
+      global_ = .false.
    end if
 
    ix = ione

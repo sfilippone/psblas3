@@ -518,9 +518,9 @@ program dpdegen
    use psb_util_mod
    use psb_prec_mod
    use psb_krylov_mod
-   use psb_ext_mod
-   use psb_cuda_mod
    use psb_d_pde3d_mod
+
+   implicit none
 
    ! input parameters
    character(len=40) :: kmethd, ptype
@@ -537,8 +537,6 @@ program dpdegen
    ! dense matrices
    real(psb_dpk_), allocatable :: b_mv_glob(:,:), x_mv_glob(:,:), r_mv_glob(:,:)
    type(psb_d_multivect_type)  :: b_mv, x_mv, r_mv
-   type(psb_d_multivect_cuda)  :: gpumold
-   type(psb_i_vect_cuda)       :: imold
    integer(psb_ipk_)           :: m
 
    ! blacs parameters
@@ -551,13 +549,6 @@ program dpdegen
    integer(psb_epk_)  :: amatsize, precsize, descsize
    integer(psb_ipk_)  :: iter, ierr, ircode
 
-   ! molds
-   type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
-   type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
-   type(psb_d_cuda_elg_sparse_mat), target   :: aelg
-   type(psb_d_cuda_hdiag_sparse_mat), target :: ahdiag
-   class(psb_d_base_sparse_mat), pointer     :: agmold
-
    ! other variables
    integer(psb_ipk_)           :: info, i, j, rep
    real(psb_dpk_)              :: t1, t2, tprec
@@ -565,21 +556,19 @@ program dpdegen
    real(psb_dpk_)              :: random_value
    real(psb_dpk_)              :: resmxp
    real(psb_dpk_), allocatable :: resmx(:)
-   logical                     :: tnd = .false.
    logical                     :: print_matrix = .false.
 
    ! Init environment
    info=psb_success_
    call psb_init(ctxt)
    call psb_info(ctxt,iam,np)
-   call psb_cuda_init(ctxt)
    if (iam < 0) then
       ! This should not happen, but just in case
       call psb_exit(ctxt)
       stop
    endif
    if(psb_get_errstatus() /= 0) goto 9999
-   name='pdegenmm_cuda'
+   name='pdegenmm_block'
    !
    ! Hello world
    !
@@ -588,8 +577,6 @@ program dpdegen
       write(*,*) 'This is the ',trim(name),' sample program'
       write(psb_out_unit,'("Number of processors: ",i8)')np
    end if
-   write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice()+1,' out of', psb_cuda_getDeviceCount()
-   write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice()+1,' is a: ', trim(psb_cuda_DeviceName())
    !
    !  get parameters
    !
@@ -599,7 +586,7 @@ program dpdegen
    !
    call psb_barrier(ctxt)
    t1 = psb_wtime()
-   call psb_gen_pde3d(ctxt,idim,a,b_mv,x_mv,nrhs,desc_a,'CSR  ',info,partition=3,tnd=tnd)
+   call psb_gen_pde3d(ctxt,idim,a,b_mv,x_mv,nrhs,desc_a,afmt,info,partition=3)
    call psb_barrier(ctxt)
    t2 = psb_wtime() - t1
    if(info /= psb_success_) then
@@ -610,35 +597,6 @@ program dpdegen
    end if
    if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
    if (iam == psb_root_) write(psb_out_unit,'(" ")')
-
-   ! building the preconditioner
-   call prec%init(ctxt,ptype,info)
-   call prec%build(a,desc_a,info)
-   if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
-      goto 9999
-   end if
-
-   select case(psb_toupper(afmt))
-    case('ELG')
-      agmold => aelg
-    case('HLG')
-      agmold => ahlg
-    case('HDIAG')
-      agmold => ahdiag
-    case('CSRG')
-      agmold => acsrg
-    case default
-      write(*,*) 'Unknown format defaulting to HLG'
-      agmold => ahlg
-   end select
-   call a%cscnv(info,mold=agmold)
-   call desc_a%cnv(mold=imold)
-   if ((info /= 0).or.(psb_get_errstatus()/=0)) then
-      write(0,*) 'From cscnv ',info
-      call psb_error()
-      stop
-   end if
 
    call psb_geall(r_mv,desc_a,info,nrhs)
    call r_mv%zero()
@@ -677,6 +635,13 @@ program dpdegen
 
    call psb_krylov(kmethd,a,prec,b_mv,x_mv,eps,desc_a,info,&
    & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc)
+
+   if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='solver routine'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+   end if
 
    call psb_barrier(ctxt)
    t2 = psb_wtime() - t1
@@ -729,6 +694,7 @@ program dpdegen
             write(psb_out_unit,993) i, x_mv_glob(i,:), r_mv_glob(i,:), b_mv_glob(i,:)
          end do
       end if
+      write(psb_out_unit,'(" ")')
    end if
 
 998 format(i8,20(2x,g20.14))
@@ -742,7 +708,6 @@ program dpdegen
    call psb_spfree(a,desc_a,info)
    call prec%free(info)
    call psb_cdfree(desc_a,info)
-   call psb_cuda_exit()
    call psb_exit(ctxt)
 
    return

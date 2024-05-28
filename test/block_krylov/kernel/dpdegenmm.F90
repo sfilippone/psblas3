@@ -588,7 +588,7 @@ program pdegenmm
   type(psb_d_vect_cuda) :: tmold
   type(psb_i_vect_cuda)       :: imold 
 #endif
-  real(psb_dpk_), allocatable :: x1(:,:), x2(:,:), x0(:,:)
+  real(psb_dpk_), allocatable :: x1(:,:), x2(:,:), x0(:,:), test(:)
   ! blacs parameters
   type(psb_ctxt_type) :: ctxt
   integer             :: iam, np
@@ -659,11 +659,6 @@ program pdegenmm
   !  get parameters
   !
   call get_parms(ctxt,nrhs,acfmt,agfmt,idim,tnd)
-  !nrhs=8
-  !acfmt='CSR'
-  !agfmt='CSRG'
-  !idim=100
-  !tnd=.false.
   call psb_init_timers()
   !
   !  allocate and fill in the coefficient matrix and initial vectors
@@ -800,43 +795,6 @@ program pdegenmm
   call x_mv_g%set(x0)
 
   ! FIXME: cache flush needed here
-  x1 = b_mv%get_vect()
-  x2 = b_mv_g%get_vect()
-
-!   ! TODO test AXPBY
-!   call psb_geall(xg,desc_a,info)
-!   call psb_geasb(xg,desc_a,info,mold=tmold)
-!   call xg%set(done)
-!   call xg%sync()
-!   call psb_geall(bg,desc_a,info)
-!   call psb_geasb(bg,desc_a,info,mold=tmold)
-!   !call bg%set(done+done)
-
-! !   ! TODO: Non funziona spgpuDaxpby (axpbyMultiVecDeviceDouble)
-!   call psb_geaxpby(done,xg,dzero,bg,desc_a,info)
-!   call psb_cuda_DeviceSync()
-
-!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
-!   call bg%sync()
-!   write(*,*) 'BG ', bg%is_dev(), bg%is_host(), bg%is_sync()
-!   do i=1,8
-!     write(*,*) bg%v%v(i)
-!   end do
-
-!   return
-
-!   call x_mv_g%set(done)
-!   call x_mv_g%sync()
-
-!   call psb_geaxpby(done,x_mv_g,dzero,b_mv_g,desc_a,info)
-
-!   call b_mv_g%sync()
-!   do i=1,size(b_mv_g%v%v,1)
-!     write(*,*) b_mv_g%v%v(i,:)
-!   end do
-
-!   return
-
   call psb_barrier(ctxt)
   tt1 = psb_wtime()
   do i=1,ntests 

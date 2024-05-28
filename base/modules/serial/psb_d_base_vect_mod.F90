@@ -2895,9 +2895,9 @@ contains
     integer(psb_ipk_)                               :: x_n, y_n, lda, ldb
 
     if (x%is_dev()) call x%sync()
+    if (y%is_dev()) call y%sync()
     select type(yy => y)
     type is (psb_d_base_multivect_type)
-      if (y%is_dev()) call y%sync()
       x_n = x%get_ncols()
       y_n = y%get_ncols()
       lda = x%get_nrows()
