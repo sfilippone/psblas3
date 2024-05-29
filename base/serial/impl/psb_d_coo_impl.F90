@@ -4214,7 +4214,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 #else
 
 
-  allocate(iaux(MAX((nzin+2),(nc+2),(nr+2)),stat=info))
+  allocate(iaux(MAX((nzin+2),(nc+2),(nr+2))),stat=info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
