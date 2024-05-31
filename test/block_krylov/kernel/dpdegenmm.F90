@@ -596,7 +596,7 @@ program pdegenmm
   ! solver parameters
   integer(psb_epk_)  :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)     :: err, eps
-  integer, parameter :: ntests=50, ngpu=10, ncnv=20
+  integer, parameter :: ntests=50, ngpu=1, ncnv=1
   type(psb_d_coo_sparse_mat), target  :: acoo
   type(psb_d_csr_sparse_mat), target  :: acsr
   type(psb_d_ell_sparse_mat), target  :: aell
@@ -865,6 +865,7 @@ program pdegenmm
     write(psb_out_unit,*)
     write(psb_out_unit,'("Matrix:                           ell1 ",i0)') idim
     write(psb_out_unit,'("Test on:            ",i20," processors")') np
+    write(psb_out_unit,'("Number of RHS:      ",i20)') nrhs
     write(psb_out_unit,'("Size of matrix:     ",i20)') nr
     write(psb_out_unit,'("Number of nonzeros: ",i20)') annz
     write(psb_out_unit,'("Memory occupation:  ",i20)') amatsize
@@ -915,6 +916,9 @@ program pdegenmm
          & gt2*1.d3/(1.d0*ntests*ngpu)
     write(psb_out_unit,'("MFLOPS                       (GPU.)  : ",F20.3)')&
          & gflops/1.d6
+
+    write(psb_out_unit,'("Speedup percentage   (%) (CPU/GPU.)  : ",F20.3)')&
+         & ((t2*1.d3/(1.d0*ntests))/(gt2*1.d3/(1.d0*ntests*ngpu)))*100
 #endif
     !
     ! This computation assumes the data movement associated with CSR:
