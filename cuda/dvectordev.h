@@ -42,8 +42,14 @@ int writeMultiVecDeviceDoubleR2(void* deviceMultiVec, double* hostMultiVec, int 
 int readMultiVecDeviceDouble(void* deviceMultiVec, double* hostMultiVec);
 int readMultiVecDeviceDoubleR2(void* deviceMultiVec, double* hostMultiVec, int ld);
 
+int prodMultiVecDeviceDouble(char transa, int m, int n, int k,
+			double *alpha, void *deviceX, void* deviceY, 
+			double *beta, void* deviceZ);
+
 int setscalMultiVecDeviceDouble(double val, int first, int last, 
-				int indexBase, void* devVecX); 
+				int indexBase, void* devVecX);
+int setscalMultiVecDeviceDoubleR2(double val, int first_row, int last_row, 
+				int first_col, int last_col, int indexBase, void* devVecX);
 
 int geinsMultiVecDeviceDouble(int n, void* devVecIrl, void* devVecVal, 
 			      int dupl, int indexBase, void* devVecX); 

@@ -1354,41 +1354,82 @@ module psb_d_cuda_multivect_mod
     real(c_double), allocatable :: buffer(:,:)
     type(c_ptr) :: dt_buf = c_null_ptr
   contains
+    !
+    !  Constructors/allocators
+    !
+    procedure, pass(x) :: bld_x    => d_cuda_multi_bld_x
+    procedure, pass(x) :: bld_n    => d_cuda_multi_bld_n
+    procedure, pass(x) :: all      => d_cuda_multi_all
+    !
+    ! Insert/set. Assembly and free.
+    ! Assembly does almost nothing here, but is important
+    ! in derived classes.
+    !
+    procedure, pass(x) :: ins      => d_cuda_multi_ins
+    procedure, pass(x) :: zero     => d_cuda_multi_zero
+    procedure, pass(x) :: asb      => d_cuda_multi_asb
+    procedure, pass(x) :: free     => d_cuda_multi_free
+    !
+    ! Sync: centerpiece of handling of external storage.
+    ! Any derived class having extra storage upon sync
+    ! will guarantee that both fortran/host side and
+    ! external side contain the same data. The base
+    ! version is only a placeholder.
+    !
+    procedure, pass(x) :: sync       => d_cuda_multi_sync
+    procedure, pass(x) :: sync_space => d_cuda_multi_sync_space
+    procedure, pass(x) :: is_host    => d_cuda_multi_is_host
+    procedure, pass(x) :: is_dev     => d_cuda_multi_is_dev
+    procedure, pass(x) :: is_sync    => d_cuda_multi_is_sync
+    procedure, pass(x) :: set_host   => d_cuda_multi_set_host
+    procedure, pass(x) :: set_dev    => d_cuda_multi_set_dev
+    procedure, pass(x) :: set_sync   => d_cuda_multi_set_sync
+    !
+    ! Basic info
+    !
     procedure, pass(x) :: get_nrows => d_cuda_multi_get_nrows
     procedure, pass(x) :: get_ncols => d_cuda_multi_get_ncols
     procedure, nopass  :: get_fmt   => d_cuda_multi_get_fmt
+    !
+    ! Set/get data from/to an external array; also
+    ! overload assignment.
+    !
+    procedure, pass(x) :: set_scal => d_cuda_multi_set_scal
+    procedure, pass(x) :: set_vect => d_cuda_multi_set_vect
+    !
+    ! Product, dot-product (col-by-col) and AXPBY
+    !
+    procedure, pass(x) :: prod_v   => d_cuda_multi_prod_v
+    procedure, pass(x) :: prod_a   => d_cuda_multi_prod_a
     procedure, pass(x) :: dot_v    => d_cuda_multi_dot_v
     procedure, pass(x) :: dot_a    => d_cuda_multi_dot_a
     procedure, pass(y) :: axpby_v  => d_cuda_multi_axpby_v
     procedure, pass(y) :: axpby_a  => d_cuda_multi_axpby_a
+    !
+    ! MultiVector by vector/multivector multiplication. Need all variants
+    ! to handle multiple requirements from preconditioners
+    !
 !!$    procedure, pass(y) :: mlt_v    => d_cuda_multi_mlt_v
 !!$    procedure, pass(y) :: mlt_a    => d_cuda_multi_mlt_a
 !!$    procedure, pass(z) :: mlt_a_2  => d_cuda_multi_mlt_a_2
 !!$    procedure, pass(z) :: mlt_v_2  => d_cuda_multi_mlt_v_2
-!!$    procedure, pass(x) :: scal     => d_cuda_multi_scal
+    !
+    ! Scaling and norms
+    !
     procedure, pass(x) :: nrm2     => d_cuda_multi_nrm2
     procedure, pass(x) :: amax     => d_cuda_multi_amax
     procedure, pass(x) :: asum     => d_cuda_multi_asum
-    procedure, pass(x) :: all      => d_cuda_multi_all
-    procedure, pass(x) :: zero     => d_cuda_multi_zero
-    procedure, pass(x) :: asb      => d_cuda_multi_asb
-    procedure, pass(x) :: sync     => d_cuda_multi_sync
-    procedure, pass(x) :: sync_space => d_cuda_multi_sync_space
-    procedure, pass(x) :: bld_x    => d_cuda_multi_bld_x
-    procedure, pass(x) :: bld_n    => d_cuda_multi_bld_n
-    procedure, pass(x) :: free     => d_cuda_multi_free
-    procedure, pass(x) :: ins      => d_cuda_multi_ins
-    procedure, pass(x) :: is_host  => d_cuda_multi_is_host
-    procedure, pass(x) :: is_dev   => d_cuda_multi_is_dev
-    procedure, pass(x) :: is_sync  => d_cuda_multi_is_sync
-    procedure, pass(x) :: set_host => d_cuda_multi_set_host
-    procedure, pass(x) :: set_dev  => d_cuda_multi_set_dev
-    procedure, pass(x) :: set_sync => d_cuda_multi_set_sync
-    procedure, pass(x) :: set_scal => d_cuda_multi_set_scal
-    procedure, pass(x) :: set_vect => d_cuda_multi_set_vect
+!!$    procedure, pass(x) :: scal     => d_cuda_multi_scal
+    !
+    ! Gather/scatter. These are needed for MPI interfacing.
+    ! May have to be reworked.
+    !
 !!$    procedure, pass(x) :: gthzv_x  => d_cuda_multi_gthzv_x
 !!$    procedure, pass(y) :: sctb     => d_cuda_multi_sctb
 !!$    procedure, pass(y) :: sctb_x   => d_cuda_multi_sctb_x
+    !
+    ! Finalize
+    !
     final              :: d_cuda_multi_vect_finalize
   end type psb_d_multivect_cuda
 
@@ -1607,13 +1648,63 @@ contains
     res = 'dGPU'
   end function d_cuda_multi_get_fmt
 
+  subroutine d_cuda_multi_prod_v(nr,x,y,res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y, res
+    integer(psb_ipk_), intent(in)                   :: nr
+    integer(psb_ipk_)                               :: info
+
+    select type(yy => y)
+    type is (psb_d_multivect_cuda)
+      select type(zz => res)
+      type is (psb_d_multivect_cuda)
+        if (x%is_host()) call x%sync()
+        if (yy%is_host()) call yy%sync()
+        if (zz%is_host()) call zz%sync()
+        if (info == 0) &
+            & info = prodMultiVecDevice('N',nr,yy%get_ncols(),x%get_ncols(),done,x%deviceVect,yy%deviceVect,done,zz%deviceVect)
+        call zz%set_dev()
+      class default
+        ! TODO
+      end select
+    class default
+      call x%prod(nr,y%v,res)
+    end select
+  end subroutine d_cuda_multi_prod_v
+
+  subroutine d_cuda_multi_prod_a(nr,x,y,res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout)      :: x
+    real(psb_dpk_), intent(in)                      :: y(:,:)
+    class(psb_d_base_multivect_type), intent(inout) :: res
+    integer(psb_ipk_), intent(in)                   :: nr
+    type(c_ptr)                                     :: gpY
+    integer(psb_ipk_)                               :: info, i
+
+    select type(zz => res)
+    type is (psb_d_multivect_cuda)
+      if (x%is_host()) call x%sync()
+      if (zz%is_host()) call zz%sync()
+      if (info == 0) &
+          & info = FallocMultiVecDevice(gpY,size(y,2),size(y,1),spgpu_type_double)
+      if (info == 0) &
+          & info = writeMultiVecDevice(gpY,y,size(y,1))
+      if (info == 0) &
+          & info = prodMultiVecDevice('N',nr,size(y,2),x%get_ncols(),done,x%deviceVect,gpY,dzero,zz%deviceVect)
+      call freeMultiVecDevice(gpY)
+      call zz%set_dev()
+    class default
+      ! TODO
+    end select
+  end subroutine d_cuda_multi_prod_a
+
   function d_cuda_multi_dot_v(nr,x,y) result(res)
     implicit none 
     class(psb_d_multivect_cuda), intent(inout)       :: x
     class(psb_d_base_multivect_type), intent(inout) :: y
     integer(psb_ipk_), intent(in)              :: nr
     real(psb_dpk_), allocatable   :: res(:,:)
-    real(psb_dpk_), external      :: ddot
     integer(psb_ipk_) :: info
     
     !
@@ -1824,22 +1915,33 @@ contains
 !!$    end select
 !!$  end subroutine d_cuda_multi_mlt_v_2
 
-
-  subroutine d_cuda_multi_set_scal(x,val)
+  subroutine d_cuda_multi_set_scal(x,val,first_row,last_row,first_col,last_col)
     class(psb_d_multivect_cuda), intent(inout) :: x
-    real(psb_dpk_), intent(in)           :: val
-        
-    integer(psb_ipk_) :: info
+    real(psb_dpk_), intent(in)                 :: val
+    integer(psb_ipk_), optional                :: first_row, last_row, first_col, last_col
+    integer(psb_ipk_) :: info, first_row_, last_row_, first_col_, last_col_
 
-    if (x%is_dev()) call x%sync()
-    call x%psb_d_base_multivect_type%set_scal(val)
-    call x%set_host()
+    first_row_=1
+    last_row_=size(x%v,1)
+
+    first_col_=1
+    last_col_=size(x%v,2)
+
+    if (present(first_row)) first_row_ = max(first_row,first_row_)
+    if (present(last_row))  last_row_  = min(last_row,last_row_)
+
+    if (present(first_col)) first_col_ = max(first_col,first_col_)
+    if (present(last_col))  last_col_  = min(last_col,last_col_)
+
+    info = setScalDevice(val,first_row_,last_row_,first_col_,last_col_,1,x%deviceVect)
+    call x%set_dev()
+
   end subroutine d_cuda_multi_set_scal
 
-  subroutine d_cuda_multi_set_vect(x,val)
+  subroutine d_cuda_multi_set_vect(x,val,first_row,last_row,first_col,last_col)
     class(psb_d_multivect_cuda), intent(inout) :: x
     real(psb_dpk_), intent(in)           :: val(:,:)
-    integer(psb_ipk_) :: nr
+    integer(psb_ipk_), optional :: first_row, last_row, first_col, last_col
     integer(psb_ipk_) :: info
 
     if (x%is_dev()) call x%sync()
@@ -1847,8 +1949,6 @@ contains
     call x%set_host()
 
   end subroutine d_cuda_multi_set_vect
-
-
 
 !!$  subroutine d_cuda_multi_scal(alpha, x)
 !!$    implicit none 
@@ -1870,7 +1970,6 @@ contains
     if (x%is_host()) call x%sync()
     allocate(res(x%get_ncols()))
     info = nrm2MultiVecDevice(res,nr,x%deviceVect)
-    
   end function d_cuda_multi_nrm2
  
   ! TODO CUDA
@@ -1887,7 +1986,6 @@ contains
     do i=1,nr
         res = max(res,sum(abs(x%v(i,1:nc))))
     end do
-
   end function d_cuda_multi_amax
 
   ! TODO CUDA
@@ -1903,7 +2001,6 @@ contains
     do j=1,x%get_ncols()
         res = max(res,sum(abs(x%v(1:nr,j))))
     end do
-
   end function d_cuda_multi_asum
   
   subroutine d_cuda_multi_all(m,n, x, info)
@@ -1931,8 +2028,8 @@ contains
     implicit none 
     class(psb_d_multivect_cuda), intent(inout) :: x
     
-    if (allocated(x%v)) x%v=dzero
-    call x%set_host()
+    call x%set_dev()
+    call x%set_scal(dzero)
   end subroutine d_cuda_multi_zero
 
   subroutine d_cuda_multi_asb(m,n, x, info)
@@ -1943,7 +2040,6 @@ contains
     class(psb_d_multivect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)       :: info
     integer(psb_ipk_) :: nd, nc
-
 
     x%m_nrows = m
     x%m_ncols = n
@@ -2035,7 +2131,7 @@ contains
     else if (x%is_dev()) then 
       info = readMultiVecDevice(x%deviceVect,x%v,size(x%v,1))
     end if
-    if (info == 0)  call x%set_sync()
+    if (info == 0) call x%set_sync()
     if (info /= 0) then
       info=psb_err_internal_error_
       call psb_errpush(info,'d_cuda_multi_sync')

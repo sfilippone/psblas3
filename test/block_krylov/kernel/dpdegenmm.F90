@@ -596,7 +596,7 @@ program pdegenmm
   ! solver parameters
   integer(psb_epk_)  :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)     :: err, eps
-  integer, parameter :: ntests=50, ngpu=1, ncnv=1
+  integer, parameter :: ntests=20, ngpu=1, ncnv=1
   type(psb_d_coo_sparse_mat), target  :: acoo
   type(psb_d_csr_sparse_mat), target  :: acsr
   type(psb_d_ell_sparse_mat), target  :: aell

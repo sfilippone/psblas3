@@ -2593,8 +2593,12 @@ contains
     implicit none
     class(psb_d_base_multivect_type), intent(inout)    :: x
 
-    if (allocated(x%v)) x%v=dzero
-
+    if (allocated(x%v)) then
+      !$omp workshare
+      x%v(:,:)=dzero
+      !$omp end workshare
+    end if
+    call x%set_host()
   end subroutine d_base_mlv_zero
 
 
@@ -2839,13 +2843,37 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine d_base_mlv_set_scal(x,val)
+  subroutine d_base_mlv_set_scal(x,val,first_row,last_row,first_col,last_col)
     implicit none
     class(psb_d_base_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
+    integer(psb_ipk_), optional :: first_row, last_row, first_col, last_col
+    integer(psb_ipk_) :: first_row_, last_row_, first_col_, last_col_, i, j
 
-    integer(psb_ipk_) :: info
-    x%v = val
+    first_row_=1
+    last_row_=size(x%v,1)
+
+    first_col_=1
+    last_col_=size(x%v,2)
+
+    if (present(first_row)) first_row_ = max(first_row,first_row_)
+    if (present(last_row))  last_row_  = min(last_row,last_row_)
+
+    if (present(first_col)) first_col_ = max(first_col,first_col_)
+    if (present(last_col))  last_col_  = min(last_col,last_col_)
+
+    if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+    !$omp parallel do private (i,j)
+    do i = first_row_, last_row_
+      do j = first_col_, last_col_
+        x%v(i,j) = val
+      end do
+    end do
+#else
+    x%v(first_row_:last_row_,first_col_:last_col_) = val
+#endif
+    call x%set_host()
 
   end subroutine d_base_mlv_set_scal
 
@@ -2855,21 +2883,41 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in
   !!
-  subroutine d_base_mlv_set_vect(x,val)
+  subroutine d_base_mlv_set_vect(x,val,first_row,last_row,first_col,last_col)
     implicit none
-    class(psb_d_base_multivect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout) :: x
     real(psb_dpk_), intent(in) :: val(:,:)
-    integer(psb_ipk_) :: nr, nc
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: first_row, last_row, first_col, last_col
+    integer(psb_ipk_) :: first_row_, last_row_, first_col_, last_col_, i, j, info
 
-    if (allocated(x%v)) then
-      nr = min(size(x%v,1),size(val,1))
-      nc = min(size(x%v,2),size(val,2))
-
-      x%v(1:nr,1:nc) = val(1:nr,1:nc)
-    else
-      x%v = val
+    if (.not.allocated(x%v)) then
+      call psb_realloc(size(val,1),size(val,2),x%v,info)
     end if
+
+    first_row_=1
+    last_row_=size(x%v,1)
+
+    first_col_=1
+    last_col_=size(x%v,2)
+
+    if (present(first_row)) first_row_ = max(first_row,first_row_)
+    if (present(last_row))  last_row_  = min(last_row,last_row_)
+
+    if (present(first_col)) first_col_ = max(first_col,first_col_)
+    if (present(last_col))  last_col_  = min(last_col,last_col_)
+
+    if (x%is_dev()) call x%sync()
+#if defined(OPENMP)
+    !$omp parallel do private(i,j)
+    do i = first_row_, last_row_
+      do j = first_col_, last_col_
+        x%v(i,j) = val(i-first_row_+1,j-first_col_+1)
+      end do
+    end do
+#else
+    x%v(first_row_:last_row_,first_col_:last_col_) = val(1:last_row_-first_row_+1,1:last_col_-first_col_+1)
+#endif
+    call x%set_host()
 
   end subroutine d_base_mlv_set_vect
 
@@ -2882,17 +2930,17 @@ contains
   !! \brief       Product by a mlv
   !! \param nr    Number of rows to be considered
   !! \param y     The other (base_mlv_vect) to be multiplied by
-  !! \param trans If true, x is transposed
   !! \param res   Result vector
   !!
-  function d_base_mlv_prod_v(nr,x,y,trans) result(res)
+  subroutine d_base_mlv_prod_v(nr,x,y,res)
     implicit none
-    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, res
     integer(psb_ipk_), intent(in)                   :: nr
-    logical, optional, intent(in)                   :: trans
-    real(psb_dpk_), allocatable                     :: res(:,:)
     external                                        :: dgemm
     integer(psb_ipk_)                               :: x_n, y_n, lda, ldb
+
+    write(*,*) 'CPU PROD'
+
 
     if (x%is_dev()) call x%sync()
     if (y%is_dev()) call y%sync()
@@ -2901,22 +2949,12 @@ contains
       x_n = x%get_ncols()
       y_n = y%get_ncols()
       lda = x%get_nrows()
-      if (trans) then
-        allocate(res(x_n,y_n))
-        res = dzero
-        ldb = y%get_nrows()
-        call dgemm('T','N',x_n,y_n,nr,done,x%v,lda,y%v,ldb,dzero,res,x_n)
-      else
-        allocate(res(x%get_nrows(),y_n))
-        res = dzero
-        ldb = y_n
-        call dgemm('N','N',nr,y_n,x_n,done,x%v,lda,y%v,ldb,dzero,res,lda)
-      end if
+      ldb = y_n
+      call dgemm('N','N',nr,y_n,x_n,done,x%v,lda,y%v,ldb,dzero,res%v,lda)
     class default
-      res = x%prod(nr,y%v,trans)
+      call x%prod(nr,y%v,res)
     end select
-
-  end function d_base_mlv_prod_v
+  end subroutine d_base_mlv_prod_v
 
   !
   ! Multivectors product base
@@ -2930,33 +2968,24 @@ contains
   !! \param trans If true, x is transposed
   !! \param res   Result vector
   !!
-  function d_base_mlv_prod_a(nr,x,y,trans) result(res)
+  subroutine d_base_mlv_prod_a(nr,x,y,res)
     implicit none
-    class(psb_d_base_multivect_type), intent(inout) :: x
+    class(psb_d_base_multivect_type), intent(inout) :: x, res
     real(psb_dpk_), intent(in)                      :: y(:,:)
     integer(psb_ipk_), intent(in)                   :: nr
-    logical, optional, intent(in)                   :: trans
-    real(psb_dpk_), allocatable                     :: res(:,:)
     external                                        :: dgemm
     integer(psb_ipk_)                               :: x_n, y_n, lda, ldb
+
+    write(*,*) 'CPU PROD'
+
 
     if (x%is_dev()) call x%sync()
     x_n = x%get_ncols()
     y_n = size(y,dim=2)
     lda = x%get_nrows()
-    if (trans) then
-      allocate(res(x_n,y_n))
-      res = dzero
-      ldb = size(y,dim=1)
-      call dgemm('T','N',x_n,y_n,nr,done,x%v,lda,y,ldb,dzero,res,x_n)
-    else
-      allocate(res(x%get_nrows(),y_n))
-      res = dzero
-      ldb = x_n
-      call dgemm('N','N',nr,y_n,x_n,done,x%v,lda,y,ldb,dzero,res,lda)
-    end if
-
-  end function d_base_mlv_prod_a
+    ldb = x_n
+    call dgemm('N','N',nr,y_n,x_n,done,x%v,lda,y,ldb,dzero,res%v,lda)
+  end subroutine d_base_mlv_prod_a
 
   !
   ! Dot products

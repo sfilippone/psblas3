@@ -1627,21 +1627,23 @@ contains
     end if
   end function d_vect_get_vect
 
-  subroutine d_vect_set_scal(x,val)
+  subroutine d_vect_set_scal(x,val,first_row,last_row,first_col,last_col)
     class(psb_d_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
-
+    integer(psb_ipk_), optional :: first_row, last_row, first_col, last_col
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+
+    if (allocated(x%v)) call x%v%set(val,first_row,last_row,first_col,last_col)
 
   end subroutine d_vect_set_scal
 
-  subroutine d_vect_set_vect(x,val)
+  subroutine d_vect_set_vect(x,val,first_row,last_row,first_col,last_col)
     class(psb_d_multivect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)         :: val(:,:)
-
+    integer(psb_ipk_), optional :: first_row, last_row, first_col, last_col
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+    
+    if (allocated(x%v)) call x%v%set(val,first_row,last_row,first_col,last_col)
 
   end subroutine d_vect_set_vect
 
@@ -1893,30 +1895,26 @@ contains
     call move_alloc(tmp,x%v)
   end subroutine d_vect_cnv
 
-  function d_vect_prod_v(nr,x,y,trans) result(res)
+  subroutine d_vect_prod_v(nr,x,y,res)
     implicit none
-    class(psb_d_multivect_type), intent(inout) :: x, y
+    class(psb_d_multivect_type), intent(inout) :: x, y, res
     integer(psb_ipk_), intent(in)              :: nr
-    logical, optional, intent(in)              :: trans
-    real(psb_dpk_), allocatable                :: res(:,:)
 
     if (allocated(x%v).and.allocated(y%v)) &
-         & res = x%v%prod(nr,y%v,trans)
+         & call x%v%prod(nr,y%v,res%v)
 
-  end function d_vect_prod_v
+  end subroutine d_vect_prod_v
 
-  function d_vect_prod_a(nr,x,y,trans) result(res)
+  subroutine d_vect_prod_a(nr,x,y,res)
     implicit none
-    class(psb_d_multivect_type), intent(inout) :: x
+    class(psb_d_multivect_type), intent(inout) :: x, res
     real(psb_dpk_), intent(in)                 :: y(:,:)
     integer(psb_ipk_), intent(in)              :: nr
-    logical, optional, intent(in)              :: trans
-    real(psb_dpk_), allocatable                :: res(:,:)
 
     if (allocated(x%v)) &
-         & res = x%v%prod(nr,y,trans)
+         & call x%v%prod(nr,y,res%v)
 
-  end function d_vect_prod_a
+  end subroutine d_vect_prod_a
 
   function d_vect_dot_v(nr,x,y) result(res)
     implicit none

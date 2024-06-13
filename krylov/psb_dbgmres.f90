@@ -63,7 +63,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    real(psb_dpk_), allocatable               :: aux(:), h(:,:), beta(:,:), y(:,:)
 
    type(psb_d_multivect_type), allocatable   :: v(:)
-   type(psb_d_multivect_type)                :: w, r0, rm, temp
+   type(psb_d_multivect_type)                :: w, r0, rm, pd
 
    integer(psb_ipk_)                         :: naux, itrace_, n_row, n_col, nrhs, nrep
    integer(psb_lpk_)                         :: mglob, n_add, ncv
@@ -153,12 +153,12 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    if (info == psb_success_) call psb_geall(w,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(r0,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(rm,desc_a,info,n=nrhs)
-   if (info == psb_success_) call psb_geall(temp,desc_a,info,n=nrhs)
+   if (info == psb_success_) call psb_geall(pd,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geasb(v,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(r0,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(rm,desc_a,info,mold=x%v,n=nrhs)
-   if (info == psb_success_) call psb_geasb(temp,desc_a,info,mold=x%v,n=nrhs)
+   if (info == psb_success_) call psb_geasb(pd,desc_a,info,mold=x%v,n=nrhs)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -261,8 +261,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
          ! STEP 7: Compute W = W - V(i)*H(i,j)
 
-         ! Compute temp product V(i)*H(i,j)
-         call mv_prod(v(i)%get_vect(),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add))
+         ! Compute product V(i)*H(i,j)
+         call psb_geprod(v(i),h(idx_i:idx_i+n_add,idx_j:idx_j+n_add),pd,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -270,7 +270,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          end if
 
          ! Compute W
-         call psb_geaxpby(-done,temp,done,w,desc_a,info)
+         call psb_geaxpby(-done,pd,done,w,desc_a,info)
          if (info /= psb_success_) then
             info=psb_err_from_subroutine_non_
             call psb_errpush(info,name)
@@ -327,16 +327,16 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       ! Compute index for Y products
       idx = (i-1)*nrhs+1
 
-      ! Compute temp product V(i)*Y(i)
-      call mv_prod(v(i)%get_vect(),y(idx:idx+n_add,:))
+      ! Compute product V(i)*Y(i)
+      call psb_geprod(v(i),y(idx:idx+n_add,:),pd,desc_a,info)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
          goto 9999
       end if
 
-      ! Add temp to X(m)
-      call psb_geaxpby(done,temp,done,x,desc_a,info)
+      ! Add product to X(m)
+      call psb_geaxpby(done,pd,done,x,desc_a,info)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
@@ -356,6 +356,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    if (info == psb_success_) call psb_gefree(w,desc_a,info)
    if (info == psb_success_) call psb_gefree(r0,desc_a,info)
    if (info == psb_success_) call psb_gefree(rm,desc_a,info)
+   if (info == psb_success_) call psb_gefree(pd,desc_a,info)
    if (info == psb_success_) deallocate(aux,h,y,r0n2,rmn2,stat=info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
@@ -426,36 +427,7 @@ contains
 
    end function qr_fact
 
-   ! Multivectors product
-   subroutine mv_prod(x_mv,y_mv)
-      implicit none
-
-      ! I/O parameters
-      real(psb_dpk_), intent(in) :: x_mv(:,:), y_mv(:,:)
-
-      ! Utils
-      real(psb_dpk_), allocatable :: res(:,:)
-      integer(psb_ipk_)           :: lda, ldb
-
-      ! Initialize params
-      lda = size(x_mv,1)
-      ldb = size(y_mv,2)
-      allocate(res(lda,ldb))
-      res = dzero
-
-      ! Compute product
-      if (n_row > 0) then
-         call dgemm('N','N',n_row,nrhs,nrhs,done,x_mv,lda,y_mv,ldb,dzero,res,lda)
-      end if
-
-      ! Set temp multivector
-      call temp%set(res)
-
-      ! Deallocate
-      deallocate(res)
-
-   end subroutine mv_prod
-
+   ! TODO Loop con Givens rotation su ogni colonna
    ! Minimize Frobenius norm
    function frobenius_norm_min(rep) result(res)
       implicit none

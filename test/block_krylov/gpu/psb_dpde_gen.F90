@@ -548,7 +548,7 @@ program dpdegen
 
    ! solver parameters
    real(psb_dpk_)     :: err, cond
-   integer(psb_epk_)  :: amatsize, precsize, descsize
+   integer(psb_epk_)  :: amatsize, precsize, descsize, annz
    integer(psb_ipk_)  :: iter, ierr, ircode
 
    ! molds
@@ -599,7 +599,7 @@ program dpdegen
    !
    call psb_barrier(ctxt)
    t1 = psb_wtime()
-   call psb_gen_pde3d(ctxt,idim,a,b_mv,x_mv,nrhs,desc_a,'CSR  ',info,partition=3,tnd=tnd)
+   call psb_gen_pde3d(ctxt,idim,a,b_mv,x_mv,nrhs,desc_a,'CSR  ',info,vmold=gpumold,partition=3,tnd=tnd)
    call psb_barrier(ctxt)
    t2 = psb_wtime() - t1
    if(info /= psb_success_) then
@@ -639,6 +639,12 @@ program dpdegen
       call psb_error()
       stop
    end if
+
+   ! set random RHS
+   call random_number(b_mv%v%v)
+   b_mv%v%v = -10 + (20)*b_mv%v%v
+   call b_mv%v%set_host()
+   call b_mv%sync()
 
    call psb_geall(r_mv,desc_a,info,nrhs)
    call r_mv%zero()
@@ -694,10 +700,12 @@ program dpdegen
    resmxp = psb_geamax(r_mv,desc_a,info)
 
    amatsize = a%sizeof()
+   annz     = a%get_nzeros()
    descsize = desc_a%sizeof()
    precsize = prec%sizeof()
 
    call psb_sum(ctxt,amatsize)
+   call psb_sum(ctxt,annz)
    call psb_sum(ctxt,descsize)
    call psb_sum(ctxt,precsize)
 
@@ -710,6 +718,9 @@ program dpdegen
       call prec%descr(info)
       write(psb_out_unit,'(" ")')
       write(psb_out_unit,'("Computed solution on:         ",i8," processors")')np
+      write(psb_out_unit,'("Dimesion of A:                      ",i12)')desc_a%get_global_rows()
+      write(psb_out_unit,'("Number of nonzeros:                 ",i12)')annz
+      write(psb_out_unit,'("Number of RHS:                      ",i12)')nrhs
       write(psb_out_unit,'("Storage format for A:                ",a)')a%get_fmt()
       write(psb_out_unit,'("Storage format for DESC_A:           ",a)')desc_a%get_fmt()
       write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize

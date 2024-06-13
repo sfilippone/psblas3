@@ -80,6 +80,18 @@ module psb_d_vectordev_mod
     end function readMultiVecDeviceDoubleR2
   end interface 
 
+  interface prodMultiVecDevice
+    function prodMultiVecDeviceDouble(transa,m,n,k,alpha,deviceVecA, &
+      & deviceVecB,beta,deviceVecC) result(res) bind(c,name='prodMultiVecDeviceDouble')
+      use iso_c_binding
+      character(c_char), value  :: transa
+      integer(c_int), value     :: m, n, k
+      integer(c_int)		        :: res
+      type(c_ptr), value	      :: deviceVecA, deviceVecB, deviceVecC 
+      real(c_double)            :: alpha,  beta
+    end function prodMultiVecDeviceDouble
+  end interface
+
   interface allocateDouble
     function allocateDouble(didx,n) &
          & result(res) bind(c,name='allocateDouble') 
@@ -159,7 +171,6 @@ module psb_d_vectordev_mod
     end subroutine freeDouble
   end interface
   
-
   interface setScalDevice
     function setScalMultiVecDeviceDouble(val, first, last, &
          & indexBase, deviceVecX) result(res) &
@@ -170,6 +181,15 @@ module psb_d_vectordev_mod
       real(c_double), value :: val
       type(c_ptr),   value  :: deviceVecX
     end function setScalMultiVecDeviceDouble
+    function setScalMultiVecDeviceDoubleR2(val, first_row, last_row, &
+         & first_col, last_col, indexBase, deviceVecX) result(res) &
+         & bind(c,name='setscalMultiVecDeviceDoubleR2')
+      use iso_c_binding
+      integer(c_int)        :: res
+      integer(c_int), value :: first_row,last_row,first_col,last_col,indexbase
+      real(c_double), value :: val
+      type(c_ptr),   value  :: deviceVecX
+    end function setScalMultiVecDeviceDoubleR2
   end interface
 
   interface 

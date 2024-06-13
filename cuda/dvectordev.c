@@ -89,10 +89,37 @@ int readMultiVecDeviceDoubleR2(void* deviceVec, double* hostVec, int ld)
   return(i);
 }
 
+int prodMultiVecDeviceDouble(char transa, int m, int n, int k,
+			double *alpha, void *deviceX, void* deviceY, 
+			double *beta, void* deviceZ)
+{
+  struct MultiVectDevice *x = (struct MultiVectDevice *) deviceX;
+  struct MultiVectDevice *y = (struct MultiVectDevice *) deviceY;
+  struct MultiVectDevice *z = (struct MultiVectDevice *) deviceZ;
+  int status;
+
+  cublasHandle_t handle=psb_cudaGetCublasHandle();
+  cublasOperation_t trans=((transa == 'N')? CUBLAS_OP_N:((transa=='T')? CUBLAS_OP_T:CUBLAS_OP_C));
+  /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
+  if (n == 1) {
+    status = cublasDgemv(handle, trans, m, k,
+			 alpha, x->v_, x->pitch_, y->v_, 1,
+			 beta, z->v_, 1);
+  } else {
+    status = cublasDgemm(handle, trans, CUBLAS_OP_N, m, n, k,
+			 alpha, x->v_, x->pitch_, y->v_, y->pitch_,
+			 beta, z->v_, z->pitch_);
+  }    
+  
+  if (status == CUBLAS_STATUS_SUCCESS)  
+    return SPGPU_SUCCESS;
+  else
+    return SPGPU_UNSUPPORTED;
+}
+
 int setscalMultiVecDeviceDouble(double val, int first, int last, 
 				int indexBase, void* devMultiVecX) 
 { int i=0;
-  int pitch = 0;
   struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
@@ -101,6 +128,20 @@ int setscalMultiVecDeviceDouble(double val, int first, int last,
   return(i);
 }
 
+int setscalMultiVecDeviceDoubleR2(double val, int first_row, int last_row, 
+				int first_col, int last_col, int indexBase, void* devMultiVecX) 
+{ int i=0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  
+  int pitch = devVecX->pitch_;
+
+  for (int j=first_col; j<=last_col; j++) {
+    spgpuDsetscal(handle, first_row, last_row, indexBase, val, ((double *) devVecX->v_)+(j-1)*pitch);
+  }
+  
+  return(i);
+}
 
 int geinsMultiVecDeviceDouble(int n, void* devMultiVecIrl, void* devMultiVecVal, 
 			      int dupl, int indexBase, void* devMultiVecX)

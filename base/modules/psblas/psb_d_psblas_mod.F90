@@ -98,37 +98,23 @@ module psb_d_psblas_mod
   end interface
 
   interface psb_geprod
-    function psb_dprod_multivect(x,y,desc_a,info,trans,global) result(res)
+    subroutine psb_dprod_multivect(x,y,res,desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_), allocatable               :: res(:,:)
-      type(psb_d_multivect_type), intent(inout) :: x, y
+      type(psb_d_multivect_type), intent(inout) :: x, y, res
       type(psb_desc_type), intent(in)           :: desc_a
       integer(psb_ipk_), intent(out)            :: info
-      logical, intent(in), optional             :: trans
       logical, intent(in), optional             :: global
-    end function psb_dprod_multivect
-    function psb_dprod_multivect_a(x,y,desc_a,info,trans,global) result(res)
+    end subroutine psb_dprod_multivect
+    subroutine psb_dprod_multivect_a(x,y,res,desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_), allocatable               :: res(:,:)
-      type(psb_d_multivect_type), intent(inout) :: x
+      type(psb_d_multivect_type), intent(inout) :: x, res
       real(psb_dpk_), intent(in)                :: y(:,:)
       type(psb_desc_type), intent(in)           :: desc_a
       integer(psb_ipk_), intent(out)            :: info
-      logical, intent(in), optional             :: trans
       logical, intent(in), optional             :: global
-    end function psb_dprod_multivect_a
-    function psb_dprod_m(x,y,desc_a,info,trans,global) result(res)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_), allocatable               :: res(:,:)
-      real(psb_dpk_), intent(in)                :: x(:,:), y(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-      logical, intent(in), optional             :: trans
-      logical, intent(in), optional             :: global
-    end function psb_dprod_m
+    end subroutine psb_dprod_multivect_a
   end interface
 
   interface psb_geaxpby
