@@ -33,6 +33,7 @@
 #define _HDIAGDEV_H_
 
 #include "cintrf.h"
+#include "vectordev.h"
 #include "hdia.h"
 
 struct HdiagDevice

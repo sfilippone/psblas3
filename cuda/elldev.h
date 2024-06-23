@@ -34,6 +34,7 @@
 #define _ELLDEV_H_
 
 #include "cintrf.h"
+#include "vectordev.h"
 #include "cuComplex.h"
 #include "ell.h"
 

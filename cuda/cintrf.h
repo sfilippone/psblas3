@@ -37,10 +37,9 @@
 #include <stdio.h>
 
 #include "core.h"
-#include "cuda_util.h"
-#include "vector.h"
-#include "vectordev.h"
-
+//#include "cuda_util.h"
+//#include "vector.h"
+//#include "vectordev.h"
 #define ELL_PITCH_ALIGN_S 32
 #define ELL_PITCH_ALIGN_D 16
 

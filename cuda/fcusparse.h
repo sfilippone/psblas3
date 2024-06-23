@@ -40,6 +40,7 @@
 #include <cusparse.h>
 #endif
 #include "cintrf.h"
+#include "vectordev.h"
 
 int FcusparseCreate();
 int FcusparseDestroy();

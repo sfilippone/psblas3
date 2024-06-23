@@ -33,6 +33,7 @@
 #define _DIAGDEV_H_
 
 #include "cintrf.h"
+#include "vectordev.h"
 #include "dia.h"
 
 struct DiagDevice
