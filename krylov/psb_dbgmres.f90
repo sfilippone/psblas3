@@ -60,7 +60,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    integer(psb_ipk_), optional, intent(out)  :: iter
    real(psb_dpk_), optional, intent(out)     :: err
 
-   real(psb_dpk_), allocatable               :: aux(:), h(:,:), beta(:,:), y(:,:)
+   real(psb_dpk_), allocatable               :: aux(:), c(:,:), s(:,:), h(:,:), beta(:,:)
 
    type(psb_d_multivect_type), allocatable   :: v(:)
    type(psb_d_multivect_type)                :: w, r0, rm, pd
@@ -148,7 +148,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    naux = 4*n_col
    nrhs = x%get_ncols()
-   allocate(aux(naux),h((nrep+1)*nrhs,nrep*nrhs),y(nrep*nrhs,nrhs),r0n2(nrhs),rmn2(nrhs),stat=info)
+   allocate(aux(naux),c(nrep*nrhs,nrhs),s(nrep*nrhs,nrhs),h((nrep+1)*nrhs,nrep*nrhs),&
+            & beta((nrep+1)*nrhs,nrhs),r0n2(nrhs),rmn2(nrhs),stat=info)
    if (info == psb_success_) call psb_geall(v,desc_a,info,m=nrep+1,n=nrhs)
    if (info == psb_success_) call psb_geall(w,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(r0,desc_a,info,n=nrhs)
@@ -193,9 +194,11 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end if
 
    h     = dzero
-   y     = dzero
+   c     = dzero
+   s     = dzero
+   beta  = dzero
+   itx   = dzero
    deps  = eps
-   itx   = 0
    n_add = nrhs-1
 
    if ((itrace_ > 0).and.(me == psb_root_)) call log_header(methdname)
@@ -221,7 +224,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end if
 
    ! STEP 2: Compute QR_fact(R(0))
-   beta = qr_fact(v(1))
+   beta(1:nrhs,1:nrhs) = qr_fact(v(1))
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -297,12 +300,12 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
          goto 9999
       end if
 
-      ! STEP 9: Compute Y(j)
-      rmn2 = frobenius_norm_min(j)
+      ! STEP 9: Compute Givens rotation
+      rmn2 = givens_rotation(j)
       if (info /= psb_success_) then
-         info=psb_err_from_subroutine_non_
-         call psb_errpush(info,name)
-         goto 9999
+        info=psb_err_from_subroutine_non_
+        call psb_errpush(info,name)
+        goto 9999
       end if
 
       ! Compute residues
@@ -322,13 +325,18 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end do outer
 
    ! STEP 10: X(m) = X(0) + VT(m)*Y(m)
-   do i=1,j
+
+   ! Compute Y(m)
+   call dtrsm('L','U','N','N',itx*nrhs,nrhs,done,h,size(h,1),beta,size(beta,1))
+
+   ! Loop product
+   do i=1,itx
 
       ! Compute index for Y products
       idx = (i-1)*nrhs+1
 
       ! Compute product V(i)*Y(i)
-      call psb_geprod(v(i),y(idx:idx+n_add,:),pd,desc_a,info)
+      call psb_geprod(v(i),beta(idx:idx+n_add,:),pd,desc_a,info)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
@@ -357,7 +365,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    if (info == psb_success_) call psb_gefree(r0,desc_a,info)
    if (info == psb_success_) call psb_gefree(rm,desc_a,info)
    if (info == psb_success_) call psb_gefree(pd,desc_a,info)
-   if (info == psb_success_) deallocate(aux,h,y,r0n2,rmn2,stat=info)
+   if (info == psb_success_) deallocate(aux,c,s,h,beta,r0n2,rmn2,stat=info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -427,43 +435,67 @@ contains
 
    end function qr_fact
 
-   ! TODO Loop con Givens rotation su ogni colonna
-   ! Minimize Frobenius norm
-   function frobenius_norm_min(rep) result(res)
-      implicit none
+   function givens_rotation(rep) result(res)
 
       ! I/O parameters
       real(psb_dpk_), allocatable   :: res(:)
       integer(psb_ipk_), intent(in) :: rep
 
       ! Utils
-      integer(psb_ipk_)           :: lwork, m_h, n_h, mn
-      real(psb_dpk_), allocatable :: work(:), beta_e1(:,:), h_temp(:,:)
+      integer(psb_ipk_) :: i, j, idx_rep, idx_col, idx, back_idx
+      real(psb_dpk_)    :: rti, rti1
 
       ! Initialize params
-      m_h    = (rep+1)*nrhs
-      n_h    = rep*nrhs
-      h_temp = h(1:m_h,1:n_h)
-      mn     = min(m_h,n_h)
-      lwork  = max(1,mn+max(mn,nrhs))
-      allocate(work(lwork),beta_e1(m_h,nrhs),res(nrhs))
+      idx_rep = (rep-1)*nrhs+1
+      idx     = done
 
-      ! Compute E1*beta
-      beta_e1 = dzero
-      beta_e1(1:nrhs,1:nrhs) = beta
+      ! Old rotations for new columns in H
+      do i=nrhs+1,rep*nrhs
 
-      ! Compute min Frobenius norm
-      call dgels('N',m_h,n_h,nrhs,h_temp,m_h,beta_e1,m_h,work,lwork,info)
+        ! Do nrhs rotation for each new column
+        do j=1,nrhs
+          call drot(nrhs,h((i-1)-(j-1),idx_rep:idx_rep+n_add),1,&
+                & h(i-(j-1),idx_rep:idx_rep+n_add),1,c(idx,j),s(idx,j))
+        end do
 
-      ! Set solution
-      y = beta_e1(1:n_h,1:nrhs)
+        ! Update C and S row idx
+        idx = idx + done
+      end do
 
-      ! Set residues
-      res = sum(beta_e1(n_h+1:m_h,:)**2,dim=1)
+      ! Rotations for new columns
+      do i=1,nrhs
 
-      ! Deallocate
-      deallocate(work,h_temp,beta_e1)
+        ! Compute col idx
+        idx_col = idx_rep+(i-1)
 
-   end function frobenius_norm_min
+        do j=1,nrhs
+
+          ! Compute backward idx
+          back_idx = idx_rep+nrhs+(i-j)
+
+          ! Generate Givens rotation
+          rti  = h(back_idx-1,idx_col)
+          rti1 = h(back_idx,idx_col)
+          call drotg(rti,rti1,c(idx_col,j),s(idx_col,j))
+
+          ! Apply Givens rotation to H
+          call drot(nrhs,h(back_idx-1,idx_rep:idx_rep+n_add),1,&
+                    & h(back_idx,idx_rep:idx_rep+n_add),&
+                    & 1,c(idx_col,j),s(idx_col,j))
+
+          ! Eliminate rotated values
+          h(back_idx,idx_rep:idx_col) = dzero
+
+          ! Apply Givens rotation to G=E1*Beta
+          call drot(nrhs,beta(back_idx-1,:),1,beta(back_idx,:),1,&
+                    & c(idx_col,j),s(idx_col,j))
+
+        end do
+      end do
+
+      ! Compute residues
+      res = sum(beta(idx_rep+nrhs:idx_rep+nrhs+n_add,:)**2,dim=1)
+
+   end function givens_rotation
 
 end subroutine psb_dbgmres_multivect
