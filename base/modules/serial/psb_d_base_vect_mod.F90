@@ -2309,15 +2309,19 @@ module psb_d_base_multivect_mod
     !
     ! Product, dot-product (col-by-col) and AXPBY
     !
-    procedure, pass(x) :: prod_v    => d_base_mlv_prod_v
-    procedure, pass(x) :: prod_a    => d_base_mlv_prod_a
-    generic, public    :: prod      => prod_v, prod_a
-    procedure, pass(x) :: dot_v     => d_base_mlv_dot_v
-    procedure, pass(x) :: dot_a     => d_base_mlv_dot_a
-    generic, public    :: dot       => dot_v, dot_a
-    procedure, pass(y) :: axpby_v   => d_base_mlv_axpby_v
-    procedure, pass(y) :: axpby_a   => d_base_mlv_axpby_a
-    generic, public    :: axpby     => axpby_v, axpby_a
+    procedure, pass(x) :: prod_v      => d_base_mlv_prod_v
+    procedure, pass(x) :: prod_a      => d_base_mlv_prod_a
+    generic, public    :: prod        => prod_v, prod_a
+    procedure, pass(x) :: dot_v       => d_base_mlv_dot_v
+    procedure, pass(x) :: dot_v_col   => d_base_mlv_dot_v_col
+    procedure, pass(x) :: dot_a       => d_base_mlv_dot_a
+    procedure, pass(x) :: dot_a_col   => d_base_mlv_dot_a_col
+    generic, public    :: dot         => dot_v, dot_v_col, dot_a, dot_a_col
+    procedure, pass(y) :: axpby_v     => d_base_mlv_axpby_v
+    procedure, pass(y) :: axpby_v_col => d_base_mlv_axpby_v_col
+    procedure, pass(y) :: axpby_a     => d_base_mlv_axpby_a 
+    procedure, pass(y) :: axpby_a_col => d_base_mlv_axpby_a_col
+    generic, public    :: axpby       => axpby_v, axpby_v_col, axpby_a, axpby_a_col
     !
     ! MultiVector by vector/multivector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -2336,7 +2340,9 @@ module psb_d_base_multivect_mod
     ! Scaling and norms
     !
     procedure, pass(x) :: scal     => d_base_mlv_scal
-    procedure, pass(x) :: nrm2     => d_base_mlv_nrm2
+    procedure, pass(x) :: nrm2_mv  => d_base_mlv_nrm2
+    procedure, pass(x) :: nrm2_col => d_base_mlv_nrm2_col
+    generic, public    :: nrm2     => nrm2_mv, nrm2_col
     procedure, pass(x) :: amax     => d_base_mlv_amax
     procedure, pass(x) :: asum     => d_base_mlv_asum
     procedure, pass(x) :: absval1  => d_base_mlv_absval1
@@ -3032,6 +3038,43 @@ contains
   end function d_base_mlv_dot_v
 
   !
+  ! Dot products
+  !
+  !
+  !> Function   base_mlv_dot_v_col
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief     Dot product by another base_mlv_vector
+  !! \param nr  Number of rows to be considered
+  !! \param col Column index
+  !! \param y   The other (base_mlv_vect) to be multiplied by
+  !! \param res Result matrix
+  !!
+  function d_base_mlv_dot_v_col(nr,col_x,col_y,x,y) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: nr, col_x, col_y
+    real(psb_dpk_)                                  :: res
+    real(psb_dpk_), external                        :: ddot
+
+    if (x%is_dev()) call x%sync()
+    !
+    ! Note: this is the base implementation.
+    !  When we get here, we are sure that X is of
+    !  TYPE psb_d_base_mlv_vect (or its class does not care).
+    !  If Y is not, throw the burden on it, implicitly
+    !  calling dot_a
+    !
+    select type(yy => y)
+    type is (psb_d_base_multivect_type)
+      if (y%is_dev()) call y%sync()
+      res = ddot(nr,x%v(1:nr,col_x),1,y%v(1:nr,col_y),1)
+    class default
+      res = x%dot(nr,col_x,col_y,y%v)
+    end select
+
+  end function d_base_mlv_dot_v_col
+
+  !
   ! Base workhorse is good old BLAS1
   !
   !
@@ -3061,6 +3104,30 @@ contains
     end do
 
   end function d_base_mlv_dot_a
+  
+  !
+  ! Base workhorse is good old BLAS1
+  !
+  !
+  !> Function       base_mlv_dot_a
+  !! \memberof      psb_d_base_multivect_type
+  !! \brief         Dot product by a normal array
+  !! \param nr      Number of rows to be considered
+  !! \param y(:,:)  The array to be multiplied by
+  !! \param res     Result matrix
+  !!
+  function d_base_mlv_dot_a_col(nr,col_x,col_y,x,y) result(res)
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)                      :: y(:,:)
+    integer(psb_ipk_), intent(in)                   :: nr, col_x, col_y
+    real(psb_dpk_)                                  :: res
+    real(psb_dpk_), external                        :: ddot
+
+    if (x%is_dev()) call x%sync()
+    res = ddot(nr,x%v(1:nr,col_x),1,y(1:nr,col_y),1)
+
+  end function d_base_mlv_dot_a_col
+
   !
   ! AXPBY is invoked via Y, hence the structure below.
   !
@@ -3104,6 +3171,39 @@ contains
   ! AXPBY is invoked via Y, hence the structure below.
   !
   !
+  !
+  !> Function  base_mlv_axpby_v_col
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief AXPBY  by a (base_mlv_vect) y=alpha*x+beta*y
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x     The class(base_mlv_vect) to be added
+  !! \param beta scalar alpha
+  !! \param col  column index
+  !! \param info   return code
+  !!
+  subroutine d_base_mlv_axpby_v_col(m, col_x, col_y, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_multivect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(in)     :: col_x, col_y
+    integer(psb_ipk_), intent(out)              :: info
+
+    select type(xx => x)
+    type is (psb_d_base_multivect_type)
+      call psb_geaxpby(m,alpha,x%v(:,col_x),beta,y%v(:,col_y),info)
+    class default
+      call y%axpby(m,col_x,col_y,alpha,x%v,beta,info)
+    end select
+
+  end subroutine d_base_mlv_axpby_v_col
+  !
+  ! AXPBY is invoked via Y, hence the structure below.
+  !
+  !
   !> Function  base_mlv_axpby_a
   !! \memberof  psb_d_base_multivect_type
   !! \brief AXPBY  by a normal array y=alpha*x+beta*y
@@ -3133,6 +3233,33 @@ contains
 
   end subroutine d_base_mlv_axpby_a
 
+  !
+  ! AXPBY is invoked via Y, hence the structure below.
+  !
+  !
+  !> Function  base_mlv_axpby_a_col
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x(:,:) The array to be added
+  !! \param beta scalar alpha
+  !! \param col  column index
+  !! \param info   return code
+  !!
+  subroutine d_base_mlv_axpby_a_col(m, col_x, col_y, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)        :: x(:,:)
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(in)     :: col_x, col_y
+    integer(psb_ipk_), intent(out)              :: info
+
+    call psb_geaxpby(m,alpha,x(:,col_x),beta,y%v(:,col_y),info)
+
+  end subroutine d_base_mlv_axpby_a_col
 
   !
   !  Multiple variants of two operations:
@@ -3398,6 +3525,26 @@ contains
     end do
 
   end function d_base_mlv_nrm2
+
+  !
+  ! Norms 1, 2 and infinity
+  !
+  !> Function  base_mlv_nrm2_col
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief 2-norm |x(1:nr,col)|_2
+  !! \param col column index to consider
+  !! \param nr  how many rows to consider
+  function d_base_mlv_nrm2_col(nr,col,x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: nr, col
+    real(psb_dpk_)                :: res
+    real(psb_dpk_), external :: dnrm2
+
+    if (x%is_dev()) call x%sync()
+    res = dnrm2(nr,x%v(:,col),1)
+
+  end function d_base_mlv_nrm2_col
 
   !
   !> Function  base_mlv_amax

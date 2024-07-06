@@ -1399,12 +1399,16 @@ module psb_d_cuda_multivect_mod
     !
     ! Product, dot-product (col-by-col) and AXPBY
     !
-    procedure, pass(x) :: prod_v   => d_cuda_multi_prod_v
-    procedure, pass(x) :: prod_a   => d_cuda_multi_prod_a
-    procedure, pass(x) :: dot_v    => d_cuda_multi_dot_v
-    procedure, pass(x) :: dot_a    => d_cuda_multi_dot_a
-    procedure, pass(y) :: axpby_v  => d_cuda_multi_axpby_v
-    procedure, pass(y) :: axpby_a  => d_cuda_multi_axpby_a
+    procedure, pass(x) :: prod_v      => d_cuda_multi_prod_v
+    procedure, pass(x) :: prod_a      => d_cuda_multi_prod_a
+    procedure, pass(x) :: dot_v       => d_cuda_multi_dot_v
+    procedure, pass(x) :: dot_v_col   => d_cuda_multi_dot_v_col
+    procedure, pass(x) :: dot_a       => d_cuda_multi_dot_a
+    procedure, pass(x) :: dot_a_col   => d_cuda_multi_dot_a_col
+    procedure, pass(y) :: axpby_v     => d_cuda_multi_axpby_v
+    procedure, pass(y) :: axpby_v_col => d_cuda_multi_axpby_v_col
+    procedure, pass(y) :: axpby_a     => d_cuda_multi_axpby_a
+    procedure, pass(y) :: axpby_a_col => d_cuda_multi_axpby_a_col
     !
     ! MultiVector by vector/multivector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -1416,7 +1420,8 @@ module psb_d_cuda_multivect_mod
     !
     ! Scaling and norms
     !
-    procedure, pass(x) :: nrm2     => d_cuda_multi_nrm2
+    procedure, pass(x) :: nrm2_mv  => d_cuda_multi_nrm2
+    procedure, pass(x) :: nrm2_col => d_cuda_multi_nrm2_col
     procedure, pass(x) :: amax     => d_cuda_multi_amax
     procedure, pass(x) :: asum     => d_cuda_multi_asum
 !!$    procedure, pass(x) :: scal     => d_cuda_multi_scal
@@ -1725,6 +1730,31 @@ contains
 
   end function d_cuda_multi_dot_v
 
+  function d_cuda_multi_dot_v_col(nr,col_x,col_y,x,y) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)                   :: nr, col_x, col_y
+    real(psb_dpk_)                                  :: res
+    integer(psb_ipk_)                               :: info
+    
+    !
+    ! Note: this is the gpu implementation.
+    !  When we get here, we are sure that X is of
+    !  TYPE psb_d_vect
+    !
+    select type(yy => y)
+    type is (psb_d_multivect_cuda)
+      if (x%is_host()) call x%sync()
+      if (yy%is_host()) call yy%sync()
+      info = dotMultiVecDevice(res,nr,col_x,col_y,x%deviceVect,yy%deviceVect)
+    class default
+      if (y%is_host()) call y%sync()
+      res = x%dot(nr,col_x,col_y,y%v)
+    end select
+
+  end function d_cuda_multi_dot_v_col
+
   function d_cuda_multi_dot_a(nr,x,y) result(res)
     implicit none 
     class(psb_d_multivect_cuda), intent(inout) :: x
@@ -1745,6 +1775,19 @@ contains
     end do
 
   end function d_cuda_multi_dot_a
+
+  function d_cuda_multi_dot_a_col(nr,col_x,col_y,x,y) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout) :: x
+    real(psb_dpk_), intent(in)                 :: y(:,:)
+    integer(psb_ipk_), intent(in)              :: nr, col_x, col_y
+    real(psb_dpk_)                             :: res
+    real(psb_dpk_), external                   :: ddot
+
+    if (x%is_dev()) call x%sync()
+    res = ddot(nr,x%v(1:nr,col_x),1,y(1:nr,col_y),1)
+
+  end function d_cuda_multi_dot_a_col
    
   subroutine d_cuda_multi_axpby_v(m,alpha, x, beta, y, info, n)
     use psi_serial_mod
@@ -1778,6 +1821,38 @@ contains
 
   end subroutine d_cuda_multi_axpby_v
 
+  subroutine d_cuda_multi_axpby_v_col(m, col_x, col_y, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)              :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    class(psb_d_multivect_cuda), intent(inout)      :: y
+    real(psb_dpk_), intent (in)                :: alpha, beta
+    integer(psb_ipk_), intent(in)              :: col_x, col_y
+    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_) :: nx, ny
+
+    info = psb_success_
+    select type(xx => x)
+    type is (psb_d_multivect_cuda)
+      if ((beta /= dzero).and.(y%is_host())) call y%sync()
+      if (xx%is_host()) call xx%sync()
+      nx = getMultiVecDeviceSize(xx%deviceVect)
+      ny = getMultiVecDeviceSize(y%deviceVect)
+      if ((nx<m).or.(ny<m)) then
+        info = psb_err_internal_error_
+      else
+        info = axpbyMultiVecDevice(m,col_x,col_y,alpha,xx%deviceVect,beta,y%deviceVect)
+      end if
+      call y%set_dev()
+    class default
+      ! Do it on the host side
+      if ((alpha /= dzero).and.(x%is_dev())) call x%sync()
+      call y%axpby(m,col_x,col_y,alpha,x%v,beta,info)
+    end select
+
+  end subroutine d_cuda_multi_axpby_v_col
+
   subroutine d_cuda_multi_axpby_a(m,alpha, x, beta, y, info, n)
     use psi_serial_mod
     implicit none 
@@ -1798,6 +1873,21 @@ contains
     call psb_geaxpby(m,nc,alpha,x,beta,y%v,info)
     call y%set_host()
   end subroutine d_cuda_multi_axpby_a
+
+  subroutine d_cuda_multi_axpby_a_col(m, col_x, col_y, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)        :: m
+    real(psb_dpk_), intent(in)           :: x(:,:)
+    class(psb_d_multivect_cuda), intent(inout) :: y
+    real(psb_dpk_), intent (in)          :: alpha, beta
+    integer(psb_ipk_), intent(in)        :: col_x, col_y
+    integer(psb_ipk_), intent(out)       :: info
+
+    if ((beta /= dzero).and.(y%is_dev())) call y%sync()
+    call psb_geaxpby(m,alpha,x(:,col_x),beta,y%v(:,col_y),info)
+    call y%set_host()
+  end subroutine d_cuda_multi_axpby_a_col
 
 !!$  subroutine d_cuda_multi_mlt_v(x, y, info)
 !!$    use psi_serial_mod
@@ -1971,6 +2061,17 @@ contains
     allocate(res(x%get_ncols()))
     info = nrm2MultiVecDevice(res,nr,x%deviceVect)
   end function d_cuda_multi_nrm2
+
+  function d_cuda_multi_nrm2_col(nr,col,x) result(res)
+    implicit none 
+    class(psb_d_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: nr, col
+    real(psb_dpk_)                :: res
+    integer(psb_ipk_)             :: info
+    ! WARNING: this should be changed. 
+    if (x%is_host()) call x%sync()
+    info = nrm2MultiVecDevice(res,nr,col,x%deviceVect)
+  end function d_cuda_multi_nrm2_col
  
   ! TODO CUDA
   function d_cuda_multi_amax(nr,x) result(res)

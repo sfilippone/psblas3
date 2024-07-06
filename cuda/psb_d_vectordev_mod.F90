@@ -279,7 +279,7 @@ module psb_d_vectordev_mod
   end interface
 
   interface dotMultiVecDevice
-    function dotMultiVecDeviceDouble(res, n,deviceVecA,deviceVecB) &
+    function dotMultiVecDeviceDouble(res,n,deviceVecA,deviceVecB) &
          & result(val) bind(c,name='dotMultiVecDeviceDouble')
       use iso_c_binding
       integer(c_int)        :: val
@@ -287,7 +287,7 @@ module psb_d_vectordev_mod
       real(c_double) :: res
       type(c_ptr), value    :: deviceVecA, deviceVecB
     end function dotMultiVecDeviceDouble
-    function dotMultiVecDeviceDoubleR2(res, n,deviceVecA,deviceVecB,ld) &
+    function dotMultiVecDeviceDoubleR2(res,n,deviceVecA,deviceVecB,ld) &
          & result(val) bind(c,name='dotMultiVecDeviceDouble')
       use iso_c_binding
       integer(c_int)        :: val
@@ -296,6 +296,14 @@ module psb_d_vectordev_mod
       integer(c_int), value :: ld
       type(c_ptr), value    :: deviceVecA, deviceVecB
     end function dotMultiVecDeviceDoubleR2
+    function dotMultiVecDeviceDoubleCol(res,n,col_x,col_y,deviceVecA,deviceVecB) &
+         & result(val) bind(c,name='dotMultiVecDeviceDoubleCol')
+      use iso_c_binding
+      integer(c_int)        :: val
+      integer(c_int), value :: n, col_x, col_y
+      real(c_double)        :: res
+      type(c_ptr), value    :: deviceVecA, deviceVecB
+    end function dotMultiVecDeviceDoubleCol
   end interface
     
   interface nrm2MultiVecDevice
@@ -304,17 +312,25 @@ module psb_d_vectordev_mod
       use iso_c_binding
       integer(c_int)        :: val
       integer(c_int), value :: n
-      real(c_double)         :: res
+      real(c_double)        :: res
       type(c_ptr), value    :: deviceVecA
     end function nrm2MultiVecDeviceDouble
     function nrm2MultiVecDeviceDoubleR2(res,n,deviceVecA) &
-        & result(val) bind(c,name='nrm2MultiVecDeviceDouble')
-     use iso_c_binding
-     integer(c_int)        :: val
-     integer(c_int), value :: n
-     real(c_double)         :: res(*)
-     type(c_ptr), value    :: deviceVecA
-   end function nrm2MultiVecDeviceDoubleR2
+         & result(val) bind(c,name='nrm2MultiVecDeviceDouble')
+      use iso_c_binding
+      integer(c_int)        :: val
+      integer(c_int), value :: n
+      real(c_double)        :: res(*)
+      type(c_ptr), value    :: deviceVecA
+    end function nrm2MultiVecDeviceDoubleR2
+    function nrm2MultiVecDeviceDoubleCol(res,n,col,deviceVecA) &
+         & result(val) bind(c,name='nrm2MultiVecDeviceDoubleCol')
+      use iso_c_binding
+      integer(c_int)        :: val
+      integer(c_int), value :: n, col
+      real(c_double)        :: res
+      type(c_ptr), value    :: deviceVecA
+    end function nrm2MultiVecDeviceDoubleCol
   end interface
 
   interface amaxMultiVecDevice
@@ -348,6 +364,14 @@ module psb_d_vectordev_mod
       real(c_double), value :: alpha, beta
       type(c_ptr), value  :: deviceVecA, deviceVecB
     end function axpbyMultiVecDeviceDouble
+    function axpbyMultiVecDeviceDoubleCol(n,col_x,col_y,alpha,deviceVecA,beta,deviceVecB) &
+         & result(res) bind(c,name='axpbyMultiVecDeviceDoubleCol')
+      use iso_c_binding
+      integer(c_int)      :: res
+      integer(c_int), value :: n, col_x, col_y
+      real(c_double), value :: alpha, beta
+      type(c_ptr), value  :: deviceVecA, deviceVecB
+    end function axpbyMultiVecDeviceDoubleCol
   end interface
 
   interface abgdxyzMultiVecDevice

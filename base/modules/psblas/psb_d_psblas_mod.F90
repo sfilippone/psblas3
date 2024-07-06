@@ -54,6 +54,16 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)            :: info
       logical, intent(in), optional             :: global
     end function psb_ddot_multivect
+    function psb_ddot_multivect_col(col_x, col_y, x, y, desc_a,info,global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_)                            :: res
+      integer(psb_ipk_), intent(in)             :: col_x, col_y
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: global
+    end function psb_ddot_multivect_col
     function psb_ddotv(x, y, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
@@ -137,15 +147,16 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in) :: desc_a
       integer(psb_ipk_), intent(out) :: info
     end subroutine psb_daxpby_multivect
-    subroutine psb_daxpby_multivect_a(alpha, x, beta, y, desc_a, info)
+    subroutine psb_daxpby_multivect_col(col_x, col_y, alpha, x, beta, y, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_), intent(in) :: x(:,:)
+      type(psb_d_multivect_type), intent (inout) :: x
       type(psb_d_multivect_type), intent (inout) :: y
       real(psb_dpk_), intent (in) :: alpha, beta
+      integer(psb_ipk_), intent(in) :: col_x, col_y
       type(psb_desc_type), intent (in) :: desc_a
       integer(psb_ipk_), intent(out) :: info
-    end subroutine psb_daxpby_multivect_a
+    end subroutine psb_daxpby_multivect_col
     subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
          & z, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
@@ -421,6 +432,16 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)             :: info
       logical, intent(in), optional              :: global
     end function psb_dnrm2_multivect
+    function psb_dnrm2_multivect_col(x, col, desc_a, info, global) result(res)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_)                             :: res
+      type(psb_d_multivect_type), intent (inout) :: x
+      integer(psb_ipk_), intent(in)              :: col
+      type(psb_desc_type), intent (in)           :: desc_a
+      integer(psb_ipk_), intent(out)             :: info
+      logical, intent(in), optional              :: global
+    end function psb_dnrm2_multivect_col
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)

@@ -243,6 +243,15 @@ int nrm2MultiVecDeviceDouble(double* y_res, int n, void* devMultiVecA)
   return(i);
 }
 
+int nrm2MultiVecDeviceDoubleCol(double* y_res, int n, int col, void* devMultiVecA)
+{ int i=0;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
+
+  spgpuDmnrm2(handle, y_res, n, ((double *)devVecA->v_)+devVecA->pitch_*(col-1), 1, devVecA->pitch_);
+  return(i);
+}
+
 int amaxMultiVecDeviceDouble(double* y_res, int n, void* devMultiVecA)
 { int i=0;
   spgpuHandle_t handle=psb_cudaGetHandle();
@@ -273,6 +282,17 @@ int dotMultiVecDeviceDouble(double* y_res, int n, void* devMultiVecA, void* devM
   return(i);
 }
 
+int dotMultiVecDeviceDoubleCol(double* y_res, int n, int col_x, int col_y, void* devMultiVecA, void* devMultiVecB)
+{int i=0;
+  struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
+  struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  
+  spgpuDmdot(handle, y_res, n, ((double*)devVecA->v_)+devVecA->pitch_*(col_x-1),
+                ((double*)devVecB->v_)+devVecB->pitch_*(col_y-1), 1, devVecA->pitch_);
+  return(i);
+}
+
 int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX, 
 			      double beta, void* devMultiVecY)
 { int j=0, i=0;
@@ -287,6 +307,22 @@ int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX,
   for(j=0;j<devVecY->count_;j++)
     spgpuDaxpby(handle,(((double *)(devVecY->v_))+(pitch)*j), n, beta, 
 		(((double *)(devVecY->v_))+(pitch)*j), alpha,(((double *)(devVecX->v_))+(pitch)*j));
+  return(i);
+}
+
+int axpbyMultiVecDeviceDoubleCol(int n, int col_x, int col_y, double alpha, void* devMultiVecX, 
+			      double beta, void* devMultiVecY)
+{ int i=0;
+  int pitch = 0;
+  struct MultiVectDevice *devVecX = (struct MultiVectDevice *) devMultiVecX;
+  struct MultiVectDevice *devVecY = (struct MultiVectDevice *) devMultiVecY;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+  pitch = devVecY->pitch_;
+  if ((n > devVecY->size_) || (n>devVecX->size_ )) 
+    return SPGPU_UNSUPPORTED;
+
+  spgpuDaxpby(handle,((double *)devVecY->v_)+pitch*(col_y-1), n, beta, 
+		((double *)devVecY->v_)+pitch*(col_y-1), alpha,((double *)devVecX->v_)+pitch*(col_x-1));
   return(i);
 }
  

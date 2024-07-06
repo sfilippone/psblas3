@@ -155,7 +155,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    if (info == psb_success_) call psb_geall(r0,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(rm,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(pd,desc_a,info,n=nrhs)
-   if (info == psb_success_) call psb_geasb(v,desc_a,info,mold=x%v,n=nrhs)
+   if (info == psb_success_) call psb_geasb(v(1),desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(r0,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(rm,desc_a,info,mold=x%v,n=nrhs)
@@ -224,7 +224,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    end if
 
    ! STEP 2: Compute QR_fact(R(0))
-   beta(1:nrhs,1:nrhs) = qr_fact(v(1))
+   beta(1:nrhs,1:nrhs) = mgs_qr_fact(v(1))
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -233,6 +233,14 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! STEP 3: Outer loop
    outer: do j=1,nrep
+
+      ! Assembly next iteration
+      call psb_geasb(v(j+1),desc_a,info,mold=x%v,n=nrhs)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_non_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
 
       ! Update itx counter
       itx = itx + 1
@@ -285,7 +293,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
       ! STEP 8: Compute QR_fact(W)
 
       ! Store R in H(j+1,j)
-      h(idx_j+nrhs:idx_j+nrhs+n_add,idx_j:idx_j+n_add) = qr_fact(w)
+      h(idx_j+nrhs:idx_j+nrhs+n_add,idx_j:idx_j+n_add) = mgs_qr_fact(w)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
@@ -380,8 +388,8 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
 contains
 
-   ! QR factorization
-   function qr_fact(mv) result(res)
+   ! Modified Gram-Schmidt QR factorization
+   function mgs_qr_fact(mv) result(res)
       implicit none
 
       ! I/O parameters
@@ -389,51 +397,37 @@ contains
       real(psb_dpk_), allocatable                :: res(:,:)
 
       ! Utils
-      real(psb_dpk_), allocatable :: vec(:,:)
-      real(psb_dpk_), allocatable :: tau(:), work(:)
-      integer(psb_ipk_)           :: ii, jj, m, lda, lwork
+      real(psb_dpk_)    :: scal
+      integer(psb_ipk_) :: i, j
 
       ! Allocate output
       allocate(res(nrhs,nrhs))
+      
+      ! Start factorization
+      do i=1,nrhs
 
-      ! Gather multivector to factorize
-      call psb_gather(vec,mv,desc_a,info,root=psb_root_)
+        ! Compute R(i,i) = nrm2(W(:,i))
+        res(i,i) = psb_genrm2(mv,i,desc_a,info)
+  
+        ! Compute 1/R(i,i)
+        scal = done/res(i,i)
+        
+        ! Compute W(:,i) = W(:,i)/R(i,i)
+        call psb_geaxpby(i,i,scal,mv,dzero,mv,desc_a,info)
 
-      ! If root
-      if (me == psb_root_) then
+        ! Iterate over columns
+        do j=i+1,nrhs
+  
+          ! Compute R(i,j) = W(:,i)'*W(:,j)
+          res(i,j) = psb_gedot(i,j,mv,mv,desc_a,info)
+  
+          ! Compute W(:,j) = W(:,j) - R(i,j)*W(:,i)
+          call psb_geaxpby(i,j,-res(i,j),mv,done,mv,desc_a,info)
+  
+        end do
+      end do
 
-         ! Initialize params
-         m = size(vec,1)
-         lda = m
-         lwork = nrhs
-         allocate(tau(nrhs),work(lwork))
-
-         ! Perform QR factorization
-         call dgeqrf(m,nrhs,vec,lda,tau,work,lwork,info)
-
-         ! Set R
-         res = vec(1:nrhs,1:nrhs)
-         do ii = 2, nrhs
-            do jj = 1, ii-1
-               res(ii,jj) = dzero
-            enddo
-         enddo
-
-         ! Generate Q matrix
-         call dorgqr(m,nrhs,nrhs,vec,lda,tau,work,lwork,info)
-
-         ! Deallocate
-         deallocate(tau,work)
-
-      end if
-
-      ! Share R
-      call psb_bcast(ctxt,res)
-
-      ! Scatter Q
-      call psb_scatter(vec,mv,desc_a,info,root=psb_root_,mold=mv%v)
-
-   end function qr_fact
+   end function mgs_qr_fact
 
    function givens_rotation(rep) result(res)
 

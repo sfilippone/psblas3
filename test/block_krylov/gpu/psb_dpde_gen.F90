@@ -641,8 +641,9 @@ program dpdegen
    end if
 
    ! set random RHS
-   call random_number(b_mv%v%v)
-   b_mv%v%v = -10 + (20)*b_mv%v%v
+   call b_mv%zero()
+   call random_number(b_mv%v%v(1:desc_a%get_local_rows(),:))
+   b_mv%v%v(1:desc_a%get_local_rows(),:) = -10 + (20)*b_mv%v%v
    call b_mv%v%set_host()
    call b_mv%sync()
 

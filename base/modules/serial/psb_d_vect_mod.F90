@@ -1424,15 +1424,19 @@ module psb_d_multivect_mod
     !
     ! Produc, dot-product and AXPBY
     !
-    procedure, pass(x) :: prod_v    => d_vect_prod_v
-    procedure, pass(x) :: prod_a    => d_vect_prod_a
-    generic, public    :: prod      => prod_v, prod_a
-    procedure, pass(x) :: dot_v     => d_vect_dot_v
-    procedure, pass(x) :: dot_a     => d_vect_dot_a
-    generic, public    :: dot       => dot_v, dot_a
-    procedure, pass(y) :: axpby_v   => d_vect_axpby_v
-    procedure, pass(y) :: axpby_a   => d_vect_axpby_a
-    generic, public    :: axpby     => axpby_v, axpby_a
+    procedure, pass(x) :: prod_v      => d_vect_prod_v
+    procedure, pass(x) :: prod_a      => d_vect_prod_a
+    generic, public    :: prod        => prod_v, prod_a
+    procedure, pass(x) :: dot_v       => d_vect_dot_v
+    procedure, pass(x) :: dot_v_col   => d_vect_dot_v_col
+    procedure, pass(x) :: dot_a       => d_vect_dot_a
+    procedure, pass(x) :: dot_a_col   => d_vect_dot_a_col
+    generic, public    :: dot         => dot_v, dot_v_col, dot_a, dot_a_col
+    procedure, pass(y) :: axpby_v     => d_vect_axpby_v
+    procedure, pass(y) :: axpby_v_col => d_vect_axpby_v_col
+    procedure, pass(y) :: axpby_a     => d_vect_axpby_a
+    procedure, pass(y) :: axpby_a_col => d_vect_axpby_a_col
+    generic, public    :: axpby       => axpby_v, axpby_v_col, axpby_a, axpby_a_col
     !
     ! MultiVector by vector/multivector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -1449,7 +1453,9 @@ module psb_d_multivect_mod
     ! Scaling and norms
     !
 !!$    procedure, pass(x) :: scal     => d_vect_scal
-    procedure, pass(x) :: nrm2     => d_vect_nrm2
+    procedure, pass(x) :: nrm2_mv  => d_vect_nrm2
+    procedure, pass(x) :: nrm2_col => d_vect_nrm2_col
+    generic, public    :: nrm2     => nrm2_mv, nrm2_col
     procedure, pass(x) :: amax     => d_vect_amax
     procedure, pass(x) :: asum     => d_vect_asum
     procedure, pass(x) :: qr_fact  => d_vect_qr_fact
@@ -1927,6 +1933,17 @@ contains
 
   end function d_vect_dot_v
 
+  function d_vect_dot_v_col(nr,col_x,col_y,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)              :: nr, col_x, col_y
+    real(psb_dpk_)                             :: res
+
+    if (allocated(x%v).and.allocated(y%v)) &
+         & res = x%v%dot(nr,col_x,col_y,y%v)
+
+  end function d_vect_dot_v_col
+
   function d_vect_dot_a(nr,x,y) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
@@ -1938,6 +1955,18 @@ contains
          & res = x%v%dot(nr,y)
 
   end function d_vect_dot_a
+
+  function d_vect_dot_a_col(nr,col_x,col_y,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)                 :: y(:,:)
+    integer(psb_ipk_), intent(in)              :: nr, col_x, col_y
+    real(psb_dpk_)                             :: res
+
+    if (allocated(x%v)) &
+         & res = x%v%dot(nr,col_x,col_y,y)
+
+  end function d_vect_dot_a_col
 
   subroutine d_vect_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod
@@ -1956,6 +1985,24 @@ contains
 
   end subroutine d_vect_axpby_v
 
+  subroutine d_vect_axpby_v_col(m, col_x, col_y, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_multivect_type), intent(inout)  :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)                 :: alpha, beta
+    integer(psb_ipk_), intent(in)               :: col_x, col_y
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (allocated(x%v).and.allocated(y%v)) then
+      call y%v%axpby(m,col_x,col_y,alpha,x%v,beta,info)
+    else
+      info = psb_err_invalid_vect_state_
+    end if
+
+  end subroutine d_vect_axpby_v_col
+
   subroutine d_vect_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
@@ -1969,6 +2016,21 @@ contains
          & call y%v%axpby(m,alpha,x,beta,info)
 
   end subroutine d_vect_axpby_a
+
+  subroutine d_vect_axpby_a_col(m, col_x, col_y, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)        :: x(:,:)
+    class(psb_d_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(in)               :: col_x, col_y
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (allocated(y%v)) &
+         & call y%v%axpby(m,col_x,col_y,alpha,x,beta,info)
+
+  end subroutine d_vect_axpby_a_col
 
 !!$  subroutine d_vect_mlt_v(x, y, info)
 !!$    use psi_serial_mod
@@ -2093,6 +2155,20 @@ contains
     end if
 
   end function d_vect_nrm2
+
+  function d_vect_nrm2_col(nr,col,x) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: col, nr
+    real(psb_dpk_)                :: res
+
+    if (allocated(x%v)) then
+      res = x%v%nrm2(nr,col)
+    else
+      res = dzero
+    end if
+
+  end function d_vect_nrm2_col
 
   function d_vect_amax(nr,x) result(res)
     implicit none

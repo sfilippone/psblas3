@@ -230,38 +230,40 @@ subroutine psb_daxpby_multivect(alpha, x, beta, y, desc_a, info)
 end subroutine psb_daxpby_multivect
 
 !
-! Subroutine: psb_daxpby_multivect
-!    Adds one distributed multivector to another,
+! Subroutine: psb_daxpby_multivect_col
+!    Adds one distributed multivector column to another,
 !
 !    Y := beta * Y + alpha * X
 !
 ! Arguments:
-!    alpha  -  real,input                  The scalar used to multiply each component of X
-!    x      -  real(psb_dpk_)(:,:)         The input multivector containing the entries of X
-!    beta   -  real,input                  The scalar used to multiply each component of Y
-!    y      -  type(psb_d_multivect_type)  The input/output multivector Y
-!    desc_a -  type(psb_desc_type)         The communication descriptor.
-!    info   -  integer                     Return code
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x      - type(psb_d_multivect_type) The input multivector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y      - type(psb_d_multivect_type)  The input/output multivector Y
+!    col    -  integer           Column index
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
 !
 !  Note: from a functional point of view, X is input, but here
 !        it's declared INOUT because of the sync() methods.
 !
-subroutine psb_daxpby_multivect_a(alpha, x, beta, y, desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_daxpby_multivect_a
+subroutine psb_daxpby_multivect_col(col_x, col_y, alpha, x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_multivect_col
   implicit none
-  real(psb_dpk_), intent(in) :: x(:,:)
+  type(psb_d_multivect_type), intent (inout) :: x
   type(psb_d_multivect_type), intent (inout) :: y
   real(psb_dpk_), intent (in) :: alpha, beta
+  integer(psb_ipk_), intent(in) :: col_x, col_y
   type(psb_desc_type), intent (in) :: desc_a
   integer(psb_ipk_), intent(out) :: info
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, iiy, jjy
-  integer(psb_lpk_) :: iy, ijy, m, n
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n
   character(len=20) :: name, ch_err
 
-  name='psb_dgeaxpby'
+  name='psb_dgeaxpby_mv_col'
   if (psb_errstatus_fatal()) return
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -274,16 +276,33 @@ subroutine psb_daxpby_multivect_a(alpha, x, beta, y, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
   if (.not.allocated(y%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
+  ix = ione
+  ijx = ione
+
   iy = ione
   ijy = ione
 
   m = desc_a%get_global_rows()
+  n = x%get_ncols()
+  ! check vector correctness
+  call psb_chkvect(m,n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
   n = y%get_ncols()
   call psb_chkvect(m,n,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
@@ -293,13 +312,13 @@ subroutine psb_daxpby_multivect_a(alpha, x, beta, y, desc_a, info)
     goto 9999
   end if
 
-  if (iiy /= ione) then
+  if ((iix /= ione).or.(iiy /= ione)) then
     info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call y%axpby(desc_a%get_local_rows(),alpha,x,beta,info)
+    call y%axpby(desc_a%get_local_rows(),col_x,col_y,alpha,x,beta,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -309,7 +328,7 @@ subroutine psb_daxpby_multivect_a(alpha, x, beta, y, desc_a, info)
 
   return
 
-end subroutine psb_daxpby_multivect_a
+end subroutine psb_daxpby_multivect_col
 
 !
 !                Parallel Sparse BLAS  version 3.5

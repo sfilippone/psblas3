@@ -68,11 +68,14 @@ int iscatMultiVecDeviceDouble(void* deviceVec, int vectorId, int n, int first, v
 
 int scalMultiVecDeviceDouble(double alpha, void* devMultiVecA);
 int nrm2MultiVecDeviceDouble(double* y_res, int n, void* devVecA);
+int nrm2MultiVecDeviceDoubleCol(double* y_res, int n, int col, void* devVecA);
 int amaxMultiVecDeviceDouble(double* y_res, int n, void* devVecA);
 int asumMultiVecDeviceDouble(double* y_res, int n, void* devVecA);
 int dotMultiVecDeviceDouble(double* y_res, int n, void* devVecA, void* devVecB);
+int dotMultiVecDeviceDoubleCol(double* y_res, int n, int col_x, int col_y, void* devVecA, void* devVecB);
 
 int axpbyMultiVecDeviceDouble(int n, double alpha, void* devVecX, double beta, void* devVecY);
+int axpbyMultiVecDeviceDoubleCol(int n, int col_x, int col_y, double alpha, void* devVecX, double beta, void* devVecY);
 int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, double delta, 
 				void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ);
 int xyzwMultiVecDeviceDouble(int n,double a, double b, double c, double d, double e, double f, 
