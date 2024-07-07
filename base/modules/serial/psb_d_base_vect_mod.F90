@@ -2945,9 +2945,6 @@ contains
     external                                        :: dgemm
     integer(psb_ipk_)                               :: x_n, y_n, lda, ldb
 
-    write(*,*) 'CPU PROD'
-
-
     if (x%is_dev()) call x%sync()
     if (y%is_dev()) call y%sync()
     select type(yy => y)
@@ -2981,9 +2978,6 @@ contains
     integer(psb_ipk_), intent(in)                   :: nr
     external                                        :: dgemm
     integer(psb_ipk_)                               :: x_n, y_n, lda, ldb
-
-    write(*,*) 'CPU PROD'
-
 
     if (x%is_dev()) call x%sync()
     x_n = x%get_ncols()

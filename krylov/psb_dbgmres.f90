@@ -63,12 +63,12 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    real(psb_dpk_), allocatable               :: aux(:), c(:,:), s(:,:), h(:,:), beta(:,:)
 
    type(psb_d_multivect_type), allocatable   :: v(:)
-   type(psb_d_multivect_type)                :: w, r0, rm, pd
+   type(psb_d_multivect_type)                :: w, pd
 
    integer(psb_ipk_)                         :: naux, itrace_, n_row, n_col, nrhs, nrep
    integer(psb_lpk_)                         :: mglob, n_add, ncv
 
-   integer(psb_ipk_)                         :: i, j, istop_, err_act, idx_i, idx_j, idx
+   integer(psb_ipk_)                         :: i, j, k, istop_, err_act, idx_i, idx_j, idx
    integer(psb_ipk_)                         :: debug_level, debug_unit
 
    type(psb_ctxt_type)                       :: ctxt
@@ -152,13 +152,9 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
             & beta((nrep+1)*nrhs,nrhs),r0n2(nrhs),rmn2(nrhs),stat=info)
    if (info == psb_success_) call psb_geall(v,desc_a,info,m=nrep+1,n=nrhs)
    if (info == psb_success_) call psb_geall(w,desc_a,info,n=nrhs)
-   if (info == psb_success_) call psb_geall(r0,desc_a,info,n=nrhs)
-   if (info == psb_success_) call psb_geall(rm,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geall(pd,desc_a,info,n=nrhs)
    if (info == psb_success_) call psb_geasb(v(1),desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v,n=nrhs)
-   if (info == psb_success_) call psb_geasb(r0,desc_a,info,mold=x%v,n=nrhs)
-   if (info == psb_success_) call psb_geasb(rm,desc_a,info,mold=x%v,n=nrhs)
    if (info == psb_success_) call psb_geasb(pd,desc_a,info,mold=x%v,n=nrhs)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
@@ -173,19 +169,19 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    ! Compute norm2 of R(0)
    if (istop_ == 1) then
-      call psb_geaxpby(done,b,dzero,r0,desc_a,info)
+      call psb_geaxpby(done,b,dzero,v(1),desc_a,info)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
          goto 9999
       end if
-      call psb_spmm(-done,a,x,done,r0,desc_a,info,work=aux)
+      call psb_spmm(-done,a,x,done,v(1),desc_a,info,work=aux)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
          goto 9999
       end if
-      r0n2 = psb_genrm2(r0,desc_a,info)
+      r0n2 = psb_genrm2(v(1),desc_a,info)
    endif
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
@@ -197,7 +193,7 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
    c     = dzero
    s     = dzero
    beta  = dzero
-   itx   = dzero
+   itx   = 0
    deps  = eps
    n_add = nrhs-1
 
@@ -370,8 +366,6 @@ subroutine psb_dbgmres_multivect(a, prec, b, x, eps, desc_a, info, itmax, iter, 
 
    if (info == psb_success_) call psb_gefree(v,desc_a,info)
    if (info == psb_success_) call psb_gefree(w,desc_a,info)
-   if (info == psb_success_) call psb_gefree(r0,desc_a,info)
-   if (info == psb_success_) call psb_gefree(rm,desc_a,info)
    if (info == psb_success_) call psb_gefree(pd,desc_a,info)
    if (info == psb_success_) deallocate(aux,c,s,h,beta,r0n2,rmn2,stat=info)
    if (info /= psb_success_) then
@@ -402,6 +396,9 @@ contains
 
       ! Allocate output
       allocate(res(nrhs,nrhs))
+
+      ! Initialize params
+      res = dzero
       
       ! Start factorization
       do i=1,nrhs
@@ -473,16 +470,17 @@ contains
           call drotg(rti,rti1,c(idx_col,j),s(idx_col,j))
 
           ! Apply Givens rotation to H
-          call drot(nrhs,h(back_idx-1,idx_rep:idx_rep+n_add),1,&
-                    & h(back_idx,idx_rep:idx_rep+n_add),&
+          call drot(nrhs-(i-1),h(back_idx-1,idx_col:idx_rep+n_add),1,&
+                    & h(back_idx,idx_col:idx_rep+n_add),&
                     & 1,c(idx_col,j),s(idx_col,j))
 
           ! Eliminate rotated values
           h(back_idx,idx_rep:idx_col) = dzero
 
           ! Apply Givens rotation to G=E1*Beta
-          call drot(nrhs,beta(back_idx-1,:),1,beta(back_idx,:),1,&
-                    & c(idx_col,j),s(idx_col,j))
+          call drot(j,beta(back_idx-1,nrhs-(j-1):nrhs),&
+                   & 1,beta(back_idx,nrhs-(j-1):nrhs),1,&
+                   & c(idx_col,j),s(idx_col,j))
 
         end do
       end do

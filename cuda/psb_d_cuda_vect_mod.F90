@@ -1668,7 +1668,7 @@ contains
         if (yy%is_host()) call yy%sync()
         if (zz%is_host()) call zz%sync()
         if (info == 0) &
-            & info = prodMultiVecDevice('N',nr,yy%get_ncols(),x%get_ncols(),done,x%deviceVect,yy%deviceVect,done,zz%deviceVect)
+            & info = prodMultiVecDevice('N',nr,yy%get_ncols(),x%get_ncols(),done,x%deviceVect,yy%deviceVect,dzero,zz%deviceVect)
         call zz%set_dev()
       class default
         ! TODO
