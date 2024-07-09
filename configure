@@ -667,6 +667,11 @@ CUDA_DIR
 EXTRALDLIBS
 SPGPU_LIBS
 SPGPU_FLAGS
+CXXOPENACC
+CCOPENACC
+FCOPENACC
+OACCLD
+OACCD
 METISINCFILE
 UTILLIBNAME
 METHDLIBNAME
@@ -840,6 +845,10 @@ with_amdincdir
 with_amdlibdir
 with_cuda
 with_cudacc
+enable_openacc
+with_ccopenacc
+with_cxxopenacc
+with_fcopenacc
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1490,6 +1499,7 @@ Optional Features:
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-openmp         Specify whether to enable openmp.
   --disable-openmp        do not use OpenMP
+  --enable-openacc        Specify whether to enable openacc.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1535,6 +1545,12 @@ Optional Packages:
   --with-cuda=DIR         Specify the CUDA install directory.
   --with-cudacc           A comma-separated list of CCs to compile to, for
                           example, --with-cudacc=50,60,70,75
+  --with-ccopenacc        additional [CCOPENACC] flags to be added: will
+                          prepend to [CCOPENACC]
+  --with-cxxopenacc       additional [CXXOPENACC] flags to be added: will
+                          prepend to [CXXOPENACC]
+  --with-fcopenacc        additional [FCOPENACC] flags to be added: will
+                          prepend to [FCOPENACC]
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -10867,6 +10883,106 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   CUDA_LIBS="";
 fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether we want openacc " >&5
+printf %s "checking whether we want openacc ... " >&6; }
+# Check whether --enable-openacc was given.
+if test ${enable_openacc+y}
+then :
+  enableval=$enable_openacc;
+pac_cv_openacc="yes";
+
+
+fi
+
+if test x"$pac_cv_openacc" == x"yes" ; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes." >&5
+printf "%s\n" "yes." >&6; }
+#   AC_LANG_PUSH([Fortran])
+#   AC_OPENACC()
+#   pac_cv_openacc_fcopt="$OPENACC_FCFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C])
+#   AC_OPENACC()
+#   pac_cv_openacc_ccopt="$OPENACC_CFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C++])
+#   AC_OPENACC()
+#   pac_cv_openacc_cxxopt="$OPENACC_CXXFLAGS";
+#   AC_LANG_POP()
+else
+ pac_cv_openacc="no";
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no." >&5
+printf "%s\n" "no." >&6; }
+fi
+
+
+if test x"$pac_cv_openacc" == x"yes" ; then
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional CCOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional CCOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-ccopenacc was given.
+if test ${with_ccopenacc+y}
+then :
+  withval=$with_ccopenacc;
+CCOPENACC="${withval} ${CCOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: CCOPENACC = ${CCOPENACC}" >&5
+printf "%s\n" "CCOPENACC = ${CCOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional CXXOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional CXXOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-cxxopenacc was given.
+if test ${with_cxxopenacc+y}
+then :
+  withval=$with_cxxopenacc;
+CXXOPENACC="${withval} ${CXXOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: CXXOPENACC = ${CXXOPENACC}" >&5
+printf "%s\n" "CXXOPENACC = ${CXXOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional FCOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional FCOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-fcopenacc was given.
+if test ${with_fcopenacc+y}
+then :
+  withval=$with_fcopenacc;
+FCOPENACC="${withval} ${FCOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: FCOPENACC = ${FCOPENACC}" >&5
+printf "%s\n" "FCOPENACC = ${FCOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
+   OACCD=oaccd;
+   OACCLD=oaccld;
+
+   #FCOPT="$FCOPT    $FCOPENACC";
+   #CCOPT="$CCOPT    $CCOPENACC"
+   #CXXOPT="$CXXOPT  $CXXOPENACC"
+   #FLINK="$FLINK $FCOPENACC";
+fi
 
 
 
@@ -10941,6 +11057,13 @@ FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
+
+
+
+
 
 
 

@@ -843,6 +843,20 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   CUDA_LIBS="";
 fi
 
+PAC_ARG_OPENACC()
+if test x"$pac_cv_openacc" == x"yes" ; then
+   PAC_ARG_WITH_FLAGS(ccopenacc,CCOPENACC)
+   PAC_ARG_WITH_FLAGS(cxxopenacc,CXXOPENACC)
+   PAC_ARG_WITH_FLAGS(fcopenacc,FCOPENACC)
+
+   OACCD=oaccd;
+   OACCLD=oaccld;
+
+   #FCOPT="$FCOPT    $FCOPENACC";
+   #CCOPT="$CCOPT    $CCOPENACC"	
+   #CXXOPT="$CXXOPT  $CXXOPENACC"		
+   #FLINK="$FLINK $FCOPENACC";
+fi
 
 
 
@@ -927,6 +941,12 @@ AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
+AC_SUBST(OACCD)
+AC_SUBST(OACCLD)
+AC_SUBST(FCOPENACC)
+AC_SUBST(CCOPENACC)
+AC_SUBST(CXXOPENACC)
+
 AC_SUBST(SPGPU_FLAGS)
 AC_SUBST(SPGPU_LIBS)
 dnl AC_SUBST(SPGPU_DIR)
@@ -944,6 +964,7 @@ AC_SUBST(CUDEFINES)
 AC_SUBST(CUDAD)
 AC_SUBST(CUDALD)
 AC_SUBST(LCUDA)
+
 ###############################################################################
 # the following files will be created by Automake
 

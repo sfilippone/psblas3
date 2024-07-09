@@ -2267,3 +2267,47 @@ CPPFLAGS="$SAVE_CPPFLAGS"
 ])dnl 
 
 
+
+dnl @synopsis PAC_ARG_OPENACC
+dnl
+dnl Test for --enable-openacc
+dnl 
+dnl 
+dnl
+dnl Example use:
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_OPENACC],
+[AC_MSG_CHECKING([whether we want openacc ])
+AC_ARG_ENABLE(openacc,
+AS_HELP_STRING([--enable-openacc], 
+[Specify whether to enable openacc. ]),
+[
+pac_cv_openacc="yes";
+]
+dnl ,
+dnl [pac_cv_openacc="no";]
+	     )
+if test x"$pac_cv_openacc" == x"yes" ; then
+   AC_MSG_RESULT([yes.])
+#   AC_LANG_PUSH([Fortran])
+#   AC_OPENACC() 
+#   pac_cv_openacc_fcopt="$OPENACC_FCFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C])
+#   AC_OPENACC() 
+#   pac_cv_openacc_ccopt="$OPENACC_CFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C++])
+#   AC_OPENACC() 
+#   pac_cv_openacc_cxxopt="$OPENACC_CXXFLAGS";
+#   AC_LANG_POP()
+else
+ pac_cv_openacc="no";
+ AC_MSG_RESULT([no.])
+fi
+]
+)
+
