@@ -10,22 +10,22 @@ subroutine d_oacc_mlt_v(x, y, info)
   integer(psb_ipk_) :: i, n
 
   info = 0    
-!!$  n = min(x%get_nrows(), y%get_nrows())
-!!$  select type(xx => x)
-!!$  type is (psb_d_base_vect_type)
-!!$    if (y%is_dev()) call y%sync()
-!!$    !$acc parallel loop
-!!$    do i = 1, n
-!!$      y%v(i) = y%v(i) * xx%v(i)
-!!$    end do
-!!$    call y%set_host()
-!!$  class default
-!!$    if (xx%is_dev()) call xx%sync()
-!!$    if (y%is_dev()) call y%sync()
-!!$    !$acc parallel loop
-!!$    do i = 1, n
-!!$      y%v(i) = y%v(i) * xx%v(i)
-!!$    end do
-!!$    call y%set_host()
-!!$  end select
+  n = min(x%get_nrows(), y%get_nrows())
+  select type(xx => x)
+  class is (psb_d_vect_oacc)
+    if (y%is_host()) call y%sync()
+    if (xx%is_host()) call xx%sync()
+    !$acc parallel loop
+    do i = 1, n
+      y%v(i) = y%v(i) * xx%v(i)
+    end do
+    call y%set_dev()
+  class default
+    if (xx%is_dev()) call xx%sync()
+    if (y%is_dev()) call y%sync()
+    do i = 1, n
+      y%v(i) = y%v(i) * xx%v(i)
+    end do
+    call y%set_host()
+  end select
 end subroutine d_oacc_mlt_v

@@ -20,7 +20,7 @@ CINCLUDES=
 
 # Source files
 FOBJS= psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
-	psb_oacc_mod.o  psb_d_oacc_csr_mat_mod.o 
+	psb_oacc_mod.o  psb_d_oacc_csr_mat_mod.o \
 	psb_oacc_env_mod.o
 
 # Library name
@@ -43,7 +43,7 @@ ilib: $(OBJS)
 	$(MAKE) -C impl lib 
 
 psb_oacc_mod.o  : psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
-	psb_d_oacc_csr_mat_mod.o
+	psb_d_oacc_csr_mat_mod.o psb_oacc_env_mod.o
 
 clean: cclean iclean
 	/bin/rm -f  $(FOBJS) *$(.mod) *.a
