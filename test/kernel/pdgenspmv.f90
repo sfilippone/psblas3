@@ -142,7 +142,7 @@ contains
   !  the rhs. 
   !
   subroutine psb_d_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info,&
-       & f,amold,vmold,imold,partition,nrl,iv)
+       & f,amold,vmold,imold,partition,nrl,iv,tnd)
     use psb_base_mod
     use psb_util_mod
     !
@@ -173,7 +173,7 @@ contains
     class(psb_d_base_vect_type), optional :: vmold 
     class(psb_i_base_vect_type), optional :: imold
     integer(psb_ipk_), optional :: partition, nrl,iv(:)
-
+    logical, optional :: tnd
     ! Local variables.
 
     integer(psb_ipk_), parameter :: nb=20
@@ -202,6 +202,7 @@ contains
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
     procedure(d_func_3d), pointer :: f_
+    logical :: tnd_
     character(len=20)  :: name, ch_err,tmpfmt
 
     info = psb_success_
@@ -495,9 +496,9 @@ contains
     t1 = psb_wtime()
     if (info == psb_success_) then 
       if (present(amold)) then 
-        call psb_spasb(a,desc_a,info,mold=amold)
+        call psb_spasb(a,desc_a,info,mold=amold,bld_and=tnd)
       else
-        call psb_spasb(a,desc_a,info,afmt=afmt)
+        call psb_spasb(a,desc_a,info,afmt=afmt,bld_and=tnd)
       end if
     end if
     call psb_barrier(ctxt)
@@ -549,13 +550,14 @@ program pdgenspmv
   use psb_base_mod
   use psb_util_mod
   use psb_d_pde3d_mod
+  
   implicit none
 
   ! input parameters
   character(len=20) :: kmethd, ptype
   character(len=5)  :: afmt
   integer(psb_ipk_) :: idim
-
+  logical           :: tnd
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = done
   real(psb_dpk_) :: t1, t2, tprec, flops, tflops, tt1, tt2, bdwdth
@@ -606,14 +608,14 @@ program pdgenspmv
   !
   !  get parameters
   !
-  call get_parms(ctxt,afmt,idim)
-
+  call get_parms(ctxt,afmt,idim,tnd)
+  call psb_init_timers()
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call psb_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info)  
+  call psb_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info,tnd=tnd)  
   call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -694,7 +696,7 @@ program pdgenspmv
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     
   end if
-  
+  call psb_print_timers(ctxt)
 
   !  
   !  cleanup storage and exit
@@ -721,10 +723,11 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ctxt,afmt,idim)
+  subroutine  get_parms(ctxt,afmt,idim,tnd)
     type(psb_ctxt_type) :: ctxt
     character(len=*) :: afmt
     integer(psb_ipk_) :: idim
+    logical :: tnd
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: intbuf(10), ip
 
@@ -733,9 +736,11 @@ contains
     if (iam == 0) then
       read(psb_inp_unit,*) afmt
       read(psb_inp_unit,*) idim
+      read(psb_inp_unit,*) tnd
     endif
     call psb_bcast(ctxt,afmt)
     call psb_bcast(ctxt,idim)
+    call psb_bcast(ctxt,tnd)
     
     if (iam == 0) then
       write(psb_out_unit,'("Testing matrix       : ell1")')      
@@ -743,6 +748,8 @@ contains
       write(psb_out_unit,'("Number of processors : ",i0)')np
       write(psb_out_unit,'("Data distribution    : BLOCK")')
       write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Storage format         ",a)') afmt
+      write(psb_out_unit,'("Testing overlap ND     ",l8)') tnd
     end if
     return
 

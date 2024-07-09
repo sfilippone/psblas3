@@ -87,7 +87,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   integer(psb_lpk_) :: mglob, ih
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np,me
-  logical, parameter  :: gettime=.true., debug=.false.
+  logical, parameter  :: debug=.false.
   integer(psb_mpk_)   :: xchg_alg 
   logical, parameter  :: do_timings=.false.
   integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
@@ -130,10 +130,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   if (.not.(idxmap%is_valid())) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid idxmap')
     goto 9999      
-  end if
-
-  if (gettime) then 
-    t0 = psb_wtime()
   end if
 
   nadj = size(adj)

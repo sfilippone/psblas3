@@ -191,7 +191,9 @@ subroutine psi_eswapidxm(ctxt,icomm,flag,n,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
+#if !defined(FLANG)
   volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info=psb_success_
@@ -676,7 +678,9 @@ subroutine psi_eswapidxv(ctxt,icomm,flag,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
+#if !defined(FLANG)
   volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info=psb_success_
