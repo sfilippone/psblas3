@@ -9,7 +9,7 @@ MODDIR=../../modules
 FINCLUDES=$(FMFLAG).. $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FIFLAG).. 
 LIBNAME=libpsb_openacc.a
 
-OBJS= psb_d_oacc_csr_vect_mv.o
+OBJS= psb_d_oacc_csr_vect_mv.o psb_d_oacc_mlt_v_2.o psb_d_oacc_mlt_v.o
 
 objs: $(OBJS)
 
