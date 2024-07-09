@@ -3,7 +3,7 @@ module psb_d_oacc_csr_mat_mod
     use iso_c_binding
     use psb_d_mat_mod
     use psb_d_oacc_vect_mod
-    use oaccsparse_mod
+    !use oaccsparse_mod
 
     integer(psb_ipk_), parameter, private :: is_host = -1
     integer(psb_ipk_), parameter, private :: is_sync = 0 

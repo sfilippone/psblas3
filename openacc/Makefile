@@ -1,11 +1,10 @@
-.SUFFIXES:
-.SUFFIXES: .F90 .f90 .o .s .c
+include ../Make.inc
 
 # Compilers and flags
-CC=mpicc
-FC=mpif90
-FCOPT=-O0 -march=native
-OFFLOAD=-fopenacc -foffload=nvptx-none="-march=sm_70"
+#CC=mpicc
+#FC=mpif90
+#FCOPT=-O0 -march=native
+#OFFLOAD=-fopenacc -foffload=nvptx-none="-march=sm_70"
 
 # Directories
 LIBDIR=../lib
@@ -14,35 +13,49 @@ MODDIR=../modules
 IMPLDIR=./impl  # Adding the impl directory
 
 # Include and library paths
-INCLUDES=-I$(LIBDIR) -I$(INCDIR) -I$(MODDIR) -I$(IMPLDIR)
-LIBS=-L$(LIBDIR) -lpsb_util -lpsb_ext -lpsb_base -lopenblas -lmetis
+INCLUDES=-I$(LIBDIR) -I$(INCDIR) -I$(MODDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) $(FMFLAG)$(MODDIR) $(FIFLAG). 
+CINCLUDES=
+#LIBS=-L$(LIBDIR) -lpsb_util -lpsb_ext -lpsb_base -lopenblas -lmetis
 
 # Source files
 FOBJS= psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
-	psb_oacc_mod.o  psb_d_oacc_csr_mat_mod.o \
-	impl/psb_d_oacc_csr_vect_mv.o 
+	psb_oacc_mod.o  psb_d_oacc_csr_mat_mod.o 
 
 # Library name
 LIBNAME=libpsb_openacc.a
 
-# Rules
-all: $(LIBNAME)
+OBJS=$(COBJS) $(FOBJS)
 
-$(LIBNAME): $(FOBJS)
-	ar cr $(LIBNAME) $(FOBJS)
+# Rules
+lib: objs ilib 
+	ar cur $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
-clean:
-	/bin/rm -fr *.o $(LIBNAME) *.mod impl/*.o
+objs: $(OBJS) iobjs
+	/bin/cp -p *$(.mod) $(MODDIR)
 
-.f90.o:
-	$(FC) $(FCOPT) $(OFFLOAD) $(INCLUDES) -c $< -o $@
+iobjs: $(OBJS)
+	$(MAKE) -C impl objs 
+
+ilib: $(OBJS)
+	$(MAKE) -C impl lib 
+
+psb_oacc_mod.o  : psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
+	psb_d_oacc_csr_mat_mod.o 
+clean: cclean iclean
+	/bin/rm -f  $(FOBJS) *$(.mod) *.a
+veryclean: clean
+cclean: 
+	/bin/rm -f  $(COBJS) 
+iclean:
+	$(MAKE) -C impl clean
 
 .c.o:
-	$(CC) -c $< -o $@
-
+	$(CC) $(CCOPT) $(CCOPENACC) $(CINCLUDES) $(CDEFINES) -c $< -o $@
+.f90.o:
+	$(FC) $(FCOPT) $(FCOPENACC) $(FINCLUDES) -c $< -o $@
 .F90.o:
-	$(FC) $(FCOPT) $(OFFLOAD) $(INCLUDES) -c $< -o $@
-
-.F90.s:
-	$(FC) $(FCOPT) $(INCLUDES) -c -S $< -o $@
+	$(FC) $(FCOPT) $(FCOPENACC) $(FINCLUDES) $(FDEFINES) -c $< -o $@
+.cpp.o:
+	$(CXX) $(CXXOPT) $(CXXOPENACC) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@
