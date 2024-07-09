@@ -11,7 +11,7 @@ OFFLOAD=-fopenacc -foffload=nvptx-none="-march=sm_70"
 LIBDIR=../lib
 INCDIR=../include
 MODDIR=../modules
-IMPLDIR=./impl  # Adding the impl directory
+IMPLDIR=./impl 
 
 # Include and library paths
 INCLUDES=-I$(LIBDIR) -I$(INCDIR) -I$(MODDIR) -I$(IMPLDIR)
@@ -20,6 +20,7 @@ LIBS=-L$(LIBDIR) -lpsb_util -lpsb_ext -lpsb_base -lopenblas -lmetis
 # Source files
 FOBJS= psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
 	psb_oacc_mod.o  psb_d_oacc_csr_mat_mod.o \
+	psb_oacc_env_mod.o \
 	impl/psb_d_oacc_csr_vect_mv.o 
 
 # Library name
