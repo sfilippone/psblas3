@@ -32,6 +32,7 @@ following steps:
 Suppose you want to use the CUDA-enabled ELLPACK data structure; you
 would use a piece of code like this (and don't forget, you need
 CUDA-side vectors along with the matrices):
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
 program my_cuda_test
   use psb_base_mod
@@ -80,6 +81,61 @@ program my_cuda_test
   stop
 end program my_cuda_test
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+program my_cuda_test
+  use psb_base_mod
+  use psb_util_mod 
+  use psb_ext_mod
+  use psb_cuda_mod
+  type(psb_dspmat_type) :: a, agpu
+  type(psb_d_vect_type) :: x, xg, bg
+
+  real(psb_dpk_), allocatable :: xtmp(:)
+  type(psb_d_vect_cuda)       :: vmold
+  type(psb_d_elg_sparse_mat) :: aelg
+  type(psb_ctxt_type) :: ctxt
+  integer             :: iam, np
+
+
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
+  call psb_cuda_init(ctxt, iam)
+
+  
+  ! My own home-grown matrix generator
+  call gen_matrix(ctxt,idim,desc_a,a,x,info)
+  if (info /= 0) goto 9999
+
+  call a%cscnv(agpu,info,mold=aelg)
+  if (info /= 0) goto 9999
+  xtmp = x%get_vect() 
+  call xg%bld(xtmp,mold=vmold)
+  call bg%bld(size(xtmp),mold=vmold)
+  
+  ! Do sparse MV
+  call psb_spmm(done,agpu,xg,dzero,bg,desc_a,info)
+
+ 
+9999 continue
+  if (info == 0) then 
+     write(*,*) '42'
+  else
+     write(*,*) 'Something went wrong ',info
+  end if
+  
+  
+  call psb_cuda_exit()
+  call psb_exit(ctxt)
+  stop
+end program my_cuda_test
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
+      
 A full example of this strategy can be seen in the
 \texttt{test/ext/kernel} and \texttt{test/\-cuda/\-kernel} subdirectories,
 where we provide  sample programs 
@@ -132,7 +188,11 @@ OFFSET          & Offset for diagonals			 \\
 \begin{figure}[ht]
 	\centering
 %		\includegraphics[width=5.2cm]{figures/mat.eps}
-		\includegraphics[width=5.2cm]{figures/mat.pdf}
+\ifcase\pdfoutput
+  \includegraphics[width=5.2cm]{mat.png}
+\or
+  \includegraphics[width=5.2cm]{figures/mat.pdf}
+\fi
 	\caption{Example of sparse matrix}
 	\label{fig:dense}
 \end{figure} 
@@ -155,7 +215,11 @@ indices, e.g. the last valid one found in the same row.
 \begin{figure}[ht]
 	\centering
 %		\includegraphics[width=8.2cm]{figures/ell.eps}
-		\includegraphics[width=8.2cm]{figures/ell.pdf}
+\ifcase\pdfoutput
+  \includegraphics[width=8.2cm]{ell.png}
+\or
+  \includegraphics[width=8.2cm]{figures/ell.pdf}
+\fi
 	\caption{ELLPACK compression of matrix in Figure~\ref{fig:dense}}
 	\label{fig:ell}
 \end{figure} 
@@ -199,6 +263,7 @@ computing days; in modern CPUs it is not quite as popular, but it
 is  the basis for many GPU formats. 
 
 The relevant data type is \verb|psb_T_ell_sparse_mat|:
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   type, extends(psb_d_base_sparse_mat) :: psb_d_ell_sparse_mat
     !
@@ -212,6 +277,25 @@ The relevant data type is \verb|psb_T_ell_sparse_mat|:
     ....
   end type psb_d_ell_sparse_mat
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  type, extends(psb_d_base_sparse_mat) :: psb_d_ell_sparse_mat
+    !
+    ! ITPACK/ELL format, extended.
+    !     
+    
+    integer(psb_ipk_), allocatable :: irn(:), ja(:,:), idiag(:)
+    real(psb_dpk_), allocatable :: val(:,:)
+
+  contains
+    ....
+  end type psb_d_ell_sparse_mat
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 
 \subsubsection*{Hacked ELLPACK}
@@ -251,13 +335,18 @@ submatrix inside the stacked \textit{cM}/\textit{rP} buffers, plus an
 additional element pointing past the end of the last block, where the
 next one would begin. 
 We thus have the property that  
-the elements of the $k$-th \textit{hack} are stored between \verb|hackOffsets[k]| and
+the elements of the $k$-th \textit{hack} are stored between
+\verb|hackOffsets[k]| and 
 \verb|hackOffsets[k+1]|, similarly to what happens in the CSR format. 
 
 \begin{figure}[ht]
 	\centering
 %		\includegraphics[width=8.2cm]{../figures/hll.eps}
-	 \includegraphics[width=.72\textwidth]{../figures/hll.pdf}
+\ifcase\pdfoutput
+  \includegraphics[width=.72\textwidth]{hll.png}
+\or
+  \includegraphics[width=.72\textwidth]{../figures/hll.pdf}
+\fi
 	\caption{Hacked ELLPACK compression of matrix in Figure~\ref{fig:dense}}
 	\label{fig:hll}
 \end{figure} 
@@ -267,6 +356,7 @@ therefore the additional memory is limited to the hack in which the
 row appears.
 
 The relevant data type is \verb|psb_T_hll_sparse_mat|:
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   type, extends(psb_d_base_sparse_mat) :: psb_d_hll_sparse_mat
     !
@@ -280,6 +370,25 @@ The relevant data type is \verb|psb_T_hll_sparse_mat|:
    ....
   end type
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  type, extends(psb_d_base_sparse_mat) :: psb_d_hll_sparse_mat
+    !
+    ! HLL format. (Hacked ELL) 
+    !     
+    integer(psb_ipk_) :: hksz
+    integer(psb_ipk_), allocatable :: irn(:), ja(:), idiag(:), hkoffs(:)
+    real(psb_dpk_), allocatable :: val(:)
+
+  contains
+   ....
+  end type
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 \subsubsection*{Diagonal storage}
 
@@ -300,13 +409,18 @@ addressing is required.
 \begin{figure}[ht]
 	\centering
 %		\includegraphics[width=8.2cm]{figures/dia.eps}
-		\includegraphics[width=.72\textwidth]{figures/dia.pdf}
+\ifcase\pdfoutput
+  \includegraphics[width=.72\textwidth]{dia.png}
+\or
+  \includegraphics[width=.72\textwidth]{figures/dia.pdf}
+\fi
 	\caption{DIA compression of matrix in Figure~\ref{fig:dense}}
 	\label{fig:dia}
 \end{figure} 
 
 
 \begin{algorithm}
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
     do j=1,ndiag
       if (offset(j) > 0) then 
@@ -319,11 +433,30 @@ addressing is required.
       end do
     end do
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+    do j=1,ndiag
+      if (offset(j) > 0) then 
+        ir1 = 1; ir2 = m - offset(j);
+      else
+        ir1 = 1 - offset(j); ir2 = m;
+      end if
+      do i=ir1,ir2
+        y(i) = y(i) + alpha*as(i,j)*x(i+offset(j))
+      end do
+    end do
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
   \caption{\label{alg:dia} Matrix-Vector product in DIA format}
 \end{algorithm}
 
 
 The relevant data type is \verb|psb_T_dia_sparse_mat|:
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   type, extends(psb_d_base_sparse_mat) :: psb_d_dia_sparse_mat
     !
@@ -336,6 +469,24 @@ The relevant data type is \verb|psb_T_dia_sparse_mat|:
 
   end type
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  type, extends(psb_d_base_sparse_mat) :: psb_d_dia_sparse_mat
+    !
+    ! DIA format, extended.
+    !     
+    
+    integer(psb_ipk_), allocatable :: offset(:)
+    integer(psb_ipk_) :: nzeros
+    real(psb_dpk_), allocatable :: data(:,:)
+
+  end type
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 
 
@@ -378,12 +529,17 @@ the number of diagonals of the $k$-th \textit{hack} is given by
 \begin{figure}[ht]
 	\centering
 %		\includegraphics[width=8.2cm]{../figures/hdia.eps}
-		\includegraphics[width=.72\textwidth]{../figures/hdia.pdf}
+\ifcase\pdfoutput
+  \includegraphics[width=.72\textwidth]{hdia.png}
+\or
+  \includegraphics[width=.72\textwidth]{../figures/hdia.pdf}
+\fi
 	\caption{Hacked DIA compression of matrix in Figure~\ref{fig:dense}}
 	\label{fig:hdia}
 \end{figure} 
 
 The relevant data type is \verb|psb_T_hdia_sparse_mat|:
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   type pm
      real(psb_dpk_), allocatable  :: data(:,:)
@@ -408,5 +564,35 @@ The relevant data type is \verb|psb_T_hdia_sparse_mat|:
    ....
   end type
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+  type pm
+     real(psb_dpk_), allocatable  :: data(:,:)
+  end type pm
+
+  type po
+     integer(psb_ipk_), allocatable  :: off(:)
+  end type po
+
+  type, extends(psb_d_base_sparse_mat) :: psb_d_hdia_sparse_mat
+    !
+    ! HDIA format, extended.
+    !
+    
+    type(pm), allocatable :: hdia(:)
+    type(po), allocatable :: offset(:)
+    integer(psb_ipk_) :: nblocks, nzeros
+    integer(psb_ipk_) :: hack = 64
+    integer(psb_long_int_k_) :: dim=0
+
+  contains
+   ....
+  end type
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 

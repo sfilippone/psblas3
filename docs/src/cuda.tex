@@ -31,9 +31,19 @@ routine in the library is built according to the following principles:
 In this way, data items are put on the {GPU} memory ``on demand'' and
 remain there as long as ``normal'' computations are carried out. 
 As an example, the following call to a matrix-vector product
+\ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
     call psb_spmm(alpha,a,x,beta,y,desc_a,info)
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+    call psb_spmm(alpha,a,x,beta,y,desc_a,info)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 will transparently and automatically be performed on the {GPU} whenever
 all three data inputs \fortinline|a|, \fortinline|x|  and
 \fortinline|y| are {GPU}-enabled. If a program makes many such calls
@@ -81,9 +91,19 @@ and \fortinline|beta|, and the return code \fortinline|info|.
   environment}
 \addcontentsline{toc}{subsection}{psb\_cuda\_init}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 call psb_cuda_init(ctxt [, device])
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+call psb_cuda_init(ctxt [, device])
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 This subroutine initializes the PSBLAS-CUDA  environment. 
 \begin{description}
@@ -109,9 +129,19 @@ available on the current node.
   environment}
 \addcontentsline{toc}{subsection}{psb\_cuda\_exit}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 call psb_cuda_exit(ctxt)
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+call psb_cuda_exit(ctxt)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 This subroutine exits from the  PSBLAS CUDA context.
 \begin{description}
@@ -131,9 +161,19 @@ Specified as: an integer variable.
 \subsection*{psb\_cuda\_DeviceSync ---  Synchronize CUDA device}
 \addcontentsline{toc}{subsection}{psb\_cuda\_DeviceSync}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 call psb_cuda_DeviceSync()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+call psb_cuda_DeviceSync()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 This subroutine ensures that all previosly invoked kernels, i.e. all
 invocation of CUDA-side code, have completed.
@@ -142,45 +182,96 @@ invocation of CUDA-side code, have completed.
 \subsection*{psb\_cuda\_getDeviceCount }
 \addcontentsline{toc}{subsection}{psb\_cuda\_getDeviceCount}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 ngpus =  psb_cuda_getDeviceCount()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+ngpus =  psb_cuda_getDeviceCount()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Get number of devices available on current computing node. 
 
 \subsection*{psb\_cuda\_getDevice }
 \addcontentsline{toc}{subsection}{psb\_cuda\_getDevice}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 ngpus =  psb_cuda_getDevice()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+ngpus =  psb_cuda_getDevice()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Get  device in use by current process. 
 
 \subsection*{psb\_cuda\_setDevice }
 \addcontentsline{toc}{subsection}{psb\_cuda\_setDevice}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 info = psb_cuda_setDevice(dev)
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+info = psb_cuda_setDevice(dev)
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Set  device to be used  by current process. 
 
 \subsection*{psb\_cuda\_DeviceHasUVA }
 \addcontentsline{toc}{subsection}{psb\_cuda\_DeviceHasUVA}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 hasUva = psb_cuda_DeviceHasUVA()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+hasUva = psb_cuda_DeviceHasUVA()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
-Returns true if device currently in use supports UVA (Unified Virtual Addressing).
+Returns true if device currently in use supports UVA
+(Unified Virtual Addressing).
 
 \subsection*{psb\_cuda\_WarpSize }
 \addcontentsline{toc}{subsection}{psb\_cuda\_WarpSize}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 nw = psb_cuda_WarpSize()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+nw = psb_cuda_WarpSize()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Returns the warp size.
 
@@ -188,18 +279,38 @@ Returns the warp size.
 \subsection*{psb\_cuda\_MultiProcessors }
 \addcontentsline{toc}{subsection}{psb\_cuda\_MultiProcessors}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 nmp = psb_cuda_MultiProcessors()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+nmp = psb_cuda_MultiProcessors()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Returns the number of multiprocessors in the CUDA device.
 
 \subsection*{psb\_cuda\_MaxThreadsPerMP }
 \addcontentsline{toc}{subsection}{psb\_cuda\_MaxThreadsPerMP}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 nt = psb_cuda_MaxThreadsPerMP()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+nt = psb_cuda_MaxThreadsPerMP()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Returns the maximum number of threads per multiprocessor. 
 
@@ -207,9 +318,19 @@ Returns the maximum number of threads per multiprocessor.
 \subsection*{psb\_cuda\_MaxRegistersPerBlock }
 \addcontentsline{toc}{subsection}{psb\_cuda\_MaxRegisterPerBlock}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 nr = psb_cuda_MaxRegistersPerBlock()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+nr = psb_cuda_MaxRegistersPerBlock()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Returns the maximum number of register per thread block. 
 
@@ -217,27 +338,57 @@ Returns the maximum number of register per thread block.
 \subsection*{psb\_cuda\_MemoryClockRate }
 \addcontentsline{toc}{subsection}{psb\_cuda\_MemoryClockRate}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 cl = psb_cuda_MemoryClockRate()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+cl = psb_cuda_MemoryClockRate()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Returns the memory clock rate in KHz, as an integer. 
 
 \subsection*{psb\_cuda\_MemoryBusWidth }
 \addcontentsline{toc}{subsection}{psb\_cuda\_MemoryBusWidth}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 nb = psb_cuda_MemoryBusWidth()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+nb = psb_cuda_MemoryBusWidth()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 
 Returns the memory bus width in bits.
 
 \subsection*{psb\_cuda\_MemoryPeakBandwidth }
 \addcontentsline{toc}{subsection}{psb\_cuda\_MemoryPeakBandwidth}
 
+\ifpdf
 \begin{minted}[breaklines=true]{fortran}
 bw = psb_cuda_MemoryPeakBandwidth()
 \end{minted}
+\else
+\begin{center}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+bw = psb_cuda_MemoryPeakBandwidth()
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+\fi
 Returns the peak memory bandwidth in MB/s (real double precision).
 
 

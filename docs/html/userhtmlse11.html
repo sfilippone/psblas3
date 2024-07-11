@@ -13,10 +13,10 @@
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlse10.html" >prev</a>] [<a 
 href="userhtmlse10.html#tailuserhtmlse10.html" >prev-tail</a>] [<a 
-href="userhtmlsu86.html#tailuserhtmlse11.html">tail</a>] [<a 
+href="userhtmlse8.html#tailuserhtmlse11.html">tail</a>] [<a 
 href="userhtml.html# " >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">11   </span> <a 
- id="x106-14200011"></a>Iterative Methods</h3>
+ id="x17-14200011"></a>Iterative Methods</h3>
 <!--l. 4--><p class="noindent" >In this chapter we provide routines for preconditioners and iterative methods.
 The interfaces for Krylov subspace methods are available in the module
 <span class="obeylines-h"><span class="verb"><span 
@@ -24,18 +24,452 @@ class="cmtt-10">psb_krylov_mod</span></span></span>.
                                                                   
 
                                                                   
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >11.1 <a 
-href="userhtmlsu90.html#x107-14300011.1">psb_krylov &#8212; Krylov Methods Driver Routine</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">11.1   </span> <a 
+ id="x17-14300011.1"></a>psb_krylov &#8212; Krylov Methods Driver Routine</h4>
+<!--l. 17--><p class="noindent" >This subroutine is a driver that provides a general interface for all the Krylov-Subspace
+family methods implemented in PSBLAS version 2.
+<!--l. 20--><p class="indent" >   The stopping criterion can take the following values:
+     <dl class="description"><dt class="description">
+     <!--l. 22--><p class="noindent" >
+<span 
+class="cmbx-10">1</span> </dt><dd 
+class="description">
+     <!--l. 22--><p class="noindent" >normwise backward error in the infinity norm; the iteration is stopped
+     when
+<div class="math-display" >
+<img 
+src="userhtml30x.png" alt="      -----&#x2225;ri&#x2225;------
+err = (&#x2225;A&#x2225;&#x2225;xi&#x2225;+ &#x2225;b&#x2225;) &#x003C; eps
+" class="math-display" ></div>
+     <!--l. 24--><p class="nopar" >
+     </dd><dt class="description">
+     <!--l. 25--><p class="noindent" >
+<span 
+class="cmbx-10">2</span> </dt><dd 
+class="description">
+     <!--l. 25--><p class="noindent" >Relative residual in the 2-norm; the iteration is stopped when
+<div class="math-display" >
+<img 
+src="userhtml31x.png" alt="      &#x2225;ri&#x2225;-
+err = &#x2225;b&#x2225;2 &#x003C; eps
+" class="math-display" ></div>
+     <!--l. 27--><p class="nopar" >
+     </dd><dt class="description">
+     <!--l. 28--><p class="noindent" >
+<span 
+class="cmbx-10">3</span> </dt><dd 
+class="description">
+     <!--l. 28--><p class="noindent" >Relative residual reduction in the 2-norm; the iteration is stopped when
+<div class="math-display" >
+<img 
+src="userhtml32x.png" alt="      &#x2225;ri&#x2225;
+err = &#x2225;r0&#x2225;2 &#x003C; eps
+" class="math-display" ></div>
+     <!--l. 30--><p class="nopar" ></dd></dl>
+<!--l. 32--><p class="noindent" >The behaviour is controlled by the istop argument (see later). In the above formulae, <span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub>
+is the tentative solution and <span 
+class="cmmi-10">r</span><sub><span 
+class="cmmi-7">i</span></sub> = <span 
+class="cmmi-10">b </span><span 
+class="cmsy-10">- </span><span 
+class="cmmi-10">Ax</span><sub><span 
+class="cmmi-7">i</span></sub> the corresponding residual at the <span 
+class="cmmi-10">i</span>-th
+iteration.
+   <!--l. 37-->
                                                                   
 
                                                                   
-   <!--l. 2--><div class="crosslinks"><p class="noindent">[<a 
+   <pre class="lstlisting" id="listing-167"><span class="label"><a 
+ id="x17-143001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">psb_krylov</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">method</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">a</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">prec</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">b</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">x</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">eps</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">desc_a</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">info</span></span><span style="color:#000000"><span 
+class="cmtt-10">,&amp;</span></span> 
+<span class="label"><a 
+ id="x17-143002r2"></a></span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span 
+class="cmtt-10">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-10">&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">itmax</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">iter</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">err</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">itrace</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">irst</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">istop</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"><span 
+class="cmtt-10">cond</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 42--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 43--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 43--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 44--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 44--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 45--><p class="noindent" >
+<span 
+class="cmbx-10">method</span> </dt><dd 
+class="description">
+     <!--l. 45--><p class="noindent" >a string that defines the iterative method to be used. Supported values
+     are:
+         <dl class="description"><dt class="description">
+         <!--l. 48--><p class="noindent" >
+     <span 
+class="cmbx-10">CG:</span> </dt><dd 
+class="description">
+         <!--l. 48--><p class="noindent" >the Conjugate Gradient method;
+         </dd><dt class="description">
+         <!--l. 49--><p class="noindent" >
+     <span 
+class="cmbx-10">CGS:</span> </dt><dd 
+class="description">
+         <!--l. 49--><p class="noindent" >the Conjugate Gradient Stabilized method;
+         </dd><dt class="description">
+         <!--l. 51--><p class="noindent" >
+     <span 
+class="cmbx-10">GCR:</span> </dt><dd 
+class="description">
+         <!--l. 51--><p class="noindent" >the Generalized Conjugate Residual method;
+         </dd><dt class="description">
+         <!--l. 52--><p class="noindent" >
+     <span 
+class="cmbx-10">FCG:</span> </dt><dd 
+class="description">
+         <!--l. 52--><p class="noindent" >the Flexible Conjugate Gradient method<span class="footnote-mark"><a 
+href="userhtml18.html#fn5x0"><sup class="textsuperscript">5</sup></a></span><a 
+ id="x17-143003f5"></a> ;
+         </dd><dt class="description">
+         <!--l. 55--><p class="noindent" >
+     <span 
+class="cmbx-10">BICG:</span> </dt><dd 
+class="description">
+         <!--l. 55--><p class="noindent" >the Bi-Conjugate Gradient method;
+         </dd><dt class="description">
+         <!--l. 56--><p class="noindent" >
+     <span 
+class="cmbx-10">BICGSTAB:</span> </dt><dd 
+class="description">
+         <!--l. 56--><p class="noindent" >the Bi-Conjugate Gradient Stabilized method;
+                                                                  
+
+                                                                  
+         </dd><dt class="description">
+         <!--l. 57--><p class="noindent" >
+     <span 
+class="cmbx-10">BICGSTABL:</span> </dt><dd 
+class="description">
+         <!--l. 57--><p class="noindent" >the Bi-Conjugate Gradient Stabilized method with restarting;
+         </dd><dt class="description">
+         <!--l. 58--><p class="noindent" >
+     <span 
+class="cmbx-10">RGMRES:</span> </dt><dd 
+class="description">
+         <!--l. 58--><p class="noindent" >the Generalized Minimal Residual method with restarting.</dd></dl>
+     </dd><dt class="description">
+     <!--l. 60--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 60--><p class="noindent" >the local portion of global sparse matrix <span 
+class="cmmi-10">A</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 66--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 66--><p class="noindent" >The data structure containing the preconditioner.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 71--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 71--><p class="noindent" >The RHS vector. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a rank one array or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 76--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 76--><p class="noindent" >The initial guess. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 81--><p class="noindent" >
+<span 
+class="cmbx-10">eps</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 81--><p class="noindent" >The stopping tolerance. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a real number.
+     </dd><dt class="description">
+     <!--l. 86--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 86--><p class="noindent" >contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 91--><p class="noindent" >
+<span 
+class="cmbx-10">itmax</span> </dt><dd 
+class="description">
+     <!--l. 91--><p class="noindent" >The maximum number of iterations to perform.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">itmax </span>= 1000.<br 
+class="newline" />Specified as: an integer variable <span 
+class="cmmi-10">itmax </span><span 
+class="cmsy-10">&#x2265; </span>1.
+     </dd><dt class="description">
+     <!--l. 97--><p class="noindent" >
+<span 
+class="cmbx-10">itrace</span> </dt><dd 
+class="description">
+     <!--l. 97--><p class="noindent" >If <span 
+class="cmmi-10">&#x003E; </span>0 print out an informational message about convergence every <span 
+class="cmmi-10">itrace</span>
+     iterations. If = 0 print a message in case of convergence failure.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">itrace </span>= <span 
+class="cmsy-10">-</span>1.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 104--><p class="noindent" >
+<span 
+class="cmbx-10">irst</span> </dt><dd 
+class="description">
+     <!--l. 104--><p class="noindent" >An integer specifying the restart parameter.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Values: <span 
+class="cmmi-10">irst &#x003E; </span>0. This is employed for the BiCGSTABL or RGMRES methods,
+     otherwise it is ignored.
+     </dd><dt class="description">
+     <!--l. 111--><p class="noindent" >
+<span 
+class="cmbx-10">istop</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 111--><p class="noindent" >An integer specifying the stopping criterion.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Values: 1: use the normwise backward error, 2: use the scaled 2-norm
+     of the residual, 3: use the residual reduction in the 2-norm. Default:
+     2.
+     </dd><dt class="description">
+     <!--l. 117--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 117--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 118--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 118--><p class="noindent" >The computed solution. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 123--><p class="noindent" >
+<span 
+class="cmbx-10">iter</span> </dt><dd 
+class="description">
+     <!--l. 123--><p class="noindent" >The number of iterations performed.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Returned as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 128--><p class="noindent" >
+<span 
+class="cmbx-10">err</span> </dt><dd 
+class="description">
+     <!--l. 128--><p class="noindent" >The convergence estimate on exit.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Returned as: a real number.
+     </dd><dt class="description">
+     <!--l. 133--><p class="noindent" >
+<span 
+class="cmbx-10">cond</span> </dt><dd 
+class="description">
+     <!--l. 133--><p class="noindent" >An estimate of the condition number of matrix <span 
+class="cmmi-10">A</span>; only available with the <span 
+class="cmmi-10">CG</span>
+     method on real data.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Returned as: a real number. A correct result will be greater than or
+     equal to one; if specified for non-real data, or an error occurred, zero is
+     returned.
+     </dd><dt class="description">
+     <!--l. 141--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 141--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlse10.html" >prev</a>] [<a 
 href="userhtmlse10.html#tailuserhtmlse10.html" >prev-tail</a>] [<a 
 href="userhtmlse11.html" >front</a>] [<a 
 href="userhtml.html# " >up</a>] </p></div>
-<!--l. 2--><p class="indent" >   <a 
- id="tailuserhtmlse11.html"></a>  
+<!--l. 1--><p class="indent" >   <a 
+ id="tailuserhtmlse11.html"></a>   
 </body></html> 

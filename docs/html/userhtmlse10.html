@@ -13,16 +13,18 @@
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlse9.html" >prev</a>] [<a 
 href="userhtmlse9.html#tailuserhtmlse9.html" >prev-tail</a>] [<a 
-href="userhtmlsu81.html#tailuserhtmlse10.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu86.html" >up</a>] </p></div>
+href="userhtmlse7.html#tailuserhtmlse10.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse13.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">10   </span> <a 
- id="x98-13500010"></a>Preconditioner routines</h3>
+ id="x15-13500010"></a>Preconditioner routines</h3>
 <!--l. 6--><p class="noindent" >The base PSBLAS library contains the implementation of two simple preconditioning
 techniques:
      <ul class="itemize1">
-     <li class="itemize">Diagonal Scaling
+     <li class="itemize">
+     <!--l. 9--><p class="noindent" >Diagonal Scaling
      </li>
-     <li class="itemize">Block Jacobi with ILU(0) factorization</li></ul>
+     <li class="itemize">
+     <!--l. 10--><p class="noindent" >Block Jacobi with ILU(0) factorization</li></ul>
 <!--l. 14--><p class="noindent" >The supporting data type and subroutine interfaces are defined in the module
 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_prec_mod</span></span></span>. The old interfaces <span class="obeylines-h"><span class="verb"><span 
@@ -32,25 +34,678 @@ supported for backward compatibility
                                                                   
 
                                                                   
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >10.1 <a 
-href="userhtmlsu84.html#x99-13600010.1">init &#8212; Initialize a preconditioner</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >10.2 <a 
-href="userhtmlsu85.html#x101-13700010.2">build &#8212; Builds a preconditioner</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >10.3 <a 
-href="userhtmlsu86.html#x102-13800010.3">apply &#8212; Preconditioner application routine</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >10.4 <a 
-href="userhtmlsu87.html#x103-13900010.4">descr &#8212; Prints a description of current preconditioner</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >10.5 <a 
-href="userhtmlsu88.html#x104-14000010.5">clone &#8212; clone current preconditioner</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >10.6 <a 
-href="userhtmlsu89.html#x105-14100010.6">free &#8212; Free a preconditioner</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">10.1   </span> <a 
+ id="x15-13600010.1"></a>init &#8212; Initialize a preconditioner</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-97">
+call&#x00A0;prec%init(icontxt,ptype,&#x00A0;info)
+</pre>
+<!--l. 30--><p class="nopar" >
+<!--l. 32--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 33--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 33--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 34--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 34--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 35--><p class="noindent" >
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">
+     <!--l. 35--><p class="noindent" >the communication context.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+     <!--l. 40--><p class="noindent" >
+<span 
+class="cmbx-10">ptype</span> </dt><dd 
+class="description">
+     <!--l. 40--><p class="noindent" >the type of preconditioner. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character string, see usage notes.
+     </dd><dt class="description">
+     <!--l. 53--><p class="noindent" >
+<span 
+class="cmbx-10">On Exit</span> </dt><dd 
+class="description">
+     <!--l. 53--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 55--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 55--><p class="noindent" >Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 60--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 60--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Error code: if no error, 0 is returned.</dd></dl>
+<!--l. 66--><p class="noindent" ><span 
+class="cmbx-12">Notes </span>Legal inputs to this subroutine are interpreted depending on the <span 
+class="cmmi-10">ptype </span>string as
+follows<span class="footnote-mark"><a 
+href="userhtml16.html#fn4x0"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x15-136001f4"></a> :
+     <dl class="description"><dt class="description">
+     <!--l. 74--><p class="noindent" >
+<span 
+class="cmbx-10">NONE</span> </dt><dd 
+class="description">
+     <!--l. 74--><p class="noindent" >No preconditioning, i.e. the preconditioner is just a copy operator.
+     </dd><dt class="description">
+     <!--l. 76--><p class="noindent" >
+<span 
+class="cmbx-10">DIAG</span> </dt><dd 
+class="description">
+     <!--l. 76--><p class="noindent" >Diagonal  scaling;  each  entry  of  the  input  vector  is  multiplied  by  the
+     reciprocal  of  the  sum  of  the  absolute  values  of  the  coefficients  in  the
+     corresponding row of matrix <span 
+class="cmmi-10">A</span>;
+     </dd><dt class="description">
+     <!--l. 79--><p class="noindent" >
+<span 
+class="cmbx-10">BJAC</span> </dt><dd 
+class="description">
+     <!--l. 79--><p class="noindent" >Precondition by a factorization of the block-diagonal of matrix <span 
+class="cmmi-10">A</span>, where
+     block  boundaries  are  determined  by  the  data  allocation  boundaries
+     for  each  process;  requires  no  communication.  Only  the  incomplete
+     factorization <span 
+class="cmmi-10">ILU</span>(0) is currently implemented.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.2   </span> <a 
+ id="x15-13700010.2"></a>build &#8212; Builds a preconditioner</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-98">
+call&#x00A0;prec%build(a,&#x00A0;desc_a,&#x00A0;info[,amold,vmold,imold])
+</pre>
+<!--l. 91--><p class="nopar" >
+<!--l. 93--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 94--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 94--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 95--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 95--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 96--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 96--><p class="noindent" >the system sparse matrix. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>, target.<br 
+class="newline" />Specified as: a sparse matrix data structure <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 101--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 101--><p class="noindent" >the preconditioner.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified   as:   an   already   initialized   precondtioner   data   structure
+     <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a><br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 106--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 106--><p class="noindent" >the problem communication descriptor. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>, target.<br 
+class="newline" />Specified as: a communication descriptor data structure <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 116--><p class="noindent" >
+<span 
+class="cmbx-10">amold</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 116--><p class="noindent" >The desired dynamic type for the internal matrix storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="spbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_sparse</span><span 
+class="cmtt-10">_mat</span>.
+     </dd><dt class="description">
+     <!--l. 121--><p class="noindent" >
+<span 
+class="cmbx-10">vmold</span> </dt><dd 
+class="description">
+     <!--l. 121--><p class="noindent" >The desired dynamic type for the internal vector storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>.
+     </dd><dt class="description">
+     <!--l. 126--><p class="noindent" >
+<span 
+class="cmbx-10">imold</span> </dt><dd 
+class="description">
+     <!--l. 126--><p class="noindent" >The desired dynamic type for the internal integer vector storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified    as:    an    object    of    a    class    derived    from    (integer)
+     <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>.</dd></dl>
+<!--l. 133--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 134--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 134--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 135--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 135--><p class="noindent" >the preconditioner.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a precondtioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a><br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 140--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 140--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 146--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">amold</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vmold</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">imold</span></span></span> arguments may be employed to interface with special
+devices, such as GPUs and other accelerators.
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.3   </span> <a 
+ id="x15-13800010.3"></a>apply &#8212; Preconditioner application routine</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-99">
+call&#x00A0;prec%apply(x,y,desc_a,info,trans,work)
+call&#x00A0;prec%apply(x,desc_a,info,trans)
+</pre>
+<!--l. 158--><p class="nopar" >
+<!--l. 160--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 161--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 161--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 162--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 162--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 163--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 163--><p class="noindent" >the preconditioner. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 168--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 168--><p class="noindent" >the source vector. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 173--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 173--><p class="noindent" >the problem communication descriptor. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a communication data structure <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 178--><p class="noindent" >
+<span 
+class="cmbx-10">trans</span> </dt><dd 
+class="description">
+     <!--l. 178--><p class="noindent" >Scope:  <br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 183--><p class="noindent" >
+<span 
+class="cmbx-10">work</span> </dt><dd 
+class="description">
+     <!--l. 183--><p class="noindent" >an optional work space Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a double precision array.</dd></dl>
+<!--l. 190--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 191--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 191--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 192--><p class="noindent" >
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">
+     <!--l. 192--><p class="noindent" >the destination vector. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 197--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 197--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.4   </span> <a 
+ id="x15-13900010.4"></a>descr &#8212; Prints a description of current preconditioner</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-100">
+call&#x00A0;prec%descr(info)
+call&#x00A0;prec%descr(info,iout,&#x00A0;root)
+</pre>
+<!--l. 212--><p class="nopar" >
+<!--l. 214--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 215--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 215--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 216--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 216--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 217--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 217--><p class="noindent" >the preconditioner. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 222--><p class="noindent" >
+<span 
+class="cmbx-10">iout</span> </dt><dd 
+class="description">
+     <!--l. 222--><p class="noindent" >output unit. Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer number. Default: default output unit.
+     </dd><dt class="description">
+     <!--l. 227--><p class="noindent" >
+<span 
+class="cmbx-10">root</span> </dt><dd 
+class="description">
+     <!--l. 227--><p class="noindent" >Process from which to print Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified  as:  an  integer  number  between  0  and  <span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1,  in  which  case
+     the specified process will print the description, or <span 
+class="cmsy-10">-</span>1, in which case all
+     processes will print. Default: 0.
+     </dd><dt class="description">
+     <!--l. 234--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 234--><p class="noindent" >
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 235--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 235--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.5   </span> <a 
+ id="x15-14000010.5"></a>clone &#8212; clone current preconditioner</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-101">
+call&#x00A0;&#x00A0;prec%clone(precout,info)
+</pre>
+<!--l. 248--><p class="nopar" >
+<!--l. 250--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 251--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 251--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 252--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 252--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 253--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 253--><p class="noindent" >the preconditioner.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 260--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 261--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 261--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 262--><p class="noindent" >
+<span 
+class="cmbx-10">precout</span> </dt><dd 
+class="description">
+     <!--l. 262--><p class="noindent" >A copy of the input object.
+     </dd><dt class="description">
+     <!--l. 263--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 263--><p class="noindent" >Return code.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.6   </span> <a 
+ id="x15-14100010.6"></a>free &#8212; Free a preconditioner</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-102">
+call&#x00A0;prec%free(info)
+</pre>
+<!--l. 271--><p class="nopar" >
+<!--l. 273--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 274--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 274--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 275--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 275--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 276--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 276--><p class="noindent" >the preconditioner.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 289--><p class="noindent" >
+<span 
+class="cmbx-10">On Exit</span> </dt><dd 
+class="description">
+     <!--l. 289--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 291--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 291--><p class="noindent" >Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 296--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 296--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Error code: if no error, 0 is returned.</dd></dl>
+<!--l. 302--><p class="noindent" ><span 
+class="cmbx-12">Notes </span>Releases all internal storage.
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
@@ -58,7 +713,7 @@ href="userhtmlsu89.html#x105-14100010.6">free &#8212; Free a preconditioner</a><
 href="userhtmlse9.html" >prev</a>] [<a 
 href="userhtmlse9.html#tailuserhtmlse9.html" >prev-tail</a>] [<a 
 href="userhtmlse10.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu86.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse13.html" >up</a>] </p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse10.html"></a>  
+ id="tailuserhtmlse10.html"></a>   
 </body></html> 
