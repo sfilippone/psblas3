@@ -11,70 +11,78 @@
 </head><body 
 >
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu12.html" >next</a>] [<a 
+href="userhtmlse7.html" >next</a>] [<a 
 href="userhtmlse2.html" >prev</a>] [<a 
 href="userhtmlse2.html#tailuserhtmlse2.html" >prev-tail</a>] [<a 
-href="userhtmlsu3.html#tailuserhtmlse3.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu7.html" >up</a>] </p></div>
+href="#tailuserhtmlse3.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse6.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
- id="x12-90003"></a>Data Structures and Classes</h3>
+ id="x8-90003"></a>Data Structures and Classes</h3>
 <!--l. 5--><p class="noindent" >In this chapter we illustrate the data structures used for definition of routines
 interfaces. They include data structures for sparse matrices, communication
 descriptors and preconditioners.
 <!--l. 11--><p class="indent" >   All the data types and the basic subroutine interfaces related to descriptors and
-sparse matrices are defined in the module <span class="lstinline"></span><span 
-class="cmtt-10">psb_base_mod</span>; this will have to be
+sparse matrices are defined in the module <code class="lstinline"><span style="color:#000000">psb_base_mod</span></code>; this will have to be
 included by every user subroutine that makes use of the library. The preconditioners
-are defined in the module <span class="lstinline"></span><span 
-class="cmtt-10">psb_prec_mod</span>
+are defined in the module <code class="lstinline"><span style="color:#000000">psb_prec_mod</span></code>
 <!--l. 17--><p class="indent" >   Integer, real and complex data types are parametrized with a kind type defined in
 the library as follows:
      <dl class="description"><dt class="description">
+     <!--l. 20--><p class="noindent" >
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_spk</span><span 
 class="cmbx-10">_</span> </dt><dd 
-class="description">Kind  parameter  for  short  precision  real  and  complex  data;
-     corresponds to a <span class="lstinline"></span><span 
-class="cmtt-10">REAL</span> declaration and is normally 4 bytes;
+class="description">
+     <!--l. 20--><p class="noindent" >Kind parameter for short precision real and complex data; corresponds to
+     a <code class="lstinline"><span style="color:#000000">REAL</span></code> declaration and is normally 4 bytes;
      </dd><dt class="description">
+     <!--l. 23--><p class="noindent" >
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_dpk</span><span 
 class="cmbx-10">_</span> </dt><dd 
-class="description">Kind  parameter  for  long  precision  real  and  complex  data;
-     corresponds to a <span class="lstinline"></span><span 
-class="cmtt-10">DOUBLE</span><span 
-class="cmtt-10">&#x00A0;</span><span 
-class="cmtt-10">PRECISION</span> declaration and is normally 8 bytes;
+class="description">
+     <!--l. 23--><p class="noindent" >Kind parameter for long precision real and complex data; corresponds to
+     a <code class="lstinline"><span style="color:#000000">DOUBLE</span><span style="color:#000000"> </span><span style="color:#000000">PRECISION</span></code> declaration and is normally 8 bytes;
      </dd><dt class="description">
+     <!--l. 26--><p class="noindent" >
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_mpk</span><span 
 class="cmbx-10">_</span> </dt><dd 
-class="description">Kind parameter for 4-bytes integer data, as is always used by MPI;
+class="description">
+     <!--l. 26--><p class="noindent" >Kind parameter for 4-bytes integer data, as is always used by MPI;
      </dd><dt class="description">
+     <!--l. 28--><p class="noindent" >
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_epk</span><span 
 class="cmbx-10">_</span> </dt><dd 
-class="description">Kind parameter for 8-bytes integer data, as is always used by the
-     <span class="lstinline"></span><span 
-class="cmtt-10">sizeof</span> methods;
+class="description">
+     <!--l. 28--><p class="noindent" >Kind parameter for 8-bytes integer data, as is always used by the <code class="lstinline"><span style="color:#000000">sizeof</span></code>
+     methods;
      </dd><dt class="description">
+     <!--l. 30--><p class="noindent" >
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_ipk</span><span 
 class="cmbx-10">_</span> </dt><dd 
-class="description">Kind parameter for &#8220;local&#8221; integer indices and data; with default
-     build options this is a 4 bytes integer;
+class="description">
+     <!--l. 30--><p class="noindent" >Kind parameter for &#8220;local&#8221; integer indices and data; with default build
+     options this is a 4 bytes integer;
+                                                                  
+
+                                                                  
      </dd><dt class="description">
+     <!--l. 32--><p class="noindent" >
 <span 
 class="cmbx-10">psb</span><span 
 class="cmbx-10">_lpk</span><span 
 class="cmbx-10">_</span> </dt><dd 
-class="description">Kind parameter for &#8220;global&#8221; integer indices and data; with default
-     build options this is an 8 bytes integer;</dd></dl>
+class="description">
+     <!--l. 32--><p class="noindent" >Kind parameter for &#8220;global&#8221; integer indices and data; with default build
+     options this is an 8 bytes integer;</dd></dl>
 <!--l. 35--><p class="noindent" >The integer kinds for local and global indices can be chosen at configure time to hold 4
 or 8 bytes, with the global indices at least as large as the local ones. Together with
 the classes attributes we also discuss their methods. Most methods detailed here only
@@ -83,115 +91,2592 @@ otherwise stated. The list of methods here is not completely exhaustive; many
 methods, especially those that alter the contents of the various objects, are usually
 not needed by the end-user, and therefore are described in the developer&#8217;s
 documentation.
-                                                                  
-
-                                                                  
 <!--l. 48--><p class="noindent" >
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >3.1 <a 
-href="userhtmlsu5.html#x13-100003.1">Descriptor data structure</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.1 <a 
-href="userhtmlsu5.html#x13-110003.1.1">Descriptor Methods</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.2 <a 
-href="userhtmlsu5.html#x13-120003.1.2">get_local_rows &#8212; Get number of local rows</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.3 <a 
-href="userhtmlsu5.html#x13-130003.1.3">get_local_cols &#8212; Get number of local cols</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.4 <a 
-href="userhtmlsu5.html#x13-140003.1.4">get_global_rows &#8212; Get number of global rows</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.5 <a 
-href="userhtmlsu5.html#x13-150003.1.5">get_global_cols &#8212; Get number of global cols</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.6 <a 
-href="userhtmlsu5.html#x13-160003.1.6">get_global_indices &#8212; Get vector of global indices</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.7 <a 
-href="userhtmlsu5.html#x13-170003.1.7">get_context &#8212; Get communication context</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.8 <a 
-href="userhtmlsu5.html#x13-180003.1.8">Clone &#8212; clone current object</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.9 <a 
-href="userhtmlsu5.html#x13-190003.1.9">CNV &#8212; convert internal storage format</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.10 <a 
-href="userhtmlsu5.html#x13-200003.1.10">psb_cd_get_large_threshold &#8212; Get threshold for index mapping switch</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.11 <a 
-href="userhtmlsu5.html#x13-210003.1.11">psb_cd_set_large_threshold &#8212; Set threshold for index mapping switch</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.12 <a 
-href="userhtmlsu5.html#x13-220003.1.12">get_p_adjcncy &#8212; Get process adjacency list</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.13 <a 
-href="userhtmlsu5.html#x13-230003.1.13">set_p_adjcncy &#8212; Set process adjacency list</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.14 <a 
-href="userhtmlsu5.html#x13-240003.1.14">fnd_owner &#8212; Find the owner process of a set of indices</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.1.15 <a 
-href="userhtmlsu5.html#x13-250003.1.15">Named Constants</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >3.2 <a 
-href="userhtmlsu6.html#x14-260003.2">Sparse Matrix class</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.1 <a 
-href="userhtmlsu6.html#x14-270003.2.1">Sparse Matrix Methods</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.2 <a 
-href="userhtmlsu6.html#x14-280003.2.2">get_nrows &#8212; Get number of rows in a sparse matrix</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.3 <a 
-href="userhtmlsu6.html#x14-290003.2.3">get_ncols &#8212; Get number of columns in a sparse matrix</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.4 <a 
-href="userhtmlsu6.html#x14-300003.2.4">get_nnzeros &#8212; Get number of nonzero elements in a sparse matrix</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.5 <a 
-href="userhtmlsu6.html#x14-310003.2.5">get_size &#8212; Get maximum number of nonzero elements in a sparse matrix</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.6 <a 
-href="userhtmlsu6.html#x14-320003.2.6">sizeof &#8212; Get memory occupation in bytes of a sparse matrix</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.7 <a 
-href="userhtmlsu6.html#x14-330003.2.7">get_fmt &#8212; Short description of the dynamic type</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.8 <a 
-href="userhtmlsu6.html#x14-340003.2.8">is_bld, is_upd, is_asb &#8212; Status check</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.9 <a 
-href="userhtmlsu6.html#x14-350003.2.9">is_lower, is_upper, is_triangle, is_unit &#8212; Format check</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.10 <a 
-href="userhtmlsu6.html#x14-360003.2.10">cscnv &#8212; Convert to a different storage format</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.11 <a 
-href="userhtmlsu6.html#x14-370003.2.11">csclip &#8212; Reduce to a submatrix</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.12 <a 
-href="userhtmlsu6.html#x14-380003.2.12">clean_zeros &#8212; Eliminate zero coefficients</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.13 <a 
-href="userhtmlsu6.html#x14-390003.2.13">get_diag &#8212; Get main diagonal</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.14 <a 
-href="userhtmlsu6.html#x14-400003.2.14">clip_diag &#8212; Cut out main diagonal</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.15 <a 
-href="userhtmlsu6.html#x14-410003.2.15">tril &#8212; Return the lower triangle</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.16 <a 
-href="userhtmlsu6.html#x14-420003.2.16">triu &#8212; Return the upper triangle</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.17 <a 
-href="userhtmlsu6.html#x14-430003.2.17">psb_set_mat_default &#8212; Set default storage format</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.18 <a 
-href="userhtmlsu6.html#x14-440003.2.18">clone &#8212; Clone current object</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.2.19 <a 
-href="userhtmlsu6.html#x14-450003.2.19">Named Constants</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >3.3 <a 
-href="userhtmlsu7.html#x15-460003.3">Dense Vector Data Structure</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.1 <a 
-href="userhtmlsu7.html#x15-470003.3.1">Vector Methods</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.2 <a 
-href="userhtmlsu7.html#x15-480003.3.2">get_nrows &#8212; Get number of rows in a dense vector</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.3 <a 
-href="userhtmlsu7.html#x15-490003.3.3">sizeof &#8212; Get memory occupation in bytes of a dense vector</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.4 <a 
-href="userhtmlsu7.html#x15-500003.3.4">set &#8212; Set contents of the vector</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.5 <a 
-href="userhtmlsu7.html#x15-510003.3.5">get_vect &#8212; Get a copy of the vector contents</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >3.3.6 <a 
-href="userhtmlsu7.html#x15-520003.3.6">clone &#8212; Clone current object</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >3.4 <a 
-href="userhtmlsu8.html#x16-530003.4">Preconditioner data structure</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >3.5 <a 
-href="userhtmlsu9.html#x17-540003.5">Heap data structure</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x8-100003.1"></a>Descriptor data structure</h4>
+<!--l. 50--><p class="noindent" >All the general matrix informations and elements to be exchanged among processes
+are stored within a data structure of the type <a 
+ id="descdata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span>. Every structure of this
+type is associated with a discretization pattern and enables data communications and
+other operations that are necessary for implementing the various algorithms of
+interest to us.
+<!--l. 57--><p class="indent" >   The data structure itself <code class="lstinline"><span style="color:#000000">psb_desc_type</span></code> can be treated as an opaque object
+handled via the tools routines of Sec.&#x00A0;<a 
+href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a> or the query routines detailed below;
+nevertheless we include here a description for the curious reader.
+<!--l. 63--><p class="indent" >   First we describe the <code class="lstinline"><span style="color:#000000">psb_indx_map</span></code> type. This is a data structure that keeps
+track of a certain number of basic issues such as:
+     <ul class="itemize1">
+     <li class="itemize">
+     <!--l. 67--><p class="noindent" >The value of the communication context;
+     </li>
+     <li class="itemize">
+     <!--l. 68--><p class="noindent" >The number of indices in the index space, i.e. global number of rows and
+     columns of a sparse matrix;
+     </li>
+     <li class="itemize">
+     <!--l. 70--><p class="noindent" >The local set of indices, including:
+         <ul class="itemize2">
+         <li class="itemize">
+         <!--l. 72--><p class="noindent" >The number of local indices (and local rows);
+         </li>
+         <li class="itemize">
+         <!--l. 73--><p class="noindent" >The number of halo indices (and therefore local columns);
+                                                                  
 
+                                                                  
+         </li>
+         <li class="itemize">
+         <!--l. 74--><p class="noindent" >The global indices corresponding to the local ones.</li></ul>
+     </li></ul>
+<!--l. 77--><p class="noindent" >There are many different schemes for storing these data; therefore there are a number of
+types extending the base one, and the descriptor structure holds a polymorphic
+object whose dynamic type can be any of the extended types. The methods
+associated with this data type answer the following queries:
+     <ul class="itemize1">
+     <li class="itemize">
+     <!--l. 84--><p class="noindent" >For a given set of local indices, find the corresponding indices in the global
+     numbering;
+     </li>
+     <li class="itemize">
+     <!--l. 86--><p class="noindent" >For a given set of global indices, find the corresponding indices in the local
+     numbering, if any, or return an invalid
+     </li>
+     <li class="itemize">
+     <!--l. 88--><p class="noindent" >Add a global index to the set of halo indices;
+     </li>
+     <li class="itemize">
+     <!--l. 89--><p class="noindent" >Find the process owner of each member of a set of global indices.</li></ul>
+<!--l. 92--><p class="noindent" >All methods but the last are purely local; the last method potentially requires
+communication among processes, and thus is a synchronous method. The
+choice of a specific dynamic type for the index map is made at the time the
+descriptor is initially allocated, according to the mode of initialization (see
+also&#x00A0;<a 
+href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>).
+<!--l. 98--><p class="indent" >   The descriptor contents are as follows:
+     <dl class="description"><dt class="description">
+     <!--l. 100--><p class="noindent" >
+<span 
+class="cmbx-10">indxmap</span> </dt><dd 
+class="description">
+     <!--l. 100--><p class="noindent" >A polymorphic variable of a type that is any extension of the indx_map
+     type described above. <br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 102--><p class="noindent" >
+<span 
+class="cmbx-10">halo</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">
+     <!--l. 102--><p class="noindent" >A list of the halo and boundary elements for the current process to be
+     exchanged with other processes; for each processes with which it is necessary to
+     communicate:
+                                                                  
 
+                                                                  
+         <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x8-10002x1">
+         <!--l. 106--><p class="noindent" >Process identifier;
+         </li>
+<li 
+  class="enumerate" id="x8-10004x2">
+         <!--l. 107--><p class="noindent" >Number of points to be received;
+         </li>
+<li 
+  class="enumerate" id="x8-10006x3">
+         <!--l. 108--><p class="noindent" >Indices of points to be received;
+         </li>
+<li 
+  class="enumerate" id="x8-10008x4">
+         <!--l. 109--><p class="noindent" >Number of points to be sent;
+         </li>
+<li 
+  class="enumerate" id="x8-10010x5">
+         <!--l. 110--><p class="noindent" >Indices of points to be sent;</li></ol>
+     <!--l. 114--><p class="noindent" >Specified as: a vector of integer type, see&#x00A0;<a 
+href="#x8-460003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+     <!--l. 115--><p class="noindent" >
+<span 
+class="cmbx-10">ext</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">
+     <!--l. 115--><p class="noindent" >A list of element indices to be exchanged to implement the mapping between a
+     base descriptor and a descriptor with overlap. <br 
+class="newline" />Specified as: a vector of integer type, see&#x00A0;<a 
+href="#x8-460003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+     <!--l. 119--><p class="noindent" >
+<span 
+class="cmbx-10">ovrlap</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">
+     <!--l. 119--><p class="noindent" >A list of the overlap elements for the current process, organized in groups like
+     the previous vector:
+         <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x8-10012x1">
+         <!--l. 122--><p class="noindent" >Process identifier;
+         </li>
+<li 
+  class="enumerate" id="x8-10014x2">
+         <!--l. 123--><p class="noindent" >Number of points to be received;
+         </li>
+<li 
+  class="enumerate" id="x8-10016x3">
+         <!--l. 124--><p class="noindent" >Indices of points to be received;
+                                                                  
 
+                                                                  
+         </li>
+<li 
+  class="enumerate" id="x8-10018x4">
+         <!--l. 125--><p class="noindent" >Number of points to be sent;
+         </li>
+<li 
+  class="enumerate" id="x8-10020x5">
+         <!--l. 126--><p class="noindent" >Indices of points to be sent;</li></ol>
+     <!--l. 130--><p class="noindent" >Specified as: a vector of integer type, see&#x00A0;<a 
+href="#x8-460003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+     <!--l. 131--><p class="noindent" >
+<span 
+class="cmbx-10">ovr</span><span 
+class="cmbx-10">_mst</span><span 
+class="cmbx-10">_idx</span> </dt><dd 
+class="description">
+     <!--l. 131--><p class="noindent" >A list to retrieve the value of each overlap element from the respective master
+     process.<br 
+class="newline" />Specified as: a vector of integer type, see&#x00A0;<a 
+href="#x8-460003.3">3.3<!--tex4ht:ref: sec:vecttype --></a>.
+     </dd><dt class="description">
+     <!--l. 134--><p class="noindent" >
+<span 
+class="cmbx-10">ovrlap</span><span 
+class="cmbx-10">_elem</span> </dt><dd 
+class="description">
+     <!--l. 134--><p class="noindent" >For all overlap points belonging to th ecurrent process:
+         <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x8-10022x1">
+         <!--l. 137--><p class="noindent" >Overlap point index;
+         </li>
+<li 
+  class="enumerate" id="x8-10024x2">
+         <!--l. 138--><p class="noindent" >Number of processes sharing that overlap points;
+         </li>
+<li 
+  class="enumerate" id="x8-10026x3">
+         <!--l. 139--><p class="noindent" >Index of a &#8220;master&#8221; process:</li></ol>
+     <!--l. 141--><p class="noindent" >Specified as: an allocatable integer array of rank two.
+     </dd><dt class="description">
+     <!--l. 142--><p class="noindent" >
+<span 
+class="cmbx-10">bnd</span><span 
+class="cmbx-10">_elem</span> </dt><dd 
+class="description">
+     <!--l. 142--><p class="noindent" >A list of all boundary points, i.e. points that have a connection with other
+     processes.</dd></dl>
+<!--l. 145--><p class="noindent" >The Fortran&#x00A0;2003 declaration for <code class="lstinline"><span style="color:#000000">psb_desc_type</span></code> structures is as follows:
+<!--l. 147--><p class="indent" >   <a 
+ id="x8-10027r1"></a><hr class="float"><div class="float" 
+>
+                                                                  
 
+                                                                  
+<div class="center" 
+>
+<!--l. 162--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-1">
+type&#x00A0;psb_desc_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_indx_map),&#x00A0;allocatable&#x00A0;::&#x00A0;indxmap
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_halo_index
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ext_index
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovrlap_index
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(psb_i_vect_type)&#x00A0;::&#x00A0;v_ovr_mst_idx
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;ovrlap_elem(:,:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;bnd_elem(:)
+end&#x00A0;type&#x00A0;psb_desc_type
+</pre>
+<!--l. 174--><p class="nopar" >                                                           </div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 1: </span><span  
+class="content">The PSBLAS defined data type that contains the communication
+descriptor.</span></div><!--tex4ht:label?: x8-10027r1 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+<!--l. 186--><p class="indent" >   A communication descriptor associated with a sparse matrix has a state, which
+can take the following values:
+     <dl class="description"><dt class="description">
+     <!--l. 189--><p class="noindent" >
+<span 
+class="cmbx-10">Build:</span> </dt><dd 
+class="description">
+     <!--l. 189--><p class="noindent" >State entered after the first allocation, and before the first assembly; in this
+     state it is possible to add communication requirements among different
+     processes.
+     </dd><dt class="description">
+     <!--l. 192--><p class="noindent" >
+<span 
+class="cmbx-10">Assembled:</span> </dt><dd 
+class="description">
+     <!--l. 192--><p class="noindent" >State entered after the assembly; computations using the associated sparse
+     matrix, such as matrix-vector products, are only possible in this state.</dd></dl>
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.1   </span> <a 
+ id="x8-110003.1.1"></a>Descriptor Methods</h5>
+<!--l. 199--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.2   </span> <a 
+ id="x8-120003.1.2"></a>get_local_rows &#8212; Get number of local rows</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-2">
+nr&#x00A0;=&#x00A0;desc%get_local_rows()
+</pre>
+<!--l. 203--><p class="nopar" >
+<!--l. 205--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 206--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 206--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 207--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 207--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 208--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 208--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 215--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 216--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 216--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 217--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 217--><p class="noindent" >The number of local rows, i.e. the number of rows owned by the current
+     process; as explained in&#x00A0;<a 
+href="userhtmlse1.html#x3-20001">1<!--tex4ht:ref: sec:intro --></a>, it is equal to <span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>. The returned value is
+     specific to the calling process.</dd></dl>
+<!--l. 224--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.3   </span> <a 
+ id="x8-130003.1.3"></a>get_local_cols &#8212; Get number of local cols</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-3">
+nc&#x00A0;=&#x00A0;desc%get_local_cols()
+</pre>
+<!--l. 228--><p class="nopar" >
+<!--l. 230--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 231--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 231--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 232--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 232--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 233--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 233--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 240--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 241--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 241--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 242--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 242--><p class="noindent" >The number of local cols, i.e. the number of indices used by the current
+     process, including both local and halo indices; as explained in&#x00A0;<a 
+href="userhtmlse1.html#x3-20001">1<!--tex4ht:ref: sec:intro --></a>, it is equal
+     to <span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-48.png" alt="H" class="10x-x-48" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>. The returned value is specific to the calling process.</dd></dl>
+<!--l. 250--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.4   </span> <a 
+ id="x8-140003.1.4"></a>get_global_rows &#8212; Get number of global rows</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-4">
+nr&#x00A0;=&#x00A0;desc%get_global_rows()
+</pre>
+<!--l. 254--><p class="nopar" >
+<!--l. 256--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 257--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 257--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 258--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 258--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 259--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 259--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 266--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 267--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 267--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 268--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 268--><p class="noindent" >The number of global rows, i.e. the size of the global index space.</dd></dl>
+<!--l. 272--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.5   </span> <a 
+ id="x8-150003.1.5"></a>get_global_cols &#8212; Get number of global cols</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-5">
+nr&#x00A0;=&#x00A0;desc%get_global_cols()
+</pre>
+<!--l. 276--><p class="nopar" >
+<!--l. 278--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 279--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 279--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 280--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 280--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 281--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 281--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 288--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 289--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 289--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 290--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 290--><p class="noindent" >The number of global cols; usually this is equal to the number of global
+     rows.</dd></dl>
+<!--l. 295--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.6   </span> <a 
+ id="x8-160003.1.6"></a>get_global_indices &#8212; Get vector of global indices</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-6">
+myidx&#x00A0;=&#x00A0;desc%get_global_indices([owned])
+</pre>
+<!--l. 299--><p class="nopar" >
+<!--l. 301--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 302--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 302--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 303--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 303--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 304--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 304--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 307--><p class="noindent" >
+<span 
+class="cmbx-10">owned</span> </dt><dd 
+class="description">
+     <!--l. 307--><p class="noindent" >Choose if you only want owned indices (<code class="lstinline"><span style="color:#000000">owned</span><span style="color:#000000">=.</span><span style="color:#000000">true</span><span style="color:#000000">.</span></code>) or also halo indices
+     (<code class="lstinline"><span style="color:#000000">owned</span><span style="color:#000000">=.</span><span style="color:#000000">false</span><span style="color:#000000">.</span></code>). Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>; default: <code class="lstinline"><span style="color:#000000">.</span><span style="color:#000000">true</span><span style="color:#000000">.</span></code>.<br 
+class="newline" /></dd></dl>
+<!--l. 315--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 316--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 316--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 317--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 317--><p class="noindent" >The  global  indices,  returned  as  an  allocatable  integer  array  of  kind
+     <code class="lstinline"><span style="color:#000000">psb_lpk_</span></code> and rank 1.</dd></dl>
+<!--l. 323--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.7   </span> <a 
+ id="x8-170003.1.7"></a>get_context &#8212; Get communication context</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-7">
+ctxt&#x00A0;=&#x00A0;desc%get_context()
+</pre>
+<!--l. 327--><p class="nopar" >
+<!--l. 329--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 330--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 330--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 331--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 331--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 332--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 332--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 339--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 340--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 340--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 341--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 341--><p class="noindent" >The communication context.</dd></dl>
+<!--l. 344--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.8   </span> <a 
+ id="x8-180003.1.8"></a>Clone &#8212; clone current object</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-8">
+call&#x00A0;&#x00A0;desc%clone(descout,info)
+</pre>
+<!--l. 348--><p class="nopar" >
+<!--l. 350--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 351--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 351--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 352--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 352--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 353--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 353--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 360--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 361--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 361--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 362--><p class="noindent" >
+<span 
+class="cmbx-10">descout</span> </dt><dd 
+class="description">
+     <!--l. 362--><p class="noindent" >A copy of the input object.
+     </dd><dt class="description">
+     <!--l. 363--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 363--><p class="noindent" >Return code.</dd></dl>
+<!--l. 367--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.9   </span> <a 
+ id="x8-190003.1.9"></a>CNV &#8212; convert internal storage format</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-9">
+call&#x00A0;&#x00A0;desc%cnv(mold)
+</pre>
+<!--l. 371--><p class="nopar" >
+<!--l. 373--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 374--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 374--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 375--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 375--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 376--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 376--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 378--><p class="noindent" >
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">
+     <!--l. 378--><p class="noindent" >the desired integer storage format.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Specified     as:     a     object     of     type     derived     from     (integer)
+     <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>.</dd></dl>
+<!--l. 384--><p class="noindent" >The <code class="lstinline"><span style="color:#000000">mold</span></code> arguments may be employed to interface with special devices, such as GPUs
+and other accelerators.
+<!--l. 391--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.10   </span> <a 
+ id="x8-200003.1.10"></a>psb_cd_get_large_threshold &#8212; Get threshold for index mapping
+switch</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-10">
+ith&#x00A0;=&#x00A0;psb_cd_get_large_threshold()
+</pre>
+<!--l. 395--><p class="nopar" >
+<!--l. 397--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 398--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 398--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 399--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 399--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 400--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 400--><p class="noindent" >The current value for the size threshold.
+     </dd></dl>
+<!--l. 407--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.11   </span> <a 
+ id="x8-210003.1.11"></a>psb_cd_set_large_threshold &#8212; Set threshold for index mapping
+switch</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-11">
+call&#x00A0;psb_cd_set_large_threshold(ith)
+</pre>
+<!--l. 412--><p class="nopar" >
+<!--l. 414--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 415--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 415--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 416--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 416--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 417--><p class="noindent" >
+<span 
+class="cmbx-10">ith</span> </dt><dd 
+class="description">
+     <!--l. 417--><p class="noindent" >the new threshold for communication descriptors.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value greater than zero.</dd></dl>
+<!--l. 423--><p class="noindent" >Note: the threshold value is only queried by the library at the time a call to <code class="lstinline"><span style="color:#000000">psb_cdall</span></code>
+is executed, therefore changing the threshold has no effect on communication
+descriptors that have already been initialized. Moreover the threshold must have the
+same value on all processes.
+<!--l. 430--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.12   </span> <a 
+ id="x8-220003.1.12"></a>get_p_adjcncy &#8212; Get process adjacency list</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-12">
+list&#x00A0;=&#x00A0;&#x00A0;desc%get_p_adjcncy()
+</pre>
+<!--l. 435--><p class="nopar" >
+<!--l. 437--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 438--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 438--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 439--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 439--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 440--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 440--><p class="noindent" >The current list of adjacent processes, i.e. processes with which the current
+     one has to exchange halo data.
+     </dd></dl>
+<!--l. 446--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.13   </span> <a 
+ id="x8-230003.1.13"></a>set_p_adjcncy &#8212; Set process adjacency list</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-13">
+call&#x00A0;desc%set_p_adjcncy(list)
+</pre>
+<!--l. 451--><p class="nopar" >
+<!--l. 453--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 454--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 454--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 455--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 455--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 456--><p class="noindent" >
+<span 
+class="cmbx-10">list</span> </dt><dd 
+class="description">
+     <!--l. 456--><p class="noindent" >the list of adjacent processes.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a one-dimensional array of integers of kind <code class="lstinline"><span style="color:#000000">psb_ipk_</span></code>.</dd></dl>
+<!--l. 462--><p class="noindent" >Note: this method can be called after a call to <code class="lstinline"><span style="color:#000000">psb_cdall</span></code> and before a call to
+<code class="lstinline"><span style="color:#000000">psb_cdasb</span></code>. The user is specifying here some knowledge about which processes are
+topological neighbours of the current process. The availability of this information
+may speed up the execution of the assembly call <code class="lstinline"><span style="color:#000000">psb_cdasb</span></code>.
+<!--l. 469--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.14   </span> <a 
+ id="x8-240003.1.14"></a>fnd_owner &#8212; Find the owner process of a set of indices</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-14">
+call&#x00A0;desc%fnd_owner(idx,iprc,info)
+</pre>
+<!--l. 474--><p class="nopar" >
+<!--l. 476--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 477--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 477--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 478--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 478--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 479--><p class="noindent" >
+<span 
+class="cmbx-10">idx</span> </dt><dd 
+class="description">
+     <!--l. 479--><p class="noindent" >the list of global indices for which we need the owning processes.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a one-dimensional array of integers of kind <code class="lstinline"><span style="color:#000000">psb_lpk_</span></code>.
+     </dd><dt class="description">
+     <!--l. 484--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 484--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 485--><p class="noindent" >
+<span 
+class="cmbx-10">iprc</span> </dt><dd 
+class="description">
+     <!--l. 485--><p class="noindent" >the list of processes owning the indices in <code class="lstinline"><span style="color:#000000">idx</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified  as:  an  allocatable  one-dimensional  array  of  integers  of  kind
+     <code class="lstinline"><span style="color:#000000">psb_ipk_</span></code>.</dd></dl>
+<!--l. 491--><p class="noindent" >Note: this method may or may not actually require communications, depending on the
+exact internal data storage; given that the choice of storage may be altered by
+runtime parameters, it is necessary for safety that this method is called by all
+processes.
+                                                                  
+
+                                                                  
+<!--l. 499--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.1.15   </span> <a 
+ id="x8-250003.1.15"></a>Named Constants</h5>
+<!--l. 501--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 502--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_none</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 502--><p class="noindent" >Generic no-op;
+     </dd><dt class="description">
+     <!--l. 503--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_root</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 503--><p class="noindent" >Default root process for broadcast and scatter operations;
+     </dd><dt class="description">
+     <!--l. 504--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_nohalo</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 504--><p class="noindent" >Do not fetch halo elements;
+     </dd><dt class="description">
+     <!--l. 505--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_halo</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 505--><p class="noindent" >Fetch halo elements from neighbouring processes;
+     </dd><dt class="description">
+     <!--l. 506--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_sum</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 506--><p class="noindent" >Sum overlapped elements
+     </dd><dt class="description">
+     <!--l. 507--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_avg</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 507--><p class="noindent" >Average overlapped elements
+     </dd><dt class="description">
+     <!--l. 508--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_halo</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 508--><p class="noindent" >Exchange data based on the <code class="lstinline"><span style="color:#000000">halo_index</span></code> list;
+     </dd><dt class="description">
+     <!--l. 510--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_ext</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 510--><p class="noindent" >Exchange data based on the <code class="lstinline"><span style="color:#000000">ext_index</span></code> list;
+     </dd><dt class="description">
+     <!--l. 512--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_ovr</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 512--><p class="noindent" >Exchange data based on the <code class="lstinline"><span style="color:#000000">ovrlap_index</span></code> list;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 514--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_comm</span><span 
+class="cmbx-10">_mov</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 514--><p class="noindent" >Exchange data based on the <code class="lstinline"><span style="color:#000000">ovr_mst_idx</span></code> list;
+     </dd></dl>
+<!--l. 534--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
+ id="x8-260003.2"></a>Sparse Matrix class</h4>
+<!--l. 536--><p class="noindent" >The <a 
+ id="spdata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type </span>class contains all information about the local portion of the
+sparse matrix and its storage mode. Its design is based on the STATE design
+pattern&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XDesignPatterns">12</a>]</span> as detailed in&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XSparse03">10</a>]</span>; the type declaration is shown in figure&#x00A0;<a 
+href="#x8-26001r2">2<!--tex4ht:ref: fig:spmattype --></a> where <code class="lstinline"><span style="color:#000000">T</span></code> is a
+placeholder for the data type and precision variants
+     <dl class="description"><dt class="description">
+     <!--l. 544--><p class="noindent" >
+<span 
+class="cmbx-10">S</span> </dt><dd 
+class="description">
+     <!--l. 544--><p class="noindent" >Single precision real;
+     </dd><dt class="description">
+     <!--l. 545--><p class="noindent" >
+<span 
+class="cmbx-10">D</span> </dt><dd 
+class="description">
+     <!--l. 545--><p class="noindent" >Double precision real;
+     </dd><dt class="description">
+     <!--l. 546--><p class="noindent" >
+<span 
+class="cmbx-10">C</span> </dt><dd 
+class="description">
+     <!--l. 546--><p class="noindent" >Single precision complex;
+     </dd><dt class="description">
+     <!--l. 547--><p class="noindent" >
+<span 
+class="cmbx-10">Z</span> </dt><dd 
+class="description">
+     <!--l. 547--><p class="noindent" >Double precision complex;
+     </dd><dt class="description">
+     <!--l. 548--><p class="noindent" >
+<span 
+class="cmbx-10">LS,LD,LC,LZ</span> </dt><dd 
+class="description">
+     <!--l. 548--><p class="noindent" >Same numeric type as above, but with <code class="lstinline"><span style="color:#000000">psb_lpk_</span></code> integer indices.</dd></dl>
+<!--l. 551--><p class="noindent" >The actual data is contained in the polymorphic component <code class="lstinline"><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">a</span></code> of type
+<a 
+ id="spbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_sparse</span><span 
+class="cmtt-10">_mat</span>; its specific layout can be chosen dynamically among the
+predefined types, or an entirely new storage layout can be implemented and passed to
+the library at runtime via the <code class="lstinline"><span style="color:#000000">psb_spasb</span></code> routine.
+<!--l. 556--><p class="indent" >   <a 
+ id="x8-26001r2"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 565--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-15">
+&#x00A0;&#x00A0;type&#x00A0;::&#x00A0;psb_Tspmat_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_sparse_mat),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;a
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_Tspmat_type
+</pre>
+<!--l. 571--><p class="nopar" >                                                        </div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 2: </span><span  
+class="content"> The PSBLAS defined data type that contains a sparse matrix.</span></div><!--tex4ht:label?: x8-26001r2 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+<!--l. 584--><p class="indent" >   The following very common formats are precompiled in PSBLAS and thus are
+always available:
+     <dl class="description"><dt class="description">
+     <!--l. 587--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_T</span><span 
+class="cmbx-10">_coo</span><span 
+class="cmbx-10">_sparse</span><span 
+class="cmbx-10">_mat</span> </dt><dd 
+class="description">
+     <!--l. 587--><p class="noindent" >Coordinate storage;
+     </dd><dt class="description">
+     <!--l. 588--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_T</span><span 
+class="cmbx-10">_csr</span><span 
+class="cmbx-10">_sparse</span><span 
+class="cmbx-10">_mat</span> </dt><dd 
+class="description">
+     <!--l. 588--><p class="noindent" >Compressed storage by rows;
+     </dd><dt class="description">
+     <!--l. 589--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_T</span><span 
+class="cmbx-10">_csc</span><span 
+class="cmbx-10">_sparse</span><span 
+class="cmbx-10">_mat</span> </dt><dd 
+class="description">
+     <!--l. 589--><p class="noindent" >Compressed storage by columns;</dd></dl>
+<!--l. 591--><p class="noindent" >The inner sparse matrix has an associated state, which can take the following
+values:
+     <dl class="description"><dt class="description">
+     <!--l. 594--><p class="noindent" >
+<span 
+class="cmbx-10">Build:</span> </dt><dd 
+class="description">
+     <!--l. 594--><p class="noindent" >State entered after the first allocation, and before the first assembly; in
+     this state it is possible to add nonzero entries.
+     </dd><dt class="description">
+     <!--l. 596--><p class="noindent" >
+<span 
+class="cmbx-10">Assembled:</span> </dt><dd 
+class="description">
+     <!--l. 596--><p class="noindent" >State entered after the assembly; computations using the sparse matrix,
+     such as matrix-vector products, are only possible in this state;
+     </dd><dt class="description">
+     <!--l. 599--><p class="noindent" >
+<span 
+class="cmbx-10">Update:</span> </dt><dd 
+class="description">
+     <!--l. 599--><p class="noindent" >State entered after a reinitalization; this is used to handle applications
+     in which the same sparsity pattern is used multiple times with different
+     coefficients. In this state it is only possible to enter coefficients for already
+     existing nonzero entries.</dd></dl>
+<!--l. 604--><p class="noindent" >The only storage variant supporting the build state is COO; all other variants are
+obtained by conversion to/from it.
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.1   </span> <a 
+ id="x8-270003.2.1"></a>Sparse Matrix Methods</h5>
+<!--l. 609--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.2   </span> <a 
+ id="x8-280003.2.2"></a>get_nrows &#8212; Get number of rows in a sparse matrix</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-16">
+nr&#x00A0;=&#x00A0;a%get_nrows()
+</pre>
+<!--l. 614--><p class="nopar" >
+<!--l. 616--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 617--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 617--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 618--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 618--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 619--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 619--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 626--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 627--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 627--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 628--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 628--><p class="noindent" >The number of rows of sparse matrix <code class="lstinline"><span style="color:#000000">a</span></code>.</dd></dl>
+<!--l. 633--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.3   </span> <a 
+ id="x8-290003.2.3"></a>get_ncols &#8212; Get number of columns in a sparse matrix</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-17">
+nc&#x00A0;=&#x00A0;a%get_ncols()
+</pre>
+<!--l. 638--><p class="nopar" >
+<!--l. 640--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 641--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 641--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 642--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 642--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 643--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 643--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 650--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 651--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 651--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 652--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 652--><p class="noindent" >The number of columns of sparse matrix <code class="lstinline"><span style="color:#000000">a</span></code>.</dd></dl>
+<!--l. 657--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.4   </span> <a 
+ id="x8-300003.2.4"></a>get_nnzeros &#8212; Get number of nonzero elements in a sparse matrix</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-18">
+nz&#x00A0;=&#x00A0;a%get_nnzeros()
+</pre>
+<!--l. 662--><p class="nopar" >
+<!--l. 664--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 665--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 665--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 666--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 666--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 667--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 667--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 674--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 675--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 675--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 676--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 676--><p class="noindent" >The number of nonzero elements stored in sparse matrix <code class="lstinline"><span style="color:#000000">a</span></code>.</dd></dl>
+<!--l. 679--><p class="noindent" ><span 
+class="cmbx-10">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x8-30002x1">
+     <!--l. 681--><p class="noindent" >The function value is specific to the storage format of matrix <code class="lstinline"><span style="color:#000000">a</span></code>; some
+     storage formats employ padding, thus the returned value for the same
+     matrix may be different for different storage choices.</li></ol>
+<!--l. 687--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.5   </span> <a 
+ id="x8-310003.2.5"></a>get_size &#8212; Get maximum number of nonzero elements in a sparse
+matrix</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-19">
+maxnz&#x00A0;=&#x00A0;a%get_size()
+</pre>
+<!--l. 692--><p class="nopar" >
+<!--l. 694--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 695--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 695--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 696--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 696--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 697--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 697--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 704--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 705--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 705--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 706--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 706--><p class="noindent" >The maximum number of nonzero elements that can be stored in sparse
+     matrix <code class="lstinline"><span style="color:#000000">a</span></code> using its current memory allocation.</dd></dl>
+<!--l. 711--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.6   </span> <a 
+ id="x8-320003.2.6"></a>sizeof &#8212; Get memory occupation in bytes of a sparse matrix</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-20">
+memory_size&#x00A0;=&#x00A0;a%sizeof()
+</pre>
+<!--l. 716--><p class="nopar" >
+<!--l. 718--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 719--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 719--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 720--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 720--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 721--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 721--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 728--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 729--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 729--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 730--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 730--><p class="noindent" >The memory occupation in bytes.</dd></dl>
+<!--l. 734--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.7   </span> <a 
+ id="x8-330003.2.7"></a>get_fmt &#8212; Short description of the dynamic type</h5>
+<!--l. 738--><p class="noindent" ><code class="lstinline"><span style="color:#000000">write</span><span style="color:#000000">(*,*)</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">get_fmt</span><span style="color:#000000">()</span></code>
+<!--l. 741--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 742--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 742--><p class="noindent" >Asynchronous.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 743--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 743--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 744--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 744--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 751--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 752--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 752--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 753--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 753--><p class="noindent" >A short string describing the dynamic type of the matrix. Predefined values
+     include <code class="lstinline"><span style="color:#000000">NULL</span></code>, <code class="lstinline"><span style="color:#000000">COO</span></code>, <code class="lstinline"><span style="color:#000000">CSR</span></code> and <code class="lstinline"><span style="color:#000000">CSC</span></code>.</dd></dl>
+<!--l. 758--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.8   </span> <a 
+ id="x8-340003.2.8"></a>is_bld, is_upd, is_asb &#8212; Status check</h5>
+<!--l. 762--><p class="noindent" ><code class="lstinline"><span style="color:#000000">if</span><span style="color:#000000"> </span><span style="color:#000000">(</span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">is_bld</span><span style="color:#000000">())</span><span style="color:#000000"> </span><span style="color:#000000">then</span></code><br 
+class="newline" /><code class="lstinline"><span style="color:#000000">if</span><span style="color:#000000"> </span><span style="color:#000000">(</span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">is_upd</span><span style="color:#000000">())</span><span style="color:#000000"> </span><span style="color:#000000">then</span></code><br 
+class="newline" /><code class="lstinline"><span style="color:#000000">if</span><span style="color:#000000"> </span><span style="color:#000000">(</span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">is_asb</span><span style="color:#000000">())</span><span style="color:#000000"> </span><span style="color:#000000">then</span></code>
+<!--l. 766--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 767--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 767--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 768--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 768--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 769--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 769--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 776--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 777--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 777--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 778--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 778--><p class="noindent" >A <code class="lstinline"><span style="color:#000000">logical</span></code> value indicating whether the matrix is in the Build, Update or
+     Assembled state, respectively.</dd></dl>
+<!--l. 783--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.9   </span> <a 
+ id="x8-350003.2.9"></a>is_lower, is_upper, is_triangle, is_unit &#8212; Format check</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-21">
+if&#x00A0;(a%is_triangle())&#x00A0;then
+if&#x00A0;(a%is_upper())&#x00A0;then
+if&#x00A0;(a%is_lower())&#x00A0;then
+if&#x00A0;(a%is_unit())&#x00A0;then
+</pre>
+<!--l. 799--><p class="nopar" >
+<!--l. 802--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 803--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 803--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 804--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 804--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 805--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 805--><p class="noindent" >the sparse matrix<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 812--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 813--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 813--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 814--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 814--><p class="noindent" >A  <code class="lstinline"><span style="color:#000000">logical</span></code>  value  indicating  whether  the  matrix  is  triangular;  if
+     <code class="lstinline"><span style="color:#000000">is_triangle</span><span style="color:#000000">()</span></code> returns <code class="lstinline"><span style="color:#000000">.</span><span style="color:#000000">true</span><span style="color:#000000">.</span></code> check also if it is lower, upper and with a
+     unit (i.e. assumed) diagonal.</dd></dl>
+<!--l. 821--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.10   </span> <a 
+ id="x8-360003.2.10"></a>cscnv &#8212; Convert to a different storage format</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-22">
+call&#x00A0;&#x00A0;a%cscnv(b,info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
+call&#x00A0;&#x00A0;a%cscnv(info&#x00A0;[,&#x00A0;type,&#x00A0;mold,&#x00A0;dupl])
+</pre>
+<!--l. 833--><p class="nopar" >
+<!--l. 836--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 837--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 837--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 838--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 838--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 839--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 839--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 842--><p class="noindent" >
+<span 
+class="cmbx-10">type</span> </dt><dd 
+class="description">
+     <!--l. 842--><p class="noindent" >a string requesting a new format.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 844--><p class="noindent" >
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">
+     <!--l. 844--><p class="noindent" >a variable of <code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_T_base_sparse_mat</span><span style="color:#000000">)</span></code> requesting a new format.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 846--><p class="noindent" >
+<span 
+class="cmbx-10">dupl</span> </dt><dd 
+class="description">
+     <!--l. 846--><p class="noindent" >an integer value specifing how to handle duplicates (see Named Constants
+     below)</dd></dl>
+<!--l. 850--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 851--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 851--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 852--><p class="noindent" >
+<span 
+class="cmbx-10">b,a</span> </dt><dd 
+class="description">
+     <!--l. 852--><p class="noindent" >A copy of <code class="lstinline"><span style="color:#000000">a</span></code> with a new storage format.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 854--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 854--><p class="noindent" >Return code.</dd></dl>
+<!--l. 856--><p class="noindent" >The <code class="lstinline"><span style="color:#000000">mold</span></code> arguments may be employed to interface with special devices, such as GPUs
+and other accelerators.
+<!--l. 861--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.11   </span> <a 
+ id="x8-370003.2.11"></a>csclip &#8212; Reduce to a submatrix</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-23">
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%csclip(b,info[,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;imin,imax,jmin,jmax,rscale,cscale])
+</pre>
+<!--l. 873--><p class="nopar" >
+<!--l. 876--><p class="indent" >   Returns the submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>, optionally rescaling row/col
+indices to the range <code class="lstinline"><span style="color:#000000">1:</span><span style="color:#000000">imax</span><span style="color:#000000">-</span><span style="color:#000000">imin</span><span style="color:#000000">+1,1:</span><span style="color:#000000">jmax</span><span style="color:#000000">-</span><span style="color:#000000">jmin</span><span style="color:#000000">+1</span></code>.
+     <dl class="description"><dt class="description">
+     <!--l. 880--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 880--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 881--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 881--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 882--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 882--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 885--><p class="noindent" >
+<span 
+class="cmbx-10">imin,imax,jmin,jmax</span> </dt><dd 
+class="description">
+     <!--l. 885--><p class="noindent" >Minimum and maximum row and column indices.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 887--><p class="noindent" >
+<span 
+class="cmbx-10">rscale,cscale</span> </dt><dd 
+class="description">
+     <!--l. 887--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
+<!--l. 890--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 891--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 891--><p class="noindent" >
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 892--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 892--><p class="noindent" >A copy of a submatrix of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 894--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 894--><p class="noindent" >Return code.</dd></dl>
+<!--l. 897--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.12   </span> <a 
+ id="x8-380003.2.12"></a>clean_zeros &#8212; Eliminate zero coefficients</h5>
+<!--l. 899--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clean_zeros</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 901--><p class="indent" >   Eliminates zero coefficients in the input matrix. Note that depending on the
+internal storage format, there may still be some amount of zero padding in the
+output.
+<!--l. 905--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 906--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 906--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 907--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 907--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 908--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 908--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 912--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 913--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 913--><p class="noindent" >
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 914--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 914--><p class="noindent" >The matrix <code class="lstinline"><span style="color:#000000">a</span></code> without zero coefficients.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 916--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 916--><p class="noindent" >Return code.</dd></dl>
+<!--l. 919--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.13   </span> <a 
+ id="x8-390003.2.13"></a>get_diag &#8212; Get main diagonal</h5>
+<!--l. 921--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">get_diag</span><span style="color:#000000">(</span><span style="color:#000000">d</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 923--><p class="indent" >   Returns a copy of the main diagonal.
+     <dl class="description"><dt class="description">
+     <!--l. 925--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 925--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 926--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 926--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 927--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 927--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 931--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 932--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 932--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 933--><p class="noindent" >
+<span 
+class="cmbx-10">d</span> </dt><dd 
+class="description">
+     <!--l. 933--><p class="noindent" >A copy of the main diagonal.<br 
+class="newline" />A one-dimensional array of the appropriate type.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 935--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 935--><p class="noindent" >Return code.</dd></dl>
+<!--l. 939--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.14   </span> <a 
+ id="x8-400003.2.14"></a>clip_diag &#8212; Cut out main diagonal</h5>
+<!--l. 941--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clip_diag</span><span style="color:#000000">(</span><span style="color:#000000">b</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 943--><p class="indent" >   Returns a copy of <code class="lstinline"><span style="color:#000000">a</span></code> without the main diagonal.
+     <dl class="description"><dt class="description">
+     <!--l. 945--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 945--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 946--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 946--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 947--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 947--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 951--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 952--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 952--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 953--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 953--><p class="noindent" >A copy of <code class="lstinline"><span style="color:#000000">a</span></code> without the main diagonal.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 955--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 955--><p class="noindent" >Return code.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 959--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.15   </span> <a 
+ id="x8-410003.2.15"></a>tril &#8212; Return the lower triangle</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-24">
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%tril(l,info[,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,u])
+</pre>
+<!--l. 971--><p class="nopar" >
+<!--l. 974--><p class="indent" >   Returns the lower triangular part of submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>,
+optionally rescaling row/col indices to the range <code class="lstinline"><span style="color:#000000">1:</span><span style="color:#000000">imax</span><span style="color:#000000">-</span><span style="color:#000000">imin</span><span style="color:#000000">+1,1:</span><span style="color:#000000">jmax</span><span style="color:#000000">-</span><span style="color:#000000">jmin</span><span style="color:#000000">+1</span></code> and
+returing the complementary upper triangle.
+     <dl class="description"><dt class="description">
+     <!--l. 979--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 979--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 980--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 980--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 981--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 981--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 984--><p class="noindent" >
+<span 
+class="cmbx-10">diag</span> </dt><dd 
+class="description">
+     <!--l. 984--><p class="noindent" >Include diagonals up to this one; <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=1</span></code> means the first superdiagonal,
+     <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=-1</span></code> means the first subdiagonal. Default 0.
+     </dd><dt class="description">
+     <!--l. 987--><p class="noindent" >
+<span 
+class="cmbx-10">imin,imax,jmin,jmax</span> </dt><dd 
+class="description">
+     <!--l. 987--><p class="noindent" >Minimum and maximum row and column indices.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 989--><p class="noindent" >
+<span 
+class="cmbx-10">rscale,cscale</span> </dt><dd 
+class="description">
+     <!--l. 989--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
+<!--l. 992--><p class="noindent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 993--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 993--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 994--><p class="noindent" >
+<span 
+class="cmbx-10">l</span> </dt><dd 
+class="description">
+     <!--l. 994--><p class="noindent" >A copy of the lower triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 996--><p class="noindent" >
+<span 
+class="cmbx-10">u</span> </dt><dd 
+class="description">
+     <!--l. 996--><p class="noindent" >(optional) A copy of the upper triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 998--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 998--><p class="noindent" >Return code.</dd></dl>
+<!--l. 1001--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.16   </span> <a 
+ id="x8-420003.2.16"></a>triu &#8212; Return the upper triangle</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-25">
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%triu(u,info[,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,l])
+</pre>
+<!--l. 1012--><p class="nopar" >
+<!--l. 1015--><p class="indent" >   Returns the upper triangular part of submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>,
+optionally rescaling row/col indices to the range <code class="lstinline"><span style="color:#000000">1:</span><span style="color:#000000">imax</span><span style="color:#000000">-</span><span style="color:#000000">imin</span><span style="color:#000000">+1,1:</span><span style="color:#000000">jmax</span><span style="color:#000000">-</span><span style="color:#000000">jmin</span><span style="color:#000000">+1</span></code>,
+and returing the complementary lower triangle.
+     <dl class="description"><dt class="description">
+     <!--l. 1020--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1020--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1021--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1021--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1022--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 1022--><p class="noindent" >the sparse matrix.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1025--><p class="noindent" >
+<span 
+class="cmbx-10">diag</span> </dt><dd 
+class="description">
+     <!--l. 1025--><p class="noindent" >Include diagonals up to this one; <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=1</span></code> means the first superdiagonal,
+     <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=-1</span></code> means the first subdiagonal. Default 0.
+     </dd><dt class="description">
+     <!--l. 1028--><p class="noindent" >
+<span 
+class="cmbx-10">imin,imax,jmin,jmax</span> </dt><dd 
+class="description">
+     <!--l. 1028--><p class="noindent" >Minimum and maximum row and column indices.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 1030--><p class="noindent" >
+<span 
+class="cmbx-10">rscale,cscale</span> </dt><dd 
+class="description">
+     <!--l. 1030--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
+<!--l. 1033--><p class="noindent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 1034--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1034--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1035--><p class="noindent" >
+<span 
+class="cmbx-10">u</span> </dt><dd 
+class="description">
+     <!--l. 1035--><p class="noindent" >A copy of the upper triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 1037--><p class="noindent" >
+<span 
+class="cmbx-10">l</span> </dt><dd 
+class="description">
+     <!--l. 1037--><p class="noindent" >(optional) A copy of the lower triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 1039--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1039--><p class="noindent" >Return code.</dd></dl>
+<!--l. 1045--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.17   </span> <a 
+ id="x8-430003.2.17"></a>psb_set_mat_default &#8212; Set default storage format</h5>
+<!--l. 1049--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_set_mat_default</span><span style="color:#000000">(</span><span style="color:#000000">a</span><span style="color:#000000">)</span></code>
+<!--l. 1051--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1052--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1052--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1053--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1053--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1054--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 1054--><p class="noindent" >a variable of <code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_T_base_sparse_mat</span><span style="color:#000000">)</span></code> requesting a new default
+     storage format.<br 
+class="newline" />Type: required.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1063--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.18   </span> <a 
+ id="x8-440003.2.18"></a>clone &#8212; Clone current object</h5>
+<!--l. 1066--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clone</span><span style="color:#000000">(</span><span style="color:#000000">b</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 1068--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1069--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1069--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1070--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1070--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1071--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 1071--><p class="noindent" >the sparse matrix.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 1078--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1079--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1079--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1080--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 1080--><p class="noindent" >A copy of the input object.
+     </dd><dt class="description">
+     <!--l. 1081--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1081--><p class="noindent" >Return code.</dd></dl>
+<!--l. 1085--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.2.19   </span> <a 
+ id="x8-450003.2.19"></a>Named Constants</h5>
+<!--l. 1087--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1092--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_dupl</span><span 
+class="cmbx-10">_ovwrt</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 1092--><p class="noindent" >Duplicate coefficients should be overwritten (i.e. ignore duplications)
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1094--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_dupl</span><span 
+class="cmbx-10">_add</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 1094--><p class="noindent" >Duplicate coefficients should be added;
+     </dd><dt class="description">
+     <!--l. 1095--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_dupl</span><span 
+class="cmbx-10">_err</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 1095--><p class="noindent" >Duplicate coefficients should trigger an error conditino
+     </dd><dt class="description">
+     <!--l. 1096--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_upd</span><span 
+class="cmbx-10">_dflt</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 1096--><p class="noindent" >Default update strategy for matrix coefficients;
+     </dd><dt class="description">
+     <!--l. 1097--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_upd</span><span 
+class="cmbx-10">_srch</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 1097--><p class="noindent" >Update strategy based on search into the data structure;
+     </dd><dt class="description">
+     <!--l. 1098--><p class="noindent" >
+<span 
+class="cmbx-10">psb</span><span 
+class="cmbx-10">_upd</span><span 
+class="cmbx-10">_perm</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+     <!--l. 1098--><p class="noindent" >Update strategy based on additional permutation data (see tools routine
+     description).</dd></dl>
+<!--l. 1103--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
+ id="x8-460003.3"></a>Dense Vector Data Structure</h4>
+<!--l. 1105--><p class="noindent" >The <a 
+ id="vdata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type </span>data structure encapsulates the dense vectors in a way similar
+to sparse matrices, i.e. including a base type <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>. The user will
+not, in general, access the vector components directly, but rather via the routines of
+sec.&#x00A0;<a 
+href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>. Among other simple things, we define here an extraction method that
+can be used to get a full copy of the part of the vector stored on the local
+process.
+<!--l. 1115--><p class="indent" >   The type declaration is shown in figure&#x00A0;<a 
+href="#x8-46001r3">3<!--tex4ht:ref: fig:vectype --></a> where <code class="lstinline"><span style="color:#000000">T</span></code> is a placeholder for the data
+type and precision variants
+     <dl class="description"><dt class="description">
+     <!--l. 1119--><p class="noindent" >
+<span 
+class="cmbx-10">I</span> </dt><dd 
+class="description">
+     <!--l. 1119--><p class="noindent" >Integer;
+     </dd><dt class="description">
+     <!--l. 1120--><p class="noindent" >
+<span 
+class="cmbx-10">S</span> </dt><dd 
+class="description">
+     <!--l. 1120--><p class="noindent" >Single precision real;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1121--><p class="noindent" >
+<span 
+class="cmbx-10">D</span> </dt><dd 
+class="description">
+     <!--l. 1121--><p class="noindent" >Double precision real;
+     </dd><dt class="description">
+     <!--l. 1122--><p class="noindent" >
+<span 
+class="cmbx-10">C</span> </dt><dd 
+class="description">
+     <!--l. 1122--><p class="noindent" >Single precision complex;
+     </dd><dt class="description">
+     <!--l. 1123--><p class="noindent" >
+<span 
+class="cmbx-10">Z</span> </dt><dd 
+class="description">
+     <!--l. 1123--><p class="noindent" >Double precision complex.</dd></dl>
+<!--l. 1125--><p class="noindent" >The actual data is contained in the polymorphic component <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">v</span></code>; the separation between
+the application and the actual data is essential for cases where it is necessary to link
+to data storage made available elsewhere outside the direct control of the
+compiler/application, e.g. data stored in a graphics accelerator&#8217;s private
+memory.
+<!--l. 1131--><p class="indent" >   <a 
+ id="x8-46001r3"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 1145--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-26">
+&#x00A0;&#x00A0;type&#x00A0;psb_T_base_vect_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;TYPE(KIND_),&#x00A0;allocatable&#x00A0;::&#x00A0;v(:)
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_T_base_vect_type
+
+&#x00A0;&#x00A0;type&#x00A0;psb_T_vect_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_vect_type),&#x00A0;allocatable&#x00A0;::&#x00A0;v
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_T_vect_type
+
+</pre>
+<!--l. 1156--><p class="nopar" >                                                        </div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 3: </span><span  
+class="content"> The PSBLAS defined data type that contains a dense vector.</span></div><!--tex4ht:label?: x8-46001r3 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.1   </span> <a 
+ id="x8-470003.3.1"></a>Vector Methods</h5>
+<!--l. 1171--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.2   </span> <a 
+ id="x8-480003.3.2"></a>get_nrows &#8212; Get number of rows in a dense vector</h5>
+<!--l. 1174--><p class="noindent" ><code class="lstinline"><span style="color:#000000">nr</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">get_nrows</span><span style="color:#000000">()</span></code>
+<!--l. 1176--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1177--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1177--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1178--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1178--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1179--><p class="noindent" >
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">
+     <!--l. 1179--><p class="noindent" >the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 1186--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1187--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1187--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1188--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 1188--><p class="noindent" >The number of rows of dense vector <code class="lstinline"><span style="color:#000000">v</span></code>.</dd></dl>
+<!--l. 1193--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.3   </span> <a 
+ id="x8-490003.3.3"></a>sizeof &#8212; Get memory occupation in bytes of a dense vector</h5>
+<!--l. 1196--><p class="noindent" ><code class="lstinline"><span style="color:#000000">memory_size</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">sizeof</span><span style="color:#000000">()</span></code>
+<!--l. 1198--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 1199--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1199--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1200--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1200--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1201--><p class="noindent" >
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">
+     <!--l. 1201--><p class="noindent" >the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 1208--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1209--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1209--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1210--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 1210--><p class="noindent" >The memory occupation in bytes.</dd></dl>
+<!--l. 1214--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.4   </span> <a 
+ id="x8-500003.3.4"></a>set &#8212; Set contents of the vector</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-27">
+&#x00A0;call&#x00A0;&#x00A0;v%set(alpha[,first,last])
+&#x00A0;call&#x00A0;&#x00A0;v%set(vect[,first,last])
+&#x00A0;call&#x00A0;&#x00A0;v%zero()
+</pre>
+<!--l. 1228--><p class="nopar" >
+<!--l. 1231--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1232--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1232--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1233--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1233--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1234--><p class="noindent" >
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">
+     <!--l. 1234--><p class="noindent" >the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1239--><p class="noindent" >
+<span 
+class="cmbx-10">alpha</span> </dt><dd 
+class="description">
+     <!--l. 1239--><p class="noindent" >A scalar value. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="userhtmlse4.html#x9-56001r1">1<!--tex4ht:ref: tab:f90axpby --></a>.
+     </dd><dt class="description">
+     <!--l. 1243--><p class="noindent" >
+<span 
+class="cmbx-10">first,last</span> </dt><dd 
+class="description">
+     <!--l. 1243--><p class="noindent" >Boundaries for setting in the vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integers.
+     </dd><dt class="description">
+     <!--l. 1246--><p class="noindent" >
+<span 
+class="cmbx-10">vect</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1246--><p class="noindent" >An array <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
+href="userhtmlse4.html#x9-56001r1">1<!--tex4ht:ref: tab:f90axpby --></a>.</dd></dl>
+<!--l. 1250--><p class="noindent" >Note that a call to <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">zero</span><span style="color:#000000">()</span></code> is provided as a shorthand, but is equivalent to a call
+to <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">set</span><span style="color:#000000">(</span><span style="color:#000000">zero</span><span style="color:#000000">)</span></code> with the <code class="lstinline"><span style="color:#000000">zero</span></code> constant having the appropriate type and
+kind.
+<!--l. 1254--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1255--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1255--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1256--><p class="noindent" >
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">
+     <!--l. 1256--><p class="noindent" >the dense vector, with updated entries<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" /></dd></dl>
+<!--l. 1260--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.5   </span> <a 
+ id="x8-510003.3.5"></a>get_vect &#8212; Get a copy of the vector contents</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-28">
+extv&#x00A0;=&#x00A0;v%get_vect([n])
+</pre>
+<!--l. 1265--><p class="nopar" >
+<!--l. 1267--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1268--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1268--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1269--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1269--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1270--><p class="noindent" >
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">
+     <!--l. 1270--><p class="noindent" >the dense vector<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span><br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1275--><p class="noindent" >
+<span 
+class="cmbx-10">n</span> </dt><dd 
+class="description">
+     <!--l. 1275--><p class="noindent" >Size to be returned<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>; default: entire vector.<br 
+class="newline" />
+     </dd></dl>
+<!--l. 1281--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1282--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1282--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1283--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 1283--><p class="noindent" >An allocatable array holding a copy of the dense vector contents. If the
+     argument <span 
+class="cmmi-10">n </span>is specified, the size of the returned array equals the minimum
+     between  <span 
+class="cmmi-10">n </span>and  the  internal  size  of  the  vector,  or  0  if  <span 
+class="cmmi-10">n </span>is  negative;
+     otherwise, the size of the array is the same as the internal size of the
+     vector.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1290--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">3.3.6   </span> <a 
+ id="x8-520003.3.6"></a>clone &#8212; Clone current object</h5>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-29">
+call&#x00A0;&#x00A0;x%clone(y,info)
+</pre>
+<!--l. 1294--><p class="nopar" >
+<!--l. 1296--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1297--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1297--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1298--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1298--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1299--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1299--><p class="noindent" >the dense vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 1306--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1307--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1307--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1308--><p class="noindent" >
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">
+     <!--l. 1308--><p class="noindent" >A copy of the input object.
+     </dd><dt class="description">
+     <!--l. 1309--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1309--><p class="noindent" >Return code.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1313--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">3.4   </span> <a 
+ id="x8-530003.4"></a>Preconditioner data structure</h4>
+<!--l. 1315--><p class="noindent" >Our base library offers support for simple well known preconditioners like Diagonal
+Scaling or Block Jacobi with incomplete factorization ILU(0).
+<!--l. 1319--><p class="indent" >   A preconditioner is held in the <a 
+ id="precdata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type </span>data structure reported in
+figure&#x00A0;<a 
+href="#x8-53001r4">4<!--tex4ht:ref: fig:prectype --></a>. The <code class="lstinline"><span style="color:#000000">psb_prec_type</span></code> data type may contain a simple preconditioning matrix
+with the associated communication descriptor.The internal preconditioner is
+allocated appropriately with the dynamic type corresponding to the desired
+preconditioner.
+                                                                  
+
+                                                                  
+<!--l. 1337--><p class="indent" >   <a 
+ id="x8-53001r4"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 1347--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-30">
+
+&#x00A0;&#x00A0;type&#x00A0;psb_Tprec_type
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;class(psb_T_base_prec_type),&#x00A0;allocatable&#x00A0;::&#x00A0;prec
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_Tprec_type
+
+</pre>
+<!--l. 1355--><p class="nopar" >                                                           </div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 4: </span><span  
+class="content">The PSBLAS defined data type that contains a preconditioner.</span></div><!--tex4ht:label?: x8-53001r4 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   <h4 class="subsectionHead"><span class="titlemark">3.5   </span> <a 
+ id="x8-540003.5"></a>Heap data structure</h4>
+<!--l. 1391--><p class="noindent" >Among the tools routines of sec.&#x00A0;<a 
+href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>, we have a number of sorting utilities; the heap
+sort is implemented in terms of heaps having the following signatures:
+     <dl class="description"><dt class="description">
+     <!--l. 1395--><p class="noindent" >
+<span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_heap</span> </dt><dd 
+class="description">
+     <!--l. 1395--><p class="noindent" >: a heap containing elements of type T, where T can be <code class="lstinline"><span style="color:#000000">i</span><span style="color:#000000">,</span><span style="color:#000000">s</span><span style="color:#000000">,</span><span style="color:#000000">c</span><span style="color:#000000">,</span><span style="color:#000000">d</span><span style="color:#000000">,</span><span style="color:#000000">z</span></code> for
+     integer, real and complex data;
+     </dd><dt class="description">
+     <!--l. 1397--><p class="noindent" >
+<span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_idx</span><span 
+class="cmtt-10">_heap</span> </dt><dd 
+class="description">
+     <!--l. 1397--><p class="noindent" >: a heap containing elements of type T, as above, together with an integer
+     index.</dd></dl>
+<!--l. 1400--><p class="noindent" >Given a heap object, the following methods are defined on it:
+     <dl class="description"><dt class="description">
+     <!--l. 1402--><p class="noindent" >
+<span 
+class="cmbx-10">init</span> </dt><dd 
+class="description">
+     <!--l. 1402--><p class="noindent" >Initialize memory; also choose ascending or descending order;
+     </dd><dt class="description">
+     <!--l. 1404--><p class="noindent" >
+<span 
+class="cmbx-10">howmany</span> </dt><dd 
+class="description">
+     <!--l. 1404--><p class="noindent" >Current heap occupancy;
+     </dd><dt class="description">
+     <!--l. 1405--><p class="noindent" >
+<span 
+class="cmbx-10">insert</span> </dt><dd 
+class="description">
+     <!--l. 1405--><p class="noindent" >Add an item (or an item and its index);
+     </dd><dt class="description">
+     <!--l. 1406--><p class="noindent" >
+<span 
+class="cmbx-10">get</span><span 
+class="cmbx-10">_first</span> </dt><dd 
+class="description">
+     <!--l. 1406--><p class="noindent" >Remove and return the first element;
+     </dd><dt class="description">
+     <!--l. 1407--><p class="noindent" >
+<span 
+class="cmbx-10">dump</span> </dt><dd 
+class="description">
+     <!--l. 1407--><p class="noindent" >Print on file;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1408--><p class="noindent" >
+<span 
+class="cmbx-10">free</span> </dt><dd 
+class="description">
+     <!--l. 1408--><p class="noindent" >Release memory.</dd></dl>
+<!--l. 1410--><p class="noindent" >These objects are used in AMG4PSBLAS to implement the factorization algorithms.
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu12.html" >next</a>] [<a 
+href="userhtmlse7.html" >next</a>] [<a 
 href="userhtmlse2.html" >prev</a>] [<a 
 href="userhtmlse2.html#tailuserhtmlse2.html" >prev-tail</a>] [<a 
 href="userhtmlse3.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu7.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse6.html" >up</a>] </p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse3.html"></a>  
+ id="tailuserhtmlse3.html"></a>   
 </body></html> 

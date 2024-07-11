@@ -11,42 +11,2309 @@
 </head><body 
 >
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu32.html" >next</a>] [<a 
+href="userhtmlse9.html" >next</a>] [<a 
 href="userhtmlse4.html" >prev</a>] [<a 
 href="userhtmlse4.html#tailuserhtmlse4.html" >prev-tail</a>] [<a 
-href="userhtmlsu23.html#tailuserhtmlse5.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu28.html" >up</a>] </p></div>
+href="#tailuserhtmlse5.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse8.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
- id="x35-720005"></a>Communication routines</h3>
+ id="x10-720005"></a>Communication routines</h3>
 <!--l. 7--><p class="noindent" >The routines in this chapter implement various global communication operators on
 vectors associated with a discretization mesh. For auxiliary communication routines
 not tied to a discretization space see&#x00A0;<a 
-href="userhtmlse6.html#x40-770006">6<!--tex4ht:ref: sec:toolsrout --></a>.
+href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>.
                                                                   
 
                                                                   
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >5.1 <a 
-href="userhtmlsu26.html#x36-730005.1">psb_halo &#8212; Halo Data Communication</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >5.2 <a 
-href="userhtmlsu27.html#x37-740005.2">psb_ovrl &#8212; Overlap Update</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >5.3 <a 
-href="userhtmlsu28.html#x38-750005.3">psb_gather &#8212; Gather Global Dense Matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >5.4 <a 
-href="userhtmlsu29.html#x39-760005.4">psb_scatter &#8212; Scatter Global Dense Matrix</a></span>
+   <h4 class="subsectionHead"><span class="titlemark">5.1   </span> <a 
+ id="x10-730005.1"></a>psb_halo &#8212; Halo Data Communication</h4>
+<!--l. 14--><p class="noindent" >These subroutines gathers the values of the halo elements:
+   <div class="par-math-display" >
+<img 
+src="userhtml25x.png" alt="x &#x2190; x
+" class="par-math-display" ></div>
+<!--l. 17--><p class="nopar" > where:
+     <dl class="description"><dt class="description">
+     <!--l. 20--><p class="noindent" >
+<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">
+     <!--l. 20--><p class="noindent" >is a global dense submatrix.</dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 23--><p class="indent" >   <a 
+ id="x10-73001r17"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 24--><p class="noindent" >
+<div class="tabular"> <table id="TBL-17" class="tabular" 
+ 
+><colgroup id="TBL-17-1g"><col 
+id="TBL-17-1"><col 
+id="TBL-17-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-1-1"  
+class="td11"><span 
+class="cmmi-10">&#x03B1;</span>, <span 
+class="cmmi-10">x                      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-17-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-2-1"  
+class="td11">Integer                       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-17-2-2"  
+class="td11">psb_halo     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-3-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-17-3-2"  
+class="td11">psb_halo     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-4-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-17-4-2"  
+class="td11">psb_halo     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-5-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-17-5-2"  
+class="td11">psb_halo     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-6-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-17-6-2"  
+class="td11">psb_halo     </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-17-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-17-7-1"  
+class="td11">                     </td></tr></table>                                           </div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;17: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x10-73001r17 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
    </div>
+<!--l. 40--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_halo</span><span style="color:#000000">(</span><span style="color:#000000">x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br 
+class="newline" /><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_halo</span><span style="color:#000000">(</span><span style="color:#000000">x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">work</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">data</span><span style="color:#000000">)</span></code>
+     <dl class="description"><dt class="description">
+     <!--l. 44--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 44--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 45--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 45--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 46--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 46--><p class="noindent" >global dense matrix <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
+href="#x10-73001r17">17<!--tex4ht:ref: tab:f90halo --></a>.
+     </dd><dt class="description">
+     <!--l. 53--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 53--><p class="noindent" >contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 58--><p class="noindent" >
+<span 
+class="cmbx-10">work</span> </dt><dd 
+class="description">
+     <!--l. 58--><p class="noindent" >the work array. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one array of the same type of <span 
+class="cmmi-10">x</span>.
+     </dd><dt class="description">
+     <!--l. 63--><p class="noindent" >
+<span 
+class="cmbx-10">data</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 63--><p class="noindent" >index list selector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional </span><br 
+class="newline" />Specified
+     as: an integer. Values:<code class="lstinline"><span style="color:#000000">psb_comm_halo_</span></code>,<code class="lstinline"><span style="color:#000000">psb_comm_mov_</span></code>, <code class="lstinline"><span style="color:#000000">psb_comm_ext_</span></code>,
+     default: <code class="lstinline"><span style="color:#000000">psb_comm_halo_</span></code>. Chooses the index list on which to base the data
+     exchange.
+     </dd><dt class="description">
+     <!--l. 71--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 71--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 72--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 72--><p class="noindent" >global dense result matrix <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Returned as: a rank one or two array containing numbers of type specified
+     in Table&#x00A0;<a 
+href="#x10-73001r17">17<!--tex4ht:ref: tab:f90halo --></a>.
+     </dd><dt class="description">
+     <!--l. 79--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 79--><p class="noindent" >the local portion of result submatrix <span 
+class="cmmi-10">y</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value that contains an error code.</dd></dl>
+<!--l. 85--><p class="noindent" ><hr class="figure"><div class="figure" 
+><a 
+ id="x10-73002r3"></a>
+<div class="center" 
+>
+<!--l. 86--><p class="noindent" >
+<!--l. 88--><p class="noindent" ><img 
+src="try8x8.png" alt="PIC"  
+width="32" height="32" ></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;3: </span><span  
+class="content">Sample discretization mesh.</span></div><!--tex4ht:label?: x10-73002r3 -->
+<!--l. 94--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 96--><p class="noindent" ><span 
+class="cmbx-12">Usage Example </span>Consider the discretization mesh depicted in fig.&#x00A0;<a 
+href="#x10-73002r3">3<!--tex4ht:ref: fig:try8x8 --></a>, partitioned
+among two processes as shown by the dashed line; the data distribution is such that
+each process will own 32 entries in the index space, with a halo made of 8 entries
+placed at local indices 33 through 40. If process 0 assigns an initial value of 1 to
+its entries in the <span 
+class="cmmi-10">x </span>vector, and process 1 assigns a value of 2, then after
+a call to <code class="lstinline"><span style="color:#000000">psb_halo</span></code> the contents of the local vectors will be the following:
+<div class="table">
+                                                                  
 
+                                                                  
+<!--l. 106--><p class="indent" >   <hr class="float"><div class="float" 
+>
+                                                                  
 
+                                                                  
+<div class="center" 
+>
+<!--l. 106--><p class="noindent" >
+<div class="tabular"> <table id="TBL-18" class="tabular" 
+ 
+><colgroup id="TBL-18-1g"><col 
+id="TBL-18-1"><col 
+id="TBL-18-2"><col 
+id="TBL-18-3"><col 
+id="TBL-18-4"><col 
+id="TBL-18-5"><col 
+id="TBL-18-6"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-18-1-"><td colspan="3" style="white-space:nowrap; text-align:right;" id="TBL-18-1-1"  
+class="td11">    <div class="multicolumn"  style="white-space:nowrap; text-align:center;"><span 
+class="cmr-9">Process 0</span></div>    </td><td colspan="3" style="white-space:nowrap; text-align:right;" id="TBL-18-1-4"  
+class="td01">     <div class="multicolumn"  style="white-space:nowrap; text-align:center;"><span 
+class="cmr-9">Process 1</span></div>
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-2-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-2-1"  
+class="td11"> <span 
+class="cmr-9">I</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-2-2"  
+class="td11"><span 
+class="cmr-9">GLOB(I)</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-2-3"  
+class="td10"><span 
+class="cmr-9">X(I)</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-2-4"  
+class="td01"> <span 
+class="cmr-9">I</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-2-5"  
+class="td11"><span 
+class="cmr-9">GLOB(I)</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-2-6"  
+class="td11"><span 
+class="cmr-9">X(I)</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-3-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-3-1"  
+class="td11"> <span 
+class="cmr-9">1</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-3-2"  
+class="td11">       <span 
+class="cmr-9">1</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-3-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-3-4"  
+class="td01"> <span 
+class="cmr-9">1</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-3-5"  
+class="td11">      <span 
+class="cmr-9">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-3-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-4-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-4-1"  
+class="td11"> <span 
+class="cmr-9">2</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-4-2"  
+class="td11"> <span 
+class="cmr-9">2</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-4-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-4-4"  
+class="td01"> <span 
+class="cmr-9">2</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-4-5"  
+class="td11"> <span 
+class="cmr-9">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-4-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-5-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-5-1"  
+class="td11"> <span 
+class="cmr-9">3</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-5-2"  
+class="td11">       <span 
+class="cmr-9">3</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-5-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-5-4"  
+class="td01"> <span 
+class="cmr-9">3</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-5-5"  
+class="td11">      <span 
+class="cmr-9">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-5-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-6-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-6-1"  
+class="td11"> <span 
+class="cmr-9">4</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-6-2"  
+class="td11"> <span 
+class="cmr-9">4</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-6-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-6-4"  
+class="td01"> <span 
+class="cmr-9">4</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-6-5"  
+class="td11"> <span 
+class="cmr-9">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-6-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-7-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-7-1"  
+class="td11"> <span 
+class="cmr-9">5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-7-2"  
+class="td11">       <span 
+class="cmr-9">5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-7-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-7-4"  
+class="td01"> <span 
+class="cmr-9">5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-7-5"  
+class="td11">      <span 
+class="cmr-9">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-7-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-8-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-8-1"  
+class="td11"> <span 
+class="cmr-9">6</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-8-2"  
+class="td11"> <span 
+class="cmr-9">6</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-8-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-8-4"  
+class="td01"> <span 
+class="cmr-9">6</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-8-5"  
+class="td11"> <span 
+class="cmr-9">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-8-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-9-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-9-1"  
+class="td11"> <span 
+class="cmr-9">7</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-9-2"  
+class="td11">       <span 
+class="cmr-9">7</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-9-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-9-4"  
+class="td01"> <span 
+class="cmr-9">7</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-9-5"  
+class="td11">      <span 
+class="cmr-9">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-9-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-10-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-10-1"  
+class="td11"> <span 
+class="cmr-9">8</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-10-2"  
+class="td11"> <span 
+class="cmr-9">8</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-10-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-10-4"  
+class="td01"> <span 
+class="cmr-9">8</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-10-5"  
+class="td11"> <span 
+class="cmr-9">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-10-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-11-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-11-1"  
+class="td11"> <span 
+class="cmr-9">9</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-11-2"  
+class="td11">       <span 
+class="cmr-9">9</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-11-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-11-4"  
+class="td01"> <span 
+class="cmr-9">9</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-11-5"  
+class="td11">      <span 
+class="cmr-9">41</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-11-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-12-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-12-1"  
+class="td11"><span 
+class="cmr-9">10</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-12-2"  
+class="td11"> <span 
+class="cmr-9">10</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-12-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-12-4"  
+class="td01"><span 
+class="cmr-9">10</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-12-5"  
+class="td11"> <span 
+class="cmr-9">42</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-12-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-13-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-13-1"  
+class="td11"><span 
+class="cmr-9">11</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-13-2"  
+class="td11">      <span 
+class="cmr-9">11</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-13-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-13-4"  
+class="td01"><span 
+class="cmr-9">11</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-13-5"  
+class="td11">      <span 
+class="cmr-9">43</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-13-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-14-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-14-1"  
+class="td11"><span 
+class="cmr-9">12</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-14-2"  
+class="td11"> <span 
+class="cmr-9">12</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-14-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-14-4"  
+class="td01"><span 
+class="cmr-9">12</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-14-5"  
+class="td11"> <span 
+class="cmr-9">44</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-14-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-15-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-15-1"  
+class="td11"><span 
+class="cmr-9">13</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-15-2"  
+class="td11">      <span 
+class="cmr-9">13</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-15-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-15-4"  
+class="td01"><span 
+class="cmr-9">13</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-15-5"  
+class="td11">      <span 
+class="cmr-9">45</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-15-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-16-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-16-1"  
+class="td11"><span 
+class="cmr-9">14</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-16-2"  
+class="td11"> <span 
+class="cmr-9">14</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-16-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-16-4"  
+class="td01"><span 
+class="cmr-9">14</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-16-5"  
+class="td11"> <span 
+class="cmr-9">46</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-16-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-17-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-17-1"  
+class="td11"><span 
+class="cmr-9">15</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-17-2"  
+class="td11">      <span 
+class="cmr-9">15</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-17-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-17-4"  
+class="td01"><span 
+class="cmr-9">15</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-17-5"  
+class="td11">      <span 
+class="cmr-9">47</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-17-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-18-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-18-1"  
+class="td11"><span 
+class="cmr-9">16</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-18-2"  
+class="td11"> <span 
+class="cmr-9">16</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-18-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-18-4"  
+class="td01"><span 
+class="cmr-9">16</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-18-5"  
+class="td11"> <span 
+class="cmr-9">48</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-18-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-19-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-19-1"  
+class="td11"><span 
+class="cmr-9">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-19-2"  
+class="td11">      <span 
+class="cmr-9">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-19-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-19-4"  
+class="td01"><span 
+class="cmr-9">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-19-5"  
+class="td11">      <span 
+class="cmr-9">49</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-19-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-20-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-20-1"  
+class="td11"><span 
+class="cmr-9">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-20-2"  
+class="td11"> <span 
+class="cmr-9">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-20-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-20-4"  
+class="td01"><span 
+class="cmr-9">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-20-5"  
+class="td11"> <span 
+class="cmr-9">50</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-20-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-21-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-21-1"  
+class="td11"><span 
+class="cmr-9">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-21-2"  
+class="td11">      <span 
+class="cmr-9">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-21-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-21-4"  
+class="td01"><span 
+class="cmr-9">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-21-5"  
+class="td11">      <span 
+class="cmr-9">51</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-21-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-22-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-22-1"  
+class="td11"><span 
+class="cmr-9">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-22-2"  
+class="td11">      <span 
+class="cmr-9">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-22-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-22-4"  
+class="td01"><span 
+class="cmr-9">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-22-5"  
+class="td11">      <span 
+class="cmr-9">52</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-22-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-23-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-23-1"  
+class="td11"><span 
+class="cmr-9">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-23-2"  
+class="td11">      <span 
+class="cmr-9">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-23-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-23-4"  
+class="td01"><span 
+class="cmr-9">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-23-5"  
+class="td11">      <span 
+class="cmr-9">53</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-23-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-24-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-24-1"  
+class="td11"><span 
+class="cmr-9">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-24-2"  
+class="td11">      <span 
+class="cmr-9">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-24-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-24-4"  
+class="td01"><span 
+class="cmr-9">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-24-5"  
+class="td11">      <span 
+class="cmr-9">54</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-24-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-25-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-25-1"  
+class="td11"><span 
+class="cmr-9">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-25-2"  
+class="td11">      <span 
+class="cmr-9">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-25-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-25-4"  
+class="td01"><span 
+class="cmr-9">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-25-5"  
+class="td11">      <span 
+class="cmr-9">55</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-25-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-26-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-26-1"  
+class="td11"><span 
+class="cmr-9">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-26-2"  
+class="td11">      <span 
+class="cmr-9">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-26-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-26-4"  
+class="td01"><span 
+class="cmr-9">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-26-5"  
+class="td11">      <span 
+class="cmr-9">56</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-26-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-27-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-27-1"  
+class="td11"><span 
+class="cmr-9">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-27-2"  
+class="td11">      <span 
+class="cmr-9">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-27-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-27-4"  
+class="td01"><span 
+class="cmr-9">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-27-5"  
+class="td11">      <span 
+class="cmr-9">57</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-27-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-28-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-28-1"  
+class="td11"><span 
+class="cmr-9">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-28-2"  
+class="td11">      <span 
+class="cmr-9">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-28-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-28-4"  
+class="td01"><span 
+class="cmr-9">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-28-5"  
+class="td11">      <span 
+class="cmr-9">58</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-28-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-29-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-29-1"  
+class="td11"><span 
+class="cmr-9">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-29-2"  
+class="td11">      <span 
+class="cmr-9">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-29-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-29-4"  
+class="td01"><span 
+class="cmr-9">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-29-5"  
+class="td11">      <span 
+class="cmr-9">59</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-29-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-30-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-30-1"  
+class="td11"><span 
+class="cmr-9">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-30-2"  
+class="td11">      <span 
+class="cmr-9">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-30-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-30-4"  
+class="td01"><span 
+class="cmr-9">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-30-5"  
+class="td11">      <span 
+class="cmr-9">60</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-30-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-31-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-31-1"  
+class="td11"><span 
+class="cmr-9">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-31-2"  
+class="td11">      <span 
+class="cmr-9">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-31-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-31-4"  
+class="td01"><span 
+class="cmr-9">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-31-5"  
+class="td11">      <span 
+class="cmr-9">61</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-31-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-32-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-32-1"  
+class="td11"><span 
+class="cmr-9">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-32-2"  
+class="td11">      <span 
+class="cmr-9">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-32-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-32-4"  
+class="td01"><span 
+class="cmr-9">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-32-5"  
+class="td11">      <span 
+class="cmr-9">62</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-32-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-33-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-33-1"  
+class="td11"><span 
+class="cmr-9">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-33-2"  
+class="td11">      <span 
+class="cmr-9">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-33-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-33-4"  
+class="td01"><span 
+class="cmr-9">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-33-5"  
+class="td11">      <span 
+class="cmr-9">63</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-33-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-34-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-34-1"  
+class="td11"><span 
+class="cmr-9">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-34-2"  
+class="td11">      <span 
+class="cmr-9">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-34-3"  
+class="td10"> <span 
+class="cmr-9">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-34-4"  
+class="td01"><span 
+class="cmr-9">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-34-5"  
+class="td11">      <span 
+class="cmr-9">64</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-34-6"  
+class="td11"> <span 
+class="cmr-9">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-35-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-35-1"  
+class="td11"><span 
+class="cmr-9">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-35-2"  
+class="td11">      <span 
+class="cmr-9">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-35-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-35-4"  
+class="td01"><span 
+class="cmr-9">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-35-5"  
+class="td11">      <span 
+class="cmr-9">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-35-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-36-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-36-1"  
+class="td11"><span 
+class="cmr-9">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-36-2"  
+class="td11">      <span 
+class="cmr-9">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-36-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-36-4"  
+class="td01"><span 
+class="cmr-9">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-36-5"  
+class="td11">      <span 
+class="cmr-9">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-36-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-37-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-37-1"  
+class="td11"><span 
+class="cmr-9">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-37-2"  
+class="td11">      <span 
+class="cmr-9">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-37-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-37-4"  
+class="td01"><span 
+class="cmr-9">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-37-5"  
+class="td11">      <span 
+class="cmr-9">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-37-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-38-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-38-1"  
+class="td11"><span 
+class="cmr-9">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-38-2"  
+class="td11">      <span 
+class="cmr-9">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-38-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-38-4"  
+class="td01"><span 
+class="cmr-9">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-38-5"  
+class="td11">      <span 
+class="cmr-9">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-38-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-39-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-39-1"  
+class="td11"><span 
+class="cmr-9">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-39-2"  
+class="td11">      <span 
+class="cmr-9">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-39-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-39-4"  
+class="td01"><span 
+class="cmr-9">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-39-5"  
+class="td11">      <span 
+class="cmr-9">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-39-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-40-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-40-1"  
+class="td11"><span 
+class="cmr-9">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-40-2"  
+class="td11">      <span 
+class="cmr-9">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-40-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-40-4"  
+class="td01"><span 
+class="cmr-9">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-40-5"  
+class="td11">      <span 
+class="cmr-9">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-40-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-41-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-41-1"  
+class="td11"><span 
+class="cmr-9">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-41-2"  
+class="td11">      <span 
+class="cmr-9">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-41-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-41-4"  
+class="td01"><span 
+class="cmr-9">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-41-5"  
+class="td11">      <span 
+class="cmr-9">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-41-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-42-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-42-1"  
+class="td11"><span 
+class="cmr-9">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-42-2"  
+class="td11">      <span 
+class="cmr-9">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-42-3"  
+class="td10"> <span 
+class="cmr-9">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-42-4"  
+class="td01"><span 
+class="cmr-9">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-42-5"  
+class="td11">      <span 
+class="cmr-9">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-18-42-6"  
+class="td11"> <span 
+class="cmr-9">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-43-"><td  style="white-space:nowrap; text-align:right;" id="TBL-18-43-1"  
+class="td11">  </td></tr></table>                                                              </div></div>
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">5.2   </span> <a 
+ id="x10-740005.2"></a>psb_ovrl &#8212; Overlap Update</h4>
+<!--l. 164--><p class="noindent" >These subroutines applies an overlap operator to the input vector:
+   <div class="par-math-display" >
+<img 
+src="userhtml26x.png" alt="x &#x2190; Qx
+" class="par-math-display" ></div>
+<!--l. 166--><p class="nopar" > where:
+     <dl class="description"><dt class="description">
+     <!--l. 169--><p class="noindent" >
+<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">
+     <!--l. 169--><p class="noindent" >is the global dense submatrix <span 
+class="cmmi-10">x</span>
+     </dd><dt class="description">
+     <!--l. 170--><p class="noindent" >
+<span 
+class="cmmi-10">Q</span> </dt><dd 
+class="description">
+     <!--l. 170--><p class="noindent" >is the overlap operator; it is the composition of two operators <span 
+class="cmmi-10">P</span><sub><span 
+class="cmmi-7">a</span></sub> and <span 
+class="cmmi-10">P</span><sup><span 
+class="cmmi-7">T</span></sup>.</dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 174--><p class="indent" >   <a 
+ id="x10-74001r18"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 175--><p class="noindent" >
+<div class="tabular"> <table id="TBL-19" class="tabular" 
+ 
+><colgroup id="TBL-19-1g"><col 
+id="TBL-19-1"><col 
+id="TBL-19-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-19-1-1"  
+class="td11"><span 
+class="cmmi-10">x                         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-19-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td></tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-19-2-1"  
+class="td11">Short Precision Real </td><td  style="white-space:nowrap; text-align:left;" id="TBL-19-2-2"  
+class="td11">psb_ovrl</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-19-3-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-19-3-2"  
+class="td11">psb_ovrl      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-19-4-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-19-4-2"  
+class="td11">psb_ovrl      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-19-5-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-19-5-2"  
+class="td11">psb_ovrl      </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-19-6-1"  
+class="td11">                     </td></tr></table>                                           </div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;18: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x10-74001r18 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+<!--l. 190--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_ovrl</span><span style="color:#000000">(</span><span style="color:#000000">x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br 
+class="newline" /><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_ovrl</span><span style="color:#000000">(</span><span style="color:#000000">x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">update</span><span style="color:#000000">=</span><span style="color:#000000">update_type</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">work</span><span style="color:#000000">=</span><span style="color:#000000">work</span><span style="color:#000000">)</span></code>
+     <dl class="description"><dt class="description">
+     <!--l. 194--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 194--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 195--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 195--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 196--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 196--><p class="noindent" >global dense matrix <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of type specified in Table&#x00A0;<a 
+href="#x10-74001r18">18<!--tex4ht:ref: tab:f90ovrl --></a>.
+     </dd><dt class="description">
+     <!--l. 203--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 203--><p class="noindent" >contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 208--><p class="noindent" >
+<span 
+class="cmbx-10">update</span> </dt><dd 
+class="description">
+     <!--l. 208--><p class="noindent" >Update operator. <br 
+class="newline" />
+         <dl class="description"><dt class="description">
+         <!--l. 210--><p class="noindent" >
+     <span 
+class="cmbx-10">update = psb</span><span 
+class="cmbx-10">_none</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+         <!--l. 210--><p class="noindent" >Do nothing;
+         </dd><dt class="description">
+         <!--l. 211--><p class="noindent" >
+     <span 
+class="cmbx-10">update = psb</span><span 
+class="cmbx-10">_add</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+         <!--l. 211--><p class="noindent" >Sum overlap entries, i.e. apply <span 
+class="cmmi-10">P</span><sup><span 
+class="cmmi-7">T</span></sup>;
+                                                                  
+
+                                                                  
+         </dd><dt class="description">
+         <!--l. 212--><p class="noindent" >
+     <span 
+class="cmbx-10">update = psb</span><span 
+class="cmbx-10">_avg</span><span 
+class="cmbx-10">_</span> </dt><dd 
+class="description">
+         <!--l. 212--><p class="noindent" >Average overlap entries, i.e. apply <span 
+class="cmmi-10">P</span><sub><span 
+class="cmmi-7">a</span></sub><span 
+class="cmmi-10">P</span><sup><span 
+class="cmmi-7">T</span></sup>;</dd></dl>
+     <!--l. 215--><p class="noindent" >Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: <span 
+class="cmmi-10">update</span>_<span 
+class="cmmi-10">type </span>= <span 
+class="cmmi-10">psb</span>_<span 
+class="cmmi-10">avg</span>_<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Specified as: a integer variable.
+     </dd><dt class="description">
+     <!--l. 220--><p class="noindent" >
+<span 
+class="cmbx-10">work</span> </dt><dd 
+class="description">
+     <!--l. 220--><p class="noindent" >the work array. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a one dimensional array of the same type of <span 
+class="cmmi-10">x</span>.
+     </dd><dt class="description">
+     <!--l. 226--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 226--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 227--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 227--><p class="noindent" >global dense result matrix <span 
+class="cmmi-10">x</span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an array of rank one or two containing numbers of type specified
+     in Table&#x00A0;<a 
+href="#x10-74001r18">18<!--tex4ht:ref: tab:f90ovrl --></a>.
+     </dd><dt class="description">
+     <!--l. 234--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 234--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 242--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x10-74003x1">
+                                                                  
+
+                                                                  
+     <!--l. 244--><p class="noindent" >If  there  is  no  overlap  in  the  data  distribution  associated  with  the
+     descriptor, no operations are performed;
+     </li>
+<li 
+  class="enumerate" id="x10-74005x2">
+     <!--l. 246--><p class="noindent" >The operator <span 
+class="cmmi-10">P</span><sup><span 
+class="cmmi-7">T</span></sup> performs the reduction sum of overlap elements; it is a
+     &#8220;prolongation&#8221; operator <span 
+class="cmmi-10">P</span><sup><span 
+class="cmmi-7">T</span></sup> that replicates overlap elements, accounting
+     for the physical replication of data;
+     </li>
+<li 
+  class="enumerate" id="x10-74007x3">
+     <!--l. 250--><p class="noindent" >The  operator  <span 
+class="cmmi-10">P</span><sub><span 
+class="cmmi-7">a</span></sub>  performs  a  scaling  on  the  overlap  elements  by  the
+     amount of replication; thus, when combined with the reduction operator,
+     it implements the average of replicated elements over all of their instances.</li></ol>
+<!--l. 261--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x10-74008r4"></a>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 262--><p class="noindent" >
+<!--l. 264--><p class="noindent" ><img 
+src="try8x8_ov.png" alt="PIC"  
+width="46" height="46" ></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;4: </span><span  
+class="content">Sample discretization mesh.</span></div><!--tex4ht:label?: x10-74008r4 -->
+                                                                  
+
+                                                                  
+<!--l. 270--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 271--><p class="noindent" ><span 
+class="cmbx-12">Example of use </span>Consider the discretization mesh depicted in fig.&#x00A0;<a 
+href="#x10-74008r4">4<!--tex4ht:ref: fig:try8x8_ov --></a>, partitioned
+among two processes as shown by the dashed lines, with an overlap of 1 extra layer
+with respect to the partition of fig.&#x00A0;<a 
+href="#x10-73002r3">3<!--tex4ht:ref: fig:try8x8 --></a>; the data distribution is such that
+each process will own 40 entries in the index space, with an overlap of 16
+entries placed at local indices 25 through 40; the halo will run from local
+index 41 through local index 48.. If process 0 assigns an initial value of 1 to
+its entries in the <span 
+class="cmmi-10">x </span>vector, and process 1 assigns a value of 2, then after a
+call to <code class="lstinline"><span style="color:#000000">psb_ovrl</span></code> with <code class="lstinline"><span style="color:#000000">psb_avg_</span></code> and a call to <code class="lstinline"><span style="color:#000000">psb_halo_</span></code> the contents of
+the local vectors will be the following (showing a transition among the two
+subdomains)
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 285--><p class="indent" >   <hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 285--><p class="noindent" >
+<div class="tabular"> <table id="TBL-20" class="tabular" 
+ 
+><colgroup id="TBL-20-1g"><col 
+id="TBL-20-1"><col 
+id="TBL-20-2"><col 
+id="TBL-20-3"><col 
+id="TBL-20-4"><col 
+id="TBL-20-5"><col 
+id="TBL-20-6"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-20-1-"><td colspan="3" style="white-space:nowrap; text-align:right;" id="TBL-20-1-1"  
+class="td11">    <div class="multicolumn"  style="white-space:nowrap; text-align:center;"><span 
+class="cmr-8">Process 0</span></div>    </td><td colspan="3" style="white-space:nowrap; text-align:right;" id="TBL-20-1-4"  
+class="td01">     <div class="multicolumn"  style="white-space:nowrap; text-align:center;"><span 
+class="cmr-8">Process 1</span></div>
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-2-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-2-1"  
+class="td11"> <span 
+class="cmr-8">I</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-2-2"  
+class="td11"><span 
+class="cmr-8">GLOB(I)</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-2-3"  
+class="td10"><span 
+class="cmr-8">X(I)</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-2-4"  
+class="td01"> <span 
+class="cmr-8">I</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-2-5"  
+class="td11"><span 
+class="cmr-8">GLOB(I)</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-2-6"  
+class="td11"><span 
+class="cmr-8">X(I)</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-3-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-3-1"  
+class="td11"> <span 
+class="cmr-8">1</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-3-2"  
+class="td11">       <span 
+class="cmr-8">1</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-3-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-3-4"  
+class="td01"> <span 
+class="cmr-8">1</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-3-5"  
+class="td11">      <span 
+class="cmr-8">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-3-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-4-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-4-1"  
+class="td11"> <span 
+class="cmr-8">2</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-4-2"  
+class="td11"> <span 
+class="cmr-8">2</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-4-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-4-4"  
+class="td01"> <span 
+class="cmr-8">2</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-4-5"  
+class="td11"> <span 
+class="cmr-8">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-4-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-5-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-5-1"  
+class="td11"> <span 
+class="cmr-8">3</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-5-2"  
+class="td11">       <span 
+class="cmr-8">3</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-5-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-5-4"  
+class="td01"> <span 
+class="cmr-8">3</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-5-5"  
+class="td11">      <span 
+class="cmr-8">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-5-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-6-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-6-1"  
+class="td11"> <span 
+class="cmr-8">4</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-6-2"  
+class="td11"> <span 
+class="cmr-8">4</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-6-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-6-4"  
+class="td01"> <span 
+class="cmr-8">4</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-6-5"  
+class="td11"> <span 
+class="cmr-8">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-6-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-7-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-7-1"  
+class="td11"> <span 
+class="cmr-8">5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-7-2"  
+class="td11">       <span 
+class="cmr-8">5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-7-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-7-4"  
+class="td01"> <span 
+class="cmr-8">5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-7-5"  
+class="td11">      <span 
+class="cmr-8">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-7-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-8-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-8-1"  
+class="td11"> <span 
+class="cmr-8">6</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-8-2"  
+class="td11"> <span 
+class="cmr-8">6</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-8-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-8-4"  
+class="td01"> <span 
+class="cmr-8">6</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-8-5"  
+class="td11"> <span 
+class="cmr-8">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-8-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-9-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-9-1"  
+class="td11"> <span 
+class="cmr-8">7</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-9-2"  
+class="td11">       <span 
+class="cmr-8">7</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-9-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-9-4"  
+class="td01"> <span 
+class="cmr-8">7</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-9-5"  
+class="td11">      <span 
+class="cmr-8">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-9-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-10-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-10-1"  
+class="td11"> <span 
+class="cmr-8">8</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-10-2"  
+class="td11"> <span 
+class="cmr-8">8</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-10-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-10-4"  
+class="td01"> <span 
+class="cmr-8">8</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-10-5"  
+class="td11"> <span 
+class="cmr-8">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-10-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-11-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-11-1"  
+class="td11"> <span 
+class="cmr-8">9</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-11-2"  
+class="td11">       <span 
+class="cmr-8">9</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-11-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-11-4"  
+class="td01"> <span 
+class="cmr-8">9</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-11-5"  
+class="td11">      <span 
+class="cmr-8">41</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-11-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-12-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-12-1"  
+class="td11"><span 
+class="cmr-8">10</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-12-2"  
+class="td11"> <span 
+class="cmr-8">10</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-12-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-12-4"  
+class="td01"><span 
+class="cmr-8">10</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-12-5"  
+class="td11"> <span 
+class="cmr-8">42</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-12-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-13-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-13-1"  
+class="td11"><span 
+class="cmr-8">11</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-13-2"  
+class="td11">      <span 
+class="cmr-8">11</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-13-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-13-4"  
+class="td01"><span 
+class="cmr-8">11</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-13-5"  
+class="td11">      <span 
+class="cmr-8">43</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-13-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-14-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-14-1"  
+class="td11"><span 
+class="cmr-8">12</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-14-2"  
+class="td11"> <span 
+class="cmr-8">12</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-14-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-14-4"  
+class="td01"><span 
+class="cmr-8">12</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-14-5"  
+class="td11"> <span 
+class="cmr-8">44</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-14-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-15-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-15-1"  
+class="td11"><span 
+class="cmr-8">13</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-15-2"  
+class="td11">      <span 
+class="cmr-8">13</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-15-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-15-4"  
+class="td01"><span 
+class="cmr-8">13</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-15-5"  
+class="td11">      <span 
+class="cmr-8">45</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-15-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-16-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-16-1"  
+class="td11"><span 
+class="cmr-8">14</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-16-2"  
+class="td11"> <span 
+class="cmr-8">14</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-16-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-16-4"  
+class="td01"><span 
+class="cmr-8">14</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-16-5"  
+class="td11"> <span 
+class="cmr-8">46</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-16-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-17-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-17-1"  
+class="td11"><span 
+class="cmr-8">15</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-17-2"  
+class="td11">      <span 
+class="cmr-8">15</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-17-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-17-4"  
+class="td01"><span 
+class="cmr-8">15</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-17-5"  
+class="td11">      <span 
+class="cmr-8">47</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-17-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-18-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-18-1"  
+class="td11"><span 
+class="cmr-8">16</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-18-2"  
+class="td11"> <span 
+class="cmr-8">16</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-18-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-18-4"  
+class="td01"><span 
+class="cmr-8">16</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-18-5"  
+class="td11"> <span 
+class="cmr-8">48</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-18-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-19-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-19-1"  
+class="td11"><span 
+class="cmr-8">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-19-2"  
+class="td11">      <span 
+class="cmr-8">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-19-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-19-4"  
+class="td01"><span 
+class="cmr-8">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-19-5"  
+class="td11">      <span 
+class="cmr-8">49</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-19-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-20-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-20-1"  
+class="td11"><span 
+class="cmr-8">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-20-2"  
+class="td11"> <span 
+class="cmr-8">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-20-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-20-4"  
+class="td01"><span 
+class="cmr-8">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-20-5"  
+class="td11"> <span 
+class="cmr-8">50</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-20-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-21-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-21-1"  
+class="td11"><span 
+class="cmr-8">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-21-2"  
+class="td11">      <span 
+class="cmr-8">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-21-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-21-4"  
+class="td01"><span 
+class="cmr-8">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-21-5"  
+class="td11">      <span 
+class="cmr-8">51</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-21-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-22-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-22-1"  
+class="td11"><span 
+class="cmr-8">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-22-2"  
+class="td11"> <span 
+class="cmr-8">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-22-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-22-4"  
+class="td01"><span 
+class="cmr-8">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-22-5"  
+class="td11"> <span 
+class="cmr-8">52</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-22-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-23-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-23-1"  
+class="td11"><span 
+class="cmr-8">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-23-2"  
+class="td11">      <span 
+class="cmr-8">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-23-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-23-4"  
+class="td01"><span 
+class="cmr-8">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-23-5"  
+class="td11">      <span 
+class="cmr-8">53</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-23-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-24-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-24-1"  
+class="td11"><span 
+class="cmr-8">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-24-2"  
+class="td11"> <span 
+class="cmr-8">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-24-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-24-4"  
+class="td01"><span 
+class="cmr-8">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-24-5"  
+class="td11"> <span 
+class="cmr-8">54</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-24-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-25-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-25-1"  
+class="td11"><span 
+class="cmr-8">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-25-2"  
+class="td11">      <span 
+class="cmr-8">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-25-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-25-4"  
+class="td01"><span 
+class="cmr-8">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-25-5"  
+class="td11">      <span 
+class="cmr-8">55</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-25-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-26-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-26-1"  
+class="td11"><span 
+class="cmr-8">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-26-2"  
+class="td11">      <span 
+class="cmr-8">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-26-3"  
+class="td10"> <span 
+class="cmr-8">1.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-26-4"  
+class="td01"><span 
+class="cmr-8">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-26-5"  
+class="td11">      <span 
+class="cmr-8">56</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-26-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-27-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-27-1"  
+class="td11"><span 
+class="cmr-8">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-27-2"  
+class="td11">      <span 
+class="cmr-8">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-27-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-27-4"  
+class="td01"><span 
+class="cmr-8">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-27-5"  
+class="td11">      <span 
+class="cmr-8">57</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-27-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-28-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-28-1"  
+class="td11"><span 
+class="cmr-8">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-28-2"  
+class="td11">      <span 
+class="cmr-8">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-28-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-28-4"  
+class="td01"><span 
+class="cmr-8">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-28-5"  
+class="td11">      <span 
+class="cmr-8">58</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-28-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-29-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-29-1"  
+class="td11"><span 
+class="cmr-8">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-29-2"  
+class="td11">      <span 
+class="cmr-8">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-29-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-29-4"  
+class="td01"><span 
+class="cmr-8">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-29-5"  
+class="td11">      <span 
+class="cmr-8">59</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-29-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-30-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-30-1"  
+class="td11"><span 
+class="cmr-8">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-30-2"  
+class="td11">      <span 
+class="cmr-8">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-30-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-30-4"  
+class="td01"><span 
+class="cmr-8">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-30-5"  
+class="td11">      <span 
+class="cmr-8">60</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-30-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-31-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-31-1"  
+class="td11"><span 
+class="cmr-8">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-31-2"  
+class="td11">      <span 
+class="cmr-8">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-31-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-31-4"  
+class="td01"><span 
+class="cmr-8">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-31-5"  
+class="td11">      <span 
+class="cmr-8">61</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-31-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-32-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-32-1"  
+class="td11"><span 
+class="cmr-8">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-32-2"  
+class="td11">      <span 
+class="cmr-8">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-32-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-32-4"  
+class="td01"><span 
+class="cmr-8">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-32-5"  
+class="td11">      <span 
+class="cmr-8">62</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-32-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-33-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-33-1"  
+class="td11"><span 
+class="cmr-8">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-33-2"  
+class="td11">      <span 
+class="cmr-8">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-33-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-33-4"  
+class="td01"><span 
+class="cmr-8">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-33-5"  
+class="td11">      <span 
+class="cmr-8">63</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-33-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-34-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-34-1"  
+class="td11"><span 
+class="cmr-8">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-34-2"  
+class="td11">      <span 
+class="cmr-8">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-34-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-34-4"  
+class="td01"><span 
+class="cmr-8">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-34-5"  
+class="td11">      <span 
+class="cmr-8">64</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-34-6"  
+class="td11"> <span 
+class="cmr-8">2.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-35-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-35-1"  
+class="td11"><span 
+class="cmr-8">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-35-2"  
+class="td11">      <span 
+class="cmr-8">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-35-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-35-4"  
+class="td01"><span 
+class="cmr-8">33</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-35-5"  
+class="td11">      <span 
+class="cmr-8">25</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-35-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-36-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-36-1"  
+class="td11"><span 
+class="cmr-8">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-36-2"  
+class="td11">      <span 
+class="cmr-8">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-36-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-36-4"  
+class="td01"><span 
+class="cmr-8">34</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-36-5"  
+class="td11">      <span 
+class="cmr-8">26</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-36-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-37-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-37-1"  
+class="td11"><span 
+class="cmr-8">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-37-2"  
+class="td11">      <span 
+class="cmr-8">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-37-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-37-4"  
+class="td01"><span 
+class="cmr-8">35</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-37-5"  
+class="td11">      <span 
+class="cmr-8">27</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-37-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-38-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-38-1"  
+class="td11"><span 
+class="cmr-8">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-38-2"  
+class="td11">      <span 
+class="cmr-8">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-38-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-38-4"  
+class="td01"><span 
+class="cmr-8">36</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-38-5"  
+class="td11">      <span 
+class="cmr-8">28</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-38-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-39-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-39-1"  
+class="td11"><span 
+class="cmr-8">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-39-2"  
+class="td11">      <span 
+class="cmr-8">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-39-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-39-4"  
+class="td01"><span 
+class="cmr-8">37</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-39-5"  
+class="td11">      <span 
+class="cmr-8">29</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-39-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-40-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-40-1"  
+class="td11"><span 
+class="cmr-8">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-40-2"  
+class="td11">      <span 
+class="cmr-8">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-40-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-40-4"  
+class="td01"><span 
+class="cmr-8">38</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-40-5"  
+class="td11">      <span 
+class="cmr-8">30</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-40-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-41-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-41-1"  
+class="td11"><span 
+class="cmr-8">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-41-2"  
+class="td11">      <span 
+class="cmr-8">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-41-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-41-4"  
+class="td01"><span 
+class="cmr-8">39</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-41-5"  
+class="td11">      <span 
+class="cmr-8">31</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-41-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-42-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-42-1"  
+class="td11"><span 
+class="cmr-8">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-42-2"  
+class="td11">      <span 
+class="cmr-8">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-42-3"  
+class="td10"> <span 
+class="cmr-8">1.5</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-42-4"  
+class="td01"><span 
+class="cmr-8">40</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-42-5"  
+class="td11">      <span 
+class="cmr-8">32</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-42-6"  
+class="td11"> <span 
+class="cmr-8">1.5</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-43-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-43-1"  
+class="td11"><span 
+class="cmr-8">41</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-43-2"  
+class="td11">      <span 
+class="cmr-8">41</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-43-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-43-4"  
+class="td01"><span 
+class="cmr-8">41</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-43-5"  
+class="td11">      <span 
+class="cmr-8">17</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-43-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-44-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-44-1"  
+class="td11"><span 
+class="cmr-8">42</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-44-2"  
+class="td11">      <span 
+class="cmr-8">42</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-44-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-44-4"  
+class="td01"><span 
+class="cmr-8">42</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-44-5"  
+class="td11">      <span 
+class="cmr-8">18</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-44-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-45-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-45-1"  
+class="td11"><span 
+class="cmr-8">43</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-45-2"  
+class="td11">      <span 
+class="cmr-8">43</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-45-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-45-4"  
+class="td01"><span 
+class="cmr-8">43</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-45-5"  
+class="td11">      <span 
+class="cmr-8">19</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-45-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-46-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-46-1"  
+class="td11"><span 
+class="cmr-8">44</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-46-2"  
+class="td11">      <span 
+class="cmr-8">44</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-46-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-46-4"  
+class="td01"><span 
+class="cmr-8">44</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-46-5"  
+class="td11">      <span 
+class="cmr-8">20</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-46-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-47-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-47-1"  
+class="td11"><span 
+class="cmr-8">45</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-47-2"  
+class="td11">      <span 
+class="cmr-8">45</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-47-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-47-4"  
+class="td01"><span 
+class="cmr-8">45</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-47-5"  
+class="td11">      <span 
+class="cmr-8">21</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-47-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-48-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-48-1"  
+class="td11"><span 
+class="cmr-8">46</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-48-2"  
+class="td11">      <span 
+class="cmr-8">46</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-48-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-48-4"  
+class="td01"><span 
+class="cmr-8">46</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-48-5"  
+class="td11">      <span 
+class="cmr-8">22</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-48-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-49-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-49-1"  
+class="td11"><span 
+class="cmr-8">47</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-49-2"  
+class="td11">      <span 
+class="cmr-8">47</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-49-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-49-4"  
+class="td01"><span 
+class="cmr-8">47</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-49-5"  
+class="td11">      <span 
+class="cmr-8">23</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-49-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-50-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-50-1"  
+class="td11"><span 
+class="cmr-8">48</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-50-2"  
+class="td11">      <span 
+class="cmr-8">48</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-50-3"  
+class="td10"> <span 
+class="cmr-8">2.0</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-50-4"  
+class="td01"><span 
+class="cmr-8">48</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-50-5"  
+class="td11">      <span 
+class="cmr-8">24</span></td><td  style="white-space:nowrap; text-align:right;" id="TBL-20-50-6"  
+class="td11"> <span 
+class="cmr-8">1.0</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-51-"><td  style="white-space:nowrap; text-align:right;" id="TBL-20-51-1"  
+class="td11">  </td></tr></table>                                                              </div></div>
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x10-750005.3"></a>psb_gather &#8212; Gather Global Dense Matrix</h4>
+<!--l. 353--><p class="noindent" >These subroutines collect the portions of global dense matrix distributed over all
+process into one single array stored on one process.
+   <div class="par-math-display" >
+<img 
+src="userhtml27x.png" alt="glob-x &#x2190; collect(loc-xi)
+" class="par-math-display" ></div>
+<!--l. 357--><p class="nopar" > where:
+     <dl class="description"><dt class="description">
+     <!--l. 360--><p class="noindent" >
+<span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">
+     <!--l. 360--><p class="noindent" >is the global submatrix <span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">1:</span><span 
+class="cmmi-7">m,</span><span 
+class="cmr-7">1:</span><span 
+class="cmmi-7">n</span></sub>
+     </dd><dt class="description">
+     <!--l. 361--><p class="noindent" >
+<span 
+class="cmmi-10">loc</span>_<span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub> </dt><dd 
+class="description">
+     <!--l. 361--><p class="noindent" >is the local portion of global dense matrix on process <span 
+class="cmmi-10">i</span>.
+     </dd><dt class="description">
+     <!--l. 363--><p class="noindent" >
+<span 
+class="cmmi-10">collect</span> </dt><dd 
+class="description">
+     <!--l. 363--><p class="noindent" >is the collect function.</dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 366--><p class="indent" >   <a 
+ id="x10-75001r19"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 367--><p class="noindent" >
+<div class="tabular"> <table id="TBL-21" class="tabular" 
+ 
+><colgroup id="TBL-21-1g"><col 
+id="TBL-21-1"><col 
+id="TBL-21-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-1-1"  
+class="td11"><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,y                      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-21-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-2-1"  
+class="td11">Integer                       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-21-2-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-3-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-21-3-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-4-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-21-4-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-5-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-21-5-2"  
+class="td11">psb_gather  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-6-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-21-6-2"  
+class="td11">psb_gather  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-21-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-21-7-1"  
+class="td11">                     </td></tr></table>                                           </div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;19: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x10-75001r19 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+<!--l. 383--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_gather</span><span style="color:#000000">(</span><span style="color:#000000">glob_x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">loc_x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">root</span><span style="color:#000000">)</span></code>
+<code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_gather</span><span style="color:#000000">(</span><span style="color:#000000">glob_x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">loc_x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">root</span><span style="color:#000000">)</span></code>
+     <dl class="description"><dt class="description">
+     <!--l. 388--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 388--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 389--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 389--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 390--><p class="noindent" >
+<span 
+class="cmbx-10">loc</span><span 
+class="cmbx-10">_x</span> </dt><dd 
+class="description">
+     <!--l. 390--><p class="noindent" >the local portion of global dense matrix <span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;indicated in Table&#x00A0;<a 
+href="#x10-75001r19">19<!--tex4ht:ref: tab:gather --></a>.
+     </dd><dt class="description">
+     <!--l. 397--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 397--><p class="noindent" >contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 402--><p class="noindent" >
+<span 
+class="cmbx-10">root</span> </dt><dd 
+class="description">
+     <!--l. 402--><p class="noindent" >The process that holds the global copy. If <span 
+class="cmmi-10">root </span>= <span 
+class="cmsy-10">-</span>1 all the processes will
+     have a copy of the global vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">root </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1, default <span 
+class="cmsy-10">-</span>1.
+     </dd><dt class="description">
+     <!--l. 432--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 432--><p class="noindent" >
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 433--><p class="noindent" >
+<span 
+class="cmbx-10">glob</span><span 
+class="cmbx-10">_x</span> </dt><dd 
+class="description">
+     <!--l. 433--><p class="noindent" >The array where the local parts must be gathered.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one or two array with the <code class="lstinline"><span style="color:#000000">ALLOCATABLE</span></code> attribute.
+     </dd><dt class="description">
+     <!--l. 438--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 438--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">5.4   </span> <a 
+ id="x10-760005.4"></a>psb_scatter &#8212; Scatter Global Dense Matrix</h4>
+<!--l. 453--><p class="noindent" >These subroutines scatters the portions of global dense matrix owned by a process to
+all the processes in the processes grid.
+   <div class="par-math-display" >
+<img 
+src="userhtml28x.png" alt="loc-xi &#x2190; scatter(glob-x)
+" class="par-math-display" ></div>
+<!--l. 456--><p class="nopar" > where:
+     <dl class="description"><dt class="description">
+     <!--l. 459--><p class="noindent" >
+<span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span> </dt><dd 
+class="description">
+     <!--l. 459--><p class="noindent" >is the global matrix <span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">1:</span><span 
+class="cmmi-7">m,</span><span 
+class="cmr-7">1:</span><span 
+class="cmmi-7">n</span></sub>
+     </dd><dt class="description">
+     <!--l. 460--><p class="noindent" >
+<span 
+class="cmmi-10">loc</span>_<span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub> </dt><dd 
+class="description">
+     <!--l. 460--><p class="noindent" >is the local portion of global dense matrix on process <span 
+class="cmmi-10">i</span>.
+     </dd><dt class="description">
+     <!--l. 462--><p class="noindent" >
+<span 
+class="cmmi-10">scatter</span> </dt><dd 
+class="description">
+     <!--l. 462--><p class="noindent" >is the scatter function.</dd></dl>
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 465--><p class="indent" >   <a 
+ id="x10-76001r20"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+<div class="center" 
+>
+<!--l. 466--><p class="noindent" >
+<div class="tabular"> <table id="TBL-22" class="tabular" 
+ 
+><colgroup id="TBL-22-1g"><col 
+id="TBL-22-1"><col 
+id="TBL-22-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-1-1"  
+class="td11"><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,y                      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-22-1-2"  
+class="td11"><span 
+class="cmbx-10">Subroutine</span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-2-1"  
+class="td11">Integer                       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-22-2-2"  
+class="td11">psb_scatter  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-3-1"  
+class="td11">Short Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-22-3-2"  
+class="td11">psb_scatter  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-4-1"  
+class="td11">Long Precision Real      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-22-4-2"  
+class="td11">psb_scatter  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-5-1"  
+class="td11">Short Precision Complex</td><td  style="white-space:nowrap; text-align:left;" id="TBL-22-5-2"  
+class="td11">psb_scatter  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-6-1"  
+class="td11">Long Precision Complex </td><td  style="white-space:nowrap; text-align:left;" id="TBL-22-6-2"  
+class="td11">psb_scatter  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-22-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-22-7-1"  
+class="td11">                     </td></tr></table>                                           </div></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;20: </span><span  
+class="content">Data types</span></div><!--tex4ht:label?: x10-76001r20 -->
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+<!--l. 482--><p class="indent" >   <code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_scatter</span><span style="color:#000000">(</span><span style="color:#000000">glob_x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">loc_x</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">desc_a</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">root</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">mold</span><span style="color:#000000">)</span></code>
+     <dl class="description"><dt class="description">
+     <!--l. 485--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 485--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 486--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 486--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 487--><p class="noindent" >
+<span 
+class="cmbx-10">glob</span><span 
+class="cmbx-10">_x</span> </dt><dd 
+class="description">
+     <!--l. 487--><p class="noindent" >The array that must be scattered into local pieces.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a rank one or two array.
+     </dd><dt class="description">
+     <!--l. 492--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 492--><p class="noindent" >contains data structures for communications.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 497--><p class="noindent" >
+<span 
+class="cmbx-10">root</span> </dt><dd 
+class="description">
+     <!--l. 497--><p class="noindent" >The process that holds the global copy. If <span 
+class="cmmi-10">root </span>= <span 
+class="cmsy-10">-</span>1 all the processes have
+     a copy of the global vector.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer variable <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">root </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1, default <code class="lstinline"><span style="color:#000000">psb_root_</span></code>,
+     i.e. process 0.
+     </dd><dt class="description">
+     <!--l. 504--><p class="noindent" >
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 504--><p class="noindent" >The desired dynamic type for the internal vector storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>;
+     this is only allowed when loc_x is of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 534--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 534--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 535--><p class="noindent" >
+<span 
+class="cmbx-10">loc</span><span 
+class="cmbx-10">_x</span> </dt><dd 
+class="description">
+     <!--l. 535--><p class="noindent" >the local portion of global dense matrix <span 
+class="cmmi-10">glob</span>_<span 
+class="cmmi-10">x</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one or two ALLOCATABLE array or an object of type
+     <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>&#x00A0;containing numbers of the type indicated in Table&#x00A0;<a 
+href="#x10-76001r20">20<!--tex4ht:ref: tab:scatter --></a>.
+     </dd><dt class="description">
+     <!--l. 542--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 542--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu32.html" >next</a>] [<a 
+href="userhtmlse9.html" >next</a>] [<a 
 href="userhtmlse4.html" >prev</a>] [<a 
 href="userhtmlse4.html#tailuserhtmlse4.html" >prev-tail</a>] [<a 
 href="userhtmlse5.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu28.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse8.html" >up</a>] </p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse5.html"></a>  
+ id="tailuserhtmlse5.html"></a>   
 </body></html> 
