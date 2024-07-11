@@ -34,7 +34,7 @@
 
 #include "cintrf.h"
 #include "hell.h"
-
+#include "vectordev.h"
 
 typedef struct hlldevice
 {

@@ -11,7 +11,7 @@
 </head><body 
 >
    <!--l. 72--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu7.html" >next</a>] [<a 
+href="userhtmlse6.html" >next</a>] [<a 
 href="userhtmlse1.html" >prev</a>] [<a 
 href="userhtmlse1.html#tailuserhtmlse1.html" >prev-tail</a>] [<a 
 href="#tailuserhtmlse2.html">tail</a>] [<a 
@@ -35,11 +35,11 @@ process are executed through calls to the serial sparse BLAS subroutines. In a
 similar way, the inter-process message exchanges are encapsulated in an
 applicaiton layer that has been strongly inspired by the Basic Linear Algebra
 Communication Subroutines (BLACS) library&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XBLACS">7</a>]</span>. Usually there is no need to deal
+href="userhtmlli2.html#XBLACS">6</a>]</span>. Usually there is no need to deal
 directly with MPI; however, in some cases, MPI routines are used directly
 to improve efficiency. For further details on our communication layer see
 Sec.&#x00A0;<a 
-href="userhtmlse7.html#x68-1050007">7<!--tex4ht:ref: sec:parenv --></a>.
+href="userhtmlse7.html#x12-1050007">7<!--tex4ht:ref: sec:parenv --></a>.
 <!--l. 101--><p class="indent" >   <hr class="figure"><div class="figure" 
 >
                                                                   
@@ -85,7 +85,7 @@ class="cmtt-10">BLOCK</span></span></span>, as well as completely
 arbitrary assignments of equation indices to processes. In particular it is
 consistent with the usage of graph partitioning tools commonly available in
 the literature, e.g. METIS&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XMETIS">14</a>]</span>. Dense vectors conform to sparse matrices,
+href="userhtmlli2.html#XMETIS">13</a>]</span>. Dense vectors conform to sparse matrices,
 that is, the entries of a vector follow the same distribution of the matrix
 rows.
 <!--l. 146--><p class="indent" >   We assume that the sparse matrix is built in parallel, where each process generates
@@ -96,30 +96,610 @@ href="userhtml5.html#fn1x0"><sup class="textsuperscript">1</sup></a></span><a
  id="x4-3002f1"></a> ,
 even though the resulting memory bottleneck would make this option unattractive in
 most cases.
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >2.1 <a 
-href="userhtmlsu1.html#x6-40002.1">Basic Nomenclature</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >2.2 <a 
-href="userhtmlsu2.html#x8-50002.2">Library contents</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >2.3 <a 
-href="userhtmlsu3.html#x9-60002.3">Application structure</a></span>
-<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >2.3.1 <a 
-href="userhtmlsu3.html#x9-70002.3.1">User-defined index mappings</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >2.4 <a 
-href="userhtmlsu4.html#x11-80002.4">Programming model</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">2.1   </span> <a 
+ id="x4-40002.1"></a>Basic Nomenclature</h4>
+<!--l. 158--><p class="noindent" >Our computational model implies that the data allocation on the parallel distributed
+memory machine is guided by the structure of the physical model, and specifically by
+the discretization mesh of the PDE.
+<!--l. 163--><p class="indent" >   Each point of the discretization mesh will have (at least) one associated
+equation/variable, and therefore one index. We say that point <span 
+class="cmmi-10">i </span><span 
+class="cmti-10">depends </span>on point <span 
+class="cmmi-10">j </span>if
+the equation for a variable associated with <span 
+class="cmmi-10">i </span>contains a term in <span 
+class="cmmi-10">j</span>, or equivalently if
+<span 
+class="cmmi-10">a</span><sub><span 
+class="cmmi-7">ij</span></sub><span 
+class="cmmi-10">&#x2260;</span>0. After the partition of the discretization mesh into <span 
+class="cmti-10">sub-domains </span>assigned
+to the parallel processes, we classify the points of a given sub-domain as
+following.
+     <dl class="description"><dt class="description">
+     <!--l. 172--><p class="noindent" >
+<span 
+class="cmbx-10">Internal.</span> </dt><dd 
+class="description">
+     <!--l. 172--><p class="noindent" >An internal point of a given domain <span 
+class="cmti-10">depends </span>only on points of the same
+     domain.  If  all  points  of  a  domain  are  assigned  to  one  process,  then
+     a  computational  step  (e.g.,  a  matrix-vector  product)  of  the  equations
+                                                                  
 
+                                                                  
+     associated  with  the  internal  points  requires  no  data  items  from  other
+     domains and no communications.
+     </dd><dt class="description">
+     <!--l. 181--><p class="noindent" >
+<span 
+class="cmbx-10">Boundary.</span> </dt><dd 
+class="description">
+     <!--l. 181--><p class="noindent" >A point of a given domain is a boundary point if it <span 
+class="cmti-10">depends </span>on points
+     belonging to other domains.
+     </dd><dt class="description">
+     <!--l. 185--><p class="noindent" >
+<span 
+class="cmbx-10">Halo.</span> </dt><dd 
+class="description">
+     <!--l. 185--><p class="noindent" >A halo point for a given domain is a point belonging to another domain
+     such that there is a boundary point which <span 
+class="cmti-10">depends </span>on it. Whenever performing
+     a computational step, such as a matrix-vector product, the values associated
+     with halo points are requested from other domains. A boundary point of a
+     given domain is usually a halo point for some other domain<span class="footnote-mark"><a 
+href="userhtml6.html#fn2x0"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x4-4001f2"></a> ;
+     therefore the cardinality of the boundary points set denotes the amount
+     of data sent to other domains.
+     </dd><dt class="description">
+     <!--l. 198--><p class="noindent" >
+<span 
+class="cmbx-10">Overlap.</span> </dt><dd 
+class="description">
+     <!--l. 198--><p class="noindent" >An overlap point is a boundary point assigned to multiple domains. Any
+     operation that involves an overlap point has to be replicated for each
+     assignment.</dd></dl>
+<!--l. 202--><p class="noindent" >Overlap points do not usually exist in the basic data distributions; however they are a
+feature of Domain Decomposition Schwarz preconditioners which are the subject of
+related research work&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#X2007c">3</a>,&#x00A0;<a 
+href="userhtmlli2.html#X2007d">2</a>]</span>.
+<!--l. 207--><p class="indent" >   We denote the sets of internal, boundary and halo points for a given subdomain
+by <span 
+class="cmsy-10"><img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span>, <span 
+class="cmsy-10"><img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /> </span>and <span 
+class="cmsy-10"><img 
+src="cmsy10-48.png" alt="H" class="10x-x-48" /></span>. Each subdomain is assigned to one process; each process usually owns
+one subdomain, although the user may choose to assign more than one subdomain to
+a process. If each process <span 
+class="cmmi-10">i </span>owns one subdomain, the number of rows in
+the local sparse matrix is <span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>, and the number of local columns (i.e.
+those for which there exists at least one non-zero entry in the local rows) is
+<span 
+class="cmsy-10">|<img 
+src="cmsy10-49.png" alt="I" class="10x-x-49" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-42.png" alt="B" class="10x-x-42" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">| </span>+ <span 
+class="cmsy-10">|<img 
+src="cmsy10-48.png" alt="H" class="10x-x-48" /></span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmsy-10">|</span>.
+<!--l. 217--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
 
+                                                                  
+<a 
+ id="x4-4003r2"></a>
+                                                                  
 
+                                                                  
+<div class="center" 
+>
+<!--l. 218--><p class="noindent" >
+<!--l. 221--><p class="noindent" ><img 
+src="points.png" alt="PIC"  
+width="46" height="46" ></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;2: </span><span  
+class="content">Point classfication.</span></div><!--tex4ht:label?: x4-4003r2 -->
+                                                                  
+
+                                                                  
+<!--l. 227--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 229--><p class="indent" >   This classification of mesh points guides the naming scheme that we adopted in
+the library internals and in the data structures. We explicitly note that &#8220;Halo&#8221; points
+are also often called &#8220;ghost&#8221; points in the literature.
+   <h4 class="subsectionHead"><span class="titlemark">2.2   </span> <a 
+ id="x4-50002.2"></a>Library contents</h4>
+<!--l. 238--><p class="noindent" >The PSBLAS library consists of various classes of subroutines:
+     <dl class="description"><dt class="description">
+     <!--l. 240--><p class="noindent" >
+<span 
+class="cmbx-10">Computational routines</span> </dt><dd 
+class="description">
+     <!--l. 240--><p class="noindent" >comprising:
+         <ul class="itemize1">
+         <li class="itemize">
+         <!--l. 242--><p class="noindent" >Sparse matrix by dense matrix product;
+         </li>
+         <li class="itemize">
+         <!--l. 243--><p class="noindent" >Sparse triangular systems solution for block diagonal matrices;
+         </li>
+         <li class="itemize">
+         <!--l. 245--><p class="noindent" >Vector and matrix norms;
+         </li>
+         <li class="itemize">
+         <!--l. 246--><p class="noindent" >Dense matrix sums;
+         </li>
+         <li class="itemize">
+         <!--l. 247--><p class="noindent" >Dot products.</li></ul>
+     </dd><dt class="description">
+     <!--l. 249--><p class="noindent" >
+<span 
+class="cmbx-10">Communication routines</span> </dt><dd 
+class="description">
+     <!--l. 249--><p class="noindent" >handling halo and overlap communications;
+     </dd><dt class="description">
+     <!--l. 251--><p class="noindent" >
+<span 
+class="cmbx-10">Data management and auxiliary routines</span> </dt><dd 
+class="description">
+     <!--l. 251--><p class="noindent" >including:
+         <ul class="itemize1">
+         <li class="itemize">
+         <!--l. 253--><p class="noindent" >Parallel environment management
+         </li>
+         <li class="itemize">
+         <!--l. 254--><p class="noindent" >Communication descriptors allocation;
+                                                                  
+
+                                                                  
+         </li>
+         <li class="itemize">
+         <!--l. 255--><p class="noindent" >Dense and sparse matrix allocation;
+         </li>
+         <li class="itemize">
+         <!--l. 256--><p class="noindent" >Dense and sparse matrix build and update;
+         </li>
+         <li class="itemize">
+         <!--l. 257--><p class="noindent" >Sparse matrix and data distribution preprocessing.</li></ul>
+     </dd><dt class="description">
+     <!--l. 259--><p class="noindent" >
+<span 
+class="cmbx-10">Preconditioner routines</span> </dt><dd 
+class="description">
+     <!--l. 259--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 260--><p class="noindent" >
+<span 
+class="cmbx-10">Iterative methods</span> </dt><dd 
+class="description">
+     <!--l. 260--><p class="noindent" >a subset of Krylov subspace iterative methods</dd></dl>
+<!--l. 263--><p class="noindent" >The following naming scheme has been adopted for all the symbols internally defined in
+the PSBLAS software package:
+     <ul class="itemize1">
+     <li class="itemize">
+     <!--l. 266--><p class="noindent" >all symbols (i.e. subroutine names, data types...) are prefixed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_</span></span></span>
+     </li>
+     <li class="itemize">
+     <!--l. 268--><p class="noindent" >all data type names are suffixed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">_type</span></span></span>
+     </li>
+     <li class="itemize">
+     <!--l. 269--><p class="noindent" >all constants are suffixed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">_</span></span></span>
+     </li>
+     <li class="itemize">
+     <!--l. 270--><p class="noindent" >all top-level subroutine names follow the rule <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_xxname</span></span></span> where <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">xx</span></span></span> can be
+     either:
+         <ul class="itemize2">
+         <li class="itemize">
+         <!--l. 273--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ge</span></span></span>: the routine is related to dense data,
+         </li>
+         <li class="itemize">
+         <!--l. 274--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">sp</span></span></span>: the routine is related to sparse data,
+         </li>
+         <li class="itemize">
+         <!--l. 275--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">cd</span></span></span>: the routine is related to communication descriptor (see&#x00A0;<a 
+href="userhtmlse3.html#x8-90003">3<!--tex4ht:ref: sec:datastruct --></a>).</li></ul>
+                                                                  
+
+                                                                  
+     <!--l. 278--><p class="noindent" >For example the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span> perform the same
+     action (see&#x00A0;<a 
+href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>) on dense matrices, sparse matrices and communication
+     descriptors respectively. Interface overloading allows the usage of the same
+     subroutine names for both real and complex data.</li></ul>
+<!--l. 285--><p class="noindent" >In the description of the subroutines, arguments or argument entries are classified
+as:
+     <dl class="description"><dt class="description">
+     <!--l. 288--><p class="noindent" >
+<span 
+class="cmbx-10">global</span> </dt><dd 
+class="description">
+     <!--l. 288--><p class="noindent" >For  input  arguments,  the  value  must  be  the  same  on  all  processes
+     participating in the subroutine call; for output arguments the value is
+     guaranteed to be the same.
+     </dd><dt class="description">
+     <!--l. 291--><p class="noindent" >
+<span 
+class="cmbx-10">local</span> </dt><dd 
+class="description">
+     <!--l. 291--><p class="noindent" >Each process has its own value(s) independently.</dd></dl>
+<!--l. 293--><p class="noindent" >To finish our general description, we define a version string with the constant
+   <div class="math-display" >
+<img 
+src="userhtml0x.png" alt="psb_version_string_
+" class="math-display" ></div>
+<!--l. 295--><p class="nopar" > whose current value is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">3.8.0</span></span></span>
+<!--l. 298--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">2.3   </span> <a 
+ id="x4-60002.3"></a>Application structure</h4>
+<!--l. 301--><p class="noindent" >The main underlying principle of the PSBLAS library is that the library objects are
+created and exist with reference to a discretized space to which there corresponds
+an index space and a matrix sparsity pattern. As an example, consider a
+cell-centered finite-volume discretization of the Navier-Stokes equations on a
+simulation domain; the index space 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n </span>is isomorphic to the set of cell centers,
+whereas the pattern of the associated linear system matrix is isomorphic to the
+adjacency graph imposed on the discretization mesh by the discretization
+stencil.
+<!--l. 311--><p class="indent" >   Thus the first order of business is to establish an index space, and this is done
+with a call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdall</span></span></span> in which we specify the size of the index space <span 
+class="cmmi-10">n </span>and the
+allocation of the elements of the index space to the various processes making up the
+MPI (virtual) parallel machine.
+<!--l. 317--><p class="indent" >   The index space is partitioned among processes, and this creates a mapping from
+the &#8220;global&#8221; numbering 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n </span>to a numbering &#8220;local&#8221; to each process; each process <span 
+class="cmmi-10">i</span>
+will own a certain subset 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n</span><sub>row<sub><span 
+class="cmmi-5">i</span></sub></sub>, each element of which corresponds to a certain
+element of 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n</span>. The user does not set explicitly this mapping; when the application
+needs to indicate to which element of the index space a certain item is related,
+such as the row and column index of a matrix coefficient, it does so in the
+&#8220;global&#8221; numbering, and the library will translate into the appropriate &#8220;local&#8221;
+numbering.
+                                                                  
+
+                                                                  
+<!--l. 327--><p class="indent" >   For a given index space 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n </span>there are many possible associated topologies, i.e.
+many different discretization stencils; thus the description of the index space is not
+completed until the user has defined a sparsity pattern, either explicitly through
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span> or implicitly through <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span>. The descriptor is finalized with a call to
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span> and a sparse matrix with a call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spasb</span></span></span>. After <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span> each
+process <span 
+class="cmmi-10">i </span>will have defined a set of &#8220;halo&#8221; (or &#8220;ghost&#8221;) indices <span 
+class="cmmi-10">n</span><sub>row<sub><span 
+class="cmmi-5">i</span></sub></sub> + 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n</span><sub>col<sub>
+<span 
+class="cmmi-5">i</span></sub></sub>,
+denoting elements of the index space that are <span 
+class="cmti-10">not </span>assigned to process <span 
+class="cmmi-10">i</span>; however the
+variables associated with them are needed to complete computations associated with
+the sparse matrix <span 
+class="cmmi-10">A</span>, and thus they have to be fetched from (neighbouring)
+processes. The descriptor of the index space is built exactly for the purpose
+of properly sequencing the communication steps required to achieve this
+objective.
+<!--l. 343--><p class="indent" >   A simple application structure will walk through the index space allocation,
+matrix/vector creation and linear system solution as follows:
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x4-6002x1">
+     <!--l. 347--><p class="noindent" >Initialize parallel environment with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_init</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6004x2">
+     <!--l. 348--><p class="noindent" >Initialize index space with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdall</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6006x3">
+     <!--l. 349--><p class="noindent" >Allocate sparse matrix and dense vectors with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spall</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geall</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6008x4">
+     <!--l. 351--><p class="noindent" >Loop over all local rows, generate matrix and vector entries, and insert
+     them with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6010x5">
+     <!--l. 353--><p class="noindent" >Assemble the various entities:
+         <ol  class="enumerate2" >
+<li 
+  class="enumerate" id="x4-6012x1">
+         <!--l. 355--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span>
+         </li>
+<li 
+  class="enumerate" id="x4-6014x2">
+         <!--l. 356--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spasb</span></span></span>
+                                                                  
+
+                                                                  
+         </li>
+<li 
+  class="enumerate" id="x4-6016x3">
+         <!--l. 357--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geasb</span></span></span></li></ol>
+     </li>
+<li 
+  class="enumerate" id="x4-6018x6">
+     <!--l. 359--><p class="noindent" >Choose the preconditioner to be used with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%init</span></span></span> and build it with
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%build</span></span></span><span class="footnote-mark"><a 
+href="userhtml7.html#fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x4-6019f3"></a> .
+     </li>
+<li 
+  class="enumerate" id="x4-6022x7">
+     <!--l. 363--><p class="noindent" >Call the iterative driver <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_krylov</span></span></span> with the method of choice, e.g.
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bicgstab</span></span></span>.</li></ol>
+<!--l. 366--><p class="noindent" >This is the structure of the sample programs in the directory <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">test/pargen/</span></span></span>.
+<!--l. 369--><p class="indent" >   For a simulation in which the same discretization mesh is used over multiple time
+steps, the following structure may be more appropriate:
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x4-6024x1">
+     <!--l. 372--><p class="noindent" >Initialize parallel environment with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_init</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6026x2">
+     <!--l. 373--><p class="noindent" >Initialize index space with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdall</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6028x3">
+     <!--l. 374--><p class="noindent" >Loop over the topology of the discretization mesh and build the descriptor
+     with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6030x4">
+     <!--l. 376--><p class="noindent" >Assemble the descriptor with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span>
+     </li>
+<li 
+  class="enumerate" id="x4-6032x5">
+     <!--l. 377--><p class="noindent" >Allocate  the  sparse  matrices  and  dense  vectors  with  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spall</span></span></span> and
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geall</span></span></span>
+                                                                  
+
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x4-6034x6">
+     <!--l. 379--><p class="noindent" >Loop over the time steps:
+         <ol  class="enumerate2" >
+<li 
+  class="enumerate" id="x4-6036x1">
+         <!--l. 381--><p class="noindent" >If after first time step, reinitialize the sparse matrix with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sprn</span></span></span>;
+         also zero out the dense vectors;
+         </li>
+<li 
+  class="enumerate" id="x4-6038x2">
+         <!--l. 384--><p class="noindent" >Loop over the mesh, generate the coefficients and insert/update them
+         with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span>
+         </li>
+<li 
+  class="enumerate" id="x4-6040x3">
+         <!--l. 386--><p class="noindent" >Assemble with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spasb</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geasb</span></span></span>
+         </li>
+<li 
+  class="enumerate" id="x4-6042x4">
+         <!--l. 387--><p class="noindent" >Choose and build preconditioner with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%init</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%build</span></span></span>
+         </li>
+<li 
+  class="enumerate" id="x4-6044x5">
+         <!--l. 389--><p class="noindent" >Call the iterative method of choice, e.g. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_bicgstab</span></span></span></li></ol>
+     </li></ol>
+<!--l. 392--><p class="noindent" >The insertion routines will be called as many times as needed; they only need to be
+called on the data that is actually allocated to the current process, i.e. each process
+generates its own data.
+<!--l. 397--><p class="indent" >   In principle there is no specific order in the calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span>, nor is there a
+requirement to build a matrix row in its entirety before calling the routine; this
+allows the application programmer to walk through the discretization mesh element
+by element, generating the main part of a given matrix row but also contributions to
+the rows corresponding to neighbouring elements.
+<!--l. 404--><p class="indent" >   From a functional point of view it is even possible to execute one call for each
+nonzero coefficient; however this would have a substantial computational
+overhead. It is therefore advisable to pack a certain amount of data into each
+call to the insertion routine, say touching on a few tens of rows; the best
+performng value would depend on both the architecture of the computer being
+used and on the problem structure. At the opposite extreme, it would be
+possible to generate the entire part of a coefficient matrix residing on a
+process and pass it in a single call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span>; this, however, would entail a
+doubling of memory occupation, and thus would be almost always far from
+optimal.
+                                                                  
+
+                                                                  
+<!--l. 417--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark">2.3.1   </span> <a 
+ id="x4-70002.3.1"></a>User-defined index mappings</h5>
+<!--l. 419--><p class="noindent" >PSBLAS supports user-defined global to local index mappings, subject to the
+constraints outlined in sec.&#x00A0;<a 
+href="#x4-60002.3">2.3<!--tex4ht:ref: sec:appstruct --></a>:
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x4-7002x1">
+     <!--l. 422--><p class="noindent" >The set of indices owned locally must be mapped to the set 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n</span><sub>row<sub><span 
+class="cmmi-5">i</span></sub></sub>;
+     </li>
+<li 
+  class="enumerate" id="x4-7004x2">
+     <!--l. 424--><p class="noindent" >The set of halo points must be mapped to the set <span 
+class="cmmi-10">n</span><sub>row<sub><span 
+class="cmmi-5">i</span></sub></sub> + 1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">n</span><sub>col<sub>
+<span 
+class="cmmi-5">i</span></sub></sub>;</li></ol>
+<!--l. 427--><p class="noindent" >but otherwise the mapping is arbitrary. The user application is responsible to ensure
+consistency of this mapping; some errors may be caught by the library, but
+this is not guaranteed. The application structure to support this usage is as
+follows:
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x4-7006x1">
+     <!--l. 433--><p class="noindent" >Initialize                                                                             index
+     space with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdall(ictx,desc,info,vl=vl,lidx=lidx)</span></span></span> passing the
+     vectors <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl(:)</span></span></span> containing the set of global indices owned by the current
+     process and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx(:)</span></span></span> containing the corresponding local indices;
+     </li>
+<li 
+  class="enumerate" id="x4-7008x2">
+     <!--l. 438--><p class="noindent" >Add the halo points <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja(:)</span></span></span> and their associated local indices <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx(:)</span></span></span> with
+     a(some) call(s) to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins(nz,ja,desc,info,lidx=lidx)</span></span></span>;
+     </li>
+<li 
+  class="enumerate" id="x4-7010x3">
+     <!--l. 441--><p class="noindent" >Assemble the descriptor with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span>;
+     </li>
+<li 
+  class="enumerate" id="x4-7012x4">
+     <!--l. 442--><p class="noindent" >Build the sparse matrices and vectors, optionally making use in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span>
+     and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span> of the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">local</span></span></span> argument specifying that the indices in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ia</span></span></span>,
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">irw</span></span></span>, respectively, are already local indices.</li></ol>
+                                                                  
+
+                                                                  
+<!--l. 449--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">2.4   </span> <a 
+ id="x4-80002.4"></a>Programming model</h4>
+<!--l. 451--><p class="noindent" >The PSBLAS librarary is based on the Single Program Multiple Data (SPMD)
+programming model: each process participating in the computation performs the
+same actions on a chunk of data. Parallelism is thus data-driven.
+<!--l. 456--><p class="indent" >   Because of this structure, many subroutines coordinate their action across the
+various processes, thus providing an implicit synchronization point, and therefore
+<span 
+class="cmti-10">must </span>be called simultaneously by all processes participating in the computation. This
+is certainly true for the data allocation and assembly routines, for all the
+computational routines and for some of the tools routines.
+<!--l. 464--><p class="indent" >   However there are many cases where no synchronization, and indeed no
+communication among processes, is implied; for instance, all the routines in sec.&#x00A0;<a 
+href="userhtmlse3.html#x8-90003">3<!--tex4ht:ref: sec:datastruct --></a>
+are only acting on the local data structures, and thus may be called independently.
+The most important case is that of the coefficient insertion routines: since the
+number of coefficients in the sparse and dense matrices varies among the processors,
+and since the user is free to choose an arbitrary order in builiding the matrix entries,
+these routines cannot imply a synchronization.
+<!--l. 474--><p class="indent" >   Throughout this user&#8217;s guide each subroutine will be clearly indicated
+as:
+     <dl class="description"><dt class="description">
+     <!--l. 477--><p class="noindent" >
+<span 
+class="cmbx-10">Synchronous:</span> </dt><dd 
+class="description">
+     <!--l. 477--><p class="noindent" >must  be  called  simultaneously  by  all  the  processes  in  the  relevant
+     communication context;
+     </dd><dt class="description">
+     <!--l. 479--><p class="noindent" >
+<span 
+class="cmbx-10">Asynchronous:</span> </dt><dd 
+class="description">
+     <!--l. 479--><p class="noindent" >may be called in a totally independent manner.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu7.html" >next</a>] [<a 
+href="userhtmlse6.html" >next</a>] [<a 
 href="userhtmlse1.html" >prev</a>] [<a 
 href="userhtmlse1.html#tailuserhtmlse1.html" >prev-tail</a>] [<a 
 href="userhtmlse2.html" >front</a>] [<a 
 href="userhtml.html#userhtmlse2.html" >up</a>] </p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse2.html"></a>  
+ id="tailuserhtmlse2.html"></a>   
 </body></html> 

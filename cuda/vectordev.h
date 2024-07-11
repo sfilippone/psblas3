@@ -28,13 +28,12 @@
   /* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE */
   /* POSSIBILITY OF SUCH DAMAGE. */
  
-  
 
 #pragma once
 //#include "utils.h"
 #include "cuda_runtime.h"
 //#include "common.h"
-#include "cintrf.h"
+//#include "cintrf.h"
 #include <complex.h>
 
 struct MultiVectDevice
@@ -85,3 +84,4 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 int getMultiVecDeviceSize(void* deviceVec);
 int getMultiVecDeviceCount(void* deviceVec);
 int getMultiVecDevicePitch(void* deviceVec);
+

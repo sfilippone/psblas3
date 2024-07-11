@@ -1,0 +1,921 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Extensions</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<!-- html,3 --> 
+<meta name="src" content="userhtml.tex"> 
+<link rel="stylesheet" type="text/css" href="userhtml.css"> 
+</head><body 
+>
+   <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse11.html" >prev</a>] [<a 
+href="userhtmlse11.html#tailuserhtmlse11.html" >prev-tail</a>] [<a 
+href="userhtmlse9.html#tailuserhtmlse12.html">tail</a>] [<a 
+href="userhtml.html# " >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">12   </span> <a 
+ id="x19-14400012"></a>Extensions</h3>
+<!--l. 3--><p class="noindent" >The EXT, CUDA and RSB subdirectories contains a set of extensions to the base
+library. The extensions provide additional storage formats beyond the ones already
+contained in the base library, as well as interfaces to:
+     <dl class="description"><dt class="description">
+     <!--l. 8--><p class="noindent" >
+<span 
+class="cmbx-10">SPGPU</span> </dt><dd 
+class="description">
+     <!--l. 8--><p class="noindent" >a                      CUDA                      library                      originally
+     published as <a 
+href="https://code.google.com/p/spgpu/" class="url" ><span 
+class="cmtt-10">https://code.google.com/p/spgpu/</span></a> and now included
+     in the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">cuda</span></span></span> subdir, for computations on NVIDIA GPUs;
+     </dd><dt class="description">
+     <!--l. 11--><p class="noindent" >
+<span 
+class="cmbx-10">LIBRSB</span> </dt><dd 
+class="description">
+     <!--l. 11--><p class="noindent" ><a 
+href="http://sourceforge.net/projects/librsb/" class="url" ><span 
+class="cmtt-10">http://sourceforge.net/projects/librsb/</span></a>, for computations on
+     multicore parallel machines.</dd></dl>
+<!--l. 14--><p class="noindent" >The infrastructure laid out in the base library to allow for these extensions is detailed in
+the references&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XDesPat:11">20</a>,&#x00A0;<a 
+href="userhtmlli2.html#XCaFiRo:2014">21</a>,&#x00A0;<a 
+href="userhtmlli2.html#XSparse03">10</a>]</span>; the CUDA-specific data formats are described
+in&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XOurTechRep">22</a>]</span>.
+<!--l. 19--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">12.1   </span> <a 
+ id="x19-14500012.1"></a>Using the extensions</h4>
+<!--l. 21--><p class="noindent" >A sample application using the PSBLAS extensions will contain the following
+steps:
+     <ul class="itemize1">
+     <li class="itemize">
+     <!--l. 24--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">USE</span></span></span> the appropriat modules (<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ext_mod</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cuda_mod</span></span></span>);
+     </li>
+     <li class="itemize">
+     <!--l. 26--><p class="noindent" >Declare     a     <span 
+class="cmti-10">mold     </span>variable     of     the     necessary     type     (e.g.
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_d_ell_sparse_mat</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_d_hlg_sparse_mat</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_d_vect_cuda</span></span></span>);
+     </li>
+     <li class="itemize">
+     <!--l. 29--><p class="noindent" >Pass the mold variable to the base library interface where needed to ensure
+     the appropriate dynamic type.</li></ul>
+                                                                  
+
+                                                                  
+<!--l. 32--><p class="noindent" >Suppose you want to use the CUDA-enabled ELLPACK data structure; you would use a
+piece of code like this (and don&#8217;t forget, you need CUDA-side vectors along with the
+matrices):
+<div class="center" 
+>
+<!--l. 85--><p class="noindent" >
+                                                                  
+
+                                                                  
+<div class="minipage"><pre class="verbatim" id="verbatim-103">
+program&#x00A0;my_cuda_test
+&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_util_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_ext_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_cuda_mod
+&#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;a,&#x00A0;agpu
+&#x00A0;&#x00A0;type(psb_d_vect_type)&#x00A0;::&#x00A0;x,&#x00A0;xg,&#x00A0;bg
+
+&#x00A0;&#x00A0;real(psb_dpk_),&#x00A0;allocatable&#x00A0;::&#x00A0;xtmp(:)
+&#x00A0;&#x00A0;type(psb_d_vect_cuda)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;vmold
+&#x00A0;&#x00A0;type(psb_d_elg_sparse_mat)&#x00A0;::&#x00A0;aelg
+&#x00A0;&#x00A0;type(psb_ctxt_type)&#x00A0;::&#x00A0;ctxt
+&#x00A0;&#x00A0;integer&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;iam,&#x00A0;np
+
+
+&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
+&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
+&#x00A0;&#x00A0;call&#x00A0;psb_cuda_init(ctxt,&#x00A0;iam)
+
+
+&#x00A0;&#x00A0;!&#x00A0;My&#x00A0;own&#x00A0;home-grown&#x00A0;matrix&#x00A0;generator
+&#x00A0;&#x00A0;call&#x00A0;gen_matrix(ctxt,idim,desc_a,a,x,info)
+&#x00A0;&#x00A0;if&#x00A0;(info&#x00A0;/=&#x00A0;0)&#x00A0;goto&#x00A0;9999
+
+&#x00A0;&#x00A0;call&#x00A0;a%cscnv(agpu,info,mold=aelg)
+&#x00A0;&#x00A0;if&#x00A0;(info&#x00A0;/=&#x00A0;0)&#x00A0;goto&#x00A0;9999
+&#x00A0;&#x00A0;xtmp&#x00A0;=&#x00A0;x%get_vect()
+&#x00A0;&#x00A0;call&#x00A0;xg%bld(xtmp,mold=vmold)
+&#x00A0;&#x00A0;call&#x00A0;bg%bld(size(xtmp),mold=vmold)
+
+&#x00A0;&#x00A0;!&#x00A0;Do&#x00A0;sparse&#x00A0;MV
+&#x00A0;&#x00A0;call&#x00A0;psb_spmm(done,agpu,xg,dzero,bg,desc_a,info)
+
+
+9999&#x00A0;continue
+&#x00A0;&#x00A0;if&#x00A0;(info&#x00A0;==&#x00A0;0)&#x00A0;then
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;write(*,*)&#x00A0;&#8217;42&#8217;
+&#x00A0;&#x00A0;else
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;write(*,*)&#x00A0;&#8217;Something&#x00A0;went&#x00A0;wrong&#x00A0;&#8217;,info
+&#x00A0;&#x00A0;end&#x00A0;if
+
+
+&#x00A0;&#x00A0;call&#x00A0;psb_cuda_exit()
+&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
+&#x00A0;&#x00A0;stop
+end&#x00A0;program&#x00A0;my_cuda_test
+</pre>
+<!--l. 134--><p class="nopar" >                                                           </div></div>
+                                                                  
+
+                                                                  
+<!--l. 139--><p class="indent" >   A full example of this strategy can be seen in the <span 
+class="cmtt-10">test/ext/kernel </span>and
+<span 
+class="cmtt-10">test/cuda/kernel </span>subdirectories, where we provide sample programs to test the
+speed of the sparse matrix-vector product with the various data structures included
+in the library.
+<!--l. 146--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">12.2   </span> <a 
+ id="x19-14600012.2"></a>Extensions&#8217; Data Structures</h4>
+<!--l. 150--><p class="noindent" >Access to the facilities provided by the EXT library is mainly achieved through
+the data types that are provided within. The data classes are derived from
+the base classes in PSBLAS, through the Fortran&#x00A0;2003 mechanism of <span 
+class="cmti-10">type</span>
+<span 
+class="cmti-10">extension</span>&#x00A0;<span class="cite">[<a 
+href="userhtmlli2.html#XMRC:11">17</a>]</span>.
+<!--l. 155--><p class="indent" >   The data classes are divided between the general purpose CPU extensions, the
+GPU interfaces and the RSB interfaces. In the description we will make use of the
+notation introduced in Table&#x00A0;<a 
+href="#x19-146001r21">21<!--tex4ht:ref: tab:notation --></a>.
+   <div class="table">
+                                                                  
+
+                                                                  
+<!--l. 160--><p class="indent" >   <a 
+ id="x19-146001r21"></a><hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+ <div class="caption" 
+><span class="id">Table&#x00A0;21: </span><span  
+class="content">Notation for parameters describing a sparse matrix</span></div><!--tex4ht:label?: x19-146001r21 -->
+<div class="center" 
+>
+<!--l. 162--><p class="noindent" >
+<div class="tabular"> <table id="TBL-23" class="tabular" 
+ 
+><colgroup id="TBL-23-1g"><col 
+id="TBL-23-1"><col 
+id="TBL-23-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-1-1"  
+class="td11"><span 
+class="cmr-8">Name     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-1-2"  
+class="td11"><span 
+class="cmr-8">Description                                    </span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-2-1"  
+class="td11"><span 
+class="cmr-8">M           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-2-2"  
+class="td11"><span 
+class="cmr-8">Number of rows in matrix                 </span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-3-1"  
+class="td11"><span 
+class="cmr-8">N </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-3-2"  
+class="td11"><span 
+class="cmr-8">Number of columns in matrix</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-4-1"  
+class="td11"><span 
+class="cmr-8">NZ         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-4-2"  
+class="td11"><span 
+class="cmr-8">Number of nonzeros in matrix           </span></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-5-1"  
+class="td11"><span 
+class="cmr-8">AVGNZR </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-5-2"  
+class="td11"><span 
+class="cmr-8">Average number of nonzeros per row</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-6-1"  
+class="td11"><span 
+class="cmr-8">MAXNZR</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-6-2"  
+class="td11"><span 
+class="cmr-8">Maximum number of nonzeros per row</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-7-1"  
+class="td11"><span 
+class="cmr-8">NDIAG   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-7-2"  
+class="td11"><span 
+class="cmr-8">Numero of nonzero diagonals             </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-8-1"  
+class="td11"><span 
+class="cmr-8">AS          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-8-2"  
+class="td11"><span 
+class="cmr-8">Coefficients array                            </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-9-1"  
+class="td11"><span 
+class="cmr-8">IA          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-9-2"  
+class="td11"><span 
+class="cmr-8">Row indices array                           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-10-1"  
+class="td11"><span 
+class="cmr-8">JA          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-10-2"  
+class="td11"><span 
+class="cmr-8">Column indices array                       </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-11-1"  
+class="td11"><span 
+class="cmr-8">IRP        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-11-2"  
+class="td11"><span 
+class="cmr-8">Row start pointers array                   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-12-1"  
+class="td11"><span 
+class="cmr-8">JCP        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-12-2"  
+class="td11"><span 
+class="cmr-8">Column start pointers array              </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-13-1"  
+class="td11"><span 
+class="cmr-8">NZR       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-13-2"  
+class="td11"><span 
+class="cmr-8">Number of nonzeros per row array      </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-14-1"  
+class="td11"><span 
+class="cmr-8">OFFSET </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-23-14-2"  
+class="td11"><span 
+class="cmr-8">Offset for diagonals                         </span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-23-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-23-15-1"  
+class="td11">         </td></tr></table>                                                         </div>
+</div>
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+   </div>
+<!--l. 188--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x19-146002r5"></a>
+                                                                  
+
+                                                                  
+<!--l. 192--><p class="noindent" ><img 
+src="mat.png" alt="PIC"  
+width="147" height="147" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;5: </span><span  
+class="content">Example of sparse matrix</span></div><!--tex4ht:label?: x19-146002r5 -->
+                                                                  
+
+                                                                  
+<!--l. 198--><p class="indent" >   </div><hr class="endfigure">
+   <h4 class="subsectionHead"><span class="titlemark">12.3   </span> <a 
+ id="x19-14700012.3"></a>CPU-class extensions</h4>
+<!--l. 203--><p class="noindent" >
+   <h5 class="likesubsubsectionHead"><a 
+ id="x19-148000"></a>ELLPACK</h5>
+<!--l. 205--><p class="noindent" >The ELLPACK/ITPACK format (shown in Figure&#x00A0;<a 
+href="#x19-148001r6">6<!--tex4ht:ref: fig:ell --></a>) comprises two 2-dimensional
+arrays <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">JA</span></span></span> with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">M</span></span></span> rows and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">MAXNZR</span></span></span> columns, where <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">MAXNZR</span></span></span> is the maximum
+number of nonzeros in any row&#x00A0;<span class="cite">[<span 
+class="cmbx-10">?</span>]</span>. Each row of the arrays <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">JA</span></span></span> contains the
+coefficients and column indices; rows shorter than <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">MAXNZR</span></span></span> are padded with zero
+coefficients and appropriate column indices, e.g. the last valid one found in the same
+row.
+<!--l. 215--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x19-148001r6"></a>
+                                                                  
+
+                                                                  
+<!--l. 219--><p class="noindent" ><img 
+src="ell.png" alt="PIC"  
+width="233" height="233" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;6: </span><span  
+class="content">ELLPACK compression of matrix in Figure&#x00A0;<a 
+href="#x19-146002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-148001r6 -->
+                                                                  
+
+                                                                  
+<!--l. 225--><p class="indent" >   </div><hr class="endfigure">
+<a 
+ id="x19-148002r1"></a>
+                                                                  
+
+                                                                  
+<!--l. 229--><p class="indent" >   <hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+   <!--l. 231-->
+   <pre class="lstlisting" id="listing-168"><span class="label"><a 
+ id="x19-148003r1"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">do</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">i</span></span><span style="color:#000000"><span 
+class="cmtt-9">=1,</span></span><span style="color:#000000"><span 
+class="cmtt-9">n</span></span> 
+<span class="label"><a 
+ id="x19-148004r2"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">t</span></span><span style="color:#000000"><span 
+class="cmtt-9">=0</span></span> 
+<span class="label"><a 
+ id="x19-148005r3"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">do</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">j</span></span><span style="color:#000000"><span 
+class="cmtt-9">=1,</span></span><span style="color:#000000"><span 
+class="cmtt-9">maxnzr</span></span> 
+<span class="label"><a 
+ id="x19-148006r4"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">t</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">t</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">+</span></span><span style="color:#000000"> </span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">as</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">i</span></span><span style="color:#000000"><span 
+class="cmtt-9">,</span></span><span style="color:#000000"><span 
+class="cmtt-9">j</span></span><span style="color:#000000"><span 
+class="cmtt-9">)*</span></span><span style="color:#000000"><span 
+class="cmtt-9">x</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">ja</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">i</span></span><span style="color:#000000"><span 
+class="cmtt-9">,</span></span><span style="color:#000000"><span 
+class="cmtt-9">j</span></span><span style="color:#000000"><span 
+class="cmtt-9">))</span></span> 
+<span class="label"><a 
+ id="x19-148007r5"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">do</span></span> 
+<span class="label"><a 
+ id="x19-148008r6"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">y</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">i</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">t</span></span> 
+<span class="label"><a 
+ id="x19-148009r7"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">do</span></span></pre>
+   
+<a 
+ id="x19-148010r1"></a>
+<a 
+ id="x19-148011"></a>
+        <span 
+class="cmbx-10">Algorithm</span><span 
+class="cmbx-10">&#x00A0;1:</span>&#x00A0; Matrix-Vector product in ELL format
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+<!--l. 242--><p class="indent" >   The matrix-vector product <span 
+class="cmmi-10">y </span>= <span 
+class="cmmi-10">Ax </span>can be computed with the code shown in
+Alg.&#x00A0;<a 
+href="#x19-148010r1">1<!--tex4ht:ref: alg:ell --></a>; it costs one memory write per outer iteration, plus three memory reads and
+two floating-point operations per inner iteration.
+<!--l. 247--><p class="indent" >   Unless all rows have exactly the same number of nonzeros, some of the coefficients
+in the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span> array will be zeros; therefore this data structure will have an overhead both
+in terms of memory space and redundant operations (multiplications by zero). The
+overhead can be acceptable if:
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x19-148013x1">
+     <!--l. 253--><p class="noindent" >The maximum number of nonzeros per row is not much larger than the
+     average;
+     </li>
+<li 
+  class="enumerate" id="x19-148015x2">
+     <!--l. 255--><p class="noindent" >The regularity of the data structure allows for faster code, e.g. by allowing
+     vectorization, thereby offsetting the additional storage requirements.</li></ol>
+<!--l. 259--><p class="noindent" >In the extreme case where the input matrix has one full row, the ELLPACK
+structure would require more memory than the normal 2D array storage. The
+ELLPACK storage format was very popular in the vector computing days; in
+modern CPUs it is not quite as popular, but it is the basis for many GPU
+formats.
+<!--l. 265--><p class="indent" >   The relevant data type is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_T_ell_sparse_mat</span></span></span>:
+<div class="center" 
+>
+<!--l. 281--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-104">
+&#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_ell_sparse_mat
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;ITPACK/ELL&#x00A0;format,&#x00A0;extended.
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_),&#x00A0;allocatable&#x00A0;::&#x00A0;irn(:),&#x00A0;ja(:,:),&#x00A0;idiag(:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;real(psb_dpk_),&#x00A0;allocatable&#x00A0;::&#x00A0;val(:,:)
+
+&#x00A0;&#x00A0;contains
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;....
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_d_ell_sparse_mat
+</pre>
+<!--l. 295--><p class="nopar" >                                                           </div></div>
+   <h5 class="likesubsubsectionHead"><a 
+ id="x19-149000"></a>Hacked ELLPACK</h5>
+<!--l. 303--><p class="noindent" >The <span 
+class="cmti-10">hacked ELLPACK </span>(<span 
+class="cmbx-10">HLL</span>) format alleviates the main problem of the ELLPACK
+format, that is, the amount of memory required by padding for sparse matrices in
+which the maximum row length is larger than the average.
+                                                                  
+
+                                                                  
+<!--l. 308--><p class="indent" >   The number of elements allocated to padding is
+[(<span 
+class="cmmi-10">m</span><span 
+class="cmsy-10">*</span><span 
+class="cmmi-10">maxNR</span>) <span 
+class="cmsy-10">- </span>(<span 
+class="cmmi-10">m</span><span 
+class="cmsy-10">*</span><span 
+class="cmmi-10">avgNR</span>) = <span 
+class="cmmi-10">m</span><span 
+class="cmsy-10">* </span>(<span 
+class="cmmi-10">maxNR</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">avgNR</span>)] for both <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">JA</span></span></span> arrays,
+where <span 
+class="cmmi-10">m </span>is equal to the number of rows of the matrix, <span 
+class="cmmi-10">maxNR </span>is the maximum
+number of nonzero elements in every row and <span 
+class="cmmi-10">avgNR </span>is the average number of
+nonzeros. Therefore a single densely populated row can seriously affect the total size
+of the allocation.
+<!--l. 317--><p class="indent" >   To limit this effect, in the HLL format we break the original matrix into equally
+sized groups of rows (called <span 
+class="cmti-10">hacks</span>), and then store these groups as independent
+matrices in ELLPACK format. The groups can be arranged selecting rows in an
+arbitrarily manner; indeed, if the rows are sorted by decreasing number of nonzeros
+we obtain essentially the JAgged Diagonals format. If the rows are not in the original
+order, then an additional vector <span 
+class="cmti-10">rIdx </span>is required, storing the actual row index for
+each row in the data structure.
+<!--l. 327--><p class="indent" >   The multiple ELLPACK-like buffers are stacked together inside a single, one
+dimensional array; an additional vector <span 
+class="cmti-10">hackOffsets </span>is provided to keep track of the
+individual submatrices. All hacks have the same number of rows <span 
+class="cmti-10">hackSize</span>; hence, the
+<span 
+class="cmti-10">hackOffsets </span>vector is an array of (<span 
+class="cmmi-10">m&#x2215;hackSize</span>) + 1 elements, each one pointing to
+the first index of a submatrix inside the stacked <span 
+class="cmti-10">cM</span>/<span 
+class="cmti-10">rP </span>buffers, plus an additional
+element pointing past the end of the last block, where the next one would begin. We
+thus have the property that the elements of the <span 
+class="cmmi-10">k</span>-th <span 
+class="cmti-10">hack </span>are stored between
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">hackOffsets[k]</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">hackOffsets[k+1]</span></span></span>, similarly to what happens in the CSR
+format.
+<!--l. 342--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x19-149001r7"></a>
+                                                                  
+
+                                                                  
+<!--l. 346--><p class="noindent" ><img 
+src="hll.png" alt="PIC"  
+width="248" height="248" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;7: </span><span  
+class="content">Hacked ELLPACK compression of matrix in Figure&#x00A0;<a 
+href="#x19-146002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-149001r7 -->
+                                                                  
+
+                                                                  
+<!--l. 352--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 354--><p class="indent" >   With this data structure a very long row only affects one hack, and therefore the
+additional memory is limited to the hack in which the row appears.
+<!--l. 358--><p class="indent" >   The relevant data type is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_T_hll_sparse_mat</span></span></span>:
+<div class="center" 
+>
+<!--l. 374--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-105">
+&#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_hll_sparse_mat
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;HLL&#x00A0;format.&#x00A0;(Hacked&#x00A0;ELL)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_)&#x00A0;::&#x00A0;hksz
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_),&#x00A0;allocatable&#x00A0;::&#x00A0;irn(:),&#x00A0;ja(:),&#x00A0;idiag(:),&#x00A0;hkoffs(:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;real(psb_dpk_),&#x00A0;allocatable&#x00A0;::&#x00A0;val(:)
+
+&#x00A0;&#x00A0;contains
+&#x00A0;&#x00A0;&#x00A0;....
+&#x00A0;&#x00A0;end&#x00A0;type
+</pre>
+<!--l. 388--><p class="nopar" >                                                           </div></div>
+   <h5 class="likesubsubsectionHead"><a 
+ id="x19-150000"></a>Diagonal storage</h5>
+<!--l. 396--><p class="noindent" >The DIAgonal (DIA) format (shown in Figure&#x00A0;<a 
+href="#x19-150001r8">8<!--tex4ht:ref: fig:dia --></a>) has a 2-dimensional array <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span>
+containing in each column the coefficients along a diagonal of the matrix, and an
+integer array <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OFFSET</span></span></span> that determines where each diagonal starts. The diagonals in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span>
+are padded with zeros as necessary.
+<!--l. 402--><p class="indent" >   The code to compute the matrix-vector product <span 
+class="cmmi-10">y </span>= <span 
+class="cmmi-10">Ax </span>is shown in Alg.&#x00A0;<a 
+href="#x19-150003r2">2<!--tex4ht:ref: alg:dia --></a>; it
+costs one memory read per outer iteration, plus three memory reads, one memory
+write and two floating-point operations per inner iteration. The accesses to
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">AS</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">x</span></span></span> are in strict sequential order, therefore no indirect addressing is
+required.
+<!--l. 409--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x19-150001r8"></a>
+                                                                  
+
+                                                                  
+<!--l. 413--><p class="noindent" ><img 
+src="dia.png" alt="PIC"  
+width="248" height="248" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;8: </span><span  
+class="content">DIA compression of matrix in Figure&#x00A0;<a 
+href="#x19-146002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-150001r8 -->
+                                                                  
+
+                                                                  
+<!--l. 419--><p class="indent" >   </div><hr class="endfigure">
+<a 
+ id="x19-150002r2"></a>
+                                                                  
+
+                                                                  
+<!--l. 423--><p class="indent" >   <hr class="float"><div class="float" 
+>
+                                                                  
+
+                                                                  
+   <div class="center" 
+>
+   <!--l. 437--><p class="noindent" >
+   <div class="minipage"><pre class="verbatim" id="verbatim-106">
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;do&#x00A0;j=1,ndiag
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;if&#x00A0;(offset(j)&#x00A0;&#x003E;&#x00A0;0)&#x00A0;then
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;ir1&#x00A0;=&#x00A0;1;&#x00A0;ir2&#x00A0;=&#x00A0;m&#x00A0;-&#x00A0;offset(j);
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;else
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;ir1&#x00A0;=&#x00A0;1&#x00A0;-&#x00A0;offset(j);&#x00A0;ir2&#x00A0;=&#x00A0;m;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;if
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;do&#x00A0;i=ir1,ir2
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;y(i)&#x00A0;=&#x00A0;y(i)&#x00A0;+&#x00A0;alpha*as(i,j)*x(i+offset(j))
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;do
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;do
+</pre>
+<!--l. 450--><p class="nopar" >                                                           </div></div>
+   <a 
+ id="x19-150003r2"></a>
+   <a 
+ id="x19-150004"></a>
+        <span 
+class="cmbx-10">Algorithm</span><span 
+class="cmbx-10">&#x00A0;2:</span>&#x00A0; Matrix-Vector product in DIA format
+                                                                  
+
+                                                                  
+   </div><hr class="endfloat" />
+<!--l. 458--><p class="indent" >   The relevant data type is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_T_dia_sparse_mat</span></span></span>:
+<div class="center" 
+>
+<!--l. 473--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-107">
+&#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_dia_sparse_mat
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;DIA&#x00A0;format,&#x00A0;extended.
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_),&#x00A0;allocatable&#x00A0;::&#x00A0;offset(:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_)&#x00A0;::&#x00A0;nzeros
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;real(psb_dpk_),&#x00A0;allocatable&#x00A0;::&#x00A0;data(:,:)
+
+&#x00A0;&#x00A0;end&#x00A0;type
+</pre>
+<!--l. 486--><p class="nopar" >                                                           </div></div>
+   <h5 class="likesubsubsectionHead"><a 
+ id="x19-151000"></a>Hacked DIA</h5>
+<!--l. 495--><p class="noindent" >Storage by DIAgonals is an attractive option for matrices whose coefficients are
+located on a small set of diagonals, since they do away with storing explicitly the
+indices and therefore reduce significantly memory traffic. However, having a few
+coefficients outside of the main set of diagonals may significantly increase the
+amount of needed padding; moreover, while the DIA code is easily vectorized,
+it does not necessarily make optimal use of the memory hierarchy. While
+processing each diagonal we are updating entries in the output vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">y</span></span></span>,
+which is then accessed multiple times; if the vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">y</span></span></span> is too large to remain
+in the cache memory, the associated cache miss penalty is paid multiple
+times.
+<!--l. 507--><p class="indent" >   The <span 
+class="cmti-10">hacked DIA </span>(<span 
+class="cmbx-10">HDIA</span>) format was designed to contain the amount of padding,
+by breaking the original matrix into equally sized groups of rows (<span 
+class="cmti-10">hacks</span>), and then
+storing these groups as independent matrices in DIA format. This approach is similar
+to that of HLL, and requires using an offset vector for each submatrix. Again,
+similarly to HLL, the various submatrices are stacked inside a linear array to
+improve memory management. The fact that the matrix is accessed in slices
+helps in reducing cache misses, especially regarding accesses to the vector
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">y</span></span></span>.
+<!--l. 519--><p class="indent" >   An additional vector <span 
+class="cmti-10">hackOffsets </span>is provided to complete the matrix format; given
+that <span 
+class="cmti-10">hackSize </span>is the number of rows of each hack, the <span 
+class="cmti-10">hackOffsets </span>vector is made by
+an array of (<span 
+class="cmmi-10">m&#x2215;hackSize</span>) + 1 elements, pointing to the first diagonal offset of a
+submatrix inside the stacked <span 
+class="cmti-10">offsets </span>buffers, plus an additional element equal to the
+number of nonzero diagonals in the whole matrix. We thus have the property that
+the number of diagonals of the <span 
+class="cmmi-10">k</span>-th <span 
+class="cmti-10">hack </span>is given by <span 
+class="cmti-10">hackOffsets[k+1] -</span>
+<span 
+class="cmti-10">hackOffsets[k]</span>.
+<!--l. 529--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                  
+
+                                                                  
+<a 
+ id="x19-151001r9"></a>
+                                                                  
+
+                                                                  
+<!--l. 533--><p class="noindent" ><img 
+src="hdia.png" alt="PIC"  
+width="248" height="248" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;9: </span><span  
+class="content">Hacked DIA compression of matrix in Figure&#x00A0;<a 
+href="#x19-146002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-151001r9 -->
+                                                                  
+
+                                                                  
+<!--l. 539--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 541--><p class="indent" >   The relevant data type is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_T_hdia_sparse_mat</span></span></span>:
+<div class="center" 
+>
+<!--l. 568--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-108">
+&#x00A0;&#x00A0;type&#x00A0;pm
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;real(psb_dpk_),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;data(:,:)
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;pm
+
+&#x00A0;&#x00A0;type&#x00A0;po
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;off(:)
+&#x00A0;&#x00A0;end&#x00A0;type&#x00A0;po
+
+&#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_hdia_sparse_mat
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;HDIA&#x00A0;format,&#x00A0;extended.
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;!
+
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(pm),&#x00A0;allocatable&#x00A0;::&#x00A0;hdia(:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;type(po),&#x00A0;allocatable&#x00A0;::&#x00A0;offset(:)
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_)&#x00A0;::&#x00A0;nblocks,&#x00A0;nzeros
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_ipk_)&#x00A0;::&#x00A0;hack&#x00A0;=&#x00A0;64
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer(psb_long_int_k_)&#x00A0;::&#x00A0;dim=0
+
+&#x00A0;&#x00A0;contains
+&#x00A0;&#x00A0;&#x00A0;....
+&#x00A0;&#x00A0;end&#x00A0;type
+</pre>
+<!--l. 593--><p class="nopar" >                                                           </div></div>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">12.4   </span> <a 
+ id="x19-15200012.4"></a>CUDA-class extensions</h4>
+<!--l. 4--><p class="noindent" >For computing with CUDA we define a dual memorization strategy in which each
+variable on the CPU (&#8220;host&#8221;) side has a GPU (&#8220;device&#8221;) side. When a GPU-type
+variable is initialized, the data contained is (usually) the same on both sides. Each
+operator invoked on the variable may change the data so that only the host side or
+the device side are up-to-date.
+<!--l. 11--><p class="indent" >   Keeping track of the updates to data in the variables is essential: we want to
+perform most computations on the GPU, but we cannot afford the time needed to
+move data between the host memory and the device memory because the bandwidth
+of the interconnection bus would become the main bottleneck of the computation.
+Thus, each and every computational routine in the library is built according to the
+following principles:
+     <ul class="itemize1">
+     <li class="itemize">
+     <!--l. 18--><p class="noindent" >If the data type being handled is GPU-enabled, make sure that its device
+     copy is up to date, perform any arithmetic operation on the GPU, and
+     if the data has been altered as a result, mark the main-memory copy as
+     outdated.
+     </li>
+     <li class="itemize">
+     <!--l. 22--><p class="noindent" >The main-memory copy is never updated unless this is requested by the user
+     either
+         <dl class="description"><dt class="description">
+         <!--l. 25--><p class="noindent" >
+     <span 
+class="cmbx-10">explicitly</span> </dt><dd 
+class="description">
+         <!--l. 25--><p class="noindent" >by invoking a synchronization method;
+         </dd><dt class="description">
+         <!--l. 26--><p class="noindent" >
+     <span 
+class="cmbx-10">implicitly</span> </dt><dd 
+class="description">
+         <!--l. 26--><p class="noindent" >by invoking a method that involves other data items that are not
+         GPU-enabled, e.g., by assignment ov a vector to a normal array.</dd></dl>
+     </li></ul>
+<!--l. 31--><p class="noindent" >In this way, data items are put on the GPU memory &#8220;on demand&#8221; and remain there as
+long as &#8220;normal&#8221; computations are carried out. As an example, the following call to a
+matrix-vector product
+<div class="center" 
+>
+<!--l. 39--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-109">
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;psb_spmm(alpha,a,x,beta,y,desc_a,info)
+</pre>
+<!--l. 43--><p class="nopar" >                                                           </div></div>
+                                                                  
+
+                                                                  
+<!--l. 47--><p class="noindent" >will transparently and automatically be performed on the GPU whenever all three data
+inputs <code class="lstinline"><span style="color:#000000">a</span></code>, <code class="lstinline"><span style="color:#000000">x</span></code> and <code class="lstinline"><span style="color:#000000">y</span></code> are GPU-enabled. If a program makes many such calls sequentially,
+then
+     <ul class="itemize1">
+     <li class="itemize">
+     <!--l. 52--><p class="noindent" >The first kernel invocation will find the data in main memory, and will
+     copy it to the GPU memory, thus incurring a significant overhead; the
+     result is however <span 
+class="cmti-10">not </span>copied back, and therefore:
+     </li>
+     <li class="itemize">
+     <!--l. 56--><p class="noindent" >Subsequent kernel invocations involving the same vector will find the data
+     on the GPU side so that they will run at full speed.</li></ul>
+<!--l. 60--><p class="noindent" >For all invocations after the first the only data that will have to be transferred to/from
+the main memory will be the scalars <code class="lstinline"><span style="color:#000000">alpha</span></code> and <code class="lstinline"><span style="color:#000000">beta</span></code>, and the return code
+<code class="lstinline"><span style="color:#000000">info</span></code>.
+<!--l. 64--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 65--><p class="noindent" >
+<span 
+class="cmbx-10">Vectors:</span> </dt><dd 
+class="description">
+     <!--l. 65--><p class="noindent" >The  data  type  <code class="lstinline"><span style="color:#000000">psb_T_vect_gpu</span></code> provides  a  GPU-enabled  extension  of
+     the inner type <code class="lstinline"><span style="color:#000000">psb_T_base_vect_type</span></code>, and must be used together with
+     the other inner matrix type to make full use of the GPU computational
+     capabilities;
+     </dd><dt class="description">
+     <!--l. 69--><p class="noindent" >
+<span 
+class="cmbx-10">CSR:</span> </dt><dd 
+class="description">
+     <!--l. 69--><p class="noindent" >The data type <code class="lstinline"><span style="color:#000000">psb_T_csrg_sparse_mat</span></code> provides an interface to the GPU
+     version of CSR available in the NVIDIA CuSPARSE library;
+     </dd><dt class="description">
+     <!--l. 72--><p class="noindent" >
+<span 
+class="cmbx-10">HYB:</span> </dt><dd 
+class="description">
+     <!--l. 72--><p class="noindent" >The data type <code class="lstinline"><span style="color:#000000">psb_T_hybg_sparse_mat</span></code> provides an interface to the HYB
+     GPU storage available in the NVIDIA CuSPARSE library. The internal
+     structure is opaque, hence the host side is just CSR; the HYB data format
+     is only available up to CUDA version 10.
+     </dd><dt class="description">
+     <!--l. 77--><p class="noindent" >
+<span 
+class="cmbx-10">ELL:</span> </dt><dd 
+class="description">
+     <!--l. 77--><p class="noindent" >The  data  type  <code class="lstinline"><span style="color:#000000">psb_T_elg_sparse_mat</span></code> provides  an  interface  to  the
+     ELLPACK implementation from SPGPU;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 80--><p class="noindent" >
+<span 
+class="cmbx-10">HLL:</span> </dt><dd 
+class="description">
+     <!--l. 80--><p class="noindent" >The data type <code class="lstinline"><span style="color:#000000">psb_T_hlg_sparse_mat</span></code> provides an interface to the Hacked
+     ELLPACK implementation from SPGPU;
+     </dd><dt class="description">
+     <!--l. 82--><p class="noindent" >
+<span 
+class="cmbx-10">HDIA:</span> </dt><dd 
+class="description">
+     <!--l. 82--><p class="noindent" >The  data  type  <code class="lstinline"><span style="color:#000000">psb_T_hdiag_sparse_mat</span></code> provides  an  interface  to  the
+     Hacked DIAgonals implementation from SPGPU;</dd></dl>
+                                                                  
+
+                                                                  
+   <!--l. 87--><div class="crosslinks"><p class="noindent">[<a 
+href="userhtmlse11.html" >prev</a>] [<a 
+href="userhtmlse11.html#tailuserhtmlse11.html" >prev-tail</a>] [<a 
+href="userhtmlse12.html" >front</a>] [<a 
+href="userhtml.html# " >up</a>] </p></div>
+<!--l. 87--><p class="indent" >   <a 
+ id="tailuserhtmlse12.html"></a>   
+</body></html> 

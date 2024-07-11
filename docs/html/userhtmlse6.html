@@ -11,105 +11,4060 @@
 </head><body 
 >
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu59.html" >next</a>] [<a 
+href="userhtmlse10.html" >next</a>] [<a 
 href="userhtmlse5.html" >prev</a>] [<a 
 href="userhtmlse5.html#tailuserhtmlse5.html" >prev-tail</a>] [<a 
-href="userhtmlsu27.html#tailuserhtmlse6.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu32.html" >up</a>] </p></div>
+href="userhtmlse3.html#tailuserhtmlse6.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse9.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
- id="x40-770006"></a>Data management routines</h3>
+ id="x11-770006"></a>Data management routines</h3>
 <!--l. 8--><p class="noindent" >
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >6.1 <a 
-href="userhtmlsu30.html#x41-780006.1">psb_cdall &#8212; Allocates a communication descriptor</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.2 <a 
-href="userhtmlsu31.html#x42-790006.2">psb_cdins &#8212; Communication descriptor insert routine</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.3 <a 
-href="userhtmlsu32.html#x43-800006.3">psb_cdasb &#8212; Communication descriptor assembly routine</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.4 <a 
-href="userhtmlsu33.html#x44-810006.4">psb_cdcpy &#8212; Copies a communication descriptor</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.5 <a 
-href="userhtmlsu34.html#x45-820006.5">psb_cdfree &#8212; Frees a communication descriptor</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.6 <a 
-href="userhtmlsu35.html#x46-830006.6">psb_cdbldext &#8212; Build an extended communication descriptor</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.7 <a 
-href="userhtmlsu36.html#x47-840006.7">psb_spall &#8212; Allocates a sparse matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.8 <a 
-href="userhtmlsu37.html#x48-850006.8">psb_spins &#8212; Insert a set of coefficients into a sparse matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.9 <a 
-href="userhtmlsu38.html#x49-860006.9">psb_spasb &#8212; Sparse matrix assembly routine</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.10 <a 
-href="userhtmlsu39.html#x50-870006.10">psb_spfree &#8212; Frees a sparse matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.11 <a 
-href="userhtmlsu40.html#x51-880006.11">psb_sprn &#8212; Reinit sparse matrix structure for psblas routines.</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.12 <a 
-href="userhtmlsu41.html#x52-890006.12">psb_geall &#8212; Allocates a dense matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.13 <a 
-href="userhtmlsu42.html#x53-900006.13">psb_geins &#8212; Dense matrix insertion routine</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.14 <a 
-href="userhtmlsu43.html#x54-910006.14">psb_geasb &#8212; Assembly a dense matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.15 <a 
-href="userhtmlsu44.html#x55-920006.15">psb_gefree &#8212; Frees a dense matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.16 <a 
-href="userhtmlsu45.html#x56-930006.16">psb_gelp &#8212; Applies a left permutation to a dense matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.17 <a 
-href="userhtmlsu46.html#x57-940006.17">psb_glob_to_loc &#8212; Global to local indices convertion</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.18 <a 
-href="userhtmlsu47.html#x58-950006.18">psb_loc_to_glob &#8212; Local to global indices conversion</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.19 <a 
-href="userhtmlsu48.html#x59-960006.19">psb_is_owned &#8212; </a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.20 <a 
-href="userhtmlsu49.html#x60-970006.20">psb_owned_index &#8212; </a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.21 <a 
-href="userhtmlsu50.html#x61-980006.21">psb_is_local &#8212; </a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.22 <a 
-href="userhtmlsu51.html#x62-990006.22">psb_local_index &#8212; </a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.23 <a 
-href="userhtmlsu52.html#x63-1000006.23">psb_get_boundary &#8212; Extract list of boundary elements</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.24 <a 
-href="userhtmlsu53.html#x64-1010006.24">psb_get_overlap &#8212; Extract list of overlap elements</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.25 <a 
-href="userhtmlsu54.html#x65-1020006.25">psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.26 <a 
-href="userhtmlsu55.html#x66-1030006.26">psb_sizeof &#8212; Memory occupation</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >6.27 <a 
-href="userhtmlsu56.html#x67-1040006.27">Sorting utilities &#8212; </a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">6.1   </span> <a 
+ id="x11-780006.1"></a>psb_cdall &#8212; Allocates a communication descriptor</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-33">
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,parts=parts)
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vg=vg,[mg=mg,flag=flag])
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,nl=nl)
+call&#x00A0;psb_cdall(icontxt,&#x00A0;desc_a,&#x00A0;info,mg=mg,repl=.true.)
+</pre>
+<!--l. 16--><p class="nopar" >
+<!--l. 18--><p class="indent" >   This subroutine initializes the communication descriptor associated with an index
+space. One of the optional arguments <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">repl</span></span></span> must be specified,
+thereby choosing the specific initialization strategy.
+     <dl class="description"><dt class="description">
+     <!--l. 24--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 24--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 25--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 25--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 26--><p class="noindent" >
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">
+     <!--l. 26--><p class="noindent" >the communication context.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+     <!--l. 31--><p class="noindent" >
+<span 
+class="cmbx-10">vg</span> </dt><dd 
+class="description">
+     <!--l. 31--><p class="noindent" >Data allocation: each index <span 
+class="cmmi-10">i </span><span 
+class="cmsy-10">&#x2208;{</span>1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">mg</span><span 
+class="cmsy-10">} </span>is allocated to process <span 
+class="cmmi-10">vg</span>(<span 
+class="cmmi-10">i</span>).<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.
+     </dd><dt class="description">
+     <!--l. 37--><p class="noindent" >
+<span 
+class="cmbx-10">flag</span> </dt><dd 
+class="description">
+     <!--l. 37--><p class="noindent" >Specifies whether entries in <span 
+class="cmmi-10">vg </span>are zero- or one-based.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value 0<span 
+class="cmmi-10">,</span>1, default 0.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 43--><p class="noindent" >
+<span 
+class="cmbx-10">mg</span> </dt><dd 
+class="description">
+     <!--l. 43--><p class="noindent" >the (global) number of rows of the problem.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. It is required if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">repl</span></span></span> is specified,
+     it is optional if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span> is specified.
+     </dd><dt class="description">
+     <!--l. 49--><p class="noindent" >
+<span 
+class="cmbx-10">parts</span> </dt><dd 
+class="description">
+     <!--l. 49--><p class="noindent" >the subroutine that defines the partitioning scheme.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a subroutine.
+     </dd><dt class="description">
+     <!--l. 53--><p class="noindent" >
+<span 
+class="cmbx-10">vl</span> </dt><dd 
+class="description">
+     <!--l. 53--><p class="noindent" >Data allocation: the set of global indices <span 
+class="cmmi-10">vl</span>(1 : <span 
+class="cmmi-10">nl</span>) belonging to the calling
+     process. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.
+     </dd><dt class="description">
+     <!--l. 59--><p class="noindent" >
+<span 
+class="cmbx-10">nl</span> </dt><dd 
+class="description">
+     <!--l. 59--><p class="noindent" >Data allocation: in a generalized block-row distribution the number of
+     indices belonging to the current process. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value. May be specified together with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 66--><p class="noindent" >
+<span 
+class="cmbx-10">repl</span> </dt><dd 
+class="description">
+     <!--l. 66--><p class="noindent" >Data allocation: build a replicated index space (i.e. all processes own all
+     indices).<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: the logical value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span>
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 72--><p class="noindent" >
+<span 
+class="cmbx-10">globalcheck</span> </dt><dd 
+class="description">
+     <!--l. 72--><p class="noindent" >Data allocation: do global checks on the local index lists <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span><br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical value, default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.false.</span></span></span>
+     </dd><dt class="description">
+     <!--l. 78--><p class="noindent" >
+<span 
+class="cmbx-10">lidx</span> </dt><dd 
+class="description">
+     <!--l. 78--><p class="noindent" >Data allocation: the set of local indices <span 
+class="cmmi-10">lidx</span>(1 : <span 
+class="cmmi-10">nl</span>) to be assigned to the
+     global indices <span 
+class="cmmi-10">vl</span>. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.</dd></dl>
+<!--l. 86--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 87--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 87--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 88--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 88--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 93--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 93--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 100--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-78002x1">
+                                                                  
 
+                                                                  
+     <!--l. 102--><p class="noindent" >One of the optional arguments <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">repl</span></span></span> must be specified,
+     thereby choosing the initialization strategy as follows:
+         <dl class="description"><dt class="description">
+         <!--l. 106--><p class="noindent" >
+     <span 
+class="cmbx-10">parts</span> </dt><dd 
+class="description">
+         <!--l. 106--><p class="noindent" >In this case we have a subroutine specifying the mapping between global
+         indices and process/local index pairs. If this optional argument is
+         specified, then it is mandatory to specify the argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mg</span></span></span> as well. The
+         subroutine must conform to the following interface:
+                                                                  
 
+                                                                  
+         <pre class="verbatim" id="verbatim-34">
+         &#x00A0;&#x00A0;interface
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;subroutine&#x00A0;psb_parts(glob_index,mg,np,pv,nv)
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(in)&#x00A0;&#x00A0;::&#x00A0;glob_index,np,mg
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;integer,&#x00A0;intent&#x00A0;(out)&#x00A0;::&#x00A0;nv,&#x00A0;pv(*)
+         &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;end&#x00A0;subroutine&#x00A0;psb_parts
+         &#x00A0;&#x00A0;end&#x00A0;interface
+</pre>
+         <!--l. 118--><p class="nopar" > The input arguments are:
+             <dl class="description"><dt class="description">
+             <!--l. 121--><p class="noindent" >
+         <span 
+class="cmbx-10">glob</span><span 
+class="cmbx-10">_index</span> </dt><dd 
+class="description">
+             <!--l. 121--><p class="noindent" >The global index to be mapped;
+             </dd><dt class="description">
+             <!--l. 122--><p class="noindent" >
+         <span 
+class="cmbx-10">np</span> </dt><dd 
+class="description">
+             <!--l. 122--><p class="noindent" >The number of processes in the mapping;
+             </dd><dt class="description">
+             <!--l. 123--><p class="noindent" >
+         <span 
+class="cmbx-10">mg</span> </dt><dd 
+class="description">
+             <!--l. 123--><p class="noindent" >The total number of global rows in the mapping;</dd></dl>
+         <!--l. 125--><p class="noindent" >The output arguments are:
+             <dl class="description"><dt class="description">
+             <!--l. 127--><p class="noindent" >
+         <span 
+class="cmbx-10">nv</span> </dt><dd 
+class="description">
+             <!--l. 127--><p class="noindent" >The number of entries in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">pv</span></span></span>;
+             </dd><dt class="description">
+             <!--l. 128--><p class="noindent" >
+         <span 
+class="cmbx-10">pv</span> </dt><dd 
+class="description">
+             <!--l. 128--><p class="noindent" >A vector containing the indices of the processes to which the
+             global index should be assigend; each entry must satisfy 0  <span 
+class="cmsy-10">&#x2264;</span>
+             <span 
+class="cmmi-10">pv</span>(<span 
+class="cmmi-10">i</span>) <span 
+class="cmmi-10">&#x003C; np</span>; if <span 
+class="cmmi-10">nv &#x003E; </span>1 we have an index assigned to multiple
+             processes, i.e. we have an overlap among the subdomains.</dd></dl>
+         </dd><dt class="description">
+         <!--l. 133--><p class="noindent" >
+     <span 
+class="cmbx-10">vg</span> </dt><dd 
+class="description">
+         <!--l. 133--><p class="noindent" >In this case the association between an index and a process is specified via
+         an integer vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg(1:mg)</span></span></span>; each index <span 
+class="cmmi-10">i </span><span 
+class="cmsy-10">&#x2208;{</span>1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">mg</span><span 
+class="cmsy-10">} </span>is assigned to process
+         <span 
+class="cmmi-10">vg</span>(<span 
+class="cmmi-10">i</span>). The vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span> must be identical on all calling processes; its
+         entries may have the ranges (0<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">np </span><span 
+class="cmsy-10">- </span>1) or (1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">np</span>) according to the
+         value of <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">flag</span></span></span>. The size <span 
+class="cmmi-10">mg </span>may be specified via the optional
+         argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mg</span></span></span>; the default is to use the entire vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>, thus having
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mg=size(vg)</span></span></span>.
+         </dd><dt class="description">
+         <!--l. 142--><p class="noindent" >
+     <span 
+class="cmbx-10">vl</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+         <!--l. 142--><p class="noindent" >In this case we are specifying the list of indices <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl(1:nl)</span></span></span> assigned to the
+         current process; thus, the global problem size <span 
+class="cmmi-10">mg </span>is given by the range of
+         the aggregate of the individual vectors <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> specified in the calling
+         processes. The size may be specified via the optional argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span>; the
+         default is to use the entire vector <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>, thus having <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl=size(vl)</span></span></span>. If
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.true.</span></span></span> the subroutine will check how many times each
+         entry in the global index space (1<span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">mg</span>) is specified in the input lists <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>,
+         thus allowing for the presence of overlap in the input, and checking for
+         &#8220;orphan&#8221; indices. If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.false.</span></span></span>, the subroutine will not
+         check for overlap, and may be significantly faster, but the user is
+         implicitly guaranteeing that there are neither orphan nor overlap
+         indices.
+         </dd><dt class="description">
+         <!--l. 157--><p class="noindent" >
+     <span 
+class="cmbx-10">lidx</span> </dt><dd 
+class="description">
+         <!--l. 157--><p class="noindent" >The optional argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx</span></span></span> is available for those cases in which the user
+         has already established a global-to-local mapping; if it is specified, each
+         index in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl(i)</span></span></span> will be mapped to the corresponding local index <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx(i)</span></span></span>.
+         When specifying the argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx</span></span></span> the user would also likely employ
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">lidx</span></span></span> in calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">local</span></span></span> in calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span> and
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_geins</span></span></span>; see also sec.&#x00A0;<a 
+href="userhtmlse2.html#x4-70002.3.1">2.3.1<!--tex4ht:ref: sec:usermaps --></a>.
+         </dd><dt class="description">
+         <!--l. 165--><p class="noindent" >
+     <span 
+class="cmbx-10">nl</span> </dt><dd 
+class="description">
+         <!--l. 165--><p class="noindent" >If this argument is specified alone (i.e. without <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span>) the result is a
+         generalized row-block distribution in which each process <span 
+class="cmmi-10">I </span>gets assigned a
+         consecutive chunk of <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">I</span></sub> = <span 
+class="cmmi-10">nl </span>global indices.
+         </dd><dt class="description">
+         <!--l. 169--><p class="noindent" >
+     <span 
+class="cmbx-10">repl</span> </dt><dd 
+class="description">
+         <!--l. 169--><p class="noindent" >This arguments specifies to replicate all indices on all processes. This is a
+         special purpose data allocation that is useful in the construction of some
+         multilevel preconditioners.</dd></dl>
+     </li>
+<li 
+  class="enumerate" id="x11-78004x2">
+     <!--l. 173--><p class="noindent" >On exit from this routine the descriptor is in the build state.
+     </li>
+<li 
+  class="enumerate" id="x11-78006x3">
+     <!--l. 175--><p class="noindent" >Calling the routine with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span> implies that every process will scan the
+     entire index space to figure out the local indices.
+     </li>
+<li 
+  class="enumerate" id="x11-78008x4">
+     <!--l. 178--><p class="noindent" >Overlapped indices are possible with both <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">parts</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> invocations.
+                                                                  
 
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x11-78010x5">
+     <!--l. 180--><p class="noindent" >When the subroutine is invoked with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> in conjunction with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.true.</span></span></span>,
+     it will perform a scan of the index space to search for overlap or orphan
+     indices.
+     </li>
+<li 
+  class="enumerate" id="x11-78012x6">
+     <!--l. 183--><p class="noindent" >When the subroutine is invoked with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> in conjunction with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">globalcheck=.false.</span></span></span>,
+     no index space scan will take place. Thus it is the responsibility of the user to
+     make sure that the indices specified in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vl</span></span></span> have neither orphans nor overlaps; if
+     this assumption fails, results will be unpredictable.
+     </li>
+<li 
+  class="enumerate" id="x11-78014x7">
+     <!--l. 189--><p class="noindent" >Orphan and overlap indices are impossible by construction when the subroutine
+     is invoked with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nl</span></span></span> (alone), or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">vg</span></span></span>.</li></ol>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.2   </span> <a 
+ id="x11-790006.2"></a>psb_cdins &#8212; Communication descriptor insert routine</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-35">
+call&#x00A0;psb_cdins(nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,ila,jla])
+call&#x00A0;psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
+</pre>
+<!--l. 204--><p class="nopar" >
+<!--l. 206--><p class="indent" >   This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a linear system
+coefficient matrix), storing them as necessary into the communication descriptor. In
+the first form the edges are specified as pairs of indices <span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,ja</span>(<span 
+class="cmmi-10">i</span>); the starting index
+<span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>) should belong to the current process. In the second form only the remote indices
+<span 
+class="cmmi-10">ja</span>(<span 
+class="cmmi-10">i</span>) are specified.
+<!--l. 214--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 215--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 215--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 216--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 216--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 217--><p class="noindent" >
+<span 
+class="cmbx-10">nz</span> </dt><dd 
+class="description">
+     <!--l. 217--><p class="noindent" >the number of points being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+     <!--l. 222--><p class="noindent" >
+<span 
+class="cmbx-10">ia</span> </dt><dd 
+class="description">
+     <!--l. 222--><p class="noindent" >the indices of the starting vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+     <!--l. 227--><p class="noindent" >
+<span 
+class="cmbx-10">ja</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 227--><p class="noindent" >the indices of the end vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+     <!--l. 232--><p class="noindent" >
+<span 
+class="cmbx-10">mask</span> </dt><dd 
+class="description">
+     <!--l. 232--><p class="noindent" >Mask entries in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span>, they are inserted only when the corresponding <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mask</span></span></span>
+     entries are <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span><br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical array of length <span 
+class="cmmi-10">nz</span>, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 238--><p class="noindent" >
+<span 
+class="cmbx-10">lidx</span> </dt><dd 
+class="description">
+     <!--l. 238--><p class="noindent" >User defined local indices for <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.</dd></dl>
+<!--l. 253--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 254--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 254--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 255--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 255--><p class="noindent" >the updated communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 260--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 260--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 265--><p class="noindent" >
+<span 
+class="cmbx-10">ila</span> </dt><dd 
+class="description">
+     <!--l. 265--><p class="noindent" >the local indices of the starting vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+     <!--l. 270--><p class="noindent" >
+<span 
+class="cmbx-10">jla</span> </dt><dd 
+class="description">
+     <!--l. 270--><p class="noindent" >the local indices of the end vertex of the edges being inserted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: an integer array of length <span 
+class="cmmi-10">nz</span>.
+     </dd></dl>
+<!--l. 277--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-79002x1">
+     <!--l. 279--><p class="noindent" >This routine may only be called if the descriptor is in the build state;
+     </li>
+<li 
+  class="enumerate" id="x11-79004x2">
+     <!--l. 281--><p class="noindent" >This routine automatically ignores edges that do not insist on the current
+     process, i.e. edges for which neither the starting nor the end vertex belong
+     to the current process.
+     </li>
+<li 
+  class="enumerate" id="x11-79006x3">
+     <!--l. 284--><p class="noindent" >The  second  form  of  this  routine  will  be  useful  when  dealing  with
+     user-specified index mappings; see also&#x00A0;<a 
+href="userhtmlse2.html#x4-70002.3.1">2.3.1<!--tex4ht:ref: sec:usermaps --></a>.</li></ol>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.3   </span> <a 
+ id="x11-800006.3"></a>psb_cdasb &#8212; Communication descriptor assembly routine</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-36">
+call&#x00A0;psb_cdasb(desc_a,&#x00A0;info&#x00A0;[,&#x00A0;mold])
+</pre>
+<!--l. 298--><p class="nopar" >
+<!--l. 300--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 301--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 301--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 302--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 302--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 303--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 303--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 308--><p class="noindent" >
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">
+     <!--l. 308--><p class="noindent" >The desired dynamic type for the internal index storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified     as:     a     object     of     type     derived     from     (integer)
+     <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>.</dd></dl>
+<!--l. 315--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 316--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 316--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 317--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 317--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 322--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 322--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 329--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-80002x1">
+     <!--l. 331--><p class="noindent" >On exit from this routine the descriptor is in the assembled state.</li></ol>
+<!--l. 334--><p class="noindent" >This call will set up all the necessary information for the halo data exchanges. In doing
+so, the library will need to identify the set of processes owning the halo indices
+through the use of the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">desc%fnd_owner()</span></span></span> method; the owning processes
+are the topological neighbours of the calling process. If the user has some
+background information on the processes that are neighbours of the current one,
+it is possible to specify explicitly the list of adjacent processes with a call
+to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">desc%set_p_adjcncy(list)</span></span></span>; this will speed up the subsequent call to
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span>.
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.4   </span> <a 
+ id="x11-810006.4"></a>psb_cdcpy &#8212; Copies a communication descriptor</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-37">
+call&#x00A0;psb_cdcpy(desc_in,&#x00A0;desc_out,&#x00A0;info)
+</pre>
+<!--l. 351--><p class="nopar" >
+<!--l. 353--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 354--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 354--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 355--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 355--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 356--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_in</span> </dt><dd 
+class="description">
+     <!--l. 356--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd></dl>
+<!--l. 364--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 365--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 365--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 366--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_out</span> </dt><dd 
+class="description">
+     <!--l. 366--><p class="noindent" >the communication descriptor copy.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 371--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 371--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.5   </span> <a 
+ id="x11-820006.5"></a>psb_cdfree &#8212; Frees a communication descriptor</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-38">
+call&#x00A0;psb_cdfree(desc_a,&#x00A0;info)
+</pre>
+<!--l. 386--><p class="nopar" >
+<!--l. 388--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 389--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 389--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 390--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 390--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 391--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 391--><p class="noindent" >the communication descriptor to be freed.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 398--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 399--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 399--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 400--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 400--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.6   </span> <a 
+ id="x11-830006.6"></a>psb_cdbldext &#8212; Build an extended communication descriptor</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-39">
+call&#x00A0;psb_cdbldext(a,desc_a,nl,desc_out,&#x00A0;info,&#x00A0;extype)
+</pre>
+<!--l. 417--><p class="nopar" >
+<!--l. 419--><p class="indent" >   This subroutine builds an extended communication descriptor, based on the input
+descriptor <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">desc_a</span></span></span> and on the stencil specified through the input sparse matrix
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">a</span></span></span>.
+     <dl class="description"><dt class="description">
+     <!--l. 423--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 423--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 424--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 424--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 425--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 425--><p class="noindent" >A sparse matrix Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data type.
+     </dd><dt class="description">
+     <!--l. 430--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 430--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 435--><p class="noindent" >
+<span 
+class="cmbx-10">nl</span> </dt><dd 
+class="description">
+     <!--l. 435--><p class="noindent" >the number of additional layers desired.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="cmmi-10">nl </span><span 
+class="cmsy-10">&#x2265; </span>0.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 440--><p class="noindent" >
+<span 
+class="cmbx-10">extype</span> </dt><dd 
+class="description">
+     <!--l. 440--><p class="noindent" >the kind of estension required.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional </span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ovt_xhal_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ovt_asov_</span></span></span>, default:
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ovt_xhal_</span></span></span>
+     </dd></dl>
+<!--l. 449--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 450--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 450--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 451--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_out</span> </dt><dd 
+class="description">
+     <!--l. 451--><p class="noindent" >the extended communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 456--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 456--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 463--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-83002x1">
+     <!--l. 465--><p class="noindent" >Specifying <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ovt_xhal_</span></span></span> for the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">extype</span></span></span> argument the user will obtain a
+     descriptor for a domain partition in which the additional layers are fetched
+     as part of an (extended) halo; however the index-to-process mapping is
+     identical to that of the base descriptor;
+     </li>
+<li 
+  class="enumerate" id="x11-83004x2">
+                                                                  
 
+                                                                  
+     <!--l. 470--><p class="noindent" >Specifying <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ovt_asov_</span></span></span> for the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">extype</span></span></span> argument the user will obtain
+     a descriptor with an overlapped decomposition: the additional layer is
+     aggregated to the local subdomain (and thus is an overlap), and a new
+     halo extending beyond the last additional layer is formed.</li></ol>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.7   </span> <a 
+ id="x11-840006.7"></a>psb_spall &#8212; Allocates a sparse matrix</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-40">
+call&#x00A0;psb_spall(a,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,&#x00A0;nnz,&#x00A0;dupl,&#x00A0;bldmode])
+</pre>
+<!--l. 551--><p class="nopar" >
+<!--l. 553--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 554--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 554--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 555--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 555--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 556--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 556--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 561--><p class="noindent" >
+<span 
+class="cmbx-10">nnz</span> </dt><dd 
+class="description">
+     <!--l. 561--><p class="noindent" >An estimate of the number of nonzeroes in the local part of the assembled
+     matrix.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+     <!--l. 567--><p class="noindent" >
+<span 
+class="cmbx-10">dupl</span> </dt><dd 
+class="description">
+     <!--l. 567--><p class="noindent" >How to handle duplicate coefficients.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integer, possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_ovwrt_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_add_</span></span></span>,
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_err_</span></span></span>.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 573--><p class="noindent" >
+<span 
+class="cmbx-10">bldmode</span> </dt><dd 
+class="description">
+     <!--l. 573--><p class="noindent" >Whether to keep track of matrix entries that do not belong to the current
+     process.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified                                                                                 as:
+     an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span>. Default:
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>.</dd></dl>
+<!--l. 582--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 583--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 583--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 584--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 584--><p class="noindent" >the matrix to be allocated.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 589--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 589--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 595--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-84002x1">
+     <!--l. 597--><p class="noindent" >On exit from this routine the sparse matrix is in the build state.
+     </li>
+<li 
+  class="enumerate" id="x11-84004x2">
+     <!--l. 599--><p class="noindent" >The descriptor may be in either the build or assembled state.
+                                                                  
+
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x11-84006x3">
+     <!--l. 600--><p class="noindent" >Providing  a  good  estimate  for  the  number  of  nonzeroes  <span 
+class="cmmi-10">nnz  </span>in  the
+     assembled matrix may substantially improve performance in the matrix
+     build  phase,  as  it  will  reduce  or  eliminate  the  need  for  (potentially
+     multiple) data reallocations;
+     </li>
+<li 
+  class="enumerate" id="x11-84008x4">
+     <!--l. 604--><p class="noindent" >Using  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span> is  likely  to  cause  a  runtime  overhead  at
+     assembly time;</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.8   </span> <a 
+ id="x11-850006.8"></a>psb_spins &#8212; Insert a set of coefficients into a sparse matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-41">
+call&#x00A0;psb_spins(nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;val,&#x00A0;a,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,local])
+call&#x00A0;psb_spins(nr,&#x00A0;irw,&#x00A0;irp,&#x00A0;ja,&#x00A0;val,&#x00A0;a,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,local])
+</pre>
+<!--l. 619--><p class="nopar" >
+<!--l. 621--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 622--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 622--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 623--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 623--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 624--><p class="noindent" >
+<span 
+class="cmbx-10">nz</span> </dt><dd 
+class="description">
+     <!--l. 624--><p class="noindent" >the number of coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer scalar.
+     </dd><dt class="description">
+     <!--l. 629--><p class="noindent" >
+<span 
+class="cmbx-10">nr</span> </dt><dd 
+class="description">
+     <!--l. 629--><p class="noindent" >the number of rows to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer scalar.
+     </dd><dt class="description">
+     <!--l. 634--><p class="noindent" >
+<span 
+class="cmbx-10">irw</span> </dt><dd 
+class="description">
+     <!--l. 634--><p class="noindent" >the first row to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer scalar.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 639--><p class="noindent" >
+<span 
+class="cmbx-10">ia</span> </dt><dd 
+class="description">
+     <!--l. 639--><p class="noindent" >the row indices of the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of size <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+     <!--l. 644--><p class="noindent" >
+<span 
+class="cmbx-10">irp</span> </dt><dd 
+class="description">
+     <!--l. 644--><p class="noindent" >the row pointers of the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of size <span 
+class="cmmi-10">nr </span>+ 1.
+     </dd><dt class="description">
+     <!--l. 649--><p class="noindent" >
+<span 
+class="cmbx-10">ja</span> </dt><dd 
+class="description">
+     <!--l. 649--><p class="noindent" >the column indices of the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array of size <span 
+class="cmmi-10">nz</span>.
+     </dd><dt class="description">
+     <!--l. 654--><p class="noindent" >
+<span 
+class="cmbx-10">val</span> </dt><dd 
+class="description">
+     <!--l. 654--><p class="noindent" >the coefficients to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an array of size <span 
+class="cmmi-10">nz</span>. Must be of the same type and kind of
+     the coefficients of the sparse matrix <span 
+class="cmmi-10">a</span>.
+     </dd><dt class="description">
+     <!--l. 660--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 660--><p class="noindent" >The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>. <br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 665--><p class="noindent" >
+<span 
+class="cmbx-10">local</span> </dt><dd 
+class="description">
+     <!--l. 665--><p class="noindent" >Whether the entries in the indices vectors <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ia</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ja</span></span></span> are already in local
+     numbering. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a logical value; default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.false.</span></span></span>.
+     </dd></dl>
+<!--l. 681--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 682--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 682--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 683--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 683--><p class="noindent" >the matrix into which coefficients will be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 688--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 688--><p class="noindent" >The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>. <br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 693--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 693--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 700--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+                                                                  
+
+                                                                  
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-85002x1">
+     <!--l. 702--><p class="noindent" >On entry to this routine the descriptor may be in either the build or
+     assembled state.
+     </li>
+<li 
+  class="enumerate" id="x11-85004x2">
+     <!--l. 704--><p class="noindent" >On entry to this routine the sparse matrix may be in either the build or
+     update state.
+     </li>
+<li 
+  class="enumerate" id="x11-85006x3">
+     <!--l. 706--><p class="noindent" >If the descriptor is in the build state, then the sparse matrix must also be
+     in the build state; the action of the routine is to (implicitly) call <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdins</span></span></span>
+     to add entries to the sparsity pattern; each sparse matrix entry implicitly
+     defines  a  graph  edge,  that  is  passed  to  the  descriptor  routine  for  the
+     appropriate processing;
+     </li>
+<li 
+  class="enumerate" id="x11-85008x4">
+     <!--l. 712--><p class="noindent" >The input data can be passed in either COO or CSR formats;
+     </li>
+<li 
+  class="enumerate" id="x11-85010x5">
+     <!--l. 713--><p class="noindent" >In  COO  format  the  coefficients  to  be  inserted  are  represented  by  the
+     ordered  triples  <span 
+class="cmmi-10">ia</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,ja</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,val</span>(<span 
+class="cmmi-10">i</span>),  for  <span 
+class="cmmi-10">i  </span>=  1<span 
+class="cmmi-10">,</span><span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">,nz</span>;  these  triples  are
+     arbitrary;
+     </li>
+<li 
+  class="enumerate" id="x11-85012x6">
+     <!--l. 716--><p class="noindent" >In CSR format the coefficients to be inserted for each input row <span 
+class="cmmi-10">i </span>= 1<span 
+class="cmmi-10">,nr</span>
+     are  represented  by  the  ordered  triples  (<span 
+class="cmmi-10">i </span>+ <span 
+class="cmmi-10">irw </span><span 
+class="cmsy-10">- </span>1)<span 
+class="cmmi-10">,ja</span>(<span 
+class="cmmi-10">j</span>)<span 
+class="cmmi-10">,val</span>(<span 
+class="cmmi-10">j</span>),  for
+     <span 
+class="cmmi-10">j </span>= <span 
+class="cmmi-10">irp</span>(<span 
+class="cmmi-10">i</span>)<span 
+class="cmmi-10">,</span><span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">,irp</span>(<span 
+class="cmmi-10">i </span>+ 1) <span 
+class="cmsy-10">- </span>1; these triples should belong to the current
+     process, i.e. <span 
+class="cmmi-10">i</span>+<span 
+class="cmmi-10">irw</span><span 
+class="cmsy-10">-</span>1 should be one of the local indices, but are otherwise
+     arbitrary;
+     </li>
+<li 
+  class="enumerate" id="x11-85014x7">
+     <!--l. 721--><p class="noindent" >There is no requirement that a given row must be passed in its entirety
+     to a single call to this routine: the buildup of a row may be split into as
+     many calls as desired (even in the CSR format);
+                                                                  
+
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x11-85016x8">
+     <!--l. 724--><p class="noindent" >Coefficients from different rows may also be mixed up freely in a single
+     call, according to the application needs;
+     </li>
+<li 
+  class="enumerate" id="x11-85018x9">
+     <!--l. 726--><p class="noindent" >Coefficients from matrix rows not owned by the calling process are treated
+     according to the value of <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bldmode</span></span></span> specified at allocation time; if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bldmode</span></span></span>
+     was chosen as <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span> the library will keep track of them,
+     otherwise they are silently ignored;
+     </li>
+<li 
+  class="enumerate" id="x11-85020x10">
+     <!--l. 731--><p class="noindent" >If the descriptor is in the assembled state, then any entries in the sparse
+     matrix that would generate additional communication requirements are
+     ignored;
+     </li>
+<li 
+  class="enumerate" id="x11-85022x11">
+     <!--l. 734--><p class="noindent" >If the matrix is in the update state, any entries in positions that were not
+     present in the original matrix are ignored.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.9   </span> <a 
+ id="x11-860006.9"></a>psb_spasb &#8212; Sparse matrix assembly routine</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-42">
+call&#x00A0;psb_spasb(a,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,&#x00A0;afmt,&#x00A0;upd,&#x00A0;&#x00A0;mold])
+</pre>
+<!--l. 745--><p class="nopar" >
+<!--l. 747--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 748--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 748--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 749--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 749--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 750--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 750--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in/out</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 755--><p class="noindent" >
+<span 
+class="cmbx-10">afmt</span> </dt><dd 
+class="description">
+     <!--l. 755--><p class="noindent" >the storage format for the sparse matrix.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an array of characters. Defalt: &#8217;CSR&#8217;.
+     </dd><dt class="description">
+     <!--l. 760--><p class="noindent" >
+<span 
+class="cmbx-10">upd</span> </dt><dd 
+class="description">
+     <!--l. 760--><p class="noindent" >Provide for updates to the matrix coefficients.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integer, possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_upd_srch_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_upd_perm_</span></span></span>
+     </dd><dt class="description">
+     <!--l. 765--><p class="noindent" >
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 765--><p class="noindent" >The desired dynamic type for the internal matrix storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="spbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_sparse</span><span 
+class="cmtt-10">_mat</span>.</dd></dl>
+<!--l. 772--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 773--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 773--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 774--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 774--><p class="noindent" >the matrix to be assembled.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 779--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 779--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in/out</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>. If the matrix was
+     allocated with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bldmode=psb_matbld_remote_</span></span></span>, then the descriptor will be
+     reassembled.
+     </dd><dt class="description">
+     <!--l. 786--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 786--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 793--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-86002x1">
+     <!--l. 795--><p class="noindent" >On entry to this routine the descriptor must be in the assembled state,
+     i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span> must already have been called.
+                                                                  
+
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x11-86004x2">
+     <!--l. 797--><p class="noindent" >The sparse matrix may be in either the build or update state;
+     </li>
+<li 
+  class="enumerate" id="x11-86006x3">
+     <!--l. 798--><p class="noindent" >Duplicate entries are detected and handled in both build and update state,
+     with the exception of the error action that is only taken in the build state,
+     i.e. on the first assembly;
+     </li>
+<li 
+  class="enumerate" id="x11-86008x4">
+     <!--l. 801--><p class="noindent" >If the update choice is <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_upd_perm_</span></span></span>, then subsequent calls to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_spins</span></span></span>
+     to update the matrix must be arranged in such a way as to produce exactly
+     the same sequence of coefficient values as encountered at the first assembly;
+     </li>
+<li 
+  class="enumerate" id="x11-86010x5">
+     <!--l. 805--><p class="noindent" >The output storage format need not be the same on all processes;
+     </li>
+<li 
+  class="enumerate" id="x11-86012x6">
+     <!--l. 807--><p class="noindent" >On exit from this routine the matrix is in the assembled state, and thus
+     is suitable for the computational routines;
+     </li>
+<li 
+  class="enumerate" id="x11-86014x7">
+     <!--l. 809--><p class="noindent" >If  the  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bldmode=psb_matbld_remote_</span></span></span> value  was  specified  at  allocation
+     time,  contributions  defined  on  the  current  process  but  belonging  to  a
+     remote process will be handled accordingly. This is most likely to occur in
+     finite element applications, with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dupl=psb_dupl_add_</span></span></span>; it is necessary to
+     check for possible updates needed in the descriptor, hence there will be a
+     runtime overhead.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.10   </span> <a 
+ id="x11-870006.10"></a>psb_spfree &#8212; Frees a sparse matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-43">
+call&#x00A0;psb_spfree(a,&#x00A0;desc_a,&#x00A0;info)
+</pre>
+<!--l. 861--><p class="nopar" >
+<!--l. 863--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 864--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 864--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 865--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 865--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 866--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 866--><p class="noindent" >the matrix to be freed.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 871--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 871--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 878--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 879--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 879--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 880--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 880--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.11   </span> <a 
+ id="x11-880006.11"></a>psb_sprn &#8212; Reinit sparse matrix structure for psblas routines.</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-44">
+call&#x00A0;psb_sprn(a,&#x00A0;decsc_a,&#x00A0;info,&#x00A0;clear)
+</pre>
+<!--l. 898--><p class="nopar" >
+<!--l. 900--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 901--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 901--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 902--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 902--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 903--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 903--><p class="noindent" >the matrix to be reinitialized.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 908--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 908--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 913--><p class="noindent" >
+<span 
+class="cmbx-10">clear</span> </dt><dd 
+class="description">
+     <!--l. 913--><p class="noindent" >Choose whether to zero out matrix coefficients<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Default: true.</dd></dl>
+<!--l. 920--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 921--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 921--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 922--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 922--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 928--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-88002x1">
+     <!--l. 930--><p class="noindent" >On exit from this routine the sparse matrix is in the update state.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.12   </span> <a 
+ id="x11-890006.12"></a>psb_geall &#8212; Allocates a dense matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-45">
+call&#x00A0;psb_geall(x,&#x00A0;desc_a,&#x00A0;info[,&#x00A0;dupl,&#x00A0;bldmode,&#x00A0;n,&#x00A0;lb])
+</pre>
+<!--l. 986--><p class="nopar" >
+<!--l. 988--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 989--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 989--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 990--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 990--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 991--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 991--><p class="noindent" >The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 996--><p class="noindent" >
+<span 
+class="cmbx-10">n</span> </dt><dd 
+class="description">
+     <!--l. 996--><p class="noindent" >The number of columns of the dense matrix to be allocated.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: Integer scalar, default 1. It is not a valid argument if <span 
+class="cmmi-10">x </span>is a
+     rank-1 array.
+     </dd><dt class="description">
+     <!--l. 1002--><p class="noindent" >
+<span 
+class="cmbx-10">lb</span> </dt><dd 
+class="description">
+     <!--l. 1002--><p class="noindent" >The lower bound for the column index range of the dense matrix to be
+     allocated.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: Integer scalar, default 1. It is not a valid argument if <span 
+class="cmmi-10">x </span>is a
+     rank-1 array.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1008--><p class="noindent" >
+<span 
+class="cmbx-10">dupl</span> </dt><dd 
+class="description">
+     <!--l. 1008--><p class="noindent" >How to handle duplicate coefficients.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: integer, possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_ovwrt_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_add_</span></span></span>;
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_dupl_err_</span></span></span> has no effect.
+     </dd><dt class="description">
+     <!--l. 1014--><p class="noindent" >
+<span 
+class="cmbx-10">bldmode</span> </dt><dd 
+class="description">
+     <!--l. 1014--><p class="noindent" >Whether to keep track of matrix entries that do not belong to the current
+     process.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified                                                                                 as:
+     an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span>. Default:
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_noremote_</span></span></span>.</dd></dl>
+<!--l. 1023--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1024--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1024--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1025--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1025--><p class="noindent" >The dense matrix to be allocated.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one or two array with the ALLOCATABLE attribute
+     or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real, complex or integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1031--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1031--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1038--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-89002x1">
+     <!--l. 1040--><p class="noindent" >Using  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_matbld_remote_</span></span></span> is  likely  to  cause  a  runtime  overhead  at
+     assembly time;</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.13   </span> <a 
+ id="x11-900006.13"></a>psb_geins &#8212; Dense matrix insertion routine</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-46">
+call&#x00A0;psb_geins(m,&#x00A0;irw,&#x00A0;val,&#x00A0;x,&#x00A0;desc_a,&#x00A0;info&#x00A0;[,local])
+</pre>
+<!--l. 1052--><p class="nopar" >
+<!--l. 1054--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1055--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1055--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1056--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1056--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1057--><p class="noindent" >
+<span 
+class="cmbx-10">m</span> </dt><dd 
+class="description">
+     <!--l. 1057--><p class="noindent" >Number of rows in <span 
+class="cmmi-10">val </span>to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer value.
+     </dd><dt class="description">
+     <!--l. 1062--><p class="noindent" >
+<span 
+class="cmbx-10">irw</span> </dt><dd 
+class="description">
+     <!--l. 1062--><p class="noindent" >Indices  of  the  rows  to  be  inserted.  Specifically,  row  <span 
+class="cmmi-10">i </span>of  <span 
+class="cmmi-10">val </span>will  be
+     inserted into the local row corresponding to the global row index <span 
+class="cmmi-10">irw</span>(<span 
+class="cmmi-10">i</span>).
+     Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer array.
+     </dd><dt class="description">
+     <!--l. 1069--><p class="noindent" >
+<span 
+class="cmbx-10">val</span> </dt><dd 
+class="description">
+     <!--l. 1069--><p class="noindent" >the dense submatrix to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a rank 1 or 2 array. Specified as: an integer value.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1075--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1075--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1080--><p class="noindent" >
+<span 
+class="cmbx-10">local</span> </dt><dd 
+class="description">
+     <!--l. 1080--><p class="noindent" >Whether  the  entries  in  the  index  vector  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">irw</span></span></span>,  are  already  in  local
+     numbering. <br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a logical value; default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.false.</span></span></span>.
+     </dd></dl>
+<!--l. 1088--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1089--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1089--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1090--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1090--><p class="noindent" >the output dense matrix.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified   as:   a   rank   one   or   two   array   or   an   object   of   type
+     <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real, complex or integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1096--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1096--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1103--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+                                                                  
+
+                                                                  
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-90002x1">
+     <!--l. 1105--><p class="noindent" >Dense vectors/matrices do not have an associated state;
+     </li>
+<li 
+  class="enumerate" id="x11-90004x2">
+     <!--l. 1106--><p class="noindent" >Duplicate entries are either overwritten or added, there is no provision for
+     raising an error condition.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.14   </span> <a 
+ id="x11-910006.14"></a>psb_geasb &#8212; Assembly a dense matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-47">
+call&#x00A0;psb_geasb(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;mold)
+</pre>
+<!--l. 1119--><p class="nopar" >
+<!--l. 1121--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1122--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1122--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 1123--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1123--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1124--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1124--><p class="noindent" >The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1129--><p class="noindent" >
+<span 
+class="cmbx-10">mold</span> </dt><dd 
+class="description">
+     <!--l. 1129--><p class="noindent" >The desired dynamic type for the internal vector storage.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>;
+     this is only allowed when <span 
+class="cmmi-10">x </span>is of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 1137--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1138--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1138--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1139--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1139--><p class="noindent" >The dense matrix to be assembled.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one or two array with the ALLOCATABLE or an
+     object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real, complex or integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1145--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1145--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1153--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-91002x1">
+     <!--l. 1155--><p class="noindent" >On entry to this routine the descriptor must be in the assembled state,
+     i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span> must already have been called.
+     </li>
+<li 
+  class="enumerate" id="x11-91004x2">
+     <!--l. 1157--><p class="noindent" >If  the  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bldmode=psb_matbld_remote_</span></span></span> value  was  specified  at  allocation
+     time,  contributions  defined  on  the  current  process  but  belonging  to  a
+     remote process will be handled accordingly. This is most likely to occur in
+     finite element applications, with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dupl=psb_dupl_add_</span></span></span>.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.15   </span> <a 
+ id="x11-920006.15"></a>psb_gefree &#8212; Frees a dense matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-48">
+call&#x00A0;psb_gefree(x,&#x00A0;desc_a,&#x00A0;info)
+</pre>
+<!--l. 1174--><p class="nopar" >
+<!--l. 1176--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1177--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1177--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 1178--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1178--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1179--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1179--><p class="noindent" >The dense matrix to be freed.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one or two array with the ALLOCATABLE or an
+     object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real, complex or integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1187--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1187--><p class="noindent" >The communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a variable of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.<br 
+class="newline" /></dd></dl>
+<!--l. 1194--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1195--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1195--><p class="noindent" >
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1196--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1196--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.16   </span> <a 
+ id="x11-930006.16"></a>psb_gelp &#8212; Applies a left permutation to a dense matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-49">
+call&#x00A0;psb_gelp(trans,&#x00A0;iperm,&#x00A0;x,&#x00A0;info)
+</pre>
+<!--l. 1213--><p class="nopar" >
+<!--l. 1215--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1216--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1216--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1217--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1217--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1218--><p class="noindent" >
+<span 
+class="cmbx-10">trans</span> </dt><dd 
+class="description">
+     <!--l. 1218--><p class="noindent" >A character that specifies whether to permute <span 
+class="cmmi-10">A </span>or <span 
+class="cmmi-10">A</span><sup><span 
+class="cmmi-7">T</span></sup>.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a single character with value &#8217;N&#8217; for <span 
+class="cmmi-10">A </span>or &#8217;T&#8217; for <span 
+class="cmmi-10">A</span><sup><span 
+class="cmmi-7">T</span></sup>.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1223--><p class="noindent" >
+<span 
+class="cmbx-10">iperm</span> </dt><dd 
+class="description">
+     <!--l. 1223--><p class="noindent" >An integer array containing permutation information.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer one-dimensional array.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1228--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1228--><p class="noindent" >The dense matrix to be permuted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a one or two dimensional array.<br 
+class="newline" /></dd></dl>
+<!--l. 1235--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 1236--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1236--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1237--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1237--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.17   </span> <a 
+ id="x11-940006.17"></a>psb_glob_to_loc &#8212; Global to local indices convertion</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-50">
+call&#x00A0;psb_glob_to_loc(x,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info,&#x00A0;iact,owned)
+call&#x00A0;psb_glob_to_loc(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;iact,owned)
+</pre>
+<!--l. 1255--><p class="nopar" >
+<!--l. 1257--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1258--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1258--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1259--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1259--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1260--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1260--><p class="noindent" >An integer vector of indices to be converted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in, inout</span>.<br 
+class="newline" />Specified as: a rank one integer array.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1265--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1265--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1270--><p class="noindent" >
+<span 
+class="cmbx-10">iact</span> </dt><dd 
+class="description">
+     <!--l. 1270--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1276--><p class="noindent" >
+<span 
+class="cmbx-10">owned</span> </dt><dd 
+class="description">
+     <!--l. 1276--><p class="noindent" >Specfies valid range of input Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />If  true,  then  only  indices  strictly  owned  by  the  current  process  are
+     considered valid, if false then halo indices are also accepted. Default: false.</dd></dl>
+<!--l. 1285--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1286--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1286--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1287--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1287--><p class="noindent" >If <span 
+class="cmmi-10">y </span>is not present, then <span 
+class="cmmi-10">x </span>is overwritten with the translated integer indices.
+     Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one integer array.
+     </dd><dt class="description">
+     <!--l. 1293--><p class="noindent" >
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">
+     <!--l. 1293--><p class="noindent" >If <span 
+class="cmmi-10">y </span>is present, then <span 
+class="cmmi-10">y </span>is overwritten with the translated integer indices,
+     and <span 
+class="cmmi-10">x </span>is left unchanged. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one integer array.
+     </dd><dt class="description">
+     <!--l. 1300--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1300--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1307--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-94002x1">
+     <!--l. 1309--><p class="noindent" >If an input index is out of range, then the corresponding output index is
+     set to a negative number;
+                                                                  
+
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x11-94004x2">
+     <!--l. 1311--><p class="noindent" >The default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore means that the negative output is the only action
+     taken on an out-of-range input.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.18   </span> <a 
+ id="x11-950006.18"></a>psb_loc_to_glob &#8212; Local to global indices conversion</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-51">
+call&#x00A0;psb_loc_to_glob(x,&#x00A0;y,&#x00A0;desc_a,&#x00A0;info,&#x00A0;iact)
+call&#x00A0;psb_loc_to_glob(x,&#x00A0;desc_a,&#x00A0;info,&#x00A0;iact)
+</pre>
+<!--l. 1323--><p class="nopar" >
+<!--l. 1325--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1326--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1326--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1327--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1327--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1328--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1328--><p class="noindent" >An integer vector of indices to be converted.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in, inout</span>.<br 
+class="newline" />Specified as: a rank one integer array.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1333--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1333--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1338--><p class="noindent" >
+<span 
+class="cmbx-10">iact</span> </dt><dd 
+class="description">
+     <!--l. 1338--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore.</dd></dl>
+<!--l. 1346--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 1347--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1347--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1348--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1348--><p class="noindent" >If <span 
+class="cmmi-10">y </span>is not present, then <span 
+class="cmmi-10">x </span>is overwritten with the translated integer indices.
+     Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a rank one integer array.
+     </dd><dt class="description">
+     <!--l. 1354--><p class="noindent" >
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">
+     <!--l. 1354--><p class="noindent" >If <span 
+class="cmmi-10">y </span>is not present, then <span 
+class="cmmi-10">y </span>is overwritten with the translated integer indices,
+     and <span 
+class="cmmi-10">x </span>is left unchanged. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one integer array.
+     </dd><dt class="description">
+     <!--l. 1361--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1361--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.19   </span> <a 
+ id="x11-960006.19"></a>psb_is_owned &#8212; </h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-52">
+call&#x00A0;psb_is_owned(x,&#x00A0;desc_a)
+</pre>
+<!--l. 1378--><p class="nopar" >
+<!--l. 1380--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1381--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1381--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1382--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1382--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1383--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1383--><p class="noindent" >Integer index.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a scalar integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1388--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1388--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 1395--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1396--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1396--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1397--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1397--><p class="noindent" >A logical mask which is true if <span 
+class="cmmi-10">x </span>is owned by the current process Scope:
+     <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 1405--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-96002x1">
+     <!--l. 1407--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span> value for an index that is strictly owned by
+     the current process, excluding the halo indices</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.20   </span> <a 
+ id="x11-970006.20"></a>psb_owned_index &#8212; </h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-53">
+call&#x00A0;psb_owned_index(y,&#x00A0;x,&#x00A0;desc_a,&#x00A0;info)
+</pre>
+<!--l. 1418--><p class="nopar" >
+<!--l. 1420--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1421--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1421--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1422--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1422--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1423--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1423--><p class="noindent" >Integer indices.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in, inout</span>.<br 
+class="newline" />Specified as: a scalar or a rank one integer array.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1428--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1428--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1433--><p class="noindent" >
+<span 
+class="cmbx-10">iact</span> </dt><dd 
+class="description">
+     <!--l. 1433--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore.</dd></dl>
+<!--l. 1441--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 1442--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1442--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1443--><p class="noindent" >
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">
+     <!--l. 1443--><p class="noindent" >A logical mask which is true for all corresponding entries of <span 
+class="cmmi-10">x </span>that are
+     owned by the current process Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a scalar or rank one logical array.
+     </dd><dt class="description">
+     <!--l. 1449--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1449--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1457--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-97002x1">
+     <!--l. 1459--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span> value for those indices that are strictly
+     owned by the current process, excluding the halo indices</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.21   </span> <a 
+ id="x11-980006.21"></a>psb_is_local &#8212; </h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-54">
+call&#x00A0;psb_is_local(x,&#x00A0;desc_a)
+</pre>
+<!--l. 1470--><p class="nopar" >
+<!--l. 1472--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1473--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1473--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1474--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1474--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1475--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1475--><p class="noindent" >Integer index.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a scalar integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1480--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1480--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 1487--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1488--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1488--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1489--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1489--><p class="noindent" >A logical mask which is true if <span 
+class="cmmi-10">x </span>is local to the current process Scope:
+     <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 1497--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-98002x1">
+     <!--l. 1499--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span> value for an index that is local to the current
+     process, including the halo indices</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.22   </span> <a 
+ id="x11-990006.22"></a>psb_local_index &#8212; </h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-55">
+call&#x00A0;psb_local_index(y,&#x00A0;x,&#x00A0;desc_a,&#x00A0;info)
+</pre>
+<!--l. 1509--><p class="nopar" >
+<!--l. 1511--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1512--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1512--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1513--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1513--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1514--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1514--><p class="noindent" >Integer indices.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in, inout</span>.<br 
+class="newline" />Specified as: a scalar or a rank one integer array.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1519--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1519--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1524--><p class="noindent" >
+<span 
+class="cmbx-10">iact</span> </dt><dd 
+class="description">
+     <!--l. 1524--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a character variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">I</span></span></span>gnore.</dd></dl>
+<!--l. 1532--><p class="indent" >
+                                                                  
+
+                                                                  
+     <dl class="description"><dt class="description">
+     <!--l. 1533--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1533--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1534--><p class="noindent" >
+<span 
+class="cmbx-10">y</span> </dt><dd 
+class="description">
+     <!--l. 1534--><p class="noindent" >A logical mask which is true for all corresponding entries of <span 
+class="cmmi-10">x </span>that are
+     local to the current process Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a scalar or rank one logical array.
+     </dd><dt class="description">
+     <!--l. 1540--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1540--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1548--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-99002x1">
+     <!--l. 1550--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.true.</span></span></span> value for those indices that are local to the
+     current process, including the halo indices.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.23   </span> <a 
+ id="x11-1000006.23"></a>psb_get_boundary &#8212; Extract list of boundary elements</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-56">
+call&#x00A0;psb_get_boundary(bndel,&#x00A0;desc,&#x00A0;info)
+</pre>
+<!--l. 1566--><p class="nopar" >
+<!--l. 1568--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1569--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1569--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1570--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1570--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1571--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 1571--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 1578--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1579--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1579--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1580--><p class="noindent" >
+<span 
+class="cmbx-10">bndel</span> </dt><dd 
+class="description">
+     <!--l. 1580--><p class="noindent" >The list of boundary elements on the calling process, in local numbering.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one array with the ALLOCATABLE attribute, of type
+     integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1587--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1587--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1594--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-100002x1">
+     <!--l. 1596--><p class="noindent" >If there are no boundary elements (i.e., if the local part of the connectivity
+     graph is self-contained) the output vector is set to the &#8220;not allocated&#8221;
+     state.
+     </li>
+<li 
+  class="enumerate" id="x11-100004x2">
+     <!--l. 1599--><p class="noindent" >Otherwise  the  size  of  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bndel</span></span></span> will  be  exactly  equal  to  the  number  of
+     boundary elements.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.24   </span> <a 
+ id="x11-1010006.24"></a>psb_get_overlap &#8212; Extract list of overlap elements</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-57">
+call&#x00A0;psb_get_overlap(ovrel,&#x00A0;desc,&#x00A0;info)
+</pre>
+<!--l. 1609--><p class="nopar" >
+<!--l. 1611--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1612--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1612--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1613--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1613--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1614--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span> </dt><dd 
+class="description">
+     <!--l. 1614--><p class="noindent" >the communication descriptor.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.</dd></dl>
+<!--l. 1621--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1622--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1622--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1623--><p class="noindent" >
+<span 
+class="cmbx-10">ovrel</span> </dt><dd 
+class="description">
+     <!--l. 1623--><p class="noindent" >The list of overlap elements on the calling process, in local numbering.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Specified as: a rank one array with the ALLOCATABLE attribute, of type
+     integer.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1630--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1630--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1637--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-101002x1">
+     <!--l. 1639--><p class="noindent" >If  there  are  no  overlap  elements  the  output  vector  is  set  to  the  &#8220;not
+     allocated&#8221; state.
+     </li>
+<li 
+  class="enumerate" id="x11-101004x2">
+     <!--l. 1641--><p class="noindent" >Otherwise the size of <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ovrel</span></span></span> will be exactly equal to the number of overlap
+     elements.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.25   </span> <a 
+ id="x11-1020006.25"></a>psb_sp_getrow &#8212; Extract row(s) from a sparse matrix</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-58">
+call&#x00A0;psb_sp_getrow(row,&#x00A0;a,&#x00A0;nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;val,&#x00A0;info,&#x00A0;&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;append,&#x00A0;nzin,&#x00A0;lrw)
+</pre>
+<!--l. 1654--><p class="nopar" >
+<!--l. 1656--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1657--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1657--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1658--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1658--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1659--><p class="noindent" >
+<span 
+class="cmbx-10">row</span> </dt><dd 
+class="description">
+     <!--l. 1659--><p class="noindent" >The (first) row to be extracted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer <span 
+class="cmmi-10">&#x003E; </span>0.
+     </dd><dt class="description">
+     <!--l. 1664--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 1664--><p class="noindent" >the matrix from which to get rows.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1669--><p class="noindent" >
+<span 
+class="cmbx-10">append</span> </dt><dd 
+class="description">
+     <!--l. 1669--><p class="noindent" >Whether to append or overwrite existing output.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a logical value default: false (overwrite).
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1674--><p class="noindent" >
+<span 
+class="cmbx-10">nzin</span> </dt><dd 
+class="description">
+     <!--l. 1674--><p class="noindent" >Input size to be appended to.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer <span 
+class="cmmi-10">&#x003E; </span>0. When append is true, specifies how many
+     entries in the output vectors are already filled.
+     </dd><dt class="description">
+     <!--l. 1680--><p class="noindent" >
+<span 
+class="cmbx-10">lrw</span> </dt><dd 
+class="description">
+     <!--l. 1680--><p class="noindent" >The last row to be extracted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span><br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer <span 
+class="cmmi-10">&#x003E; </span>0, default: <span 
+class="cmmi-10">row</span>.
+     </dd></dl>
+<!--l. 1696--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1697--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1697--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1698--><p class="noindent" >
+<span 
+class="cmbx-10">nz</span> </dt><dd 
+class="description">
+     <!--l. 1698--><p class="noindent" >the number of elements returned by this call.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />Returned as: an integer scalar.
+     </dd><dt class="description">
+     <!--l. 1703--><p class="noindent" >
+<span 
+class="cmbx-10">ia</span> </dt><dd 
+class="description">
+     <!--l. 1703--><p class="noindent" >the row indices.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an integer array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+     <!--l. 1708--><p class="noindent" >
+<span 
+class="cmbx-10">ja</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 1708--><p class="noindent" >the column indices of the elements to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: an integer array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+     <!--l. 1713--><p class="noindent" >
+<span 
+class="cmbx-10">val</span> </dt><dd 
+class="description">
+     <!--l. 1713--><p class="noindent" >the elements to be inserted.<br 
+class="newline" />Scope:<span 
+class="cmbx-10">local</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Intent: <span 
+class="cmbx-10">inout</span>.<br 
+class="newline" />Specified as: a real array with the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
+     </dd><dt class="description">
+     <!--l. 1718--><p class="noindent" >
+<span 
+class="cmbx-10">info</span> </dt><dd 
+class="description">
+     <!--l. 1718--><p class="noindent" >Error code.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">out</span>.<br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 1725--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-102002x1">
+     <!--l. 1727--><p class="noindent" >The output <span 
+class="cmmi-10">nz </span>is always the size of the output generated by the current
+     call; thus, if <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">append=.true.</span></span></span>, the total output size will be <span 
+class="cmmi-10">nzin </span>+ <span 
+class="cmmi-10">nz</span>, with
+     the newly extracted coefficients stored in entries <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">nzin+1:nzin+nz</span></span></span> of the
+     array arguments;
+     </li>
+<li 
+  class="enumerate" id="x11-102004x2">
+     <!--l. 1731--><p class="noindent" >When <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">append=.true.</span></span></span> the output arrays are reallocated as necessary;
+     </li>
+<li 
+  class="enumerate" id="x11-102006x3">
+     <!--l. 1733--><p class="noindent" >The  row  and  column  indices  are  returned  in  the  local  numbering
+     scheme;  if  the  global  numbering  is  desired,  the  user  may  employ  the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_loc_to_glob</span></span></span> routine on the output.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.26   </span> <a 
+ id="x11-1030006.26"></a>psb_sizeof &#8212; Memory occupation</h4>
+<!--l. 1744--><p class="noindent" >This function computes the memory occupation of a PSBLAS object.
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-59">
+isz&#x00A0;=&#x00A0;psb_sizeof(a)
+isz&#x00A0;=&#x00A0;psb_sizeof(desc_a)
+isz&#x00A0;=&#x00A0;psb_sizeof(prec)
+</pre>
+<!--l. 1751--><p class="nopar" >
+<!--l. 1753--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1754--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1754--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1755--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1755--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1756--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 1756--><p class="noindent" >A sparse matrix <span 
+class="cmmi-10">A</span>. <br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1762--><p class="noindent" >
+<span 
+class="cmbx-10">desc</span><span 
+class="cmbx-10">_a</span> </dt><dd 
+class="description">
+     <!--l. 1762--><p class="noindent" >Communication descriptor.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#descdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_desc</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 1767--><p class="noindent" >
+<span 
+class="cmbx-10">prec</span> </dt><dd 
+class="description">
+     <!--l. 1767--><p class="noindent" >Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_prec</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1772--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1772--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1773--><p class="noindent" >
+<span 
+class="cmbx-10">Function value</span> </dt><dd 
+class="description">
+     <!--l. 1773--><p class="noindent" >The memory occupation of the object specified in the calling sequence, in
+     bytes.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Returned as: an <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">integer(psb_long_int_k_)</span></span></span> number.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">6.27   </span> <a 
+ id="x11-1040006.27"></a>Sorting utilities &#8212; </h4>
+<!--l. 1783--><p class="noindent" ><span 
+class="cmbx-12">psb</span><span 
+class="cmbx-12">_msort &#8212; Sorting by the Merge-sort algorithm</span>
+<!--l. 1786--><p class="noindent" ><span 
+class="cmbx-12">psb</span><span 
+class="cmbx-12">_qsort &#8212; Sorting by the Quicksort algorithm</span>
+<!--l. 1789--><p class="noindent" ><span 
+class="cmbx-12">psb</span><span 
+class="cmbx-12">_hsort &#8212; Sorting by the Heapsort algorithm</span>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-60">
+call&#x00A0;psb_msort(x,ix,dir,flag)
+call&#x00A0;psb_qsort(x,ix,dir,flag)
+call&#x00A0;psb_hsort(x,ix,dir,flag)
+</pre>
+<!--l. 1794--><p class="nopar" >
+<!--l. 1796--><p class="indent" >   These serial routines sort a sequence <span 
+class="cmmi-10">X </span>into ascending or descending order. The
+argument meaning is identical for the three calls; the only difference is the algorithm
+used to accomplish the task (see Usage Notes below).
+     <dl class="description"><dt class="description">
+     <!--l. 1801--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1801--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 1802--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 1802--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1803--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1803--><p class="noindent" >The sequence to be sorted.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: an integer, real or complex array of rank 1.
+     </dd><dt class="description">
+     <!--l. 1806--><p class="noindent" >
+<span 
+class="cmbx-10">ix</span> </dt><dd 
+class="description">
+     <!--l. 1806--><p class="noindent" >A vector of indices.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer array of (at least) the same size as <span 
+class="cmmi-10">X</span>.
+     </dd><dt class="description">
+     <!--l. 1809--><p class="noindent" >
+<span 
+class="cmbx-10">dir</span> </dt><dd 
+class="description">
+     <!--l. 1809--><p class="noindent" >The desired ordering.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value:
+         <dl class="description"><dt class="description">
+         <!--l. 1812--><p class="noindent" >
+     <span 
+class="cmbx-10">Integer and real data:</span> </dt><dd 
+class="description">
+         <!--l. 1812--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_up_</span></span></span>,             <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_down_</span></span></span>,             <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_up_</span></span></span>,
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_down_</span></span></span>; default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_up_</span></span></span>.
+                                                                  
+
+                                                                  
+         </dd><dt class="description">
+         <!--l. 1815--><p class="noindent" >
+     <span 
+class="cmbx-10">Complex data:</span> </dt><dd 
+class="description">
+         <!--l. 1815--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lsort_up_</span></span></span>,           <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lsort_down_</span></span></span>,           <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_up_</span></span></span>,
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_asort_down_</span></span></span>; default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lsort_up_</span></span></span>.</dd></dl>
+     </dd><dt class="description">
+     <!--l. 1819--><p class="noindent" >
+<span 
+class="cmbx-10">flag</span> </dt><dd 
+class="description">
+     <!--l. 1819--><p class="noindent" >Whether to keep the original values in <span 
+class="cmmi-10">IX</span>.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_ovw_idx_</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_keep_idx_</span></span></span>;
+     default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_ovw_idx_</span></span></span>.
+     </dd></dl>
+<!--l. 1826--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1827--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1827--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1828--><p class="noindent" >
+<span 
+class="cmbx-10">x</span> </dt><dd 
+class="description">
+     <!--l. 1828--><p class="noindent" >The sequence of values, in the chosen ordering.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: an integer, real or complex array of rank 1.
+     </dd><dt class="description">
+     <!--l. 1831--><p class="noindent" >
+<span 
+class="cmbx-10">ix</span> </dt><dd 
+class="description">
+     <!--l. 1831--><p class="noindent" >A vector of indices.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />An integer array of rank 1, whose entries are moved to the same position
+     as the corresponding entries in <span 
+class="cmmi-10">x</span>.</dd></dl>
+<!--l. 1837--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x11-104002x1">
+     <!--l. 1839--><p class="noindent" >For integer or real data the sorting can be performed in the up/down
+     direction, on the natural or absolute values;
+     </li>
+<li 
+  class="enumerate" id="x11-104004x2">
+     <!--l. 1841--><p class="noindent" >For complex data the sorting can be done in a lexicographic order (i.e.:
+     sort on the real part with ties broken according to the imaginary part) or
+     on the absolute values;
+                                                                  
+
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x11-104006x3">
+     <!--l. 1844--><p class="noindent" >The routines return the items in the chosen ordering; the output difference
+     is the handling of ties (i.e. items with an equal value) in the original input.
+     With the merge-sort algorithm ties are preserved in the same relative
+     order as they had in the original sequence, while this is not guaranteed for
+     quicksort or heapsort;
+     </li>
+<li 
+  class="enumerate" id="x11-104008x4">
+     <!--l. 1850--><p class="noindent" >If <span 
+class="cmmi-10">flag </span>= <span 
+class="cmmi-10">psb</span>_<span 
+class="cmmi-10">sort</span>_<span 
+class="cmmi-10">ovw</span>_<span 
+class="cmmi-10">idx</span>_ then the entries in <span 
+class="cmmi-10">ix</span>(1 : <span 
+class="cmmi-10">n</span>) where <span 
+class="cmmi-10">n </span>is the size
+     of <span 
+class="cmmi-10">x </span>are initialized to <span 
+class="cmmi-10">ix</span>(<span 
+class="cmmi-10">i</span>) <span 
+class="cmsy-10">&#x2190; </span><span 
+class="cmmi-10">i</span>; thus, upon return from the subroutine,
+     for each index <span 
+class="cmmi-10">i </span>we have in <span 
+class="cmmi-10">ix</span>(<span 
+class="cmmi-10">i</span>) the position that the item <span 
+class="cmmi-10">x</span>(<span 
+class="cmmi-10">i</span>) occupied
+     in the original data sequence;
+     </li>
+<li 
+  class="enumerate" id="x11-104010x5">
+     <!--l. 1855--><p class="noindent" >If <span 
+class="cmmi-10">flag </span>= <span 
+class="cmmi-10">psb</span>_<span 
+class="cmmi-10">sort</span>_<span 
+class="cmmi-10">keep</span>_<span 
+class="cmmi-10">idx</span>_ the routine will assume that the entries in
+     <span 
+class="cmmi-10">ix</span>(:) have already been initialized by the user;
+     </li>
+<li 
+  class="enumerate" id="x11-104012x6">
+     <!--l. 1857--><p class="noindent" >The three sorting algorithms have a similar <span 
+class="cmmi-10">O</span>(<span 
+class="cmmi-10">n</span>log <span 
+class="cmmi-10">n</span>) expected running time;
+     in the average case quicksort will be the fastest and merge-sort the slowest.
+     However note that:
+         <ol  class="enumerate2" >
+<li 
+  class="enumerate" id="x11-104014x1">
+         <!--l. 1861--><p class="noindent" >The worst case running time for quicksort is <span 
+class="cmmi-10">O</span>(<span 
+class="cmmi-10">n</span><sup><span 
+class="cmr-7">2</span></sup>); the algorithm
+         implemented here follows the well-known median-of-three heuristics,
+         but the worst case may still apply;
+         </li>
+<li 
+  class="enumerate" id="x11-104016x2">
+         <!--l. 1864--><p class="noindent" >The  worst  case  running  time  for  merge-sort  and  heap-sort  is
+         <span 
+class="cmmi-10">O</span>(<span 
+class="cmmi-10">n</span>log <span 
+class="cmmi-10">n</span>) as the average case;
+         </li>
+<li 
+  class="enumerate" id="x11-104018x3">
+         <!--l. 1866--><p class="noindent" >The  merge-sort  algorithm  is  implemented  to  take  advantage  of
+         subsequences that may be already in the desired ordering prior to
+         the subroutine call; this situation is relatively common when dealing
+         with groups of indices of sparse matrix entries, thus merge-sort is the
+         preferred choice when a sorting is needed by other routines in the
+         library.</li></ol>
+                                                                  
+
+                                                                  
+     </li></ol>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu59.html" >next</a>] [<a 
+href="userhtmlse10.html" >next</a>] [<a 
 href="userhtmlse5.html" >prev</a>] [<a 
 href="userhtmlse5.html#tailuserhtmlse5.html" >prev-tail</a>] [<a 
 href="userhtmlse6.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu32.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse9.html" >up</a>] </p></div>
 <!--l. 3--><p class="indent" >   <a 
- id="tailuserhtmlse6.html"></a>  
+ id="tailuserhtmlse6.html"></a>   
 </body></html> 
