@@ -1,0 +1,412 @@
+\section{Extensions}\label{sec:ext-intro}
+
+The EXT, CUDA and RSB  subdirectories contains a set of extensions to the base
+library. The extensions provide additional storage formats beyond the
+ones already contained in the base library, as well as interfaces
+to:
+\begin{description}
+\item[SPGPU] a CUDA library originally published as
+  \url{https://code.google.com/p/spgpu/} and now included in the
+  \verb|cuda| subdir, for computations on   NVIDIA GPUs;
+\item[LIBRSB] \url{http://sourceforge.net/projects/librsb/}, for
+  computations on multicore parallel machines. 
+\end{description}
+The infrastructure laid out in the base library to allow for these
+extensions is detailed in the references~\cite{DesPat:11,CaFiRo:2014,Sparse03};
+the CUDA-specific data formats are described in~\cite{OurTechRep}. 
+
+
+\subsection{Using the extensions}
+\label{sec:ext-appstruct}
+A sample application using the PSBLAS extensions will contain the
+following steps:
+\begin{itemize}
+\item \verb|USE| the appropriat modules (\verb|psb_ext_mod|,
+  \verb|psb_cuda_mod|);
+\item Declare a \emph{mold} variable of the necessary type
+  (e.g. \verb|psb_d_ell_sparse_mat|, \verb|psb_d_hlg_sparse_mat|,
+  \verb|psb_d_vect_cuda|);
+\item Pass the mold variable to the base library interface where
+  needed to ensure the appropriate dynamic type.
+\end{itemize}
+Suppose you want to use the CUDA-enabled ELLPACK data structure; you
+would use a piece of code like this (and don't forget, you need
+CUDA-side vectors along with the matrices):
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+program my_cuda_test
+  use psb_base_mod
+  use psb_util_mod 
+  use psb_ext_mod
+  use psb_cuda_mod
+  type(psb_dspmat_type) :: a, agpu
+  type(psb_d_vect_type) :: x, xg, bg
+
+  real(psb_dpk_), allocatable :: xtmp(:)
+  type(psb_d_vect_cuda)       :: vmold
+  type(psb_d_elg_sparse_mat) :: aelg
+  type(psb_ctxt_type) :: ctxt
+  integer             :: iam, np
+
+
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
+  call psb_cuda_init(ctxt, iam)
+
+  
+  ! My own home-grown matrix generator
+  call gen_matrix(ctxt,idim,desc_a,a,x,info)
+  if (info /= 0) goto 9999
+
+  call a%cscnv(agpu,info,mold=aelg)
+  if (info /= 0) goto 9999
+  xtmp = x%get_vect() 
+  call xg%bld(xtmp,mold=vmold)
+  call bg%bld(size(xtmp),mold=vmold)
+  
+  ! Do sparse MV
+  call psb_spmm(done,agpu,xg,dzero,bg,desc_a,info)
+
+ 
+9999 continue
+  if (info == 0) then 
+     write(*,*) '42'
+  else
+     write(*,*) 'Something went wrong ',info
+  end if
+  
+  
+  call psb_cuda_exit()
+  call psb_exit(ctxt)
+  stop
+end program my_cuda_test
+\end{minted}
+A full example of this strategy can be seen in the
+\texttt{test/ext/kernel} and \texttt{test/\-cuda/\-kernel} subdirectories,
+where we provide  sample programs 
+to test the speed of the sparse matrix-vector product with the various
+data structures included in the library. 
+
+
+\subsection{Extensions' Data Structures}
+\label{sec:ext-datastruct}
+%\ifthenelse{\boolean{mtc}}{\minitoc}{}
+
+Access to the facilities provided by the EXT library is mainly
+achieved through the data types that are provided within. 
+The data classes are derived from the base  classes in PSBLAS, through 
+the Fortran~2003 mechanism of \emph{type extension}~\cite{MRC:11}.  
+
+The data classes are divided between the general purpose CPU
+extensions, the GPU interfaces and the RSB interfaces.
+In the description we will make use of the notation introduced in
+Table~\ref{tab:notation}. 
+
+\begin{table}[ht]
+\caption{Notation for parameters describing a sparse matrix}
+\begin{center}
+{\footnotesize
+\begin{tabular}{ll}
+\hline
+Name & Description \\
+\hline
+M		& Number of rows in matrix		 \\
+N		& Number of columns in matrix		 \\
+NZ              & Number of nonzeros in matrix   \\
+AVGNZR          & Average number of nonzeros per row  \\
+MAXNZR          & Maximum number of nonzeros per row  \\
+NDIAG           & Numero of nonzero diagonals\\
+AS	        & Coefficients 	array		 \\
+IA	        & Row indices array			 \\
+JA	        & Column  indices array			 \\
+IRP	        & Row start pointers array			 \\
+JCP	        & Column start pointers array			 \\
+NZR 	        & Number of nonzeros per row array \\
+OFFSET          & Offset for diagonals			 \\
+\hline
+\end{tabular}
+}
+\end{center}
+\label{tab:notation}
+\end{table}
+
+\begin{figure}[ht]
+	\centering
+%		\includegraphics[width=5.2cm]{figures/mat.eps}
+		\includegraphics[width=5.2cm]{figures/mat.pdf}
+	\caption{Example of sparse matrix}
+	\label{fig:dense}
+\end{figure} 
+
+\subsection{CPU-class extensions}
+
+
+\subsubsection*{ELLPACK}
+
+The ELLPACK/ITPACK format (shown in Figure~\ref{fig:ell}) 
+comprises  two 2-dimensional arrays \verb|AS| and
+\verb|JA|  with \verb|M| rows and \verb|MAXNZR| columns, where
+\verb|MAXNZR| is the maximum
+number of nonzeros in any row~\cite{ELLPACK}. 
+Each row of the arrays \verb|AS| and \verb|JA| contains the
+coefficients and column indices; rows shorter than
+\verb|MAXNZR| are padded with zero coefficients and appropriate column
+indices, e.g. the last valid one found in the same row.
+
+\begin{figure}[ht]
+	\centering
+%		\includegraphics[width=8.2cm]{figures/ell.eps}
+		\includegraphics[width=8.2cm]{figures/ell.pdf}
+	\caption{ELLPACK compression of matrix in Figure~\ref{fig:dense}}
+	\label{fig:ell}
+\end{figure} 
+
+
+\begin{algorithm}
+\lstset{language=Fortran}
+\small
+  \begin{lstlisting}
+    do i=1,n
+      t=0
+      do j=1,maxnzr
+        t = t +  as(i,j)*x(ja(i,j))
+      end do
+      y(i) = t
+    end do
+  \end{lstlisting}
+  \caption{\label{alg:ell} Matrix-Vector product in ELL format}
+\end{algorithm}
+The matrix-vector product $y=Ax$ can be computed with the code shown in
+Alg.~\ref{alg:ell}; it costs  one  memory write per outer iteration, 
+plus three memory reads  and two floating-point operations per inner
+iteration.   
+
+Unless all rows have exactly the same number of nonzeros, some of the
+coefficients in the \verb|AS| array will be zeros; therefore this
+data structure will have  an overhead both in terms of memory space
+and redundant operations (multiplications by zero).  The overhead can
+be acceptable if: 
+\begin{enumerate}
+\item The maximum number of nonzeros per row is not much larger than
+  the    average;
+\item The regularity of the data structure allows for faster  code,
+  e.g. by allowing vectorization, thereby offsetting the additional
+  storage requirements.  
+\end{enumerate}
+In the extreme case where the input matrix has one full row, the
+ELLPACK structure would require more memory than the normal 2D array
+storage. The ELLPACK storage format was very popular in the vector
+computing days; in modern CPUs it is not quite as popular, but it
+is  the basis for many GPU formats. 
+
+The relevant data type is \verb|psb_T_ell_sparse_mat|:
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type, extends(psb_d_base_sparse_mat) :: psb_d_ell_sparse_mat
+    !
+    ! ITPACK/ELL format, extended.
+    !     
+    
+    integer(psb_ipk_), allocatable :: irn(:), ja(:,:), idiag(:)
+    real(psb_dpk_), allocatable :: val(:,:)
+
+  contains
+    ....
+  end type psb_d_ell_sparse_mat
+\end{minted}
+
+
+\subsubsection*{Hacked ELLPACK}
+
+The \textit{hacked ELLPACK} (\textbf{HLL}) format 
+alleviates the main problem of the ELLPACK format, that is, 
+the  amount of  memory required by  padding for  sparse matrices in
+which the maximum row length is  larger than the average.
+
+The number of  elements  allocated to padding is $[(m*maxNR) -
+(m*avgNR) = m*(maxNR-avgNR)]$ 
+for both \verb|AS|  and \verb|JA| arrays,
+where $m$ is equal to the number of rows of the matrix, $maxNR$ is the
+maximum number of nonzero elements 
+in every row and $avgNR$ is the average number of nonzeros. 
+Therefore a single densely populated row can seriously affect the
+total size of the allocation. 
+
+To limit this effect, in the HLL format  we break the original matrix
+into equally sized groups of rows (called \textit{hacks}), and then store
+these groups as independent matrices in ELLPACK format. 
+The groups can be arranged selecting rows in an arbitrarily manner;
+indeed, if the rows are sorted by decreasing number of nonzeros we
+obtain essentially the JAgged Diagonals format. 
+If the rows are not in the original order, then an   additional vector
+\textit{rIdx} is required, storing the actual row index  for each row
+in the data structure.
+
+The multiple ELLPACK-like buffers are stacked together inside a
+single, one dimensional array; 
+an additional  vector \textit{hackOffsets} is provided to keep track
+of the individual submatrices.
+All hacks have the same number of rows  \textit{hackSize}; hence, 
+the \textit{hackOffsets} vector is  an array of
+$(m/hackSize)+1$ elements, each one pointing  to the first index of a
+submatrix inside the stacked \textit{cM}/\textit{rP} buffers, plus an
+additional element pointing past the end of the last block, where the
+next one would begin. 
+We thus have the property that  
+the elements of the $k$-th \textit{hack} are stored between \verb|hackOffsets[k]| and
+\verb|hackOffsets[k+1]|, similarly to what happens in the CSR format. 
+
+\begin{figure}[ht]
+	\centering
+%		\includegraphics[width=8.2cm]{../figures/hll.eps}
+	 \includegraphics[width=.72\textwidth]{../figures/hll.pdf}
+	\caption{Hacked ELLPACK compression of matrix in Figure~\ref{fig:dense}}
+	\label{fig:hll}
+\end{figure} 
+
+With this data structure a very long row only affects one hack, and
+therefore the additional memory is limited to the hack in which the
+row appears.
+
+The relevant data type is \verb|psb_T_hll_sparse_mat|:
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type, extends(psb_d_base_sparse_mat) :: psb_d_hll_sparse_mat
+    !
+    ! HLL format. (Hacked ELL) 
+    !     
+    integer(psb_ipk_) :: hksz
+    integer(psb_ipk_), allocatable :: irn(:), ja(:), idiag(:), hkoffs(:)
+    real(psb_dpk_), allocatable :: val(:)
+
+  contains
+   ....
+  end type
+\end{minted}
+
+\subsubsection*{Diagonal storage}
+
+
+The DIAgonal (DIA) format (shown in Figure~\ref{fig:dia}) 
+has   a 2-dimensional array \verb|AS| containing in each column the
+coefficients along a  diagonal of the matrix, and an integer array
+\verb|OFFSET|  that determines  where each diagonal starts. The
+diagonals in \verb|AS| are padded with zeros as necessary. 
+
+The code to compute the matrix-vector product $y=Ax$ is shown in Alg.~\ref{alg:dia};
+it costs one  memory read per outer iteration, 
+plus three memory reads, one memory write  and two floating-point
+operations per inner iteration. The accesses to  \verb|AS| and
+\verb|x| are in strict sequential order,  therefore no indirect
+addressing is required.  
+
+\begin{figure}[ht]
+	\centering
+%		\includegraphics[width=8.2cm]{figures/dia.eps}
+		\includegraphics[width=.72\textwidth]{figures/dia.pdf}
+	\caption{DIA compression of matrix in Figure~\ref{fig:dense}}
+	\label{fig:dia}
+\end{figure} 
+
+
+\begin{algorithm}
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+    do j=1,ndiag
+      if (offset(j) > 0) then 
+        ir1 = 1; ir2 = m - offset(j);
+      else
+        ir1 = 1 - offset(j); ir2 = m;
+      end if
+      do i=ir1,ir2
+        y(i) = y(i) + alpha*as(i,j)*x(i+offset(j))
+      end do
+    end do
+\end{minted}
+  \caption{\label{alg:dia} Matrix-Vector product in DIA format}
+\end{algorithm}
+
+
+The relevant data type is \verb|psb_T_dia_sparse_mat|:
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type, extends(psb_d_base_sparse_mat) :: psb_d_dia_sparse_mat
+    !
+    ! DIA format, extended.
+    !     
+    
+    integer(psb_ipk_), allocatable :: offset(:)
+    integer(psb_ipk_) :: nzeros
+    real(psb_dpk_), allocatable :: data(:,:)
+
+  end type
+\end{minted}
+
+
+
+\subsubsection*{Hacked DIA}
+
+Storage by DIAgonals is an attractive option for matrices whose
+coefficients are located on a small set of diagonals, since they do
+away with storing explicitly the indices and therefore reduce
+significantly memory traffic. However, having a few coefficients
+outside of the main set of diagonals may  significantly increase the
+amount of needed padding; moreover, while the DIA code is easily
+vectorized, it does not necessarily make optimal use of the memory
+hierarchy. While processing each diagonal we are updating entries in
+the output vector \verb|y|, which is then accessed multiple times; if 
+the vector \verb|y| is too large to remain in the cache memory, the
+associated cache miss penalty is paid multiple times. 
+
+The \textit{hacked DIA} (\textbf{HDIA}) format was designed to contain
+the amount of padding, by  breaking  the original matrix
+into equally sized groups of rows (\textit{hacks}), and then storing
+these groups as independent matrices in DIA format. This approach is
+similar to that of HLL, and requires using an offset vector for each
+submatrix. Again, similarly to HLL, the various submatrices are
+stacked inside a linear array to improve memory management. The fact
+that the matrix is accessed in slices helps in reducing cache misses,
+especially regarding accesses to the %output 
+vector \verb|y|.  
+
+
+An additional vector \textit{hackOffsets} is provided to complete
+the matrix format; given  that \textit{hackSize} is the number of rows of each hack,
+the \textit{hackOffsets} vector is made by an array of
+$(m/hackSize)+1$ elements,  pointing to the first diagonal offset of a
+submatrix inside the stacked \textit{offsets} buffers, plus an
+additional element equal to the number of nonzero diagonals in the whole matrix. 
+We thus have the property that  
+the number of diagonals of the $k$-th \textit{hack} is given by
+\textit{hackOffsets[k+1] - hackOffsets[k]}.  
+
+\begin{figure}[ht]
+	\centering
+%		\includegraphics[width=8.2cm]{../figures/hdia.eps}
+		\includegraphics[width=.72\textwidth]{../figures/hdia.pdf}
+	\caption{Hacked DIA compression of matrix in Figure~\ref{fig:dense}}
+	\label{fig:hdia}
+\end{figure} 
+
+The relevant data type is \verb|psb_T_hdia_sparse_mat|:
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  type pm
+     real(psb_dpk_), allocatable  :: data(:,:)
+  end type pm
+
+  type po
+     integer(psb_ipk_), allocatable  :: off(:)
+  end type po
+
+  type, extends(psb_d_base_sparse_mat) :: psb_d_hdia_sparse_mat
+    !
+    ! HDIA format, extended.
+    !
+    
+    type(pm), allocatable :: hdia(:)
+    type(po), allocatable :: offset(:)
+    integer(psb_ipk_) :: nblocks, nzeros
+    integer(psb_ipk_) :: hack = 64
+    integer(psb_long_int_k_) :: dim=0
+
+  contains
+   ....
+  end type
+\end{minted}
+
+

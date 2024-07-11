@@ -1,0 +1,244 @@
+
+\subsection{CUDA-class extensions}
+
+For computing  with CUDA we define a dual memorization strategy in
+which each variable on the CPU (``host'') side has a GPU (``device'')
+side. When a GPU-type variable is initialized, the data contained is
+(usually) the same on both sides. Each operator invoked on the
+variable may change the data so that only the host side or the device
+side are up-to-date. 
+
+Keeping track of the updates to data in the variables  is essential: we want
+to perform most  computations on the GPU, but we cannot afford the time
+needed to move data between the host  memory and the device memory
+because the bandwidth of the interconnection bus would become the main
+bottleneck of the computation. Thus, each and every computational
+routine in the library is built according to the following principles: 
+\begin{itemize}
+\item If the data type being handled is {GPU}-enabled, make sure that
+  its device copy is up to date, perform any arithmetic operation on
+  the {GPU}, and if the data has been altered as a result, mark
+  the main-memory copy as outdated.
+\item The main-memory copy is never updated unless this is requested
+  by the user either 
+\begin{description}
+\item[explicitly] by invoking a synchronization method;
+\item[implicitly] by invoking a method that involves other data items
+  that are not {GPU}-enabled, e.g., by assignment ov a vector to a
+  normal array. 
+\end{description}
+\end{itemize}
+In this way, data items are put on the {GPU} memory ``on demand'' and
+remain there as long as ``normal'' computations are carried out. 
+As an example, the following call to a matrix-vector product
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+    call psb_spmm(alpha,a,x,beta,y,desc_a,info)
+\end{minted}
+will transparently and automatically be performed on the {GPU} whenever
+all three data inputs \fortinline|a|, \fortinline|x|  and
+\fortinline|y| are {GPU}-enabled. If a program makes many such calls
+sequentially, then 
+\begin{itemize}
+\item The first kernel invocation will find the data in main memory,
+  and will copy it to the {GPU} memory, thus incurring a significant
+  overhead; the result is however \emph{not} copied back, and
+  therefore:
+\item Subsequent kernel invocations involving the same vector will
+  find the data on the {GPU} side so that they will run at full
+  speed.
+\end{itemize}
+For all invocations after the first the only data that will have to be
+transferred to/from the main memory will be the scalars \fortinline|alpha|
+and \fortinline|beta|, and the return code \fortinline|info|.  
+
+\begin{description}
+\item[Vectors:] The data type \fortinline|psb_T_vect_gpu| provides a
+  GPU-enabled extension of the inner type \fortinline|psb_T_base_vect_type|,
+  and must be used together with the other inner matrix type to make
+  full use of the GPU computational capabilities;
+\item[CSR:] The data type \fortinline|psb_T_csrg_sparse_mat| provides an
+  interface to the GPU version of CSR available in the NVIDIA CuSPARSE
+  library;
+\item[HYB:] The data type \fortinline|psb_T_hybg_sparse_mat| provides an
+  interface to the HYB GPU storage  available in the NVIDIA CuSPARSE
+  library. The internal structure is opaque, hence the host side is
+  just CSR; the HYB data format is only available up to CUDA version
+  10. 
+\item[ELL:] The data type \fortinline|psb_T_elg_sparse_mat| provides an
+  interface to the  ELLPACK implementation from SPGPU;
+
+\item[HLL:] The data type \fortinline|psb_T_hlg_sparse_mat| provides an
+  interface to the  Hacked ELLPACK implementation from SPGPU;
+\item[HDIA:] The data type \fortinline|psb_T_hdiag_sparse_mat| provides an
+  interface to the  Hacked DIAgonals implementation from SPGPU;
+\end{description}
+
+
+\section{CUDA Environment Routines}
+\label{sec:cudaenv}
+
+\subsection*{psb\_cuda\_init --- Initializes PSBLAS-CUDA
+  environment}
+\addcontentsline{toc}{subsection}{psb\_cuda\_init}
+
+\begin{minted}[breaklines=true]{fortran}
+call psb_cuda_init(ctxt [, device])
+\end{minted}
+
+This subroutine initializes the PSBLAS-CUDA  environment. 
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf  On Entry ]
+\item[device] ID of CUDA device to attach to.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value. \
+Default: use \fortinline|mod(iam,ngpu)| where \fortinline|iam| is the calling
+process index and \fortinline|ngpu| is the total number of CUDA devices
+available on the current node. 
+\end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item A call to this routine must precede any other PSBLAS-CUDA call. 
+\end{enumerate}
+
+\subsection*{psb\_cuda\_exit --- Exit from  PSBLAS-CUDA
+  environment}
+\addcontentsline{toc}{subsection}{psb\_cuda\_exit}
+
+\begin{minted}[breaklines=true]{fortran}
+call psb_cuda_exit(ctxt)
+\end{minted}
+
+This subroutine exits from the  PSBLAS CUDA context.
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf  On Entry ]
+\item[ctxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope: {\bf global}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer variable.
+\end{description}
+
+
+
+
+\subsection*{psb\_cuda\_DeviceSync ---  Synchronize CUDA device}
+\addcontentsline{toc}{subsection}{psb\_cuda\_DeviceSync}
+
+\begin{minted}[breaklines=true]{fortran}
+call psb_cuda_DeviceSync()
+\end{minted}
+
+This subroutine ensures that all previosly invoked kernels, i.e. all
+invocation of CUDA-side code, have completed.
+
+
+\subsection*{psb\_cuda\_getDeviceCount }
+\addcontentsline{toc}{subsection}{psb\_cuda\_getDeviceCount}
+
+\begin{minted}[breaklines=true]{fortran}
+ngpus =  psb_cuda_getDeviceCount()
+\end{minted}
+
+Get number of devices available on current computing node. 
+
+\subsection*{psb\_cuda\_getDevice }
+\addcontentsline{toc}{subsection}{psb\_cuda\_getDevice}
+
+\begin{minted}[breaklines=true]{fortran}
+ngpus =  psb_cuda_getDevice()
+\end{minted}
+
+Get  device in use by current process. 
+
+\subsection*{psb\_cuda\_setDevice }
+\addcontentsline{toc}{subsection}{psb\_cuda\_setDevice}
+
+\begin{minted}[breaklines=true]{fortran}
+info = psb_cuda_setDevice(dev)
+\end{minted}
+
+Set  device to be used  by current process. 
+
+\subsection*{psb\_cuda\_DeviceHasUVA }
+\addcontentsline{toc}{subsection}{psb\_cuda\_DeviceHasUVA}
+
+\begin{minted}[breaklines=true]{fortran}
+hasUva = psb_cuda_DeviceHasUVA()
+\end{minted}
+
+Returns true if device currently in use supports UVA (Unified Virtual Addressing).
+
+\subsection*{psb\_cuda\_WarpSize }
+\addcontentsline{toc}{subsection}{psb\_cuda\_WarpSize}
+
+\begin{minted}[breaklines=true]{fortran}
+nw = psb_cuda_WarpSize()
+\end{minted}
+
+Returns the warp size.
+
+
+\subsection*{psb\_cuda\_MultiProcessors }
+\addcontentsline{toc}{subsection}{psb\_cuda\_MultiProcessors}
+
+\begin{minted}[breaklines=true]{fortran}
+nmp = psb_cuda_MultiProcessors()
+\end{minted}
+
+Returns the number of multiprocessors in the CUDA device.
+
+\subsection*{psb\_cuda\_MaxThreadsPerMP }
+\addcontentsline{toc}{subsection}{psb\_cuda\_MaxThreadsPerMP}
+
+\begin{minted}[breaklines=true]{fortran}
+nt = psb_cuda_MaxThreadsPerMP()
+\end{minted}
+
+Returns the maximum number of threads per multiprocessor. 
+
+
+\subsection*{psb\_cuda\_MaxRegistersPerBlock }
+\addcontentsline{toc}{subsection}{psb\_cuda\_MaxRegisterPerBlock}
+
+\begin{minted}[breaklines=true]{fortran}
+nr = psb_cuda_MaxRegistersPerBlock()
+\end{minted}
+
+Returns the maximum number of register per thread block. 
+
+
+\subsection*{psb\_cuda\_MemoryClockRate }
+\addcontentsline{toc}{subsection}{psb\_cuda\_MemoryClockRate}
+
+\begin{minted}[breaklines=true]{fortran}
+cl = psb_cuda_MemoryClockRate()
+\end{minted}
+
+Returns the memory clock rate in KHz, as an integer. 
+
+\subsection*{psb\_cuda\_MemoryBusWidth }
+\addcontentsline{toc}{subsection}{psb\_cuda\_MemoryBusWidth}
+
+\begin{minted}[breaklines=true]{fortran}
+nb = psb_cuda_MemoryBusWidth()
+\end{minted}
+
+Returns the memory bus width in bits.
+
+\subsection*{psb\_cuda\_MemoryPeakBandwidth }
+\addcontentsline{toc}{subsection}{psb\_cuda\_MemoryPeakBandwidth}
+
+\begin{minted}[breaklines=true]{fortran}
+bw = psb_cuda_MemoryPeakBandwidth()
+\end{minted}
+Returns the peak memory bandwidth in MB/s (real double precision).
+
+
+

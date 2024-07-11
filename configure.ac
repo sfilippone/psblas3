@@ -204,7 +204,7 @@ PAC_ARG_WITH_FLAGS(module-path,MODULE_PATH)
 
 # we just gave the user the chance to append values to these variables
 
-###############################################################################
+
 
 dnl  Library oriented Autotools facilities (we don't care about this for now)
 
@@ -844,6 +844,30 @@ if test "x$pac_cv_ipk_size" != "x4"; then
 fi
 
 
+###############################################################################
+PAC_ARG_WITH_LIBRSB
+LIBRSB_DIR="$pac_cv_librsb_dir";
+AC_MSG_CHECKING([for LIBRSB install dir])
+case $LIBRSB_DIR in 
+     /*) ;; 
+     *) dnl AC_MSG_ERROR([The LIBRSB installation dir must be an absolute pathname
+ dnl specified with --with-librsb=/path/to/librsb])
+esac
+dnl if test ! -d "$LIBRSB_DIR" ; then 
+dnl    AC_MSG_ERROR([Could not find LIBRSB build dir $LIBRSB_DIR!])	
+dnl fi
+pac_cv_status_file="$LIBRSB_DIR/librsb.a"
+if test ! -f "$pac_cv_status_file" ; then 
+  AC_MSG_RESULT([no])
+  #AC_MSG_ERROR([Could not find an installation  in $LIBRSB_DIR.])
+else
+  AC_MSG_RESULT([$LIBRSB_DIR])
+  RSBTARGETLIB=rsbd;
+  RSBTARGETOBJ=rsbobj;	
+fi
+
+
+
 
 
 ###############################################################################
@@ -944,6 +968,14 @@ AC_SUBST(CUDEFINES)
 AC_SUBST(CUDAD)
 AC_SUBST(CUDALD)
 AC_SUBST(LCUDA)
+AC_SUBST(LIBRSB_LIBS)
+AC_SUBST(LIBRSB_INCLUDES)
+AC_SUBST(LIBRSB_INCDIR)
+AC_SUBST(LIBRSB_DIR)
+AC_SUBST(LIBRSB_DEFINES)
+AC_SUBST(LRSB)
+
+
 ###############################################################################
 # the following files will be created by Automake
 
