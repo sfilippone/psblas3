@@ -49,8 +49,8 @@ module psb_d_oacc_vect_mod
     procedure, pass(z) :: abgdxyz     => d_oacc_abgdxyz
     procedure, pass(y) :: mlt_a       => d_oacc_mlt_a
     procedure, pass(z) :: mlt_a_2     => d_oacc_mlt_a_2
-    procedure, pass(y) :: mlt_v       => d_oacc_mlt_v
-    procedure, pass(z) :: mlt_v_2     => d_oacc_mlt_v_2
+    procedure, pass(y) :: mlt_v       => psb_d_oacc_mlt_v
+    procedure, pass(z) :: mlt_v_2     => psb_d_oacc_mlt_v_2
     procedure, pass(x) :: scal        => d_oacc_scal 
     procedure, pass(x) :: nrm2        => d_oacc_nrm2
     procedure, pass(x) :: amax        => d_oacc_amax
@@ -63,19 +63,17 @@ module psb_d_oacc_vect_mod
   real(psb_dpk_), allocatable :: v1(:),v2(:),p(:)
 
   interface
-    subroutine d_oacc_mlt_v(x, y, info)
-      import
+    module subroutine psb_d_oacc_mlt_v(x, y, info)
       implicit none 
       class(psb_d_base_vect_type), intent(inout) :: x
       class(psb_d_vect_oacc), intent(inout)       :: y
       integer(psb_ipk_), intent(out)             :: info
-    end subroutine d_oacc_mlt_v
+    end subroutine psb_d_oacc_mlt_v
   end interface
   
 
   interface
-    subroutine d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
-      import
+    module subroutine psb_d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       implicit none 
       real(psb_dpk_), intent(in)                 :: alpha, beta
       class(psb_d_base_vect_type), intent(inout) :: x
@@ -83,7 +81,7 @@ module psb_d_oacc_vect_mod
       class(psb_d_vect_oacc), intent(inout)      :: z
       integer(psb_ipk_), intent(out)             :: info
       character(len=1), intent(in), optional     :: conjgx, conjgy
-    end subroutine d_oacc_mlt_v_2
+    end subroutine psb_d_oacc_mlt_v_2
   end interface
   
 contains

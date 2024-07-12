@@ -2,6 +2,7 @@ include ../../Make.inc
 LIBDIR=../../lib
 INCDIR=../../include
 MODDIR=../../modules
+UP=..
 #
 # Compilers and such
 #
@@ -21,6 +22,17 @@ objs: $(OBJS)
 
 lib: objs
 	ar cur ../$(LIBNAME) $(OBJS)
+
+
+psb_d_oacc_csr_vect_mv.o psb_d_oacc_csr_inner_vect_sv.o \
+	psb_d_oacc_csr_csmm.o psb_d_oacc_csr_csmv.o psb_d_oacc_csr_scals.o \
+	psb_d_oacc_csr_scal.o psb_d_oacc_csr_allocate_mnnz.o \
+	psb_d_oacc_csr_reallocate_nz.o psb_d_oacc_csr_cp_from_coo.o \
+	psb_d_oacc_csr_cp_from_fmt.o psb_d_oacc_csr_mv_from_coo.o \
+	psb_d_oacc_csr_mv_from_fmt.o psb_d_oacc_csr_mold.o: $(UP)/psb_d_oacc_csr_mat_mod.o
+
+psb_d_oacc_mlt_v_2.o psb_d_oacc_mlt_v.o: $(UP)/psb_d_oacc_vect_mod.o
+
 
 clean:
 	/bin/rm -f $(OBJS)

@@ -1,6 +1,7 @@
-subroutine psb_d_oacc_csr_vect_mv(alpha, a, x, beta, y, info, trans)
-    use psb_base_mod
-    use psb_d_oacc_csr_mat_mod, psb_protect_name => psb_d_oacc_csr_vect_mv
+submodule (psb_d_oacc_csr_mat_mod) psb_d_oacc_csr_vect_mv_impl
+  use psb_base_mod
+contains
+  module subroutine psb_d_oacc_csr_vect_mv(alpha, a, x, beta, y, info, trans)
     implicit none
 
     real(psb_dpk_), intent(in)        :: alpha, beta
@@ -16,9 +17,9 @@ subroutine psb_d_oacc_csr_vect_mv(alpha, a, x, beta, y, info, trans)
     n = a%get_ncols()
 
     if ((n /= size(x%v)) .or. (n /= size(y%v))) then
-        write(0,*) 'Size error ', m, n, size(x%v), size(y%v)
-        info = psb_err_invalid_mat_state_
-        return
+      write(0,*) 'Size error ', m, n, size(x%v), size(y%v)
+      info = psb_err_invalid_mat_state_
+      return
     end if
 
     if (a%is_host()) call a%sync()
@@ -28,34 +29,35 @@ subroutine psb_d_oacc_csr_vect_mv(alpha, a, x, beta, y, info, trans)
     call inner_spmv(m, n, alpha, a%val, a%ja, a%irp, x%v, beta, y%v, info)
     call y%set_dev()
 
-contains
+  contains
 
     subroutine inner_spmv(m, n, alpha, val, ja, irp, x, beta, y, info)
-        implicit none
-        integer(psb_ipk_) :: m, n
-        real(psb_dpk_), intent(in) :: alpha, beta
-        real(psb_dpk_) :: val(:), x(:), y(:)
-        integer(psb_ipk_) :: ja(:), irp(:)
-        integer(psb_ipk_), intent(out) :: info
-        integer(psb_ipk_) :: i, j, ii, isz
-        real(psb_dpk_) :: tmp
-        integer(psb_ipk_), parameter :: vsz = 256
+      implicit none
+      integer(psb_ipk_) :: m, n
+      real(psb_dpk_), intent(in) :: alpha, beta
+      real(psb_dpk_) :: val(:), x(:), y(:)
+      integer(psb_ipk_) :: ja(:), irp(:)
+      integer(psb_ipk_), intent(out) :: info
+      integer(psb_ipk_) :: i, j, ii, isz
+      real(psb_dpk_) :: tmp
+      integer(psb_ipk_), parameter :: vsz = 256
 
-        info = 0
+      info = 0
 
-        !$acc parallel loop vector_length(vsz) private(isz)
-        do ii = 1, m, vsz
-            isz = min(vsz, m - ii + 1)
-            !$acc loop independent private(tmp)
-            do i = ii, ii + isz - 1
-                tmp = 0.0_psb_dpk_
-                !$acc loop seq
-                do j = irp(i), irp(i + 1) - 1
-                    tmp = tmp + val(j) * x(ja(j))
-                end do
-                y(i) = alpha * tmp + beta * y(i)
-            end do
+      !$acc parallel loop vector_length(vsz) private(isz)
+      do ii = 1, m, vsz
+        isz = min(vsz, m - ii + 1)
+        !$acc loop independent private(tmp)
+        do i = ii, ii + isz - 1
+          tmp = 0.0_psb_dpk_
+          !$acc loop seq
+          do j = irp(i), irp(i + 1) - 1
+            tmp = tmp + val(j) * x(ja(j))
+          end do
+          y(i) = alpha * tmp + beta * y(i)
         end do
+      end do
     end subroutine inner_spmv
 
-end subroutine psb_d_oacc_csr_vect_mv
+  end subroutine psb_d_oacc_csr_vect_mv
+end submodule psb_d_oacc_csr_vect_mv_impl

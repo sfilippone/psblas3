@@ -1,6 +1,7 @@
-subroutine psb_d_oacc_csr_reallocate_nz(nz, a)
-    use psb_base_mod
-    use psb_d_oacc_csr_mat_mod, psb_protect_name => psb_d_oacc_csr_reallocate_nz
+submodule (psb_d_oacc_csr_mat_mod) psb_d_oacc_csr_reallocate_nz_impl
+  use psb_base_mod
+contains
+  module subroutine psb_d_oacc_csr_reallocate_nz(nz, a)
     implicit none 
     integer(psb_ipk_), intent(in) :: nz
     class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
@@ -8,20 +9,20 @@ subroutine psb_d_oacc_csr_reallocate_nz(nz, a)
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='d_oacc_csr_reallocate_nz'
     logical, parameter :: debug=.false.
-  
+
     call psb_erractionsave(err_act)
     info = psb_success_
-  
+
     call a%psb_d_csr_sparse_mat%reallocate(nz)
-  
+
     call a%set_dev()
     if (info /= 0) goto 9999
-  
+
     call psb_erractionrestore(err_act)
     return
-  
-  9999 call psb_error_handler(err_act)
+
+9999 call psb_error_handler(err_act)
     return
-  
+
   end subroutine psb_d_oacc_csr_reallocate_nz
-  
+end submodule psb_d_oacc_csr_reallocate_nz_impl
