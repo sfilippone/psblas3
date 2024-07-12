@@ -13,8 +13,8 @@ OBJS= psb_d_oacc_csr_vect_mv.o psb_d_oacc_csr_inner_vect_sv.o \
 	psb_d_oacc_csr_csmm.o psb_d_oacc_csr_csmv.o psb_d_oacc_csr_scals.o \
 	psb_d_oacc_csr_scal.o psb_d_oacc_csr_allocate_mnnz.o \
 	psb_d_oacc_csr_reallocate_nz.o psb_d_oacc_csr_cp_from_coo.o \
-	psb_d_oacc_csr_cp_from_fmt.o psb_d_oacc_csr_mv_from_coo \
-	psb_d_oacc_csr_mv_from_fmt psb_d_oacc_csr_mold.o \
+	psb_d_oacc_csr_cp_from_fmt.o psb_d_oacc_csr_mv_from_coo.o \
+	psb_d_oacc_csr_mv_from_fmt.o psb_d_oacc_csr_mold.o \
 	psb_d_oacc_mlt_v_2.o psb_d_oacc_mlt_v.o
 
 objs: $(OBJS)
