@@ -12,17 +12,68 @@ module psb_d_oacc_csr_mat_mod
     type, extends(psb_d_csr_sparse_mat) :: psb_d_oacc_csr_sparse_mat
         integer(psb_ipk_) :: devstate = is_host
     contains
-        procedure, pass(a) :: all         => d_oacc_csr_all
-        procedure, pass(a) :: is_host     => d_oacc_csr_is_host
-        procedure, pass(a) :: is_sync     => d_oacc_csr_is_sync
-        procedure, pass(a) :: is_dev      => d_oacc_csr_is_dev
-        procedure, pass(a) :: set_host    => d_oacc_csr_set_host
-        procedure, pass(a) :: set_sync    => d_oacc_csr_set_sync
-        procedure, pass(a) :: set_dev     => d_oacc_csr_set_dev
-        procedure, pass(a) :: sync_space  => d_oacc_csr_sync_space
-        procedure, pass(a) :: sync        => d_oacc_csr_sync
-        procedure, pass(a) :: vect_mv     => psb_d_oacc_csr_vect_mv
+        procedure, nopass  :: get_fmt       => d_oacc_csr_get_fmt
+        procedure, pass(a) :: sizeof        => d_oacc_csr_sizeof
+        procedure, pass(a) :: vect_mv       => psb_d_oacc_csr_vect_mv
+        procedure, pass(a) :: in_vect_sv    => psb_d_oacc_csr_inner_vect_sv
+        procedure, pass(a) :: csmm          => psb_d_oacc_csr_csmm
+        procedure, pass(a) :: csmv          => psb_d_oacc_csr_csmv
+        procedure, pass(a) :: scals         => psb_d_oacc_csr_scals
+        procedure, pass(a) :: scalv         => psb_d_oacc_csr_scal
+        procedure, pass(a) :: reallocate_nz => psb_d_oacc_csr_reallocate_nz
+        procedure, pass(a) :: allocate_mnnz => psb_d_oacc_csr_allocate_mnnz
+        procedure, pass(a) :: cp_from_coo   => psb_d_oacc_csr_cp_from_coo
+        procedure, pass(a) :: cp_from_fmt   => psb_d_oacc_csr_cp_from_fmt
+        procedure, pass(a) :: mv_from_coo   => psb_d_oacc_csr_mv_from_coo
+        procedure, pass(a) :: mv_from_fmt   => psb_d_oacc_csr_mv_from_fmt
+        procedure, pass(a) :: free          => d_oacc_csr_free
+        procedure, pass(a) :: mold          => psb_d_oacc_csr_mold
+        procedure, pass(a) :: all           => d_oacc_csr_all
+        procedure, pass(a) :: is_host       => d_oacc_csr_is_host
+        procedure, pass(a) :: is_sync       => d_oacc_csr_is_sync
+        procedure, pass(a) :: is_dev        => d_oacc_csr_is_dev
+        procedure, pass(a) :: set_host      => d_oacc_csr_set_host
+        procedure, pass(a) :: set_sync      => d_oacc_csr_set_sync
+        procedure, pass(a) :: set_dev       => d_oacc_csr_set_dev
+        procedure, pass(a) :: sync_space    => d_oacc_csr_sync_space
+        procedure, pass(a) :: sync          => d_oacc_csr_sync
     end type psb_d_oacc_csr_sparse_mat
+
+    interface 
+        subroutine psb_d_oacc_csr_mold(a,b,info)
+            import :: psb_d_oacc_csr_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
+            class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+            integer(psb_ipk_), intent(out) :: info
+        end subroutine psb_d_oacc_csr_mold
+    end interface
+
+    interface
+        subroutine psb_d_oacc_csr_cp_from_fmt(a,b,info)
+            import :: psb_d_oacc_csr_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            class(psb_d_base_sparse_mat), intent(in) :: b
+            integer(psb_ipk_), intent(out) :: info
+        end subroutine psb_d_oacc_csr_cp_from_fmt
+    end interface
+
+    interface 
+        subroutine psb_d_oacc_csr_mv_from_coo(a,b,info)
+            import :: psb_d_oacc_csr_sparse_mat, psb_d_coo_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            class(psb_d_coo_sparse_mat), intent(inout) :: b
+            integer(psb_ipk_), intent(out) :: info
+        end subroutine psb_d_oacc_csr_mv_from_coo
+    end interface
+
+    interface
+        subroutine psb_d_oacc_csr_mv_from_fmt(a,b,info)
+            import :: psb_d_oacc_csr_sparse_mat, psb_d_base_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            class(psb_d_base_sparse_mat), intent(inout) :: b
+            integer(psb_ipk_), intent(out) :: info
+        end subroutine psb_d_oacc_csr_mv_from_fmt
+    end interface
 
     interface 
         subroutine psb_d_oacc_csr_vect_mv(alpha, a, x, beta, y, info, trans)
@@ -35,7 +86,130 @@ module psb_d_oacc_csr_mat_mod
         end subroutine psb_d_oacc_csr_vect_mv
     end interface
 
+    interface
+        subroutine psb_d_oacc_csr_inner_vect_sv(alpha, a, x, beta, y, info, trans)
+            import :: psb_d_oacc_csr_sparse_mat, psb_dpk_, psb_d_base_vect_type, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
+            real(psb_dpk_), intent(in) :: alpha, beta
+            class(psb_d_base_vect_type), intent(inout) :: x,y
+            integer(psb_ipk_), intent(out) :: info
+            character, optional, intent(in) :: trans
+        end subroutine psb_d_oacc_csr_inner_vect_sv
+    end interface
+
+    interface
+        subroutine psb_d_oacc_csr_csmm(alpha, a, x, beta, y, info, trans)
+            import :: psb_d_oacc_csr_sparse_mat, psb_dpk_, psb_d_base_vect_type, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
+            real(psb_dpk_), intent(in) :: alpha, beta, x(:,:)
+            real(psb_dpk_), intent(inout) :: y(:,:)
+            integer(psb_ipk_), intent(out) :: info
+            character, optional, intent(in) :: trans
+        end subroutine psb_d_oacc_csr_csmm
+    end interface
+
+    interface
+        subroutine psb_d_oacc_csr_csmv(alpha, a, x, beta, y, info, trans)
+            import :: psb_d_oacc_csr_sparse_mat, psb_dpk_, psb_d_base_vect_type, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
+            real(psb_dpk_), intent(in) :: alpha, beta, x(:)
+            real(psb_dpk_), intent(inout) :: y(:)
+            integer(psb_ipk_), intent(out) :: info
+            character, optional, intent(in) :: trans
+        end subroutine psb_d_oacc_csr_csmv
+    end interface
+            
+    interface
+        subroutine psb_d_oacc_csr_scals(d, a, info)
+            import :: psb_d_oacc_csr_sparse_mat, psb_dpk_, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            real(psb_dpk_), intent(in) :: d
+            integer(psb_ipk_), intent(out) :: info
+        end subroutine psb_d_oacc_csr_scals
+    end interface
+
+    interface 
+        subroutine psb_d_oacc_csr_scal(d,a,info,side)
+            import :: psb_d_oacc_csr_sparse_mat, psb_dpk_, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            real(psb_dpk_), intent(in) :: d(:)
+            integer(psb_ipk_), intent(out) :: info
+            character, optional, intent(in) :: side
+        end subroutine psb_d_oacc_csr_scal
+    end interface
+
+    interface
+        subroutine psb_d_oacc_csr_reallocate_nz(nz,a)
+            import :: psb_d_oacc_csr_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            integer(psb_ipk_), intent(in) :: nz
+        end subroutine psb_d_oacc_csr_reallocate_nz
+    end interface
+
+    interface
+        subroutine psb_d_oacc_csr_allocate_mnnz(m,n,a,nz)
+            import :: psb_d_oacc_csr_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            integer(psb_ipk_), intent(in) :: m,n
+            integer(psb_ipk_), intent(in), optional :: nz
+        end subroutine psb_d_oacc_csr_allocate_mnnz
+    end interface
+
+    interface 
+        subroutine psb_d_oacc_csr_cp_from_coo(a,b,info)
+            import :: psb_d_oacc_csr_sparse_mat, psb_d_coo_sparse_mat, psb_ipk_
+            class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+            class(psb_d_coo_sparse_mat), intent(in) :: b
+            integer(psb_ipk_), intent(out) :: info
+        end subroutine psb_d_oacc_csr_cp_from_coo
+    end interface
+
 contains
+    
+
+    subroutine d_oacc_csr_free(a)
+        use psb_base_mod
+        implicit none 
+        class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
+        integer(psb_ipk_) :: info
+    
+        if (allocated(a%val)) then
+        !$acc exit data delete(a%val)
+        end if
+        if (allocated(a%ja)) then
+        !$acc exit data delete(a%ja)
+        end if
+        if (allocated(a%irp)) then
+        !$acc exit data delete(a%irp)
+        end if
+    
+        call a%psb_d_csr_sparse_mat%free()
+        
+        return
+    end subroutine d_oacc_csr_free
+    
+    
+
+    function d_oacc_csr_sizeof(a) result(res)
+        implicit none
+        class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
+        integer(psb_epk_) :: res
+
+        if (a%is_dev()) call a%sync()
+        
+        res = 8
+        res = res + psb_sizeof_dp * size(a%val)
+        res = res + psb_sizeof_ip * size(a%irp)
+        res = res + psb_sizeof_ip * size(a%ja)
+
+    end function d_oacc_csr_sizeof
+
+
+    function d_oacc_csr_get_fmt() result(res)
+        implicit none
+        character(len=5) :: res
+        res = 'CSR_oacc'
+    end function d_oacc_csr_get_fmt
 
     subroutine d_oacc_csr_all(m, n, nz, a, info)
         implicit none 
