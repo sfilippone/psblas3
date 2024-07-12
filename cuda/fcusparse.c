@@ -34,7 +34,6 @@
 #include <stdlib.h>
 
 #include <cuda_runtime.h>
-#include "cintrf.h"
 #include "fcusparse.h"
 
 static   cusparseHandle_t *cusparse_handle=NULL;

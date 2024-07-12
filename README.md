@@ -25,7 +25,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 -------------
-See docs/psblas-3.8.pdf; an HTML version of the same document is
+See docs/psblas-3.9.pdf; an HTML version of the same document is
 available in docs/html. Please consult the sample programs, especially
 test/pargen/psb_[sd]_pde[23]d.f90
 

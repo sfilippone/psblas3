@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "cintrf.h"
-#include "vectordev.h"
 #include "psi_cuda_common.cuh"
 
 
