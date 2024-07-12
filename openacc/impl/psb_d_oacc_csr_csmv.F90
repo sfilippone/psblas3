@@ -1,7 +1,7 @@
 subroutine psb_d_oacc_csr_csmv(alpha, a, x, beta, y, info, trans)
     use psb_base_mod
-    use elldev_mod
-    use psb_vectordev_mod
+    !use elldev_mod
+    !use psb_vectordev_mod
     use psb_d_oacc_csr_mat_mod, psb_protect_name => psb_d_oacc_csr_csmv
     implicit none 
     class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
