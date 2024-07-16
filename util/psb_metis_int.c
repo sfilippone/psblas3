@@ -26,7 +26,7 @@ int metis_PartGraphKway_C(idx_t *n, idx_t *ixadj, idx_t *iadj, idx_t *ivwg,
     /* 				   NULL,NULL,NULL,(idx_t *)nparts,NULL,NULL,NULL, */
     /* 				   &objval,(idx_t *)graphpart); */
     res = METIS_PartGraphKway((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj,
-    				   NULL,NULL,NULL,(idx_t *)nparts,weights,NULL,options,
+			      NULL,NULL,NULL,(idx_t *)nparts,(void *)weights,NULL,options,
     				   &objval,(idx_t *)graphpart);
   }
   if (res == METIS_OK) {
