@@ -215,7 +215,9 @@ contains
     end if
 
     if (present(mask)) then 
-
+      !$omp parallel do default(none) schedule(dynamic) &
+      !$omp shared(mask,idx,idxmap,owned_,info) &
+      !$omp private(i) 
       do i=1, size(idx)
         if (mask(i)) then 
           if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
@@ -229,9 +231,11 @@ contains
           end if
         end if
       end do
-
+      !$omp end parallel do
     else  if (.not.present(mask)) then 
-
+      !$omp parallel do default(none) schedule(dynamic) &
+      !$omp shared(idx,idxmap,owned_,info) &
+      !$omp private(i) 
       do i=1, size(idx)
         if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
           idx(i) = idxmap%min_glob_row + idx(i) - 1
@@ -243,7 +247,7 @@ contains
           info = -1
         end if
       end do
-
+      !$omp end parallel do
     end if
 
   end subroutine block_ll2gv1
@@ -277,7 +281,9 @@ contains
     end if
 
     if (present(mask)) then 
-
+      !$omp parallel do default(none) schedule(dynamic) &
+      !$omp shared(mask,idxin,idxout,idxmap,owned_,info,im) &
+      !$omp private(i) 
       do i=1, im
         if (mask(i)) then 
           if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
@@ -291,9 +297,11 @@ contains
           end if
         end if
       end do
-
+      !$omp end parallel do
     else  if (.not.present(mask)) then 
-
+      !$omp parallel do default(none) schedule(dynamic) &
+      !$omp shared(idxin,idxout,idxmap,owned_,info,im) &
+      !$omp private(i) 
       do i=1, im
         if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
           idxout(i) = idxmap%min_glob_row + idxin(i) - 1
@@ -305,7 +313,7 @@ contains
           info = -1
         end if
       end do
-
+      !$omp end parallel do
     end if
 
     if (is > im) then 
@@ -392,6 +400,9 @@ contains
     if (present(mask)) then 
 
       if (idxmap%is_asb()) then 
+        !$omp parallel do default(none) schedule(dynamic) &
+        !$omp shared(mask,is,idx,idxmap,owned_) &
+        !$omp private(i,nv,tidx) 
         do i=1, is
           if (mask(i)) then 
             if ((idxmap%min_glob_row <= idx(i)).and. &
@@ -408,7 +419,11 @@ contains
             end if
           end if
         end do
+        !$omp end parallel do
       else if (idxmap%is_valid()) then 
+        !$omp parallel do default(none) schedule(dynamic) &
+        !$omp shared(mask,is,idx,idxmap,owned_) &
+        !$omp private(i,ip,lip,tidx,info) 
         do i=1,is
           if (mask(i)) then 
             if ((idxmap%min_glob_row <= idx(i)).and.&
@@ -424,8 +439,8 @@ contains
             end if
           end if
         end do
+        !$omp end parallel do
       else 
-!!$        write(0,*) 'Block status: invalid ',idxmap%get_state()
         idx(1:is) = -1
         info = -1
       end if
@@ -433,6 +448,9 @@ contains
     else  if (.not.present(mask)) then 
 
       if (idxmap%is_asb()) then 
+        !$omp parallel do default(none) schedule(dynamic) &
+        !$omp shared(is,idx,idxmap,owned_) &
+        !$omp private(i,nv,tidx) 
         do i=1, is
           if ((idxmap%min_glob_row <= idx(i)).and.&
                & (idx(i) <= idxmap%max_glob_row)) then
@@ -447,8 +465,11 @@ contains
             idx(i) = -1
           end if
         end do
-
+        !$omp end parallel do
       else if (idxmap%is_valid()) then 
+        !$omp parallel do default(none) schedule(dynamic) &
+        !$omp shared(is,idx,idxmap,owned_) &
+        !$omp private(i,ip,lip,tidx,info) 
         do i=1,is
           if ((idxmap%min_glob_row <= idx(i)).and.&
                & (idx(i) <= idxmap%max_glob_row)) then
@@ -462,6 +483,7 @@ contains
             idx(i) = -1
           end if
         end do
+        !$omp end parallel do
       else 
         idx(1:is) = -1
         info = -1
@@ -953,7 +975,9 @@ contains
                 end if
                 info = psb_success_
               else
-                info = -5
+                write(0,*) 'From has_search_ins:',info,ip,lip,nxt,&
+                     & idxmap%min_glob_row,idxmap%max_glob_row
+                info = -6
                 return
               end if
               idxout(i)  = lip + idxmap%local_rows
@@ -1131,7 +1155,7 @@ contains
     idxmap%global_cols  = ntot
     idxmap%local_rows   = nl
     idxmap%local_cols   = nl
-    idxmap%ctxt        = ctxt
+    idxmap%ctxt         = ctxt
     idxmap%state        = psb_desc_bld_
     idxmap%mpic         = psb_get_mpi_comm(ctxt)
     idxmap%min_glob_row = vnl(iam)+1

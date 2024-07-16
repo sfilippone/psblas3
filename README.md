@@ -1,4 +1,4 @@
-PSBLAS library, version 3.8
+PSBLAS library, version 3.9
 ===========================
 
 The architecture of the Fortran 2003 sparse BLAS is described in:
@@ -25,7 +25,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 -------------
-See docs/psblas-3.8.pdf; an HTML version of the same document is
+See docs/psblas-3.9.pdf; an HTML version of the same document is
 available in docs/html. Please consult the sample programs, especially
 test/pargen/psb_[sd]_pde[23]d.f90
 
@@ -40,6 +40,15 @@ The main reference for the serial sparse BLAS is:
 >linear algebra subprograms for sparse matrices: a user level interface,
 >ACM Trans. Math. Softw., 23(3), 379-401, 1997.
 
+CUDA and GPU support
+--------------------
+This version of PSBLAS incorporates into a single package three
+entities that were previouslty separated:
+1. PSBLAS     -- the base library
+2. PSBLAS-EXT -- a library providing additional storage formats
+3. SPGPU      -- a package of kernels for NVIDIA GPUs originally
+   	      	 written by Davide Barbieri and Salvatore Filippone;
+		 see the license file cuda/License-spgpu.md
 
 INSTALLING
 ----------
@@ -60,6 +69,11 @@ prerequisites (see also SERIAL below):
 4. If you have the AMD package of Davis, Duff and Amestoy, you can
    specify `--with-amd` (see `./configure --help` for more details).
    We use the C interface to AMD.
+
+5. If you have CUDA available, use
+   --with-cuda=<path>      to specify the CUDA toolkit location
+   --with-cudacc=XX,YY,ZZ  to specify a list of target CCs (compute
+   			   capabilities) to compile the CUDA code for.
 
 The configure script will generate a Make.inc file suitable for building
 the library. The script is capable of recognizing the needed libraries

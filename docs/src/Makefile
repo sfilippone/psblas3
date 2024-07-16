@@ -86,7 +86,8 @@
 TOPFILE   = userguide.tex
 HTMLFILE  = userhtml.tex
 SECFILE   = intro.tex commrout.tex datastruct.tex psbrout.tex toolsrout.tex\
-	methods.tex precs.tex penv.tex error.tex util.tex biblio.tex
+	methods.tex precs.tex penv.tex error.tex util.tex biblio.tex \
+        ext-intro.tex cuda.tex
 FIGDIR    = figures
 
 XPDFFLAGS = 
@@ -139,7 +140,7 @@ PDF      = $(join $(BASEFILE),.pdf)
 PS       = $(join $(BASEFILE),.ps)
 GXS      = $(join $(BASEFILE),.gxs)
 GLX      = $(join $(BASEFILE),.glx)
-TARGETPDF= ../psblas-3.8.pdf
+TARGETPDF= ../psblas-3.9.pdf
 BASEHTML = $(patsubst %.tex,%,$(HTMLFILE))
 HTML     = $(join $(BASEHTML),.html)
 HTMLDIR  = ../html
