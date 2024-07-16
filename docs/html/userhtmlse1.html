@@ -27,35 +27,35 @@ preprocessing sparse matrices, and contains additional routines for dense matrix
 operations. The current implementation of PSBLAS addresses a distributed memory
 execution model operating with message passing.
 <!--l. 14--><p class="indent" >   The PSBLAS library version 3 is implemented in the Fortran&#x00A0;2003&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#Xmetcalf">17</a>]</span>
+href="userhtmlli2.html#Xmetcalf">16</a>]</span>
 programming language, with reuse and/or adaptation of existing Fortran&#x00A0;77 and
 Fortran&#x00A0;95 software, plus a handful of C routines.
 <!--l. 19--><p class="indent" >   The use of Fortran&#x00A0;2003 offers a number of advantages over Fortran&#x00A0;95, mostly in
 the handling of requirements for evolution and adaptation of the library to new
 computing architectures and integration of new algorithms. For a detailed discussion
 of our design see&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XSparse03">11</a>]</span>; other works discussing advanced programming in Fortran&#x00A0;2003
+href="userhtmlli2.html#XSparse03">10</a>]</span>; other works discussing advanced programming in Fortran&#x00A0;2003
 include&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XDesPat:11">1</a>,&#x00A0;<a 
+href="userhtmlli2.html#XDesPat:11">20</a>,&#x00A0;<a 
 href="userhtmlli2.html#XRouXiaXu:11">18</a>]</span>; sufficient support for Fortran&#x00A0;2003 is now available from many
 compilers, including the GNU Fortran compiler from the Free Software Foundation
 (as of version 4.8).
 <!--l. 30--><p class="indent" >   Previous approaches have been based on mixing Fortran&#x00A0;95, with its support for
 object-based design, with other languages; these have been advocated by a number of
 authors, e.g.&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#Xmachiels">16</a>]</span>. Moreover, the Fortran&#x00A0;95 facilities for dynamic memory
+href="userhtmlli2.html#Xmachiels">15</a>]</span>. Moreover, the Fortran&#x00A0;95 facilities for dynamic memory
 management and interface overloading greatly enhance the usability of the PSBLAS
 subroutines. In this way, the library can take care of runtime memory requirements
 that are quite difficult or even impossible to predict at implementation or
 compilation time.
 <!--l. 40--><p class="indent" >   The presentation of the PSBLAS library follows the general structure of the
 proposal for serial Sparse BLAS&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#Xsblas97">8</a>,&#x00A0;<a 
-href="userhtmlli2.html#Xsblas02">9</a>]</span>, which in its turn is based on the proposal for
+href="userhtmlli2.html#Xsblas97">7</a>,&#x00A0;<a 
+href="userhtmlli2.html#Xsblas02">8</a>]</span>, which in its turn is based on the proposal for
 BLAS on dense matrices&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XBLAS1">15</a>,&#x00A0;<a 
-href="userhtmlli2.html#XBLAS2">5</a>,&#x00A0;<a 
-href="userhtmlli2.html#XBLAS3">6</a>]</span>.
+href="userhtmlli2.html#XBLAS1">14</a>,&#x00A0;<a 
+href="userhtmlli2.html#XBLAS2">4</a>,&#x00A0;<a 
+href="userhtmlli2.html#XBLAS3">5</a>]</span>.
 <!--l. 45--><p class="indent" >   The applicability of sparse iterative solvers to many different areas causes some
 terminology problems because the same concept may be denoted through different
 names depending on the application area. The PSBLAS features presented in this

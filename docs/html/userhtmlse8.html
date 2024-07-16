@@ -11,13 +11,13 @@
 </head><body 
 >
    <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu80.html" >next</a>] [<a 
+href="userhtmlse12.html" >next</a>] [<a 
 href="userhtmlse7.html" >prev</a>] [<a 
 href="userhtmlse7.html#tailuserhtmlse7.html" >prev-tail</a>] [<a 
-href="userhtmlsu71.html#tailuserhtmlse8.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu76.html" >up</a>] </p></div>
+href="userhtmlse5.html#tailuserhtmlse8.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse11.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">8   </span> <a 
- id="x86-1230008"></a>Error handling</h3>
+ id="x13-1230008"></a>Error handling</h3>
 <!--l. 5--><p class="noindent" >The PSBLAS library error handling policy has been completely rewritten in version
 2.0. The idea behind the design of this new error handling strategy is to keep error
 messages on a stack allowing the user to trace back up to the point where the first
@@ -36,7 +36,7 @@ zero, an error condition is raised. This process continues on all the levels of
 nested calls until the level where the user decides to abort the program
 execution.
 <!--l. 23--><p class="indent" >   Figure&#x00A0;<a 
-href="#x86-123025r5">5<!--tex4ht:ref: fig:routerr --></a> shows the layout of a generic <span class="obeylines-h"><span class="verb"><span 
+href="#x13-123025r5">5<!--tex4ht:ref: fig:routerr --></a> shows the layout of a generic <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_foo</span></span></span> routine with respect to the
 PSBLAS-2.0 error handling policy. It is possible to see how, whenever an error
 condition is detected, the <span class="obeylines-h"><span class="verb"><span 
@@ -58,7 +58,7 @@ explicitly.
 
                                                                   
 <!--l. 40--><p class="indent" >   <a 
- id="x86-123025r5"></a><hr class="float"><div class="float" 
+ id="x13-123025r5"></a><hr class="float"><div class="float" 
 >
                                                                   
 
@@ -67,270 +67,241 @@ explicitly.
 >
 <!--l. 101--><p class="noindent" >
 <div class="fbox"><div class="minipage"><!--l. 72-->
-<div class="lstlisting" id="listing-5"><span class="label"><a 
- id="x86-123001r1"></a></span><span 
-class="cmtt-9">subroutine</span><span 
+<pre class="lstlisting" id="listing-154"><span class="label"><a 
+ id="x13-123001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-9">subroutine</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">psb_foo</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">some</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">args</span></span><span style="color:#000000"><span 
+class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">info</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span> 
+<span class="label"><a 
+ id="x13-123002r2"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">psb_foo</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">some</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">args</span><span 
-class="cmtt-9">,</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">...</span></span> 
+<span class="label"><a 
+ id="x13-123003r3"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">info</span><span 
-class="cmtt-9">)</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123002r2"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">if</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">error</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">detected</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">then</span></span> 
+<span class="label"><a 
+ id="x13-123004r4"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">...</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123003r3"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">if</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">error</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">info</span></span><span style="color:#000000"><span 
+class="cmtt-9">=</span></span><span style="color:#000000"><span 
+class="cmtt-9">errcode1</span></span> 
+<span class="label"><a 
+ id="x13-123005r5"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">detected</span><span 
-class="cmtt-9">)</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">then</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123004r4"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">psb_errpush</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">&#8217;</span></span><span style="color:#000000"><span 
+class="cmtt-9">psb_foo</span></span><span style="color:#000000"><span 
+class="cmtt-9">&#8217;</span></span><span style="color:#000000"><span 
+class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">errcode1</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span> 
+<span class="label"><a 
+ id="x13-123006r6"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">info</span><span 
-class="cmtt-9">=</span><span 
-class="cmtt-9">errcode1</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123005r5"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">goto</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">9999</span></span> 
+<span class="label"><a 
+ id="x13-123007r7"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">if</span></span> 
+<span class="label"><a 
+ id="x13-123008r8"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">call</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">...</span></span> 
+<span class="label"><a 
+ id="x13-123009r9"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">psb_errpush</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">&#8217;</span><span 
-class="cmtt-9">psb_foo</span><span 
-class="cmtt-9">&#8217;</span><span 
-class="cmtt-9">,</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">errcode1</span><span 
-class="cmtt-9">)</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123006r6"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">psb_bar</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">some</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">args</span></span><span style="color:#000000"><span 
+class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">info</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span> 
+<span class="label"><a 
+ id="x13-123010r10"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">if</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">info</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">.</span></span><span style="color:#000000"><span 
+class="cmtt-9">ne</span></span><span style="color:#000000"><span 
+class="cmtt-9">.</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">zero</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">then</span></span> 
+<span class="label"><a 
+ id="x13-123011r11"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">goto</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">9999</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123007r7"></a></span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">info</span></span><span style="color:#000000"><span 
+class="cmtt-9">=</span></span><span style="color:#000000"><span 
+class="cmtt-9">errcode2</span></span> 
+<span class="label"><a 
+ id="x13-123012r12"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">end</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">if</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123008r8"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">psb_errpush</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">&#8217;</span></span><span style="color:#000000"><span 
+class="cmtt-9">psb_foo</span></span><span style="color:#000000"><span 
+class="cmtt-9">&#8217;</span></span><span style="color:#000000"><span 
+class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">errcode2</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span> 
+<span class="label"><a 
+ id="x13-123013r13"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">...</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123009r9"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">call</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">goto</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">9999</span></span> 
+<span class="label"><a 
+ id="x13-123014r14"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">psb_bar</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">some</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">args</span><span 
-class="cmtt-9">,</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">if</span></span> 
+<span class="label"><a 
+ id="x13-123015r15"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">info</span><span 
-class="cmtt-9">)</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123010r10"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">...</span></span> 
+<span class="label"><a 
+ id="x13-123016r16"></a></span><span style="color:#000000"><span 
+class="cmtt-9">9999</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">continue</span></span> 
+<span class="label"><a 
+ id="x13-123017r17"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">if</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">info</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">if</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">err_act</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">.</span></span><span style="color:#000000"><span 
+class="cmtt-9">eq</span></span><span style="color:#000000"><span 
+class="cmtt-9">.</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">act_abort</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">then</span></span> 
+<span class="label"><a 
+ id="x13-123018r18"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">.</span><span 
-class="cmtt-9">ne</span><span 
-class="cmtt-9">.</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">zero</span><span 
-class="cmtt-9">)</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">then</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123011r11"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">psb_error</span></span><span style="color:#000000"><span 
+class="cmtt-9">(</span></span><span style="color:#000000"><span 
+class="cmtt-9">icontxt</span></span><span style="color:#000000"><span 
+class="cmtt-9">)</span></span> 
+<span class="label"><a 
+ id="x13-123019r19"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">return</span></span> 
+<span class="label"><a 
+ id="x13-123020r20"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">info</span><span 
-class="cmtt-9">=</span><span 
-class="cmtt-9">errcode2</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123012r12"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">else</span></span> 
+<span class="label"><a 
+ id="x13-123021r21"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">return</span></span> 
+<span class="label"><a 
+ id="x13-123022r22"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">call</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">psb_errpush</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">&#8217;</span><span 
-class="cmtt-9">psb_foo</span><span 
-class="cmtt-9">&#8217;</span><span 
-class="cmtt-9">,</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">errcode2</span><span 
-class="cmtt-9">)</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123013r13"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">goto</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">9999</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123014r14"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">end</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">if</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123015r15"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">...</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123016r16"></a></span><span 
-class="cmtt-9">9999</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">continue</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123017r17"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">if</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">err_act</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">.</span><span 
-class="cmtt-9">eq</span><span 
-class="cmtt-9">.</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">act_abort</span><span 
-class="cmtt-9">)</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">then</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123018r18"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">call</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">psb_error</span><span 
-class="cmtt-9">(</span><span 
-class="cmtt-9">icontxt</span><span 
-class="cmtt-9">)</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123019r19"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">return</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123020r20"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">else</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123021r21"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">return</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123022r22"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">end</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">if</span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123023r23"></a></span><span 
-class="cmtt-9">&#x00A0;</span><br /><span class="label"><a 
- id="x86-123024r24"></a></span><span 
-class="cmtt-9">end</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">subroutine</span><span 
-class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">psb_foo</span>
-</div>                                                              </div> </div>
+class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
+class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">if</span></span> 
+<span class="label"><a 
+ id="x13-123023r23"></a></span> 
+<span class="label"><a 
+ id="x13-123024r24"></a></span><span style="color:#000000"><span 
+class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">subroutine</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-9">psb_foo</span></span></pre></div></div>
 </div>
 <br /> <div class="caption" 
 ><span class="id">Listing 5: </span><span  
 class="content">The layout of a generic <span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_foo </span>routine with respect to PSBLAS-2.0
-error handling policy.</span></div><!--tex4ht:label?: x86-123025r5 -->
+error handling policy.</span></div><!--tex4ht:label?: x13-123025r5 -->
                                                                   
 
                                                                   
    </div><hr class="endfloat" />
 <!--l. 112--><p class="indent" >   Figure&#x00A0;<a 
-href="#x86-123026r6">6<!--tex4ht:ref: fig:errormsg --></a> reports a sample error message generated by the PSBLAS-2.0
+href="#x13-123026r6">6<!--tex4ht:ref: fig:errormsg --></a> reports a sample error message generated by the PSBLAS-2.0
 library. This error has been generated by the fact that the user has chosen the
 invalid &#8220;FOO&#8221; storage format to represent the sparse matrix. From this
 error message it is possible to see that the error has been detected inside
@@ -342,7 +313,7 @@ process).
 
                                                                   
 <!--l. 120--><p class="indent" >   <a 
- id="x86-123026r6"></a><hr class="float"><div class="float" 
+ id="x13-123026r6"></a><hr class="float"><div class="float" 
 >
                                                                   
 
@@ -371,7 +342,7 @@ Aborting...
 <br /> <div class="caption" 
 ><span class="id">Listing 6: </span><span  
 class="content">A sample PSBLAS-3.0 error message. Process 0 detected an error
-condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x86-123026r6 -->
+condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x13-123026r6 -->
                                                                   
 
                                                                   
@@ -379,28 +350,236 @@ condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x86-1230
                                                                   
 
                                                                   
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >8.1 <a 
-href="userhtmlsu74.html#x87-1240008.1">psb_errpush &#8212; Pushes an error code onto the error stack</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >8.2 <a 
-href="userhtmlsu75.html#x88-1250008.2">psb_error &#8212; Prints the error stack content and aborts execution</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >8.3 <a 
-href="userhtmlsu76.html#x89-1260008.3">psb_set_errverbosity &#8212; Sets the verbosity of error messages</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >8.4 <a 
-href="userhtmlsu77.html#x90-1270008.4">psb_set_erraction &#8212; Set the type of action to be taken upon error condition</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">8.1   </span> <a 
+ id="x13-1240008.1"></a>psb_errpush &#8212; Pushes an error code onto the error stack</h4>
+   <!--l. 174-->
+   <pre class="lstlisting" id="listing-155"><span class="label"><a 
+ id="x13-124001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">psb_errpush</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">err_c</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">r_name</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">i_err</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">a_err</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 178--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 179--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 179--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 180--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 180--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 181--><p class="noindent" >
+<span 
+class="cmbx-10">err</span><span 
+class="cmbx-10">_c</span> </dt><dd 
+class="description">
+     <!--l. 181--><p class="noindent" >the error code<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer.
+     </dd><dt class="description">
+     <!--l. 186--><p class="noindent" >
+<span 
+class="cmbx-10">r</span><span 
+class="cmbx-10">_name</span> </dt><dd 
+class="description">
+     <!--l. 186--><p class="noindent" >the soutine where the error has been caught.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: a string.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 191--><p class="noindent" >
+<span 
+class="cmbx-10">i</span><span 
+class="cmbx-10">_err</span> </dt><dd 
+class="description">
+     <!--l. 191--><p class="noindent" >addional info for error code<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Specified as: an integer array<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 195--><p class="noindent" >
+<span 
+class="cmbx-10">a</span><span 
+class="cmbx-10">_err</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 195--><p class="noindent" >addional info for error code<br 
+class="newline" />Scope: <span 
+class="cmbx-10">local </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Specified as: a string.<br 
+class="newline" /></dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">8.2   </span> <a 
+ id="x13-1250008.2"></a>psb_error &#8212; Prints the error stack content and aborts execution</h4>
+   <!--l. 204-->
+   <pre class="lstlisting" id="listing-156"><span class="label"><a 
+ id="x13-125001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">psb_error</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">icontxt</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 208--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 209--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 209--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 210--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 210--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 211--><p class="noindent" >
+<span 
+class="cmbx-10">icontxt</span> </dt><dd 
+class="description">
+     <!--l. 211--><p class="noindent" >the communication context.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">optional</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">8.3   </span> <a 
+ id="x13-1260008.3"></a>psb_set_errverbosity &#8212; Sets the verbosity of error messages</h4>
+   <!--l. 224-->
+   <pre class="lstlisting" id="listing-157"><span class="label"><a 
+ id="x13-126001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">psb_set_errverbosity</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">v</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 228--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 229--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 229--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 230--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 230--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 231--><p class="noindent" >
+<span 
+class="cmbx-10">v</span> </dt><dd 
+class="description">
+     <!--l. 231--><p class="noindent" >the verbosity level<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global</span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">8.4   </span> <a 
+ id="x13-1270008.4"></a>psb_set_erraction &#8212; Set the type of action to be taken upon error
+condition</h4>
+   <!--l. 241-->
+   <pre class="lstlisting" id="listing-158"><span class="label"><a 
+ id="x13-127001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">psb_set_erraction</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">err_act</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 245--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 246--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 246--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 247--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 247--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 248--><p class="noindent" >
+<span 
+class="cmbx-10">err</span><span 
+class="cmbx-10">_act</span> </dt><dd 
+class="description">
+     <!--l. 248--><p class="noindent" >the type of action.<br 
+class="newline" />Scope: <span 
+class="cmbx-10">global </span><br 
+class="newline" />Type: <span 
+class="cmbx-10">required</span><br 
+class="newline" />Intent: <span 
+class="cmbx-10">in</span>.<br 
+class="newline" />Specified as: an integer. Possible values: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_act_ret</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_act_abort</span></span></span>.</dd></dl>
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu80.html" >next</a>] [<a 
+href="userhtmlse12.html" >next</a>] [<a 
 href="userhtmlse7.html" >prev</a>] [<a 
 href="userhtmlse7.html#tailuserhtmlse7.html" >prev-tail</a>] [<a 
 href="userhtmlse8.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu76.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse11.html" >up</a>] </p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse8.html"></a>  
+ id="tailuserhtmlse8.html"></a>   
 </body></html> 

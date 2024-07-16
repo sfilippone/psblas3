@@ -11,47 +11,728 @@
 </head><body 
 >
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu86.html" >next</a>] [<a 
+href="userhtmlse13.html" >next</a>] [<a 
 href="userhtmlse8.html" >prev</a>] [<a 
 href="userhtmlse8.html#tailuserhtmlse8.html" >prev-tail</a>] [<a 
-href="userhtmlsu75.html#tailuserhtmlse9.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu80.html" >up</a>] </p></div>
+href="userhtmlse6.html#tailuserhtmlse9.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse12.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">9   </span> <a 
- id="x91-1280009"></a>Utilities</h3>
+ id="x14-1280009"></a>Utilities</h3>
 <!--l. 4--><p class="noindent" >We have some utilities available for input and output of sparse matrices; the
 interfaces to these routines are available in the module <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_util_mod</span></span></span>.
                                                                   
 
                                                                   
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >9.1 <a 
-href="userhtmlsu78.html#x92-1290009.1"> hb_read &#8212; Read a sparse matrix from a file in the Harwell&#8211;Boeing format</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >9.2 <a 
-href="userhtmlsu79.html#x93-1300009.2">hb_write &#8212; Write a sparse matrix to a file in the Harwell&#8211;Boeing format</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >9.3 <a 
-href="userhtmlsu80.html#x94-1310009.3">mm_mat_read &#8212; Read a sparse matrix from a file in the MatrixMarket format</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >9.4 <a 
-href="userhtmlsu81.html#x95-1320009.4">mm_array_read &#8212; Read a dense array from a file in the MatrixMarket format</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >9.5 <a 
-href="userhtmlsu82.html#x96-1330009.5">mm_mat_write &#8212; Write a sparse matrix to a file in the MatrixMarket format</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >9.6 <a 
-href="userhtmlsu83.html#x97-1340009.6">mm_array_write &#8212; Write a dense array from a file in the MatrixMarket format</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">9.1   </span> <a 
+ id="x14-1290009.1"></a> hb_read &#8212; Read a sparse matrix from a file in the Harwell&#8211;Boeing
+format</h4>
+   <!--l. 16-->
+   <pre class="lstlisting" id="listing-159"><span class="label"><a 
+ id="x14-129001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">hb_read</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">a</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iret</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iunit</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">filename</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">b</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mtitle</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 20--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 21--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 21--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 22--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 22--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 23--><p class="noindent" >
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">
+     <!--l. 23--><p class="noindent" >The name of the file to be read.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default input unit 5 (i.e. standard input in Unix jargon) is
+     used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 28--><p class="noindent" >
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">
+     <!--l. 28--><p class="noindent" >The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+<!--l. 33--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 34--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 34--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 35--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 35--><p class="noindent" >the sparse matrix read from file.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 38--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 38--><p class="noindent" >Rigth hand side(s).<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />An array of type real or complex, rank 2 and having the ALLOCATABLE
+     attribute; will be allocated and filled in if the input file contains a right
+     hand side, otherwise will be left in the UNALLOCATED state.
+     </dd><dt class="description">
+     <!--l. 43--><p class="noindent" >
+<span 
+class="cmbx-10">mtitle</span> </dt><dd 
+class="description">
+     <!--l. 43--><p class="noindent" >Matrix title.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />A charachter variable of length 72 holding a copy of the matrix title as
+     specified by the Harwell-Boeing format and contained in the input file.
+     </dd><dt class="description">
+     <!--l. 48--><p class="noindent" >
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">
+     <!--l. 48--><p class="noindent" >Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">9.2   </span> <a 
+ id="x14-1300009.2"></a>hb_write &#8212; Write a sparse matrix to a file in the Harwell&#8211;Boeing
+format</h4>
+   <!--l. 59-->
+   <pre class="lstlisting" id="listing-160"><span class="label"><a 
+ id="x14-130001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">hb_write</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">a</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iret</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iunit</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">filename</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">key</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">rhs</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mtitle</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 65--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 66--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 66--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 67--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 67--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 68--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 68--><p class="noindent" >the sparse matrix to be written.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 71--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 71--><p class="noindent" >Rigth hand side.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />An array of type real or complex, rank 1 and having the ALLOCATABLE
+     attribute; will be allocated and filled in if the input file contains a right
+     hand side.
+     </dd><dt class="description">
+     <!--l. 76--><p class="noindent" >
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">
+     <!--l. 76--><p class="noindent" >The name of the file to be written to.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default output unit 6 (i.e. standard output in Unix jargon)
+     is used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 81--><p class="noindent" >
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">
+     <!--l. 81--><p class="noindent" >The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 84--><p class="noindent" >
+<span 
+class="cmbx-10">key</span> </dt><dd 
+class="description">
+     <!--l. 84--><p class="noindent" >Matrix key.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />A charachter variable of length 8 holding the matrix key as specified by
+     the Harwell-Boeing format and to be written to file.
+     </dd><dt class="description">
+     <!--l. 89--><p class="noindent" >
+<span 
+class="cmbx-10">mtitle</span> </dt><dd 
+class="description">
+     <!--l. 89--><p class="noindent" >Matrix title.<br 
+class="newline" />Type: <span 
+class="cmbx-10">Optional </span><br 
+class="newline" />A charachter variable of length 72 holding the matrix title as specified by
+     the Harwell-Boeing format and to be written to file.</dd></dl>
+<!--l. 96--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 97--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 97--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 98--><p class="noindent" >
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">
+     <!--l. 98--><p class="noindent" >Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">9.3   </span> <a 
+ id="x14-1310009.3"></a>mm_mat_read &#8212; Read a sparse matrix from a file in the MatrixMarket
+format</h4>
+   <!--l. 111-->
+   <pre class="lstlisting" id="listing-161"><span class="label"><a 
+ id="x14-131001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mm_mat_read</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">a</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iret</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iunit</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">filename</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 115--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 116--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 116--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 117--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 117--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 118--><p class="noindent" >
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">
+     <!--l. 118--><p class="noindent" >The name of the file to be read.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default input unit 5 (i.e. standard input in Unix jargon) is
+     used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 123--><p class="noindent" >
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">
+     <!--l. 123--><p class="noindent" >The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+<!--l. 128--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 129--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 129--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 130--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 130--><p class="noindent" >the sparse matrix read from file.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 133--><p class="noindent" >
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">
+     <!--l. 133--><p class="noindent" >Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">9.4   </span> <a 
+ id="x14-1320009.4"></a>mm_array_read &#8212; Read a dense array from a file in the MatrixMarket
+format</h4>
+   <!--l. 142-->
+   <pre class="lstlisting" id="listing-162"><span class="label"><a 
+ id="x14-132001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mm_array_read</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">b</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iret</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iunit</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">filename</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 146--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 147--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 147--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 148--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 148--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 149--><p class="noindent" >
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">
+     <!--l. 149--><p class="noindent" >The name of the file to be read.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default input unit 5 (i.e. standard input in Unix jargon) is
+     used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 154--><p class="noindent" >
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">
+     <!--l. 154--><p class="noindent" >The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+<!--l. 159--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 160--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 160--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 161--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 161--><p class="noindent" >Rigth hand side(s).<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An  array  of  type  real  or  complex,  rank  1  or  2  and  having  the
+                                                                  
+
+                                                                  
+     ALLOCATABLE attribute, or an object of type <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of
+     type real or complex.<br 
+class="newline" />Will be allocated and filled in if the input file contains a right hand side,
+     otherwise will be left in the UNALLOCATED state. <br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 168--><p class="noindent" >
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">
+     <!--l. 168--><p class="noindent" >Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">9.5   </span> <a 
+ id="x14-1330009.5"></a>mm_mat_write &#8212; Write a sparse matrix to a file in the MatrixMarket
+format</h4>
+   <!--l. 179-->
+   <pre class="lstlisting" id="listing-163"><span class="label"><a 
+ id="x14-133001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mm_mat_write</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">a</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mtitle</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iret</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iunit</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">filename</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 182--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 183--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 183--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 184--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 184--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 185--><p class="noindent" >
+<span 
+class="cmbx-10">a</span> </dt><dd 
+class="description">
+     <!--l. 185--><p class="noindent" >the sparse matrix to be written.<br 
+class="newline" />Type:<span 
+class="cmbx-10">required</span>.<br 
+class="newline" />Specified as: a structured data of type <a 
+href="userhtmlse3.html#spdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tspmat</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 188--><p class="noindent" >
+<span 
+class="cmbx-10">mtitle</span> </dt><dd 
+class="description">
+     <!--l. 188--><p class="noindent" >Matrix title.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />A  charachter  variable  holding  a  descriptive  title  for  the  matrix  to  be
+     written to file.
+     </dd><dt class="description">
+     <!--l. 192--><p class="noindent" >
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">
+     <!--l. 192--><p class="noindent" >The name of the file to be written to.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default output unit 6 (i.e. standard output in Unix jargon)
+     is used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 197--><p class="noindent" >
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">
+     <!--l. 197--><p class="noindent" >The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 202--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 203--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 203--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 204--><p class="noindent" >
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">
+     <!--l. 204--><p class="noindent" >Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 209--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+<!--l. 211--><p class="indent" >   If this function is called on a matrix <code class="lstinline"><span style="color:#000000">a</span></code> on a distributed communicator only the
+local part is written in output. To get a single MatrixMarket file with the whole
+matrix when appropriate, e.g. for debugging purposes, one could <span 
+class="cmti-10">gather </span>the whole
+matrix on a single rank and then write it. Consider the following example for a
+<span 
+class="cmti-10">double </span>precision matrix
+<div class="center" 
+>
+<!--l. 227--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-93">
+type(psb_ldspmat_type)&#x00A0;::&#x00A0;aglobal
+
+call&#x00A0;psb_gather(aglobal,a,desc_a,info)
+if&#x00A0;(iam&#x00A0;==&#x00A0;psb_root_)&#x00A0;then
+call&#x00A0;mm_mat_write(aglobal,mtitle,info,filename)
+end&#x00A0;if
+call&#x00A0;psb_spfree(aglobal,&#x00A0;desc_a,&#x00A0;info)
+</pre>
+<!--l. 237--><p class="nopar" >                                                           </div></div>
+<!--l. 241--><p class="noindent" >To simplify this procedure in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">C</span></span></span>, there is a utility function
+<div class="center" 
+>
+<!--l. 247--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-94">
+psb_i_t&#x00A0;psb_c_&#x003C;s,d,c,z&#x003E;global_mat_write(ah,cdh);
+</pre>
+<!--l. 251--><p class="nopar" >                                                           </div></div>
+<!--l. 255--><p class="noindent" >that produces exactly this result.
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">9.6   </span> <a 
+ id="x14-1340009.6"></a>mm_array_write &#8212; Write a dense array from a file in the MatrixMarket
+format</h4>
+   <!--l. 261-->
+   <pre class="lstlisting" id="listing-165"><span class="label"><a 
+ id="x14-134001r1"></a></span><span style="color:#000000"><span 
+class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">mm_array_write</span></span><span style="color:#000000"><span 
+class="cmtt-10">(</span></span><span style="color:#000000"><span 
+class="cmtt-10">b</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">vtitle</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iret</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">iunit</span></span><span style="color:#000000"><span 
+class="cmtt-10">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="cmtt-10">filename</span></span><span style="color:#000000"><span 
+class="cmtt-10">)</span></span></pre>
+   
+<!--l. 265--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 266--><p class="noindent" >
+<span 
+class="cmbx-10">Type:</span> </dt><dd 
+class="description">
+     <!--l. 266--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 267--><p class="noindent" >
+<span 
+class="cmbx-10">On Entry</span>  </dt><dd 
+class="description">
+     <!--l. 267--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 268--><p class="noindent" >
+<span 
+class="cmbx-10">b</span> </dt><dd 
+class="description">
+     <!--l. 268--><p class="noindent" >Rigth hand side(s).<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An  array  of  type  real  or  complex,  rank  1  or  2,  or  an  object  of  type
+     <a 
+href="userhtmlse3.html#vdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span></a>, of type real or complex; its contents will be written to
+     disk.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 273--><p class="noindent" >
+<span 
+class="cmbx-10">filename</span> </dt><dd 
+class="description">
+     <!--l. 273--><p class="noindent" >The name of the file to be written.<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 274--><p class="noindent" >
+<span 
+class="cmbx-10">vtitle</span> </dt><dd 
+class="description">
+     <!--l. 274--><p class="noindent" >Matrix title.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />A charachter variable holding a descriptive title for the vector to be written
+     to file. Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: a character variable containing a valid file name, or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>, in
+     which case the default input unit 5 (i.e. standard input in Unix jargon) is
+     used. Default: <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 282--><p class="noindent" >
+<span 
+class="cmbx-10">iunit</span> </dt><dd 
+class="description">
+                                                                  
+
+                                                                  
+     <!--l. 282--><p class="noindent" >The Fortran file unit number.<br 
+class="newline" />Type:<span 
+class="cmbx-10">optional</span>.<br 
+class="newline" />Specified as: an integer value. Only meaningful if filename is not <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">-</span></span></span>.</dd></dl>
+<!--l. 287--><p class="noindent" >
+     <dl class="description"><dt class="description">
+     <!--l. 288--><p class="noindent" >
+<span 
+class="cmbx-10">On Return</span> </dt><dd 
+class="description">
+     <!--l. 288--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 289--><p class="noindent" >
+<span 
+class="cmbx-10">iret</span> </dt><dd 
+class="description">
+     <!--l. 289--><p class="noindent" >Error code.<br 
+class="newline" />Type: <span 
+class="cmbx-10">required </span><br 
+class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 294--><p class="noindent" ><span 
+class="cmbx-12">Notes</span>
+<!--l. 296--><p class="indent" >   If this function is called on a vector <code class="lstinline"><span style="color:#000000">v</span></code> on a distributed communicator only the
+local part is written in output. To get a single MatrixMarket file with the whole
+vector when appropriate, e.g. for debugging purposes, one could <span 
+class="cmti-10">gather </span>the whole
+vector on a single rank and then write it. Consider the following example for a <span 
+class="cmti-10">double</span>
+precision vector
+<div class="center" 
+>
+<!--l. 312--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-95">
+real(psb_dpk_),&#x00A0;allocatable&#x00A0;::&#x00A0;vglobal(:)
+
+call&#x00A0;psb_gather(vglobal,v,desc,info)
+if&#x00A0;(iam&#x00A0;==&#x00A0;psb_root_)&#x00A0;then
+call&#x00A0;mm_array_write(vglobal,vtitle,info,filename)
+end&#x00A0;if
+call&#x00A0;deallocate(vglobal,&#x00A0;stat=info)
+</pre>
+<!--l. 322--><p class="nopar" >                                                           </div></div>
+<!--l. 326--><p class="noindent" >To simplify this procedure in <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">C</span></span></span>, there is a utility function
+<div class="center" 
+>
+<!--l. 332--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-96">
+psb_i_t&#x00A0;psb_c_&#x003C;s,d,c,z&#x003E;global_vec_write(vh,cdh);
+</pre>
+<!--l. 336--><p class="nopar" >                                                           </div></div>
+<!--l. 340--><p class="noindent" >that produces exactly this result.
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu86.html" >next</a>] [<a 
+href="userhtmlse13.html" >next</a>] [<a 
 href="userhtmlse8.html" >prev</a>] [<a 
 href="userhtmlse8.html#tailuserhtmlse8.html" >prev-tail</a>] [<a 
 href="userhtmlse9.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu80.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse12.html" >up</a>] </p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse9.html"></a>  
+ id="tailuserhtmlse9.html"></a>   
 </body></html> 
