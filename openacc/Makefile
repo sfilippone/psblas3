@@ -17,9 +17,12 @@ CINCLUDES=
 #LIBS=-L$(LIBDIR) -lpsb_util -lpsb_ext -lpsb_base -lopenblas -lmetis
 
 
-FOBJS= psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
-	psb_oacc_mod.o  psb_d_oacc_csr_mat_mod.o \
-	psb_oacc_env_mod.o
+FOBJS= psb_i_oacc_vect_mod.o \
+       psb_s_oacc_vect_mod.o psb_s_oacc_csr_mat_mod.o \
+       psb_d_oacc_vect_mod.o psb_d_oacc_csr_mat_mod.o \
+       psb_c_oacc_vect_mod.o psb_c_oacc_csr_mat_mod.o \
+       psb_z_oacc_vect_mod.o psb_z_oacc_csr_mat_mod.o \
+       psb_oacc_mod.o   psb_oacc_env_mod.o
 
 
 LIBNAME=libpsb_openacc.a
@@ -40,8 +43,23 @@ iobjs: $(OBJS)
 ilib: $(OBJS)
 	$(MAKE) -C impl lib 
 
-psb_oacc_mod.o  : psb_i_oacc_vect_mod.o psb_d_oacc_vect_mod.o \
-	psb_d_oacc_csr_mat_mod.o psb_oacc_env_mod.o
+psb_oacc_mod.o  : psb_i_oacc_vect_mod.o \
+       psb_s_oacc_vect_mod.o psb_s_oacc_csr_mat_mod.o \
+       psb_d_oacc_vect_mod.o psb_d_oacc_csr_mat_mod.o \
+       psb_c_oacc_vect_mod.o psb_c_oacc_csr_mat_mod.o \
+       psb_z_oacc_vect_mod.o psb_z_oacc_csr_mat_mod.o \
+       psb_oacc_env_mod.o
+
+psb_s_oacc_vect_mod.o  psb_d_oacc_vect_mod.o \
+       psb_c_oacc_vect_mod.o  psb_z_oacc_vect_mod.o : psb_i_oacc_vect_mod.o
+
+
+psb_s_oacc_csr_mat_mod.o:        psb_s_oacc_vect_mod.o
+psb_d_oacc_csr_mat_mod.o:        psb_d_oacc_vect_mod.o
+psb_c_oacc_csr_mat_mod.o:        psb_c_oacc_vect_mod.o
+psb_z_oacc_csr_mat_mod.o:        psb_z_oacc_vect_mod.o
+
+
 
 clean: cclean iclean
 	/bin/rm -f  $(FOBJS) *$(.mod) *.a

@@ -175,8 +175,6 @@ contains
     return
   end subroutine d_oacc_csr_free
 
-
-
   function d_oacc_csr_sizeof(a) result(res)
     implicit none
     class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
@@ -340,7 +338,6 @@ contains
     integer(psb_ipk_), intent(in) :: v(:)
     !$acc update self(v)          
   end subroutine i_oacc_csr_to_host
-
 
 end module psb_d_oacc_csr_mat_mod
         

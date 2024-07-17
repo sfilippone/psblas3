@@ -1,11 +1,11 @@
-subroutine d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
-  use psb_d_oacc_vect_mod, psb_protect_name => d_oacc_mlt_v_2
+subroutine c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
+  use psb_c_oacc_vect_mod, psb_protect_name => c_oacc_mlt_v_2
   use psb_string_mod
   implicit none 
-  real(psb_dpk_), intent(in)                 :: alpha, beta
-  class(psb_d_base_vect_type), intent(inout) :: x
-  class(psb_d_base_vect_type), intent(inout) :: y
-  class(psb_d_vect_oacc), intent(inout)      :: z
+  complex(psb_spk_), intent(in)                 :: alpha, beta
+  class(psb_c_base_vect_type), intent(inout) :: x
+  class(psb_c_base_vect_type), intent(inout) :: y
+  class(psb_c_vect_oacc), intent(inout)      :: z
   integer(psb_ipk_), intent(out)             :: info
   character(len=1), intent(in), optional     :: conjgx, conjgy
   integer(psb_ipk_) :: i, n
@@ -19,26 +19,26 @@ subroutine d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
   n = min(x%get_nrows(), y%get_nrows(), z%get_nrows())
   info = 0    
   select type(xx => x)
-  class is (psb_d_vect_oacc)
+  class is (psb_c_vect_oacc)
     select type (yy => y)
-    class is (psb_d_vect_oacc)
+    class is (psb_c_vect_oacc)
       if (xx%is_host()) call xx%sync()
       if (yy%is_host()) call yy%sync()
-      if ((beta /= dzero) .and. (z%is_host())) call z%sync()
+      if ((beta /= czero) .and. (z%is_host())) call z%sync()
       if (conjgx_.and.conjgy_) then 
         !$acc parallel loop
         do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * conjg(xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
         end do
       else if (conjgx_.and.(.not.conjgy_)) then 
         !$acc parallel loop
         do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * conjg(xx%v(i)) * (yy%v(i)) + beta * z%v(i)
         end do
       else if ((.not.conjgx_).and.(conjgy_)) then 
         !$acc parallel loop
         do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * (xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
         end do
       else
         !$acc parallel loop
@@ -51,18 +51,18 @@ subroutine d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
     class default
       if (xx%is_dev()) call xx%sync()
       if (yy%is_dev()) call yy%sync()
-      if ((beta /= dzero) .and. (z%is_dev())) call z%sync()
+      if ((beta /= czero) .and. (z%is_dev())) call z%sync()
       if (conjgx_.and.conjgy_) then 
         do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * conjg(xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
         end do
       else if (conjgx_.and.(.not.conjgy_)) then 
         do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * conjg(xx%v(i)) * (yy%v(i)) + beta * z%v(i)
         end do
       else if ((.not.conjgx_).and.(conjgy_)) then 
         do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * (xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
         end do
       else
         do i = 1, n
@@ -74,18 +74,18 @@ subroutine d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
   class default
     if (x%is_dev()) call x%sync()
     if (y%is_dev()) call y%sync()
-    if ((beta /= dzero) .and. (z%is_dev())) call z%sync()
+    if ((beta /= czero) .and. (z%is_dev())) call z%sync()
       if (conjgx_.and.conjgy_) then 
         do i = 1, n
-          z%v(i) = alpha * (x%v(i)) * (y%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * conjg(x%v(i)) * conjg(y%v(i)) + beta * z%v(i)
         end do
       else if (conjgx_.and.(.not.conjgy_)) then 
         do i = 1, n
-          z%v(i) = alpha * (x%v(i)) * (y%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * conjg(x%v(i)) * (y%v(i)) + beta * z%v(i)
         end do
       else if ((.not.conjgx_).and.(conjgy_)) then 
         do i = 1, n
-          z%v(i) = alpha * (x%v(i)) * (y%v(i)) + beta * z%v(i)
+          z%v(i) = alpha * (x%v(i)) * conjg(y%v(i)) + beta * z%v(i)
         end do
       else
         do i = 1, n
@@ -94,5 +94,5 @@ subroutine d_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       end if
     call z%set_host()
   end select
-end subroutine d_oacc_mlt_v_2
+end subroutine c_oacc_mlt_v_2
 
