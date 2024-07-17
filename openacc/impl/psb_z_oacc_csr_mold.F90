@@ -31,5 +31,5 @@ contains
     return
 
   end subroutine psb_z_oacc_csr_mold
-end submodule psb_z_oacc_csr_molz_impl
+end submodule psb_z_oacc_csr_mold_impl
 

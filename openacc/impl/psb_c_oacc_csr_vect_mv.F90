@@ -18,7 +18,7 @@ contains
 
     if ((n /= size(x%v)) .or. (n /= size(y%v))) then
       write(0,*) 'Size error ', m, n, size(x%v), size(y%v)
-      info = psb_err_invalic_mat_state_
+      info = psb_err_invalid_mat_state_
       return
     end if
 

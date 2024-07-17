@@ -27,7 +27,7 @@ contains
     end if
 
     if (.not.a%is_asb()) then 
-      info = psb_err_invalic_mat_state_
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info, name)
       goto 9999
     endif
