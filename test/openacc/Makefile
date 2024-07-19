@@ -9,7 +9,7 @@ INCDIR=$(TOPDIR)/include
 MODDIR=$(TOPDIR)/modules
 EXEDIR=./runs
 
-PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_base -lpsb_ext -lpsb_util -lpsb_krylov -lpsb_prec -lopenblas -lmetis
+PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBGPULDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
@@ -38,6 +38,11 @@ dir:
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(FINCLUDES) -c $< -o $@
+
+psb_d_oacc_pde3d:
+	mpifort -fallow-argument-mismatch -frecursive -g -O3 -frecursive  -I../../modules/ -I. -DOPENACC -DHAVE_LAPACK -DHAVE_FLUSH_STMT -DLPK8 -DIPK4 -DMPI_MOD   -c psb_d_oacc_pde3d.F90 -o psb_d_oacc_pde3d.o
+	$(FLINK) -fopenacc -DOPENACC psb_d_oacc_pde3d.o -o psb_d_oacc_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_oacc_pde3d $(EXEDIR)
 
 clean:
 	/bin/rm -fr *.o *.mod $(EXEDIR)/*

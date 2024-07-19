@@ -5,7 +5,7 @@ include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
 LIBDIR=$(INSTALLDIR)/lib
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_openacc -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
 # Compilers and such
@@ -24,11 +24,6 @@ runsd:
 psb_d_pde3d: psb_d_pde3d.o 
 	$(FLINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_pde3d $(EXEDIR)
-
-psb_d_oacc_pde3d:
-	mpifort -fallow-argument-mismatch -frecursive -g -O3 -frecursive  -I../../modules/ -I. -DOPENACC -DHAVE_LAPACK -DHAVE_FLUSH_STMT -DLPK8 -DIPK4 -DMPI_MOD   -c psb_d_oacc_pde3d.F90 -o psb_d_oacc_pde3d.o
-	$(FLINK) -fopenacc -DOPENACC psb_d_oacc_pde3d.o -o psb_d_oacc_pde3d $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv psb_d_oacc_pde3d $(EXEDIR)
 
 psb_s_pde3d: psb_s_pde3d.o 
 	$(FLINK) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
