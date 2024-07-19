@@ -9,7 +9,7 @@ INCDIR=$(TOPDIR)/include
 MODDIR=$(TOPDIR)/modules
 EXEDIR=./runs
 
-PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_base -lpsb_ext -lpsb_util -lopenblas -lmetis
+PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_base -lpsb_ext -lpsb_util -lpsb_krylov -lpsb_prec -lopenblas -lmetis
 LDLIBS=$(PSBGPULDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
@@ -17,7 +17,7 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR)
 FFLAGS=-O0 -march=native -fopenacc -foffload=nvptx-none="-march=sm_70"
 CFLAGS=-O0 -march=native
 
-SRCS=test.F90 vectoacc.F90 datavect.F90
+SRCS=vectoacc.F90 datavect.F90
 CSRC=timers.c
 
 OBJS=$(SRCS:.F90=.o) $(CSRC:.c=.o)
