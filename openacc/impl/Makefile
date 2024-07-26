@@ -70,7 +70,20 @@ psb_z_oacc_csr_mv_from_coo.o \
 psb_z_oacc_csr_mv_from_fmt.o \
 psb_z_oacc_csr_mold.o \
 psb_z_oacc_mlt_v_2.o \
-psb_z_oacc_mlt_v.o
+psb_z_oacc_mlt_v.o \
+psb_d_oacc_ell_vect_mv.o \
+psb_d_oacc_ell_inner_vect_sv.o \
+psb_d_oacc_ell_csmm.o \
+psb_d_oacc_ell_csmv.o \
+psb_d_oacc_ell_scals.o \
+psb_d_oacc_ell_scal.o \
+psb_d_oacc_ell_reallocate_nz.o \
+psb_d_oacc_ell_allocate_mnnz.o \
+psb_d_oacc_ell_cp_from_coo.o \
+psb_d_oacc_ell_cp_from_fmt.o \
+psb_d_oacc_ell_mv_from_coo.o \
+psb_d_oacc_ell_mv_from_fmt.o \
+psb_d_oacc_ell_mold.o \
 
 objs: $(OBJS)
 
