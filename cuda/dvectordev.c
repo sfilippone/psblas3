@@ -241,7 +241,7 @@ int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX,
   return(i);
 }
  
-int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, double delta, 
+int upd_xyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, double delta, 
 				void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
 { int j=0, i=0;
   int pitch = 0;
@@ -253,7 +253,7 @@ int abgdxyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, do
   if ((n > devVecY->size_) || (n>devVecX->size_ )) 
     return SPGPU_UNSUPPORTED;
 
-  spgpuDabgdxyz(handle,n, alpha,beta,gamma,delta, 
+  spgpuDupd_xyz(handle,n, alpha,beta,gamma,delta, 
 	      (double*)devVecX->v_,(double*) devVecY->v_,(double*) devVecZ->v_);
   return(i);
 }

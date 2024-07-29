@@ -143,8 +143,8 @@ module psb_s_psblas_mod
     end subroutine psb_saxpby
   end interface
 
-  interface psb_abgdxyz
-    subroutine psb_sabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
+  interface psb_upd_xyz
+    subroutine psb_s_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
          & desc_a, info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_s_vect_type, psb_sspmat_type
@@ -154,8 +154,8 @@ module psb_s_psblas_mod
       real(psb_spk_), intent (in)        :: alpha, beta, gamma, delta
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
-    end subroutine psb_sabgdxyz_vect
-  end interface psb_abgdxyz
+    end subroutine psb_s_upd_xyz_vect
+  end interface psb_upd_xyz
   
   interface psb_geamax
     function psb_samax(x, desc_a, info, jx,global)

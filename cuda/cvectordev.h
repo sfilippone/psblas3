@@ -69,7 +69,7 @@ int asumMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devVecA);
 int dotMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devVecA, void* devVecB);
 
 int axpbyMultiVecDeviceFloatComplex(int n, cuFloatComplex alpha, void* devVecX, cuFloatComplex beta, void* devVecY);
-int abgdxyzMultiVecDeviceFloatComplex(int n,cuFloatComplex  alpha,cuFloatComplex  beta,
+int upd_xyzMultiVecDeviceFloatComplex(int n,cuFloatComplex  alpha,cuFloatComplex  beta,
 				      cuFloatComplex  gamma, cuFloatComplex  delta, 
 				      void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ);
 int xyzwMultiVecDeviceFloatComplex(int n,cuFloatComplex  a,cuFloatComplex  b,

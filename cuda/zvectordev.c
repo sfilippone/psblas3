@@ -234,7 +234,7 @@ int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMulti
   return(i);
 }
 
-int abgdxyzMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  alpha,
+int upd_xyzMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  alpha,
 				       cuDoubleComplex  beta, cuDoubleComplex  gamma, cuDoubleComplex  delta, 
 				       void* devMultiVecX, void* devMultiVecY, void* devMultiVecZ)
 { int j=0, i=0;
@@ -247,7 +247,7 @@ int abgdxyzMultiVecDeviceDoubleComplex(int n,cuDoubleComplex  alpha,
   if ((n > devVecY->size_) || (n>devVecX->size_ )) 
     return SPGPU_UNSUPPORTED;
 
-  spgpuZabgdxyz(handle,n, alpha,beta,gamma,delta, 
+  spgpuZupd_xyz(handle,n, alpha,beta,gamma,delta, 
 	      (cuDoubleComplex *)devVecX->v_,(cuDoubleComplex *) devVecY->v_,(cuDoubleComplex *) devVecZ->v_);
   return(i);
 }
