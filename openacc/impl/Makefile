@@ -84,6 +84,19 @@ psb_d_oacc_ell_cp_from_fmt.o \
 psb_d_oacc_ell_mv_from_coo.o \
 psb_d_oacc_ell_mv_from_fmt.o \
 psb_d_oacc_ell_mold.o \
+psb_d_oacc_hll_mold.o \
+psb_d_oacc_hll_mv_from_fmt.o \
+psb_d_oacc_hll_mv_from_coo.o \
+psb_d_oacc_hll_cp_from_fmt.o \
+psb_d_oacc_hll_cp_from_coo.o \
+psb_d_oacc_hll_allocate_mnnz.o \
+psb_d_oacc_hll_reallocate_nz.o \
+psb_d_oacc_hll_scal.o \
+psb_d_oacc_hll_scals.o \
+psb_d_oacc_hll_csmv.o \
+psb_d_oacc_hll_csmm.o \
+psb_d_oacc_hll_inner_vect_sv.o \
+psb_d_oacc_hll_vect_mv.o \
 
 objs: $(OBJS)
 
