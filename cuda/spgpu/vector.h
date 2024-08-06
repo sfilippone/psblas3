@@ -182,7 +182,7 @@ void spgpuSaxpby(spgpuHandle_t handle,
 	__device float* x);
 
 
-void spgpuSabgdxyz(spgpuHandle_t handle,
+void spgpuSupd_xyz(spgpuHandle_t handle,
 		   int n,
 		   float alpha,
 		   float beta,
@@ -487,7 +487,7 @@ void spgpuDaxpby(spgpuHandle_t handle,
 	__device double* x);
 	
 
-void spgpuDabgdxyz(spgpuHandle_t handle,
+void spgpuDupd_xyz(spgpuHandle_t handle,
 		   int n,
 		   double alpha,
 		   double beta,
@@ -789,7 +789,7 @@ void spgpuCaxpby(spgpuHandle_t handle,
 	__device cuFloatComplex* x);
 
 
-void spgpuCabgdxyz(spgpuHandle_t handle,
+void spgpuCupd_xyz(spgpuHandle_t handle,
 		   int n,
 		   cuFloatComplex alpha,
 		   cuFloatComplex beta,
@@ -1092,7 +1092,7 @@ void spgpuZaxpby(spgpuHandle_t handle,
 	__device cuDoubleComplex* x);
 	
 
-void spgpuZabgdxyz(spgpuHandle_t handle,
+void spgpuZupd_xyz(spgpuHandle_t handle,
 		   int n,
 		   cuDoubleComplex alpha,
 		   cuDoubleComplex beta,

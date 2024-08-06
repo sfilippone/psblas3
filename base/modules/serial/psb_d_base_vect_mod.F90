@@ -155,7 +155,7 @@ module psb_d_base_vect_mod
     procedure, pass(z) :: axpby_v2  => d_base_axpby_v2
     procedure, pass(z) :: axpby_a2  => d_base_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
-    procedure, pass(z) :: abgdxyz  => d_base_abgdxyz
+    procedure, pass(z) :: upd_xyz  => d_base_upd_xyz
     procedure, pass(w) :: xyzw     => d_base_xyzw
     
     !
@@ -1137,12 +1137,12 @@ contains
   end subroutine d_base_axpby_a2
 
   !
-  ! ABGDXYZ is invoked via Z, hence the structure below.
+  ! UPD_XYZ is invoked via Z, hence the structure below.
   !
   !
-  !> Function  base_abgdxyz
+  !> Function  base_upd_xyz
   !! \memberof  psb_d_base_vect_type
-  !! \brief ABGDXYZ combines two AXPBYS y=alpha*x+beta*y, z=gamma*y+delta*zeta
+  !! \brief UPD_XYZ combines two AXPBYS y=alpha*x+beta*y, z=gamma*y+delta*zeta
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param beta scalar beta 
@@ -1153,7 +1153,7 @@ contains
   !! \param z     The class(base_vect) to be added
   !! \param info   return code
   !!
-  subroutine d_base_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+  subroutine d_base_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
@@ -1166,11 +1166,11 @@ contains
     if (x%is_dev().and.(alpha/=dzero)) call x%sync()
     if (y%is_dev().and.(beta/=dzero))   call y%sync()
     if (z%is_dev().and.(delta/=dzero))  call z%sync()
-    call psi_abgdxyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+    call psi_upd_xyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
     call y%set_host()
     call z%set_host()
         
-  end subroutine d_base_abgdxyz
+  end subroutine d_base_upd_xyz
 
   subroutine d_base_xyzw(m,a,b,c,d,e,f,x, y, z, w,info)
     use psi_serial_mod

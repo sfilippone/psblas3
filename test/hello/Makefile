@@ -16,7 +16,7 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: runsd hello pingpong tsum tsum1
+all: runsd hello pingpong 
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
@@ -28,13 +28,6 @@ hello: hello.o
 pingpong: pingpong.o 
 	$(FLINK)  pingpong.o -o pingpong $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv pingpong $(EXEDIR)
-tsum: tsum.o 
-	$(FLINK)  tsum.o -o tsum $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv tsum $(EXEDIR)
-tsum1: tsum1.o 
-	$(FLINK)  tsum1.o -o tsum1 $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv tsum1 $(EXEDIR)
-
 
 
 clean: 
