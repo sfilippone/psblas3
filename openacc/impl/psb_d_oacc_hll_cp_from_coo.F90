@@ -48,7 +48,7 @@ contains
         row_counts(row) = row_counts(row) + 1
       else
         info = psb_err_invalid_mat_state_
-        goto 9999
+        !goto 9999
       end if
     end do
 

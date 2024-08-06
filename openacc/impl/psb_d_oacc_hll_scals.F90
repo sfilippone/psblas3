@@ -20,7 +20,8 @@ contains
     nhacks = (a%get_nrows() + hksz - 1) / hksz
     nzt = a%nzt
 
-    !$acc parallel loop collapse(2) present(a)
+    ! $ a parallel loop collapse(2) present(a)
+    !$acc parallel loop  present(a)
     do i = 1, nhacks
       do j = a%hkoffs(i), a%hkoffs(i + 1) - 1
         a%val(j) = a%val(j) * d

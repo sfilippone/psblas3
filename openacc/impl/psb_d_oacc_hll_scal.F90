@@ -23,7 +23,8 @@ contains
 
     if (present(side)) then
       if (side == 'L') then
-        !$acc parallel loop collapse(2) present(a, d)
+        ! $ a    parallel loop collapse(2) present(a, d)
+        !$acc parallel loop  present(a, d)
         do i = 1, nhacks
           do j = a%hkoffs(i), a%hkoffs(i + 1) - 1
             k = (j - a%hkoffs(i)) / nzt + (i - 1) * hksz + 1
@@ -31,7 +32,8 @@ contains
           end do
         end do
       else if (side == 'R') then
-        !$acc parallel loop collapse(2) present(a, d)
+        ! $ a  parallel loop collapse(2) present(a, d)
+        !$acc parallel loop present(a, d)
         do i = 1, nhacks
           do j = a%hkoffs(i), a%hkoffs(i + 1) - 1
             a%val(j) = a%val(j) * d(a%ja(j))
@@ -39,7 +41,8 @@ contains
         end do
       end if
     else
-      !$acc parallel loop collapse(2) present(a, d)
+      ! $ a parallel loop collapse(2) present(a, d)
+      !$acc parallel loop  present(a, d)
       do i = 1, nhacks
         do j = a%hkoffs(i), a%hkoffs(i + 1) - 1
           a%val(j) = a%val(j) * d(j - a%hkoffs(i) + 1)

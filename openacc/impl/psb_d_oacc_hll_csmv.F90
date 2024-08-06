@@ -64,8 +64,11 @@ contains
       do i = 1, m
         y(i) = beta * y(i)
       end do
-
+#if (__GNUC__ <= 13) 
+      !$acc parallel loop present(a, x, y)
+#else      
       !$acc parallel loop collapse(2) present(a, x, y)
+#endif
       do i = 1, nhacks
         do j = a%hkoffs(i), a%hkoffs(i + 1) - 1
           y(a%irn(j)) = y(a%irn(j)) + alpha * a%val(j) * x(a%ja(j))
