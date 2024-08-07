@@ -860,7 +860,7 @@ if test x"$pac_cv_openacc" == x"yes" ; then
 fi
 
 ###############################################################################
-PAC_ARG_WITH_LIBRSB
+dnl PAC_ARG_WITH_LIBRSB()
 LIBRSB_DIR="$pac_cv_librsb_dir";
 AC_MSG_CHECKING([for LIBRSB install dir])
 case $LIBRSB_DIR in 
@@ -1023,6 +1023,9 @@ AC_MSG_NOTICE([
 	CUDA 		      : ${HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -1042,6 +1045,13 @@ dnl Note : we should use LDLIBS sooner or later!
 dnl	To install the program and its documentation, run 'make install' if you are root,
 dnl	or run 'su -c "make install"' if you are not root.
 ])
+if test x"${pac_cv_openacc}" == x"yes" ; then
+   if test x"${FCOPENACC}" == x ; then
+   AC_MSG_NOTICE([
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= ])
+  fi  
+fi	
 
 ###############################################################################
 

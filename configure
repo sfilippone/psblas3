@@ -653,6 +653,12 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+LRSB
+LIBRSB_DEFINES
+LIBRSB_DIR
+LIBRSB_INCDIR
+LIBRSB_INCLUDES
+LIBRSB_LIBS
 LCUDA
 CUDALD
 CUDAD
@@ -5841,7 +5847,7 @@ fi
 
 # we just gave the user the chance to append values to these variables
 
-###############################################################################
+
 
 
 if test -n "$ac_tool_prefix"; then
@@ -10985,6 +10991,27 @@ fi
    #FLINK="$FLINK $FCOPENACC";
 fi
 
+###############################################################################
+LIBRSB_DIR="$pac_cv_librsb_dir";
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for LIBRSB install dir" >&5
+printf %s "checking for LIBRSB install dir... " >&6; }
+case $LIBRSB_DIR in
+     /*) ;;
+     *)  esac
+pac_cv_status_file="$LIBRSB_DIR/librsb.a"
+if test ! -f "$pac_cv_status_file" ; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+  #AC_MSG_ERROR([Could not find an installation  in $LIBRSB_DIR.])
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $LIBRSB_DIR" >&5
+printf "%s\n" "$LIBRSB_DIR" >&6; }
+  RSBTARGETLIB=rsbd;
+  RSBTARGETOBJ=rsbobj;
+fi
+
+
+
 
 
 ###############################################################################
@@ -11058,6 +11085,12 @@ FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
+
+
+
 
 
 
@@ -12422,6 +12455,9 @@ fi
 	CUDA 		      : ${HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -12455,6 +12491,9 @@ printf "%s\n" "$as_me:
 	CUDA 		      : ${HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -12471,6 +12510,16 @@ printf "%s\n" "$as_me:
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
 " >&6;}
+if test x"${pac_cv_openacc}" == x"yes" ; then
+   if test x"${FCOPENACC}" == x ; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}:
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= " >&5
+printf "%s\n" "$as_me:
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= " >&6;}
+  fi
+fi
 
 ###############################################################################
 
