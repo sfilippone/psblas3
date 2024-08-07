@@ -733,7 +733,8 @@ program psb_d_oacc_pde3d
   end if
 
   ! get parameters
-  call get_parms(ctxt, kmethd, ptype, afmt, agfmt, idim, istopc, itmax, itrace, irst, ipart, parms)
+  call get_parms(ctxt, kmethd, ptype, afmt, agfmt, idim, istopc,&
+       & itmax, itrace, irst, ipart, parms)
 
   ! allocate and fill in the coefficient matrix, rhs and initial guess
   call psb_barrier(ctxt)

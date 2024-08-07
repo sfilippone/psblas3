@@ -17,14 +17,17 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR)
 FFLAGS=-O0 -march=native -fopenacc -foffload=nvptx-none="-march=sm_70"
 CFLAGS=-O0 -march=native
 
-SRCS=vectoacc.F90 datavect.F90
+VTC=vectoacc.o
+DVT=datavect.o
 CSRC=timers.c
 
 OBJS=$(SRCS:.F90=.o) $(CSRC:.c=.o)
 
-all: dir $(OBJS)
-	$(FC) $(FFLAGS) $(OBJS) -o datavect $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv datavect $(EXEDIR)
+all: dir psb_d_oacc_pde3d
+
+#$(OBJS)
+#	$(FC) $(FFLAGS) $(OBJS) -o datavect $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS)
+#	/bin/mv datavect $(EXEDIR)
 
 dir:
 	@if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi

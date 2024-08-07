@@ -845,11 +845,35 @@ if test "x$pac_cv_ipk_size" != "x4"; then
 fi
 
 PAC_ARG_OPENACC()
+dnl AC_ARG_ENABLE([openacc],
+dnl    [AS_HELP_STRING([--disable-openacc], [do not use Openacc])])
 if test x"$pac_cv_openacc" == x"yes" ; then
-   PAC_ARG_WITH_FLAGS(ccopenacc,CCOPENACC)
+   PAC_ARG_WITH_FLAGS(extraopenacc,EXTRAOPENACC)
+   dnl if test false; then
+   AX_C_OPENACC()
+   CCOPENACC="$ax_cv_prog_c_openacc";
+   AX_CXX_OPENACC()
+   CXXOPENACC="$ax_cv_prog_cxx_openacc";
+   AX_FC_OPENACC()
+   FCOPENACC="$ax_cv_prog_fc_openacc";
+    dnl AX_OPENACC()
+    dnl 
+    dnl CXXOPENACC="$ax_cv_prog_cxx_openacc";	
+    dnl FCOPENACC="$ax_cv_prog_fc_openacc";   
+   dnl else   
+dnl   AC_MSG_NOTICE([OpenACC 1 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
+   PAC_ARG_WITH_FLAGS(ccopenacc,CCOPENACC)	
    PAC_ARG_WITH_FLAGS(cxxopenacc,CXXOPENACC)
    PAC_ARG_WITH_FLAGS(fcopenacc,FCOPENACC)
-
+dnl   AC_MSG_NOTICE([OpenACC 2 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])		
+dnl   CCOPENACC="$ax_cv_prog_c_openacc";
+dnl   CXXOPENACC="$ax_cv_prog_cxx_openacc";	
+dnl   FCOPENACC="$ax_cv_prog_fc_openacc";   
+dnl   fi
+   CCOPENACC="$CCOPENACC   $EXTRAOPENACC";
+   CXXOPENACC="$CXXOPENACC   $EXTRAOPENACC";
+   FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
+dnl   AC_MSG_NOTICE([OpenACC 3 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
    OACCD=oaccd;
    OACCLD=oaccld;
 
@@ -1025,7 +1049,9 @@ AC_MSG_NOTICE([
 
 	OPENACC		      : ${pac_cv_openacc}
         FCOPENACC             : ${FCOPENACC}
-
+	OACCD                 : ${OACCD}
+	OACCLD                : ${OACCLD}
+	
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
