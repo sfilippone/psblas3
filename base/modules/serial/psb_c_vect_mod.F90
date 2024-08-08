@@ -104,7 +104,6 @@ module psb_c_vect_mod
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
     procedure, pass(z) :: upd_xyz  => c_vect_upd_xyz
     procedure, pass(z) :: xyzw     => c_vect_xyzw
-    
     procedure, pass(y) :: mlt_v    => c_vect_mlt_v
     procedure, pass(y) :: mlt_a    => c_vect_mlt_a
     procedure, pass(z) :: mlt_a_2  => c_vect_mlt_a_2
