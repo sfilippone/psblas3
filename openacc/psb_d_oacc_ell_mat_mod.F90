@@ -303,6 +303,18 @@ contains
     call tmpa%set_sync()
   end subroutine d_oacc_ell_sync
 
+  subroutine d_oacc_ell_to_dev_scalar(v)
+    implicit none
+    real(psb_dpk_), intent(in) :: v(:)
+    !$acc update device(v)
+  end subroutine d_oacc_ell_to_dev_scalar
+
+  subroutine d_oacc_ell_to_dev(v)
+    implicit none
+    real(psb_dpk_), intent(in) :: v(:,:)
+    !$acc update device(v)
+  end subroutine d_oacc_ell_to_dev
+
   subroutine d_oacc_ell_to_host(v)
     implicit none
     real(psb_dpk_), intent(in) :: v(:,:)
