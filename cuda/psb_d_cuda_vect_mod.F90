@@ -90,7 +90,7 @@ module psb_d_cuda_vect_mod
     procedure, pass(x) :: dot_a    => d_cuda_dot_a
     procedure, pass(y) :: axpby_v  => d_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => d_cuda_axpby_a
-    procedure, pass(z) :: upd_xyz  => d_cuda_upd_xyz
+    procedure, pass(z) :: abgdxyz  => d_cuda_abgdxyz
     procedure, pass(y) :: mlt_v    => d_cuda_mlt_v
     procedure, pass(y) :: mlt_a    => d_cuda_mlt_a
     procedure, pass(z) :: mlt_a_2  => d_cuda_mlt_a_2
@@ -912,7 +912,7 @@ contains
 
   end subroutine d_cuda_axpby_v
 
-  subroutine d_cuda_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+  subroutine d_cuda_abgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
@@ -946,7 +946,7 @@ contains
             if ((nx<m).or.(ny<m).or.(nz<m)) then
               info = psb_err_internal_error_
             else
-              info = upd_xyzMultiVecDevice(m,alpha,beta,gamma,delta,&
+              info = abgdxyzMultiVecDevice(m,alpha,beta,gamma,delta,&
                    & xx%deviceVect,yy%deviceVect,zz%deviceVect)
             end if
             call yy%set_dev()
@@ -972,7 +972,7 @@ contains
       call z%axpby(m,gamma,y,delta,info)
     end if
 
-  end subroutine d_cuda_upd_xyz
+  end subroutine d_cuda_abgdxyz
 
   subroutine d_cuda_xyzw(m,a,b,c,d,e,f,x, y, z,w, info)
     use psi_serial_mod

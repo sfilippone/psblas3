@@ -29,7 +29,7 @@ contains
       allocate(a%idiag(m))
     end if
 
-    a%val = 0.0_psb_dpk_
+    a%val = dzero
     a%ja = -1
     a%irn = 0
     a%idiag = 0

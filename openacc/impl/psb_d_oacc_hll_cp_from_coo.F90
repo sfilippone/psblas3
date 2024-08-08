@@ -27,7 +27,7 @@ contains
       allocate(a%idiag(a%get_nrows()))
       allocate(a%hkoffs((a%get_nrows() + hacksize - 1) / hacksize))
     end if
-    a%val = 0.0_psb_dpk_
+    a%val = dzero
     a%ja = -1
     a%irn = 0
     a%idiag = 0

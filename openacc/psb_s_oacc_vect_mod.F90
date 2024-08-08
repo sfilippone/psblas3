@@ -42,6 +42,7 @@ module psb_s_oacc_vect_mod
     procedure, pass(y) :: sctb_buf    => s_oacc_sctb_buf
 
     procedure, pass(x) :: get_size    => s_oacc_get_size
+
     procedure, pass(x) :: dot_v       => s_oacc_vect_dot
     procedure, pass(x) :: dot_a       => s_oacc_dot_a
     procedure, pass(y) :: axpby_v     => s_oacc_axpby_v
@@ -70,7 +71,6 @@ module psb_s_oacc_vect_mod
     end subroutine s_oacc_mlt_v
   end interface
   
-
   interface
     subroutine s_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       import
@@ -83,7 +83,7 @@ module psb_s_oacc_vect_mod
       character(len=1), intent(in), optional     :: conjgx, conjgy
     end subroutine s_oacc_mlt_v_2
   end interface
-  
+
 contains
 
   subroutine s_oacc_absval1(x)
@@ -432,7 +432,7 @@ contains
 
     select type(ii => idx)
     class is (psb_i_vect_oacc)
-      if (ii%is_host()) call ii%sync_space(info)
+      if (ii%is_host()) call ii%sync_space()
       if (y%is_host()) call y%sync_space()
 
       !$acc parallel loop
@@ -459,7 +459,7 @@ contains
 
     select type(ii => idx)
     class is (psb_i_vect_oacc)
-      if (ii%is_host()) call ii%sync_space(info)
+      if (ii%is_host()) call ii%sync_space()
     class default
       call psb_errpush(info, 's_oacc_sctb_x')
       return
@@ -474,8 +474,6 @@ contains
 
     call y%set_dev()
   end subroutine s_oacc_sctb_x
-
-
 
   subroutine s_oacc_sctb(n, idx, x, beta, y)
     use psb_base_mod
@@ -498,7 +496,6 @@ contains
     call y%set_host()
   end subroutine s_oacc_sctb
 
-
   subroutine s_oacc_gthzbuf(i, n, idx, x)
     use psb_base_mod
     implicit none
@@ -515,7 +512,7 @@ contains
 
     select type(ii => idx)
     class is (psb_i_vect_oacc)
-      if (ii%is_host()) call ii%sync_space(info)
+      if (ii%is_host()) call ii%sync_space()
     class default
       call psb_errpush(info, 's_oacc_gthzbuf')
       return
@@ -542,7 +539,7 @@ contains
 
     select type(ii => idx)
     class is (psb_i_vect_oacc)
-      if (ii%is_host()) call ii%sync_space(info)
+      if (ii%is_host()) call ii%sync_space()
     class default
       call psb_errpush(info, 's_oacc_gthzv_x')
       return
@@ -577,7 +574,7 @@ contains
       select type(vval => val)
       type is (psb_s_vect_oacc)
         if (vval%is_host()) call vval%sync_space()
-        if (virl%is_host()) call virl%sync_space(info)
+        if (virl%is_host()) call virl%sync_space()
         if (x%is_host()) call x%sync_space()
         !$acc parallel loop
         do i = 1, n
@@ -591,7 +588,7 @@ contains
     if (.not.done_oacc) then
       select type(virl => irl)
       type is (psb_i_vect_oacc)
-        if (virl%is_dev()) call virl%sync_space(info)
+        if (virl%is_dev()) call virl%sync_space()
       end select
       select type(vval => val)
       type is (psb_s_vect_oacc)
@@ -606,8 +603,6 @@ contains
     end if
 
   end subroutine s_oacc_ins_v
-
-
 
   subroutine s_oacc_ins_a(n, irl, val, dupl, x, info)
     use psi_serial_mod
@@ -627,8 +622,6 @@ contains
     !$acc update device(x%v)
 
   end subroutine s_oacc_ins_a
-
-
 
   subroutine s_oacc_bld_mn(x, n)
     use psb_base_mod
@@ -668,7 +661,6 @@ contains
 
   end subroutine s_oacc_bld_x
 
-
   subroutine s_oacc_asb_m(n, x, info)
     use psb_base_mod
     implicit none 
@@ -696,8 +688,6 @@ contains
     end if
   end subroutine s_oacc_asb_m
 
-
-
   subroutine s_oacc_set_scal(x, val, first, last)
     class(psb_s_vect_oacc), intent(inout) :: x
     real(psb_spk_), intent(in)           :: val
@@ -717,8 +707,6 @@ contains
 
     call x%set_dev()
   end subroutine s_oacc_set_scal
-
-
 
   subroutine s_oacc_zero(x)
     use psi_serial_mod
@@ -742,6 +730,7 @@ contains
     res = "sOACC"
 
   end function s_oacc_get_fmt
+
 
   function s_oacc_vect_dot(n, x, y) result(res)
     implicit none
@@ -775,9 +764,6 @@ contains
     end select
 
   end function s_oacc_vect_dot
-
-
-
 
   function s_oacc_dot_a(n, x, y) result(res)
     implicit none 
@@ -909,7 +895,6 @@ contains
            i_err=(/n, n, n, n, n/))
     end if
   end subroutine s_oacc_vect_all
-
 
   subroutine s_oacc_vect_free(x, info)
     implicit none 

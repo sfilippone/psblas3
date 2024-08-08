@@ -26,7 +26,7 @@ contains
       allocate(a%irn(a%get_nrows()))
       allocate(a%idiag(a%get_nrows()))
     end if
-    a%val = 0.0_psb_dpk_
+    a%val = dzero
     a%ja = -1
     a%irn = 0
     a%idiag = 0

@@ -743,9 +743,9 @@ subroutine psb_saddconst_vect(x,b,z,desc_a,info)
 end subroutine psb_saddconst_vect
 
 
-subroutine psb_s_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
+subroutine psb_sabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
      & desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_s_upd_xyz_vect
+  use psb_base_mod, psb_protect_name => psb_sabgdxyz_vect
   implicit none 
   type(psb_s_vect_type), intent (inout) :: x
   type(psb_s_vect_type), intent (inout) :: y
@@ -812,7 +812,7 @@ subroutine psb_s_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call z%upd_xyz(nr,alpha,beta,gamma,delta,x,y,info)
+    call z%abgdxyz(nr,alpha,beta,gamma,delta,x,y,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -822,5 +822,5 @@ subroutine psb_s_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
 
   return
 
-end subroutine psb_s_upd_xyz_vect
+end subroutine psb_sabgdxyz_vect
 

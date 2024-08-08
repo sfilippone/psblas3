@@ -143,8 +143,8 @@ module psb_c_psblas_mod
     end subroutine psb_caxpby
   end interface
 
-  interface psb_upd_xyz
-    subroutine psb_c_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
+  interface psb_abgdxyz
+    subroutine psb_cabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
          & desc_a, info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
@@ -154,8 +154,8 @@ module psb_c_psblas_mod
       complex(psb_spk_), intent (in)        :: alpha, beta, gamma, delta
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
-    end subroutine psb_c_upd_xyz_vect
-  end interface psb_upd_xyz
+    end subroutine psb_cabgdxyz_vect
+  end interface psb_abgdxyz
   
   interface psb_geamax
     function psb_camax(x, desc_a, info, jx,global)

@@ -313,16 +313,16 @@ module psb_d_vectordev_mod
     end function axpbyMultiVecDeviceDouble
   end interface
 
-  interface upd_xyzMultiVecDevice
-    function upd_xyzMultiVecDeviceDouble(n,alpha,beta,gamma,delta,deviceVecX,&
+  interface abgdxyzMultiVecDevice
+    function abgdxyzMultiVecDeviceDouble(n,alpha,beta,gamma,delta,deviceVecX,&
          & deviceVecY,deviceVecZ) &
-         & result(res) bind(c,name='upd_xyzMultiVecDeviceDouble')
+         & result(res) bind(c,name='abgdxyzMultiVecDeviceDouble')
       use iso_c_binding
       integer(c_int)      :: res
       integer(c_int), value :: n
       real(c_double), value :: alpha, beta,gamma,delta
       type(c_ptr), value  :: deviceVecX, deviceVecY, deviceVecZ
-    end function upd_xyzMultiVecDeviceDouble
+    end function abgdxyzMultiVecDeviceDouble
   end interface
 
   interface xyzwMultiVecDevice
