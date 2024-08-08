@@ -143,8 +143,8 @@ module psb_z_psblas_mod
     end subroutine psb_zaxpby
   end interface
 
-  interface psb_abgdxyz
-    subroutine psb_zabgdxyz_vect(alpha, beta, gamma, delta, x, y, z,&
+  interface psb_upd_xyz
+    subroutine psb_z_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
          & desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
@@ -154,8 +154,8 @@ module psb_z_psblas_mod
       complex(psb_dpk_), intent (in)        :: alpha, beta, gamma, delta
       type(psb_desc_type), intent (in)      :: desc_a
       integer(psb_ipk_), intent(out)        :: info
-    end subroutine psb_zabgdxyz_vect
-  end interface psb_abgdxyz
+    end subroutine psb_z_upd_xyz_vect
+  end interface psb_upd_xyz
   
   interface psb_geamax
     function psb_zamax(x, desc_a, info, jx,global)
