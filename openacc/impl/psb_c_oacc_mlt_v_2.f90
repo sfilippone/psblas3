@@ -1,5 +1,5 @@
-subroutine c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
-  use psb_c_oacc_vect_mod, psb_protect_name => c_oacc_mlt_v_2
+subroutine psb_c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
+  use psb_c_oacc_vect_mod, psb_protect_name => psb_c_oacc_mlt_v_2
   use psb_string_mod
   implicit none 
   complex(psb_spk_), intent(in)                 :: alpha, beta
@@ -25,33 +25,13 @@ subroutine c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       if (xx%is_host()) call xx%sync()
       if (yy%is_host()) call yy%sync()
       if ((beta /= czero) .and. (z%is_host())) call z%sync()
-      if (conjgx_.and.conjgy_) then 
-        !$acc parallel loop
-        do i = 1, n
-          z%v(i) = alpha * conjg(xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
-        end do
-      else if (conjgx_.and.(.not.conjgy_)) then 
-        !$acc parallel loop
-        do i = 1, n
-          z%v(i) = alpha * conjg(xx%v(i)) * (yy%v(i)) + beta * z%v(i)
-        end do
-      else if ((.not.conjgx_).and.(conjgy_)) then 
-        !$acc parallel loop
-        do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
-        end do
-      else
-        !$acc parallel loop
-        do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
-        end do
-        
-      end if
+      call c_inner_oacc_mlt_v_2(n,alpha, xx%v, yy%v, beta, z%v, info, conjgx_, conjgy_)
       call z%set_dev()
     class default
       if (xx%is_dev()) call xx%sync()
       if (yy%is_dev()) call yy%sync()
       if ((beta /= czero) .and. (z%is_dev())) call z%sync()
+      !call c_inner_oacc_mlt_v_2(n,alpha, xx%v, yy%v, beta, z%v, info, conjgx_, conjgy_)
       if (conjgx_.and.conjgy_) then 
         do i = 1, n
           z%v(i) = alpha * conjg(xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
@@ -67,7 +47,7 @@ subroutine c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       else
         do i = 1, n
           z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
-        end do       
+        end do
       end if
       call z%set_host()
     end select
@@ -75,24 +55,56 @@ subroutine c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
     if (x%is_dev()) call x%sync()
     if (y%is_dev()) call y%sync()
     if ((beta /= czero) .and. (z%is_dev())) call z%sync()
-      if (conjgx_.and.conjgy_) then 
-        do i = 1, n
-          z%v(i) = alpha * conjg(x%v(i)) * conjg(y%v(i)) + beta * z%v(i)
-        end do
-      else if (conjgx_.and.(.not.conjgy_)) then 
-        do i = 1, n
-          z%v(i) = alpha * conjg(x%v(i)) * (y%v(i)) + beta * z%v(i)
-        end do
-      else if ((.not.conjgx_).and.(conjgy_)) then 
-        do i = 1, n
-          z%v(i) = alpha * (x%v(i)) * conjg(y%v(i)) + beta * z%v(i)
-        end do
-      else
-        do i = 1, n
-          z%v(i) = alpha * (x%v(i)) * (y%v(i)) + beta * z%v(i)
-        end do       
-      end if
+    if (conjgx_.and.conjgy_) then 
+      do i = 1, n
+        z%v(i) = alpha * conjg(x%v(i)) * conjg(y%v(i)) + beta * z%v(i)
+      end do
+    else if (conjgx_.and.(.not.conjgy_)) then 
+      do i = 1, n
+        z%v(i) = alpha * conjg(x%v(i)) * (y%v(i)) + beta * z%v(i)
+      end do
+    else if ((.not.conjgx_).and.(conjgy_)) then 
+      do i = 1, n
+        z%v(i) = alpha * (x%v(i)) * conjg(y%v(i)) + beta * z%v(i)
+      end do
+    else
+      do i = 1, n
+        z%v(i) = alpha * (x%v(i)) * (y%v(i)) + beta * z%v(i)
+      end do
+    end if
     call z%set_host()
   end select
-end subroutine c_oacc_mlt_v_2
+contains
+  subroutine c_inner_oacc_mlt_v_2(n,alpha, x, y, beta, z, info, conjgx, conjgy)
+    implicit none
+    integer(psb_ipk_), intent(in) :: n
+complex(psb_spk_), intent(in)                 :: alpha, beta
+complex(psb_spk_), intent(inout) :: x(:), y(:), z(:)
+    integer(psb_ipk_), intent(out)             :: info
+    logical, intent(in)         :: conjgx, conjgy
+
+    integer(psb_ipk_) :: i
+    if (conjgx.and.conjgy) then 
+      !$acc parallel loop present(x,y,z)
+      do i = 1, n
+        z(i) = alpha * conjg(x(i)) * conjg(y(i)) + beta * z(i)
+      end do
+    else if (conjgx.and.(.not.conjgy)) then 
+      !$acc parallel loop present(x,y,z)
+      do i = 1, n
+        z(i) = alpha * conjg(x(i)) * (y(i)) + beta * z(i)
+      end do
+    else if ((.not.conjgx).and.(conjgy)) then 
+      !$acc parallel loop present(x,y,z)
+      do i = 1, n
+        z(i) = alpha * (x(i)) * conjg(y(i)) + beta * z(i)
+      end do
+    else
+      !$acc parallel loop present(x,y,z)
+      do i = 1, n
+        z(i) = alpha * (x(i)) * (y(i)) + beta * z(i)
+      end do
+    end if
+  end subroutine c_inner_oacc_mlt_v_2
+end subroutine psb_c_oacc_mlt_v_2
 
