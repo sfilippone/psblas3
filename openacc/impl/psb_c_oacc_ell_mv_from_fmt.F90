@@ -14,10 +14,12 @@ contains
     type is (psb_c_coo_sparse_mat)
       call a%mv_from_coo(b, info)
     class default
+      call a%free_space()
       call a%psb_c_ell_sparse_mat%mv_from_fmt(b, info)
       if (info /= 0) return
-
-      !$acc update device(a%val, a%ja, a%irn, a%idiag)
+      call a%sync_space()
+      call a%set_host()
+      call a%sync()
     end select
 
   end subroutine psb_c_oacc_ell_mv_from_fmt

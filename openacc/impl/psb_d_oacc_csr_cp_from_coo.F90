@@ -10,11 +10,12 @@ contains
 
     info = psb_success_
 
+    call a%free_space()
     call a%psb_d_csr_sparse_mat%cp_from_coo(b, info)
     if (info /= 0) goto 9999
-
-    call a%set_dev()
-    if (info /= 0) goto 9999
+    call a%sync_space()
+    call a%set_host()
+    call a%sync()
 
     return
 

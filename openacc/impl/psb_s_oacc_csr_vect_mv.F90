@@ -16,8 +16,8 @@ contains
     m = a%get_nrows()
     n = a%get_ncols()
 
-    if ((n /= size(x%v)) .or. (n /= size(y%v))) then
-      write(0,*) 'Size error ', m, n, size(x%v), size(y%v)
+    if ((n /= size(x%v)) .or. (m /= size(y%v))) then
+      write(0,*) 'ocsrmv Size error ', m, n, size(x%v), size(y%v)
       info = psb_err_invalid_mat_state_
       return
     end if

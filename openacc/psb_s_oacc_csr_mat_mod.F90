@@ -1,6 +1,7 @@
 module psb_s_oacc_csr_mat_mod
 
   use iso_c_binding
+  use openacc
   use psb_s_mat_mod
   use psb_s_oacc_vect_mod
   !use oaccsparse_mod
@@ -35,6 +36,7 @@ module psb_s_oacc_csr_mat_mod
     procedure, pass(a) :: set_host      => s_oacc_csr_set_host
     procedure, pass(a) :: set_sync      => s_oacc_csr_set_sync
     procedure, pass(a) :: set_dev       => s_oacc_csr_set_dev
+    procedure, pass(a) :: free_space    => s_oacc_csr_free_space
     procedure, pass(a) :: sync_space    => s_oacc_csr_sync_space
     procedure, pass(a) :: sync          => s_oacc_csr_sync
   end type psb_s_oacc_csr_sparse_mat
@@ -154,22 +156,26 @@ module psb_s_oacc_csr_mat_mod
 contains
 
 
+  subroutine s_oacc_csr_free_space(a)
+    use psb_base_mod
+    implicit none 
+    class(psb_s_oacc_csr_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_) :: info
+
+    if (allocated(a%val)) call acc_delete_finalize(a%val)
+    if (allocated(a%ja))  call acc_delete_finalize(a%ja)
+    if (allocated(a%irp)) call acc_delete_finalize(a%irp)
+
+    return
+  end subroutine s_oacc_csr_free_space
+
   subroutine s_oacc_csr_free(a)
     use psb_base_mod
     implicit none 
     class(psb_s_oacc_csr_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    if (allocated(a%val)) then
-      !$acc exit data delete(a%val)
-    end if
-    if (allocated(a%ja)) then
-      !$acc exit data delete(a%ja)
-    end if
-    if (allocated(a%irp)) then
-      !$acc exit data delete(a%irp)
-    end if
-
+    call a%free_space()
     call a%psb_s_csr_sparse_mat%free()
 
     return
@@ -193,7 +199,7 @@ contains
   function s_oacc_csr_get_fmt() result(res)
     implicit none
     character(len=5) :: res
-    res = 'CSR_oacc'
+    res = 'CSROA'
   end function s_oacc_csr_get_fmt
 
   subroutine s_oacc_csr_all(m, n, nz, a, info)
@@ -202,19 +208,8 @@ contains
     class(psb_s_oacc_csr_sparse_mat), intent(out) :: a
     integer(psb_ipk_), intent(out)     :: info
 
-    info = 0 
-    if (allocated(a%val)) then
-      !$acc exit data delete(a%val) finalize
-      deallocate(a%val, stat=info)
-    end if
-    if (allocated(a%ja)) then
-      !$acc exit data delete(a%ja) finalize
-      deallocate(a%ja, stat=info)
-    end if
-    if (allocated(a%irp)) then
-      !$acc exit data delete(a%irp) finalize
-      deallocate(a%irp, stat=info)
-    end if
+    info = 0
+    call a%free()
 
     call a%set_nrows(m)
     call a%set_ncols(n)
@@ -274,26 +269,9 @@ contains
   subroutine s_oacc_csr_sync_space(a)
     implicit none
     class(psb_s_oacc_csr_sparse_mat), intent(inout) :: a
-    if (allocated(a%val)) then
-      call s_oacc_create_dev(a%val)
-    end if
-    if (allocated(a%ja)) then
-      call i_oacc_create_dev(a%ja)
-    end if
-    if (allocated(a%irp)) then
-      call i_oacc_create_dev(a%irp)
-    end if
-  contains
-    subroutine s_oacc_create_dev(v)
-      implicit none
-      real(psb_spk_), intent(in) :: v(:)
-      !$acc enter data copyin(v)          
-    end subroutine s_oacc_create_dev
-    subroutine i_oacc_create_dev(v)
-      implicit none
-      integer(psb_ipk_), intent(in) :: v(:)
-      !$acc enter data copyin(v)          
-    end subroutine i_oacc_create_dev
+    if (allocated(a%val)) call acc_create(a%val)
+    if (allocated(a%ja))  call acc_create(a%ja)
+    if (allocated(a%irp)) call acc_create(a%irp)
   end subroutine s_oacc_csr_sync_space
 
   subroutine s_oacc_csr_sync(a)
@@ -304,40 +282,16 @@ contains
 
     tmpa => a
     if (a%is_dev()) then
-      call s_oacc_csr_to_host(a%val)
-      call i_oacc_csr_to_host(a%ja)
-      call i_oacc_csr_to_host(a%irp)
+      call acc_update_self(a%val)
+      call acc_update_self(a%ja)
+      call acc_update_self(a%irp)
     else if (a%is_host()) then
-      call s_oacc_csr_to_dev(a%val)
-      call i_oacc_csr_to_dev(a%ja)
-      call i_oacc_csr_to_dev(a%irp)
+      call acc_update_device(a%val)
+      call acc_update_device(a%ja)
+      call acc_update_device(a%irp)
     end if
     call tmpa%set_sync()
   end subroutine s_oacc_csr_sync
-
-  subroutine s_oacc_csr_to_dev(v)
-    implicit none
-    real(psb_spk_), intent(in) :: v(:)
-    !$acc update device(v)          
-  end subroutine s_oacc_csr_to_dev
-
-  subroutine s_oacc_csr_to_host(v)
-    implicit none
-    real(psb_spk_), intent(in) :: v(:)
-    !$acc update self(v)          
-  end subroutine s_oacc_csr_to_host
-
-  subroutine i_oacc_csr_to_dev(v)
-    implicit none
-    integer(psb_ipk_), intent(in) :: v(:)
-    !$acc update device(v)          
-  end subroutine i_oacc_csr_to_dev
-
-  subroutine i_oacc_csr_to_host(v)
-    implicit none
-    integer(psb_ipk_), intent(in) :: v(:)
-    !$acc update self(v)          
-  end subroutine i_oacc_csr_to_host
 
 end module psb_s_oacc_csr_mat_mod
         

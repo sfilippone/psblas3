@@ -59,7 +59,7 @@ module psb_c_oacc_vect_mod
     procedure, pass(x) :: asum        => c_oacc_asum
     procedure, pass(x) :: absval1     => c_oacc_absval1
     procedure, pass(x) :: absval2     => c_oacc_absval2
-
+    final ::  c_oacc_final_vect_free
   end type psb_c_vect_oacc
 
   interface
@@ -164,21 +164,25 @@ contains
     implicit none
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: n
-    real(psb_spk_)                     :: res
-    real(psb_spk_)                     :: mx
+    real(psb_spk_)                       :: res
     integer(psb_ipk_) :: info
 
     if (x%is_host()) call x%sync()
-    mx  = c_oacc_amax(n,x)
-    res = c_inner_oacc_nrm2(n, mx, x%v)
+!!$    write(0,*)'oacc_nrm2'
+    res = c_inner_oacc_nrm2(n, x%v)
   contains
-    function c_inner_oacc_nrm2(n, mx,x) result(res)
+    function c_inner_oacc_nrm2(n, x) result(res)
       integer(psb_ipk_) :: n
       complex(psb_spk_) :: x(:)
-      real(psb_spk_) :: mx, res
-      real(psb_spk_) :: sum
+      real(psb_spk_) :: res
+      real(psb_spk_) :: sum, mx
       integer(psb_ipk_) :: i
-      sum = 0.0
+      mx = szero
+      !$acc parallel loop reduction(max:mx)
+      do i = 1, n
+        if (abs(x(i)) > mx) mx = abs(x(i))
+      end do      
+      sum = szero
       !$acc parallel loop reduction(+:sum)
       do i = 1, n
         sum = sum + abs(x(i)/mx)**2
@@ -203,7 +207,7 @@ contains
       real(psb_spk_) :: res
       real(psb_spk_) :: max_val
       integer(psb_ipk_) :: i
-      max_val = -huge(0.0)
+      max_val = szero
       !$acc parallel loop reduction(max:max_val)
       do i = 1, n
         if (abs(x(i)) > max_val) max_val = abs(x(i))
@@ -228,7 +232,7 @@ contains
       complex(psb_spk_) :: x(:)
       real(psb_spk_) :: res
       integer(psb_ipk_) :: i
-      res = 0.0
+      res = szero
       !$acc parallel loop reduction(+:res)
       do i = 1, n
         res = res + abs(x(i))
@@ -270,92 +274,6 @@ contains
     end do
     call z%set_host()
   end subroutine c_oacc_mlt_a_2
-
-
-!!$  subroutine c_oacc_mlt_v(x, y, info)
-!!$    implicit none 
-!!$    class(psb_c_base_vect_type), intent(inout) :: x
-!!$    class(psb_c_vect_oacc), intent(inout)       :: y
-!!$    integer(psb_ipk_), intent(out)             :: info
-!!$
-!!$    integer(psb_ipk_) :: i, n
-!!$    
-!!$    info = 0    
-!!$    n = min(x%get_nrows(), y%get_nrows())
-!!$    select type(xx => x)
-!!$    type is (psb_c_base_vect_type)
-!!$        if (y%is_dev()) call y%sync()
-!!$        !$acc parallel loop
-!!$        do i = 1, n
-!!$            y%v(i) = y%v(i) * xx%v(i)
-!!$        end do
-!!$        call y%set_host()
-!!$    class default
-!!$        if (xx%is_dev()) call xx%sync()
-!!$        if (y%is_dev()) call y%sync()
-!!$        !$acc parallel loop
-!!$        do i = 1, n
-!!$            y%v(i) = y%v(i) * xx%v(i)
-!!$        end do
-!!$        call y%set_host()
-!!$    end select
-!!$  end subroutine c_oacc_mlt_v
-!!$
-!!$  subroutine c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
-!!$    use psi_serial_mod
-!!$    use psb_string_mod
-!!$    implicit none 
-!!$    complex(psb_spk_), intent(in)                 :: alpha, beta
-!!$    class(psb_c_base_vect_type), intent(inout) :: x
-!!$    class(psb_c_base_vect_type), intent(inout) :: y
-!!$    class(psb_c_vect_oacc), intent(inout)      :: z
-!!$    integer(psb_ipk_), intent(out)             :: info
-!!$    character(len=1), intent(in), optional     :: conjgx, conjgy
-!!$    integer(psb_ipk_) :: i, n
-!!$    logical :: conjgx_, conjgy_
-!!$
-!!$    conjgx_ = .false.
-!!$    conjgy_ = .false.
-!!$    if (present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
-!!$    if (present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
-!!$    
-!!$    n = min(x%get_nrows(), y%get_nrows(), z%get_nrows())
-!!$    
-!!$    info = 0    
-!!$    select type(xx => x)
-!!$    class is (psb_c_vect_oacc)
-!!$        select type (yy => y)
-!!$        class is (psb_c_vect_oacc)
-!!$            if (xx%is_host()) call xx%sync()
-!!$            if (yy%is_host()) call yy%sync()
-!!$            if ((beta /= czero) .and. (z%is_host())) call z%sync()
-!!$            !$acc parallel loop
-!!$            do i = 1, n
-!!$                z%v(i) = alpha * xx%v(i) * yy%v(i) + beta * z%v(i)
-!!$            end do
-!!$            call z%set_dev()
-!!$        class default
-!!$            if (xx%is_dev()) call xx%sync()
-!!$            if (yy%is_dev()) call yy%sync()
-!!$            if ((beta /= czero) .and. (z%is_dev())) call z%sync()
-!!$            !$acc parallel loop
-!!$            do i = 1, n
-!!$                z%v(i) = alpha * xx%v(i) * yy%v(i) + beta * z%v(i)
-!!$            end do
-!!$            call z%set_host()
-!!$        end select
-!!$    class default
-!!$        if (x%is_dev()) call x%sync()
-!!$        if (y%is_dev()) call y%sync()
-!!$        if ((beta /= czero) .and. (z%is_dev())) call z%sync()
-!!$        !$acc parallel loop
-!!$        do i = 1, n
-!!$            z%v(i) = alpha * x%v(i) * y%v(i) + beta * z%v(i)
-!!$        end do
-!!$        call z%set_host()
-!!$    end select
-!!$  end subroutine c_oacc_mlt_v_2
-
 
   subroutine c_oacc_axpby_v(m, alpha, x, beta, y, info)
     !use psi_serial_mod
@@ -414,7 +332,7 @@ contains
     integer(psb_ipk_) :: i
 
     if ((beta /= czero) .and. (y%is_dev())) call y%sync()
-    !$acc parallel loop
+
     do i = 1, m
         y%v(i) = alpha * x(i) + beta * y%v(i)
     end do
@@ -432,44 +350,44 @@ contains
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: nx, ny, nz, i
     logical :: gpu_done
-    write(0,*)'upd_xyz'    
+
     info = psb_success_
     gpu_done = .false.
 
     select type(xx => x)
     class is (psb_c_vect_oacc)
-        select type(yy => y)
+      select type(yy => y)
+      class is (psb_c_vect_oacc)
+        select type(zz => z)
         class is (psb_c_vect_oacc)
-            select type(zz => z)
-            class is (psb_c_vect_oacc)
-                if ((beta /= czero) .and. yy%is_host()) call yy%sync()
-                if ((delta /= czero) .and. zz%is_host()) call zz%sync()
-                if (xx%is_host()) call xx%sync()
-                nx = size(xx%v)
-                ny = size(yy%v)
-                nz = size(zz%v)
-                if ((nx < m) .or. (ny < m) .or. (nz < m)) then
-                    info = psb_err_internal_error_
-                else
-                    !$acc parallel loop
-                    do i = 1, m
-                        yy%v(i) = alpha * xx%v(i) + beta * yy%v(i)
-                        zz%v(i) = gamma * yy%v(i) + delta * zz%v(i)
-                    end do
-                end if
-                call yy%set_dev()
-                call zz%set_dev()
-                gpu_done = .true.
-            end select
+          if ((beta /= czero) .and. yy%is_host()) call yy%sync()
+          if ((delta /= czero) .and. zz%is_host()) call zz%sync()
+          if (xx%is_host()) call xx%sync()
+          nx = size(xx%v)
+          ny = size(yy%v)
+          nz = size(zz%v)
+          if ((nx < m) .or. (ny < m) .or. (nz < m)) then
+            info = psb_err_internal_error_
+          else
+            !$acc parallel loop
+            do i = 1, m
+              yy%v(i) = alpha * xx%v(i) + beta * yy%v(i)
+              zz%v(i) = gamma * yy%v(i) + delta * zz%v(i)
+            end do
+          end if
+          call yy%set_dev()
+          call zz%set_dev()
+          gpu_done = .true.
         end select
+      end select
     end select
 
     if (.not. gpu_done) then
-        if (x%is_host()) call x%sync()
-        if (y%is_host()) call y%sync()
-        if (z%is_host()) call z%sync()
-        call y%axpby(m, alpha, x, beta, info)
-        call z%axpby(m, gamma, y, delta, info)
+      if (x%is_host()) call x%sync()
+      if (y%is_host()) call y%sync()
+      if (z%is_host()) call z%sync()
+      call y%axpby(m, alpha, x, beta, info)
+      call z%axpby(m, gamma, y, delta, info)
     end if
   end subroutine c_oacc_upd_xyz
 
@@ -676,7 +594,7 @@ contains
     if (x%is_dev()) call x%sync()
     call x%psb_c_base_vect_type%ins(n, irl, val, dupl, info)
     call x%set_host()
-    !$acc update device(x%v)
+
 
   end subroutine c_oacc_ins_a
 
@@ -687,16 +605,14 @@ contains
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_) :: info
 
+    call x%free(info)
     call x%all(n, info)
     if (info /= 0) then
       call psb_errpush(info, 'c_oacc_bld_mn', i_err=(/n, n, n, n, n/))
     end if
     call x%set_host()
-    if (acc_is_present(x%v))  then
-      !$acc exit data delete(x%v) finalize
-    end if
-    !$acc enter data copyin(x%v)
-
+    call x%sync_space()
+    
   end subroutine c_oacc_bld_mn
 
 
@@ -707,6 +623,7 @@ contains
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_) :: info
 
+    call x%free(info)
     call psb_realloc(size(this), x%v, info)
     if (info /= 0) then
       info = psb_err_alloc_request_
@@ -714,13 +631,9 @@ contains
            i_err=(/size(this), izero, izero, izero, izero/))
       return
     end if
-
     x%v(:) = this(:)
     call x%set_host()
-    if (acc_is_present(x%v))  then
-      !$acc exit data delete(x%v) finalize
-    end if
-    !$acc enter data copyin(x%v)
+    call x%sync_space()
 
   end subroutine c_oacc_bld_x
 
@@ -848,54 +761,21 @@ contains
 
   end function c_oacc_dot_a
 
-  ! subroutine c_oacc_set_vect(x,y)
-  !   implicit none 
-  !   class(psb_c_vect_oacc), intent(inout) :: x
-  !   complex(psb_spk_), intent(in) :: y(:)
-  !   integer(psb_ipk_) :: info
-  
-  !   if (size(x%v) /= size(y)) then 
-  !     call x%free(info)
-  !     call x%all(size(y),info)
-  !   end if
-  !   x%v(:) = y(:)
-  !   call x%set_host()
-  ! end subroutine c_oacc_set_vect
-
-  subroutine c_oacc_to_dev(v)
-    implicit none
-    complex(psb_spk_) :: v(:)
-    !$acc update device(v)          
-  end subroutine c_oacc_to_dev
-
-  subroutine c_oacc_to_host(v)
-    implicit none
-    complex(psb_spk_) :: v(:)
-    !$acc update self(v)          
-  end subroutine c_oacc_to_host
 
   subroutine c_oacc_sync_space(x)
     implicit none 
     class(psb_c_vect_oacc), intent(inout) :: x
-    if (allocated(x%v)) then
-      if (.not.acc_is_present(x%v)) call c_oacc_create_dev(x%v)
-    end if
-  contains
-    subroutine c_oacc_create_dev(v)
-      implicit none
-      complex(psb_spk_) :: v(:)
-      !$acc enter data copyin(v)          
-    end subroutine c_oacc_create_dev
+    if (allocated(x%v)) call acc_create(x%v)
   end subroutine c_oacc_sync_space
 
   subroutine c_oacc_sync(x)
     implicit none 
     class(psb_c_vect_oacc), intent(inout) :: x
     if (x%is_dev()) then
-      call c_oacc_to_host(x%v)
+      call acc_update_self(x%v)
     end if
     if (x%is_host()) then
-      call c_oacc_to_dev(x%v)
+      call acc_update_device(x%v)
     end if
     call x%set_sync()
   end subroutine c_oacc_sync
@@ -954,20 +834,26 @@ contains
     integer(psb_ipk_), intent(out)     :: info
 
     call psb_realloc(n, x%v, info)
-    if (info == 0) then
-      call x%set_host()
-      if (acc_is_present(x%v))  then
-        !$acc exit data delete(x%v) finalize
-      end if
-      !$acc enter data create(x%v)
-      call x%sync_space()
-    end if
     if (info /= 0) then 
       info = psb_err_alloc_request_
       call psb_errpush(info, 'c_oacc_all', &
            i_err=(/n, n, n, n, n/))
     end if
+    call x%set_host()
+    call x%sync_space()
   end subroutine c_oacc_vect_all
+
+  subroutine c_oacc_final_vect_free(x)
+    implicit none 
+    type(psb_c_vect_oacc), intent(inout) :: x
+    integer(psb_ipk_)     :: info
+    info = 0
+    if (allocated(x%v)) then
+      if (acc_is_present(x%v)) call acc_delete_finalize(x%v) 
+      deallocate(x%v, stat=info)
+    end if
+
+  end subroutine c_oacc_final_vect_free
 
   subroutine c_oacc_vect_free(x, info)
     implicit none 
@@ -975,12 +861,9 @@ contains
     integer(psb_ipk_), intent(out)     :: info
     info = 0
     if (allocated(x%v)) then
-      if (acc_is_present(x%v)) then 
-        !$acc exit data delete(x%v) finalize
-      end if
+      if (acc_is_present(x%v)) call acc_delete_finalize(x%v) 
       deallocate(x%v, stat=info)
     end if
-
   end subroutine c_oacc_vect_free
 
   function c_oacc_get_size(x) result(res)

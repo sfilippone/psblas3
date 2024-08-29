@@ -42,7 +42,7 @@ module psb_i_oacc_vect_mod
 
     procedure, pass(x) :: get_size    => i_oacc_get_size
 
-
+    final ::  i_oacc_final_vect_free
   end type psb_i_vect_oacc
 
 
@@ -252,7 +252,7 @@ contains
     if (x%is_dev()) call x%sync()
     call x%psb_i_base_vect_type%ins(n, irl, val, dupl, info)
     call x%set_host()
-    !$acc update device(x%v)
+
 
   end subroutine i_oacc_ins_a
 
@@ -263,16 +263,14 @@ contains
     class(psb_i_vect_oacc), intent(inout) :: x
     integer(psb_ipk_) :: info
 
+    call x%free(info)
     call x%all(n, info)
     if (info /= 0) then
       call psb_errpush(info, 'i_oacc_bld_mn', i_err=(/n, n, n, n, n/))
     end if
     call x%set_host()
-    if (acc_is_present(x%v))  then
-      !$acc exit data delete(x%v) finalize
-    end if
-    !$acc enter data copyin(x%v)
-
+    call x%sync_space()
+    
   end subroutine i_oacc_bld_mn
 
 
@@ -283,6 +281,7 @@ contains
     class(psb_i_vect_oacc), intent(inout) :: x
     integer(psb_ipk_) :: info
 
+    call x%free(info)
     call psb_realloc(size(this), x%v, info)
     if (info /= 0) then
       info = psb_err_alloc_request_
@@ -290,13 +289,9 @@ contains
            i_err=(/size(this), izero, izero, izero, izero/))
       return
     end if
-
     x%v(:) = this(:)
     call x%set_host()
-    if (acc_is_present(x%v))  then
-      !$acc exit data delete(x%v) finalize
-    end if
-    !$acc enter data copyin(x%v)
+    call x%sync_space()
 
   end subroutine i_oacc_bld_x
 
@@ -370,54 +365,21 @@ contains
 
   end function i_oacc_get_fmt
 
-  ! subroutine i_oacc_set_vect(x,y)
-  !   implicit none 
-  !   class(psb_i_vect_oacc), intent(inout) :: x
-  !   integer(psb_ipk_), intent(in) :: y(:)
-  !   integer(psb_ipk_) :: info
-  
-  !   if (size(x%v) /= size(y)) then 
-  !     call x%free(info)
-  !     call x%all(size(y),info)
-  !   end if
-  !   x%v(:) = y(:)
-  !   call x%set_host()
-  ! end subroutine i_oacc_set_vect
-
-  subroutine i_oacc_to_dev(v)
-    implicit none
-    integer(psb_ipk_) :: v(:)
-    !$acc update device(v)          
-  end subroutine i_oacc_to_dev
-
-  subroutine i_oacc_to_host(v)
-    implicit none
-    integer(psb_ipk_) :: v(:)
-    !$acc update self(v)          
-  end subroutine i_oacc_to_host
 
   subroutine i_oacc_sync_space(x)
     implicit none 
     class(psb_i_vect_oacc), intent(inout) :: x
-    if (allocated(x%v)) then
-      if (.not.acc_is_present(x%v)) call i_oacc_create_dev(x%v)
-    end if
-  contains
-    subroutine i_oacc_create_dev(v)
-      implicit none
-      integer(psb_ipk_) :: v(:)
-      !$acc enter data copyin(v)          
-    end subroutine i_oacc_create_dev
+    if (allocated(x%v)) call acc_create(x%v)
   end subroutine i_oacc_sync_space
 
   subroutine i_oacc_sync(x)
     implicit none 
     class(psb_i_vect_oacc), intent(inout) :: x
     if (x%is_dev()) then
-      call i_oacc_to_host(x%v)
+      call acc_update_self(x%v)
     end if
     if (x%is_host()) then
-      call i_oacc_to_dev(x%v)
+      call acc_update_device(x%v)
     end if
     call x%set_sync()
   end subroutine i_oacc_sync
@@ -476,20 +438,26 @@ contains
     integer(psb_ipk_), intent(out)     :: info
 
     call psb_realloc(n, x%v, info)
-    if (info == 0) then
-      call x%set_host()
-      if (acc_is_present(x%v))  then
-        !$acc exit data delete(x%v) finalize
-      end if
-      !$acc enter data create(x%v)
-      call x%sync_space()
-    end if
     if (info /= 0) then 
       info = psb_err_alloc_request_
       call psb_errpush(info, 'i_oacc_all', &
            i_err=(/n, n, n, n, n/))
     end if
+    call x%set_host()
+    call x%sync_space()
   end subroutine i_oacc_vect_all
+
+  subroutine i_oacc_final_vect_free(x)
+    implicit none 
+    type(psb_i_vect_oacc), intent(inout) :: x
+    integer(psb_ipk_)     :: info
+    info = 0
+    if (allocated(x%v)) then
+      if (acc_is_present(x%v)) call acc_delete_finalize(x%v) 
+      deallocate(x%v, stat=info)
+    end if
+
+  end subroutine i_oacc_final_vect_free
 
   subroutine i_oacc_vect_free(x, info)
     implicit none 
@@ -497,12 +465,9 @@ contains
     integer(psb_ipk_), intent(out)     :: info
     info = 0
     if (allocated(x%v)) then
-      if (acc_is_present(x%v)) then 
-        !$acc exit data delete(x%v) finalize
-      end if
+      if (acc_is_present(x%v)) call acc_delete_finalize(x%v) 
       deallocate(x%v, stat=info)
     end if
-
   end subroutine i_oacc_vect_free
 
   function i_oacc_get_size(x) result(res)

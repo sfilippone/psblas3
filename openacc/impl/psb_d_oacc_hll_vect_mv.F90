@@ -40,28 +40,28 @@ contains
       real(psb_dpk_) :: val(:), x(:), y(:)
       integer(psb_ipk_) :: ja(:), hkoffs(:)
       integer(psb_ipk_), intent(out) :: info
-      integer(psb_ipk_) :: i, j, idx, k
+      integer(psb_ipk_) :: i, j, idx, k, ipnt,ir,nr,nlc,isz,ii
       real(psb_dpk_) :: tmp
 
       info = 0
-
-      !$acc parallel loop present(val, ja, hkoffs, x, y)
+      !$acc parallel loop  private(nlc, isz,ir,nr)
       do i = 1, nhacks
-        do k = 0, hksz - 1
-          idx = hkoffs(i) + k
-          if (idx <= hkoffs(i + 1) - 1) then
-            tmp = 0.0_psb_dpk_
-            !$acc loop seq
-            do j = hkoffs(i) + k, hkoffs(i + 1) - 1, hksz
-              if (ja(j) > 0) then
-                tmp = tmp + val(j) * x(ja(j))
-              end if
-            end do
-            y(k + 1 + (i - 1) * hksz) = alpha * tmp + beta * y(k + 1 + (i - 1) * hksz)
-          end if
+        isz = hkoffs(i + 1) - hkoffs(i) 
+        nlc = isz/hksz
+        ir  = (i-1)*hksz
+        nr  = min(hksz,m-ir)
+        !$acc loop independent private(tmp,ii,ipnt)
+        do ii = 1, nr
+          ipnt = hkoffs(i) + ii 
+          tmp = dzero
+          !$acc loop seq
+          do j = 1, nlc
+            tmp = tmp + val(ipnt) * x(ja(ipnt))
+            ipnt = ipnt + hksz
+          end do
+          y(ii+ir) = alpha * tmp + beta * y(ii+ir)
         end do
       end do
     end subroutine inner_spmv
-
   end subroutine psb_d_oacc_hll_vect_mv
 end submodule psb_d_oacc_hll_vect_mv_impl

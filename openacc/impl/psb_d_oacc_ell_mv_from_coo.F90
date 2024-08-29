@@ -9,11 +9,13 @@ contains
     integer(psb_ipk_), intent(out)                  :: info
 
     info = psb_success_
-
+    
+    call a%free_space()
     call a%psb_d_ell_sparse_mat%mv_from_coo(b, info)
     if (info /= 0) goto 9999
-
-    !$acc update device(a%val, a%ja, a%irn, a%idiag)
+    call a%sync_space()
+    call a%set_host()
+    call a%sync()
 
     return
 

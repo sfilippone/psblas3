@@ -1,5 +1,6 @@
 module psb_s_oacc_ell_mat_mod
   use iso_c_binding
+  use openacc
   use psb_s_mat_mod
   use psb_s_ell_mat_mod
   use psb_s_oacc_vect_mod
@@ -21,6 +22,7 @@ module psb_s_oacc_ell_mat_mod
     procedure, pass(a) :: set_dev        => s_oacc_ell_set_dev
     procedure, pass(a) :: sync_space     => s_oacc_ell_sync_space
     procedure, pass(a) :: sync           => s_oacc_ell_sync
+    procedure, pass(a) :: free_space     => s_oacc_ell_free_space
     procedure, pass(a) :: free           => s_oacc_ell_free
     procedure, pass(a) :: vect_mv        => psb_s_oacc_ell_vect_mv
     procedure, pass(a) :: in_vect_sv     => psb_s_oacc_ell_inner_vect_sv
@@ -152,30 +154,31 @@ module psb_s_oacc_ell_mat_mod
 
 contains
 
+  subroutine s_oacc_ell_free_space(a)
+    use psb_base_mod
+    implicit none 
+    class(psb_s_oacc_ell_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_) :: info
+
+    if (allocated(a%val))   call acc_delete_finalize(a%val)
+    if (allocated(a%ja))    call acc_delete_finalize(a%ja)
+    if (allocated(a%irn))   call acc_delete_finalize(a%irn)
+    if (allocated(a%idiag)) call acc_delete_finalize(a%idiag)
+    
+    return
+  end subroutine s_oacc_ell_free_space
+
   subroutine s_oacc_ell_free(a)
     use psb_base_mod
     implicit none 
     class(psb_s_oacc_ell_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    if (allocated(a%val)) then
-      !$acc exit data delete(a%val)
-    end if
-    if (allocated(a%ja)) then
-      !$acc exit data delete(a%ja)
-    end if
-    if (allocated(a%irn)) then
-      !$acc exit data delete(a%irn)
-    end if
-    if (allocated(a%idiag)) then
-      !$acc exit data delete(a%idiag)
-    end if
-
+    call a%free_space()
     call a%psb_s_ell_sparse_mat%free()
 
     return
   end subroutine s_oacc_ell_free
-
 
   function s_oacc_ell_sizeof(a) result(res)
     implicit none
@@ -196,40 +199,11 @@ contains
     implicit none
     class(psb_s_oacc_ell_sparse_mat), intent(inout) :: a
 
-    if (allocated(a%val)) then
-      call s_oacc_create_dev(a%val)
-    end if
-    if (allocated(a%ja)) then
-      call i_oacc_create_dev(a%ja)
-    end if
-    if (allocated(a%irn)) then
-      call i_oacc_create_dev_scalar(a%irn)
-    end if
-    if (allocated(a%idiag)) then
-      call i_oacc_create_dev_scalar(a%idiag)
-    end if
-
-  contains
-    subroutine s_oacc_create_dev(v)
-      implicit none
-      real(psb_spk_), intent(in) :: v(:,:)
-      !$acc enter data copyin(v)
-    end subroutine s_oacc_create_dev
-
-    subroutine i_oacc_create_dev(v)
-      implicit none
-      integer(psb_ipk_), intent(in) :: v(:,:)
-      !$acc enter data copyin(v)
-    end subroutine i_oacc_create_dev
-
-    subroutine i_oacc_create_dev_scalar(v)
-      implicit none
-      integer(psb_ipk_), intent(in) :: v(:)
-      !$acc enter data copyin(v)
-    end subroutine i_oacc_create_dev_scalar
+    if (allocated(a%val))   call acc_create(a%val)
+    if (allocated(a%ja))    call acc_create(a%ja)
+    if (allocated(a%irn))   call acc_create(a%irn)
+    if (allocated(a%idiag)) call acc_create(a%idiag)
   end subroutine s_oacc_ell_sync_space
-
-
 
   function s_oacc_ell_is_host(a) result(res)
     implicit none
@@ -279,7 +253,7 @@ contains
   function s_oacc_ell_get_fmt() result(res)
     implicit none
     character(len=5) :: res
-    res = 'ELL_oacc'
+    res = 'ELLOA'
   end function s_oacc_ell_get_fmt
 
   subroutine s_oacc_ell_sync(a)
@@ -290,64 +264,17 @@ contains
 
     tmpa => a
     if (a%is_dev()) then
-      call s_oacc_ell_to_host(a%val)
-      call i_oacc_ell_to_host(a%ja)
-      call i_oacc_ell_to_host_scalar(a%irn)
-      call i_oacc_ell_to_host_scalar(a%idiag)
+      call acc_update_self(a%val)
+      call acc_update_self(a%ja)
+      call acc_update_self(a%irn)
+      call acc_update_self(a%idiag)
     else if (a%is_host()) then
-      call s_oacc_ell_to_dev(a%val)
-      call i_oacc_ell_to_dev(a%ja)
-      call i_oacc_ell_to_dev_scalar(a%irn)
-      call i_oacc_ell_to_dev_scalar(a%idiag)
+      call acc_update_device(a%val)
+      call acc_update_device(a%ja)
+      call acc_update_device(a%irn)
+      call acc_update_device(a%idiag)
     end if
     call tmpa%set_sync()
   end subroutine s_oacc_ell_sync
 
-  subroutine s_oacc_ell_to_dev_scalar(v)
-    implicit none
-    real(psb_spk_), intent(in) :: v(:)
-    !$acc update device(v)
-  end subroutine s_oacc_ell_to_dev_scalar
-
-  subroutine s_oacc_ell_to_dev(v)
-    implicit none
-    real(psb_spk_), intent(in) :: v(:,:)
-    !$acc update device(v)
-  end subroutine s_oacc_ell_to_dev
-
-  subroutine s_oacc_ell_to_host(v)
-    implicit none
-    real(psb_spk_), intent(in) :: v(:,:)
-    !$acc update self(v)
-  end subroutine s_oacc_ell_to_host
-
-  subroutine s_oacc_ell_to_host_scalar(v)
-    implicit none
-    real(psb_spk_), intent(in) :: v(:)
-    !$acc update self(v)
-  end subroutine s_oacc_ell_to_host_scalar
-
-  subroutine i_oacc_ell_to_dev(v)
-    implicit none
-    integer(psb_ipk_), intent(in) :: v(:,:)
-    !$acc update device(v)
-  end subroutine i_oacc_ell_to_dev
-
-  subroutine i_oacc_ell_to_dev_scalar(v)
-    implicit none
-    integer(psb_ipk_), intent(in) :: v(:)
-    !$acc update device(v)
-  end subroutine i_oacc_ell_to_dev_scalar
-
-  subroutine i_oacc_ell_to_host(v)
-    implicit none
-    integer(psb_ipk_), intent(in) :: v(:,:)
-    !$acc update self(v)
-  end subroutine i_oacc_ell_to_host
-
-  subroutine i_oacc_ell_to_host_scalar(v)
-    implicit none
-    integer(psb_ipk_), intent(in) :: v(:)
-    !$acc update self(v)
-  end subroutine i_oacc_ell_to_host_scalar
 end module psb_s_oacc_ell_mat_mod

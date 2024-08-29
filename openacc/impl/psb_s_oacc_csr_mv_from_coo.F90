@@ -10,10 +10,12 @@ contains
 
     info = psb_success_
 
+    call a%free_space()
     call a%psb_s_csr_sparse_mat%mv_from_coo(b, info)
     if (info /= 0) goto 9999
-
-    !$acc update device(a%val, a%ja, a%irp)
+    call a%sync_space()
+    call a%set_host()
+    call a%sync()
 
     return
 
