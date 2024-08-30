@@ -4,7 +4,6 @@ module psb_d_oacc_csr_mat_mod
   use openacc
   use psb_d_mat_mod
   use psb_d_oacc_vect_mod
-  !use oaccsparse_mod
 
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
@@ -17,8 +16,6 @@ module psb_d_oacc_csr_mat_mod
     procedure, pass(a) :: sizeof         => d_oacc_csr_sizeof
     procedure, pass(a) :: vect_mv        => psb_d_oacc_csr_vect_mv
     procedure, pass(a) :: in_vect_sv     => psb_d_oacc_csr_inner_vect_sv
-    procedure, pass(a) :: csmm           => psb_d_oacc_csr_csmm
-    procedure, pass(a) :: csmv           => psb_d_oacc_csr_csmv
     procedure, pass(a) :: scals          => psb_d_oacc_csr_scals
     procedure, pass(a) :: scalv          => psb_d_oacc_csr_scal
     procedure, pass(a) :: reallocate_nz  => psb_d_oacc_csr_reallocate_nz
@@ -91,26 +88,6 @@ module psb_d_oacc_csr_mat_mod
       integer(psb_ipk_), intent(out) :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_oacc_csr_inner_vect_sv
-  end interface
-
-  interface
-    module subroutine psb_d_oacc_csr_csmm(alpha, a, x, beta, y, info, trans)
-      class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in) :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout) :: y(:,:)
-      integer(psb_ipk_), intent(out) :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_d_oacc_csr_csmm
-  end interface
-
-  interface
-    module subroutine psb_d_oacc_csr_csmv(alpha, a, x, beta, y, info, trans)
-      class(psb_d_oacc_csr_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in) :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout) :: y(:)
-      integer(psb_ipk_), intent(out) :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_d_oacc_csr_csmv
   end interface
 
   interface

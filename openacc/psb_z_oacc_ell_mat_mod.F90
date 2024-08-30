@@ -26,8 +26,6 @@ module psb_z_oacc_ell_mat_mod
     procedure, pass(a) :: free            => z_oacc_ell_free
     procedure, pass(a) :: vect_mv         => psb_z_oacc_ell_vect_mv
     procedure, pass(a) :: in_vect_sv      => psb_z_oacc_ell_inner_vect_sv
-    procedure, pass(a) :: csmm            => psb_z_oacc_ell_csmm
-    procedure, pass(a) :: csmv            => psb_z_oacc_ell_csmv
     procedure, pass(a) :: scals           => psb_z_oacc_ell_scals
     procedure, pass(a) :: scalv           => psb_z_oacc_ell_scal
     procedure, pass(a) :: reallocate_nz   => psb_z_oacc_ell_reallocate_nz
@@ -90,26 +88,6 @@ module psb_z_oacc_ell_mat_mod
       integer(psb_ipk_), intent(out) :: info
       character, optional, intent(in) :: trans
     end subroutine psb_z_oacc_ell_inner_vect_sv
-  end interface
-
-  interface
-    module subroutine psb_z_oacc_ell_csmm(alpha, a, x, beta, y, info, trans)
-      class(psb_z_oacc_ell_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(in) :: alpha, beta, x(:,:)
-      complex(psb_dpk_), intent(inout) :: y(:,:)
-      integer(psb_ipk_), intent(out) :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_z_oacc_ell_csmm
-  end interface
-
-  interface
-    module subroutine psb_z_oacc_ell_csmv(alpha, a, x, beta, y, info, trans)
-      class(psb_z_oacc_ell_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(in) :: alpha, beta, x(:)
-      complex(psb_dpk_), intent(inout) :: y(:)
-      integer(psb_ipk_), intent(out) :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_z_oacc_ell_csmv
   end interface
 
   interface

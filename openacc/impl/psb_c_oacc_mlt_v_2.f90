@@ -9,10 +9,11 @@ subroutine psb_c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
   integer(psb_ipk_), intent(out)             :: info
   character(len=1), intent(in), optional     :: conjgx, conjgy
   integer(psb_ipk_) :: i, n
-  logical :: conjgx_, conjgy_
+  logical :: conjgx_, conjgy_, device_done
 
   conjgx_ = .false.
   conjgy_ = .false.
+  device_done = .false.
   if (present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
   if (present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
 
@@ -27,31 +28,10 @@ subroutine psb_c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       if ((beta /= czero) .and. (z%is_host())) call z%sync()
       call c_inner_oacc_mlt_v_2(n,alpha, xx%v, yy%v, beta, z%v, info, conjgx_, conjgy_)
       call z%set_dev()
-    class default
-      if (xx%is_dev()) call xx%sync()
-      if (yy%is_dev()) call yy%sync()
-      if ((beta /= czero) .and. (z%is_dev())) call z%sync()
-      !call c_inner_oacc_mlt_v_2(n,alpha, xx%v, yy%v, beta, z%v, info, conjgx_, conjgy_)
-      if (conjgx_.and.conjgy_) then 
-        do i = 1, n
-          z%v(i) = alpha * conjg(xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
-        end do
-      else if (conjgx_.and.(.not.conjgy_)) then 
-        do i = 1, n
-          z%v(i) = alpha * conjg(xx%v(i)) * (yy%v(i)) + beta * z%v(i)
-        end do
-      else if ((.not.conjgx_).and.(conjgy_)) then 
-        do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * conjg(yy%v(i)) + beta * z%v(i)
-        end do
-      else
-        do i = 1, n
-          z%v(i) = alpha * (xx%v(i)) * (yy%v(i)) + beta * z%v(i)
-        end do
-      end if
-      call z%set_host()
+      device_done = .true.
     end select
-  class default
+  end select
+  if (.not.device_done) then 
     if (x%is_dev()) call x%sync()
     if (y%is_dev()) call y%sync()
     if ((beta /= czero) .and. (z%is_dev())) call z%sync()
@@ -73,13 +53,14 @@ subroutine psb_c_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
       end do
     end if
     call z%set_host()
-  end select
+  end if
+
 contains
   subroutine c_inner_oacc_mlt_v_2(n,alpha, x, y, beta, z, info, conjgx, conjgy)
     implicit none
     integer(psb_ipk_), intent(in) :: n
-complex(psb_spk_), intent(in)                 :: alpha, beta
-complex(psb_spk_), intent(inout) :: x(:), y(:), z(:)
+    complex(psb_spk_), intent(in)                 :: alpha, beta
+    complex(psb_spk_), intent(inout) :: x(:), y(:), z(:)
     integer(psb_ipk_), intent(out)             :: info
     logical, intent(in)         :: conjgx, conjgy
 

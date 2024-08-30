@@ -11,6 +11,8 @@ contains
     character, optional, intent(in)   :: trans
 
     integer(psb_ipk_) :: m, n, nzt, nc
+    character :: trans_
+    logical :: device_done, tra
 
     info = psb_success_
     m = a%get_nrows()
@@ -18,19 +20,40 @@ contains
     nzt = a%nzt
     nc = size(a%ja,2)
     if ((n /= size(x%v)) .or. (m /= size(y%v))) then
-      write(0,*) 'Size error ', m, n, size(x%v), size(y%v)
+      write(0,*) 'oellmv Size error ', m, n, size(x%v), size(y%v)
       info = psb_err_invalid_mat_state_
       return
     end if
+    device_done = .false.
+    if (present(trans)) then
+      trans_ = trans
+    else
+      trans_ = 'N'
+    end if
+    tra = (psb_toupper(trans_) == 'T') .or. (psb_toupper(trans_) == 'C')
 
-    if (a%is_host()) call a%sync()
-    if (x%is_host()) call x%sync()
-    if (y%is_host()) call y%sync()
-
-    call inner_spmv(m, n, nc, alpha, a%val, a%ja, x%v, beta, y%v, info)
-
-    call y%set_dev()
-
+    if (.not.tra) then 
+      select type(xx  => x)
+      class is (psb_s_vect_oacc)
+        select type (yy  => y)
+        class is (psb_s_vect_oacc)
+          if (a%is_host()) call a%sync()
+          if (xx%is_host()) call xx%sync()
+          if (yy%is_host()) call yy%sync()
+          call inner_spmv(m, n, nc, alpha, a%val, a%ja, x%v, beta, y%v, info)
+          call y%set_dev()
+          device_done = .true.
+        end select
+      end select
+    end if
+    
+    if (.not.device_done) then
+      if (x%is_dev()) call x%sync()
+      if (y%is_dev()) call y%sync()
+      call a%psb_s_ell_sparse_mat%spmm(alpha, x%v, beta, y%v, info, trans)
+      call y%set_host()
+    end if
+    
   contains
 
     subroutine inner_spmv(m, n, nc, alpha, val, ja, x, beta, y, info)
