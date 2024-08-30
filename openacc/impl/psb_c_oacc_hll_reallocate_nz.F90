@@ -15,8 +15,8 @@ contains
     info = psb_success_
 
     call a%psb_c_hll_sparse_mat%reallocate(nz)
-
-    call a%set_dev()
+    call a%sync_dev_space()
+    call a%set_host()
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)

@@ -1,5 +1,5 @@
 subroutine psb_z_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
-  use psb_z_oacc_vect_mod, psb_protect_name => psb_z_oacc_mlt_v_2
+  use psb_z_oacc_vect_mod, psb_protect_name  => psb_z_oacc_mlt_v_2
   use psb_string_mod
   implicit none 
   complex(psb_dpk_), intent(in)                 :: alpha, beta
@@ -18,9 +18,9 @@ subroutine psb_z_oacc_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
 
   n = min(x%get_nrows(), y%get_nrows(), z%get_nrows())
   info = 0    
-  select type(xx => x)
+  select type(xx  => x)
   class is (psb_z_vect_oacc)
-    select type (yy => y)
+    select type (yy  => y)
     class is (psb_z_vect_oacc)
       if (xx%is_host()) call xx%sync()
       if (yy%is_host()) call yy%sync()

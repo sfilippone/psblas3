@@ -1,6 +1,6 @@
 
 subroutine psb_d_oacc_mlt_v(x, y, info)
-  use psb_d_oacc_vect_mod, psb_protect_name => psb_d_oacc_mlt_v
+  use psb_d_oacc_vect_mod, psb_protect_name  => psb_d_oacc_mlt_v
 
   implicit none 
   class(psb_d_base_vect_type), intent(inout) :: x
@@ -13,7 +13,7 @@ subroutine psb_d_oacc_mlt_v(x, y, info)
   n = min(x%get_nrows(), y%get_nrows())
   info = 0    
   n = min(x%get_nrows(), y%get_nrows())
-  select type(xx => x)
+  select type(xx  => x)
   class is (psb_d_vect_oacc)
     if (y%is_host()) call y%sync()
     if (xx%is_host()) call xx%sync()

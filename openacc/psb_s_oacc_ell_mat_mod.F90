@@ -12,31 +12,31 @@ module psb_s_oacc_ell_mat_mod
   type, extends(psb_s_ell_sparse_mat) :: psb_s_oacc_ell_sparse_mat
     integer(psb_ipk_) :: devstate = is_host
   contains
-    procedure, nopass  :: get_fmt        => s_oacc_ell_get_fmt
-    procedure, pass(a) :: sizeof         => s_oacc_ell_sizeof
-    procedure, pass(a) :: is_host        => s_oacc_ell_is_host
-    procedure, pass(a) :: is_sync        => s_oacc_ell_is_sync
-    procedure, pass(a) :: is_dev         => s_oacc_ell_is_dev
-    procedure, pass(a) :: set_host       => s_oacc_ell_set_host
-    procedure, pass(a) :: set_sync       => s_oacc_ell_set_sync
-    procedure, pass(a) :: set_dev        => s_oacc_ell_set_dev
-    procedure, pass(a) :: sync_space     => s_oacc_ell_sync_space
-    procedure, pass(a) :: sync           => s_oacc_ell_sync
-    procedure, pass(a) :: free_space     => s_oacc_ell_free_space
-    procedure, pass(a) :: free           => s_oacc_ell_free
-    procedure, pass(a) :: vect_mv        => psb_s_oacc_ell_vect_mv
-    procedure, pass(a) :: in_vect_sv     => psb_s_oacc_ell_inner_vect_sv
-    procedure, pass(a) :: csmm           => psb_s_oacc_ell_csmm
-    procedure, pass(a) :: csmv           => psb_s_oacc_ell_csmv
-    procedure, pass(a) :: scals          => psb_s_oacc_ell_scals
-    procedure, pass(a) :: scalv          => psb_s_oacc_ell_scal
-    procedure, pass(a) :: reallocate_nz  => psb_s_oacc_ell_reallocate_nz
-    procedure, pass(a) :: allocate_mnnz  => psb_s_oacc_ell_allocate_mnnz
-    procedure, pass(a) :: cp_from_coo    => psb_s_oacc_ell_cp_from_coo
-    procedure, pass(a) :: cp_from_fmt    => psb_s_oacc_ell_cp_from_fmt
-    procedure, pass(a) :: mv_from_coo    => psb_s_oacc_ell_mv_from_coo
-    procedure, pass(a) :: mv_from_fmt    => psb_s_oacc_ell_mv_from_fmt
-    procedure, pass(a) :: mold           => psb_s_oacc_ell_mold
+    procedure, nopass  :: get_fmt         => s_oacc_ell_get_fmt
+    procedure, pass(a) :: sizeof          => s_oacc_ell_sizeof
+    procedure, pass(a) :: is_host         => s_oacc_ell_is_host
+    procedure, pass(a) :: is_sync         => s_oacc_ell_is_sync
+    procedure, pass(a) :: is_dev          => s_oacc_ell_is_dev
+    procedure, pass(a) :: set_host        => s_oacc_ell_set_host
+    procedure, pass(a) :: set_sync        => s_oacc_ell_set_sync
+    procedure, pass(a) :: set_dev         => s_oacc_ell_set_dev
+    procedure, pass(a) :: sync_dev_space  => s_oacc_ell_sync_dev_space
+    procedure, pass(a) :: sync            => s_oacc_ell_sync
+    procedure, pass(a) :: free_dev_space  => s_oacc_ell_free_dev_space
+    procedure, pass(a) :: free            => s_oacc_ell_free
+    procedure, pass(a) :: vect_mv         => psb_s_oacc_ell_vect_mv
+    procedure, pass(a) :: in_vect_sv      => psb_s_oacc_ell_inner_vect_sv
+    procedure, pass(a) :: csmm            => psb_s_oacc_ell_csmm
+    procedure, pass(a) :: csmv            => psb_s_oacc_ell_csmv
+    procedure, pass(a) :: scals           => psb_s_oacc_ell_scals
+    procedure, pass(a) :: scalv           => psb_s_oacc_ell_scal
+    procedure, pass(a) :: reallocate_nz   => psb_s_oacc_ell_reallocate_nz
+    procedure, pass(a) :: allocate_mnnz   => psb_s_oacc_ell_allocate_mnnz
+    procedure, pass(a) :: cp_from_coo     => psb_s_oacc_ell_cp_from_coo
+    procedure, pass(a) :: cp_from_fmt     => psb_s_oacc_ell_cp_from_fmt
+    procedure, pass(a) :: mv_from_coo     => psb_s_oacc_ell_mv_from_coo
+    procedure, pass(a) :: mv_from_fmt     => psb_s_oacc_ell_mv_from_fmt
+    procedure, pass(a) :: mold            => psb_s_oacc_ell_mold
 
   end type psb_s_oacc_ell_sparse_mat
 
@@ -154,7 +154,7 @@ module psb_s_oacc_ell_mat_mod
 
 contains
 
-  subroutine s_oacc_ell_free_space(a)
+  subroutine s_oacc_ell_free_dev_space(a)
     use psb_base_mod
     implicit none 
     class(psb_s_oacc_ell_sparse_mat), intent(inout) :: a
@@ -166,7 +166,7 @@ contains
     if (allocated(a%idiag)) call acc_delete_finalize(a%idiag)
     
     return
-  end subroutine s_oacc_ell_free_space
+  end subroutine s_oacc_ell_free_dev_space
 
   subroutine s_oacc_ell_free(a)
     use psb_base_mod
@@ -174,7 +174,7 @@ contains
     class(psb_s_oacc_ell_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    call a%free_space()
+    call a%free_dev_space()
     call a%psb_s_ell_sparse_mat%free()
 
     return
@@ -195,7 +195,7 @@ contains
 
   end function s_oacc_ell_sizeof
 
-  subroutine s_oacc_ell_sync_space(a)
+  subroutine s_oacc_ell_sync_dev_space(a)
     implicit none
     class(psb_s_oacc_ell_sparse_mat), intent(inout) :: a
 
@@ -203,7 +203,7 @@ contains
     if (allocated(a%ja))    call acc_create(a%ja)
     if (allocated(a%irn))   call acc_create(a%irn)
     if (allocated(a%idiag)) call acc_create(a%idiag)
-  end subroutine s_oacc_ell_sync_space
+  end subroutine s_oacc_ell_sync_dev_space
 
   function s_oacc_ell_is_host(a) result(res)
     implicit none
@@ -262,7 +262,7 @@ contains
     class(psb_s_oacc_ell_sparse_mat), pointer :: tmpa
     integer(psb_ipk_) :: info
 
-    tmpa => a
+    tmpa  => a
     if (a%is_dev()) then
       call acc_update_self(a%val)
       call acc_update_self(a%ja)

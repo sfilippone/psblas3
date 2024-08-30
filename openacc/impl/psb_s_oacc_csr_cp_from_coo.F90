@@ -10,10 +10,10 @@ contains
 
     info = psb_success_
 
-    call a%free_space()
+    call a%free_dev_space()
     call a%psb_s_csr_sparse_mat%cp_from_coo(b, info)
     if (info /= 0) goto 9999
-    call a%sync_space()
+    call a%sync_dev_space()
     call a%set_host()
     call a%sync()
 

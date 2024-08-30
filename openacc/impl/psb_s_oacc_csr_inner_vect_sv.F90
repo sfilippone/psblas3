@@ -40,9 +40,9 @@ contains
       call a%psb_s_csr_sparse_mat%inner_spsm(alpha, x, beta, y, info, trans)
       call y%set_host()
     else
-      select type (xx => x)
+      select type (xx  => x)
       type is (psb_s_vect_oacc)
-        select type(yy => y)
+        select type(yy  => y)
         type is (psb_s_vect_oacc)
           if (xx%is_host()) call xx%sync()
           if (beta /= dzero) then

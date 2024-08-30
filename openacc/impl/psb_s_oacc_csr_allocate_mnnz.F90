@@ -15,14 +15,8 @@ contains
     info = psb_success_
 
     call a%psb_s_csr_sparse_mat%allocate(m, n, nz)
-
-    if (.not.allocated(a%val)) then
-      allocate(a%val(nz))
-      allocate(a%ja(nz))
-      allocate(a%irp(m+1))
-    end if
-
-    call a%set_dev()
+    call a%set_host()
+    call a%sync_dev_space()
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)

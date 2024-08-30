@@ -12,31 +12,31 @@ module psb_z_oacc_hll_mat_mod
   type, extends(psb_z_hll_sparse_mat) :: psb_z_oacc_hll_sparse_mat
     integer(psb_ipk_) :: devstate = is_host
   contains
-    procedure, nopass  :: get_fmt        => z_oacc_hll_get_fmt
-    procedure, pass(a) :: sizeof         => z_oacc_hll_sizeof
-    procedure, pass(a) :: is_host        => z_oacc_hll_is_host
-    procedure, pass(a) :: is_sync        => z_oacc_hll_is_sync
-    procedure, pass(a) :: is_dev         => z_oacc_hll_is_dev
-    procedure, pass(a) :: set_host       => z_oacc_hll_set_host
-    procedure, pass(a) :: set_sync       => z_oacc_hll_set_sync
-    procedure, pass(a) :: set_dev        => z_oacc_hll_set_dev
-    procedure, pass(a) :: sync_space     => z_oacc_hll_sync_space
-    procedure, pass(a) :: sync           => z_oacc_hll_sync
-    procedure, pass(a) :: free_space     => z_oacc_hll_free_space
-    procedure, pass(a) :: free           => z_oacc_hll_free
-    procedure, pass(a) :: vect_mv        => psb_z_oacc_hll_vect_mv
-    procedure, pass(a) :: in_vect_sv     => psb_z_oacc_hll_inner_vect_sv
-    procedure, pass(a) :: csmm           => psb_z_oacc_hll_csmm
-    procedure, pass(a) :: csmv           => psb_z_oacc_hll_csmv
-    procedure, pass(a) :: scals          => psb_z_oacc_hll_scals
-    procedure, pass(a) :: scalv          => psb_z_oacc_hll_scal
-    procedure, pass(a) :: reallocate_nz  => psb_z_oacc_hll_reallocate_nz
-    procedure, pass(a) :: allocate_mnnz  => psb_z_oacc_hll_allocate_mnnz
-    procedure, pass(a) :: cp_from_coo    => psb_z_oacc_hll_cp_from_coo
-    procedure, pass(a) :: cp_from_fmt    => psb_z_oacc_hll_cp_from_fmt
-    procedure, pass(a) :: mv_from_coo    => psb_z_oacc_hll_mv_from_coo
-    procedure, pass(a) :: mv_from_fmt    => psb_z_oacc_hll_mv_from_fmt
-    procedure, pass(a) :: mold           => psb_z_oacc_hll_mold
+    procedure, nopass  :: get_fmt         => z_oacc_hll_get_fmt
+    procedure, pass(a) :: sizeof          => z_oacc_hll_sizeof
+    procedure, pass(a) :: is_host         => z_oacc_hll_is_host
+    procedure, pass(a) :: is_sync         => z_oacc_hll_is_sync
+    procedure, pass(a) :: is_dev          => z_oacc_hll_is_dev
+    procedure, pass(a) :: set_host        => z_oacc_hll_set_host
+    procedure, pass(a) :: set_sync        => z_oacc_hll_set_sync
+    procedure, pass(a) :: set_dev         => z_oacc_hll_set_dev
+    procedure, pass(a) :: sync_dev_space  => z_oacc_hll_sync_dev_space
+    procedure, pass(a) :: sync            => z_oacc_hll_sync
+    procedure, pass(a) :: free_dev_space  => z_oacc_hll_free_dev_space
+    procedure, pass(a) :: free            => z_oacc_hll_free
+    procedure, pass(a) :: vect_mv         => psb_z_oacc_hll_vect_mv
+    procedure, pass(a) :: in_vect_sv      => psb_z_oacc_hll_inner_vect_sv
+    procedure, pass(a) :: csmm            => psb_z_oacc_hll_csmm
+    procedure, pass(a) :: csmv            => psb_z_oacc_hll_csmv
+    procedure, pass(a) :: scals           => psb_z_oacc_hll_scals
+    procedure, pass(a) :: scalv           => psb_z_oacc_hll_scal
+    procedure, pass(a) :: reallocate_nz   => psb_z_oacc_hll_reallocate_nz
+    procedure, pass(a) :: allocate_mnnz   => psb_z_oacc_hll_allocate_mnnz
+    procedure, pass(a) :: cp_from_coo     => psb_z_oacc_hll_cp_from_coo
+    procedure, pass(a) :: cp_from_fmt     => psb_z_oacc_hll_cp_from_fmt
+    procedure, pass(a) :: mv_from_coo     => psb_z_oacc_hll_mv_from_coo
+    procedure, pass(a) :: mv_from_fmt     => psb_z_oacc_hll_mv_from_fmt
+    procedure, pass(a) :: mold            => psb_z_oacc_hll_mold
 
   end type psb_z_oacc_hll_sparse_mat
 
@@ -154,7 +154,7 @@ module psb_z_oacc_hll_mat_mod
 
 contains 
 
-  subroutine z_oacc_hll_free_space(a)
+  subroutine z_oacc_hll_free_dev_space(a)
     use psb_base_mod
     implicit none 
     class(psb_z_oacc_hll_sparse_mat), intent(inout) :: a
@@ -167,7 +167,7 @@ contains
     if (allocated(a%hkoffs)) call acc_delete_finalize(a%hkoffs)
 
     return
-  end subroutine z_oacc_hll_free_space
+  end subroutine z_oacc_hll_free_dev_space
 
   subroutine z_oacc_hll_free(a)
     use psb_base_mod
@@ -175,7 +175,7 @@ contains
     class(psb_z_oacc_hll_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    call a%free_space()
+    call a%free_dev_space()
     call a%psb_z_hll_sparse_mat%free()
 
     return
@@ -249,7 +249,7 @@ contains
     res = 'HLLOA'
   end function z_oacc_hll_get_fmt
 
-  subroutine z_oacc_hll_sync_space(a)
+  subroutine z_oacc_hll_sync_dev_space(a)
     implicit none
     class(psb_z_oacc_hll_sparse_mat), intent(inout) :: a
 
@@ -258,7 +258,7 @@ contains
     if (allocated(a%irn))    call acc_create(a%irn)
     if (allocated(a%idiag))  call acc_create(a%idiag)
     if (allocated(a%hkoffs)) call acc_create(a%hkoffs)
-  end subroutine z_oacc_hll_sync_space
+  end subroutine z_oacc_hll_sync_dev_space
 
 
   subroutine z_oacc_hll_sync(a)
@@ -267,7 +267,7 @@ contains
     class(psb_z_oacc_hll_sparse_mat), pointer :: tmpa
     integer(psb_ipk_) :: info
 
-    tmpa => a
+    tmpa  => a
     if (a%is_dev()) then
       call acc_update_self(a%val)
       call acc_update_self(a%ja)

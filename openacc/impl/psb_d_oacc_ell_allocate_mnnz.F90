@@ -21,20 +21,8 @@ contains
     end if
 
     call a%psb_d_ell_sparse_mat%allocate(m, n, nz_)
-
-    if (.not.allocated(a%val)) then
-      allocate(a%val(m, nz_))
-      allocate(a%ja(m, nz_))
-      allocate(a%irn(m))
-      allocate(a%idiag(m))
-    end if
-
-    a%val = dzero
-    a%ja = -1
-    a%irn = 0
-    a%idiag = 0
-
-    call a%set_dev()
+    call a%sync_dev_space()
+    call a%set_host()
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
