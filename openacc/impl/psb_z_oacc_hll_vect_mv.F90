@@ -20,7 +20,7 @@ contains
     nhacks = size(a%hkoffs) - 1
     hksz = a%hksz
 
-    if ((n /= size(x%v)) .or. (m /= size(y%v))) then
+    if ((n > size(x%v)) .or. (m > size(y%v))) then
       write(0,*) 'Size error ', m, n, size(x%v), size(y%v)
       info = psb_err_invalid_mat_state_
       return

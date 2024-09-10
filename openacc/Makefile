@@ -58,9 +58,10 @@ psb_oacc_mod.o  : psb_i_oacc_vect_mod.o psb_l_oacc_vect_mod.o \
        psb_z_oacc_ell_mat_mod.o psb_z_oacc_hll_mat_mod.o \
        psb_oacc_env_mod.o
 
-psb_s_oacc_vect_mod.o psb_d_oacc_vect_mod.o\
- psb_c_oacc_vect_mod.o  psb_z_oacc_vect_mod.o: psb_i_oacc_vect_mod.o psb_l_oacc_vect_mod.o
-psb_l_oacc_vect_mod.o: psb_i_oacc_vect_mod.o
+psb_s_oacc_vect_mod.o  psb_d_oacc_vect_mod.o \
+       psb_c_oacc_vect_mod.o  psb_z_oacc_vect_mod.o: psb_i_oacc_vect_mod.o psb_l_oacc_vect_mod.o psb_oacc_env_mod.o
+psb_l_oacc_vect_mod.o: psb_i_oacc_vect_mod.o psb_oacc_env_mod.o
+psb_i_oacc_vect_mod.o: psb_oacc_env_mod.o
 
 
 psb_s_oacc_csr_mat_mod.o psb_s_oacc_ell_mat_mod.o psb_s_oacc_hll_mat_mod.o: psb_s_oacc_vect_mod.o

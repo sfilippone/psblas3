@@ -3,6 +3,8 @@ module psb_z_oacc_vect_mod
   use openacc
   use psb_const_mod
   use psb_error_mod
+  use psb_realloc_mod
+  use psb_oacc_env_mod
   use psb_z_vect_mod
   use psb_i_vect_mod
   use psb_i_oacc_vect_mod
@@ -26,6 +28,8 @@ module psb_z_oacc_vect_mod
     procedure, pass(x) :: bld_x        => z_oacc_bld_x
     procedure, pass(x) :: bld_mn       => z_oacc_bld_mn
     procedure, pass(x) :: free         => z_oacc_vect_free
+    procedure, pass(x) :: free_buffer  => z_oacc_vect_free_buffer
+    procedure, pass(x) :: maybe_free_buffer => z_oacc_vect_maybe_free_buffer
     procedure, pass(x) :: ins_a        => z_oacc_ins_a
     procedure, pass(x) :: ins_v        => z_oacc_ins_v
     procedure, pass(x) :: is_host      => z_oacc_is_host
@@ -36,11 +40,13 @@ module psb_z_oacc_vect_mod
     procedure, pass(x) :: set_sync     => z_oacc_set_sync
     procedure, pass(x) :: set_scal     => z_oacc_set_scal
 
+    procedure, pass(x) :: new_buffer   => z_oacc_new_buffer
     procedure, pass(x) :: gthzv_x      => z_oacc_gthzv_x
-    procedure, pass(x) :: gthzbuf_x    => z_oacc_gthzbuf
+    procedure, pass(x) :: gthzbuf      => z_oacc_gthzbuf
     procedure, pass(y) :: sctb         => z_oacc_sctb
     procedure, pass(y) :: sctb_x       => z_oacc_sctb_x
     procedure, pass(y) :: sctb_buf     => z_oacc_sctb_buf
+    procedure, nopass  :: device_wait  => z_oacc_device_wait
 
     procedure, pass(x) :: get_size     => z_oacc_get_size
 
@@ -86,6 +92,11 @@ module psb_z_oacc_vect_mod
   end interface
 
 contains
+
+   subroutine z_oacc_device_wait()
+     implicit none
+     call acc_wait_all()
+   end subroutine z_oacc_device_wait
 
   subroutine z_oacc_absval1(x)
     implicit none
@@ -181,13 +192,17 @@ contains
       !$acc parallel loop reduction(max:mx)
       do i = 1, n
         if (abs(x(i)) > mx) mx = abs(x(i))
-      end do      
-      sum = dzero
-      !$acc parallel loop reduction(+:sum)
-      do i = 1, n
-        sum = sum + abs(x(i)/mx)**2
       end do
-      res = mx*sqrt(sum)
+      if (mx == dzero) then
+        res = mx
+      else
+        sum = dzero
+        !$acc parallel loop reduction(+:sum)
+        do i = 1, n
+          sum = sum + abs(x(i)/mx)**2
+        end do
+        res = mx*sqrt(sum)
+      end if
     end function z_inner_oacc_nrm2
   end function z_oacc_nrm2
 
@@ -398,29 +413,44 @@ contains
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta
     class(psb_z_vect_oacc) :: y
-    integer(psb_ipk_) :: info
-
+    integer(psb_ipk_) :: info, k
+    logical           :: acc_done
     if (.not.allocated(y%combuf)) then
       call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf')
       return
     end if
 
+    acc_done = .false. 
     select type(ii  => idx)
     class is (psb_i_vect_oacc)
       if (ii%is_host()) call ii%sync()
       if (y%is_host()) call y%sync()
-
-      !$acc parallel loop
-      do i = 1, n
-        y%v(ii%v(i)) = beta * y%v(ii%v(i)) + y%combuf(i)
-      end do
-
-    class default
-      !$acc parallel loop
-      do i = 1, n
-        y%v(idx%v(i)) = beta * y%v(idx%v(i)) + y%combuf(i)
-      end do
+      !$acc update device(y%combuf)
+      call inner_sctb(n,y%combuf(i:i+n-1),beta,y%v,ii%v(i:i+n-1))
+      call y%set_dev()
+      acc_done = .true.
     end select
+
+    if (.not.acc_done) then 
+      if (idx%is_dev()) call idx%sync()
+      if (y%is_dev()) call y%sync()
+      do k = 1, n
+        y%v(idx%v(k+i-1)) = beta * y%v(idx%v(k+i-1)) + y%combuf(k)
+      end do
+    end if
+
+  contains
+    subroutine inner_sctb(n,x,beta,y,idx)
+      integer(psb_ipk_) :: n, idx(:)
+      complex(psb_dpk_)    :: beta,x(:), y(:)
+      integer(psb_ipk_) :: k
+      !$acc parallel loop 
+      do k = 1, n
+        y(idx(k)) = x(k) + beta *y(idx(k))
+      end do
+      !$acc end parallel loop 
+    end subroutine inner_sctb
+    
   end subroutine z_oacc_sctb_buf
 
   subroutine z_oacc_sctb_x(i, n, idx, x, beta, y)
@@ -430,24 +460,41 @@ contains
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta, x(:)
     class(psb_z_vect_oacc) :: y
-    integer(psb_ipk_) :: info, ni
+    integer(psb_ipk_) :: info, ni, k 
+    logical :: acc_done 
 
+    acc_done = .false. 
     select type(ii  => idx)
     class is (psb_i_vect_oacc)
       if (ii%is_host()) call ii%sync()
-    class default
-      call psb_errpush(info, 'z_oacc_sctb_x')
-      return
+      if (y%is_host()) call y%sync()
+      if (acc_is_present(x)) then
+        call inner_sctb(n,x(i:i+n-1),beta,y%v,idx%v(i:i+n-1))
+        acc_done = .true.
+        call y%set_dev()
+      end if
     end select
+    if (.not.acc_done) then
+      if (idx%is_dev()) call idx%sync()
+      if (y%is_dev()) call y%sync()
+      do k = 1, n
+        y%v(idx%v(k+i-1)) = beta * y%v(idx%v(k+i-1)) + x(k+i-1)
+      end do
+      call y%set_host()
+    end if
 
-    if (y%is_host()) call y%sync()
-
-    !$acc parallel loop
-    do i = 1, n
-      y%v(idx%v(i)) = beta * y%v(idx%v(i)) + x(i)
-    end do
-
-    call y%set_dev()
+  contains
+    subroutine inner_sctb(n,x,beta,y,idx)
+      integer(psb_ipk_) :: n, idx(:)
+      complex(psb_dpk_) :: beta, x(:), y(:)
+      integer(psb_ipk_) :: k
+      !$acc parallel loop 
+      do k = 1, n
+        y(idx(k)) = x(k) + beta *y(idx(k))
+      end do
+      !$acc end parallel loop 
+    end subroutine inner_sctb
+    
   end subroutine z_oacc_sctb_x
 
   subroutine z_oacc_sctb(n, idx, x, beta, y)
@@ -463,7 +510,6 @@ contains
     if (n == 0) return
     if (y%is_dev()) call y%sync()
 
-    !$acc parallel loop
     do i = 1, n
       y%v(idx(i)) = beta * y%v(idx(i)) + x(i)
     end do
@@ -477,30 +523,48 @@ contains
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     class(psb_z_vect_oacc) :: x
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: info,k
+    logical :: acc_done
 
     info = 0
+    acc_done = .false.
+
     if (.not.allocated(x%combuf)) then
       call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf')
       return
     end if
 
-    select type(ii  => idx)
+    select type (ii  => idx)
     class is (psb_i_vect_oacc)
       if (ii%is_host()) call ii%sync()
-    class default
-      call psb_errpush(info, 'z_oacc_gthzbuf')
-      return
+      if (x%is_host()) call x%sync()
+      call inner_gth(n,x%v,x%combuf(i:i+n-1),ii%v(i:i+n-1))
+      acc_done = .true.      
     end select
 
-    if (x%is_host()) call x%sync()
+    if (.not.acc_done) then
+      if (idx%is_dev()) call idx%sync()
+      if (x%is_dev()) call x%sync()
+      do k = 1, n
+        x%combuf(k+i-1) = x%v(idx%v(k+i-1))
+      end do
+    end if
 
-    !$acc parallel loop
-    do i = 1, n
-      x%combuf(i) = x%v(idx%v(i))
-    end do
+  contains
+    subroutine inner_gth(n,x,y,idx)
+      integer(psb_ipk_) :: n, idx(:)
+      complex(psb_dpk_)   :: x(:), y(:)
+      integer(psb_ipk_) :: k
+      
+      !$acc parallel loop present(y)
+      do k = 1, n
+        y(k) = x(idx(k))
+      end do
+      !$acc end parallel loop
+      !$acc update self(y)      
+    end subroutine inner_gth
   end subroutine z_oacc_gthzbuf
-
+  
   subroutine z_oacc_gthzv_x(i, n, idx, x, y)
     use psb_base_mod
     implicit none
@@ -508,24 +572,41 @@ contains
     class(psb_i_base_vect_type):: idx
     complex(psb_dpk_) :: y(:)
     class(psb_z_vect_oacc):: x
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: info, k 
+    logical :: acc_done 
 
     info = 0
-
-    select type(ii  => idx)
+    acc_done = .false. 
+    select type (ii  => idx)
     class is (psb_i_vect_oacc)
       if (ii%is_host()) call ii%sync()
-    class default
-      call psb_errpush(info, 'z_oacc_gthzv_x')
-      return
+      if (x%is_host()) call x%sync()
+      if (acc_is_present(y)) then 
+        call inner_gth(n,x%v,y(i:),ii%v(i:))
+        acc_done=.true.
+      end if
     end select
-
-    if (x%is_host()) call x%sync()
-
-    !$acc parallel loop
-    do i = 1, n
-      y(i) = x%v(idx%v(i))
-    end do
+    if (.not.acc_done) then 
+      if (x%is_dev()) call x%sync()
+      if (idx%is_dev()) call idx%sync()
+      do k = 1, n
+        y(k+i-1) = x%v(idx%v(k+i-1))
+        !write(0,*) 'oa gthzv ',k+i-1,idx%v(k+i-1),k,y(k)
+      end do
+    end if
+  contains
+    subroutine inner_gth(n,x,y,idx)
+      integer(psb_ipk_) :: n, idx(:)
+      complex(psb_dpk_) :: x(:), y(:)
+      integer(psb_ipk_) :: k
+      
+      !$acc parallel loop present(y)
+      do k = 1, n
+        y(k) = x(idx(k))
+      end do
+      !$acc end parallel loop
+      !$acc update self(y)      
+    end subroutine inner_gth
   end subroutine z_oacc_gthzv_x
 
   subroutine z_oacc_ins_v(n, irl, val, dupl, x, info)
@@ -718,7 +799,7 @@ contains
     integer(psb_ipk_) :: info
 
     res = zzero
-    !write(0,*) 'dot_v'
+!!$    write(0,*) 'oacc_dot_v'
     select type(yy  => y)
     type is (psb_z_base_vect_type)
         if (x%is_dev()) call x%sync()
@@ -761,6 +842,17 @@ contains
 
   end function z_oacc_dot_a
 
+
+  subroutine z_oacc_new_buffer(n,x,info)
+    implicit none
+    class(psb_z_vect_oacc), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+    if (n /= psb_size(x%combuf)) then 
+      call x%psb_z_base_vect_type%new_buffer(n,info)
+      !$acc enter data copyin(x%combuf)
+    end if
+  end subroutine z_oacc_new_buffer
 
   subroutine z_oacc_sync_dev_space(x)
     implicit none 
@@ -860,12 +952,33 @@ contains
     class(psb_z_vect_oacc), intent(inout) :: x
     integer(psb_ipk_), intent(out)     :: info
     info = 0
-    if (allocated(x%v)) then
-      if (acc_is_present(x%v)) call acc_delete_finalize(x%v) 
-      deallocate(x%v, stat=info)
-    end if
+    if (acc_is_present(x%v)) call acc_delete_finalize(x%v)
+    if (acc_is_present(x%combuf))  call acc_delete_finalize(x%combuf)
+    call x%psb_z_base_vect_type%free(info)
   end subroutine z_oacc_vect_free
+  
+  subroutine z_oacc_vect_maybe_free_buffer(x,info)
+    implicit none
+    class(psb_z_vect_oacc), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
 
+    info = 0
+    if (psb_oacc_get_maybe_free_buffer())&
+         &  call x%free_buffer(info)
+
+  end subroutine z_oacc_vect_maybe_free_buffer
+  
+  subroutine z_oacc_vect_free_buffer(x,info)
+    implicit none
+    class(psb_z_vect_oacc), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    info = 0
+    if (acc_is_present(x%combuf))  call acc_delete_finalize(x%combuf) 
+    call x%psb_z_base_vect_type%free_buffer(info)
+
+  end subroutine z_oacc_vect_free_buffer
+  
   function z_oacc_get_size(x) result(res)
     implicit none 
     class(psb_z_vect_oacc), intent(inout) :: x

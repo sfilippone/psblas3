@@ -19,7 +19,7 @@ contains
     n = a%get_ncols()
     nzt = a%nzt
     nc = size(a%ja,2)
-    if ((n /= size(x%v)) .or. (m /= size(y%v))) then
+    if ((n > size(x%v)) .or. (m > size(y%v))) then
       write(0,*) 'oellmv Size error ', m, n, size(x%v), size(y%v)
       info = psb_err_invalid_mat_state_
       return
