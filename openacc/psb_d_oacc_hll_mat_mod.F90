@@ -138,12 +138,16 @@ contains
     class(psb_d_oacc_hll_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    if (allocated(a%val))    call acc_delete_finalize(a%val)
-    if (allocated(a%ja))     call acc_delete_finalize(a%ja)
-    if (allocated(a%irn))    call acc_delete_finalize(a%irn)
-    if (allocated(a%idiag))  call acc_delete_finalize(a%idiag)
-    if (allocated(a%hkoffs)) call acc_delete_finalize(a%hkoffs)
-
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
+    if (psb_size(a%val)>0)    call acc_delete_finalize(a%val)
+    if (psb_size(a%ja)>0)     call acc_delete_finalize(a%ja)
+    if (psb_size(a%irn)>0)    call acc_delete_finalize(a%irn)
+    if (psb_size(a%idiag)>0)  call acc_delete_finalize(a%idiag)
+    if (psb_size(a%hkoffs)>0) call acc_delete_finalize(a%hkoffs)
     return
   end subroutine d_oacc_hll_free_dev_space
 
@@ -231,11 +235,16 @@ contains
     implicit none
     class(psb_d_oacc_hll_sparse_mat), intent(inout) :: a
 
-    if (allocated(a%val))    call acc_create(a%val)
-    if (allocated(a%ja))     call acc_create(a%ja)
-    if (allocated(a%irn))    call acc_create(a%irn)
-    if (allocated(a%idiag))  call acc_create(a%idiag)
-    if (allocated(a%hkoffs)) call acc_create(a%hkoffs)
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
+    if (psb_size(a%val)>0)    call acc_create(a%val)
+    if (psb_size(a%ja)>0)     call acc_create(a%ja)
+    if (psb_size(a%irn)>0)    call acc_create(a%irn)
+    if (psb_size(a%idiag)>0)  call acc_create(a%idiag)
+    if (psb_size(a%hkoffs)>0) call acc_create(a%hkoffs)
   end subroutine d_oacc_hll_sync_dev_space
 
 
@@ -246,18 +255,23 @@ contains
     integer(psb_ipk_) :: info
 
     tmpa  => a
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
     if (a%is_dev()) then
-      call acc_update_self(a%val)
-      call acc_update_self(a%ja)
-      call acc_update_self(a%irn)
-      call acc_update_self(a%idiag)
-      call acc_update_self(a%hkoffs)
+      if (psb_size(a%val)>0)    call acc_update_self(a%val)
+      if (psb_size(a%ja)>0)     call acc_update_self(a%ja)
+      if (psb_size(a%irn)>0)    call acc_update_self(a%irn)
+      if (psb_size(a%idiag)>0)  call acc_update_self(a%idiag)
+      if (psb_size(a%hkoffs)>0) call acc_update_self(a%hkoffs)
     else if (a%is_host()) then
-      call acc_update_device(a%val)
-      call acc_update_device(a%ja)
-      call acc_update_device(a%irn)
-      call acc_update_device(a%idiag)
-      call acc_update_device(a%hkoffs)
+      if (psb_size(a%val)>0)    call acc_update_device(a%val)
+      if (psb_size(a%ja)>0)     call acc_update_device(a%ja)
+      if (psb_size(a%irn)>0)    call acc_update_device(a%irn)
+      if (psb_size(a%idiag)>0)  call acc_update_device(a%idiag)
+      if (psb_size(a%hkoffs)>0) call acc_update_device(a%hkoffs)
     end if
     call tmpa%set_sync()
   end subroutine d_oacc_hll_sync

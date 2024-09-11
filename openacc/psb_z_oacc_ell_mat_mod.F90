@@ -138,11 +138,15 @@ contains
     class(psb_z_oacc_ell_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    if (allocated(a%val))   call acc_delete_finalize(a%val)
-    if (allocated(a%ja))    call acc_delete_finalize(a%ja)
-    if (allocated(a%irn))   call acc_delete_finalize(a%irn)
-    if (allocated(a%idiag)) call acc_delete_finalize(a%idiag)
-    
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
+    if (psb_size(a%val)>0)   call acc_delete_finalize(a%val)
+    if (psb_size(a%ja)>0)    call acc_delete_finalize(a%ja)
+    if (psb_size(a%irn)>0)   call acc_delete_finalize(a%irn)
+    if (psb_size(a%idiag)>0) call acc_delete_finalize(a%idiag)
     return
   end subroutine z_oacc_ell_free_dev_space
 
@@ -177,10 +181,15 @@ contains
     implicit none
     class(psb_z_oacc_ell_sparse_mat), intent(inout) :: a
 
-    if (allocated(a%val))   call acc_create(a%val)
-    if (allocated(a%ja))    call acc_create(a%ja)
-    if (allocated(a%irn))   call acc_create(a%irn)
-    if (allocated(a%idiag)) call acc_create(a%idiag)
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
+    if (psb_size(a%val)>0)   call acc_create(a%val)
+    if (psb_size(a%ja)>0)    call acc_create(a%ja)
+    if (psb_size(a%irn)>0)   call acc_create(a%irn)
+    if (psb_size(a%idiag)>0) call acc_create(a%idiag)
   end subroutine z_oacc_ell_sync_dev_space
 
   function z_oacc_ell_is_host(a) result(res)
@@ -241,16 +250,21 @@ contains
     integer(psb_ipk_) :: info
 
     tmpa  => a
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
     if (a%is_dev()) then
-      call acc_update_self(a%val)
-      call acc_update_self(a%ja)
-      call acc_update_self(a%irn)
-      call acc_update_self(a%idiag)
+      if (psb_size(a%val)>0)   call acc_update_self(a%val)
+      if (psb_size(a%ja)>0)    call acc_update_self(a%ja)
+      if (psb_size(a%irn)>0)   call acc_update_self(a%irn)
+      if (psb_size(a%idiag)>0) call acc_update_self(a%idiag)
     else if (a%is_host()) then
-      call acc_update_device(a%val)
-      call acc_update_device(a%ja)
-      call acc_update_device(a%irn)
-      call acc_update_device(a%idiag)
+      if (psb_size(a%val)>0)         call acc_update_device(a%val)
+      if (psb_size(a%ja)>0)          call acc_update_device(a%ja)
+      if (psb_size(a%irn)>0)         call acc_update_device(a%irn)
+      if (psb_size(a%idiag)>0)       call acc_update_device(a%idiag)
     end if
     call tmpa%set_sync()
   end subroutine z_oacc_ell_sync

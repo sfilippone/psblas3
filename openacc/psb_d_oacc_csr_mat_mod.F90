@@ -139,9 +139,14 @@ contains
     class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
     integer(psb_ipk_) :: info
 
-    if (allocated(a%val)) call acc_delete_finalize(a%val)
-    if (allocated(a%ja))  call acc_delete_finalize(a%ja)
-    if (allocated(a%irp)) call acc_delete_finalize(a%irp)
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
+    if (psb_size(a%val)>0) call acc_delete_finalize(a%val)
+    if (psb_size(a%ja)>0)  call acc_delete_finalize(a%ja)
+    if (psb_size(a%irp)>0) call acc_delete_finalize(a%irp)
 
     return
   end subroutine d_oacc_csr_free_dev_space
@@ -246,9 +251,15 @@ contains
   subroutine d_oacc_csr_sync_dev_space(a)
     implicit none
     class(psb_d_oacc_csr_sparse_mat), intent(inout) :: a
-    if (allocated(a%val)) call acc_create(a%val)
-    if (allocated(a%ja))  call acc_create(a%ja)
-    if (allocated(a%irp)) call acc_create(a%irp)
+
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
+    if (psb_size(a%val)>0) call acc_create(a%val)
+    if (psb_size(a%ja)>0)  call acc_create(a%ja)
+    if (psb_size(a%irp)>0) call acc_create(a%irp)
   end subroutine d_oacc_csr_sync_dev_space
 
   subroutine d_oacc_csr_sync(a)
@@ -258,14 +269,19 @@ contains
     integer(psb_ipk_) :: info
 
     tmpa  => a
+    !
+    ! Note: at least on GNU, if an array is allocated
+    !       but with size 0, then CREATE,UPDATE and DELETE
+    !       will fail
+    !
     if (a%is_dev()) then
-      call acc_update_self(a%val)
-      call acc_update_self(a%ja)
-      call acc_update_self(a%irp)
+      if (psb_size(a%val)>0) call acc_update_self(a%val)
+      if (psb_size(a%ja)>0)  call acc_update_self(a%ja)
+      if (psb_size(a%irp)>0) call acc_update_self(a%irp)
     else if (a%is_host()) then
-      call acc_update_device(a%val)
-      call acc_update_device(a%ja)
-      call acc_update_device(a%irp)
+      if (psb_size(a%val)>0) call acc_update_device(a%val)
+      if (psb_size(a%ja)>0)  call acc_update_device(a%ja)
+      if (psb_size(a%irp)>0) call acc_update_device(a%irp)
     end if
     call tmpa%set_sync()
   end subroutine d_oacc_csr_sync
