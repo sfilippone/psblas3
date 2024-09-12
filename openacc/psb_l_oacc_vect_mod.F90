@@ -81,7 +81,6 @@ contains
     class is (psb_i_vect_oacc)
       if (ii%is_host()) call ii%sync()
       if (y%is_host()) call y%sync()
-      !$acc update device(y%combuf)
       call inner_sctb(n,y%combuf(i:i+n-1),beta,y%v,ii%v(i:i+n-1))
       call y%set_dev()
       acc_done = .true.
@@ -100,6 +99,7 @@ contains
       integer(psb_ipk_) :: n, idx(:)
       integer(psb_lpk_)    :: beta,x(:), y(:)
       integer(psb_ipk_) :: k
+      !$acc update device(x(1:n)) async 
       !$acc parallel loop 
       do k = 1, n
         y(idx(k)) = x(k) + beta *y(idx(k))
@@ -144,6 +144,7 @@ contains
       integer(psb_ipk_) :: n, idx(:)
       integer(psb_lpk_) :: beta, x(:), y(:)
       integer(psb_ipk_) :: k
+      !$acc update device(x(1:n)) async
       !$acc parallel loop 
       do k = 1, n
         y(idx(k)) = x(k) + beta *y(idx(k))
@@ -217,7 +218,7 @@ contains
         y(k) = x(idx(k))
       end do
       !$acc end parallel loop
-      !$acc update self(y)      
+      !$acc update self(y(1:n)) async
     end subroutine inner_gth
   end subroutine l_oacc_gthzbuf
   
@@ -261,7 +262,7 @@ contains
         y(k) = x(idx(k))
       end do
       !$acc end parallel loop
-      !$acc update self(y)      
+      !$acc update self(y(1:n)) async     
     end subroutine inner_gth
   end subroutine l_oacc_gthzv_x
 
