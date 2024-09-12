@@ -129,8 +129,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   logical                     :: do_cond
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CG'
-  logical, parameter  :: do_timings=.true.
-  integer(psb_ipk_), save  :: cg_vect=-1, cg_mv=-1, cg_prec=-1
 
   info = psb_success_
   name = 'psb_dcg'
@@ -151,12 +149,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name)
     goto 9999
   endif
-  if ((do_timings).and.(cg_vect==-1))       &
-       & cg_vect = psb_get_timer_idx("CG: vector ops ")
-  if ((do_timings).and.(cg_mv==-1))       &
-       & cg_mv = psb_get_timer_idx("CG: MV product")
-  if ((do_timings).and.(cg_prec==-1))       &
-       & cg_prec = psb_get_timer_idx("CG: preconditioner")
 
 
   mglob = desc_a%get_global_rows()
@@ -227,21 +219,17 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
 ! =   
 ! =    r0 = b-Ax0
 ! =   
-    if (do_timings) call psb_tic(cg_vect)
     if (itx>= itmax_) exit restart 
+
     it = 0
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
-    if (do_timings) call psb_toc(cg_vect)
-    if (do_timings) call psb_tic(cg_mv)
     if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
-    if (do_timings) call psb_toc(cg_mv)
-    
-    if (do_timings) call psb_tic(cg_vect)
+
     rho = dzero
     
     call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
@@ -249,18 +237,13 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
     End If
-    if (do_timings) call psb_toc(cg_vect)
-        
+
     iteration:  do 
 
       it   = it + 1
       itx = itx + 1
-      if (do_timings) call psb_tic(cg_prec)
-    
-      call prec%apply(r,z,desc_a,info,work=aux)
-      if (do_timings) call psb_toc(cg_prec)
-      if (do_timings) call psb_tic(cg_vect)
 
+      call prec%apply(r,z,desc_a,info,work=aux)
       rho_old = rho
       rho     = psb_gedot(r,z,desc_a,info)
 
@@ -271,18 +254,13 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
           if (debug_level >= psb_debug_ext_)&
                & write(debug_unit,*) me,' ',trim(name),&
                & ': CG Iteration breakdown rho'
-          if (do_timings) call psb_toc(cg_vect)
           exit iteration
         endif
         beta = rho/rho_old
         call psb_geaxpby(done,z,beta,p,desc_a,info)
       end if
-      if (do_timings) call psb_toc(cg_vect)
-      if (do_timings) call psb_tic(cg_mv)
 
       call psb_spmm(done,a,p,dzero,q,desc_a,info,work=aux)
-      if (do_timings) call psb_toc(cg_mv)
-      if (do_timings) call psb_tic(cg_vect)
       sigma = psb_gedot(p,q,desc_a,info)
       if (sigma == dzero) then
           if (debug_level >= psb_debug_ext_)&
@@ -315,7 +293,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
 
     end do iteration
   end do restart
-  if (do_timings) call psb_toc(cg_vect)
   if (do_cond) then 
     if (me == psb_root_) then 
 #if defined(HAVE_LAPACK) 

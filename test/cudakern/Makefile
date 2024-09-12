@@ -16,48 +16,26 @@ LDLIBS=$(PSBGPULDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR)  $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
 
-ZTOBJS=z_file_spmv.o data_input.o
-CTOBJS=c_file_spmv.o data_input.o
-DTOBJS=d_file_spmv.o data_input.o
-STOBJS=s_file_spmv.o data_input.o
-DPGOBJS=dpdegenmv.o
-SPGOBJS=spdegenmv.o
+DPGOBJS=dpdegenmv.o data_input.o
+SPGOBJS=spdegenmv.o data_input.o
 EXEDIR=./runs
 
-all: dir pgen file
+all: dir pgen 
 pgen: dpdegenmv spdegenmv 
-file: s_file_spmv c_file_spmv d_file_spmv z_file_spmv
-dpdegenmv spdegenmv s_file_spmv c_file_spmv d_file_spmv z_file_spmv: dir
+dpdegenmv spdegenmv: dir 
 dir:
 	(if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi)
-
-dpdegenmv: $(DPGOBJS)
+dpdegenmv.o spdegenmv.o: data_input.o
+dpdegenmv: $(DPGOBJS) 
 	$(FLINK) $(LOPT) $(DPGOBJS) -fopenmp -o dpdegenmv $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv dpdegenmv $(EXEDIR) 
 spdegenmv: $(SPGOBJS)
 	$(FLINK) $(LOPT) $(SPGOBJS) -o spdegenmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv spdegenmv $(EXEDIR) 
 
-z_file_spmv: $(ZTOBJS)
-	$(FLINK) $(LOPT) $(ZTOBJS) -o z_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv z_file_spmv $(EXEDIR) 
-c_file_spmv: $(CTOBJS)
-	$(FLINK) $(LOPT) $(CTOBJS) -o c_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv c_file_spmv $(EXEDIR) 
-d_file_spmv: $(DTOBJS)
-	$(FLINK) $(LOPT) $(DTOBJS) -o d_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv d_file_spmv $(EXEDIR) 
-s_file_spmv: $(STOBJS)
-	$(FLINK) $(LOPT) $(STOBJS) -o s_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/cp s_file_spmv $(EXEDIR) 
-
-d_file_spmv.o s_file_spmv.o z_file_spmv.o c_file_spmv.o: data_input.o
-
 clean: 
 	/bin/rm -f $(DTOBJS) $(STOBJS) $(DPGOBJS) $(SPGOBJS) $(ZTOBJS) $(CTOBJS)  \
-	$(EXEDIR)/dpdegenmv $(EXEDIR)/spdegenmv \
-	$(EXEDIR)/d_file_spmv $(EXEDIR)/s_file_spmv \
-	$(EXEDIR)/z_file_spmv $(EXEDIR)/c_file_spmv 
+	$(EXEDIR)/dpdegenmv $(EXEDIR)/spdegenmv *mod
 
 lib:
 	(cd ../../; make library)

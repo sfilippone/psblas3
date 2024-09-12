@@ -31,38 +31,38 @@ extern "C"
 
 #define BLOCK_SIZE 512
 
-__global__ void spgpuDabgdxyz_krn(int n, double alpha, double beta, double gamma, double delta,
-				  double* x, double *y, double *z)
+__global__ void spgpuSupd_xyz_krn(int n, float alpha, float beta, float gamma, float delta,
+				  float* x, float *y, float *z)
 {
 	int id = threadIdx.x + BLOCK_SIZE*blockIdx.x;
 	unsigned int gridSize = blockDim.x * gridDim.x;
-	double t;
+	float t;
 	for ( ; id < n; id +=gridSize)
 		//if (id,n) 
 	{
 
 	  if (beta == 0.0)
-	    t = PREC_DMUL(alpha,x[id]);
+	    t = PREC_FMUL(alpha,x[id]);
 	  else
-	    t = PREC_DADD(PREC_DMUL(alpha, x[id]), PREC_DMUL(beta,y[id]));
+	    t = PREC_FADD(PREC_FMUL(alpha, x[id]), PREC_FMUL(beta,y[id]));
 	  if (delta == 0.0)
 	    z[id] = gamma * t;
 	  else
-	    z[id] = PREC_DADD(PREC_DMUL(gamma, t), PREC_DMUL(delta,z[id]));
+	    z[id] = PREC_FADD(PREC_FMUL(gamma, t), PREC_FMUL(delta,z[id]));
 	  y[id] = t;
 	}
 }
 
 
-void spgpuDabgdxyz(spgpuHandle_t handle,
+void spgpuSupd_xyz(spgpuHandle_t handle,
 		   int n,
-		   double alpha,
-		   double beta,
-		   double gamma,
-		   double delta,
-		   __device double* x,
-		   __device double* y,
-		   __device double *z)
+		   float alpha,
+		   float beta,
+		   float gamma,
+		   float delta,
+		   __device float* x,
+		   __device float* y,
+		   __device float *z)
 {
 	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
 	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
@@ -73,7 +73,7 @@ void spgpuDabgdxyz(spgpuHandle_t handle,
 	num_blocks     = num_blocks_mp*num_mp;
 	dim3 grid(num_blocks);
 
-	spgpuDabgdxyz_krn<<<grid, block, 0, handle->currentStream>>>(n, alpha, beta, gamma, delta,
+	spgpuSupd_xyz_krn<<<grid, block, 0, handle->currentStream>>>(n, alpha, beta, gamma, delta,
 								   x, y, z);
 }
 

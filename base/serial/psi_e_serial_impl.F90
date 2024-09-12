@@ -1568,7 +1568,7 @@ subroutine  eaxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 
 end subroutine eaxpbyv2
 
-subroutine psi_eabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
+subroutine psi_e_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -1582,7 +1582,7 @@ subroutine psi_eabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
   integer(psb_ipk_) :: i
   integer(psb_ipk_) :: int_err(5)
   character  name*20
-  name='eabgdxyz'
+  name='e_upd_xyz'
 
   info = psb_success_
   if (m.lt.0) then
@@ -1791,7 +1791,7 @@ subroutine psi_eabgdxyz(m,alpha, beta, gamma,delta,x, y, z, info)
   call fcpsb_serror()
   return
 
-end subroutine psi_eabgdxyz
+end subroutine psi_e_upd_xyz
 
 subroutine psi_exyzw(m,a,b,c,d,e,f,x, y, z,w, info)
   use psb_const_mod
@@ -1808,7 +1808,7 @@ subroutine psi_exyzw(m,a,b,c,d,e,f,x, y, z,w, info)
   integer(psb_ipk_) :: i
   integer(psb_ipk_) :: int_err(5)
   character  name*20
-  name='eabgdxyz'
+  name='e_xyzw'
 
   info = psb_success_
   if (m.lt.0) then
