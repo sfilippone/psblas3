@@ -653,6 +653,12 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+LRSB
+LIBRSB_DEFINES
+LIBRSB_DIR
+LIBRSB_INCDIR
+LIBRSB_INCLUDES
+LIBRSB_LIBS
 LCUDA
 CUDALD
 CUDAD
@@ -667,6 +673,11 @@ CUDA_DIR
 EXTRALDLIBS
 SPGPU_LIBS
 SPGPU_FLAGS
+CXXOPENACC
+CCOPENACC
+FCOPENACC
+OACCLD
+OACCD
 METISINCFILE
 UTILLIBNAME
 METHDLIBNAME
@@ -840,6 +851,11 @@ with_amdincdir
 with_amdlibdir
 with_cuda
 with_cudacc
+enable_openacc
+with_extraopenacc
+with_ccopenacc
+with_cxxopenacc
+with_fcopenacc
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1490,6 +1506,8 @@ Optional Features:
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-openmp         Specify whether to enable openmp.
   --disable-openmp        do not use OpenMP
+  --enable-openacc        Specify whether to enable openacc.
+  --disable-openacc       do not use Openacc
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1535,6 +1553,14 @@ Optional Packages:
   --with-cuda=DIR         Specify the CUDA install directory.
   --with-cudacc           A comma-separated list of CCs to compile to, for
                           example, --with-cudacc=50,60,70,75
+  --with-extraopenacc     additional [EXTRAOPENACC] flags to be added: will
+                          prepend to [EXTRAOPENACC]
+  --with-ccopenacc        additional [CCOPENACC] flags to be added: will
+                          prepend to [CCOPENACC]
+  --with-cxxopenacc       additional [CXXOPENACC] flags to be added: will
+                          prepend to [CXXOPENACC]
+  --with-fcopenacc        additional [FCOPENACC] flags to be added: will
+                          prepend to [FCOPENACC]
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -5825,7 +5851,7 @@ fi
 
 # we just gave the user the chance to append values to these variables
 
-###############################################################################
+
 
 
 if test -n "$ac_tool_prefix"; then
@@ -10868,6 +10894,407 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   CUDA_LIBS="";
 fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether we want openacc " >&5
+printf %s "checking whether we want openacc ... " >&6; }
+# Check whether --enable-openacc was given.
+if test ${enable_openacc+y}
+then :
+  enableval=$enable_openacc;
+pac_cv_openacc="yes";
+
+
+fi
+
+if test x"$pac_cv_openacc" == x"yes" ; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes." >&5
+printf "%s\n" "yes." >&6; }
+#   AC_LANG_PUSH([Fortran])
+#   AC_OPENACC()
+#   pac_cv_openacc_fcopt="$OPENACC_FCFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C])
+#   AC_OPENACC()
+#   pac_cv_openacc_ccopt="$OPENACC_CFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C++])
+#   AC_OPENACC()
+#   pac_cv_openacc_cxxopt="$OPENACC_CXXFLAGS";
+#   AC_LANG_POP()
+else
+ pac_cv_openacc="no";
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no." >&5
+printf "%s\n" "no." >&6; }
+fi
+
+
+if test x"$pac_cv_openacc" == x"yes" ; then
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional EXTRAOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional EXTRAOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-extraopenacc was given.
+if test ${with_extraopenacc+y}
+then :
+  withval=$with_extraopenacc;
+EXTRAOPENACC="${withval} ${EXTRAOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: EXTRAOPENACC = ${EXTRAOPENACC}" >&5
+printf "%s\n" "EXTRAOPENACC = ${EXTRAOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+      if test -e penmp || test -e mp; then
+  as_fn_error $? "AX_OPENACC clobbers files named 'mp' and 'penmp'. Aborting configure because one of these files already exists." "$LINENO" 5
+fi
+# Check whether --enable-openacc was given.
+if test ${enable_openacc+y}
+then :
+  enableval=$enable_openacc;
+fi
+
+  OPENACC_CFLAGS=
+  if test "$enable_openacc" != no; then
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC option to support Openacc" >&5
+printf %s "checking for $CC option to support Openacc... " >&6; }
+if test ${ax_cv_prog_c_openacc+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ax_cv_prog_c_openacc='not found'
+                                                                        for ac_option in '' -fopenacc -openacc -acc; do
+
+        ac_save_CFLAGS=$CFLAGS
+        CFLAGS="$CFLAGS $ac_option"
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENACC
+#error "OpenACC not supported"
+#endif
+#include <openacc.h>
+  int main (void) { acc_init (0); return 0;}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENACC
+#error "OpenACC not supported"
+#endif
+#include <openacc.h>
+ int main (void) { acc_init (0); return 0;}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ax_cv_prog_c_openacc=$ac_option
+else $as_nop
+  ax_cv_prog_c_openacc='unsupported'
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+        CFLAGS=$ac_save_CFLAGS
+
+        if test "$ax_cv_prog_c_openacc" != 'not found'; then
+          break
+        fi
+      done
+      if test "$ax_cv_prog_c_openacc" = 'not found'; then
+        ac_cv_prog_c_openacc='unsupported'
+      elif test "$ax_cv_prog_c_openacc" = ''; then
+        ac_cv_prog_c_openacc='none needed'
+      fi
+                        rm -f penmp mp
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_prog_c_openacc" >&5
+printf "%s\n" "$ax_cv_prog_c_openacc" >&6; }
+    if test "$ax_cv_prog_c_openacc" != 'unsupported' && \
+       test "$ax_cv_prog_c_openacc" != 'none needed'; then
+      OPENACC_CFLAGS="$ax_cv_prog_c_openacc"
+    fi
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+  fi
+
+   CCOPENACC="$ax_cv_prog_c_openacc";
+   # Check whether --enable-openacc was given.
+if test ${enable_openacc+y}
+then :
+  enableval=$enable_openacc;
+fi
+
+  OPENACC_CFLAGS=
+  if test "$enable_openacc" != no; then
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to support Openacc" >&5
+printf %s "checking for $CXX option to support Openacc... " >&6; }
+if test ${ax_cv_prog_cxx_openacc+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ax_cv_prog_cxx_openacc='not found'
+                                                                        for ac_option in '' -fopenacc -openacc -acc; do
+
+        ac_save_CXXFLAGS=$CXXFLAGS
+        CXXFLAGS="$CXXFLAGS $ac_option"
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENACC
+#error "OpenACC not supported"
+#endif
+#include <openacc.h>
+ int main (void) { acc_init (acc_get_device_type()); return 0;}
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENACC
+#error "OpenACC not supported"
+#endif
+#include <openacc.h>
+ int main (void) { acc_init (acc_get_device_type()); return 0;}
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  ax_cv_prog_cxx_openacc=$ac_option
+else $as_nop
+  ax_cv_prog_cxx_openacc='unsupported'
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+        CXXFLAGS=$ac_save_CXXFLAGS
+
+        if test "$ax_cv_prog_cxx_openacc" != 'not found'; then
+          break
+        fi
+      done
+      if test "$ax_cv_prog_cxx_openacc" = 'not found'; then
+        ac_cv_prog_cxx_openacc='unsupported'
+      elif test "$ax_cv_prog_cxx_openacc" = ''; then
+        ac_cv_prog_cxx_openacc='none needed'
+      fi
+                        rm -f penmp mp
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_prog_cxx_openacc" >&5
+printf "%s\n" "$ax_cv_prog_cxx_openacc" >&6; }
+    if test "$ax_cv_prog_cxx_openacc" != 'unsupported' && \
+       test "$ax_cv_prog_cxx_openacc" != 'none needed'; then
+      OPENACC_CXXFLAGS="$ax_cv_prog_cxx_openacc"
+    fi
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+  fi
+
+   CXXOPENACC="$ax_cv_prog_cxx_openacc";
+   # Check whether --enable-openacc was given.
+if test ${enable_openacc+y}
+then :
+  enableval=$enable_openacc;
+fi
+
+  OPENACC_CFLAGS=
+  if test "$enable_openacc" != no; then
+      ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $FC option to support Openacc" >&5
+printf %s "checking for $FC option to support Openacc... " >&6; }
+if test ${ax_cv_prog_fc_openacc+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ax_cv_prog_fc_openacc='not found'
+                                                                        for ac_option in '' -fopenacc -openacc -acc; do
+
+        ac_save_FCFLAGS=$FCFLAGS
+        FCFLAGS="$FCFLAGS $ac_option"
+        cat > conftest.$ac_ext <<_ACEOF
+
+      program main
+      use openacc
+      implicit none
+      integer tid, np
+      tid = 42
+      call acc_init(0)
+      end
+
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"
+then :
+  cat > conftest.$ac_ext <<_ACEOF
+
+      program main
+      use openacc
+      implicit none
+      integer tid, np
+      tid = 42
+      call acc_init(0)
+      end
+
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"
+then :
+  ax_cv_prog_fc_openacc=$ac_option
+else $as_nop
+  ax_cv_prog_fc_openacc='unsupported'
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+        FCFLAGS=$ac_save_FCFLAGS
+
+        if test "$ax_cv_prog_fc_openacc" != 'unsupported'; then
+          break
+        fi
+      done
+      if test "$ax_cv_prog_fc_openacc" = 'not found'; then
+        ac_cv_prog_fc_openacc='unsupported'
+      elif test "$ax_cv_prog_fc_openacc" = ''; then
+        ac_cv_prog_fc_openacc='none needed'
+      fi
+                        rm -f penmp mp
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_prog_fc_openacc" >&5
+printf "%s\n" "$ax_cv_prog_fc_openacc" >&6; }
+    if test "$ax_cv_prog_fc_openacc" != 'unsupported' && \
+       test "$ax_cv_prog_fc_openacc" != 'none needed'; then
+      OPENACC_FCFLAGS="$ax_cv_prog_fc_openacc"
+    fi
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+  fi
+
+   FCOPENACC="$ax_cv_prog_fc_openacc";
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional CCOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional CCOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-ccopenacc was given.
+if test ${with_ccopenacc+y}
+then :
+  withval=$with_ccopenacc;
+CCOPENACC="${withval} ${CCOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: CCOPENACC = ${CCOPENACC}" >&5
+printf "%s\n" "CCOPENACC = ${CCOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional CXXOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional CXXOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-cxxopenacc was given.
+if test ${with_cxxopenacc+y}
+then :
+  withval=$with_cxxopenacc;
+CXXOPENACC="${withval} ${CXXOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: CXXOPENACC = ${CXXOPENACC}" >&5
+printf "%s\n" "CXXOPENACC = ${CXXOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional FCOPENACC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional FCOPENACC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-fcopenacc was given.
+if test ${with_fcopenacc+y}
+then :
+  withval=$with_fcopenacc;
+FCOPENACC="${withval} ${FCOPENACC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: FCOPENACC = ${FCOPENACC}" >&5
+printf "%s\n" "FCOPENACC = ${FCOPENACC}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+   CCOPENACC="$CCOPENACC   $EXTRAOPENACC";
+   CXXOPENACC="$CXXOPENACC   $EXTRAOPENACC";
+   FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
+   OACCD=oaccd;
+   OACCLD=oaccld;
+
+   #FCOPT="$FCOPT    $FCOPENACC";
+   #CCOPT="$CCOPT    $CCOPENACC"
+   #CXXOPT="$CXXOPT  $CXXOPENACC"
+   #FLINK="$FLINK $FCOPENACC";
+fi
+
+###############################################################################
+LIBRSB_DIR="$pac_cv_librsb_dir";
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for LIBRSB install dir" >&5
+printf %s "checking for LIBRSB install dir... " >&6; }
+case $LIBRSB_DIR in
+     /*) ;;
+     *)  esac
+pac_cv_status_file="$LIBRSB_DIR/librsb.a"
+if test ! -f "$pac_cv_status_file" ; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+  #AC_MSG_ERROR([Could not find an installation  in $LIBRSB_DIR.])
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $LIBRSB_DIR" >&5
+printf "%s\n" "$LIBRSB_DIR" >&6; }
+  RSBTARGETLIB=rsbd;
+  RSBTARGETOBJ=rsbobj;
+fi
+
+
 
 
 
@@ -10942,6 +11369,19 @@ FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -12299,6 +12739,9 @@ fi
 	CUDA 		      : ${HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -12332,6 +12775,9 @@ printf "%s\n" "$as_me:
 	CUDA 		      : ${HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -12348,6 +12794,16 @@ printf "%s\n" "$as_me:
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
 " >&6;}
+if test x"${pac_cv_openacc}" == x"yes" ; then
+   if test x"${FCOPENACC}" == x ; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}:
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= " >&5
+printf "%s\n" "$as_me:
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= " >&6;}
+  fi
+fi
 
 ###############################################################################
 

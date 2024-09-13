@@ -25,7 +25,6 @@ psb_d_pde3d: psb_d_pde3d.o
 	$(FLINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_pde3d $(EXEDIR)
 
-
 psb_s_pde3d: psb_s_pde3d.o 
 	$(FLINK) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_s_pde3d $(EXEDIR)
@@ -41,7 +40,7 @@ psb_s_pde2d: psb_s_pde2d.o
 
 
 clean: 
-	/bin/rm -f psb_d_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o  *$(.mod) \
+	/bin/rm -f psb_d_pde3d.o psb_d_oacc_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o  *$(.mod) \
 	$(EXEDIR)/psb_d_pde3d $(EXEDIR)/psb_s_pde3d $(EXEDIR)/psb_d_pde2d $(EXEDIR)/psb_s_pde2d 
 verycleanlib: 
 	(cd ../..; make veryclean)

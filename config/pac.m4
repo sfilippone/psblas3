@@ -2234,56 +2234,6 @@ AC_HELP_STRING([--with-cudacc], [A comma-separated list of CCs to compile to, fo
 [pac_cv_cudacc=''])
 ])
 
-AC_DEFUN(PAC_ARG_WITH_LIBRSB,
-	 [SAVE_LIBS="$LIBS"
-	  SAVE_CPPFLAGS="$CPPFLAGS"
-
-	  AC_ARG_WITH(librsb,
-	  AC_HELP_STRING([--with-librsb], [The directory for LIBRSB, for example,
- 	  --with-librsb=/opt/packages/librsb]),
-	  [pac_cv_librsb_dir=$withval],
-	  [pac_cv_librsb_dir=''])
-	  
-	  if test "x$pac_cv_librsb_dir" != "x"; then 
-	  LIBS="-L$pac_cv_librsb_dir $LIBS"
-	  RSB_INCLUDES="-I$pac_cv_librsb_dir"
-	  # CPPFLAGS="$GPU_INCLUDES $CUDA_INCLUDES $CPPFLAGS"
-	  RSB_LIBDIR="-L$pac_cv_librsb_dir"
-	  fi
-	  #AC_MSG_CHECKING([librsb dir $pac_cv_librsb_dir])
-	  AC_CHECK_HEADER([$pac_cv_librsb_dir/rsb.h],
-			  [pac_rsb_header_ok=yes],
-			  [pac_rsb_header_ok=no; RSB_INCLUDES=""])
-	  
-	  if test "x$pac_rsb_header_ok" == "xyes" ; then 
-	  RSB_LIBS="-lrsb $RSB_LIBDIR"
-	  # LIBS="$GPU_LIBS $CUDA_LIBS -lm $LIBS";
-	  # AC_MSG_CHECKING([for spgpuCreate in $GPU_LIBS])
-	  # AC_TRY_LINK_FUNC(spgpuCreate, 
-	  # 		   [pac_cv_have_spgpu=yes;pac_gpu_lib_ok=yes; ],
-	  # 		   [pac_cv_have_spgpu=no;pac_gpu_lib_ok=no; GPU_LIBS=""])
-	  # AC_MSG_RESULT($pac_gpu_lib_ok)
-	  # if test "x$pac_cv_have_spgpu" == "xyes" ; then 
-	  # AC_MSG_NOTICE([Have found SPGPU])
-	  RSBLIBNAME="librsb.a";
-	  LIBRSB_DIR="$pac_cv_librsb_dir";
-	  # SPGPU_DEFINES="-DHAVE_SPGPU";
-	  LIBRSB_INCDIR="$LIBRSB_DIR";
-	  LIBRSB_INCLUDES="-I$LIBRSB_INCDIR";
-	  LIBRSB_LIBS="-lrsb -L$LIBRSB_DIR";
-	  # CUDA_DIR="$pac_cv_cuda_dir";
-	  LIBRSB_DEFINES="-DHAVE_RSB";
-	  LRSB=-lpsb_rsb
-	  # CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
-	  # CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
-	  FDEFINES="$LIBRSB_DEFINES $psblas_cv_define_prepend $FDEFINES";
-	  CDEFINES="$LIBRSB_DEFINES $CDEFINES";#CDEFINES="-DHAVE_SPGPU -DHAVE_CUDA $CDEFINES";
-	  fi
-#  fi
-LIBS="$SAVE_LIBS"
-CPPFLAGS="$SAVE_CPPFLAGS"
-])
-dnl
 
 dnl @synopsis PAC_CHECK_CUDA_VERSION
 dnl
@@ -2335,4 +2285,48 @@ LIBS="$SAVE_LIBS"
 CPPFLAGS="$SAVE_CPPFLAGS"
 ])dnl 
 
+
+
+dnl @synopsis PAC_ARG_OPENACC
+dnl
+dnl Test for --enable-openacc
+dnl 
+dnl 
+dnl
+dnl Example use:
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_OPENACC],
+[AC_MSG_CHECKING([whether we want openacc ])
+AC_ARG_ENABLE(openacc,
+AS_HELP_STRING([--enable-openacc], 
+[Specify whether to enable openacc. ]),
+[
+pac_cv_openacc="yes";
+]
+dnl ,
+dnl [pac_cv_openacc="no";]
+	     )
+if test x"$pac_cv_openacc" == x"yes" ; then
+   AC_MSG_RESULT([yes.])
+#   AC_LANG_PUSH([Fortran])
+#   AC_OPENACC() 
+#   pac_cv_openacc_fcopt="$OPENACC_FCFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C])
+#   AC_OPENACC() 
+#   pac_cv_openacc_ccopt="$OPENACC_CFLAGS";
+#   AC_LANG_POP()
+#   AC_LANG_PUSH([C++])
+#   AC_OPENACC() 
+#   pac_cv_openacc_cxxopt="$OPENACC_CXXFLAGS";
+#   AC_LANG_POP()
+else
+ pac_cv_openacc="no";
+ AC_MSG_RESULT([no.])
+fi
+]
+)
 
