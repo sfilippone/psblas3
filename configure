@@ -849,7 +849,8 @@ with_amd
 with_amddir
 with_amdincdir
 with_amdlibdir
-with_cuda
+enable_cuda
+with_cudadir
 with_cudacc
 enable_openacc
 with_extraopenacc
@@ -1506,6 +1507,7 @@ Optional Features:
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-openmp         Specify whether to enable openmp.
   --disable-openmp        do not use OpenMP
+  --enable-cuda           Specify whether to enable cuda.
   --enable-openacc        Specify whether to enable openacc.
   --disable-openacc       do not use Openacc
 
@@ -1550,7 +1552,7 @@ Optional Packages:
   --with-amddir=DIR       Specify the directory for AMD library and includes.
   --with-amdincdir=DIR    Specify the directory for AMD includes.
   --with-amdlibdir=DIR    Specify the directory for AMD library.
-  --with-cuda=DIR         Specify the CUDA install directory.
+  --with-cudadir=DIR      Specify the CUDA install directory.
   --with-cudacc           A comma-separated list of CCs to compile to, for
                           example, --with-cudacc=50,60,70,75
   --with-extraopenacc     additional [EXTRAOPENACC] flags to be added: will
@@ -10628,12 +10630,26 @@ if test "x$psblas_cv_have_amd" == "xyes" ; then
 fi
 
 
-
-
-# Check whether --with-cuda was given.
-if test ${with_cuda+y}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether we want cuda " >&5
+printf %s "checking whether we want cuda ... " >&6; }
+# Check whether --enable-cuda was given.
+if test ${enable_cuda+y}
 then :
-  withval=$with_cuda; pac_cv_cuda_dir=$withval
+  enableval=$enable_cuda;
+pac_cv_cuda="yes";
+
+
+fi
+
+
+
+if test "x$pac_cv_cuda" == "xyes"; then
+
+
+# Check whether --with-cudadir was given.
+if test ${with_cudadir+y}
+then :
+  withval=$with_cudadir; pac_cv_cuda_dir=$withval
 else $as_nop
   pac_cv_cuda_dir=''
 fi
@@ -10719,10 +10735,10 @@ SAVE_LIBS="$LIBS"
 SAVE_CPPFLAGS="$CPPFLAGS"
 if test "x$pac_cv_have_cuda" == "x"; then
 
-# Check whether --with-cuda was given.
-if test ${with_cuda+y}
+# Check whether --with-cudadir was given.
+if test ${with_cudadir+y}
 then :
-  withval=$with_cuda; pac_cv_cuda_dir=$withval
+  withval=$with_cudadir; pac_cv_cuda_dir=$withval
 else $as_nop
   pac_cv_cuda_dir=''
 fi
@@ -10884,6 +10900,7 @@ fi
 if test "x$pac_cv_ipk_size" != "x4"; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU" >&5
 printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU" >&6;}
+  pac_cv_cuda="no";
   HAVE_CUDA="no";
   CUDA_CC="";
   SPGPU_LIBS="";
@@ -10892,6 +10909,7 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   CUDEFINES="";
   CUDA_INCLUDES="";
   CUDA_LIBS="";
+fi
 fi
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether we want openacc " >&5
@@ -12741,6 +12759,8 @@ fi
 
 	OPENACC		      : ${pac_cv_openacc}
         FCOPENACC             : ${FCOPENACC}
+	OACCD                 : ${OACCD}
+	OACCLD                : ${OACCLD}
 
 	BLAS                  : ${BLAS_LIBS}
 
@@ -12777,6 +12797,8 @@ printf "%s\n" "$as_me:
 
 	OPENACC		      : ${pac_cv_openacc}
         FCOPENACC             : ${FCOPENACC}
+	OACCD                 : ${OACCD}
+	OACCLD                : ${OACCLD}
 
 	BLAS                  : ${BLAS_LIBS}
 

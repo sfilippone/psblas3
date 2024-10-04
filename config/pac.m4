@@ -2157,6 +2157,31 @@ CPPFLAGS="$SAVE_CPPFLAGS"
 
 
 
+dnl @synopsis PAC_ARG_CUDA
+dnl
+dnl Test for --enable-cuda
+dnl 
+dnl 
+dnl
+dnl Example use:
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_CUDA],
+[AC_MSG_CHECKING([whether we want cuda ])
+AC_ARG_ENABLE(cuda,
+AS_HELP_STRING([--enable-cuda], 
+[Specify whether to enable cuda. ]),
+[
+pac_cv_cuda="yes";
+]
+dnl ,
+dnl [pac_cv_cuda="no";]
+	     )
+]
+)
+
 
 dnl @synopsis PAC_CHECK_CUDA
 dnl
@@ -2173,7 +2198,7 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_CUDA,
-[AC_ARG_WITH(cuda, AC_HELP_STRING([--with-cuda=DIR], [Specify the CUDA install directory.]),
+[AC_ARG_WITH(cudadir, AC_HELP_STRING([--with-cudadir=DIR], [Specify the CUDA install directory.]),
         [pac_cv_cuda_dir=$withval],
         [pac_cv_cuda_dir=''])
 

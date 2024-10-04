@@ -795,6 +795,8 @@ if test "x$psblas_cv_have_amd" == "xyes" ; then
 fi
 
 
+PAC_ARG_CUDA()
+if test "x$pac_cv_cuda" == "xyes"; then
 
 PAC_CHECK_CUDA()
 
@@ -834,6 +836,7 @@ fi
 
 if test "x$pac_cv_ipk_size" != "x4"; then
   AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
+  pac_cv_cuda="no";
   HAVE_CUDA="no";
   CUDA_CC="";	
   SPGPU_LIBS="";	
@@ -842,6 +845,7 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   CUDEFINES="";
   CUDA_INCLUDES="";
   CUDA_LIBS="";
+fi
 fi
 
 PAC_ARG_OPENACC()
