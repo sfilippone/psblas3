@@ -2412,6 +2412,7 @@ subroutine  psb_d_csc_clean_zeros(a, info)
   !
   integer(psb_ipk_) :: i, j, k, nc
   integer(psb_ipk_), allocatable :: ilcp(:)
+  logical           :: cpy
 
   info = 0
   call a%sync()
@@ -2421,7 +2422,10 @@ subroutine  psb_d_csc_clean_zeros(a, info)
   j        = a%icp(1)
   do i=1, nc
     do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= dzero) then
+      cpy = (a%val(k) /= dzero)
+      ! Always keep the diagonal, even if numerically zero
+      if (.not.cpy) cpy = (i == a%ia(k))
+      if (cpy) then
         a%val(j) = a%val(k)
         a%ia(j)  = a%ia(k)
         j = j + 1
