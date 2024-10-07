@@ -18,7 +18,7 @@ contains
   subroutine psb_oacc_init(ctxt, dev)
     type(psb_ctxt_type), intent(in) :: ctxt
     integer, intent(in), optional :: dev
-    
+    oacc_do_maybe_free_buffer = .false.    
   end subroutine psb_oacc_init
 
   subroutine psb_oacc_exit()
