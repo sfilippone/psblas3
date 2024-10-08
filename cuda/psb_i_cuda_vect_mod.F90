@@ -795,18 +795,6 @@ contains
     call x%set_dev()
     
   end subroutine i_cuda_set_scal
-!!$
-!!$  subroutine i_cuda_set_vect(x,val)
-!!$    class(psb_i_vect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: val(:)
-!!$    integer(psb_ipk_) :: nr
-!!$    integer(psb_ipk_) :: info
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$    call x%psb_i_base_vect_type%set_vect(val)
-!!$    call x%set_host()
-!!$
-!!$  end subroutine i_cuda_set_vect
 
 
 

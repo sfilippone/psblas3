@@ -813,18 +813,6 @@ contains
     call x%set_dev()
     
   end subroutine c_cuda_set_scal
-!!$
-!!$  subroutine c_cuda_set_vect(x,val)
-!!$    class(psb_c_vect_cuda), intent(inout) :: x
-!!$    complex(psb_spk_), intent(in)           :: val(:)
-!!$    integer(psb_ipk_) :: nr
-!!$    integer(psb_ipk_) :: info
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$    call x%psb_c_base_vect_type%set_vect(val)
-!!$    call x%set_host()
-!!$
-!!$  end subroutine c_cuda_set_vect
 
 
 
@@ -834,7 +822,6 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: y
     integer(psb_ipk_), intent(in)              :: n
     complex(psb_spk_)                :: res
-    complex(psb_spk_), external      :: ddot
     integer(psb_ipk_) :: info
     
     res = czero
@@ -844,9 +831,6 @@ contains
     !  TYPE psb_c_vect
     !
     select type(yy => y)
-    type is (psb_c_base_vect_type)
-      if (x%is_dev()) call x%sync()
-      res = ddot(n,x%v,1,yy%v,1)
     type is (psb_c_vect_cuda)
       if (x%is_host()) call x%sync()
       if (yy%is_host()) call yy%sync()
@@ -858,7 +842,7 @@ contains
 
     class default
       ! y%sync is done in dot_a
-      call x%sync()      
+      if (x%is_dev()) call x%sync()
       res = y%dot(n,x%v)
     end select
 
@@ -870,10 +854,10 @@ contains
     complex(psb_spk_), intent(in)           :: y(:)
     integer(psb_ipk_), intent(in)        :: n
     complex(psb_spk_)                :: res
-    complex(psb_spk_), external      :: ddot
+    complex(psb_spk_), external      :: cdot
     
     if (x%is_dev()) call x%sync()
-    res = ddot(n,y,1,x%v,1)
+    res = cdot(n,y,1,x%v,1)
 
   end function c_cuda_dot_a
     

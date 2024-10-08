@@ -223,7 +223,8 @@ int scalMultiVecDeviceDoubleComplex(cuDoubleComplex alpha, void* devMultiVecA)
   return(i);
 }
 
-int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMultiVecA, void* devMultiVecB)
+int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n,
+				   void* devMultiVecA, void* devMultiVecB)
 {int i=0;
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;

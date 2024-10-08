@@ -220,7 +220,8 @@ int dotMultiVecDeviceDouble(double* y_res, int n, void* devMultiVecA, void* devM
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;
   spgpuHandle_t handle=psb_cudaGetHandle();
 
-  spgpuDmdot(handle, y_res, n, (double*)devVecA->v_, (double*)devVecB->v_,devVecA->count_,devVecB->pitch_);
+  spgpuDmdot(handle, y_res, n, (double*)devVecA->v_, (double*)devVecB->v_,
+	     devVecA->count_,devVecB->pitch_);
   return(i);
 }
 
