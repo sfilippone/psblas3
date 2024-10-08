@@ -798,22 +798,18 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: y
     integer(psb_ipk_), intent(in) :: n
     complex(psb_spk_) :: res
-    complex(psb_spk_), external :: ddot
     integer(psb_ipk_) :: info
 
     res = czero
 !!$    write(0,*) 'oacc_dot_v'
     select type(yy  => y)
-    type is (psb_c_base_vect_type)
-        if (x%is_dev()) call x%sync()
-        res = ddot(n, x%v, 1, yy%v, 1)
     type is (psb_c_vect_oacc)
         if (x%is_host()) call x%sync()
         if (yy%is_host()) call yy%sync()
         res = c_inner_oacc_dot(n, x%v, yy%v)
     class default
-        call x%sync()
-        res = y%dot(n, x%v)
+      if (x%is_dev()) call x%sync()
+      res = y%dot(n, x%v)
     end select
   contains
     function c_inner_oacc_dot(n, x, y) result(res)
@@ -838,10 +834,10 @@ contains
     complex(psb_spk_), intent(in) :: y(:)
     integer(psb_ipk_), intent(in) :: n
     complex(psb_spk_)  :: res
-    complex(psb_spk_), external :: ddot
+    complex(psb_spk_), external :: cdot
 
     if (x%is_dev()) call x%sync()
-    res = ddot(n, y, 1, x%v, 1)
+    res = cdot(n, y, 1, x%v, 1)
 
   end function c_oacc_dot_a
 
