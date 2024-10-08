@@ -96,7 +96,6 @@ __global__ void spgpuSdot_kern(int n, float* x, float* y)
 	{
 #endif	
 
-
 #ifdef ASSUME_LOCK_SYNC_PARALLELISM
 		volatile float* vsSum = sSum;
 		vsSum[threadIdx.x] = res;

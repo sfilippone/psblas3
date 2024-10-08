@@ -803,10 +803,11 @@ PAC_CHECK_CUDA()
 if test "x$pac_cv_have_cuda" == "xyes"; then
    
    PAC_CHECK_CUDA_VERSION()
-   CUDA_VERSION="$pac_cv_cuda_version";
-   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
    dnl PAC_CHECK_SPGPU()
    HAVE_CUDA="yes";
+   CUDA_VERSION="$pac_cv_cuda_version";
+   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+   CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
    SPGPU_LIBS="-lspgpu";	
    CUDAD=cudad;
    CUDALD=cudald;
@@ -816,7 +817,7 @@ if test "x$pac_cv_have_cuda" == "xyes"; then
 
    PAC_ARG_WITH_CUDACC()
    if test "x$pac_cv_cudacc" == "x"; then
-      pac_cv_cudacc="50,60,70,75";
+      pac_cv_cudacc="50,60,70,75,80,86";
       CUDA_CC="$pac_cv_cudacc";
    fi
    if (( $pac_cv_cuda_version >= 11070  ))
@@ -828,9 +829,10 @@ if test "x$pac_cv_have_cuda" == "xyes"; then
 	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
    done
    if test "x$pac_cv_cuda_version" != "xunknown"; then
-     CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-     FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-     CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"    
+     CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
+     FCUDEFINES=" ${CUDA_DEFINES}"
+     CCUDEFINES=" ${CUDA_DEFINES}"
+     CXXCUDEFINES=" ${CUDA_DEFINES}"	
    fi
 fi
 
@@ -843,8 +845,12 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
+  CUDA_DEFINES="";
   CUDA_INCLUDES="";
   CUDA_LIBS="";
+  FCUDEFINES="";
+  CCUDEFINES="";
+  CXXCUDEFINES="";
 fi
 fi
 
@@ -970,9 +976,9 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)  $(CUDA_DEFINES)
-CDEFINES=$(PSBCDEFINES) $(CUDA_DEFINES)
-FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
+CXXDEFINES=$(PSBCXXDEFINES) 
+CDEFINES=$(PSBCDEFINES) 
+FDEFINES=$(PSBFDEFINES) 
 	
 
 # These should be portable rules, arent they?
@@ -1008,6 +1014,9 @@ dnl AC_SUBST(SPGPU_INCDIR)
 AC_SUBST(EXTRALDLIBS)
 AC_SUBST(CUDA_DIR)
 AC_SUBST(CUDA_DEFINES)
+AC_SUBST(FCUDEFINES)
+AC_SUBST(CCUDEFINES)
+AC_SUBST(CXXCUDEFINES)	
 AC_SUBST(CUDA_INCLUDES)
 AC_SUBST(CUDA_LIBS)
 AC_SUBST(CUDA_VERSION)

@@ -668,6 +668,9 @@ CUDA_SHORT_VERSION
 CUDA_VERSION
 CUDA_LIBS
 CUDA_INCLUDES
+CXXCUDEFINES
+CCUDEFINES
+FCUDEFINES
 CUDA_DEFINES
 CUDA_DIR
 EXTRALDLIBS
@@ -10856,9 +10859,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 LIBS="$SAVE_LIBS"
 CPPFLAGS="$SAVE_CPPFLAGS"
 
+      HAVE_CUDA="yes";
    CUDA_VERSION="$pac_cv_cuda_version";
    CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-      HAVE_CUDA="yes";
+   CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
    SPGPU_LIBS="-lspgpu";
    CUDAD=cudad;
    CUDALD=cudald;
@@ -10879,7 +10883,7 @@ fi
 
 
    if test "x$pac_cv_cudacc" == "x"; then
-      pac_cv_cudacc="50,60,70,75";
+      pac_cv_cudacc="50,60,70,75,80,86";
       CUDA_CC="$pac_cv_cudacc";
    fi
    if (( $pac_cv_cuda_version >= 11070  ))
@@ -10891,9 +10895,10 @@ fi
 	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
    done
    if test "x$pac_cv_cuda_version" != "xunknown"; then
-     CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-     FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-     CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
+     CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
+     FCUDEFINES=" ${CUDA_DEFINES}"
+     CCUDEFINES=" ${CUDA_DEFINES}"
+     CXXCUDEFINES=" ${CUDA_DEFINES}"
    fi
 fi
 
@@ -10907,8 +10912,12 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
+  CUDA_DEFINES="";
   CUDA_INCLUDES="";
   CUDA_LIBS="";
+  FCUDEFINES="";
+  CCUDEFINES="";
+  CXXCUDEFINES="";
 fi
 fi
 
@@ -11373,9 +11382,9 @@ UTILLIBNAME=libpsb_util.a
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)  $(CUDA_DEFINES)
-CDEFINES=$(PSBCDEFINES) $(CUDA_DEFINES)
-FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
+CXXDEFINES=$(PSBCXXDEFINES)
+CDEFINES=$(PSBCDEFINES)
+FDEFINES=$(PSBFDEFINES)
 
 
 # These should be portable rules, arent they?
@@ -11387,6 +11396,9 @@ FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
 
 
 

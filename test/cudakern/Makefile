@@ -41,3 +41,8 @@ lib:
 	(cd ../../; make library)
 verycleanlib:
 	(cd ../../; make veryclean)
+
+%.o: %.F90
+	$(FC) $(FFLAGS) $(FINCLUDES) $(FCUDEFINES) -c $< -o $@
+%.o: %.f90
+	$(FC) $(FFLAGS) $(FINCLUDES) $(FCUDEFINES) -c $< -o $@
