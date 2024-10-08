@@ -2412,7 +2412,6 @@ subroutine  psb_s_csc_clean_zeros(a, info)
   !
   integer(psb_ipk_) :: i, j, k, nc
   integer(psb_ipk_), allocatable :: ilcp(:)
-  logical           :: cpy
 
   info = 0
   call a%sync()
@@ -2422,13 +2421,8 @@ subroutine  psb_s_csc_clean_zeros(a, info)
   j        = a%icp(1)
   do i=1, nc
     do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= szero) then 
-        cpy = .true.
-      else
-        ! Always keep the diagonal, even if numerically zero
-        cpy = (i == a%ia(k))
-      end if
-      if (cpy) then
+      ! Always keep the diagonal, even if numerically zero
+      if ((a%val(k) /= szero).or.(i == a%ia(k))) then
         a%val(j) = a%val(k)
         a%ia(j)  = a%ia(k)
         j = j + 1
@@ -4320,7 +4314,6 @@ subroutine  psb_ls_csc_clean_zeros(a, info)
   !
   integer(psb_lpk_) :: i, j, k, nc
   integer(psb_lpk_), allocatable :: ilcp(:)
-  logical :: cpy
   
   info = 0
   call a%sync()
@@ -4330,13 +4323,8 @@ subroutine  psb_ls_csc_clean_zeros(a, info)
   j        = a%icp(1)
   do i=1, nc
     do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= szero) then 
-        cpy = .true.
-      else
-        ! Always keep the diagonal, even if numerically zero
-        cpy = (i == a%ia(k))
-      end if
-      if (cpy) then
+      ! Always keep the diagonal, even if numerically zero
+      if ((a%val(k) /= szero).or.(i == a%ia(k))) then
         a%val(j) = a%val(k)
         a%ia(j)  = a%ia(k)
         j = j + 1

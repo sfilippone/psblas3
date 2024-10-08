@@ -595,19 +595,13 @@ subroutine  psb_c_coo_clean_zeros(a, info)
   integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_ipk_) :: i,j,k, nzin
-  logical           :: cpy
   
   info = 0
   nzin = a%get_nzeros()
   j = 0
   do i=1, nzin
-    if (a%val(i) /= czero) then 
-      cpy = .true.
-    else
-      ! Always keep the diagonal, even if numerically zero
-      cpy = (a%ia(i) == a%ja(i))
-    end if
-    if (cpy) then
+    ! Always keep the diagonal, even if numerically zero
+    if ((a%val(i) /= czero).or.(a%ia(i) == a%ja(i))) then
       j = j + 1
       a%val(j) = a%val(i)
       a%ia(j)  = a%ia(i)
@@ -5933,19 +5927,13 @@ subroutine  psb_lc_coo_clean_zeros(a, info)
   integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_lpk_) :: i,j,k, nzin
-  logical :: cpy
   
   info = 0
   nzin = a%get_nzeros()
   j = 0
   do i=1, nzin
-    if (a%val(i) /= czero) then 
-      cpy = .true.
-    else
-      ! Always keep the diagonal, even if numerically zero
-      cpy = (a%ia(i) == a%ja(i))
-    end if
-    if (cpy) then 
+    ! Always keep the diagonal, even if numerically zero
+    if ((a%val(i) /= czero).or.(a%ia(i) == a%ja(i))) then 
       j = j + 1
       a%val(j) = a%val(i)
       a%ia(j)  = a%ia(i)
