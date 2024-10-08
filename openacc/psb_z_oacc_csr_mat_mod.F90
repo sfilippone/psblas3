@@ -257,9 +257,9 @@ contains
     !       but with size 0, then CREATE,UPDATE and DELETE
     !       will fail
     !
-    if (psb_size(a%val)>0) call acc_create(a%val)
-    if (psb_size(a%ja)>0)  call acc_create(a%ja)
-    if (psb_size(a%irp)>0) call acc_create(a%irp)
+    if (psb_size(a%val)>0) call acc_copyin(a%val)
+    if (psb_size(a%ja)>0)  call acc_copyin(a%ja)
+    if (psb_size(a%irp)>0) call acc_copyin(a%irp)
   end subroutine z_oacc_csr_sync_dev_space
 
   subroutine z_oacc_csr_sync(a)

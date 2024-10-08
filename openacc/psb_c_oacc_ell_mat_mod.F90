@@ -186,10 +186,10 @@ contains
     !       but with size 0, then CREATE,UPDATE and DELETE
     !       will fail
     !
-    if (psb_size(a%val)>0)   call acc_create(a%val)
-    if (psb_size(a%ja)>0)    call acc_create(a%ja)
-    if (psb_size(a%irn)>0)   call acc_create(a%irn)
-    if (psb_size(a%idiag)>0) call acc_create(a%idiag)
+    if (psb_size(a%val)>0)   call acc_copyin(a%val)
+    if (psb_size(a%ja)>0)    call acc_copyin(a%ja)
+    if (psb_size(a%irn)>0)   call acc_copyin(a%irn)
+    if (psb_size(a%idiag)>0) call acc_copyin(a%idiag)
   end subroutine c_oacc_ell_sync_dev_space
 
   function c_oacc_ell_is_host(a) result(res)

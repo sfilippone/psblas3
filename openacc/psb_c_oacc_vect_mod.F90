@@ -113,7 +113,7 @@ contains
       complex(psb_spk_), intent(inout) :: x(:)
       integer(psb_ipk_) :: n
       integer(psb_ipk_) :: i
-      !$acc parallel loop
+      !$acc parallel loop present(x)
       do i = 1, n
         x(i) = abs(x(i))
       end do
@@ -144,7 +144,7 @@ contains
       complex(psb_spk_), intent(inout) :: x(:),y(:)
       integer(psb_ipk_) :: n
       integer(psb_ipk_) :: i
-      !$acc parallel loop
+      !$acc parallel loop present(x,y)
       do i = 1, n
         y(i) = abs(x(i))
       end do
@@ -164,7 +164,7 @@ contains
       complex(psb_spk_), intent(in) :: alpha
       complex(psb_spk_), intent(inout) :: x(:)
       integer(psb_ipk_) :: i
-      !$acc parallel loop
+      !$acc parallel loop present(x)
       do i = 1, size(x)
         x(i) = alpha * x(i)
       end do
@@ -189,7 +189,7 @@ contains
       real(psb_spk_) :: sum, mx
       integer(psb_ipk_) :: i
       mx = szero
-      !$acc parallel loop reduction(max:mx)
+      !$acc parallel loop reduction(max:mx) present(x)
       do i = 1, n
         if (abs(x(i)) > mx) mx = abs(x(i))
       end do
@@ -197,7 +197,7 @@ contains
         res = mx
       else
         sum = szero
-        !$acc parallel loop reduction(+:sum)
+        !$acc parallel loop reduction(+:sum)  present(x)
         do i = 1, n
           sum = sum + abs(x(i)/mx)**2
         end do
@@ -223,7 +223,7 @@ contains
       real(psb_spk_) :: max_val
       integer(psb_ipk_) :: i
       max_val = szero
-      !$acc parallel loop reduction(max:max_val)
+      !$acc parallel loop reduction(max:max_val) present(x) 
       do i = 1, n
         if (abs(x(i)) > max_val) max_val = abs(x(i))
       end do
@@ -248,7 +248,7 @@ contains
       real(psb_spk_) :: res
       integer(psb_ipk_) :: i
       res = szero
-      !$acc parallel loop reduction(+:res)
+      !$acc parallel loop reduction(+:res) present(x)
       do i = 1, n
         res = res + abs(x(i))
       end do
@@ -265,7 +265,7 @@ contains
     
     info = 0    
     if (y%is_dev()) call y%sync()
-    !$acc parallel loop
+    !$acc parallel loop present(x,y)
     do i = 1, size(x)
         y%v(i) = y%v(i) * x(i)
     end do
@@ -283,7 +283,7 @@ contains
     
     info = 0    
     if (z%is_dev()) call z%sync()
-    !$acc parallel loop
+    !$acc parallel loop  present(x,y,z%v)
     do i = 1, size(x)
         z%v(i) = alpha * x(i) * y(i) + beta * z%v(i)
     end do
@@ -327,7 +327,7 @@ contains
       complex(psb_spk_), intent(inout) :: y(:)
       complex(psb_spk_), intent(in) :: alpha, beta
       integer(psb_ipk_), intent(out)  :: info
-      !$acc parallel 
+      !$acc parallel present(x,y)
       !$acc loop
       do i = 1, m
         y(i) = alpha * x(i) + beta * y(i)
@@ -384,7 +384,7 @@ contains
           if ((nx < m) .or. (ny < m) .or. (nz < m)) then
             info = psb_err_internal_error_
           else
-            !$acc parallel loop
+            !$acc parallel loop  present(xx%v,yy%v,zz%v)
             do i = 1, m
               yy%v(i) = alpha * xx%v(i) + beta * yy%v(i)
               zz%v(i) = gamma * yy%v(i) + delta * zz%v(i)
@@ -416,6 +416,7 @@ contains
     integer(psb_ipk_) :: info, k
     logical           :: acc_done
     if (.not.allocated(y%combuf)) then
+      write(0,*) 'allocation error for y%combuf '
       call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf')
       return
     end if
@@ -443,8 +444,8 @@ contains
       integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_)    :: beta,x(:), y(:)
       integer(psb_ipk_) :: k
-      !$acc update device(x(1:n)) async 
-      !$acc parallel loop 
+      !$acc update device(x(1:n)) 
+      !$acc parallel loop present(x,y)
       do k = 1, n
         y(idx(k)) = x(k) + beta *y(idx(k))
       end do
@@ -488,8 +489,8 @@ contains
       integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_) :: beta, x(:), y(:)
       integer(psb_ipk_) :: k
-      !$acc update device(x(1:n)) async
-      !$acc parallel loop 
+      !$acc update device(x(1:n)) 
+      !$acc parallel loop  present(x,y)
       do k = 1, n
         y(idx(k)) = x(k) + beta *y(idx(k))
       end do
@@ -531,6 +532,7 @@ contains
     acc_done = .false.
 
     if (.not.allocated(x%combuf)) then
+      write(0,*) 'oacc allocation error combuf gthzbuf '    
       call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf')
       return
     end if
@@ -556,13 +558,13 @@ contains
       integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_)   :: x(:), y(:)
       integer(psb_ipk_) :: k
-      
-      !$acc parallel loop present(y)
+      !
+      !$acc parallel loop present(x,y)
       do k = 1, n
         y(k) = x(idx(k))
       end do
       !$acc end parallel loop
-      !$acc update self(y(1:n)) async
+      !$acc update self(y(1:n)) 
     end subroutine inner_gth
   end subroutine c_oacc_gthzbuf
   
@@ -600,13 +602,13 @@ contains
       integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_) :: x(:), y(:)
       integer(psb_ipk_) :: k
-      
-      !$acc parallel loop present(y)
+      !
+      !$acc parallel loop present(x,y)
       do k = 1, n
         y(k) = x(idx(k))
       end do
       !$acc end parallel loop
-      !$acc update self(y(1:n)) async     
+      !$acc update self(y(1:n))      
     end subroutine inner_gth
   end subroutine c_oacc_gthzv_x
 
@@ -633,7 +635,7 @@ contains
         if (vval%is_host()) call vval%sync()
         if (virl%is_host()) call virl%sync()
         if (x%is_host()) call x%sync()
-        !$acc parallel loop
+        !$acc parallel loop  present(x%v,virl%v,vval%v)
         do i = 1, n
           x%v(virl%v(i)) = vval%v(i)
         end do
@@ -757,7 +759,7 @@ contains
     if (present(first)) first_ = max(1, first)
     if (present(last))  last_  = min(last, last_)
 
-    !$acc parallel loop
+    !$acc parallel loop present(x%v)
     do i = first_, last_
       x%v(i) = val
     end do
@@ -796,22 +798,18 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: y
     integer(psb_ipk_), intent(in) :: n
     complex(psb_spk_) :: res
-    complex(psb_spk_), external :: ddot
     integer(psb_ipk_) :: info
 
     res = czero
 !!$    write(0,*) 'oacc_dot_v'
     select type(yy  => y)
-    type is (psb_c_base_vect_type)
-        if (x%is_dev()) call x%sync()
-        res = ddot(n, x%v, 1, yy%v, 1)
     type is (psb_c_vect_oacc)
         if (x%is_host()) call x%sync()
         if (yy%is_host()) call yy%sync()
         res = c_inner_oacc_dot(n, x%v, yy%v)
     class default
-        call x%sync()
-        res = y%dot(n, x%v)
+      if (x%is_dev()) call x%sync()
+      res = y%dot(n, x%v)
     end select
   contains
     function c_inner_oacc_dot(n, x, y) result(res)
@@ -836,10 +834,10 @@ contains
     complex(psb_spk_), intent(in) :: y(:)
     integer(psb_ipk_), intent(in) :: n
     complex(psb_spk_)  :: res
-    complex(psb_spk_), external :: ddot
+    complex(psb_spk_), external :: cdot
 
     if (x%is_dev()) call x%sync()
-    res = ddot(n, y, 1, x%v, 1)
+    res = cdot(n, y, 1, x%v, 1)
 
   end function c_oacc_dot_a
 
@@ -849,26 +847,36 @@ contains
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
-    if (n /= psb_size(x%combuf)) then 
+
+    !write(0,*) 'oacc new_buffer',n,psb_size(x%combuf)    
+    if (n > psb_size(x%combuf)) then
+      !write(0,*) 'oacc new_buffer: reallocating '
+      if (allocated(x%combuf)) then
+        !if (acc_is_present(x%combuf)) call acc_delete_finalize(x%combuf)
+        !$acc exit data delete(x%combuf) 
+      end if
       call x%psb_c_base_vect_type%new_buffer(n,info)
       !$acc enter data copyin(x%combuf)
+      ! call acc_copyin(x%combuf)
     end if
   end subroutine c_oacc_new_buffer
 
   subroutine c_oacc_sync_dev_space(x)
     implicit none 
     class(psb_c_vect_oacc), intent(inout) :: x
-    if (allocated(x%v)) call acc_create(x%v)
+!!$    write(0,*) 'oacc sync_dev_space'    
+    if (psb_size(x%v)>0) call acc_copyin(x%v)
   end subroutine c_oacc_sync_dev_space
 
   subroutine c_oacc_sync(x)
     implicit none 
     class(psb_c_vect_oacc), intent(inout) :: x
     if (x%is_dev()) then
-      call acc_update_self(x%v)
+      if (psb_size(x%v)>0) call acc_update_self(x%v)
     end if
     if (x%is_host()) then
-      call acc_update_device(x%v)
+      if (.not.acc_is_present(x%v)) call c_oacc_sync_dev_space(x)      
+      if (psb_size(x%v)>0) call acc_update_device(x%v)
     end if
     call x%set_sync()
   end subroutine c_oacc_sync
@@ -941,6 +949,8 @@ contains
     type(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_)     :: info
     info = 0
+!!$    write(0,*) 'oacc final_vect_free'
+    call x%free_buffer(info)
     if (allocated(x%v)) then
       if (acc_is_present(x%v)) call acc_delete_finalize(x%v) 
       deallocate(x%v, stat=info)
@@ -953,8 +963,9 @@ contains
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_), intent(out)     :: info
     info = 0
+!!$    write(0,*) 'oacc vect_free'
+    call x%free_buffer(info)
     if (acc_is_present(x%v)) call acc_delete_finalize(x%v)
-    if (acc_is_present(x%combuf))  call acc_delete_finalize(x%combuf)
     call x%psb_c_base_vect_type%free(info)
   end subroutine c_oacc_vect_free
   
@@ -964,8 +975,10 @@ contains
     integer(psb_ipk_), intent(out)             :: info
 
     info = 0
-    if (psb_oacc_get_maybe_free_buffer())&
-         &  call x%free_buffer(info)
+    if (psb_oacc_get_maybe_free_buffer()) then
+      !write(0,*) 'psb_oacc_get_maybe_free_buffer() ',psb_oacc_get_maybe_free_buffer()
+      call x%free_buffer(info)
+    end if
 
   end subroutine c_oacc_vect_maybe_free_buffer
   
@@ -973,7 +986,7 @@ contains
     implicit none
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
-
+!    write(0,*) 'oacc free_buffer'    
     info = 0
     if (acc_is_present(x%combuf))  call acc_delete_finalize(x%combuf) 
     call x%psb_c_base_vect_type%free_buffer(info)
@@ -985,7 +998,6 @@ contains
     class(psb_c_vect_oacc), intent(inout) :: x
     integer(psb_ipk_)   :: res
 
-    if (x%is_dev()) call x%sync()
     res = size(x%v)
   end function c_oacc_get_size
 
