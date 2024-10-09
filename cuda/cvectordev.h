@@ -37,6 +37,7 @@
 #include "vectordev.h"
 #include "cuda_runtime.h"
 #include "core.h"
+#include "vector.h"
 
 int registerMappedFloatComplex(void *, void **, int, cuFloatComplex);
 int writeMultiVecDeviceFloatComplex(void* deviceMultiVec, cuFloatComplex* hostMultiVec);
@@ -63,9 +64,9 @@ int iscatMultiVecDeviceFloatComplex(void* deviceVec, int vectorId, int n, int fi
 			      int hfirst, void* host_values, int indexBase, cuFloatComplex beta);
 
 int scalMultiVecDeviceFloatComplex(cuFloatComplex alpha, void* devMultiVecA);
-int nrm2MultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devVecA);
-int amaxMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devVecA);
-int asumMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devVecA);
+int nrm2MultiVecDeviceFloatComplex(float* y_res, int n, void* devVecA);
+int amaxMultiVecDeviceFloatComplex(float* y_res, int n, void* devVecA);
+int asumMultiVecDeviceFloatComplex(float* y_res, int n, void* devVecA);
 int dotMultiVecDeviceFloatComplex(cuFloatComplex* y_res, int n, void* devVecA, void* devVecB);
 
 int axpbyMultiVecDeviceFloatComplex(int n, cuFloatComplex alpha, void* devVecX, cuFloatComplex beta, void* devVecY);

@@ -439,7 +439,7 @@ int T_CSRGDeviceSetMatFillMode(T_Cmat *Matrix, int type)
   T_CSRGDeviceMat *cMat= Matrix->mat;
   cusparseFillMode_t  mode=type;
 
-  CHECK_CUSPARSE(cusparseSpMatSetAttribute(cMat->spmvDescr,
+  CHECK_CUSPARSE(cusparseSpMatSetAttribute((*(cMat->spmvDescr)),
 					   CUSPARSE_SPMAT_FILL_MODE,
 					   (const void*) &mode,
 					   sizeof(cusparseFillMode_t)));
@@ -450,7 +450,7 @@ int T_CSRGDeviceSetMatDiagType(T_Cmat *Matrix, int type)
 {
   T_CSRGDeviceMat *cMat= Matrix->mat;
   cusparseDiagType_t  cutype=type;
-  CHECK_CUSPARSE(cusparseSpMatSetAttribute(cMat->spmvDescr,
+  CHECK_CUSPARSE(cusparseSpMatSetAttribute((*(cMat->spmvDescr)),
 					   CUSPARSE_SPMAT_DIAG_TYPE,
 					   (const void*) &cutype,
 					   sizeof(cusparseDiagType_t)));

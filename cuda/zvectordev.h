@@ -37,6 +37,7 @@
 #include "vectordev.h"
 #include "cuda_runtime.h"
 #include "core.h"
+#include "vector.h"
 
 int registerMappedDoubleComplex(void *, void **, int, cuDoubleComplex);
 int writeMultiVecDeviceDoubleComplex(void* deviceMultiVec, cuDoubleComplex* hostMultiVec);
@@ -69,9 +70,9 @@ int iscatMultiVecDeviceDoubleComplex(void* deviceVec, int vectorId, int n,
 				     int indexBase, cuDoubleComplex beta);
 
 int scalMultiVecDeviceDoubleComplex(cuDoubleComplex alpha, void* devMultiVecA);
-int nrm2MultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devVecA);
-int amaxMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devVecA);
-int asumMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devVecA);
+int nrm2MultiVecDeviceDoubleComplex(double* y_res, int n, void* devVecA);
+int amaxMultiVecDeviceDoubleComplex(double* y_res, int n, void* devVecA);
+int asumMultiVecDeviceDoubleComplex(double* y_res, int n, void* devVecA);
 int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, 
 				   void* devVecA, void* devVecB);
 

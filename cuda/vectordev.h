@@ -34,6 +34,7 @@
 #include "cuda_runtime.h"
 //#include "common.h"
 //#include "cintrf.h"
+#include "cuda_util.h"
 #include <complex.h>
 
 struct MultiVectDevice

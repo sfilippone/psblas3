@@ -35,6 +35,7 @@
 #include "vectordev.h"
 #include "cuda_runtime.h"
 #include "core.h"
+#include "vector.h"
 
 int registerMappedFloat(void *, void **, int, float);
 int writeMultiVecDeviceFloat(void* deviceMultiVec, float* hostMultiVec);

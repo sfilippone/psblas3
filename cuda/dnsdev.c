@@ -178,12 +178,12 @@ int spmvDnsDeviceFloatComplex(char transa, int m, int n, int k, float complex *a
   /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
   if (n == 1) {
     status = cublasCgemv(handle, trans, m,k,
-			 alpha, devMat->cM,devMat->pitch, x->v_,1,
-			 beta,  y->v_,1);
+			 (const cuComplex *) alpha, devMat->cM,devMat->pitch, x->v_,1,
+			 (const cuComplex *) beta,  y->v_,1);
   } else {
     status = cublasCgemm(handle, trans, CUBLAS_OP_N, m,n,k,
-			 alpha, devMat->cM,devMat->pitch, x->v_,x->pitch_,
-			 beta,  y->v_,y->pitch_);
+			 (const cuComplex *) alpha, devMat->cM,devMat->pitch, x->v_,x->pitch_,
+			 (const cuComplex *) beta,  y->v_,y->pitch_);
   }    
   
   if (status == CUBLAS_STATUS_SUCCESS)  
@@ -205,12 +205,12 @@ int spmvDnsDeviceDoubleComplex(char transa, int m, int n, int k, double complex 
   /* Note: the M,N,K choices according to TRANS have already been handled in the caller */  
   if (n == 1) {
     status = cublasZgemv(handle, trans, m,k,
-			 alpha, devMat->cM,devMat->pitch, x->v_,1,
-			 beta,  y->v_,1);
+			 (const cuDoubleComplex *) alpha, devMat->cM,devMat->pitch, x->v_,1,
+			 (const cuDoubleComplex *) beta,  y->v_,1);
   } else {
     status = cublasZgemm(handle, trans, CUBLAS_OP_N, m,n,k,
-			 alpha, devMat->cM,devMat->pitch, x->v_,x->pitch_,
-			 beta,  y->v_,y->pitch_);
+			 (const cuDoubleComplex *) alpha, devMat->cM,devMat->pitch, x->v_,x->pitch_,
+			 (const cuDoubleComplex *) beta,  y->v_,y->pitch_);
   }    
   
   if (status == CUBLAS_STATUS_SUCCESS)  
