@@ -50,6 +50,15 @@ entities that were previouslty separated:
    	      	 written by Davide Barbieri and Salvatore Filippone;
 		 see the license file cuda/License-spgpu.md
 
+OpenACC
+-------------------
+There is a highly experimental version of an OpenACC interface,
+you can access it by speficifying
+--enable-openacc  --with-extraopenacc="-foffload=nvptx-none=-march=sm_70"
+where the argument to the extraopenacc option depends on the compiler
+you are using (the example shown here is relevant for the GNU
+compiler). 
+		 
 INSTALLING
 ----------
 To compile and run our software you will need the following
@@ -135,6 +144,7 @@ Salvatore Filippone
 
 Contributors (roughly reverse cronological order):
 
+Theophane  Loloum
 Dimitri    Walther
 Andea      Di Iorio
 Stefano    Petrilli
