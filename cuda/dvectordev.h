@@ -35,6 +35,7 @@
 #include "vectordev.h"
 #include "cuda_runtime.h"
 #include "core.h"
+#include "vector.h"
 
 int registerMappedDouble(void *, void **, int, double);
 int writeMultiVecDeviceDouble(void* deviceMultiVec, double* hostMultiVec);
