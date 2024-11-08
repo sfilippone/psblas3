@@ -127,4 +127,88 @@ Module psb_krylov_mod
   end interface
 
 
+  interface psb_richardson
+    
+    Subroutine psb_srichardson_vect(a,prec,b,x,eps,desc_a,info,&
+         & itmax,iter,err,itrace,istop)
+      
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_sspmat_type, &
+           & psb_spk_, psb_s_vect_type
+      use psb_prec_mod, only : psb_sprec_type
+      
+      Type(psb_sspmat_type), Intent(in)     :: a
+      Type(psb_desc_type), Intent(in)       :: desc_a
+      class(psb_sprec_type), intent(inout)  :: prec 
+      type(psb_s_vect_type), Intent(inout)  :: b
+      type(psb_s_vect_type), Intent(inout)  :: x
+      Real(psb_spk_), Intent(in)            :: eps
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
+      Real(psb_spk_), Optional, Intent(out) :: err
+
+    end Subroutine psb_srichardson_vect
+
+    Subroutine psb_crichardson_vect(a,prec,b,x,eps,desc_a,info,&
+         & itmax,iter,err,itrace,istop)
+      
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_cspmat_type, &
+           & psb_spk_, psb_c_vect_type
+      use psb_prec_mod, only : psb_cprec_type
+      
+      Type(psb_cspmat_type), Intent(in)     :: a
+      Type(psb_desc_type), Intent(in)       :: desc_a
+      class(psb_cprec_type), intent(inout)  :: prec 
+      type(psb_c_vect_type), Intent(inout)  :: b
+      type(psb_c_vect_type), Intent(inout)  :: x
+      Real(psb_spk_), Intent(in)            :: eps
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
+      Real(psb_spk_), Optional, Intent(out) :: err
+
+    end Subroutine psb_crichardson_vect
+
+    Subroutine psb_drichardson_vect(a,prec,b,x,eps,desc_a,info,&
+         & itmax,iter,err,itrace,istop)
+      
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_dspmat_type, &
+           & psb_dpk_, psb_d_vect_type
+      use psb_prec_mod, only : psb_dprec_type
+      
+      Type(psb_dspmat_type), Intent(in)     :: a
+      Type(psb_desc_type), Intent(in)       :: desc_a
+      class(psb_dprec_type), intent(inout)  :: prec 
+      type(psb_d_vect_type), Intent(inout)  :: b
+      type(psb_d_vect_type), Intent(inout)  :: x
+      Real(psb_dpk_), Intent(in)            :: eps
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
+      Real(psb_dpk_), Optional, Intent(out) :: err
+
+    end Subroutine psb_drichardson_vect
+
+    Subroutine psb_zrichardson_vect(a,prec,b,x,eps,desc_a,info,&
+         & itmax,iter,err,itrace,istop)
+      
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_zspmat_type, &
+           & psb_dpk_, psb_z_vect_type
+      use psb_prec_mod, only : psb_zprec_type
+      
+      Type(psb_zspmat_type), Intent(in)     :: a
+      Type(psb_desc_type), Intent(in)       :: desc_a
+      class(psb_zprec_type), intent(inout)  :: prec 
+      type(psb_z_vect_type), Intent(inout)  :: b
+      type(psb_z_vect_type), Intent(inout)  :: x
+      Real(psb_dpk_), Intent(in)            :: eps
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
+      Real(psb_dpk_), Optional, Intent(out) :: err
+
+    end Subroutine psb_zrichardson_vect
+
+  end interface
+  
 end module psb_krylov_mod

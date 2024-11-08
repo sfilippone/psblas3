@@ -42,6 +42,7 @@
 !
 !    methd  -  character                    The specific method; can take the values:
 !                                           CG
+!                                           FCG
 !                                           CGS
 !                                           BICG
 !                                           BICGSTAB
