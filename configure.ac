@@ -483,7 +483,7 @@ fi
 ##############################################################################
 BASEMODNAME=psb_base_mod
 PRECMODNAME=psb_prec_mod
-METHDMODNAME=psb_krylov_mod
+METHDMODNAME=psb_linsolve_mod
 UTILMODNAME=psb_util_mod
 
 if test "X$psblas_cv_fc" == X"cray" 
@@ -493,7 +493,7 @@ then
    FIFLAG="-I"
    BASEMODNAME=PSB_BASE_MOD
    PRECMODNAME=PSB_PREC_MOD
-   METHDMODNAME=PSB_KRYLOV_MOD
+   METHDMODNAME=PSB_LINSOLVE_MOD
    UTILMODNAME=PSB_UTIL_MOD
 
 else 
@@ -926,7 +926,7 @@ fi
 LIBDIR=lib
 BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
-METHDLIBNAME=libpsb_krylov.a
+METHDLIBNAME=libpsb_linsolve.a
 UTILLIBNAME=libpsb_util.a
 
 ###############################################################################
