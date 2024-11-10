@@ -30,33 +30,33 @@
 !   
 !    
 !
-! File: psb_krylov_conv_mod.f90
-!  Interfaces for Krylov subspace iterative methods.
+! File: psb_linsolve_conv_mod.f90
+!  Interfaces for linear solvers.
 !
-Module psb_c_krylov_conv_mod
+Module psb_z_linsolve_conv_mod
 
-  use psb_base_krylov_conv_mod
+  use psb_base_linsolve_conv_mod
 
   interface psb_init_conv
-    module procedure psb_c_init_conv, psb_c_init_conv_vect
+    module procedure psb_z_init_conv, psb_z_init_conv_vect
   end interface
 
   interface psb_check_conv
-    module procedure psb_c_check_conv, psb_c_check_conv_vect
+    module procedure psb_z_check_conv, psb_z_check_conv_vect
   end interface
 
 
 contains
 
-  subroutine psb_c_init_conv(methdname,stopc,trace,itmax,a,x,b,eps,&
+  subroutine psb_z_init_conv(methdname,stopc,trace,itmax,a,x,b,eps,&
        & desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer(psb_ipk_), intent(in)               :: stopc, trace, itmax
-    type(psb_cspmat_type), intent(in) :: a
-    complex(psb_spk_), intent(inout)     :: b(:), x(:)
-    real(psb_spk_), intent(in)        :: eps
+    type(psb_zspmat_type), intent(in) :: a
+    complex(psb_dpk_), intent(inout)     :: b(:), x(:)
+    real(psb_dpk_), intent(in)        :: eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
@@ -64,7 +64,7 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: me, np, err_act
     character(len=20)                 :: name
-    complex(psb_spk_), allocatable     :: r(:)
+    complex(psb_dpk_), allocatable     :: r(:)
 
     info = psb_success_
     name = 'psb_init_conv'
@@ -93,8 +93,8 @@ contains
 
     case (3)
       call psb_geall(r,desc_a,info)
-      call psb_geaxpby(cone,b,czero,r,desc_a,info)
-      call psb_spmm(-cone,a,x,cone,r,desc_a,info)
+      call psb_geaxpby(zone,b,zzero,r,desc_a,info)
+      call psb_spmm(-zone,a,x,zone,r,desc_a,info)
       stopdat%values(psb_ik_r0n2_) = psb_genrm2(r,desc_a,info)
       call psb_gefree(r,desc_a,info)
     case default
@@ -121,15 +121,15 @@ contains
 
     return
 
-  end subroutine psb_c_init_conv
+  end subroutine psb_z_init_conv
 
 
-  function psb_c_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
+  function psb_z_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer(psb_ipk_), intent(in)             :: it
-    complex(psb_spk_), intent(in)   :: x(:), r(:)
+    complex(psb_dpk_), intent(in)   :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
     logical                         :: res
@@ -199,17 +199,17 @@ contains
 
     return
 
-  end function psb_c_check_conv
+  end function psb_z_check_conv
 
 
-  subroutine psb_c_init_conv_vect(methdname,stopc,trace,itmax,a,x,b,eps,desc_a,stopdat,info)
+  subroutine psb_z_init_conv_vect(methdname,stopc,trace,itmax,a,x,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer(psb_ipk_), intent(in)               :: stopc, trace,itmax
-    type(psb_cspmat_type), intent(in) :: a
-    real(psb_spk_), intent(in)        :: eps
-    type(psb_c_vect_type), intent(inout)  :: x, b
+    type(psb_zspmat_type), intent(in) :: a
+    real(psb_dpk_), intent(in)        :: eps
+    type(psb_z_vect_type), intent(inout)  :: x, b
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
@@ -217,7 +217,7 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: me, np, err_act
     character(len=20)                 :: name
-    type(psb_c_vect_type) :: r
+    type(psb_z_vect_type) :: r
 
     info = psb_success_
     name = 'psb_init_conv'
@@ -246,8 +246,8 @@ contains
 
     case (3)
       call psb_geasb(r,desc_a,info,scratch=.true.)
-      call psb_geaxpby(cone,b,czero,r,desc_a,info)
-      call psb_spmm(-cone,a,x,cone,r,desc_a,info)
+      call psb_geaxpby(zone,b,zzero,r,desc_a,info)
+      call psb_spmm(-zone,a,x,zone,r,desc_a,info)
       stopdat%values(psb_ik_r0n2_) = psb_genrm2(r,desc_a,info)
       call psb_gefree(r,desc_a,info)
     case default
@@ -274,14 +274,14 @@ contains
 
     return
 
-  end subroutine psb_c_init_conv_vect
+  end subroutine psb_z_init_conv_vect
 
-  function psb_c_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
+  function psb_z_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)     :: methdname
     integer(psb_ipk_), intent(in)              :: it
-    type(psb_c_vect_type), intent(inout) :: x, r
+    type(psb_z_vect_type), intent(inout) :: x, r
     type(psb_desc_type), intent(in)  :: desc_a
     type(psb_itconv_type)            :: stopdat
     logical                          :: res
@@ -353,6 +353,6 @@ contains
 
     return
 
-  end function psb_c_check_conv_vect
+  end function psb_z_check_conv_vect
 
-end module psb_c_krylov_conv_mod
+end module psb_z_linsolve_conv_mod

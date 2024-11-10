@@ -1,6 +1,6 @@
 include Make.inc
 
-all: dirs based precd kryld utild cbindd extd  $(CUDAD) $(OACCD) libd
+all: dirs based precd linslvd utild cbindd extd  $(CUDAD) $(OACCD) libd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -11,16 +11,16 @@ dirs:
 
 precd: based
 utild: based	
-kryld: precd 
+linslvd: precd 
 extd:  based
 cudad:  extd
 oaccd:  extd	
-cbindd: based precd kryld utild 
+cbindd: based precd linslvd utild 
 
-libd: based precd kryld utild cbindd extd $(CUDALD) $(OACCLD)
+libd: based precd linslvd utild cbindd extd $(CUDALD) $(OACCLD)
 	$(MAKE) -C base lib
 	$(MAKE) -C prec lib
-	$(MAKE) -C krylov lib
+	$(MAKE) -C linsolve lib
 	$(MAKE) -C util lib 
 	$(MAKE) -C cbind lib
 	$(MAKE) -C ext lib
@@ -34,8 +34,8 @@ based:
 	$(MAKE) -C base objs
 precd:
 	$(MAKE) -C prec objs
-kryld:
-	$(MAKE) -C krylov objs
+linslvd:
+	$(MAKE) -C linsolve objs
 utild:
 	$(MAKE) -C util objs 
 cbindd:
@@ -67,7 +67,7 @@ install: all
 clean: 
 	$(MAKE) -C base clean
 	$(MAKE) -C prec clean 
-	$(MAKE) -C krylov clean
+	$(MAKE) -C linsolve clean
 	$(MAKE) -C util clean
 	$(MAKE) -C cbind clean
 	$(MAKE) -C ext clean
@@ -85,7 +85,7 @@ cleanlib:
 veryclean: cleanlib
 	cd base && $(MAKE) veryclean
 	cd prec && $(MAKE) veryclean 
-	cd krylov && $(MAKE) veryclean
+	cd linsolve && $(MAKE) veryclean
 	cd util && $(MAKE) veryclean
 	cd cbind && $(MAKE) veryclean
 	cd ext && $(MAKE) veryclean

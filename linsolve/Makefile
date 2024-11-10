@@ -6,9 +6,9 @@ LIBDIR=../lib
 INCDIR=../include
 MODDIR=../modules
 
-MODOBJS= psb_base_krylov_conv_mod.o \
-	psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o \
-	psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o \
+MODOBJS= psb_base_linsolve_conv_mod.o \
+	psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o \
+	psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o \
 	psb_krylov_mod.o
 F90OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
 	psb_drichardson.o psb_srichardson.o psb_crichardson.o psb_zrichardson.o \
@@ -36,8 +36,8 @@ lib: objs
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 
 
-psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o:  psb_base_krylov_conv_mod.o
-psb_krylov_conv_mod.o: psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o 
+psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o:  psb_base_linsolve_conv_mod.o
+psb_linsolve_conv_mod.o: psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o 
 $(F90OBJS): $(MODOBJS)
 $(OBJS): $(MODDIR)/$(PRECMODNAME)$(.mod)  $(MODDIR)/$(BASEMODNAME)$(.mod)
 
