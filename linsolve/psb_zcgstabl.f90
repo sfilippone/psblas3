@@ -107,7 +107,7 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_z_krylov_conv_mod
+  use psb_z_linsolve_conv_mod
   use psb_krylov_mod
   implicit none
   type(psb_zspmat_type), intent(in)    :: a

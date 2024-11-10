@@ -73,7 +73,7 @@ Subroutine psb_zrichardson_vect(a,prec,b,x,eps,desc_a,info,&
 
   use psb_base_mod
   use psb_prec_mod
-  use psb_z_krylov_conv_mod
+  use psb_z_linsolve_conv_mod
   use psb_krylov_mod, psb_protect_name => psb_zrichardson_vect
 
   Type(psb_zspmat_type), Intent(in)    :: a
