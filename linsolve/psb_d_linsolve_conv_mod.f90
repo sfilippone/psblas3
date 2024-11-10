@@ -31,7 +31,7 @@
 !    
 !
 ! File: psb_linsolve_conv_mod.f90
-!  Interfaces for Krylov subspace iterative methods.
+!  Interfaces for linear solvers' convergence handling.
 !
 Module psb_d_linsolve_conv_mod
 

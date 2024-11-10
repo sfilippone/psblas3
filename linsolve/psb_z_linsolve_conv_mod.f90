@@ -31,7 +31,7 @@
 !    
 !
 ! File: psb_linsolve_conv_mod.f90
-!  Interfaces for linear solvers.
+!  Interfaces for linear solvers' convergence handling.
 !
 Module psb_z_linsolve_conv_mod
 
