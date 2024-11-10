@@ -99,7 +99,7 @@ subroutine psb_cbicg_vect(a,prec,b,x,eps,desc_a,info,&
   use psb_base_mod
   use psb_prec_mod
   use psb_c_linsolve_conv_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   implicit none
   type(psb_cspmat_type), intent(in)    :: a
   type(psb_desc_type), intent(in)      :: desc_a

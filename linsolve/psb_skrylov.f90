@@ -84,7 +84,7 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
   use psb_base_mod
   use psb_prec_mod,only : psb_sprec_type
-  use psb_krylov_mod, psb_protect_name => psb_skrylov_vect
+  use psb_linsolve_mod, psb_protect_name => psb_skrylov_vect
 
   character(len=*)                     :: method
   Type(psb_sspmat_type), Intent(in)    :: a

@@ -110,7 +110,7 @@ subroutine psb_cgcr_vect(a,prec,b,x,eps,desc_a,info,&
   use psb_base_mod
   use psb_prec_mod
   use psb_c_linsolve_conv_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   implicit none
   
   

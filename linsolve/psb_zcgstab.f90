@@ -97,7 +97,7 @@ Subroutine psb_zcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   use psb_base_mod
   use psb_prec_mod
   use psb_z_linsolve_conv_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   implicit none
   type(psb_zspmat_type), intent(in)  :: a
   class(psb_zprec_type), Intent(inout)  :: prec 

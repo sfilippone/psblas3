@@ -74,7 +74,7 @@ Subroutine psb_drichardson_vect(a,prec,b,x,eps,desc_a,info,&
   use psb_base_mod
   use psb_prec_mod
   use psb_d_linsolve_conv_mod
-  use psb_krylov_mod, psb_protect_name => psb_drichardson_vect
+  use psb_linsolve_mod, psb_protect_name => psb_drichardson_vect
 
   Type(psb_dspmat_type), Intent(in)    :: a
   Type(psb_desc_type), Intent(in)      :: desc_a

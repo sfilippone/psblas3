@@ -9,7 +9,7 @@ MODDIR=../modules
 MODOBJS= psb_base_linsolve_conv_mod.o \
 	psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o \
 	psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o \
-	psb_krylov_mod.o
+	psb_linsolve_mod.o
 F90OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
 	psb_drichardson.o psb_srichardson.o psb_crichardson.o psb_zrichardson.o \
         psb_dcgstab.o psb_dcg.o psb_dfcg.o psb_dgcr.o psb_dcgs.o \
