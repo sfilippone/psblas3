@@ -471,7 +471,13 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call prec%apply(w1,w,desc_a,info)
       call psb_geaxpby(done,w,done,x,desc_a,info)
     end if
-     
+    
+    if (itx >= litmax) then
+      if (mod(itx,itrace_)/=0) &
+           &  call log_conv(methdname,me,itx,ione,errnum,errden,deps)
+      exit restart
+    end if
+    
   end do restart
 
   call log_end(methdname,me,itx,itrace_,errnum,errden,deps,err=derr,iter=iter)
