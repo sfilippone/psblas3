@@ -344,19 +344,16 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
     
-    if (errnum <= eps*errden) exit restart
+    if ((errnum <= eps*errden).or.(itx >= litmax)) exit restart  
 
     if (itrace_ > 0) &
          & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
      
     call v(1)%scal(scal) !v(1) = v(1) * scal
 
-    if (itx >= litmax) exit restart  
-
     !
     ! inner iterations
     !
-
     inner:  Do i=1,nl
       itx  = itx + 1
 
@@ -446,6 +443,8 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
           call psb_geaxpby(cone,w,cone,x,desc_a,info)
         end if
 
+        if (itrace_ > 0) &
+             & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
         exit restart
 
       end if
@@ -474,8 +473,6 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
     end if
      
   end do restart
-  if (itrace_ > 0) &
-       & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
 
   call log_end(methdname,me,itx,itrace_,errnum,errden,deps,err=derr,iter=iter)
   if (present(err)) err = derr
