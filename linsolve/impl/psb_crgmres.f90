@@ -472,7 +472,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(cone,w,cone,x,desc_a,info)
     end if
     
-    if (itx >= litmax) then
+    if ((itx >= litmax).and.(itrace_ > 0)) then
       if (mod(itx,itrace_)/=0) &
            &  call log_conv(methdname,me,itx,ione,errnum,errden,deps)
       exit restart
