@@ -3,7 +3,7 @@
 
 The PSBLAS library, developed with the aim to facilitate the parallelization of computationally intensive scientific applications, is designed to address parallel implementation of iterative solvers for sparse linear systems through the distributed memory paradigm. It includes routines for multiplying sparse matrices by dense matrices, solving block diagonal systems with triangular diagonal entries, preprocessing sparse matrices, and contains additional routines for dense matrix operations. The current implementation of PSBLAS addresses a distributed memory execution model operating with message passing.
 
-The PSBLAS library version 3 is implemented in the Fortran 2003 programming language, with reuse and/or adaptation of existing Fortran 77 and Fortran 95 software, plus a handful of C routines.
+The PSBLAS library version 3 is implemented in the Fortran 2008 programming language, with reuse and/or adaptation of existing Fortran 77 and Fortran 95 software, plus a handful of C routines. 
 
 ## References
 
