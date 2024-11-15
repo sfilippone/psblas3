@@ -59,7 +59,8 @@ prerequisites (see also SERIAL below):
    We use the C interface to AMD.
 
 5. If you have CUDA available, use
-   --with-cuda=<path>      to specify the CUDA toolkit location
+   --enable-cuda           to compile CUDA-enabled methods
+   --with-cudadir=<path>   to specify the CUDA toolkit location
    --with-cudacc=XX,YY,ZZ  to specify a list of target CCs (compute
    			   capabilities) to compile the CUDA code for.
 
