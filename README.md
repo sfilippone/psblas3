@@ -188,22 +188,22 @@ Salvatore Filippone
 
 **Contributors** (_roughly reverse cronological order_):
 
-Theophane  Loloum
-Fabio      Durastante
-Dimitri    Walther
-Andea      Di Iorio
-Stefano    Petrilli
-Soren 	   Rasmussen
-Zaak       Beekman
-Ambra	   Abdullahi Hassan
-Pasqua	   D'Ambra
-Alfredo    Buttari
-Daniela    di Serafino
-Michele    Martone
-Michele    Colajanni
-Fabio      Cerioni
-Stefano    Maiolatesi
-Dario      Pascucci
+- Theophane  Loloum
+- Fabio      Durastante
+- Dimitri    Walther
+- Andea      Di Iorio
+- Stefano    Petrilli
+- Soren 	   Rasmussen
+- Zaak       Beekman
+- Ambra	   Abdullahi Hassan
+- Pasqua	   D'Ambra
+- Alfredo    Buttari
+- Daniela    di Serafino
+- Michele    Martone
+- Michele    Colajanni
+- Fabio      Cerioni
+- Stefano    Maiolatesi
+- Dario      Pascucci
 
 
 ## RELATED SOFTWARE
