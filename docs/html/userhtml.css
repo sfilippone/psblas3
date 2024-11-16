@@ -3,12 +3,10 @@
 .pplb7t-x-x-172{font-size:172%;font-weight: bold;}
 .pplb7t-x-x-172{font-weight: bold;}
 .pplb7t-x-x-172{font-weight: bold;}
-.pplb7t-x-x-172{font-weight: bold;}
 .pplri7t-{font-style: italic;}
 .pplri7t-{font-style: italic;}
 .pplri7t-x-x-120{font-size:120%;font-style: italic;}
 .pplri7t-x-x-120{font-style: italic;}
-.pplb7t-{font-weight: bold;}
 .pplb7t-{font-weight: bold;}
 .pplb7t-{font-weight: bold;}
 .pplb7t-{font-weight: bold;}
@@ -38,7 +36,6 @@
 .pplb7t-x-x-120{font-size:120%;font-weight: bold;}
 .pplb7t-x-x-120{font-weight: bold;}
 .pplb7t-x-x-120{font-weight: bold;}
-.pplb7t-x-x-120{font-weight: bold;}
 .cmtt-8{font-size:80%;font-family: monospace,monospace;}
 .cmtt-8{font-family: monospace,monospace;}
 .cmtt-8{font-family: monospace,monospace;}
@@ -59,10 +56,6 @@
 .zplmr7m-x-x-80{font-style: italic;}
 .zplmr7t-x-x-80{font-size:80%;}
 .pplrc7t-x-x-90{font-size:90%;}
-.pplb7t-x-x-90{font-size:90%;font-weight: bold;}
-.pplb7t-x-x-90{font-weight: bold;}
-.pplb7t-x-x-90{font-weight: bold;}
-.pplb7t-x-x-90{font-weight: bold;}
 .small-caps{font-variant: small-caps; }
 p{margin-top:0;margin-bottom:0}
 p.indent{text-indent:0;}
@@ -200,11 +193,5 @@ pre.lstinputlisting{ font-family: monospace,monospace; white-space: pre-wrap; }
 #TBL-24-3{border-right:1px solid black;}
 #TBL-24-4{border-right:1px solid black;}
 #TBL-24-5{border-right:1px solid black;}
-#TBL-25-1{border-left: 1px solid black;}
-#TBL-25-1{border-right:1px solid black;}
-#TBL-25-2{border-right:1px solid black;}
-#TBL-25-3{border-right:1px solid black;}
-#TBL-25-4{border-right:1px solid black;}
-#TBL-25-5{border-right:1px solid black;}
 /* end css.sty */
 

@@ -35,7 +35,7 @@ process are executed through calls to the serial sparse BLAS subroutines. In a
 similar way, the inter-process message exchanges are encapsulated in an
 applicaiton layer that has been strongly inspired by the Basic Linear Algebra
 Communication Subroutines (BLACS) library&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XBLACS">6</a>]</span>. Usually there is no need to deal
+href="userhtmlli2.html#XBLACS">7</a>]</span>. Usually there is no need to deal
 directly with MPI; however, in some cases, MPI routines are used directly
 to improve efficiency. For further details on our communication layer see
 Sec.&#x00A0;<a 
@@ -85,7 +85,7 @@ class="cmtt-10">BLOCK</span></span></span>, as well as completely
 arbitrary assignments of equation indices to processes. In particular it is
 consistent with the usage of graph partitioning tools commonly available in
 the literature, e.g. METIS&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XMETIS">13</a>]</span>. Dense vectors conform to sparse matrices,
+href="userhtmlli2.html#XMETIS">14</a>]</span>. Dense vectors conform to sparse matrices,
 that is, the entries of a vector follow the same distribution of the matrix
 rows.
 <!--l. 146--><p class="indent" >   We assume that the sparse matrix is built in parallel, where each process generates
@@ -164,8 +164,8 @@ class="description">
 <!--l. 202--><p class="noindent" >Overlap points do not usually exist in the basic data distributions; however they are a
 feature of Domain Decomposition Schwarz preconditioners which are the subject of
 related research work&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#X2007c">3</a>,&#x00A0;<a 
-href="userhtmlli2.html#X2007d">2</a>]</span>.
+href="userhtmlli2.html#X2007c">4</a>,&#x00A0;<a 
+href="userhtmlli2.html#X2007d">3</a>]</span>.
 <!--l. 207--><p class="indent" >   We denote the sets of internal, boundary and halo points for a given subdomain
 by <span 
 class="zplmr7y-"><img 

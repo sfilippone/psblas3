@@ -42,11 +42,11 @@ class="cmtt-10">http://sourceforge.net/projects/librsb/</span></a>,  for  comput
      multicore parallel machines.</dd></dl>
 <!--l. 14--><p class="noindent" >The infrastructure laid out in the base library to allow for these extensions is detailed in
 the references&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XDesPat:11">20</a>,&#x00A0;<a 
-href="userhtmlli2.html#XCaFiRo:2014">21</a>,&#x00A0;<a 
-href="userhtmlli2.html#XSparse03">10</a>]</span>; the CUDA-specific data formats are described
+href="userhtmlli2.html#XDesPat:11">21</a>,&#x00A0;<a 
+href="userhtmlli2.html#XCaFiRo:2014">22</a>,&#x00A0;<a 
+href="userhtmlli2.html#XSparse03">11</a>]</span>; the CUDA-specific data formats are described
 in&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XOurTechRep">22</a>]</span>.
+href="userhtmlli2.html#XOurTechRep">23</a>]</span>.
 <!--l. 19--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark">12.1    </span> <a 
  id="x19-14700012.1"></a>Using the extensions</h4>
@@ -149,120 +149,120 @@ the base classes in PSBLAS, through the Fortran&#x00A0;2003 mechanism of <span
 class="pplri7t-">type</span>
 <span 
 class="pplri7t-">extension</span>&#x00A0;<span class="cite">[<a 
-href="userhtmlli2.html#XMRC:11">17</a>]</span>.
+href="userhtmlli2.html#XMRC:11">18</a>]</span>.
 <!--l. 155--><p class="indent" >   The data classes are divided between the general purpose CPU extensions, the
 GPU interfaces and the RSB interfaces. In the description we will make use of the
 notation introduced in Table&#x00A0;<a 
-href="#x19-148001r23">23<!--tex4ht:ref: tab:notation --></a>.
+href="#x19-148001r22">22<!--tex4ht:ref: tab:notation --></a>.
    <div class="table">
                                                                   
 
                                                                   
 <!--l. 160--><p class="indent" >   <a 
- id="x19-148001r23"></a><hr class="float"><div class="float" 
+ id="x19-148001r22"></a><hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
  <div class="caption" 
-><span class="id">Table&#x00A0;23: </span><span  
-class="content">Notation for parameters describing a sparse matrix</span></div><!--tex4ht:label?: x19-148001r23 -->
+><span class="id">Table&#x00A0;22: </span><span  
+class="content">Notation for parameters describing a sparse matrix</span></div><!--tex4ht:label?: x19-148001r22 -->
 <div class="center" 
 >
 <!--l. 162--><p class="noindent" >
-<div class="tabular"> <table id="TBL-26" class="tabular" 
+<div class="tabular"> <table id="TBL-25" class="tabular" 
  
-><colgroup id="TBL-26-1g"><col 
-id="TBL-26-1"><col 
-id="TBL-26-2"></colgroup><tr 
+><colgroup id="TBL-25-1g"><col 
+id="TBL-25-1"><col 
+id="TBL-25-2"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-26-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-1-1"  
+ style="vertical-align:baseline;" id="TBL-25-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-1-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">Name      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-1-2"  
+class="pplr7t-x-x-80">Name      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-1-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Description                                                 </span></td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-26-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-2-1"  
+ style="vertical-align:baseline;" id="TBL-25-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-2-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">M              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-2-2"  
+class="pplr7t-x-x-80">M              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-2-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Number of rows in matrix                        </span></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-26-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-3-1"  
+ style="vertical-align:baseline;" id="TBL-25-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-3-1"  
 class="td
 11"><span 
-class="pplr7t-x-x-80">N               </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-3-2"  
+class="pplr7t-x-x-80">N               </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-3-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Number of columns in matrix                 </span></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-26-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-4-1"  
+ style="vertical-align:baseline;" id="TBL-25-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-4-1"  
 class="td
 11"><span 
-class="pplr7t-x-x-80">NZ            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-4-2"  
+class="pplr7t-x-x-80">NZ            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-4-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Number of nonzeros in matrix                </span></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-26-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-5-1"  
+ style="vertical-align:baseline;" id="TBL-25-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-5-1"  
 class="td
 11"><span 
-class="pplr7t-x-x-80">AVGNZR </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-5-2"  
+class="pplr7t-x-x-80">AVGNZR </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-5-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Average number of nonzeros per row    </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-6-1"  
+ style="vertical-align:baseline;" id="TBL-25-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-6-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">MAXNZR</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-6-2"  
+class="pplr7t-x-x-80">MAXNZR</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-6-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Maximum number of nonzeros per row</span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-7-1"  
+ style="vertical-align:baseline;" id="TBL-25-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-7-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">NDIAG    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-7-2"  
+class="pplr7t-x-x-80">NDIAG    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-7-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Numero of nonzero diagonals                 </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-8-1"  
+ style="vertical-align:baseline;" id="TBL-25-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-8-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">AS             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-8-2"  
+class="pplr7t-x-x-80">AS             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-8-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Coefficients array                                       </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-9-1"  
+ style="vertical-align:baseline;" id="TBL-25-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-9-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">IA              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-9-2"  
+class="pplr7t-x-x-80">IA              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-9-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Row indices array                                      </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-10-1"  
+ style="vertical-align:baseline;" id="TBL-25-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-10-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">JA              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-10-2"  
+class="pplr7t-x-x-80">JA              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-10-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Column indices array                                </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-11-1"  
+ style="vertical-align:baseline;" id="TBL-25-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-11-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">IRP            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-11-2"  
+class="pplr7t-x-x-80">IRP            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-11-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Row start pointers array                           </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-12-1"  
+ style="vertical-align:baseline;" id="TBL-25-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-12-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">JCP            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-12-2"  
+class="pplr7t-x-x-80">JCP            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-12-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Column start pointers array                     </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-13-1"  
+ style="vertical-align:baseline;" id="TBL-25-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-13-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">NZR          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-13-2"  
+class="pplr7t-x-x-80">NZR          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-13-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Number of nonzeros per row array        </span></td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-26-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-14-1"  
+ style="vertical-align:baseline;" id="TBL-25-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-14-1"  
 class="td11"><span 
-class="pplr7t-x-x-80">OFFSET    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-26-14-2"  
+class="pplr7t-x-x-80">OFFSET    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-25-14-2"  
 class="td11"><span 
 class="pplr7t-x-x-80">Offset for diagonals                                   </span></td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-26-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-26-15-1"  
+ style="vertical-align:baseline;" id="TBL-25-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-25-15-1"  
 class="td11">         </td></tr></table>                                                         </div>
 </div>
                                                                   
@@ -343,7 +343,7 @@ href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:l
 
                                                                   
    <!--l. 231-->
-   <pre class="lstlisting" id="listing-198"><span class="label"><a 
+   <pre class="lstlisting" id="listing-220"><span class="label"><a 
  id="x19-150003r1"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
