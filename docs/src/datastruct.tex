@@ -1317,13 +1317,14 @@ like Diagonal Scaling or Block Jacobi with incomplete
 factorization ILU(0). 
 
  A preconditioner is held in the \hypertarget{precdata}{{\tt
-    psb\_prec\_type}} data structure reported in 
-figure~\ref{fig:prectype}. The \fortinline|psb_prec_type| 
+    psb\_Tprec\_type}} data structure reported in 
+figure~\ref{fig:prectype}. The \fortinline|psb_Tprec_type| 
 data type may contain a simple preconditioning matrix with the
-associated communication descriptor.%%  which may be different than the
+associated communication descriptor.
+%% which may be different from  the
 %% system communication descriptor in the case of parallel
 %% preconditioners like the Additive Schwarz one. Then the
-%% \fortinline|psb_prec_type| may contain more than one preconditioning matrix
+%% \fortinline|psb_Tprec_type| may contain more than one preconditioning matrix
 %% like in the case of Two-Level (in general Multi-Level) preconditioners.
 %% The user can choose the type of preconditioner to be used by means of
 %% the \fortinline|psb_precset| subroutine; once the type of preconditioning
@@ -1407,8 +1408,8 @@ Given a heap object, the following methods are defined on it:
 \item[dump] Print on file;
 \item[free] Release memory.
 \end{description}
-These objects are used in AMG4PSBLAS to implement the factorization
-algorithms. 
+These objects are used to implement the factorization
+and approximate inversion algorithms. 
 
 %%% Local Variables: 
 %%% mode: latex

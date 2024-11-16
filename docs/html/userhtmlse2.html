@@ -432,18 +432,18 @@ matrix/vector creation and linear system solution as follows:
 <li 
   class="enumerate" id="x4-6002x1">
      <!--l. 347--><p class="noindent" >Initialize parallel environment with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_init</span></span></span>
+class="cmtt-10">psb_init</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-6004x2">
      <!--l. 348--><p class="noindent" >Initialize index space with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_cdall</span></span></span>
+class="cmtt-10">psb_cdall</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-6006x3">
      <!--l. 349--><p class="noindent" >Allocate sparse matrix and dense vectors with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spall</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_geall</span></span></span>
+class="cmtt-10">psb_geall</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-6008x4">
@@ -459,12 +459,12 @@ class="cmtt-10">psb_geins</span></span></span>
 <li 
   class="enumerate" id="x4-6012x1">
          <!--l. 355--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_cdasb</span></span></span>
+class="cmtt-10">psb_cdasb</span></span></span>,
          </li>
 <li 
   class="enumerate" id="x4-6014x2">
          <!--l. 356--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_spasb</span></span></span>
+class="cmtt-10">psb_spasb</span></span></span>,
                                                                   
 
                                                                   
@@ -472,106 +472,118 @@ class="cmtt-10">psb_spasb</span></span></span>
 <li 
   class="enumerate" id="x4-6016x3">
          <!--l. 357--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_geasb</span></span></span></li></ol>
+class="cmtt-10">psb_geasb</span></span></span>;</li></ol>
      </li>
 <li 
   class="enumerate" id="x4-6018x6">
      <!--l. 359--><p class="noindent" >Choose the preconditioner to be used with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">prec%init</span></span></span> and build it with
+class="cmtt-10">prec%init</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%set</span></span></span>, and build it with
      <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">prec%build</span></span></span><span class="footnote-mark"><a 
 href="userhtml7.html#fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
- id="x4-6019f3"></a> .
+ id="x4-6019f3"></a> ;
      </li>
 <li 
   class="enumerate" id="x4-6022x7">
-     <!--l. 363--><p class="noindent" >Call the iterative driver <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_krylov</span></span></span> with the method of choice, e.g.
-     <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 364--><p class="noindent" >Call one of the iterative drivers with the method of choice, e.g. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_krylov</span></span></span>
+     with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">bicgstab</span></span></span>.</li></ol>
-<!--l. 366--><p class="noindent" >This is the structure of the sample programs in the directory <span class="obeylines-h"><span class="verb"><span 
+<!--l. 367--><p class="noindent" >This is the structure of the sample programs in the directory <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">test/pargen/</span></span></span>.
-<!--l. 369--><p class="indent" >   For a simulation in which the same discretization mesh is used over multiple time
+<!--l. 370--><p class="indent" >   For a simulation in which the same discretization mesh is used over multiple time
 steps, the following structure may be more appropriate:
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x4-6024x1">
-     <!--l. 372--><p class="noindent" >Initialize parallel environment with <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 373--><p class="noindent" >Initialize parallel environment with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_init</span></span></span>
      </li>
 <li 
   class="enumerate" id="x4-6026x2">
-     <!--l. 373--><p class="noindent" >Initialize index space with <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 374--><p class="noindent" >Initialize index space with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_cdall</span></span></span>
      </li>
 <li 
   class="enumerate" id="x4-6028x3">
-     <!--l. 374--><p class="noindent" >Loop over the topology of the discretization mesh and build the descriptor
+     <!--l. 375--><p class="noindent" >Loop over the topology of the discretization mesh and build the descriptor
      with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_cdins</span></span></span>
+class="cmtt-10">psb_cdins</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-6030x4">
-     <!--l. 376--><p class="noindent" >Assemble the descriptor with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_cdasb</span></span></span>
+     <!--l. 377--><p class="noindent" >Assemble the descriptor with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_cdasb</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-6032x5">
-     <!--l. 377--><p class="noindent" >Allocate  the  sparse  matrices  and  dense  vectors  with  <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 378--><p class="noindent" >Allocate  the  sparse  matrices  and  dense  vectors  with;  <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spall</span></span></span> and
      <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_geall</span></span></span>
+class="cmtt-10">psb_geall</span></span></span>;
                                                                   
 
                                                                   
      </li>
 <li 
   class="enumerate" id="x4-6034x6">
-     <!--l. 379--><p class="noindent" >Loop over the time steps:
+     <!--l. 380--><p class="noindent" >Loop over the time steps:
          <ol  class="enumerate2" >
 <li 
   class="enumerate" id="x4-6036x1">
-         <!--l. 381--><p class="noindent" >If after first time step, reinitialize the sparse matrix with <span class="obeylines-h"><span class="verb"><span 
+         <!--l. 382--><p class="noindent" >If after first time step, reinitialize the sparse matrix with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_sprn</span></span></span>;
          also zero out the dense vectors;
          </li>
 <li 
   class="enumerate" id="x4-6038x2">
-         <!--l. 384--><p class="noindent" >Loop over the mesh, generate the coefficients and insert/update them
+         <!--l. 385--><p class="noindent" >Loop over the mesh, generate the coefficients and insert/update them
          with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spins</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_geins</span></span></span>
+class="cmtt-10">psb_geins</span></span></span>;
          </li>
 <li 
   class="enumerate" id="x4-6040x3">
-         <!--l. 386--><p class="noindent" >Assemble with <span class="obeylines-h"><span class="verb"><span 
+         <!--l. 387--><p class="noindent" >Assemble with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spasb</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_geasb</span></span></span>
+class="cmtt-10">psb_geasb</span></span></span>;
          </li>
 <li 
   class="enumerate" id="x4-6042x4">
-         <!--l. 387--><p class="noindent" >Choose and build preconditioner with <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">prec%init</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">prec%build</span></span></span>
+         <!--l. 388--><p class="noindent" >
          </li>
 <li 
   class="enumerate" id="x4-6044x5">
-         <!--l. 389--><p class="noindent" >Call the iterative method of choice, e.g. <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">psb_bicgstab</span></span></span></li></ol>
+         <!--l. 388--><p class="noindent" >Choose the preconditioner to be used with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%init</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%set</span></span></span>,
+         and build it with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">prec%build</span></span></span>;
+         </li>
+<li 
+  class="enumerate" id="x4-6046x6">
+         <!--l. 391--><p class="noindent" >Call  one  of  the  iterative  drivers  with  the  method  of  choice,  e.g.
+         <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_krylov</span></span></span> with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">bicgstab</span></span></span>.</li></ol>
      </li></ol>
-<!--l. 392--><p class="noindent" >The insertion routines will be called as many times as needed; they only need to be
+<!--l. 395--><p class="noindent" >The insertion routines will be called as many times as needed; they only need to be
 called on the data that is actually allocated to the current process, i.e. each process
 generates its own data.
-<!--l. 397--><p class="indent" >   In principle there is no specific order in the calls to <span class="obeylines-h"><span class="verb"><span 
+<!--l. 400--><p class="indent" >   In principle there is no specific order in the calls to <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spins</span></span></span>, nor is there a
 requirement to build a matrix row in its entirety before calling the routine; this
 allows the application programmer to walk through the discretization mesh element
 by element, generating the main part of a given matrix row but also contributions to
 the rows corresponding to neighbouring elements.
-<!--l. 404--><p class="indent" >   From a functional point of view it is even possible to execute one call for each
+<!--l. 407--><p class="indent" >   From a functional point of view it is even possible to execute one call for each
 nonzero coefficient; however this would have a substantial computational
 overhead. It is therefore advisable to pack a certain amount of data into each
 call to the insertion routine, say touching on a few tens of rows; the best
+                                                                  
+
+                                                                  
 performng value would depend on both the architecture of the computer being
 used and on the problem structure. At the opposite extreme, it would be
 possible to generate the entire part of a coefficient matrix residing on a
@@ -579,40 +591,37 @@ process and pass it in a single call to <span class="obeylines-h"><span class="v
 class="cmtt-10">psb_spins</span></span></span>; this, however, would entail a
 doubling of memory occupation, and thus would be almost always far from
 optimal.
-                                                                  
-
-                                                                  
-<!--l. 417--><p class="noindent" >
+<!--l. 420--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">2.3.1   </span> <a 
  id="x4-70002.3.1"></a>User-defined index mappings</h5>
-<!--l. 419--><p class="noindent" >PSBLAS supports user-defined global to local index mappings, subject to the
+<!--l. 422--><p class="noindent" >PSBLAS supports user-defined global to local index mappings, subject to the
 constraints outlined in sec.&#x00A0;<a 
 href="#x4-60002.3">2.3<!--tex4ht:ref: sec:appstruct --></a>:
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x4-7002x1">
-     <!--l. 422--><p class="noindent" >The set of indices owned locally must be mapped to the set 1<span 
+     <!--l. 425--><p class="noindent" >The set of indices owned locally must be mapped to the set 1<span 
 class="cmmi-10">&#x2026;</span><span 
 class="cmmi-10">n</span><sub>row<sub><span 
 class="cmmi-5">i</span></sub></sub>;
      </li>
 <li 
   class="enumerate" id="x4-7004x2">
-     <!--l. 424--><p class="noindent" >The set of halo points must be mapped to the set <span 
+     <!--l. 427--><p class="noindent" >The set of halo points must be mapped to the set <span 
 class="cmmi-10">n</span><sub>row<sub><span 
 class="cmmi-5">i</span></sub></sub> + 1<span 
 class="cmmi-10">&#x2026;</span><span 
 class="cmmi-10">n</span><sub>col<sub>
 <span 
 class="cmmi-5">i</span></sub></sub>;</li></ol>
-<!--l. 427--><p class="noindent" >but otherwise the mapping is arbitrary. The user application is responsible to ensure
+<!--l. 430--><p class="noindent" >but otherwise the mapping is arbitrary. The user application is responsible to ensure
 consistency of this mapping; some errors may be caught by the library, but
 this is not guaranteed. The application structure to support this usage is as
 follows:
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x4-7006x1">
-     <!--l. 433--><p class="noindent" >Initialize                                                                             index
+     <!--l. 436--><p class="noindent" >Initialize                                                                             index
      space with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_cdall(ictx,desc,info,vl=vl,lidx=lidx)</span></span></span> passing the
      vectors <span class="obeylines-h"><span class="verb"><span 
@@ -622,7 +631,7 @@ class="cmtt-10">lidx(:)</span></span></span> containing the corresponding local 
      </li>
 <li 
   class="enumerate" id="x4-7008x2">
-     <!--l. 438--><p class="noindent" >Add the halo points <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 441--><p class="noindent" >Add the halo points <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">ja(:)</span></span></span> and their associated local indices <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">lidx(:)</span></span></span> with
      a(some) call(s) to <span class="obeylines-h"><span class="verb"><span 
@@ -630,12 +639,15 @@ class="cmtt-10">psb_cdins(nz,ja,desc,info,lidx=lidx)</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-7010x3">
-     <!--l. 441--><p class="noindent" >Assemble the descriptor with <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 444--><p class="noindent" >Assemble the descriptor with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_cdasb</span></span></span>;
      </li>
 <li 
   class="enumerate" id="x4-7012x4">
-     <!--l. 442--><p class="noindent" >Build the sparse matrices and vectors, optionally making use in <span class="obeylines-h"><span class="verb"><span 
+                                                                  
+
+                                                                  
+     <!--l. 445--><p class="noindent" >Build the sparse matrices and vectors, optionally making use in <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_spins</span></span></span>
      and <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_geins</span></span></span> of the <span class="obeylines-h"><span class="verb"><span 
@@ -644,22 +656,19 @@ class="cmtt-10">ia</span></span></span>,
      <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">ja</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">irw</span></span></span>, respectively, are already local indices.</li></ol>
-                                                                  
-
-                                                                  
-<!--l. 449--><p class="noindent" >
+<!--l. 452--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark">2.4   </span> <a 
  id="x4-80002.4"></a>Programming model</h4>
-<!--l. 451--><p class="noindent" >The PSBLAS librarary is based on the Single Program Multiple Data (SPMD)
+<!--l. 454--><p class="noindent" >The PSBLAS librarary is based on the Single Program Multiple Data (SPMD)
 programming model: each process participating in the computation performs the
 same actions on a chunk of data. Parallelism is thus data-driven.
-<!--l. 456--><p class="indent" >   Because of this structure, many subroutines coordinate their action across the
+<!--l. 459--><p class="indent" >   Because of this structure, many subroutines coordinate their action across the
 various processes, thus providing an implicit synchronization point, and therefore
 <span 
 class="cmti-10">must </span>be called simultaneously by all processes participating in the computation. This
 is certainly true for the data allocation and assembly routines, for all the
 computational routines and for some of the tools routines.
-<!--l. 464--><p class="indent" >   However there are many cases where no synchronization, and indeed no
+<!--l. 467--><p class="indent" >   However there are many cases where no synchronization, and indeed no
 communication among processes, is implied; for instance, all the routines in sec.&#x00A0;<a 
 href="userhtmlse3.html#x8-90003">3<!--tex4ht:ref: sec:datastruct --></a>
 are only acting on the local data structures, and thus may be called independently.
@@ -667,21 +676,21 @@ The most important case is that of the coefficient insertion routines: since the
 number of coefficients in the sparse and dense matrices varies among the processors,
 and since the user is free to choose an arbitrary order in builiding the matrix entries,
 these routines cannot imply a synchronization.
-<!--l. 474--><p class="indent" >   Throughout this user&#8217;s guide each subroutine will be clearly indicated
+<!--l. 477--><p class="indent" >   Throughout this user&#8217;s guide each subroutine will be clearly indicated
 as:
      <dl class="description"><dt class="description">
-     <!--l. 477--><p class="noindent" >
+     <!--l. 480--><p class="noindent" >
 <span 
 class="cmbx-10">Synchronous:</span> </dt><dd 
 class="description">
-     <!--l. 477--><p class="noindent" >must  be  called  simultaneously  by  all  the  processes  in  the  relevant
+     <!--l. 480--><p class="noindent" >must  be  called  simultaneously  by  all  the  processes  in  the  relevant
      communication context;
      </dd><dt class="description">
-     <!--l. 479--><p class="noindent" >
+     <!--l. 482--><p class="noindent" >
 <span 
 class="cmbx-10">Asynchronous:</span> </dt><dd 
 class="description">
-     <!--l. 479--><p class="noindent" >may be called in a totally independent manner.</dd></dl>
+     <!--l. 482--><p class="noindent" >may be called in a totally independent manner.</dd></dl>
                                                                   
 
                                                                   

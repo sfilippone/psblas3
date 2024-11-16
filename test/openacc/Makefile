@@ -9,7 +9,7 @@ INCDIR=$(TOPDIR)/include
 MODDIR=$(TOPDIR)/modules
 EXEDIR=./runs
 
-PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBGPULDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)

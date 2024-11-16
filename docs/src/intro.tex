@@ -344,24 +344,25 @@ A simple application structure will walk through the index space
 allocation, matrix/vector creation and linear system solution as
 follows:
 \begin{enumerate}
-\item Initialize parallel environment with \verb|psb_init|
-\item Initialize index space with \verb|psb_cdall|
+\item Initialize parallel environment with \verb|psb_init|;
+\item Initialize index space with \verb|psb_cdall|;
 \item Allocate sparse matrix and dense vectors with \verb|psb_spall|
-  and \verb|psb_geall|
+  and \verb|psb_geall|;
 \item Loop over all local rows, generate matrix and vector entries,
   and insert them with \verb|psb_spins| and \verb|psb_geins|
 \item Assemble the various entities: 
 \begin{enumerate}
-\item \verb|psb_cdasb|
-\item \verb|psb_spasb|
-\item \verb|psb_geasb|
+\item \verb|psb_cdasb|,
+\item \verb|psb_spasb|,
+\item \verb|psb_geasb|;
 \end{enumerate}
 \item Choose the preconditioner to be used with \verb|prec%init| and
+  \verb|prec%set|,  and
   build it with \verb|prec%build|\footnote{The subroutine style {\tt
-      psb\_precinit} and {\tt psb\_precbl} are still supported for
-    backward compatibility}. 
-\item Call the iterative driver \verb|psb_krylov| with the method of
-  choice, e.g. \verb|bicgstab|.
+      psb\_precinit} and {\tt psb\_precbld} are still supported for
+    backward compatibility};
+\item Call one of the iterative drivers with the method of
+  choice, e.g. \verb|psb_krylov| with \verb|bicgstab|.
 \end{enumerate}
 This is the structure of the sample programs in the directory 
 \verb|test/pargen/|. 
@@ -372,21 +373,23 @@ multiple time steps, the following structure may be more appropriate:
 \item Initialize parallel environment with \verb|psb_init|
 \item Initialize index space with \verb|psb_cdall|
 \item Loop over the topology of the discretization mesh and build the
-  descriptor with \verb|psb_cdins|
-\item Assemble the descriptor with \verb|psb_cdasb|
-\item Allocate the sparse matrices and dense vectors with
-  \verb|psb_spall| and \verb|psb_geall|
+  descriptor with \verb|psb_cdins|;
+\item Assemble the descriptor with \verb|psb_cdasb|;
+\item Allocate the sparse matrices and dense vectors with;
+  \verb|psb_spall| and \verb|psb_geall|;
 \item Loop over the time steps: 
 \begin{enumerate}
 \item If after first time step, 
   reinitialize the sparse matrix with \verb|psb_sprn|; also zero out
   the dense vectors;
 \item Loop over the mesh, generate the coefficients and insert/update
-  them with \verb|psb_spins| and \verb|psb_geins|
-\item Assemble with \verb|psb_spasb| and \verb|psb_geasb|
-\item Choose and build preconditioner with \verb|prec%init| and
-  \verb|prec%build|
-\item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
+  them with \verb|psb_spins| and \verb|psb_geins|;
+\item Assemble with \verb|psb_spasb| and \verb|psb_geasb|;
+\item \item Choose the preconditioner to be used with \verb|prec%init| and
+  \verb|prec%set|,  and
+  build it with \verb|prec%build|;
+\item Call one of the iterative drivers with the method of
+  choice, e.g. \verb|psb_krylov| with \verb|bicgstab|.
  \end{enumerate}
 \end{enumerate}
 The insertion routines will be called as many times as needed; 
