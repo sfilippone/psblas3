@@ -24,6 +24,13 @@ The architecture, philosophy and implementation details of the library are conta
   >S. Filippone, M. Colajanni. PSBLAS: A library for parallel linear
   >algebra computation on sparse matrices, ACM Trans. on Math. Software,
   >26(4), Dec. 2000, pp. 527-550.
+- The software infrastructure changes required to accommodate the implementation of the
+  Additive-Schwarz preconditioners available in [AMG4PSBLAS](https://github.com/sfilippone/amg4psblas/) are detailed in:
+  > A. Buttari, P. D'Ambra, D. di Serafino, S. Filippone, Extending PSBLAS to build parallel Schwarz preconditioners, Applied Parallel Computing. State of the Art in Scientific Computing: 7th International Workshop, PARA 2004, LNCS 3732, 2006, pp. 593-602.
+  
+  > A. Buttari,  P. D'Ambra, D. Di Serafino, S. Filippone, 2LEV-D2P4: A package of high-performance preconditioners for scientific and engineering applications, Applicable Algebra in Engineering, Communications and Computing, 2007, 18(3), pp. 223-239.
+  
+  > P. D'Ambra, D. Di Serafino, S. Filippone, MLD2P4: A package of parallel algebraic multilevel domain decomposition preconditioners in Fortran 95 ACM Transactions on Mathematical Software, 2010, 37(3), 30
 
 PSBLAS is the backbone of the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
 > D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
