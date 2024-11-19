@@ -1712,154 +1712,155 @@ class="description">
 <!--l. 899--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clean_zeros</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
 <!--l. 901--><p class="indent" >   Eliminates zero coefficients in the input matrix. Note that depending on the
 internal storage format, there may still be some amount of zero padding in the
-output.
-<!--l. 905--><p class="indent" >
+output. Even after a call to this method, any explicit zeros on the main diagonal are
+always kept in the data structure.
+<!--l. 907--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 906--><p class="noindent" >
+     <!--l. 908--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 906--><p class="noindent" >Asynchronous.
+     <!--l. 908--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 907--><p class="noindent" >
+     <!--l. 909--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 907--><p class="noindent" >
+     <!--l. 909--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 908--><p class="noindent" >
+     <!--l. 910--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 908--><p class="noindent" >the sparse matrix.<br 
+     <!--l. 910--><p class="noindent" >the sparse matrix.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 912--><p class="noindent" >
+<!--l. 914--><p class="noindent" >
      <dl class="description"><dt class="description">
-     <!--l. 913--><p class="noindent" >
+     <!--l. 915--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 913--><p class="noindent" >
+     <!--l. 915--><p class="noindent" >
                                                                   
 
                                                                   
      </dd><dt class="description">
-     <!--l. 914--><p class="noindent" >
+     <!--l. 916--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 914--><p class="noindent" >The matrix <code class="lstinline"><span style="color:#000000">a</span></code> without zero coefficients.<br 
+     <!--l. 916--><p class="noindent" >The matrix <code class="lstinline"><span style="color:#000000">a</span></code> without zero coefficients.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
      </dd><dt class="description">
-     <!--l. 916--><p class="noindent" >
+     <!--l. 918--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 916--><p class="noindent" >Return code.</dd></dl>
-<!--l. 919--><p class="noindent" >
+     <!--l. 918--><p class="noindent" >Return code.</dd></dl>
+<!--l. 921--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.13    </span> <a 
  id="x8-390003.2.13"></a>get_diag &#8212; Get main diagonal</h5>
-<!--l. 921--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">get_diag</span><span style="color:#000000">(</span><span style="color:#000000">d</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
-<!--l. 923--><p class="indent" >   Returns a copy of the main diagonal.
+<!--l. 923--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">get_diag</span><span style="color:#000000">(</span><span style="color:#000000">d</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 925--><p class="indent" >   Returns a copy of the main diagonal.
      <dl class="description"><dt class="description">
-     <!--l. 925--><p class="noindent" >
+     <!--l. 927--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 925--><p class="noindent" >Asynchronous.
+     <!--l. 927--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 926--><p class="noindent" >
+     <!--l. 928--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 926--><p class="noindent" >
+     <!--l. 928--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 927--><p class="noindent" >
+     <!--l. 929--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 927--><p class="noindent" >the sparse matrix.<br 
+     <!--l. 929--><p class="noindent" >the sparse matrix.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 931--><p class="noindent" >
+<!--l. 933--><p class="noindent" >
      <dl class="description"><dt class="description">
-     <!--l. 932--><p class="noindent" >
+     <!--l. 934--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 932--><p class="noindent" >
+     <!--l. 934--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 933--><p class="noindent" >
+     <!--l. 935--><p class="noindent" >
 <span 
 class="pplb7t-">d</span> </dt><dd 
 class="description">
-     <!--l. 933--><p class="noindent" >A copy of the main diagonal.<br 
+     <!--l. 935--><p class="noindent" >A copy of the main diagonal.<br 
 class="newline" />A one-dimensional array of the appropriate type.
                                                                   
 
                                                                   
      </dd><dt class="description">
-     <!--l. 935--><p class="noindent" >
+     <!--l. 937--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 935--><p class="noindent" >Return code.</dd></dl>
-<!--l. 939--><p class="noindent" >
+     <!--l. 937--><p class="noindent" >Return code.</dd></dl>
+<!--l. 941--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.14    </span> <a 
  id="x8-400003.2.14"></a>clip_diag &#8212; Cut out main diagonal</h5>
-<!--l. 941--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clip_diag</span><span style="color:#000000">(</span><span style="color:#000000">b</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
-<!--l. 943--><p class="indent" >   Returns a copy of <code class="lstinline"><span style="color:#000000">a</span></code> without the main diagonal.
+<!--l. 943--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clip_diag</span><span style="color:#000000">(</span><span style="color:#000000">b</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 945--><p class="indent" >   Returns a copy of <code class="lstinline"><span style="color:#000000">a</span></code> without the main diagonal.
      <dl class="description"><dt class="description">
-     <!--l. 945--><p class="noindent" >
+     <!--l. 947--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 945--><p class="noindent" >Asynchronous.
+     <!--l. 947--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 946--><p class="noindent" >
+     <!--l. 948--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 946--><p class="noindent" >
+     <!--l. 948--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 947--><p class="noindent" >
+     <!--l. 949--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 947--><p class="noindent" >the sparse matrix.<br 
+     <!--l. 949--><p class="noindent" >the sparse matrix.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 951--><p class="noindent" >
+<!--l. 953--><p class="noindent" >
      <dl class="description"><dt class="description">
-     <!--l. 952--><p class="noindent" >
+     <!--l. 954--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 952--><p class="noindent" >
-     </dd><dt class="description">
-     <!--l. 953--><p class="noindent" >
-<span 
-class="pplb7t-">b</span> </dt><dd 
-class="description">
-     <!--l. 953--><p class="noindent" >A copy of <code class="lstinline"><span style="color:#000000">a</span></code> without the main diagonal.<br 
-class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     <!--l. 954--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 955--><p class="noindent" >
 <span 
+class="pplb7t-">b</span> </dt><dd 
+class="description">
+     <!--l. 955--><p class="noindent" >A copy of <code class="lstinline"><span style="color:#000000">a</span></code> without the main diagonal.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 957--><p class="noindent" >
+<span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 955--><p class="noindent" >Return code.</dd></dl>
+     <!--l. 957--><p class="noindent" >Return code.</dd></dl>
                                                                   
 
                                                                   
-<!--l. 959--><p class="noindent" >
+<!--l. 961--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.15    </span> <a 
  id="x8-410003.2.15"></a>tril &#8212; Return the lower triangle</h5>
                                                                   
@@ -1869,83 +1870,83 @@ class="description">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%tril(l,info[,&amp;
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,u])
 </pre>
-<!--l. 971--><p class="nopar" >
-<!--l. 974--><p class="indent" >   Returns the lower triangular part of submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>,
+<!--l. 973--><p class="nopar" >
+<!--l. 976--><p class="indent" >   Returns the lower triangular part of submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>,
 optionally rescaling row/col indices to the range <code class="lstinline"><span style="color:#000000">1:</span><span style="color:#000000">imax</span><span style="color:#000000">-</span><span style="color:#000000">imin</span><span style="color:#000000">+1,1:</span><span style="color:#000000">jmax</span><span style="color:#000000">-</span><span style="color:#000000">jmin</span><span style="color:#000000">+1</span></code>
 and returing the complementary upper triangle.
      <dl class="description"><dt class="description">
-     <!--l. 979--><p class="noindent" >
+     <!--l. 981--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 979--><p class="noindent" >Asynchronous.
+     <!--l. 981--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 980--><p class="noindent" >
+     <!--l. 982--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 980--><p class="noindent" >
+     <!--l. 982--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 981--><p class="noindent" >
+     <!--l. 983--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 981--><p class="noindent" >the sparse matrix.<br 
+     <!--l. 983--><p class="noindent" >the sparse matrix.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 984--><p class="noindent" >
+     <!--l. 986--><p class="noindent" >
 <span 
 class="pplb7t-">diag</span> </dt><dd 
 class="description">
-     <!--l. 984--><p class="noindent" >Include diagonals up to this one; <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=1</span></code> means the first superdiagonal,
+     <!--l. 986--><p class="noindent" >Include diagonals up to this one; <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=1</span></code> means the first superdiagonal,
      <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=-1</span></code> means the first subdiagonal. Default 0.
-     </dd><dt class="description">
-     <!--l. 987--><p class="noindent" >
-<span 
-class="pplb7t-">imin,imax,jmin,jmax</span> </dt><dd 
-class="description">
-     <!--l. 987--><p class="noindent" >Minimum and maximum row and column indices.<br 
-class="newline" />Type: optional.
      </dd><dt class="description">
      <!--l. 989--><p class="noindent" >
 <span 
+class="pplb7t-">imin,imax,jmin,jmax</span> </dt><dd 
+class="description">
+     <!--l. 989--><p class="noindent" >Minimum and maximum row and column indices.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 991--><p class="noindent" >
+<span 
 class="pplb7t-">rscale,cscale</span> </dt><dd 
 class="description">
-     <!--l. 989--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
-<!--l. 992--><p class="noindent" >
+     <!--l. 991--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
+<!--l. 994--><p class="noindent" >
                                                                   
 
                                                                   
      <dl class="description"><dt class="description">
-     <!--l. 993--><p class="noindent" >
+     <!--l. 995--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 993--><p class="noindent" >
-     </dd><dt class="description">
-     <!--l. 994--><p class="noindent" >
-<span 
-class="pplb7t-">l</span> </dt><dd 
-class="description">
-     <!--l. 994--><p class="noindent" >A copy of the lower triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
-class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     <!--l. 995--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 996--><p class="noindent" >
 <span 
-class="pplb7t-">u</span> </dt><dd 
+class="pplb7t-">l</span> </dt><dd 
 class="description">
-     <!--l. 996--><p class="noindent" >(optional) A copy of the upper triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+     <!--l. 996--><p class="noindent" >A copy of the lower triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
      </dd><dt class="description">
      <!--l. 998--><p class="noindent" >
 <span 
+class="pplb7t-">u</span> </dt><dd 
+class="description">
+     <!--l. 998--><p class="noindent" >(optional) A copy of the upper triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 1000--><p class="noindent" >
+<span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 998--><p class="noindent" >Return code.</dd></dl>
-<!--l. 1001--><p class="noindent" >
+     <!--l. 1000--><p class="noindent" >Return code.</dd></dl>
+<!--l. 1003--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.16    </span> <a 
  id="x8-420003.2.16"></a>triu &#8212; Return the upper triangle</h5>
                                                                   
@@ -1955,221 +1956,221 @@ class="description">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;a%triu(u,info[,&amp;
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;diag,imin,imax,jmin,jmax,rscale,cscale,l])
 </pre>
-<!--l. 1012--><p class="nopar" >
-<!--l. 1015--><p class="indent" >   Returns the upper triangular part of submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>,
+<!--l. 1014--><p class="nopar" >
+<!--l. 1017--><p class="indent" >   Returns the upper triangular part of submatrix <code class="lstinline"><span style="color:#000000">A</span><span style="color:#000000">(</span><span style="color:#000000">imin</span><span style="color:#000000">:</span><span style="color:#000000">imax</span><span style="color:#000000">,</span><span style="color:#000000">jmin</span><span style="color:#000000">:</span><span style="color:#000000">jmax</span><span style="color:#000000">)</span></code>,
 optionally rescaling row/col indices to the range <code class="lstinline"><span style="color:#000000">1:</span><span style="color:#000000">imax</span><span style="color:#000000">-</span><span style="color:#000000">imin</span><span style="color:#000000">+1,1:</span><span style="color:#000000">jmax</span><span style="color:#000000">-</span><span style="color:#000000">jmin</span><span style="color:#000000">+1</span></code>,
 and returing the complementary lower triangle.
      <dl class="description"><dt class="description">
-     <!--l. 1020--><p class="noindent" >
+     <!--l. 1022--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1020--><p class="noindent" >Asynchronous.
+     <!--l. 1022--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1021--><p class="noindent" >
+     <!--l. 1023--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1021--><p class="noindent" >
+     <!--l. 1023--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1022--><p class="noindent" >
+     <!--l. 1024--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 1022--><p class="noindent" >the sparse matrix.<br 
+     <!--l. 1024--><p class="noindent" >the sparse matrix.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1025--><p class="noindent" >
+     <!--l. 1027--><p class="noindent" >
 <span 
 class="pplb7t-">diag</span> </dt><dd 
 class="description">
-     <!--l. 1025--><p class="noindent" >Include diagonals up to this one; <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=1</span></code> means the first superdiagonal,
+     <!--l. 1027--><p class="noindent" >Include diagonals up to this one; <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=1</span></code> means the first superdiagonal,
      <code class="lstinline"><span style="color:#000000">diag</span><span style="color:#000000">=-1</span></code> means the first subdiagonal. Default 0.
-     </dd><dt class="description">
-     <!--l. 1028--><p class="noindent" >
-<span 
-class="pplb7t-">imin,imax,jmin,jmax</span> </dt><dd 
-class="description">
-     <!--l. 1028--><p class="noindent" >Minimum and maximum row and column indices.<br 
-class="newline" />Type: optional.
      </dd><dt class="description">
      <!--l. 1030--><p class="noindent" >
 <span 
+class="pplb7t-">imin,imax,jmin,jmax</span> </dt><dd 
+class="description">
+     <!--l. 1030--><p class="noindent" >Minimum and maximum row and column indices.<br 
+class="newline" />Type: optional.
+     </dd><dt class="description">
+     <!--l. 1032--><p class="noindent" >
+<span 
 class="pplb7t-">rscale,cscale</span> </dt><dd 
 class="description">
-     <!--l. 1030--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
-<!--l. 1033--><p class="noindent" >
+     <!--l. 1032--><p class="noindent" >Whether to rescale row/column indices. Type: optional.</dd></dl>
+<!--l. 1035--><p class="noindent" >
                                                                   
 
                                                                   
      <dl class="description"><dt class="description">
-     <!--l. 1034--><p class="noindent" >
+     <!--l. 1036--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1034--><p class="noindent" >
-     </dd><dt class="description">
-     <!--l. 1035--><p class="noindent" >
-<span 
-class="pplb7t-">u</span> </dt><dd 
-class="description">
-     <!--l. 1035--><p class="noindent" >A copy of the upper triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
-class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     <!--l. 1036--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 1037--><p class="noindent" >
 <span 
-class="pplb7t-">l</span> </dt><dd 
+class="pplb7t-">u</span> </dt><dd 
 class="description">
-     <!--l. 1037--><p class="noindent" >(optional) A copy of the lower triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+     <!--l. 1037--><p class="noindent" >A copy of the upper triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
 class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
      </dd><dt class="description">
      <!--l. 1039--><p class="noindent" >
 <span 
+class="pplb7t-">l</span> </dt><dd 
+class="description">
+     <!--l. 1039--><p class="noindent" >(optional) A copy of the lower triangle of <code class="lstinline"><span style="color:#000000">a</span></code>.<br 
+class="newline" />A variable of type <code class="lstinline"><span style="color:#000000">psb_Tspmat_type</span></code>.
+     </dd><dt class="description">
+     <!--l. 1041--><p class="noindent" >
+<span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1039--><p class="noindent" >Return code.</dd></dl>
-<!--l. 1045--><p class="noindent" >
+     <!--l. 1041--><p class="noindent" >Return code.</dd></dl>
+<!--l. 1047--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.17    </span> <a 
  id="x8-430003.2.17"></a>psb_set_mat_default &#8212; Set default storage format</h5>
-<!--l. 1049--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_set_mat_default</span><span style="color:#000000">(</span><span style="color:#000000">a</span><span style="color:#000000">)</span></code>
-<!--l. 1051--><p class="indent" >
+<!--l. 1051--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">psb_set_mat_default</span><span style="color:#000000">(</span><span style="color:#000000">a</span><span style="color:#000000">)</span></code>
+<!--l. 1053--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1052--><p class="noindent" >
+     <!--l. 1054--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1052--><p class="noindent" >Asynchronous.
+     <!--l. 1054--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1053--><p class="noindent" >
+     <!--l. 1055--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1053--><p class="noindent" >
+     <!--l. 1055--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1054--><p class="noindent" >
+     <!--l. 1056--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 1054--><p class="noindent" >a variable of <code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_T_base_sparse_mat</span><span style="color:#000000">)</span></code> requesting a new default
+     <!--l. 1056--><p class="noindent" >a variable of <code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_T_base_sparse_mat</span><span style="color:#000000">)</span></code> requesting a new default
      storage format.<br 
 class="newline" />Type: required.</dd></dl>
                                                                   
 
                                                                   
-<!--l. 1063--><p class="noindent" >
+<!--l. 1065--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.18    </span> <a 
  id="x8-440003.2.18"></a>clone &#8212; Clone current object</h5>
-<!--l. 1066--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clone</span><span style="color:#000000">(</span><span style="color:#000000">b</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
-<!--l. 1068--><p class="indent" >
+<!--l. 1068--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">a</span><span style="color:#000000">%</span><span style="color:#000000">clone</span><span style="color:#000000">(</span><span style="color:#000000">b</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code>
+<!--l. 1070--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1069--><p class="noindent" >
+     <!--l. 1071--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1069--><p class="noindent" >Asynchronous.
+     <!--l. 1071--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1070--><p class="noindent" >
+     <!--l. 1072--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1070--><p class="noindent" >
+     <!--l. 1072--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1071--><p class="noindent" >
+     <!--l. 1073--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 1071--><p class="noindent" >the sparse matrix.<br 
+     <!--l. 1073--><p class="noindent" >the sparse matrix.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 1078--><p class="indent" >
+<!--l. 1080--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1079--><p class="noindent" >
+     <!--l. 1081--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1079--><p class="noindent" >
+     <!--l. 1081--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1080--><p class="noindent" >
+     <!--l. 1082--><p class="noindent" >
 <span 
 class="pplb7t-">b</span> </dt><dd 
 class="description">
-     <!--l. 1080--><p class="noindent" >A copy of the input object.
+     <!--l. 1082--><p class="noindent" >A copy of the input object.
      </dd><dt class="description">
-     <!--l. 1081--><p class="noindent" >
+     <!--l. 1083--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1081--><p class="noindent" >Return code.</dd></dl>
-<!--l. 1085--><p class="noindent" >
+     <!--l. 1083--><p class="noindent" >Return code.</dd></dl>
+<!--l. 1087--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.19    </span> <a 
  id="x8-450003.2.19"></a>Named Constants</h5>
-<!--l. 1087--><p class="noindent" >
+<!--l. 1089--><p class="noindent" >
      <dl class="description"><dt class="description">
-     <!--l. 1092--><p class="noindent" >
+     <!--l. 1094--><p class="noindent" >
 <span 
 class="pplb7t-">psb</span><span 
 class="pplb7t-">_dupl</span><span 
 class="pplb7t-">_ovwrt</span><span 
 class="pplb7t-">_</span> </dt><dd 
 class="description">
-     <!--l. 1092--><p class="noindent" >Duplicate coefficients should be overwritten (i.e. ignore duplications)
+     <!--l. 1094--><p class="noindent" >Duplicate coefficients should be overwritten (i.e. ignore duplications)
                                                                   
 
                                                                   
      </dd><dt class="description">
-     <!--l. 1094--><p class="noindent" >
+     <!--l. 1096--><p class="noindent" >
 <span 
 class="pplb7t-">psb</span><span 
 class="pplb7t-">_dupl</span><span 
 class="pplb7t-">_add</span><span 
 class="pplb7t-">_</span> </dt><dd 
 class="description">
-     <!--l. 1094--><p class="noindent" >Duplicate coefficients should be added;
+     <!--l. 1096--><p class="noindent" >Duplicate coefficients should be added;
      </dd><dt class="description">
-     <!--l. 1095--><p class="noindent" >
+     <!--l. 1097--><p class="noindent" >
 <span 
 class="pplb7t-">psb</span><span 
 class="pplb7t-">_dupl</span><span 
 class="pplb7t-">_err</span><span 
 class="pplb7t-">_</span> </dt><dd 
 class="description">
-     <!--l. 1095--><p class="noindent" >Duplicate coefficients should trigger an error conditino
+     <!--l. 1097--><p class="noindent" >Duplicate coefficients should trigger an error conditino
      </dd><dt class="description">
-     <!--l. 1096--><p class="noindent" >
+     <!--l. 1098--><p class="noindent" >
 <span 
 class="pplb7t-">psb</span><span 
 class="pplb7t-">_upd</span><span 
 class="pplb7t-">_dflt</span><span 
 class="pplb7t-">_</span> </dt><dd 
 class="description">
-     <!--l. 1096--><p class="noindent" >Default update strategy for matrix coefficients;
+     <!--l. 1098--><p class="noindent" >Default update strategy for matrix coefficients;
      </dd><dt class="description">
-     <!--l. 1097--><p class="noindent" >
+     <!--l. 1099--><p class="noindent" >
 <span 
 class="pplb7t-">psb</span><span 
 class="pplb7t-">_upd</span><span 
 class="pplb7t-">_srch</span><span 
 class="pplb7t-">_</span> </dt><dd 
 class="description">
-     <!--l. 1097--><p class="noindent" >Update strategy based on search into the data structure;
+     <!--l. 1099--><p class="noindent" >Update strategy based on search into the data structure;
      </dd><dt class="description">
-     <!--l. 1098--><p class="noindent" >
+     <!--l. 1100--><p class="noindent" >
 <span 
 class="pplb7t-">psb</span><span 
 class="pplb7t-">_upd</span><span 
 class="pplb7t-">_perm</span><span 
 class="pplb7t-">_</span> </dt><dd 
 class="description">
-     <!--l. 1098--><p class="noindent" >Update strategy based on additional permutation data (see tools routine
+     <!--l. 1100--><p class="noindent" >Update strategy based on additional permutation data (see tools routine
      description).</dd></dl>
-<!--l. 1103--><p class="noindent" >
+<!--l. 1105--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x8-460003.3"></a>Dense Vector Data Structure</h4>
-<!--l. 1105--><p class="noindent" >The <a 
+<!--l. 1107--><p class="noindent" >The <a 
  id="vdata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
@@ -2187,48 +2188,48 @@ sec.&#x00A0;<a
 href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>. Among other simple things, we define here an extraction method that
 can be used to get a full copy of the part of the vector stored on the local
 process.
-<!--l. 1115--><p class="indent" >   The type declaration is shown in figure&#x00A0;<a 
+<!--l. 1117--><p class="indent" >   The type declaration is shown in figure&#x00A0;<a 
 href="#x8-46001r3">3<!--tex4ht:ref: fig:vectype --></a> where <code class="lstinline"><span style="color:#000000">T</span></code> is a placeholder for the data
 type and precision variants
      <dl class="description"><dt class="description">
-     <!--l. 1119--><p class="noindent" >
+     <!--l. 1121--><p class="noindent" >
 <span 
 class="pplb7t-">I</span> </dt><dd 
 class="description">
-     <!--l. 1119--><p class="noindent" >Integer;
+     <!--l. 1121--><p class="noindent" >Integer;
      </dd><dt class="description">
-     <!--l. 1120--><p class="noindent" >
+     <!--l. 1122--><p class="noindent" >
 <span 
 class="pplb7t-">S</span> </dt><dd 
 class="description">
-     <!--l. 1120--><p class="noindent" >Single precision real;
+     <!--l. 1122--><p class="noindent" >Single precision real;
                                                                   
 
                                                                   
      </dd><dt class="description">
-     <!--l. 1121--><p class="noindent" >
+     <!--l. 1123--><p class="noindent" >
 <span 
 class="pplb7t-">D</span> </dt><dd 
 class="description">
-     <!--l. 1121--><p class="noindent" >Double precision real;
+     <!--l. 1123--><p class="noindent" >Double precision real;
      </dd><dt class="description">
-     <!--l. 1122--><p class="noindent" >
+     <!--l. 1124--><p class="noindent" >
 <span 
 class="pplb7t-">C</span> </dt><dd 
 class="description">
-     <!--l. 1122--><p class="noindent" >Single precision complex;
+     <!--l. 1124--><p class="noindent" >Single precision complex;
      </dd><dt class="description">
-     <!--l. 1123--><p class="noindent" >
+     <!--l. 1125--><p class="noindent" >
 <span 
 class="pplb7t-">Z</span> </dt><dd 
 class="description">
-     <!--l. 1123--><p class="noindent" >Double precision complex.</dd></dl>
-<!--l. 1125--><p class="noindent" >The actual data is contained in the polymorphic component <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">v</span></code>; the separation between
+     <!--l. 1125--><p class="noindent" >Double precision complex.</dd></dl>
+<!--l. 1127--><p class="noindent" >The actual data is contained in the polymorphic component <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">v</span></code>; the separation between
 the application and the actual data is essential for cases where it is necessary to link
 to data storage made available elsewhere outside the direct control of the
 compiler/application, e.g. data stored in a graphics accelerator&#8217;s private
 memory.
-<!--l. 1131--><p class="indent" >   <a 
+<!--l. 1133--><p class="indent" >   <a 
  id="x8-46001r3"></a><hr class="float"><div class="float" 
 >
                                                                   
@@ -2236,7 +2237,7 @@ memory.
                                                                   
 <div class="center" 
 >
-<!--l. 1145--><p class="noindent" >
+<!--l. 1147--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-26">
 &#x00A0;&#x00A0;type&#x00A0;psb_T_base_vect_type
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;TYPE(KIND_),&#x00A0;allocatable&#x00A0;::&#x00A0;v(:)
@@ -2247,7 +2248,7 @@ memory.
 &#x00A0;&#x00A0;end&#x00A0;type&#x00A0;&#x00A0;psb_T_vect_type
 
 </pre>
-<!--l. 1156--><p class="nopar" >                                                        </div></div>
+<!--l. 1158--><p class="nopar" >                                                        </div></div>
 <br /><div class="caption" 
 ><span class="id">Listing 3: </span><span  
 class="content"> The PSBLAS defined data type that contains a dense vector.</span></div><!--tex4ht:label?: x8-46001r3 -->
@@ -2257,88 +2258,88 @@ class="content"> The PSBLAS defined data type that contains a dense vector.</spa
    </div><hr class="endfloat" />
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.1    </span> <a 
  id="x8-470003.3.1"></a>Vector Methods</h5>
-<!--l. 1171--><p class="noindent" >
+<!--l. 1173--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.2    </span> <a 
  id="x8-480003.3.2"></a>get_nrows &#8212; Get number of rows in a dense vector</h5>
-<!--l. 1174--><p class="noindent" ><code class="lstinline"><span style="color:#000000">nr</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">get_nrows</span><span style="color:#000000">()</span></code>
-<!--l. 1176--><p class="indent" >
+<!--l. 1176--><p class="noindent" ><code class="lstinline"><span style="color:#000000">nr</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">get_nrows</span><span style="color:#000000">()</span></code>
+<!--l. 1178--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1177--><p class="noindent" >
+     <!--l. 1179--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1177--><p class="noindent" >Asynchronous.
+     <!--l. 1179--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1178--><p class="noindent" >
+     <!--l. 1180--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1178--><p class="noindent" >
+     <!--l. 1180--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1179--><p class="noindent" >
+     <!--l. 1181--><p class="noindent" >
 <span 
 class="pplb7t-">v</span> </dt><dd 
 class="description">
-     <!--l. 1179--><p class="noindent" >the dense vector<br 
+     <!--l. 1181--><p class="noindent" >the dense vector<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 1186--><p class="indent" >
+<!--l. 1188--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1187--><p class="noindent" >
+     <!--l. 1189--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1187--><p class="noindent" >
+     <!--l. 1189--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1188--><p class="noindent" >
+     <!--l. 1190--><p class="noindent" >
 <span 
 class="pplb7t-">Function value</span> </dt><dd 
 class="description">
-     <!--l. 1188--><p class="noindent" >The number of rows of dense vector <code class="lstinline"><span style="color:#000000">v</span></code>.</dd></dl>
-<!--l. 1193--><p class="noindent" >
+     <!--l. 1190--><p class="noindent" >The number of rows of dense vector <code class="lstinline"><span style="color:#000000">v</span></code>.</dd></dl>
+<!--l. 1195--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.3    </span> <a 
  id="x8-490003.3.3"></a>sizeof &#8212; Get memory occupation in bytes of a dense vector</h5>
-<!--l. 1196--><p class="noindent" ><code class="lstinline"><span style="color:#000000">memory_size</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">sizeof</span><span style="color:#000000">()</span></code>
-<!--l. 1198--><p class="indent" >
+<!--l. 1198--><p class="noindent" ><code class="lstinline"><span style="color:#000000">memory_size</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">sizeof</span><span style="color:#000000">()</span></code>
+<!--l. 1200--><p class="indent" >
                                                                   
 
                                                                   
      <dl class="description"><dt class="description">
-     <!--l. 1199--><p class="noindent" >
+     <!--l. 1201--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1199--><p class="noindent" >Asynchronous.
+     <!--l. 1201--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1200--><p class="noindent" >
+     <!--l. 1202--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1200--><p class="noindent" >
+     <!--l. 1202--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1201--><p class="noindent" >
+     <!--l. 1203--><p class="noindent" >
 <span 
 class="pplb7t-">v</span> </dt><dd 
 class="description">
-     <!--l. 1201--><p class="noindent" >the dense vector<br 
+     <!--l. 1203--><p class="noindent" >the dense vector<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 1208--><p class="indent" >
+<!--l. 1210--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1209--><p class="noindent" >
+     <!--l. 1211--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1209--><p class="noindent" >
+     <!--l. 1211--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1210--><p class="noindent" >
+     <!--l. 1212--><p class="noindent" >
 <span 
 class="pplb7t-">Function value</span> </dt><dd 
 class="description">
-     <!--l. 1210--><p class="noindent" >The memory occupation in bytes.</dd></dl>
-<!--l. 1214--><p class="noindent" >
+     <!--l. 1212--><p class="noindent" >The memory occupation in bytes.</dd></dl>
+<!--l. 1216--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.4    </span> <a 
  id="x8-500003.3.4"></a>set &#8212; Set contents of the vector</h5>
                                                                   
@@ -2349,35 +2350,35 @@ class="description">
 &#x00A0;call&#x00A0;&#x00A0;v%set(vect[,first,last])
 &#x00A0;call&#x00A0;&#x00A0;v%zero()
 </pre>
-<!--l. 1228--><p class="nopar" >
-<!--l. 1231--><p class="indent" >
+<!--l. 1230--><p class="nopar" >
+<!--l. 1233--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1232--><p class="noindent" >
+     <!--l. 1234--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1232--><p class="noindent" >Asynchronous.
+     <!--l. 1234--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1233--><p class="noindent" >
+     <!--l. 1235--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1233--><p class="noindent" >
+     <!--l. 1235--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1234--><p class="noindent" >
+     <!--l. 1236--><p class="noindent" >
 <span 
 class="pplb7t-">v</span> </dt><dd 
 class="description">
-     <!--l. 1234--><p class="noindent" >the dense vector<br 
+     <!--l. 1236--><p class="noindent" >the dense vector<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span><br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1239--><p class="noindent" >
+     <!--l. 1241--><p class="noindent" >
 <span 
 class="pplb7t-">alpha</span> </dt><dd 
 class="description">
-     <!--l. 1239--><p class="noindent" >A scalar value. <br 
+     <!--l. 1241--><p class="noindent" >A scalar value. <br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -2387,11 +2388,11 @@ class="pplb7t-">in</span>.<br
 class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
 href="userhtmlse4.html#x9-56001r1">1<!--tex4ht:ref: tab:f90axpby --></a>.
      </dd><dt class="description">
-     <!--l. 1243--><p class="noindent" >
+     <!--l. 1245--><p class="noindent" >
 <span 
 class="pplb7t-">first,last</span> </dt><dd 
 class="description">
-     <!--l. 1243--><p class="noindent" >Boundaries for setting in the vector.<br 
+     <!--l. 1245--><p class="noindent" >Boundaries for setting in the vector.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -2400,14 +2401,14 @@ class="newline" />Intent: <span
 class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: integers.
      </dd><dt class="description">
-     <!--l. 1246--><p class="noindent" >
+     <!--l. 1248--><p class="noindent" >
 <span 
 class="pplb7t-">vect</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 1246--><p class="noindent" >An array <br 
+     <!--l. 1248--><p class="noindent" >An array <br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -2416,26 +2417,26 @@ class="newline" />Intent: <span
 class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: a number of the data type indicated in Table&#x00A0;<a 
 href="userhtmlse4.html#x9-56001r1">1<!--tex4ht:ref: tab:f90axpby --></a>.</dd></dl>
-<!--l. 1250--><p class="noindent" >Note that a call to <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">zero</span><span style="color:#000000">()</span></code> is provided as a shorthand, but is equivalent to a call
+<!--l. 1252--><p class="noindent" >Note that a call to <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">zero</span><span style="color:#000000">()</span></code> is provided as a shorthand, but is equivalent to a call
 to <code class="lstinline"><span style="color:#000000">v</span><span style="color:#000000">%</span><span style="color:#000000">set</span><span style="color:#000000">(</span><span style="color:#000000">zero</span><span style="color:#000000">)</span></code> with the <code class="lstinline"><span style="color:#000000">zero</span></code> constant having the appropriate type and
 kind.
-<!--l. 1254--><p class="indent" >
+<!--l. 1256--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1255--><p class="noindent" >
+     <!--l. 1257--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1255--><p class="noindent" >
+     <!--l. 1257--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1256--><p class="noindent" >
+     <!--l. 1258--><p class="noindent" >
 <span 
 class="pplb7t-">v</span> </dt><dd 
 class="description">
-     <!--l. 1256--><p class="noindent" >the dense vector, with updated entries<br 
+     <!--l. 1258--><p class="noindent" >the dense vector, with updated entries<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span><br 
 class="newline" /></dd></dl>
-<!--l. 1260--><p class="noindent" >
+<!--l. 1262--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.5    </span> <a 
  id="x8-510003.3.5"></a>get_vect &#8212; Get a copy of the vector contents</h5>
                                                                   
@@ -2444,54 +2445,54 @@ class="newline" /></dd></dl>
    <pre class="verbatim" id="verbatim-28">
 extv&#x00A0;=&#x00A0;v%get_vect([n])
 </pre>
-<!--l. 1265--><p class="nopar" >
-<!--l. 1267--><p class="indent" >
+<!--l. 1267--><p class="nopar" >
+<!--l. 1269--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1268--><p class="noindent" >
+     <!--l. 1270--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1268--><p class="noindent" >Asynchronous.
+     <!--l. 1270--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1269--><p class="noindent" >
+     <!--l. 1271--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1269--><p class="noindent" >
+     <!--l. 1271--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1270--><p class="noindent" >
+     <!--l. 1272--><p class="noindent" >
 <span 
 class="pplb7t-">v</span> </dt><dd 
 class="description">
-     <!--l. 1270--><p class="noindent" >the dense vector<br 
+     <!--l. 1272--><p class="noindent" >the dense vector<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span><br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1275--><p class="noindent" >
+     <!--l. 1277--><p class="noindent" >
 <span 
 class="pplb7t-">n</span> </dt><dd 
 class="description">
-     <!--l. 1275--><p class="noindent" >Size to be returned<br 
+     <!--l. 1277--><p class="noindent" >Size to be returned<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span>; default: entire vector.<br 
 class="newline" />
      </dd></dl>
-<!--l. 1281--><p class="indent" >
+<!--l. 1283--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1282--><p class="noindent" >
+     <!--l. 1284--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1282--><p class="noindent" >
+     <!--l. 1284--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1283--><p class="noindent" >
+     <!--l. 1285--><p class="noindent" >
 <span 
 class="pplb7t-">Function value</span> </dt><dd 
 class="description">
-     <!--l. 1283--><p class="noindent" >An  allocatable  array  holding  a  copy  of  the  dense  vector  contents.  If
+     <!--l. 1285--><p class="noindent" >An  allocatable  array  holding  a  copy  of  the  dense  vector  contents.  If
      the  argument  <span 
 class="zplmr7m-">n </span>is  specified,  the  size  of  the  returned  array  equals  the
      minimum  between  <span 
@@ -2502,7 +2503,7 @@ class="zplmr7m-">n </span>is
                                                                   
 
                                                                   
-<!--l. 1290--><p class="noindent" >
+<!--l. 1292--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.6    </span> <a 
  id="x8-520003.3.6"></a>clone &#8212; Clone current object</h5>
                                                                   
@@ -2511,57 +2512,57 @@ class="zplmr7m-">n </span>is
    <pre class="verbatim" id="verbatim-29">
 call&#x00A0;&#x00A0;x%clone(y,info)
 </pre>
-<!--l. 1294--><p class="nopar" >
-<!--l. 1296--><p class="indent" >
+<!--l. 1296--><p class="nopar" >
+<!--l. 1298--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1297--><p class="noindent" >
+     <!--l. 1299--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1297--><p class="noindent" >Asynchronous.
+     <!--l. 1299--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1298--><p class="noindent" >
+     <!--l. 1300--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1298--><p class="noindent" >
+     <!--l. 1300--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1299--><p class="noindent" >
+     <!--l. 1301--><p class="noindent" >
 <span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1299--><p class="noindent" >the dense vector.<br 
+     <!--l. 1301--><p class="noindent" >the dense vector.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 1306--><p class="indent" >
+<!--l. 1308--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1307--><p class="noindent" >
+     <!--l. 1309--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1307--><p class="noindent" >
+     <!--l. 1309--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1308--><p class="noindent" >
+     <!--l. 1310--><p class="noindent" >
 <span 
 class="pplb7t-">y</span> </dt><dd 
 class="description">
-     <!--l. 1308--><p class="noindent" >A copy of the input object.
+     <!--l. 1310--><p class="noindent" >A copy of the input object.
      </dd><dt class="description">
-     <!--l. 1309--><p class="noindent" >
+     <!--l. 1311--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1309--><p class="noindent" >Return code.</dd></dl>
+     <!--l. 1311--><p class="noindent" >Return code.</dd></dl>
                                                                   
 
                                                                   
-<!--l. 1313--><p class="noindent" >
+<!--l. 1315--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark">3.4    </span> <a 
  id="x8-530003.4"></a>Preconditioner data structure</h4>
-<!--l. 1315--><p class="noindent" >Our base library offers support for simple well known preconditioners like Diagonal
+<!--l. 1317--><p class="noindent" >Our base library offers support for simple well known preconditioners like Diagonal
 Scaling or Block Jacobi with incomplete factorization ILU(0).
-<!--l. 1319--><p class="indent" >   A preconditioner is held in the <a 
+<!--l. 1321--><p class="indent" >   A preconditioner is held in the <a 
  id="precdata"></a><span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_Tprec</span><span 
@@ -2574,7 +2575,7 @@ preconditioner.
                                                                   
 
                                                                   
-<!--l. 1338--><p class="indent" >   <a 
+<!--l. 1340--><p class="indent" >   <a 
  id="x8-53001r4"></a><hr class="float"><div class="float" 
 >
                                                                   
@@ -2582,7 +2583,7 @@ preconditioner.
                                                                   
 <div class="center" 
 >
-<!--l. 1348--><p class="noindent" >
+<!--l. 1350--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-30">
 
 &#x00A0;&#x00A0;type&#x00A0;psb_Tprec_type
@@ -2590,7 +2591,7 @@ preconditioner.
 &#x00A0;&#x00A0;end&#x00A0;type&#x00A0;psb_Tprec_type
 
 </pre>
-<!--l. 1356--><p class="nopar" >                                                           </div></div>
+<!--l. 1358--><p class="nopar" >                                                           </div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 4: </span><span  
 class="content">The PSBLAS defined data type that contains a preconditioner.</span></div><!--tex4ht:label?: x8-53001r4 -->
@@ -2600,70 +2601,70 @@ class="content">The PSBLAS defined data type that contains a preconditioner.</sp
    </div><hr class="endfloat" />
    <h4 class="subsectionHead"><span class="titlemark">3.5    </span> <a 
  id="x8-540003.5"></a>Heap data structure</h4>
-<!--l. 1392--><p class="noindent" >Among the tools routines of sec.&#x00A0;<a 
+<!--l. 1394--><p class="noindent" >Among the tools routines of sec.&#x00A0;<a 
 href="userhtmlse6.html#x11-770006">6<!--tex4ht:ref: sec:toolsrout --></a>, we have a number of sorting utilities; the heap
 sort is implemented in terms of heaps having the following signatures:
      <dl class="description"><dt class="description">
-     <!--l. 1396--><p class="noindent" >
+     <!--l. 1398--><p class="noindent" >
 <span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_heap</span> </dt><dd 
 class="description">
-     <!--l. 1396--><p class="noindent" >:  a  heap  containing  elements  of  type  T,  where  T  can  be  <code class="lstinline"><span style="color:#000000">i</span><span style="color:#000000">,</span><span style="color:#000000">s</span><span style="color:#000000">,</span><span style="color:#000000">c</span><span style="color:#000000">,</span><span style="color:#000000">d</span><span style="color:#000000">,</span><span style="color:#000000">z</span></code> for
+     <!--l. 1398--><p class="noindent" >:  a  heap  containing  elements  of  type  T,  where  T  can  be  <code class="lstinline"><span style="color:#000000">i</span><span style="color:#000000">,</span><span style="color:#000000">s</span><span style="color:#000000">,</span><span style="color:#000000">c</span><span style="color:#000000">,</span><span style="color:#000000">d</span><span style="color:#000000">,</span><span style="color:#000000">z</span></code> for
      integer, real and complex data;
      </dd><dt class="description">
-     <!--l. 1398--><p class="noindent" >
+     <!--l. 1400--><p class="noindent" >
 <span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_T</span><span 
 class="cmtt-10">_idx</span><span 
 class="cmtt-10">_heap</span> </dt><dd 
 class="description">
-     <!--l. 1398--><p class="noindent" >: a heap containing elements of type T, as above, together with an integer
+     <!--l. 1400--><p class="noindent" >: a heap containing elements of type T, as above, together with an integer
      index.</dd></dl>
-<!--l. 1401--><p class="noindent" >Given a heap object, the following methods are defined on it:
+<!--l. 1403--><p class="noindent" >Given a heap object, the following methods are defined on it:
      <dl class="description"><dt class="description">
-     <!--l. 1403--><p class="noindent" >
+     <!--l. 1405--><p class="noindent" >
 <span 
 class="pplb7t-">init</span> </dt><dd 
 class="description">
-     <!--l. 1403--><p class="noindent" >Initialize memory; also choose ascending or descending order;
+     <!--l. 1405--><p class="noindent" >Initialize memory; also choose ascending or descending order;
      </dd><dt class="description">
-     <!--l. 1405--><p class="noindent" >
+     <!--l. 1407--><p class="noindent" >
 <span 
 class="pplb7t-">howmany</span> </dt><dd 
 class="description">
-     <!--l. 1405--><p class="noindent" >Current heap occupancy;
+     <!--l. 1407--><p class="noindent" >Current heap occupancy;
      </dd><dt class="description">
-     <!--l. 1406--><p class="noindent" >
+     <!--l. 1408--><p class="noindent" >
 <span 
 class="pplb7t-">insert</span> </dt><dd 
 class="description">
-     <!--l. 1406--><p class="noindent" >Add an item (or an item and its index);
+     <!--l. 1408--><p class="noindent" >Add an item (or an item and its index);
      </dd><dt class="description">
-     <!--l. 1407--><p class="noindent" >
+     <!--l. 1409--><p class="noindent" >
 <span 
 class="pplb7t-">get</span><span 
 class="pplb7t-">_first</span> </dt><dd 
 class="description">
-     <!--l. 1407--><p class="noindent" >Remove and return the first element;
+     <!--l. 1409--><p class="noindent" >Remove and return the first element;
      </dd><dt class="description">
-     <!--l. 1408--><p class="noindent" >
+     <!--l. 1410--><p class="noindent" >
 <span 
 class="pplb7t-">dump</span> </dt><dd 
 class="description">
-     <!--l. 1408--><p class="noindent" >Print on file;
+     <!--l. 1410--><p class="noindent" >Print on file;
                                                                   
 
                                                                   
      </dd><dt class="description">
-     <!--l. 1409--><p class="noindent" >
+     <!--l. 1411--><p class="noindent" >
 <span 
 class="pplb7t-">free</span> </dt><dd 
 class="description">
-     <!--l. 1409--><p class="noindent" >Release memory.</dd></dl>
-<!--l. 1411--><p class="noindent" >These objects are used to implement the factorization and approximate inversion
+     <!--l. 1411--><p class="noindent" >Release memory.</dd></dl>
+<!--l. 1413--><p class="noindent" >These objects are used to implement the factorization and approximate inversion
 algorithms.
                                                                   
 

@@ -900,7 +900,9 @@ A variable of type \fortinline|psb_Tspmat_type|.
 
 Eliminates zero coefficients in the input matrix. Note that depending
 on the internal storage format, there may still be some amount of
-zero padding in the output.
+zero padding in the output. Even after a call to this method, any
+explicit zeros on the main diagonal are always kept in the data
+structure. 
 
 \begin{description}
 \item[Type:] Asynchronous.
