@@ -898,11 +898,7 @@ A variable of type \fortinline|psb_Tspmat_type|.
 %\addcontentsline{toc}{paragraph}{clean\_zeros}
 \fortinline|call a%clean_zeros(info)|
 
-Eliminates zero coefficients in the input matrix. Note that depending
-on the internal storage format, there may still be some amount of
-zero padding in the output. Even after a call to this method, any
-explicit zeros on the main diagonal are always kept in the data
-structure. 
+Eliminates zero coefficients explicitly stored in the input matrix.  
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -917,6 +913,13 @@ Scope: {\bf local}.\\
 A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
+{\par\noindent\bfseries Notes}
+\begin{enumerate}
+\item Depending on the internal storage format, there may still be some amount of 
+  zero padding in the output.
+\item Any explicit zeros on the main diagonal are always kept in the
+  data structure. 
+\end{enumerate}
 
 \subsubsection{get\_diag --- Get main diagonal}
 %\addcontentsline{toc}{paragraph}{get\_diag}
