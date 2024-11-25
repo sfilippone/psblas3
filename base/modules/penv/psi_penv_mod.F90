@@ -167,6 +167,7 @@ module psi_penv_mod
 
 #else 
 
+  integer(psb_mpk_), save :: mpi_i2amx_op, mpi_i2amn_op
   integer(psb_mpk_), save :: mpi_iamx_op, mpi_iamn_op
   integer(psb_mpk_), save :: mpi_mamx_op, mpi_mamn_op
   integer(psb_mpk_), save :: mpi_eamx_op, mpi_eamn_op
@@ -181,6 +182,7 @@ module psi_penv_mod
 #endif
 
   private :: psi_get_sizes,  psi_register_mpi_extras
+  private :: psi_i2amx_op, psi_i2amn_op
   private :: psi_iamx_op, psi_iamn_op 
   private :: psi_mamx_op, psi_mamn_op 
   private :: psi_eamx_op, psi_eamn_op 
@@ -773,6 +775,8 @@ contains
 
 #if defined(SERIAL_MPI)
 #else 
+    if (info == 0) call mpi_op_create(psi_i2amx_op,.true.,mpi_i2amx_op,info)
+    if (info == 0) call mpi_op_create(psi_i2amn_op,.true.,mpi_i2amn_op,info)
     if (info == 0) call mpi_op_create(psi_mamx_op,.true.,mpi_mamx_op,info)
     if (info == 0) call mpi_op_create(psi_mamn_op,.true.,mpi_mamn_op,info)
     if (info == 0) call mpi_op_create(psi_eamx_op,.true.,mpi_eamx_op,info)
@@ -997,6 +1001,8 @@ contains
            & call mpi_comm_Free(ctxt%ctxt,info)
     end if
     if (close_) then 
+      if (info == 0) call mpi_op_free(mpi_i2amx_op,info)
+      if (info == 0) call mpi_op_free(mpi_i2amn_op,info)
       if (info == 0) call mpi_op_free(mpi_mamx_op,info)
       if (info == 0) call mpi_op_free(mpi_mamn_op,info)
       if (info == 0) call mpi_op_free(mpi_eamx_op,info)
@@ -1188,6 +1194,26 @@ contains
   ! Note: len & type are always default integer.
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
+  subroutine psi_i2amx_op(inv, outv,len,type) 
+    integer(psb_i2pk_) :: inv(len), outv(len)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
+
+    do i=1, len
+      if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
+    end do
+  end subroutine psi_i2amx_op
+  
+  subroutine psi_i2amn_op(inv, outv,len,type) 
+    integer(psb_i2pk_) :: inv(len), outv(len)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
+
+    do i=1, len
+      if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
+    end do
+  end subroutine psi_i2amn_op
+
   subroutine psi_mamx_op(inv, outv,len,type) 
     integer(psb_mpk_) :: inv(len), outv(len)
     integer(psb_mpk_) :: len,type

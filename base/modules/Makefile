@@ -10,13 +10,14 @@ BASIC_MODS= psb_const_mod.o psb_cbind_const_mod.o psb_error_mod.o psb_realloc_mo
 	auxil/psb_z_realloc_mod.o
 
 COMMINT= penv/psi_penv_mod.o \
-	 penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o \
+	 penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o penv/psi_i2_p2p_mod.o \
 	 penv/psi_e_p2p_mod.o \
 	 penv/psi_s_p2p_mod.o \
 	 penv/psi_d_p2p_mod.o \
 	 penv/psi_c_p2p_mod.o \
 	 penv/psi_z_p2p_mod.o \
 	 penv/psi_collective_mod.o \
+	 penv/psi_i2_collective_mod.o \
 	 penv/psi_e_collective_mod.o \
 	 penv/psi_m_collective_mod.o \
 	 penv/psi_s_collective_mod.o \
