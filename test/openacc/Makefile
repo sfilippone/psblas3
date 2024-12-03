@@ -9,21 +9,24 @@ INCDIR=$(TOPDIR)/include
 MODDIR=$(TOPDIR)/modules
 EXEDIR=./runs
 
-PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_ext -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBGPULDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
-
-FFLAGS=-O0 -march=native -fopenacc -foffload=nvptx-none="-march=sm_70"
-CFLAGS=-O0 -march=native
+FDEFINES=-DHAVE_OPENACC
+FFLAGS=-O3 -march=native -fopenacc -foffload=nvptx-none="-march=sm_75" -DHAVE_OPENACC
+CFLAGS=-O3 -march=native
 
 VTC=vectoacc.o
 DVT=datavect.o
 CSRC=timers.c
 
 OBJS=$(SRCS:.F90=.o) $(CSRC:.c=.o)
+DPGOBJS=dpdegenmv.o #data_input.o
 
-all: dir psb_d_oacc_pde3d
+all: dir psb_d_oacc_pde3d dpdegenmv 
+dpdegenmv: dir 
+
 
 #$(OBJS)
 #	$(FC) $(FFLAGS) $(OBJS) -o datavect $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS)
@@ -31,6 +34,10 @@ all: dir psb_d_oacc_pde3d
 
 dir:
 	@if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi
+#dpdegenmv.o spdegenmv.o: data_input.o
+dpdegenmv: $(DPGOBJS) 
+	$(FLINK) $(LOPT) -fopenacc $(DPGOBJS) -o dpdegenmv $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv dpdegenmv $(EXEDIR) 
 
 %: %.o timers.o
 	$(FC) $(FFLAGS) $^ -o $@ $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS)

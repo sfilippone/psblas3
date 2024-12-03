@@ -10,6 +10,7 @@ contains
 
     info = psb_success_
 
+
     select type(b)
     type is (psb_d_coo_sparse_mat)
       call a%cp_from_coo(b, info)
