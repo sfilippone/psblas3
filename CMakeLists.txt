@@ -430,11 +430,8 @@ endif()
 #---------------------------------------
 
 # Link order, left to right:
-<<<<<<< HEAD
-# cbind.a, util.a krylov.a prec.a base.a
-=======
 # cbind.a, util.a linsolve.a prec.a base.a
->>>>>>> cmake2
+
 
 include(${CMAKE_CURRENT_LIST_DIR}/base/CMakeLists.txt)
 
@@ -519,21 +516,7 @@ target_include_directories(prec PUBLIC
   $<INSTALL_INTERFACE:modules>)
 target_link_libraries(prec PUBLIC base)
 
-<<<<<<< HEAD
-include(${CMAKE_CURRENT_LIST_DIR}/krylov/CMakeLists.txt)
-add_library(krylov ${krylov_source_files})
-set_target_properties(krylov
-  PROPERTIES
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules"
-  POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME psb_krylov
-  LINKER_LANGUAGE Fortran
-  )
-target_include_directories(krylov PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
-  $<INSTALL_INTERFACE:modules>)
-target_link_libraries(krylov PUBLIC base prec)
-=======
+
 include(${CMAKE_CURRENT_LIST_DIR}/linsolve/CMakeLists.txt)
 add_library(linsolve ${linsolve_source_files})
 set_target_properties(linsolve
@@ -547,7 +530,7 @@ target_include_directories(linsolve PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
   $<INSTALL_INTERFACE:modules>)
 target_link_libraries(linsolve PUBLIC base prec)
->>>>>>> cmake2
+
 
 
 include(${CMAKE_CURRENT_LIST_DIR}/ext/CMakeLists.txt)
@@ -664,11 +647,9 @@ target_include_directories(cbind PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>  # Path for building
   $<INSTALL_INTERFACE:modules>  # Path for installation
 )
-<<<<<<< HEAD
-target_link_libraries(cbind PUBLIC base prec krylov ext util)
-=======
+
 target_link_libraries(cbind PUBLIC base prec linsolve ext util)
->>>>>>> cmake2
+
 
 
 # Custom command to copy all header files
@@ -730,21 +711,15 @@ if(MPI_FOUND)
   endif()
     
     
-<<<<<<< HEAD
-  foreach(lib base prec krylov ext util cbind)
-=======
+
   foreach(lib base prec linsolve ext util cbind)
->>>>>>> cmake2
+
     target_link_libraries(${lib} PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
   endforeach()
 endif()
 
 if(OpenCoarrays_FOUND)
-<<<<<<< HEAD
-  foreach(lib base prec krylov ext util cbind)  #TODO: check if cbind goes here!
-=======
   foreach(lib base prec linsolve ext util cbind)  #TODO: check if cbind goes here!
->>>>>>> cmake2
     target_link_libraries(${lib} PUBLIC OpenCoarrays::caf_mpi_static)
   endforeach()
 endif()
@@ -763,11 +738,8 @@ install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
 install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
   FILES_MATCHING PATTERN "*.mod")
 
-<<<<<<< HEAD
-install(TARGETS base prec krylov ext util cbind
-=======
+
 install(TARGETS base prec linsolve ext util cbind
->>>>>>> cmake2
   EXPORT ${CMAKE_PROJECT_NAME}-targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
