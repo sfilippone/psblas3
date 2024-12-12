@@ -183,7 +183,7 @@ int iscatMultiVecDeviceDoubleComplex(void* deviceVec, int vectorId, int n,
 }
 
 
-int nrm2MultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMultiVecA)
+int nrm2MultiVecDeviceDoubleComplex(double* y_res, int n, void* devMultiVecA)
 { int i=0;
   spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
@@ -192,7 +192,7 @@ int nrm2MultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMult
   return(i);
 }
 
-int amaxMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMultiVecA)
+int amaxMultiVecDeviceDoubleComplex(double* y_res, int n, void* devMultiVecA)
 { int i=0;
   spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
@@ -202,7 +202,7 @@ int amaxMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMult
   return(i);
 }
 
-int asumMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMultiVecA)
+int asumMultiVecDeviceDoubleComplex(double* y_res, int n, void* devMultiVecA)
 { int i=0;
   spgpuHandle_t handle=psb_cudaGetHandle();
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
@@ -223,7 +223,8 @@ int scalMultiVecDeviceDoubleComplex(cuDoubleComplex alpha, void* devMultiVecA)
   return(i);
 }
 
-int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n, void* devMultiVecA, void* devMultiVecB)
+int dotMultiVecDeviceDoubleComplex(cuDoubleComplex* y_res, int n,
+				   void* devMultiVecA, void* devMultiVecB)
 {int i=0;
   struct MultiVectDevice *devVecA = (struct MultiVectDevice *) devMultiVecA;
   struct MultiVectDevice *devVecB = (struct MultiVectDevice *) devMultiVecB;

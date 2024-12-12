@@ -295,3 +295,12 @@ lib:  objs
 
 clean:
 	/bin/rm -f $(OBJS)
+
+.c.o:
+	$(CC) $(CCOPT) $(CCUDEFINES) $(CINCLUDES) $(CDEFINES) -c $< -o $@
+.f90.o:
+	$(FC) $(FCOPT) $(FCUDEFINES) $(FINCLUDES) -c $< -o $@
+.F90.o:
+	$(FC) $(FCOPT) $(FCUDEFINES) $(FINCLUDES) $(FDEFINES) -c $< -o $@
+.cpp.o:
+	$(CXX) $(CXXOPT) $(CXXCUDEFINES) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@

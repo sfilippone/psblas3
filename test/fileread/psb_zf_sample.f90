@@ -32,7 +32,7 @@
 program psb_zf_sample
   use psb_base_mod
   use psb_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use psb_util_mod
   use getp
   implicit none

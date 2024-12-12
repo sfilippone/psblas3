@@ -2421,7 +2421,8 @@ subroutine  psb_d_csc_clean_zeros(a, info)
   j        = a%icp(1)
   do i=1, nc
     do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= dzero) then
+      ! Always keep the diagonal, even if numerically zero
+      if ((a%val(k) /= dzero).or.(i == a%ia(k))) then
         a%val(j) = a%val(k)
         a%ia(j)  = a%ia(k)
         j = j + 1
@@ -4313,7 +4314,7 @@ subroutine  psb_ld_csc_clean_zeros(a, info)
   !
   integer(psb_lpk_) :: i, j, k, nc
   integer(psb_lpk_), allocatable :: ilcp(:)
-
+  
   info = 0
   call a%sync()
   nc   = a%get_ncols()
@@ -4322,7 +4323,8 @@ subroutine  psb_ld_csc_clean_zeros(a, info)
   j        = a%icp(1)
   do i=1, nc
     do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= dzero) then
+      ! Always keep the diagonal, even if numerically zero
+      if ((a%val(k) /= dzero).or.(i == a%ia(k))) then
         a%val(j) = a%val(k)
         a%ia(j)  = a%ia(k)
         j = j + 1

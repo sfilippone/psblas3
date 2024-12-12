@@ -17,8 +17,14 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \usepackage{listings}
-\usepackage{algorithm2e}
+\usepackage{rotating}
 \usepackage{microtype}
+\usepackage{algorithm2e}
+
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\usepackage{breakurl}
+\usepackage{mathpazo}
+\usepackage[english]{babel}
 \ifpdf
 \newmintinline[fortinline]{fortran}{}
 \else%
@@ -78,12 +84,14 @@
 \newcommand{\example}{\stepcounter{example}%
 \section*{\examplename~\theexample}}
 
-\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_prec\_type}}}
+\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_Tprec\_type}}}
 \newcommand{\descdata}{\hyperlink{descdata}{{\tt psb\_desc\_type}}}
 \newcommand{\spdata}{\hyperlink{spdata}{{\tt psb\_Tspmat\_type}}}
 \newcommand{\vdata}{\hyperlink{vdata}{{\tt psb\_T\_vect\_type}}}
 \newcommand{\spbasedata}{\hypertarget{spbasedata}{{\tt psb\_T\_base\_sparse\_mat}}}
 \newcommand{\vbasedata}{\hypertarget{vbasedata}{{\tt psb\_T\_base\_vect\_type}}}
+\def\bsideways{\begin{table}}
+\def\esideways{\end{table}}
 
 \begin{document}
 \lstset{language=Fortran}

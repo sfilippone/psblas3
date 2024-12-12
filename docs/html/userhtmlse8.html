@@ -16,21 +16,21 @@ href="userhtmlse7.html" >prev</a>] [<a
 href="userhtmlse7.html#tailuserhtmlse7.html" >prev-tail</a>] [<a 
 href="userhtmlse5.html#tailuserhtmlse8.html">tail</a>] [<a 
 href="userhtml.html#userhtmlse11.html" >up</a>] </p></div>
-   <h3 class="sectionHead"><span class="titlemark">8   </span> <a 
+   <h3 class="sectionHead"><span class="titlemark">8    </span> <a 
  id="x13-1230008"></a>Error handling</h3>
 <!--l. 5--><p class="noindent" >The PSBLAS library error handling policy has been completely rewritten in version
 2.0. The idea behind the design of this new error handling strategy is to keep error
 messages on a stack allowing the user to trace back up to the point where the first
 error message has been generated. Every routine in the PSBLAS-2.0 library has, as
 last non-optional argument, an integer <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">info</span></span></span> variable; whenever, inside the routine, an
-error is detected, this variable is set to a value corresponding to a specific
-error code. Then this error code is also pushed on the error stack and then
-either control is returned to the caller routine or the execution is aborted,
-depending on the users choice. At the time when the execution is aborted,
-an error message is printed on standard output with a level of verbosity
-than can be chosen by the user. If the execution is not aborted, then, the
-caller routine checks the value returned in the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">info</span></span></span> variable; whenever, inside the
+routine, an error is detected, this variable is set to a value corresponding to a
+specific error code. Then this error code is also pushed on the error stack
+and then either control is returned to the caller routine or the execution is
+aborted, depending on the users choice. At the time when the execution is
+aborted, an error message is printed on standard output with a level of
+verbosity than can be chosen by the user. If the execution is not aborted, then,
+the caller routine checks the value returned in the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">info</span></span></span> variable and, if not
 zero, an error condition is raised. This process continues on all the levels of
 nested calls until the level where the user decides to abort the program
@@ -100,14 +100,12 @@ class="cmtt-9">&#x00A0;</span><span
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">info</span></span><span style="color:#000000"><span 
 class="cmtt-9">=</span></span><span style="color:#000000"><span 
 class="cmtt-9">errcode1</span></span> 
 <span class="label"><a 
  id="x13-123005r5"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -124,7 +122,6 @@ class="cmtt-9">errcode1</span></span><span style="color:#000000"><span
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
  id="x13-123006r6"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -178,14 +175,12 @@ class="cmtt-9">&#x00A0;</span><span
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">info</span></span><span style="color:#000000"><span 
 class="cmtt-9">=</span></span><span style="color:#000000"><span 
 class="cmtt-9">errcode2</span></span> 
 <span class="label"><a 
  id="x13-123012r12"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -202,7 +197,6 @@ class="cmtt-9">errcode2</span></span><span style="color:#000000"><span
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
  id="x13-123013r13"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -246,7 +240,6 @@ class="cmtt-9">then</span></span>
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">psb_error</span></span><span style="color:#000000"><span 
@@ -255,7 +248,6 @@ class="cmtt-9">icontxt</span></span><span style="color:#000000"><span
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
  id="x13-123019r19"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -269,7 +261,6 @@ class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span
 class="cmtt-9">else</span></span> 
 <span class="label"><a 
  id="x13-123021r21"></a></span><span 
-class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -337,7 +328,7 @@ Format&#x00A0;FOO&#x00A0;is&#x00A0;unknown
 ==========================================================
 Aborting...
 </pre>
-<!--l. 156--><p class="nopar" >                                                              </div> </div>
+<!--l. 156--><p class="nopar" >                                                              </div></div>
 </div>
 <br /> <div class="caption" 
 ><span class="id">Listing 6: </span><span  
@@ -350,7 +341,7 @@ condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x13-1230
                                                                   
 
                                                                   
-   <h4 class="subsectionHead"><span class="titlemark">8.1   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">8.1    </span> <a 
  id="x13-1240008.1"></a>psb_errpush &#8212; Pushes an error code onto the error stack</h4>
    <!--l. 174-->
    <pre class="lstlisting" id="listing-155"><span class="label"><a 
@@ -371,77 +362,77 @@ class="cmtt-10">)</span></span></pre>
      <dl class="description"><dt class="description">
      <!--l. 179--><p class="noindent" >
 <span 
-class="cmbx-10">Type:</span> </dt><dd 
+class="pplb7t-">Type:</span> </dt><dd 
 class="description">
      <!--l. 179--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 180--><p class="noindent" >
 <span 
-class="cmbx-10">On Entry</span> </dt><dd 
+class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
      <!--l. 180--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 181--><p class="noindent" >
 <span 
-class="cmbx-10">err</span><span 
-class="cmbx-10">_c</span> </dt><dd 
+class="pplb7t-">err</span><span 
+class="pplb7t-">_c</span> </dt><dd 
 class="description">
      <!--l. 181--><p class="noindent" >the error code<br 
 class="newline" />Scope: <span 
-class="cmbx-10">local </span><br 
+class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
-class="cmbx-10">required</span><br 
+class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
-class="cmbx-10">in</span>.<br 
+class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: an integer.
      </dd><dt class="description">
      <!--l. 186--><p class="noindent" >
 <span 
-class="cmbx-10">r</span><span 
-class="cmbx-10">_name</span> </dt><dd 
+class="pplb7t-">r</span><span 
+class="pplb7t-">_name</span> </dt><dd 
 class="description">
      <!--l. 186--><p class="noindent" >the soutine where the error has been caught.<br 
 class="newline" />Scope: <span 
-class="cmbx-10">local </span><br 
+class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
-class="cmbx-10">required</span><br 
+class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
-class="cmbx-10">in</span>.<br 
+class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: a string.<br 
 class="newline" />
      </dd><dt class="description">
      <!--l. 191--><p class="noindent" >
 <span 
-class="cmbx-10">i</span><span 
-class="cmbx-10">_err</span> </dt><dd 
+class="pplb7t-">i</span><span 
+class="pplb7t-">_err</span> </dt><dd 
 class="description">
      <!--l. 191--><p class="noindent" >addional info for error code<br 
 class="newline" />Scope: <span 
-class="cmbx-10">local </span><br 
+class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
-class="cmbx-10">optional</span><br 
+class="pplb7t-">optional</span><br 
 class="newline" />Specified as: an integer array<br 
 class="newline" />
      </dd><dt class="description">
      <!--l. 195--><p class="noindent" >
 <span 
-class="cmbx-10">a</span><span 
-class="cmbx-10">_err</span> </dt><dd 
+class="pplb7t-">a</span><span 
+class="pplb7t-">_err</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
      <!--l. 195--><p class="noindent" >addional info for error code<br 
 class="newline" />Scope: <span 
-class="cmbx-10">local </span><br 
+class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
-class="cmbx-10">optional</span><br 
+class="pplb7t-">optional</span><br 
 class="newline" />Specified as: a string.<br 
 class="newline" /></dd></dl>
                                                                   
 
                                                                   
-   <h4 class="subsectionHead"><span class="titlemark">8.2   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">8.2    </span> <a 
  id="x13-1250008.2"></a>psb_error &#8212; Prints the error stack content and aborts execution</h4>
    <!--l. 204-->
    <pre class="lstlisting" id="listing-156"><span class="label"><a 
@@ -456,32 +447,32 @@ class="cmtt-10">)</span></span></pre>
      <dl class="description"><dt class="description">
      <!--l. 209--><p class="noindent" >
 <span 
-class="cmbx-10">Type:</span> </dt><dd 
+class="pplb7t-">Type:</span> </dt><dd 
 class="description">
      <!--l. 209--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 210--><p class="noindent" >
 <span 
-class="cmbx-10">On Entry</span> </dt><dd 
+class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
      <!--l. 210--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 211--><p class="noindent" >
 <span 
-class="cmbx-10">icontxt</span> </dt><dd 
+class="pplb7t-">icontxt</span> </dt><dd 
 class="description">
      <!--l. 211--><p class="noindent" >the communication context.<br 
 class="newline" />Scope: <span 
-class="cmbx-10">global </span><br 
+class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
-class="cmbx-10">optional</span><br 
+class="pplb7t-">optional</span><br 
 class="newline" />Intent: <span 
-class="cmbx-10">in</span>.<br 
+class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: an integer.</dd></dl>
                                                                   
 
                                                                   
-   <h4 class="subsectionHead"><span class="titlemark">8.3   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">8.3    </span> <a 
  id="x13-1260008.3"></a>psb_set_errverbosity &#8212; Sets the verbosity of error messages</h4>
    <!--l. 224-->
    <pre class="lstlisting" id="listing-157"><span class="label"><a 
@@ -496,32 +487,32 @@ class="cmtt-10">)</span></span></pre>
      <dl class="description"><dt class="description">
      <!--l. 229--><p class="noindent" >
 <span 
-class="cmbx-10">Type:</span> </dt><dd 
+class="pplb7t-">Type:</span> </dt><dd 
 class="description">
      <!--l. 229--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 230--><p class="noindent" >
 <span 
-class="cmbx-10">On Entry</span> </dt><dd 
+class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
      <!--l. 230--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 231--><p class="noindent" >
 <span 
-class="cmbx-10">v</span> </dt><dd 
+class="pplb7t-">v</span> </dt><dd 
 class="description">
      <!--l. 231--><p class="noindent" >the verbosity level<br 
 class="newline" />Scope: <span 
-class="cmbx-10">global</span><br 
+class="pplb7t-">global</span><br 
 class="newline" />Type: <span 
-class="cmbx-10">required</span><br 
+class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
-class="cmbx-10">in</span>.<br 
+class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: an integer.</dd></dl>
                                                                   
 
                                                                   
-   <h4 class="subsectionHead"><span class="titlemark">8.4   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">8.4    </span> <a 
  id="x13-1270008.4"></a>psb_set_erraction &#8212; Set the type of action to be taken upon error
 condition</h4>
    <!--l. 241-->
@@ -537,28 +528,28 @@ class="cmtt-10">)</span></span></pre>
      <dl class="description"><dt class="description">
      <!--l. 246--><p class="noindent" >
 <span 
-class="cmbx-10">Type:</span> </dt><dd 
+class="pplb7t-">Type:</span> </dt><dd 
 class="description">
      <!--l. 246--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 247--><p class="noindent" >
 <span 
-class="cmbx-10">On Entry</span> </dt><dd 
+class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
      <!--l. 247--><p class="noindent" >
      </dd><dt class="description">
      <!--l. 248--><p class="noindent" >
 <span 
-class="cmbx-10">err</span><span 
-class="cmbx-10">_act</span> </dt><dd 
+class="pplb7t-">err</span><span 
+class="pplb7t-">_act</span> </dt><dd 
 class="description">
      <!--l. 248--><p class="noindent" >the type of action.<br 
 class="newline" />Scope: <span 
-class="cmbx-10">global </span><br 
+class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
-class="cmbx-10">required</span><br 
+class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
-class="cmbx-10">in</span>.<br 
+class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: an integer. Possible values: <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_act_ret</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_act_abort</span></span></span>.</dd></dl>

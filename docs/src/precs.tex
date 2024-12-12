@@ -76,12 +76,123 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \item[DIAG] Diagonal scaling; each entry of the input vector is
   multiplied by the reciprocal of the sum of the absolute values of
   the coefficients in the corresponding row of matrix  $A$;
-\item[BJAC] Precondition by a  factorization of the
-  block-diagonal of matrix $A$, where block boundaries are determined
-  by the data allocation boundaries for each process; requires no
-  communication. Only the incomplete factorization $ILU(0)$ is
-  currently implemented.  
+\item[BJAC] Precondition by a factorization or an approximante inverse
+  of the   block-diagonal of matrix $A$, where block boundaries are
+  determined   by the data allocation boundaries for each process;
+  requires no   communication.  See also Table-\ref{tab:p_subsolve_1}. 
 \end{description}
+
+
+
+\clearpage
+
+\subsection{Set\label{sec:precset} --- set preconditioner parameters}
+
+\begin{center}
+\fortinline|call p%set(what,val,info)|
+\end{center}
+
+\noindent
+This method sets the parameters defining the subdomain solver when the
+preconditioner type is \verb|BJAC|. More precisely, the parameter
+identified by \fortinline|what| is assigned the value 
+contained in \fortinline|val|.
+
+{\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
+
+\begin{tabular}{p{1.2cm}p{12cm}}
+\fortinline|what|   & \fortinline|character(len=*)|. \\
+              & The parameter to be set. It can be specified through its name;
+                the string is case-insensitive. See
+                Table~\ref{tab:p_subsolve_1}.\\
+\fortinline|val |   & \fortinline|integer| \emph{or} \fortinline|character(len=*)| \emph{or}
+                \fortinline|real(psb_spk_)| \emph{or} \fortinline|real(psb_dpk_)|,
+                \fortinline|intent(in)|.\\
+              & The value of the parameter to be set. The list of allowed
+                values and the corresponding data types is given in
+                Table~\ref{tab:p_subsolve_1}.
+                When the value is of type \fortinline|character(len=*)|,
+                it is also treated as case insensitive.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
+              & Error code. If no error, 0 is returned. See Section~\ref{sec:errors}
+                for details.
+\end{tabular}
+
+
+\noindent
+A number of subdomain solvers can be chosen with this method;
+a list of the parameters that can be set, along with their allowed and
+default values, is given in Table-\ref{tab:p_subsolve_1}.\\
+
+
+\bsideways
+\begin{center}
+\small
+% \begin{tabular}{|p{3.6cm}|l|p{1.9cm}|p{3.6cm}|p{6.5cm}|}
+\begin{tabular}{|p{3.2cm}|l|p{2.6cm}|p{2.6cm}|p{6.7cm}|}
+\hline
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
+\textsc{comments} \\ \hline
+
+\fortinline|'SUB_SOLVE'|  & \fortinline|character(len=*)|
+                         & \fortinline|'ILU'| \par
+                           \fortinline|'ILUT'| \par 
+                            \par \fortinline|'INVT'| \par \fortinline|'INVK'| \par \fortinline|'AINV'|
+                         & 
+                         & The local solver to be used with the smoother or one-level
+                            preconditioner  ILU($p$),  ILU($p,t$), 
+                           Approximate Inverses  INVK($p,q$),
+                           INVT($p_1,p2,t_1,t_2$) and
+                           AINV($t$); note  that approximate inverses
+                           are specifically suited for GPUs since they
+                           do not employ triangular system solve
+                           kernels,
+                           see~\cite{BERTACCINIFILIPPONE}.\\ \hline
+\fortinline|'SUB_FILLIN'|  & \fortinline|integer|
+                         & Any integer \par number~$\ge 0$
+                         & 0
+                         & Fill-in level $p$ of the incomplete LU factorizations. \\ \hline
+\fortinline|'SUB_ILUTHRS'|  & \fortinline|real(kind_parameter)|
+                         & Any real number~$\ge 0$
+                         & 0
+                         & Drop tolerance $t$ in the ILU($p,t$) factorization. \\ \hline
+\fortinline|'ILU_ALG'|  & \fortinline|character(len=*)|
+                         & \fortinline|'MILU'|
+                         & \fortinline|'NONE'|
+                         & ILU algorithmic variant \\ \hline
+\fortinline|'ILUT_SCALE'|  & \fortinline|character(len=*)|
+                          & \fortinline|'MAXVAL'| \par
+                            \fortinline|'DIAG'| \par
+                            \fortinline|'ARSWUM'| \par
+                            \fortinline|'ARCSUM'| \par
+                            \fortinline|'ACLSUM'| \par
+                            \fortinline|'NONE'| 
+                         & \fortinline|'NONE'|
+                         & ILU scaling strategy \\ \hline
+\fortinline|'INV_FILLIN'|  & \fortinline|integer|
+                         & Any integer \par number~$\ge 0$
+                         & 0
+                         & Second fill-in level $q$ of the INVK($p,q$)
+                           approximate inverse. \\ \hline
+\fortinline|'INV_ILUTHRS'|  & \fortinline|real(kind_parameter)|
+                         & Any real number~$\ge 0$
+                         & 0
+                         & Second drop tolerance $s$ in the
+                           INVT($t,s$) approximate inverse. \\ \hline
+\fortinline|'AINV_ALG'|  & \fortinline|character(len=*)|
+                         & \fortinline|'LLK'| \par
+                            \fortinline|'SYM-LLK'| \par
+                            \fortinline|'STAB-LLK'| \par
+                            \fortinline|'MLK,LMX'| 
+                         & \fortinline|'LLK'|
+                         & AINV algorithmic strategy. \\ \hline
+\end{tabular}
+\end{center}
+\caption{Parameters defining the solver of the BJAC
+  preconditioner.\label{tab:p_subsolve_1}} 
+ \esideways
+
+
 
 
 \clearpage\subsection{build --- Builds a preconditioner}

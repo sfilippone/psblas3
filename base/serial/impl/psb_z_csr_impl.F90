@@ -3642,7 +3642,8 @@ subroutine  psb_z_csr_clean_zeros(a, info)
   j        = a%irp(1)
   do i=1, nr
     do k = ilrp(i), ilrp(i+1) -1
-      if (a%val(k) /= zzero) then
+      ! Always keep the diagonal, even if numerically zero
+      if ((a%val(k) /= zzero).or.(i == a%ja(k))) then
         a%val(j) = a%val(k)
         a%ja(j)  = a%ja(k)
         j = j + 1
@@ -6552,7 +6553,7 @@ subroutine  psb_lz_csr_clean_zeros(a, info)
   !
   integer(psb_lpk_) :: i, j, k, nr
   integer(psb_lpk_), allocatable :: ilrp(:)
-
+  
   info = 0
   call a%sync()
   nr   = a%get_nrows()
@@ -6561,7 +6562,8 @@ subroutine  psb_lz_csr_clean_zeros(a, info)
   j        = a%irp(1)
   do i=1, nr
     do k = ilrp(i), ilrp(i+1) -1
-      if (a%val(k) /= zzero) then
+      ! Always keep the diagonal, even if numerically zero
+      if ((a%val(k) /= zzero).or.(i == a%ja(k))) then 
         a%val(j) = a%val(k)
         a%ja(j)  = a%ja(k)
         j = j + 1

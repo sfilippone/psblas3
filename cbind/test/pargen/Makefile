@@ -9,7 +9,7 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR)
 CINCLUDES=-I. -I$(HERE) -I$(INCLUDEDIR)
 
 PSBC_LIBS= -L$(LIBDIR) -lpsb_cbind
-PSB_LIBS=-lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base -L$(LIBDIR)
+PSB_LIBS=-lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base -L$(LIBDIR)
 
 #
 # Compilers and such

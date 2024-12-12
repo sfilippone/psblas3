@@ -483,7 +483,7 @@ fi
 ##############################################################################
 BASEMODNAME=psb_base_mod
 PRECMODNAME=psb_prec_mod
-METHDMODNAME=psb_krylov_mod
+METHDMODNAME=psb_linsolve_mod
 UTILMODNAME=psb_util_mod
 
 if test "X$psblas_cv_fc" == X"cray" 
@@ -493,7 +493,7 @@ then
    FIFLAG="-I"
    BASEMODNAME=PSB_BASE_MOD
    PRECMODNAME=PSB_PREC_MOD
-   METHDMODNAME=PSB_KRYLOV_MOD
+   METHDMODNAME=PSB_LINSOLVE_MOD
    UTILMODNAME=PSB_UTIL_MOD
 
 else 
@@ -795,16 +795,19 @@ if test "x$psblas_cv_have_amd" == "xyes" ; then
 fi
 
 
+PAC_ARG_CUDA()
+if test "x$pac_cv_cuda" == "xyes"; then
 
 PAC_CHECK_CUDA()
 
 if test "x$pac_cv_have_cuda" == "xyes"; then
    
    PAC_CHECK_CUDA_VERSION()
-   CUDA_VERSION="$pac_cv_cuda_version";
-   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
    dnl PAC_CHECK_SPGPU()
    HAVE_CUDA="yes";
+   CUDA_VERSION="$pac_cv_cuda_version";
+   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+   CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
    SPGPU_LIBS="-lspgpu";	
    CUDAD=cudad;
    CUDALD=cudald;
@@ -814,7 +817,7 @@ if test "x$pac_cv_have_cuda" == "xyes"; then
 
    PAC_ARG_WITH_CUDACC()
    if test "x$pac_cv_cudacc" == "x"; then
-      pac_cv_cudacc="50,60,70,75";
+      pac_cv_cudacc="50,60,70,75,80,86";
       CUDA_CC="$pac_cv_cudacc";
    fi
    if (( $pac_cv_cuda_version >= 11070  ))
@@ -826,27 +829,72 @@ if test "x$pac_cv_have_cuda" == "xyes"; then
 	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
    done
    if test "x$pac_cv_cuda_version" != "xunknown"; then
-     CUDEFINES="$CUDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-     FDEFINES="$FDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"
-     CDEFINES="$CDEFINES -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}"    
+     CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
+     FCUDEFINES=" ${CUDA_DEFINES}"
+     CCUDEFINES=" ${CUDA_DEFINES}"
+     CXXCUDEFINES=" ${CUDA_DEFINES}"	
    fi
 fi
 
 if test "x$pac_cv_ipk_size" != "x4"; then
   AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
+  pac_cv_cuda="no";
   HAVE_CUDA="no";
   CUDA_CC="";	
   SPGPU_LIBS="";	
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
+  CUDA_DEFINES="";
   CUDA_INCLUDES="";
   CUDA_LIBS="";
+  FCUDEFINES="";
+  CCUDEFINES="";
+  CXXCUDEFINES="";
+fi
 fi
 
+PAC_ARG_OPENACC()
+dnl AC_ARG_ENABLE([openacc],
+dnl    [AS_HELP_STRING([--disable-openacc], [do not use Openacc])])
+if test x"$pac_cv_openacc" == x"yes" ; then
+   PAC_ARG_WITH_FLAGS(extraopenacc,EXTRAOPENACC)
+   dnl if test false; then
+   AX_C_OPENACC()
+   CCOPENACC="$ax_cv_prog_c_openacc";
+   AX_CXX_OPENACC()
+   CXXOPENACC="$ax_cv_prog_cxx_openacc";
+   AX_FC_OPENACC()
+   FCOPENACC="$ax_cv_prog_fc_openacc";
+    dnl AX_OPENACC()
+    dnl 
+    dnl CXXOPENACC="$ax_cv_prog_cxx_openacc";	
+    dnl FCOPENACC="$ax_cv_prog_fc_openacc";   
+   dnl else   
+dnl   AC_MSG_NOTICE([OpenACC 1 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
+   PAC_ARG_WITH_FLAGS(ccopenacc,CCOPENACC)	
+   PAC_ARG_WITH_FLAGS(cxxopenacc,CXXOPENACC)
+   PAC_ARG_WITH_FLAGS(fcopenacc,FCOPENACC)
+dnl   AC_MSG_NOTICE([OpenACC 2 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])		
+dnl   CCOPENACC="$ax_cv_prog_c_openacc";
+dnl   CXXOPENACC="$ax_cv_prog_cxx_openacc";	
+dnl   FCOPENACC="$ax_cv_prog_fc_openacc";   
+dnl   fi
+   CCOPENACC="$CCOPENACC   $EXTRAOPENACC";
+   CXXOPENACC="$CXXOPENACC   $EXTRAOPENACC";
+   FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
+dnl   AC_MSG_NOTICE([OpenACC 3 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
+   OACCD=oaccd;
+   OACCLD=oaccld;
+
+   #FCOPT="$FCOPT    $FCOPENACC";
+   #CCOPT="$CCOPT    $CCOPENACC"	
+   #CXXOPT="$CXXOPT  $CXXOPENACC"		
+   #FLINK="$FLINK $FCOPENACC";
+fi
 
 ###############################################################################
-PAC_ARG_WITH_LIBRSB
+dnl PAC_ARG_WITH_LIBRSB()
 LIBRSB_DIR="$pac_cv_librsb_dir";
 AC_MSG_CHECKING([for LIBRSB install dir])
 case $LIBRSB_DIR in 
@@ -878,7 +926,7 @@ fi
 LIBDIR=lib
 BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
-METHDLIBNAME=libpsb_krylov.a
+METHDLIBNAME=libpsb_linsolve.a
 UTILLIBNAME=libpsb_util.a
 
 ###############################################################################
@@ -928,9 +976,9 @@ AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)  $(CUDA_DEFINES)
-CDEFINES=$(PSBCDEFINES) $(CUDA_DEFINES)
-FDEFINES=$(PSBFDEFINES) $(CUDA_DEFINES)
+CXXDEFINES=$(PSBCXXDEFINES) 
+CDEFINES=$(PSBCDEFINES) 
+FDEFINES=$(PSBFDEFINES) 
 	
 
 # These should be portable rules, arent they?
@@ -952,6 +1000,12 @@ AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
+AC_SUBST(OACCD)
+AC_SUBST(OACCLD)
+AC_SUBST(FCOPENACC)
+AC_SUBST(CCOPENACC)
+AC_SUBST(CXXOPENACC)
+
 AC_SUBST(SPGPU_FLAGS)
 AC_SUBST(SPGPU_LIBS)
 dnl AC_SUBST(SPGPU_DIR)
@@ -960,6 +1014,9 @@ dnl AC_SUBST(SPGPU_INCDIR)
 AC_SUBST(EXTRALDLIBS)
 AC_SUBST(CUDA_DIR)
 AC_SUBST(CUDA_DEFINES)
+AC_SUBST(FCUDEFINES)
+AC_SUBST(CCUDEFINES)
+AC_SUBST(CXXCUDEFINES)	
 AC_SUBST(CUDA_INCLUDES)
 AC_SUBST(CUDA_LIBS)
 AC_SUBST(CUDA_VERSION)
@@ -975,7 +1032,6 @@ AC_SUBST(LIBRSB_INCDIR)
 AC_SUBST(LIBRSB_DIR)
 AC_SUBST(LIBRSB_DEFINES)
 AC_SUBST(LRSB)
-
 
 ###############################################################################
 # the following files will be created by Automake
@@ -1004,6 +1060,11 @@ AC_MSG_NOTICE([
 	CUDA 		      : ${HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+	OACCD                 : ${OACCD}
+	OACCLD                : ${OACCLD}
+	
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -1023,6 +1084,13 @@ dnl Note : we should use LDLIBS sooner or later!
 dnl	To install the program and its documentation, run 'make install' if you are root,
 dnl	or run 'su -c "make install"' if you are not root.
 ])
+if test x"${pac_cv_openacc}" == x"yes" ; then
+   if test x"${FCOPENACC}" == x ; then
+   AC_MSG_NOTICE([
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= ])
+  fi  
+fi	
 
 ###############################################################################
 

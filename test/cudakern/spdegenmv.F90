@@ -580,7 +580,7 @@ program pdgenmv
 
   ! solver parameters
   integer(psb_epk_) :: amatsize, precsize, descsize, annz, nbytes
-  real(psb_spk_)   :: err, eps
+  real(psb_spk_)   :: err, eps, tnv, tng,tdot, snrm2,sdot
   integer, parameter :: ntests=200, ngpu=50, ncnv=20
   type(psb_s_coo_sparse_mat), target   :: acoo
   type(psb_s_csr_sparse_mat), target   :: acsr
@@ -728,7 +728,7 @@ program pdgenmv
   call psb_geall(x0,desc_a,info)
   do i=1, nr
     call desc_a%l2g(i,ig,info)
-    x0(i) = 1.0 + (1.0*ig)/nrg
+    x0(i) = 1.0 + (1.0*ig)/(nrg**2)
   end do
   call a%cscnv(aux_a,info,mold=acoo)
   tcnvcsr = 0
@@ -826,10 +826,16 @@ program pdgenmv
   call psb_amx(ctxt,gt2)
   call bg%sync()
   x1 = bv%get_vect()
-  x2 = bg%get_vect()
+  x2 = bg%get_vect()  
+  tnv = psb_genrm2(bv,desc_a,info)
+  tng = psb_genrm2(bg,desc_a,info)
+  tdot = psb_gedot(bg,bg,desc_a,info)
+  write(0,*) ' bv ',tnv,' bg ',tng, ' dot ',tdot,eps,&
+       & snrm2(desc_a%get_local_rows(),x2,1),&
+       & sdot(desc_a%get_local_rows(),x1,1,x2,1)
   call psb_geaxpby(-sone,bg,+sone,bv,desc_a,info)
   eps = psb_geamax(bv,desc_a,info)
-
+  
   call psb_amx(ctxt,t2)
   eps = maxval(abs(x1(1:nr)-x2(1:nr)))
   call psb_amx(ctxt,eps)

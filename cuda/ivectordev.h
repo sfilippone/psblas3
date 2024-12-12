@@ -35,6 +35,7 @@
 #include "vectordev.h"
 #include "cuda_runtime.h"
 #include "core.h"
+#include "vector.h"
 
 int registerMappedInt(void *, void **, int, int);
 int writeMultiVecDeviceInt(void* deviceMultiVec, int* hostMultiVec);

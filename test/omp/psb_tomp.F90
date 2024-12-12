@@ -658,7 +658,7 @@ end module psb_d_pde3d_mod
 program psb_d_pde3d
   use psb_base_mod
   use psb_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use psb_util_mod
   use psb_d_pde3d_mod
 #if defined(OPENMP)

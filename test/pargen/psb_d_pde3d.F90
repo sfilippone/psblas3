@@ -653,7 +653,7 @@ end module psb_d_pde3d_mod
 program psb_d_pde3d
   use psb_base_mod
   use psb_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use psb_util_mod
   use psb_d_pde3d_mod
 #if defined(OPENMP)
@@ -814,8 +814,22 @@ program psb_d_pde3d
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   eps   = 1.d-6
-  call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,&
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)
+  select case(psb_toupper(trim(kmethd)))
+  case('RICHARDSON')
+    call psb_richardson(a,prec,bv,xxv,eps,&
+         & desc_a,info,itmax=itmax,iter=iter,&
+         & err=err,itrace=itrace,&
+         & istop=istopc)
+  case('BICGSTAB','BICGSTABL','BICG','CG','CGS','FCG','GCR','RGMRES')
+    call psb_krylov(kmethd,a,prec,bv,xxv,eps,&
+         & desc_a,info,itmax=itmax,iter=iter,err=err,itrace=itrace,&
+         & istop=istopc,irst=irst)
+  case default
+    write(psb_err_unit,*) 'Unknown method :"',trim(kmethd),'"'
+    info=psb_err_invalid_input_
+    call psb_errpush(info,name)
+    goto 9999
+  end select
 
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
