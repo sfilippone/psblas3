@@ -39,7 +39,7 @@ foreach(file IN LISTS PSB_util_source_files)
 endforeach()
 
 set(PSB_util_source_C_files
-  metis_int.c
+  psb_metis_int.c
   psb_amd_order.c
   )
 foreach(file IN LISTS PSB_util_source_C_files)
