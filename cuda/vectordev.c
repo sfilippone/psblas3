@@ -98,7 +98,8 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = (((params->size*sizeof(int) + 255)/256)*256)/sizeof(int);
       //fprintf(stderr,"Allocating  an INT vector %ld\n",tmp->pitch_*tmp->count_*sizeof(double));
       
-      return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*params->count*sizeof(int));
+      return allocRemoteBuffer((void **)&(tmp->v_),
+			       ((size_t) tmp->pitch_)*params->count*sizeof(int));
     }
   else if (params->elementType == SPGPU_TYPE_FLOAT)
     {
@@ -107,7 +108,8 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
       else
 	tmp->pitch_ = (((params->size*sizeof(float) + 255)/256)*256)/sizeof(float);
 
-      return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*params->count*sizeof(float));
+      return allocRemoteBuffer((void **)&(tmp->v_),
+			       ((size_t) tmp->pitch_)*params->count*sizeof(float));
     }
   else if (params->elementType == SPGPU_TYPE_DOUBLE)
     {
@@ -118,7 +120,8 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = (int)(((params->size*sizeof(double) + 255)/256)*256)/sizeof(double);
       //fprintf(stderr,"Allocating  a DOUBLE vector %ld\n",tmp->pitch_*tmp->count_*sizeof(double));
  
-      return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*tmp->count_*sizeof(double));
+      return allocRemoteBuffer((void **)&(tmp->v_),
+			       ((size_t) tmp->pitch_)*tmp->count_*sizeof(double));
     }
   else if (params->elementType == SPGPU_TYPE_COMPLEX_FLOAT)
     {
@@ -126,7 +129,8 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = params->size;
       else
 	tmp->pitch_ = (int)(((params->size*sizeof(cuFloatComplex) + 255)/256)*256)/sizeof(cuFloatComplex);
-      return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*tmp->count_*sizeof(cuFloatComplex));
+      return allocRemoteBuffer((void **)&(tmp->v_),
+			       ((size_t) tmp->pitch_)*tmp->count_*sizeof(cuFloatComplex));
     }
   else if (params->elementType == SPGPU_TYPE_COMPLEX_DOUBLE)
     {
@@ -134,7 +138,8 @@ int allocMultiVecDevice(void ** remoteMultiVec, struct MultiVectorDeviceParams *
 	tmp->pitch_ = params->size;
       else
 	tmp->pitch_ = (int)(((params->size*sizeof(cuDoubleComplex) + 255)/256)*256)/sizeof(cuDoubleComplex);
-      return allocRemoteBuffer((void **)&(tmp->v_), tmp->pitch_*tmp->count_*sizeof(cuDoubleComplex));
+      return allocRemoteBuffer((void **)&(tmp->v_),
+			       ((size_t) tmp->pitch_)*tmp->count_*sizeof(cuDoubleComplex));
     }
   else
     return SPGPU_UNSUPPORTED; // Unsupported params

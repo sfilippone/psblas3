@@ -38,12 +38,12 @@ static struct cudaDeviceProp *prop=NULL;
 static spgpuHandle_t psb_cuda_handle = NULL;
 static cublasHandle_t psb_cublas_handle = NULL;
 #if defined(TRACK_CUDA_MALLOC)
-static long long total_cuda_mem = 0;
+static int64_t total_cuda_mem = 0;
 #endif
 
-int allocRemoteBuffer(void** buffer, int count)
+int allocRemoteBuffer(void** buffer, size_t count)
 {
-  cudaError_t err = cudaMalloc(buffer, count);
+  cudaError_t err = cudaMalloc(buffer, (size_t) count);
 #if defined(TRACK_CUDA_MALLOC)
   total_cuda_mem += count;
   fprintf(stderr,"Tracking CUDA allocRemoteBuffer for %ld bytes total  %ld  address %p\n",
@@ -65,7 +65,7 @@ int allocRemoteBuffer(void** buffer, int count)
     }
 }
 
-int hostRegisterMapped(void *pointer, long size) 
+int hostRegisterMapped(void *pointer, size_t size) 
 {
   cudaError_t err = cudaHostRegister(pointer, size, cudaHostRegisterMapped);
 
@@ -101,7 +101,7 @@ int getDevicePointer(void **d_p, void * h_p)
     }
 }
 
-int registerMappedMemory(void *buffer, void **dp, int size)
+int registerMappedMemory(void *buffer, void **dp, size_t size)
 {
   //cudaError_t err = cudaHostAlloc(buffer,size,cudaHostAllocMapped);
   cudaError_t err = cudaHostRegister(buffer, size, cudaHostRegisterMapped);
@@ -130,7 +130,7 @@ int registerMappedMemory(void *buffer, void **dp, int size)
     }
 }
 
-int allocMappedMemory(void **buffer, void **dp, int size)
+int allocMappedMemory(void **buffer, void **dp, size_t size)
 {
   cudaError_t err = cudaHostAlloc(buffer,size,cudaHostAllocMapped);
   if (err == 0) err = cudaHostGetDevicePointer(dp,*buffer,0);
@@ -168,7 +168,7 @@ int unregisterMappedMemory(void *buffer)
     }
 }
 
-int writeRemoteBuffer(void* hostSrc, void* buffer, int count)
+int writeRemoteBuffer(void* hostSrc, void* buffer, size_t count)
 {
   cudaError_t err = cudaMemcpy(buffer, hostSrc, count, cudaMemcpyHostToDevice);
 
@@ -181,7 +181,7 @@ int writeRemoteBuffer(void* hostSrc, void* buffer, int count)
   }
 }
 
-int readRemoteBuffer(void* hostDest, void* buffer, int count)
+int readRemoteBuffer(void* hostDest, void* buffer, size_t count)
 {
 
   

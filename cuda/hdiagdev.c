@@ -93,38 +93,45 @@ int allocHdiagDevice(void **remoteMatrix, HdiagDeviceParams* params)
 #endif
 
   if (ret == SPGPU_SUCCESS)
-    ret=allocRemoteBuffer((void **)&(tmp->hackOffsets), (tmp->hackCount+1)*sizeof(int));
+    ret=allocRemoteBuffer((void **)&(tmp->hackOffsets),
+			  ((size_t) tmp->hackCount+1)*sizeof(int));
   
 
   if (ret == SPGPU_SUCCESS)
-    ret=allocRemoteBuffer((void **)&(tmp->hdiaOffsets), tmp->allocationHeight*sizeof(int));
+    ret=allocRemoteBuffer((void **)&(tmp->hdiaOffsets),
+			  ((size_t) tmp->allocationHeight)*sizeof(int));
   
   /* tmp->baseIndex = params->firstIndex; */
 
   if (params->elementType == SPGPU_TYPE_INT)
     {
       if (ret == SPGPU_SUCCESS)
-	ret=allocRemoteBuffer((void **)&(tmp->cM), tmp->hackSize*tmp->allocationHeight*sizeof(int));
+	ret=allocRemoteBuffer((void **)&(tmp->cM),
+			      ((size_t) tmp->hackSize)*tmp->allocationHeight*sizeof(int));
     }
   else if (params->elementType == SPGPU_TYPE_FLOAT)
     {
       if (ret == SPGPU_SUCCESS)
-	ret=allocRemoteBuffer((void **)&(tmp->cM), tmp->hackSize*tmp->allocationHeight*sizeof(float));
+	ret=allocRemoteBuffer((void **)&(tmp->cM),
+			      ((size_t) tmp->hackSize)*tmp->allocationHeight*sizeof(float));
     }    
   else if (params->elementType == SPGPU_TYPE_DOUBLE)
     {
       if (ret == SPGPU_SUCCESS)
-	ret=allocRemoteBuffer((void **)&(tmp->cM), tmp->hackSize*tmp->allocationHeight*sizeof(double));
+	ret=allocRemoteBuffer((void **)&(tmp->cM),
+			      ((size_t) tmp->hackSize)*tmp->allocationHeight*sizeof(double));
     }
   else if (params->elementType == SPGPU_TYPE_COMPLEX_FLOAT)
     {
       if (ret == SPGPU_SUCCESS)
-	ret=allocRemoteBuffer((void **)&(tmp->cM), tmp->hackSize*tmp->allocationHeight*sizeof(cuFloatComplex));
+	ret=allocRemoteBuffer((void **)&(tmp->cM),
+			      ((size_t) tmp->hackSize)*tmp->allocationHeight*sizeof(cuFloatComplex));
     }
   else if (params->elementType == SPGPU_TYPE_COMPLEX_DOUBLE)
     {
       if (ret == SPGPU_SUCCESS)
-	ret=allocRemoteBuffer((void **)&(tmp->cM), tmp->hackSize*tmp->allocationHeight*sizeof(cuDoubleComplex));
+	ret=allocRemoteBuffer((void **)&(tmp->cM),
+			      ((size_t) tmp->hackSize)*tmp->allocationHeight*sizeof(cuDoubleComplex));
     }
   else
     return SPGPU_UNSUPPORTED; // Unsupported params
@@ -137,7 +144,8 @@ int FallocHdiagDevice(void** deviceMat, unsigned int rows, unsigned int cols,
 { int i=0;
   HdiagDeviceParams p;
  
-  p = getHdiagDeviceParams(rows, cols, allocationHeight, hackSize, hackCount,elementType);
+  p = getHdiagDeviceParams(rows, cols, allocationHeight,
+			   hackSize, hackCount,elementType);
   
   i = allocHdiagDevice(deviceMat, &p);
 #if DEBUG
@@ -188,14 +196,14 @@ int writeHdiagDeviceDouble(void* deviceMat, double* val, int* hdiaOffsets, int *
   
   if(i== SPGPU_SUCCESS)
     i = writeRemoteBuffer((void *) hackOffsets,(void *) devMat->hackOffsets,
-			  (devMat->hackCount+1)*sizeof(int));
+			  ((size_t) devMat->hackCount+1)*sizeof(int));
   
   if(i== SPGPU_SUCCESS)
     i = writeRemoteBuffer((void*) hdiaOffsets, (void *)devMat->hdiaOffsets, 
-			  devMat->allocationHeight*sizeof(int));
+			  ((size_t) devMat->allocationHeight)*sizeof(int));
   if(i== SPGPU_SUCCESS)
     i = writeRemoteBuffer((void*) val, (void *)devMat->cM, 
-			  devMat->allocationHeight*devMat->hackSize*sizeof(double));
+			  ((size_t) devMat->allocationHeight)*devMat->hackSize*sizeof(double));
   if (i!=0) 
     fprintf(stderr,"Error in writeHdiagDeviceDouble %d\n",i);
 
@@ -304,14 +312,14 @@ int writeHdiagDeviceFloat(void* deviceMat, float* val, int* hdiaOffsets, int *ha
   
   if(i== SPGPU_SUCCESS)
     i = writeRemoteBuffer((void *) hackOffsets,(void *) devMat->hackOffsets,
-			  (devMat->hackCount+1)*sizeof(int));
+			  ((size_t) devMat->hackCount+1)*sizeof(int));
   
   if(i== SPGPU_SUCCESS)
     i = writeRemoteBuffer((void*) hdiaOffsets, (void *)devMat->hdiaOffsets, 
-			  devMat->allocationHeight*sizeof(int));
+			  ((size_t) devMat->allocationHeight)*sizeof(int));
   if(i== SPGPU_SUCCESS)
     i = writeRemoteBuffer((void*) val, (void *)devMat->cM, 
-			  devMat->allocationHeight*devMat->hackSize*sizeof(float));
+			  ((size_t) devMat->allocationHeight)*devMat->hackSize*sizeof(float));
   if (i!=0) 
     fprintf(stderr,"Error in writeHdiagDeviceFloat %d\n",i);
 
