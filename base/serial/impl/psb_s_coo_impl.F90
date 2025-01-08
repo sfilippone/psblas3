@@ -609,6 +609,7 @@ subroutine  psb_s_coo_clean_zeros(a, info)
     end if
   end do
   call a%set_nzeros(j)
+  call a%fix(info)
   call a%trim()
 end subroutine psb_s_coo_clean_zeros
 
