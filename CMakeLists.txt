@@ -313,6 +313,7 @@ message(STATUS "${MPI_C_INCLUDE_PATH}; ${MPI_Fortran_INCLUDE_PATH};; ${CMAKE_For
     #message(STATUS "-DSERIAL_MPI")
   endif()
   set(SERIAL_MPI OFF)
+  
 else()
   message(STATUS "MPI  not found, serial ahead")
   add_compile_options(-DSERIAL_MPI)
@@ -433,6 +434,9 @@ endif()
 # cbind.a, util.a linsolve.a prec.a base.a
 
 
+
+
+
 include(${CMAKE_CURRENT_LIST_DIR}/base/CMakeLists.txt)
 
 include_directories("${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
@@ -451,8 +455,6 @@ if(WIN32)
   target_link_libraries(base
     PUBLIC psb_base_C)
 else()
-  message(STATUS "       ----------------------- ;")
-  message(STATUS "       -----------------------   ${base_source_C_files};")
   add_library(base_C OBJECT ${base_source_C_files})
   add_library(base ${base_source_files} $<TARGET_OBJECTS:base_C>)
 endif()
@@ -461,6 +463,8 @@ endif()
 # Set the Fortran module output directory for all targets
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
 #set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
+
+
 
 message(STATUS "fortran module direcotry ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
 
@@ -471,6 +475,7 @@ include_directories(${MPI_Fortran_INCLUDE_PATH})
 message(STATUS "Using MPI include at: ${MPI_Fortran_INCLUDE_PATH}")
     
 
+
 set_target_properties(base
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules"  
@@ -480,9 +485,8 @@ set_target_properties(base
   )
 
 target_include_directories(base PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
-  $<INSTALL_INTERFACE:modules>
-  ${MPI_Fortran_INCLUDE_PATH})
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules> 
+  $<INSTALL_INTERFACE:modules>)
 
 message(STATUS "include dir := ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
 
@@ -551,6 +555,7 @@ target_link_libraries(ext PUBLIC base prec)  #TODO: check actual dependencies
 
 
 include(${CMAKE_CURRENT_LIST_DIR}/util/CMakeLists.txt)
+
 if(WIN32)
   if(METIS_FOUND)
     add_library(psb_util_C STATIC ${util_source_C_files})
@@ -585,6 +590,21 @@ target_include_directories(util PUBLIC
 target_link_libraries(util PUBLIC base prec)
 if(METIS_FOUND)
   message(STATUS ${METIS_INCLUDES})
+  
+  
+
+  # Make sure this path is correct
+  set(METISINCFILE ${METIS_INCLUDES})  # Adjust this to your actual path
+
+  # Specify the configuration file
+  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
+  set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
+
+  # Configure the header file
+  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+
+  
+  
   target_include_directories(util
     PUBLIC ${METIS_INCLUDES})
   target_include_directories(psb_util_C
@@ -624,8 +644,6 @@ if(WIN32)
   target_link_libraries(cbind
     PUBLIC psb_cbind_C)
 else()
-  message(STATUS "       ----------------------- ;")
-  message(STATUS "      cbindcbind -----------------------   ${cbind_header_C_files};")
   add_library(cbind_C OBJECT ${cbind_source_C_files})
   add_library(cbind ${cbind_source_files})
 endif()
@@ -668,17 +686,17 @@ target_link_libraries(cbind PUBLIC base prec linsolve ext util)
 
         # Copy the header file to the include directory
         file(COPY "${path}" DESTINATION "${CMAKE_BINARY_DIR}/include")
-        message(STATUS "Copied ${path}  to ${CMAKE_BINARY_DIR}/include")
+        
 
   endforeach()
-
+message(STATUS "Copied .h files to ${CMAKE_BINARY_DIR}/include")
 
 
 #target_include_directories(cbind PUBLIC
 #  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
 #  $<INSTALL_INTERFACE:modules>)
 # Include directories for the cbind library
-#target_include_directories(cbind_C PUBLIC
+#target_include_directories(cbind_C PUBLICF
 #  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>  # Path for building
 #  $<INSTALL_INTERFACE:include>  # Path for installation
 #  ${CMAKE_BINARY_DIR}/include  # Include the copied headers
@@ -768,3 +786,4 @@ endif()
 
 # Unit tests targeting each function, argument, and branch of code
 # add_mpi_test(initialize_mpi 2 initialize_mpi)
+
