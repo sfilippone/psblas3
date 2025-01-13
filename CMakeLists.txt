@@ -589,12 +589,9 @@ target_include_directories(util PUBLIC
   $<INSTALL_INTERFACE:modules>)
 target_link_libraries(util PUBLIC base prec)
 if(METIS_FOUND)
-  message(STATUS ${METIS_INCLUDES})
-  
-  
-
+  message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
   # Make sure this path is correct
-  set(METISINCFILE ${METIS_INCLUDES})  # Adjust this to your actual path
+  set(METISINCFILE "metis.h")  # Adjust this to your actual path
 
   # Specify the configuration file
   set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
@@ -602,8 +599,55 @@ if(METIS_FOUND)
 
   # Configure the header file
   configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+ 
 
-  
+
+
+ # Check for real sizes using try_compile
+include(CheckCSourceCompiles)
+
+# Function to check the size of a type
+function(check_metis_real_type type_name)
+    set(source_code "
+    #include <metis.h>
+    #include <stdio.h>
+    int main() {
+        printf(\"%zu\\n\", sizeof(${type_name}));
+        return 0;
+    }")
+
+    # Create a temporary source file
+    file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c" "${source_code}")
+
+    # Try to compile it
+    try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
+        "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c")
+
+    # Check the result and read the output
+    if (COMPILER_RESULT)
+        execute_process(COMMAND "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size"
+            OUTPUT_VARIABLE type_size)
+        string(STRIP "${type_size}" type_size)
+        if (type_name STREQUAL "float")
+            set(METIS_REAL_32 "${type_size}")
+            add_definitions(-DMETIS_REAL_32)
+        elseif (type_name STREQUAL "double")
+            set(METIS_REAL_64 "${type_size}")
+            add_definitions(-DMETIS_REAL_64)
+        endif()
+    else()
+        message(WARNING "Failed to compile test for type size: ${type_name}")
+    endif()
+endfunction()
+
+# Check for both float and double
+check_metis_real_type(float)
+check_metis_real_type(double)
+
+# Set HAVE_METIS if METIS is found
+add_compile_options(-DHAVE_METIS)
+
+
   
   target_include_directories(util
     PUBLIC ${METIS_INCLUDES})
