@@ -221,9 +221,9 @@ contains
 
     if (present(mask)) then 
 
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(mask,idx,idxmap,owned_) &
-      !$omp private(i) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(mask,idx,idxmap,owned_) &
+      ! $ o m p private(i) 
       do i=1, size(idx)
         if (mask(i)) then 
           if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
@@ -236,12 +236,12 @@ contains
           end if
         end if
       end do
-      !$omp end parallel do 
+      ! $ o m p end parallel do 
     else  if (.not.present(mask)) then 
 
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(idx,idxmap,owned_) &
-      !$omp private(i) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(idx,idxmap,owned_) &
+      ! $ o m p private(i) 
       do i=1, size(idx)
         if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
           idx(i) = idxmap%loc_to_glob(idx(i))
@@ -252,7 +252,7 @@ contains
           idx(i) = -1
         end if
       end do
-      !$omp end parallel do
+      ! $ o m p end parallel do
     end if
   end subroutine hash_l2gv1
 
@@ -369,9 +369,9 @@ contains
 
       else if (idxmap%is_valid()) then 
 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
-        !$omp private(i,ip,lip,tlip,info) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info) 
         do i = 1, is
           if (mask(i)) then 
             ip = idx(i) 
@@ -397,7 +397,7 @@ contains
             endif
           end if
         enddo
-        !$omp end parallel do
+        ! $ o m p end parallel do
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idx(1:is) = -1
@@ -413,9 +413,9 @@ contains
 
       else if (idxmap%is_valid()) then 
 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
-        !$omp private(i,ip,lip,tlip,info) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info) 
         do i = 1, is
           ip = idx(i) 
           if ((ip < 1 ).or.(ip>mglob)) then 
@@ -439,7 +439,7 @@ contains
             idx(i) = lip
           endif
         enddo
-        !$omp end parallel do 
+        ! $ o m p end parallel do 
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idx(1:is) = -1
@@ -503,9 +503,9 @@ contains
 
       else if (idxmap%is_valid()) then 
 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
-        !$omp private(i,ip,lip,tlip,info) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info) 
         do i = 1, is
           if (mask(i)) then 
             ip = idxin(i) 
@@ -531,7 +531,7 @@ contains
             endif
           end if
         enddo
-        !$omp end parallel do 
+        ! $ o m p end parallel do 
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idxout(1:is) = -1
@@ -547,9 +547,9 @@ contains
 
       else if (idxmap%is_valid()) then 
 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
-        !$omp private(i,ip,lip,tlip,info) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info) 
         do i = 1, is
           ip = idxin(i) 
           if ((ip < 1 ).or.(ip>mglob)) then 
@@ -573,7 +573,7 @@ contains
             idxout(i) = lip
           endif
         enddo
-        !$omp end parallel do 
+        ! $ o m p end parallel do 
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idxout(1:is) = -1
@@ -704,10 +704,10 @@ contains
 
       if (present(lidx)) then
         if (present(mask)) then 
-          !$omp parallel do default(none) schedule(dynamic) &
-          !$omp shared(lidx,mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
-          !$omp reduction(.AND.:isLoopValid)          
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(lidx,mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
+          ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
             if (mask(i)) then 
               ip = idx(i) 
@@ -722,7 +722,7 @@ contains
                 idx(i) = lip 
                 info = psb_success_
               else
-                !$omp critical(hash_g2l_ins)          
+                ! $ o m p critical(hash_g2l_ins)          
                 tlip  = lip
                 nxt = lidx(i)
                 if (nxt <= nrow) then 
@@ -758,20 +758,20 @@ contains
                     end if
                   end if
                 endif
-                !$omp end critical(hash_g2l_ins)
+                ! $ o m p end critical(hash_g2l_ins)
               end if
             else
               idx(i) = -1
             end if
           enddo
-          !$omp end parallel do
+          ! $ o m p end parallel do
 
         else if (.not.present(mask)) then 
 
-          !$omp parallel do default(none) schedule(dynamic) &
-          !$omp shared(lidx,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
-          !$omp reduction(.AND.:isLoopValid)          
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(lidx,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
+          ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
             ip = idx(i) 
             if ((ip < 1 ).or.(ip>mglob) ) then 
@@ -785,7 +785,7 @@ contains
               idx(i) = lip 
               info = psb_success_
             else
-              !$omp critical(hash_g2l_ins)          
+              ! $ o m p critical(hash_g2l_ins)          
               tlip  = lip
               nxt = lidx(i)
               if (nxt <= nrow) then 
@@ -821,19 +821,19 @@ contains
                   end if
                 end if
               endif
-              !$omp end critical(hash_g2l_ins)
+              ! $ o m p end critical(hash_g2l_ins)
             end if
           enddo
-          !$omp end parallel do
+          ! $ o m p end parallel do
         end if
 
       else if (.not.present(lidx)) then 
 
         if (present(mask)) then
-          !$omp parallel do default(none) schedule(dynamic) &
-          !$omp shared(mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
-          !$omp reduction(.AND.:isLoopValid)          
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
+          ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
             if (mask(i)) then
               ip   = idx(i) 
@@ -848,7 +848,7 @@ contains
                 idx(i) = lip 
                 info = psb_success_
               else
-                !$omp critical(hash_g2l_ins)          
+                ! $ o m p critical(hash_g2l_ins)          
                 ncol = idxmap%get_lc()
                 nxt  = ncol + 1 
                 call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -879,20 +879,20 @@ contains
                     isLoopValid = .false.
                   end if
                 end if
-                !$omp end critical(hash_g2l_ins)          
+                ! $ o m p end critical(hash_g2l_ins)          
               end if
             else
               idx(i) = -1
             end if
           enddo
-          !$omp end parallel do
+          ! $ o m p end parallel do
 
         else if (.not.present(mask)) then 
 
-          !$omp parallel do default(none) schedule(dynamic) &
-          !$omp shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
-          !$omp private(i,ip,lip,tlip,nxt,info) &
-          !$omp reduction(.AND.:isLoopValid)          
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
+          ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
             ip   = idx(i) 
             if ((ip < 1 ).or.(ip>mglob)) then 
@@ -906,7 +906,7 @@ contains
               idx(i) = lip 
               info = psb_success_
             else
-              !$omp critical(hash_g2l_ins)          
+              ! $ o m p critical(hash_g2l_ins)          
               ncol = idxmap%get_lc()
               nxt  = ncol + 1 
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -937,10 +937,10 @@ contains
                   isLoopValid = .false.
                 end if
               end if
-              !$omp end critical(hash_g2l_ins)          
+              ! $ o m p end critical(hash_g2l_ins)          
             end if
           enddo
-          !$omp end parallel do
+          ! $ o m p end parallel do
         end if
       end if
     else 
@@ -1648,9 +1648,9 @@ contains
     ! for a width of psb_hash_bits 
     !
     if (present(mask)) then 
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(n,hashv,hashmask,x,glb_lc,nrm,mask) &
-      !$omp private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(n,hashv,hashmask,x,glb_lc,nrm,mask) &
+      ! $ o m p private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
       do i=1, n
         if (mask(i)) then 
           key = x(i) 
@@ -1688,11 +1688,11 @@ contains
           end if
         end if
       end do
-      !$omp end parallel do 
+      ! $ o m p end parallel do 
     else
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(n,hashv,hashmask,x,glb_lc,nrm) &
-      !$omp private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(n,hashv,hashmask,x,glb_lc,nrm) &
+      ! $ o m p private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
       do i=1, n
         key = x(i) 
         ih  = iand(key,hashmask)
@@ -1728,7 +1728,7 @@ contains
           x(i) = tmp 
         end if
       end do
-      !$omp end parallel do 
+      ! $ o m p end parallel do 
     end if
   end subroutine hash_inner_cnv1
 
@@ -1751,9 +1751,9 @@ contains
     ! for a width of psb_hash_bits 
     !
     if (present(mask)) then 
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(n,hashv,hashmask,x,y,glb_lc,nrm,mask,psb_err_unit) &
-      !$omp private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(n,hashv,hashmask,x,y,glb_lc,nrm,mask,psb_err_unit) &
+      ! $ o m p private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
       do i=1, n
         if (mask(i)) then 
           key = x(i) 
@@ -1794,12 +1794,12 @@ contains
           end if
         end if
       end do
-      !$omp end parallel do 
+      ! $ o m p end parallel do 
     else
 
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(n,hashv,hashmask,x,y,glb_lc,nrm,psb_err_unit) &
-      !$omp private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(n,hashv,hashmask,x,y,glb_lc,nrm,psb_err_unit) &
+      ! $ o m p private(i,key,idx,ih,nh,tmp,lb,ub,lm) 
       do i=1, n
         key = x(i) 
         ih  = iand(key,hashmask)
@@ -1838,7 +1838,7 @@ contains
           y(i) = tmp 
         end if
       end do
-      !$omp end parallel do 
+      ! $ o m p end parallel do 
     end if
   end subroutine hash_inner_cnv2
 
