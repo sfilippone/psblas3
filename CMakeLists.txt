@@ -4,7 +4,7 @@
 #-----------------------------------
 # Set oldest allowable CMake version
 #-----------------------------------
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 cmake_policy(VERSION 3.11.1...3.13.3)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -379,9 +379,17 @@ define_property(TARGET
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
+#install(EXPORT ${CMAKE_PROJECT_NAME}-targets
+#  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+#)
+
 install(EXPORT ${CMAKE_PROJECT_NAME}-targets
+  FILE ${CMAKE_PROJECT_NAME}Config.cmake
+  NAMESPACE ${CMAKE_PROJECT_NAME}::
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
 )
+
+
 include(CMakePackageConfigHelpers) # standard CMake module
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
@@ -603,11 +611,11 @@ if(METIS_FOUND)
 
 
 
- # Check for real sizes using try_compile
-include(CheckCSourceCompiles)
+  # Check for real sizes using try_compile
+  include(CheckCSourceCompiles)
 
-# Function to check the size of a type
-function(check_metis_real_type type_name)
+  # Function to check the size of a type
+  function(check_metis_real_type type_name)
     set(source_code "
     #include <metis.h>
     #include <stdio.h>
@@ -638,14 +646,14 @@ function(check_metis_real_type type_name)
     else()
         message(WARNING "Failed to compile test for type size: ${type_name}")
     endif()
-endfunction()
+  endfunction()
 
-# Check for both float and double
-check_metis_real_type(float)
-check_metis_real_type(double)
+  # Check for both float and double
+  check_metis_real_type(float)
+  check_metis_real_type(double)
 
-# Set HAVE_METIS if METIS is found
-add_compile_options(-DHAVE_METIS)
+  # Set HAVE_METIS if METIS is found
+  add_compile_options(-DHAVE_METIS)
 
 
   
@@ -789,6 +797,8 @@ endif()
 
 
 
+
+message(STATUS "\t\t ${CMAKE_INSTALL_LIBDIR}")
 # Install the header files to the include directory
 #install(FILES ${cbind_header_C_files}
 #  DESTINATION include
@@ -824,6 +834,26 @@ if(WIN32)
   endif()
 endif()
 
+# Step 2: Create the configuration file from the template
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/psblasConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
+)
+
+# Step 3: Install the generated config files
+install(FILES 
+  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
+)
+
+# Step 4: Export targets so that the build directory can be used directly
+export(
+  EXPORT ${CMAKE_PROJECT_NAME}-targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
+    NAMESPACE psblas::
+)
 #-----------------
 # Add PSBLAS tests
 #-----------------
