@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.10)
 project(HelloWorld Fortran)
 
 # Accept a user-defined library path
-set(LIBRARY_DIR "" CACHE PATH "Path to the library directory")
-    message(STATUS "Library directory ${LIBRARY_DIR}")
+#set(LIBRARY_DIR "" CACHE PATH "Path to the library directory")
+
 # Check if the user provided a library directory
-if(NOT LIBRARY_DIR)
-    message(FATAL_ERROR "Library directory not specified! Use -DLIBRARY_DIR=path/to/library")
-endif()
+#if(NOT LIBRARY_DIR)
+#    message(FATAL_ERROR "Library directory not specified! Use -DLIBRARY_DIR=path/to/library")
+#endif()
 
 include(CMakePackageConfigHelpers)
 # Find the package
@@ -19,9 +19,10 @@ if(NOT psblas_FOUND)
 endif()
 
 # Include directories for the library
-include_directories(${LIBRARY_DIR}/include)  # Path to header files
-include_directories(${LIBRARY_DIR}/modules)   # Path to module files
-
+#include_directories(${LIBRARY_DIR}/include)  # Path to header files
+include_directories(${psblas_DIR}/modules)   # Path to module files
+    message(STATUS "Library directory ${psblas_DIR}")
+    
 # Add the executables
 add_executable(hello hello.f90)
 add_executable(pingpong pingpong.f90)
@@ -36,5 +37,5 @@ set_target_properties(hello pingpong PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE
 
 # Ensure the module path is set correctly
 set_target_properties(hello pingpong PROPERTIES
-    Fortran_MODULE_DIRECTORY "${LIBRARY_DIR}/modules"
+    Fortran_MODULE_DIRECTORY "${psblas_DIR}/modules"
 )
