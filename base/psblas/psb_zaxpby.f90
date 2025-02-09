@@ -299,7 +299,7 @@ end subroutine psb_zaxpby_vect_out
 !
 subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_zaxpby
-
+  use psi_z_serial_mod
   implicit none
 
   integer(psb_ipk_), intent(in), optional   :: n, jx, jy
@@ -384,7 +384,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in /= 0)) then
     if(desc_a%get_local_rows() > 0) then
-      call pab_geaxpby(desc_a%get_local_cols(),in,&
+      call psi_zaxpby(desc_a%get_local_cols(),in,&
            & alpha,x(iix:,jjx:),beta,&
            & y(iiy:,jjy:),info)
     end if
