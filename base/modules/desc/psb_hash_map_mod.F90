@@ -722,7 +722,7 @@ contains
                 idx(i) = lip 
                 info = psb_success_
               else
-                ! $ o m p critical(hash_g2l_ins)          
+                !$omp critical(hash_g2l_ins)          
                 tlip  = lip
                 nxt = lidx(i)
                 if (nxt <= nrow) then 
@@ -758,7 +758,7 @@ contains
                     end if
                   end if
                 endif
-                ! $ o m p end critical(hash_g2l_ins)
+                !$omp end critical(hash_g2l_ins)
               end if
             else
               idx(i) = -1
@@ -785,7 +785,7 @@ contains
               idx(i) = lip 
               info = psb_success_
             else
-              ! $ o m p critical(hash_g2l_ins)          
+              !$omp critical(hash_g2l_ins)          
               tlip  = lip
               nxt = lidx(i)
               if (nxt <= nrow) then 
@@ -821,7 +821,7 @@ contains
                   end if
                 end if
               endif
-              ! $ o m p end critical(hash_g2l_ins)
+              !$omp end critical(hash_g2l_ins)
             end if
           enddo
           ! $ o m p end parallel do
@@ -848,7 +848,7 @@ contains
                 idx(i) = lip 
                 info = psb_success_
               else
-                ! $ o m p critical(hash_g2l_ins)          
+                !$omp critical(hash_g2l_ins)          
                 ncol = idxmap%get_lc()
                 nxt  = ncol + 1 
                 call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -879,7 +879,7 @@ contains
                     isLoopValid = .false.
                   end if
                 end if
-                ! $ o m p end critical(hash_g2l_ins)          
+                !$omp end critical(hash_g2l_ins)          
               end if
             else
               idx(i) = -1
@@ -906,7 +906,7 @@ contains
               idx(i) = lip 
               info = psb_success_
             else
-              ! $ o m p critical(hash_g2l_ins)          
+              !$omp critical(hash_g2l_ins)          
               ncol = idxmap%get_lc()
               nxt  = ncol + 1 
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -937,7 +937,7 @@ contains
                   isLoopValid = .false.
                 end if
               end if
-              ! $ o m p end critical(hash_g2l_ins)          
+              !$omp end critical(hash_g2l_ins)          
             end if
           enddo
           ! $ o m p end parallel do

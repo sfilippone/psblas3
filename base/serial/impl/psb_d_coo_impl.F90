@@ -2892,10 +2892,8 @@ subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
 #if !defined(OPENMP)      
-    !$omp critical
     nza = nzaold
     call a%set_nzeros(nza)
-    !$omp end critical
 #endif
     call a%set_sorted(.false.)
     
@@ -2949,6 +2947,8 @@ contains
 
     info = psb_success_
 #if defined(OPENMP)
+    ! Disabling OpenMP parallel do  for the time being.
+    ! Will need to redesign the entire code stack
     ! The logic here is different from the one used for
     ! the serial version: each element is stored in data
     ! structures but the invalid ones are stored as '-1' values.

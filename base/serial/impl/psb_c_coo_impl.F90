@@ -2947,13 +2947,15 @@ contains
 
     info = psb_success_
 #if defined(OPENMP)
+    ! Disabling OpenMP parallel do  for the time being.
+    ! Will need to redesign the entire code stack
     ! The logic here is different from the one used for
     ! the serial version: each element is stored in data
     ! structures but the invalid ones are stored as '-1' values.
     ! These values will be filtered in a future fixing process.
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
-    !$OMP shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
-    !$OMP private(ir,ic,i)
+    ! $ O M P PARALLEL DO default(none) schedule(STATIC) &
+    ! $ O M P shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
+    ! $ O M P private(ir,ic,i)
     do i=1,nz
       ir = ia(i)
       ic = ja(i)
@@ -2967,7 +2969,7 @@ contains
         aspk(nza+i) = -1
       end if
     end do
-    !$OMP END PARALLEL DO
+    ! $ O M P END PARALLEL DO
     nza = nza + nz
 #else
     do i=1, nz
