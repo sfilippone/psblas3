@@ -56,7 +56,7 @@ int allocRemoteBuffer(void** buffer, size_t count)
     }
   else
     { 
-      fprintf(stderr,"CUDA allocRemoteBuffer for %d bytes Error: %s \n",
+      fprintf(stderr,"CUDA allocRemoteBuffer for %ld bytes Error: %s \n",
 	      count, cudaGetErrorString(err));
       if(err == cudaErrorMemoryAllocation)
 	return SPGPU_OUTOFMEMORY;
@@ -175,7 +175,7 @@ int writeRemoteBuffer(void* hostSrc, void* buffer, size_t count)
   if (err == cudaSuccess)
     return SPGPU_SUCCESS;	
   else {
-    fprintf(stderr,"CUDA Error writeRemoteBuffer: %s  %p %p %d\n", 
+    fprintf(stderr,"CUDA Error writeRemoteBuffer: %s  %p %p %ld\n", 
 	    cudaGetErrorString(err),buffer, hostSrc, count);
     return SPGPU_UNSPECIFIED;
   }
@@ -200,7 +200,7 @@ int readRemoteBuffer(void* hostDest, void* buffer, size_t count)
   if (err == cudaSuccess)
     return SPGPU_SUCCESS;	
   else {
-    fprintf(stderr,"CUDA Error readRemoteBuffer: %s %p  %p %d %d\n", 
+    fprintf(stderr,"CUDA Error readRemoteBuffer: %s %p  %p %ld %d\n", 
 	    cudaGetErrorString(err),hostDest,buffer,count,err);
     return SPGPU_UNSPECIFIED;
   }

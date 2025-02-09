@@ -127,6 +127,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
   CHECK_CUSPARSE(cusparseDestroySpMat(*(cMat->spmvDescr)));
 #endif
+  return(0);
 }
 
 int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
@@ -215,6 +216,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
   CHECK_CUSPARSE(cusparseDestroySpMat(*(cMat->spmvDescr)));
 #endif
+  return(0);
 }
 
 #if CUDA_VERSION >=  11030
