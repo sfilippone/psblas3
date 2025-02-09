@@ -829,6 +829,7 @@ enable_serial
 with_ccopt
 with_cxxopt
 with_fcopt
+with_extra_opt
 with_libs
 with_clibs
 with_flibs
@@ -1523,6 +1524,8 @@ Optional Packages:
                           to [CXXOPT]
   --with-fcopt            additional [FCOPT] flags to be added: will prepend
                           to [FCOPT]
+  --with-extra-opt        additional [EXTRA_OPT] flags to be added: will
+                          prepend to [EXTRA_OPT]
   --with-libs             List additional link flags here. For example,
                           --with-libs=-lspecial_system_lib or
                           --with-libs=-L/path/to/libs
@@ -5738,6 +5741,25 @@ fi
 
 
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional EXTRA_OPT flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional EXTRA_OPT flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-extra-opt was given.
+if test ${with_extra_opt+y}
+then :
+  withval=$with_extra_opt;
+EXTRA_OPT="${withval} ${EXTRA_OPT}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: EXTRA_OPT = ${EXTRA_OPT}" >&5
+printf "%s\n" "EXTRA_OPT = ${EXTRA_OPT}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional libraries are needed" >&5
 printf %s "checking whether additional libraries are needed... " >&6; }
 
@@ -7354,7 +7376,7 @@ fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options
      FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
-     EXTRA_OPT="-mismatch_all"
+     EXTRA_OPT="$EXTRA_OPT -mismatch_all"
 fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
    FCOPT="-frecursive $FCOPT"

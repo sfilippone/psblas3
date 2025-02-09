@@ -193,6 +193,7 @@ dnl NOTE : no spaces before the comma, and no brackets before the second argumen
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
 PAC_ARG_WITH_FLAGS(cxxopt,CXXOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
+PAC_ARG_WITH_FLAGS(extra-opt,EXTRA_OPT)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
 PAC_ARG_WITH_FLAGS(flibs,FLIBS)
@@ -449,7 +450,7 @@ fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
      FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
-     EXTRA_OPT="-mismatch_all"
+     EXTRA_OPT="$EXTRA_OPT -mismatch_all"
 fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
    FCOPT="-frecursive $FCOPT"  
