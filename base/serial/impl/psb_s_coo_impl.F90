@@ -2953,7 +2953,7 @@ contains
     ! the serial version: each element is stored in data
     ! structures but the invalid ones are stored as '-1' values.
     ! These values will be filtered in a future fixing process.
-    ! $ O M P PARALLEL DO default(none) schedule(STATIC) &
+    ! $ O M P PARALLEL DO schedule(STATIC) &
     ! $ O M P shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
     ! $ O M P private(ir,ic,i)
     do i=1,nz
@@ -4311,7 +4311,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     iaux(:) = 0
     !$omp end workshare
     maxnzr = 0   
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP PARALLEL DO schedule(STATIC) &
     !$OMP shared(nzin,ia,nr,iaux,maxnzr) &
     !$OMP private(i) &
     !$OMP reduction(.and.:use_buffers)
@@ -4327,7 +4327,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     end do
     !$OMP END PARALLEL DO
     maxnzr = 0
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP PARALLEL DO schedule(STATIC) &
     !$OMP private(i) shared(nr,iaux)&
     !$OMP reduction(max:maxnzr)
     do i=1,nr
@@ -4375,7 +4375,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     err = 0
     ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
     ! index for each row. We do the same on 'kaux'
-    !$OMP PARALLEL default(none) &
+    !$OMP PARALLEL &
     !$OMP shared(maxnzr,idxaux,ia,ja,val,ias,jas,vs,nthreads,nr,nc,nzin,iaux,kaux,dupl,err) &
     !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
     !$OMP first_elem,last_elem,nzl,iret,act_row,i1,i2) reduction(max: info)
@@ -4735,7 +4735,7 @@ subroutine psb_s_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
 #if defined(OPENMP)
-    !$OMP PARALLEL default(none) &
+    !$OMP PARALLEL &
     !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads,maxnzr) &
     !$OMP private(i,j,idxstart,idxend,nzl,act_row,iret,ithread, &
     !$OMP work,first_elem,last_elem)
