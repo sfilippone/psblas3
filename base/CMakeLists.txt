@@ -630,6 +630,7 @@ foreach(file IN LISTS PSB_base_source_files)
 endforeach()
 
 list(APPEND PSB_base_source_C_files modules/cutil.c)
+list(APPEND PSB_base_source_C_files modules/desc/psb_hashval.c)
 if (SERIAL_MPI)
  list(APPEND PSB_base_source_C_files modules/fakempi.c)
 endif()
