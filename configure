@@ -707,6 +707,7 @@ MODEXT
 FMFLAG
 FIFLAG
 FAKEMPI
+EXTRA_NVCC
 EXTRA_OPT
 CXXOPT
 CCOPT
@@ -833,6 +834,7 @@ with_extra_opt
 with_libs
 with_clibs
 with_flibs
+with_extra_nvcc
 with_library_path
 with_include_path
 with_module_path
@@ -1533,6 +1535,8 @@ Optional Packages:
                           to [CLIBS]
   --with-flibs            additional [FLIBS] flags to be added: will prepend
                           to [FLIBS]
+  --with-extra-nvcc       additional [EXTRA_NVCC] flags to be added: will
+                          prepend to [EXTRA_NVCC]
   --with-library-path     additional [LIBRARYPATH] flags to be added: will
                           prepend to [LIBRARYPATH]
   --with-include-path     additional [INCLUDEPATH] flags to be added: will
@@ -5809,6 +5813,25 @@ then :
 FLIBS="${withval} ${FLIBS}"
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: FLIBS = ${FLIBS}" >&5
 printf "%s\n" "FLIBS = ${FLIBS}" >&6; }
+
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+fi
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether additional EXTRA_NVCC flags should be added (should be invoked only once)" >&5
+printf %s "checking whether additional EXTRA_NVCC flags should be added (should be invoked only once)... " >&6; }
+
+# Check whether --with-extra-nvcc was given.
+if test ${with_extra_nvcc+y}
+then :
+  withval=$with_extra_nvcc;
+EXTRA_NVCC="${withval} ${EXTRA_NVCC}"
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: EXTRA_NVCC = ${EXTRA_NVCC}" >&5
+printf "%s\n" "EXTRA_NVCC = ${EXTRA_NVCC}" >&6; }
 
 else $as_nop
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
@@ -11360,6 +11383,7 @@ UTILLIBNAME=libpsb_util.a
 ###############################################################################
 # Variable substitutions : the Make.inc.in will have these @VARIABLES@
 # substituted.
+
 
 
 
