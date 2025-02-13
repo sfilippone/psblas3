@@ -27,7 +27,7 @@ dir:
 	(if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi)
 dpdegenmv.o spdegenmv.o: data_input.o
 dpdegenmv: $(DPGOBJS) 
-	$(FLINK) $(LOPT) $(DPGOBJS) -fopenmp -o dpdegenmv $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS) 
+	$(FLINK) $(LOPT) $(DPGOBJS) -o dpdegenmv $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv dpdegenmv $(EXEDIR) 
 spdegenmv: $(SPGOBJS)
 	$(FLINK) $(LOPT) $(SPGOBJS) -o spdegenmv $(PSBLAS_LIB) $(LDLIBS) 
