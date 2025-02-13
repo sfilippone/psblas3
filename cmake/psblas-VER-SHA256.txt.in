@@ -1,0 +1,3 @@
+# To verify cryptographic checksums `shasum -c psblas-@git_version@-SHA256.txt` on Mac OS X, or
+# `sha256sum -c  psblas-@git_version@-SHA256.txt` on Linux.
+@sha256_checksum@

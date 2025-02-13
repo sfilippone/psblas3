@@ -1,0 +1,48 @@
+set(PSB_krylov_source_files
+  psb_base_krylov_conv_mod.f90
+  psb_cbicg.f90
+  psb_ccg.F90
+  psb_ccgs.f90
+  psb_ccgstab.f90
+  psb_ccgstabl.f90
+  psb_cfcg.F90
+  psb_cgcr.f90
+  psb_c_krylov_conv_mod.f90
+  psb_ckrylov.f90
+  psb_crgmres.f90
+  psb_dbicg.f90
+  psb_dcg.F90
+  psb_dcgs.f90
+  psb_dcgstab.f90
+  psb_dcgstabl.f90
+  psb_dfcg.F90
+  psb_dgcr.f90
+  psb_d_krylov_conv_mod.f90
+  psb_dkrylov.f90
+  psb_drgmres.f90
+  psb_krylov_conv_mod.f90
+  psb_krylov_mod.f90
+  psb_sbicg.f90
+  psb_scg.F90
+  psb_scgs.f90
+  psb_scgstab.f90
+  psb_scgstabl.f90
+  psb_sfcg.F90
+  psb_sgcr.f90
+  psb_s_krylov_conv_mod.f90
+  psb_skrylov.f90
+  psb_srgmres.f90
+  psb_zbicg.f90
+  psb_zcg.F90
+  psb_zcgs.f90
+  psb_zcgstab.f90
+  psb_zcgstabl.f90
+  psb_zfcg.F90
+  psb_zgcr.f90
+  psb_z_krylov_conv_mod.f90
+  psb_zkrylov.f90
+  psb_zrgmres.f90
+  )
+foreach(file IN LISTS PSB_krylov_source_files)
+  list(APPEND krylov_source_files ${CMAKE_CURRENT_LIST_DIR}/${file})
+endforeach()

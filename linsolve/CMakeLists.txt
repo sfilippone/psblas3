@@ -1,0 +1,52 @@
+set(PSB_linsolve_source_files
+  psb_base_linsolve_conv_mod.f90
+  psb_z_linsolve_conv_mod.f90
+  impl/psb_crichardson.f90
+  impl/psb_zfcg.F90
+  impl/psb_zkrylov.f90
+  impl/psb_srichardson.f90
+  impl/psb_ckrylov.f90
+  impl/psb_crgmres.f90
+  impl/psb_cgcr.f90
+  impl/psb_sbicg.f90
+  impl/psb_ccgstabl.f90
+  impl/psb_drgmres.f90
+  impl/psb_skrylov.f90
+  impl/psb_scg.F90
+  impl/psb_dcgstabl.f90
+  impl/psb_ccg.F90
+  impl/psb_zrgmres.f90
+  impl/psb_zgcr.f90
+  impl/psb_dcg.F90
+  impl/psb_dgcr.f90
+  impl/psb_scgstabl.f90
+  impl/psb_dfcg.F90
+  impl/psb_cbicg.f90
+  impl/psb_zbicg.f90
+  impl/psb_cfcg.F90
+  impl/psb_zrichardson.f90
+  impl/psb_dkrylov.f90
+  impl/psb_ccgstab.f90
+  impl/psb_zcg.F90
+  impl/psb_dbicg.f90
+  impl/psb_srgmres.f90
+  impl/psb_zcgstabl.f90
+  impl/psb_zcgs.f90
+  impl/psb_ccgs.f90
+  impl/psb_sgcr.f90
+  impl/psb_dcgstab.f90
+  impl/psb_scgstab.f90
+  impl/psb_dcgs.f90
+  impl/psb_drichardson.f90
+  impl/psb_scgs.f90
+  impl/psb_sfcg.F90
+  impl/psb_zcgstab.f90
+  psb_linsolve_mod.f90
+  psb_linsolve_conv_mod.f90
+  psb_c_linsolve_conv_mod.f90
+  psb_d_linsolve_conv_mod.f90
+  psb_s_linsolve_conv_mod.f90
+  )
+foreach(file IN LISTS PSB_linsolve_source_files)
+  list(APPEND linsolve_source_files ${CMAKE_CURRENT_LIST_DIR}/${file})
+endforeach()
