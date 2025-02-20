@@ -47,7 +47,7 @@ psb_renum_mod.o: psb_s_renum_mod.o psb_d_renum_mod.o psb_c_renum_mod.o psb_z_ren
 $(IMPLOBJS): $(BASEOBJS)
 
 veryclean: clean
-	/bin/rm -f $(HERE)/$(LIBNAME) psb_metis_int.h
+	/bin/rm -f $(HERE)/$(LIBNAME) 
 
 clean:
 	/bin/rm -f $(OBJS) $(LOCAL_MODS) *$(.mod)
