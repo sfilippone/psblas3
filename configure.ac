@@ -100,7 +100,7 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang-new ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
 AC_PROG_CC([xlc pgcc clang icc gcc cc ])
@@ -235,12 +235,12 @@ PAC_CHECK_HAVE_CRAYFTN(
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
-	psblas_cv_fc="xlf"
+	psblas_cv_fc="xlf";
 	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES"		  
+        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -249,22 +249,50 @@ if test x"$psblas_cv_fc" == "x" ; then
  elif eval "$MPIFC -V  2>&1 | grep Sun 2>/dev/null" ; then
    # Sun compiler detection
   
-   psblas_cv_fc="sun"
- elif eval "$MPIFC --version  2>&1 | grep flang-new 2>/dev/null" ; then
-   # Portland group compiler detection
-   
-   psblas_cv_fc="flang"
-   psblas_cv_define_prepend=""
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"		  
+   psblas_cv_fc="sun";
+ elif eval "$MPIFC --version  2>&1 | grep flang-new 2>&1 1>/dev/null" ; then
+   # LLVM compiler
+   psblas_cv_fc="flang-new";
+   psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
+   psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
+   psblas_cv_define_prepend="";
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
+   if test x"$psblas_shvs" != x""; then
+     AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
+     if (( $psblas_flang_shv < 20 )) ;   then	 
+        AC_MSG_ERROR([[The minimum supported LLVM version is version 20, bailing out. ]])
+     else
+        psblas_cv_fc="flang";
+     fi
+   else
+     AC_MSG_ERROR([[Unrecognized LLVM version. The minimum supported LLVM version is version 20, bailing out. ]])
+   fi  
+ elif eval "$MPIFC --version  2>&1 | grep flang 2>&1 1>/dev/null" ; then
+   # LLVM compiler
+   psblas_flang_version=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
+   psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
+   psblas_cv_fc="flang";
+   psblas_cv_define_prepend="";
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
+   if test x"$psblas_shvs" != x""; then
+     AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
+     if (( $psblas_flang_shv < 20 )) ;   then	 
+        AC_MSG_ERROR([[The minimum supported LLVM version is version 20, bailing out. ]])
+     fi
+   else
+     AC_MSG_ERROR([[Unrecognized LLVM version. The minimum supported LLVM version is version 20, bailing out. ]])
+   fi  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
     
-   psblas_cv_fc="ifc"
+   psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
-   psblas_cv_fc="nag"
-   FC="$MPIFC"
+   psblas_cv_fc="nag";
+   FC="$MPIFC";
  else
-   psblas_cv_fc=""
+   psblas_cv_fc="";
   # unsupported MPI Fortran compiler
      AC_MSG_NOTICE([[Unknown Fortran compiler, proceeding with fingers crossed !]])
  fi
