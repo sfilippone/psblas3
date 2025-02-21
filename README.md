@@ -145,7 +145,12 @@ e.g.
 which is asking for 4-bytes local indices, and 8-bytes global indices
 (this is the default). 
 
+## CMAKE
+There is initial support for building with CMAKE. As of this time, it does not compile the CUDA part.
 
+## LLVM
+The library has been successfully compiled and tested with LLVM version 20.1.0-rc2.
+ 			   
 ## Documentation
 
 Further information on installation and configuration can be found in the documentation.
