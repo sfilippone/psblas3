@@ -1,5 +1,9 @@
 WHAT'S NEW
-
+Version 3.9
+   1. PSBLAS3-EXT has been folded into the main library
+   2. Renamed GPU into CUDA.
+   3. Highly experimental OpenACC support. 
+   
 Version 3.8.0-2
    1. CTXT is now an opaque object.
    2. OpenMP is now better integrated.
