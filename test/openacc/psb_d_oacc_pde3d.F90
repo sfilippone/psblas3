@@ -822,6 +822,9 @@ program psb_d_oacc_pde3d
   ! iterative method parameters
   if (iam == psb_root_) write(psb_out_unit, '("Calling iterative method ", a)') kmethd
   call psb_barrier(ctxt)
+#ifdef OPENACC
+  call prec%allocate_wrk(info,vmold)
+#endif
   t1 = psb_wtime()
   eps = 1.d-6
 
@@ -842,6 +845,9 @@ program psb_d_oacc_pde3d
 
   call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
+#ifdef OPENACC
+  call prec%deallocate_wrk(info)
+#endif
   call psb_amx(ctxt, t2)
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
