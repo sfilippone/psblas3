@@ -3,11 +3,12 @@
 
 % \section{Preconditioners}
 \label{sec:psprecs}
-The base PSBLAS library  contains the implementation of two simple
+The base PSBLAS library  contains the implementation of some simple
 preconditioning techniques:
 \begin{itemize}
 \item Diagonal Scaling
 \item Block Jacobi with ILU(0) factorization
+\item Block Jacobi with an approximate inverse
 %% \item Additive Schwarz with the Restricted Additive Schwarz and
 %%   Additive Schwarz with Harmonic extensions;
 \end{itemize}
@@ -311,7 +312,9 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-
+{\par\noindent\large\bfseries Notes}
+This method is almost always called  by the iterative methods of
+Sec.~\ref{sec:methods}, and practically  never directly by the user.
 
 
 \clearpage\subsection{descr --- Prints a description of current
@@ -416,6 +419,99 @@ Error code: if no error, 0 is returned.
 %% preconditioners may use the SuperLU or the UMFPACK software, if
 %% installed; see~\cite{SUPERLU,UMFPACK}. 
 Releases all internal storage.
+
+
+\clearpage\subsection{allocate\_wrk --- preconditioner}
+\label{sec:allocatewrk}
+\begin{verbatim}
+call prec%allocate_wrk(info[,vmold])
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[vmold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata. 
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Preconditioners often need internal work storage during their
+application at each iteration of a linear solver method: in many
+situations this can be  accomplished by allocating and releasing
+memory ``on the fly''. However, when running on an accelerator through
+e.g. the CUDA enabled data strutures of Sec.~\ref{sec:cudastruct} and
+~\ref{sec:cudaenv},  memory allocation and deallocation usually have a
+much larger overhead, significantly affecting performance. To
+alleviate this problem we define this method that preallocates
+internal storage; it is intended to be invoked prior to the iterative
+solver method, so that the necessary internal scratch storage is
+available throughout the iterative method application.
+
+When using GPUs or other specialized devices, the \fortinline|vmold|
+argument is also necessary to ensure the internal work vectors are of
+the appropriate dynamic type to exploit the accelerator hardware.
+
+
+\clearpage\subsection{deallocate\_wrk --- preconditioner}
+
+\begin{verbatim}
+call prec%allocate_wrk(info)
+call prec%free_wrk(info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Deallocates preconditioner internal work storage; to be invoked after an
+iterative solver has completed execution, see the discussion in
+Sec.~\ref{sec:allocatewrk}. 
+
 
 %%% Local Variables: 
 %%% mode: latex

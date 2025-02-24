@@ -17,15 +17,18 @@ href="userhtmlse7.html#tailuserhtmlse10.html">tail</a>] [<a
 href="userhtml.html#userhtmlse13.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">10    </span> <a 
  id="x15-13500010"></a>Preconditioner routines</h3>
-<!--l. 6--><p class="noindent" >The base PSBLAS library contains the implementation of two simple preconditioning
+<!--l. 6--><p class="noindent" >The base PSBLAS library contains the implementation of some simple preconditioning
 techniques:
      <ul class="itemize1">
      <li class="itemize">
      <!--l. 9--><p class="noindent" >Diagonal Scaling
      </li>
      <li class="itemize">
-     <!--l. 10--><p class="noindent" >Block Jacobi with ILU(0) factorization</li></ul>
-<!--l. 14--><p class="noindent" >The supporting data type and subroutine interfaces are defined in the module
+     <!--l. 10--><p class="noindent" >Block Jacobi with ILU(0) factorization
+     </li>
+     <li class="itemize">
+     <!--l. 11--><p class="noindent" >Block Jacobi with an approximate inverse</li></ul>
+<!--l. 15--><p class="noindent" >The supporting data type and subroutine interfaces are defined in the module
 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_prec_mod</span></span></span>. The old interfaces <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_precinit</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
@@ -42,26 +45,26 @@ for backward compatibility
    <pre class="verbatim" id="verbatim-97">
 call&#x00A0;prec%init(icontxt,ptype,&#x00A0;info)
 </pre>
-<!--l. 30--><p class="nopar" >
-<!--l. 32--><p class="indent" >
+<!--l. 31--><p class="nopar" >
+<!--l. 33--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 33--><p class="noindent" >
+     <!--l. 34--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 33--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 34--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 34--><p class="noindent" >
+     <!--l. 34--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 35--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 35--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 36--><p class="noindent" >
+<span 
 class="pplb7t-">icontxt</span> </dt><dd 
 class="description">
-     <!--l. 35--><p class="noindent" >the communication context.<br 
+     <!--l. 36--><p class="noindent" >the communication context.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">global</span>.<br 
 class="newline" />Type:<span 
@@ -70,11 +73,11 @@ class="newline" />Intent: <span
 class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: an integer value.
      </dd><dt class="description">
-     <!--l. 40--><p class="noindent" >
+     <!--l. 41--><p class="noindent" >
 <span 
 class="pplb7t-">ptype</span> </dt><dd 
 class="description">
-     <!--l. 40--><p class="noindent" >the type of preconditioner. Scope: <span 
+     <!--l. 41--><p class="noindent" >the type of preconditioner. Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -82,17 +85,17 @@ class="newline" />Intent: <span
 class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: a character string, see usage notes.
      </dd><dt class="description">
-     <!--l. 53--><p class="noindent" >
+     <!--l. 54--><p class="noindent" >
 <span 
 class="pplb7t-">On Exit</span> </dt><dd 
 class="description">
-     <!--l. 53--><p class="noindent" >
+     <!--l. 54--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 55--><p class="noindent" >
+     <!--l. 56--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 55--><p class="noindent" >Scope: <span 
+     <!--l. 56--><p class="noindent" >Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -107,44 +110,44 @@ class="cmtt-10">_type</span></a>.
 
                                                                   
      </dd><dt class="description">
-     <!--l. 60--><p class="noindent" >
+     <!--l. 61--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 60--><p class="noindent" >Scope: <span 
+     <!--l. 61--><p class="noindent" >Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />Error code: if no error, 0 is returned.</dd></dl>
-<!--l. 66--><p class="noindent" ><span 
+<!--l. 67--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes </span>Legal inputs to this subroutine are interpreted depending on the <span 
 class="zplmr7m-">ptype </span>string as
 follows<span class="footnote-mark"><a 
 href="userhtml16.html#fn4x0"><sup class="textsuperscript">4</sup></a></span><a 
  id="x15-136001f4"></a> :
      <dl class="description"><dt class="description">
-     <!--l. 74--><p class="noindent" >
+     <!--l. 75--><p class="noindent" >
 <span 
 class="pplb7t-">NONE</span> </dt><dd 
 class="description">
-     <!--l. 74--><p class="noindent" >No preconditioning, i.e. the preconditioner is just a copy operator.
+     <!--l. 75--><p class="noindent" >No preconditioning, i.e. the preconditioner is just a copy operator.
      </dd><dt class="description">
-     <!--l. 76--><p class="noindent" >
+     <!--l. 77--><p class="noindent" >
 <span 
 class="pplb7t-">DIAG</span> </dt><dd 
 class="description">
-     <!--l. 76--><p class="noindent" >Diagonal  scaling;  each  entry  of  the  input  vector  is  multiplied  by  the
+     <!--l. 77--><p class="noindent" >Diagonal  scaling;  each  entry  of  the  input  vector  is  multiplied  by  the
      reciprocal  of  the  sum  of  the  absolute  values  of  the  coefficients  in  the
      corresponding row of matrix <span 
 class="zplmr7m-">A</span>;
      </dd><dt class="description">
-     <!--l. 79--><p class="noindent" >
+     <!--l. 80--><p class="noindent" >
 <span 
 class="pplb7t-">BJAC</span> </dt><dd 
 class="description">
-     <!--l. 79--><p class="noindent" >Precondition  by  a  factorization  or  an  approximante  inverse  of  the
+     <!--l. 80--><p class="noindent" >Precondition  by  a  factorization  or  an  approximante  inverse  of  the
      block-diagonal  of  matrix  <span 
 class="zplmr7m-">A</span>,  where  block  boundaries  are  determined
      by   the   data   allocation   boundaries   for   each   process;   requires   no
@@ -157,13 +160,13 @@ href="#x15-137001r21">21<!--tex4ht:ref: tab:p_subsolve_1 --></a>.</dd></dl>
  id="x15-13700010.2"></a>Set &#8212; set preconditioner parameters</h4>
 <div class="center" 
 >
-<!--l. 91--><p class="noindent" >
-<!--l. 92--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">set</span><span style="color:#000000">(</span><span style="color:#000000">what</span><span style="color:#000000">,</span><span style="color:#000000">val</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code></div>
-<!--l. 95--><p class="noindent" >This method sets the parameters defining the subdomain solver when the
+<!--l. 92--><p class="noindent" >
+<!--l. 93--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">set</span><span style="color:#000000">(</span><span style="color:#000000">what</span><span style="color:#000000">,</span><span style="color:#000000">val</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code></div>
+<!--l. 96--><p class="noindent" >This method sets the parameters defining the subdomain solver when the
 preconditioner type is <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">BJAC</span></span></span>. More precisely, the parameter identified by <code class="lstinline"><span style="color:#000000">what</span></code> is
 assigned the value contained in <code class="lstinline"><span style="color:#000000">val</span></code>.
-<!--l. 101--><p class="noindent" ><span 
+<!--l. 102--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Arguments</span>
    <div class="tabular"> <table id="TBL-23" class="tabular" 
  
@@ -171,39 +174,39 @@ class="pplb7t-x-x-120">Arguments</span>
 id="TBL-23-1"><col 
 id="TBL-23-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-23-1-"><td  style="white-space:normal; text-align:left;" id="TBL-23-1-1"  
-class="td11"><!--l. 104--><p class="noindent" ><code class="lstinline"><span style="color:#000000">what</span></code>   </td><td  style="white-space:normal; text-align:left;" id="TBL-23-1-2"  
-class="td11"><!--l. 104--><p class="noindent" ><code class="lstinline"><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span></code>.                                                                                                      </td>
+class="td11"><!--l. 105--><p class="noindent" ><code class="lstinline"><span style="color:#000000">what</span></code>   </td><td  style="white-space:normal; text-align:left;" id="TBL-23-1-2"  
+class="td11"><!--l. 105--><p class="noindent" ><code class="lstinline"><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span></code>.                                                                                                      </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-23-2-"><td  style="white-space:normal; text-align:left;" id="TBL-23-2-1"  
-class="td11"><!--l. 105--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-2-2"  
-class="td11"><!--l. 105--><p class="noindent" >The  parameter  to  be  set.  It  can  be  specified  through  its  name;  the  string  is
+class="td11"><!--l. 106--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-2-2"  
+class="td11"><!--l. 106--><p class="noindent" >The  parameter  to  be  set.  It  can  be  specified  through  its  name;  the  string  is
 case-insensitive. See Table&#x00A0;<a 
 href="#x15-137001r21">21<!--tex4ht:ref: tab:p_subsolve_1 --></a>.                                                                                    </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-23-3-"><td  style="white-space:normal; text-align:left;" id="TBL-23-3-1"  
-class="td11"><!--l. 108--><p class="noindent" ><code class="lstinline"><span style="color:#000000">val</span><span style="color:#000000"> </span></code>    </td><td  style="white-space:normal; text-align:left;" id="TBL-23-3-2"  
-class="td11"><!--l. 108--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span></code> <span 
+class="td11"><!--l. 109--><p class="noindent" ><code class="lstinline"><span style="color:#000000">val</span><span style="color:#000000"> </span></code>    </td><td  style="white-space:normal; text-align:left;" id="TBL-23-3-2"  
+class="td11"><!--l. 109--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span></code> <span 
 class="pplri7t-">or   </span><code class="lstinline"><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span></code> <span 
 class="pplri7t-">or   </span><code class="lstinline"><span style="color:#000000">real</span><span style="color:#000000">(</span><span style="color:#000000">psb_spk_</span><span style="color:#000000">)</span></code> <span 
 class="pplri7t-">or   </span><code class="lstinline"><span style="color:#000000">real</span><span style="color:#000000">(</span><span style="color:#000000">psb_dpk_</span><span style="color:#000000">)</span></code>,
 <code class="lstinline"><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">)</span></code>.                                                                                                                   </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-23-4-"><td  style="white-space:normal; text-align:left;" id="TBL-23-4-1"  
-class="td11"><!--l. 111--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-4-2"  
-class="td11"><!--l. 111--><p class="noindent" >The  value  of  the  parameter  to  be  set.  The  list  of  allowed  values  and  the
+class="td11"><!--l. 112--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-4-2"  
+class="td11"><!--l. 112--><p class="noindent" >The  value  of  the  parameter  to  be  set.  The  list  of  allowed  values  and  the
 corresponding  data  types  is  given  in  Table&#x00A0;<a 
 href="#x15-137001r21">21<!--tex4ht:ref: tab:p_subsolve_1 --></a>.  When  the  value  is  of  type
 <code class="lstinline"><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span></code>, it is also treated as case insensitive.                                       </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-23-5-"><td  style="white-space:normal; text-align:left;" id="TBL-23-5-1"  
-class="td11"><!--l. 116--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>   </td><td  style="white-space:normal; text-align:left;" id="TBL-23-5-2"  
-class="td11"><!--l. 116--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code>.                                                                                                </td>
+class="td11"><!--l. 117--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>   </td><td  style="white-space:normal; text-align:left;" id="TBL-23-5-2"  
+class="td11"><!--l. 117--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code>.                                                                                                </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-23-6-"><td  style="white-space:normal; text-align:left;" id="TBL-23-6-1"  
-class="td11"><!--l. 117--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-6-2"  
-class="td11"><!--l. 117--><p class="noindent" >Error code. If no error, 0 is returned. See Section&#x00A0;<a 
+class="td11"><!--l. 118--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-6-2"  
+class="td11"><!--l. 118--><p class="noindent" >Error code. If no error, 0 is returned. See Section&#x00A0;<a 
 href="userhtmlse8.html#x13-1230008">8<!--tex4ht:ref: sec:errors --></a> for details.                            </td> </tr></table></div>
-<!--l. 122--><p class="noindent" >A number of subdomain solvers can be chosen with this method; a list of the
+<!--l. 123--><p class="noindent" >A number of subdomain solvers can be chosen with this method; a list of the
 parameters that can be set, along with their allowed and default values, is given in
 Table-<a 
 href="#x15-137001r21">21<!--tex4ht:ref: tab:p_subsolve_1 --></a>.<br 
@@ -212,7 +215,7 @@ class="newline" />
                                                                   
 
                                                                   
-<!--l. 129--><p class="indent" >   <a 
+<!--l. 130--><p class="indent" >   <a 
  id="x15-137001r21"></a><hr class="float"><div class="float" 
 >
                                                                   
@@ -220,7 +223,7 @@ class="newline" />
                                                                   
 <div class="center" 
 >
-<!--l. 129--><p class="noindent" >
+<!--l. 130--><p class="noindent" >
 <div class="tabular"> <table id="TBL-24" class="tabular" 
  
 ><colgroup id="TBL-24-1g"><col 
@@ -231,7 +234,7 @@ id="TBL-24-4"></colgroup><colgroup id="TBL-24-5g"><col
 id="TBL-24-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-1-"><td  style="white-space:normal; text-align:left;" id="TBL-24-1-1"  
-class="td11"><!--l. 134--><p class="noindent" ><code class="lstinline"><span style="color:#000000">what</span></code>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-1-2"  
+class="td11"><!--l. 135--><p class="noindent" ><code class="lstinline"><span style="color:#000000">what</span></code>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-1-2"  
 class="td11"><span 
 class="pplrc7t-x-x-90"><span 
 class="small-caps">d</span><span 
@@ -242,8 +245,8 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>                      </span></td><td  style="white-space:normal; text-align:left;" id="TBL-24-1-3"  
-class="td11"><!--l. 134--><p class="noindent" ><code class="lstinline"><span style="color:#000000">val</span></code>             </td><td  style="white-space:normal; text-align:left;" id="TBL-24-1-4"  
-class="td11"><!--l. 134--><p class="noindent" ><span 
+class="td11"><!--l. 135--><p class="noindent" ><code class="lstinline"><span style="color:#000000">val</span></code>             </td><td  style="white-space:normal; text-align:left;" id="TBL-24-1-4"  
+class="td11"><!--l. 135--><p class="noindent" ><span 
 class="pplrc7t-x-x-90"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -252,7 +255,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span>                 </td><td  style="white-space:normal; text-align:left;" id="TBL-24-1-5"  
-class="td11"><!--l. 135--><p class="noindent" ><span 
+class="td11"><!--l. 136--><p class="noindent" ><span 
 class="pplrc7t-x-x-90"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -265,15 +268,15 @@ class="small-caps">s</span></span>                                              
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-2-"><td  style="white-space:normal; text-align:left;" id="TBL-24-2-1"  
 class="td
-11"><!--l. 137--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SUB_SOLVE</span><span style="color:#000000">&#8217;</span></code>         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-2-2"  
-class="td11"><code class="lstinline"><!--l. 137--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-2-3"  
-class="td11"><!--l. 138--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILU</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 139--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILUT</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 140--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INVT</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 140--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INVK</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 140--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">AINV</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-2-4"  
-class="td11"><!--l. 142--><p class="noindent" >                </td><td  style="white-space:normal; text-align:left;" id="TBL-24-2-5"  
-class="td11"><!--l. 142--><p class="noindent" ><span 
+11"><!--l. 138--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SUB_SOLVE</span><span style="color:#000000">&#8217;</span></code>         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-2-2"  
+class="td11"><code class="lstinline"><!--l. 138--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-2-3"  
+class="td11"><!--l. 139--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILU</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 140--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILUT</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 141--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INVT</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 141--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INVK</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 141--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">AINV</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-2-4"  
+class="td11"><!--l. 143--><p class="noindent" >                </td><td  style="white-space:normal; text-align:left;" id="TBL-24-2-5"  
+class="td11"><!--l. 143--><p class="noindent" ><span 
 class="pplr7t-x-x-90">The  local  solver  to  be  used  with  the  smoother</span>
 <span 
 class="pplr7t-x-x-90">or  one-level  preconditioner  ILU(</span><span 
@@ -319,18 +322,18 @@ class="pplr7t-x-x-90">.</span>              </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-3-"><td  style="white-space:normal; text-align:left;" id="TBL-24-3-1"  
-class="td11"><!--l. 151--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SUB_FILLIN</span><span style="color:#000000">&#8217;</span></code>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-3-2"  
-class="td11"><code class="lstinline"><!--l. 151--><p class="noindent" ><span style="color:#000000">integer</span>                                                                   </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-3-3"  
-class="td11"><!--l. 152--><p class="noindent" ><span 
+class="td11"><!--l. 152--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SUB_FILLIN</span><span style="color:#000000">&#8217;</span></code>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-3-2"  
+class="td11"><code class="lstinline"><!--l. 152--><p class="noindent" ><span style="color:#000000">integer</span>                                                                   </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-3-3"  
+class="td11"><!--l. 153--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Any integer</span>
-<!--l. 152--><p class="noindent" ><span 
+<!--l. 153--><p class="noindent" ><span 
 class="pplr7t-x-x-90">number</span><span 
 class="pplr7t-x-x-90">&#x00A0;</span><span 
 class="zplmr7y-x-x-90">&#x2265; </span><span 
 class="pplr7t-x-x-90">0</span>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-3-4"  
-class="td11"><!--l. 153--><p class="noindent" ><span 
-class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-3-5"  
 class="td11"><!--l. 154--><p class="noindent" ><span 
+class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-3-5"  
+class="td11"><!--l. 155--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Fill-in     level     </span><span 
 class="zplmr7m-x-x-90">p  </span><span 
 class="pplr7t-x-x-90">of     the     incomplete     LU</span>
@@ -339,18 +342,18 @@ class="pplr7t-x-x-90">factorizations.</span>                                    
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-4-"><td  style="white-space:normal; text-align:left;" id="TBL-24-4-1"  
-class="td11"><!--l. 155--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SUB_ILUTHRS</span><span style="color:#000000">&#8217;</span></code>       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-4-2"  
-class="td11"><code class="lstinline"><!--l. 155--><p class="noindent" ><span style="color:#000000">real</span><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span>                                                      </code></td><td  style="white-space:normal; text-align:left;" id="TBL-24-4-3"  
-class="td11"><!--l. 156--><p class="noindent" ><span 
+class="td11"><!--l. 156--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SUB_ILUTHRS</span><span style="color:#000000">&#8217;</span></code>       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-4-2"  
+class="td11"><code class="lstinline"><!--l. 156--><p class="noindent" ><span style="color:#000000">real</span><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span>                                                      </code></td><td  style="white-space:normal; text-align:left;" id="TBL-24-4-3"  
+class="td11"><!--l. 157--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Any real</span>
 <span 
 class="pplr7t-x-x-90">number</span><span 
 class="pplr7t-x-x-90">&#x00A0;</span><span 
 class="zplmr7y-x-x-90">&#x2265; </span><span 
 class="pplr7t-x-x-90">0</span>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-4-4"  
-class="td11"><!--l. 157--><p class="noindent" ><span 
-class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-4-5"  
 class="td11"><!--l. 158--><p class="noindent" ><span 
+class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-4-5"  
+class="td11"><!--l. 159--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Drop tolerance </span><span 
 class="zplmr7m-x-x-90">t </span><span 
 class="pplr7t-x-x-90">in the ILU(</span><span 
@@ -361,41 +364,41 @@ class="pplr7t-x-x-90">) factorization.</span>     </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-5-"><td  style="white-space:normal; text-align:left;" id="TBL-24-5-1"  
-class="td11"><!--l. 159--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILU_ALG</span><span style="color:#000000">&#8217;</span></code>           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-5-2"  
-class="td11"><code class="lstinline"><!--l. 159--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-5-3"  
-class="td11"><!--l. 160--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">MILU</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-5-4"  
-class="td11"><!--l. 161--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-5-5"  
-class="td11"><!--l. 162--><p class="noindent" ><span 
+class="td11"><!--l. 160--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILU_ALG</span><span style="color:#000000">&#8217;</span></code>           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-5-2"  
+class="td11"><code class="lstinline"><!--l. 160--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-5-3"  
+class="td11"><!--l. 161--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">MILU</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-5-4"  
+class="td11"><!--l. 162--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-5-5"  
+class="td11"><!--l. 163--><p class="noindent" ><span 
 class="pplr7t-x-x-90">ILU algorithmic variant</span>                                           </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-6-"><td  style="white-space:normal; text-align:left;" id="TBL-24-6-1"  
-class="td11"><!--l. 163--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILUT_SCALE</span><span style="color:#000000">&#8217;</span></code>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-6-2"  
-class="td11"><code class="lstinline"><!--l. 163--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-6-3"  
-class="td11"><!--l. 164--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">MAXVAL</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 165--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">DIAG</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 166--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ARSWUM</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 167--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ARCSUM</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 168--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ACLSUM</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 169--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-6-4"  
-class="td11"><!--l. 170--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-6-5"  
-class="td11"><!--l. 171--><p class="noindent" ><span 
+class="td11"><!--l. 164--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ILUT_SCALE</span><span style="color:#000000">&#8217;</span></code>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-6-2"  
+class="td11"><code class="lstinline"><!--l. 164--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-6-3"  
+class="td11"><!--l. 165--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">MAXVAL</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 166--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">DIAG</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 167--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ARSWUM</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 168--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ARCSUM</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 169--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ACLSUM</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 170--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-6-4"  
+class="td11"><!--l. 171--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-6-5"  
+class="td11"><!--l. 172--><p class="noindent" ><span 
 class="pplr7t-x-x-90">ILU scaling strategy</span>                                                 </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-7-"><td  style="white-space:normal; text-align:left;" id="TBL-24-7-1"  
-class="td11"><!--l. 172--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INV_FILLIN</span><span style="color:#000000">&#8217;</span></code>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-7-2"  
-class="td11"><code class="lstinline"><!--l. 172--><p class="noindent" ><span style="color:#000000">integer</span>                                                                   </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-7-3"  
-class="td11"><!--l. 173--><p class="noindent" ><span 
+class="td11"><!--l. 173--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INV_FILLIN</span><span style="color:#000000">&#8217;</span></code>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-7-2"  
+class="td11"><code class="lstinline"><!--l. 173--><p class="noindent" ><span style="color:#000000">integer</span>                                                                   </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-7-3"  
+class="td11"><!--l. 174--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Any integer</span>
-<!--l. 173--><p class="noindent" ><span 
+<!--l. 174--><p class="noindent" ><span 
 class="pplr7t-x-x-90">number</span><span 
 class="pplr7t-x-x-90">&#x00A0;</span><span 
 class="zplmr7y-x-x-90">&#x2265; </span><span 
 class="pplr7t-x-x-90">0</span>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-7-4"  
-class="td11"><!--l. 174--><p class="noindent" ><span 
-class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-7-5"  
 class="td11"><!--l. 175--><p class="noindent" ><span 
+class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-7-5"  
+class="td11"><!--l. 176--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Second    fill-in    level    </span><span 
 class="zplmr7m-x-x-90">q  </span><span 
 class="pplr7t-x-x-90">of    the    INVK(</span><span 
@@ -408,18 +411,18 @@ class="pplr7t-x-x-90">approximate inverse.</span>                               
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-8-"><td  style="white-space:normal; text-align:left;" id="TBL-24-8-1"  
-class="td11"><!--l. 177--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INV_ILUTHRS</span><span style="color:#000000">&#8217;</span></code>       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-8-2"  
-class="td11"><code class="lstinline"><!--l. 177--><p class="noindent" ><span style="color:#000000">real</span><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span>                                                      </code></td><td  style="white-space:normal; text-align:left;" id="TBL-24-8-3"  
-class="td11"><!--l. 178--><p class="noindent" ><span 
+class="td11"><!--l. 178--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">INV_ILUTHRS</span><span style="color:#000000">&#8217;</span></code>       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-8-2"  
+class="td11"><code class="lstinline"><!--l. 178--><p class="noindent" ><span style="color:#000000">real</span><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span>                                                      </code></td><td  style="white-space:normal; text-align:left;" id="TBL-24-8-3"  
+class="td11"><!--l. 179--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Any real</span>
 <span 
 class="pplr7t-x-x-90">number</span><span 
 class="pplr7t-x-x-90">&#x00A0;</span><span 
 class="zplmr7y-x-x-90">&#x2265; </span><span 
 class="pplr7t-x-x-90">0</span>          </td><td  style="white-space:normal; text-align:left;" id="TBL-24-8-4"  
-class="td11"><!--l. 179--><p class="noindent" ><span 
-class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-8-5"  
 class="td11"><!--l. 180--><p class="noindent" ><span 
+class="pplr7t-x-x-90">0</span>                               </td><td  style="white-space:normal; text-align:left;" id="TBL-24-8-5"  
+class="td11"><!--l. 181--><p class="noindent" ><span 
 class="pplr7t-x-x-90">Second   drop   tolerance   </span><span 
 class="zplmr7m-x-x-90">s  </span><span 
 class="pplr7t-x-x-90">in   the   INVT(</span><span 
@@ -432,14 +435,14 @@ class="pplr7t-x-x-90">approximate inverse.</span>                               
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-24-9-"><td  style="white-space:normal; text-align:left;" id="TBL-24-9-1"  
-class="td11"><!--l. 182--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">AINV_ALG</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-9-2"  
-class="td11"><code class="lstinline"><!--l. 182--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-9-3"  
-class="td11"><!--l. 183--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 184--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SYM</span><span style="color:#000000">-</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 185--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">STAB</span><span style="color:#000000">-</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>
-<!--l. 186--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">MLK</span><span style="color:#000000">,</span><span style="color:#000000">LMX</span><span style="color:#000000">&#8217;</span></code>       </td><td  style="white-space:normal; text-align:left;" id="TBL-24-9-4"  
-class="td11"><!--l. 187--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>           </td><td  style="white-space:normal; text-align:left;" id="TBL-24-9-5"  
-class="td11"><!--l. 188--><p class="noindent" ><span 
+class="td11"><!--l. 183--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">AINV_ALG</span><span style="color:#000000">&#8217;</span></code>          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-24-9-2"  
+class="td11"><code class="lstinline"><!--l. 183--><p class="noindent" ><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=*)</span>                                                          </code> </td><td  style="white-space:normal; text-align:left;" id="TBL-24-9-3"  
+class="td11"><!--l. 184--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 185--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">SYM</span><span style="color:#000000">-</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 186--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">STAB</span><span style="color:#000000">-</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>
+<!--l. 187--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">MLK</span><span style="color:#000000">,</span><span style="color:#000000">LMX</span><span style="color:#000000">&#8217;</span></code>       </td><td  style="white-space:normal; text-align:left;" id="TBL-24-9-4"  
+class="td11"><!--l. 188--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">LLK</span><span style="color:#000000">&#8217;</span></code>           </td><td  style="white-space:normal; text-align:left;" id="TBL-24-9-5"  
+class="td11"><!--l. 189--><p class="noindent" ><span 
 class="pplr7t-x-x-90">AINV algorithmic strategy.</span>                                     </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
@@ -464,26 +467,26 @@ class="content">Parameters defining the solver of the BJAC preconditioner.</span
    <pre class="verbatim" id="verbatim-98">
 call&#x00A0;prec%build(a,&#x00A0;desc_a,&#x00A0;info[,amold,vmold,imold])
 </pre>
-<!--l. 202--><p class="nopar" >
-<!--l. 204--><p class="indent" >
+<!--l. 203--><p class="nopar" >
+<!--l. 205--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 205--><p class="noindent" >
+     <!--l. 206--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 205--><p class="noindent" >Synchronous.
-     </dd><dt class="description">
-     <!--l. 206--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 206--><p class="noindent" >
+     <!--l. 206--><p class="noindent" >Synchronous.
      </dd><dt class="description">
      <!--l. 207--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 207--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 208--><p class="noindent" >
+<span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 207--><p class="noindent" >the system sparse matrix. Scope: <span 
+     <!--l. 208--><p class="noindent" >the system sparse matrix. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -495,11 +498,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tspmat</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 212--><p class="noindent" >
+     <!--l. 213--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 212--><p class="noindent" >the preconditioner.<br 
+     <!--l. 213--><p class="noindent" >the preconditioner.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -514,12 +517,12 @@ class="cmtt-10">_Tprec</span><span
 class="cmtt-10">_type</span></a><br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 217--><p class="noindent" >
+     <!--l. 218--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 217--><p class="noindent" >the problem communication descriptor. Scope: <span 
+     <!--l. 218--><p class="noindent" >the problem communication descriptor. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -531,14 +534,14 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 227--><p class="noindent" >
+     <!--l. 228--><p class="noindent" >
 <span 
 class="pplb7t-">amold</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 227--><p class="noindent" >The desired dynamic type for the internal matrix storage.<br 
+     <!--l. 228--><p class="noindent" >The desired dynamic type for the internal matrix storage.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type: <span 
@@ -553,11 +556,11 @@ class="cmtt-10">_base</span><span
 class="cmtt-10">_sparse</span><span 
 class="cmtt-10">_mat</span>.
      </dd><dt class="description">
-     <!--l. 232--><p class="noindent" >
+     <!--l. 233--><p class="noindent" >
 <span 
 class="pplb7t-">vmold</span> </dt><dd 
 class="description">
-     <!--l. 232--><p class="noindent" >The desired dynamic type for the internal vector storage.<br 
+     <!--l. 233--><p class="noindent" >The desired dynamic type for the internal vector storage.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type: <span 
@@ -572,11 +575,11 @@ class="cmtt-10">_base</span><span
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span>.
      </dd><dt class="description">
-     <!--l. 237--><p class="noindent" >
+     <!--l. 238--><p class="noindent" >
 <span 
 class="pplb7t-">imold</span> </dt><dd 
 class="description">
-     <!--l. 237--><p class="noindent" >The desired dynamic type for the internal integer vector storage.<br 
+     <!--l. 238--><p class="noindent" >The desired dynamic type for the internal integer vector storage.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type: <span 
@@ -591,19 +594,19 @@ class="cmtt-10">_T</span><span
 class="cmtt-10">_base</span><span 
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span>.</dd></dl>
-<!--l. 244--><p class="indent" >
+<!--l. 245--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 245--><p class="noindent" >
+     <!--l. 246--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 245--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 246--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 247--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 246--><p class="noindent" >the preconditioner.<br 
+     <!--l. 247--><p class="noindent" >the preconditioner.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -617,11 +620,11 @@ class="cmtt-10">_Tprec</span><span
 class="cmtt-10">_type</span></a><br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 251--><p class="noindent" >
+     <!--l. 252--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 251--><p class="noindent" >Error code.<br 
+     <!--l. 252--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -632,7 +635,7 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
                                                                   
 
                                                                   
-<!--l. 257--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+<!--l. 258--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">amold</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">vmold</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">imold</span></span></span> arguments may be employed to interface with special
@@ -649,26 +652,26 @@ devices, such as GPUs and other accelerators.
 call&#x00A0;prec%apply(x,y,desc_a,info,trans,work)
 call&#x00A0;prec%apply(x,desc_a,info,trans)
 </pre>
-<!--l. 269--><p class="nopar" >
-<!--l. 271--><p class="indent" >
+<!--l. 270--><p class="nopar" >
+<!--l. 272--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 272--><p class="noindent" >
+     <!--l. 273--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 272--><p class="noindent" >Synchronous.
-     </dd><dt class="description">
-     <!--l. 273--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 273--><p class="noindent" >
+     <!--l. 273--><p class="noindent" >Synchronous.
      </dd><dt class="description">
      <!--l. 274--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 274--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 275--><p class="noindent" >
+<span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 274--><p class="noindent" >the preconditioner. Scope: <span 
+     <!--l. 275--><p class="noindent" >the preconditioner. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -680,11 +683,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tprec</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 279--><p class="noindent" >
+     <!--l. 280--><p class="noindent" >
 <span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 279--><p class="noindent" >the source vector. Scope: <span 
+     <!--l. 280--><p class="noindent" >the source vector. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -697,12 +700,12 @@ class="cmtt-10">_T</span><span
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 284--><p class="noindent" >
+     <!--l. 285--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 284--><p class="noindent" >the problem communication descriptor. Scope: <span 
+     <!--l. 285--><p class="noindent" >the problem communication descriptor. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -714,11 +717,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 289--><p class="noindent" >
+     <!--l. 290--><p class="noindent" >
 <span 
 class="pplb7t-">trans</span> </dt><dd 
 class="description">
-     <!--l. 289--><p class="noindent" >Scope:  <br 
+     <!--l. 290--><p class="noindent" >Scope:  <br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
 class="newline" />Intent: <span 
@@ -728,30 +731,30 @@ class="newline" />Specified as: a character.
 
                                                                   
      </dd><dt class="description">
-     <!--l. 294--><p class="noindent" >
+     <!--l. 295--><p class="noindent" >
 <span 
 class="pplb7t-">work</span> </dt><dd 
 class="description">
-     <!--l. 294--><p class="noindent" >an optional work space Scope: <span 
+     <!--l. 295--><p class="noindent" >an optional work space Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />Specified as: a double precision array.</dd></dl>
-<!--l. 301--><p class="indent" >
+<!--l. 302--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 302--><p class="noindent" >
+     <!--l. 303--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 302--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 303--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 304--><p class="noindent" >
 <span 
 class="pplb7t-">y</span> </dt><dd 
 class="description">
-     <!--l. 303--><p class="noindent" >the destination vector. Scope: <span 
+     <!--l. 304--><p class="noindent" >the destination vector. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -764,11 +767,11 @@ class="cmtt-10">_T</span><span
 class="cmtt-10">_vect</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 308--><p class="noindent" >
+     <!--l. 309--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 308--><p class="noindent" >Error code.<br 
+     <!--l. 309--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -776,6 +779,10 @@ class="pplb7t-">required </span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
+<!--l. 315--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes </span>This method is almost always called by the iterative methods of Sec.&#x00A0;<a 
+href="userhtmlse11.html#x17-14500011">11<!--tex4ht:ref: sec:methods --></a>, and
+practically never directly by the user.
                                                                   
 
                                                                   
@@ -788,26 +795,26 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
 call&#x00A0;prec%descr(info)
 call&#x00A0;prec%descr(info,iout,&#x00A0;root)
 </pre>
-<!--l. 323--><p class="nopar" >
-<!--l. 325--><p class="indent" >
+<!--l. 326--><p class="nopar" >
+<!--l. 328--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 326--><p class="noindent" >
+     <!--l. 329--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 326--><p class="noindent" >Asynchronous.
+     <!--l. 329--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 327--><p class="noindent" >
+     <!--l. 330--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 327--><p class="noindent" >
+     <!--l. 330--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 328--><p class="noindent" >
+     <!--l. 331--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 328--><p class="noindent" >the preconditioner. Scope: <span 
+     <!--l. 331--><p class="noindent" >the preconditioner. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -819,11 +826,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tprec</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 333--><p class="noindent" >
+     <!--l. 336--><p class="noindent" >
 <span 
 class="pplb7t-">iout</span> </dt><dd 
 class="description">
-     <!--l. 333--><p class="noindent" >output unit. Scope: <span 
+     <!--l. 336--><p class="noindent" >output unit. Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
@@ -831,11 +838,11 @@ class="newline" />Intent: <span
 class="pplb7t-">in</span>.<br 
 class="newline" />Specified as: an integer number. Default: default output unit.
      </dd><dt class="description">
-     <!--l. 338--><p class="noindent" >
+     <!--l. 341--><p class="noindent" >
 <span 
 class="pplb7t-">root</span> </dt><dd 
 class="description">
-     <!--l. 338--><p class="noindent" >Process from which to print Scope: <span 
+     <!--l. 341--><p class="noindent" >Process from which to print Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
@@ -848,20 +855,20 @@ class="zplmr7y-">- </span>1,  in  which  case
 class="zplmr7y-">-</span>1, in which case all
      processes will print. Default: 0.
      </dd><dt class="description">
-     <!--l. 345--><p class="noindent" >
+     <!--l. 348--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 345--><p class="noindent" >
+     <!--l. 348--><p class="noindent" >
                                                                   
 
                                                                   
      </dd><dt class="description">
-     <!--l. 346--><p class="noindent" >
+     <!--l. 349--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 346--><p class="noindent" >Error code.<br 
+     <!--l. 349--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -880,48 +887,48 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
    <pre class="verbatim" id="verbatim-101">
 call&#x00A0;&#x00A0;prec%clone(precout,info)
 </pre>
-<!--l. 359--><p class="nopar" >
-<!--l. 361--><p class="indent" >
+<!--l. 362--><p class="nopar" >
+<!--l. 364--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 362--><p class="noindent" >
+     <!--l. 365--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 362--><p class="noindent" >Asynchronous.
+     <!--l. 365--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 363--><p class="noindent" >
+     <!--l. 366--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 363--><p class="noindent" >
+     <!--l. 366--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 364--><p class="noindent" >
+     <!--l. 367--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 364--><p class="noindent" >the preconditioner.<br 
+     <!--l. 367--><p class="noindent" >the preconditioner.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 371--><p class="indent" >
+<!--l. 374--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 372--><p class="noindent" >
+     <!--l. 375--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 372--><p class="noindent" >
+     <!--l. 375--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 373--><p class="noindent" >
+     <!--l. 376--><p class="noindent" >
 <span 
 class="pplb7t-">precout</span> </dt><dd 
 class="description">
-     <!--l. 373--><p class="noindent" >A copy of the input object.
+     <!--l. 376--><p class="noindent" >A copy of the input object.
      </dd><dt class="description">
-     <!--l. 374--><p class="noindent" >
+     <!--l. 377--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 374--><p class="noindent" >Return code.</dd></dl>
+     <!--l. 377--><p class="noindent" >Return code.</dd></dl>
                                                                   
 
                                                                   
@@ -933,26 +940,26 @@ class="description">
    <pre class="verbatim" id="verbatim-102">
 call&#x00A0;prec%free(info)
 </pre>
-<!--l. 382--><p class="nopar" >
-<!--l. 384--><p class="indent" >
+<!--l. 385--><p class="nopar" >
+<!--l. 387--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 385--><p class="noindent" >
+     <!--l. 388--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 385--><p class="noindent" >Asynchronous.
+     <!--l. 388--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 386--><p class="noindent" >
+     <!--l. 389--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 386--><p class="noindent" >
+     <!--l. 389--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 387--><p class="noindent" >
+     <!--l. 390--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 387--><p class="noindent" >the preconditioner.<br 
+     <!--l. 390--><p class="noindent" >the preconditioner.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type: <span 
@@ -965,17 +972,17 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tprec</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 400--><p class="noindent" >
+     <!--l. 403--><p class="noindent" >
 <span 
 class="pplb7t-">On Exit</span> </dt><dd 
 class="description">
-     <!--l. 400--><p class="noindent" >
+     <!--l. 403--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 402--><p class="noindent" >
+     <!--l. 405--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 402--><p class="noindent" >Scope: <span 
+     <!--l. 405--><p class="noindent" >Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -987,19 +994,216 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tprec</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 407--><p class="noindent" >
+     <!--l. 410--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 407--><p class="noindent" >Scope: <span 
+     <!--l. 410--><p class="noindent" >Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />Error code: if no error, 0 is returned.</dd></dl>
-<!--l. 413--><p class="noindent" ><span 
+<!--l. 416--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes </span>Releases all internal storage.
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.8    </span> <a 
+ id="x15-14300010.8"></a>allocate_wrk &#8212; preconditioner</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-103">
+call&#x00A0;prec%allocate_wrk(info[,vmold])
+</pre>
+<!--l. 428--><p class="nopar" >
+<!--l. 430--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 431--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 431--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 432--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 432--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 433--><p class="noindent" >
+<span 
+class="pplb7t-">prec</span> </dt><dd 
+class="description">
+     <!--l. 433--><p class="noindent" >the preconditioner.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span><br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tprec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 438--><p class="noindent" >
+<span 
+class="pplb7t-">vmold</span> </dt><dd 
+class="description">
+     <!--l. 438--><p class="noindent" >The desired dynamic type for the internal vector storage.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an object of a class derived from <a 
+ id="vbasedata"></a><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_T</span><span 
+class="cmtt-10">_base</span><span 
+class="cmtt-10">_vect</span><span 
+class="cmtt-10">_type</span>.
+     </dd><dt class="description">
+     <!--l. 443--><p class="noindent" >
+<span 
+class="pplb7t-">On Exit</span> </dt><dd 
+class="description">
+     <!--l. 443--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 445--><p class="noindent" >
+<span 
+class="pplb7t-">prec</span> </dt><dd 
+class="description">
+     <!--l. 445--><p class="noindent" >Scope: <span 
+class="pplb7t-">local </span><br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span><br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tprec</span><span 
+class="cmtt-10">_type</span></a>.
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 450--><p class="noindent" >
+<span 
+class="pplb7t-">info</span> </dt><dd 
+class="description">
+     <!--l. 450--><p class="noindent" >Scope: <span 
+class="pplb7t-">global </span><br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span><br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" />Error code: if no error, 0 is returned.</dd></dl>
+<!--l. 456--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes </span>Preconditioners often need internal work storage during their application at
+each iteration of a linear solver method: in many situations this can be accomplished
+by allocating and releasing memory &#8220;on the fly&#8221;. However, when running on an
+accelerator through e.g. the CUDA enabled data strutures of Sec.&#x00A0;<a 
+href="userhtmlse12.html#x19-15600012.4">12.4<!--tex4ht:ref: sec:cudastruct --></a> and &#x00A0;<a 
+href="userhtmlse13.html#x20-15700013">13<!--tex4ht:ref: sec:cudaenv --></a>,
+memory allocation and deallocation usually have a much larger overhead,
+significantly affecting performance. To alleviate this problem we define this method
+that preallocates internal storage; it is intended to be invoked prior to the iterative
+solver method, so that the necessary internal scratch storage is available throughout
+the iterative method application.
+<!--l. 473--><p class="indent" >   When using GPUs or other specialized devices, the <code class="lstinline"><span style="color:#000000">vmold</span></code> argument is also
+necessary to ensure the internal work vectors are of the appropriate dynamic type to
+exploit the accelerator hardware.
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">10.9    </span> <a 
+ id="x15-14400010.9"></a>deallocate_wrk &#8212; preconditioner</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-104">
+call&#x00A0;prec%allocate_wrk(info)
+call&#x00A0;prec%free_wrk(info)
+</pre>
+<!--l. 483--><p class="nopar" >
+<!--l. 485--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 486--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 486--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 487--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 487--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 488--><p class="noindent" >
+<span 
+class="pplb7t-">prec</span> </dt><dd 
+class="description">
+     <!--l. 488--><p class="noindent" >the preconditioner.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span><br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tprec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 493--><p class="noindent" >
+<span 
+class="pplb7t-">On Exit</span> </dt><dd 
+class="description">
+     <!--l. 493--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 495--><p class="noindent" >
+<span 
+class="pplb7t-">prec</span> </dt><dd 
+class="description">
+     <!--l. 495--><p class="noindent" >Scope: <span 
+class="pplb7t-">local </span><br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span><br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: a preconditioner data structure <a 
+href="userhtmlse3.html#precdata"><span 
+class="cmtt-10">psb</span><span 
+class="cmtt-10">_Tprec</span><span 
+class="cmtt-10">_type</span></a>.
+     </dd><dt class="description">
+     <!--l. 500--><p class="noindent" >
+<span 
+class="pplb7t-">info</span> </dt><dd 
+class="description">
+     <!--l. 500--><p class="noindent" >Scope: <span 
+class="pplb7t-">global </span><br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span><br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" />Error code: if no error, 0 is returned.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 506--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes </span>Deallocates preconditioner internal work storage; to be invoked after an
+iterative solver has completed execution, see the discussion in Sec.&#x00A0;<a 
+href="#x15-14300010.8">10.8<!--tex4ht:ref: sec:allocatewrk --></a>.
                                                                   
 
                                                                   
