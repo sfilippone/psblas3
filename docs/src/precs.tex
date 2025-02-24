@@ -467,7 +467,7 @@ e.g. the CUDA enabled data strutures of Sec.~\ref{sec:cudastruct} and
 much larger overhead, significantly affecting performance. To
 alleviate this problem we define this method that preallocates
 internal storage; it is intended to be invoked prior to the iterative
-solver method, so that the necessary internal scratch storage is
+solver method, so that the necessary internal work storage is
 available throughout the iterative method application.
 
 When using GPUs or other specialized devices, the \fortinline|vmold|

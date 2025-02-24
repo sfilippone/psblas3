@@ -1115,7 +1115,7 @@ href="userhtmlse13.html#x20-15700013">13<!--tex4ht:ref: sec:cudaenv --></a>,
 memory allocation and deallocation usually have a much larger overhead,
 significantly affecting performance. To alleviate this problem we define this method
 that preallocates internal storage; it is intended to be invoked prior to the iterative
-solver method, so that the necessary internal scratch storage is available throughout
+solver method, so that the necessary internal work storage is available throughout
 the iterative method application.
 <!--l. 473--><p class="indent" >   When using GPUs or other specialized devices, the <code class="lstinline"><span style="color:#000000">vmold</span></code> argument is also
 necessary to ensure the internal work vectors are of the appropriate dynamic type to
