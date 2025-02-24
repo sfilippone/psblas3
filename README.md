@@ -115,7 +115,8 @@ entities that were previously separated:
 |---------|--------------------|
 | PSBLAS  | the base library   |
 | PSBLAS-EXT | a library providing additional storage formats for matrices and vectors |
-								| SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
+| SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
+
 Moreover, the module and library previously called psb_krylovv are now called
 psb_linsolve, but their usage is otherwise unchanged.								
 
