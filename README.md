@@ -15,10 +15,14 @@ The architecture, philosophy and implementation details of the library are conta
   >Computations in Fortran 2003, ACM Trans. on Math. Software, vol. 38, No.
   4, 2012.
 
-- The ideas are explored further with the paper:
+- The software engineering ideas are further detailed in  the paper:
   >V. Cardellini, S. Filippone and D. Rouson. Design Patterns for
   >sparse-matrix computations on hybrid CPU/GPU platforms, Scientific 
   >Programming, 22(2014), pp.1-19.
+
+- The GPU support is  explored in
+  >  S. Filippone, V. Cardellini, D. Barbieri and A. Fanfarillo:
+  >  Sparse Matrix-Vector Multiplication on GPGPUs ACM Transactions on Mathematical Software (TOMS), Volume 43 Issue 4, December 2016.
 
 - Version 1.0 of the library is described in:
   >S. Filippone, M. Colajanni. PSBLAS: A library for parallel linear
