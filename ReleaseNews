@@ -2,7 +2,10 @@ WHAT'S NEW
 Version 3.9
    1. PSBLAS3-EXT has been folded into the main library
    2. Renamed GPU into CUDA.
-   3. Highly experimental OpenACC support. 
+   3. Highly experimental OpenACC support.
+   4. The iterative solvers are now defined in psb_linsolve_mod
+      and implemented in libpsb_linsolve.a; existing code using
+      Krylov methods will work with no changes. 
    
 Version 3.8.0-2
    1. CTXT is now an opaque object.

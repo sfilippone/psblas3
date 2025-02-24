@@ -107,15 +107,17 @@ install and the libraries will be installed under `/path/lib`, while the
 module files will be installed under `/path/modules`. The regular and
 experimental C interface header files are under `/path/include`.
 
-### CUDA and GPU support
+### Packaging changes, CUDA and GPU support
 
 This version of PSBLAS incorporates into a single package three
-entities that were previouslty separated:
+entities that were previously separated:
 | Library |                    |
 |---------|--------------------|
 | PSBLAS  | the base library   |
 | PSBLAS-EXT | a library providing additional storage formats for matrices and vectors |
-| SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
+								| SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
+Moreover, the module and library previously called psb_krylovv are now called
+psb_linsolve, but their usage is otherwise unchanged.								
 
 ### OpenACC
 There is a highly experimental version of an OpenACC interface,
