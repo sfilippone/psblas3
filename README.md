@@ -37,7 +37,7 @@ The architecture, philosophy and implementation details of the library are conta
   > P. D'Ambra, D. Di Serafino, S. Filippone, MLD2P4: A package of parallel algebraic multilevel domain decomposition preconditioners in Fortran 95 ACM Transactions on Mathematical Software, 2010, 37(3), 30
 
 PSBLAS is the backbone of the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
-> D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
+  > D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
 
 ### Other Software credits 
 
@@ -45,9 +45,9 @@ We originally included a modified implementation of some of the Sparker
 (serial sparse BLAS)  material; this has been completely rewritten, way
 beyond the intention(s) and responsibilities of the original developers.
 The main reference for the serial sparse BLAS is:
->Duff, I., Marrone, M., Radicati, G., and Vittoli, C. Level 3 basic 
->linear algebra subprograms for sparse matrices: a user level interface,
->ACM Trans. Math. Softw., 23(3), 379-401, 1997.
+  >Duff, I., Marrone, M., Radicati, G., and Vittoli, C. Level 3 basic 
+  >linear algebra subprograms for sparse matrices: a user level interface,
+  >ACM Trans. Math. Softw., 23(3), 379-401, 1997.
 
 ## Installing
 
