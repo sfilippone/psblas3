@@ -507,7 +507,7 @@ contains
     class(psb_c_vect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gthzv(n,idx,y)
+         &  call x%v%gth(n,idx,y)
 
   end subroutine c_vect_gthzv
 
@@ -1677,7 +1677,7 @@ contains
     class(psb_c_multivect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gthzv_x(i,n,idx,y)
+         &  call x%v%gth(i,n,idx,y)
 
   end subroutine c_mvect_gthzv_x
 
