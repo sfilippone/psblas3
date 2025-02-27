@@ -100,17 +100,17 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang ifx ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([xlc pgcc clang icc gcc cc ])
+AC_PROG_CC([xlc pgcc clang icx icc gcc cc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
    C99OPT="$ac_cv_prog_cc_stdc";
 fi	
 CFLAGS="$save_CFLAGS";
-AC_PROG_CXX([CC xlc++  clang++ icpc g++])
+AC_PROG_CXX([CC xlc++  clang++ icpx icpc g++])
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
 dnl AC_PROG_F90
@@ -144,22 +144,23 @@ else
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpiicx mpiicc mpcc mpicc cc])
+else
+    AC_MSG_NOTICE([test with $MPICC])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
-AC_LANG([Fortran])
 AC_LANG([C++])
 if test "X$MPICXX" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpx mpiicpc  mpicxx])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
 AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifx mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
