@@ -167,7 +167,6 @@ subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 end subroutine psb_base_csgetptn
 
@@ -254,7 +253,7 @@ subroutine  psb_base_allocate_mnnz(m,n,a,nz)
   integer(psb_ipk_), intent(in) :: m,n
   class(psb_base_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(in), optional  :: nz
-  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
 
@@ -262,8 +261,8 @@ subroutine  psb_base_allocate_mnnz(m,n,a,nz)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_base_allocate_mnnz
 
@@ -273,7 +272,7 @@ subroutine  psb_base_reallocate_nz(nz,a)
   implicit none 
   integer(psb_ipk_), intent(in) :: nz
   class(psb_base_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -281,8 +280,8 @@ subroutine  psb_base_reallocate_nz(nz,a)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_base_reallocate_nz
 
@@ -291,7 +290,7 @@ subroutine  psb_base_free(a)
   use psb_error_mod
   implicit none 
   class(psb_base_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='free'
   logical, parameter :: debug=.false.
 
@@ -299,8 +298,8 @@ subroutine  psb_base_free(a)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_base_free
 
@@ -309,7 +308,7 @@ subroutine  psb_base_trim(a)
   use psb_error_mod
   implicit none 
   class(psb_base_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
@@ -384,7 +383,6 @@ function psb_lbase_get_size(a) result(res)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 end function psb_lbase_get_size
 
@@ -401,12 +399,11 @@ subroutine psb_lbase_reinit(a,clear)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  info = psb_err_missing_override_method_
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_lbase_reinit
 
@@ -426,12 +423,11 @@ subroutine psb_lbase_sparse_print(iout,a,iv,head,ivr,ivc)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  info = psb_err_missing_override_method_
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_lbase_sparse_print
 
@@ -462,7 +458,6 @@ subroutine psb_lbase_csgetptn(imin,imax,a,nz,ia,ja,info,&
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 end subroutine psb_lbase_csgetptn
 
@@ -559,7 +554,6 @@ subroutine  psb_lbase_allocate_mnnz(m,n,a,nz)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 end subroutine psb_lbase_allocate_mnnz
 
@@ -578,7 +572,6 @@ subroutine  psb_lbase_reallocate_nz(nz,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 end subroutine psb_lbase_reallocate_nz
 
@@ -596,7 +589,6 @@ subroutine  psb_lbase_free(a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 end subroutine psb_lbase_free
 
