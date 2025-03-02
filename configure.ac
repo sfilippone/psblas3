@@ -717,7 +717,7 @@ if test "X$RANLIB" == "X" ; then
 fi
 
 # This should be portable
-AR="${AR} -cur"
+AR="${AR} -cDr"
 
 
 ###############################################################################
