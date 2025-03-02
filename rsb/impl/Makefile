@@ -24,7 +24,7 @@ psb_d_cp_rsb_to_coo.o psb_d_rsb_csmv.o
 objs: $(OBJS)
 
 lib: objs
-	ar cur ../$(LIBNAME) $(OBJS)
+	$(AR) ../$(LIBNAME) $(OBJS)
 
 clean:
 	/bin/rm -f $(OBJS)

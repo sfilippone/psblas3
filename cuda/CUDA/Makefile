@@ -29,7 +29,7 @@ psi_cuda_z_CopyCooToElg.o psi_cuda_z_CopyCooToHlg.o
 objs: $(CUDAOBJS)
 
 lib: objs
-	ar cur ../$(LIBNAME) $(CUDAOBJS)
+	$(AR) ../$(LIBNAME) $(CUDAOBJS)
 
 $(CUDAOBJS): psi_cuda_common.cuh psi_cuda_CopyCooToElg.cuh psi_cuda_CopyCooToHlg.cuh
 

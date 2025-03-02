@@ -15,7 +15,7 @@ all: includes objs
 objs: $(OBJS) iobjs
 
 lib: objs iobjs ilib
-	ar cur $(LIBNAME) $(OBJS)
+	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 iobjs:
