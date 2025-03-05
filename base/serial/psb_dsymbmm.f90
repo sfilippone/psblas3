@@ -84,6 +84,7 @@ end subroutine psb_dsymbmm
 
 subroutine psb_dbase_symbmm(a,b,c,info)
   use psb_mat_mod
+  use psb_sort_mod
   implicit none 
 
   class(psb_d_base_sparse_mat), intent(in) :: a,b
@@ -301,6 +302,7 @@ end subroutine psb_ldsymbmm
 
 subroutine psb_ldbase_symbmm(a,b,c,info)
   use psb_mat_mod
+  use psb_sort_mod
   implicit none 
 
   class(psb_ld_base_sparse_mat), intent(in) :: a,b
