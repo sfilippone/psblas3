@@ -482,12 +482,12 @@ if test "X$psblas_cv_fc" == X"nag" ; then
      FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="$EXTRA_OPT -mismatch_all"
 fi
-if test "X$psblas_cv_fc" == "Xgcc" ; then
-   FCOPT="-frecursive $FCOPT"  
-   PAC_HAVE_GFORTRAN_10(
-	[FCOPT="-fallow-argument-mismatch $FCOPT"],
-        [])  
-fi   
+dnl if test "X$psblas_cv_fc" == "Xgcc" ; then
+dnl   FCOPT="-frecursive $FCOPT"  
+dnl   PAC_HAVE_GFORTRAN_10(
+dnl	[FCOPT="-fallow-argument-mismatch $FCOPT"],
+dnl        [])  
+dnl fi   
 
 
 # COPT,FCOPT are aliases for CFLAGS,FCFLAGS .
