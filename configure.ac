@@ -449,7 +449,7 @@ if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   FCOPT="-g -O3 -frecursive $FCOPT"  
+   FCOPT="-g -O3 $FCOPT"  
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
@@ -482,12 +482,12 @@ if test "X$psblas_cv_fc" == X"nag" ; then
      FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="$EXTRA_OPT -mismatch_all"
 fi
-dnl if test "X$psblas_cv_fc" == "Xgcc" ; then
-dnl   FCOPT="-frecursive $FCOPT"  
+if test "X$psblas_cv_fc" == "Xgcc" ; then
+  FCOPT="-frecursive $FCOPT"  
 dnl   PAC_HAVE_GFORTRAN_10(
 dnl	[FCOPT="-fallow-argument-mismatch $FCOPT"],
 dnl        [])  
-dnl fi   
+fi   
 
 
 # COPT,FCOPT are aliases for CFLAGS,FCFLAGS .
