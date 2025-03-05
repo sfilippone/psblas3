@@ -10746,7 +10746,7 @@ if test "x$pac_cv_cuda_dir" != "x"; then
    CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
    CUDA_DEFINES="-DHAVE_CUDA"
    CPPFLAGS="$CUDA_INCLUDES $CPPFLAGS"
-   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib -L$pac_cv_cuda_dir/../math_libs/lib64"
    if test -f "$pac_cv_cuda_dir/bin/nvcc"; then
      CUDA_NVCC="$pac_cv_cuda_dir/bin/nvcc"
    else
@@ -10835,7 +10835,7 @@ if test "x$pac_cv_cuda_dir" != "x"; then
    CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
    CUDA_DEFINES="-DHAVE_CUDA"
    CPPFLAGS="$CUDA_INCLUDES $CPPFLAGS"
-   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib -L$pac_cv_cuda_dir/../math_libs/lib64"
    if test -f "$pac_cv_cuda_dir/bin/nvcc"; then
      CUDA_NVCC="$pac_cv_cuda_dir/bin/nvcc"
    else
