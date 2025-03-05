@@ -445,7 +445,7 @@ contains
       real(psb_dpk_)    :: beta,x(:), y(:)
       integer(psb_ipk_) :: k
       !$acc update device(x(1:n)) 
-      !$acc parallel loop present(x,y,idx)
+      !$acc parallel loop present(x,y)
       do k = 1, n
         y(idx(k)) = x(k) + beta *y(idx(k))
       end do
@@ -490,7 +490,7 @@ contains
       real(psb_dpk_) :: beta, x(:), y(:)
       integer(psb_ipk_) :: k
       !$acc update device(x(1:n)) 
-      !$acc parallel loop  present(x,y,idx)
+      !$acc parallel loop  present(x,y)
       do k = 1, n
         y(idx(k)) = x(k) + beta *y(idx(k))
       end do
@@ -559,7 +559,7 @@ contains
       real(psb_dpk_)   :: x(:), y(:)
       integer(psb_ipk_) :: k
       !
-      !$acc parallel loop present(x,y,idx)
+      !$acc parallel loop present(x,y)
       do k = 1, n
         y(k) = x(idx(k))
       end do
@@ -603,7 +603,7 @@ contains
       real(psb_dpk_) :: x(:), y(:)
       integer(psb_ipk_) :: k
       !
-      !$acc parallel loop present(x,y,idx)
+      !$acc parallel loop present(x,y)
       do k = 1, n
         y(k) = x(idx(k))
       end do
