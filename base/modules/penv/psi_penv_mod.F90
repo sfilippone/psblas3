@@ -812,7 +812,7 @@ contains
   end subroutine psb_info_epk
 #endif
   
-  subroutine psb_init_mpik(ctxt,np,basectxt,ids)
+  subroutine psb_init_mpik(ctxt,np,basectxt,ids,extcomm)
     use psb_const_mod
     use psb_error_mod
     use psb_mat_mod
@@ -827,7 +827,7 @@ contains
 #endif
     type(psb_ctxt_type), intent(out) :: ctxt
     type(psb_ctxt_type), intent(in), optional :: basectxt
-    integer(psb_mpk_), intent(in), optional :: np, ids(:)
+    integer(psb_mpk_), intent(in), optional :: np, ids(:), extcomm
 
     integer(psb_mpk_) :: i, isnullcomm, icomm
     integer(psb_mpk_), allocatable :: iids(:) 
@@ -861,6 +861,8 @@ contains
       else
         basecomm = mpi_comm_world
       end if
+    else if (present(extcomm)) then
+      basecomm = extcomm
     else
       basecomm = mpi_comm_world
     end if
