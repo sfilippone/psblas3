@@ -39,7 +39,7 @@
 
 int registerMappedFloatComplex(void  *buff, void **d_p, int n, cuFloatComplex dummy)
 {
-  return registerMappedMemory(buff,d_p,n*sizeof(cuFloatComplex));
+  return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(cuFloatComplex));
 }
 
 int writeMultiVecDeviceFloatComplex(void* deviceVec, cuFloatComplex* hostVec)
@@ -47,7 +47,7 @@ int writeMultiVecDeviceFloatComplex(void* deviceVec, cuFloatComplex* hostVec)
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
   // Ex updateFromHost vector function
   i = writeRemoteBuffer((void*) hostVec, (void *)devVec->v_, 
-			devVec->pitch_*devVec->count_*sizeof(cuFloatComplex));
+			((size_t) devVec->pitch_)*devVec->count_*sizeof(cuFloatComplex));
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","FallocMultiVecDevice",i);
   }
@@ -67,7 +67,7 @@ int readMultiVecDeviceFloatComplex(void* deviceVec, cuFloatComplex* hostVec)
 { int i,j;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
   i = readRemoteBuffer((void *) hostVec, (void *)devVec->v_, 
-		       devVec->pitch_*devVec->count_*sizeof(cuFloatComplex));
+		       ((size_t) devVec->pitch_)*devVec->count_*sizeof(cuFloatComplex));
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","readMultiVecDeviceFloat",i);
   }

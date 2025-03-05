@@ -36,11 +36,11 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.8.1, [https://github.com/sfilippone/psblas3/issues])
+AC_INIT([PSBLAS],3.9.0, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.8.1"
+psblas_cv_version="3.9.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -100,17 +100,17 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang-new ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang ifx ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([xlc pgcc clang icc gcc cc ])
+AC_PROG_CC([xlc pgcc clang icx icc gcc cc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
    C99OPT="$ac_cv_prog_cc_stdc";
 fi	
 CFLAGS="$save_CFLAGS";
-AC_PROG_CXX([CC xlc++  clang++ icpc g++])
+AC_PROG_CXX([CC xlc++  clang++ icpx icpc g++])
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
 dnl AC_PROG_F90
@@ -144,22 +144,23 @@ else
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpiicx mpiicc mpcc mpicc cc])
+else
+    AC_MSG_NOTICE([test with $MPICC])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
-AC_LANG([Fortran])
 AC_LANG([C++])
 if test "X$MPICXX" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpx mpiicpc  mpicxx])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
 AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifx mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
@@ -193,9 +194,11 @@ dnl NOTE : no spaces before the comma, and no brackets before the second argumen
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
 PAC_ARG_WITH_FLAGS(cxxopt,CXXOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
+PAC_ARG_WITH_FLAGS(extra-opt,EXTRA_OPT)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
 PAC_ARG_WITH_FLAGS(flibs,FLIBS)
+PAC_ARG_WITH_FLAGS(extra-nvcc,EXTRA_NVCC)
 
 dnl candidates for removal:
 PAC_ARG_WITH_FLAGS(library-path,LIBRARYPATH)
@@ -233,12 +236,12 @@ PAC_CHECK_HAVE_CRAYFTN(
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
-	psblas_cv_fc="xlf"
+	psblas_cv_fc="xlf";
 	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES"		  
+        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -247,22 +250,50 @@ if test x"$psblas_cv_fc" == "x" ; then
  elif eval "$MPIFC -V  2>&1 | grep Sun 2>/dev/null" ; then
    # Sun compiler detection
   
-   psblas_cv_fc="sun"
- elif eval "$MPIFC --version  2>&1 | grep flang-new 2>/dev/null" ; then
-   # Portland group compiler detection
-   
-   psblas_cv_fc="flang"
-   psblas_cv_define_prepend=""
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"		  
+   psblas_cv_fc="sun";
+ elif eval "$MPIFC --version  2>&1 | grep flang-new 2>&1 1>/dev/null" ; then
+   # LLVM compiler
+   psblas_cv_fc="flang-new";
+   psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
+   psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
+   psblas_cv_define_prepend="";
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
+   if test x"$psblas_shvs" != x""; then
+     AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
+     if (( $psblas_flang_shv < 20 )) ;   then	 
+        AC_MSG_ERROR([[The minimum supported LLVM version is version 20, bailing out. ]])
+     else
+        psblas_cv_fc="flang";
+     fi
+   else
+     AC_MSG_ERROR([[Unrecognized LLVM version. The minimum supported LLVM version is version 20, bailing out. ]])
+   fi  
+ elif eval "$MPIFC --version  2>&1 | grep flang 2>&1 1>/dev/null" ; then
+   # LLVM compiler
+   psblas_flang_version=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
+   psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
+   psblas_cv_fc="flang";
+   psblas_cv_define_prepend="";
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
+   if test x"$psblas_shvs" != x""; then
+     AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
+     if (( $psblas_flang_shv < 20 )) ;   then	 
+        AC_MSG_ERROR([[The minimum supported LLVM version is version 20, bailing out. ]])
+     fi
+   else
+     AC_MSG_ERROR([[Unrecognized LLVM version. The minimum supported LLVM version is version 20, bailing out. ]])
+   fi  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
     
-   psblas_cv_fc="ifc"
+   psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
-   psblas_cv_fc="nag"
-   FC="$MPIFC"
+   psblas_cv_fc="nag";
+   FC="$MPIFC";
  else
-   psblas_cv_fc=""
+   psblas_cv_fc="";
   # unsupported MPI Fortran compiler
      AC_MSG_NOTICE([[Unknown Fortran compiler, proceeding with fingers crossed !]])
  fi
@@ -449,7 +480,7 @@ fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
      FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
-     EXTRA_OPT="-mismatch_all"
+     EXTRA_OPT="$EXTRA_OPT -mismatch_all"
 fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
    FCOPT="-frecursive $FCOPT"  
@@ -686,7 +717,7 @@ if test "X$RANLIB" == "X" ; then
 fi
 
 # This should be portable
-AR="${AR} -cur"
+AR="${AR} -cDr"
 
 
 ###############################################################################
@@ -946,12 +977,14 @@ AC_SUBST(FCOPT)
 AC_SUBST(CCOPT)
 AC_SUBST(CXXOPT)
 AC_SUBST(EXTRA_OPT)
+AC_SUBST(EXTRA_NVCC)
 AC_SUBST(FAKEMPI)
 AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
 AC_SUBST(FLINK)
 AC_SUBST(LIBS)
+AC_SUBST(FLIBS)
 AC_SUBST(AR)
 AC_SUBST(RANLIB)
 AC_SUBST(MPIFC)
@@ -975,7 +1008,7 @@ AC_SUBST(CINCLUDES)
 AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
-PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(FLIBS) $(LIBS)
 CXXDEFINES=$(PSBCXXDEFINES) 
 CDEFINES=$(PSBCDEFINES) 
 FDEFINES=$(PSBFDEFINES) 

@@ -24,7 +24,7 @@ OBJS=cabs.o  camax.o  casum.o  caxpby.o  caxy.o  cdot.o  cgath.o \
 
 objs: $(OBJS)
 lib: objs
-	ar cur $(UP)/$(LIBNAME) $(OBJS)
+	$(AR) $(UP)/$(LIBNAME) $(OBJS)
 
 
 clean:

@@ -1,0 +1,12 @@
+$Format:%d%n%n$
+# Fall back version, probably last release:
+3.9.0
+
+# PSBLAS version file.
+#
+# Release archive created from commit:
+# $Format:%H %d$
+# $Format:Created on %ci by %cN, and$
+# $Format:signed by %GS using %GK.$
+# $Format:Signature status: %G?$
+$Format:%GG$

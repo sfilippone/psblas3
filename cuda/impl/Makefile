@@ -291,7 +291,7 @@ psb_z_cuda_dnsg_mat_impl.o
 
 objs: $(OBJS)
 lib:  objs
-	ar cur ../$(LIBNAME) $(OBJS)
+	$(AR) ../$(LIBNAME) $(OBJS)
 
 clean:
 	/bin/rm -f $(OBJS)

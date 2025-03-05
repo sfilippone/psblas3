@@ -77,7 +77,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
       cMat->mvbuffer = NULL;
     }
     //CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
-    allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);
+    allocRemoteBuffer((void **) &(cMat->mvbuffer), (size_t) bfsz);
     cMat->mvbsize = bfsz;
   }
   CHECK_CUSPARSE(cusparseCsrmvEx(*my_handle,
@@ -115,7 +115,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
       cMat->mvbuffer = NULL;
     }
     //CHECK_CUDA(cudaMalloc((void **) &(cMat->mvbuffer), bfsz));
-    allocRemoteBuffer((void **) &(cMat->mvbuffer), bfsz);
+    allocRemoteBuffer((void **) &(cMat->mvbuffer), (size_t) bfsz);
     
     cMat->mvbsize = bfsz;
   }
@@ -127,6 +127,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
   CHECK_CUSPARSE(cusparseDestroySpMat(*(cMat->spmvDescr)));
 #endif
+  return(0);
 }
 
 int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
@@ -189,7 +190,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 	cMat->svbuffer = NULL;
       }
       //CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
-      allocRemoteBuffer((void **) &(cMat->svbuffer), bfsz);
+      allocRemoteBuffer((void **) &(cMat->svbuffer), (size_t) bfsz);
     
       cMat->svbsize=bfsz;
       CHECK_CUSPARSE(cusparseSpSV_analysis(*my_handle,
@@ -215,6 +216,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   CHECK_CUSPARSE(cusparseDestroyDnVec(vecY) );
   CHECK_CUSPARSE(cusparseDestroySpMat(*(cMat->spmvDescr)));
 #endif
+  return(0);
 }
 
 #if CUDA_VERSION >=  11030
@@ -251,11 +253,14 @@ int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
   cMat->nz = nz;
   if (nr1 == 0) nr1 = 1;
   if (nz1 == 0) nz1 = 1;
-  if ((rc= allocRemoteBuffer(((void **) &(cMat->irp)), ((nr1+1)*sizeof(int)))) != 0)
+  if ((rc= allocRemoteBuffer(((void **) &(cMat->irp)),
+			     (((size_t) nr1+1)*sizeof(int)))) != 0)
     return(rc);
-  if ((rc= allocRemoteBuffer(((void **) &(cMat->ja)), ((nz1)*sizeof(int)))) != 0)
+  if ((rc= allocRemoteBuffer(((void **) &(cMat->ja)),
+			     (((size_t) nz1)*sizeof(int)))) != 0)
     return(rc);
-  if ((rc= allocRemoteBuffer(((void **) &(cMat->val)), ((nz1)*sizeof(TYPE)))) != 0)
+  if ((rc= allocRemoteBuffer(((void **) &(cMat->val)),
+			     (((size_t) nz1)*sizeof(TYPE)))) != 0)
     return(rc);
 #if CUDA_SHORT_VERSION <= 10  
   if ((rc= cusparseCreateMatDescr(&(cMat->descr))) !=0) 
@@ -286,7 +291,7 @@ int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
   /* } */
   if (bfsz > 0) {
     //CHECK_CUDA(cudaMalloc((void **) &(cMat->svbuffer), bfsz));
-    allocRemoteBuffer((void **) &(cMat->svbuffer), bfsz);
+    allocRemoteBuffer((void **) &(cMat->svbuffer), (size_t) bfsz);
 
   } else {
     cMat->svbuffer=NULL;
@@ -481,16 +486,16 @@ int T_CSRGHost2Device(T_Cmat *Matrix, int m, int n, int nz,
   cusparseHandle_t *my_handle=getHandle();
   
   if ((rc=writeRemoteBuffer((void *) irp, (void *) cMat->irp, 
-			    (m+1)*sizeof(int)))
+			    ((size_t) m+1)*sizeof(int)))
       != SPGPU_SUCCESS) 
     return(rc);
   
   if ((rc=writeRemoteBuffer((void *) ja,(void *) cMat->ja, 
-			    (nz)*sizeof(int)))
+			    ((size_t) nz)*sizeof(int)))
       != SPGPU_SUCCESS) 
     return(rc);
   if ((rc=writeRemoteBuffer((void *) val, (void *) cMat->val, 
-			    (nz)*sizeof(TYPE)))
+			    ((size_t) nz)*sizeof(TYPE)))
       != SPGPU_SUCCESS) 
     return(rc);
 #if (CUDA_SHORT_VERSION > 10  ) && (CUDA_VERSION <  11030)
@@ -515,14 +520,17 @@ int T_CSRGDevice2Host(T_Cmat *Matrix, int m, int n, int nz,
   int rc;
   T_CSRGDeviceMat *cMat = Matrix->mat;
   
-  if ((rc=readRemoteBuffer((void *) irp, (void *) cMat->irp, (m+1)*sizeof(int))) 
+  if ((rc=readRemoteBuffer((void *) irp, (void *) cMat->irp,
+			   ((size_t) m+1)*sizeof(int))) 
       != SPGPU_SUCCESS) 
     return(rc);
 
-  if ((rc=readRemoteBuffer((void *) ja, (void *) cMat->ja, (nz)*sizeof(int))) 
+  if ((rc=readRemoteBuffer((void *) ja, (void *) cMat->ja,
+			   ((size_t) nz)*sizeof(int))) 
       != SPGPU_SUCCESS) 
     return(rc);
-  if ((rc=readRemoteBuffer((void *) val, (void *) cMat->val, (nz)*sizeof(TYPE))) 
+  if ((rc=readRemoteBuffer((void *) val, (void *) cMat->val,
+			   ((size_t) nz)*sizeof(TYPE))) 
       != SPGPU_SUCCESS) 
     return(rc);
 
@@ -679,24 +687,27 @@ int T_HYBGHost2Device(T_Hmat *Matrix, int m, int n, int nz,
 
   if (nr1 == 0) nr1 = 1;
   if (nz1 == 0) nz1 = 1;
-  if ((rc= allocRemoteBuffer(((void **) &(hMat->irp)), ((nr1+1)*sizeof(int)))) != 0)
+  if ((rc= allocRemoteBuffer(((void **) &(hMat->irp)),
+			     (((size_t) nr1+1)*sizeof(int)))) != 0)
     return(rc);
-  if ((rc= allocRemoteBuffer(((void **) &(hMat->ja)), ((nz1)*sizeof(int)))) != 0)
+  if ((rc= allocRemoteBuffer(((void **) &(hMat->ja)),
+			     (((size_t) nz1)*sizeof(int)))) != 0)
     return(rc);
-  if ((rc= allocRemoteBuffer(((void **) &(hMat->val)), ((nz1)*sizeof(TYPE)))) != 0)
+  if ((rc= allocRemoteBuffer(((void **) &(hMat->val)),
+			     (((size_t) nz1)*sizeof(TYPE)))) != 0)
     return(rc);
 
   if ((rc=writeRemoteBuffer((void *) irp, (void *) hMat->irp, 
-			    (m+1)*sizeof(int)))
+			    ((size_t) m+1)*sizeof(int)))
       != SPGPU_SUCCESS) 
     return(rc);
   
   if ((rc=writeRemoteBuffer((void *) ja,(void *) hMat->ja, 
-			    (nz)*sizeof(int)))
+			    ((size_t) nz)*sizeof(int)))
       != SPGPU_SUCCESS) 
     return(rc);
   if ((rc=writeRemoteBuffer((void *) val, (void *) hMat->val, 
-			    (nz)*sizeof(TYPE)))
+			    ((size_t) nz)*sizeof(TYPE)))
       != SPGPU_SUCCESS) 
     return(rc);
   /* rc = (int) cusparseGetMatType(hMat->descr); */

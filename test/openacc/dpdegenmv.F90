@@ -558,7 +558,7 @@ program pdgenmv
   use psb_base_mod
   use psb_util_mod 
   use psb_ext_mod
-#if defined(HAVE_OPENACC)
+#ifdef OPENACC
   use psb_oacc_mod
 #endif
   use psb_d_pde3d_mod
@@ -580,12 +580,9 @@ program pdgenmv
   type(psb_desc_type)   :: desc_a
   ! dense matrices
   type(psb_d_vect_type), target :: xv, bv, xg, bg  
-#ifdef HAVE_OPENACC
-  type(psb_d_vect_oacc), target  :: vmold
-  type(psb_i_vect_oacc ) :: imold 
-  type(psb_d_oacc_csr_sparse_mat), target :: acsrg
-  type(psb_d_oacc_ell_sparse_mat), target :: aellg
-  type(psb_d_oacc_hll_sparse_mat), target :: ahllg
+#ifdef OPENACC
+  type(psb_d_vect_oacc)  :: vmold
+  type(psb_i_vect_oacc)  :: imold 
 #endif
   real(psb_dpk_), allocatable :: x1(:), x2(:), x0(:)
   ! blacs parameters
@@ -602,6 +599,11 @@ program pdgenmv
   type(psb_d_hll_sparse_mat), target   :: ahll
   type(psb_d_dia_sparse_mat), target   :: adia
   type(psb_d_hdia_sparse_mat), target   :: ahdia
+#ifdef OPENACC
+  type(psb_d_oacc_ell_sparse_mat), target   :: aelg
+  type(psb_d_oacc_csr_sparse_mat), target  :: acsrg
+  type(psb_d_oacc_hll_sparse_mat), target   :: ahlg
+#endif
   class(psb_d_base_sparse_mat), pointer :: agmold, acmold
   ! other variables
   logical, parameter :: dump=.false.
@@ -616,7 +618,7 @@ program pdgenmv
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
 
-#if defined(HAVE_OPENACC)
+#ifdef OPENACC
   call psb_oacc_init(ctxt)
 #endif
 
@@ -626,7 +628,7 @@ program pdgenmv
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='pdegenmv-cuda'
+  name='pdegenmv-oacc'
   !
   ! Hello world
   !
@@ -634,7 +636,7 @@ program pdgenmv
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
   write(*,*) 'Process ',iam,' running on OPENACC: '
 #endif
   !
@@ -688,18 +690,18 @@ program pdgenmv
     stop
   end if
 
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
   select case(psb_toupper(agfmt))
   case('ELG')
-    agmold => aellg
+    agmold => aelg
   case('HLG')
-    agmold => ahllg
+    agmold => ahlg
   case('CSRG')
     agmold => acsrg
   case default
-    write(*,*) 'Unknown format defaulting to HLG'
-    agmold => ahllg
+    agmold => ahlg
   end select
+#endif
   call a%cscnv(agpu,info,mold=agmold)
   if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
     write(0,*) 'From cscnv ',info
@@ -710,7 +712,7 @@ program pdgenmv
   
   call psb_geasb(bg,desc_a,info,scratch=.true.,mold=vmold)
   call psb_geasb(xg,desc_a,info,scratch=.true.,mold=vmold)
-#endif
+
   nr       = desc_a%get_local_rows()
   nrg      = desc_a%get_global_rows() 
   call psb_geall(x0,desc_a,info)
@@ -735,7 +737,6 @@ program pdgenmv
     call xv%bld(x0)
     call psb_geasb(bv,desc_a,info,scratch=.true.)
     
-#ifdef HAVE_OPENACC
     
     call aux_a%cscnv(agpu,info,mold=acoo)
     call xg%bld(x0,mold=vmold)
@@ -743,7 +744,7 @@ program pdgenmv
     call psb_barrier(ctxt)
     t1 = psb_wtime()
     call agpu%cscnv(info,mold=agmold)
-    !call psb_cuda_DeviceSync()
+!!$    call psb_oacc_DeviceSync()
     t2 = psb_Wtime() -t1
     call psb_amx(ctxt,t2)
     if (j==1) tcnvg1 = t2
@@ -762,7 +763,7 @@ program pdgenmv
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
 
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
   call xg%set(x0)
 
   ! FIXME: cache flush needed here
@@ -780,7 +781,7 @@ program pdgenmv
     end if
 
   end do
-  !call psb_cuda_DeviceSync()
+!!$  call psb_oacc_DeviceSync()
   call psb_barrier(ctxt)
   tt2 = psb_wtime() - tt1
   call psb_amx(ctxt,tt2)
@@ -807,7 +808,7 @@ program pdgenmv
     end if
 
   end do
-  !call psb_cuda_DeviceSync()
+!!$  call psb_oacc_DeviceSync()
   call psb_barrier(ctxt)
   gt2 = psb_wtime() - gt1
   call psb_amx(ctxt,gt2)
@@ -858,7 +859,7 @@ program pdgenmv
     tflops = flops
     gflops = flops * ngpu
     write(psb_out_unit,'("Storage type for    A: ",a)') a%get_fmt()
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
     write(psb_out_unit,'("Storage type for AGPU: ",a)') agpu%get_fmt()
     write(psb_out_unit,'("Time to convert A from COO to CPU (1): ",F20.9)')&
          & tcnvc1
@@ -888,7 +889,7 @@ program pdgenmv
          & t2*1.d3/(1.d0*ntests)
     write(psb_out_unit,'("MFLOPS                       (CPU)   : ",F20.3)')&
          & flops/1.d6
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
     write(psb_out_unit,'("Time for ",i6," products (s) (xGPU)  : ",F20.3)')&
          & ntests, tt2
     write(psb_out_unit,'("Time per product    (ms)     (xGPU)  : ",F20.3)')&
@@ -913,11 +914,11 @@ program pdgenmv
     bdwdth = ntests*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (CPU)  : ",F20.3)') bdwdth
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
     bdwdth = ngpu*ntests*nbytes/(gt2*1.d6)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
-    !bdwdth = psb_cuda_MemoryPeakBandwidth()
-    !write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth
+!!$    bdwdth = psb_oacc_MemoryPeakBandwidth()
+    write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth
 #endif
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
@@ -938,7 +939,7 @@ program pdgenmv
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-#ifdef HAVE_OPENACC
+#ifdef OPENACC
   call psb_oacc_exit()
 #endif
   call psb_exit(ctxt)
@@ -964,7 +965,7 @@ contains
     if (iam == 0) then
       write(*,*) 'CPU side format?'
       read(psb_inp_unit,*) acfmt
-      write(*,*) 'GPU side format?'
+      write(*,*) 'OACC side format?'
       read(psb_inp_unit,*) agfmt
       write(*,*) 'Size of discretization cube?'
       read(psb_inp_unit,*) idim

@@ -45,7 +45,8 @@ subroutine psi_d_exscanv(n,x,info,shift)
   real(psb_dpk_) :: shift_, tp, ts
   integer(psb_ipk_) :: i
   logical is_nested, is_parallel
-  
+
+  info = psb_success_
   if (present(shift)) then
     shift_ = shift
   else

@@ -54,7 +54,6 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iia, jja
-  integer(psb_lpk_) :: localnnz
   character(len=20) :: name, ch_err
   !
   name='psb_dget_nnz'
@@ -72,9 +71,9 @@ function  psb_dget_nnz(a,desc_a,info) result(res)
     goto 9999
   endif
 
-  localnnz = a%get_nzeros()
+  res = a%get_nzeros()
 
-  call psb_sum(ctxt,localnnz)
+  call psb_sum(ctxt,res)
 
   call psb_erractionrestore(err_act)
   return

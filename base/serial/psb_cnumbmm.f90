@@ -40,7 +40,8 @@
 !
 !
 subroutine psb_cnumbmm(a,b,c)
-  use psb_base_mod, psb_protect_name => psb_cnumbmm
+  use psb_mat_mod
+  use psb_c_serial_mod, only :  psb_cbase_numbmm
   implicit none 
 
   type(psb_cspmat_type), intent(in) :: a,b
@@ -60,7 +61,7 @@ subroutine psb_cnumbmm(a,b,c)
 
   select type(aa=>c%a)
   type is (psb_c_csr_sparse_mat)
-    call psb_numbmm(a%a,b%a,aa)
+    call psb_cbase_numbmm(a%a,b%a,aa)
   class default
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -81,7 +82,6 @@ end subroutine psb_cnumbmm
 subroutine psb_cbase_numbmm(a,b,c)
   use psb_mat_mod
   use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_cbase_numbmm
   implicit none 
 
   class(psb_c_base_sparse_mat), intent(in) :: a,b
@@ -234,10 +234,10 @@ contains
 
 end subroutine psb_cbase_numbmm
 
-
-
 subroutine psb_lcnumbmm(a,b,c)
-  use psb_base_mod, psb_protect_name => psb_lcnumbmm
+  use psb_mat_mod
+  use psb_c_serial_mod, only :  psb_lcbase_numbmm
+
   implicit none 
 
   type(psb_lcspmat_type), intent(in) :: a,b
@@ -257,7 +257,7 @@ subroutine psb_lcnumbmm(a,b,c)
 
   select type(aa=>c%a)
   type is (psb_lc_csr_sparse_mat)
-    call psb_numbmm(a%a,b%a,aa)
+    call psb_lcbase_numbmm(a%a,b%a,aa)
   class default
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -278,7 +278,6 @@ end subroutine psb_lcnumbmm
 subroutine psb_lcbase_numbmm(a,b,c)
   use psb_mat_mod
   use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_lcbase_numbmm
   implicit none 
 
   class(psb_lc_base_sparse_mat), intent(in) :: a,b

@@ -609,6 +609,7 @@ subroutine  psb_c_coo_clean_zeros(a, info)
     end if
   end do
   call a%set_nzeros(j)
+  call a%fix(info)
   call a%trim()
 end subroutine psb_c_coo_clean_zeros
 
@@ -2946,13 +2947,15 @@ contains
 
     info = psb_success_
 #if defined(OPENMP)
+    ! Disabling OpenMP parallel do  for the time being.
+    ! Will need to redesign the entire code stack
     ! The logic here is different from the one used for
     ! the serial version: each element is stored in data
     ! structures but the invalid ones are stored as '-1' values.
     ! These values will be filtered in a future fixing process.
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
-    !$OMP shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
-    !$OMP private(ir,ic,i)
+    ! $ O M P PARALLEL DO schedule(STATIC) &
+    ! $ O M P shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
+    ! $ O M P private(ir,ic,i)
     do i=1,nz
       ir = ia(i)
       ic = ja(i)
@@ -2966,7 +2969,7 @@ contains
         aspk(nza+i) = -1
       end if
     end do
-    !$OMP END PARALLEL DO
+    ! $ O M P END PARALLEL DO
     nza = nza + nz
 #else
     do i=1, nz
@@ -4308,7 +4311,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     iaux(:) = 0
     !$omp end workshare
     maxnzr = 0   
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP PARALLEL DO schedule(STATIC) &
     !$OMP shared(nzin,ia,nr,iaux,maxnzr) &
     !$OMP private(i) &
     !$OMP reduction(.and.:use_buffers)
@@ -4324,7 +4327,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     end do
     !$OMP END PARALLEL DO
     maxnzr = 0
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
+    !$OMP PARALLEL DO schedule(STATIC) &
     !$OMP private(i) shared(nr,iaux)&
     !$OMP reduction(max:maxnzr)
     do i=1,nr
@@ -4372,7 +4375,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     err = 0
     ! Here, starting from 'iaux', we apply a fixing in order to obtain the starting
     ! index for each row. We do the same on 'kaux'
-    !$OMP PARALLEL default(none) &
+    !$OMP PARALLEL &
     !$OMP shared(maxnzr,idxaux,ia,ja,val,ias,jas,vs,nthreads,nr,nc,nzin,iaux,kaux,dupl,err) &
     !$OMP private(s,i,j,k,ithread,idxstart,idxend,work,nxt_val,old_val,saved_elem, &
     !$OMP first_elem,last_elem,nzl,iret,act_row,i1,i2) reduction(max: info)
@@ -4732,7 +4735,7 @@ subroutine psb_c_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
 #if defined(OPENMP)
-    !$OMP PARALLEL default(none) &
+    !$OMP PARALLEL &
     !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads,maxnzr) &
     !$OMP private(i,j,idxstart,idxend,nzl,act_row,iret,ithread, &
     !$OMP work,first_elem,last_elem)

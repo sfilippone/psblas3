@@ -27,7 +27,6 @@ DPGOBJS=dpdegenmv.o #data_input.o
 all: dir psb_d_oacc_pde3d dpdegenmv 
 dpdegenmv: dir 
 
-
 #$(OBJS)
 #	$(FC) $(FFLAGS) $(OBJS) -o datavect $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS)
 #	/bin/mv datavect $(EXEDIR)
@@ -53,6 +52,11 @@ psb_d_oacc_pde3d:
 	mpifort -fallow-argument-mismatch -frecursive -g -O3 -frecursive  -I../../modules/ -I. -DOPENACC -DHAVE_LAPACK -DHAVE_FLUSH_STMT -DLPK8 -DIPK4 -DMPI_MOD   -c psb_d_oacc_pde3d.F90 -o psb_d_oacc_pde3d.o
 	$(FLINK) -fopenacc -DOPENACC psb_d_oacc_pde3d.o -o psb_d_oacc_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_oacc_pde3d $(EXEDIR)
+
+dpdegenmv:
+	mpifort -fallow-argument-mismatch -frecursive -g -O3 -frecursive  -I../../modules/ -I. -DOPENACC -DHAVE_LAPACK -DHAVE_FLUSH_STMT -DLPK8 -DIPK4 -DMPI_MOD   -c dpdegenmv.F90 -o dpdegenmv.o
+	$(FLINK) -fopenacc -DOPENACC dpdegenmv.o -o dpdegenmv $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv dpdegenmv $(EXEDIR)
 
 clean:
 	/bin/rm -fr *.o *.mod $(EXEDIR)/*

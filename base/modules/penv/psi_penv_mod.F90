@@ -711,9 +711,9 @@ contains
       subroutine psi_c_diffadd(p1, p2, val) &
            & bind(c,name="psi_c_diffadd")
         use iso_c_binding
-        import :: psb_mpk_
+        import :: psb_mpk_, psb_epk_
         type(c_ptr), value :: p1, p2
-        integer(psb_mpk_) :: val
+        integer(psb_epk_) :: val
       end subroutine psi_c_diffadd
     end interface
     

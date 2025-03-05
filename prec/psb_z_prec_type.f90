@@ -60,6 +60,7 @@ module psb_z_prec_type
     generic, public                     :: set => cseti, csetc, csetr
     procedure, pass(prec)               :: allocate_wrk => psb_z_allocate_wrk
     procedure, pass(prec)               :: free_wrk => psb_z_free_wrk
+    procedure, pass(prec)               :: deallocate_wrk => psb_z_free_wrk
     procedure, pass(prec)               :: is_allocated_wrk => psb_z_is_allocated_wrk
   end type psb_zprec_type
 

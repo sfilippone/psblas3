@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "cuda_runtime.h"
 #include "core.h" 
@@ -44,12 +45,12 @@
 #include "fcusparse.h"
 #include "cublas_v2.h"
 
-int allocRemoteBuffer(void** buffer, int count);
-int allocMappedMemory(void **buffer, void **dp, int size);
-int registerMappedMemory(void *buffer, void **dp, int size);
+int allocRemoteBuffer(void** buffer, size_t count);
+int allocMappedMemory(void **buffer, void **dp, size_t size);
+int registerMappedMemory(void *buffer, void **dp, size_t size);
 int unregisterMappedMemory(void *buffer);
-int writeRemoteBuffer(void* hostSrc, void* buffer, int count);
-int readRemoteBuffer(void* hostDest, void* buffer, int count);
+int writeRemoteBuffer(void* hostSrc, void* buffer, size_t count);
+int readRemoteBuffer(void* hostDest, void* buffer, size_t count);
 int freeRemoteBuffer(void* buffer);
 int gpuInit(int dev);
 int getDeviceCount();

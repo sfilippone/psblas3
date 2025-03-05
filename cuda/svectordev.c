@@ -39,14 +39,15 @@
 
 int registerMappedFloat(void  *buff, void **d_p, int n, float dummy)
 {
-  return registerMappedMemory(buff,d_p,n*sizeof(float));
+  return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(float));
 }
 
 int writeMultiVecDeviceFloat(void* deviceVec, float* hostVec)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
   // Ex updateFromHost vector function
-  i = writeRemoteBuffer((void*) hostVec, (void *)devVec->v_, devVec->pitch_*devVec->count_*sizeof(float));
+  i = writeRemoteBuffer((void*) hostVec, (void *)devVec->v_,
+			((size_t) devVec->pitch_)*devVec->count_*sizeof(float));
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","FallocMultiVecDevice",i);
   }
@@ -66,7 +67,7 @@ int readMultiVecDeviceFloat(void* deviceVec, float* hostVec)
 { int i,j;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
   i = readRemoteBuffer((void *) hostVec, (void *)devVec->v_, 
-		       devVec->pitch_*devVec->count_*sizeof(float));
+		       ((size_t) devVec->pitch_)*devVec->count_*sizeof(float));
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","readMultiVecDeviceFloat",i);
   }

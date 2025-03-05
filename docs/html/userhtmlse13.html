@@ -16,16 +16,16 @@ href="userhtmlse12.html#tailuserhtmlse12.html" >prev-tail</a>] [<a
 href="userhtmlse10.html#tailuserhtmlse13.html">tail</a>] [<a 
 href="userhtml.html# " >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">13    </span> <a 
- id="x20-15500013"></a>CUDA Environment Routines</h3>
+ id="x20-15700013"></a>CUDA Environment Routines</h3>
 <!--l. 91--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-156000"></a>psb_cuda_init &#8212; Initializes PSBLAS-CUDA environment</h4>
+ id="x20-158000"></a>psb_cuda_init &#8212; Initializes PSBLAS-CUDA environment</h4>
 <a 
- id="Q1-20-194"></a>
+ id="Q1-20-196"></a>
 <div class="center" 
 >
 <!--l. 99--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-110">
+<div class="minipage"><pre class="verbatim" id="verbatim-112">
 call&#x00A0;psb_cuda_init(ctxt&#x00A0;[,&#x00A0;device])
 </pre>
 <!--l. 103--><p class="nopar" >                                                           </div></div>
@@ -64,17 +64,17 @@ class="pplb7t-x-x-120">Notes</span>
                                                                   
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x20-156002x1">
+  class="enumerate" id="x20-158002x1">
      <!--l. 125--><p class="noindent" >A call to this routine must precede any other PSBLAS-CUDA call.</li></ol>
 <!--l. 129--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-157000"></a>psb_cuda_exit &#8212; Exit from PSBLAS-CUDA environment</h4>
+ id="x20-159000"></a>psb_cuda_exit &#8212; Exit from PSBLAS-CUDA environment</h4>
 <a 
- id="Q1-20-196"></a>
+ id="Q1-20-198"></a>
 <div class="center" 
 >
 <!--l. 137--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-111">
+<div class="minipage"><pre class="verbatim" id="verbatim-113">
 call&#x00A0;psb_cuda_exit(ctxt)
 </pre>
 <!--l. 141--><p class="nopar" >                                                           </div></div>
@@ -106,16 +106,16 @@ class="pplb7t-">in</span>.<br
 class="newline" />Specified as: an integer variable.</dd></dl>
 <!--l. 161--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-158000"></a>psb_cuda_DeviceSync &#8212; Synchronize CUDA device</h4>
+ id="x20-160000"></a>psb_cuda_DeviceSync &#8212; Synchronize CUDA device</h4>
 <a 
- id="Q1-20-198"></a>
+ id="Q1-20-200"></a>
                                                                   
 
                                                                   
 <div class="center" 
 >
 <!--l. 169--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-112">
+<div class="minipage"><pre class="verbatim" id="verbatim-114">
 call&#x00A0;psb_cuda_DeviceSync()
 </pre>
 <!--l. 173--><p class="nopar" >                                                           </div></div>
@@ -123,26 +123,26 @@ call&#x00A0;psb_cuda_DeviceSync()
 CUDA-side code, have completed.
 <!--l. 182--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-159000"></a>psb_cuda_getDeviceCount </h4>
+ id="x20-161000"></a>psb_cuda_getDeviceCount </h4>
 <a 
- id="Q1-20-200"></a>
+ id="Q1-20-202"></a>
 <div class="center" 
 >
 <!--l. 190--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-113">
+<div class="minipage"><pre class="verbatim" id="verbatim-115">
 ngpus&#x00A0;=&#x00A0;&#x00A0;psb_cuda_getDeviceCount()
 </pre>
 <!--l. 194--><p class="nopar" >                                                           </div></div>
 <!--l. 199--><p class="noindent" >Get number of devices available on current computing node.
 <!--l. 201--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-160000"></a>psb_cuda_getDevice </h4>
+ id="x20-162000"></a>psb_cuda_getDevice </h4>
 <a 
- id="Q1-20-202"></a>
+ id="Q1-20-204"></a>
 <div class="center" 
 >
 <!--l. 209--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-114">
+<div class="minipage"><pre class="verbatim" id="verbatim-116">
 ngpus&#x00A0;=&#x00A0;&#x00A0;psb_cuda_getDevice()
 </pre>
 <!--l. 213--><p class="nopar" >                                                           </div></div>
@@ -152,39 +152,39 @@ ngpus&#x00A0;=&#x00A0;&#x00A0;psb_cuda_getDevice()
                                                                   
 <!--l. 220--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-161000"></a>psb_cuda_setDevice </h4>
+ id="x20-163000"></a>psb_cuda_setDevice </h4>
 <a 
- id="Q1-20-204"></a>
+ id="Q1-20-206"></a>
 <div class="center" 
 >
 <!--l. 228--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-115">
+<div class="minipage"><pre class="verbatim" id="verbatim-117">
 info&#x00A0;=&#x00A0;psb_cuda_setDevice(dev)
 </pre>
 <!--l. 232--><p class="nopar" >                                                           </div></div>
 <!--l. 237--><p class="noindent" >Set device to be used by current process.
 <!--l. 239--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-162000"></a>psb_cuda_DeviceHasUVA </h4>
+ id="x20-164000"></a>psb_cuda_DeviceHasUVA </h4>
 <a 
- id="Q1-20-206"></a>
+ id="Q1-20-208"></a>
 <div class="center" 
 >
 <!--l. 247--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-116">
+<div class="minipage"><pre class="verbatim" id="verbatim-118">
 hasUva&#x00A0;=&#x00A0;psb_cuda_DeviceHasUVA()
 </pre>
 <!--l. 251--><p class="nopar" >                                                           </div></div>
 <!--l. 256--><p class="noindent" >Returns true if device currently in use supports UVA (Unified Virtual Addressing).
 <!--l. 259--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-163000"></a>psb_cuda_WarpSize </h4>
+ id="x20-165000"></a>psb_cuda_WarpSize </h4>
 <a 
- id="Q1-20-208"></a>
+ id="Q1-20-210"></a>
 <div class="center" 
 >
 <!--l. 267--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-117">
+<div class="minipage"><pre class="verbatim" id="verbatim-119">
 nw&#x00A0;=&#x00A0;psb_cuda_WarpSize()
 </pre>
 <!--l. 271--><p class="nopar" >                                                           </div></div>
@@ -194,39 +194,39 @@ nw&#x00A0;=&#x00A0;psb_cuda_WarpSize()
                                                                   
 <!--l. 279--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-164000"></a>psb_cuda_MultiProcessors </h4>
+ id="x20-166000"></a>psb_cuda_MultiProcessors </h4>
 <a 
- id="Q1-20-210"></a>
+ id="Q1-20-212"></a>
 <div class="center" 
 >
 <!--l. 287--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-118">
+<div class="minipage"><pre class="verbatim" id="verbatim-120">
 nmp&#x00A0;=&#x00A0;psb_cuda_MultiProcessors()
 </pre>
 <!--l. 291--><p class="nopar" >                                                           </div></div>
 <!--l. 296--><p class="noindent" >Returns the number of multiprocessors in the CUDA device.
 <!--l. 298--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-165000"></a>psb_cuda_MaxThreadsPerMP </h4>
+ id="x20-167000"></a>psb_cuda_MaxThreadsPerMP </h4>
 <a 
- id="Q1-20-212"></a>
+ id="Q1-20-214"></a>
 <div class="center" 
 >
 <!--l. 306--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-119">
+<div class="minipage"><pre class="verbatim" id="verbatim-121">
 nt&#x00A0;=&#x00A0;psb_cuda_MaxThreadsPerMP()
 </pre>
 <!--l. 310--><p class="nopar" >                                                           </div></div>
 <!--l. 315--><p class="noindent" >Returns the maximum number of threads per multiprocessor.
 <!--l. 318--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-166000"></a>psb_cuda_MaxRegistersPerBlock </h4>
+ id="x20-168000"></a>psb_cuda_MaxRegistersPerBlock </h4>
 <a 
- id="Q1-20-214"></a>
+ id="Q1-20-216"></a>
 <div class="center" 
 >
 <!--l. 326--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-120">
+<div class="minipage"><pre class="verbatim" id="verbatim-122">
 nr&#x00A0;=&#x00A0;psb_cuda_MaxRegistersPerBlock()
 </pre>
 <!--l. 330--><p class="nopar" >                                                           </div></div>
@@ -236,39 +236,39 @@ nr&#x00A0;=&#x00A0;psb_cuda_MaxRegistersPerBlock()
                                                                   
 <!--l. 338--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-167000"></a>psb_cuda_MemoryClockRate </h4>
+ id="x20-169000"></a>psb_cuda_MemoryClockRate </h4>
 <a 
- id="Q1-20-216"></a>
+ id="Q1-20-218"></a>
 <div class="center" 
 >
 <!--l. 346--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-121">
+<div class="minipage"><pre class="verbatim" id="verbatim-123">
 cl&#x00A0;=&#x00A0;psb_cuda_MemoryClockRate()
 </pre>
 <!--l. 350--><p class="nopar" >                                                           </div></div>
 <!--l. 355--><p class="noindent" >Returns the memory clock rate in KHz, as an integer.
 <!--l. 357--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-168000"></a>psb_cuda_MemoryBusWidth </h4>
+ id="x20-170000"></a>psb_cuda_MemoryBusWidth </h4>
 <a 
- id="Q1-20-218"></a>
+ id="Q1-20-220"></a>
 <div class="center" 
 >
 <!--l. 365--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-122">
+<div class="minipage"><pre class="verbatim" id="verbatim-124">
 nb&#x00A0;=&#x00A0;psb_cuda_MemoryBusWidth()
 </pre>
 <!--l. 369--><p class="nopar" >                                                           </div></div>
 <!--l. 374--><p class="noindent" >Returns the memory bus width in bits.
 <!--l. 376--><p class="noindent" >
    <h4 class="likesubsectionHead"><a 
- id="x20-169000"></a>psb_cuda_MemoryPeakBandwidth </h4>
+ id="x20-171000"></a>psb_cuda_MemoryPeakBandwidth </h4>
 <a 
- id="Q1-20-220"></a>
+ id="Q1-20-222"></a>
 <div class="center" 
 >
 <!--l. 384--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-123">
+<div class="minipage"><pre class="verbatim" id="verbatim-125">
 bw&#x00A0;=&#x00A0;psb_cuda_MemoryPeakBandwidth()
 </pre>
 <!--l. 388--><p class="nopar" >                                                           </div></div>

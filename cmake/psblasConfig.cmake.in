@@ -1,0 +1,11 @@
+# Config file for the installed package
+
+set(psblas_VERSION "@psblas_VERSION@")
+
+# Include directories
+set(psblas_INCLUDE_DIRS "@CMAKE_INSTALL_INCLUDEDIR@")
+
+include(CMakeFindDependencyMacro)
+
+# Provide the targets
+include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")

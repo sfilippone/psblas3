@@ -47,9 +47,9 @@ psb_renum_mod.o: psb_s_renum_mod.o psb_d_renum_mod.o psb_c_renum_mod.o psb_z_ren
 $(IMPLOBJS): $(BASEOBJS)
 
 veryclean: clean
-	/bin/rm -f $(HERE)/$(LIBNAME)
+	/bin/rm -f $(HERE)/$(LIBNAME) 
 
 clean:
-	/bin/rm -f $(OBJS) $(LOCAL_MODS)
+	/bin/rm -f $(OBJS) $(LOCAL_MODS) *$(.mod)
 
 veryclean: clean
