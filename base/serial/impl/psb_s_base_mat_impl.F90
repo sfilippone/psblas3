@@ -584,7 +584,7 @@ subroutine psb_s_base_csclip(a,b,info,&
     nb = a%get_ncols()  ! Should this be jmax_ ??
   endif
   call b%allocate(mb,nb)
-  call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
+  call a%csgetrow(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin_, jmax=jmax_, append=.false., &
        & nzin=nzin, rscale=rscale_, cscale=cscale_)
   if (info /= psb_success_) goto 9999

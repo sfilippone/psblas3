@@ -503,7 +503,7 @@ contains
     class(psb_s_vect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gth(n,idx,alpha,beta,y)
+         &  call x%v%gthab(n,idx,alpha,beta,y)
 
   end subroutine s_vect_gthab
 
@@ -514,7 +514,7 @@ contains
     class(psb_s_vect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gth(n,idx,y)
+         &  call x%v%gthzv(n,idx,y)
 
   end subroutine s_vect_gthzv
 
@@ -950,7 +950,7 @@ contains
 
     info = 0
     if (allocated(x%v).and.allocated(y%v)) &
-         & call x%v%div(y%v,info,flag)
+         & call x%v%div_v_check(y%v,info,flag)
 
   end subroutine s_vect_div_v_check
 
@@ -966,7 +966,7 @@ contains
 
     info = 0
     if (allocated(x%v).and.allocated(y%v).and.allocated(z%v)) &
-         & call z%v%div(x%v,y%v,info,flag)
+         & call z%v%div_v2_check(x%v,y%v,info,flag)
 
   end subroutine s_vect_div_v2_check
 
@@ -981,7 +981,7 @@ contains
 
     info = 0
     if (allocated(z%v)) &
-         & call z%v%div(x,y,info)
+         & call z%v%div_a2(x,y,info)
 
   end subroutine s_vect_div_a2
 
@@ -997,7 +997,7 @@ contains
 
     info = 0
     if (allocated(z%v)) &
-         & call z%v%div(x,y,info,flag)
+         & call z%v%div_a2_check(x,y,info,flag)
 
   end subroutine s_vect_div_a2_check
 
@@ -1733,7 +1733,7 @@ contains
     class(psb_s_multivect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gth(n,idx,alpha,beta,y)
+         &  call x%v%gthab(n,idx,alpha,beta,y)
 
   end subroutine s_mvect_gthab
 
@@ -1744,7 +1744,7 @@ contains
     class(psb_s_multivect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gth(n,idx,y)
+         &  call x%v%gthzv(n,idx,y)
 
   end subroutine s_mvect_gthzv
 
@@ -1756,7 +1756,7 @@ contains
     class(psb_s_multivect_type) :: x
 
     if (allocated(x%v)) &
-         &  call x%v%gth(i,n,idx,y)
+         &  call x%v%gthzv_x(i,n,idx,y)
 
   end subroutine s_mvect_gthzv_x
 
