@@ -583,6 +583,9 @@ program pdgenmv
 #ifdef OPENACC
   type(psb_d_vect_oacc)  :: vmold
   type(psb_i_vect_oacc)  :: imold 
+#else
+  type(psb_d_base_vect_type)  :: vmold
+  type(psb_i_base_vect_type)  :: imold
 #endif
   real(psb_dpk_), allocatable :: x1(:), x2(:), x0(:)
   ! blacs parameters
@@ -749,7 +752,6 @@ program pdgenmv
     call psb_amx(ctxt,t2)
     if (j==1) tcnvg1 = t2
     tcnvgpu = tcnvgpu + t2
-#endif
   end do
 
 
