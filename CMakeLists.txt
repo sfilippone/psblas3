@@ -353,8 +353,12 @@ find_package(METIS)
 include(GNUInstallDirs)
 #set(mod_dir_tail "${${CMAKE_PROJECT_NAME}_dist_string}_${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
+set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE STRING "Include directory")
+set(CMAKE_INSTALL_MODULDIR "modules" CACHE STRING "Module directory")
+
 
 #-----------------------------------
 # Turn on testing/ctest capabilities
@@ -397,15 +401,16 @@ write_basic_package_version_file(
   COMPATIBILITY SameMajorVersion
   )
 
-configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}Config.cmake.in"
+configure_file("${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake" @ONLY)
 
 install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
   DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
+    "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}"
 )
 
 #------------------------------------------
@@ -804,11 +809,31 @@ message(STATUS "\t\t ${CMAKE_INSTALL_LIBDIR}")
 #  DESTINATION include
 #)
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
-  FILES_MATCHING PATTERN "*.h")
+#install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
+#  FILES_MATCHING PATTERN "*.h")
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
-  FILES_MATCHING PATTERN "*.mod")
+#install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
+#  FILES_MATCHING PATTERN "*.mod")
+
+
+#install(DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" DESTINATION "include"
+#  FILES_MATCHING PATTERN "*.h")
+
+#install(DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MODULDIR}" DESTINATION "modules"
+#  FILES_MATCHING PATTERN "*.mod")
+
+# Install header files
+install(DIRECTORY ${CMAKE_BINARY_DIR}/include/
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"  # This will place headers in <prefix>/include
+  FILES_MATCHING PATTERN "*.h"
+)
+
+# Install module files
+install(DIRECTORY ${CMAKE_BINARY_DIR}/modules/
+  DESTINATION "${CMAKE_INSTALL_MODULDIR}"  # This will place .mod files in <prefix>/modules
+  FILES_MATCHING PATTERN "*.mod"
+)
+
 
 
 install(TARGETS base prec linsolve ext util cbind
@@ -834,26 +859,40 @@ if(WIN32)
   endif()
 endif()
 
-# Step 2: Create the configuration file from the template
-configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/psblasConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
-)
 
-# Step 3: Install the generated config files
-install(FILES 
-  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
-)
+#configure_package_config_file(
+#  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/psblasConfig.cmake.in"
+#  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
+#  INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake/psblas"
+#)
 
-# Step 4: Export targets so that the build directory can be used directly
-export(
-  EXPORT ${CMAKE_PROJECT_NAME}-targets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
-    NAMESPACE psblas::
-)
+#install(FILES 
+#  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
+#  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfigVersion.cmake"
+#  DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake/psblas"
+#)
+
+
+#export(
+#  EXPORT ${CMAKE_PROJECT_NAME}-targets
+#  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
+#    NAMESPACE psblas::
+#)
+
+
+
+
+
+
+
+
+
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX};")
+message(STATUS "CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR};")
+message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR};")
+message(STATUS "CMAKE_INSTALL_MODULDIR: ${CMAKE_INSTALL_MODULDIR};")
+
+
 #-----------------
 # Add PSBLAS tests
 #-----------------
