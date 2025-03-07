@@ -687,6 +687,8 @@ PRECLIBNAME
 RSB_LIBS
 LIBDIR
 PSBLASRULES
+LPK
+IPK
 FINCLUDES
 CINCLUDES
 METIS_LIBS
@@ -6816,14 +6818,6 @@ fi
 ###############################################################################
 #	Linking, symbol mangling, and misc tests
 ###############################################################################
-
-# Note : This is functional to Make.inc rules and structure (see below).
-#AC_LANG([C])
-#AC_CHECK_SIZEOF(void *)
-## Define for platforms with 64 bit (void *     ) pointers
-#if test X"$ac_cv_sizeof_void_p" == X"8" ; then
-#  CDEFINES="-DPtr64Bits $CDEFINES"
-#fi
 ac_ext=${ac_fc_srcext-f}
 ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
@@ -6983,40 +6977,6 @@ pac_fc_sec_under=${pac_fc_under#*,}
 pac_fc_sec_under=${pac_fc_sec_under# }
 pac_fc_under=${pac_fc_under%%,*}
 pac_fc_under=${pac_fc_under# }
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking defines for C/Fortran name interfaces" >&5
-printf %s "checking defines for C/Fortran name interfaces... " >&6; }
-if test "x$pac_fc_case" == "xlower case"; then
-   if test "x$pac_fc_under" == "xunderscore"; then
-      if test "x$pac_fc_sec_under" == "xno extra underscore"; then
-          pac_f_c_names="-DLowerUnderscore"
-      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
-          pac_f_c_names="-DLowerDoubleUnderscore"
-      else
-          pac_f_c_names="-DUNKNOWN"
-      fi
-   elif test "x$pac_fc_under" == "xno underscore"; then
-      pac_f_c_names="-DLowerCase"
-   else
-      pac_f_c_names="-DUNKNOWN"
-   fi
-elif test "x$pac_fc_case" == "xupper case"; then
-   if test "x$pac_fc_under" == "xunderscore"; then
-      if test "x$pac_fc_sec_under" == "xno extra underscore"; then
-          pac_f_c_names="-DUpperUnderscore"
-      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
-          pac_f_c_names="-DUpperDoubleUnderscore"
-      else
-          pac_f_c_names="-DUNKNOWN"
-      fi
-   elif test "x$pac_fc_under" == "xno underscore"; then
-      pac_f_c_names="-DUpperCase"
-   else
-      pac_f_c_names="-DUNKNOWN"
-   fi
-else
-   pac_f_c_names="-DUNKNOWN"
-fi
-CDEFINES="$pac_f_c_names $CDEFINES"
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result:  $pac_f_c_names " >&5
 printf "%s\n" " $pac_f_c_names " >&6; }
@@ -7452,6 +7412,8 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
+IPK="IPK$pac_cv_ipk_size"
+LPK="LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. " >&5
@@ -11204,10 +11166,14 @@ FDEFINES=$(PSBFDEFINES)
 
 
 
+
+
 ###############################################################################
 # the following files will be created by Automake
 
 ac_config_files="$ac_config_files Make.inc"
+
+ac_config_files="$ac_config_files base/modules/psb_config.h"
 
 ac_config_files="$ac_config_files util/psb_metis_int.h"
 
@@ -11953,6 +11919,7 @@ do
   case $ac_config_target in
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Make.inc") CONFIG_FILES="$CONFIG_FILES Make.inc" ;;
+    "base/modules/psb_config.h") CONFIG_FILES="$CONFIG_FILES base/modules/psb_config.h" ;;
     "util/psb_metis_int.h") CONFIG_FILES="$CONFIG_FILES util/psb_metis_int.h" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -12606,7 +12573,7 @@ printf "%s\n" "$as_me:
    You may want to rerun configure with --with-fcopenacc= " >&6;}
   fi
 fi
-
+ 
 ###############################################################################
 
 

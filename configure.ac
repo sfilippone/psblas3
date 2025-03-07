@@ -321,45 +321,45 @@ dnl AC_MSG_NOTICE([Fortran name mangling: $ac_cv_fc_mangling])
 [pac_fc_sec_under=${pac_fc_sec_under# }]
 [pac_fc_under=${pac_fc_under%%,*}]
 [pac_fc_under=${pac_fc_under# }]
-AC_MSG_CHECKING([defines for C/Fortran name interfaces])
-if test "x$pac_fc_case" == "xlower case"; then
-   if test "x$pac_fc_under" == "xunderscore"; then
-      if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
-          pac_f_c_names="-DLowerUnderscore"
-      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
-          pac_f_c_names="-DLowerDoubleUnderscore"
-      else
-          pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
-      fi
-   elif test "x$pac_fc_under" == "xno underscore"; then
-      pac_f_c_names="-DLowerCase"
-   else		       
-      pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
-   fi
-elif test "x$pac_fc_case" == "xupper case"; then
-   if test "x$pac_fc_under" == "xunderscore"; then
-      if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
-          pac_f_c_names="-DUpperUnderscore"
-      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
-          pac_f_c_names="-DUpperDoubleUnderscore"
-      else
-          pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
-      fi
-   elif test "x$pac_fc_under" == "xno underscore"; then
-      pac_f_c_names="-DUpperCase"
-   else		       
-      pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
-   fi
-dnl  AC_MSG_NOTICE([Fortran name mangling UPPERCASE not handled])	
-else
-   pac_f_c_names="-DUNKNOWN"   
-dnl   AC_MSG_NOTICE([Fortran name mangling unknown case])	
-fi
-CDEFINES="$pac_f_c_names $CDEFINES"
+dnl AC_MSG_CHECKING([defines for C/Fortran name interfaces])
+dnl if test "x$pac_fc_case" == "xlower case"; then
+dnl    if test "x$pac_fc_under" == "xunderscore"; then
+dnl       if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
+dnl           pac_f_c_names="-DLowerUnderscore"
+dnl       elif test "x$pac_fc_sec_under" == "xextra underscore"; then
+dnl           pac_f_c_names="-DLowerDoubleUnderscore"
+dnl       else
+dnl           pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
+dnl       fi
+dnl    elif test "x$pac_fc_under" == "xno underscore"; then
+dnl       pac_f_c_names="-DLowerCase"
+dnl    else		       
+dnl       pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
+dnl    fi
+dnl elif test "x$pac_fc_case" == "xupper case"; then
+dnl    if test "x$pac_fc_under" == "xunderscore"; then
+dnl       if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
+dnl           pac_f_c_names="-DUpperUnderscore"
+dnl       elif test "x$pac_fc_sec_under" == "xextra underscore"; then
+dnl           pac_f_c_names="-DUpperDoubleUnderscore"
+dnl       else
+dnl           pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
+dnl       fi
+dnl    elif test "x$pac_fc_under" == "xno underscore"; then
+dnl       pac_f_c_names="-DUpperCase"
+dnl    else		       
+dnl       pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
+dnl    fi
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling UPPERCASE not handled])	
+dnl else
+dnl    pac_f_c_names="-DUNKNOWN"   
+dnl dnl   AC_MSG_NOTICE([Fortran name mangling unknown case])	
+dnl fi
+dnl CDEFINES="$pac_f_c_names $CDEFINES"
 
 AC_MSG_RESULT([ $pac_f_c_names ])
 
@@ -562,6 +562,8 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
+IPK="IPK$pac_cv_ipk_size"
+LPK="LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    AC_MSG_NOTICE([[Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. ]]);
@@ -1016,6 +1018,8 @@ FDEFINES=$(PSBFDEFINES)
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
 
 
+AC_SUBST(IPK)
+AC_SUBST(LPK)
 AC_SUBST(PSBLASRULES)
 AC_SUBST(LIBDIR)
 AC_SUBST(RSB_LIBS)
@@ -1061,6 +1065,7 @@ AC_SUBST(LRSB)
 # the following files will be created by Automake
 
 AC_CONFIG_FILES([Make.inc])
+AC_CONFIG_FILES([base/modules/psb_config.h])
 AC_CONFIG_FILES([util/psb_metis_int.h])	
 AC_OUTPUT()
 #AC_OUTPUT(Make.inc Makefile)
