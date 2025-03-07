@@ -1,5 +1,6 @@
 #include <math.h>
 #include <complex.h>
+#include "psb_config.h"
 #include "@METISINCFILE@"
 
 typedef int32_t psb_m_t;
