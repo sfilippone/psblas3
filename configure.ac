@@ -305,18 +305,9 @@ PAC_HAVE_MODERN_GFORTRAN(
 )
 fi
 
-
 ###############################################################################
 #	Linking, symbol mangling, and misc tests
 ###############################################################################
-
-# Note : This is functional to Make.inc rules and structure (see below).
-AC_LANG([C])
-AC_CHECK_SIZEOF(void *)
-# Define for platforms with 64 bit (void *     ) pointers
-if test X"$ac_cv_sizeof_void_p" == X"8" ; then
-  CDEFINES="-DPtr64Bits $CDEFINES"
-fi
 AC_LANG([Fortran])
 __AC_FC_NAME_MANGLING
 if test "X$psblas_cv_fc" == X"pg" ; then
