@@ -139,7 +139,8 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FAKEMPI="fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
-   MPICXX="$CXX";	
+   MPICXX="$CXX";
+   CSERIALMPI="#define SERIAL_MPI"
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
@@ -1025,6 +1026,7 @@ FDEFINES=$(PSBFDEFINES)
 
 AC_SUBST(IPKDEF)
 AC_SUBST(LPKDEF)
+AC_SUBST(CSERIALMPI)
 AC_SUBST(CHAVEMETIS)
 AC_SUBST(CINTMETIS)
 AC_SUBST(CREALMETIS)

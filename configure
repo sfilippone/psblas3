@@ -692,6 +692,7 @@ CHAVEAMD
 CREALMETIS
 CINTMETIS
 CHAVEMETIS
+CSERIALMPI
 LPKDEF
 IPKDEF
 FINCLUDES
@@ -4643,6 +4644,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    MPIFC="$FC";
    MPICC="$CC";
    MPICXX="$CXX";
+   CSERIALMPI="#define SERIAL_MPI"
 else
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -11135,6 +11137,7 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
 
 
 

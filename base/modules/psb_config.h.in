@@ -4,6 +4,8 @@
 #include <math.h>
 #include <complex.h>
 
+@CSERIALMPI@
+
 @IPKDEF@
 @LPKDEF@
 
@@ -34,3 +36,5 @@ typedef float  psb_s_t;
 typedef double psb_d_t;
 typedef float  complex psb_c_t;
 typedef double complex psb_z_t;
+
+#endif
