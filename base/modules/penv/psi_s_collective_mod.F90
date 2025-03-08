@@ -32,6 +32,7 @@
 module psi_s_collective_mod
   use psi_penv_mod
   use psb_desc_const_mod
+  use iso_c_binding
   
   interface psb_max
     module procedure psb_smaxs, psb_smaxv, psb_smaxm
@@ -2103,10 +2104,10 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    real(psb_spk_), intent(in)  :: valsnd(:)
-    integer(psb_mpk_), intent(in)  :: iasnd(:), jasnd(:)
-    real(psb_spk_), intent(out) :: valrcv(:)
-    integer(psb_mpk_), intent(out) :: iarcv(:), jarcv(:)
+    real(psb_spk_), intent(in), target  :: valsnd(:)
+    integer(psb_mpk_), intent(in), target  :: iasnd(:), jasnd(:)
+    real(psb_spk_), intent(out), target :: valrcv(:)
+    integer(psb_mpk_), intent(out),target :: iarcv(:), jarcv(:)
     integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(out) :: info
@@ -2133,14 +2134,14 @@ contains
         prcid(ip+1) = psb_get_mpi_rank(ctxt,ip)
         idx = brvindx(ip+1)
         p2ptag =  psb_real_tag
-        call mpi_irecv(valrcv(idx+1:idx+sz),sz,&
+        call mpi_irecv((valrcv(idx+1:idx+sz)),sz,&
              & psb_mpi_r_spk_,prcid(ip+1),&
              & p2ptag, icomm,rvhd(ip+1,1),iret)
         p2ptag = psb_int_swap_tag
-        call mpi_irecv(iarcv(idx+1:idx+sz),sz,&
+        call mpi_irecv((iarcv(idx+1:idx+sz)),sz,&
              & psb_mpi_mpk_,prcid(ip+1),&
              & p2ptag, icomm,rvhd(ip+1,2),iret)
-        call mpi_irecv(jarcv(idx+1:idx+sz),sz,&
+        call mpi_irecv((jarcv(idx+1:idx+sz)),sz,&
              & psb_mpi_mpk_,prcid(ip+1),&
              & p2ptag, icomm,rvhd(ip+1,3),iret)
       end if
@@ -2153,14 +2154,14 @@ contains
         if (prcid(ip+1)<0) prcid(ip+1) = psb_get_mpi_rank(ctxt,ip)
         idx = bsdindx(ip+1)
         p2ptag =  psb_real_tag
-        call mpi_send(valsnd(idx+1:idx+sz),sz,&
+        call mpi_send((valsnd(idx+1:idx+sz)),sz,&
              & psb_mpi_r_spk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
         p2ptag = psb_int_swap_tag
-        call mpi_send(iasnd(idx+1:idx+sz),sz,&
+        call mpi_send((iasnd(idx+1:idx+sz)),sz,&
              & psb_mpi_mpk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
-        call mpi_send(jasnd(idx+1:idx+sz),sz,&
+        call mpi_send((jasnd(idx+1:idx+sz)),sz,&
              & psb_mpi_mpk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
       end if
@@ -2186,10 +2187,10 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    real(psb_spk_), intent(in)  :: valsnd(:)
-    integer(psb_epk_), intent(in)  :: iasnd(:), jasnd(:)
-    real(psb_spk_), intent(out) :: valrcv(:)
-    integer(psb_epk_), intent(out) :: iarcv(:), jarcv(:)
+    real(psb_spk_), intent(in), target  :: valsnd(:)
+    integer(psb_epk_), intent(in), target  :: iasnd(:), jasnd(:)
+    real(psb_spk_), intent(out), target :: valrcv(:)
+    integer(psb_epk_), intent(out), target :: iarcv(:), jarcv(:)
     integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(out) :: info
@@ -2216,14 +2217,14 @@ contains
         prcid(ip+1) = psb_get_mpi_rank(ctxt,ip)
         idx = brvindx(ip+1)
         p2ptag =  psb_real_tag
-        call mpi_irecv(valrcv(idx+1:idx+sz),sz,&
+        call mpi_irecv((valrcv(idx+1:idx+sz)),sz,&
              & psb_mpi_r_spk_,prcid(ip+1),&
              & p2ptag, icomm,rvhd(ip+1,1),iret)
         p2ptag = psb_int_swap_tag
-        call mpi_irecv(iarcv(idx+1:idx+sz),sz,&
+        call mpi_irecv((iarcv(idx+1:idx+sz)),sz,&
              & psb_mpi_epk_,prcid(ip+1),&
              & p2ptag, icomm,rvhd(ip+1,2),iret)
-        call mpi_irecv(jarcv(idx+1:idx+sz),sz,&
+        call mpi_irecv((jarcv(idx+1:idx+sz)),sz,&
              & psb_mpi_epk_,prcid(ip+1),&
              & p2ptag, icomm,rvhd(ip+1,3),iret)
       end if
@@ -2236,14 +2237,14 @@ contains
         if (prcid(ip+1)<0) prcid(ip+1) = psb_get_mpi_rank(ctxt,ip)
         idx = bsdindx(ip+1)
         p2ptag = psb_real_tag
-        call mpi_send(valsnd(idx+1:idx+sz),sz,&
+        call mpi_send((valsnd(idx+1:idx+sz)),sz,&
              & psb_mpi_r_spk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
         p2ptag = psb_int_swap_tag
-        call mpi_send(iasnd(idx+1:idx+sz),sz,&
+        call mpi_send((iasnd(idx+1:idx+sz)),sz,&
              & psb_mpi_epk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
-        call mpi_send(jasnd(idx+1:idx+sz),sz,&
+        call mpi_send((jasnd(idx+1:idx+sz)),sz,&
              & psb_mpi_epk_,prcid(ip+1),&
              & p2ptag, icomm,iret)
       end if

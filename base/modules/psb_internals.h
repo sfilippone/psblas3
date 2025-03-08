@@ -37,8 +37,8 @@ void mpi_gatherv(void* sdb, int* sdc, int* sdt,
 		 int* rvt, int* comm, int *root, int* ierr);
 void mpi_scatter(void* sdb, int* sdc, int* sdt,
 		 void* rvb, int* rvc, int* rvt, int *root, int* comm, int* ierr);
-void mpi_scatterv(void* sdb, int* sdc, int* sdt,
-		  void* rvb, int* rvc, int* rdspl,
+void mpi_scatterv(void* sdb, int* sdc, int* sdspl, int* sdt,
+		  void* rvb, int* rvc, 
 		  int* rvt, int* comm, int *root, int* ierr);
 void mpi_allgather(void* sdb, int* sdc, int* sdt,
 		   void* rvb, int* rvc, int* rvt, int* comm, int* ierr);

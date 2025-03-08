@@ -33,6 +33,7 @@
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
   use psb_const_mod
+  use iso_c_binding
   integer(psb_mpk_), parameter :: mpi_success          = 0
   integer(psb_mpk_), parameter :: mpi_request_null     = 0
   integer(psb_mpk_), parameter :: mpi_status_size      = 1
@@ -49,13 +50,124 @@ module mpi
   integer(psb_mpk_), parameter :: mpi_comm_null        = -1
   integer(psb_mpk_), parameter :: mpi_comm_world       = 1
   
-  real(psb_dpk_), external :: mpi_wtime
+  !real(psb_dpk_), external :: mpi_wtime
+
+  interface
+    function mpi_wtime()  result(res) bind(c,name='mpi_wtime')
+      import
+    end function mpi_wtime
+  end interface
+
+  interface
+    subroutine mpi_wait(request, status,ierr) bind(c,name='mpi_wait')
+      import
+      type(*), dimension(..) :: request
+      integer(psb_mpk_) :: status(*)
+      integer(psb_mpk_) :: ierr
+    end subroutine mpi_wait
+  end interface
+  
+  interface
+    subroutine mpi_send(buf,count,datatype,dest,tag,comm,ierr) &
+         & bind(c,name='mpi_send')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, dest, tag, comm, ierr
+    end subroutine mpi_send
+  end interface
+
+  interface
+    subroutine mpi_irecv(buf,count,datatype,src,tag,comm,request,ierr) &
+         & bind(c,name='mpi_irecv')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, src, tag, comm, request, ierr
+    end subroutine mpi_irecv
+  end interface
+
+  interface
+    subroutine mpi_alltoall(sdb,sdc,sdt,rvb,rvc,rvt,comm,ierr) &
+         & bind(c,name='mpi_alltoall')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, comm, ierr
+    end subroutine mpi_alltoall
+  end interface
+
+  interface
+    subroutine mpi_alltoallv(sdb,sdc,sdspl,sdt,rvb,rvc,rdspl,rvt,comm,ierr) &
+         & bind(c,name='mpi_alltoallv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdspl(*), rdspl(*), sdc(*), rvc(*)
+      integer(psb_mpk_) :: sdt,rvt, comm, ierr
+    end subroutine mpi_alltoallv
+  end interface
+
+  interface
+    subroutine mpi_gather(sdb,sdc,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_gather')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_gather
+  end interface
+
+  interface
+    subroutine mpi_gatherv(sdb,sdc,sdt,rvb,rvc,rdspl,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_gatherv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: rdspl(*), rvc(*)
+      integer(psb_mpk_) :: sdt,sdc,rvt, root, comm, ierr
+    end subroutine mpi_gatherv
+  end interface
+
+  interface
+    subroutine mpi_scatter(sdb,sdc,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_scatter')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_scatter
+  end interface
+
+  interface
+    subroutine mpi_scatterv(sdb,sdc,sdspl,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_scatterv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdspl(*), sdc(*)
+      integer(psb_mpk_) :: sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_scatterv
+  end interface
+  
+  interface
+    subroutine mpi_allgather(sdb,sdc,sdt,rvb,rvc,rvt,comm,ierr) &
+         & bind(c,name='mpi_allgather')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, comm, ierr
+    end subroutine mpi_allgather
+  end interface
+
+  interface
+    subroutine mpi_allgatherv(sdb,sdc,sdt,rvb,rvc,rdspl,rvt,comm,ierr) &
+         & bind(c,name='mpi_allgatherv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: rdspl(*),rvc(*)
+      integer(psb_mpk_) :: sdc,sdt,rvt, comm, ierr
+    end subroutine mpi_allgatherv
+  end interface
+
 end module mpi
 #endif    
 
 
 module psi_penv_mod
   use psb_const_mod
+  use iso_c_binding
 
   integer(psb_mpk_), parameter:: psb_int_tag      = 543987
   integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
@@ -381,7 +493,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_mpk_,&
+    call mpi_isend(c_loc(node%int4buf),size(node%int4buf),psb_mpi_mpk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -420,7 +532,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_epk_,&
+    call mpi_isend(c_loc(node%int8buf),size(node%int8buf),psb_mpi_epk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
@@ -457,7 +569,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_i2pk_,&
+    call mpi_isend(c_loc(node%int2buf),size(node%int2buf),psb_mpi_i2pk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -494,7 +606,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%realbuf,size(node%realbuf),psb_mpi_r_spk_,&
+    call mpi_isend(c_loc(node%realbuf),size(node%realbuf),psb_mpi_r_spk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)  
@@ -531,7 +643,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%doublebuf,size(node%doublebuf),psb_mpi_r_dpk_,&
+    call mpi_isend(c_loc(node%doublebuf),size(node%doublebuf),psb_mpi_r_dpk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -568,7 +680,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%complexbuf,size(node%complexbuf),psb_mpi_c_spk_,&
+    call mpi_isend(c_loc(node%complexbuf),size(node%complexbuf),psb_mpi_c_spk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
@@ -605,7 +717,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%dcomplbuf,size(node%dcomplbuf),psb_mpi_c_dpk_,&
+    call mpi_isend(c_loc(node%dcomplbuf),size(node%dcomplbuf),psb_mpi_c_dpk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -643,7 +755,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%logbuf,size(node%logbuf),mpi_logical,&
+    call mpi_isend(c_loc(node%logbuf),size(node%logbuf),mpi_logical,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -681,7 +793,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%charbuf,size(node%charbuf),mpi_character,&
+    call mpi_isend(c_loc(node%charbuf),size(node%charbuf),mpi_character,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
