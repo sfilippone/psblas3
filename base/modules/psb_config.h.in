@@ -4,9 +4,16 @@
 #include <math.h>
 #include <complex.h>
 
-#define @IPK@
-#define @LPK@
+@IPKDEF@
+@LPKDEF@
 
+@CHAVEMETIS@
+@CINTMETIS@
+@CREALMETIS@
+
+@CHAVEAMD@
+
+@CHAVELIBRSB@
 
 typedef int32_t psb_m_t;
 

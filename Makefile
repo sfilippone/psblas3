@@ -84,7 +84,7 @@ cleanlib:
 	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
 
 distclean: clean
-	/bin/rm -f Make.inc  util/psb_metis_int.h
+	/bin/rm -f Make.inc  util/psb_metis_int.h base/modules/psb_config.h
 
 check: all
 	make check -C test/serial

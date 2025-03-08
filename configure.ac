@@ -562,8 +562,8 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-IPK="IPK$pac_cv_ipk_size"
-LPK="LPK$pac_cv_lpk_size"
+IPKDEF="#define IPK$pac_cv_ipk_size"
+LPKDEF="#define LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    AC_MSG_NOTICE([[Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. ]]);
@@ -810,12 +810,16 @@ if test "x$psblas_cv_have_metis" == "xyes" ; then
    FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
    CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
    METISINCFILE=$psblas_cv_metisincfile
+   CHAVEMETIS="#define HAVE_METIS_"
+   CINTMETIS="#define METIS_$pac_cv_metis_idx"
+   CREALMETIS="#define METIS_REAL_$pac_cv_metis_real"	
 fi
 
 PAC_CHECK_AMD
 if test "x$psblas_cv_have_amd" == "xyes" ; then 
    FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
    CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
+   CHAVEAMD="#define HAVE_AMD_"
 fi
 
 
@@ -936,7 +940,8 @@ if test ! -f "$pac_cv_status_file" ; then
 else
   AC_MSG_RESULT([$LIBRSB_DIR])
   RSBTARGETLIB=rsbd;
-  RSBTARGETOBJ=rsbobj;	
+  RSBTARGETOBJ=rsbobj;
+  CHAVELIBRSB="#define HAVE_LIBRSB"
 fi
 
 
@@ -1018,11 +1023,16 @@ FDEFINES=$(PSBFDEFINES)
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
 
 
-AC_SUBST(IPK)
-AC_SUBST(LPK)
+AC_SUBST(IPKDEF)
+AC_SUBST(LPKDEF)
+AC_SUBST(CHAVEMETIS)
+AC_SUBST(CINTMETIS)
+AC_SUBST(CREALMETIS)
+AC_SUBST(CHAVEAMD)
 AC_SUBST(PSBLASRULES)
 AC_SUBST(LIBDIR)
 AC_SUBST(RSB_LIBS)
+AC_SUBST(CHAVELIBRSB)
 AC_SUBST(BASELIBNAME)
 AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
