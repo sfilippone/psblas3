@@ -136,7 +136,7 @@ PAC_ARG_SERIAL_MPI
 
 #Note : we miss the name of the Intel C compiler
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
-   FAKEMPI="fakempi.o";
+   FAKEMPI="psb_fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
    MPICXX="$CXX";
@@ -541,7 +541,7 @@ fi
 # Custom test : do we have a module or include for MPI Fortran interface?
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
-   CDEFINES="-DSERIAL_MPI $CDEFINES"
+  dnl CDEFINES="-DSERIAL_MPI $CDEFINES"
 else 
  PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
@@ -573,13 +573,14 @@ if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
 fi				
 FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";	
-CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
+dnl CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
 
 FLINK="$MPIFC"
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
-   CDEFINES="-DOPENMP $CDEFINES";	
+   CDEFINES="-DOPENMP $CDEFINES";
+   CHAVEOPENMP="#define OPENMP"
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";	
@@ -809,7 +810,7 @@ if test "x$pac_cv_metis_real" == "xunknown" ; then
 fi		   
 if test "x$psblas_cv_have_metis" == "xyes" ; then 
    FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
+   #   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
    METISINCFILE=$psblas_cv_metisincfile
    CHAVEMETIS="#define HAVE_METIS_"
    CINTMETIS="#define METIS_$pac_cv_metis_idx"
@@ -819,52 +820,13 @@ fi
 PAC_CHECK_AMD
 if test "x$psblas_cv_have_amd" == "xyes" ; then 
    FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
-   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
+   #   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
    CHAVEAMD="#define HAVE_AMD_"
 fi
 
 
 PAC_ARG_CUDA()
 if test "x$pac_cv_cuda" == "xyes"; then
-
-PAC_CHECK_CUDA()
-
-if test "x$pac_cv_have_cuda" == "xyes"; then
-   
-   PAC_CHECK_CUDA_VERSION()
-   dnl PAC_CHECK_SPGPU()
-   HAVE_CUDA="yes";
-   CUDA_VERSION="$pac_cv_cuda_version";
-   CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-   CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
-   SPGPU_LIBS="-lspgpu";	
-   CUDAD=cudad;
-   CUDALD=cudald;
-   LCUDA="-lpsb_cuda";	
-   EXTRALDLIBS="-lstdc++";
-   AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
-
-   PAC_ARG_WITH_CUDACC()
-   if test "x$pac_cv_cudacc" == "x"; then
-      pac_cv_cudacc="50,60,70,75,80,86";
-      CUDA_CC="$pac_cv_cudacc";
-   fi
-   if (( $pac_cv_cuda_version >= 11070  ))
-   then 
-     CUDEFINES="--dopt=on";
-   fi	
-   for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
-   do
-	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
-   done
-   if test "x$pac_cv_cuda_version" != "xunknown"; then
-     CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
-     FCUDEFINES=" ${CUDA_DEFINES}"
-     CCUDEFINES=" ${CUDA_DEFINES}"
-     CXXCUDEFINES=" ${CUDA_DEFINES}"	
-   fi
-fi
-
 if test "x$pac_cv_ipk_size" != "x4"; then
   AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
   pac_cv_cuda="no";
@@ -880,6 +842,48 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   FCUDEFINES="";
   CCUDEFINES="";
   CXXCUDEFINES="";
+else
+
+   PAC_CHECK_CUDA()
+	
+	if test "x$pac_cv_have_cuda" == "xyes"; then
+   
+      PAC_CHECK_CUDA_VERSION()
+      dnl PAC_CHECK_SPGPU()
+      HAVE_CUDA="yes";
+      CUDA_VERSION="$pac_cv_cuda_version";
+      CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+      CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
+      CHAVECUDA="#define HAVE_CUDA"
+      CSHORTVCUDA="#define CUDA_SHORT_VERSION ${CUDA_SHORT_VERSION}"
+      CVERSIONCUDA="#define CUDA_VERSION ${CUDA_VERSION}"
+      SPGPU_LIBS="-lspgpu";	
+      CUDAD=cudad;
+      CUDALD=cudald;
+      LCUDA="-lpsb_cuda";	
+      EXTRALDLIBS="-lstdc++";
+      AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
+
+      PAC_ARG_WITH_CUDACC()
+      if test "x$pac_cv_cudacc" == "x"; then
+         pac_cv_cudacc="50,60,70,75,80,86";
+         CUDA_CC="$pac_cv_cudacc";
+      fi
+      if (( $pac_cv_cuda_version >= 11070  ))
+      then 
+        CUDEFINES="--dopt=on";
+      fi	
+      for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
+      do
+ 	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
+      done
+      if test "x$pac_cv_cuda_version" != "xunknown"; then
+      dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
+       FCUDEFINES=" ${CUDA_DEFINES}"
+       dnl CCUDEFINES=" ${CUDA_DEFINES}"
+       dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
+     fi
+  fi
 fi
 fi
 
@@ -1027,10 +1031,14 @@ FDEFINES=$(PSBFDEFINES)
 AC_SUBST(IPKDEF)
 AC_SUBST(LPKDEF)
 AC_SUBST(CSERIALMPI)
+AC_SUBST(CHAVEOPENMP)
 AC_SUBST(CHAVEMETIS)
 AC_SUBST(CINTMETIS)
 AC_SUBST(CREALMETIS)
 AC_SUBST(CHAVEAMD)
+AC_SUBST(CHAVECUDA)
+AC_SUBST(CSHORTVCUDA)
+AC_SUBST(CVERSIONCUDA)
 AC_SUBST(PSBLASRULES)
 AC_SUBST(LIBDIR)
 AC_SUBST(RSB_LIBS)
@@ -1078,6 +1086,7 @@ AC_SUBST(LRSB)
 
 AC_CONFIG_FILES([Make.inc])
 AC_CONFIG_FILES([base/modules/psb_config.h])
+dnl AC_CONFIG_FILES([base/modules/psb_cxxconfig.h])	
 AC_CONFIG_FILES([util/psb_metis_int.h])	
 AC_OUTPUT()
 #AC_OUTPUT(Make.inc Makefile)
