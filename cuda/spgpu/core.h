@@ -46,7 +46,7 @@
  * GNU General Public License for more details.
  */
 
- 
+#include "psb_config.h"
 #include "driver_types.h"
 #include "cuComplex.h"
  

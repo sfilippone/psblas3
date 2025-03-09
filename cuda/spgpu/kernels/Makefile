@@ -9,7 +9,7 @@ MODDIR=$(TOP)/modules
 UP=..
 LIBNAME=$(UP)/libspgpu.a
 CINCLUDES=-I$(INCDIR)
-
+CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
 OBJS=cabs.o  camax.o  casum.o  caxpby.o  caxy.o  cdot.o  cgath.o \
   cnrm2.o cscal.o cscat.o csetscal.o cupd_xyz.o\
   dabs.o damax.o dasum.o daxpby.o daxy.o ddot.o dgath.o dupd_xyz.o\
@@ -30,5 +30,5 @@ lib: objs
 clean:
 	/bin/rm -fr $(OBJS)
 .cu.o:
-	$(NVCC)   $(CINCLUDES) $(CDEFINES) $(CUDEFINES) $(CUDA_INCLUDES) -c $<
+	$(NVCC)   $(CINCLUDES) $(CDEFINES) $(CUDEFINES) $(CU_INCLUDES) -c $<
 

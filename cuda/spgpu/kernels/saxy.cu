@@ -17,10 +17,10 @@
 #include "stdio.h"
 #include "cudadebug.h"
 #include "cudalang.h"
+#include "core.h"
 
 extern "C"
 {
-#include "core.h"
 #include "vector.h"
 }
 
