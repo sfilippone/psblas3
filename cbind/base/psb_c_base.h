@@ -1,4 +1,3 @@
-
 #ifndef PSB_C_BASE__
 #define PSB_C_BASE__
 #ifdef __cplusplus
@@ -14,35 +13,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdbool.h>
 
-
-  typedef int32_t psb_m_t;
-
-#if defined(IPK4) &&  defined(LPK4)
-  typedef int32_t psb_i_t;
-  typedef int32_t psb_l_t;
-#elif defined(IPK4) &&  defined(LPK8)
-  typedef int32_t psb_i_t;
-  typedef int64_t psb_l_t;
-#elif defined(IPK8) &&  defined(LPK8)
-  typedef int64_t psb_i_t;
-  typedef int64_t psb_l_t;
-#else
-#endif
-  typedef int64_t psb_e_t;
-
-  typedef float  psb_s_t;
-  typedef double psb_d_t;
-
-#ifdef  __cplusplus
-   typedef std::complex<float> psb_c_t;
-   typedef std::complex<double> psb_z_t;
-#else
-   typedef float complex psb_c_t;
-   typedef float complex psb_z_t;
-#endif
-
-#define PSB_ERR_ERROR  -1
-#define PSB_ERR_SUCCESS 0
+#include "psb_config.h"
 
 
   typedef struct PSB_C_DESCRIPTOR {

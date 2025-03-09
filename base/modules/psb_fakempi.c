@@ -1,7 +1,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <string.h>
-#include "psb_internals.h"
+#include "psb_fakempi.h"
 
 double mpi_wtime() 
 {
