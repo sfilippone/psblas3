@@ -579,7 +579,7 @@ FLINK="$MPIFC"
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
-   CDEFINES="-DOPENMP $CDEFINES";
+   CDEFINES="$CDEFINES";
    CHAVEOPENMP="#define OPENMP"
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
