@@ -12,7 +12,11 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
   integer(psb_ipk_) :: info
   integer(psb_lpk_) :: nl,nptl
   integer(psb_lpk_), allocatable :: irpl(:),jal(:),gvl(:)
+#if defined(METIS_REAL_32)  
   real(psb_spk_),allocatable  :: wgh_(:)
+#elif defined(METIS_REAL_64)  
+  real(psb_dpk_),allocatable  :: wgh_(:)
+#endif
 
 #if defined(HAVE_METIS) && defined(LPK4) && defined(METIS_32) 
   interface 
@@ -22,7 +26,11 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
       integer(c_int) :: res
       integer(c_int) :: n,nparts
       integer(c_int) :: ixadj(*),iadj(*),ivwg(*),iajw(*),part(*)
+#if defined(METIS_REAL_32)  
       real(c_float)  :: weights(*)
+#elif defined(METIS_REAL_64)
+      real(c_double)  :: weights(*)
+#endif
       !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
       !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
     end function METIS_PartGraphKway
@@ -49,23 +57,23 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
     nptl = nparts
     wgh_ = -1.0
     if(present(weights)) then
-      if (size(weights) == nptl) then 
+      if (size(weights) == nptl) then
+        wgh_(:) = weights(:)
 !!$            write(*,*) 'weights present',weights
-        ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
-        !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
-        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-             & nptl,weights,gvl)
+!!$        ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
+!!$        !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
+!!$        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,weights,gvl)
 
-      else
-!!$            write(*,*) 'weights absent',wgh_
-        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-             & nptl,wgh_,gvl)
+!!$      else
+            write(*,*) 'weights absent',wgh_
+!!$        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,wgh_,gvl)
       end if
-    else
+    endif
 !!$          write(*,*) 'weights absent',wgh_
       info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
            & nptl,wgh_,gvl)
-    endif
 !!$        write(*,*) 'after allocation',info
 
     do i=1, n
@@ -86,7 +94,11 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
       integer(c_long_long) :: res
       integer(c_long_long) :: n,nparts
       integer(c_long_long) :: ixadj(*),iadj(*),ivwg(*),iajw(*),part(*)
+#if defined(METIS_REAL_32)  
       real(c_float)  :: weights(*)
+#elif defined(METIS_REAL_64)
+      real(c_double)  :: weights(*)
+#endif
       !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
       !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
     end function METIS_PartGraphKway
@@ -113,6 +125,25 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
     nptl = nparts
     wgh_ = -1.0
     if(present(weights)) then
+      if (size(weights) == nptl) then
+        wgh_(:) = weights(:)
+!!$            write(*,*) 'weights present',weights
+!!$        ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
+!!$        !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
+!!$        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,weights,gvl)
+
+!!$      else
+            write(*,*) 'weights absent',wgh_
+!!$        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,wgh_,gvl)
+      end if
+    endif
+!!$          write(*,*) 'weights absent',wgh_
+      info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+           & nptl,wgh_,gvl)
+#if 0
+      if(present(weights)) then
       if (size(weights) == nptl) then 
 !!$            write(*,*) 'weights present',weights
         ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
@@ -131,7 +162,7 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
            & nptl,wgh_,gvl)
     endif
 !!$        write(*,*) 'after allocation',info
-
+#endif
     do i=1, n
       graph_vect(i) = gvl(i) - 1 
     enddo
