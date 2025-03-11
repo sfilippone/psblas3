@@ -58,7 +58,7 @@
    typedef std::complex<double> psb_z_t;
 #else
    typedef float complex psb_c_t;
-   typedef float complex psb_z_t;
+   typedef double complex psb_z_t;
 #endif
 
 #endif

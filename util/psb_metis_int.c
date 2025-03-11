@@ -1,6 +1,6 @@
 #include <stdio.h>
-#if defined(HAVE_METIS_)
 #include "psb_metis_int.h"
+#if defined(HAVE_METIS)
 
 #if defined(METIS_REAL_32)
 
