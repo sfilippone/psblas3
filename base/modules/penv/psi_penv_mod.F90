@@ -76,6 +76,16 @@ module mpi
     end subroutine mpi_send
   end interface
 
+  
+  interface
+    subroutine mpi_isend(buf,count,datatype,dest,tag,comm,request,ierr) &
+         & bind(c,name='mpi_isend')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, dest, tag, comm, request,ierr
+    end subroutine mpi_send
+  end interface
+
   interface
     subroutine mpi_irecv(buf,count,datatype,src,tag,comm,request,ierr) &
          & bind(c,name='mpi_irecv')
@@ -643,7 +653,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(c_loc(node%doublebuf),size(node%doublebuf),psb_mpi_r_dpk_,&
+    call mpi_isend(node%doublebuf,size(node%doublebuf),psb_mpi_r_dpk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -680,7 +690,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(c_loc(node%complexbuf),size(node%complexbuf),psb_mpi_c_spk_,&
+    call mpi_isend(node%complexbuf,size(node%complexbuf),psb_mpi_c_spk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
@@ -717,7 +727,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(c_loc(node%dcomplbuf),size(node%dcomplbuf),psb_mpi_c_dpk_,&
+    call mpi_isend(node%dcomplbuf,size(node%dcomplbuf),psb_mpi_c_dpk_,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -755,7 +765,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(c_loc(node%logbuf),size(node%logbuf),mpi_logical,&
+    call mpi_isend(node%logbuf,size(node%logbuf),mpi_logical,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -793,7 +803,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(c_loc(node%charbuf),size(node%charbuf),mpi_character,&
+    call mpi_isend(node%charbuf,size(node%charbuf),mpi_character,&
          & dest,tag,icomm,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
