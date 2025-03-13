@@ -39,9 +39,15 @@ foreach(file IN LISTS PSB_util_source_files)
 endforeach()
 
 set(PSB_util_source_C_files
-  psb_metis_int.c
+
   psb_amd_order.c
   )
+set(PSB_util_source_C__metis_files
+
+  psb_metis_int.c
+  )
+  
+
 foreach(file IN LISTS PSB_util_source_C_files)
   list(APPEND util_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
 endforeach()
