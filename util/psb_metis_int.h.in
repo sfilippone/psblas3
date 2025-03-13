@@ -1,7 +1,9 @@
 #include <math.h>
 #include <complex.h>
+#include "psb_config.h"
 #include "@METISINCFILE@"
 
+#if 0
 typedef int32_t psb_m_t;
 
 #if defined(IPK4) &&  defined(LPK4)
@@ -21,3 +23,4 @@ typedef float  psb_s_t;
 typedef double psb_d_t;
 typedef float  complex psb_c_t;
 typedef double complex psb_z_t;
+#endif

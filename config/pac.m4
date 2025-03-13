@@ -2048,7 +2048,7 @@ AC_DEFUN(PAC_ARG_WITH_LIBRSB,
 	  if test "x$pac_cv_librsb_dir" != "x"; then 
 	  LIBS="-L$pac_cv_librsb_dir $LIBS"
 	  RSB_INCLUDES="-I$pac_cv_librsb_dir"
-	  # CPPFLAGS="$GPU_INCLUDES $CUDA_INCLUDES $CPPFLAGS"
+	  # CPPFLAGS="$GPU_INCLUDES $RSB_INCLUDES $CPPFLAGS"
 	  RSB_LIBDIR="-L$pac_cv_librsb_dir"
 	  fi
 	  #AC_MSG_CHECKING([librsb dir $pac_cv_librsb_dir])
@@ -2058,7 +2058,7 @@ AC_DEFUN(PAC_ARG_WITH_LIBRSB,
 	  
 	  if test "x$pac_rsb_header_ok" == "xyes" ; then 
 	  RSB_LIBS="-lrsb $RSB_LIBDIR"
-	  # LIBS="$GPU_LIBS $CUDA_LIBS -lm $LIBS";
+	  # LIBS="$GPU_LIBS $RSB_LIBS -lm $LIBS";
 	  # AC_MSG_CHECKING([for spgpuCreate in $GPU_LIBS])
 	  # AC_TRY_LINK_FUNC(spgpuCreate, 
 	  # 		   [pac_cv_have_spgpu=yes;pac_gpu_lib_ok=yes; ],
@@ -2072,13 +2072,13 @@ AC_DEFUN(PAC_ARG_WITH_LIBRSB,
 	  LIBRSB_INCDIR="$LIBRSB_DIR";
 	  LIBRSB_INCLUDES="-I$LIBRSB_INCDIR";
 	  LIBRSB_LIBS="-lrsb -L$LIBRSB_DIR";
-	  # CUDA_DIR="$pac_cv_cuda_dir";
+	  # RSB_DIR="$pac_cv_rsb_dir";
 	  LIBRSB_DEFINES="-DHAVE_RSB";
 	  LRSB=-lpsb_rsb
-	  # CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
-	  # CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+	  # RSB_INCLUDES="-I$pac_cv_rsb_dir/include"
+	  # RSB_LIBDIR="-L$pac_cv_rsb_dir/lib64 -L$pac_cv_rsb_dir/lib"
 	  FDEFINES="$LIBRSB_DEFINES $psblas_cv_define_prepend $FDEFINES";
-	  CDEFINES="$LIBRSB_DEFINES $CDEFINES";#CDEFINES="-DHAVE_SPGPU -DHAVE_CUDA $CDEFINES";
+	  CDEFINES="$LIBRSB_DEFINES $CDEFINES";#CDEFINES="-DHAVE_SPGPU -DHAVE_RSB $CDEFINES";
 	  fi
 #  fi
 LIBS="$SAVE_LIBS"
@@ -2145,7 +2145,7 @@ dnl AC_MSG_NOTICE([From CUDA: $pac_cv_have_cuda ])
 	  CUDA_DIR="$pac_cv_cuda_dir";
 	  CUDA_DEFINES="-DHAVE_CUDA";
 	  CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
-	  CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+	  CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib -L$pac_cv_cuda_dir/../math_libs/lib64"
 	  FDEFINES="$psblas_cv_define_prepend-DHAVE_GPU $psblas_cv_define_prepend-DHAVE_SPGPU $psblas_cv_define_prepend-DHAVE_CUDA $FDEFINES";
 	  CDEFINES="-DHAVE_SPGPU -DHAVE_CUDA $CDEFINES" ;
 	  fi
@@ -2211,7 +2211,7 @@ if test "x$pac_cv_cuda_dir" != "x"; then
    CUDA_INCLUDES="-I$pac_cv_cuda_dir/include"
    CUDA_DEFINES="-DHAVE_CUDA"
    CPPFLAGS="$CUDA_INCLUDES $CPPFLAGS"
-   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib"
+   CUDA_LIBDIR="-L$pac_cv_cuda_dir/lib64 -L$pac_cv_cuda_dir/lib -L$pac_cv_cuda_dir/../math_libs/lib64"
    if test -f "$pac_cv_cuda_dir/bin/nvcc"; then
      CUDA_NVCC="$pac_cv_cuda_dir/bin/nvcc"
    else

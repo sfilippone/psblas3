@@ -33,6 +33,7 @@
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
   use psb_const_mod
+  use iso_c_binding
   integer(psb_mpk_), parameter :: mpi_success          = 0
   integer(psb_mpk_), parameter :: mpi_request_null     = 0
   integer(psb_mpk_), parameter :: mpi_status_size      = 1
@@ -49,13 +50,134 @@ module mpi
   integer(psb_mpk_), parameter :: mpi_comm_null        = -1
   integer(psb_mpk_), parameter :: mpi_comm_world       = 1
   
-  real(psb_dpk_), external :: mpi_wtime
+  !real(psb_dpk_), external :: mpi_wtime
+
+  interface
+    function mpi_wtime()  result(res) bind(c,name='mpi_wtime')
+      import
+    end function mpi_wtime
+  end interface
+
+  interface
+    subroutine mpi_wait(request, status,ierr) bind(c,name='mpi_wait')
+      import
+      type(*), dimension(..) :: request
+      integer(psb_mpk_) :: status(*)
+      integer(psb_mpk_) :: ierr
+    end subroutine mpi_wait
+  end interface
+  
+  interface
+    subroutine mpi_send(buf,count,datatype,dest,tag,comm,ierr) &
+         & bind(c,name='mpi_send')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, dest, tag, comm, ierr
+    end subroutine mpi_send
+  end interface
+
+  
+  interface
+    subroutine mpi_isend(buf,count,datatype,dest,tag,comm,request,ierr) &
+         & bind(c,name='mpi_isend')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, dest, tag, comm, request,ierr
+    end subroutine mpi_isend
+  end interface
+
+  interface
+    subroutine mpi_irecv(buf,count,datatype,src,tag,comm,request,ierr) &
+         & bind(c,name='mpi_irecv')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, src, tag, comm, request, ierr
+    end subroutine mpi_irecv
+  end interface
+
+  interface
+    subroutine mpi_alltoall(sdb,sdc,sdt,rvb,rvc,rvt,comm,ierr) &
+         & bind(c,name='mpi_alltoall')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, comm, ierr
+    end subroutine mpi_alltoall
+  end interface
+
+  interface
+    subroutine mpi_alltoallv(sdb,sdc,sdspl,sdt,rvb,rvc,rdspl,rvt,comm,ierr) &
+         & bind(c,name='mpi_alltoallv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdspl(*), rdspl(*), sdc(*), rvc(*)
+      integer(psb_mpk_) :: sdt,rvt, comm, ierr
+    end subroutine mpi_alltoallv
+  end interface
+
+  interface
+    subroutine mpi_gather(sdb,sdc,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_gather')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_gather
+  end interface
+
+  interface
+    subroutine mpi_gatherv(sdb,sdc,sdt,rvb,rvc,rdspl,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_gatherv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: rdspl(*), rvc(*)
+      integer(psb_mpk_) :: sdt,sdc,rvt, root, comm, ierr
+    end subroutine mpi_gatherv
+  end interface
+
+  interface
+    subroutine mpi_scatter(sdb,sdc,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_scatter')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_scatter
+  end interface
+
+  interface
+    subroutine mpi_scatterv(sdb,sdc,sdspl,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_scatterv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdspl(*), sdc(*)
+      integer(psb_mpk_) :: sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_scatterv
+  end interface
+  
+  interface
+    subroutine mpi_allgather(sdb,sdc,sdt,rvb,rvc,rvt,comm,ierr) &
+         & bind(c,name='mpi_allgather')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, comm, ierr
+    end subroutine mpi_allgather
+  end interface
+
+  interface
+    subroutine mpi_allgatherv(sdb,sdc,sdt,rvb,rvc,rdspl,rvt,comm,ierr) &
+         & bind(c,name='mpi_allgatherv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: rdspl(*),rvc(*)
+      integer(psb_mpk_) :: sdc,sdt,rvt, comm, ierr
+    end subroutine mpi_allgatherv
+  end interface
+
 end module mpi
 #endif    
 
 
 module psi_penv_mod
   use psb_const_mod
+  use iso_c_binding
 
   integer(psb_mpk_), parameter:: psb_int_tag      = 543987
   integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
@@ -711,9 +833,9 @@ contains
       subroutine psi_c_diffadd(p1, p2, val) &
            & bind(c,name="psi_c_diffadd")
         use iso_c_binding
-        import :: psb_mpk_
+        import :: psb_mpk_, psb_epk_
         type(c_ptr), value :: p1, p2
-        integer(psb_mpk_) :: val
+        integer(psb_epk_) :: val
       end subroutine psi_c_diffadd
     end interface
     
@@ -812,7 +934,7 @@ contains
   end subroutine psb_info_epk
 #endif
   
-  subroutine psb_init_mpik(ctxt,np,basectxt,ids)
+  subroutine psb_init_mpik(ctxt,np,basectxt,ids,extcomm)
     use psb_const_mod
     use psb_error_mod
     use psb_mat_mod
@@ -827,7 +949,7 @@ contains
 #endif
     type(psb_ctxt_type), intent(out) :: ctxt
     type(psb_ctxt_type), intent(in), optional :: basectxt
-    integer(psb_mpk_), intent(in), optional :: np, ids(:)
+    integer(psb_mpk_), intent(in), optional :: np, ids(:), extcomm
 
     integer(psb_mpk_) :: i, isnullcomm, icomm
     integer(psb_mpk_), allocatable :: iids(:) 
@@ -861,6 +983,8 @@ contains
       else
         basecomm = mpi_comm_world
       end if
+    else if (present(extcomm)) then
+      basecomm = extcomm
     else
       basecomm = mpi_comm_world
     end if

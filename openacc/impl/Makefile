@@ -178,7 +178,7 @@ psb_z_oacc_hll_vect_mv.o
 objs: $(OBJS)
 
 lib: objs
-	ar cur ../$(LIBNAME) $(OBJS)
+	$(AR) ../$(LIBNAME) $(OBJS)
 
 psb_s_oacc_csr_vect_mv.o psb_s_oacc_csr_inner_vect_sv.o \
 	psb_s_oacc_csr_scals.o \

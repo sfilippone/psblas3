@@ -64,34 +64,30 @@ install: all
 	mkdir -p  $(INSTALL_SAMPLESDIR) && \
 	     /bin/cp -fr test/pargen test/fileread  $(INSTALL_SAMPLESDIR) && \
 	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
-clean: 
-	$(MAKE) -C base clean
-	$(MAKE) -C prec clean 
-	$(MAKE) -C linsolve clean
-	$(MAKE) -C util clean
-	$(MAKE) -C cbind clean
-	$(MAKE) -C ext clean
-	$(MAKE) -C cuda clean
-	$(MAKE) -C openacc clean
-
-check: all
-	make check -C test/serial
+clean: cleanlib
+	$(MAKE) -C base veryclean
+	$(MAKE) -C prec veryclean 
+	$(MAKE) -C linsolve veryclean
+	$(MAKE) -C util veryclean
+	$(MAKE) -C cbind veryclean
+	$(MAKE) -C ext veryclean
+	$(MAKE) -C cuda veryclean
+	$(MAKE) -C openacc veryclean
+cleantest:
+	cd test/fileread && $(MAKE) clean
+	cd test/pargen && $(MAKE) clean
+	cd test/util && $(MAKE) clean
 
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
 	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
-	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)	
+	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
 
-veryclean: cleanlib
-	cd base && $(MAKE) veryclean
-	cd prec && $(MAKE) veryclean 
-	cd linsolve && $(MAKE) veryclean
-	cd util && $(MAKE) veryclean
-	cd cbind && $(MAKE) veryclean
-	cd ext && $(MAKE) veryclean
-	cd cuda && $(MAKE) veryclean
-	cd openacc && $(MAKE) veryclean
-	cd test/fileread && $(MAKE) clean
-	cd test/pargen && $(MAKE) clean
-	cd test/util && $(MAKE) clean
+distclean: clean
+	/bin/rm -f Make.inc  util/psb_metis_int.h base/modules/psb_config.h \
+	 base/modules/psb_cxxconfig.h
+
+check: all
+	make check -C test/serial
+
 

@@ -681,7 +681,8 @@ program psb_d_oacc_pde3d
 #ifdef OPENACC
   type(psb_d_vect_oacc)  :: vmold
   type(psb_i_vect_oacc)  :: imold 
-  type(psb_d_oacc_csr_sparse_mat) :: acsrg
+  type(psb_d_oacc_csr_sparse_mat) :: acsro
+  type(psb_d_oacc_hll_sparse_mat) :: ahllo
 #endif
   real(psb_dpk_), allocatable :: x0(:)
   ! parallel environment
@@ -753,7 +754,7 @@ program psb_d_oacc_pde3d
 
 #ifdef OPENACC
   ! Convert matrix to GPU format
-  call a%cscnv(agpu, info, mold = acsrg)
+  call a%cscnv(agpu, info, mold = acsro)
   if ((info /= 0) .or. (psb_get_errstatus() /= 0)) then
     write(0,*) 'From cscnv ', info
     call psb_error()
@@ -822,6 +823,9 @@ program psb_d_oacc_pde3d
   ! iterative method parameters
   if (iam == psb_root_) write(psb_out_unit, '("Calling iterative method ", a)') kmethd
   call psb_barrier(ctxt)
+#ifdef OPENACC
+  call prec%allocate_wrk(info,vmold)
+#endif
   t1 = psb_wtime()
   eps = 1.d-6
 
@@ -842,6 +846,9 @@ program psb_d_oacc_pde3d
 
   call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
+#ifdef OPENACC
+  call prec%deallocate_wrk(info)
+#endif
   call psb_amx(ctxt, t2)
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()

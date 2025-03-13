@@ -48,7 +48,7 @@ COBJS= elldev.o hlldev.o diagdev.o hdiagdev.o vectordev.o  ivectordev.o dnsdev.o
 OBJS=$(COBJS) $(FOBJS)
 
 lib: objs ilib cudalib spgpulib
-	ar cur $(LIBNAME) $(OBJS)
+	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 

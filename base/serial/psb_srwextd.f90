@@ -40,7 +40,7 @@
 !
 subroutine psb_srwextd(nr,a,info,b,rowscale)
   use psb_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_srwextd
+  use psb_s_serial_mod, only : psb_sbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -63,23 +63,23 @@ subroutine psb_srwextd(nr,a,info,b,rowscale)
     select type(aa=> a%a) 
     type is (psb_s_csr_sparse_mat)
       if (present(b)) then 
-        call psb_rwextd(nr,aa,info,b%a,rowscale)
+        call psb_sbase_rwextd(nr,aa,info,b%a,rowscale)
       else
-        call psb_rwextd(nr,aa,info,rowscale=rowscale)
+        call psb_sbase_rwextd(nr,aa,info,rowscale=rowscale)
       end if
     type is (psb_s_coo_sparse_mat) 
       if (present(b)) then 
-        call psb_rwextd(nr,aa,info,b%a,rowscale=rowscale)
+        call psb_sbase_rwextd(nr,aa,info,b%a,rowscale=rowscale)
       else
-        call psb_rwextd(nr,aa,info,rowscale=rowscale)
+        call psb_sbase_rwextd(nr,aa,info,rowscale=rowscale)
       end if
     class default
       call aa%mv_to_coo(actmp,info)
       if (info == psb_success_) then 
         if (present(b)) then 
-          call psb_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
+          call psb_sbase_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
         else
-          call psb_rwextd(nr,actmp,info,rowscale=rowscale)
+          call psb_sbase_rwextd(nr,actmp,info,rowscale=rowscale)
         end if
       end if
       if (info == psb_success_) call aa%mv_from_coo(actmp,info)
@@ -95,9 +95,9 @@ subroutine psb_srwextd(nr,a,info,b,rowscale)
   return
 
 end subroutine psb_srwextd
+
 subroutine psb_sbase_rwextd(nr,a,info,b,rowscale)
   use psb_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_sbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -240,7 +240,7 @@ end subroutine psb_sbase_rwextd
 
 subroutine psb_lsrwextd(nr,a,info,b,rowscale)
   use psb_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_lsrwextd
+  use psb_s_serial_mod, only : psb_lsbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -264,23 +264,23 @@ subroutine psb_lsrwextd(nr,a,info,b,rowscale)
     select type(aa=> a%a) 
     type is (psb_ls_csr_sparse_mat)
       if (present(b)) then 
-        call psb_rwextd(nr,aa,info,b%a,rowscale)
+        call psb_lsbase_rwextd(nr,aa,info,b%a,rowscale)
       else
-        call psb_rwextd(nr,aa,info,rowscale=rowscale)
+        call psb_lsbase_rwextd(nr,aa,info,rowscale=rowscale)
       end if
     type is (psb_ls_coo_sparse_mat) 
       if (present(b)) then 
-        call psb_rwextd(nr,aa,info,b%a,rowscale=rowscale)
+        call psb_lsbase_rwextd(nr,aa,info,b%a,rowscale=rowscale)
       else
-        call psb_rwextd(nr,aa,info,rowscale=rowscale)
+        call psb_lsbase_rwextd(nr,aa,info,rowscale=rowscale)
       end if
     class default
       call aa%mv_to_coo(actmp,info)
       if (info == psb_success_) then 
         if (present(b)) then 
-          call psb_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
+          call psb_lsbase_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
         else
-          call psb_rwextd(nr,actmp,info,rowscale=rowscale)
+          call psb_lsbase_rwextd(nr,actmp,info,rowscale=rowscale)
         end if
       end if
       if (info == psb_success_) call aa%mv_from_coo(actmp,info)
@@ -296,9 +296,9 @@ subroutine psb_lsrwextd(nr,a,info,b,rowscale)
   return
 
 end subroutine psb_lsrwextd
+
 subroutine psb_lsbase_rwextd(nr,a,info,b,rowscale)
   use psb_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_lsbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)

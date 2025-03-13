@@ -15,10 +15,14 @@ The architecture, philosophy and implementation details of the library are conta
   >Computations in Fortran 2003, ACM Trans. on Math. Software, vol. 38, No.
   4, 2012.
 
-- The ideas are explored further with the paper:
+- The software engineering ideas are further detailed in  the paper:
   >V. Cardellini, S. Filippone and D. Rouson. Design Patterns for
   >sparse-matrix computations on hybrid CPU/GPU platforms, Scientific 
   >Programming, 22(2014), pp.1-19.
+
+- The GPU support is  explored in
+  >  S. Filippone, V. Cardellini, D. Barbieri and A. Fanfarillo:
+  >  Sparse Matrix-Vector Multiplication on GPGPUs ACM Transactions on Mathematical Software (TOMS), Volume 43 Issue 4, December 2016.
 
 - Version 1.0 of the library is described in:
   >S. Filippone, M. Colajanni. PSBLAS: A library for parallel linear
@@ -33,7 +37,7 @@ The architecture, philosophy and implementation details of the library are conta
   > P. D'Ambra, D. Di Serafino, S. Filippone, MLD2P4: A package of parallel algebraic multilevel domain decomposition preconditioners in Fortran 95 ACM Transactions on Mathematical Software, 2010, 37(3), 30
 
 PSBLAS is the backbone of the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
-> D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
+  > D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
 
 ### Other Software credits 
 
@@ -41,9 +45,9 @@ We originally included a modified implementation of some of the Sparker
 (serial sparse BLAS)  material; this has been completely rewritten, way
 beyond the intention(s) and responsibilities of the original developers.
 The main reference for the serial sparse BLAS is:
->Duff, I., Marrone, M., Radicati, G., and Vittoli, C. Level 3 basic 
->linear algebra subprograms for sparse matrices: a user level interface,
->ACM Trans. Math. Softw., 23(3), 379-401, 1997.
+  >Duff, I., Marrone, M., Radicati, G., and Vittoli, C. Level 3 basic 
+  >linear algebra subprograms for sparse matrices: a user level interface,
+  >ACM Trans. Math. Softw., 23(3), 379-401, 1997.
 
 ## Installing
 
@@ -107,15 +111,18 @@ install and the libraries will be installed under `/path/lib`, while the
 module files will be installed under `/path/modules`. The regular and
 experimental C interface header files are under `/path/include`.
 
-### CUDA and GPU support
+### Packaging changes, CUDA and GPU support
 
 This version of PSBLAS incorporates into a single package three
-entities that were previouslty separated:
+entities that were previously separated:
 | Library |                    |
 |---------|--------------------|
 | PSBLAS  | the base library   |
 | PSBLAS-EXT | a library providing additional storage formats for matrices and vectors |
 | SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
+
+Moreover, the module and library previously called psb_krylovv are now called
+psb_linsolve, but their usage is otherwise unchanged.								
 
 ### OpenACC
 There is a highly experimental version of an OpenACC interface,
@@ -145,7 +152,12 @@ e.g.
 which is asking for 4-bytes local indices, and 8-bytes global indices
 (this is the default). 
 
+## CMAKE
+There is initial support for building with CMAKE. As of this time, it does not compile the CUDA part.
 
+## LLVM
+The library has been successfully compiled and tested with LLVM version 20.1.0-rc2.
+ 			   
 ## Documentation
 
 Further information on installation and configuration can be found in the documentation.

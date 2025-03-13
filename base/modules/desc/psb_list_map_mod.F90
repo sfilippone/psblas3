@@ -179,9 +179,9 @@ contains
 
     if (present(mask)) then 
       
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(mask,idx,idxmap,owned_) &
-      !$omp private(i) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(mask,idx,idxmap,owned_) &
+      ! $ o m p private(i) 
       do i=1, size(idx)
         if (mask(i)) then 
           if ((1<=idx(i)).and.(idx(i) <= idxmap%get_lr())) then
@@ -194,12 +194,12 @@ contains
           end if
         end if
       end do
-      !$omp end parallel do 
+      ! $ o m p end parallel do 
     else  if (.not.present(mask)) then 
 
-      !$omp parallel do default(none) schedule(dynamic) &
-      !$omp shared(idx,idxmap,owned_) &
-      !$omp private(i) 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(idx,idxmap,owned_) &
+      ! $ o m p private(i) 
       do i=1, size(idx)
         if ((1<=idx(i)).and.(idx(i) <= idxmap%get_lr())) then
           idx(i) = idxmap%loc_to_glob(idx(i))
@@ -210,7 +210,7 @@ contains
           idx(i) = -1
         end if
       end do
-      !$omp end parallel do
+      ! $ o m p end parallel do
       
     end if
 
@@ -305,9 +305,9 @@ contains
 
     if (present(mask)) then 
       if (idxmap%is_valid()) then 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,is,idx,idxmap,owned_) &
-        !$omp private(i,ix) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idx,idxmap,owned_) &
+        ! $ o m p private(i,ix) 
         do i=1,is
           if (mask(i)) then 
             if ((1 <= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
@@ -319,7 +319,7 @@ contains
             end if
           end if
         end do
-        !$omp end parallel do
+        ! $ o m p end parallel do
       else 
         idx(1:is) = -1
         info = -1
@@ -328,9 +328,9 @@ contains
     else  if (.not.present(mask)) then 
 
       if (idxmap%is_valid()) then 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(is,idx,idxmap,owned_) &
-        !$omp private(i,ix) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(is,idx,idxmap,owned_) &
+        ! $ o m p private(i,ix) 
         do i=1, is
           if ((1 <= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
             ix = idxmap%glob_to_loc(idx(i))
@@ -340,7 +340,7 @@ contains
             idx(i) = -1
           end if
         end do
-        !$omp end parallel do
+        ! $ o m p end parallel do
       else 
         idx(1:is) = -1
         info = -1
@@ -380,9 +380,9 @@ contains
 
     if (present(mask)) then 
       if (idxmap%is_valid()) then 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(mask,is,idxin,idxout,idxmap,owned_) &
-        !$omp private(i,ix) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idxin,idxout,idxmap,owned_) &
+        ! $ o m p private(i,ix) 
         do i=1,is
           if (mask(i)) then 
             if ((1 <= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
@@ -394,7 +394,7 @@ contains
             end if
           end if
         end do
-        !$omp end parallel do
+        ! $ o m p end parallel do
       else 
         idxout(1:is) = -1
         info = -1
@@ -403,9 +403,9 @@ contains
     else  if (.not.present(mask)) then 
 
       if (idxmap%is_valid()) then 
-        !$omp parallel do default(none) schedule(dynamic) &
-        !$omp shared(is,idxin,idxout,idxmap,owned_) &
-        !$omp private(i,ix) 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(is,idxin,idxout,idxmap,owned_) &
+        ! $ o m p private(i,ix) 
         do i=1, is
           if ((1 <= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
             ix = idxmap%glob_to_loc(idxin(i))
@@ -415,7 +415,7 @@ contains
             idxout(i) = -1
           end if
         end do
-        !$omp end parallel do
+        ! $ o m p end parallel do
       else 
         idxout(1:is) = -1
         info = -1
@@ -564,9 +564,9 @@ contains
 
         else if (.not.present(mask)) then 
 
-          !$omp parallel do default(none) schedule(dynamic) &
-          !$omp shared(mask,is,idx,idxmap,laddsz,lidx) &
-          !$omp private(i,ix,info) 
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(mask,is,idx,idxmap,laddsz,lidx) &
+          ! $ o m p private(i,ix,info) 
           ! $ o m p reduction(.AND.:isLoopValid)        
           do i=1, is
             if (info /= 0) cycle
@@ -606,7 +606,7 @@ contains
               idx(i) = -1
             end if
           end do
-          !$omp end parallel do 
+          ! $ o m p end parallel do 
         end if
       else if (.not.present(lidx)) then
 

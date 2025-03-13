@@ -7,7 +7,7 @@
   environment}
 
 \begin{verbatim}
-call psb_init(ctxt, np, basectxt, ids)
+call psb_init(ctxt, np, basectxt, ids, extcomm)
 \end{verbatim}
 
 This subroutine initializes the PSBLAS parallel environment, defining
@@ -21,7 +21,7 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. \
 Default: use all available processes.
-\item[basectxt] the initial communication context. The new context
+\item[basectxt] the initial PSBLAS communication context. The new context
   will be defined from the processes participating in the initial one.\\
   Scope: {\bf global}.\\
 Type: {\bf optional}.\\
@@ -37,6 +37,13 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array. \
 Default: use the indices $(0\dots np-1)$.  
+\item[extcomm] an alternative initial MPI communicator. The new context
+  will be defined from the processes participating in the initial one.\\
+  Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value. \
+Default: use MPI\_COMM\_WORLD.
 \end{description}
 
 \begin{description}

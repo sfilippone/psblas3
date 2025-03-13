@@ -16,7 +16,7 @@ href="userhtmlse11.html#tailuserhtmlse11.html" >prev-tail</a>] [<a
 href="userhtmlse9.html#tailuserhtmlse12.html">tail</a>] [<a 
 href="userhtml.html# " >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">12    </span> <a 
- id="x19-14600012"></a>Extensions</h3>
+ id="x19-14800012"></a>Extensions</h3>
 <!--l. 3--><p class="noindent" >The EXT, CUDA and RSB subdirectories contains a set of extensions to the base
 library. The extensions provide additional storage formats beyond the ones already
 contained in the base library, as well as interfaces to:
@@ -49,7 +49,7 @@ in&#x00A0;<span class="cite">[<a
 href="userhtmlli2.html#XOurTechRep">23</a>]</span>.
 <!--l. 19--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark">12.1    </span> <a 
- id="x19-14700012.1"></a>Using the extensions</h4>
+ id="x19-14900012.1"></a>Using the extensions</h4>
 <!--l. 21--><p class="noindent" >A sample application using the PSBLAS extensions will contain the following
 steps:
      <ul class="itemize1">
@@ -82,7 +82,7 @@ matrices):
                                                                   
 
                                                                   
-<div class="minipage"><pre class="verbatim" id="verbatim-103">
+<div class="minipage"><pre class="verbatim" id="verbatim-105">
 program&#x00A0;my_cuda_test
 &#x00A0;&#x00A0;use&#x00A0;psb_base_mod
 &#x00A0;&#x00A0;use&#x00A0;psb_util_mod
@@ -142,7 +142,7 @@ speed of the sparse matrix-vector product with the various data structures inclu
 in the library.
 <!--l. 146--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark">12.2    </span> <a 
- id="x19-14800012.2"></a>Extensions&#8217; Data Structures</h4>
+ id="x19-15000012.2"></a>Extensions&#8217; Data Structures</h4>
 <!--l. 150--><p class="noindent" >Access to the facilities provided by the EXT library is mainly achieved through
 the data types that are provided within. The data classes are derived from
 the base classes in PSBLAS, through the Fortran&#x00A0;2003 mechanism of <span 
@@ -153,20 +153,20 @@ href="userhtmlli2.html#XMRC:11">18</a>]</span>.
 <!--l. 155--><p class="indent" >   The data classes are divided between the general purpose CPU extensions, the
 GPU interfaces and the RSB interfaces. In the description we will make use of the
 notation introduced in Table&#x00A0;<a 
-href="#x19-148001r22">22<!--tex4ht:ref: tab:notation --></a>.
+href="#x19-150001r22">22<!--tex4ht:ref: tab:notation --></a>.
    <div class="table">
                                                                   
 
                                                                   
 <!--l. 160--><p class="indent" >   <a 
- id="x19-148001r22"></a><hr class="float"><div class="float" 
+ id="x19-150001r22"></a><hr class="float"><div class="float" 
 >
                                                                   
 
                                                                   
  <div class="caption" 
 ><span class="id">Table&#x00A0;22: </span><span  
-class="content">Notation for parameters describing a sparse matrix</span></div><!--tex4ht:label?: x19-148001r22 -->
+class="content">Notation for parameters describing a sparse matrix</span></div><!--tex4ht:label?: x19-150001r22 -->
 <div class="center" 
 >
 <!--l. 162--><p class="noindent" >
@@ -276,7 +276,7 @@ class="td11">         </td></tr></table>                                        
 
                                                                   
 <a 
- id="x19-148002r5"></a>
+ id="x19-150002r5"></a>
                                                                   
 
                                                                   
@@ -285,18 +285,18 @@ src="mat.png" alt="PIC"
 width="147" height="147" >
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;5: </span><span  
-class="content">Example of sparse matrix</span></div><!--tex4ht:label?: x19-148002r5 -->
+class="content">Example of sparse matrix</span></div><!--tex4ht:label?: x19-150002r5 -->
                                                                   
 
                                                                   
 <!--l. 198--><p class="indent" >   </div><hr class="endfigure">
    <h4 class="subsectionHead"><span class="titlemark">12.3    </span> <a 
- id="x19-14900012.3"></a>CPU-class extensions</h4>
+ id="x19-15100012.3"></a>CPU-class extensions</h4>
 <!--l. 203--><p class="noindent" >
    <h5 class="likesubsubsectionHead"><a 
- id="x19-150000"></a>ELLPACK</h5>
+ id="x19-152000"></a>ELLPACK</h5>
 <!--l. 205--><p class="noindent" >The ELLPACK/ITPACK format (shown in Figure&#x00A0;<a 
-href="#x19-150001r6">6<!--tex4ht:ref: fig:ell --></a>) comprises two 2-dimensional
+href="#x19-152001r6">6<!--tex4ht:ref: fig:ell --></a>) comprises two 2-dimensional
 arrays <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">AS</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">JA</span></span></span> with <span class="obeylines-h"><span class="verb"><span 
@@ -317,7 +317,7 @@ row.
 
                                                                   
 <a 
- id="x19-150001r6"></a>
+ id="x19-152001r6"></a>
                                                                   
 
                                                                   
@@ -327,13 +327,13 @@ width="233" height="233" >
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;6: </span><span  
 class="content">ELLPACK compression of matrix in Figure&#x00A0;<a 
-href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-150001r6 -->
+href="#x19-150002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-152001r6 -->
                                                                   
 
                                                                   
 <!--l. 225--><p class="indent" >   </div><hr class="endfigure">
 <a 
- id="x19-150002r1"></a>
+ id="x19-152002r1"></a>
                                                                   
 
                                                                   
@@ -343,8 +343,8 @@ href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:l
 
                                                                   
    <!--l. 231-->
-   <pre class="lstlisting" id="listing-220"><span class="label"><a 
- id="x19-150003r1"></a></span><span 
+   <pre class="lstlisting" id="listing-221"><span class="label"><a 
+ id="x19-152003r1"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
@@ -353,7 +353,7 @@ class="cmtt-9">i</span></span><span style="color:#000000"><span
 class="cmtt-9">=1,</span></span><span style="color:#000000"><span 
 class="cmtt-9">n</span></span> 
 <span class="label"><a 
- id="x19-150004r2"></a></span><span 
+ id="x19-152004r2"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -362,7 +362,7 @@ class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span
 class="cmtt-9">t</span></span><span style="color:#000000"><span 
 class="cmtt-9">=0</span></span> 
 <span class="label"><a 
- id="x19-150005r3"></a></span><span 
+ id="x19-152005r3"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -373,7 +373,7 @@ class="cmtt-9">j</span></span><span style="color:#000000"><span
 class="cmtt-9">=1,</span></span><span style="color:#000000"><span 
 class="cmtt-9">maxnzr</span></span> 
 <span class="label"><a 
- id="x19-150006r4"></a></span><span 
+ id="x19-152006r4"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -401,7 +401,7 @@ class="cmtt-9">,</span></span><span style="color:#000000"><span
 class="cmtt-9">j</span></span><span style="color:#000000"><span 
 class="cmtt-9">))</span></span> 
 <span class="label"><a 
- id="x19-150007r5"></a></span><span 
+ id="x19-152007r5"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -410,7 +410,7 @@ class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span
 class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">do</span></span> 
 <span class="label"><a 
- id="x19-150008r6"></a></span><span 
+ id="x19-152008r6"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -423,7 +423,7 @@ class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="c
 class="cmtt-9">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">t</span></span> 
 <span class="label"><a 
- id="x19-150009r7"></a></span><span 
+ id="x19-152009r7"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
@@ -431,9 +431,9 @@ class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style=
 class="cmtt-9">do</span></span></pre>
    
 <a 
- id="x19-150010r1"></a>
+ id="x19-152010r1"></a>
 <a 
- id="x19-150011"></a>
+ id="x19-152011"></a>
          <span 
 class="pplb7t-">Algorithm</span><span 
 class="pplb7t-">&#x00A0;1:</span>&#x00A0; Matrix-Vector product in ELL format
@@ -446,7 +446,7 @@ class="zplmr7m-">y </span><span
 class="zplmr7t-">= </span><span 
 class="zplmr7m-">Ax </span>can be computed with the code shown in
 Alg.&#x00A0;<a 
-href="#x19-150010r1">1<!--tex4ht:ref: alg:ell --></a>; it costs one memory write per outer iteration, plus three memory reads and
+href="#x19-152010r1">1<!--tex4ht:ref: alg:ell --></a>; it costs one memory write per outer iteration, plus three memory reads and
 two floating-point operations per inner iteration.
 <!--l. 247--><p class="indent" >   Unless all rows have exactly the same number of nonzeros, some of the
 coefficients in the <span class="obeylines-h"><span class="verb"><span 
@@ -455,12 +455,12 @@ overhead both in terms of memory space and redundant operations (multiplications
 by zero). The overhead can be acceptable if:
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x19-150013x1">
+  class="enumerate" id="x19-152013x1">
      <!--l. 253--><p class="noindent" >The maximum number of nonzeros per row is not much larger than the
      average;
      </li>
 <li 
-  class="enumerate" id="x19-150015x2">
+  class="enumerate" id="x19-152015x2">
      <!--l. 255--><p class="noindent" >The regularity of the data structure allows for faster code, e.g. by allowing
      vectorization, thereby offsetting the additional storage requirements.</li></ol>
 <!--l. 259--><p class="noindent" >In the extreme case where the input matrix has one full row, the ELLPACK
@@ -473,7 +473,7 @@ class="cmtt-10">psb_T_ell_sparse_mat</span></span></span>:
 <div class="center" 
 >
 <!--l. 281--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-104">
+<div class="minipage"><pre class="verbatim" id="verbatim-106">
 &#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_ell_sparse_mat
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;!
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;ITPACK/ELL&#x00A0;format,&#x00A0;extended.
@@ -488,7 +488,7 @@ class="cmtt-10">psb_T_ell_sparse_mat</span></span></span>:
 </pre>
 <!--l. 295--><p class="nopar" >                                                           </div></div>
    <h5 class="likesubsubsectionHead"><a 
- id="x19-151000"></a>Hacked ELLPACK</h5>
+ id="x19-153000"></a>Hacked ELLPACK</h5>
                                                                   
 
                                                                   
@@ -564,7 +564,7 @@ format.
 
                                                                   
 <a 
- id="x19-151001r7"></a>
+ id="x19-153001r7"></a>
                                                                   
 
                                                                   
@@ -574,7 +574,7 @@ width="248" height="248" >
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;7: </span><span  
 class="content">Hacked ELLPACK compression of matrix in Figure&#x00A0;<a 
-href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-151001r7 -->
+href="#x19-150002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-153001r7 -->
                                                                   
 
                                                                   
@@ -586,7 +586,7 @@ class="cmtt-10">psb_T_hll_sparse_mat</span></span></span>:
 <div class="center" 
 >
 <!--l. 374--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-105">
+<div class="minipage"><pre class="verbatim" id="verbatim-107">
 &#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_hll_sparse_mat
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;!
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;HLL&#x00A0;format.&#x00A0;(Hacked&#x00A0;ELL)
@@ -601,9 +601,9 @@ class="cmtt-10">psb_T_hll_sparse_mat</span></span></span>:
 </pre>
 <!--l. 388--><p class="nopar" >                                                           </div></div>
    <h5 class="likesubsubsectionHead"><a 
- id="x19-152000"></a>Diagonal storage</h5>
+ id="x19-154000"></a>Diagonal storage</h5>
 <!--l. 396--><p class="noindent" >The DIAgonal (DIA) format (shown in Figure&#x00A0;<a 
-href="#x19-152001r8">8<!--tex4ht:ref: fig:dia --></a>) has a 2-dimensional array <span class="obeylines-h"><span class="verb"><span 
+href="#x19-154001r8">8<!--tex4ht:ref: fig:dia --></a>) has a 2-dimensional array <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">AS</span></span></span>
 containing in each column the coefficients along a diagonal of the matrix, and an
 integer array <span class="obeylines-h"><span class="verb"><span 
@@ -614,7 +614,7 @@ are padded with zeros as necessary.
 class="zplmr7m-">y </span><span 
 class="zplmr7t-">= </span><span 
 class="zplmr7m-">Ax </span>is shown in Alg.&#x00A0;<a 
-href="#x19-152003r2">2<!--tex4ht:ref: alg:dia --></a>; it
+href="#x19-154003r2">2<!--tex4ht:ref: alg:dia --></a>; it
 costs one memory read per outer iteration, plus three memory reads, one memory
 write and two floating-point operations per inner iteration. The accesses to
 <span class="obeylines-h"><span class="verb"><span 
@@ -627,7 +627,7 @@ required.
 
                                                                   
 <a 
- id="x19-152001r8"></a>
+ id="x19-154001r8"></a>
                                                                   
 
                                                                   
@@ -637,13 +637,13 @@ width="248" height="248" >
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;8: </span><span  
 class="content">DIA compression of matrix in Figure&#x00A0;<a 
-href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-152001r8 -->
+href="#x19-150002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-154001r8 -->
                                                                   
 
                                                                   
 <!--l. 419--><p class="indent" >   </div><hr class="endfigure">
 <a 
- id="x19-152002r2"></a>
+ id="x19-154002r2"></a>
                                                                   
 
                                                                   
@@ -655,7 +655,7 @@ href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:l
    <div class="center" 
 >
    <!--l. 437--><p class="noindent" >
-   <div class="minipage"><pre class="verbatim" id="verbatim-106">
+   <div class="minipage"><pre class="verbatim" id="verbatim-108">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;do&#x00A0;j=1,ndiag
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;if&#x00A0;(offset(j)&#x00A0;&#x003E;&#x00A0;0)&#x00A0;then
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;ir1&#x00A0;=&#x00A0;1;&#x00A0;ir2&#x00A0;=&#x00A0;m&#x00A0;-&#x00A0;offset(j);
@@ -669,9 +669,9 @@ href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:l
 </pre>
 <!--l. 450--><p class="nopar" >                                                           </div></div>
    <a 
- id="x19-152003r2"></a>
+ id="x19-154003r2"></a>
    <a 
- id="x19-152004"></a>
+ id="x19-154004"></a>
          <span 
 class="pplb7t-">Algorithm</span><span 
 class="pplb7t-">&#x00A0;2:</span>&#x00A0; Matrix-Vector product in DIA format
@@ -684,7 +684,7 @@ class="cmtt-10">psb_T_dia_sparse_mat</span></span></span>:
 <div class="center" 
 >
 <!--l. 473--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-107">
+<div class="minipage"><pre class="verbatim" id="verbatim-109">
 &#x00A0;&#x00A0;type,&#x00A0;extends(psb_d_base_sparse_mat)&#x00A0;::&#x00A0;psb_d_dia_sparse_mat
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;!
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;!&#x00A0;DIA&#x00A0;format,&#x00A0;extended.
@@ -698,7 +698,7 @@ class="cmtt-10">psb_T_dia_sparse_mat</span></span></span>:
 </pre>
 <!--l. 486--><p class="nopar" >                                                           </div></div>
    <h5 class="likesubsubsectionHead"><a 
- id="x19-153000"></a>Hacked DIA</h5>
+ id="x19-155000"></a>Hacked DIA</h5>
 <!--l. 495--><p class="noindent" >Storage by DIAgonals is an attractive option for matrices whose coefficients are
 located on a small set of diagonals, since they do away with storing explicitly the
 indices and therefore reduce significantly memory traffic. However, having a few
@@ -749,7 +749,7 @@ class="pplri7t-">hackOffsets[k]</span>.
 
                                                                   
 <a 
- id="x19-153001r9"></a>
+ id="x19-155001r9"></a>
                                                                   
 
                                                                   
@@ -759,7 +759,7 @@ width="248" height="248" >
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;9: </span><span  
 class="content">Hacked DIA compression of matrix in Figure&#x00A0;<a 
-href="#x19-148002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-153001r9 -->
+href="#x19-150002r5">5<!--tex4ht:ref: fig:dense --></a></span></div><!--tex4ht:label?: x19-155001r9 -->
                                                                   
 
                                                                   
@@ -769,7 +769,7 @@ class="cmtt-10">psb_T_hdia_sparse_mat</span></span></span>:
 <div class="center" 
 >
 <!--l. 568--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-108">
+<div class="minipage"><pre class="verbatim" id="verbatim-110">
 &#x00A0;&#x00A0;type&#x00A0;pm
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;real(psb_dpk_),&#x00A0;allocatable&#x00A0;&#x00A0;::&#x00A0;data(:,:)
 &#x00A0;&#x00A0;end&#x00A0;type&#x00A0;pm
@@ -804,7 +804,7 @@ class="cmtt-10">psb_T_hdia_sparse_mat</span></span></span>:
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">12.4    </span> <a 
- id="x19-15400012.4"></a>CUDA-class extensions</h4>
+ id="x19-15600012.4"></a>CUDA-class extensions</h4>
 <!--l. 4--><p class="noindent" >For computing with CUDA we define a dual memorization strategy in which each
 variable on the CPU (&#8220;host&#8221;) side has a GPU (&#8220;device&#8221;) side. When a GPU-type
 variable is initialized, the data contained is (usually) the same on both sides. Each
@@ -846,7 +846,7 @@ a matrix-vector product
 <div class="center" 
 >
 <!--l. 39--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-109">
+<div class="minipage"><pre class="verbatim" id="verbatim-111">
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;call&#x00A0;psb_spmm(alpha,a,x,beta,y,desc_a,info)
 </pre>
 <!--l. 43--><p class="nopar" >                                                           </div></div>

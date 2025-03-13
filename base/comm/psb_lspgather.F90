@@ -48,6 +48,7 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   use psb_penv_mod
   use psb_mat_mod
   use psb_tools_mod
+  use iso_c_binding
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -62,7 +63,7 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_), intent(in), optional   :: root, dupl
   logical, intent(in), optional   :: keepnum,keeploc
 
-  type(psb_l_coo_sparse_mat)      :: loc_coo, glob_coo
+  type(psb_l_coo_sparse_mat), target   :: loc_coo, glob_coo
   integer(psb_ipk_) :: nrg, ncg, nzg, nzl
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k
@@ -156,27 +157,27 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     enddo
     ndx = nzbr(me+1)
     if (root_ == -1) then 
-      call mpi_allgatherv(loc_coo%val,ndx,psb_mpi_lpk_,&
+      call mpi_allgatherv((loc_coo%val),ndx,psb_mpi_lpk_,&
            & glob_coo%val,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_allgatherv(locia,ndx,psb_mpi_lpk_,&
+           & mpi_allgatherv((locia),ndx,psb_mpi_lpk_,&
            & glbia,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_allgatherv(locja,ndx,psb_mpi_lpk_,&
+           & mpi_allgatherv((locja),ndx,psb_mpi_lpk_,&
            & glbja,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
     else
-      call mpi_gatherv(loc_coo%val,ndx,psb_mpi_lpk_,&
+      call mpi_gatherv((loc_coo%val),ndx,psb_mpi_lpk_,&
            & glob_coo%val,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_gatherv(locia,ndx,psb_mpi_lpk_,&
+           & mpi_gatherv((locia),ndx,psb_mpi_lpk_,&
            & glbia,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_gatherv(locja,ndx,psb_mpi_lpk_,&
+           & mpi_gatherv((locja),ndx,psb_mpi_lpk_,&
            & glbja,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
      
@@ -231,6 +232,7 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   use psb_penv_mod
   use psb_mat_mod
   use psb_tools_mod
+  use iso_c_binding
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -245,7 +247,7 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   integer(psb_ipk_), intent(in), optional   :: root, dupl
   logical, intent(in), optional   :: keepnum,keeploc
 
-  type(psb_@LX@_coo_sparse_mat)     :: loc_coo, glob_coo
+  type(psb_@LX@_coo_sparse_mat), target  :: loc_coo, glob_coo
   integer(psb_lpk_) :: nrg, ncg, nzg
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
@@ -337,27 +339,27 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     enddo
     ndx = nzbr(me+1)
     if (root_ == -1) then 
-      call mpi_allgatherv(loc_coo%val,ndx,psb_mpi_lpk_,&
+      call mpi_allgatherv((loc_coo%val),ndx,psb_mpi_lpk_,&
            & glob_coo%val,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_lpk_,&
+           & mpi_allgatherv((loc_coo%ia),ndx,psb_mpi_lpk_,&
            & glob_coo%ia,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_lpk_,&
+           & mpi_allgatherv((loc_coo%ja),ndx,psb_mpi_lpk_,&
            & glob_coo%ja,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
     else
-      call mpi_gatherv(loc_coo%val,ndx,psb_mpi_lpk_,&
+      call mpi_gatherv((loc_coo%val),ndx,psb_mpi_lpk_,&
            & glob_coo%val,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_gatherv(loc_coo%ia,ndx,psb_mpi_lpk_,&
+           & mpi_gatherv((loc_coo%ia),ndx,psb_mpi_lpk_,&
            & glob_coo%ia,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_gatherv(loc_coo%ja,ndx,psb_mpi_lpk_,&
+           & mpi_gatherv((loc_coo%ja),ndx,psb_mpi_lpk_,&
            & glob_coo%ja,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
     end if
@@ -369,7 +371,7 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     call loc_coo%free()
     !
     ! Is the code below safe? For very large cases
-    ! the indices in glob_coo will overflow. But then,
+    ! the indices in glob_coo will overflow. But then),
     ! for very large cases it does not make sense to
     ! gather the matrix on a single procecss anyway...
     !
@@ -403,6 +405,7 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
   use psb_penv_mod
   use psb_mat_mod
   use psb_tools_mod
+  use iso_c_binding
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -417,7 +420,7 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
   integer(psb_ipk_), intent(in), optional   :: root, dupl
   logical, intent(in), optional   :: keepnum,keeploc
 
-  type(psb_@LX@_coo_sparse_mat)     :: loc_coo, glob_coo
+  type(psb_@LX@_coo_sparse_mat), target  :: loc_coo, glob_coo
   integer(psb_lpk_) :: nrg, ncg, nzg
   integer(psb_ipk_) :: err_act, dupl_
   integer(psb_lpk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
@@ -507,27 +510,27 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
     ndx = nzbr(me+1)
 
     if (root_ == -1) then  
-      call mpi_allgatherv(loc_coo%val,ndx,psb_mpi_lpk_,&
+      call mpi_allgatherv((loc_coo%val),ndx,psb_mpi_lpk_,&
            & glob_coo%val,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_lpk_,&
+           & mpi_allgatherv((loc_coo%ia),ndx,psb_mpi_lpk_,&
            & glob_coo%ia,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_lpk_,&
+           & mpi_allgatherv((loc_coo%ja),ndx,psb_mpi_lpk_,&
            & glob_coo%ja,nzbr,idisp,&
            & psb_mpi_lpk_,icomm,minfo)
     else
-      call mpi_gatherv(loc_coo%val,ndx,psb_mpi_lpk_,&
+      call mpi_gatherv((loc_coo%val),ndx,psb_mpi_lpk_,&
            & glob_coo%val,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_gatherv(loc_coo%ia,ndx,psb_mpi_lpk_,&
+           & mpi_gatherv((loc_coo%ia),ndx,psb_mpi_lpk_,&
            & glob_coo%ia,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
       if (minfo == psb_success_) call &
-           & mpi_gatherv(loc_coo%ja,ndx,psb_mpi_lpk_,&
+           & mpi_gatherv((loc_coo%ja),ndx,psb_mpi_lpk_,&
            & glob_coo%ja,nzbr,idisp,&
            & psb_mpi_lpk_,root_,icomm,minfo)
     end if

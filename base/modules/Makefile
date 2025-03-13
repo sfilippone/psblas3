@@ -116,6 +116,7 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 MODULES=$(BASIC_MODS) $(SERIAL_MODS) $(UTIL_MODS)
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
 MODDIR=../../modules
+INCDIR=../../include
 LIBDIR=../
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
@@ -123,6 +124,7 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 objs:  $(MODULES) $(OBJS) $(MPFOBJS)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+	/bin/cp -p $(CPUPDFLAG) psb_config.h $(INCDIR)
 
 lib: objs  $(LIBDIR)/$(LIBNAME) 
 
@@ -415,7 +417,8 @@ penv/psi_collective_mod.o: penv/psi_collective_mod.F90 $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 clean:
-	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod)
+	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod) 
 
 veryclean: clean
+	/bin/rm -f *.h
 

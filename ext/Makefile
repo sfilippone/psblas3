@@ -34,9 +34,9 @@ COBJS=
 OBJS=$(COBJS) $(FOBJS)
 
 lib: objs ilib 
-	ar cur $(LIBNAME) $(OBJS)
+	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
-
+   
 objs: $(OBJS) iobjs
 	/bin/cp -p *$(.mod) $(MODDIR)
 

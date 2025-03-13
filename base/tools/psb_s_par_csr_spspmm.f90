@@ -62,7 +62,11 @@
 !                  Error code.
 !
 Subroutine psb_s_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
-  use psb_base_mod, psb_protect_name => psb_s_par_csr_spspmm
+  use psb_mat_mod
+  use psb_comm_mod
+  use psb_penv_mod
+  use psb_s_tools_mod, psb_protect_name => psb_s_par_csr_spspmm
+  use psb_s_serial_mod, only : psb_scsrspspmm, psb_sbase_rwextd
   Implicit None
 
   type(psb_s_csr_sparse_mat),intent(in)    :: acsr
@@ -132,7 +136,7 @@ Subroutine psb_s_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
     call desc_c%indxmap%g2lip(ltcsr%ja(1:nnz),info)
   end if
   call ltcsr%mv_to_ifmt(tcsr,info)
-  if (info == psb_success_) call psb_rwextd(ncol,bcsr,info,b=tcsr)      
+  if (info == psb_success_) call psb_sbase_rwextd(ncol,bcsr,info,b=tcsr)      
   if (info == psb_success_) call tcsr%free()
   if(info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='Extend am3')
@@ -146,7 +150,7 @@ Subroutine psb_s_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
        & 'starting spspmm 3'
   if (debug_level >= psb_debug_outer_) write(debug_unit,*) me,' ',trim(name),&
        & 'starting spspmm ',acsr%get_nrows(),acsr%get_ncols(),bcsr%get_nrows(),bcsr%get_ncols()
-  call psb_spspmm(acsr,bcsr,ccsr,info)
+  call psb_scsrspspmm(acsr,bcsr,ccsr,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -158,7 +162,11 @@ Subroutine psb_s_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
 End Subroutine psb_s_par_csr_spspmm
 
 Subroutine psb_ls_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
-  use psb_base_mod, psb_protect_name => psb_ls_par_csr_spspmm
+  use psb_mat_mod
+  use psb_comm_mod
+  use psb_penv_mod
+  use psb_s_tools_mod, psb_protect_name => psb_ls_par_csr_spspmm
+  use psb_s_serial_mod, only : psb_lscsrspspmm, psb_lsbase_rwextd
   Implicit None
 
   type(psb_ls_csr_sparse_mat),intent(in)    :: acsr
@@ -226,7 +234,7 @@ Subroutine psb_ls_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   else
     call desc_c%indxmap%g2lip(tcsr1%ja(1:nnz),info)
   end if
-  if (info == psb_success_) call psb_rwextd(nacol,bcsr,info,b=tcsr1)      
+  if (info == psb_success_) call psb_lsbase_rwextd(nacol,bcsr,info,b=tcsr1)      
   if (info == psb_success_) call tcsr1%free()
   if(info /= psb_success_) then
     call psb_errpush(psb_err_internal_error_,name,a_err='Extend am3')
@@ -241,7 +249,7 @@ Subroutine psb_ls_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
        & 'starting spspmm 3'
   if (debug_level >= psb_debug_outer_) write(debug_unit,*) me,' ',trim(name),&
        & 'starting spspmm ',acsr%get_nrows(),acsr%get_ncols(),bcsr%get_nrows(),bcsr%get_ncols()
-  call psb_spspmm(acsr,bcsr,ccsr,info)
+  call psb_lscsrspspmm(acsr,bcsr,ccsr,info)
 
   call psb_erractionrestore(err_act)
   return

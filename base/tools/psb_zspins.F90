@@ -134,7 +134,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='allocate',i_err=(/info/))
         goto 9999
       end if
-#if defined(OPENMP)
+#if 0 && defined(OPENMP)
       block
         logical :: is_in_parallel
         is_in_parallel = omp_in_parallel()

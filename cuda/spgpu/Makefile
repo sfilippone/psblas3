@@ -9,13 +9,14 @@ MODDIR=$(TOP)/modules
 LIBNAME=libspgpu.a
 
 OBJS=coo.o core.o dia.o ell.o hdia.o hell.o 
+CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
 
 all: includes objs
 
 objs: $(OBJS) iobjs
 
 lib: objs iobjs ilib
-	ar cur $(LIBNAME) $(OBJS)
+	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 iobjs:
@@ -31,9 +32,9 @@ clean: iclean
 iclean:
 	$(MAKE) -C kernels clean 
 .c.o:
-	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) $(CUDA_INCLUDES) -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) $(CU_INCLUDES) -c $<
 .cpp.o:
-	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) $(CUDA_INCLUDES) -c $< -o $@
+	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) $(CU_INCLUDES) -c $< -o $@
 
 .cu.o:
-	$(NVCC)   $(CINCLUDES) $(CDEFINES) $(CUDEFINES) $(CUDA_INCLUDES) -c $<
+	$(NVCC)   $(CINCLUDES) $(CDEFINES) $(CUDEFINES) $(CU_INCLUDES) -c $<

@@ -16,11 +16,10 @@
 #include "cudadebug.h"
 #include "cudalang.h"
 #include "cuComplex.h"
-
+#include "core.h"
 
 extern "C"
 {
-#include "core.h"
 #include "vector.h"
   int getGPUMultiProcessors();
   int getGPUMaxThreadsPerMP();

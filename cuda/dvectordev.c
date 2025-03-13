@@ -39,14 +39,15 @@
 
 int registerMappedDouble(void  *buff, void **d_p, int n, double dummy)
 {
-  return registerMappedMemory(buff,d_p,n*sizeof(double));
+  return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(double));
 }
 
 int writeMultiVecDeviceDouble(void* deviceVec, double* hostVec)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
   // Ex updateFromHost vector function
-  i = writeRemoteBuffer((void*) hostVec, (void *)devVec->v_, devVec->pitch_*devVec->count_*sizeof(double));
+  i = writeRemoteBuffer((void*) hostVec, (void *)devVec->v_,
+			((size_t) devVec->pitch_)*devVec->count_*sizeof(double));
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","FallocMultiVecDevice",i);
   }
@@ -66,7 +67,7 @@ int readMultiVecDeviceDouble(void* deviceVec, double* hostVec)
 { int i,j;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;
   i = readRemoteBuffer((void *) hostVec, (void *)devVec->v_, 
-		       devVec->pitch_*devVec->count_*sizeof(double));
+		       ((size_t) devVec->pitch_)*devVec->count_*sizeof(double));
   if (i != 0) {
     fprintf(stderr,"From routine : %s : %d \n","readMultiVecDeviceDouble",i);
   }

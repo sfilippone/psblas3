@@ -406,7 +406,7 @@ psb_z_dns_mat_impl.o
 objs: $(OBJS)
 
 lib: objs
-	ar cur ../$(LIBNAME) $(OBJS)
+	$(AR) ../$(LIBNAME) $(OBJS)
 
 clean:
 	/bin/rm -f $(OBJS)

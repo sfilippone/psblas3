@@ -299,7 +299,7 @@ end subroutine psb_zaxpby_vect_out
 !
 subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_zaxpby
-
+  use psi_z_serial_mod
   implicit none
 
   integer(psb_ipk_), intent(in), optional   :: n, jx, jy
@@ -384,9 +384,9 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in /= 0)) then
     if(desc_a%get_local_rows() > 0) then
-      call zaxpby(desc_a%get_local_cols(),in,&
-           & alpha,x(iix:,jjx),lldx,beta,&
-           & y(iiy:,jjy),lldy,info)
+      call psi_zaxpby(desc_a%get_local_cols(),in,&
+           & alpha,x(iix:,jjx:),beta,&
+           & y(iiy:,jjy:),info)
     end if
   end if
 
@@ -510,9 +510,8 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call zaxpby(desc_a%get_local_cols(),ione,&
-         & alpha,x,lldx,beta,&
-         & y,lldy,info)
+    call psb_geaxpby(desc_a%get_local_cols(),&
+         & alpha,x,beta,y,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -642,9 +641,8 @@ subroutine  psb_zaxpbyvout(alpha, x, beta,y, z, desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call zaxpbyv2(desc_a%get_local_cols(),ione,&
-         & alpha,x,lldx,beta,&
-         & y,lldy,z,lldz,info)
+    call psb_geaxpby(desc_a%get_local_cols(),&
+         & alpha,x,beta,y,z,info)
   end if
 
   call psb_erractionrestore(err_act)
