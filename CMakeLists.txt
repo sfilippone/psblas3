@@ -439,6 +439,21 @@ if(MPI_FOUND)
   endif()
 endif()
 
+
+
+#------------------------------------------
+# Configure the psb_config.h file
+#------------------------------------------
+
+message(STATUS "bin dir ${CMAKE_CURRENT_BINARY_DIR}; source dir ${CMAKE_CURRENT_SOURCE_DIR};;")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/modules/psb_config.h.in 
+    ${CMAKE_CURRENT_BINARY_DIR}/include/psb_config.h 	
+    @ONLY  # Replace variables only
+)
+
+
+
 #---------------------------------------
 # Add the PSBLAS libraries and utilities
 #---------------------------------------
@@ -587,7 +602,14 @@ if(WIN32)
       PUBLIC psb_util_C)
   endif()
 else()
+
+  if(METIS_FOUND)
+    foreach(file IN LISTS util_source_C_metis_files)
+      list(APPEND util_source_C_files file)
+    endforeach()
+  endif()
   add_library(psb_util_C OBJECT ${util_source_C_files})
+
   add_library(util ${util_source_files} $<TARGET_OBJECTS:psb_util_C>)
 endif()
 set_target_properties(util
@@ -873,11 +895,11 @@ endif()
 #)
 
 
-#export(
-#  EXPORT ${CMAKE_PROJECT_NAME}-targets
-#  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
-#    NAMESPACE psblas::
-#)
+export(
+  EXPORT ${CMAKE_PROJECT_NAME}-targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
+    NAMESPACE psblas::
+)
 
 
 
