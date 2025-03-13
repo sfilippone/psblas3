@@ -51,3 +51,7 @@ set(PSB_util_source_C__metis_files
 foreach(file IN LISTS PSB_util_source_C_files)
   list(APPEND util_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
 endforeach()
+
+foreach(file IN LISTS PSB_util_source_C_metis_files)
+  list(APPEND util_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
+endforeach()
