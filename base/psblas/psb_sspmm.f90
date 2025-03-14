@@ -599,7 +599,7 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
 
     if (doswap_)then
       ik = lik ! This should not be an issue, we are expecting the values
-      ! to be small, within IPK
+      ! to be small, within PSB_IPK
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & ik,sone,y(:,1:ik),desc_a,iwork,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&

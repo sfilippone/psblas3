@@ -100,7 +100,7 @@ module psb_error_mod
   end interface
 
   interface psb_errcomm
-#if defined(IPK8)
+#if defined(PSB_IPK8)
     subroutine psb_errcomm_m(ctxt, err)
       import :: psb_ipk_, psb_mpk_, psb_ctxt_type
       type(pxb_ctxt_type), intent(in)  :: ctxt

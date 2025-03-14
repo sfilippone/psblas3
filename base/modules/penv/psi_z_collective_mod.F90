@@ -89,11 +89,11 @@ contains
   ! gather
   !
   subroutine psb_zgather_s(ctxt,dat,resv,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -107,7 +107,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
     
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     resv(1) = dat
 #else
     call psb_info(ctxt,iam,np)
@@ -157,11 +157,11 @@ contains
   end subroutine psb_zgather_s
 
     subroutine psb_zgather_v(ctxt,dat,resv,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -175,7 +175,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
     
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     resv(:) = dat(:)
 #else
     call psb_info(ctxt,iam,np)
@@ -225,11 +225,11 @@ contains
   end subroutine psb_zgather_v
 
     subroutine psb_zgatherv_v(ctxt,dat,resv,szs,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -245,7 +245,7 @@ contains
     integer(psb_mpk_), allocatable  :: displs(:)
     logical :: collective_start, collective_end, collective_sync
     
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     resv(:) = dat(:)
 #else
     call psb_info(ctxt,iam,np)
@@ -334,11 +334,11 @@ contains
   !
 
   subroutine psb_zsums(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -352,7 +352,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
     
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -410,11 +410,11 @@ contains
   end subroutine psb_zsums
 
   subroutine psb_zsumv(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -428,7 +428,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -487,11 +487,11 @@ contains
   end subroutine psb_zsumv
 
   subroutine psb_zsumm(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -505,7 +505,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
     
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
 
@@ -568,11 +568,11 @@ contains
   !
   
   subroutine psb_zamxs(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -586,7 +586,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -645,11 +645,11 @@ contains
   end subroutine psb_zamxs
 
   subroutine psb_zamxv(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -663,7 +663,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -722,11 +722,11 @@ contains
   end subroutine psb_zamxv
 
   subroutine psb_zamxm(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -740,7 +740,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
 
@@ -802,11 +802,11 @@ contains
   ! AMN: Minimum Absolute Value
   !
   subroutine psb_zamns(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -820,7 +820,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -879,11 +879,11 @@ contains
   end subroutine psb_zamns
 
   subroutine psb_zamnv(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -897,7 +897,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -956,11 +956,11 @@ contains
   end subroutine psb_zamnv
 
   subroutine psb_zamnm(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -974,7 +974,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
 
@@ -1037,11 +1037,11 @@ contains
   ! BCAST Broadcast
   !  
   subroutine psb_zbcasts(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1056,7 +1056,7 @@ contains
     logical :: collective_start, collective_end, collective_sync
     
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -1092,11 +1092,11 @@ contains
   end subroutine psb_zbcasts
 
   subroutine psb_zbcastv(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1110,7 +1110,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then 
@@ -1147,11 +1147,11 @@ contains
   end subroutine psb_zbcastv
 
   subroutine psb_zbcastm(ctxt,dat,root,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1165,7 +1165,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
 
@@ -1209,11 +1209,11 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine psb_zscan_sums(ctxt,dat,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1227,7 +1227,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
     if (present(mode)) then
@@ -1260,11 +1260,11 @@ contains
   end subroutine psb_zscan_sums
 
   subroutine psb_zexscan_sums(ctxt,dat,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1279,7 +1279,7 @@ contains
     logical :: collective_start, collective_end, collective_sync
 
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
     if (present(mode)) then
@@ -1314,11 +1314,11 @@ contains
   end subroutine psb_zexscan_sums
 
   subroutine psb_zscan_sumv(ctxt,dat,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1332,7 +1332,7 @@ contains
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
     complex(psb_dpk_), allocatable :: dat_(:)
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
     if (present(mode)) then
@@ -1365,11 +1365,11 @@ contains
   end subroutine psb_zscan_sumv
 
   subroutine psb_zexscan_sumv(ctxt,dat,mode,request)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)              :: ctxt
@@ -1384,7 +1384,7 @@ contains
     logical :: collective_start, collective_end, collective_sync
     complex(psb_dpk_), allocatable :: dat_(:)
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
     if (present(mode)) then
@@ -1457,11 +1457,11 @@ contains
 
   subroutine psb_z_m_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & valrcv,iarcv,jarcv,rvsz,brvindx,ctxt,info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     complex(psb_dpk_), intent(in), target  :: valsnd(:)
@@ -1540,11 +1540,11 @@ contains
 
   subroutine psb_z_e_simple_triad_a2av(valsnd,iasnd,jasnd,sdsz,bsdindx,&
        & valrcv,iarcv,jarcv,rvsz,brvindx,ctxt,info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     complex(psb_dpk_), intent(in), target  :: valsnd(:)

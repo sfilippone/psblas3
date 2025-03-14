@@ -71,7 +71,7 @@
 !
 ! We are also introducing the type psb_lcspmat_type.
 ! The basic difference with psb_cspmat_type is in the type
-! of the indices, which are PSB_LPK_ so that the entries
+! of the indices, which are PSB_PSB_LPK_ so that the entries
 ! are guaranteed to be able to contain global indices.
 ! This type only supports data handling and preprocessing, it is
 ! not supposed to be used for computations.
@@ -145,7 +145,7 @@ module psb_c_mat_mod
     procedure, pass(a) :: csgetrow    => psb_c_csgetrow
     procedure, pass(a) :: csgetblk    => psb_c_csgetblk
     generic, public    :: csget       => csgetptn, csgetrow, csgetblk
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: lcsgetptn    => psb_c_lcsgetptn
     procedure, pass(a) :: lcsgetrow    => psb_c_lcsgetrow
     generic, public    :: csget        => lcsgetptn, lcsgetrow
@@ -311,7 +311,7 @@ module psb_c_mat_mod
     ! Setters
     procedure, pass(a) :: set_lnrows   => psb_lc_set_lnrows
     procedure, pass(a) :: set_lncols   => psb_lc_set_lncols
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: set_inrows   => psb_lc_set_inrows
     procedure, pass(a) :: set_incols   => psb_lc_set_incols
     generic, public    :: set_nrows   => set_inrows, set_lnrows
@@ -346,7 +346,7 @@ module psb_c_mat_mod
     procedure, pass(a) :: csgetrow    => psb_lc_csgetrow
     procedure, pass(a) :: csgetblk    => psb_lc_csgetblk
     generic, public    :: csget       => csgetptn, csgetrow, csgetblk
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 !!$    procedure, pass(a) :: icsgetptn    => psb_lc_icsgetptn
 !!$    procedure, pass(a) :: icsgetrow    => psb_lc_icsgetrow
 !!$    generic, public    :: csget        => icsgetptn, icsgetrow
@@ -1270,7 +1270,7 @@ module psb_c_mat_mod
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: m
     end subroutine psb_lc_set_lnrows
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     subroutine  psb_lc_set_inrows(m,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
@@ -1285,7 +1285,7 @@ module psb_c_mat_mod
       class(psb_lcspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: n
     end subroutine psb_lc_set_lncols
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     subroutine psb_lc_set_incols(n,a)
       import :: psb_ipk_, psb_lpk_, psb_lcspmat_type
       class(psb_lcspmat_type), intent(inout) :: a
@@ -2410,7 +2410,7 @@ contains
 
   end subroutine psb_c_clean_zeros
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   subroutine psb_c_lcsgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
     implicit none
@@ -2929,7 +2929,7 @@ contains
 
   end subroutine psb_lc_clean_zeros
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 !!$  subroutine psb_lc_icsgetptn(imin,imax,a,nz,ia,ja,info,&
 !!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
 !!$    implicit none

@@ -267,7 +267,7 @@ subroutine psb_s_rb_idx_tree_scalar_sparse_row_mul(tree, scalar, mat, row_num)
 end subroutine psb_s_rb_idx_tree_scalar_sparse_row_mul
 
 subroutine psb_s_rb_idx_tree_merge(trees, mat)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   use psb_realloc_mod
@@ -294,7 +294,7 @@ subroutine psb_s_rb_idx_tree_merge(trees, mat)
   call psb_realloc(nnz, mat%val, info)
   call psb_realloc(nnz, mat%ja, info)
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   !$omp parallel do schedule(static), private(current, previous, j)
 #endif
   do i = 1, size(trees)
@@ -323,7 +323,7 @@ subroutine psb_s_rb_idx_tree_merge(trees, mat)
       deallocate(previous)
     end do
   end do
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   !$omp end parallel do
 #endif
 end subroutine psb_s_rb_idx_tree_merge

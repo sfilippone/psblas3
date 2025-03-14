@@ -33,10 +33,10 @@
 
 typedef struct T_CSRGDeviceMat
 {			
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
   cusparseMatDescr_t descr;
   cusparseSolveAnalysisInfo_t triang;
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
   cusparseMatDescr_t descr;
   csrsv2Info_t   triang;
   size_t        mvbsize, svbsize;
@@ -59,7 +59,7 @@ typedef struct T_Cmat
   T_CSRGDeviceMat *mat;
 } T_Cmat;
 
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
 typedef struct T_HYBGDeviceMat
 {			
   cusparseMatDescr_t descr;
@@ -94,13 +94,13 @@ int T_CSRGDevice2Host(T_Cmat *Mat, int m, int n, int nz,
 
 int T_CSRGDeviceGetParms(T_Cmat *Mat,int *nr, int *nc, int *nz);
 
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
 int T_CSRGDeviceSetMatType(T_Cmat *Mat, int type);
 int T_CSRGDeviceSetMatFillMode(T_Cmat *Mat, int type);
 int T_CSRGDeviceSetMatDiagType(T_Cmat *Mat, int type);
 int T_CSRGDeviceSetMatIndexBase(T_Cmat *Mat, int type);
 int T_CSRGDeviceCsrsmAnalysis(T_Cmat *Mat);
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
 int T_CSRGDeviceSetMatType(T_Cmat *Mat, int type);
 int T_CSRGDeviceSetMatFillMode(T_Cmat *Mat, int type);
 int T_CSRGDeviceSetMatDiagType(T_Cmat *Mat, int type);
@@ -115,7 +115,7 @@ int T_CSRGIsNullMvDescr(T_CSRGDeviceMat *cMat);
 
 
 
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
 
 
 int T_HYBGDeviceFree(T_Hmat *Matrix);

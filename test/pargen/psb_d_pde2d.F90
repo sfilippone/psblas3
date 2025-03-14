@@ -156,7 +156,7 @@ contains
        & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -316,7 +316,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else
       call mpi_dims_create(np,2,npdims,info)
@@ -422,7 +422,10 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
+#if 0
+    !Disable parallel generation for the time being
     !$omp parallel shared(deltah,myidx,a,desc_a)
+#endif
     !
     block 
       integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy, ith,nth
@@ -430,7 +433,7 @@ contains
       integer(psb_lpk_), allocatable     :: irow(:),icol(:)
       real(psb_dpk_), allocatable :: val(:)
       real(psb_dpk_)    :: x,y, zt(nb)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else
@@ -445,7 +448,10 @@ contains
         !goto 9999
       endif
       
+#if 0
+      !Disable parallel generation for the time being
       !$omp  do schedule(dynamic)
+#endif
       !     
       do ii=1, nlr,nb
         if(info /= psb_success_) cycle
@@ -509,7 +515,7 @@ contains
           endif
           
         end do
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 !!$        write(0,*) omp_get_thread_num(),' Check insertion ',&
 !!$             & irow(1:icoeff-1),':',icol(1:icoeff-1)
 #endif
@@ -521,10 +527,16 @@ contains
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
         if(info /= psb_success_) cycle
       end do
+#if 0
+      !Disable parallel generation for the time being
       !$omp end do
+#endif
       deallocate(val,irow,icol)
     end block
+#if 0
+    !Disable parallel generation for the time being
     !$omp end parallel
+#endif
     
     
     tgen = psb_wtime()-t1
@@ -598,7 +610,7 @@ program psb_d_pde2d
   use psb_linsolve_mod
   use psb_util_mod
   use psb_d_pde2d_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -647,7 +659,7 @@ program psb_d_pde2d
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   !$OMP parallel shared(nth)
   !$OMP master
   nth = omp_get_num_threads()

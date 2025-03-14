@@ -70,29 +70,29 @@ module psb_const_mod
 #endif
 
   ! Now for the choices:
-  !  IPK = integer kind for "local" indices and sizes.
+  !  PSB_IPK = integer kind for "local" indices and sizes.
   !        Can be 4 or 8 bytes.
-  !  LPK = integer kind for "global" indices and sizes.
+  !  PSB_LPK = integer kind for "global" indices and sizes.
   !        Can be 4 or 8 bytes.
-  !        Size must be >= size of IPK
+  !        Size must be >= size of PSB_IPK
   !
   !  Additional rules:
   !  1. MPI related stuff is always MPK
   !  2. ctxt,IAM,NP: should we have two versions of everything,
   !                   one with MPK the other with EPK?
-  !  3. INFO, ERR_ACT, IERR etc are always IPK
+  !  3. INFO, ERR_ACT, IERR etc are always PSB_IPK
   !  4. For the array version of things, where it makes sense
   !     e.g. realloc, snd/receive, define as MPK,EPK and the
   !     compiler will later pick up the correct version according
-  !     to what IPK/LPK are mapped onto.
+  !     to what PSB_IPK/PSB_LPK are mapped onto.
   !
-#if defined(IPK4) && defined(LPK4)
+#if defined(PSB_IPK4) && defined(PSB_LPK4)
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_mpk_
-#elif  defined(IPK4) && defined(LPK8)
+#elif  defined(PSB_IPK4) && defined(PSB_LPK8)
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_epk_
-#elif  defined(IPK8) && defined(LPK8)
+#elif  defined(PSB_IPK8) && defined(PSB_LPK8)
   integer, parameter  :: psb_ipk_ = psb_epk_
   integer, parameter  :: psb_lpk_ = psb_epk_
 #else
@@ -107,13 +107,13 @@ module psb_const_mod
   integer(psb_epk_), save      :: psb_sizeof_mp  = 4
   integer(psb_epk_), save      :: psb_sizeof_ep  = 8
 
-#if defined(IPK4) && defined(LPK4)
+#if defined(PSB_IPK4) && defined(PSB_LPK4)
   integer(psb_epk_), save      :: psb_sizeof_ip = 4
   integer(psb_epk_), save      :: psb_sizeof_lp = 4
-#elif  defined(IPK4) && defined(LPK8)
+#elif  defined(PSB_IPK4) && defined(PSB_LPK8)
   integer(psb_epk_), save      :: psb_sizeof_ip = 4
   integer(psb_epk_), save      :: psb_sizeof_lp = 8
-#elif  defined(IPK8) && defined(LPK8)
+#elif  defined(PSB_IPK8) && defined(PSB_LPK8)
   integer(psb_epk_), save      :: psb_sizeof_ip = 8
   integer(psb_epk_), save      :: psb_sizeof_lp = 8
 #else

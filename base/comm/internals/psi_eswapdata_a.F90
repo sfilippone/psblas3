@@ -90,11 +90,11 @@ subroutine psi_eswapdatam(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -161,11 +161,11 @@ subroutine psi_eswapidxm(ctxt,icomm,flag,n,beta,y,idx, &
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -567,11 +567,11 @@ subroutine psi_eswapdatav(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -649,11 +649,11 @@ subroutine psi_eswapidxv(ctxt,icomm,flag,beta,y,idx, &
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 

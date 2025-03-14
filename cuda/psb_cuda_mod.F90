@@ -68,7 +68,7 @@ module psb_cuda_mod
   use psb_d_cuda_csrg_mat_mod
   use psb_c_cuda_csrg_mat_mod
   use psb_z_cuda_csrg_mat_mod
-#if CUDA_SHORT_VERSION <= 10 
+#if PSB_CUDA_SHORT_VERSION <= 10 
   use psb_s_cuda_hybg_mat_mod
   use psb_d_cuda_hybg_mat_mod
   use psb_c_cuda_hybg_mat_mod

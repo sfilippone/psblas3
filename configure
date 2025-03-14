@@ -663,8 +663,8 @@ CUDALD
 CUDAD
 CUDEFINES
 CUDA_NVCC
-CUDA_SHORT_VERSION
-CUDA_VERSION
+PSB_CUDA_SHORT_VERSION
+PSB_CUDA_VERSION
 CUDA_LIBS
 CUDA_INCLUDES
 CXXCUDEFINES
@@ -695,10 +695,10 @@ CHAVEAMD
 CREALMETIS
 CINTMETIS
 CHAVEMETIS
-CHAVEOPENMP
+CHAVE_OPENMP
 CSERIALMPI
-LPKDEF
-IPKDEF
+PSB_LPKDEF
+PSB_IPKDEF
 FINCLUDES
 CINCLUDES
 METIS_LIBS
@@ -4648,7 +4648,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    MPIFC="$FC";
    MPICC="$CC";
    MPICXX="$CXX";
-   CSERIALMPI="#define SERIAL_MPI"
+   CSERIALMPI="#define PSB_SERIAL_MPI"
 else
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -7286,7 +7286,7 @@ fi
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+   FDEFINES="$psblas_cv_define_prepend-DPSB_SERIAL_MPI $psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
   else
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking MPI Fortran 2008 interface" >&5
 printf %s "checking MPI Fortran 2008 interface... " >&6; }
@@ -7327,7 +7327,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
-    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
   else
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Fortran MPI mod" >&5
 printf %s "checking for Fortran MPI mod... " >&6; }
@@ -7349,13 +7349,13 @@ if ac_fn_fc_try_compile "$LINENO"
 then :
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
-		      FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES"
 else $as_nop
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
-		      FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_H $FDEFINES"
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 ac_ext=c
@@ -7414,25 +7414,25 @@ printf "%s\n" "Unsupported value for LPK: $pac_cv_lpk_size, defaulting to 8." >&
 fi
 
 
-# Defaults for IPK/LPK
+# Defaults for PSB_IPK/PSB_LPK
 if test x"$pac_cv_ipk_size" == x"" ; then
   pac_cv_ipk_size=4
 fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-IPKDEF="#define IPK$pac_cv_ipk_size"
-LPKDEF="#define LPK$pac_cv_lpk_size"
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. " >&5
-printf "%s\n" "$as_me: Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. " >&6;};
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. " >&5
+printf "%s\n" "$as_me: Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. " >&6;};
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Forcing equal values" >&5
 printf "%s\n" "$as_me: Forcing equal values" >&6;}
    pac_cv_lpk_size=$pac_cv_ipk_size;
 fi
-FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
-FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";
+FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
+FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";
 
 FLINK="$MPIFC"
 if test -e penmp || test -e mp; then
@@ -7720,9 +7720,9 @@ fi
 
 
 if test x"$pac_cv_openmp" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   FDEFINES="$psblas_cv_define_prepend-DPSB_OPENMP $FDEFINES";
    CDEFINES="$CDEFINES";
-   CHAVEOPENMP="#define OPENMP"
+   CHAVE_OPENMP="#define PSB_OPENMP"
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";
@@ -8381,7 +8381,7 @@ else $as_nop
 printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
-		      FDEFINES="$psblas_cv_define_prepend-DHAVE_BUGGY_GENERICS $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_BUGGY_GENERICS $FDEFINES"
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -8417,7 +8417,7 @@ if ac_fn_fc_try_compile "$LINENO"
 then :
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
-		      FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"
 else $as_nop
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
@@ -9698,7 +9698,7 @@ done
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$pac_lapack_ok" = xyes; then
-        FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"
+        FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_LAPACK $FDEFINES"
         :
 else
         pac_lapack_ok=no
@@ -10128,8 +10128,8 @@ LIBS="$SAVE_LIBS";
 CPPFLAGS="$SAVE_CPPFLAGS";
 
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Compatibility between metis and LPK" >&5
-printf %s "checking Compatibility between metis and LPK... " >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Compatibility between metis and PSB_LPK" >&5
+printf %s "checking Compatibility between metis and PSB_LPK... " >&6; }
 if  test  "x$pac_cv_lpk_size" == "x4" ; then
   if test  "x$pac_cv_metis_idx" == "x64" ; then
          psblas_cv_have_metis="no";
@@ -10154,12 +10154,12 @@ printf "%s\n" "$as_me: Unknown  METIS REAL bitsize." >&6;}
      $psblas_cv_have_metis = "no";
 fi
 if test "x$psblas_cv_have_metis" == "xyes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
-   #   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_METIS $psblas_cv_define_prepend-DPSB_METIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DPSB_METIS_REAL_$pac_cv_metis_real $FDEFINES"
+   CDEFINES="$psblas_cv_metis_includes $CDEFINES"
    METISINCFILE=$psblas_cv_metisincfile
-   CHAVEMETIS="#define HAVE_METIS"
-   CINTMETIS="#define METIS_$pac_cv_metis_idx"
-   CREALMETIS="#define METIS_REAL_$pac_cv_metis_real"
+   CHAVEMETIS="#define PSB_HAVE_METIS"
+   CINTMETIS="#define PSB_METIS_$pac_cv_metis_idx"
+   CREALMETIS="#define PSB_METIS_REAL_$pac_cv_metis_real"
 fi
 
 
@@ -10368,9 +10368,9 @@ LIBS="$SAVE_LIBS";
 CPPFLAGS="$SAVE_CPPFLAGS";
 
 if test "x$psblas_cv_have_amd" == "xyes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
-   #   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
-   CHAVEAMD="#define HAVE_AMD_"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_AMD $FDEFINES"
+   CDEFINES="$psblas_cv_amd_includes $CDEFINES"
+   CHAVEAMD="#define PSB_HAVE_AMD"
 fi
 
 
@@ -10392,7 +10392,7 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU" >&5
 printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU" >&6;}
   pac_cv_cuda="no";
-  HAVE_CUDA="no";
+  PSB_HAVE_CUDA="no";
   CUDA_CC="";
   SPGPU_LIBS="";
   CUDAD="";
@@ -10617,13 +10617,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 LIBS="$SAVE_LIBS"
 CPPFLAGS="$SAVE_CPPFLAGS"
 
-            HAVE_CUDA="yes";
-      CUDA_VERSION="$pac_cv_cuda_version";
-      CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-      CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
-      CHAVECUDA="#define HAVE_CUDA"
-      CSHORTVCUDA="#define CUDA_SHORT_VERSION ${CUDA_SHORT_VERSION}"
-      CVERSIONCUDA="#define CUDA_VERSION ${CUDA_VERSION}"
+            PSB_HAVE_CUDA="yes";
+      PSB_CUDA_VERSION="$pac_cv_cuda_version";
+      PSB_CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+      CUDA_DEFINES="-DPSB_HAVE_CUDA -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}";
+      CHAVECUDA="#define PSB_HAVE_CUDA"
+      CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
+      CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
       SPGPU_LIBS="-lspgpu";
       CUDAD=cudad;
       CUDALD=cudald;
@@ -11060,7 +11060,7 @@ else
 printf "%s\n" "$LIBRSB_DIR" >&6; }
   RSBTARGETLIB=rsbd;
   RSBTARGETOBJ=rsbobj;
-  CHAVELIBRSB="#define HAVE_LIBRSB"
+  CHAVELIBRSB="#define PSB_HAVE_LIBRSB"
 fi
 
 
@@ -11125,7 +11125,7 @@ UTILLIBNAME=libpsb_util.a
 
 
 PSBLASRULES='
-PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(FLIBS) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(PSB_METIS_LIB) $(AMD_LIB) $(FLIBS) $(LIBS)
 CXXDEFINES=$(PSBCXXDEFINES)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
@@ -12525,7 +12525,7 @@ fi
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
-	CUDA 		      : ${HAVE_CUDA}
+	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
 	OPENACC		      : ${pac_cv_openacc}
@@ -12563,7 +12563,7 @@ printf "%s\n" "$as_me:
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
-	CUDA 		      : ${HAVE_CUDA}
+	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
 	OPENACC		      : ${pac_cv_openacc}

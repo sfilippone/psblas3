@@ -35,13 +35,13 @@ module psb_cbind_const_mod
   use psb_const_mod
   
   integer, parameter :: psb_c_mpk_ = c_int32_t
-#if defined(IPK4) &&  defined(LPK4)
+#if defined(PSB_IPK4) &&  defined(PSB_LPK4)
   integer, parameter :: psb_c_ipk_ = c_int32_t
   integer, parameter :: psb_c_lpk_ = c_int32_t
-#elif defined(IPK4) &&  defined(LPK8)
+#elif defined(PSB_IPK4) &&  defined(PSB_LPK8)
   integer, parameter :: psb_c_ipk_ = c_int32_t
   integer, parameter :: psb_c_lpk_ = c_int64_t
-#elif defined(IPK8) &&  defined(LPK8)
+#elif defined(PSB_IPK8) &&  defined(PSB_LPK8)
   integer, parameter :: psb_c_ipk_ = c_int64_t
   integer, parameter :: psb_c_lpk_ = c_int64_t
 #else

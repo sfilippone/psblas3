@@ -447,7 +447,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ik = lik ! This should not be a problem.
-  ! We expect ik to be small, well within IPK
+  ! We expect ik to be small, well within PSB_IPK
   ! Perform local triangular system solve
   xp => x(iix:lldx,jjx:jjx+ik-1)
   yp => y(iiy:lldy,jjy:jjy+ik-1)

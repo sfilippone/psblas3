@@ -74,11 +74,11 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_csphalo
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -100,7 +100,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   ! If globals are 8 bytes but locals are 4, things get tricky
   integer(psb_ipk_), allocatable  :: liasnd(:), ljasnd(:)
   integer(psb_lpk_), allocatable  :: iasnd(:), jasnd(:), iarcv(:), jarcv(:)
@@ -268,7 +268,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_ensure_size(max(iszs,1),iasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   ! If globals are 8 bytes but locals are not, things get tricky
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),liasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),ljasnd,info)
@@ -540,11 +540,11 @@ Subroutine psb_lcsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_lcsphalo
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -883,11 +883,11 @@ Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,data,outcol_glob,col_desc)
   use psb_base_mod, psb_protect_name => psb_lc_csr_halo
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -1243,11 +1243,11 @@ Subroutine psb_c_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,data,outcol_glob,col_desc)
   use psb_base_mod, psb_protect_name => psb_c_lc_csr_halo
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 

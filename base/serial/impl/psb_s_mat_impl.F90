@@ -3111,7 +3111,7 @@ subroutine  psb_ls_set_lnrows(m,a)
 
 end subroutine psb_ls_set_lnrows
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 subroutine  psb_ls_set_inrows(m,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_inrows
   use psb_error_mod
@@ -3168,7 +3168,7 @@ subroutine  psb_ls_set_lncols(n,a)
 
 end subroutine psb_ls_set_lncols
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 subroutine  psb_ls_set_incols(n,a)
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_incols
   use psb_error_mod
