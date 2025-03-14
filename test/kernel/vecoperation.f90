@@ -35,15 +35,20 @@ module unittestvector_mod
 
   use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
        &  psb_dspmat_type, psb_d_vect_type, dzero, psb_ctxt_type,&
-       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
+       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type,&
+       &  psb_d_base_multivect_type
 
   interface psb_gen_const
-   module procedure  psb_d_gen_const
+   module procedure  psb_d_gen_const, psb_d_gen_const_multi
   end interface psb_gen_const
+
+  interface psb_check_ans
+   module procedure  psb_check_ans_v, psb_check_ans_mv
+  end interface psb_check_ans
 
 contains
 
-  function psb_check_ans(v,val,ctxt) result(ans)
+  function psb_check_ans_v(v,val,ctxt) result(ans)
     use psb_base_mod
 
     implicit none
@@ -73,7 +78,39 @@ contains
       ans = .false.
     end if
 
-  end function psb_check_ans
+  end function psb_check_ans_v
+
+  function psb_check_ans_mv(v,val,ctxt) result(ans)
+    use psb_base_mod
+
+    implicit none
+
+    type(psb_d_multivect_type) :: v
+    real(psb_dpk_)        :: val
+    type(psb_ctxt_type) :: ctxt
+    logical               :: ans
+
+    ! Local variables
+    integer(psb_ipk_) :: np, iam, info
+    real(psb_dpk_)    :: check
+    real(psb_dpk_), allocatable    :: va(:,:)
+
+    call psb_info(ctxt,iam,np)
+
+    va = v%get_vect()
+    va = va - val;
+
+    check = maxval(va);
+
+    call psb_sum(ctxt,check)
+
+    if(check == 0.d0) then
+      ans = .true.
+    else
+      ans = .false.
+    end if
+
+  end function psb_check_ans_mv
   !
   !  subroutine to fill a vector with constant entries
   !
@@ -160,6 +197,93 @@ contains
 
     return
   end subroutine psb_d_gen_const
+    !
+  !  subroutine to fill a multivectorvector with constant entries
+  !
+  subroutine psb_d_gen_const_multi(v,val,idim,jdim,ctxt,desc_a,info)
+    use psb_base_mod
+    implicit none
+
+    type(psb_d_multivect_type) :: v
+    type(psb_desc_type)   :: desc_a
+    integer(psb_lpk_)     :: idim
+    integer(psb_ipk_)     :: jdim !! Number of columns of the multivector
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)     :: info
+    real(psb_dpk_)        :: val
+
+    ! Local variables
+    integer(psb_ipk_), parameter    :: nb=20
+    real(psb_dpk_)                  :: zt(nb,jdim) ! Temporary array to fill the vector
+    character(len=40)               :: name, ch_err
+    integer(psb_ipk_)               :: np, iam, nr, nt
+    integer(psb_ipk_)               :: n,nlr,ib,ii
+    integer(psb_ipk_)               :: err_act
+    integer(psb_lpk_), allocatable  :: myidx(:)
+
+
+    info = psb_success_
+    name = 'create_constant_multivector'
+    call psb_erractionsave(err_act)
+
+    call psb_info(ctxt, iam, np)
+
+    n = idim*np         ! The global dimension is the number of process times
+                        ! the input size
+
+    ! We use a simple minded block distribution
+    nt = (n+np-1)/np
+    nr = max(0,min(nt,n-(iam*nt)))
+    nt = nr
+
+    call psb_sum(ctxt,nt)
+    if (nt /= n) then
+      write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,n
+      info = -1
+      call psb_barrier(ctxt)
+      call psb_abort(ctxt)
+      return
+    end if
+    ! Allocate the descriptor with simple minded data distribution
+    call psb_cdall(ctxt,desc_a,info,nl=nr)
+    ! Allocate the vector on the recently build descriptor
+    if (info == psb_success_) call psb_geall(v,desc_a,info,n=jdim)
+    ! Check that allocation has gone good
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='allocation rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    myidx = desc_a%get_global_indices()
+    nlr = size(myidx)
+
+    do ii=1,nlr,nb
+      ib = min(nb,nlr-ii+1)
+      zt(:,:) = val
+      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib,1:jdim),v,desc_a,info)
+      if(info /= psb_success_) exit
+    end do
+
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='insert rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    ! Assembly of communicator and vector
+    call psb_cdasb(desc_a,info)
+    if (info == psb_success_) call psb_geasb(v,desc_a,info)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psb_d_gen_const_multi
 
 end module unittestvector_mod
 
@@ -171,7 +295,8 @@ program vecoperation
   implicit none
 
   ! input parameters
-  integer(psb_lpk_) :: idim = 100
+  integer(psb_lpk_) :: idim = 100 ! Local vector size
+  integer(psb_ipk_) :: nmv = 10 ! Number of columns of the multivector
 
   ! miscellaneous
   real(psb_dpk_), parameter :: one = 1.d0
@@ -184,13 +309,17 @@ program vecoperation
   type(psb_desc_type)   :: desc_a
   ! vector
   type(psb_d_vect_type)  :: x,y,z
+  ! multivector
+  type(psb_d_multivect_type) :: mv1, mv2
   ! blacs parameters
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: iam, np
   ! auxiliary parameters
+  integer(psb_ipk_) :: ii
   integer(psb_ipk_) :: info
   character(len=20) :: name,ch_err,readinput
   real(psb_dpk_)    :: ans
+  real(psb_dpk_), allocatable :: ansmv(:)
   logical           :: hasitnotfailed
   integer(psb_lpk_), allocatable  :: myidx(:)
   integer(psb_ipk_) :: ib = 1
@@ -363,9 +492,54 @@ program vecoperation
     if(ans /= onehalf) write(psb_out_unit,'("TEST FAILED --- MaxNorm")')
   end if
 
+
+  !
+  ! Test of multivector operation
+  !
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  if (iam == psb_root_) write(psb_out_unit,'("Multivector Operations")')
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  ! X = 1
+  call psb_d_gen_const_multi(mv1,one,idim,nmv,ctxt,desc_a,info)
+  hasitnotfailed = psb_check_ans(mv1,one,ctxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> Constant multivector ")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- Constant multivector ")')
+  end if
+
+  ! 
+  ! Multivector to field operation
+  !
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  if (iam == psb_root_) write(psb_out_unit,'("Multivector to Field Operations")')
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
+
+  ! Dot product: multivector vs multivector
+  call psb_d_gen_const_multi(mv1,two,idim,nmv,ctxt,desc_a,info)
+  call psb_d_gen_const_multi(mv2,onehalf,idim,nmv,ctxt,desc_a,info)
+  ansmv = psb_gedot(mv1,mv2,desc_a,info)
+  if (iam == psb_root_) then
+    ! write ansmv to check
+    if(all(ansmv(:) == np*idim)) write(psb_out_unit,'("TEST PASSED >>> Dot product")')
+    if(any(ansmv(:) /= np*idim)) write(psb_out_unit,'("TEST FAILED --- Dot product")')
+  end if
+  ! Dot product: multivector vs vector
+  call psb_d_gen_const_multi(mv1,two,idim,nmv,ctxt,desc_a,info)
+  call psb_d_gen_const(x,onehalf,idim,ctxt,desc_a,info)
+  ansmv = psb_gedot(mv1,x,desc_a,info)
+  if (iam == psb_root_) then
+    ! write ansmv to check
+    if(all(ansmv(:) == np*idim)) write(psb_out_unit,'("TEST PASSED >>> Dot product")')
+    if(any(ansmv(:) /= np*idim)) write(psb_out_unit,'("TEST FAILED --- Dot product")')
+  end if
+
+
+
   call psb_gefree(x,desc_a,info)
   call psb_gefree(y,desc_a,info)
   call psb_gefree(z,desc_a,info)
+  call psb_gefree(mv1,desc_a,info)
+  call psb_gefree(mv2,desc_a,info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_

@@ -1366,6 +1366,7 @@ end module psb_d_vect_mod
 module psb_d_multivect_mod
 
   use psb_d_base_multivect_mod
+  use psb_d_vect_mod
   use psb_const_mod
   use psb_i_vect_mod
 
@@ -1388,11 +1389,18 @@ module psb_d_multivect_mod
     procedure, pass(x) :: get_dupl => d_mvect_get_dupl
     procedure, pass(x) :: set_dupl => d_mvect_set_dupl
 
+    procedure, pass(x) :: sync     => d_mvect_sync
+    procedure, pass(x) :: is_host  => d_mvect_is_host
+    procedure, pass(x) :: is_dev   => d_mvect_is_dev
+    procedure, pass(x) :: is_sync  => d_mvect_is_sync
+    procedure, pass(x) :: set_host => d_mvect_set_host
+    procedure, pass(x) :: set_dev  => d_mvect_set_dev
+    procedure, pass(x) :: set_sync => d_mvect_set_sync
+
     procedure, pass(x) :: all      => d_mvect_all
     procedure, pass(x) :: reall    => d_mvect_reall
     procedure, pass(x) :: zero     => d_mvect_zero
     procedure, pass(x) :: asb      => d_mvect_asb
-    procedure, pass(x) :: sync     => d_mvect_sync
     procedure, pass(x) :: free     => d_mvect_free
     procedure, pass(x) :: ins      => d_mvect_ins
     procedure, pass(x) :: bld_x    => d_mvect_bld_x
@@ -1411,9 +1419,10 @@ module psb_d_multivect_mod
     procedure, pass(y) :: sctb     => d_mvect_sctb
     procedure, pass(y) :: sctb_x   => d_mvect_sctb_x
     generic, public    :: sct      => sctb, sctb_x
-!!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
-!!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
-!!$    generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(x) :: dot_v    => d_mvect_dot_v
+    procedure, pass(x) :: dot_a    => d_mvect_dot_a
+    procedure, pass(x) :: dot_vect => d_mvect_dot_vect
+    generic, public    :: dot      => dot_v, dot_a, dot_vect
 !!$    procedure, pass(y) :: axpby_v  => d_mvect_axpby_v
 !!$    procedure, pass(y) :: axpby_a  => d_mvect_axpby_a
 !!$    generic, public    :: axpby    => axpby_v, axpby_a
@@ -1473,6 +1482,75 @@ contains
       x%dupl = psb_dupl_def_
     end if
   end subroutine d_mvect_set_dupl
+
+  subroutine d_mvect_sync(x)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%sync()
+
+  end subroutine d_mvect_sync
+
+  subroutine d_mvect_set_sync(x)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%set_sync()
+
+  end subroutine d_mvect_set_sync
+
+  subroutine d_mvect_set_host(x)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%set_host()
+
+  end subroutine d_mvect_set_host
+
+  subroutine d_mvect_set_dev(x)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%set_dev()
+
+  end subroutine d_mvect_set_dev
+
+  function d_mvect_is_sync(x) result(res)
+    implicit none
+    logical :: res
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_sync()
+
+  end function d_mvect_is_sync
+
+  function d_mvect_is_host(x) result(res)
+    implicit none
+    logical :: res
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_host()
+
+  end function d_mvect_is_host
+
+  function d_mvect_is_dev(x) result(res)
+    implicit none
+    logical :: res
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    res = .false.
+    if (allocated(x%v)) &
+         & res =  x%v%is_dev()
+
+  end function d_mvect_is_dev
         
 
   function d_mvect_is_remote_build(x) result(res)
@@ -1717,15 +1795,6 @@ contains
 
   end subroutine d_mvect_asb
 
-  subroutine d_mvect_sync(x)
-    implicit none
-    class(psb_d_multivect_type), intent(inout) :: x
-
-    if (allocated(x%v)) &
-         & call x%v%sync()
-
-  end subroutine d_mvect_sync
-
   subroutine d_mvect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -1840,30 +1909,50 @@ contains
   end subroutine d_mvect_cnv
 
 
-!!$  function d_mvect_dot_v(n,x,y) result(res)
-!!$    implicit none
-!!$    class(psb_d_multivect_type), intent(inout) :: x, y
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_dpk_)                :: res
-!!$
-!!$    res = dzero
-!!$    if (allocated(x%v).and.allocated(y%v)) &
-!!$         & res = x%v%dot(n,y%v)
-!!$
-!!$  end function d_mvect_dot_v
-!!$
-!!$  function d_mvect_dot_a(n,x,y) result(res)
-!!$    implicit none
-!!$    class(psb_d_multivect_type), intent(inout) :: x
-!!$    real(psb_dpk_), intent(in)    :: y(:)
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_dpk_)                :: res
-!!$
-!!$    res = dzero
-!!$    if (allocated(x%v)) &
-!!$         & res = x%v%dot(n,y)
-!!$
-!!$  end function d_mvect_dot_a
+  function d_mvect_dot_v(n,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_), dimension(:), allocatable :: res
+
+    if (allocated(x%v).and.allocated(y%v)) then 
+      res = x%v%dot(n,y%v)
+    else
+      allocate(res(1))
+      res(1) = psb_err_invalid_vect_state_
+    end if
+
+  end function d_mvect_dot_v
+
+  function d_mvect_dot_vect(n,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    class(psb_d_vect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_), dimension(:), allocatable :: res
+
+    if (allocated(x%v).and.allocated(y%v)) then 
+      res = x%v%dot(n,y%v)
+    else
+      allocate(res(1))
+      res(1) = psb_err_invalid_vect_state_
+    end if
+
+  end function d_mvect_dot_vect
+
+  function d_mvect_dot_a(n,x,y) result(res)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)    :: y(:,:)
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_), dimension(:), allocatable :: res
+
+    res = dzero
+    if (allocated(x%v)) then
+      res = x%v%dot(n,y)
+    end if
+
+  end function d_mvect_dot_a
 !!$
 !!$  subroutine d_mvect_axpby_v(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod

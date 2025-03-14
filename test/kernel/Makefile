@@ -18,7 +18,7 @@ DPGOBJS=pdgenspmv.o
 DVECOBJS=vecoperation.o
 EXEDIR=./runs
 
-all: runsd pdgenspmv
+all: runsd pdgenspmv vecoperation
 #d_file_spmv s_file_spmv pdgenspmv vecoperation
 
 runsd:
