@@ -1,5 +1,5 @@
-#ifndef PSB_INTERNALS_H
-#define PSB_INTERNALS_H
+#ifndef PSB_FAKEMPI_H
+#define PSB_FAKEMPI_H
 #include "psb_config.h"
 
 #define MPI_INTEGER        1
