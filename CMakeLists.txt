@@ -390,7 +390,7 @@ define_property(TARGET
 install(EXPORT ${CMAKE_PROJECT_NAME}-targets
   FILE ${CMAKE_PROJECT_NAME}Config.cmake
   NAMESPACE ${CMAKE_PROJECT_NAME}::
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/"
 )
 
 
@@ -408,7 +408,7 @@ install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake"
   DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}"
 )
@@ -898,7 +898,7 @@ endif()
 export(
   EXPORT ${CMAKE_PROJECT_NAME}-targets
   FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
-    NAMESPACE psblas::
+    NAMESPACE ${CMAKE_PROJECT_NAME}::
 )
 
 
