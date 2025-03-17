@@ -1,6 +1,7 @@
 #include <math.h>
 #include <complex.h>
 #include "psb_config.h"
+#include "psb_types.h"
 #if defined(PSB_HAVE_METIS)
 #include "@METISINCFILE@"
 #endif

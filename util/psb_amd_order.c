@@ -30,6 +30,7 @@
  
 */
 #include "psb_config.h"
+#include "psb_types.h"
 #ifdef PSB_HAVE_AMD
 #include "amd.h"
 #endif

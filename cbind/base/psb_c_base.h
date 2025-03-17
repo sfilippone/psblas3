@@ -14,6 +14,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "psb_config.h"
+#include "psb_types.h"
 
 
   typedef struct PSB_C_DESCRIPTOR {
