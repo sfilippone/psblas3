@@ -380,7 +380,7 @@ AC_ARG_ENABLE(serial,
 AC_HELP_STRING([--enable-serial], 
 [Specify whether to enable a fake mpi library to run in serial mode. ]),
 [
-pac_cv_serial_mpi="yes";
+pac_cv_serial_mpi="$enableval";
 ]
 dnl ,
 dnl [pac_cv_serial_mpi="no";]
@@ -410,12 +410,8 @@ AC_DEFUN([PAC_ARG_OPENMP],
 AC_ARG_ENABLE(openmp,
 AC_HELP_STRING([--enable-openmp], 
 [Specify whether to enable openmp. ]),
-[
-pac_cv_openmp="yes";
-]
-dnl ,
-dnl [pac_cv_openmp="no";]
-	     )
+[pac_cv_openmp="$enableval";])
+dnl AC_MSG_NOTICE([Result from test: "x$pac_cv_openmp"])
 if test x"$pac_cv_openmp" == x"yes" ; then
    AC_MSG_RESULT([yes.])
    AC_LANG_PUSH([Fortran])
@@ -455,7 +451,7 @@ AC_ARG_ENABLE(long-integers,
 AC_HELP_STRING([--enable-long-integers], 
 [Specify usage of 64 bits integers. ]),
 [
-pac_cv_long_integers="yes";
+pac_cv_long_integers="$enableval";
 ]
 dnl ,
 dnl [pac_cv_long_integers="no";]
