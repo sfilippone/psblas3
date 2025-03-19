@@ -4626,7 +4626,7 @@ printf %s "checking whether we want serial  mpi stubs... " >&6; }
 if test ${enable_serial+y}
 then :
   enableval=$enable_serial;
-pac_cv_serial_mpi="yes";
+pac_cv_serial_mpi="$enableval";
 
 
 fi
@@ -4635,7 +4635,6 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes." >&5
 printf "%s\n" "yes." >&6; }
 else
- pac_cv_serial_mpi="no";
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no." >&5
 printf "%s\n" "no." >&6; }
 fi
@@ -7443,10 +7442,7 @@ printf %s "checking whether we want openmp ... " >&6; }
 # Check whether --enable-openmp was given.
 if test ${enable_openmp+y}
 then :
-  enableval=$enable_openmp;
-pac_cv_openmp="yes";
-
-
+  enableval=$enable_openmp; pac_cv_openmp="$enableval";
 fi
 
 if test x"$pac_cv_openmp" == x"yes" ; then
@@ -10380,7 +10376,7 @@ printf %s "checking whether we want cuda ... " >&6; }
 if test ${enable_cuda+y}
 then :
   enableval=$enable_cuda;
-pac_cv_cuda="yes";
+pac_cv_cuda="$enableval";
 
 
 fi
@@ -10668,7 +10664,7 @@ printf %s "checking whether we want openacc ... " >&6; }
 if test ${enable_openacc+y}
 then :
   enableval=$enable_openacc;
-pac_cv_openacc="yes";
+pac_cv_openacc="$enableval";
 
 
 fi
