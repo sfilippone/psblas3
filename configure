@@ -4796,7 +4796,7 @@ printf %s "checking whether we want serial  mpi stubs... " >&6; }
 if test ${enable_serial+y}
 then :
   enableval=$enable_serial;
-pac_cv_serial_mpi="yes";
+pac_cv_serial_mpi="$enableval";
 
 
 fi
@@ -7687,10 +7687,7 @@ printf %s "checking whether we want openmp ... " >&6; }
 # Check whether --enable-openmp was given.
 if test ${enable_openmp+y}
 then :
-  enableval=$enable_openmp;
-pac_cv_openmp="yes";
-
-
+  enableval=$enable_openmp; pac_cv_openmp="$enableval";
 fi
 
 if test x"$pac_cv_openmp" == x"yes" ; then
