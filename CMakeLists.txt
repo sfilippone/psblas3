@@ -129,14 +129,17 @@ set(DEFAULT_IPK_SIZE 4)
 set(DEFAULT_LPK_SIZE 8)
 
 # Allow user to override with command line definitions
-if(NOT DEFINED IPK_SIZE)
-    set(IPK_SIZE ${DEFAULT_IPK_SIZE} CACHE STRING "Size of IPK (default: 4)")
+if(NOT DEFINED CMAKE_PSB_IPK)
+    set(CMAKE_PSB_IPK ${DEFAULT_IPK_SIZE} CACHE STRING "Size of IPK (default: 4)")
 endif()
 
-if(NOT DEFINED LPK_SIZE)
-    set(LPK_SIZE ${DEFAULT_LPK_SIZE} CACHE STRING "Size of LPK (default: 8)")
+if(NOT DEFINED CMAKE_PSB_LPK)
+    set(CMAKE_PSB_LPK ${DEFAULT_LPK_SIZE} CACHE STRING "Size of LPK (default: 8)")
 endif()
 
+# Use the passed values
+set(IPK_SIZE ${CMAKE_PSB_IPK})
+set(LPK_SIZE ${CMAKE_PSB_LPK})			
 # Define IPKDEF and LPKDEF based on the sizes
 set(IPKDEF "#define PSB_IPK${IPK_SIZE}")
 set(LPKDEF "#define PSB_LPK${LPK_SIZE}")
