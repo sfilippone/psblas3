@@ -138,8 +138,8 @@ if(NOT DEFINED LPK_SIZE)
 endif()
 
 # Define IPKDEF and LPKDEF based on the sizes
-set(IPKDEF "#define IPK${IPK_SIZE}")
-set(LPKDEF "#define LPK${LPK_SIZE}")
+set(IPKDEF "#define PSB_IPK${IPK_SIZE}")
+set(LPKDEF "#define PSB_LPK${LPK_SIZE}")
 
 # Output the definitions for verification
 message(STATUS "Using IPKDEF: ${IPKDEF}")
@@ -338,7 +338,7 @@ else()
   add_compile_options(-DSERIAL_MPI)
   add_compile_options(-DMPI_MOD)
   set(SERIAL_MPI ON)
-  set(CSERIALMPI "#define SERIAL_MPI")
+  set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
 
 #-------------------------------------------------------
@@ -387,9 +387,9 @@ if(METIS_FOUND)
   endif()
 
 
-  set(CHAVEMETIS "#define HAVE_METIS")
-  set(CINTMETIS "#define METIS_${IPK_SIZE}")
-  set(CREALMETIS "#define METIS_REAL_${LPK_SIZE}")
+  set(CHAVEMETIS "#define PSB_HAVE_METIS")
+  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
+  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
 endif()
 
 #---------------------------------------------------
