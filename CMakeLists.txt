@@ -785,6 +785,68 @@ message(STATUS "Copied .h files to ${CMAKE_BINARY_DIR}/include")
 
 
 
+
+#########################################
+#######	BUILD CUDA LIBRARY ##############
+#########################################
+
+
+# Optionally check for CUDA requirement
+option(BUILD_CUDA "Build CUDA code" OFF)
+
+if(BUILD_CUDA)
+
+
+    # Include the CMakeLists for the cbind library
+    include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
+
+
+
+
+    find_package(CUDA REQUIRED)
+
+
+    # Define the CUDA library
+    #if(WIN32)
+        #add_library(psb_cuda_C STATIC ${cuda_source_files})
+        #target_compile_definitions(psb_cuda_C
+        #    PRIVATE -DWIN32 -D_LIB -DWIN64)
+        #set_target_properties(psb_cuda_C
+        #    PROPERTIES
+        #    LINKER_LANGUAGE C
+        #    POSITION_INDEPENDENT_CODE TRUE)
+        #target_link_libraries(psb_cuda_C
+        #    PUBLIC kernel32 user32 shell32)
+    #else()
+        #add_library(psb_cuda_C OBJECT ${cuda_source_files})
+    #endif()
+    
+    add_library(psb_cuda_C OBJECT ${cuda_source_c_files})
+    
+
+    # Create the main CUDA library
+    add_library(cuda ${cuda_source_files})
+
+    # Set properties for the CUDA library
+    set_target_properties(cuda
+        PROPERTIES
+        POSITION_INDEPENDENT_CODE TRUE
+        OUTPUT_NAME psb_cuda
+        LINKER_LANGUAGE C)
+    
+    # Include directories for the CUDA library
+    target_include_directories(cuda PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>  # Path for building
+        $<INSTALL_INTERFACE:modules>  # Path for installation
+    )
+
+    # Link with other necessary libraries
+    target_link_libraries(cuda PUBLIC base prec linsolve ext util)
+endif()
+
+
+
+
 if(MPI_FOUND)
 # Copy mpi.mod from the first available path in MPI_Fortran_INCLUDE_PATH
   set(MPI_MOD_COPIED FALSE)
