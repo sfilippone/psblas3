@@ -99,7 +99,7 @@ endif()
 
 
   message(STATUS "win? ${WIN32};")
-if(TRUE )#NOT ${WIN32})
+if(TRUE)#NOT ${WIN32})
 #previous check did not work if WIN32 is empty string
   #----------------------------------------------
   # Determine system endian-ness and pointer size
@@ -118,17 +118,36 @@ if(TRUE )#NOT ${WIN32})
     add_compile_options(-DPtr64Bits)
   endif()
   message(STATUS "Have 64bit pointers")
-  
-  #add define values for integer size (IPKx) and long size (LPKx)
-  CHECK_TYPE_SIZE("int" INT_SIZE LANGUAGE C)
-  CHECK_TYPE_SIZE("long" LONG_SIZE LANGUAGE C)
-  message(STATUS "INT SIZE ${INT_SIZE}")
-
-  add_compile_options(-DIPK${INT_SIZE})
-  add_compile_options(-DLPK${LONG_SIZE})
-
+ 
   
 endif()
+
+
+
+# Set default values for IPK_SIZE and LPK_SIZE
+set(DEFAULT_IPK_SIZE 4)
+set(DEFAULT_LPK_SIZE 8)
+
+# Allow user to override with command line definitions
+if(NOT DEFINED IPK_SIZE)
+    set(IPK_SIZE ${DEFAULT_IPK_SIZE} CACHE STRING "Size of IPK (default: 4)")
+endif()
+
+if(NOT DEFINED LPK_SIZE)
+    set(LPK_SIZE ${DEFAULT_LPK_SIZE} CACHE STRING "Size of LPK (default: 8)")
+endif()
+
+# Define IPKDEF and LPKDEF based on the sizes
+set(IPKDEF "#define IPK${IPK_SIZE}")
+set(LPKDEF "#define LPK${LPK_SIZE}")
+
+# Output the definitions for verification
+message(STATUS "Using IPKDEF: ${IPKDEF}")
+message(STATUS "Using LPKDEF: ${LPKDEF}")
+
+add_compile_options(-DIPK${IPK_SIZE})
+add_compile_options(-DLPK${LPK_SIZE})
+
 
 
   
@@ -319,6 +338,7 @@ else()
   add_compile_options(-DSERIAL_MPI)
   add_compile_options(-DMPI_MOD)
   set(SERIAL_MPI ON)
+  set(CSERIALMPI "#define SERIAL_MPI")
 endif()
 
 #-------------------------------------------------------
@@ -346,6 +366,31 @@ add_compile_options(-DHAVE_LAPACK)
 #--------------------------------
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/FindMETIS.cmake)
 find_package(METIS)
+
+if(METIS_FOUND)
+
+  set(METIS_INDEX 64 CACHE STRING "Index size for METIS (default: 64)")
+
+   # Check conditions for LPK_SIZE and METIS_INDEX
+  if(LPK_SIZE STREQUAL "4")
+    if(METIS_INDEX STREQUAL "64")
+        # Mismatch between METIS size and PSBLAS LPK
+      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+  if(LPK_SIZE STREQUAL "8")
+    if(METIS_INDEX STREQUAL "32")
+        # Mismatch between METIS size and PSBLAS LPK
+            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+
+  set(CHAVEMETIS "#define HAVE_METIS")
+  set(CINTMETIS "#define METIS_${IPK_SIZE}")
+  set(CREALMETIS "#define METIS_REAL_${LPK_SIZE}")
+endif()
 
 #---------------------------------------------------
 # Use standardized GNU install directory conventions
