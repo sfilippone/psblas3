@@ -33,7 +33,7 @@ oaccld:  oaccd
 based:
 	$(MAKE) -C base objs
 precd:
-	$(MAKE) -C prec objs
+	$(MAKE) -C prec objs8
 linslvd:
 	$(MAKE) -C linsolve objs
 utild:
@@ -62,7 +62,7 @@ install: all
 	mkdir -p  $(INSTALL_DOCSDIR) && \
 	   $(INSTALL_DATA) README.md LICENSE  $(INSTALL_DOCSDIR)
 	mkdir -p  $(INSTALL_SAMPLESDIR) && \
-	     /bin/cp -fr test/pargen test/fileread  $(INSTALL_SAMPLESDIR) && \
+	     /bin/cp -fr test/pdegen test/fileread  $(INSTALL_SAMPLESDIR) && \
 	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
 clean: cleanlib
 	$(MAKE) -C base veryclean
