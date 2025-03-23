@@ -63,7 +63,7 @@ install: all
 	   $(INSTALL_DATA) README.md LICENSE  $(INSTALL_DOCSDIR)
 	mkdir -p  $(INSTALL_SAMPLESDIR) && \
 	     /bin/cp -fr test/pdegen test/fileread  $(INSTALL_SAMPLESDIR) && \
-	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
+	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pdegen/* $(INSTALL_SAMPLESDIR)/cbind
 clean: cleanlib
 	$(MAKE) -C base veryclean
 	$(MAKE) -C prec veryclean 
@@ -75,7 +75,7 @@ clean: cleanlib
 	$(MAKE) -C openacc veryclean
 cleantest:
 	cd test/fileread && $(MAKE) clean
-	cd test/pargen && $(MAKE) clean
+	cd test/pdegen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
 
 cleanlib:
