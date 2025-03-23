@@ -33,7 +33,7 @@ oaccld:  oaccd
 based:
 	$(MAKE) -C base objs
 precd:
-	$(MAKE) -C prec objs8
+	$(MAKE) -C prec objs
 linslvd:
 	$(MAKE) -C linsolve objs
 utild:
