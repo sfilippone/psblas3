@@ -198,7 +198,7 @@ contains
         read(inp_unit,*) kmethd
         read(inp_unit,*) ptype
         read(inp_unit,*) afmt
-        read(inp_unit,*) ipart
+        read(inp_unit,*) part
 
 
         call psb_bcast(ctxt,mtrx_file)
