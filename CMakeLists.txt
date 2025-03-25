@@ -99,7 +99,7 @@ endif()
 
 
   message(STATUS "win? ${WIN32};")
-if(TRUE )#NOT ${WIN32})
+if(TRUE)#NOT ${WIN32})
 #previous check did not work if WIN32 is empty string
   #----------------------------------------------
   # Determine system endian-ness and pointer size
@@ -118,17 +118,39 @@ if(TRUE )#NOT ${WIN32})
     add_compile_options(-DPtr64Bits)
   endif()
   message(STATUS "Have 64bit pointers")
-  
-  #add define values for integer size (IPKx) and long size (LPKx)
-  CHECK_TYPE_SIZE("int" INT_SIZE LANGUAGE C)
-  CHECK_TYPE_SIZE("long" LONG_SIZE LANGUAGE C)
-  message(STATUS "INT SIZE ${INT_SIZE}")
-
-  add_compile_options(-DIPK${INT_SIZE})
-  add_compile_options(-DLPK${LONG_SIZE})
-
+ 
   
 endif()
+
+
+
+# Set default values for IPK_SIZE and LPK_SIZE
+set(DEFAULT_IPK_SIZE 4)
+set(DEFAULT_LPK_SIZE 8)
+
+# Allow user to override with command line definitions
+if(NOT DEFINED CMAKE_PSB_IPK)
+    set(CMAKE_PSB_IPK ${DEFAULT_IPK_SIZE} CACHE STRING "Size of IPK (default: 4)")
+endif()
+
+if(NOT DEFINED CMAKE_PSB_LPK)
+    set(CMAKE_PSB_LPK ${DEFAULT_LPK_SIZE} CACHE STRING "Size of LPK (default: 8)")
+endif()
+
+# Use the passed values
+set(IPK_SIZE ${CMAKE_PSB_IPK})
+set(LPK_SIZE ${CMAKE_PSB_LPK})			
+# Define IPKDEF and LPKDEF based on the sizes
+set(IPKDEF "#define PSB_IPK${IPK_SIZE}")
+set(LPKDEF "#define PSB_LPK${LPK_SIZE}")
+
+# Output the definitions for verification
+message(STATUS "Using IPKDEF: ${IPKDEF}")
+message(STATUS "Using LPKDEF: ${LPKDEF}")
+
+add_compile_options(-DIPK${IPK_SIZE})
+add_compile_options(-DLPK${LPK_SIZE})
+
 
 
   
@@ -319,6 +341,7 @@ else()
   add_compile_options(-DSERIAL_MPI)
   add_compile_options(-DMPI_MOD)
   set(SERIAL_MPI ON)
+  set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
 
 #-------------------------------------------------------
@@ -347,14 +370,43 @@ add_compile_options(-DHAVE_LAPACK)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/FindMETIS.cmake)
 find_package(METIS)
 
+if(METIS_FOUND)
+
+  set(METIS_INDEX 64 CACHE STRING "Index size for METIS (default: 64)")
+
+   # Check conditions for LPK_SIZE and METIS_INDEX
+  if(LPK_SIZE STREQUAL "4")
+    if(METIS_INDEX STREQUAL "64")
+        # Mismatch between METIS size and PSBLAS LPK
+      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+  if(LPK_SIZE STREQUAL "8")
+    if(METIS_INDEX STREQUAL "32")
+        # Mismatch between METIS size and PSBLAS LPK
+            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+
+  set(CHAVEMETIS "#define PSB_HAVE_METIS")
+  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
+  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
+endif()
+
 #---------------------------------------------------
 # Use standardized GNU install directory conventions
 #---------------------------------------------------
 include(GNUInstallDirs)
 #set(mod_dir_tail "${${CMAKE_PROJECT_NAME}_dist_string}_${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
+set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE STRING "Include directory")
+set(CMAKE_INSTALL_MODULDIR "modules" CACHE STRING "Module directory")
+
 
 #-----------------------------------
 # Turn on testing/ctest capabilities
@@ -386,7 +438,7 @@ define_property(TARGET
 install(EXPORT ${CMAKE_PROJECT_NAME}-targets
   FILE ${CMAKE_PROJECT_NAME}Config.cmake
   NAMESPACE ${CMAKE_PROJECT_NAME}::
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/"
 )
 
 
@@ -397,15 +449,16 @@ write_basic_package_version_file(
   COMPATIBILITY SameMajorVersion
   )
 
-configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}Config.cmake.in"
+configure_file("${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake" @ONLY)
 
 install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake"
   DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
+    "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}"
 )
 
 #------------------------------------------
@@ -433,6 +486,21 @@ if(MPI_FOUND)
     set ( openmpi true )
   endif()
 endif()
+
+
+
+#------------------------------------------
+# Configure the psb_config.h file
+#------------------------------------------
+
+message(STATUS "bin dir ${CMAKE_CURRENT_BINARY_DIR}; source dir ${CMAKE_CURRENT_SOURCE_DIR};;")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/modules/psb_config.h.in 
+    ${CMAKE_CURRENT_BINARY_DIR}/include/psb_config.h 	
+    @ONLY  # Replace variables only
+)
+
+
 
 #---------------------------------------
 # Add the PSBLAS libraries and utilities
@@ -582,7 +650,14 @@ if(WIN32)
       PUBLIC psb_util_C)
   endif()
 else()
+
+  if(METIS_FOUND)
+    foreach(file IN LISTS util_source_C_metis_files)
+      list(APPEND util_source_C_files file)
+    endforeach()
+  endif()
   add_library(psb_util_C OBJECT ${util_source_C_files})
+
   add_library(util ${util_source_files} $<TARGET_OBJECTS:psb_util_C>)
 endif()
 set_target_properties(util
@@ -758,6 +833,68 @@ message(STATUS "Copied .h files to ${CMAKE_BINARY_DIR}/include")
 
 
 
+
+#########################################
+#######	BUILD CUDA LIBRARY ##############
+#########################################
+
+
+# Optionally check for CUDA requirement
+option(BUILD_CUDA "Build CUDA code" OFF)
+
+if(BUILD_CUDA)
+
+
+    # Include the CMakeLists for the cbind library
+    include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
+
+
+
+
+    find_package(CUDA REQUIRED)
+
+
+    # Define the CUDA library
+    #if(WIN32)
+        #add_library(psb_cuda_C STATIC ${cuda_source_files})
+        #target_compile_definitions(psb_cuda_C
+        #    PRIVATE -DWIN32 -D_LIB -DWIN64)
+        #set_target_properties(psb_cuda_C
+        #    PROPERTIES
+        #    LINKER_LANGUAGE C
+        #    POSITION_INDEPENDENT_CODE TRUE)
+        #target_link_libraries(psb_cuda_C
+        #    PUBLIC kernel32 user32 shell32)
+    #else()
+        #add_library(psb_cuda_C OBJECT ${cuda_source_files})
+    #endif()
+    
+    add_library(psb_cuda_C OBJECT ${cuda_source_c_files})
+    
+
+    # Create the main CUDA library
+    add_library(cuda ${cuda_source_files})
+
+    # Set properties for the CUDA library
+    set_target_properties(cuda
+        PROPERTIES
+        POSITION_INDEPENDENT_CODE TRUE
+        OUTPUT_NAME psb_cuda
+        LINKER_LANGUAGE C)
+    
+    # Include directories for the CUDA library
+    target_include_directories(cuda PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>  # Path for building
+        $<INSTALL_INTERFACE:modules>  # Path for installation
+    )
+
+    # Link with other necessary libraries
+    target_link_libraries(cuda PUBLIC base prec linsolve ext util)
+endif()
+
+
+
+
 if(MPI_FOUND)
 # Copy mpi.mod from the first available path in MPI_Fortran_INCLUDE_PATH
   set(MPI_MOD_COPIED FALSE)
@@ -804,11 +941,31 @@ message(STATUS "\t\t ${CMAKE_INSTALL_LIBDIR}")
 #  DESTINATION include
 #)
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
-  FILES_MATCHING PATTERN "*.h")
+#install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
+#  FILES_MATCHING PATTERN "*.h")
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
-  FILES_MATCHING PATTERN "*.mod")
+#install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
+#  FILES_MATCHING PATTERN "*.mod")
+
+
+#install(DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" DESTINATION "include"
+#  FILES_MATCHING PATTERN "*.h")
+
+#install(DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MODULDIR}" DESTINATION "modules"
+#  FILES_MATCHING PATTERN "*.mod")
+
+# Install header files
+install(DIRECTORY ${CMAKE_BINARY_DIR}/include/
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"  # This will place headers in <prefix>/include
+  FILES_MATCHING PATTERN "*.h"
+)
+
+# Install module files
+install(DIRECTORY ${CMAKE_BINARY_DIR}/modules/
+  DESTINATION "${CMAKE_INSTALL_MODULDIR}"  # This will place .mod files in <prefix>/modules
+  FILES_MATCHING PATTERN "*.mod"
+)
+
 
 
 install(TARGETS base prec linsolve ext util cbind
@@ -834,26 +991,40 @@ if(WIN32)
   endif()
 endif()
 
-# Step 2: Create the configuration file from the template
-configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/psblasConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
-)
 
-# Step 3: Install the generated config files
-install(FILES 
-  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
-)
+#configure_package_config_file(
+#  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/psblasConfig.cmake.in"
+#  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
+#  INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake/psblas"
+#)
 
-# Step 4: Export targets so that the build directory can be used directly
+#install(FILES 
+#  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfig.cmake"
+#  "${CMAKE_CURRENT_BINARY_DIR}/psblasConfigVersion.cmake"
+#  DESTINATION "${CMAKE_INSTALL_PREFIX}/cmake/psblas"
+#)
+
+
 export(
   EXPORT ${CMAKE_PROJECT_NAME}-targets
   FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
-    NAMESPACE psblas::
+    NAMESPACE ${CMAKE_PROJECT_NAME}::
 )
+
+
+
+
+
+
+
+
+
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX};")
+message(STATUS "CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR};")
+message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR};")
+message(STATUS "CMAKE_INSTALL_MODULDIR: ${CMAKE_INSTALL_MODULDIR};")
+
+
 #-----------------
 # Add PSBLAS tests
 #-----------------
