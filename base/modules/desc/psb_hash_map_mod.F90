@@ -1217,11 +1217,9 @@ contains
     !  To be implemented
     integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, int_err(5)
-    integer(psb_lpk_) ::  m, nrt 
-    integer(psb_lpk_), allocatable :: vlu(:)
-    integer(psb_lpk_), allocatable :: ix(:)
+    integer(psb_lpk_) ::  m, nrt
     character(len=20), parameter :: name='hash_map_init_vl'
-
+    real(psb_dpk_) :: t0, t1, t2,t3, t4, t5
     info = 0
     call psb_info(ctxt,iam,np) 
     if (np < 0) then 
@@ -1229,7 +1227,6 @@ contains
       info = -1
       return
     end if
-
     nl = size(vl) 
 
     m   = maxval(vl(1:nl))
@@ -1237,46 +1234,15 @@ contains
     call psb_sum(ctxt,nrt)
     call psb_max(ctxt,m)
 
-    allocate(vlu(nl), ix(nl), stat=info) 
-    if (info /= 0) then 
-      info = -1
-      return
-    end if
-
-    do i=1,nl
-      if ((vl(i)<1).or.(vl(i)>m)) then 
-        info = psb_err_entry_out_of_bounds_
-        int_err(1) = i
-        int_err(2) = vl(i)
-        int_err(3) = nl
-        int_err(4) = m
-        exit
-      endif
-      vlu(i) = vl(i) 
-    end do
-
     if ((m /= nrt).and.(iam == psb_root_))  then 
       write(psb_err_unit,*) trim(name),&
-           & ' Warning: globalcheck=.false., but there is a mismatch'
+           & ' Warning: we got to hash_init_vl but there is a mismatch'
       write(psb_err_unit,*) trim(name),&
            & '        : in the global sizes!',m,nrt
 
     end if
-
-    call psb_msort(vlu,ix)
-    nlu = 1
-    do i=2,nl
-      if (vlu(i) /= vlu(nlu)) then
-        nlu = nlu + 1 
-        vlu(nlu) = vlu(i)
-        ix(nlu) = ix(i)
-      end if
-    end do
-    call psb_msort(ix(1:nlu),vlu(1:nlu),flag=psb_sort_keep_idx_)
+    call hash_init_vlu(idxmap,ctxt,m,nl,vl,info)
     
-    nlu = nl
-    call hash_init_vlu(idxmap,ctxt,m,nlu,vlu,info)    
-
   end subroutine hash_init_vl
 
   subroutine hash_init_vg(idxmap,ctxt,vg,info)

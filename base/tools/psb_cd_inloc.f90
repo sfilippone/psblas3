@@ -163,7 +163,6 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   !  3. any overlap?
   ! Checks 2 and 3 are controlled by globalcheck
   !  
-
   if (check_.or.(.not.islarge)) then
     if (debug_size) &
          & write(debug_unit,*) me,' ',trim(name),': Going for global checks'
