@@ -40,11 +40,11 @@ utild:
 	$(MAKE) -C util objs 
 cbindd:
 	$(MAKE) -C cbind objs 
-extd:   based
+extd:   
 	$(MAKE) -C ext objs
-cudad:   based extd
+cudad:   
 	$(MAKE) -C cuda objs
-oaccd:   based extd
+oaccd:   
 	$(MAKE) -C openacc objs 
 
 
