@@ -64,7 +64,6 @@ void spgpuSupd_xyz(spgpuHandle_t handle,
 		   __device float* y,
 		   __device float *z)
 {
-	int msize = (n+BLOCK_SIZE-1)/BLOCK_SIZE;
 	int num_mp, max_threads_mp, num_blocks_mp, num_blocks;
 	dim3 block(BLOCK_SIZE);
 	num_mp         = getGPUMultiProcessors();
