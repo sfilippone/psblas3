@@ -281,6 +281,7 @@ contains
       ! contiguous rows
       !
       call psb_cdall(ctxt,desc_a,info,nl=nr)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -308,6 +309,7 @@ contains
       ! process that owns it
       !
       call psb_cdall(ctxt,desc_a,info,vg=iv)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -357,6 +359,7 @@ contains
       ! the set of global indices it owns.
       !
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
+      if (info /=0) goto 9999
 
       !
       ! Specify process topology
