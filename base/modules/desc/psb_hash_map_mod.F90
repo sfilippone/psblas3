@@ -104,7 +104,8 @@ module psb_hash_map_mod
        & hash_g2lv1, hash_g2lv2, hash_g2ls1_ins, hash_g2ls2_ins, &
        & hash_g2lv1_ins, hash_g2lv2_ins, hash_init_vlu, &
        & hash_bld_g2l_map, hash_inner_cnvs2, hash_inner_cnvs1, &
-       & hash_inner_cnv2, hash_inner_cnv1, hash_row_extendable 
+       & hash_inner_cnv2, hash_inner_cnv1, hash_row_extendable, &
+       & hash_srch_ipk, hash_srch_lpk
 
   integer(psb_ipk_), private :: psb_laddsz=500
 
@@ -113,6 +114,10 @@ module psb_hash_map_mod
          &  hash_inner_cnvs1,  hash_inner_cnv1
   end interface hash_inner_cnv
   private :: hash_inner_cnv
+  interface hash_srch 
+    module procedure  hash_srch_ipk, hash_srch_lpk
+  end interface hash_srch
+  private :: hash_srch
 
 contains
 
@@ -1634,7 +1639,7 @@ contains
     integer(psb_ipk_), intent(in)    :: hashv(0:)
     integer(psb_lpk_), intent(inout) :: x
     integer(psb_ipk_), intent(in)    :: nrm
-    integer(psb_ipk_) :: idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: idx,nh,tmp
     integer(psb_lpk_) :: key, ih
     !
     ! When a large descriptor is assembled the indices 
@@ -1648,32 +1653,7 @@ contains
     ih  = iand(key,hashmask)
     idx = hashv(ih)
     nh  = hashv(ih+1) - hashv(ih) 
-    tmp = -1 
-    if (nh > 0) then 
-      if (nh <= 8) then
-        do lm=idx,idx+nh-1
-          if (key == glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          end if
-        end do
-      else
-        lb = idx
-        ub = idx+nh-1
-        do 
-          if (lb>ub) exit
-          lm = (lb+ub)/2
-          if (key == glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          else if (key<glb_lc(lm,1)) then 
-            ub = lm - 1
-          else
-            lb = lm + 1
-          end if
-        end do
-      end if
-    end if
+    tmp = hash_srch(key,idx,nh,glb_lc(:,1))
     if (tmp > 0) then 
       x = glb_lc(tmp,2)
       if (x > nrm) then 
@@ -1690,7 +1670,7 @@ contains
     integer(psb_lpk_), intent(in)  :: hashmask, x, glb_lc(:,:)
     integer(psb_ipk_), intent(out) :: y
     integer(psb_ipk_), intent(in)  :: nrm
-    integer(psb_ipk_) :: idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: idx,nh,tmp
     integer(psb_lpk_) :: ih, key
     !
     ! When a large descriptor is assembled the indices 
@@ -1704,32 +1684,7 @@ contains
     ih  = iand(key,hashmask)
     idx = hashv(ih)
     nh  = hashv(ih+1) - hashv(ih) 
-    tmp = -1 
-    if (nh > 0) then 
-      if (nh <= 8) then
-        do lm=idx,idx+nh-1
-          if (key == glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          end if
-        end do
-      else
-        lb = idx
-        ub = idx+nh-1
-        do 
-          if (lb>ub) exit
-          lm = (lb+ub)/2
-          if (key == glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          else if (key<glb_lc(lm,1)) then 
-            ub = lm - 1
-          else
-            lb = lm + 1
-          end if
-        end do
-      end if
-    end if
+    tmp = hash_srch(key,idx,nh,glb_lc(:,1))
     if (tmp > 0) then 
       y = glb_lc(tmp,2)
       if (y > nrm) then 
@@ -1749,7 +1704,7 @@ contains
     logical, intent(in), optional  :: mask(:)
     integer(psb_ipk_), intent(in), optional  :: nrm
 
-    integer(psb_ipk_) :: i, nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: i, nh,tmp
     integer(psb_lpk_) :: ih, key, idx
     !
     ! When a large descriptor is assembled the indices 
@@ -1767,33 +1722,8 @@ contains
           key = x(i) 
           ih  = iand(key,hashmask)
           idx = hashv(ih)
-          nh  = hashv(ih+1) - hashv(ih) 
-          tmp = -1 
-          if (nh > 0) then
-            if (nh <= 8) then
-              do lm=idx,idx+nh-1
-                if (key == glb_lc(lm,1)) then 
-                  tmp = lm
-                  exit
-                end if
-              end do
-            else
-              lb = idx
-              ub = idx+nh-1
-              do 
-                if (lb>ub) exit
-                lm = (lb+ub)/2
-                if (key == glb_lc(lm,1)) then 
-                  tmp = lm
-                  exit
-                else if (key<glb_lc(lm,1)) then 
-                  ub = lm - 1
-                else
-                  lb = lm + 1
-                end if
-              end do
-            end if
-          end if
+          nh  = hashv(ih+1) - hashv(ih)
+          tmp = hash_srch(key,idx,nh,glb_lc(:,1))
           if (tmp > 0) then 
             x(i) = glb_lc(tmp,2)
             if (present(nrm)) then 
@@ -1815,33 +1745,8 @@ contains
         key = x(i) 
         ih  = iand(key,hashmask)
         idx = hashv(ih)
-        nh  = hashv(ih+1) - hashv(ih) 
-        tmp = -1 
-        if (nh > 0) then 
-          if (nh <= 8) then
-            do lm=idx,idx+nh-1
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              end if
-            end do
-          else
-            lb = idx
-            ub = idx+nh-1
-            do 
-              if (lb>ub) exit
-              lm = (lb+ub)/2
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              else if (key<glb_lc(lm,1)) then 
-                ub = lm - 1
-              else
-                lb = lm + 1
-              end if
-            end do
-          end if
-        end if
+        nh  = hashv(ih+1) - hashv(ih)
+        tmp = hash_srch(key,idx,nh,glb_lc(:,1))
         if (tmp > 0) then 
           x(i) = glb_lc(tmp,2)
           if (present(nrm)) then 
@@ -1866,7 +1771,7 @@ contains
     integer(psb_lpk_), intent(in)  :: x(:)
     integer(psb_ipk_), intent(out) :: y(:)
 
-    integer(psb_ipk_) :: i, idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: i, idx,nh,tmp
     integer(psb_lpk_) :: ih, key
     !
     ! When a large descriptor is assembled the indices 
@@ -1887,33 +1792,8 @@ contains
             write(psb_err_unit,*) ' In inner cnv: ',ih,ubound(hashv)
           end if
           idx = hashv(ih)
-          nh  = hashv(ih+1) - hashv(ih) 
-          tmp = -1 
-          if (nh > 0) then 
-            if (nh <= 8) then
-              do lm=idx,idx+nh-1
-                if (key == glb_lc(lm,1)) then 
-                  tmp = lm
-                  exit
-                end if
-              end do
-            else
-              lb = idx
-              ub = idx+nh-1
-              do 
-                if (lb>ub) exit
-                lm = (lb+ub)/2
-                if (key == glb_lc(lm,1)) then 
-                  tmp = lm
-                  exit
-                else if (key<glb_lc(lm,1)) then 
-                  ub = lm - 1
-                else
-                  lb = lm + 1
-                end if
-              end do
-            end if
-          end if
+          nh  = hashv(ih+1) - hashv(ih)
+          tmp = hash_srch(key,idx,nh,glb_lc(:,1))
           if (tmp > 0) then 
             y(i) = glb_lc(tmp,2)
             if (present(nrm)) then 
@@ -1940,32 +1820,7 @@ contains
         end if
         idx = hashv(ih)
         nh  = hashv(ih+1) - hashv(ih) 
-        tmp = -1 
-        if (nh > 0) then 
-          if (nh <= 8) then
-            do lm=idx,idx+nh-1
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              end if
-            end do
-          else
-            lb = idx
-            ub = idx+nh-1
-            do 
-              if (lb>ub) exit
-              lm = (lb+ub)/2
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              else if (key<glb_lc(lm,1)) then 
-                ub = lm - 1
-              else
-                lb = lm + 1
-              end if
-            end do
-          end if
-        end if
+        tmp = hash_srch(key,idx,nh,glb_lc(:,1))
         if (tmp > 0) then 
           y(i) = glb_lc(tmp,2)
           if (present(nrm)) then 
@@ -1981,6 +1836,89 @@ contains
     end if
   end subroutine hash_inner_cnv2
 
+  function hash_srch_ipk(key,idx,nh,glb_lc) result(res)
+    integer(psb_lpk_), intent(in) :: key
+    integer(psb_lpk_), intent(in) :: glb_lc(:)
+    integer(psb_ipk_), intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: nh
+    integer(psb_ipk_) :: res
+    !
+    integer(psb_ipk_) :: lb,ub,lm
+    res = -1
+    if (nh > 0) then
+      if (nh <= 8) then
+        !
+        ! If the list is short, a sequential search is enough 
+        !
+        do lm=idx,idx+nh-1
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          end if
+        end do
+      else
+        !
+        ! Otherwise use binary 
+        !
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          else if (key<glb_lc(lm)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      end if
+    end if
+  end function hash_srch_ipk
+
+  function hash_srch_lpk(key,idx,nh,glb_lc) result(res)
+    integer(psb_lpk_), intent(in) :: key
+    integer(psb_lpk_), intent(in) :: glb_lc(:)
+    integer(psb_lpk_), intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: nh
+    integer(psb_ipk_) :: res
+    !
+    integer(psb_ipk_) :: lb,ub,lm
+    res = -1
+    if (nh > 0) then
+      if (nh <= 8) then
+        !
+        ! If the list is short, a sequential search is enough 
+        !
+        do lm=idx,idx+nh-1
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          end if
+        end do
+      else
+        !
+        ! Otherwise use binary 
+        !
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          else if (key<glb_lc(lm)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      end if
+    end if
+  end function hash_srch_lpk
 
   subroutine hash_clone(idxmap,outmap,info)
     use psb_penv_mod
