@@ -141,12 +141,12 @@ endif()
 set(IPK_SIZE ${CMAKE_PSB_IPK})
 set(LPK_SIZE ${CMAKE_PSB_LPK})			
 # Define IPKDEF and LPKDEF based on the sizes
-set(IPKDEF "#define PSB_IPK${IPK_SIZE}")
-set(LPKDEF "#define PSB_LPK${LPK_SIZE}")
+set(PSB_IPKDEF "#define PSB_IPK${IPK_SIZE}")
+set(PSB_LPKDEF "#define PSB_LPK${LPK_SIZE}")
 
 # Output the definitions for verification
-message(STATUS "Using IPKDEF: ${IPKDEF}")
-message(STATUS "Using LPKDEF: ${LPKDEF}")
+message(STATUS "Using IPKDEF: ${PSB_IPKDEF}")
+message(STATUS "Using LPKDEF: ${PSB_LPKDEF}")
 
 add_compile_options(-DPSB_IPK${IPK_SIZE})
 add_compile_options(-DPSB_LPK${LPK_SIZE})
@@ -180,8 +180,8 @@ CHECK_Fortran_SOURCE_COMPILES(
   SRC_EXT f90
   )
 if(HAVE_VOLATILE)
-  add_compile_options(-DHAVE_VOLATILE)
-  message(STATUS "-DHAVE_VOLATILE")
+  add_compile_options(-DPSB_HAVE_VOLATILE)
+  message(STATUS "-DPSB_HAVE_VOLATILE")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
   "use ISO_FORTRAN_ENV ; end"
@@ -189,8 +189,8 @@ CHECK_Fortran_SOURCE_COMPILES(
   SRC_EXT f90
   )
 if(HAVE_ISO_FORTRAN_ENV)
-  add_compile_options(-DHAVE_ISO_FORTRAN_ENV)
-  message(STATUS "-DHAVE_ISO_FORTRAN_ENV")
+  add_compile_options(-DPSB_HAVE_ISO_FORTRAN_ENV)
+  message(STATUS "-DPSB_HAVE_ISO_FORTRAN_ENV")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
   "flush(5); end"
@@ -198,8 +198,8 @@ CHECK_Fortran_SOURCE_COMPILES(
   SRC_EXT f90
   )
 if(HAVE_FLUSH_STMT)
-  add_compile_options(-DHAVE_FLUSH_STMT)
-  message(STATUS "-DHAVE_FLUSH_STMT")
+  add_compile_options(-DPSB_HAVE_FLUSH_STMT)
+  message(STATUS "-DPSB_HAVE_FLUSH_STMT")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
   "
@@ -224,8 +224,8 @@ end program"
   SRC_EXT f90
   )
 if(HAVE_FINAL)
-  add_compile_options(-DHAVE_FINAL)
-  message(STATUS "-DHAVE_FINAL")
+  add_compile_options(-DPSB_HAVE_FINAL)
+  message(STATUS "-DPSB_HAVE_FINAL")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
   "
@@ -334,13 +334,13 @@ message(STATUS "${MPI_C_INCLUDE_PATH}; ${MPI_Fortran_INCLUDE_PATH};; ${CMAKE_For
     #add_compile_options(-DSERIAL_MPI) # Is it right??
     #message(STATUS "-DSERIAL_MPI")
   endif()
-  set(SERIAL_MPI OFF)
+  set(PSB_SERIAL_MPI OFF)
   
 else()
   message(STATUS "MPI  not found, serial ahead")
   add_compile_options(-DPSB_SERIAL_MPI)
   add_compile_options(-DPSB_MPI_MOD)
-  set(SERIAL_MPI ON)
+  set(PSB_SERIAL_MPI ON)
   set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
 
@@ -361,7 +361,7 @@ if(NOT APPLE)
 endif()
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
-add_compile_options(-DHAVE_LAPACK)
+add_compile_options(-DPSB_HAVE_LAPACK)
 
 
 #--------------------------------
@@ -761,9 +761,9 @@ if(METIS_FOUND)
   target_link_libraries(util
     PUBLIC ${METIS_LIBRARIES})
   target_compile_definitions(psb_util_C
-    PUBLIC HAVE_METIS_) #TDDO: CHECK IF THAT _ IS CORRECT
+    PUBLIC PSB_HAVE_METIS) #TDDO: CHECK IF THAT _ IS CORRECT
   target_compile_definitions(util
-    PUBLIC HAVE_METIS)
+    PUBLIC PSB_HAVE_METIS)
 endif()
 
 
