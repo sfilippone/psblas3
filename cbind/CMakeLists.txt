@@ -55,7 +55,7 @@ list(APPEND PSB_cbind_source_C_files
   prec/psb_c_cprec.c
   prec/psb_c_zprec.c
   prec/psb_c_sprec.c
-  test/pargen/ppdec.c
+  #test/pargen/ppdec.c
 
  )
 

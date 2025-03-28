@@ -148,8 +148,8 @@ set(LPKDEF "#define PSB_LPK${LPK_SIZE}")
 message(STATUS "Using IPKDEF: ${IPKDEF}")
 message(STATUS "Using LPKDEF: ${LPKDEF}")
 
-add_compile_options(-DIPK${IPK_SIZE})
-add_compile_options(-DLPK${LPK_SIZE})
+add_compile_options(-DPSB_IPK${IPK_SIZE})
+add_compile_options(-DPSB_LPK${LPK_SIZE})
 
 
 
@@ -329,8 +329,8 @@ https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
   include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
 message(STATUS "${MPI_C_INCLUDE_PATH}; ${MPI_Fortran_INCLUDE_PATH};; ${CMAKE_Fortran_LINK_FLAGS} ;")
   if(MPI_Fortran_HAVE_F90_MODULE OR MPI_Fortran_HAVE_F08_MODULE)
-    add_compile_options(-DMPI_MOD)
-    message(STATUS "-DMPI_MOD")
+    add_compile_options(-DPSB_MPI_MOD)
+    message(STATUS "-DPSB_MPI_MOD")
     #add_compile_options(-DSERIAL_MPI) # Is it right??
     #message(STATUS "-DSERIAL_MPI")
   endif()
@@ -338,8 +338,8 @@ message(STATUS "${MPI_C_INCLUDE_PATH}; ${MPI_Fortran_INCLUDE_PATH};; ${CMAKE_For
   
 else()
   message(STATUS "MPI  not found, serial ahead")
-  add_compile_options(-DSERIAL_MPI)
-  add_compile_options(-DMPI_MOD)
+  add_compile_options(-DPSB_SERIAL_MPI)
+  add_compile_options(-DPSB_MPI_MOD)
   set(SERIAL_MPI ON)
   set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
@@ -370,30 +370,6 @@ add_compile_options(-DHAVE_LAPACK)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/FindMETIS.cmake)
 find_package(METIS)
 
-if(METIS_FOUND)
-
-  set(METIS_INDEX 64 CACHE STRING "Index size for METIS (default: 64)")
-
-   # Check conditions for LPK_SIZE and METIS_INDEX
-  if(LPK_SIZE STREQUAL "4")
-    if(METIS_INDEX STREQUAL "64")
-        # Mismatch between METIS size and PSBLAS LPK
-      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    endif()
-  endif()
-
-  if(LPK_SIZE STREQUAL "8")
-    if(METIS_INDEX STREQUAL "32")
-        # Mismatch between METIS size and PSBLAS LPK
-            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    endif()
-  endif()
-
-
-  set(CHAVEMETIS "#define PSB_HAVE_METIS")
-  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
-  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
-endif()
 
 #---------------------------------------------------
 # Use standardized GNU install directory conventions
@@ -516,6 +492,15 @@ configure_file(
 include(${CMAKE_CURRENT_LIST_DIR}/base/CMakeLists.txt)
 
 include_directories("${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+
+
+  foreach(path IN LISTS base_header_C_files)
+
+        # Copy the header file to the include directory
+        file(COPY "${path}" DESTINATION "${CMAKE_BINARY_DIR}/include")
+        
+
+  endforeach()
 
 if(WIN32)
   add_library(psb_base_C STATIC ${base_source_C_files})
@@ -712,10 +697,10 @@ if(METIS_FOUND)
             OUTPUT_VARIABLE type_size)
         string(STRIP "${type_size}" type_size)
         if (type_name STREQUAL "float")
-            set(METIS_REAL_32 "${type_size}")
+            set(METIS_REAL_32 "${type_size}" PARENT_SCOPE)
             add_definitions(-DMETIS_REAL_32)
         elseif (type_name STREQUAL "double")
-            set(METIS_REAL_64 "${type_size}")
+            set(METIS_REAL_64 "${type_size}" PARENT_SCOPE)
             add_definitions(-DMETIS_REAL_64)
         endif()
     else()
@@ -728,7 +713,44 @@ if(METIS_FOUND)
   check_metis_real_type(double)
 
   # Set HAVE_METIS if METIS is found
-  add_compile_options(-DHAVE_METIS)
+  add_compile_options(-DPSB_HAVE_METIS)
+  
+  
+  
+  
+  
+  
+  # Determine METIS_INDEX based on real type sizes
+  if(DEFINED METIS_REAL_32)
+    set(METIS_INDEX 32)
+  elseif(DEFINED METIS_REAL_64)
+    set(METIS_INDEX 64)
+  else()
+    message(WARNING "Neither METIS_REAL_32 nor METIS_REAL_64 is defined.")
+    set(METIS_INDEX 64)  # Default to 64 if not defined
+  endif()
+
+   # Check conditions for LPK_SIZE and METIS_INDEX
+  if(LPK_SIZE STREQUAL "4")
+    if(METIS_INDEX STREQUAL "64")
+        # Mismatch between METIS size and PSBLAS LPK
+      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+  if(LPK_SIZE STREQUAL "8")
+    if(METIS_INDEX STREQUAL "32")
+        # Mismatch between METIS size and PSBLAS LPK
+            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+
+  set(CHAVEMETIS "#define PSB_HAVE_METIS")
+  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
+  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
+
+
 
 
   
@@ -739,7 +761,7 @@ if(METIS_FOUND)
   target_link_libraries(util
     PUBLIC ${METIS_LIBRARIES})
   target_compile_definitions(psb_util_C
-    PUBLIC HAVE_METIS_)
+    PUBLIC HAVE_METIS_) #TDDO: CHECK IF THAT _ IS CORRECT
   target_compile_definitions(util
     PUBLIC HAVE_METIS)
 endif()
@@ -758,7 +780,7 @@ include_directories(${CMAKE_BINARY_DIR}/include)
 
 include(${CMAKE_CURRENT_LIST_DIR}/cbind/CMakeLists.txt)
 if(WIN32)
-  add_library(psb_cbind_C STATIC ${base_source_C_files})
+  add_library(psb_cbind_C STATIC ${cbind_source_C_files})
   target_compile_definitions(psb_cbind_C
     PRIVATE -DWIN32 -D_LIB -DWIN64)
   set_target_properties(psb_cbind_C
