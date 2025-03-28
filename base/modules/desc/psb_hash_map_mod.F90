@@ -41,7 +41,7 @@
 !  local counterpart, so that the local storage will be proportional to 
 !  N_COL.
 !  The idea is that  glb_lc(:,1) will hold sorted global indices, and
-!  glb_lc(:,2) the corresponding local indices, so that we may do a binary search.
+!  glb_lc(:,2) the corresponding local indices, so that we may do a search.
 !  To cut down  the search time we partition glb_lc into a set of lists
 !  addressed by  hashv(:) based on the value of the lowest
 !  PSB_HASH_BITS bits of the  global index. 
@@ -695,7 +695,7 @@ contains
     integer(kind = OMP_lock_kind) :: ins_lck
 #endif
     logical, volatile :: isLoopValid
-    logical, parameter  :: do_timings=.true.
+    logical, parameter  :: do_timings=.false.
     integer(psb_ipk_), save  :: ins_phase1=-1, ins_phase2=-1, ins_phase3=-1, ins_phase4=-1
     integer(psb_ipk_), save  :: ins_phase11=-1, ins_phase12=-1
 
@@ -1101,51 +1101,6 @@ contains
       else if (.not.present(lidx)) then 
 
         if (present(mask)) then
-#if 0
-          do i = 1, is
-            if (mask(i)) then
-              ip   = idx(i) 
-              if ((ip < 1 ).or.(ip>mglob)) then 
-                idx(i) = -1
-                cycle
-              endif
-              ncol = idxmap%get_lc()
-              nxt  = ncol + 1 
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                   & idxmap%glb_lc,ncol)
-              if (lip < 0) then
-                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-                lip = tlip
-              end if
-
-              if (info >=0) then 
-                if (nxt == lip) then 
-                  ncol = nxt
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_)
-                  if (info /= psb_success_) then
-                    write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
-                    info = lip
-                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         & a_err='psb_ensure_size',i_err=(/info/))
-                    isLoopValid = .false.
-                  end if
-                  idxmap%loc_to_glob(nxt)  = ip
-                  call idxmap%set_lc(ncol)
-                endif
-                info = psb_success_
-              else
-                call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     & a_err='SearchInsKeyVal',i_err=(/info/))
-                isLoopValid = .false.
-              end if
-              idx(i) = lip
-              info = psb_success_
-            else
-              idx(i) = -1
-            end if
-          enddo
-#else
           call psb_tic(ins_phase1)
           ncol = idxmap%get_lc()
           call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
@@ -1186,50 +1141,47 @@ contains
             end if
           enddo
           call psb_toc(ins_phase2)
-#endif
         else if (.not.present(mask)) then 
 
+          ncol = idxmap%get_lc()
+          call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
+               & idxmap%glb_lc,nrm=ncol)
           do i = 1, is
-            ncol  = idxmap%get_lc()
-            ip = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
-              cycle
-            endif
-            nxt = ncol + 1 
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                 & idxmap%glb_lc,ncol)
-            if (lip < 0) then
-              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-              lip = tlip
-            end if
-
-            if (info >=0) then 
-              if (nxt == lip) then 
-                ncol = nxt
-                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                     & pad=-1_psb_lpk_)
-                if (info /= psb_success_) then
-                  write(0,*)'Problem 8:',info,lip,size(idxmap%loc_to_glob)
-                  info = lip
-                  ch_err='psb_ensure_size'
-                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-                  isLoopValid = .false.
-
-                end if
-                idxmap%loc_to_glob(nxt)  = ip
-                call idxmap%set_lc(ncol)
-              endif
+            if (idx(i)<0) then 
+              ncol  = idxmap%get_lc()
+              nxt = ncol + 1 
+              if (lip < 0) then
+                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                lip = tlip
+              end if
+              
+              if (info >=0) then 
+                if (nxt == lip) then 
+                  ncol = nxt
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_)
+                  if (info /= psb_success_) then
+                    write(0,*)'Problem 8:',info,lip,size(idxmap%loc_to_glob)
+                    info = lip
+                    ch_err='psb_ensure_size'
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                    isLoopValid = .false.
+                    
+                  end if
+                  idxmap%loc_to_glob(nxt)  = ip
+                  call idxmap%set_lc(ncol)
+                endif
+                info = psb_success_
+              else
+                ch_err='SearchInsKeyVal'
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                isLoopValid = .false.
+              end if
+              idx(i) = lip
               info = psb_success_
-            else
-              ch_err='SearchInsKeyVal'
-              call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                   & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-              isLoopValid = .false.
             end if
-            idx(i) = lip
-            info = psb_success_
           enddo
 
         end if
@@ -1598,7 +1550,7 @@ contains
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1607,24 +1559,31 @@ contains
     ih  = iand(key,hashmask)
     idx = hashv(ih)
     nh  = hashv(ih+1) - hashv(ih) 
+    tmp = -1 
     if (nh > 0) then 
-      tmp = -1 
-      lb = idx
-      ub = idx+nh-1
-      do 
-        if (lb>ub) exit
-        lm = (lb+ub)/2
-        if (key == glb_lc(lm,1)) then 
-          tmp = lm
-          exit
-        else if (key<glb_lc(lm,1)) then 
-          ub = lm - 1
-        else
-          lb = lm + 1
-        end if
-      end do
-    else 
-      tmp = -1
+      if (nh <= 8) then
+        do lm=idx,idx+nh-1
+          if (key == glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          end if
+        end do
+      else
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key == glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          else if (key<glb_lc(lm,1)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      end if
     end if
     if (tmp > 0) then 
       x = glb_lc(tmp,2)
@@ -1647,7 +1606,7 @@ contains
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1656,24 +1615,31 @@ contains
     ih  = iand(key,hashmask)
     idx = hashv(ih)
     nh  = hashv(ih+1) - hashv(ih) 
+    tmp = -1 
     if (nh > 0) then 
-      tmp = -1 
-      lb = idx
-      ub = idx+nh-1
-      do 
-        if (lb>ub) exit
-        lm = (lb+ub)/2
-        if (key == glb_lc(lm,1)) then 
-          tmp = lm
-          exit
-        else if (key<glb_lc(lm,1)) then 
-          ub = lm - 1
-        else
-          lb = lm + 1
-        end if
-      end do
-    else 
-      tmp = -1
+      if (nh <= 8) then
+        do lm=idx,idx+nh-1
+          if (key == glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          end if
+        end do
+      else
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key == glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          else if (key<glb_lc(lm,1)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      end if
     end if
     if (tmp > 0) then 
       y = glb_lc(tmp,2)
@@ -1689,17 +1655,17 @@ contains
   subroutine hash_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask,nrm)
     implicit none 
     integer(psb_ipk_), intent(in)  :: n, hashv(0:)
+    integer(psb_lpk_), intent(inout) :: x(:)
     integer(psb_lpk_), intent(in)  :: glb_lc(:,:),hashmask
     logical, intent(in), optional  :: mask(:)
     integer(psb_ipk_), intent(in), optional  :: nrm
-    integer(psb_lpk_), intent(inout) :: x(:)
 
     integer(psb_ipk_) :: i, nh,tmp,lb,ub,lm
     integer(psb_lpk_) :: ih, key, idx
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1713,24 +1679,31 @@ contains
           ih  = iand(key,hashmask)
           idx = hashv(ih)
           nh  = hashv(ih+1) - hashv(ih) 
-          if (nh > 0) then 
-            tmp = -1 
-            lb = idx
-            ub = idx+nh-1
-            do 
-              if (lb>ub) exit
-              lm = (lb+ub)/2
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              else if (key<glb_lc(lm,1)) then 
-                ub = lm - 1
-              else
-                lb = lm + 1
-              end if
-            end do
-          else 
-            tmp = -1
+          tmp = -1 
+          if (nh > 0) then
+            if (nh <= 8) then
+              do lm=idx,idx+nh-1
+                if (key == glb_lc(lm,1)) then 
+                  tmp = lm
+                  exit
+                end if
+              end do
+            else
+              lb = idx
+              ub = idx+nh-1
+              do 
+                if (lb>ub) exit
+                lm = (lb+ub)/2
+                if (key == glb_lc(lm,1)) then 
+                  tmp = lm
+                  exit
+                else if (key<glb_lc(lm,1)) then 
+                  ub = lm - 1
+                else
+                  lb = lm + 1
+                end if
+              end do
+            end if
           end if
           if (tmp > 0) then 
             x(i) = glb_lc(tmp,2)
@@ -1754,24 +1727,31 @@ contains
         ih  = iand(key,hashmask)
         idx = hashv(ih)
         nh  = hashv(ih+1) - hashv(ih) 
+        tmp = -1 
         if (nh > 0) then 
-          tmp = -1 
-          lb = idx
-          ub = idx+nh-1
-          do 
-            if (lb>ub) exit
-            lm = (lb+ub)/2
-            if (key == glb_lc(lm,1)) then 
-              tmp = lm
-              exit
-            else if (key<glb_lc(lm,1)) then 
-              ub = lm - 1
-            else
-              lb = lm + 1
-            end if
-          end do
-        else 
-          tmp = -1
+          if (nh <= 8) then
+            do lm=idx,idx+nh-1
+              if (key == glb_lc(lm,1)) then 
+                tmp = lm
+                exit
+              end if
+            end do
+          else
+            lb = idx
+            ub = idx+nh-1
+            do 
+              if (lb>ub) exit
+              lm = (lb+ub)/2
+              if (key == glb_lc(lm,1)) then 
+                tmp = lm
+                exit
+              else if (key<glb_lc(lm,1)) then 
+                ub = lm - 1
+              else
+                lb = lm + 1
+              end if
+            end do
+          end if
         end if
         if (tmp > 0) then 
           x(i) = glb_lc(tmp,2)
@@ -1802,7 +1782,7 @@ contains
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1819,24 +1799,31 @@ contains
           end if
           idx = hashv(ih)
           nh  = hashv(ih+1) - hashv(ih) 
+          tmp = -1 
           if (nh > 0) then 
-            tmp = -1 
-            lb = idx
-            ub = idx+nh-1
-            do 
-              if (lb>ub) exit
-              lm = (lb+ub)/2
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              else if (key<glb_lc(lm,1)) then 
-                ub = lm - 1
-              else
-                lb = lm + 1
-              end if
-            end do
-          else 
-            tmp = -1
+            if (nh <= 8) then
+              do lm=idx,idx+nh-1
+                if (key == glb_lc(lm,1)) then 
+                  tmp = lm
+                  exit
+                end if
+              end do
+            else
+              lb = idx
+              ub = idx+nh-1
+              do 
+                if (lb>ub) exit
+                lm = (lb+ub)/2
+                if (key == glb_lc(lm,1)) then 
+                  tmp = lm
+                  exit
+                else if (key<glb_lc(lm,1)) then 
+                  ub = lm - 1
+                else
+                  lb = lm + 1
+                end if
+              end do
+            end if
           end if
           if (tmp > 0) then 
             y(i) = glb_lc(tmp,2)
@@ -1864,24 +1851,31 @@ contains
         end if
         idx = hashv(ih)
         nh  = hashv(ih+1) - hashv(ih) 
+        tmp = -1 
         if (nh > 0) then 
-          tmp = -1 
-          lb = idx
-          ub = idx+nh-1
-          do 
-            if (lb>ub) exit
-            lm = (lb+ub)/2
-            if (key == glb_lc(lm,1)) then 
-              tmp = lm
-              exit
-            else if (key<glb_lc(lm,1)) then 
-              ub = lm - 1
-            else
-              lb = lm + 1
-            end if
-          end do
-        else 
-          tmp = -1
+          if (nh <= 8) then
+            do lm=idx,idx+nh-1
+              if (key == glb_lc(lm,1)) then 
+                tmp = lm
+                exit
+              end if
+            end do
+          else
+            lb = idx
+            ub = idx+nh-1
+            do 
+              if (lb>ub) exit
+              lm = (lb+ub)/2
+              if (key == glb_lc(lm,1)) then 
+                tmp = lm
+                exit
+              else if (key<glb_lc(lm,1)) then 
+                ub = lm - 1
+              else
+                lb = lm + 1
+              end if
+            end do
+          end if
         end if
         if (tmp > 0) then 
           y(i) = glb_lc(tmp,2)
