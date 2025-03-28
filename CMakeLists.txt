@@ -465,20 +465,6 @@ if(METIS_FOUND)
   set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
   set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
 
-
-
-
-  
-  target_include_directories(util
-    PUBLIC ${METIS_INCLUDES})
-  target_include_directories(psb_util_C
-    PUBLIC ${METIS_INCLUDES})
-  target_link_libraries(util
-    PUBLIC ${METIS_LIBRARIES})
-  target_compile_definitions(psb_util_C
-    PUBLIC PSB_HAVE_METIS) #TDDO: CHECK IF THAT _ IS CORRECT
-  target_compile_definitions(util
-    PUBLIC PSB_HAVE_METIS)
 endif()
 
 
