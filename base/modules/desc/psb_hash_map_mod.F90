@@ -373,59 +373,30 @@ contains
              & idxmap%hashv,idxmap%glb_lc,mask=mask, nrm=nrm)
 
       else if (idxmap%is_valid()) then 
-
-        if (.false.) then 
-          ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
-          ! $ o m p private(i,ip,lip,tlip,info)
-          do i = 1, is
-            if (mask(i)) then 
-              ip = idx(i) 
-              if ((ip < 1 ).or.(ip>mglob)) then 
+        call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
+             & idxmap%glb_lc,nrm=nrm,mask=mask)
+        
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info)
+        ! $ o m p end parallel do
+        do i = 1, is
+          lip = idx(i)
+          if (lip < 0) then 
+            call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+            lip = tlip
+            info = 0
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idx(i) = lip
+              else 
                 idx(i) = -1
-                cycle
               endif
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                   & idxmap%glb_lc,nrm)
-              if (lip < 0) then 
-                call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
-                lip = tlip
-                info = 0
-              end if
-              if (owned_) then 
-                if (lip<=nrow) then 
-                  idx(i) = lip
-                else 
-                  idx(i) = -1
-                endif
-              else
-                idx(i) = lip
-              endif
-            end if
-          enddo
-          ! $ o m p end parallel do
-        else
-          call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
-               & idxmap%glb_lc,nrm=nrm,mask=mask)
-
-          do i = 1, is
-            lip = idx(i)
-            if (lip < 0) then 
-              call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
-              lip = tlip
-              info = 0
-              if (owned_) then 
-                if (lip<=nrow) then 
-                  idx(i) = lip
-                else 
-                  idx(i) = -1
-                endif
-              else
-                idx(i) = lip
-              endif
-            end if
-          enddo
-        end if
+            else
+              idx(i) = lip
+            endif
+          end if
+        enddo
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idx(1:is) = -1
@@ -441,31 +412,27 @@ contains
 
       else if (idxmap%is_valid()) then 
 
+        call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
+             & idxmap%glb_lc,nrm=nrm)
         ! $ o m p parallel do default(none) schedule(dynamic) &
         ! $ o m p shared(is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
         ! $ o m p private(i,ip,lip,tlip,info) 
         do i = 1, is
-          ip = idx(i) 
-          if ((ip < 1 ).or.(ip>mglob)) then 
-            idx(i) = -1
-            cycle
-          endif
-          call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-               & idxmap%hashv,idxmap%glb_lc,nrm)
+          lip = idx(i) 
           if (lip < 0) then
             call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
             lip = tlip
             info = 0
-          end if
-          if (owned_) then 
-            if (lip<=nrow) then 
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idx(i) = lip
+              else 
+                idx(i) = -1
+              endif
+            else
               idx(i) = lip
-            else 
-              idx(i) = -1
             endif
-          else
-            idx(i) = lip
-          endif
+          end if
         enddo
         ! $ o m p end parallel do 
       else 
@@ -529,7 +496,34 @@ contains
         call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,&
              & idxmap%hashv,idxmap%glb_lc,mask=mask, nrm=nrm)
 
-      else if (idxmap%is_valid()) then 
+      else if (idxmap%is_valid()) then
+#if 1
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,idxmap%hashv,&
+             & idxmap%glb_lc,nrm=nrm,mask=mask)
+
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info) 
+        do i = 1, is
+          lip = idxout(i) 
+          if (mask(i).and.(lip<0)) then
+            ip = idxin(i)
+            call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+            lip = tlip
+            info = 0
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idxout(i) = lip
+              else 
+                idxout(i) = -1
+              endif
+            else
+              idxout(i) = lip
+            endif
+          end if
+        enddo
+        ! $ o m p end parallel do 
+#else
 
         ! $ o m p parallel do default(none) schedule(dynamic) &
         ! $ o m p shared(mask,is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
@@ -559,7 +553,8 @@ contains
             endif
           end if
         enddo
-        ! $ o m p end parallel do 
+        ! $ o m p end parallel do
+#endif
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idxout(1:is) = -1
@@ -574,7 +569,33 @@ contains
              & idxmap%hashv,idxmap%glb_lc,nrm=nrm)
 
       else if (idxmap%is_valid()) then 
+#if 1
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,idxmap%hashv,&
+             & idxmap%glb_lc,nrm=nrm)
 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p private(i,ip,lip,tlip,info) 
+        do i = 1, is
+          lip = idxout(i) 
+          if (lip < 0) then 
+            ip = idxin(i)
+            call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+            lip = tlip
+            info = 0
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idxout(i) = lip
+              else 
+                idxout(i) = -1
+              endif
+            else
+              idxout(i) = lip
+            endif
+          end if
+        enddo
+        ! $ o m p end parallel do 
+#else
         ! $ o m p parallel do default(none) schedule(dynamic) &
         ! $ o m p shared(is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
         ! $ o m p private(i,ip,lip,tlip,info) 
@@ -601,15 +622,16 @@ contains
             idxout(i) = lip
           endif
         enddo
-        ! $ o m p end parallel do 
+        ! $ o m p end parallel do
+#endif
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idxout(1:is) = -1
         info = -1
       end if
+      
     end if
   end subroutine hash_g2lv2
-
 
 
   subroutine hash_g2ls1_ins(idx,idxmap,info,mask,lidx)
@@ -1005,101 +1027,6 @@ contains
     if (idxmap%is_bld()) then 
 
       if (present(lidx)) then
-!!$        if (present(mask)) then 
-!!$          do i = 1, is
-!!$            ncol  = idxmap%get_lc()
-!!$            if (mask(i)) then 
-!!$              ip = idx(i) 
-!!$              if ((ip < 1 ).or.(ip>mglob) ) then 
-!!$                idx(i) = -1
-!!$                cycle
-!!$              endif
-!!$              call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-!!$                   & idxmap%hashv,idxmap%glb_lc,ncol)
-!!$              if (lip < 0) then
-!!$                nxt = lidx(i)
-!!$                if (nxt <= nrow) then 
-!!$                  idx(i) = -1
-!!$                  cycle
-!!$                endif
-!!$                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-!!$                lip = tlip
-!!$                if (info >=0) then 
-!!$                  if (nxt == tlip) then 
-!!$                    ncol = max(ncol,nxt)
-!!$                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-!!$                         & pad=-1_psb_lpk_)
-!!$                    if (info /= psb_success_) then
-!!$                      !write(0,*) 'Error spot'
-!!$                      write(0,*)'Problem 5:',info,lip,size(idxmap%loc_to_glob)
-!!$                      info = lip
-!!$                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$                           &a_err='psb_ensure_size',i_err=(/info/))
-!!$                      isLoopValid = .false.
-!!$                    end if
-!!$                    idxmap%loc_to_glob(nxt)  = ip
-!!$                    call idxmap%set_lc(ncol)
-!!$                  endif
-!!$                  info = psb_success_
-!!$                else
-!!$                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$                       & a_err='SearchInsKeyVal',i_err=(/info/))
-!!$                  isLoopValid = .false.
-!!$                end if
-!!$              end if
-!!$              idx(i) = lip
-!!$              info = psb_success_
-!!$            end if
-!!$          enddo
-!!$
-!!$        else if (.not.present(mask)) then 
-!!$
-!!$          do i = 1, is
-!!$            ncol  = idxmap%get_lc()
-!!$            ip    = idx(i) 
-!!$            if ((ip < 1 ).or.(ip>mglob)) then 
-!!$              idx(i) = -1
-!!$              cycle
-!!$            endif
-!!$            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-!!$                 & idxmap%glb_lc,ncol)
-!!$            if (lip < 0) then 
-!!$              nxt = lidx(i)
-!!$              if (nxt <= nrow) then 
-!!$                idx(i) = -1
-!!$                cycle
-!!$              endif
-!!$              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-!!$              lip = tlip
-!!$
-!!$              if (info >=0) then 
-!!$                if (nxt == lip) then 
-!!$                  ncol = max(nxt,ncol)
-!!$                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-!!$                       & pad=-1_psb_lpk_)
-!!$                  if (info /= psb_success_) then
-!!$                    !write(0,*) 'Error spot'                      
-!!$                    write(0,*)'Problem 6:',info,lip,size(idxmap%loc_to_glob)
-!!$                    info = lip
-!!$                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$                         &a_err='psb_ensure_size',i_err=(/info/))
-!!$                    isLoopValid = .false.
-!!$                  end if
-!!$                  idxmap%loc_to_glob(nxt)  = ip
-!!$                  call idxmap%set_lc(ncol)
-!!$                endif
-!!$                info = psb_success_
-!!$              else
-!!$                call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$                     & a_err='SearchInsKeyVal',i_err=(/info/))
-!!$                isLoopValid = .false.
-!!$              end if
-!!$            end if
-!!$            idx(i) = lip
-!!$            info = psb_success_
-!!$          enddo
-!!$
-!!$        end if
         if (present(mask)) then
           call psb_tic(ins_phase1)
           ncol = idxmap%get_lc()
