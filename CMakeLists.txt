@@ -414,9 +414,11 @@ if(METIS_FOUND)
         if (type_name STREQUAL "float")
             set(PSB_METIS_REAL_32 "${type_size}" PARENT_SCOPE)
             add_definitions(-DPSB_METIS_REAL_32)
+            set(CREALMETIS "#define PSB_METIS_REAL_32" PARENT_SCOPE)	
         elseif (type_name STREQUAL "double")
             set(PSB_METIS_REAL_64 "${type_size}" PARENT_SCOPE)
             add_definitions(-DPSB_METIS_REAL_64)
+            set(CREALMETIS "#define PSB_METIS_REAL_64" PARENT_SCOPE)		    
         endif()
     else()
         message(WARNING "Failed to compile test for type size: ${type_name}")
@@ -462,8 +464,8 @@ if(METIS_FOUND)
 
 
   set(CHAVEMETIS "#define PSB_HAVE_METIS")
-  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
-  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
+  set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
+#  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
 
 endif()
 
