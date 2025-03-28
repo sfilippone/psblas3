@@ -78,7 +78,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
   real(psb_dpk_), allocatable     :: lval(:)
   character(len=20)  :: name
-  logical, parameter  :: do_timings=.true.
+  logical, parameter  :: do_timings=.false.
   integer(psb_ipk_), save  :: ins_phase1=-1, ins_phase2=-1, ins_phase3=-1, ins_phase4=-1
   integer(psb_ipk_), save  :: ins_phase11=-1, ins_phase12=-1
 
