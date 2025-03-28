@@ -371,6 +371,103 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/FindMETIS.cmake)
 find_package(METIS)
 
 
+target_link_libraries(util PUBLIC base prec)
+if(METIS_FOUND)
+  message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
+  # Make sure this path is correct
+  set(METISINCFILE "metis.h")  # Adjust this to your actual path
+
+  # Specify the configuration file
+  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
+  set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
+
+  # Configure the header file
+  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+ 
+
+
+
+  # Check for real sizes using try_compile
+  include(CheckCSourceCompiles)
+
+  # Function to check the size of a type
+  function(check_metis_real_type type_name)
+    set(source_code "
+    #include <metis.h>
+    #include <stdio.h>
+    int main() {
+        printf(\"%zu\\n\", sizeof(${type_name}));
+        return 0;
+    }")
+
+    # Create a temporary source file
+    file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c" "${source_code}")
+
+    # Try to compile it
+    try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
+        "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c")
+
+    # Check the result and read the output
+    if (COMPILER_RESULT)
+        execute_process(COMMAND "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size"
+            OUTPUT_VARIABLE type_size)
+        string(STRIP "${type_size}" type_size)
+        if (type_name STREQUAL "float")
+            set(PSB_METIS_REAL_32 "${type_size}" PARENT_SCOPE)
+            add_definitions(-DPSB_METIS_REAL_32)
+        elseif (type_name STREQUAL "double")
+            set(PSB_METIS_REAL_64 "${type_size}" PARENT_SCOPE)
+            add_definitions(-DPSB_METIS_REAL_64)
+        endif()
+    else()
+        message(WARNING "Failed to compile test for type size: ${type_name}")
+    endif()
+  endfunction()
+
+  # Check for both float and double
+  check_metis_real_type(float)
+  check_metis_real_type(double)
+
+  # Set HAVE_METIS if METIS is found
+  add_compile_options(-DPSB_HAVE_METIS)
+  
+  
+  # Determine METIS_INDEX based on real type sizes
+  if(DEFINED PSB_METIS_REAL_32)
+    set(METIS_INDEX 32)
+  elseif(DEFINED PSB_METIS_REAL_64)
+    set(METIS_INDEX 64)
+  else()
+    message(WARNING "Neither METIS_REAL_32 nor METIS_REAL_64 is defined.")
+    set(METIS_INDEX 64)  # Default to 64 if not defined
+  endif()
+
+   # Check conditions for LPK_SIZE and METIS_INDEX
+  if(LPK_SIZE STREQUAL "4")
+    if(METIS_INDEX STREQUAL "64")
+        # Mismatch between METIS size and PSBLAS LPK
+      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+  if(LPK_SIZE STREQUAL "8")
+    if(METIS_INDEX STREQUAL "32")
+        # Mismatch between METIS size and PSBLAS LPK
+            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    endif()
+  endif()
+
+
+  set(CHAVEMETIS "#define PSB_HAVE_METIS")
+  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
+  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
+
+endif()
+
+
+
+
+
 #---------------------------------------------------
 # Use standardized GNU install directory conventions
 #---------------------------------------------------
@@ -656,104 +753,9 @@ target_include_directories(util PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
   $<INSTALL_INTERFACE:modules>)
 target_link_libraries(util PUBLIC base prec)
+
 if(METIS_FOUND)
-  message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
-  # Make sure this path is correct
-  set(METISINCFILE "metis.h")  # Adjust this to your actual path
 
-  # Specify the configuration file
-  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
-  set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
-
-  # Configure the header file
-  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
- 
-
-
-
-  # Check for real sizes using try_compile
-  include(CheckCSourceCompiles)
-
-  # Function to check the size of a type
-  function(check_metis_real_type type_name)
-    set(source_code "
-    #include <metis.h>
-    #include <stdio.h>
-    int main() {
-        printf(\"%zu\\n\", sizeof(${type_name}));
-        return 0;
-    }")
-
-    # Create a temporary source file
-    file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c" "${source_code}")
-
-    # Try to compile it
-    try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
-        "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c")
-
-    # Check the result and read the output
-    if (COMPILER_RESULT)
-        execute_process(COMMAND "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size"
-            OUTPUT_VARIABLE type_size)
-        string(STRIP "${type_size}" type_size)
-        if (type_name STREQUAL "float")
-            set(PSB_METIS_REAL_32 "${type_size}" PARENT_SCOPE)
-            add_definitions(-DPSB_METIS_REAL_32)
-        elseif (type_name STREQUAL "double")
-            set(PSB_METIS_REAL_64 "${type_size}" PARENT_SCOPE)
-            add_definitions(-DPSB_METIS_REAL_64)
-        endif()
-    else()
-        message(WARNING "Failed to compile test for type size: ${type_name}")
-    endif()
-  endfunction()
-
-  # Check for both float and double
-  check_metis_real_type(float)
-  check_metis_real_type(double)
-
-  # Set HAVE_METIS if METIS is found
-  add_compile_options(-DPSB_HAVE_METIS)
-  
-  
-  
-  
-  
-  
-  # Determine METIS_INDEX based on real type sizes
-  if(DEFINED PSB_METIS_REAL_32)
-    set(METIS_INDEX 32)
-  elseif(DEFINED PSB_METIS_REAL_64)
-    set(METIS_INDEX 64)
-  else()
-    message(WARNING "Neither METIS_REAL_32 nor METIS_REAL_64 is defined.")
-    set(METIS_INDEX 64)  # Default to 64 if not defined
-  endif()
-
-   # Check conditions for LPK_SIZE and METIS_INDEX
-  if(LPK_SIZE STREQUAL "4")
-    if(METIS_INDEX STREQUAL "64")
-        # Mismatch between METIS size and PSBLAS LPK
-      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    endif()
-  endif()
-
-  if(LPK_SIZE STREQUAL "8")
-    if(METIS_INDEX STREQUAL "32")
-        # Mismatch between METIS size and PSBLAS LPK
-            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    endif()
-  endif()
-
-
-  set(CHAVEMETIS "#define PSB_HAVE_METIS")
-  set(CINTMETIS "#define PSB_METIS_${IPK_SIZE}")
-  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
-
-
-
-
-  
   target_include_directories(util
     PUBLIC ${METIS_INCLUDES})
   target_include_directories(psb_util_C
