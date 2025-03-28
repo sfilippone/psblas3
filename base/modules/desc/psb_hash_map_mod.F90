@@ -369,35 +369,58 @@ contains
 
       else if (idxmap%is_valid()) then 
 
-        ! $ o m p parallel do default(none) schedule(dynamic) &
-        ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
-        ! $ o m p private(i,ip,lip,tlip,info) 
-        do i = 1, is
-          if (mask(i)) then 
-            ip = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
-              cycle
-            endif
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                 & idxmap%glb_lc,nrm)
+        if (.false.) then 
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
+          ! $ o m p private(i,ip,lip,tlip,info)
+          do i = 1, is
+            if (mask(i)) then 
+              ip = idx(i) 
+              if ((ip < 1 ).or.(ip>mglob)) then 
+                idx(i) = -1
+                cycle
+              endif
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                   & idxmap%glb_lc,nrm)
+              if (lip < 0) then 
+                call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+                lip = tlip
+                info = 0
+              end if
+              if (owned_) then 
+                if (lip<=nrow) then 
+                  idx(i) = lip
+                else 
+                  idx(i) = -1
+                endif
+              else
+                idx(i) = lip
+              endif
+            end if
+          enddo
+          ! $ o m p end parallel do
+        else
+          call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
+               & idxmap%glb_lc,nrm=nrm,mask=mask)
+
+          do i = 1, is
+            lip = idx(i)
             if (lip < 0) then 
               call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
               lip = tlip
               info = 0
-            end if
-            if (owned_) then 
-              if (lip<=nrow) then 
+              if (owned_) then 
+                if (lip<=nrow) then 
+                  idx(i) = lip
+                else 
+                  idx(i) = -1
+                endif
+              else
                 idx(i) = lip
-              else 
-                idx(i) = -1
               endif
-            else
-              idx(i) = lip
-            endif
-          end if
-        enddo
-        ! $ o m p end parallel do
+            end if
+          enddo
+        end if
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idx(1:is) = -1
@@ -648,10 +671,10 @@ contains
     use psb_realloc_mod
     use psb_sort_mod
     use psb_penv_mod
+    use psb_timers_mod
 #ifdef PSB_OPENMP    
     use omp_lib
 #endif
-
     implicit none 
 
     class(psb_hash_map), intent(inout) :: idxmap
@@ -672,12 +695,26 @@ contains
     integer(kind = OMP_lock_kind) :: ins_lck
 #endif
     logical, volatile :: isLoopValid
+    logical, parameter  :: do_timings=.true.
+    integer(psb_ipk_), save  :: ins_phase1=-1, ins_phase2=-1, ins_phase3=-1, ins_phase4=-1
+    integer(psb_ipk_), save  :: ins_phase11=-1, ins_phase12=-1
+
     info = psb_success_
     name = 'hash_g2lv1_ins'
     call psb_erractionsave(err_act)
 
     ctxt = idxmap%get_ctxt()
     call psb_info(ctxt, me, np)
+  if ((do_timings).and.(ins_phase1==-1))       &
+       & ins_phase1 = psb_get_timer_idx("HSHINS: inner_cnv ")
+  if ((do_timings).and.(ins_phase2==-1))       &
+       & ins_phase2 = psb_get_timer_idx("HSINS: srchins_lp")
+!!$  if ((do_timings).and.(ins_phase3==-1))       &
+!!$       & ins_phase3 = psb_get_timer_idx("HSHINS: csput")
+!!$  if ((do_timings).and.(ins_phase4==-1))       &
+!!$       & ins_phase4 = psb_get_timer_idx("HSHINS: rmt%csput")
+
+
 
     is = size(idx)
 
@@ -739,7 +776,7 @@ contains
                     if (info >=0) then 
                       if (nxt == lip) then 
                         call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                             & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                             & pad=-1_psb_lpk_)
                         if (info /= psb_success_) then
                           write(0,*)'Problem 1:',info,lip,size(idxmap%loc_to_glob)
                           info=lip 
@@ -803,7 +840,7 @@ contains
                   if (info >=0) then 
                     if (nxt == lip) then 
                       call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                           & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                           & pad=-1_psb_lpk_)
                       if (info /= psb_success_) then
                         write(0,*)'Problem 2:',info,lip,size(idxmap%loc_to_glob)
                         info=lip
@@ -865,7 +902,7 @@ contains
                     if (nxt == lip) then
                       if (lip > size(idxmap%loc_to_glob)) then 
                         call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                             & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                             & pad=-1_psb_lpk_)
                       end if
                       if (info /= psb_success_) then
                         write(0,*)'Problem 3:',info,lip,size(idxmap%loc_to_glob)
@@ -925,7 +962,7 @@ contains
                 if (info >=0) then 
                   if (nxt == lip) then 
                     call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                         & pad=-1_psb_lpk_)
                     if (info /= psb_success_) then
                       write(0,*)'Problem 4:',info,lip,size(idxmap%loc_to_glob)
                       info=lip
@@ -986,7 +1023,7 @@ contains
                   if (nxt == tlip) then 
                     ncol = max(ncol,nxt)
                     call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                         & pad=-1_psb_lpk_)
                     if (info /= psb_success_) then
                       !write(0,*) 'Error spot'
                       write(0,*)'Problem 5:',info,lip,size(idxmap%loc_to_glob)
@@ -1036,7 +1073,7 @@ contains
                 if (nxt == lip) then 
                   ncol = max(nxt,ncol)
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                       & pad=-1_psb_lpk_)
                   if (info /= psb_success_) then
                     !write(0,*) 'Error spot'                      
                     write(0,*)'Problem 6:',info,lip,size(idxmap%loc_to_glob)
@@ -1064,6 +1101,7 @@ contains
       else if (.not.present(lidx)) then 
 
         if (present(mask)) then
+#if 0
           do i = 1, is
             if (mask(i)) then
               ip   = idx(i) 
@@ -1084,7 +1122,7 @@ contains
                 if (nxt == lip) then 
                   ncol = nxt
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                       & pad=-1_psb_lpk_)
                   if (info /= psb_success_) then
                     write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
                     info = lip
@@ -1107,6 +1145,48 @@ contains
               idx(i) = -1
             end if
           enddo
+#else
+          call psb_tic(ins_phase1)
+          ncol = idxmap%get_lc()
+          call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
+               & idxmap%glb_lc,nrm=ncol, mask=mask)
+          call psb_toc(ins_phase1)
+          call psb_tic(ins_phase2)
+          do i = 1, is
+            if (mask(i).and.(idx(i)<0)) then
+              ncol = idxmap%get_lc()
+              nxt  = ncol + 1 
+              ip  = idx(i)
+              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+              lip = tlip
+              
+              if (info >=0) then 
+                if (nxt == lip) then 
+                  ncol = nxt
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_)
+                  if (info /= psb_success_) then
+                    write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
+                    info = lip
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         & a_err='psb_ensure_size',i_err=(/info/))
+                    isLoopValid = .false.
+                  end if
+                  idxmap%loc_to_glob(nxt)  = ip
+                  call idxmap%set_lc(ncol)
+                endif
+                info = psb_success_
+              else
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err='SearchInsKeyVal',i_err=(/info/))
+                isLoopValid = .false.
+              end if
+              idx(i) = lip
+              info = psb_success_
+            end if
+          enddo
+          call psb_toc(ins_phase2)
+#endif
         else if (.not.present(mask)) then 
 
           do i = 1, is
@@ -1128,7 +1208,7 @@ contains
               if (nxt == lip) then 
                 ncol = nxt
                 call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                     & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                     & pad=-1_psb_lpk_)
                 if (info /= psb_success_) then
                   write(0,*)'Problem 8:',info,lip,size(idxmap%loc_to_glob)
                   info = lip
@@ -1172,7 +1252,6 @@ contains
   end subroutine hash_g2lv1_ins
 
   ! ################## END THESIS #########################
-
   subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     use psb_realloc_mod
     use psb_error_mod

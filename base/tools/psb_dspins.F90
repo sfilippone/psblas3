@@ -78,7 +78,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
   real(psb_dpk_), allocatable     :: lval(:)
   character(len=20)  :: name
-  logical, parameter  :: do_timings=.false.
+  logical, parameter  :: do_timings=.true.
   integer(psb_ipk_), save  :: ins_phase1=-1, ins_phase2=-1, ins_phase3=-1, ins_phase4=-1
   integer(psb_ipk_), save  :: ins_phase11=-1, ins_phase12=-1
 
@@ -124,17 +124,13 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     local_ = .false.
   endif
   if ((do_timings).and.(ins_phase1==-1))       &
-       & ins_phase1 = psb_get_timer_idx("SPINS: and send ")
+       & ins_phase1 = psb_get_timer_idx("SPINS: g2l ")
   if ((do_timings).and.(ins_phase2==-1))       &
-       & ins_phase2 = psb_get_timer_idx("SPINS: and cmp ad")
+       & ins_phase2 = psb_get_timer_idx("SPINS: g2l_ins")
   if ((do_timings).and.(ins_phase3==-1))       &
-       & ins_phase3 = psb_get_timer_idx("SPINS: and rcv")
+       & ins_phase3 = psb_get_timer_idx("SPINS: csput")
   if ((do_timings).and.(ins_phase4==-1))       &
-       & ins_phase4 = psb_get_timer_idx("SPINS: and cmp and")
-  if ((do_timings).and.(ins_phase11==-1))       &
-       & ins_phase11 = psb_get_timer_idx("SPINS: noand exch ")
-  if ((do_timings).and.(ins_phase12==-1))       &
-       & ins_phase12 = psb_get_timer_idx("SPINS: noand cmp")
+       & ins_phase4 = psb_get_timer_idx("SPINS: rmt%csput")
 
 
   if (desc_a%is_bld()) then 
