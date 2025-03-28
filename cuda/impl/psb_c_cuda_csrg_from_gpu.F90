@@ -57,7 +57,7 @@ subroutine psb_c_cuda_csrg_from_gpu(a,info)
   if (info == 0) call psb_realloc(nz,a%val,info)
   if (info == 0)  info = &
        & CSRGDevice2Host(a%deviceMat,m,n,nz,a%irp,a%ja,a%val)
-#if (CUDA_SHORT_VERSION <= 10) || (CUDA_VERSION <  11030)
+#if (PSB_CUDA_SHORT_VERSION <= 10) || (PSB_CUDA_VERSION <  11030)
   a%irp(:) = a%irp(:)+1
   a%ja(:) = a%ja(:)+1
 #endif

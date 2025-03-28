@@ -46,8 +46,6 @@ module psb_s_cuda_elg_mat_mod
     ! ITPACK/ELL format, extended.
     ! We are adding here the routines to create a copy of the data
     ! into the GPU. 
-    ! If HAVE_SPGPU is undefined this is just
-    ! a copy of ELL, indistinguishable.
     ! 
     type(c_ptr)       :: deviceMat = c_null_ptr
     integer(psb_ipk_) :: devstate  = is_host

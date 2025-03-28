@@ -77,9 +77,9 @@ module psb_metispart_mod
       integer(psb_lpk_), intent(in) :: n, nparts
       integer(psb_lpk_), intent(in) :: ja(:), irp(:)
       integer(psb_lpk_), allocatable, intent(inout) :: vect(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
       real(psb_spk_),optional, intent(in) :: weights(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
       real(psb_dpk_),optional, intent(in) :: weights(:)
 #else
       choke on me;
@@ -187,9 +187,9 @@ contains
     type(psb_ld_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;
@@ -231,9 +231,9 @@ contains
     type(psb_lz_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;
@@ -292,9 +292,9 @@ contains
     type(psb_lc_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;
@@ -320,9 +320,9 @@ contains
     type(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;

@@ -278,13 +278,9 @@ subroutine psb_d_cuda_cp_dnsg_from_fmt(a,b,info)
 !!$    m   = b%get_nrows()
 !!$    nc  = b%get_ncols()
 !!$    nza = b%get_nzeros()
-!!$#ifdef HAVE_SPGPU
 !!$    gpu_parms = FgetEllDeviceParams(m,nzm,nza,nc,spgpu_type_double,1)
 !!$    ld  = gpu_parms%pitch
 !!$    nzm = gpu_parms%maxRowSize
-!!$#else
-!!$    ld  = m 
-!!$#endif
 !!$    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
 !!$    if (info == 0) call psb_safe_cpy( b%idiag, a%idiag , info)
 !!$    if (info == 0) call psb_safe_cpy( b%irn,   a%irn , info)
@@ -299,9 +295,7 @@ subroutine psb_d_cuda_cp_dnsg_from_fmt(a,b,info)
 !!$      a%val(1:m,1:nzm) = b%val(1:m,1:nzm)
 !!$    end if
 !!$    a%nzt = nza
-!!$#ifdef HAVE_SPGPU
 !!$    call a%to_gpu(info)
-!!$#endif
 
   class default
   
@@ -385,13 +379,9 @@ subroutine psb_d_cuda_mv_dnsg_from_fmt(a,b,info)
 !!$    m   = b%get_nrows()
 !!$    nc  = b%get_ncols()
 !!$    nza = b%get_nzeros()
-!!$#ifdef HAVE_SPGPU
 !!$    gpu_parms = FgetEllDeviceParams(m,nzm,nza,nc,spgpu_type_double,1)
 !!$    ld  = gpu_parms%pitch
 !!$    nzm = gpu_parms%maxRowSize
-!!$#else
-!!$    ld  = m 
-!!$#endif
 !!$    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
 !!$    if (info == 0) call psb_safe_cpy( b%idiag, a%idiag , info)
 !!$    if (info == 0) call psb_safe_cpy( b%irn,   a%irn , info)
@@ -406,9 +396,7 @@ subroutine psb_d_cuda_mv_dnsg_from_fmt(a,b,info)
 !!$      a%val(1:m,1:nzm) = b%val(1:m,1:nzm)
 !!$    end if
 !!$    a%nzt = nza
-!!$#ifdef HAVE_SPGPU
 !!$    call a%to_gpu(info)
-!!$#endif
 
   class default
   

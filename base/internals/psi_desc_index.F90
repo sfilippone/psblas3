@@ -101,14 +101,14 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   use psb_realloc_mod
   use psb_error_mod
   use psb_const_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   use psb_penv_mod
   use psb_timers_mod
   use psi_mod, psb_protect_name => psi_i_desc_index
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 

@@ -98,11 +98,11 @@ subroutine psi_iswaptran_vect(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -185,11 +185,11 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
   use psb_desc_mod
   use psb_penv_mod
   use psb_i_base_vect_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -445,11 +445,11 @@ subroutine psi_iswaptran_multivect(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -533,11 +533,11 @@ subroutine psi_itran_vidx_multivect(ctxt,icomm,flag,beta,y,idx,&
   use psb_desc_mod
   use psb_penv_mod
   use psb_i_base_multivect_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 

@@ -71,7 +71,7 @@ module psb_hash_mod
   integer(psb_ipk_), parameter  :: HashNotFound = -256
 
   interface psb_hashval
-#if defined(IPK4)     
+#if defined(PSB_IPK4)     
     function  psb_c_hashval_32(key) bind(c) result(res)
       import psb_c_ipk_
       implicit none 
@@ -79,7 +79,7 @@ module psb_hash_mod
       integer(psb_c_ipk_)        :: res
     end function psb_c_hashval_32
 #endif
-#if defined(IPK4) &&  defined(LPK8)
+#if defined(PSB_IPK4) &&  defined(PSB_LPK8)
     function  psb_c_hashval_64_32(key) bind(c) result(res)
       import psb_c_ipk_, psb_c_lpk_
       implicit none 
@@ -87,7 +87,7 @@ module psb_hash_mod
       integer(psb_c_ipk_)        :: res
     end function psb_c_hashval_64_32
 #endif
-#if defined(IPK8)     
+#if defined(PSB_IPK8)     
     function  psb_c_hashval_64(key) bind(c) result(res)
       import psb_c_ipk_
       implicit none 
@@ -115,7 +115,7 @@ module psb_hash_mod
     module procedure psb_hash_lsearchkey
   end interface psb_hash_searchkey
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   interface psb_hash_init
     module procedure psb_hash_init_v, psb_hash_init_n
   end interface

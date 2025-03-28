@@ -109,13 +109,13 @@ module psb_gen_block_map_mod
        & block_lg2ls1_ins, block_lg2ls2_ins, block_lg2lv1_ins, block_lg2lv2_ins, &
        & block_clone, block_reinit,&
        & block_get_fmt, i_gen_block_search
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   private ::  l_gen_block_search
 #endif
 
   interface gen_block_search
     module procedure i_gen_block_search
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     module procedure l_gen_block_search
 #endif
   end interface gen_block_search
@@ -1382,7 +1382,7 @@ contains
     return
   end function i_gen_block_search
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
  
   function  l_gen_block_search(key,n,v) result(ipos)
     implicit none

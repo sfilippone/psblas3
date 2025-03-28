@@ -42,7 +42,7 @@ module psb_mmio_mod
 
   public mm_mat_read, mm_mat_write, mm_array_read, mm_array_write
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   public mm_vet_read, mm_vet_write
 #endif
 
@@ -127,7 +127,7 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet2_read
-#if defined(IPK4) && defined(LPK8) 
+#if defined(PSB_IPK4) && defined(PSB_LPK8) 
     subroutine mm_lvet_read(b, info, iunit, filename)   
       import :: psb_dpk_, psb_ipk_, psb_lpk_
       implicit none
@@ -196,7 +196,7 @@ module psb_mmio_mod
   end interface
 
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface mm_vet_read
     procedure mm_svet_read, mm_dvet_read, mm_cvet_read,&
          & mm_zvet_read, mm_svet2_read, mm_dvet2_read, &
@@ -296,7 +296,7 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet1_write
-#if defined(IPK4) && defined(LPK8) 
+#if defined(PSB_IPK4) && defined(PSB_LPK8) 
     subroutine mm_lvet2_write(b, header, info, iunit, filename)   
       import :: psb_dpk_, psb_ipk_, psb_lpk_
       implicit none
@@ -372,7 +372,7 @@ module psb_mmio_mod
     end subroutine mm_lvect_write
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface mm_vet_write
     procedure mm_svet1_write, mm_dvet1_write, mm_cvet1_write,&
          & mm_zvet1_write, mm_svet2_write, mm_dvet2_write, &

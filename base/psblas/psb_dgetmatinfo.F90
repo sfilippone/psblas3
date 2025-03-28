@@ -37,11 +37,11 @@
 function  psb_dget_nnz(a,desc_a,info) result(res)
   use psb_base_mod, psb_protect_name => psb_dget_nnz
   use psi_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
       use mpi
 #endif
       implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
       include 'mpif.h'
 #endif
 

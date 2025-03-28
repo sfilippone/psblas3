@@ -55,7 +55,7 @@ subroutine psb_c_cuda_csrg_to_gpu(a,info,nzrm)
   if (c_associated(a%deviceMat%Mat)) then 
     info = CSRGDeviceFree(a%deviceMat)
   end if
-#if (CUDA_SHORT_VERSION <= 10 )
+#if (PSB_CUDA_SHORT_VERSION <= 10 )
   if (a%is_unit()) then 
     !
     ! CUSPARSE has the habit of storing the diagonal and then ignoring,
@@ -137,7 +137,7 @@ subroutine psb_c_cuda_csrg_to_gpu(a,info,nzrm)
     info = CSRGDeviceCsrsmAnalysis(a%deviceMat)
   end if
 
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
   if (a%is_unit()) then 
     !
     ! CUSPARSE has the habit of storing the diagonal and then ignoring,

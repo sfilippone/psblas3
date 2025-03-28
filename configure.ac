@@ -140,7 +140,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    MPIFC="$FC";
    MPICC="$CC";
    MPICXX="$CXX";
-   CSERIALMPI="#define SERIAL_MPI"
+   CSERIALMPI="#define PSB_SERIAL_MPI"
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
@@ -540,47 +540,47 @@ fi
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
-  dnl CDEFINES="-DSERIAL_MPI $CDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_SERIAL_MPI $psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
+  dnl CDEFINES="-DPSB_SERIAL_MPI $CDEFINES"
 else 
  PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
-dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
-    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+dnl    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD_F08 $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
   else					     	     
     PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
- 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
-	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ 	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_H $FDEFINES"])	  
  fi
 fi
 
 PAC_ARG_WITH_IPK
 PAC_ARG_WITH_LPK
-# Defaults for IPK/LPK
+# Defaults for PSB_IPK/PSB_LPK
 if test x"$pac_cv_ipk_size" == x"" ; then
   pac_cv_ipk_size=4
 fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-IPKDEF="#define IPK$pac_cv_ipk_size"
-LPKDEF="#define LPK$pac_cv_lpk_size"
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
-   AC_MSG_NOTICE([[Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. ]]);
+   AC_MSG_NOTICE([[Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. ]]);
    AC_MSG_NOTICE([[Forcing equal values]])	
    pac_cv_lpk_size=$pac_cv_ipk_size;	
 fi				
-FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
-FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";	
-dnl CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
+FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
+FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";	
+dnl CDEFINES="-DPSB_IPK${pac_cv_ipk_size} -DPSB_LPK${pac_cv_lpk_size} $CDEFINES"
 
 FLINK="$MPIFC"
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   FDEFINES="$psblas_cv_define_prepend-DPSB_OPENMP $FDEFINES";
    CDEFINES="$CDEFINES";
-   CHAVEOPENMP="#define OPENMP"
+   CHAVE_OPENMP="#define PSB_OPENMP"
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";	
@@ -671,11 +671,11 @@ PAC_FORTRAN_TEST_FINAL(
 
 PAC_FORTRAN_TEST_GENERICS( 
 	[],
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_BUGGY_GENERICS $FDEFINES"]
+	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_BUGGY_GENERICS $FDEFINES"]
 )
 
 PAC_FORTRAN_TEST_FLUSH( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
+	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"],
 )
 
 
@@ -728,7 +728,7 @@ AR="${AR} -cDr"
 
 PAC_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
 PAC_LAPACK(
-[FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
+[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_LAPACK $FDEFINES"],
 )
 AC_LANG([C])
 
@@ -774,7 +774,7 @@ dnl 			true;
 dnl 			# we assume want_rsb_libs are linkage parameters
 dnl 		fi
 dnl 	fi
-dnl 	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
+dnl 	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DPSB_HAVE_LIBRSB"
 dnl fi
 dnl RSB_LIBS="$want_rsb_libs"
 dnl LIBS="$RSB_LIBS ${LIBS}"
@@ -782,46 +782,46 @@ dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS
 
-AC_MSG_CHECKING([Compatibility between metis and LPK])
+AC_MSG_CHECKING([Compatibility between metis and PSB_LPK])
 if  test  "x$pac_cv_lpk_size" == "x4" ; then
   if test  "x$pac_cv_metis_idx" == "x64" ; then
-  dnl mismatch between metis size and PSBLAS LPK
+  dnl mismatch between metis size and PSBLAS PSB_LPK
        psblas_cv_have_metis="no";
  dnl 
    fi
  fi			   
  if test "x$pac_cv_lpk_size" == "x8" ; then
    if test "x$pac_cv_metis_idx" == "x32" ; then 
-   dnl mismatch between metis size and PSBLAS LPK
+   dnl mismatch between metis size and PSBLAS PSB_LPK
       psblas_cv_have_metis="no";
    fi
  fi			   
 AC_MSG_RESULT([$psblas_cv_have_metis])
 
 if test "x$pac_cv_metis_idx" == "xunknown" ; then
-  dnl mismatch between metis size and PSBLAS LPK
+  dnl mismatch between metis size and PSBLAS PSB_LPK
      AC_MSG_NOTICE([Unknown  METIS bitsize.])	
      $psblas_cv_have_metis = "no";
 fi		   
 if test "x$pac_cv_metis_real" == "xunknown" ; then
-  dnl mismatch between metis size and PSBLAS LPK
+  dnl mismatch between metis size and PSBLAS PSB_LPK
      AC_MSG_NOTICE([Unknown  METIS REAL bitsize.])	
      $psblas_cv_have_metis = "no";
 fi		   
 if test "x$psblas_cv_have_metis" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
-   #   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_METIS $psblas_cv_define_prepend-DPSB_METIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DPSB_METIS_REAL_$pac_cv_metis_real $FDEFINES"
+   CDEFINES="$psblas_cv_metis_includes $CDEFINES"
    METISINCFILE=$psblas_cv_metisincfile
-   CHAVEMETIS="#define HAVE_METIS"
-   CINTMETIS="#define METIS_$pac_cv_metis_idx"
-   CREALMETIS="#define METIS_REAL_$pac_cv_metis_real"	
+   CHAVEMETIS="#define PSB_HAVE_METIS"
+   CINTMETIS="#define PSB_METIS_$pac_cv_metis_idx"
+   CREALMETIS="#define PSB_METIS_REAL_$pac_cv_metis_real"	
 fi
 
 PAC_CHECK_AMD
 if test "x$psblas_cv_have_amd" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
-   #   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
-   CHAVEAMD="#define HAVE_AMD_"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_AMD $FDEFINES"
+   CDEFINES="$psblas_cv_amd_includes $CDEFINES"
+   CHAVEAMD="#define PSB_HAVE_AMD"
 fi
 
 
@@ -830,7 +830,7 @@ if test "x$pac_cv_cuda" == "xyes"; then
 if test "x$pac_cv_ipk_size" != "x4"; then
   AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
   pac_cv_cuda="no";
-  HAVE_CUDA="no";
+  PSB_HAVE_CUDA="no";
   CUDA_CC="";	
   SPGPU_LIBS="";	
   CUDAD="";
@@ -850,13 +850,13 @@ else
    
       PAC_CHECK_CUDA_VERSION()
       dnl PAC_CHECK_SPGPU()
-      HAVE_CUDA="yes";
-      CUDA_VERSION="$pac_cv_cuda_version";
-      CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-      CUDA_DEFINES="-DHAVE_CUDA -DCUDA_SHORT_VERSION=${CUDA_SHORT_VERSION} -DCUDA_VERSION=${CUDA_VERSION}";
-      CHAVECUDA="#define HAVE_CUDA"
-      CSHORTVCUDA="#define CUDA_SHORT_VERSION ${CUDA_SHORT_VERSION}"
-      CVERSIONCUDA="#define CUDA_VERSION ${CUDA_VERSION}"
+      PSB_HAVE_CUDA="yes";
+      PSB_CUDA_VERSION="$pac_cv_cuda_version";
+      PSB_CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+      CUDA_DEFINES="-DPSB_HAVE_CUDA -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}";
+      CHAVECUDA="#define PSB_HAVE_CUDA"
+      CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
+      CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
       SPGPU_LIBS="-lspgpu";	
       CUDAD=cudad;
       CUDALD=cudald;
@@ -946,7 +946,7 @@ else
   AC_MSG_RESULT([$LIBRSB_DIR])
   RSBTARGETLIB=rsbd;
   RSBTARGETOBJ=rsbobj;
-  CHAVELIBRSB="#define HAVE_LIBRSB"
+  CHAVELIBRSB="#define PSB_HAVE_LIBRSB"
 fi
 
 
@@ -1028,10 +1028,10 @@ FDEFINES=$(PSBFDEFINES)
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
 
 
-AC_SUBST(IPKDEF)
-AC_SUBST(LPKDEF)
+AC_SUBST(PSB_IPKDEF)
+AC_SUBST(PSB_LPKDEF)
 AC_SUBST(CSERIALMPI)
-AC_SUBST(CHAVEOPENMP)
+AC_SUBST(CHAVE_OPENMP)
 AC_SUBST(CHAVEMETIS)
 AC_SUBST(CINTMETIS)
 AC_SUBST(CREALMETIS)
@@ -1067,8 +1067,8 @@ AC_SUBST(CCUDEFINES)
 AC_SUBST(CXXCUDEFINES)	
 AC_SUBST(CUDA_INCLUDES)
 AC_SUBST(CUDA_LIBS)
-AC_SUBST(CUDA_VERSION)
-AC_SUBST(CUDA_SHORT_VERSION)
+AC_SUBST(PSB_CUDA_VERSION)
+AC_SUBST(PSB_CUDA_SHORT_VERSION)
 AC_SUBST(CUDA_NVCC)
 AC_SUBST(CUDEFINES)
 AC_SUBST(CUDAD)
@@ -1107,7 +1107,7 @@ AC_MSG_NOTICE([
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
-	CUDA 		      : ${HAVE_CUDA}
+	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
 	OPENACC		      : ${pac_cv_openacc}

@@ -29,14 +29,16 @@
   POSSIBILITY OF SUCH DAMAGE.
  
 */
-#ifdef HAVE_AMD_
+#include "psb_config.h"
+#include "psb_types.h"
+#ifdef PSB_HAVE_AMD
 #include "amd.h"
 #endif
 
 int psb_amd_order(int n, int Ap[], int Ai[], int P[])
 { 
   int i;
-#ifdef HAVE_AMD_
+#ifdef PSB_HAVE_AMD
   i= amd_order(n,Ap,Ai, P,(double *)NULL, (double *)NULL);
   if ((i==AMD_OK)||(i==AMD_OK_BUT_JUMBLED)) return(0);
 #endif

@@ -34,7 +34,7 @@
 #define FCUSPARSE_
 
 #include <cuda_runtime.h>
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
 #include <cusparse_v2.h>
 #else
 #include <cusparse.h>

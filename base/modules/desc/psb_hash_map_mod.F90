@@ -106,7 +106,7 @@ module psb_hash_map_mod
        & hash_bld_g2l_map, hash_inner_cnvs2, hash_inner_cnvs1, &
        & hash_inner_cnv2, hash_inner_cnv1, hash_row_extendable 
 
-  integer(psb_ipk_), private :: laddsz=500
+  integer(psb_ipk_), private :: psb_laddsz=500
 
   interface hash_inner_cnv 
     module procedure  hash_inner_cnvs2, hash_inner_cnv2,&
@@ -648,7 +648,7 @@ contains
     use psb_realloc_mod
     use psb_sort_mod
     use psb_penv_mod
-#ifdef OPENMP    
+#ifdef PSB_OPENMP    
     use omp_lib
 #endif
 
@@ -668,7 +668,7 @@ contains
     character(len=20)   :: name,ch_err
     logical, allocatable :: mask_(:)
 !!$    logical :: use_openmp = .true.
-#ifdef OPENMP
+#ifdef PSB_OPENMP
     integer(kind = OMP_lock_kind) :: ins_lck
 #endif
     logical, volatile :: isLoopValid
@@ -698,14 +698,15 @@ contains
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
     !write(0,*) me,name,' before loop ',psb_errstatus_fatal()
-#if defined(OPENMP) 
+#if 0&& defined(PSB_OPENMP)
+    !$omp critical(hash_g2l_ins)              
     isLoopValid = .true.
     if (idxmap%is_bld()) then 
 
       if (present(lidx)) then
         if (present(mask)) then 
           ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(lidx,mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p shared(lidx,mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
           ! $ o m p private(i,ip,lip,tlip,nxt,info) &
           ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
@@ -722,7 +723,7 @@ contains
                 idx(i) = lip 
                 info = psb_success_
               else
-                !$omp critical(hash_g2l_ins)          
+                ! $ o m p critical(hash_g2l_ins)          
                 tlip  = lip
                 nxt = lidx(i)
                 if (nxt <= nrow) then 
@@ -738,9 +739,10 @@ contains
                     if (info >=0) then 
                       if (nxt == lip) then 
                         call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                             & pad=-1_psb_lpk_,addsz=laddsz)
+                             & pad=-1_psb_lpk_,addsz=psb_laddsz)
                         if (info /= psb_success_) then
-                          info=1
+                          write(0,*)'Problem 1:',info,lip,size(idxmap%loc_to_glob)
+                          info=lip 
                           call psb_errpush(psb_err_from_subroutine_ai_,name,&
                                & a_err='psb_ensure_size',i_err=(/info/))
                           isLoopValid = .false.
@@ -758,7 +760,7 @@ contains
                     end if
                   end if
                 endif
-                !$omp end critical(hash_g2l_ins)
+                ! $ o m p end critical(hash_g2l_ins)
               end if
             else
               idx(i) = -1
@@ -769,7 +771,7 @@ contains
         else if (.not.present(mask)) then 
 
           ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(lidx,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p shared(lidx,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
           ! $ o m p private(i,ip,lip,tlip,nxt,info) &
           ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
@@ -785,7 +787,7 @@ contains
               idx(i) = lip 
               info = psb_success_
             else
-              !$omp critical(hash_g2l_ins)          
+              ! $ o m p critical(hash_g2l_ins)          
               tlip  = lip
               nxt = lidx(i)
               if (nxt <= nrow) then 
@@ -801,9 +803,10 @@ contains
                   if (info >=0) then 
                     if (nxt == lip) then 
                       call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                           & pad=-1_psb_lpk_,addsz=laddsz)
+                           & pad=-1_psb_lpk_,addsz=psb_laddsz)
                       if (info /= psb_success_) then
-                        info=1
+                        write(0,*)'Problem 2:',info,lip,size(idxmap%loc_to_glob)
+                        info=lip
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              & a_err='psb_ensure_size',i_err=(/info/))
                         isLoopValid = .false.
@@ -821,7 +824,7 @@ contains
                   end if
                 end if
               endif
-              !$omp end critical(hash_g2l_ins)
+              ! $ o m p end critical(hash_g2l_ins)
             end if
           enddo
           ! $ o m p end parallel do
@@ -831,7 +834,7 @@ contains
 
         if (present(mask)) then
           ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p shared(mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
           ! $ o m p private(i,ip,lip,tlip,nxt,info) &
           ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
@@ -848,7 +851,7 @@ contains
                 idx(i) = lip 
                 info = psb_success_
               else
-                !$omp critical(hash_g2l_ins)          
+                ! $ o m p critical(hash_g2l_ins)          
                 ncol = idxmap%get_lc()
                 nxt  = ncol + 1 
                 call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -859,11 +862,14 @@ contains
                   call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                   lip = tlip
                   if (info >=0) then 
-                    if (nxt == lip) then 
-                      call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                           & pad=-1_psb_lpk_,addsz=laddsz)
+                    if (nxt == lip) then
+                      if (lip > size(idxmap%loc_to_glob)) then 
+                        call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
+                             & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                      end if
                       if (info /= psb_success_) then
-                        info=1
+                        write(0,*)'Problem 3:',info,lip,size(idxmap%loc_to_glob)
+                        info=lip
                         call psb_errpush(psb_err_from_subroutine_ai_,name,&
                              & a_err='psb_ensure_size',i_err=(/info/))
                         isLoopValid = .false.
@@ -879,7 +885,7 @@ contains
                     isLoopValid = .false.
                   end if
                 end if
-                !$omp end critical(hash_g2l_ins)          
+                ! $ o m p end critical(hash_g2l_ins)          
               end if
             else
               idx(i) = -1
@@ -890,7 +896,7 @@ contains
         else if (.not.present(mask)) then 
 
           ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,laddsz) &
+          ! $ o m p shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
           ! $ o m p private(i,ip,lip,tlip,nxt,info) &
           ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
@@ -906,7 +912,7 @@ contains
               idx(i) = lip 
               info = psb_success_
             else
-              !$omp critical(hash_g2l_ins)          
+              ! $ o m p critical(hash_g2l_ins)          
               ncol = idxmap%get_lc()
               nxt  = ncol + 1 
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -919,9 +925,10 @@ contains
                 if (info >=0) then 
                   if (nxt == lip) then 
                     call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=laddsz)
+                         & pad=-1_psb_lpk_,addsz=psb_laddsz)
                     if (info /= psb_success_) then
-                      info=1
+                      write(0,*)'Problem 4:',info,lip,size(idxmap%loc_to_glob)
+                      info=lip
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            & a_err='psb_ensure_size',i_err=(/info/))
                       isLoopValid = .false.
@@ -937,7 +944,7 @@ contains
                   isLoopValid = .false.
                 end if
               end if
-              !$omp end critical(hash_g2l_ins)          
+              ! $ o m p end critical(hash_g2l_ins)          
             end if
           enddo
           ! $ o m p end parallel do
@@ -948,6 +955,7 @@ contains
       idx = -1
       info = -1
     end if
+    !$omp end critical(hash_g2l_ins)
     if (.not. isLoopValid) goto 9999
 #else
 !!$    else if (.not.use_openmp) then 
@@ -978,9 +986,11 @@ contains
                   if (nxt == tlip) then 
                     ncol = max(ncol,nxt)
                     call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=laddsz)
+                         & pad=-1_psb_lpk_,addsz=psb_laddsz)
                     if (info /= psb_success_) then
-                      !write(0,*) 'Error spot'                        
+                      !write(0,*) 'Error spot'
+                      write(0,*)'Problem 5:',info,lip,size(idxmap%loc_to_glob)
+                      info = lip
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
                            &a_err='psb_ensure_size',i_err=(/info/))
                       isLoopValid = .false.
@@ -1026,10 +1036,11 @@ contains
                 if (nxt == lip) then 
                   ncol = max(nxt,ncol)
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=laddsz)
+                       & pad=-1_psb_lpk_,addsz=psb_laddsz)
                   if (info /= psb_success_) then
-                    info=1
                     !write(0,*) 'Error spot'                      
+                    write(0,*)'Problem 6:',info,lip,size(idxmap%loc_to_glob)
+                    info = lip
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
                          &a_err='psb_ensure_size',i_err=(/info/))
                     isLoopValid = .false.
@@ -1073,10 +1084,10 @@ contains
                 if (nxt == lip) then 
                   ncol = nxt
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=laddsz)
+                       & pad=-1_psb_lpk_,addsz=psb_laddsz)
                   if (info /= psb_success_) then
-                    info=1
-                    write(0,*) 'Error spot 5'
+                    write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
+                    info = lip
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
                          & a_err='psb_ensure_size',i_err=(/info/))
                     isLoopValid = .false.
@@ -1117,10 +1128,10 @@ contains
               if (nxt == lip) then 
                 ncol = nxt
                 call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                     & pad=-1_psb_lpk_,addsz=laddsz)
+                     & pad=-1_psb_lpk_,addsz=psb_laddsz)
                 if (info /= psb_success_) then
-                  info=1
-                  write(0,*) 'Error spot 6'
+                  write(0,*)'Problem 8:',info,lip,size(idxmap%loc_to_glob)
+                  info = lip
                   ch_err='psb_ensure_size'
                   call psb_errpush(psb_err_from_subroutine_ai_,name,&
                        &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
@@ -1206,11 +1217,9 @@ contains
     !  To be implemented
     integer(psb_ipk_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, int_err(5)
-    integer(psb_lpk_) ::  m, nrt 
-    integer(psb_lpk_), allocatable :: vlu(:)
-    integer(psb_lpk_), allocatable :: ix(:)
+    integer(psb_lpk_) ::  m, nrt
     character(len=20), parameter :: name='hash_map_init_vl'
-
+    real(psb_dpk_) :: t0, t1, t2,t3, t4, t5
     info = 0
     call psb_info(ctxt,iam,np) 
     if (np < 0) then 
@@ -1218,7 +1227,6 @@ contains
       info = -1
       return
     end if
-
     nl = size(vl) 
 
     m   = maxval(vl(1:nl))
@@ -1226,46 +1234,15 @@ contains
     call psb_sum(ctxt,nrt)
     call psb_max(ctxt,m)
 
-    allocate(vlu(nl), ix(nl), stat=info) 
-    if (info /= 0) then 
-      info = -1
-      return
-    end if
-
-    do i=1,nl
-      if ((vl(i)<1).or.(vl(i)>m)) then 
-        info = psb_err_entry_out_of_bounds_
-        int_err(1) = i
-        int_err(2) = vl(i)
-        int_err(3) = nl
-        int_err(4) = m
-        exit
-      endif
-      vlu(i) = vl(i) 
-    end do
-
     if ((m /= nrt).and.(iam == psb_root_))  then 
       write(psb_err_unit,*) trim(name),&
-           & ' Warning: globalcheck=.false., but there is a mismatch'
+           & ' Warning: we got to hash_init_vl but there is a mismatch'
       write(psb_err_unit,*) trim(name),&
            & '        : in the global sizes!',m,nrt
 
     end if
-
-    call psb_msort(vlu,ix)
-    nlu = 1
-    do i=2,nl
-      if (vlu(i) /= vlu(nlu)) then
-        nlu = nlu + 1 
-        vlu(nlu) = vlu(i)
-        ix(nlu) = ix(i)
-      end if
-    end do
-    call psb_msort(ix(1:nlu),vlu(1:nlu),flag=psb_sort_keep_idx_)
+    call hash_init_vlu(idxmap,ctxt,m,nl,vl,info)
     
-    nlu = nl
-    call hash_init_vlu(idxmap,ctxt,m,nlu,vlu,info)    
-
   end subroutine hash_init_vl
 
   subroutine hash_init_vg(idxmap,ctxt,vg,info)
@@ -1354,7 +1331,7 @@ contains
     idxmap%global_cols  = ntot
     idxmap%local_rows   = nl
     idxmap%local_cols   = nl
-    idxmap%ctxt        = ctxt
+    idxmap%ctxt         = ctxt
     idxmap%state        = psb_desc_bld_
     idxmap%mpic         = psb_get_mpi_comm(ctxt)
 

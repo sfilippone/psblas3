@@ -46,8 +46,6 @@ module psb_i_cuda_hlg_mat_mod
     ! ITPACK/HLL format, extended.
     ! We are adding here the routines to create a copy of the data
     ! into the GPU. 
-    ! If HAVE_SPGPU is undefined this is just
-    ! a copy of HLL, indistinguishable.
     ! 
     type(c_ptr) :: deviceMat = c_null_ptr
     integer     :: devstate  = is_host

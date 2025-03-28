@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "psb_config.h"
+#include "psb_types.h"
 #include "core.h"
 
 #define ELL_PITCH_ALIGN_S 32

@@ -163,7 +163,6 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   !  3. any overlap?
   ! Checks 2 and 3 are controlled by globalcheck
   !  
-
   if (check_.or.(.not.islarge)) then
     if (debug_size) &
          & write(debug_unit,*) me,' ',trim(name),': Going for global checks'
@@ -248,7 +247,6 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   if (check_) then 
     ! Sort, eliminate duplicates, then
     ! scramble back into original position.
-    ix(1) = -1 
     if (present(idx)) then 
       if (size(idx) >= loc_row) then
         !$omp parallel do private(i) 
@@ -256,8 +254,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
           ix(i) = idx(i) 
         end do
       end if
-    end if
-    if (ix(1) == -1) then
+    else
       !$omp parallel do private(i)
       do i=1, loc_row
         ix(i) = i 

@@ -46,11 +46,11 @@
 subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
 
   use psb_base_mod, psb_protect_name => psb_mscatterm
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -162,8 +162,8 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
     
     rootrank = psb_get_mpi_rank(ctxt,iroot)
     !
-    ! This is potentially unsafe when IPK=8
-    ! But then, IPK=8 is highly experimental anyway.
+    ! This is potentially unsafe when PSB_IPK=8
+    ! But then, PSB_IPK=8 is highly experimental anyway.
     !
     nlr = nrow
     call mpi_gather(nlr,1,psb_mpi_mpk_,all_dim,&
@@ -291,11 +291,11 @@ end subroutine psb_mscatterm
 !
 subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
   use psb_base_mod, psb_protect_name => psb_mscatterv
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -398,8 +398,8 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
   else
     rootrank = psb_get_mpi_rank(ctxt,iroot)
     !
-    ! This is potentially unsafe when IPK=8
-    ! But then, IPK=8 is highly experimental anyway.
+    ! This is potentially unsafe when PSB_IPK=8
+    ! But then, PSB_IPK=8 is highly experimental anyway.
     !
     nlr = nrow
     call mpi_gather(nlr,1,psb_mpi_mpk_,all_dim,&

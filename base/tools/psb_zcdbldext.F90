@@ -64,11 +64,11 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   use psb_base_mod, psb_protect_name => psb_zcdbldext
   use psi_mod
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 

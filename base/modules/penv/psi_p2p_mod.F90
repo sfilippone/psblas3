@@ -66,11 +66,11 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine psb_lsnds(ctxt,dat,dst)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -78,7 +78,7 @@ contains
     integer(psb_mpk_), intent(in)  :: dst
     logical, allocatable :: dat_(:)
     integer(psb_mpk_) :: info 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! do nothing
 #else
     allocate(dat_(1), stat=info)
@@ -89,11 +89,11 @@ contains
 
   subroutine psb_lsndv(ctxt,dat,dst)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -102,7 +102,7 @@ contains
     logical, allocatable :: dat_(:)
     integer(psb_mpk_) :: info 
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
 #else
     allocate(dat_(size(dat)), stat=info)
     dat_(:) = dat(:)
@@ -113,11 +113,11 @@ contains
 
   subroutine psb_lsndm(ctxt,dat,dst,m)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -128,7 +128,7 @@ contains
     integer(psb_mpk_) :: info
     integer(psb_ipk_) :: i,j,k,m_,n_
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
 #else
     if (present(m)) then 
       m_ = m
@@ -150,11 +150,11 @@ contains
 
   subroutine psb_hsnds(ctxt,dat,dst)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -162,7 +162,7 @@ contains
     integer(psb_mpk_), intent(in)  :: dst
     character(len=1), allocatable :: dat_(:)
     integer(psb_mpk_) :: info, l, i
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! do nothing
 #else
     l = len(dat) 
@@ -182,11 +182,11 @@ contains
 
   subroutine psb_lrcvs(ctxt,dat,src)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -194,7 +194,7 @@ contains
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! do nothing
 #else
     icomm = psb_get_mpi_comm(ctxt)
@@ -205,11 +205,11 @@ contains
 
   subroutine psb_lrcvv(ctxt,dat,src)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -217,7 +217,7 @@ contains
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info 
     integer(psb_mpk_) :: status(mpi_status_size), icomm
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
 #else
     icomm = psb_get_mpi_comm(ctxt)
     call mpi_recv(dat,size(dat),mpi_logical,src,psb_logical_tag,icomm,status,info)
@@ -228,11 +228,11 @@ contains
 
   subroutine psb_lrcvm(ctxt,dat,src,m)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -242,7 +242,7 @@ contains
     integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
     integer(psb_mpk_) :: status(mpi_status_size), icomm
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! What should we do here?? 
 #else
     icomm = psb_get_mpi_comm(ctxt)
@@ -269,11 +269,11 @@ contains
 
   subroutine psb_hrcvs(ctxt,dat,src)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -282,7 +282,7 @@ contains
     character(len=1), allocatable :: dat_(:)
     integer(psb_mpk_) :: info, l, i
     integer(psb_mpk_) :: status(mpi_status_size), icomm
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! do nothing
 #else
     l = len(dat) 

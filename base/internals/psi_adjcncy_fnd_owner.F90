@@ -61,12 +61,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   use psb_realloc_mod
   use psb_timers_mod
   use psb_indx_map_mod, psb_protect_name => psi_adjcncy_fnd_owner
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
 
   implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)   :: idx(:)
@@ -139,7 +139,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
   iprc(:) = 0
 #else 
   iprc = -1

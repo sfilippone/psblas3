@@ -154,30 +154,32 @@ Contains
     end if
     ub_ = lb_ + len-1
 
+#if defined(PSB_OPENMP)
+    !$omp critical(r_m_e_rk1)
+#endif
     if (allocated(rrax)) then 
       dim = size(rrax)
       lbi = lbound(rrax,1)
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= psb_success_) then
-          err=4025
-          call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
-               & a_err='integer(psb_epk_)')
-          goto 9999
+        if (info == psb_success_) then
+          tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
+          call psb_move_alloc(tmp,rrax,info)
         end if
-        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
-      if (info /= psb_success_) then
-        err=4025
-        call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
-             & a_err='integer(psb_epk_)')
-        goto 9999
-      end if
     endif
+#if defined(PSB_OPENMP)
+    !$omp end critical(r_m_e_rk1)
+#endif
+    if (info /= psb_success_) then
+      err=4025
+      call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
+           & a_err='integer(psb_epk_)')
+      goto 9999
+    end if
     if (present(pad)) then 
       !$omp parallel do private(i) shared(dim,len)
       do i=lb_-1+dim+1,lb_-1+len
@@ -239,7 +241,9 @@ Contains
       goto 9999
     end if
 
-
+#if defined(PSB_OPENMP)
+    !$omp critical(r_m_e_rk2)
+#endif
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -248,27 +252,26 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= psb_success_) then
-          err=4025
-          call psb_errpush(err,name, l_err=(/len1*1_psb_lpk_*len2/), &
-               & a_err='integer(psb_epk_)')
-          goto 9999
+        if (info == psb_success_) then 
+          tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+               & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
+          call psb_move_alloc(tmp,rrax,info)
         end if
-        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
-             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= psb_success_) then
-        err=4025
-        call psb_errpush(err,name, l_err=(/len1*1_psb_lpk_*len2/), &
-             & a_err='integer(psb_epk_)')
-        goto 9999
-      end if
     endif
+#if defined(PSB_OPENMP)
+    !$omp end critical(r_m_e_rk2)
+#endif
+    if (info /= psb_success_) then
+      err=4025
+      call psb_errpush(err,name, l_err=(/len1*1_psb_lpk_*len2/), &
+           & a_err='integer(psb_epk_)')
+      goto 9999
+    end if
     if (present(pad)) then 
       !$omp parallel do private(i) shared(lb1_,dim,len1)
       do i=lb1_-1+dim+1,lb1_-1+len1
@@ -325,30 +328,33 @@ Contains
     end if
     ub_ = lb_ + len-1
 
+#if defined(PSB_OPENMP)
+    !$omp critical(r_e_e_rk1)
+#endif
     if (allocated(rrax)) then 
       dim = size(rrax)
       lbi = lbound(rrax,1)
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= psb_success_) then
-          err=4025
-          call psb_errpush(err,name, e_err=(/len/), &
-               & a_err='integer(psb_epk_)')
-          goto 9999
+        if (info == psb_success_) then 
+          tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
+          call psb_move_alloc(tmp,rrax,info)
         end if
-        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
-      if (info /= psb_success_) then
-        err=4025
-        call psb_errpush(err,name, e_err=(/len/), &
-             & a_err='integer(psb_epk_)')
-        goto 9999
-      end if
     endif
+#if defined(PSB_OPENMP)
+    !$omp end critical(r_e_e_rk1)
+#endif    
+    if (info /= psb_success_) then
+      err=4025
+      call psb_errpush(err,name, e_err=(/len/), &
+           & a_err='integer(psb_epk_)')
+      goto 9999
+    end if
+    
     if (present(pad)) then 
       rrax(lb_-1+dim+1:lb_-1+len) = pad
     endif
@@ -407,7 +413,9 @@ Contains
       goto 9999
     end if
 
-
+#if defined(PSB_OPENMP)
+    !$omp critical(r_e_e_rk2)
+#endif
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -416,27 +424,26 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= psb_success_) then
-          err=4025
-          call psb_errpush(err,name, e_err=(/(len1*len2)/), &
-               & a_err='integer(psb_epk_)')
-          goto 9999
+        if (info == psb_success_) then 
+          tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+               & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
+          call psb_move_alloc(tmp,rrax,info)
         end if
-        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
-             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= psb_success_) then
-        err=4025
-        call psb_errpush(err,name, e_err=(/(len1*len2)/), &
-             & a_err='integer(psb_epk_)')
-        goto 9999
-      end if
     endif
+#if defined(PSB_OPENMP)
+    !$omp end critical(r_e_e_rk2)
+#endif
+    if (info /= psb_success_) then
+      err=4025
+      call psb_errpush(err,name, e_err=(/(len1*len2)/), &
+           & a_err='integer(psb_epk_)')
+      goto 9999
+    end if
     if (present(pad)) then 
       rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
       rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
@@ -498,7 +505,9 @@ Contains
       goto 9999
     end if
 
-
+#if defined(PSB_OPENMP)
+    !$omp critical(r_me_e_rk2)
+#endif
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -507,27 +516,28 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= psb_success_) then
-          err=4025
-          call psb_errpush(err,name, e_err=(/len1*len2/), &
-               & a_err='integer(psb_epk_)')
-          goto 9999
+        if (info == psb_success_) then
+          tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+               & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
+          call psb_move_alloc(tmp,rrax,info)
         end if
-        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
-             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= psb_success_) then
-        err=4025
-        call psb_errpush(err,name,e_err=(/len1*len2/),&
-             &  a_err='integer(psb_epk_)')
-        goto 9999
-      end if
     endif
+#if defined(PSB_OPENMP)
+    !$omp end critical(r_me_e_rk2)
+#endif
+
+    if (info /= psb_success_) then
+      err=4025
+      call psb_errpush(err,name, e_err=(/len1*len2/), &
+           & a_err='integer(psb_epk_)')
+      goto 9999
+    end if
+    
     if (present(pad)) then 
       rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
       rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
@@ -589,7 +599,9 @@ Contains
       goto 9999
     end if
 
-
+#if defined(PSB_OPENMP)
+    !$omp critical(r_em_e_rk2)
+#endif
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -598,27 +610,26 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= psb_success_) then
-          err=4025
-          call psb_errpush(err,name, e_err=(/len1*len2/), &
-               & a_err='integer(psb_epk_)')
-          goto 9999
+        if (info == psb_success_) then
+          tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+               & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
+          call psb_move_alloc(tmp,rrax,info)
         end if
-        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
-             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= psb_success_) then
-        err=4025
-        call psb_errpush(err,name, e_err=(/len1*len2/), &
-             & a_err='integer(psb_epk_)')
-        goto 9999
-      end if
     endif
+#if defined(PSB_OPENMP)
+    !$omp end critical(r_em_e_rk2)
+#endif
+    if (info /= psb_success_) then
+      err=4025
+      call psb_errpush(err,name, e_err=(/len1*len2/), &
+           & a_err='integer(psb_epk_)')
+      goto 9999
+    end if
     if (present(pad)) then 
       rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
       rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
@@ -714,8 +725,6 @@ Contains
     return
 
   End Subroutine psb_r_e_2_e_rk1
-
-
 
   subroutine psb_ab_cpy_e_s(vin,vout,info) 
     use psb_error_mod
@@ -999,8 +1008,9 @@ Contains
 
     isz = psb_size(v)
     If (len > isz) Then
-#if defined(OPENMP)
-      !$OMP CRITICAL
+#if defined(PSB_OPENMP)
+      !$omp critical(m_sz_e_rk1)
+      isz = psb_size(v)
       if (len > isz) then
         if (present(newsz)) then
           isz = max(len+1,1,newsz)
@@ -1012,7 +1022,9 @@ Contains
 
         call psb_realloc(isz,v,info,pad=pad)
       end if
-      !$OMP END CRITICAL
+      if (info /= psb_success_) &
+           & write(0,*) 'Error from realloc ',info,len,isz
+      !$omp end critical(m_sz_e_rk1)
 
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -1028,7 +1040,6 @@ Contains
         else
           isz = max(len,1,int(1.25*isz))
         endif
-
         call psb_realloc(isz,v,info,pad=pad)
       end if
 
@@ -1075,6 +1086,28 @@ Contains
     end if
     isz = psb_size(v)
     If (len > isz) Then
+#if defined(PSB_OPENMP)
+      !$omp critical(e_sz_e_rk1)
+      isz = psb_size(v)
+      If (len > isz) Then
+        if (present(newsz)) then
+          isz = max(len+1,1,newsz)
+        else if (present(addsz)) then
+          isz = max(len,1,isz+addsz)
+        else
+          isz = max(len,1,int(1.25*isz))
+        endif
+        call psb_realloc(isz,v,info,pad=pad)
+      end If
+      if (info /= psb_success_)&
+           & write(0,*) 'Error from realloc ',info,len,isz
+      !$omp end critical(e_sz_e_rk1)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='psb_realloc')
+        goto 9999
+      End If
+#else
       if (present(newsz)) then
         isz = max(len+1,1,newsz)
       else if (present(addsz)) then
@@ -1082,13 +1115,13 @@ Contains
       else
         isz = max(len,1,int(1.25*isz))
       endif
-
       call psb_realloc(isz,v,info,pad=pad)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       End If
+#endif
     end If
 
     call psb_erractionrestore(err_act)
