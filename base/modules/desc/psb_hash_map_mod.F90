@@ -1773,7 +1773,7 @@ contains
     integer(psb_ipk_) :: lb,ub,lm
     res = -1
     if (nh > 0) then
-      if (nh <= 8) then
+      if (nh <= 6) then
         !
         ! If the list is short, a sequential search is enough 
         !
@@ -1815,7 +1815,7 @@ contains
     integer(psb_ipk_) :: lb,ub,lm
     res = -1
     if (nh > 0) then
-      if (nh <= 8) then
+      if (nh <= 6) then
         !
         ! If the list is short, a sequential search is enough 
         !
