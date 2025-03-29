@@ -118,6 +118,7 @@ module psb_hash_map_mod
     module procedure  hash_srch_ipk, hash_srch_lpk
   end interface hash_srch
   private :: hash_srch
+  integer, parameter, private :: seqsrchmax=6
 
 contains
 
@@ -1773,7 +1774,7 @@ contains
     integer(psb_ipk_) :: lb,ub,lm
     res = -1
     if (nh > 0) then
-      if (nh <= 6) then
+      if (nh <= seqsrchmax) then
         !
         ! If the list is short, a sequential search is enough 
         !
@@ -1815,7 +1816,7 @@ contains
     integer(psb_ipk_) :: lb,ub,lm
     res = -1
     if (nh > 0) then
-      if (nh <= 6) then
+      if (nh <= seqsrchmax) then
         !
         ! If the list is short, a sequential search is enough 
         !
