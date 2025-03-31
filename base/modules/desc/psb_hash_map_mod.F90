@@ -1115,37 +1115,37 @@ contains
                 cycle
               endif
               ncol = idxmap%get_lc()
+              nxt  = ncol + 1 
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
                    & idxmap%glb_lc,ncol)
               if (lip < 0) then
-                nxt  = ncol + 1 
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                 lip = tlip
-
-                if (info >=0) then 
-                  if (nxt == lip) then 
-                    ncol = nxt
-                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_)
-                    if (info /= psb_success_) then
-                      write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
-                      info = lip
-                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                           & a_err='psb_ensure_size',i_err=(/info/))
-                      isLoopValid = .false.
-                    end if
-                    idxmap%loc_to_glob(nxt)  = ip
-                    call idxmap%set_lc(ncol)
-                  endif
-                  info = psb_success_
-                else
-                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       & a_err='SearchInsKeyVal',i_err=(/info/))
-                  isLoopValid = .false.
-                end if
-                idx(i) = lip
-                info = psb_success_
               end if
+
+              if (info >=0) then 
+                if (nxt == lip) then 
+                  ncol = nxt
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_)
+                  if (info /= psb_success_) then
+                    write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
+                    info = lip
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         & a_err='psb_ensure_size',i_err=(/info/))
+                    isLoopValid = .false.
+                  end if
+                  idxmap%loc_to_glob(nxt)  = ip
+                  call idxmap%set_lc(ncol)
+                endif
+                info = psb_success_
+              else
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err='SearchInsKeyVal',i_err=(/info/))
+                isLoopValid = .false.
+              end if
+              idx(i) = lip
+              info = psb_success_
             else
               idx(i) = -1
             end if
