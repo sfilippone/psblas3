@@ -2879,9 +2879,9 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
     if (info /= 0) write(0,*) name,' point 0:',info,isza,nza,nz
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
-      write(0,*) ' before reallocate in csput ',psb_errstatus_fatal(),info
+      !write(0,*) ' before reallocate in csput ',psb_errstatus_fatal(),info
       call a%reallocate(max(nza+nz,int(1.5*isza)))
-      write(0,*) '  after reallocate in csput ',psb_errstatus_fatal(),info            
+      !write(0,*) '  after reallocate in csput ',psb_errstatus_fatal(),info            
     endif
     isza = a%get_size()
     if (isza < (nza+nz)) then
