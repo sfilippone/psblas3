@@ -57,6 +57,10 @@ module psb_hash_map_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_hash_mod 
+  use psb_penv_mod
+  use psb_sort_mod
+  use psb_realloc_mod
+  use psb_error_mod
   
   type, extends(psb_indx_map) :: psb_hash_map
 
@@ -326,8 +330,6 @@ contains
 
 
   subroutine hash_g2lv1(idx,idxmap,info,mask,owned)
-    use psb_penv_mod
-    use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_lpk_), intent(inout) :: idx(:)
@@ -477,9 +479,6 @@ contains
   end subroutine hash_g2lv1
 
   subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
-    use psb_penv_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_lpk_), intent(in)    :: idxin(:)
@@ -613,8 +612,6 @@ contains
 
 
   subroutine hash_g2ls1_ins(idx,idxmap,info,mask,lidx)
-    use psb_realloc_mod
-    use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(inout) :: idx
@@ -672,10 +669,6 @@ contains
   ! #################### THESIS ####################
 
   subroutine hash_g2lv1_ins(idx,idxmap,info,mask,lidx)
-    use psb_error_mod
-    use psb_realloc_mod
-    use psb_sort_mod
-    use psb_penv_mod
     use psb_timers_mod
 #ifdef PSB_OPENMP    
     use omp_lib
@@ -1118,14 +1111,14 @@ contains
               nxt  = ncol + 1 
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
                    & idxmap%glb_lc,ncol)
-              if (i==1) write(0,*) me,' v1 icnv:',i,lip
+              !if (i==1) write(0,*) me,' v1 icnv:',i,lip
               if (lip > 0) then
                 idx(i) = lip
                 info = psb_success_
               else
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                 lip = tlip
-                if (i==1) write(0,*) me,' v1 srchins:',i,lip
+!                if (i==1) write(0,*) me,' v1 srchins:',i,lip
 
                 if (info >=0) then 
                   if (nxt == lip) then 
@@ -1171,7 +1164,7 @@ contains
               ip  = idx(i)
               call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
               lip = tlip
-              if (i==1) write(0,*) me,' v2 isrchins:',i,lip
+              !              if (i==1) write(0,*) me,' v2 isrchins:',i,lip
               
               if (info >=0) then 
                 if (nxt == lip) then 
@@ -1272,8 +1265,6 @@ contains
 
   ! ################## END THESIS #########################
   subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
-    use psb_realloc_mod
-    use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(in)    :: idxin(:)
@@ -1303,10 +1294,6 @@ contains
   ! init from VL, with checks on input.
   !
   subroutine hash_init_vl(idxmap,ctxt,vl,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)    :: ctxt
@@ -1344,8 +1331,6 @@ contains
   end subroutine hash_init_vl
 
   subroutine hash_init_vg(idxmap,ctxt,vg,info)
-    use psb_penv_mod
-    use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)    :: ctxt
@@ -1402,10 +1387,6 @@ contains
   ! init from VL, with no checks on input
   !
   subroutine hash_init_vlu(idxmap,ctxt,ntot,nl,vlu,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)    :: ctxt
@@ -1458,10 +1439,6 @@ contains
 
 
   subroutine hash_bld_g2l_map(idxmap,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
@@ -1563,10 +1540,6 @@ contains
 
 
   subroutine hash_asb(idxmap,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_realloc_mod
-    use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)     :: info
