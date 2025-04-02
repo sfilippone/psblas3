@@ -1421,8 +1421,8 @@ module psb_d_multivect_mod
     generic, public    :: sct      => sctb, sctb_x
     procedure, pass(x) :: dot_v    => d_mvect_dot_v
     procedure, pass(x) :: dot_a    => d_mvect_dot_a
-    procedure, pass(x) :: dot_vect => d_mvect_dot_vect
-    generic, public    :: dot      => dot_v, dot_a, dot_vect
+    procedure, pass(x) :: dot_a_vect  => d_mvect_dot_vect
+    generic, public    :: dot      => dot_v, dot_a, dot_a_vect
 !!$    procedure, pass(y) :: axpby_v  => d_mvect_axpby_v
 !!$    procedure, pass(y) :: axpby_a  => d_mvect_axpby_a
 !!$    generic, public    :: axpby    => axpby_v, axpby_a
@@ -1483,15 +1483,6 @@ contains
     end if
   end subroutine d_mvect_set_dupl
 
-  subroutine d_mvect_sync(x)
-    implicit none
-    class(psb_d_multivect_type), intent(inout) :: x
-
-    if (allocated(x%v)) &
-         & call x%v%sync()
-
-  end subroutine d_mvect_sync
-
   subroutine d_mvect_set_sync(x)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
@@ -1551,7 +1542,6 @@ contains
          & res =  x%v%is_dev()
 
   end function d_mvect_is_dev
-        
 
   function d_mvect_is_remote_build(x) result(res)
     implicit none
@@ -1795,6 +1785,15 @@ contains
 
   end subroutine d_mvect_asb
 
+  subroutine d_mvect_sync(x)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%sync()
+
+  end subroutine d_mvect_sync
+
   subroutine d_mvect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -1912,7 +1911,7 @@ contains
   function d_mvect_dot_v(n,x,y) result(res)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
+    integer(psb_ipk_), intent(in)              :: n
     real(psb_dpk_), dimension(:), allocatable :: res
 
     if (allocated(x%v).and.allocated(y%v)) then 
@@ -1947,13 +1946,15 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_), dimension(:), allocatable :: res
 
-    res = dzero
     if (allocated(x%v)) then
-      res = x%v%dot(n,y)
+        res = x%v%dot(n,y)
+    else
+      allocate(res(1))
+      res(1) = psb_err_invalid_vect_state_
     end if
 
   end function d_mvect_dot_a
-!!$
+
 !!$  subroutine d_mvect_axpby_v(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none

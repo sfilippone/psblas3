@@ -628,6 +628,7 @@ end module psb_i_vect_mod
 module psb_i_multivect_mod
 
   use psb_i_base_multivect_mod
+  use psb_i_vect_mod
   use psb_const_mod
   use psb_i_vect_mod
 
@@ -650,11 +651,18 @@ module psb_i_multivect_mod
     procedure, pass(x) :: get_dupl => i_mvect_get_dupl
     procedure, pass(x) :: set_dupl => i_mvect_set_dupl
 
+    procedure, pass(x) :: sync     => i_mvect_sync
+    procedure, pass(x) :: is_host  => i_mvect_is_host
+    procedure, pass(x) :: is_dev   => i_mvect_is_dev
+    procedure, pass(x) :: is_sync  => i_mvect_is_sync
+    procedure, pass(x) :: set_host => i_mvect_set_host
+    procedure, pass(x) :: set_dev  => i_mvect_set_dev
+    procedure, pass(x) :: set_sync => i_mvect_set_sync
+
     procedure, pass(x) :: all      => i_mvect_all
     procedure, pass(x) :: reall    => i_mvect_reall
     procedure, pass(x) :: zero     => i_mvect_zero
     procedure, pass(x) :: asb      => i_mvect_asb
-    procedure, pass(x) :: sync     => i_mvect_sync
     procedure, pass(x) :: free     => i_mvect_free
     procedure, pass(x) :: ins      => i_mvect_ins
     procedure, pass(x) :: bld_x    => i_mvect_bld_x
@@ -717,7 +725,66 @@ contains
       x%dupl = psb_dupl_def_
     end if
   end subroutine i_mvect_set_dupl
-        
+
+  subroutine i_mvect_set_sync(x)
+    implicit none
+    class(psb_i_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%set_sync()
+
+  end subroutine i_mvect_set_sync
+
+  subroutine i_mvect_set_host(x)
+    implicit none
+    class(psb_i_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%set_host()
+
+  end subroutine i_mvect_set_host
+
+  subroutine i_mvect_set_dev(x)
+    implicit none
+    class(psb_i_multivect_type), intent(inout) :: x
+
+    if (allocated(x%v)) &
+         & call x%v%set_dev()
+
+  end subroutine i_mvect_set_dev
+
+  function i_mvect_is_sync(x) result(res)
+    implicit none
+    logical :: res
+    class(psb_i_multivect_type), intent(inout) :: x
+
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_sync()
+
+  end function i_mvect_is_sync
+
+  function i_mvect_is_host(x) result(res)
+    implicit none
+    logical :: res
+    class(psb_i_multivect_type), intent(inout) :: x
+
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_host()
+
+  end function i_mvect_is_host
+
+  function i_mvect_is_dev(x) result(res)
+    implicit none
+    logical :: res
+    class(psb_i_multivect_type), intent(inout) :: x
+
+    res = .false.
+    if (allocated(x%v)) &
+         & res =  x%v%is_dev()
+
+  end function i_mvect_is_dev
 
   function i_mvect_is_remote_build(x) result(res)
     implicit none

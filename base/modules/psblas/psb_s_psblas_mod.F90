@@ -31,6 +31,7 @@
 !
 module psb_s_psblas_mod
   use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
+  use psb_s_multivect_mod, only : psb_s_multivect_type
   use psb_s_vect_mod, only : psb_s_vect_type
   use psb_s_mat_mod, only : psb_sspmat_type
 
@@ -63,6 +64,26 @@ module psb_s_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
       logical, intent(in), optional      :: global
     end function psb_sdot
+    function psb_sdot_multivect(x, y, desc_a,info,global) result(res)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_s_multivect_type, psb_sspmat_type
+      real(psb_spk_), dimension(:), allocatable :: res
+      type(psb_s_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
+    end function psb_sdot_multivect
+    function psb_sdot_mvect_vect(x, y, desc_a,info,global) result(res)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+        & psb_s_multivect_type, psb_sspmat_type, &
+        & psb_s_vect_type
+      real(psb_spk_), dimension(:), allocatable :: res
+      type(psb_s_multivect_type), intent(inout) :: x
+      type(psb_s_vect_type), intent(inout) :: y
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
+    end function psb_sdot_mvect_vect
   end interface
 
 

@@ -149,7 +149,8 @@ module psb_c_base_vect_mod
     !
     procedure, pass(x) :: dot_v    => c_base_dot_v
     procedure, pass(x) :: dot_a    => c_base_dot_a
-    generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(x) :: dot_a2   => c_base_dot_a2
+    generic, public    :: dot      => dot_v, dot_a, dot_a2
     procedure, pass(y) :: axpby_v  => c_base_axpby_v
     procedure, pass(y) :: axpby_a  => c_base_axpby_a
     procedure, pass(z) :: axpby_v2  => c_base_axpby_v2
@@ -1009,6 +1010,34 @@ contains
     res = cdotc(n,y,1,x%v,1)
 
   end function c_base_dot_a
+
+  !
+  ! Base workhorse is good old BLAS2
+  !
+  !
+  !> Function  base_dot_a
+  !! \memberof  psb_d_base_vect_type
+  !! \brief  Dot product by a normal array
+  !! \param n    Number of entries to be considered
+  !! \param y(:,:) The matrix to be multiplied by
+  !!
+  function c_base_dot_a2(n,x,y) result(res)
+    implicit none
+    class(psb_c_base_vect_type), intent(inout) :: x
+    complex(psb_spk_), intent(in)    :: y(:,:)
+    integer(psb_ipk_), intent(in)           :: n
+    complex(psb_spk_), allocatable, dimension(:) :: res
+
+    ! local
+    integer(psb_ipk_) :: ncol
+
+    ncol = size(y,2)
+    allocate(res(ncol))
+    ! On the real cases the 'C' acts as a transpose, 
+    ! on the complex cases it is a conjugate transpose
+    call cgemv('C',n,ncol,cone,y,n,x%v,1,czero,res,1)
+
+  end function c_base_dot_a2
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -2133,7 +2162,8 @@ module psb_c_base_multivect_mod
     !
     procedure, pass(x) :: dot_v    => c_base_mlv_dot_v
     procedure, pass(x) :: dot_a    => c_base_mlv_dot_a
-    generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(x) :: dot_vect => c_base_mlv_dot_vect
+    generic, public    :: dot      => dot_v, dot_a, dot_vect
     procedure, pass(y) :: axpby_v  => c_base_mlv_axpby_v
     procedure, pass(y) :: axpby_a  => c_base_mlv_axpby_a
     generic, public    :: axpby    => axpby_v, axpby_a
@@ -2753,6 +2783,36 @@ contains
     end do
 
   end function c_base_mlv_dot_a
+
+  !> Function  c_base_mlv_dot_vect
+  !! \memberof  psb_c_base_multivect_type
+  !! \brief  Dot product by a base_mlv_vector
+  !! \param n    Number of entries to be considered
+  !! \param y    The other (base_vect) to be multiplied by
+  !!
+  function c_base_mlv_dot_vect(n,x,y) result(res)
+    implicit none
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    class(psb_c_base_vect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)           :: n
+    complex(psb_spk_), allocatable   :: res(:)
+    complex(psb_spk_), external      :: cdot
+    integer(psb_ipk_) :: j,nc
+
+    if (x%is_dev()) call x%sync()
+
+    select type(yy => y)
+    type is (psb_c_base_vect_type)
+      nc = psb_size(x%v,2_psb_ipk_)
+      allocate(res(nc))
+      do j=1,nc
+        res(j) = cdot(n,x%v(:,j),1,y%v,1)
+      end do
+    class default
+      res = y%dot(n,x%v)
+    end select
+
+  end function c_base_mlv_dot_vect
 
   !
   ! AXPBY is invoked via Y, hence the structure below.

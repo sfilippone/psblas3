@@ -190,10 +190,10 @@ end function psb_ddot_vect
 !    
 ! File: psb_ddot.f90
 !
-! Function: psb_ddot_vect
+! Function: psb_ddot_multivect
 !    psb_ddot computes the dot product of two distributed vectors,
 !
-!    dot := ( X )**C * ( Y )
+!    dot(:) := ( X(:) )**C * ( Y(:) )
 !
 !
 ! Arguments:
@@ -226,7 +226,7 @@ function psb_ddot_multivect(x, y, desc_a,info,global) result(res)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, nx, ny
   logical :: global_
   character(len=20)      :: name, ch_err
 
@@ -268,11 +268,13 @@ function psb_ddot_multivect(x, y, desc_a,info,global) result(res)
   ijy = ione
 
   m = desc_a%get_global_rows()
+  nx = x%get_ncols()
+  ny = y%get_ncols()
 
   ! check vector correctness
-  call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,nx,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,y%get_ncols(),y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ny,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -361,14 +363,14 @@ end function psb_ddot_multivect
 !    
 ! File: psb_ddot.f90
 !
-! Function: psb_ddot_vect
+! Function: psb_ddot_mvect_vect
 !    psb_ddot computes the dot product of two distributed vectors,
 !
-!    dot := ( X )**C * ( Y )
+!    dot(:) := ( X )**C * ( Y )
 !
 !
 ! Arguments:
-!    x      -  type(psb_d_vect_type) The input vector containing the entries of sub( X ).
+!    x      -  type(psb_d_multivect_type) The input vector containing the entries of sub( X ).
 !    y      -  type(psb_d_vect_type) The input vector containing the entries of sub( Y ).
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
@@ -441,9 +443,10 @@ function psb_ddot_mvect_vect(x, y, desc_a,info,global) result(res)
   ijy = ione
 
   m = desc_a%get_global_rows()
+  n = x%get_ncols()
 
   ! check vector correctness
-  call psb_chkvect(m,x%get_ncols(),x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,n,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
        & call psb_chkvect(m,lone,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
@@ -479,7 +482,7 @@ function psb_ddot_mvect_vect(x, y, desc_a,info,global) result(res)
         ndm = desc_a%ovrlap_elem(i,2)
         ! Remove the overlapped elements via dgemv calls 
         ! res = - (real(ndm-1)/real(ndm))* x(idx,:)^T y(idx)  + 1.0 res
-        call dgemv('T',size(x%v%v,1),size(x%v%v,2),-(real(ndm-1)/real(ndm)), &
+        call dgemv('C',size(x%v%v,1),size(x%v%v,2),-(real(ndm-1)/real(ndm)), &
           & size(x%v%v,1),y%v%v(idx),ione,done,res,ione)
       end do
     end if

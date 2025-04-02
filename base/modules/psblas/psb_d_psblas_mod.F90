@@ -31,8 +31,8 @@
 !
 module psb_d_psblas_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
-  use psb_d_vect_mod, only : psb_d_vect_type
   use psb_d_multivect_mod, only : psb_d_multivect_type
+  use psb_d_vect_mod, only : psb_d_vect_type
   use psb_d_mat_mod, only : psb_dspmat_type
 
   interface psb_gedot

@@ -1018,8 +1018,8 @@ contains
 
   end function d_base_dot_a
 
-    !
-  ! Base workhorse is good old BLAS1
+  !
+  ! Base workhorse is good old BLAS2
   !
   !
   !> Function  base_dot_a
@@ -1034,15 +1034,15 @@ contains
     real(psb_dpk_), intent(in)    :: y(:,:)
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_), allocatable, dimension(:) :: res
-    real(psb_dpk_), external      :: ddot
 
     ! local
     integer(psb_ipk_) :: ncol
 
     ncol = size(y,2)
     allocate(res(ncol))
-
-    call dgemv('T',n,ncol,done,y,n,x%v,1,dzero,res,1)
+    ! On the real cases the 'C' acts as a transpose, 
+    ! on the complex cases it is a conjugate transpose
+    call dgemv('C',n,ncol,done,y,n,x%v,1,dzero,res,1)
 
   end function d_base_dot_a2
 
@@ -2913,6 +2913,7 @@ contains
     integer(psb_ipk_) :: j,nc
 
     if (x%is_dev()) call x%sync()
+    res = dzero
     !
     ! Note: this is the base implementation.
     !  When we get here, we are sure that X is of
@@ -2933,36 +2934,6 @@ contains
     end select
 
   end function d_base_mlv_dot_v
-
-  !> Function  d_base_mlv_dot_vect
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief  Dot product by another base_mlv_vector
-  !! \param n    Number of entries to be considered
-  !! \param y    The other (base_vect) to be multiplied by
-  !!
-  function d_base_mlv_dot_vect(n,x,y) result(res)
-    implicit none
-    class(psb_d_base_multivect_type), intent(inout) :: x
-    class(psb_d_base_vect_type), intent(inout) :: y
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable   :: res(:)
-    real(psb_dpk_), external      :: ddot
-    integer(psb_ipk_) :: j,nc
-
-    if (x%is_dev()) call x%sync()
-
-    select type(yy => y)
-    type is (psb_d_base_vect_type)
-      nc = psb_size(x%v,2_psb_ipk_)
-      allocate(res(nc))
-      do j=1,nc
-        res(j) = ddot(n,x%v(:,j),1,y%v,1)
-      end do
-    class default
-      res = y%dot(n,x%v)
-    end select
-
-  end function d_base_mlv_dot_vect
 
   !
   ! Base workhorse is good old BLAS1
@@ -2991,6 +2962,36 @@ contains
     end do
 
   end function d_base_mlv_dot_a
+
+  !> Function  d_base_mlv_dot_vect
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief  Dot product by a base_mlv_vector
+  !! \param n    Number of entries to be considered
+  !! \param y    The other (base_vect) to be multiplied by
+  !!
+  function d_base_mlv_dot_vect(n,x,y) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    class(psb_d_base_vect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_), allocatable   :: res(:)
+    real(psb_dpk_), external      :: ddot
+    integer(psb_ipk_) :: j,nc
+
+    if (x%is_dev()) call x%sync()
+
+    select type(yy => y)
+    type is (psb_d_base_vect_type)
+      nc = psb_size(x%v,2_psb_ipk_)
+      allocate(res(nc))
+      do j=1,nc
+        res(j) = ddot(n,x%v(:,j),1,y%v,1)
+      end do
+    class default
+      res = y%dot(n,x%v)
+    end select
+
+  end function d_base_mlv_dot_vect
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
