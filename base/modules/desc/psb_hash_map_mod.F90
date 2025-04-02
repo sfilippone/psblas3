@@ -572,7 +572,8 @@ contains
              & idxmap%hashv,idxmap%glb_lc,nrm=nrm)
 
       else if (idxmap%is_valid()) then 
-
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,&
+             & idxmap%hashv,idxmap%glb_lc,nrm=nrm)
         ! $ o m p parallel do default(none) schedule(dynamic) &
         ! $ o m p shared(is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
         ! $ o m p private(i,ip,lip,tlip,info) 
@@ -582,22 +583,20 @@ contains
             idxout(i) = -1
             cycle
           endif
-          call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-               & idxmap%hashv,idxmap%glb_lc,nrm)
-          if (lip < 0) then
+          if (idxout(i) < 0) then
             call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
             lip = tlip
             info = 0
-          end if
-          if (owned_) then 
-            if (lip<=nrow) then 
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idxout(i) = lip
+              else 
+                idxout(i) = -1
+              endif
+            else
               idxout(i) = lip
-            else 
-              idxout(i) = -1
             endif
-          else
-            idxout(i) = lip
-          endif
+          end if
         enddo
         ! $ o m p end parallel do 
       else 
