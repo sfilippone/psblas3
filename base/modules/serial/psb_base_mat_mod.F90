@@ -61,7 +61,7 @@
 !
 ! We are also introducing the type psb_lbase_sparse_mat.
 ! The basic difference is in the type
-! of the indices, which are PSB_LPK_ so that the entries
+! of the indices, which are PSB_PSB_LPK_ so that the entries
 ! are guaranteed to be able to contain global indices.
 ! This type only supports data handling and preprocessing, it is
 ! not supposed to be used for computations.
@@ -80,7 +80,7 @@ module psb_base_mat_mod
   integer(psb_ipk_), parameter :: spspmm_serial_rb_tree = 3
   integer(psb_ipk_), parameter :: spspmm_omp_rb_tree = 4
   integer(psb_ipk_), parameter :: spspmm_omp_two_pass = 5
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   integer(psb_ipk_), save :: spspmm_impl = spspmm_omp_gustavson
 #else
   integer(psb_ipk_), save :: spspmm_impl = spspmm_serial
@@ -564,7 +564,7 @@ module psb_base_mat_mod
     ! == = =================================
     procedure, pass(a) :: set_lnrows    => psb_lbase_set_lnrows
     procedure, pass(a) :: set_lncols    => psb_lbase_set_lncols
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: set_inrows    => psb_lbase_set_inrows
     procedure, pass(a) :: set_incols    => psb_lbase_set_incols
     generic, public    :: set_nrows     => set_lnrows, set_inrows
@@ -601,7 +601,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: reinit     => psb_lbase_reinit
     procedure, pass(a) :: allocate_mnnz => psb_lbase_allocate_mnnz
     procedure, pass(a) :: reallocate_nz => psb_lbase_reallocate_nz
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: allocate_imnnz => psb_lbase_allocate_imnnz
     procedure, pass(a) :: reallocate_inz => psb_lbase_reallocate_inz
     generic,   public  :: allocate   => allocate_mnnz, allocate_imnnz
@@ -1433,7 +1433,7 @@ contains
     a%n = n
   end subroutine psb_lbase_set_lncols
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   subroutine  psb_lbase_allocate_imnnz(m,n,a,nz)
     implicit none 
     integer(psb_ipk_), intent(in) :: m,n

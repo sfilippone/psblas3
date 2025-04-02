@@ -309,7 +309,7 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(out)         :: info
       logical, intent(in), optional         :: rebuild, local
     end subroutine psb_zspins_csr_lirp
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     subroutine psb_zspins_csr_iirp(nr,irw,irp,ja,val,a,desc_a,info,rebuild,local)
       import
       implicit none

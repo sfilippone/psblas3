@@ -292,7 +292,7 @@ contains
 
   function psb_c_cspasb_opt(mh,cdh,afmt,upd) bind(c) result(res)
 
-#ifdef HAVE_LIBRSB
+#ifdef PSB_HAVE_LIBRSB
     use psb_c_rsb_mat_mod
 #endif
     implicit none
@@ -301,7 +301,7 @@ contains
     character(c_char)     :: afmt(*)
     integer(psb_c_ipk_)    :: info,n
     character(len=5)      :: fafmt
-#ifdef HAVE_LIBRSB
+#ifdef PSB_HAVE_LIBRSB
     type(psb_c_rsb_sparse_mat) :: arsb
 #endif
 
@@ -313,7 +313,7 @@ contains
 
     call stringc2f(afmt,fafmt)
     select case(fafmt)
-#ifdef HAVE_LIBRSB
+#ifdef PSB_HAVE_LIBRSB
     case('RSB')
       call psb_spasb(double_spmat_pool(mh)%item,descriptor_pool(cdh)%item,info,&
            & upd=upd,mold=arsb)

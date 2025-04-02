@@ -209,7 +209,7 @@ module psb_d_psblas_mod
     end function psb_damax_vect
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_damax, psb_damaxv, psb_damax_vect
   end interface
@@ -304,7 +304,7 @@ module psb_d_psblas_mod
     end subroutine psb_dmasum
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_dasum, psb_dasumv, psb_dasum_vect
   end interface
@@ -367,7 +367,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2_weightmask_vect
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_dnrm2, psb_dnrm2v, psb_dnrm2_vect, psb_dnrm2_weight_vect, psb_dnrm2_weightmask_vect
   end interface
@@ -398,7 +398,7 @@ module psb_d_psblas_mod
     end function psb_dnrmi
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_dnrmi
   end interface
@@ -416,7 +416,7 @@ module psb_d_psblas_mod
     end function psb_dspnrm1
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_dspnrm1
   end interface

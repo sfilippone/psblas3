@@ -109,7 +109,7 @@ subroutine psi_i_xtr_loc_dl(ctxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   !            dependence list of current process
   !           
   use psi_mod, psb_protect_name => psi_i_xtr_loc_dl
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   use psb_penv_mod
@@ -118,7 +118,7 @@ subroutine psi_i_xtr_loc_dl(ctxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   use psb_desc_mod
   use psb_sort_mod
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   !     ....scalar parameters...

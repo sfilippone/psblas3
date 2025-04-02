@@ -2189,7 +2189,7 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   use psb_error_mod
   use psb_c_base_mat_mod
   use psb_c_csc_mat_mod, psb_protect_name => psb_c_mv_csc_from_coo
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib 
 #endif  
   implicit none
@@ -2226,7 +2226,7 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   call psb_realloc(nc+1,a%icp,info)
   call b%free()
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 
   !$OMP PARALLEL default(shared)
 

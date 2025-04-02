@@ -42,8 +42,6 @@ module psb_c_cuda_dnsg_mat_mod
     ! ITPACK/DNS format, extended.
     ! We are adding here the routines to create a copy of the data
     ! into the GPU. 
-    ! If HAVE_SPGPU is undefined this is just
-    ! a copy of DNS, indistinguishable.
     ! 
     type(c_ptr) :: deviceMat = c_null_ptr
 

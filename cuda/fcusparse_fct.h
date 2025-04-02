@@ -38,7 +38,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   int r,n;
   cusparseHandle_t *my_handle=getHandle();
   TYPE   ealpha=alpha, ebeta=beta;
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
   /* getAddrMultiVecDevice(deviceX, &vX); */
   /*   getAddrMultiVecDevice(deviceY, &vY);  */
   vX=x->v_;
@@ -49,7 +49,7 @@ int T_spmvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 				cMat->val, cMat->irp, cMat->ja,
 				(const TYPE *) vX, (const TYPE *) &beta, (TYPE *) vY));
   
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
   size_t bfsz;
   vX=x->v_;
   vY=y->v_;
@@ -139,7 +139,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   void *vX, *vY;  
   int r,n;
   cusparseHandle_t *my_handle=getHandle();
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
   vX=x->v_;
   vY=y->v_;
 
@@ -147,7 +147,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
 			      cMat->m,(const TYPE *) &alpha,cMat->descr,
 			      cMat->val, cMat->irp, cMat->ja, cMat->triang,
 			      (const TYPE *) vX,  (TYPE *) vY);
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
   vX=x->v_;
   vY=y->v_;
   CHECK_CUSPARSE(cusparseTcsrsv2_solve(*my_handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -219,7 +219,7 @@ int T_spsvCSRGDevice(T_Cmat *Matrix, TYPE alpha, void *deviceX,
   return(0);
 }
 
-#if CUDA_VERSION >=  11030
+#if PSB_CUDA_VERSION >=  11030
 int T_CSRGCreateSpMVDescr(T_CSRGDeviceMat *cMat)
 {
   int64_t tr,tc,tz;
@@ -262,12 +262,12 @@ int T_CSRGDeviceAlloc(T_Cmat *Matrix,int nr, int nc, int nz)
   if ((rc= allocRemoteBuffer(((void **) &(cMat->val)),
 			     (((size_t) nz1)*sizeof(TYPE)))) != 0)
     return(rc);
-#if CUDA_SHORT_VERSION <= 10  
+#if PSB_CUDA_SHORT_VERSION <= 10  
   if ((rc= cusparseCreateMatDescr(&(cMat->descr))) !=0) 
     return(rc);
   if ((rc= cusparseCreateSolveAnalysisInfo(&(cMat->triang))) !=0)
     return(rc);
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
   if ((rc= cusparseCreateMatDescr(&(cMat->descr))) !=0) 
     return(rc);
   CHECK_CUSPARSE(cusparseSetMatType(cMat->descr,CUSPARSE_MATRIX_TYPE_GENERAL));
@@ -323,10 +323,10 @@ int T_CSRGDeviceFree(T_Cmat *Matrix)
     freeRemoteBuffer(cMat->irp);
     freeRemoteBuffer(cMat->ja);
     freeRemoteBuffer(cMat->val);
-#if CUDA_SHORT_VERSION <= 10  
+#if PSB_CUDA_SHORT_VERSION <= 10  
     cusparseDestroyMatDescr(cMat->descr);
     cusparseDestroySolveAnalysisInfo(cMat->triang);
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
     cusparseDestroyMatDescr(cMat->descr);
     cusparseDestroyCsrsv2Info(cMat->triang);
 #else
@@ -369,7 +369,7 @@ int T_CSRGDeviceGetParms(T_Cmat *Matrix,int *nr, int *nc, int *nz)
   }
 }
 
-#if CUDA_SHORT_VERSION <= 10  
+#if PSB_CUDA_SHORT_VERSION <= 10  
 
 int T_CSRGDeviceSetMatType(T_Cmat *Matrix, int type)
 {
@@ -412,7 +412,7 @@ int T_CSRGDeviceCsrsmAnalysis(T_Cmat *Matrix)
   return(rc);
 }
 
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
 int T_CSRGDeviceSetMatType(T_Cmat *Matrix, int type)
 {
   T_CSRGDeviceMat *cMat= Matrix->mat;
@@ -498,7 +498,7 @@ int T_CSRGHost2Device(T_Cmat *Matrix, int m, int n, int nz,
 			    ((size_t) nz)*sizeof(TYPE)))
       != SPGPU_SUCCESS) 
     return(rc);
-#if (CUDA_SHORT_VERSION > 10  ) && (CUDA_VERSION <  11030)
+#if (PSB_CUDA_SHORT_VERSION > 10  ) && (PSB_CUDA_VERSION <  11030)
   if (cusparseGetMatType(cMat->descr)== CUSPARSE_MATRIX_TYPE_TRIANGULAR) {
     // Why do we need to set TYPE_GENERAL??? cuSPARSE can be misterious sometimes. 
     cusparseSetMatType(cMat->descr,CUSPARSE_MATRIX_TYPE_GENERAL);
@@ -537,7 +537,7 @@ int T_CSRGDevice2Host(T_Cmat *Matrix, int m, int n, int nz,
   return(CUSPARSE_STATUS_SUCCESS);
 }
 
-#if CUDA_SHORT_VERSION <= 10
+#if PSB_CUDA_SHORT_VERSION <= 10
 int T_HYBGDeviceFree(T_Hmat *Matrix)
 {
   T_HYBGDeviceMat *hMat= Matrix->mat;

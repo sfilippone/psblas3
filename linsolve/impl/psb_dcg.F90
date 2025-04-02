@@ -295,7 +295,7 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   end do restart
   if (do_cond) then 
     if (me == psb_root_) then 
-#if defined(HAVE_LAPACK) 
+#if defined(PSB_HAVE_LAPACK) 
       call dstebz('A','E',istebz,dzero,dzero,0,0,-done,td,tu,&
            & ieg,nspl,eig,ibl,ispl,ewrk,iwrk,info)
       if (info < 0) then 

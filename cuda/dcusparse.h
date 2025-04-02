@@ -54,7 +54,7 @@
 #define T_CSRGDeviceSetMatDiagType     d_CSRGDeviceSetMatDiagType
 #define T_CSRGDeviceGetParms	       d_CSRGDeviceGetParms
 
-#if CUDA_SHORT_VERSION <= 10  
+#if PSB_CUDA_SHORT_VERSION <= 10  
 #define T_CSRGDeviceSetMatType	       d_CSRGDeviceSetMatType
 #define T_CSRGDeviceSetMatIndexBase    d_CSRGDeviceSetMatIndexBase
 #define T_CSRGDeviceCsrsmAnalysis      d_CSRGDeviceCsrsmAnalysis
@@ -78,7 +78,7 @@
 #define cusparseThybsv_analysis	       cusparseDhybsv_analysis
 #define cusparseTcsr2hyb               cusparseDcsr2hyb               
 
-#elif CUDA_VERSION <  11030
+#elif PSB_CUDA_VERSION <  11030
 
 #define T_CSRGDeviceSetMatType	       d_CSRGDeviceSetMatType
 #define T_CSRGDeviceSetMatIndexBase    d_CSRGDeviceSetMatIndexBase

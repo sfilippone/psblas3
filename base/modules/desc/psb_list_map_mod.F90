@@ -528,7 +528,7 @@ contains
               if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
                 ix = idxmap%glob_to_loc(idx(i))                
                 if (ix < 0) then 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                   !$OMP CRITICAL(LISTINS)
                   ix = idxmap%glob_to_loc(idx(i))                
                   if (ix < 0) then 
@@ -573,7 +573,7 @@ contains
             if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
               ix = idxmap%glob_to_loc(idx(i))
               if (ix < 0) then 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                 !$OMP CRITICAL(LISTINS)
                 ix = idxmap%glob_to_loc(idx(i))
                 if (ix < 0) then 
@@ -617,7 +617,7 @@ contains
               if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
                 ix = idxmap%glob_to_loc(idx(i))
                 if (ix < 0) then 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                   !$OMP CRITICAL(LISTINS)
                   ix = idxmap%glob_to_loc(idx(i))
                   if (ix < 0) then 
@@ -658,7 +658,7 @@ contains
             if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
               ix = idxmap%glob_to_loc(idx(i))
               if (ix < 0) then 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                 !$OMP CRITICAL(LISTINS)
                 ix = idxmap%glob_to_loc(idx(i))
                 if (ix < 0) then 
@@ -745,7 +745,7 @@ contains
               if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 ix = idxmap%glob_to_loc(idxin(i))                
                 if (ix < 0) then                  
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                   !$OMP CRITICAL(LISTINS)
                   ix = idxmap%glob_to_loc(idxin(i))
                   if (ix < 0) then 
@@ -786,7 +786,7 @@ contains
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               ix = idxmap%glob_to_loc(idxin(i))
               if (ix < 0) then 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                 !$OMP CRITICAL(LISTINS)
                 ix = idxmap%glob_to_loc(idxin(i))
                 if (ix < 0) then 
@@ -829,7 +829,7 @@ contains
               if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 ix = idxmap%glob_to_loc(idxin(i))
                 if (ix < 0) then
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                   !$OMP CRITICAL(LISTINS)
                   ix = idxmap%glob_to_loc(idxin(i))
                   if (ix < 0) then 
@@ -870,7 +870,7 @@ contains
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               ix = idxmap%glob_to_loc(idxin(i))
               if (ix < 0) then 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
                 !$OMP CRITICAL(LISTINS)
                 ix = idxmap%glob_to_loc(idxin(i))
                 if (ix < 0) then 

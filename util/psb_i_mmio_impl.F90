@@ -284,7 +284,7 @@ subroutine mm_ivet1_write(b, header, info, iunit, filename)
 
 end subroutine mm_ivet1_write
 
-#if defined(IPK4) && defined(LPK8) 
+#if defined(PSB_IPK4) && defined(PSB_LPK8) 
 subroutine mm_lvet_read(b, info, iunit, filename)   
   use psb_base_mod
   implicit none

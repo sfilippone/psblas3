@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
   use psb_const_mod
@@ -55,6 +55,7 @@ module mpi
   interface
     function mpi_wtime()  result(res) bind(c,name='mpi_wtime')
       import
+      real(c_double) :: res
     end function mpi_wtime
   end interface
 
@@ -262,7 +263,7 @@ module psi_penv_mod
   interface psb_info
     module procedure psb_info_mpik
   end interface
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   interface psb_info
     module procedure psb_info_epk
   end interface
@@ -284,7 +285,7 @@ module psi_penv_mod
     module procedure psb_m_get_mpi_rank!, psb_e_get_mpi_rank
   end interface psb_get_mpi_rank
 
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
   integer(psb_mpk_), private, save :: nctxt=0
 
 #else 
@@ -340,11 +341,11 @@ contains
   end subroutine psb_init_queue
 
   subroutine psb_wait_buffer(node, info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_buffer_node), intent(inout) :: node
@@ -356,11 +357,11 @@ contains
   end subroutine psb_wait_buffer
 
   subroutine psb_test_buffer(node, flag, info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_buffer_node), intent(inout) :: node
@@ -368,7 +369,7 @@ contains
     integer(psb_ipk_), intent(out) :: info 
     integer(psb_mpk_) :: status(mpi_status_size), minfo
     minfo = mpi_success
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     flag  = .true.
 #else
     call mpi_test(node%request,flag,status,minfo)
@@ -475,11 +476,11 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!
   subroutine psi_msnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -514,11 +515,11 @@ contains
 
 
   subroutine psi_esnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -551,11 +552,11 @@ contains
   end subroutine psi_esnd
 
   subroutine psi_i2snd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -588,11 +589,11 @@ contains
   end subroutine psi_i2snd
 
   subroutine psi_ssnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -625,11 +626,11 @@ contains
   end subroutine psi_ssnd
 
   subroutine psi_dsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -662,11 +663,11 @@ contains
   end subroutine psi_dsnd
     
   subroutine psi_csnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -699,11 +700,11 @@ contains
   end subroutine psi_csnd
 
   subroutine psi_zsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -737,11 +738,11 @@ contains
 
 
   subroutine psi_logsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -775,11 +776,11 @@ contains
 
 
   subroutine psi_hsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -850,11 +851,11 @@ contains
   end subroutine psi_get_sizes
 
   subroutine  psi_register_mpi_extras(info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     integer(psb_mpk_) :: info
@@ -870,18 +871,18 @@ contains
     if (info == 0) call mpi_type_create_f90_complex(psb_spk_p_,psb_spk_r_, psb_mpi_c_spk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
 #else
-#if defined(IPK4) && defined(LPK4)
+#if defined(PSB_IPK4) && defined(PSB_LPK4)
     psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer4
-#elif defined(IPK4) && defined(LPK8)
+#elif defined(PSB_IPK4) && defined(PSB_LPK8)
     psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer8
-#elif defined(IPK8) && defined(LPK8)
+#elif defined(PSB_IPK8) && defined(PSB_LPK8)
     psb_mpi_ipk_ = mpi_integer8
     psb_mpi_lpk_ = mpi_integer8
 #else
     ! This should never happen
-    write(psb_err_unit,*) 'Warning: an impossible IPK/LPK combination.'
+    write(psb_err_unit,*) 'Warning: an impossible PSB_IPK/PSB_LPK combination.'
     write(psb_err_unit,*) 'Something went wrong at configuration time.'
     psb_mpi_ipk_ = -1
     psb_mpi_lpk_ = -1
@@ -895,7 +896,7 @@ contains
     psb_mpi_c_dpk_  = mpi_double_complex
 #endif
 
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
 #else 
     if (info == 0) call mpi_op_create(psi_i2amx_op,.true.,mpi_i2amx_op,info)
     if (info == 0) call mpi_op_create(psi_i2amn_op,.true.,mpi_i2amn_op,info)
@@ -917,7 +918,7 @@ contains
 
   end subroutine psi_register_mpi_extras
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   subroutine psb_info_epk(ctxt,iam,np)
 
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -940,11 +941,11 @@ contains
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(out) :: ctxt
@@ -960,7 +961,7 @@ contains
     !    
     call psb_set_debug_unit(psb_err_unit)
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ctxt%ctxt = nctxt ! allocate on assignment
     nctxt = nctxt + 1
 
@@ -1079,11 +1080,11 @@ contains
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(inout) :: ctxt
@@ -1108,7 +1109,7 @@ contains
 ! !$        call psb_error(ctxt)
 ! !$      endif
 ! !$    endif
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     ! Under serial mode, CLOSE has no effect, but reclaim
     ! the used ctxt number. 
     nctxt = max(0, nctxt - 1)    
@@ -1153,17 +1154,17 @@ contains
 
 
   subroutine psb_barrier_mpik(ctxt)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in) :: ctxt
 
     integer(psb_mpk_) :: info
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     if (allocated(ctxt%ctxt)) then 
       if (ctxt%ctxt /= mpi_comm_null) call mpi_barrier(ctxt%ctxt, info)
     end if
@@ -1174,11 +1175,11 @@ contains
   function psb_wtime()
     use psb_const_mod
 !    use mpi_constants
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     real(psb_dpk_) :: psb_wtime
@@ -1193,7 +1194,7 @@ contains
     
     integer(psb_mpk_) :: code, info 
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     stop 
 #else    
     if (present(errc)) then 
@@ -1209,11 +1210,11 @@ contains
 
 
   subroutine psb_info_mpik(ctxt,iam,np)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
 
@@ -1241,7 +1242,7 @@ contains
     ! it's valid or not. 
     !
     
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     iam = 0
     np  = 1
 #else    
@@ -1268,11 +1269,11 @@ contains
 
 
   function psb_m_get_mpi_comm(ctxt) result(comm)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -1290,11 +1291,11 @@ contains
   end function psb_m_get_mpi_rank
 
   subroutine psb_get_mpicomm(ctxt,comm)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt

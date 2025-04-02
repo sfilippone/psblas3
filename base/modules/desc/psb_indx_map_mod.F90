@@ -153,7 +153,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: set_gci   => base_set_gci
     procedure, pass(idxmap)  :: set_grl   => base_set_grl
     procedure, pass(idxmap)  :: set_gcl   => base_set_gcl
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     generic, public          :: set_gr => set_grl, set_gri
     generic, public          :: set_gc => set_gcl, set_gci
 #else
@@ -165,7 +165,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: set_lci   => base_set_lci
     procedure, pass(idxmap)  :: set_lcl   => base_set_lcl
     procedure, pass(idxmap)  :: inc_lc    => base_inc_lc
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     generic, public          :: set_lr => set_lrl, set_lri
     generic, public          :: set_lc => set_lcl, set_lci
 #else

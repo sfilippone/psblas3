@@ -2289,7 +2289,7 @@ subroutine psb_z_csr_tril(a,l,info,&
     nb = jmax_
   endif
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_), allocatable :: lrws(:),urws(:)
     integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
@@ -2591,7 +2591,7 @@ subroutine psb_z_csr_triu(a,u,info,&
   endif
 
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_), allocatable :: lrws(:),urws(:)
     integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
@@ -3156,7 +3156,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   use psb_realloc_mod
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod, psb_protect_name => psb_z_cp_csr_from_coo
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib 
 #endif  
   implicit none
@@ -3217,7 +3217,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   endif
 
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 
   !$OMP PARALLEL default(shared) reduction(max:info)
 
@@ -3346,7 +3346,7 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   use psb_error_mod
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod, psb_protect_name => psb_z_mv_csr_from_coo
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib 
 #endif  
   implicit none
@@ -3385,7 +3385,7 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
   call b%free()
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 
   !$OMP PARALLEL default(shared)  reduction(max:info)
 
@@ -3655,7 +3655,7 @@ end subroutine psb_z_cp_csr_from_fmt
 !!$  call a%set_host()
 !!$end subroutine psb_z_csr_clean_zeros
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 subroutine psb_zcsrspspmm(a,b,c,info)
   use psb_z_mat_mod
   use psb_serial_mod, psb_protect_name => psb_zcsrspspmm

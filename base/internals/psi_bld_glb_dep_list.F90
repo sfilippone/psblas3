@@ -31,7 +31,7 @@
 !    
 subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   use psi_mod, psb_protect_name => psi_i_bld_glb_dep_list
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   use psb_penv_mod
@@ -40,7 +40,7 @@ subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   use psb_desc_mod
   use psb_sort_mod
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   !     ....scalar parameters...

@@ -188,7 +188,7 @@ module psb_c_psblas_mod
     end function psb_camax_vect
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_camax, psb_camaxv, psb_camax_vect
   end interface
@@ -272,7 +272,7 @@ module psb_c_psblas_mod
     end subroutine psb_cmasum
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_casum, psb_casumv, psb_casum_vect
   end interface
@@ -335,7 +335,7 @@ module psb_c_psblas_mod
     end function psb_cnrm2_weightmask_vect
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_cnrm2, psb_cnrm2v, psb_cnrm2_vect, psb_cnrm2_weight_vect, psb_cnrm2_weightmask_vect
   end interface
@@ -366,7 +366,7 @@ module psb_c_psblas_mod
     end function psb_cnrmi
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_cnrmi
   end interface
@@ -384,7 +384,7 @@ module psb_c_psblas_mod
     end function psb_cspnrm1
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_cspnrm1
   end interface

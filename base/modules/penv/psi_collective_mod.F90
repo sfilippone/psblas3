@@ -53,11 +53,11 @@ module psi_collective_mod
 contains
 
   subroutine psb_hbcasts(ctxt,dat,root,length)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)             :: ctxt
@@ -66,7 +66,7 @@ contains
 
     integer(psb_mpk_) :: iam, np, root_,length_,info, icomm
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -86,11 +86,11 @@ contains
   end subroutine psb_hbcasts
 
   subroutine psb_hbcastv(ctxt,dat,root)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)             :: ctxt
@@ -100,7 +100,7 @@ contains
     integer(psb_mpk_) :: iam, np, root_, icomm
     integer(psb_mpk_) :: length_,info, size_
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -117,11 +117,11 @@ contains
   end subroutine psb_hbcastv
 
   subroutine psb_lbcasts(ctxt,dat,root)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)             :: ctxt
@@ -130,7 +130,7 @@ contains
 
     integer(psb_mpk_) :: iam, np, root_,info, icomm
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -145,11 +145,11 @@ contains
   end subroutine psb_lbcasts
 
   subroutine psb_lallreduceand(ctxt,dat,rec)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)             :: ctxt
@@ -158,7 +158,7 @@ contains
 
     integer(psb_mpk_) :: iam, np, info, icomm
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
     icomm = psb_get_mpi_comm(ctxt)
     if (present(rec)) then
@@ -172,11 +172,11 @@ end subroutine psb_lallreduceand
 
 
   subroutine psb_lbcastv(ctxt,dat,root)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)             :: ctxt
@@ -185,7 +185,7 @@ end subroutine psb_lallreduceand
 
     integer(psb_mpk_) :: iam, np, root_,info, icomm
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -201,11 +201,11 @@ end subroutine psb_lallreduceand
 #if defined(SHORT_INTEGERS)
   subroutine psb_i2sums(ctxt,dat,root)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ctxt
@@ -216,7 +216,7 @@ end subroutine psb_lallreduceand
     integer(psb_mpk_) :: iam, np, info, icomm
     integer(psb_ipk_) :: iinfo
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
 
@@ -239,11 +239,11 @@ end subroutine psb_lallreduceand
 
   subroutine psb_i2sumv(ctxt,dat,root)
     use psb_realloc_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ctxt
@@ -254,7 +254,7 @@ end subroutine psb_lallreduceand
     integer(psb_mpk_) :: iam, np,  info, icomm
     integer(psb_ipk_) :: iinfo
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
     call psb_info(ctxt,iam,np)
 
@@ -283,11 +283,11 @@ end subroutine psb_lallreduceand
 
   subroutine psb_i2summ(ctxt,dat,root)
     use psb_realloc_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ctxt
@@ -299,7 +299,7 @@ end subroutine psb_lallreduceand
     integer(psb_ipk_) :: iinfo
 
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     call psb_info(ctxt,iam,np)
 
     if (present(root)) then

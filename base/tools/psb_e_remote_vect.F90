@@ -66,11 +66,11 @@
 subroutine psb_e_remote_vect(n,v,iv,desc_a,x,ix, info)
   use psb_base_mod, psb_protect_name => psb_e_remote_vect
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   integer(psb_ipk_), intent(in)  :: n

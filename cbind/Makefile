@@ -33,5 +33,5 @@ clean:
 	cd util && $(MAKE) clean
 
 veryclean: clean
-	cd test/pargen && $(MAKE) clean
+	cd test/pdegen && $(MAKE) clean
 	/bin/rm -f $(HERE)/$(LIBNAME) $(LIBMOD) *$(.mod) *.h

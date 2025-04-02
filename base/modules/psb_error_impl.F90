@@ -9,7 +9,7 @@ subroutine psb_errcomm_i(ctxt, err)
 
 end subroutine psb_errcomm_i
 
-#if defined(IPK8)
+#if defined(PSB_IPK8)
 
 subroutine psb_errcomm_m(ctxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
@@ -105,7 +105,7 @@ subroutine psb_serror()
       end do
     end if
   end if
-#if defined(HAVE_FLUSH_STMT)
+#if defined(PSB_HAVE_FLUSH_STMT)
   flush(psb_err_unit) 
 #endif
 
@@ -142,7 +142,7 @@ subroutine psb_perror(ctxt,abrt)
         call psb_errmsg(psb_err_unit,err_c, r_name, e_e_d, a_e_d,iam)
         !            write(psb_err_unit,'(50("="))')
       end do
-#if defined(HAVE_FLUSH_STMT)
+#if defined(PSB_HAVE_FLUSH_STMT)
       flush(psb_err_unit) 
 #endif
       
@@ -155,7 +155,7 @@ subroutine psb_perror(ctxt,abrt)
       do while (psb_get_numerr() > 0)
         call psb_errpop(err_c, r_name, e_e_d, a_e_d)
       end do
-#if defined(HAVE_FLUSH_STMT)
+#if defined(PSB_HAVE_FLUSH_STMT)
       flush(psb_err_unit) 
 #endif
 

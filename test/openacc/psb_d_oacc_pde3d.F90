@@ -172,7 +172,7 @@ contains
        & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -332,7 +332,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else
       call mpi_dims_create(np,3,npdims,info)
@@ -458,7 +458,7 @@ contains
       integer(psb_lpk_), allocatable     :: irow(:),icol(:)
       real(psb_dpk_), allocatable :: val(:)
       real(psb_dpk_)    :: x,y,z, zt(nb)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else
@@ -557,7 +557,7 @@ contains
         endif
 
       end do
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 !!$        write(0,*) omp_get_thread_num(),' Check insertion ',&
 !!$             & irow(1:icoeff-1),':',icol(1:icoeff-1)
 #endif

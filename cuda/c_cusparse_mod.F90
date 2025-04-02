@@ -37,7 +37,7 @@ module c_cusparse_mod
     type(c_ptr) :: Mat = c_null_ptr
   end type c_Cmat
   
-#if CUDA_SHORT_VERSION <= 10 
+#if PSB_CUDA_SHORT_VERSION <= 10 
   type, bind(c) :: c_Hmat
     type(c_ptr) :: Mat = c_null_ptr
   end type c_Hmat
@@ -97,7 +97,7 @@ module c_cusparse_mod
     end function c_CSRGDeviceSetMatIndexBase
   end interface
   
-#if CUDA_SHORT_VERSION <= 10  
+#if PSB_CUDA_SHORT_VERSION <= 10  
   interface CSRGDeviceCsrsmAnalysis
     function c_CSRGDeviceCsrsmAnalysis(Mat) &
          & bind(c,name="c_CSRGDeviceCsrsmAnalysis") result(res)
@@ -193,7 +193,7 @@ module c_cusparse_mod
     end function c_CSRGDevice2Host
   end interface
 
-#if CUDA_SHORT_VERSION <=10  
+#if PSB_CUDA_SHORT_VERSION <=10  
   interface HYBGDeviceAlloc
     function c_HYBGDeviceAlloc(Mat,nr,nc,nz) &
          & bind(c,name="c_HYBGDeviceAlloc") result(res)

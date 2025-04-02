@@ -29,9 +29,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: psb_d_pde2d.f90
+! File: psb_s_pde2d.f90
 !
-! Program: psb_d_pde2d
+! Program: psb_s_pde2d
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs.
 !
@@ -57,34 +57,34 @@
 ! 3. A 2D distribution in which the unit square is partitioned
 !    into rectangles, each one assigned to a process.
 !
-module psb_d_pde2d_mod
+module psb_s_pde2d_mod
 
-  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
-       &  psb_dspmat_type, psb_d_vect_type, dzero,&
-       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
+  use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
+       &  psb_sspmat_type, psb_s_vect_type, szero,&
+       &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
 
   interface
-    function d_func_2d(x,y) result(val)
-      import :: psb_dpk_
-      real(psb_dpk_), intent(in) :: x,y
-      real(psb_dpk_) :: val
-    end function d_func_2d
+    function s_func_2d(x,y) result(val)
+      import :: psb_spk_
+      real(psb_spk_), intent(in) :: x,y
+      real(psb_spk_) :: val
+    end function s_func_2d
   end interface
 
   interface psb_gen_pde2d
-    module procedure  psb_d_gen_pde2d
+    module procedure  psb_s_gen_pde2d
   end interface psb_gen_pde2d
 
 contains
 
-  function d_null_func_2d(x,y) result(val)
+  function s_null_func_2d(x,y) result(val)
 
-    real(psb_dpk_), intent(in) :: x,y
-    real(psb_dpk_) :: val
+    real(psb_spk_), intent(in) :: x,y
+    real(psb_spk_) :: val
 
-    val = dzero
+    val = szero
 
-  end function d_null_func_2d
+  end function s_null_func_2d
 
   !
   ! functions parametrizing the differential equation
@@ -97,52 +97,52 @@ contains
   ! matrix is symmetric/hermitian and suitable for
   ! testing with CG and FCG.
   ! When testing methods for non-hermitian matrices you can
-  ! change the B1/B2 functions to e.g. done/sqrt((2*done))
+  ! change the B1/B2 functions to e.g. sone/sqrt((2*sone))
   !
   function b1(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
+    use psb_base_mod, only : psb_spk_, sone, szero
     implicit none
-    real(psb_dpk_) :: b1
-    real(psb_dpk_), intent(in) :: x,y
-    b1=dzero
+    real(psb_spk_) :: b1
+    real(psb_spk_), intent(in) :: x,y
+    b1=szero
   end function b1
   function b2(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
+    use psb_base_mod, only : psb_spk_, sone, szero
     implicit none
-    real(psb_dpk_) ::  b2
-    real(psb_dpk_), intent(in) :: x,y
-    b2=dzero
+    real(psb_spk_) ::  b2
+    real(psb_spk_), intent(in) :: x,y
+    b2=szero
   end function b2
   function c(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
+    use psb_base_mod, only : psb_spk_, sone, szero
     implicit none
-    real(psb_dpk_) ::  c
-    real(psb_dpk_), intent(in) :: x,y
+    real(psb_spk_) ::  c
+    real(psb_spk_), intent(in) :: x,y
     c=0.d0
   end function c
   function a1(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
+    use psb_base_mod, only : psb_spk_, sone, szero
     implicit none
-    real(psb_dpk_) ::  a1
-    real(psb_dpk_), intent(in) :: x,y
-    a1=done/80
+    real(psb_spk_) ::  a1
+    real(psb_spk_), intent(in) :: x,y
+    a1=sone/80
   end function a1
   function a2(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
+    use psb_base_mod, only : psb_spk_, sone, szero
     implicit none
-    real(psb_dpk_) ::  a2
-    real(psb_dpk_), intent(in) :: x,y
-    a2=done/80
+    real(psb_spk_) ::  a2
+    real(psb_spk_), intent(in) :: x,y
+    a2=sone/80
   end function a2
   function g(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
+    use psb_base_mod, only : psb_spk_, sone, szero
     implicit none
-    real(psb_dpk_) ::  g
-    real(psb_dpk_), intent(in) :: x,y
-    g = dzero
-    if (x == done) then
-      g = done
-    else if (x == dzero) then
+    real(psb_spk_) ::  g
+    real(psb_spk_), intent(in) :: x,y
+    g = szero
+    if (x == sone) then
+      g = sone
+    else if (x == szero) then
       g = exp(-y**2)
     end if
   end function g
@@ -152,11 +152,11 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs.
   !
-  subroutine psb_d_gen_pde2d(ctxt,idim,a,bv,xv,desc_a,afmt,info,&
+  subroutine psb_s_gen_pde2d(ctxt,idim,a,bv,xv,desc_a,afmt,info,&
        & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -176,25 +176,25 @@ contains
     !
     implicit none
     integer(psb_ipk_)     :: idim
-    type(psb_dspmat_type) :: a
-    type(psb_d_vect_type) :: xv,bv
+    type(psb_sspmat_type) :: a
+    type(psb_s_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
     type(psb_ctxt_type)   :: ctxt
     integer(psb_ipk_)     :: info
     character(len=*)      :: afmt
-    procedure(d_func_2d), optional :: f
-    class(psb_d_base_sparse_mat), optional :: amold
-    class(psb_d_base_vect_type), optional :: vmold
+    procedure(s_func_2d), optional :: f
+    class(psb_s_base_sparse_mat), optional :: amold
+    class(psb_s_base_vect_type), optional :: vmold
     class(psb_i_base_vect_type), optional :: imold
     integer(psb_ipk_), optional :: partition, nrl,iv(:)
 
     ! Local variables.
 
     integer(psb_ipk_), parameter :: nb=20
-    type(psb_d_csc_sparse_mat)  :: acsc
-    type(psb_d_coo_sparse_mat)  :: acoo
-    type(psb_d_csr_sparse_mat)  :: acsr
-    real(psb_dpk_)           :: zt(nb),x,y,z
+    type(psb_s_csc_sparse_mat)  :: acsc
+    type(psb_s_coo_sparse_mat)  :: acoo
+    type(psb_s_csr_sparse_mat)  :: acsr
+    real(psb_spk_)           :: zt(nb),x,y,z
     integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_, mysz
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
@@ -210,11 +210,11 @@ contains
     integer(psb_lpk_), allocatable     :: myidx(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_dpk_)            :: deltah, sqdeltah, deltah2
-    real(psb_dpk_), parameter :: rhs=dzero,one=done,zero=dzero
+    real(psb_spk_)            :: deltah, sqdeltah, deltah2
+    real(psb_spk_), parameter :: rhs=szero,one=sone,zero=szero
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
-    procedure(d_func_2d), pointer :: f_
+    procedure(s_func_2d), pointer :: f_
     character(len=20)  :: name, ch_err,tmpfmt
 
     info = psb_success_
@@ -227,12 +227,12 @@ contains
     if (present(f)) then
       f_ => f
     else
-      f_ => d_null_func_2d
+      f_ => s_null_func_2d
     end if
 
-    deltah   = done/(idim+1)
+    deltah   = sone/(idim+1)
     sqdeltah = deltah*deltah
-    deltah2  = (2*done)* deltah
+    deltah2  = (2*sone)* deltah
 
     if (present(partition)) then
       if ((1<= partition).and.(partition <= 3)) then
@@ -281,6 +281,7 @@ contains
       ! contiguous rows
       !
       call psb_cdall(ctxt,desc_a,info,nl=nr)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -308,6 +309,7 @@ contains
       ! process that owns it
       !
       call psb_cdall(ctxt,desc_a,info,vg=iv)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -316,7 +318,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else
       call mpi_dims_create(np,2,npdims,info)
@@ -357,6 +359,7 @@ contains
       ! the set of global indices it owns.
       !
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
+      if (info /=0) goto 9999
 
       !
       ! Specify process topology
@@ -422,15 +425,18 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
+#if 0
+    !Disable parallel generation for the time being
     !$omp parallel shared(deltah,myidx,a,desc_a)
+#endif
     !
     block 
       integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy, ith,nth
       integer(psb_lpk_) :: glob_row
       integer(psb_lpk_), allocatable     :: irow(:),icol(:)
-      real(psb_dpk_), allocatable :: val(:)
-      real(psb_dpk_)    :: x,y, zt(nb)
-#if defined(OPENMP)
+      real(psb_spk_), allocatable :: val(:)
+      real(psb_spk_)    :: x,y, zt(nb)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else
@@ -445,7 +451,10 @@ contains
         !goto 9999
       endif
       
+#if 0
+      !Disable parallel generation for the time being
       !$omp  do schedule(dynamic)
+#endif
       !     
       do ii=1, nlr,nb
         if(info /= psb_success_) cycle
@@ -468,7 +477,7 @@ contains
           !
           val(icoeff) = -a1(x,y)/sqdeltah-b1(x,y)/deltah2
           if (ix == 1) then
-            zt(k) = g(dzero,y)*(-val(icoeff)) + zt(k)
+            zt(k) = g(szero,y)*(-val(icoeff)) + zt(k)
           else
             call ijk2idx(icol(icoeff),ix-1,iy,idim,idim)
             irow(icoeff) = glob_row
@@ -477,7 +486,7 @@ contains
           !  term depending on     (x,y-1)
           val(icoeff)  = -a2(x,y)/sqdeltah-b2(x,y)/deltah2
           if (iy == 1) then
-            zt(k) = g(x,dzero)*(-val(icoeff))   + zt(k)
+            zt(k) = g(x,szero)*(-val(icoeff))   + zt(k)
           else
             call ijk2idx(icol(icoeff),ix,iy-1,idim,idim)
             irow(icoeff) = glob_row
@@ -485,14 +494,14 @@ contains
           endif
           
           !  term depending on     (x,y)
-          val(icoeff)=(2*done)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
+          val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
           call ijk2idx(icol(icoeff),ix,iy,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
           !  term depending on     (x,y+1)
           val(icoeff)=-a2(x,y)/sqdeltah+b2(x,y)/deltah2
           if (iy == idim) then
-            zt(k) = g(x,done)*(-val(icoeff))   + zt(k)
+            zt(k) = g(x,sone)*(-val(icoeff))   + zt(k)
           else
             call ijk2idx(icol(icoeff),ix,iy+1,idim,idim)
             irow(icoeff) = glob_row
@@ -501,7 +510,7 @@ contains
           !  term depending on     (x+1,y)
           val(icoeff)=-a1(x,y)/sqdeltah+b1(x,y)/deltah2
           if (ix==idim) then
-            zt(k) = g(done,y)*(-val(icoeff))   + zt(k)
+            zt(k) = g(sone,y)*(-val(icoeff))   + zt(k)
           else
             call ijk2idx(icol(icoeff),ix+1,iy,idim,idim)
             irow(icoeff) = glob_row
@@ -509,7 +518,7 @@ contains
           endif
           
         end do
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 !!$        write(0,*) omp_get_thread_num(),' Check insertion ',&
 !!$             & irow(1:icoeff-1),':',icol(1:icoeff-1)
 #endif
@@ -517,14 +526,20 @@ contains
         if(info /= psb_success_) cycle
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
         if(info /= psb_success_) cycle
-        zt(:)=dzero
+        zt(:)=szero
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
         if(info /= psb_success_) cycle
       end do
+#if 0
+      !Disable parallel generation for the time being
       !$omp end do
+#endif
       deallocate(val,irow,icol)
     end block
+#if 0
+    !Disable parallel generation for the time being
     !$omp end parallel
+#endif
     
     
     tgen = psb_wtime()-t1
@@ -588,17 +603,17 @@ contains
 9999 call psb_error_handler(ctxt,err_act)
 
     return
-  end subroutine psb_d_gen_pde2d
+  end subroutine psb_s_gen_pde2d
 
-end module psb_d_pde2d_mod
+end module psb_s_pde2d_mod
 
-program psb_d_pde2d
+program psb_s_pde2d
   use psb_base_mod
   use psb_prec_mod
   use psb_linsolve_mod
   use psb_util_mod
-  use psb_d_pde2d_mod
-#if defined(OPENMP)
+  use psb_s_pde2d_mod
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -610,16 +625,16 @@ program psb_d_pde2d
   integer(psb_epk_) :: system_size
 
   ! miscellaneous
-  real(psb_dpk_), parameter :: one = done
+  real(psb_spk_), parameter :: one = sone
   real(psb_dpk_) :: t1, t2, tprec
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
-  type(psb_dprec_type)  :: prec
+  type(psb_sspmat_type) :: a
+  type(psb_sprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense vectors
-  type(psb_d_vect_type) :: xxv,bv
+  type(psb_s_vect_type) :: xxv,bv
   ! parallel environment
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: iam, np, nth
@@ -627,13 +642,13 @@ program psb_d_pde2d
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, ipart
   integer(psb_epk_) :: amatsize, precsize, descsize, d2size
-  real(psb_dpk_)   :: err, eps
+  real(psb_spk_)   :: err, eps
 
   ! Parameters for solvers in Block-Jacobi preconditioner
   type ainvparms
     character(len=12) :: alg, orth_alg, ilu_alg, ilut_scale
     integer(psb_ipk_) :: fill, inv_fill
-    real(psb_dpk_)    :: thresh, inv_thresh
+    real(psb_spk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
 
@@ -647,7 +662,7 @@ program psb_d_pde2d
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   !$OMP parallel shared(nth)
   !$OMP master
   nth = omp_get_num_threads()
@@ -911,8 +926,8 @@ contains
           parms%ilut_scale = 'NONE' ! If ILUT: NONE, MAXVAL, DIAG, ARWSUM, ACLSUM, ARCSUM
           parms%fill = 0     ! Level of fill for forward factorization
           parms%inv_fill = 1 ! Level of fill for inverse factorization (only INVK)
-          parms%thresh = 1E-1_psb_dpk_ ! Threshold for forward factorization
-          parms%inv_thresh = 1E-1_psb_dpk_ ! Threshold for inverse factorization
+          parms%thresh = 1E-1_psb_spk_ ! Threshold for forward factorization
+          parms%inv_thresh = 1E-1_psb_spk_ ! Threshold for inverse factorization
           parms%orth_alg = 'LLK'  ! What orthogonalization algorithm?
         endif
 
@@ -1014,4 +1029,4 @@ contains
     write(iout,*)'               iterations '
   end subroutine pr_usage
 
-end program psb_d_pde2d
+end program psb_s_pde2d

@@ -83,7 +83,7 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
   integer(psb_ipk_) :: debug_level, debug_unit
-  logical, parameter  :: do_timings=.true.
+  logical, parameter  :: do_timings=.false.
   integer(psb_ipk_), save  :: mv_phase1=-1, mv_phase2=-1, mv_phase3=-1, mv_phase4=-1
   integer(psb_ipk_), save  :: mv_phase11=-1, mv_phase12=-1
 
@@ -197,7 +197,7 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     
     if (allocated(a%ad)) then
       block
-        logical, parameter :: do_timings=.true.
+        logical, parameter :: do_timings=.false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
         !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if (do_timings) call psb_barrier(ctxt)
@@ -218,7 +218,7 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
       
     else
       block
-        logical, parameter :: do_timings=.true.
+        logical, parameter :: do_timings=.false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
         if (do_timings) call psb_barrier(ctxt)
         
@@ -599,7 +599,7 @@ subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
 
     if (doswap_)then
       ik = lik ! This should not be an issue, we are expecting the values
-      ! to be small, within IPK
+      ! to be small, within PSB_IPK
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & ik,sone,y(:,1:ik),desc_a,iwork,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&

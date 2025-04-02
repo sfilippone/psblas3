@@ -207,7 +207,7 @@ Contains
 
     info = psb_success_
     call psb_erractionsave(err_act)
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     iam = 0
 #else
     call psb_info(ctxt,iam,np)

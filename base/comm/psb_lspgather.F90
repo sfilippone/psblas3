@@ -33,8 +33,8 @@
 !
 ! Gathers a sparse matrix onto a single process.
 ! Two variants:
-! 1. Gathers to PSB_l_SPARSE_MAT   (i.e. to matrix with IPK_ indices)
-! 2. Gathers to PSB_@LX@_SPARSE_MAT  (i.e. to matrix with LPK_ indices)
+! 1. Gathers to PSB_l_SPARSE_MAT   (i.e. to matrix with PSB_IPK_ indices)
+! 2. Gathers to PSB_@LX@_SPARSE_MAT  (i.e. to matrix with PSB_LPK_ indices)
 !
 ! Note: this function uses MPI_ALLGATHERV. At this time, the size of the
 ! resulting matrix must be within the range of 4 bytes because of the
@@ -49,11 +49,11 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   use psb_mat_mod
   use psb_tools_mod
   use iso_c_binding
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   type(psb_lspmat_type), intent(inout) :: loca
@@ -233,11 +233,11 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   use psb_mat_mod
   use psb_tools_mod
   use iso_c_binding
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   type(psb_lspmat_type), intent(inout) :: loca
@@ -406,11 +406,11 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
   use psb_mat_mod
   use psb_tools_mod
   use iso_c_binding
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   type(psb_@LX@spmat_type), intent(inout) :: loca

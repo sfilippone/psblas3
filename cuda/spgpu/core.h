@@ -47,6 +47,7 @@
  */
 
 #include "psb_config.h"
+#include "psb_types.h"
 #include "driver_types.h"
 #include "cuComplex.h"
  

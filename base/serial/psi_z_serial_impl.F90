@@ -33,7 +33,7 @@ subroutine psi_z_exscanv(n,x,info,shift)
   use psi_z_serial_mod, psb_protect_name => psi_z_exscanv
   use psb_const_mod
   use psb_error_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -53,7 +53,7 @@ subroutine psi_z_exscanv(n,x,info,shift)
     shift_ = zzero
   end if
     
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   is_parallel = omp_in_parallel()
   if (is_parallel) then 
     call inner_z_exscan()
@@ -71,7 +71,7 @@ subroutine psi_z_exscanv(n,x,info,shift)
   end do
 
 #endif
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 contains
   subroutine inner_z_exscan()
     ! Note: all these variables are private, but SUMB should *really* be

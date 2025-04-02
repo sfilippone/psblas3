@@ -28,7 +28,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-#if CUDA_SHORT_VERSION <= 10 
+#if PSB_CUDA_SHORT_VERSION <= 10 
   
 subroutine  psb_d_cuda_hybg_allocate_mnnz(m,n,a,nz) 
   

@@ -7,6 +7,7 @@
 # header files generated
 /cbind/*.h
 /util/psb_metis_int.h
+/base/modules/psb_config.h
 
 # Make.inc generated
 /Make.inc

@@ -104,7 +104,7 @@ module psb_cd_tools_mod
   end interface
 
   interface psb_cdins
-#if defined(IPK4) && defined(LPK8) 
+#if defined(PSB_IPK4) && defined(PSB_LPK8) 
     subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       import :: psb_ipk_, psb_lpk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc_a

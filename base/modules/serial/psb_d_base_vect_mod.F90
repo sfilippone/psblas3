@@ -284,7 +284,7 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
       return
     end if
-#if defined (OPENMP)
+#if defined (PSB_OPENMP)
     !$omp parallel do private(i)
     do i = 1, size(this)
       x%v(i) = this(i)
@@ -849,7 +849,7 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     !$omp parallel do private(i)
     do i = first_, last_        
       x%v(i) = val
@@ -887,7 +887,7 @@ contains
 
     if (x%is_dev()) call x%sync()
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i  = first_, last_
         x%v(i) = val(i-first_+1)
@@ -936,7 +936,7 @@ contains
     
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i=1, size(x%v)
         x%v(i) =  abs(x%v(i))
@@ -1771,7 +1771,7 @@ contains
     integer(psb_ipk_) :: i
 
     if (allocated(x%v)) then
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i=1,size(x%v)
         x%v(i) = alpha*x%v(i)
@@ -1815,7 +1815,7 @@ contains
     integer(psb_ipk_) :: i
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res = dzero
     !$omp parallel do private(i) reduction(max: res)
     do i=1, n
@@ -1839,7 +1839,7 @@ contains
     integer(psb_ipk_) :: i
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res = HUGE(done)
     !$omp parallel do private(i) reduction(min: res)
     do i=1, n
@@ -1920,7 +1920,7 @@ contains
     integer(psb_ipk_) :: i
     
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res=dzero
     !$omp parallel do private(i) reduction(+: res)
     do i= 1, size(x%v)
@@ -2227,7 +2227,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     if (z%is_dev()) call z%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     n = size(x)
     !$omp parallel do private(i)
     do i = 1, n

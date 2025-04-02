@@ -17,17 +17,12 @@ PSB_LIBS=-lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base -L$(LIBDIR)
 
 EXEDIR=./runs
 
-all: ppdec build
+all: pdegen3dc 
 
-ppdec: ppdec.o
-	$(MPFC) ppdec.o  -o ppdec $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran
-	/bin/mv ppdec $(EXEDIR)
+pdegen3dc: pdegen3dc.o
+	$(MPFC) pdegen3dc.o  -o pdegen3dc $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran
+	/bin/mv pdegen3dc $(EXEDIR)
 
-build: build.o
-		$(MPFC) build.o  -o build $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran
-		/bin/mv build $(EXEDIR)
-# \
-#	-lifcore -lifcoremt -lguide -limf -lirc -lintlc -lcxaguard -L/opt/intel/fc/10.0.023/lib/ -lm
 
 .f90.o:
 	$(MPFC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
@@ -36,11 +31,11 @@ build: build.o
 
 
 clean:
-	/bin/rm -f  ppdec.o build.o  $(EXEDIR)/ppdec
+	/bin/rm -f  pdegen3dc.o  $(EXEDIR)/pdegen3dc
 verycleanlib:
 	(cd ../..; make veryclean)
 lib:
 	(cd ../../; make library)
 
 tests: all
-	cd runs ; ./ppdec < ppde.inp
+	cd runs ; ./pdegen3dc < pdegen3d.inp
