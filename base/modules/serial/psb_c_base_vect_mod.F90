@@ -2796,7 +2796,7 @@ contains
     class(psb_c_base_vect_type), intent(inout) :: y
     integer(psb_ipk_), intent(in)           :: n
     complex(psb_spk_), allocatable   :: res(:)
-    complex(psb_spk_), external      :: cdot
+    complex(psb_spk_), external      :: cdotc
     integer(psb_ipk_) :: j,nc
 
     if (x%is_dev()) call x%sync()
@@ -2806,7 +2806,7 @@ contains
       nc = psb_size(x%v,2_psb_ipk_)
       allocate(res(nc))
       do j=1,nc
-        res(j) = cdot(n,x%v(:,j),1,y%v,1)
+        res(j) = cdotc(n,x%v(:,j),1,y%v,1)
       end do
     class default
       res = y%dot(n,x%v)
