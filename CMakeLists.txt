@@ -76,6 +76,14 @@ else()
   )
 endif()
 
+#----------------------------------------------------
+# Define -frecursive for GNU Fortran Compiler
+#----------------------------------------------------
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -frecursive")
+    message(STATUS "GNU Fortran COMPILER ${CMAKE_Fortran_FLAGS};")
+endif()
+
 
   message(STATUS "cmake flags? ${CMAKE_Fortran_FLAGS};")
 
