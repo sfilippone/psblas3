@@ -78,9 +78,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_lpk_), allocatable   :: lila(:),ljla(:)
   complex(psb_spk_), allocatable     :: lval(:)
   character(len=20)  :: name
-  logical, parameter  :: do_timings=.false.
-  integer(psb_ipk_), save  :: ins_phase1=-1, ins_phase2=-1, ins_phase3=-1, ins_phase4=-1
-  integer(psb_ipk_), save  :: ins_phase11=-1, ins_phase12=-1
 
   info = psb_success_
   name = 'psb_cspins'
@@ -123,19 +120,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   else
     local_ = .false.
   endif
-  if ((do_timings).and.(ins_phase1==-1))       &
-       & ins_phase1 = psb_get_timer_idx("SPINS: and send ")
-  if ((do_timings).and.(ins_phase2==-1))       &
-       & ins_phase2 = psb_get_timer_idx("SPINS: and cmp ad")
-  if ((do_timings).and.(ins_phase3==-1))       &
-       & ins_phase3 = psb_get_timer_idx("SPINS: and rcv")
-  if ((do_timings).and.(ins_phase4==-1))       &
-       & ins_phase4 = psb_get_timer_idx("SPINS: and cmp and")
-  if ((do_timings).and.(ins_phase11==-1))       &
-       & ins_phase11 = psb_get_timer_idx("SPINS: noand exch ")
-  if ((do_timings).and.(ins_phase12==-1))       &
-       & ins_phase12 = psb_get_timer_idx("SPINS: noand cmp")
-
 
   if (desc_a%is_bld()) then 
 
@@ -256,7 +240,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         end if
       end block
 #else
-      if (do_timings) call psb_tic(ins_phase1)
           
       !write(0,*) me,' Before g2l ',psb_errstatus_fatal()
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
@@ -265,8 +248,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='g2l',i_err=(/info/))
         goto 9999
       end if
-      if (do_timings) call psb_toc(ins_phase1)
-      if (do_timings) call psb_tic(ins_phase2)
 
       if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
            & mask=(ila(1:nz)>0))
@@ -279,20 +260,15 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
-      if (do_timings) call psb_toc(ins_phase2)
-
       !write(0,*) me,' Before csput',psb_errstatus_fatal()
       if (a%is_bld()) then 
-        if (do_timings) call psb_tic(ins_phase3)
         call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='a%csput')
           goto 9999
         end if
-        if (do_timings) call psb_toc(ins_phase3)
-        if (do_timings) call psb_tic(ins_phase4)
-
+        
         if (a%is_remote_build()) then 
           nnl = count(ila(1:nz)<0)
           if (nnl > 0) then 
@@ -311,8 +287,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
                  & 1_psb_lpk_,desc_a%get_global_rows(),info)
           end if
         end if
-        if (do_timings) call psb_toc(ins_phase4)
-
+          
       else
         info = psb_err_invalid_a_and_cd_state_
         call psb_errpush(info,name)
