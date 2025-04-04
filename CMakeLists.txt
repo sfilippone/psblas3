@@ -489,9 +489,20 @@ include(GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
+#set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
 set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE STRING "Include directory")
-set(CMAKE_INSTALL_MODULDIR "modules" CACHE STRING "Module directory")
+set(CMAKE_INSTALL_MODULDIR "modules" CACHE STRING "Modules directory")
+
+message(STATUS "Initial CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
+
+if(CMAKE_INSTALL_LIBDIR STREQUAL "lib64")
+    message(STATUS "CMAKE_INSTALL_LIBDIR is set to lib64. Overriding it to lib.")
+    set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory" FORCE)
+elseif(CMAKE_INSTALL_LIBDIR STREQUAL "lib")
+    message(STATUS "CMAKE_INSTALL_LIBDIR is already set to lib.")
+else()
+    message(STATUS "CMAKE_INSTALL_LIBDIR is set to: ${CMAKE_INSTALL_LIBDIR}")
+endif()
 
 
 #-----------------------------------
