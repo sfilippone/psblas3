@@ -22,10 +22,10 @@ contains
     ! 0 0
 
     ! declaration of VA,IA,JA 
-    integer(psb_ipk_) :: nnz=2
-    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: nnz=2 ! non zero
+    integer(psb_ipk_) :: m=2   ! 
     integer(psb_ipk_) :: k=2
-    integer(psb_ipk_) :: IA(2)=(/1, 1/)
+    integer(psb_ipk_) :: IA(2)=(/1, 1/) ! coordinate representation
     integer(psb_ipk_) :: JA(2)=(/1, 2/)
     real*8 :: VA(2)=(/1, 1/)
     real*8 :: x(2)=(/1, 1/)! reference x 
@@ -41,20 +41,20 @@ contains
       goto 9999
     endif
     call psb_barrier(ctxt)
-    call psb_cdall(ctxt,desc_a,info,nl=m)
+    call psb_cdall(ctxt,desc_a,info,nl=m)   ! specify index space m. Init desc_a
     if (info /= psb_success_)goto 9996
-    call psb_spall(a,desc_a,info,nnz=nnz)
+    call psb_spall(a,desc_a,info,nnz=nnz)   ! Init matrix a
     if (info /= psb_success_)goto 9996
     call psb_barrier(ctxt)
-    call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
+    call psb_spins(nnz,IA,JA,VA,a,desc_a,info)  ! insert nnz values VA into matrix a in coordinates (IA, JA). Representation is given by the number of parameters: either COO or CSR. This one is COO
     if (info /= psb_success_)goto 9996
-    call psb_cdasb(desc_a,info)
+    call psb_cdasb(desc_a,info)  ! assemblatore comunicatore
     if (info /= psb_success_)goto 9996
-    call psb_spasb(a,desc_a,info,afmt=afmt)
+    call psb_spasb(a,desc_a,info,afmt=afmt)  ! "broadcast" the generated matrix. After this it can be used. Dovrebbe risolvere problemi di halo. afmt indicated the required format
     if(info.ne.0)print *,"matrix assembly failed"
     if(info.ne.0)goto 9996
 
-    call psb_spmm(alpha,A,x,beta,y,desc_a,info,transa)
+    call psb_spmm(alpha,A,x,beta,y,desc_a,info,transa)  !Sparse Matrix Dense Vectore Multiplication: alphaAx + betay. 
     if(info.ne.0)print *,"psb_spmm failed"
     if(info.ne.0)goto 9996
     do i=1,2
