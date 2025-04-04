@@ -505,6 +505,8 @@ else()
 endif()
 
 
+
+
 #-----------------------------------
 # Turn on testing/ctest capabilities
 #-----------------------------------
@@ -1072,7 +1074,12 @@ message(STATUS "CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR};")
 message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR};")
 message(STATUS "CMAKE_INSTALL_MODULDIR: ${CMAKE_INSTALL_MODULDIR};")
 
+#Ser variables exportable for other projects
 
+set(PSB_CMAKE_INSTALL_PREFIX CMAKE_INSTALL_PREFIX)
+set(PSB_CMAKE_INSTALL_LIBDIR CMAKE_INSTALL_LIBDIR)
+set(PSB_CMAKE_INSTALL_INCLUDEDIR CMAKE_INSTALL_INCLUDEDIR)
+set(PSB_CMAKE_INSTALL_MODULDIR CMAKE_INSTALL_MODULDIR)
 #-----------------
 # Add PSBLAS tests
 #-----------------
