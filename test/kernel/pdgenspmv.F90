@@ -191,7 +191,7 @@ contains
     integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
     ! Process grid
-    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: np, iam, nth
     integer(psb_ipk_) :: icoeff
     integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
@@ -550,6 +550,9 @@ program pdgenspmv
   use psb_base_mod
   use psb_util_mod
   use psb_d_pde3d_mod
+#if defined(PSB_OPENMP)
+  use omp_lib
+#endif
   
   implicit none
 
@@ -571,7 +574,7 @@ program pdgenspmv
   real(psb_dpk_), allocatable :: tst(:)
   ! blacs parameters
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: iam, np
+  integer(psb_ipk_) :: iam, np, nth 
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr, ipart
@@ -589,6 +592,15 @@ program pdgenspmv
   
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
+#if defined(PSB_OPENMP)
+  !$OMP parallel shared(nth)
+  !$OMP master
+  nth = omp_get_num_threads()
+  !$OMP end master
+  !$OMP end parallel
+#else
+  nth = 1
+#endif
 
   if (iam < 0) then 
     ! This should not happen, but just in case
@@ -667,7 +679,9 @@ program pdgenspmv
     flops = 2.d0*times*annz
     tflops=flops
     write(psb_out_unit,'("Matrix: ell1 ",i0)') idim
-    write(psb_out_unit,'("Test on                          : ",i20," processors")') np
+    write(psb_out_unit,'("Test on                          : ",i20," processes ")') np
+    write(psb_out_unit,'("Test on                          : ",i20," threads   ")') nth
+    write(psb_out_unit,'("Total number of tasks            : ",i20              )') nth*np
     write(psb_out_unit,'("Size of matrix                   : ",i20,"           ")') nr
     write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') annz
     write(psb_out_unit,'("Memory occupation                : ",i20,"           ")') amatsize
