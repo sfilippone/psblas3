@@ -12,6 +12,7 @@ program psb_spmm_test
 
     ! sparse matrices
     type(psb_sspmat_type)       :: a
+    type(psb_lsspmat_type)      :: aux_a
 
     ! vectors
     type(psb_s_vect_type)       :: x, y
@@ -25,6 +26,7 @@ program psb_spmm_test
 
     ! matrix parameters
     integer(psb_ipk_)           :: m, n, nnz
+    integer(psb_ipk_)           :: nr, nt ! In BLOCK ROWS distributin, the number of rows 
 
 
     real(psb_spk_), allocatable :: x_global(:)
@@ -49,11 +51,17 @@ program psb_spmm_test
     end if
 
 
-    call mm_mat_read(a,info,filename=mtx_file)
-    
-    m   = a%get_nrows()
-    n   = a%get_ncols()
-    nnz = a%get_nzeros()
+    call mm_mat_read(aux_a,info,filename=mtx_file)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error while reading matric ", mtx_file
+        goto 9999        
+    end if 
+
+    call psb_matdist(aux_a, a, ctxt,desc_a,info,fmt="COO",parts=part_block)
+
+    m   = aux_a%get_nrows()
+    n   = aux_a%get_ncols()
+    nnz = aux_a%get_nzeros()
 
     call psb_bcast(ctxt,m)
     call psb_bcast(ctxt,n)
@@ -70,30 +78,83 @@ program psb_spmm_test
     if(my_rank == psb_root_) then
         call random_init(repeatable=.true.,image_distinct=.false.) 
         allocate(x_global(n))
-        do i=0,n
-            call random_number(x_global(i))
-        end do
-        write(psb_out_unit, *) x_global
+        call random_number(x_global)
     end if
 
-    ! call psb_matdist to initialize desc_a
+    ! nt = (m+np-1)/np
+    ! nr = max(0,min(nt,m-(my_rank*nt)))
 
-    ! call psb_scatter(x_global,x,desc_a,info,root=psb_root_)
-    ! call psb_geall(y,desc_a,info)
+    ! Check if distribution metadata is correct
+    ! nt = nr
+    ! call psb_sum(ctxt,nt)
+    ! if (nt /= m) then
+    !   write(psb_err_unit,*) my_rank, 'Initialization error ',nr,nt,m
+    !   info = -1
+    !   call psb_barrier(ctxt)
+    !   call psb_abort(ctxt)
+    !   return
+    ! end if
 
-
-    ! call psb_spfree(a, desc_a,info)
+    ! call psb_cdall(ctxt,desc_a,info, nl=nr)
     ! if(info /= psb_success_) then
-    !     write(psb_out_unit,*) "Error in matrix A free routine"
+    !     write(psb_out_unit,*) "Error in dexcriptor allocator routine using BLOCK ROWS distribution"
     !     goto 9999
     ! end if
+
+    call psb_geall(x,desc_a,info)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error allocating x data structure"
+        goto 9999
+    end if
+
+    ! Populate x class using data from x_global vector
+    call psb_scatter(x_global,x,desc_a,info,root=psb_root_)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error in psb_scatter to populate x data structure"
+        goto 9999
+    end if
     
-    ! call psb_cdfree(desc_a,info)
-    ! if(info /= psb_success_) then
-    !     write(psb_out_unit,*) "Error in matrix descriptor free routine"
-    !     goto 9999
-    ! end if
+    call psb_geall(y,desc_a,info)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error allocating y data structure"
+        goto 9999
+    end if
+    
+    call y%zero()
 
+
+    ! y = alpha * A * x + betha * y
+    call psb_spmm(sone,a,x,sone,y,desc_a,info)
+
+    ! Deallocate
+    call psb_gefree(x, desc_a,info)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error in vector x free routine"
+        goto 9999
+    end if
+
+    call psb_gefree(y, desc_a,info)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error in vector y free routine"
+        goto 9999
+    end if
+
+    call psb_spfree(a, desc_a,info)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error in matrix A free routine"
+        goto 9999
+    end if
+    
+    call psb_cdfree(desc_a,info)
+    if(info /= psb_success_) then
+        write(psb_out_unit,*) "Error in matrix descriptor free routine"
+        goto 9999
+    end if
+
+    if(my_rank == psb_root_) then
+        deallocate(x_global)
+    end if
+    
     call psb_exit(ctxt)
     stop
 
