@@ -30,85 +30,85 @@
 !
 !
 ! File: psb_dvmlt.f90
-
-subroutine psb_dvmlt(x,y,desc_a,info)
-  use psb_base_mod, psb_protect_name => psb_dvmlt
-  implicit none
-  type(psb_d_vect_type), intent (inout) ::  x
-  type(psb_d_vect_type), intent (inout) ::  y
-  type(psb_desc_type), intent (in)      :: desc_a
-  integer(psb_ipk_), intent(out)                  :: info
-
-  ! locals
-  integer(psb_ipk_) :: ctxt, np, me,&
-       & err_act, iix, jjx, iiy, jjy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  character(len=20)        :: name, ch_err
-
-  name='psb_dgevmlt'
-  if (psb_errstatus_fatal()) return
-  info=psb_success_
-  call psb_erractionsave(err_act)
-
-  ctxt=desc_a%get_context()
-
-  call psb_info(ctxt, me, np)
-  if (np == -ione) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.allocated(x%v)) then
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.allocated(y%v)) then
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  ix = ione
-  iy = ione
-
-  m = desc_a%get_global_rows()
-
-  ! check vector correctness
-  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect 1'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  call psb_chkvect(m,lone,y%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect 2'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  if ((iix /= ione).or.(iiy /= ione)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-  end if
-
-  if(desc_a%get_local_rows() > 0) then
-    call y%base_mlt_v(desc_a%get_local_rows(),&
-         & alpha,x,beta,info)
-  end if
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-
-end subroutine psb_dvmlt
+!!$
+!!$subroutine psb_dvmlt(x,y,desc_a,info)
+!!$  use psb_base_mod, psb_protect_name => psb_dvmlt
+!!$  implicit none
+!!$  type(psb_d_vect_type), intent (inout) ::  x
+!!$  type(psb_d_vect_type), intent (inout) ::  y
+!!$  type(psb_desc_type), intent (in)      :: desc_a
+!!$  integer(psb_ipk_), intent(out)                  :: info
+!!$
+!!$  ! locals
+!!$  integer(psb_ipk_) :: ctxt, np, me,&
+!!$       & err_act, iix, jjx, iiy, jjy
+!!$  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+!!$  character(len=20)        :: name, ch_err
+!!$
+!!$  name='psb_dgevmlt'
+!!$  if (psb_errstatus_fatal()) return
+!!$  info=psb_success_
+!!$  call psb_erractionsave(err_act)
+!!$
+!!$  ctxt=desc_a%get_context()
+!!$
+!!$  call psb_info(ctxt, me, np)
+!!$  if (np == -ione) then
+!!$    info = psb_err_context_error_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
+!!$  if (.not.allocated(x%v)) then
+!!$    info = psb_err_invalid_vect_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
+!!$  if (.not.allocated(y%v)) then
+!!$    info = psb_err_invalid_vect_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
+!!$
+!!$
+!!$  ix = ione
+!!$  iy = ione
+!!$
+!!$  m = desc_a%get_global_rows()
+!!$
+!!$  ! check vector correctness
+!!$  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+!!$  if(info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_
+!!$    ch_err='psb_chkvect 1'
+!!$    call psb_errpush(info,name,a_err=ch_err)
+!!$    goto 9999
+!!$  end if
+!!$  call psb_chkvect(m,lone,y%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+!!$  if(info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_
+!!$    ch_err='psb_chkvect 2'
+!!$    call psb_errpush(info,name,a_err=ch_err)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  if ((iix /= ione).or.(iiy /= ione)) then
+!!$    info=psb_err_ix_n1_iy_n1_unsupported_
+!!$    call psb_errpush(info,name)
+!!$  end if
+!!$
+!!$  if(desc_a%get_local_rows() > 0) then
+!!$    call y%base_mlt_v(desc_a%get_local_rows(),&
+!!$         & alpha,x,beta,info)
+!!$  end if
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 call psb_error_handler(ctxt,err_act)
+!!$
+!!$  return
+!!$
+!!$end subroutine psb_dvmlt
 
 !   
 !                Parallel Sparse BLAS  version 3.5
@@ -160,7 +160,7 @@ end subroutine psb_dvmlt
 !        they are declared INOUT because of the sync() methods. 
 !
 !
-subroutine psb_dmlt_multivect(x, y, desc_a,res,info,global) 
+subroutine psb_dmlt_multivect(x, y, res,desc_a,info,global) 
   use psb_desc_mod
   use psb_d_base_mat_mod
   use psb_check_mod
@@ -246,7 +246,7 @@ subroutine psb_dmlt_multivect(x, y, desc_a,res,info,global)
     call psb_errpush(info,name)
     goto 9999
   else
-    allocate(res(x%get_ncols()),stat=info)
+    allocate(res(x%get_nrows(),x%get_ncols()),stat=info)
     if (info /= 0) then
       info=psb_err_alloc_dealloc_
       call psb_errpush(info,name)
@@ -271,7 +271,7 @@ subroutine psb_dmlt_multivect(x, y, desc_a,res,info,global)
         ! using dgemm to compute the matrix-matrix product of the form R = R - X'*Y
         ! where R is the result, X' is the transpose of the matrix x%v%v(idx,:) 
         ! and Y is the matrix y%v%v(idx,:)
-        call dgemm('T','N',size(x%v%v(idx,:),2),size(y%v%v(idx,:),2),&
+        call dgemm('T','N',size(x%v%v(idx,:),1),size(y%v%v(idx,:),1),&
              & size(x%v%v(idx,:),1),-done,x%v%v(idx,:),size(x%v%v(idx,:),1),&
              & y%v%v(idx,:),size(y%v%v(idx,:),1),done,res,y%get_ncols())
       end do
