@@ -169,7 +169,7 @@ subroutine psb_dmlt_multivect(x, y, res,desc_a,info,global)
   use psb_d_multivect_mod
   use psb_d_psblas_mod, psb_protect_name => psb_dmlt_multivect
   implicit none 
-  real(psb_dpk_), dimension(:,:), allocatable :: res
+  real(psb_dpk_), dimension(:,:), allocatable, intent(inout) :: res
   type(psb_d_multivect_type), intent(inout) :: x, y
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)       :: info
@@ -246,17 +246,16 @@ subroutine psb_dmlt_multivect(x, y, res,desc_a,info,global)
     call psb_errpush(info,name)
     goto 9999
   else
-    allocate(res(x%get_nrows(),x%get_ncols()),stat=info)
-    if (info /= 0) then
-      info=psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
+    if (allocated(res)) then
+      if ((size(res,1) /= x%get_ncols()).or.(size(res,2) /= y%get_ncols())) then
+        deallocate(res,stat=info)
+      end if
     end if
   end if
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    call x%mlt(y,res,info) 
+    call x%mlt(nr,y,res,info) 
     ! FIXME
     ! adjust dot_local because overlapped elements are computed more than once
     if (size(desc_a%ovrlap_elem,1)>0) then
@@ -265,15 +264,20 @@ subroutine psb_dmlt_multivect(x, y, res,desc_a,info,global)
       do i=1,size(desc_a%ovrlap_elem,1)
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
+        ! FIXME: case of AS-type descriptors
         ! Since I'm coputing res via a dgemm on the whole vector, I need to adjust
         ! the result by removing the contribution of the overlapped elements
         ! specifically: res(:,:) = res(:,:) - x%v%v(idx,:)^T*y%v%v(idx,:)
         ! using dgemm to compute the matrix-matrix product of the form R = R - X'*Y
         ! where R is the result, X' is the transpose of the matrix x%v%v(idx,:) 
         ! and Y is the matrix y%v%v(idx,:)
-        call dgemm('T','N',size(x%v%v(idx,:),1),size(y%v%v(idx,:),1),&
-             & size(x%v%v(idx,:),1),-done,x%v%v(idx,:),size(x%v%v(idx,:),1),&
-             & y%v%v(idx,:),size(y%v%v(idx,:),1),done,res,y%get_ncols())
+        ! call dgemm('T','N',size(x%v%v(idx,:),1),size(y%v%v(idx,:),1),&
+        !      & size(x%v%v(idx,:),1),-done,x%v%v(idx,:),size(x%v%v(idx,:),1),&
+        !      & y%v%v(idx,:),size(y%v%v(idx,:),1),done,res,y%get_ncols())
+        info = psb_err_internal_error_
+        ch_err='over_elem_unsup'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
       end do
     end if
   else

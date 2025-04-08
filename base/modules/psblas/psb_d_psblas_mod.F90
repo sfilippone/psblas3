@@ -543,7 +543,7 @@ module psb_d_psblas_mod
     subroutine psb_dmlt_multivect(x, y, res, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_multivect_type, psb_dspmat_type
-      real(psb_dpk_), dimension(:,:), allocatable :: res
+      real(psb_dpk_), dimension(:,:), allocatable, intent(inout) :: res
       type(psb_d_multivect_type), intent(inout) :: x, y
       type(psb_desc_type), intent(in)      :: desc_a
       integer(psb_ipk_), intent(out)       :: info
@@ -588,6 +588,18 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       logical, intent(in)                   :: flag
     end subroutine psb_ddiv_vect2_check
+    subroutine psb_ddiv_trslv(x,a,desc_a,uplo,info,alpha,trans,diag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_dpk_, psb_d_multivect_type
+      type(psb_d_multivect_type), intent (inout)  :: x
+      real(psb_dpk_), intent (in), dimension(:,:) :: a
+      type(psb_desc_type), intent (in)            :: desc_a
+      character(len=1), intent(in)                :: uplo
+      integer(psb_ipk_), intent(out)              :: info
+      real(psb_dpk_), intent (in), optional       :: alpha
+      character(len=1), intent(in), optional      :: trans
+      character(len=1), intent(in), optional      :: diag
+    end subroutine psb_ddiv_trslv
   end interface
 
   interface psb_geinv

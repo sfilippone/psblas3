@@ -1976,16 +1976,17 @@ contains
     end if
   end subroutine d_mlv_trslv
 
-  subroutine d_mvect_mlt_mv2(x,y,a,info)
+  subroutine d_mvect_mlt_mv2(n,x,y,a,info)
     use psi_serial_mod
     implicit none
+    integer(psb_ipk_), intent(in)              :: n
     class(psb_d_multivect_type), intent(inout) :: x
     class(psb_d_multivect_type), intent(inout) :: y
     real(psb_dpk_), intent(inout), allocatable :: a(:,:)
     integer(psb_ipk_), intent(out)             :: info
 
     if (allocated(x%v).and.allocated(y%v)) then
-      call y%v%mlt(x%v,a,info)
+      call y%v%mlt(n,x%v,a,info)
     else
       info = psb_err_invalid_vect_state_
       return

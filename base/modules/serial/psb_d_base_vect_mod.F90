@@ -2911,8 +2911,8 @@ contains
     if (x%is_dev()) call x%sync()
     if (x%is_sync()) then
       ! Call BLAS function to solve the system
-      lda = n
-      ldb = n
+      lda = size(a,1)
+      ldb = x%get_nrows()
       side = 'R'  ! X*op( A ) = alpha*B.
       call dtrsm(side, uplo, trans_, diag_, n, x%get_ncols(), alpha_, a, lda, x%v, ldb)
     end if
@@ -3141,9 +3141,10 @@ contains
   !! \param y    The class(base_mlv_vect) to be multiplied by
   !! \param a    The resulting matrix
   !! \param info   return code
-  subroutine d_base_mlv_mlt_mv2(x,y,a,info)
+  subroutine d_base_mlv_mlt_mv2(n,x,y,a,info)
     use psi_serial_mod
     implicit none
+    integer(psb_ipk_), intent(in)                    :: n
     class(psb_d_base_multivect_type), intent(inout)  :: x
     class(psb_d_base_multivect_type), intent(inout)  :: y
     real(psb_dpk_), intent(inout), allocatable :: a(:,:)
@@ -3171,7 +3172,7 @@ contains
     ! C = alpha*op( A )*op( B ) + beta*C
     ! In our case, we want to compute
     ! C = X'*Y  
-    call dgemm('T', 'N', x%get_ncols(), y%get_ncols(), x%get_nrows(), done, &
+    call dgemm('T', 'N', x%get_ncols(), y%get_ncols(), n, done, &
       & x%v, x%get_nrows(), y%v, y%get_nrows(), dzero, a, x%get_ncols())
 
   end subroutine d_base_mlv_mlt_mv2

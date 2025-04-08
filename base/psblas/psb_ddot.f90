@@ -480,7 +480,8 @@ function psb_ddot_mvect_vect(x, y, desc_a,info,global) result(res)
       do i=1,size(desc_a%ovrlap_elem,1)
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
-        ! Remove the overlapped elements via dgemv calls 
+        ! FIXME: MAKES NO SENSE!
+        ! Remove the overlapped elements via dgemv calls which are axpy
         ! res = - (real(ndm-1)/real(ndm))* x(idx,:)^T y(idx)  + 1.0 res
         call dgemv('C',size(x%v%v,1),size(x%v%v,2),-(real(ndm-1)/real(ndm)), &
           & size(x%v%v,1),y%v%v(idx),ione,done,res,ione)

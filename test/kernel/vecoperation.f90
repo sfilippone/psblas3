@@ -45,7 +45,8 @@ module unittestvector_mod
    module procedure  psb_d_check_ans_v, psb_c_check_ans_v, &
        &  psb_z_check_ans_v, psb_s_check_ans_v, &
        &  psb_d_check_ans_mv, psb_s_check_ans_mv, &
-       &  psb_c_check_ans_mv, psb_z_check_ans_mv
+       &  psb_c_check_ans_mv, psb_z_check_ans_mv, &
+       &  psb_d_check_ans_mv_a
   end interface psb_check_ans
 
 contains
@@ -209,6 +210,43 @@ contains
     end if
 
   end function psb_d_check_ans_mv
+
+  function psb_d_check_ans_mv_a(v,val,ctxt) result(ans)
+    use psb_base_mod
+
+    implicit none
+
+    type(psb_d_multivect_type) :: v
+    real(psb_dpk_)        :: val(:)
+    type(psb_ctxt_type) :: ctxt
+    logical               :: ans
+
+    ! Local variables
+    integer(psb_ipk_) :: np, iam, info,i
+    real(psb_dpk_)    :: check
+    real(psb_dpk_), allocatable    :: va(:,:)
+
+    call psb_info(ctxt,iam,np)
+
+    va = v%get_vect()
+    ! subtract the row vector val from every row of va
+
+    do i=1,size(va,1)
+      va(i,:) = va(i,:) - val;
+    end do
+
+    check = maxval(va);
+
+    call psb_sum(ctxt,check)
+
+    if(check == 0.d0) then
+      ans = .true.
+    else
+      ans = .false.
+    end if
+
+  end function psb_d_check_ans_mv_a
+
 
   function psb_s_check_ans_mv(v,val,ctxt) result(ans)
     use psb_base_mod
@@ -1050,11 +1088,13 @@ program vecoperation
   type(psb_z_multivect_type) :: zmv1, zmv2
   ! scalars
   real(psb_dpk_), allocatable, dimension(:,:) :: res
+  real(psb_dpk_), allocatable, dimension(:,:) :: a
+  real(psb_dpk_), allocatable, dimension(:) :: check_row
   ! blacs parameters
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: iam, np
   ! auxiliary parameters
-  integer(psb_ipk_) :: ii
+  integer(psb_ipk_) :: ii,jj
   integer(psb_ipk_) :: info
   character(len=20) :: name,ch_err,readinput
   real(psb_dpk_)    :: ans
@@ -1491,6 +1531,41 @@ program vecoperation
     if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> Constant multivector (complex double precision)")')
     if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- Constant multivector (complex double precision)")')
   end if
+  ! X = 1, T = upper triangular of all ones
+  call psb_d_gen_const_multi(mv1,done,idim,nmv,ctxt,desc_a,info)
+  allocate(a(nmv,nmv),check_row(nmv))
+  do ii=1,nmv
+    do jj=ii,nmv 
+      a(ii,jj) = done
+    end do
+  end do 
+  check_row = 0
+  check_row(1) = done
+  call psb_gediv(mv1,a,desc_a,'U',info)
+  hasitnotfailed = psb_check_ans(mv1,check_row,ctxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> Triangular solve (UP) mv1 = mv1 / T")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- Triangular solve (UP) mv1 = mv1 / T")')
+  end if
+  ! X = 1, T = lower triangular of all ones
+  call psb_d_gen_const_multi(mv1,done,idim,nmv,ctxt,desc_a,info)
+  if (allocated(a)) deallocate(a)
+  if (allocated(check_row)) deallocate(check_row)
+  allocate(a(nmv,nmv),check_row(nmv))
+  do ii=1,nmv
+    do jj=1,ii 
+      a(ii,jj) = done
+    end do
+  end do 
+  check_row = 0
+  check_row(nmv) = done
+  call psb_gediv(mv1,a,desc_a,'L',info)
+  hasitnotfailed = psb_check_ans(mv1,check_row,ctxt)
+  if (iam == psb_root_) then
+    if(hasitnotfailed) write(psb_out_unit,'("TEST PASSED >>> Triangular solve (LOW) mv1 = mv1 / T")')
+    if(.not.hasitnotfailed) write(psb_out_unit,'("TEST FAILED --- Triangular solve (LOW) mv1 = mv1 / T")')
+  end if
+  
 
   ! 
   ! Multivector to field operation
@@ -1604,6 +1679,8 @@ program vecoperation
   call psb_gefree(zmv2,desc_a,info)
   call psb_cdfree(desc_a,info)
   if(allocated(res)) deallocate(res)
+  if(allocated(a)) deallocate(a)
+  if(allocated(check_row)) deallocate(check_row)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='free routine'
