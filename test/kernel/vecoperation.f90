@@ -1048,6 +1048,8 @@ program vecoperation
   type(psb_s_multivect_type) :: smv1, smv2
   type(psb_c_multivect_type) :: cmv1, cmv2
   type(psb_z_multivect_type) :: zmv1, zmv2
+  ! scalars
+  real(psb_dpk_), allocatable, dimension(:,:) :: res
   ! blacs parameters
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: iam, np
@@ -1569,7 +1571,15 @@ program vecoperation
     if(all(ansmv(:) == np*idim)) write(psb_out_unit,'("TEST PASSED >>> Dot product (mv vs vector) (double complex)")')
     if(any(ansmv(:) /= np*idim)) write(psb_out_unit,'("TEST FAILED --- Dot product (mv vs vector) (double complex)")')
   end if
-
+  ! Inner product: multivector vs multivector (double real)
+  call psb_d_gen_const_multi(mv1,done,idim,nmv,ctxt,desc_a,info)
+  call psb_d_gen_const_multi(mv2,done,idim,nmv,ctxt,desc_a,info)
+  allocate(res(nmv,nmv))
+  call psb_gemlt(mv1,mv2,res,desc_a,info)
+  if (iam == psb_root_) then
+    if(all(res(:,:) == np*idim)) write(psb_out_unit,'("TEST PASSED >>> Inner product (mv vs mv) (double real)")')
+    if(any(res(:,:) /= np*idim)) write(psb_out_unit,'("TEST FAILED --- Inner product (mv vs mv) (double real)")')
+  end if
 
 
   call psb_gefree(x,desc_a,info)
@@ -1593,6 +1603,7 @@ program vecoperation
   call psb_gefree(zmv1,desc_a,info)
   call psb_gefree(zmv2,desc_a,info)
   call psb_cdfree(desc_a,info)
+  if(allocated(res)) deallocate(res)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='free routine'

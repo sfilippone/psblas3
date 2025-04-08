@@ -540,6 +540,15 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       character(len=1), intent(in), optional :: conjgx, conjgy
     end subroutine psb_dmlt_vect2
+    subroutine psb_dmlt_multivect(x, y, res, desc_a,info,global)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_multivect_type, psb_dspmat_type
+      real(psb_dpk_), dimension(:,:), allocatable :: res
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
+    end subroutine psb_dmlt_multivect
   end interface
 
   interface psb_gediv
