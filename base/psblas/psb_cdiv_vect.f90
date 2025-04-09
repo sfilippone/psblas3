@@ -356,3 +356,70 @@ subroutine psb_cdiv_vect2_check(x,y,z,desc_a,info,flag)
 
 end subroutine psb_cdiv_vect2_check
 
+subroutine psb_cdiv_trslv(x,a,desc_a,uplo,info,alpha,trans,diag)
+  use psb_base_mod, psb_protect_name => psb_cdiv_trslv
+  implicit none
+  type(psb_c_multivect_type), intent (inout)  :: x
+  complex(psb_spk_), intent (in), dimension(:,:) :: a
+  type(psb_desc_type), intent (in)            :: desc_a
+  character(len=1), intent(in)                :: uplo
+  integer(psb_ipk_), intent(out)              :: info
+  complex(psb_spk_), intent (in), optional       :: alpha
+  character(len=1), intent(in), optional      :: trans
+  character(len=1), intent(in), optional      :: diag
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
+       & err_act, iix, jjx, iiy, jjy, nr
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, nx
+  character(len=20)        :: name, ch_err
+
+  name='psb_cdiv_trslv'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  ijx = ione
+
+  m = desc_a%get_global_rows()
+  nx = x%get_ncols()
+
+  ! check vector correctness
+  call psb_chkvect(m,nx,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  nr = desc_a%get_local_rows()
+  if(nr > 0) then
+    call x%trslv(nr,a,uplo,alpha,trans,diag,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_cdiv_trslv
+

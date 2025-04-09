@@ -540,6 +540,15 @@ module psb_s_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       character(len=1), intent(in), optional :: conjgx, conjgy
     end subroutine psb_smlt_vect2
+    subroutine psb_smlt_multivect(x, y, res, desc_a,info,global)
+      import :: psb_desc_type, psb_spk_, psb_ipk_, &
+           & psb_s_multivect_type, psb_sspmat_type
+      real(psb_spk_), dimension(:,:), allocatable, intent(inout) :: res
+      type(psb_s_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
+    end subroutine psb_smlt_multivect
   end interface
 
   interface psb_gediv
@@ -579,6 +588,18 @@ module psb_s_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       logical, intent(in)                   :: flag
     end subroutine psb_sdiv_vect2_check
+    subroutine psb_sdiv_trslv(x,a,desc_a,uplo,info,alpha,trans,diag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_spk_, psb_s_multivect_type
+      type(psb_s_multivect_type), intent (inout)  :: x
+      real(psb_spk_), intent (in), dimension(:,:) :: a
+      type(psb_desc_type), intent (in)            :: desc_a
+      character(len=1), intent(in)                :: uplo
+      integer(psb_ipk_), intent(out)              :: info
+      real(psb_spk_), intent (in), optional       :: alpha
+      character(len=1), intent(in), optional      :: trans
+      character(len=1), intent(in), optional      :: diag
+    end subroutine psb_sdiv_trslv
   end interface
 
   interface psb_geinv

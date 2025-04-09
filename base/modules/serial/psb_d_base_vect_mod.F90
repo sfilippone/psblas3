@@ -2917,8 +2917,6 @@ contains
       call dtrsm(side, uplo, trans_, diag_, n, x%get_ncols(), alpha_, a, lda, x%v, ldb)
     end if
   end subroutine d_base_mlv_trslv
-
-
   !
   ! Reset all values
   !
@@ -3133,10 +3131,9 @@ contains
 
   end subroutine d_base_mlv_axpby_a
 
-
-  !> Function base_mlv_mlt_mv2
+    !> Function base_mlv_mlt_mv2
   !! \memberof  psb_d_base_multivect_type
-  !! \brief computes A = transpose(X)*Y
+  !! \brief computes A = transpose(X)*Y / conjugatetranspose(X)*Y
   !! \param x    The class(base_mlv_vect) to be multiplied by
   !! \param y    The class(base_mlv_vect) to be multiplied by
   !! \param a    The resulting matrix
@@ -3172,12 +3169,10 @@ contains
     ! C = alpha*op( A )*op( B ) + beta*C
     ! In our case, we want to compute
     ! C = X'*Y  
-    call dgemm('T', 'N', x%get_ncols(), y%get_ncols(), n, done, &
+    call dgemm('C', 'N', x%get_ncols(), y%get_ncols(), n, done, &
       & x%v, x%get_nrows(), y%v, y%get_nrows(), dzero, a, x%get_ncols())
 
   end subroutine d_base_mlv_mlt_mv2
-
-
 
   !
   !  Multiple variants of two operations:

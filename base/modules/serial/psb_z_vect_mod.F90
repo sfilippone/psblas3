@@ -1344,6 +1344,9 @@ module psb_z_multivect_mod
     procedure, pass(x) :: dot_a    => z_mvect_dot_a
     procedure, pass(x) :: dot_a_vect  => z_mvect_dot_vect
     generic, public    :: dot      => dot_v, dot_a, dot_a_vect
+    procedure, pass(x) :: trslv    => z_mlv_trslv
+    procedure, pass(x) :: mlt_mv2  => z_mvect_mlt_mv2
+    generic, public    :: mlt      => mlt_mv2
 !!$    procedure, pass(y) :: axpby_v  => z_mvect_axpby_v
 !!$    procedure, pass(y) :: axpby_a  => z_mvect_axpby_a
 !!$    generic, public    :: axpby    => axpby_v, axpby_a
@@ -1875,6 +1878,43 @@ contains
     end if
 
   end function z_mvect_dot_a
+
+  subroutine z_mlv_trslv(n,x,a,uplo,alpha,trans,diag,info)
+    implicit none
+    class(psb_z_multivect_type), intent(inout) :: x
+    complex(psb_dpk_), intent(in)      :: a(:,:)
+    integer(psb_ipk_), intent(in)   :: n
+    character(len=1), intent(in)    :: uplo
+    complex(psb_dpk_), intent(in), optional :: alpha
+    character(len=1), intent(in), optional :: trans, diag
+    integer(psb_ipk_), intent(out)  :: info
+    
+    if (.not.allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    else
+      call x%v%trslv(n,a,uplo,alpha=alpha,trans=trans,diag=diag,info=info)
+    end if
+  end subroutine z_mlv_trslv
+
+  subroutine z_mvect_mlt_mv2(n,x,y,a,info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)              :: n
+    class(psb_z_multivect_type), intent(inout) :: x
+    class(psb_z_multivect_type), intent(inout) :: y
+    complex(psb_dpk_), intent(inout), allocatable :: a(:,:)
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%v).and.allocated(y%v)) then
+      call y%v%mlt(n,x%v,a,info)
+    else
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+  end subroutine z_mvect_mlt_mv2
+
 
 !!$  subroutine z_mvect_axpby_v(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod

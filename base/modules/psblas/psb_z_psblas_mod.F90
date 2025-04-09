@@ -529,6 +529,15 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       character(len=1), intent(in), optional :: conjgx, conjgy
     end subroutine psb_zmlt_vect2
+    subroutine psb_zmlt_multivect(x, y, res, desc_a,info,global)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_multivect_type, psb_zspmat_type
+      complex(psb_dpk_), dimension(:,:), allocatable, intent(inout) :: res
+      type(psb_z_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
+    end subroutine psb_zmlt_multivect
   end interface
 
   interface psb_gediv
@@ -568,6 +577,18 @@ module psb_z_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       logical, intent(in)                   :: flag
     end subroutine psb_zdiv_vect2_check
+    subroutine psb_zdiv_trslv(x,a,desc_a,uplo,info,alpha,trans,diag)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_dpk_, psb_z_multivect_type
+      type(psb_z_multivect_type), intent (inout)  :: x
+      complex(psb_dpk_), intent (in), dimension(:,:) :: a
+      type(psb_desc_type), intent (in)            :: desc_a
+      character(len=1), intent(in)                :: uplo
+      integer(psb_ipk_), intent(out)              :: info
+      complex(psb_dpk_), intent (in), optional       :: alpha
+      character(len=1), intent(in), optional      :: trans
+      character(len=1), intent(in), optional      :: diag
+    end subroutine psb_zdiv_trslv
   end interface
 
   interface psb_geinv

@@ -478,12 +478,17 @@ function psb_cdot_mvect_vect(x, y, desc_a,info,global) result(res)
       if (x%is_dev()) call x%sync()
       if (y%is_dev()) call y%sync()
       do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
+        !idx = desc_a%ovrlap_elem(i,1)
+        !ndm = desc_a%ovrlap_elem(i,2)
         ! Remove the overlapped elements via cgemv calls 
         ! res = - (real(ndm-1)/real(ndm))* x(idx,:)^T y(idx)  + 1.0 res
-        call cgemv('C',size(x%v%v,1),size(x%v%v,2),-(real(ndm-1)/real(ndm)), &
-          & size(x%v%v,1),y%v%v(idx),ione,done,res,ione)
+        !call cgemv('C',size(x%v%v,1),size(x%v%v,2),-(real(ndm-1)/real(ndm)), &
+        !  & size(x%v%v,1),y%v%v(idx),ione,done,res,ione)
+        ! FIXME: To be fixed for overlapped communicators, e.g., AS
+        info = psb_err_internal_error_
+        ch_err='over_elem_unsup'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
       end do
     end if
   else

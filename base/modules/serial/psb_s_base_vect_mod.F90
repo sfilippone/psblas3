@@ -2356,13 +2356,15 @@ module psb_s_base_multivect_mod
     procedure, pass(y) :: mlt_ar2  => s_base_mlv_mlt_ar2
     procedure, pass(z) :: mlt_a_2  => s_base_mlv_mlt_a_2
     procedure, pass(z) :: mlt_v_2  => s_base_mlv_mlt_v_2
+    procedure, pass(x) :: mlt_mv2  => s_base_mlv_mlt_mv2
 !!$    procedure, pass(z) :: mlt_va   => s_base_mlv_mlt_va
 !!$    procedure, pass(z) :: mlt_av   => s_base_mlv_mlt_av
     generic, public    :: mlt      => mlt_mv, mlt_mv_v, mlt_ar1, mlt_ar2, &
-         & mlt_a_2, mlt_v_2 !, mlt_av, mlt_va
+         & mlt_a_2, mlt_v_2, mlt_mv2 !, mlt_av, mlt_va
     !
     ! Scaling and norms
     !
+    procedure, pass(x) :: trslv    => s_base_mlv_trslv
     procedure, pass(x) :: scal     => s_base_mlv_scal
     procedure, pass(x) :: nrm2     => s_base_mlv_nrm2
     procedure, pass(x) :: amax     => s_base_mlv_amax
@@ -2852,6 +2854,70 @@ contains
   end function s_base_mlv_get_vect
 
   !
+  !> subroutine  d_base_mlv_trslv
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief  Computes X = X / A with A an upper triangular matrix
+  !! \param n    Number of entries to be considered
+  !! \param x    The multivector to be used for the division
+  !! \param uplo  'U' for upper triangular, 'L' for lower triangular
+  !! \param a    The matrix to be used for the division
+  !! \param alpha (optional)  The scaling factor
+  !! \param trans (optional)  'N' for no transpose, 'T' for transpose
+  !! \param diag (optional)  'N' for non-unit diagonal, 'U' for unit diagonal
+  !! \param info return code
+  !!
+  subroutine s_base_mlv_trslv(n,x,a,uplo,alpha,trans,diag,info)
+    implicit none
+    class(psb_s_base_multivect_type), intent(inout) :: x
+    real(psb_spk_), intent(in)      :: a(:,:)
+    integer(psb_ipk_), intent(in)   :: n
+    character(len=1), intent(in)    :: uplo
+    real(psb_spk_), intent(in), optional :: alpha
+    character(len=1), intent(in), optional :: trans, diag
+    integer(psb_ipk_), intent(out)  :: info
+    ! Local variables
+    integer(psb_ipk_) :: lda, ldb
+    character(len=1) :: trans_, diag_, side
+    real(psb_spk_) :: alpha_
+    
+    ! Default values
+    if (.not.present(alpha)) then
+      alpha_ = sone
+    else
+      alpha_ = alpha
+    end if
+    if (.not.present(trans)) then
+      trans_ = 'N'
+    else 
+      trans_ = trans
+    end if
+    if (.not.present(diag)) then
+      diag_ = 'N'
+    else
+      diag_ = diag
+    end if
+
+    info = psb_success_
+    ! Check that a is square
+    if (size(a,1) /= size(a,2)) then
+      info = psb_err_invalid_input_
+      return
+    end if
+    ! Check that a has the same number of columns as x
+    if (size(a,2) /= x%get_ncols()) then
+      info = psb_err_invalid_input_
+      return
+    end if
+    if (x%is_dev()) call x%sync()
+    if (x%is_sync()) then
+      ! Call BLAS function to solve the system
+      lda = size(a,1)
+      ldb = x%get_nrows()
+      side = 'R'  ! X*op( A ) = alpha*B.
+      call dtrsm(side, uplo, trans_, diag_, n, x%get_ncols(), alpha_, a, lda, x%v, ldb)
+    end if
+  end subroutine s_base_mlv_trslv
+  !
   ! Reset all values
   !
   !
@@ -3065,6 +3131,48 @@ contains
 
   end subroutine s_base_mlv_axpby_a
 
+    !> Function base_mlv_mlt_mv2
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief computes A = transpose(X)*Y / conjugatetranspose(X)*Y
+  !! \param x    The class(base_mlv_vect) to be multiplied by
+  !! \param y    The class(base_mlv_vect) to be multiplied by
+  !! \param a    The resulting matrix
+  !! \param info   return code
+  subroutine s_base_mlv_mlt_mv2(n,x,y,a,info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                    :: n
+    class(psb_s_base_multivect_type), intent(inout)  :: x
+    class(psb_s_base_multivect_type), intent(inout)  :: y
+    real(psb_spk_), intent(inout), allocatable :: a(:,:)
+    integer(psb_ipk_), intent(out)              :: info
+
+    info = psb_success_
+    if (x%is_dev()) call x%sync()
+    if (y%is_dev()) call y%sync()
+    
+    if (allocated(a)) then
+      if (size(a,1) /= x%get_ncols()) then
+        info = psb_err_invalid_input_
+        return
+      end if
+      if (size(a,2) /= y%get_ncols()) then
+        info = psb_err_invalid_input_
+        return
+      end if
+    else
+      allocate(a(x%get_ncols(),y%get_ncols()),stat=info)
+      if (info /= 0) call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_mlt_mv2')
+    end if
+    ! We do the multiplication by using the BLAS function
+    ! dgemm, which computes the matrix-matrix product
+    ! C = alpha*op( A )*op( B ) + beta*C
+    ! In our case, we want to compute
+    ! C = X'*Y  
+    call dgemm('C', 'N', x%get_ncols(), y%get_ncols(), n, sone, &
+      & x%v, x%get_nrows(), y%v, y%get_nrows(), szero, a, x%get_ncols())
+
+  end subroutine s_base_mlv_mlt_mv2
 
   !
   !  Multiple variants of two operations:
