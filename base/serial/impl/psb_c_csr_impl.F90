@@ -152,7 +152,7 @@ contains
           !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -164,7 +164,7 @@ contains
           !$omp parallel do private(i,j, acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -176,7 +176,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -192,7 +192,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -204,7 +204,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -216,7 +216,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -231,7 +231,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -243,7 +243,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -255,7 +255,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -270,7 +270,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -282,7 +282,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -294,7 +294,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = czero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
