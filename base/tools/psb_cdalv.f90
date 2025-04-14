@@ -46,6 +46,7 @@
 subroutine psb_cdalv(v, ctxt, desc, info, flag)
   use psb_base_mod
   use psi_mod
+  use psb_desc_mod
   use psb_repl_map_mod
   use psb_glist_map_mod
   use psb_hash_map_mod

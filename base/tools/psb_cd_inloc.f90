@@ -43,6 +43,7 @@
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   use psb_base_mod
+  use psb_desc_mod
   use psi_mod
   use psb_repl_map_mod
   use psb_list_map_mod

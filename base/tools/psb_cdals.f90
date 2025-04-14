@@ -45,6 +45,7 @@
 !    info    - integer.                       Error code (if any).
 subroutine psb_cdals(m, n, parts, ctxt, desc, info)
   use psb_base_mod
+  use psb_desc_mod
   use psi_mod
   use psb_repl_map_mod
   use psb_list_map_mod
