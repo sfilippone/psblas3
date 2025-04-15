@@ -6,7 +6,7 @@ include $(INCDIR)/Make.inc.psblas
 # Libraries used
 #
 LIBDIR = $(INSTALLDIR)/lib/
-PSBLAS_LIB = -L$(LIBDIR) -lpsb_util -lpsb_prec -lpsb_base
+PSBLAS_LIB = -L$(LIBDIR) -lpsb_util -lpsb_base
 LDLIBS = $(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
@@ -30,7 +30,7 @@ runsd:
 
 
 psb_spmm_test:
-	@$(FLINK) $(LOPT) psb_spmm_test.f90 -o psb_spmm_test -I../../modules/ -I. $(PSBLAS_LIB) $(LDLIBS) 
+	@$(FLINK) $(LOPT) psb_spmm_test.f90 spmm.f90 -o psb_spmm_test -I../../modules/ -I. $(PSBLAS_LIB) $(LDLIBS) 
 	@mv psb_spmm_test $(EXEDIR)
 	@printf "$(BLUE)[INFO]\tTesting files generated correctly$(END_COLOUR)\n" 
 

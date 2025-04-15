@@ -1,0 +1,1990 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:204 (message)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      The system is: Linux - 5.14.0-503.26.1.el9_5.x86_64 - x86_64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /usr/bin/gcc 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is GNU, found in:
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/3.26.5/CompilerIdC/a.out
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineFortranCompiler.cmake:179 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      Compiling the Fortran compiler identification source file "CMakeFortranCompilerId.F" succeeded.
+      Compiler: /usr/bin/gfortran 
+      Build flags: 
+      Id flags: -v 
+      
+      The output was:
+      0
+      Driving: /usr/bin/gfortran -v CMakeFortranCompilerId.F -l gfortran -l m -shared-libgcc
+      Using built-in specs.
+      COLLECT_GCC=/usr/bin/gfortran
+      COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper
+      OFFLOAD_TARGET_NAMES=nvptx-none
+      OFFLOAD_TARGET_DEFAULT=1
+      Target: x86_64-redhat-linux
+      Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+      Thread model: posix
+      Supported LTO compression algorithms: zlib zstd
+      gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) 
+      COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'a-'
+       /usr/libexec/gcc/x86_64-redhat-linux/11/f951 CMakeFortranCompilerId.F -ffixed-form -cpp=/tmp/cc7AsLCb.f90 -quiet -v CMakeFortranCompilerId.F -quiet -dumpdir a- -dumpbase CMakeFortranCompilerId.F -dumpbase-ext .F -mtune=generic -march=x86-64-v2 -version -fintrinsic-modules-path /usr/lib/gcc/x86_64-redhat-linux/11/finclude -fpre-include=/usr/include/finclude/math-vector-fortran.h -o /tmp/cc2kjZnf.s
+      GNU Fortran (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)
+      	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+      GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+      ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"
+      ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"
+      #include "..." search starts here:
+      #include <...> search starts here:
+       /usr/lib/gcc/x86_64-redhat-linux/11/finclude
+       /usr/lib/gcc/x86_64-redhat-linux/11/include
+       /usr/local/include
+       /usr/include
+      End of search list.
+      GNU Fortran2008 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)
+      	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+      GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+      COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'a-'
+       as -v --64 -o /tmp/ccyIjjRf.o /tmp/cc2kjZnf.s
+      GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-54.el9
+      Reading specs from /usr/lib/gcc/x86_64-redhat-linux/11/libgfortran.spec
+      rename spec lib to liborig
+      COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'a-'
+      COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+      LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+      COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'a.'
+       /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/ccqbY7hk.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lquadmath -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. /tmp/ccyIjjRf.o -lgfortran -lm -lgcc_s -lgcc -lquadmath -lm -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o
+      COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'a.'
+      
+      
+      Compilation of the Fortran compiler identification source "CMakeFortranCompilerId.F" produced "a.out"
+      
+      The Fortran compiler identification is GNU, found in:
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/3.26.5/CompilerIdFortran/a.out
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/usr/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:33 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_544f0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_544f0.dir/build.make CMakeFiles/cmTC_544f0.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr'
+        Building C object CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o
+        /usr/bin/gcc   -v -o CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake/Modules/CMakeCCompilerABI.c
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/gcc
+        OFFLOAD_TARGET_NAMES=nvptx-none
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-redhat-linux
+        Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_544f0.dir/'
+         /usr/libexec/gcc/x86_64-redhat-linux/11/cc1 -quiet -v /usr/share/cmake/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_544f0.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64-v2 -version -o /tmp/ccKJvLd5.s
+        GNU C17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)
+        	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/lib/gcc/x86_64-redhat-linux/11/include
+         /usr/local/include
+         /usr/include
+        End of search list.
+        GNU C17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)
+        	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        Compiler executable checksum: 908485988b78eea6a554fb7238e689b4
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_544f0.dir/'
+         as -v --64 -o CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o /tmp/ccKJvLd5.s
+        GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-54.el9
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.'
+        Linking C executable cmTC_544f0
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_544f0.dir/link.txt --verbose=1
+        /usr/bin/gcc  -v CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o -o cmTC_544f0 
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/gcc
+        COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper
+        OFFLOAD_TARGET_NAMES=nvptx-none
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-redhat-linux
+        Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) 
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_544f0' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_544f0.'
+         /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/cc0OYvRE.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_544f0 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_544f0' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_544f0.'
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      Parsed C implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/include]
+          add: [/usr/local/include]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/include] ==> [/usr/lib/gcc/x86_64-redhat-linux/11/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/lib/gcc/x86_64-redhat-linux/11/include;/usr/local/include;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr]
+        ignore line: []
+        ignore line: [Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_544f0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_544f0.dir/build.make CMakeFiles/cmTC_544f0.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vZUzbr']
+        ignore line: [Building C object CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o]
+        ignore line: [/usr/bin/gcc   -v -o CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/gcc]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-redhat-linux]
+        ignore line: [Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c c++ fortran lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_544f0.dir/']
+        ignore line: [ /usr/libexec/gcc/x86_64-redhat-linux/11/cc1 -quiet -v /usr/share/cmake/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_544f0.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64-v2 -version -o /tmp/ccKJvLd5.s]
+        ignore line: [GNU C17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)]
+        ignore line: [	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5)  GMP version 6.2.0  MPFR version 4.1.0-p9  MPC version 1.2.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [GNU C17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)]
+        ignore line: [	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5)  GMP version 6.2.0  MPFR version 4.1.0-p9  MPC version 1.2.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [Compiler executable checksum: 908485988b78eea6a554fb7238e689b4]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_544f0.dir/']
+        ignore line: [ as -v --64 -o CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o /tmp/ccKJvLd5.s]
+        ignore line: [GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-54.el9]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.']
+        ignore line: [Linking C executable cmTC_544f0]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_544f0.dir/link.txt --verbose=1]
+        ignore line: [/usr/bin/gcc  -v CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o -o cmTC_544f0 ]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/gcc]
+        ignore line: [COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-redhat-linux]
+        ignore line: [Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c c++ fortran lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) ]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_544f0' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_544f0.']
+        link line: [ /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/cc0OYvRE.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_544f0 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+          arg [/usr/libexec/gcc/x86_64-redhat-linux/11/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/cc0OYvRE.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--no-add-needed] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_544f0] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../..] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../..]
+          arg [CMakeFiles/cmTC_544f0.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [-lgcc] ==> lib [gcc]
+          arg [--push-state] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--pop-state] ==> ignore
+          arg [-lc] ==> lib [c]
+          arg [-lgcc] ==> lib [gcc]
+          arg [--push-state] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--pop-state] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o] ==> [/usr/lib64/crt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> [/usr/lib64/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> [/usr/lib64/crtn.o]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11] ==> [/usr/lib/gcc/x86_64-redhat-linux/11]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../..] ==> [/usr/lib]
+        implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+        implicit objs: [/usr/lib64/crt1.o;/usr/lib64/crti.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o;/usr/lib64/crtn.o]
+        implicit dirs: [/usr/lib/gcc/x86_64-redhat-linux/11;/usr/lib64;/lib64;/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/usr/share/cmake/Modules/CMakeTestFortranCompiler.cmake:20 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:33 (project)"
+    checks:
+      - "Detecting Fortran compiler ABI info"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "CMAKE_Fortran_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_23114/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_23114.dir/build.make CMakeFiles/cmTC_23114.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ'
+        Building Fortran object CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o
+        /usr/bin/gfortran   -v -c /usr/share/cmake/Modules/CMakeFortranCompilerABI.F90 -o CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/gfortran
+        OFFLOAD_TARGET_NAMES=nvptx-none
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-redhat-linux
+        Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) 
+        COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_23114.dir/'
+         /usr/libexec/gcc/x86_64-redhat-linux/11/f951 /usr/share/cmake/Modules/CMakeFortranCompilerABI.F90 -cpp=/tmp/ccdHSoGv.f90 -quiet -v /usr/share/cmake/Modules/CMakeFortranCompilerABI.F90 -quiet -dumpdir CMakeFiles/cmTC_23114.dir/ -dumpbase CMakeFortranCompilerABI.F90.F90 -dumpbase-ext .F90 -mtune=generic -march=x86-64-v2 -version -fintrinsic-modules-path /usr/lib/gcc/x86_64-redhat-linux/11/finclude -fpre-include=/usr/include/finclude/math-vector-fortran.h -o /tmp/cciyyGd1.s
+        GNU Fortran (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)
+        	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/lib/gcc/x86_64-redhat-linux/11/finclude
+         /usr/lib/gcc/x86_64-redhat-linux/11/include
+         /usr/local/include
+         /usr/include
+        End of search list.
+        GNU Fortran2008 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)
+        	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_23114.dir/'
+         as -v --64 -o CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o /tmp/cciyyGd1.s
+        GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-54.el9
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.'
+        Linking Fortran executable cmTC_23114
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_23114.dir/link.txt --verbose=1
+        /usr/bin/gfortran  -v CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o -o cmTC_23114 
+        Driving: /usr/bin/gfortran -v CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o -o cmTC_23114 -l gfortran -l m -shared-libgcc
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/gfortran
+        COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper
+        OFFLOAD_TARGET_NAMES=nvptx-none
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-redhat-linux
+        Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) 
+        Reading specs from /usr/lib/gcc/x86_64-redhat-linux/11/libgfortran.spec
+        rename spec lib to liborig
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_23114' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_23114-'
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_23114' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_23114.'
+         /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/ccA0e4rs.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lquadmath -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_23114 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o -lgfortran -lm -lgcc_s -lgcc -lquadmath -lm -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_23114' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_23114.'
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestFortranCompiler.cmake:20 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      Parsed Fortran implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/finclude]
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/include]
+          add: [/usr/local/include]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/finclude] ==> [/usr/lib/gcc/x86_64-redhat-linux/11/finclude]
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/include] ==> [/usr/lib/gcc/x86_64-redhat-linux/11/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/lib/gcc/x86_64-redhat-linux/11/finclude;/usr/lib/gcc/x86_64-redhat-linux/11/include;/usr/local/include;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestFortranCompiler.cmake:20 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:33 (project)"
+    message: |
+      Parsed Fortran implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ]
+        ignore line: []
+        ignore line: [Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_23114/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_23114.dir/build.make CMakeFiles/cmTC_23114.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-kiW4pQ']
+        ignore line: [Building Fortran object CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o]
+        ignore line: [/usr/bin/gfortran   -v -c /usr/share/cmake/Modules/CMakeFortranCompilerABI.F90 -o CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/gfortran]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-redhat-linux]
+        ignore line: [Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c c++ fortran lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_23114.dir/']
+        ignore line: [ /usr/libexec/gcc/x86_64-redhat-linux/11/f951 /usr/share/cmake/Modules/CMakeFortranCompilerABI.F90 -cpp=/tmp/ccdHSoGv.f90 -quiet -v /usr/share/cmake/Modules/CMakeFortranCompilerABI.F90 -quiet -dumpdir CMakeFiles/cmTC_23114.dir/ -dumpbase CMakeFortranCompilerABI.F90.F90 -dumpbase-ext .F90 -mtune=generic -march=x86-64-v2 -version -fintrinsic-modules-path /usr/lib/gcc/x86_64-redhat-linux/11/finclude -fpre-include=/usr/include/finclude/math-vector-fortran.h -o /tmp/cciyyGd1.s]
+        ignore line: [GNU Fortran (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)]
+        ignore line: [	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5)  GMP version 6.2.0  MPFR version 4.1.0-p9  MPC version 1.2.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/finclude]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [GNU Fortran2008 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-5) (x86_64-redhat-linux)]
+        ignore line: [	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-5)  GMP version 6.2.0  MPFR version 4.1.0-p9  MPC version 1.2.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_23114.dir/']
+        ignore line: [ as -v --64 -o CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o /tmp/cciyyGd1.s]
+        ignore line: [GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-54.el9]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.']
+        ignore line: [Linking Fortran executable cmTC_23114]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_23114.dir/link.txt --verbose=1]
+        ignore line: [/usr/bin/gfortran  -v CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o -o cmTC_23114 ]
+        ignore line: [Driving: /usr/bin/gfortran -v CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o -o cmTC_23114 -l gfortran -l m -shared-libgcc]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/gfortran]
+        ignore line: [COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-redhat-linux]
+        ignore line: [Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c c++ fortran lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 11.5.0 20240719 (Red Hat 11.5.0-5) (GCC) ]
+        ignore line: [Reading specs from /usr/lib/gcc/x86_64-redhat-linux/11/libgfortran.spec]
+        ignore line: [rename spec lib to liborig]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_23114' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_23114-']
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_23114' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_23114.']
+        link line: [ /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/ccA0e4rs.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lquadmath -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_23114 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o -lgfortran -lm -lgcc_s -lgcc -lquadmath -lm -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+          arg [/usr/libexec/gcc/x86_64-redhat-linux/11/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccA0e4rs.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lquadmath] ==> ignore
+          arg [-plugin-opt=-pass-through=-lm] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--no-add-needed] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_23114] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../..] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../..]
+          arg [CMakeFiles/cmTC_23114.dir/CMakeFortranCompilerABI.F90.o] ==> ignore
+          arg [-lgfortran] ==> lib [gfortran]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lquadmath] ==> lib [quadmath]
+          arg [-lm] ==> lib [m]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o] ==> [/usr/lib64/crt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> [/usr/lib64/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> [/usr/lib64/crtn.o]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11] ==> [/usr/lib/gcc/x86_64-redhat-linux/11]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../..] ==> [/usr/lib]
+        implicit libs: [gfortran;m;gcc_s;gcc;quadmath;m;c;gcc_s;gcc]
+        implicit objs: [/usr/lib64/crt1.o;/usr/lib64/crti.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o;/usr/lib64/crtn.o]
+        implicit dirs: [/usr/lib/gcc/x86_64-redhat-linux/11;/usr/lib64;/lib64;/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FortranCInterface/Detect.cmake:49 (try_compile)"
+      - "/usr/share/cmake/Modules/FortranCInterface.cmake:224 (include)"
+      - "CMakeLists.txt:86 (include)"
+    checks:
+      - "Detecting Fortran/C Interface"
+    description: "Fortran/C interface test project"
+    directories:
+      source: "/usr/share/cmake/Modules/FortranCInterface"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface"
+    buildResult:
+      variable: "FortranCInterface_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile FortranCInterface && /usr/bin/cmake -S/usr/share/cmake/Modules/FortranCInterface -B/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface --check-build-system CMakeFiles/Makefile.cmake 0
+        /usr/bin/gmake  -f CMakeFiles/Makefile2 FortranCInterface
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        /usr/bin/cmake -S/usr/share/cmake/Modules/FortranCInterface -B/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface --check-build-system CMakeFiles/Makefile.cmake 0
+        /usr/bin/cmake -E cmake_progress_start /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles 39
+        /usr/bin/gmake  -f CMakeFiles/Makefile2 CMakeFiles/FortranCInterface.dir/all
+        gmake[2]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        /usr/bin/gmake  -f CMakeFiles/myfort.dir/build.make CMakeFiles/myfort.dir/depend
+        gmake[3]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        cd /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /usr/share/cmake/Modules/FortranCInterface /usr/share/cmake/Modules/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/myfort.dir/DependInfo.cmake
+        Dependee "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/myfort.dir/DependInfo.cmake" is newer than depender "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/myfort.dir/depend.internal".
+        Dependee "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/CMakeDirectoryInformation.cmake" is newer than depender "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/myfort.dir/depend.internal".
+        Scanning dependencies of target myfort
+        gmake[3]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        /usr/bin/gmake  -f CMakeFiles/myfort.dir/build.make CMakeFiles/myfort.dir/build
+        gmake[3]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        [  2%] Building Fortran object CMakeFiles/myfort.dir/my_module.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/my_module.f90 -o CMakeFiles/myfort.dir/my_module.f90.o
+        /usr/bin/cmake -E cmake_copy_f90_mod my_module.mod CMakeFiles/myfort.dir/my_module.mod.stamp GNU
+        /usr/bin/cmake -E touch CMakeFiles/myfort.dir/my_module.f90.o.provides.build
+        [  5%] Building Fortran object CMakeFiles/myfort.dir/mymodule.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/mymodule.f90 -o CMakeFiles/myfort.dir/mymodule.f90.o
+        /usr/bin/cmake -E cmake_copy_f90_mod mymodule.mod CMakeFiles/myfort.dir/mymodule.mod.stamp GNU
+        /usr/bin/cmake -E touch CMakeFiles/myfort.dir/mymodule.f90.o.provides.build
+        [  7%] Building Fortran object CMakeFiles/myfort.dir/mysub.f.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/mysub.f -o CMakeFiles/myfort.dir/mysub.f.o
+        [ 10%] Building Fortran object CMakeFiles/myfort.dir/my_sub.f.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/my_sub.f -o CMakeFiles/myfort.dir/my_sub.f.o
+        [ 12%] Linking Fortran static library libmyfort.a
+        /usr/bin/cmake -P CMakeFiles/myfort.dir/cmake_clean_target.cmake
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/myfort.dir/link.txt --verbose=1
+        /usr/bin/ar qc libmyfort.a CMakeFiles/myfort.dir/mysub.f.o CMakeFiles/myfort.dir/my_sub.f.o CMakeFiles/myfort.dir/mymodule.f90.o CMakeFiles/myfort.dir/my_module.f90.o
+        /usr/bin/ranlib libmyfort.a
+        gmake[3]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        [ 12%] Built target myfort
+        /usr/bin/gmake  -f CMakeFiles/symbols.dir/build.make CMakeFiles/symbols.dir/depend
+        gmake[3]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        cd /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /usr/share/cmake/Modules/FortranCInterface /usr/share/cmake/Modules/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/symbols.dir/DependInfo.cmake
+        Dependee "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/symbols.dir/DependInfo.cmake" is newer than depender "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/symbols.dir/depend.internal".
+        Dependee "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/CMakeDirectoryInformation.cmake" is newer than depender "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/symbols.dir/depend.internal".
+        Scanning dependencies of target symbols
+        gmake[3]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        /usr/bin/gmake  -f CMakeFiles/symbols.dir/build.make CMakeFiles/symbols.dir/build
+        gmake[3]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        [ 15%] Building C object CMakeFiles/symbols.dir/mymodule_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/mymodule_.c.o -c /usr/share/cmake/Modules/FortranCInterface/mymodule_.c
+        [ 17%] Building C object CMakeFiles/symbols.dir/my_module_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/my_module_.c.o -c /usr/share/cmake/Modules/FortranCInterface/my_module_.c
+        [ 20%] Building C object CMakeFiles/symbols.dir/MY_MODULE.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/MY_MODULE.c.o -c /usr/share/cmake/Modules/FortranCInterface/MY_MODULE.c
+        [ 23%] Building C object CMakeFiles/symbols.dir/MYMODULE.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/MYMODULE.c.o -c /usr/share/cmake/Modules/FortranCInterface/MYMODULE.c
+        [ 25%] Building C object CMakeFiles/symbols.dir/symbols/my_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_sub.c
+        [ 28%] Building C object CMakeFiles/symbols.dir/symbols/my_sub_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_sub_.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_sub_.c
+        [ 30%] Building C object CMakeFiles/symbols.dir/symbols/my_sub__.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_sub__.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_sub__.c
+        [ 33%] Building C object CMakeFiles/symbols.dir/symbols/MY_SUB-UPPER.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/MY_SUB-UPPER.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/MY_SUB-UPPER.c
+        [ 35%] Building C object CMakeFiles/symbols.dir/symbols/mysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/mysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/mysub.c
+        [ 38%] Building C object CMakeFiles/symbols.dir/symbols/mysub_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/mysub_.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/mysub_.c
+        [ 41%] Building C object CMakeFiles/symbols.dir/symbols/MYSUB-UPPER.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/MYSUB-UPPER.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/MYSUB-UPPER.c
+        [ 43%] Building C object CMakeFiles/symbols.dir/symbols/__my_module_MOD_my_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/__my_module_MOD_my_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/__my_module_MOD_my_sub.c
+        [ 46%] Building C object CMakeFiles/symbols.dir/symbols/__my_module_NMOD_my_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/__my_module_NMOD_my_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/__my_module_NMOD_my_sub.c
+        [ 48%] Building C object CMakeFiles/symbols.dir/symbols/__my_module__my_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/__my_module__my_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/__my_module__my_sub.c
+        [ 51%] Building C object CMakeFiles/symbols.dir/symbols/__mymodule_MOD_mysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/__mymodule_MOD_mysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/__mymodule_MOD_mysub.c
+        [ 53%] Building C object CMakeFiles/symbols.dir/symbols/__mymodule_NMOD_mysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/__mymodule_NMOD_mysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/__mymodule_NMOD_mysub.c
+        [ 56%] Building C object CMakeFiles/symbols.dir/symbols/__mymodule__mysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/__mymodule__mysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/__mymodule__mysub.c
+        [ 58%] Building C object CMakeFiles/symbols.dir/symbols/my_moduleSmy_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_moduleSmy_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_moduleSmy_sub.c
+        [ 61%] Building C object CMakeFiles/symbols.dir/symbols/my_module_mp_my_sub_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_module_mp_my_sub_.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_module_mp_my_sub_.c
+        [ 64%] Building C object CMakeFiles/symbols.dir/symbols/MY_MODULE_mp_MY_SUB-UPPER.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/MY_MODULE_mp_MY_SUB-UPPER.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/MY_MODULE_mp_MY_SUB-UPPER.c
+        [ 66%] Building C object CMakeFiles/symbols.dir/symbols/my_module_my_sub_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_module_my_sub_.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_module_my_sub_.c
+        [ 69%] Building C object CMakeFiles/symbols.dir/symbols/my_module_MP_my_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/my_module_MP_my_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/my_module_MP_my_sub.c
+        [ 71%] Building C object CMakeFiles/symbols.dir/symbols/mymoduleSmysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/mymoduleSmysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/mymoduleSmysub.c
+        [ 74%] Building C object CMakeFiles/symbols.dir/symbols/mymodule_mp_mysub_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/mymodule_mp_mysub_.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/mymodule_mp_mysub_.c
+        [ 76%] Building C object CMakeFiles/symbols.dir/symbols/MYMODULE_mp_MYSUB-UPPER.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/MYMODULE_mp_MYSUB-UPPER.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/MYMODULE_mp_MYSUB-UPPER.c
+        [ 79%] Building C object CMakeFiles/symbols.dir/symbols/mymodule_mysub_.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/mymodule_mysub_.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/mymodule_mysub_.c
+        [ 82%] Building C object CMakeFiles/symbols.dir/symbols/mymodule_MP_mysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/mymodule_MP_mysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/mymodule_MP_mysub.c
+        [ 84%] Building C object CMakeFiles/symbols.dir/symbols/_QMmy_modulePmy_sub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/_QMmy_modulePmy_sub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/_QMmy_modulePmy_sub.c
+        [ 87%] Building C object CMakeFiles/symbols.dir/symbols/_QMmymodulePmysub.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -fPIC -o CMakeFiles/symbols.dir/symbols/_QMmymodulePmysub.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/symbols/_QMmymodulePmysub.c
+        [ 89%] Linking C static library libsymbols.a
+        /usr/bin/cmake -P CMakeFiles/symbols.dir/cmake_clean_target.cmake
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/symbols.dir/link.txt --verbose=1
+        /usr/bin/ar qc libsymbols.a CMakeFiles/symbols.dir/mymodule_.c.o CMakeFiles/symbols.dir/my_module_.c.o CMakeFiles/symbols.dir/MY_MODULE.c.o CMakeFiles/symbols.dir/MYMODULE.c.o CMakeFiles/symbols.dir/symbols/my_sub.c.o CMakeFiles/symbols.dir/symbols/my_sub_.c.o CMakeFiles/symbols.dir/symbols/my_sub__.c.o "CMakeFiles/symbols.dir/symbols/MY_SUB-UPPER.c.o" CMakeFiles/symbols.dir/symbols/mysub.c.o CMakeFiles/symbols.dir/symbols/mysub_.c.o "CMakeFiles/symbols.dir/symbols/MYSUB-UPPER.c.o" CMakeFiles/symbols.dir/symbols/__my_module_MOD_my_sub.c.o CMakeFiles/symbols.dir/symbols/__my_module_NMOD_my_sub.c.o CMakeFiles/symbols.dir/symbols/__my_module__my_sub.c.o CMakeFiles/symbols.dir/symbols/__mymodule_MOD_mysub.c.o CMakeFiles/symbols.dir/symbols/__mymodule_NMOD_mysub.c.o CMakeFiles/symbols.dir/symbols/__mymodule__mysub.c.o CMakeFiles/symbols.dir/symbols/my_moduleSmy_sub.c.o CMakeFiles/symbols.dir/symbols/my_module_mp_my_sub_.c.o "CMakeFiles/symbols.dir/symbols/MY_MODULE_mp_MY_SUB-UPPER.c.o" CMakeFiles/symbols.dir/symbols/my_module_my_sub_.c.o CMakeFiles/symbols.dir/symbols/my_module_MP_my_sub.c.o CMakeFiles/symbols.dir/symbols/mymoduleSmysub.c.o CMakeFiles/symbols.dir/symbols/mymodule_mp_mysub_.c.o "CMakeFiles/symbols.dir/symbols/MYMODULE_mp_MYSUB-UPPER.c.o" CMakeFiles/symbols.dir/symbols/mymodule_mysub_.c.o CMakeFiles/symbols.dir/symbols/mymodule_MP_mysub.c.o CMakeFiles/symbols.dir/symbols/_QMmy_modulePmy_sub.c.o CMakeFiles/symbols.dir/symbols/_QMmymodulePmysub.c.o
+        /usr/bin/ranlib libsymbols.a
+        gmake[3]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        [ 89%] Built target symbols
+        /usr/bin/gmake  -f CMakeFiles/FortranCInterface.dir/build.make CMakeFiles/FortranCInterface.dir/depend
+        gmake[3]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        cd /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /usr/share/cmake/Modules/FortranCInterface /usr/share/cmake/Modules/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/FortranCInterface.dir/DependInfo.cmake
+        Dependee "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/FortranCInterface.dir/DependInfo.cmake" is newer than depender "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/FortranCInterface.dir/depend.internal".
+        Dependee "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/CMakeDirectoryInformation.cmake" is newer than depender "/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles/FortranCInterface.dir/depend.internal".
+        Scanning dependencies of target FortranCInterface
+        gmake[3]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        /usr/bin/gmake  -f CMakeFiles/FortranCInterface.dir/build.make CMakeFiles/FortranCInterface.dir/build
+        gmake[3]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        [ 92%] Building Fortran object CMakeFiles/FortranCInterface.dir/main.F.o
+        /usr/bin/gfortran  -DCALL_MOD  -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/main.F -o CMakeFiles/FortranCInterface.dir/main.F.o
+        [ 94%] Building Fortran object CMakeFiles/FortranCInterface.dir/call_sub.f.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/call_sub.f -o CMakeFiles/FortranCInterface.dir/call_sub.f.o
+        [ 97%] Building Fortran object CMakeFiles/FortranCInterface.dir/call_mod.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /usr/share/cmake/Modules/FortranCInterface/call_mod.f90 -o CMakeFiles/FortranCInterface.dir/call_mod.f90.o
+        [100%] Linking Fortran executable FortranCInterface
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/FortranCInterface.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/FortranCInterface.dir/main.F.o CMakeFiles/FortranCInterface.dir/call_sub.f.o CMakeFiles/FortranCInterface.dir/call_mod.f90.o -o FortranCInterface  libsymbols.a libmyfort.a 
+        gmake[3]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        [100%] Built target FortranCInterface
+        gmake[2]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        /usr/bin/cmake -E cmake_progress_start /home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface/CMakeFiles 0
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/FortranCInterface»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckIncludeFile.cmake:95 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:252 (check_include_file)"
+      - "CMakeLists.txt:116 (CHECK_TYPE_SIZE)"
+    checks:
+      - "Looking for sys/types.h"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xzOAnd"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xzOAnd"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_RELEASE: "-O3 -DNDEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_SYS_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xzOAnd
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_6aa40/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6aa40.dir/build.make CMakeFiles/cmTC_6aa40.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xzOAnd»
+        Building C object CMakeFiles/cmTC_6aa40.dir/CheckIncludeFile.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -o CMakeFiles/cmTC_6aa40.dir/CheckIncludeFile.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xzOAnd/CheckIncludeFile.c
+        Linking C executable cmTC_6aa40
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6aa40.dir/link.txt --verbose=1
+        /usr/bin/gcc -O3 -DNDEBUG CMakeFiles/cmTC_6aa40.dir/CheckIncludeFile.c.o -o cmTC_6aa40 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xzOAnd»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckIncludeFile.cmake:95 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:253 (check_include_file)"
+      - "CMakeLists.txt:116 (CHECK_TYPE_SIZE)"
+    checks:
+      - "Looking for stdint.h"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2iBYQP"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2iBYQP"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_RELEASE: "-O3 -DNDEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_STDINT_H"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2iBYQP
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_b9f59/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b9f59.dir/build.make CMakeFiles/cmTC_b9f59.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2iBYQP»
+        Building C object CMakeFiles/cmTC_b9f59.dir/CheckIncludeFile.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -o CMakeFiles/cmTC_b9f59.dir/CheckIncludeFile.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2iBYQP/CheckIncludeFile.c
+        Linking C executable cmTC_b9f59
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b9f59.dir/link.txt --verbose=1
+        /usr/bin/gcc -O3 -DNDEBUG CMakeFiles/cmTC_b9f59.dir/CheckIncludeFile.c.o -o cmTC_b9f59 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2iBYQP»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckIncludeFile.cmake:95 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:254 (check_include_file)"
+      - "CMakeLists.txt:116 (CHECK_TYPE_SIZE)"
+    checks:
+      - "Looking for stddef.h"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tL7Sid"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tL7Sid"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_RELEASE: "-O3 -DNDEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_STDDEF_H"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tL7Sid
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_98262/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_98262.dir/build.make CMakeFiles/cmTC_98262.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tL7Sid»
+        Building C object CMakeFiles/cmTC_98262.dir/CheckIncludeFile.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -o CMakeFiles/cmTC_98262.dir/CheckIncludeFile.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tL7Sid/CheckIncludeFile.c
+        Linking C executable cmTC_98262
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_98262.dir/link.txt --verbose=1
+        /usr/bin/gcc -O3 -DNDEBUG CMakeFiles/cmTC_98262.dir/CheckIncludeFile.c.o -o cmTC_98262 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tL7Sid»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:148 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:273 (__check_type_size_impl)"
+      - "CMakeLists.txt:116 (CHECK_TYPE_SIZE)"
+    checks:
+      - "Check size of void *"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-gclrC2"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-gclrC2"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_RELEASE: "-O3 -DNDEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_VOID_P_SIZE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-gclrC2
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_0eb3a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_0eb3a.dir/build.make CMakeFiles/cmTC_0eb3a.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-gclrC2»
+        Building C object CMakeFiles/cmTC_0eb3a.dir/VOID_P_SIZE.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -o CMakeFiles/cmTC_0eb3a.dir/VOID_P_SIZE.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-gclrC2/VOID_P_SIZE.c
+        Linking C executable cmTC_0eb3a
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0eb3a.dir/link.txt --verbose=1
+        /usr/bin/gcc -O3 -DNDEBUG CMakeFiles/cmTC_0eb3a.dir/VOID_P_SIZE.c.o -o cmTC_0eb3a 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-gclrC2»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:148 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:273 (__check_type_size_impl)"
+      - "CMakeLists.txt:123 (CHECK_TYPE_SIZE)"
+    checks:
+      - "Check size of int"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vWOxP4"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vWOxP4"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_RELEASE: "-O3 -DNDEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_INT_SIZE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vWOxP4
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_eba3f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_eba3f.dir/build.make CMakeFiles/cmTC_eba3f.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vWOxP4»
+        Building C object CMakeFiles/cmTC_eba3f.dir/INT_SIZE.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -o CMakeFiles/cmTC_eba3f.dir/INT_SIZE.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vWOxP4/INT_SIZE.c
+        Linking C executable cmTC_eba3f
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eba3f.dir/link.txt --verbose=1
+        /usr/bin/gcc -O3 -DNDEBUG CMakeFiles/cmTC_eba3f.dir/INT_SIZE.c.o -o cmTC_eba3f 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vWOxP4»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:148 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckTypeSize.cmake:273 (__check_type_size_impl)"
+      - "CMakeLists.txt:124 (CHECK_TYPE_SIZE)"
+    checks:
+      - "Check size of long"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Z31KGP"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Z31KGP"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_RELEASE: "-O3 -DNDEBUG"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_LONG_SIZE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Z31KGP
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_aa9c4/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_aa9c4.dir/build.make CMakeFiles/cmTC_aa9c4.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Z31KGP»
+        Building C object CMakeFiles/cmTC_aa9c4.dir/LONG_SIZE.c.o
+        /usr/bin/gcc   -O3 -DNDEBUG -o CMakeFiles/cmTC_aa9c4.dir/LONG_SIZE.c.o -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Z31KGP/LONG_SIZE.c
+        Linking C executable cmTC_aa9c4
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aa9c4.dir/link.txt --verbose=1
+        /usr/bin/gcc -O3 -DNDEBUG CMakeFiles/cmTC_aa9c4.dir/LONG_SIZE.c.o -o cmTC_aa9c4 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Z31KGP»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:140 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_MOVE_ALLOC"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1vuZna"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1vuZna"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_MOVE_ALLOC"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1vuZna
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_f5070/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f5070.dir/build.make CMakeFiles/cmTC_f5070.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1vuZna»
+        Building Fortran object CMakeFiles/cmTC_f5070.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_MOVE_ALLOC  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1vuZna/src.f90 -o CMakeFiles/cmTC_f5070.dir/src.f90.o
+        Linking Fortran executable cmTC_f5070
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f5070.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_f5070.dir/src.f90.o -o cmTC_f5070 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1vuZna»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:155 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_VOLATILE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-yiIfw8"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-yiIfw8"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_VOLATILE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-yiIfw8
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_72594/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_72594.dir/build.make CMakeFiles/cmTC_72594.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-yiIfw8»
+        Building Fortran object CMakeFiles/cmTC_72594.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_VOLATILE  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-yiIfw8/src.f90 -o CMakeFiles/cmTC_72594.dir/src.f90.o
+        Linking Fortran executable cmTC_72594
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72594.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_72594.dir/src.f90.o -o cmTC_72594 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-yiIfw8»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:164 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_ISO_FORTRAN_ENV"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojFOlk"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojFOlk"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_ISO_FORTRAN_ENV"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojFOlk
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_c3d48/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c3d48.dir/build.make CMakeFiles/cmTC_c3d48.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojFOlk»
+        Building Fortran object CMakeFiles/cmTC_c3d48.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_ISO_FORTRAN_ENV  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojFOlk/src.f90 -o CMakeFiles/cmTC_c3d48.dir/src.f90.o
+        Linking Fortran executable cmTC_c3d48
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c3d48.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_c3d48.dir/src.f90.o -o cmTC_c3d48 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojFOlk»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:173 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_FLUSH_STMT"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-sTuQx0"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-sTuQx0"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_FLUSH_STMT"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-sTuQx0
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_b5485/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b5485.dir/build.make CMakeFiles/cmTC_b5485.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-sTuQx0»
+        Building Fortran object CMakeFiles/cmTC_b5485.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_FLUSH_STMT  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-sTuQx0/src.f90 -o CMakeFiles/cmTC_b5485.dir/src.f90.o
+        Linking Fortran executable cmTC_b5485
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b5485.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_b5485.dir/src.f90.o -o cmTC_b5485 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-sTuQx0»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:182 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_FINAL"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Q3uFf9"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Q3uFf9"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_FINAL"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Q3uFf9
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_7d8c6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7d8c6.dir/build.make CMakeFiles/cmTC_7d8c6.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Q3uFf9»
+        Building Fortran object CMakeFiles/cmTC_7d8c6.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_FINAL  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Q3uFf9/src.f90 -o CMakeFiles/cmTC_7d8c6.dir/src.f90.o
+        Linking Fortran executable cmTC_7d8c6
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7d8c6.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_7d8c6.dir/src.f90.o -o cmTC_7d8c6 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Q3uFf9»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:208 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_MOLD"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-GUJ846"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-GUJ846"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_MOLD"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-GUJ846
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_99d2a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_99d2a.dir/build.make CMakeFiles/cmTC_99d2a.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-GUJ846»
+        Building Fortran object CMakeFiles/cmTC_99d2a.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_MOLD  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-GUJ846/src.f90 -o CMakeFiles/cmTC_99d2a.dir/src.f90.o
+        Linking Fortran executable cmTC_99d2a
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_99d2a.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_99d2a.dir/src.f90.o -o cmTC_99d2a 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-GUJ846»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:228 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_EXTENDS_TYPE_OF"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-zzAf3d"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-zzAf3d"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_EXTENDS_TYPE_OF"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-zzAf3d
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_8bab2/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_8bab2.dir/build.make CMakeFiles/cmTC_8bab2.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-zzAf3d»
+        Building Fortran object CMakeFiles/cmTC_8bab2.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_EXTENDS_TYPE_OF  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-zzAf3d/src.f90 -o CMakeFiles/cmTC_8bab2.dir/src.f90.o
+        Linking Fortran executable cmTC_8bab2
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8bab2.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_8bab2.dir/src.f90.o -o cmTC_8bab2 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-zzAf3d»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckFortranSourceCompiles.cmake:101 (cmake_check_source_compiles)"
+      - "CMakeLists.txt:245 (CHECK_Fortran_SOURCE_COMPILES)"
+    checks:
+      - "Performing Test HAVE_SAME_TYPE_AS"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-4OoVKj"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-4OoVKj"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "HAVE_SAME_TYPE_AS"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-4OoVKj
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_f0b77/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f0b77.dir/build.make CMakeFiles/cmTC_f0b77.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-4OoVKj»
+        Building Fortran object CMakeFiles/cmTC_f0b77.dir/src.f90.o
+        /usr/bin/gfortran -DHAVE_SAME_TYPE_AS  -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-4OoVKj/src.f90 -o CMakeFiles/cmTC_f0b77.dir/src.f90.o
+        Linking Fortran executable cmTC_f0b77
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f0b77.dir/link.txt --verbose=1
+        /usr/bin/gfortran -O3 -DNDEBUG -O3 CMakeFiles/cmTC_f0b77.dir/src.f90.o -o cmTC_f0b77 
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-4OoVKj»
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1297 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_7738b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7738b.dir/build.make CMakeFiles/cmTC_7738b.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N»
+        Building Fortran object CMakeFiles/cmTC_7738b.dir/test_mpi.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N/test_mpi.f90 -o CMakeFiles/cmTC_7738b.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_7738b.dir/build.make:78: CMakeFiles/cmTC_7738b.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-bfqc9N»
+        gmake: *** [Makefile:127: cmTC_7738b/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1298 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F90_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F90_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_15c1f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_15c1f.dir/build.make CMakeFiles/cmTC_15c1f.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG»
+        Building Fortran object CMakeFiles/cmTC_15c1f.dir/test_mpi.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG/test_mpi.f90 -o CMakeFiles/cmTC_15c1f.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG/test_mpi.f90:2:11:
+        
+            2 |       use mpi
+              |           1
+        Fatal Error: Cannot open module file ‘mpi.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_15c1f.dir/build.make:78: CMakeFiles/cmTC_15c1f.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-i9XxqG»
+        gmake: *** [Makefile:127: cmTC_15c1f/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1299 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F08_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F08_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_ae6b8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ae6b8.dir/build.make CMakeFiles/cmTC_ae6b8.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7»
+        Building Fortran object CMakeFiles/cmTC_ae6b8.dir/test_mpi.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7/test_mpi.f90 -o CMakeFiles/cmTC_ae6b8.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7/test_mpi.f90:2:11:
+        
+            2 |       use mpi_f08
+              |           1
+        Fatal Error: Cannot open module file ‘mpi_f08.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_ae6b8.dir/build.make:78: CMakeFiles/cmTC_ae6b8.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tXqhj7»
+        gmake: *** [Makefile:127: cmTC_ae6b8/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1315 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER_NOKIND"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_RELEASE: "-O3 -DNDEBUG -O3"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER_NOKIND"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_9db40/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_9db40.dir/build.make CMakeFiles/cmTC_9db40.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH»
+        Building Fortran object CMakeFiles/cmTC_9db40.dir/test_mpi.f90.o
+        /usr/bin/gfortran   -O3 -DNDEBUG -O3 -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH/test_mpi.f90 -o CMakeFiles/cmTC_9db40.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_9db40.dir/build.make:78: CMakeFiles/cmTC_9db40.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-8TuEAH»
+        gmake: *** [Makefile:127: cmTC_9db40/fast] Errore 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1297 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_524ad/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_524ad.dir/build.make CMakeFiles/cmTC_524ad.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb»
+        Building Fortran object CMakeFiles/cmTC_524ad.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb/test_mpi.f90 -o CMakeFiles/cmTC_524ad.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_524ad.dir/build.make:78: CMakeFiles/cmTC_524ad.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-UMwmqb»
+        gmake: *** [Makefile:127: cmTC_524ad/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1298 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F90_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F90_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_1014b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1014b.dir/build.make CMakeFiles/cmTC_1014b.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI»
+        Building Fortran object CMakeFiles/cmTC_1014b.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI/test_mpi.f90 -o CMakeFiles/cmTC_1014b.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI/test_mpi.f90:2:11:
+        
+            2 |       use mpi
+              |           1
+        Fatal Error: Cannot open module file ‘mpi.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_1014b.dir/build.make:78: CMakeFiles/cmTC_1014b.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-coYAVI»
+        gmake: *** [Makefile:127: cmTC_1014b/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1299 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F08_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F08_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_c2cc5/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c2cc5.dir/build.make CMakeFiles/cmTC_c2cc5.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm»
+        Building Fortran object CMakeFiles/cmTC_c2cc5.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm/test_mpi.f90 -o CMakeFiles/cmTC_c2cc5.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm/test_mpi.f90:2:11:
+        
+            2 |       use mpi_f08
+              |           1
+        Fatal Error: Cannot open module file ‘mpi_f08.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_c2cc5.dir/build.make:78: CMakeFiles/cmTC_c2cc5.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vL99Xm»
+        gmake: *** [Makefile:127: cmTC_c2cc5/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1315 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER_NOKIND"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER_NOKIND"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_431d7/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_431d7.dir/build.make CMakeFiles/cmTC_431d7.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r»
+        Building Fortran object CMakeFiles/cmTC_431d7.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r/test_mpi.f90 -o CMakeFiles/cmTC_431d7.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_431d7.dir/build.make:78: CMakeFiles/cmTC_431d7.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-RQB76r»
+        gmake: *** [Makefile:127: cmTC_431d7/fast] Errore 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1297 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_cbb0b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_cbb0b.dir/build.make CMakeFiles/cmTC_cbb0b.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7»
+        Building Fortran object CMakeFiles/cmTC_cbb0b.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7/test_mpi.f90 -o CMakeFiles/cmTC_cbb0b.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_cbb0b.dir/build.make:78: CMakeFiles/cmTC_cbb0b.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-SAnnF7»
+        gmake: *** [Makefile:127: cmTC_cbb0b/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1298 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F90_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F90_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_5b19c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5b19c.dir/build.make CMakeFiles/cmTC_5b19c.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw»
+        Building Fortran object CMakeFiles/cmTC_5b19c.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw/test_mpi.f90 -o CMakeFiles/cmTC_5b19c.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw/test_mpi.f90:2:11:
+        
+            2 |       use mpi
+              |           1
+        Fatal Error: Cannot open module file ‘mpi.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_5b19c.dir/build.make:78: CMakeFiles/cmTC_5b19c.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-Ys1dnw»
+        gmake: *** [Makefile:127: cmTC_5b19c/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1299 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F08_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F08_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_06cbe/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_06cbe.dir/build.make CMakeFiles/cmTC_06cbe.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht»
+        Building Fortran object CMakeFiles/cmTC_06cbe.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht/test_mpi.f90 -o CMakeFiles/cmTC_06cbe.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht/test_mpi.f90:2:11:
+        
+            2 |       use mpi_f08
+              |           1
+        Fatal Error: Cannot open module file ‘mpi_f08.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_06cbe.dir/build.make:78: CMakeFiles/cmTC_06cbe.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-pdmtht»
+        gmake: *** [Makefile:127: cmTC_06cbe/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1315 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER_NOKIND"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER_NOKIND"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_a3900/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a3900.dir/build.make CMakeFiles/cmTC_a3900.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV»
+        Building Fortran object CMakeFiles/cmTC_a3900.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV/test_mpi.f90 -o CMakeFiles/cmTC_a3900.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_a3900.dir/build.make:78: CMakeFiles/cmTC_a3900.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-aEJCsV»
+        gmake: *** [Makefile:127: cmTC_a3900/fast] Errore 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1297 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_52d38/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_52d38.dir/build.make CMakeFiles/cmTC_52d38.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi»
+        Building Fortran object CMakeFiles/cmTC_52d38.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi/test_mpi.f90 -o CMakeFiles/cmTC_52d38.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_52d38.dir/build.make:78: CMakeFiles/cmTC_52d38.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-2XsXJi»
+        gmake: *** [Makefile:127: cmTC_52d38/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1298 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F90_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F90_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4e06b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4e06b.dir/build.make CMakeFiles/cmTC_4e06b.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa»
+        Building Fortran object CMakeFiles/cmTC_4e06b.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa/test_mpi.f90 -o CMakeFiles/cmTC_4e06b.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa/test_mpi.f90:2:11:
+        
+            2 |       use mpi
+              |           1
+        Fatal Error: Cannot open module file ‘mpi.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_4e06b.dir/build.make:78: CMakeFiles/cmTC_4e06b.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-LhedCa»
+        gmake: *** [Makefile:127: cmTC_4e06b/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1299 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F08_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F08_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_bc7a8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_bc7a8.dir/build.make CMakeFiles/cmTC_bc7a8.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7»
+        Building Fortran object CMakeFiles/cmTC_bc7a8.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7/test_mpi.f90 -o CMakeFiles/cmTC_bc7a8.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7/test_mpi.f90:2:11:
+        
+            2 |       use mpi_f08
+              |           1
+        Fatal Error: Cannot open module file ‘mpi_f08.mod’ for reading at (1): File o directory non esistente
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_bc7a8.dir/build.make:78: CMakeFiles/cmTC_bc7a8.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0OAZU7»
+        gmake: *** [Makefile:127: cmTC_bc7a8/fast] Errore 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1315 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER_NOKIND"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER_NOKIND"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_e9f74/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e9f74.dir/build.make CMakeFiles/cmTC_e9f74.dir/build
+        gmake[1]: ingresso nella directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr»
+        Building Fortran object CMakeFiles/cmTC_e9f74.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr/test_mpi.f90 -o CMakeFiles/cmTC_e9f74.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_e9f74.dir/build.make:78: CMakeFiles/cmTC_e9f74.dir/test_mpi.f90.o] Errore 1
+        gmake[1]: uscita dalla directory «/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-vQkMCr»
+        gmake: *** [Makefile:127: cmTC_e9f74/fast] Errore 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1297 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_dd541/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_dd541.dir/build.make CMakeFiles/cmTC_dd541.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj'
+        Building Fortran object CMakeFiles/cmTC_dd541.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj/test_mpi.f90 -o CMakeFiles/cmTC_dd541.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_dd541.dir/build.make:78: CMakeFiles/cmTC_dd541.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-0h21oj'
+        gmake: *** [Makefile:127: cmTC_dd541/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1298 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F90_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F90_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_51fcc/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_51fcc.dir/build.make CMakeFiles/cmTC_51fcc.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i'
+        Building Fortran object CMakeFiles/cmTC_51fcc.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i/test_mpi.f90 -o CMakeFiles/cmTC_51fcc.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i/test_mpi.f90:2:11:
+        
+            2 |       use mpi
+              |           1
+        Fatal Error: Cannot open module file 'mpi.mod' for reading at (1): No such file or directory
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_51fcc.dir/build.make:78: CMakeFiles/cmTC_51fcc.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ojGJ9i'
+        gmake: *** [Makefile:127: cmTC_51fcc/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1299 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F08_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F08_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_786a7/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_786a7.dir/build.make CMakeFiles/cmTC_786a7.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9'
+        Building Fortran object CMakeFiles/cmTC_786a7.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9/test_mpi.f90 -o CMakeFiles/cmTC_786a7.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9/test_mpi.f90:2:11:
+        
+            2 |       use mpi_f08
+              |           1
+        Fatal Error: Cannot open module file 'mpi_f08.mod' for reading at (1): No such file or directory
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_786a7.dir/build.make:78: CMakeFiles/cmTC_786a7.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-xNufd9'
+        gmake: *** [Makefile:127: cmTC_786a7/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1315 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER_NOKIND"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER_NOKIND"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_69864/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_69864.dir/build.make CMakeFiles/cmTC_69864.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV'
+        Building Fortran object CMakeFiles/cmTC_69864.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV/test_mpi.f90 -o CMakeFiles/cmTC_69864.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_69864.dir/build.make:78: CMakeFiles/cmTC_69864.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-MlwQLV'
+        gmake: *** [Makefile:127: cmTC_69864/fast] Error 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1297 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_602e3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_602e3.dir/build.make CMakeFiles/cmTC_602e3.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3'
+        Building Fortran object CMakeFiles/cmTC_602e3.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3/test_mpi.f90 -o CMakeFiles/cmTC_602e3.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_602e3.dir/build.make:78: CMakeFiles/cmTC_602e3.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-ZI8vA3'
+        gmake: *** [Makefile:127: cmTC_602e3/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1298 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F90_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F90_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_7897e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7897e.dir/build.make CMakeFiles/cmTC_7897e.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E'
+        Building Fortran object CMakeFiles/cmTC_7897e.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E/test_mpi.f90 -o CMakeFiles/cmTC_7897e.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E/test_mpi.f90:2:11:
+        
+            2 |       use mpi
+              |           1
+        Fatal Error: Cannot open module file 'mpi.mod' for reading at (1): No such file or directory
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_7897e.dir/build.make:78: CMakeFiles/cmTC_7897e.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-7Tgd8E'
+        gmake: *** [Makefile:127: cmTC_7897e/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1299 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F08_MODULE"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F08_MODULE"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_02759/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_02759.dir/build.make CMakeFiles/cmTC_02759.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C'
+        Building Fortran object CMakeFiles/cmTC_02759.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C/test_mpi.f90 -o CMakeFiles/cmTC_02759.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C/test_mpi.f90:2:11:
+        
+            2 |       use mpi_f08
+              |           1
+        Fatal Error: Cannot open module file 'mpi_f08.mod' for reading at (1): No such file or directory
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_02759.dir/build.make:78: CMakeFiles/cmTC_02759.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-1Vme6C'
+        gmake: *** [Makefile:127: cmTC_02759/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1315 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:271 (find_package)"
+    description: "The MPI test test_mpi for Fortran in mode F77_HEADER_NOKIND"
+    directories:
+      source: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R"
+      binary: "/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R"
+    cmakeVariables:
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_Fortran_FLAGS: ""
+      CMAKE_Fortran_FLAGS_DEBUG: "-g"
+      CMAKE_MODULE_PATH: "/home/stack/test_psblas/psblas3/cmake"
+    buildResult:
+      variable: "MPI_RESULT_Fortran_test_mpi_F77_HEADER_NOKIND"
+      cached: true
+      stdout: |
+        Change Dir: /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_acaf4/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_acaf4.dir/build.make CMakeFiles/cmTC_acaf4.dir/build
+        gmake[1]: Entering directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R'
+        Building Fortran object CMakeFiles/cmTC_acaf4.dir/test_mpi.f90.o
+        /usr/bin/gfortran    -c /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R/test_mpi.f90 -o CMakeFiles/cmTC_acaf4.dir/test_mpi.f90.o
+        /home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R/test_mpi.f90:3: Error: Can't open included file 'mpif.h'
+        gmake[1]: *** [CMakeFiles/cmTC_acaf4.dir/build.make:78: CMakeFiles/cmTC_acaf4.dir/test_mpi.f90.o] Error 1
+        gmake[1]: Leaving directory '/home/stack/test_psblas/psblas3/build/CMakeFiles/CMakeScratch/TryCompile-tv4k0R'
+        gmake: *** [Makefile:127: cmTC_acaf4/fast] Error 2
+        
+      exitCode: 2
+...
