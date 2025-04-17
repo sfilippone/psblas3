@@ -91,35 +91,35 @@ endif()
 # Fortran name mangling introspection
 #------------------------------------
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
-include(FortranCInterface)
-CapitalizeString(${FortranCInterface_GLOBAL__CASE} fc_case)
-message(STATUS "Name mangling capitalization: ${fc_case}")
-message(STATUS "Name mangling fortran global suffix underscore: ${FortranCInterface_GLOBAL__SUFFIX}")
-if(FortranCInterface_GLOBAL__SUFFIX STREQUAL "")
-  add_compile_options("-D${fc_case}Case")
-elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "_")
-  add_compile_options("-D${fc_case}Underscore")
-elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "__")
-  add_compile_options("-D${fc_case}DoubleUnderscore")
-else()
-  message( FATAL_ERROR "Fortran name mangling suffix, \'${FortranCInterface_GLOBAL__SUFFIX}\', unknown to PSBLAS")
-endif()
+#include(FortranCInterface)
+#CapitalizeString(${FortranCInterface_GLOBAL__CASE} fc_case)
+#message(STATUS "Name mangling capitalization: ${fc_case}")
+#message(STATUS "Name mangling fortran global suffix underscore: ${FortranCInterface_GLOBAL__SUFFIX}")
+#if(FortranCInterface_GLOBAL__SUFFIX STREQUAL "")
+#  add_compile_options("-D${fc_case}Case")
+#elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "_")
+#  add_compile_options("-D${fc_case}Underscore")
+#elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "__")
+#  add_compile_options("-D${fc_case}DoubleUnderscore")
+#else()
+#  message( FATAL_ERROR "Fortran name mangling suffix, \'${FortranCInterface_GLOBAL__SUFFIX}\', unknown to PSBLAS")
+#endif()
 
 
-  message(STATUS "win? ${WIN32};")
-if(TRUE)#NOT ${WIN32})
+#  message(STATUS "win? ${WIN32};")
+#if(TRUE)#NOT ${WIN32})
 #previous check did not work if WIN32 is empty string
   #----------------------------------------------
   # Determine system endian-ness and pointer size
   #----------------------------------------------
-  include(TestBigEndian)
-  TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
-  if(IS_BIG_ENDIAN)
-    message( STATUS "System appears to be big endian.")
-  else()
-    message( STATUS "System appears to be little endian.")
-    add_compile_options(-DLittleEndian)
-  endif()
+#  include(TestBigEndian)
+#  TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+#  if(IS_BIG_ENDIAN)
+#    message( STATUS "System appears to be big endian.")
+#  else()
+#    message( STATUS "System appears to be little endian.")
+#    add_compile_options(-DLittleEndian)
+#  endif()
 #  include(CheckTypeSize)
 #  CHECK_TYPE_SIZE("void *" VOID_P_SIZE LANGUAGE C)
 #  if(${VOID_P_SIZE} EQUAL 8)
@@ -128,7 +128,7 @@ if(TRUE)#NOT ${WIN32})
 #  message(STATUS "Have 64bit pointers")
  
   
-endif()
+#endif()
 
 
 
@@ -156,9 +156,11 @@ set(PSB_LPKDEF "#define PSB_LPK${LPK_SIZE}")
 message(STATUS "Using IPKDEF: ${PSB_IPKDEF}")
 message(STATUS "Using LPKDEF: ${PSB_LPKDEF}")
 
-add_compile_options(-DPSB_IPK${IPK_SIZE})
-add_compile_options(-DPSB_LPK${LPK_SIZE})
-
+#add_compile_options(-DPSB_IPK${IPK_SIZE})
+#add_compile_options(-DPSB_LPK${LPK_SIZE})
+# Add PSB_IPK/LPK flag only for fortran files.
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_IPK${IPK_SIZE}")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_LPK${LPK_SIZE}")
 
 
   
