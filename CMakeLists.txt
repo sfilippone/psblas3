@@ -141,7 +141,7 @@ if(NOT DEFINED CMAKE_PSB_IPK)
     set(CMAKE_PSB_IPK ${DEFAULT_IPK_SIZE} CACHE STRING "Size of IPK (default: 4)")
 endif()
 
-if(NOT DEFINED CMAKE_PSB_LPK)
+if(NOT DEFINED CMAKE_PSB_LPK)  
     set(CMAKE_PSB_LPK ${DEFAULT_LPK_SIZE} CACHE STRING "Size of LPK (default: 8)")
 endif()
 
@@ -181,7 +181,8 @@ end
   SRC_EXT f90
   )
 if(HAVE_MOVE_ALLOC)
-  add_compile_options(-DHAVE_MOVE_ALLOC)
+  #add_compile_options(-DHAVE_MOVE_ALLOC)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DHAVE_MOVE_ALLOC")
   message(STATUS "-DHAVE_MOVE_ALLOC")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
@@ -190,7 +191,8 @@ CHECK_Fortran_SOURCE_COMPILES(
   SRC_EXT f90
   )
 if(HAVE_VOLATILE)
-  add_compile_options(-DPSB_HAVE_VOLATILE)
+  #add_compile_options(-DPSB_HAVE_VOLATILE)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_VOLATILE")
   message(STATUS "-DPSB_HAVE_VOLATILE")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
@@ -199,7 +201,8 @@ CHECK_Fortran_SOURCE_COMPILES(
   SRC_EXT f90
   )
 if(HAVE_ISO_FORTRAN_ENV)
-  add_compile_options(-DPSB_HAVE_ISO_FORTRAN_ENV)
+  #add_compile_options(-DPSB_HAVE_ISO_FORTRAN_ENV)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_ISO_FORTRAN_ENV")
   message(STATUS "-DPSB_HAVE_ISO_FORTRAN_ENV")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
@@ -208,7 +211,8 @@ CHECK_Fortran_SOURCE_COMPILES(
   SRC_EXT f90
   )
 if(HAVE_FLUSH_STMT)
-  add_compile_options(-DPSB_HAVE_FLUSH_STMT)
+  #add_compile_options(-DPSB_HAVE_FLUSH_STMT)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_FLUSH_STMT")
   message(STATUS "-DPSB_HAVE_FLUSH_STMT")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
@@ -235,6 +239,7 @@ end program"
   )
 if(HAVE_FINAL)
   add_compile_options(-DPSB_HAVE_FINAL)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_FINAL")
   message(STATUS "-DPSB_HAVE_FINAL")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
@@ -254,8 +259,9 @@ end program"
   HAVE_MOLD
   SRC_EXT f90)
 if(HAVE_MOLD)
-  add_compile_options(-DHAVE_MOLD)
-  message(STATUS "-DHAVE_MOLD")
+  add_compile_options(-DPSB_HAVE_MOLD)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_MOLD")
+  message(STATUS "-DPSB_HAVE_MOLD")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
   "
@@ -271,8 +277,9 @@ end program "
   HAVE_EXTENDS_TYPE_OF
   SRC_EXT f90)
 if(HAVE_EXTENDS_TYPE_OF)
-  add_compile_options(-DHAVE_EXTENDS_TYPE_OF)
-  message(STATUS "-DHAVE_EXTENDS_TYPE_OF")
+  add_compile_options(-DPSB_HAVE_EXTENDS_TYPE_OF)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_EXTENDS_TYPE_OF")
+  message(STATUS "-DPSB_HAVE_EXTENDS_TYPE_OF")
 endif()
 CHECK_Fortran_SOURCE_COMPILES(
   "
@@ -293,8 +300,9 @@ end program"
   HAVE_SAME_TYPE_AS
   SRC_EXT f90)
 if(HAVE_SAME_TYPE_AS)
-  add_compile_options(-DHAVE_SAME_TYPE_AS)
-  message(STATUS "-DHAVE_SAME_TYPE_AS")
+  add_compile_options(-DPSB_HAVE_SAME_TYPE_AS)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_SAME_TYPE_AS")
+  message(STATUS "-DPSB_HAVE_SAME_TYPE_AS")
 endif()
 
 #----------------------------------------------------------------------------
@@ -371,7 +379,9 @@ if(NOT APPLE)
 endif()
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
-add_compile_options(-DPSB_HAVE_LAPACK)
+#add_compile_options(-DPSB_HAVE_LAPACK)
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_LAPACK")
+
 
 
 #--------------------------------
@@ -440,8 +450,9 @@ if(METIS_FOUND)
   check_metis_real_type(double)
 
   # Set HAVE_METIS if METIS is found
-  add_compile_options(-DPSB_HAVE_METIS)
-  
+  #add_compile_options(-DPSB_HAVE_METIS)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
+
   
   
   
