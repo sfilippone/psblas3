@@ -828,10 +828,10 @@ if(METIS_FOUND)
     PUBLIC ${METIS_INCLUDES})
   target_link_libraries(util
     PUBLIC ${METIS_LIBRARIES})
-  target_compile_definitions(psb_util_C
-    PUBLIC PSB_HAVE_METIS) #TDDO: CHECK IF THAT _ IS CORRECT
-  target_compile_definitions(util
-    PUBLIC PSB_HAVE_METIS)
+#  target_compile_definitions(psb_util_C
+#    PUBLIC PSB_HAVE_METIS) #TDDO: CHECK IF THAT _ IS CORRECT
+#  target_compile_definitions(util
+#    PUBLIC PSB_HAVE_METIS)
 endif()
 
 
