@@ -238,7 +238,7 @@ end program"
   SRC_EXT f90
   )
 if(HAVE_FINAL)
-  add_compile_options(-DPSB_HAVE_FINAL)
+  # add_compile_options(-DPSB_HAVE_FINAL)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_FINAL")
   message(STATUS "-DPSB_HAVE_FINAL")
 endif()
@@ -259,7 +259,7 @@ end program"
   HAVE_MOLD
   SRC_EXT f90)
 if(HAVE_MOLD)
-  add_compile_options(-DPSB_HAVE_MOLD)
+  # add_compile_options(-DPSB_HAVE_MOLD)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_MOLD")
   message(STATUS "-DPSB_HAVE_MOLD")
 endif()
@@ -277,7 +277,7 @@ end program "
   HAVE_EXTENDS_TYPE_OF
   SRC_EXT f90)
 if(HAVE_EXTENDS_TYPE_OF)
-  add_compile_options(-DPSB_HAVE_EXTENDS_TYPE_OF)
+  # add_compile_options(-DPSB_HAVE_EXTENDS_TYPE_OF)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_EXTENDS_TYPE_OF")
   message(STATUS "-DPSB_HAVE_EXTENDS_TYPE_OF")
 endif()
@@ -300,7 +300,7 @@ end program"
   HAVE_SAME_TYPE_AS
   SRC_EXT f90)
 if(HAVE_SAME_TYPE_AS)
-  add_compile_options(-DPSB_HAVE_SAME_TYPE_AS)
+  # add_compile_options(-DPSB_HAVE_SAME_TYPE_AS)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_SAME_TYPE_AS")
   message(STATUS "-DPSB_HAVE_SAME_TYPE_AS")
 endif()
@@ -400,6 +400,11 @@ if(METIS_FOUND)
   set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
   set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
 
+  # Configure the header file
+  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+ 
+
+
 
   # Check for real sizes using try_compile
   include(CheckCSourceCompiles)
@@ -444,6 +449,9 @@ if(METIS_FOUND)
   check_metis_real_type(float)
   check_metis_real_type(double)
 
+  # Set HAVE_METIS if METIS is found
+  #add_compile_options(-DPSB_HAVE_METIS)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
 
   
   
@@ -490,7 +498,6 @@ if(METIS_FOUND)
 endif()
 
 endif()
-
 
 
 
