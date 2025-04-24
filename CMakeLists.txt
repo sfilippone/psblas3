@@ -400,11 +400,6 @@ if(METIS_FOUND)
   set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
   set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
 
-  # Configure the header file
-  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
- 
-
-
 
   # Check for real sizes using try_compile
   include(CheckCSourceCompiles)
@@ -433,11 +428,11 @@ if(METIS_FOUND)
         string(STRIP "${type_size}" type_size)
         if (type_name STREQUAL "float")
             set(PSB_METIS_REAL_32 "${type_size}" PARENT_SCOPE)
-            add_definitions(-DPSB_METIS_REAL_32)
+	    #         add_definitions(-DPSB_METIS_REAL_32)
             set(CREALMETIS "#define PSB_METIS_REAL_32" PARENT_SCOPE)	
         elseif (type_name STREQUAL "double")
             set(PSB_METIS_REAL_64 "${type_size}" PARENT_SCOPE)
-            add_definitions(-DPSB_METIS_REAL_64)
+            #add_definitions(-DPSB_METIS_REAL_64)
             set(CREALMETIS "#define PSB_METIS_REAL_64" PARENT_SCOPE)		    
         endif()
     else()
@@ -449,9 +444,6 @@ if(METIS_FOUND)
   check_metis_real_type(float)
   check_metis_real_type(double)
 
-  # Set HAVE_METIS if METIS is found
-  #add_compile_options(-DPSB_HAVE_METIS)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
 
   
   
@@ -473,6 +465,7 @@ if(METIS_FOUND)
     if(METIS_INDEX STREQUAL "64")
         # Mismatch between METIS size and PSBLAS LPK
       message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    set(METIS_FOUND  FALSE)  
     endif()
   endif()
 
@@ -480,13 +473,21 @@ if(METIS_FOUND)
     if(METIS_INDEX STREQUAL "32")
         # Mismatch between METIS size and PSBLAS LPK
             message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
+    set(METIS_FOUND  FALSE)
     endif()
   endif()
 
-
+ if(METIS_FOUND)
   set(CHAVEMETIS "#define PSB_HAVE_METIS")
   set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
 #  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
+  # Configure the header file
+  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+  # Set HAVE_METIS if METIS is found
+  #add_compile_options(-DPSB_HAVE_METIS)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
+
+endif()
 
 endif()
 
