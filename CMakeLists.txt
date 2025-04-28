@@ -394,14 +394,14 @@ find_package(METIS)
 if(METIS_FOUND)
   message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
   # Make sure this path is correct
-  set(METISINCFILE "metis.h")  # Adjust this to your actual path
+#  set(METISINCFILE "metis.h")  # Adjust this to your actual path
 
   # Specify the configuration file
-  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
-  set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
+  #  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
+  # set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
 
   # Configure the header file
-  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+  #configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
  
 
 
@@ -451,7 +451,7 @@ if(METIS_FOUND)
 
   # Set HAVE_METIS if METIS is found
   #add_compile_options(-DPSB_HAVE_METIS)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
+  #  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
 
   
   
@@ -486,6 +486,23 @@ if(METIS_FOUND)
   endif()
 
  if(METIS_FOUND)
+
+    # Make sure this path is correct
+  set(METISINCFILE "metis.h")  # Adjust this to your actual path
+
+  # Specify the configuration file
+  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
+  set(HEADER_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/psb_metis_int.h")
+
+  # Configure the header file
+  configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
+
+  # Set HAVE_METIS if METIS is found and coherent with the system settings
+  #add_compile_options(-DPSB_HAVE_METIS)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
+
+
+   
   set(CHAVEMETIS "#define PSB_HAVE_METIS")
   set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
 #  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
