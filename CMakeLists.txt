@@ -32,7 +32,7 @@ message( STATUS "Building PSBLAS1 version: ${full_git_describe}" )
 #------------------------------------------
 project(psblas
   VERSION "${PSBLAS_Version}"
-  LANGUAGES C Fortran)
+  LANGUAGES C Fortran CUDA)
 
 #--------------------------------------------------
 # Set option to allow building against OpenCoarrays
@@ -945,13 +945,14 @@ if(PSB_BUILD_CUDA)
 
     # Include the CMakeLists for the cbind library
     include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
+    include_directories("/opt/cuda/12.8/include")
+    message(STATUS "${CUDA_HOME};;;")
 
 
+    #    find_package(CUDA REQUIRED)
 
-
-    find_package(CUDA REQUIRED)
-
-
+    enable_language(CUDA)
+    
     # Define the CUDA library
     #if(WIN32)
         #add_library(psb_cuda_C STATIC ${cuda_source_files})
@@ -966,8 +967,28 @@ if(PSB_BUILD_CUDA)
     #else()
         #add_library(psb_cuda_C OBJECT ${cuda_source_files})
     #endif()
-    
-    add_library(psb_cuda_C OBJECT ${cuda_source_c_files})
+   
+    foreach(path IN LISTS cuda_header_C_files)
+
+        # Copy the header file to the include directory
+        file(COPY "${path}" DESTINATION "${CMAKE_BINARY_DIR}/include")
+        
+
+    endforeach()
+    message(STATUS "Copied .h files to ${CMAKE_BINARY_DIR}/include")
+    foreach(path IN LISTS cuda_header_cu_files)
+
+        # Copy the header file to the include directory
+        file(COPY "${path}" DESTINATION "${CMAKE_BINARY_DIR}/include")
+
+
+    endforeach()
+    message(STATUS "Copied .cuh files to ${CMAKE_BINARY_DIR}/include")
+
+
+
+
+    add_library(psb_cuda_C OBJECT ${cuda_source_C_files} ${cuda_source_cu_files})
     
 
     # Create the main CUDA library
@@ -978,12 +999,13 @@ if(PSB_BUILD_CUDA)
         PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE
         OUTPUT_NAME psb_cuda
-        LINKER_LANGUAGE C)
+	LINKER_LANGUAGE C)
     
     # Include directories for the CUDA library
     target_include_directories(cuda PUBLIC
         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>  # Path for building
         $<INSTALL_INTERFACE:modules>  # Path for installation
+        /opt/cuda/12.8/include
     )
 
     # Link with other necessary libraries
