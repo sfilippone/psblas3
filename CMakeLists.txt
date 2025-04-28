@@ -959,11 +959,13 @@ option(PSB_BUILD_CUDA "Build CUDA code" OFF)
 
 if(PSB_BUILD_CUDA)
 
-
+    if(NOT DEFINED PSB_CUDA_PATH)
+        set(PSB_CUDA_PATH "/opt/cuda/12.8")    
+    endif()
     # Include the CMakeLists for the cbind library
     include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
-    include_directories("/opt/cuda/12.8/include")
-    message(STATUS "${CUDA_HOME};;;")
+    include_directories("${PSB_CUDA_PATH}/include")
+    message(STATUS "${PSB_CUDA_PATH}")
 
 
     #    find_package(CUDA REQUIRED)
