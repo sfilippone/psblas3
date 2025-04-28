@@ -938,9 +938,9 @@ message(STATUS "Copied .h files to ${CMAKE_BINARY_DIR}/include")
 
 
 # Optionally check for CUDA requirement
-option(BUILD_CUDA "Build CUDA code" OFF)
+option(PSB_BUILD_CUDA "Build CUDA code" OFF)
 
-if(BUILD_CUDA)
+if(PSB_BUILD_CUDA)
 
 
     # Include the CMakeLists for the cbind library
