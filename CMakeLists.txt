@@ -651,7 +651,48 @@ if(MPI_FOUND)
   endif()
 endif()
 
+# Optionally check for CUDA requirement
+option(PSB_BUILD_CUDA "Build CUDA code" OFF)
 
+if(PSB_BUILD_CUDA)
+
+    if(NOT DEFINED PSB_CUDA_PATH)
+            set(PSB_CUDA_PATH "/opt/cuda/12.8")
+    endif()
+    # Include the CMakeLists for the cbind library
+    include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
+    include_directories("${PSB_CUDA_PATH}/include")
+    message(STATUS "${PSB_CUDA_PATH}")
+
+
+    #    find_package(CUDA REQUIRED)
+
+    enable_language(CUDA)
+
+    # Check for CUDA version
+    set(PSB_CUDA_VERSION 12800)
+    if(PSB_CUDA_VERSION)
+            message(STATUS "CUDA version: ${PSB_CUDA_VERSION}")
+
+        # Define macros for CUDA version
+        #        add_definitions(-DPSB_HAVE_CUDA)
+        #       add_definitions(-DPSB_CUDA_VERSION=${PSB_CUDA_VERSION})
+        math(EXPR PSB_CUDA_SHORT_VERSION "${PSB_CUDA_VERSION} / 1000")
+        #        add_definitions(-DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION})
+
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_CUDA")
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}")
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION}")
+
+
+        set(CHAVECUDA "#define PSB_HAVE_CUDA")
+        set(CSHORTVCUDA "#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}")
+        set(CVERSIONCUDA "#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}")
+
+    else()
+        message(FATAL_ERROR "CUDA version not found!")
+    endif()
+endif()
 
 #------------------------------------------
 # Configure the psb_config.h file
@@ -955,46 +996,46 @@ message(STATUS "Copied .h files to ${CMAKE_BINARY_DIR}/include")
 
 
 # Optionally check for CUDA requirement
-option(PSB_BUILD_CUDA "Build CUDA code" OFF)
+#option(PSB_BUILD_CUDA "Build CUDA code" OFF)
 
 if(PSB_BUILD_CUDA)
 
-    if(NOT DEFINED PSB_CUDA_PATH)
-	    set(PSB_CUDA_PATH "/opt/cuda/12.8")    
-    endif()
+	#    if(NOT DEFINED PSB_CUDA_PATH)
+	#   set(PSB_CUDA_PATH "/opt/cuda/12.8")    
+	#endif()
     # Include the CMakeLists for the cbind library
-    include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
-    include_directories("${PSB_CUDA_PATH}/include")
-    message(STATUS "${PSB_CUDA_PATH}")
+    #include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
+    #include_directories("${PSB_CUDA_PATH}/include")
+    #message(STATUS "${PSB_CUDA_PATH}")
 
 
     #    find_package(CUDA REQUIRED)
 
-    enable_language(CUDA)
+    #enable_language(CUDA)
     
     # Check for CUDA version
-    set(PSB_CUDA_VERSION 12800)
-    if(PSB_CUDA_VERSION)
-	    message(STATUS "CUDA version: ${PSB_CUDA_VERSION}")
+    #set(PSB_CUDA_VERSION 12800)
+    #if(PSB_CUDA_VERSION)
+    #  message(STATUS "CUDA version: ${PSB_CUDA_VERSION}")
 
 	# Define macros for CUDA version
 	#        add_definitions(-DPSB_HAVE_CUDA)
 	#	add_definitions(-DPSB_CUDA_VERSION=${PSB_CUDA_VERSION})
-	math(EXPR PSB_CUDA_SHORT_VERSION "${PSB_CUDA_VERSION} / 1000")
+	#math(EXPR PSB_CUDA_SHORT_VERSION "${PSB_CUDA_VERSION} / 1000")
 	#        add_definitions(-DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION})
        
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_CUDA")
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}")
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION}")
+	#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_CUDA")
+	#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}")
+	#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION}")
 
 
-        set(CHAVECUDA "#define PSB_HAVE_CUDA")
-	set(CSHORTVCUDA "#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}")
-	set(CVERSIONCUDA "#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}")
+	#set(CHAVECUDA "#define PSB_HAVE_CUDA")
+	#set(CSHORTVCUDA "#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}")
+	#set(CVERSIONCUDA "#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}")
 
-    else()
-        message(FATAL_ERROR "CUDA version not found!")
-    endif()
+	#else()
+	#message(FATAL_ERROR "CUDA version not found!")
+	#endif()
 
 
 
