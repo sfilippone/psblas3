@@ -1038,8 +1038,6 @@ if(PSB_BUILD_CUDA)
 
     # Create the main CUDA library
     add_library(cuda ${cuda_source_files})
-    # Create the main CUDA library
-    add_library(cuda ${cuda_source_files})
 
     # Set properties for the CUDA library
     set_target_properties(cuda
