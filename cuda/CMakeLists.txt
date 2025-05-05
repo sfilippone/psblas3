@@ -3,15 +3,15 @@ set(PSB_cuda_source_files
   psb_cuda_mod.F90
   c_cusparse_mod.F90
   psb_d_cuda_csrg_mat_mod.F90
-  psb_i_cuda_dnsg_mat_mod.F90
+  #psb_i_cuda_dnsg_mat_mod.F90
   psb_z_cuda_diag_mat_mod.F90
   psb_i_vectordev_mod.F90
   psb_z_cuda_csrg_mat_mod.F90
   cusparse_mod.F90
-  impl/psb_z_cuda_hdiag_csmv.F90
+  #impl/psb_z_cuda_hdiag_csmv.F90
   impl/psb_c_cuda_hybg_csmm.F90
   impl/psb_c_cuda_csrg_vect_mv.F90
-  impl/psb_c_cuda_elg_trim.f90
+  #  impl/psb_c_cuda_elg_trim.f90
   impl/psb_s_cuda_mv_elg_from_fmt.F90
   impl/psb_c_cuda_csrg_inner_vect_sv.F90
   impl/psb_c_cuda_cp_hlg_from_coo.F90
@@ -28,7 +28,7 @@ set(PSB_cuda_source_files
   impl/psb_s_cuda_elg_scal.F90
   impl/psb_c_cuda_mv_csrg_from_fmt.F90
   impl/psb_z_cuda_mv_hlg_from_fmt.F90
-  impl/psb_d_cuda_elg_trim.f90
+  #impl/psb_d_cuda_elg_trim.f90
   impl/psb_c_cuda_hybg_inner_vect_sv.F90
   impl/psb_c_cuda_cp_elg_from_fmt.F90
   impl/psb_s_cuda_hybg_vect_mv.F90
@@ -66,7 +66,7 @@ set(PSB_cuda_source_files
   impl/psb_s_cuda_elg_asb.f90
   impl/psb_s_cuda_cp_hlg_from_coo.F90
   impl/psb_s_cuda_hybg_csmv.F90
-  impl/psb_z_cuda_elg_trim.f90
+  #impl/psb_z_cuda_elg_trim.f90
   impl/psb_z_cuda_csrg_inner_vect_sv.F90
   impl/psb_s_cuda_hybg_to_gpu.F90
   impl/psb_s_cuda_hybg_mold.F90
@@ -90,11 +90,11 @@ set(PSB_cuda_source_files
   impl/psb_c_cuda_elg_asb.f90
   impl/psb_d_cuda_csrg_vect_mv.F90
   impl/psb_d_cuda_hybg_reallocate_nz.F90
-  impl/psb_z_cuda_hdiag_vect_mv.F90
+  #impl/psb_z_cuda_hdiag_vect_mv.F90
   impl/psb_z_cuda_hybg_to_gpu.F90
   impl/psb_d_cuda_mv_hdiag_from_coo.F90
   impl/psb_c_cuda_cp_elg_from_coo.F90
-  impl/psb_c_cuda_hdiag_to_gpu.F90
+  #impl/psb_c_cuda_hdiag_to_gpu.F90
   impl/psb_c_cuda_hlg_inner_vect_sv.F90
   impl/psb_z_cuda_diag_to_gpu.F90
   impl/psb_c_cuda_elg_to_gpu.F90
@@ -195,7 +195,7 @@ set(PSB_cuda_source_files
   impl/psb_s_cuda_mv_diag_from_coo.F90
   impl/psb_c_cuda_hybg_mold.F90
   impl/psb_s_cuda_hlg_from_gpu.F90
-  impl/psb_c_cuda_hdiag_csmv.F90
+  #impl/psb_c_cuda_hdiag_csmv.F90
   impl/psb_z_cuda_cp_hlg_from_coo.F90
   impl/psb_c_cuda_hlg_csmm.F90
   impl/psb_d_cuda_hlg_csmm.F90
@@ -250,7 +250,7 @@ set(PSB_cuda_source_files
   impl/psb_z_cuda_csrg_reallocate_nz.F90
   impl/psb_c_cuda_hlg_to_gpu.F90
   impl/psb_c_cuda_csrg_allocate_mnnz.F90
-  impl/psb_s_cuda_elg_trim.f90
+  #impl/psb_s_cuda_elg_trim.f90
   impl/psb_c_cuda_elg_reallocate_nz.F90
   impl/psb_d_cuda_csrg_csmv.F90
   impl/psb_z_cuda_csrg_scals.F90
@@ -273,7 +273,7 @@ set(PSB_cuda_source_files
   impl/psb_s_cuda_hlg_to_gpu.F90
   impl/psb_d_cuda_hybg_mold.F90
   impl/psb_s_cuda_hybg_scal.F90
-  impl/psb_c_cuda_hdiag_vect_mv.F90
+#  impl/psb_c_cuda_hdiag_vect_mv.F90
   impl/psb_z_cuda_elg_from_gpu.F90
   impl/psb_c_cuda_mv_hybg_from_fmt.F90
   impl/psb_s_cuda_elg_to_gpu.F90
@@ -296,7 +296,7 @@ set(PSB_cuda_source_files
   impl/psb_z_cuda_elg_csmv.F90
   impl/psb_s_cuda_hdiag_to_gpu.F90
   impl/psb_s_cuda_hlg_allocate_mnnz.F90
-  impl/psb_z_cuda_hdiag_to_gpu.F90
+#  impl/psb_z_cuda_hdiag_to_gpu.F90
   impl/psb_s_cuda_cp_hdiag_from_coo.F90
   impl/psb_z_cuda_csrg_scal.F90
   impl/psb_c_cuda_elg_vect_mv.F90
@@ -311,8 +311,8 @@ set(PSB_cuda_source_files
   psb_d_cuda_elg_mat_mod.F90
   psb_d_cuda_hlg_mat_mod.F90
   hdiagdev_mod.F90
-  psb_s_cuda_hybg_mat_mod.F90
-  psb_d_cuda_hybg_mat_mod.F90
+  #psb_s_cuda_hybg_mat_mod.F90
+  #psb_d_cuda_hybg_mat_mod.F90
   dnsdev_mod.F90
   psb_c_cuda_hlg_mat_mod.F90
   psb_i_cuda_vect_mod.F90
@@ -321,21 +321,21 @@ set(PSB_cuda_source_files
   psb_d_cuda_hdiag_mat_mod.F90
   psb_z_cuda_hdiag_mat_mod.F90
   psb_z_cuda_vect_mod.F90
-  psb_z_cuda_hybg_mat_mod.F90
+  #psb_z_cuda_hybg_mat_mod.F90
   psb_c_cuda_elg_mat_mod.F90
   psb_c_cuda_dnsg_mat_mod.F90
   elldev_mod.F90
   psb_c_cuda_diag_mat_mod.F90
   psb_z_cuda_elg_mat_mod.F90
-  psb_i_cuda_diag_mat_mod.F90
-  psb_i_cuda_hdiag_mat_mod.F90
+  #psb_i_cuda_diag_mat_mod.F90
+  #psb_i_cuda_hdiag_mat_mod.F90
   psb_c_cuda_vect_mod.F90
   psb_d_cuda_dnsg_mat_mod.F90
   psb_s_cuda_dnsg_mat_mod.F90
   psb_s_cuda_vect_mod.F90
   hlldev_mod.F90
   psb_z_cuda_dnsg_mat_mod.F90
-  psb_i_cuda_csrg_mat_mod.F90
+  #psb_i_cuda_csrg_mat_mod.F90
   psb_z_cuda_hlg_mat_mod.F90
   psb_c_vectordev_mod.F90
   psb_s_cuda_diag_mat_mod.F90
@@ -343,17 +343,17 @@ set(PSB_cuda_source_files
   psb_s_cuda_hlg_mat_mod.F90
   core_mod.f90
   psb_d_cuda_diag_mat_mod.F90
-  psb_i_cuda_hybg_mat_mod.F90
+  #psb_i_cuda_hybg_mat_mod.F90
   psb_z_vectordev_mod.F90
-  psb_i_cuda_hlg_mat_mod.F90
+  #psb_i_cuda_hlg_mat_mod.F90
   psb_d_cuda_vect_mod.F90
   psb_cuda_env_mod.F90
   psb_c_cuda_hdiag_mat_mod.F90
   psb_s_vectordev_mod.F90
   base_cusparse_mod.F90
-  psb_i_cuda_elg_mat_mod.F90
+  #psb_i_cuda_elg_mat_mod.F90
   psb_vectordev_mod.f90
-  psb_c_cuda_hybg_mat_mod.F90
+  #psb_c_cuda_hybg_mat_mod.F90
   s_cusparse_mod.F90
   d_cusparse_mod.F90
   diagdev_mod.F90
