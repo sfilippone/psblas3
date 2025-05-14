@@ -30,7 +30,7 @@
 !   
 !    
 subroutine psb_smatdist(a_glob, a, ctxt, desc_a,&
-     & info, parts, vg, vsz, inroot,fmt,mold)
+     & info, parts, vg, vsz, inroot,fmt,amold,imold)
   !
   ! an utility subroutine to distribute a matrix among processors
   ! according to a user defined data distribution, using
@@ -81,7 +81,8 @@ subroutine psb_smatdist(a_glob, a, ctxt, desc_a,&
   integer(psb_ipk_), intent(out)       :: info
   integer(psb_ipk_), optional       :: inroot
   character(len=*), optional :: fmt
-  class(psb_s_base_sparse_mat), optional :: mold
+  class(psb_s_base_sparse_mat), optional :: amold
+  class(psb_i_base_vect_type), optional, intent(in) :: imold
   procedure(psb_parts), optional  :: parts
   integer(psb_ipk_), optional     :: vg(:)
   integer(psb_ipk_), optional     :: vsz(:)
@@ -321,7 +322,7 @@ subroutine psb_smatdist(a_glob, a, ctxt, desc_a,&
 
   call psb_barrier(ctxt)
   t0 = psb_wtime()
-  call psb_cdasb(desc_a,info)     
+  call psb_cdasb(desc_a,info,mold=imold)     
   t1 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -332,7 +333,7 @@ subroutine psb_smatdist(a_glob, a, ctxt, desc_a,&
 
   call psb_barrier(ctxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,afmt=fmt,mold=mold)     
+  call psb_spasb(a,desc_a,info,afmt=fmt,mold=amold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -371,7 +372,7 @@ end subroutine psb_smatdist
 
 
 subroutine psb_lsmatdist(a_glob, a, ctxt, desc_a,&
-     & info, parts, vg, vsz, inroot,fmt,mold)
+     & info, parts, vg, vsz, inroot,fmt,amold,imold)
   !
   ! an utility subroutine to distribute a matrix among processors
   ! according to a user defined data distribution, using
@@ -422,7 +423,8 @@ subroutine psb_lsmatdist(a_glob, a, ctxt, desc_a,&
   integer(psb_ipk_), intent(out)       :: info
   integer(psb_ipk_), optional       :: inroot
   character(len=*), optional :: fmt
-  class(psb_s_base_sparse_mat), optional :: mold
+  class(psb_s_base_sparse_mat), optional :: amold
+  class(psb_i_base_vect_type), optional, intent(in) :: imold
   procedure(psb_parts), optional  :: parts
   integer(psb_ipk_), optional     :: vg(:) 
   integer(psb_ipk_), optional     :: vsz(:)
@@ -660,7 +662,7 @@ subroutine psb_lsmatdist(a_glob, a, ctxt, desc_a,&
 
   call psb_barrier(ctxt)
   t0 = psb_wtime()
-  call psb_cdasb(desc_a,info)     
+  call psb_cdasb(desc_a,info,mold=imold)     
   t1 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -671,7 +673,7 @@ subroutine psb_lsmatdist(a_glob, a, ctxt, desc_a,&
 
   call psb_barrier(ctxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,afmt=fmt,mold=mold)     
+  call psb_spasb(a,desc_a,info,afmt=fmt,mold=amold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
