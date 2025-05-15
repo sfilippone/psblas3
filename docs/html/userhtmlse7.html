@@ -17,12 +17,12 @@ href="userhtmlse6.html#tailuserhtmlse6.html" >prev-tail</a>] [<a
 href="userhtmlse4.html#tailuserhtmlse7.html">tail</a>] [<a 
 href="userhtml.html#userhtmlse10.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
- id="x12-1050007"></a>Parallel environment routines</h3>
+ id="x13-1060007"></a>Parallel environment routines</h3>
                                                                   
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.1    </span> <a 
- id="x12-1060007.1"></a>psb_init &#8212; Initializes PSBLAS parallel environment</h4>
+ id="x13-1070007.1"></a>psb_init &#8212; Initializes PSBLAS parallel environment</h4>
                                                                   
 
                                                                   
@@ -138,11 +138,11 @@ class="newline" />Specified as: an integer variable.</dd></dl>
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-106002x1">
+  class="enumerate" id="x13-107002x1">
      <!--l. 64--><p class="noindent" >A call to this routine must precede any other PSBLAS call.
      </li>
 <li 
-  class="enumerate" id="x12-106004x2">
+  class="enumerate" id="x13-107004x2">
      <!--l. 65--><p class="noindent" >It is an error to specify a value for <span 
 class="zplmr7m-">np </span>greater than the number of processes
      available in the underlying base parallel environment.</li></ol>
@@ -150,7 +150,7 @@ class="zplmr7m-">np </span>greater than the number of processes
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.2    </span> <a 
- id="x12-1070007.2"></a>psb_info &#8212; Return information about PSBLAS parallel environment</h4>
+ id="x13-1080007.2"></a>psb_info &#8212; Return information about PSBLAS parallel environment</h4>
                                                                   
 
                                                                   
@@ -231,7 +231,7 @@ class="newline" />Specified as: an integer variable. &#x00A0;</dd></dl>
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-107002x1">
+  class="enumerate" id="x13-108002x1">
      <!--l. 108--><p class="noindent" >For  processes  in  the  virtual  parallel  machine  the  identifier  will  satisfy
      0 <span 
 class="zplmr7y-">&#x2264; </span><span 
@@ -241,7 +241,7 @@ class="zplmr7m-">np</span><span
 class="zplmr7y-">- </span>1;
      </li>
 <li 
-  class="enumerate" id="x12-107004x2">
+  class="enumerate" id="x13-108004x2">
      <!--l. 110--><p class="noindent" >If the user has requested on <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_init</span></span></span> a number of processes less than
      the total available in the parallel execution environment, the remaining
@@ -256,7 +256,7 @@ class="cmtt-10">psb_exit</span></span></span>.</li></ol>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.3    </span> <a 
- id="x12-1080007.3"></a>psb_exit &#8212; Exit from PSBLAS parallel environment</h4>
+ id="x13-1090007.3"></a>psb_exit &#8212; Exit from PSBLAS parallel environment</h4>
                                                                   
 
                                                                   
@@ -309,7 +309,7 @@ class="newline" />Specified as: a logical variable, default value: true.</dd></d
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-108002x1">
+  class="enumerate" id="x13-109002x1">
      <!--l. 146--><p class="noindent" >This  routine  may  be  called  even  if  a  previous  call  to  <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_info</span></span></span> has
      returned  with  <span 
@@ -323,14 +323,14 @@ class="cmtt-10">ctxt</span></span></span> in this situation.
                                                                   
      </li>
 <li 
-  class="enumerate" id="x12-108004x2">
+  class="enumerate" id="x13-109004x2">
      <!--l. 150--><p class="noindent" >A call to this routine with <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">close=.true.</span></span></span> implies a call to <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">MPI_Finalize</span></span></span>,
      after which no parallel routine may be called.
      </li>
 <li 
-  class="enumerate" id="x12-108006x3">
+  class="enumerate" id="x13-109006x3">
      <!--l. 152--><p class="noindent" >If  the  user  whishes  to  use  multiple  communication  contexts  in  the
      same  program,  or  to  enter  and  exit  multiple  times  into  the  parallel
      environment,   this   routine   may   be   called   to   selectively   close   the
@@ -343,7 +343,7 @@ class="cmtt-10">close=.true.</span></span></span> to  shutdown  in  a  clean  wa
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.4    </span> <a 
- id="x12-1090007.4"></a>psb_get_mpi_comm &#8212; Get the MPI communicator</h4>
+ id="x13-1100007.4"></a>psb_get_mpi_comm &#8212; Get the MPI communicator</h4>
                                                                   
 
                                                                   
@@ -407,7 +407,7 @@ deprecated.
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.5    </span> <a 
- id="x12-1100007.5"></a>psb_get_mpi_rank &#8212; Get the MPI rank</h4>
+ id="x13-1110007.5"></a>psb_get_mpi_rank &#8212; Get the MPI rank</h4>
                                                                   
 
                                                                   
@@ -491,7 +491,7 @@ class="cmtt-10">psb_get_rank</span></span></span> is still available but is depr
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.6    </span> <a 
- id="x12-1110007.6"></a>psb_wtime &#8212; Wall clock timing</h4>
+ id="x13-1120007.6"></a>psb_wtime &#8212; Wall clock timing</h4>
                                                                   
 
                                                                   
@@ -525,7 +525,7 @@ class="cmtt-10">real(psb_dpk_)</span></span></span> variable.</dd></dl>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.7    </span> <a 
- id="x12-1120007.7"></a>psb_barrier &#8212; Sinchronization point parallel environment</h4>
+ id="x13-1130007.7"></a>psb_barrier &#8212; Sinchronization point parallel environment</h4>
                                                                   
 
                                                                   
@@ -564,7 +564,7 @@ class="newline" />Specified as: an integer variable.</dd></dl>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.8    </span> <a 
- id="x12-1130007.8"></a>psb_abort &#8212; Abort a computation</h4>
+ id="x13-1140007.8"></a>psb_abort &#8212; Abort a computation</h4>
                                                                   
 
                                                                   
@@ -602,7 +602,7 @@ class="newline" />Specified as: an integer variable.</dd></dl>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.9    </span> <a 
- id="x12-1140007.9"></a>psb_bcast &#8212; Broadcast data</h4>
+ id="x13-1150007.9"></a>psb_bcast &#8212; Broadcast data</h4>
                                                                   
 
                                                                   
@@ -709,8 +709,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 335--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 336--><p class="noindent" >
@@ -746,19 +745,21 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
 <!--l. 352--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-114002x1">
+  class="enumerate" id="x13-115002x1">
      <!--l. 354--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-114004x2">
+  class="enumerate" id="x13-115004x2">
      <!--l. 357--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -774,7 +775,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 371--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-114006x3">
+  class="enumerate" id="x13-115006x3">
      <!--l. 376--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -793,7 +794,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.10    </span> <a 
- id="x12-1150007.10"></a>psb_sum &#8212; Global sum</h4>
+ id="x13-1160007.10"></a>psb_sum &#8212; Global sum</h4>
                                                                   
 
                                                                   
@@ -901,8 +902,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 449--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 450--><p class="noindent" >
@@ -938,19 +938,21 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
 <!--l. 466--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-115002x1">
+  class="enumerate" id="x13-116002x1">
      <!--l. 468--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-115004x2">
+  class="enumerate" id="x13-116004x2">
      <!--l. 471--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -966,7 +968,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 485--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-115006x3">
+  class="enumerate" id="x13-116006x3">
      <!--l. 490--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -985,7 +987,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.11    </span> <a 
- id="x12-1160007.11"></a>psb_max &#8212; Global maximum</h4>
+ id="x13-1170007.11"></a>psb_max &#8212; Global maximum</h4>
                                                                   
 
                                                                   
@@ -1094,8 +1096,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 563--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 564--><p class="noindent" >
@@ -1130,8 +1131,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
                                                                   
 
                                                                   
@@ -1139,13 +1139,13 @@ class="cmtt-10">mode</span></span></span> does not specify synchronous completio
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-116002x1">
+  class="enumerate" id="x13-117002x1">
      <!--l. 583--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-116004x2">
+  class="enumerate" id="x13-117004x2">
      <!--l. 586--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -1161,7 +1161,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 600--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-116006x3">
+  class="enumerate" id="x13-117006x3">
      <!--l. 605--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -1180,7 +1180,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.12    </span> <a 
- id="x12-1170007.12"></a>psb_min &#8212; Global minimum</h4>
+ id="x13-1180007.12"></a>psb_min &#8212; Global minimum</h4>
                                                                   
 
                                                                   
@@ -1288,8 +1288,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 676--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 677--><p class="noindent" >
@@ -1325,19 +1324,21 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
 <!--l. 694--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-117002x1">
+  class="enumerate" id="x13-118002x1">
      <!--l. 696--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-117004x2">
+  class="enumerate" id="x13-118004x2">
      <!--l. 699--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -1353,7 +1354,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 713--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-117006x3">
+  class="enumerate" id="x13-118006x3">
      <!--l. 718--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -1372,7 +1373,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.13    </span> <a 
- id="x12-1180007.13"></a>psb_amx &#8212; Global maximum absolute value</h4>
+ id="x13-1190007.13"></a>psb_amx &#8212; Global maximum absolute value</h4>
                                                                   
 
                                                                   
@@ -1481,8 +1482,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 789--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 790--><p class="noindent" >
@@ -1518,19 +1518,21 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
 <!--l. 807--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-118002x1">
+  class="enumerate" id="x13-119002x1">
      <!--l. 809--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-118004x2">
+  class="enumerate" id="x13-119004x2">
      <!--l. 812--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -1546,7 +1548,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 826--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-118006x3">
+  class="enumerate" id="x13-119006x3">
      <!--l. 831--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -1565,7 +1567,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.14    </span> <a 
- id="x12-1190007.14"></a>psb_amn &#8212; Global minimum absolute value</h4>
+ id="x13-1200007.14"></a>psb_amn &#8212; Global minimum absolute value</h4>
                                                                   
 
                                                                   
@@ -1674,8 +1676,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 902--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 903--><p class="noindent" >
@@ -1711,19 +1712,21 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
 <!--l. 920--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-119002x1">
+  class="enumerate" id="x13-120002x1">
      <!--l. 922--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-119004x2">
+  class="enumerate" id="x13-120004x2">
      <!--l. 925--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -1739,7 +1742,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 939--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-119006x3">
+  class="enumerate" id="x13-120006x3">
      <!--l. 944--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -1758,7 +1761,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.15    </span> <a 
- id="x12-1200007.15"></a>psb_nrm2 &#8212; Global 2-norm reduction</h4>
+ id="x13-1210007.15"></a>psb_nrm2 &#8212; Global 2-norm reduction</h4>
                                                                   
 
                                                                   
@@ -1866,8 +1869,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
 <!--l. 1015--><p class="indent" >
      <dl class="description"><dt class="description">
      <!--l. 1016--><p class="noindent" >
@@ -1902,8 +1904,7 @@ class="pplb7t-">optional</span>.<br
 class="newline" />Intent: <span 
 class="pplb7t-">inout</span>.<br 
 class="newline" />If <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">mode</span></span></span> does not specify synchronous completion, then this variable must
-     be present.</dd></dl>
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
                                                                   
 
                                                                   
@@ -1911,12 +1912,12 @@ class="cmtt-10">mode</span></span></span> does not specify synchronous completio
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-120002x1">
+  class="enumerate" id="x13-121002x1">
      <!--l. 1035--><p class="noindent" >This reduction is appropriate to compute the results of multiple (local)
      NRM2 operations at the same time.
      </li>
 <li 
-  class="enumerate" id="x12-120004x2">
+  class="enumerate" id="x13-121004x2">
      <!--l. 1037--><p class="noindent" >Denoting by <span 
 class="zplmr7m-">dat</span><sub><span 
 class="zplmr7m-x-x-76">i</span></sub> the value of the variable <span 
@@ -1933,13 +1934,13 @@ res =  &#x2211; dat2i,
      <!--l. 1039--><p class="nopar" > with care taken to avoid unnecessary overflow.
      </li>
 <li 
-  class="enumerate" id="x12-120006x3">
+  class="enumerate" id="x13-121006x3">
      <!--l. 1041--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
      even on processes different from the final result destination.
      </li>
 <li 
-  class="enumerate" id="x12-120008x4">
+  class="enumerate" id="x13-121008x4">
      <!--l. 1044--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">IOR()</span></span></span> operator; in the
@@ -1955,7 +1956,7 @@ class="cmtt-10">request</span></span></span> argument needs not be specified:
 <!--l. 1058--><p class="nopar" >                                                           </div></div>
      </li>
 <li 
-  class="enumerate" id="x12-120010x5">
+  class="enumerate" id="x13-121010x5">
      <!--l. 1063--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">dat</span></span></span> argument <span 
 class="pplri7t-">must not </span>be
@@ -1977,7 +1978,7 @@ class="pplri7t-">must not </span>be
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.16    </span> <a 
- id="x12-1210007.16"></a>psb_snd &#8212; Send data</h4>
+ id="x13-1220007.16"></a>psb_snd &#8212; Send data</h4>
                                                                   
 
                                                                   
@@ -2091,7 +2092,7 @@ class="description">
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-121002x1">
+  class="enumerate" id="x13-122002x1">
      <!--l. 1134--><p class="noindent" >This subroutine implies a synchronization, but only between the calling
      process and the destination process <span 
 class="zplmr7m-">dst</span>.</li></ol>
@@ -2099,7 +2100,7 @@ class="zplmr7m-">dst</span>.</li></ol>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">7.17    </span> <a 
- id="x12-1220007.17"></a>psb_rcv &#8212; Receive data</h4>
+ id="x13-1230007.17"></a>psb_rcv &#8212; Receive data</h4>
                                                                   
 
                                                                   
@@ -2213,7 +2214,7 @@ class="zplmr7m-">m </span>is not specified, size
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x12-122002x1">
+  class="enumerate" id="x13-123002x1">
      <!--l. 1185--><p class="noindent" >This subroutine implies a synchronization, but only between the calling
      process and the source process <span 
 class="zplmr7m-">src</span>.</li></ol>

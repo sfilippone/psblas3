@@ -17,11 +17,13 @@ class="pplb7t-x-x-172">User&#8217;s and Reference Guide</span><br
 class="newline" /> <span 
 class="pplri7t-x-x-120">A reference guide for the Parallel Sparse BLAS library</span><br 
 class="newline" /> <span 
-class="pplb7t-">Salvatore Filippone</span><br 
+class="pplb7t-">by Salvatore Filippone</span><br 
 class="newline" /><span 
-class="pplb7t-">Alfredo Buttari  </span><br 
+class="pplb7t-">Alfredo Buttari </span><br 
+class="newline" /><span 
+class="pplb7t-">Fabio Durastante  </span><br 
 class="newline" />Software version: 3.9.0<br 
-class="newline" />Aug 1st, 2024
+class="newline" />Jun 1st, 2025
                                                                   
 
                                                                   
@@ -31,35 +33,40 @@ class="newline" />Aug 1st, 2024
    <div class="tableofcontents">
    &#x00A0;<span class="likesectionToc" ><a 
 href="userhtmlli1.html#x2-1000" id="QQ2-2-1">Contents</a></span>
-<br />   &#x00A0;<span class="sectionToc" >1 <a 
-href="userhtmlse1.html#x3-20001" id="QQ2-3-2">Introduction</a></span>
-<br />   &#x00A0;<span class="sectionToc" >2 <a 
-href="userhtmlse2.html#x4-30002" id="QQ2-4-3">General overview</a></span>
-<br />   &#x00A0;<span class="sectionToc" >3 <a 
-href="userhtmlse3.html#x8-90003" id="QQ2-8-11">Data Structures and Classes</a></span>
-<br />   &#x00A0;<span class="sectionToc" >4 <a 
-href="userhtmlse4.html#x9-550004" id="QQ2-9-61">Computational routines</a></span>
-<br />   &#x00A0;<span class="sectionToc" >5 <a 
-href="userhtmlse5.html#x10-720005" id="QQ2-10-94">Communication routines</a></span>
-<br />   &#x00A0;<span class="sectionToc" >6 <a 
-href="userhtmlse6.html#x11-770006" id="QQ2-11-105">Data management routines</a></span>
-<br />   &#x00A0;<span class="sectionToc" >7 <a 
-href="userhtmlse7.html#x12-1050007" id="QQ2-12-133">Parallel environment routines</a></span>
-<br />   &#x00A0;<span class="sectionToc" >8 <a 
-href="userhtmlse8.html#x13-1230008" id="QQ2-13-151">Error handling</a></span>
-<br />   &#x00A0;<span class="sectionToc" >9 <a 
-href="userhtmlse9.html#x14-1280009" id="QQ2-14-158">Utilities</a></span>
-<br />   &#x00A0;<span class="sectionToc" >10 <a 
-href="userhtmlse10.html#x15-13500010" id="QQ2-15-165">Preconditioner routines</a></span>
-<br />   &#x00A0;<span class="sectionToc" >11 <a 
-href="userhtmlse11.html#x17-14500011" id="QQ2-17-176">Iterative Methods</a></span>
-<br />   &#x00A0;<span class="sectionToc" >12 <a 
-href="userhtmlse12.html#x19-14800012" id="QQ2-19-179">Extensions</a></span>
-<br />   &#x00A0;<span class="sectionToc" >13 <a 
-href="userhtmlse13.html#x20-15700013" id="QQ2-20-194">CUDA Environment Routines</a></span>
 <br />   &#x00A0;<span class="likesectionToc" ><a 
-href="userhtmlli2.html#x21-172000" id="QQ2-21-223">References</a></span>
+href="userhtmlli2.html#x3-2000" id="QQ2-3-2">Preface</a></span>
+<br />   &#x00A0;<span class="sectionToc" ><a 
+href="userhtmlli2.html#Q1-3-3">Preface</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1 <a 
+href="userhtmlse1.html#x4-30001" id="QQ2-4-4">Introduction</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2 <a 
+href="userhtmlse2.html#x5-40002" id="QQ2-5-5">General overview</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3 <a 
+href="userhtmlse3.html#x9-100003" id="QQ2-9-13">Data Structures and Classes</a></span>
+<br />   &#x00A0;<span class="sectionToc" >4 <a 
+href="userhtmlse4.html#x10-560004" id="QQ2-10-63">Computational routines</a></span>
+<br />   &#x00A0;<span class="sectionToc" >5 <a 
+href="userhtmlse5.html#x11-730005" id="QQ2-11-96">Communication routines</a></span>
+<br />   &#x00A0;<span class="sectionToc" >6 <a 
+href="userhtmlse6.html#x12-780006" id="QQ2-12-107">Data management routines</a></span>
+<br />   &#x00A0;<span class="sectionToc" >7 <a 
+href="userhtmlse7.html#x13-1060007" id="QQ2-13-135">Parallel environment routines</a></span>
+<br />   &#x00A0;<span class="sectionToc" >8 <a 
+href="userhtmlse8.html#x14-1240008" id="QQ2-14-153">Error handling</a></span>
+<br />   &#x00A0;<span class="sectionToc" >9 <a 
+href="userhtmlse9.html#x15-1290009" id="QQ2-15-160">Utilities</a></span>
+<br />   &#x00A0;<span class="sectionToc" >10 <a 
+href="userhtmlse10.html#x16-13600010" id="QQ2-16-167">Preconditioner routines</a></span>
+<br />   &#x00A0;<span class="sectionToc" >11 <a 
+href="userhtmlse11.html#x18-14600011" id="QQ2-18-178">Iterative Methods</a></span>
+<br />   &#x00A0;<span class="sectionToc" >12 <a 
+href="userhtmlse12.html#x20-14900012" id="QQ2-20-181">Extensions</a></span>
+<br />   &#x00A0;<span class="sectionToc" >13 <a 
+href="userhtmlse13.html#x21-15800013" id="QQ2-21-196">CUDA Environment Routines</a></span>
+<br />   &#x00A0;<span class="likesectionToc" ><a 
+href="userhtmlli3.html#x22-173000" id="QQ2-22-225">References</a></span>
    </div>
+
 
 
 
