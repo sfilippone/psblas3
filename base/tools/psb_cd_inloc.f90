@@ -43,6 +43,7 @@
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   use psb_base_mod
+  use psb_desc_mod
   use psi_mod
   use psb_repl_map_mod
   use psb_list_map_mod
@@ -125,7 +126,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
   if (me == psb_root_) then
     exch(1)=m
     exch(2)=n
-    exch(3)=psb_cd_get_large_threshold()
+    exch(3)=psb_cd_get_hash_threshold()
     call psb_bcast(ctxt,exch(1:3),root=psb_root_)
   else
     call psb_bcast(ctxt,exch(1:3),root=psb_root_)
@@ -140,7 +141,7 @@ subroutine psb_cd_inloc(v, ctxt, desc, info, globalcheck,idx,usehash)
       call psb_errpush(err,name,l_err=l_err)
       goto 9999
     endif
-    call psb_cd_set_large_threshold(exch(3))
+    call psb_cd_set_hash_threshold(exch(3))
   endif
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  

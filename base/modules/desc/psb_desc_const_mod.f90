@@ -108,7 +108,7 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_max_hash_bits = 22
   integer(psb_ipk_), parameter :: psb_hash_size     = 2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
   integer(psb_ipk_), parameter :: psb_hpnt_nentries_ = 7
-  integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024   
+  integer(psb_ipk_), parameter :: psb_default_hash_threshold=1*1024*1024   
   !
   ! Choice of algorithm for sparse matrix A2AV
   !
