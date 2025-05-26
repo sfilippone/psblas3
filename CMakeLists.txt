@@ -26,13 +26,12 @@ set_version(
   GIT_DESCRIBE_VAR full_git_describe
   CUSTOM_VERSION_FILE "${CMAKE_SOURCE_DIR}/.VERSION")
 message( STATUS "Building PSBLAS1 version: ${full_git_describe}" )
-
 #------------------------------------------
 # Name project and specify source languages
 #------------------------------------------
 project(psblas
   VERSION "${PSBLAS_Version}"
-  LANGUAGES C Fortran CUDA)
+  LANGUAGES C Fortran)
 
 #--------------------------------------------------
 # Set option to allow building against OpenCoarrays
@@ -130,6 +129,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
   
 #endif()
 
+message(STATUS "Using compiler ${CMAKE_C_COMPILER};")
 
 
 # Set default values for IPK_SIZE and LPK_SIZE
@@ -669,8 +669,48 @@ if(PSB_BUILD_CUDA)
 
     enable_language(CUDA)
 
+
+    
+    # Function to check the installed cuda version
+    function(check_cuda_version)
+    
+      set(CUDA_VERSION_CHECK_CODE "
+        #include <stdio.h>
+        #include <cuda.h>
+
+        int main() {
+          printf(\"%d\\n\", CUDA_VERSION);
+          return 0;
+        }
+      ")
+
+    # Create a temporary source file
+    file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/cuda_version.cu" "${CUDA_VERSION_CHECK_CODE}")
+
+    # Try to compile it
+    try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
+        "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/cuda_version.cu")
+
+    # Check the result and read the output
+    if (COMPILER_RESULT)
+        execute_process(COMMAND "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/cuda_version"
+            OUTPUT_VARIABLE cuda_version)
+        string(STRIP "${cuda_version}" cuda_version)
+        message(STATUS "${cuda_version}")
+        set(PSB_CUDA_VERSION ${cuda_version} PARENT_SCOPE)
+
+    else()
+        message(WARNING "Failed to compile test for type size: ${cuda_version}")
+    endif()
+  endfunction()
+
+  # Check for cuda version 
+  check_cuda_version()
+
+  message(STATUS "${PSB_CUDA_VERSION}")
+
     # Check for CUDA version
-    set(PSB_CUDA_VERSION 12800)
+    # set(PSB_CUDA_VERSION 12800)
     if(PSB_CUDA_VERSION)
             message(STATUS "CUDA version: ${PSB_CUDA_VERSION}")
 
