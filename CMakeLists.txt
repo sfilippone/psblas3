@@ -668,46 +668,17 @@ if(PSB_BUILD_CUDA)
     #    find_package(CUDA REQUIRED)
 
     enable_language(CUDA)
+    message(STATUS "Enabled CUDA ${CMAKE_CUDA_COMPILER_VERSION} ${CMAKE_CUDA_ARCHITECTURES};; ${CMAKE_CUDA_HOST_COMPILER_VERSION};")
+    find_package(CUDAToolkit)
+    message(STATUS "Enabled CUDA throguh find ${CUDAToolkit_VERSION_MAJOR} ${CUDAToolkit_VERSION};; ${CUDAToolkit_VERSION_MINOR};")
+    #compute cuda versio for psblas
+    math(EXPR PSB_CUDA_VERSION "${CUDAToolkit_VERSION_MAJOR} * 1000 + ${CUDAToolkit_VERSION_MINOR} * 10")
+
 
 
     
-    # Function to check the installed cuda version
-    function(check_cuda_version)
-    
-      set(CUDA_VERSION_CHECK_CODE "
-        #include <stdio.h>
-        #include <cuda.h>
 
-        int main() {
-          printf(\"%d\\n\", CUDA_VERSION);
-          return 0;
-        }
-      ")
-
-    # Create a temporary source file
-    file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/cuda_version.cu" "${CUDA_VERSION_CHECK_CODE}")
-
-    # Try to compile it
-    try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
-        "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/cuda_version.cu")
-
-    # Check the result and read the output
-    if (COMPILER_RESULT)
-        execute_process(COMMAND "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/cuda_version"
-            OUTPUT_VARIABLE cuda_version)
-        string(STRIP "${cuda_version}" cuda_version)
-        message(STATUS "${cuda_version}")
-        set(PSB_CUDA_VERSION ${cuda_version} PARENT_SCOPE)
-
-    else()
-        message(WARNING "Failed to compile test for type size: ${cuda_version}")
-    endif()
-  endfunction()
-
-  # Check for cuda version 
-  check_cuda_version()
-
-  message(STATUS "${PSB_CUDA_VERSION}")
+    message(STATUS "cuda version called has given ${PSB_CUDA_VERSION}:")
 
     # Check for CUDA version
     # set(PSB_CUDA_VERSION 12800)
@@ -717,8 +688,10 @@ if(PSB_BUILD_CUDA)
         # Define macros for CUDA version
         #        add_definitions(-DPSB_HAVE_CUDA)
         #       add_definitions(-DPSB_CUDA_VERSION=${PSB_CUDA_VERSION})
-        math(EXPR PSB_CUDA_SHORT_VERSION "${PSB_CUDA_VERSION} / 1000")
+        # math(EXPR PSB_CUDA_SHORT_VERSION "${PSB_CUDA_VERSION} / 1000")
         #        add_definitions(-DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION})
+        set(PSB_CUDA_SHORT_VERSION ${CUDAToolkit_VERSION_MAJOR})
+        message(STATUS "cuda version called has given ${PSB_CUDA_SHORT_VERSION}:")
 
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_CUDA")
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}")
@@ -1131,7 +1104,7 @@ if(PSB_BUILD_CUDA)
     target_include_directories(cuda PUBLIC
         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>  # Path for building
         $<INSTALL_INTERFACE:modules>  # Path for installation
-        /opt/cuda/12.8/include
+        #/opt/cuda/12.8/include
     )
 
     # Link with other necessary libraries
@@ -1220,7 +1193,14 @@ install(TARGETS base prec linsolve ext util cbind
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   )
  
- 
+if(PSB_BUILD_CUDA)
+ install(TARGETS cuda
+   EXPORT ${CMAKE_PROJECT_NAME}-targets
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+   )
+
+endif() 
 
 if(WIN32)
   install(TARGETS psb_base_C
