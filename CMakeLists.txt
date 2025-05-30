@@ -654,6 +654,13 @@ endif()
 # Optionally check for CUDA requirement
 option(PSB_BUILD_CUDA "Build CUDA code" OFF)
 
+
+if(IPK_SIZE EQUAL 8)
+  set(PSB_BUILD_CUDA OFF)
+  message(STATUS "IPK8 is not compatible with CUDA. Cuda is now OFF ${PSB_BUILD_CUDA}") 
+endif()
+
+
 if(PSB_BUILD_CUDA)
 
     if(NOT DEFINED PSB_CUDA_PATH)
