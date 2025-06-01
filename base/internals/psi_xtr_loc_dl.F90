@@ -125,7 +125,8 @@ subroutine psi_i_xtr_loc_dl(ctxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   logical,  intent(in)            :: is_bld, is_upd
   type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(in)   :: desc_str(:)
-  integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:), length_dl(:)
+  integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:)
+  integer(psb_mpk_), allocatable, intent(out) :: length_dl(:)
   integer(psb_ipk_), intent(out)  :: info
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)

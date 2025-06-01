@@ -204,7 +204,8 @@ contains
   subroutine i_cuda_gthzv_x(i,n,idx,x,y)
     use psb_cuda_env_mod
     use psi_serial_mod
-    integer(psb_ipk_) :: i,n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer(psb_ipk_) ::  y(:)
     class(psb_i_vect_cuda) :: x
@@ -313,7 +314,8 @@ contains
   subroutine i_cuda_gthzbuf(i,n,idx,x)
     use psb_cuda_env_mod
     use psi_serial_mod
-    integer(psb_ipk_) :: i,n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     class(psb_i_vect_cuda)       :: x
     integer ::  info, ni
@@ -366,7 +368,8 @@ contains
   subroutine i_cuda_sctb(n,idx,x,beta,y)
     implicit none
     !use psb_const_mod
-    integer(psb_ipk_)     :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_ipk_)        :: beta, x(:)
     class(psb_i_vect_cuda) :: y
     integer(psb_ipk_)     :: info
@@ -383,7 +386,8 @@ contains
   subroutine i_cuda_sctb_x(i,n,idx,x,beta,y)
     use psb_cuda_env_mod
     use psi_serial_mod
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_vect_cuda) :: y
@@ -489,7 +493,8 @@ contains
     use psi_serial_mod
     use psb_cuda_env_mod
     implicit none 
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer(psb_ipk_) :: beta
     class(psb_i_vect_cuda) :: y

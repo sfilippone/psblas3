@@ -51,7 +51,8 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
 
   !locals
   type(psb_ctxt_type) :: ctxt, newctxt 
-  integer(psb_ipk_) :: np, me, err_act
+  integer(psb_mpk_) :: np, me, nprm
+  integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: rnp, rme
   integer(psb_ipk_) :: ipdest, id1, id2, imd, i
   integer(psb_ipk_), allocatable :: newnl(:)
@@ -82,7 +83,8 @@ subroutine psb_cd_remap(np_remap, desc_in, desc_out, info)
  
   if (desc_in%get_fmt() == 'BLOCK') then
     ! OK
-    call psb_init(newctxt,np=np_remap,basectxt=ctxt)
+    nprm = np_remap
+    call psb_init(newctxt,np=nprm,basectxt=ctxt)
     call psb_info(newctxt,rme,rnp)
     write(0,*) 'Old context: ',me,np,' New context: ',rme,rnp
     call psb_bcast(ctxt,rnp)

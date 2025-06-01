@@ -185,7 +185,7 @@ program psb_sf_sample
 
     endif
     call psb_barrier(ctxt)
-    call distr_mtpart(psb_root_,ctxt)
+    call distr_mtpart(ione*psb_root_,ctxt)
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ctxt,desc_a,info,fmt=afmt,vg=ivg)
 
@@ -194,7 +194,7 @@ program psb_sf_sample
     call psb_matdist(aux_a, a,  ctxt,desc_a,info,fmt=afmt,parts=part_block)
   end select
 
-  call psb_scatter(b_col_glob,b_col,desc_a,info,root=psb_root_)
+  call psb_scatter(b_col_glob,b_col,desc_a,info,root=ione*psb_root_)
   call psb_geall(x_col,desc_a,info)
   call x_col%zero()
   call psb_geasb(x_col,desc_a,info)
@@ -276,9 +276,9 @@ program psb_sf_sample
          &  desc_a%get_fmt()
   end if
 
-  call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
+  call psb_gather(x_col_glob,x_col,desc_a,info,root=ione*psb_root_)
   if (info == psb_success_) &
-       & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+       & call psb_gather(r_col_glob,r_col,desc_a,info,root=ione*psb_root_)
   if (info /= psb_success_) goto 9999
   if (iam == psb_root_) then
     write(psb_err_unit,'(" ")')

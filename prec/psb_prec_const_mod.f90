@@ -74,15 +74,15 @@ module psb_prec_const_mod
   integer(psb_ipk_), parameter :: psb_ilu_scale_arcsum_  = 5
 
   ! Numerical parameters relative to Approximate Inverse Preconditioners
-  integer, parameter   :: psb_inv_fillin_     = 3
-  integer, parameter   :: psb_ainv_alg_       = psb_inv_fillin_ + 1
-  integer, parameter   :: psb_inv_thresh_     = 3
-  integer, parameter   :: psb_ainv_llk_       = psb_inv_thresh_ + 1
-  integer, parameter   :: psb_ainv_s_llk_     = psb_ainv_llk_ + 1
-  integer, parameter   :: psb_ainv_s_ft_llk_  = psb_ainv_s_llk_ + 1
-  integer, parameter   :: psb_ainv_llk_noth_  = psb_ainv_s_ft_llk_  + 1
-  integer, parameter   :: psb_ainv_mlk_       = psb_ainv_llk_noth_  + 1
-  integer, parameter   :: psb_ainv_lmx_       = psb_ainv_mlk_
+  integer(psb_ipk_), parameter   :: psb_inv_fillin_     = 3
+  integer(psb_ipk_), parameter   :: psb_ainv_alg_       = psb_inv_fillin_ + 1
+  integer(psb_ipk_), parameter   :: psb_inv_thresh_     = 3
+  integer(psb_ipk_), parameter   :: psb_ainv_llk_       = psb_inv_thresh_ + 1
+  integer(psb_ipk_), parameter   :: psb_ainv_s_llk_     = psb_ainv_llk_ + 1
+  integer(psb_ipk_), parameter   :: psb_ainv_s_ft_llk_  = psb_ainv_s_llk_ + 1
+  integer(psb_ipk_), parameter   :: psb_ainv_llk_noth_  = psb_ainv_s_ft_llk_  + 1
+  integer(psb_ipk_), parameter   :: psb_ainv_mlk_       = psb_ainv_llk_noth_  + 1
+  integer(psb_ipk_), parameter   :: psb_ainv_lmx_       = psb_ainv_mlk_
 
 
   interface psb_check_def

@@ -1861,8 +1861,8 @@ contains
     integer(psb_mpk_), intent(inout), optional :: request
     real(psb_spk_), intent(inout)  :: dat
     real(psb_spk_) :: dat_
-    integer(psb_ipk_) :: iam, np, info
-    integer(psb_mpk_) :: minfo
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: iam, np, minfo
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
@@ -1896,6 +1896,7 @@ contains
         call mpi_wait(request,status,minfo)
       end if
     end if
+    info = minfo
 #endif    
   end subroutine psb_sscan_sums
 
@@ -1912,8 +1913,8 @@ contains
     integer(psb_ipk_), intent(in), optional    :: mode
     integer(psb_mpk_), intent(inout), optional :: request
     real(psb_spk_) :: dat_
-    integer(psb_ipk_) :: iam, np, info
-    integer(psb_mpk_) :: minfo
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: iam, np, minfo
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
@@ -1948,6 +1949,7 @@ contains
         call mpi_wait(request,status,minfo)
       end if
     end if
+    info = minfo
 #else
     dat = szero
 #endif    
@@ -1966,8 +1968,8 @@ contains
     integer(psb_ipk_), intent(in), optional    :: mode
     integer(psb_mpk_), intent(inout), optional :: request
 
-    integer(psb_ipk_) :: iam, np,  info
-    integer(psb_mpk_) :: minfo
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: iam, np, minfo
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
@@ -1996,11 +1998,12 @@ contains
     else
       if (collective_start) then
         call mpi_iscan(dat_,dat,size(dat),&
-             & psb_mpi_r_spk_,mpi_sum,icomm,request,info)
+             & psb_mpi_r_spk_,mpi_sum,icomm,request,minfo)
       else if (collective_end) then
-        call mpi_wait(request,status,info)
+        call mpi_wait(request,status,minfo)
       end if
     end if
+    info = minfo
 #endif
   end subroutine psb_sscan_sumv
 
@@ -2017,8 +2020,8 @@ contains
     integer(psb_ipk_), intent(in), optional    :: mode
     integer(psb_mpk_), intent(inout), optional :: request
 
-    integer(psb_ipk_) :: iam, np,  info
-    integer(psb_mpk_) :: minfo
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: iam, np, minfo
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_) :: status(mpi_status_size)
     logical :: collective_start, collective_end, collective_sync
@@ -2048,12 +2051,12 @@ contains
     else
       if (collective_start) then
         call mpi_iexscan(dat_,dat,size(dat),&
-             & psb_mpi_r_spk_,mpi_sum,icomm,request,info)
+             & psb_mpi_r_spk_,mpi_sum,icomm,request,minfo)
       else if (collective_end) then
-        call mpi_wait(request,status,info)
+        call mpi_wait(request,status,minfo)
       end if
     end if
-    
+    info = minfo
 #else
     dat = szero
 #endif
@@ -2068,7 +2071,9 @@ contains
     integer(psb_mpk_), intent(in) :: bsdindx(:), brvindx(:), sdsz(:), rvsz(:)
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: iam, np, i,j,k, ip, ipx, idx, sz
+    integer(psb_ipk_) :: i,j,k, ipx, idx
+    integer(psb_mpk_) :: ip, sz
+    integer(psb_mpk_) :: iam, np
 
     call psb_info(ctxt,iam,np)
 
@@ -2113,9 +2118,11 @@ contains
     integer(psb_ipk_), intent(out) :: info
 
     !Local variables
-    integer(psb_ipk_)  :: iam, np, i,j,k, ip, ipx, idx, sz, counter
+    integer(psb_ipk_)  :: i,j,k, ipx, idx, counter
     integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret, icomm
     integer(psb_mpk_), allocatable :: prcid(:), rvhd(:,:)
+    integer(psb_mpk_)  :: ip, sz
+    integer(psb_mpk_)  :: iam, np
 
     call psb_info(ctxt,iam,np)
 
@@ -2196,9 +2203,11 @@ contains
     integer(psb_ipk_), intent(out) :: info
 
     !Local variables
-    integer(psb_ipk_)  :: iam, np, i,j,k, ip, ipx, idx, sz, counter
+    integer(psb_ipk_)  :: i,j,k, ipx, idx, counter
     integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret, icomm
     integer(psb_mpk_), allocatable :: prcid(:), rvhd(:,:)
+    integer(psb_mpk_)  :: ip, sz
+    integer(psb_mpk_)  :: iam, np
 
     call psb_info(ctxt,iam,np)
 

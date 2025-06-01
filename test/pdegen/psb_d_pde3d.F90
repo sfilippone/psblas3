@@ -345,7 +345,7 @@ contains
 
       allocate(bndx(0:npx),bndy(0:npy),bndz(0:npz))
       ! We can reuse idx2ijk for process indices as well.
-      call idx2ijk(iamx,iamy,iamz,iam,npx,npy,npz,base=0)
+      call idx2ijk(iamx,iamy,iamz,iam,npx,npy,npz,base=mzero)
       ! Now let's split the 3D cube in hexahedra
       call dist1Didx(bndx,idim,npx)
       mynx = bndx(iamx+1)-bndx(iamx)
@@ -389,7 +389,7 @@ contains
         !
         ! Use adjcncy methods 
         ! 
-        integer(psb_mpk_), allocatable :: neighbours(:)
+        integer(psb_ipk_), allocatable :: neighbours(:)
         integer(psb_mpk_) :: cnt
         logical, parameter :: debug_adj=.true.
         if (debug_adj.and.(np > 1)) then 
@@ -397,27 +397,27 @@ contains
           allocate(neighbours(np))
           if (iamx < npx-1) then
             cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx+1,iamy,iamz,npx,npy,npz,base=0)
+            call ijk2idx(neighbours(cnt),iamx+1,iamy,iamz,npx,npy,npz,base=mzero)
           end if
           if (iamy < npy-1) then
             cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy+1,iamz,npx,npy,npz,base=0)
+            call ijk2idx(neighbours(cnt),iamx,iamy+1,iamz,npx,npy,npz,base=mzero)
           end if
           if (iamz < npz-1) then
             cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy,iamz+1,npx,npy,npz,base=0)
+            call ijk2idx(neighbours(cnt),iamx,iamy,iamz+1,npx,npy,npz,base=mzero)
           end if
           if (iamx >0) then
             cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx-1,iamy,iamz,npx,npy,npz,base=0)
+            call ijk2idx(neighbours(cnt),iamx-1,iamy,iamz,npx,npy,npz,base=mzero)
           end if
           if (iamy >0) then
             cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy-1,iamz,npx,npy,npz,base=0)
+            call ijk2idx(neighbours(cnt),iamx,iamy-1,iamz,npx,npy,npz,base=mzero)
           end if
           if (iamz >0) then
             cnt = cnt + 1 
-            call ijk2idx(neighbours(cnt),iamx,iamy,iamz-1,npx,npy,npz,base=0)
+            call ijk2idx(neighbours(cnt),iamx,iamy,iamz-1,npx,npy,npz,base=mzero)
           end if
           call psb_realloc(cnt, neighbours,info)
           call desc_a%set_p_adjcncy(neighbours)

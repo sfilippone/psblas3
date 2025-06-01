@@ -116,7 +116,7 @@ subroutine psb_lalloc_vect(x, desc_a,info, dupl, bldmode)
   end if
   call x%set_dupl(dupl_)
   call x%set_remote_build(bldmode_)
-  call x%set_nrmv(0)
+  call x%set_nrmv(izero)
   if (x%is_remote_build()) then
     nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
     call psb_ensure_size(nrmt_,x%rmtv,info)

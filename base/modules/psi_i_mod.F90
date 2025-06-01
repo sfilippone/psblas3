@@ -87,8 +87,8 @@ module psi_i_mod
     subroutine psi_i_csr_sort_dl(dl_ptr,c_dep_list,l_dep_list,ctxt,info)
       import
       implicit none 
-      integer(psb_ipk_), intent(in) :: dl_ptr(0:)
-      integer(psb_ipk_), intent(inout)  :: c_dep_list(:), l_dep_list(0:)
+      integer(psb_mpk_), intent(in) :: dl_ptr(0:), l_dep_list(0:)
+      integer(psb_ipk_), intent(inout)  :: c_dep_list(:)
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_csr_sort_dl
@@ -98,8 +98,10 @@ module psi_i_mod
     subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
       import
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_ipk_), intent(in)     :: loc_dl(:), length_dl(0:)
-      integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:), dl_ptr(:)
+      integer(psb_ipk_), intent(in)   :: loc_dl(:)
+      integer(psb_mpk_), intent(in)     :: length_dl(0:)
+      integer(psb_mpk_), allocatable, intent(out) :: dl_ptr(:)
+      integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:)
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_bld_glb_dep_list
   end interface
@@ -110,7 +112,8 @@ module psi_i_mod
       logical,  intent(in)           :: is_bld, is_upd
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(in)  :: desc_str(:)
-      integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:), length_dl(:)
+      integer(psb_ipk_), allocatable, intent(out) :: loc_dl(:)
+      integer(psb_mpk_), allocatable, intent(out) :: length_dl(:)
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_xtr_loc_dl
   end interface

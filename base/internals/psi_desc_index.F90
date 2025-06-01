@@ -119,7 +119,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   integer(psb_ipk_),allocatable  :: desc_index(:)
   integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
   !    ....local scalars...        
-  integer(psb_ipk_) :: j,me,np,i,proc
+  integer(psb_mpk_) :: me,np,proc
+  integer(psb_ipk_) :: j,i
   !    ...parameters...
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_), parameter  :: no_comm=-1

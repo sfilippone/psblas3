@@ -89,9 +89,9 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
 
   ! local variables
   logical           :: use_parts, use_vg, use_vsz
-  integer(psb_ipk_) :: np, iam, np_sharing
-  integer(psb_ipk_) :: k_count, root, liwork,  nnzero, nrhs,&
-       & i, ll, nz, isize, iproc, nnr, err, err_act
+  integer(psb_mpk_) :: np, iam, root, iproc
+  integer(psb_ipk_) :: k_count, inp, np_sharing, liwork,  nnzero, nrhs,&
+       & i, ll, nz, isize, nnr, err, err_act
   integer(psb_lpk_) :: i_count, j_count, nrow, ncol, ig, lastigp
   integer(psb_ipk_), allocatable  :: iwork(:), iwrk2(:)
   integer(psb_lpk_), allocatable  :: irow(:),icol(:)
@@ -112,7 +112,7 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
     root = psb_root_
   end if
   call psb_info(ctxt, iam, np)     
-
+  
   use_parts = present(parts)
   use_vg    = present(vg)
   use_vsz   = present(vsz)
@@ -195,8 +195,9 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
   end if
   do while (i_count <= nrow)
 
-    if (use_parts) then 
-      call parts(i_count,nrow,np,iwork, np_sharing)
+    if (use_parts) then
+      inp = np
+      call parts(i_count,nrow,inp,iwork, np_sharing)
       !
       ! np_sharing allows for overlap in the data distribution.
       ! If an index is overlapped, then we have to send its row
@@ -211,7 +212,7 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
           j_count = j_count + 1 
           if (j_count-i_count >= nb) exit
           if (j_count > nrow) exit
-          call parts(j_count,nrow,np,iwrk2, np_sharing)
+          call parts(j_count,nrow,inp,iwrk2, np_sharing)
           if (np_sharing /= 1 ) exit
           if (iwrk2(1) /= iproc ) exit
         end do
@@ -431,8 +432,8 @@ subroutine psb_ldmatdist(a_glob, a, ctxt, desc_a,&
   
   ! local variables
   logical           :: use_parts, use_vg, use_vsz
-  integer(psb_ipk_) :: np, iam, np_sharing, root, iproc
-  integer(psb_ipk_) :: err_act, il, inz
+  integer(psb_mpk_) :: np, iam, root, iproc
+  integer(psb_ipk_) :: err_act, il, inz, np_sharing, inp
   integer(psb_lpk_) :: k_count, liwork,  nnzero, nrhs,&
        & i, ll, nz, isize, nnr, err
   integer(psb_lpk_) :: i_count, j_count, nrow, ncol, ig, lastigp
@@ -533,8 +534,9 @@ subroutine psb_ldmatdist(a_glob, a, ctxt, desc_a,&
   end if
   do while (i_count <= nrow)
 
-    if (use_parts) then 
-      call parts(i_count,nrow,np,iwork, np_sharing)
+    if (use_parts) then
+      inp = np 
+      call parts(i_count,nrow,inp,iwork, np_sharing)
       !
       ! np_sharing allows for overlap in the data distribution.
       ! If an index is overlapped, then we have to send its row
@@ -549,7 +551,7 @@ subroutine psb_ldmatdist(a_glob, a, ctxt, desc_a,&
           j_count = j_count + 1 
           if (j_count-i_count >= nb) exit
           if (j_count > nrow) exit
-          call parts(j_count,nrow,np,iwrk2, np_sharing)
+          call parts(j_count,nrow,inp,iwrk2, np_sharing)
           if (np_sharing /= 1 ) exit
           if (iwrk2(1) /= iproc ) exit
         end do

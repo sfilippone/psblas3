@@ -77,8 +77,8 @@ subroutine  psb_eovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me
-  integer(psb_ipk_) :: err_act, iix, jjx, nrow, ncol, k, maxk, update_,&
+  integer(psb_mpk_) :: np, me, k
+  integer(psb_ipk_) :: err_act, iix, jjx, nrow, ncol, maxk, update_,&
        & mode_, liwork, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_epk_),pointer :: iwork(:), xp(:,:)
