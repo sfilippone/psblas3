@@ -237,7 +237,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
     ! Choose a sample, should it be done in this simplistic way?
     ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
     !
-    call psi_get_sample(1,idx,iprc,tidx,tsmpl,iend,nsampl_in,nsampl_out)
+    call psi_get_sample(ione,idx,iprc,tidx,tsmpl,iend,nsampl_in,nsampl_out)
     nsampl = min(nsampl_out,nsampl_in)
     if (debugsz) write(0,*) me,' From first sampling ',nsampl_in
     ! 

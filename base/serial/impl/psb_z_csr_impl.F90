@@ -3817,14 +3817,18 @@ contains
     ! dense accumulator
     ! https://sc18.supercomputing.org/proceedings/workshops/workshop_files/ws_lasalss115s2-file1.pdf
     call psb_realloc(nb, acc, info)
-    !$omp parallel shared(nth,lth)
+    !$omp parallel shared(nth,lth,offsets,info)
     !$omp single
     nth = omp_get_num_threads()
     lth = min(nth, ma)
+    allocate(offsets(omp_get_max_threads()),stat=info)
     !$omp end single
     !$omp end parallel
+    if (info /= 0) then
+      write(0,*)'Offsets allocation failed ',info
+      return
+    end if
 
-    allocate(offsets(omp_get_max_threads()))
     !$omp parallel private(vals,col_inds,nnz,rwnz,thread_upperbound,acc,start_idx,end_idx) &
     !$omp num_threads(lth) shared(a,b,c,offsets) 
     thread_upperbound = 0

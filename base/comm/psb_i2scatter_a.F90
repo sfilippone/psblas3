@@ -63,7 +63,8 @@ subroutine  psb_i2scatterm(globx, locx, desc_a, info, root)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, iroot, icomm, myrank, rootrank, iam, nlr
+  integer(psb_mpk_) :: np, me, iroot, icomm, myrank, rootrank, iam,&
+       & nlr, minfo
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
@@ -167,8 +168,8 @@ subroutine  psb_i2scatterm(globx, locx, desc_a, info, root)
     !
     nlr = nrow
     call mpi_gather(nlr,1,psb_mpi_mpk_,all_dim,&
-         & 1,psb_mpi_mpk_,rootrank,icomm,info)
-
+         & 1,psb_mpi_mpk_,rootrank,icomm,minfo)
+    info = minfo
     if (iam == iroot) then
       displ(1)=0
       do i=2,np
@@ -195,8 +196,8 @@ subroutine  psb_i2scatterm(globx, locx, desc_a, info, root)
 
     call mpi_gatherv(ltg,nlr,&
          & psb_mpi_lpk_,l_t_g_all,all_dim,&
-         & displ,psb_mpi_lpk_,rootrank,icomm,info)
-
+         & displ,psb_mpi_lpk_,rootrank,icomm,minfo)
+    info = minfo 
     do col=1, k
       ! prepare vector to scatter
       if(iam == iroot) then
@@ -211,9 +212,9 @@ subroutine  psb_i2scatterm(globx, locx, desc_a, info, root)
 
       ! scatter 
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & psb_mpi_i2pk_,locx(1,col),nrow,&
-           & psb_mpi_i2pk_,rootrank,icomm,info)
-
+           & psb_mpi_i2pk_,locx(1,col),nlr,&
+           & psb_mpi_i2pk_,rootrank,icomm,minfo)
+      info = minfo
     end do
 
     deallocate(l_t_g_all, scatterv,stat=info)
@@ -308,7 +309,7 @@ subroutine  psb_i2scatterv(globx, locx, desc_a, info, root)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr
+  integer(psb_mpk_) :: np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr, minfo
   integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_lpk_) :: m, n, i, j, idx, iglobx, jglobx
@@ -403,8 +404,8 @@ subroutine  psb_i2scatterv(globx, locx, desc_a, info, root)
     !
     nlr = nrow
     call mpi_gather(nlr,1,psb_mpi_mpk_,all_dim,&
-         & 1,psb_mpi_mpk_,rootrank,icomm,info)
-
+         & 1,psb_mpi_mpk_,rootrank,icomm,minfo)
+    info = minfo
     if(iam == iroot) then
       displ(1)=0
       do i=2,np
@@ -436,8 +437,8 @@ subroutine  psb_i2scatterv(globx, locx, desc_a, info, root)
 
     call mpi_gatherv(ltg,nlr,&
          & psb_mpi_lpk_,l_t_g_all,all_dim,&
-         & displ,psb_mpi_lpk_,rootrank,icomm,info)
-
+         & displ,psb_mpi_lpk_,rootrank,icomm,minfo)
+    info = minfo 
     ! prepare vector to scatter
     if (iam == iroot) then
       do i=1,np
@@ -451,9 +452,9 @@ subroutine  psb_i2scatterv(globx, locx, desc_a, info, root)
     end if
 
     call mpi_scatterv(scatterv,all_dim,displ,&
-         & psb_mpi_i2pk_,locx,nrow,&
-         & psb_mpi_i2pk_,rootrank,icomm,info)
-
+         & psb_mpi_i2pk_,locx,nlr,&
+         & psb_mpi_i2pk_,rootrank,icomm,minfo)
+    info = minfo 
     deallocate(l_t_g_all, scatterv,stat=info)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_

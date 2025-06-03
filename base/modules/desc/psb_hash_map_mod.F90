@@ -118,7 +118,11 @@ module psb_hash_map_mod
   end interface hash_inner_cnv
   private :: hash_inner_cnv
   interface hash_srch 
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     module procedure  hash_srch_ipk, hash_srch_lpk
+#else
+    module procedure hash_srch_ipk
+#endif
   end interface hash_srch
   private :: hash_srch
   integer, parameter, private :: seqsrchmax=6
@@ -1498,6 +1502,7 @@ contains
     end if
   end function hash_srch_ipk
 
+#if defined(PSB_IPK4) && defined(PSB_LPK8) 
   function hash_srch_lpk(key,idx,nh,glb_lc) result(res)
     integer(psb_lpk_), intent(in) :: key
     integer(psb_lpk_), intent(in) :: glb_lc(:)
@@ -1539,6 +1544,7 @@ contains
       end if
     end if
   end function hash_srch_lpk
+#endif
 
   subroutine hash_clone(idxmap,outmap,info)
     use psb_penv_mod

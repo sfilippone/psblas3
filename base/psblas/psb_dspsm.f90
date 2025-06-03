@@ -291,9 +291,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
-       & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
+  integer(psb_mpk_) :: np, me, ik
+  integer(psb_ipk_) :: err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
+       & i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
   character                :: lscale

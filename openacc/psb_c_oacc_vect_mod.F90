@@ -409,7 +409,8 @@ contains
   subroutine c_oacc_sctb_buf(i, n, idx, beta, y)
     use psb_base_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     complex(psb_spk_) :: beta
     class(psb_c_vect_oacc) :: y
@@ -441,7 +442,8 @@ contains
 
   contains
     subroutine inner_sctb(n,x,beta,y,idx)
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_)    :: beta,x(:), y(:)
       integer(psb_ipk_) :: k
       !$acc update device(x(1:n)) 
@@ -457,7 +459,8 @@ contains
   subroutine c_oacc_sctb_x(i, n, idx, x, beta, y)
     use psb_base_mod
     implicit none
-    integer(psb_ipk_):: i, n
+    integer(psb_ipk_):: i
+    integer(psb_mpk_):: n
     class(psb_i_base_vect_type) :: idx
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_vect_oacc) :: y
@@ -486,7 +489,8 @@ contains
 
   contains
     subroutine inner_sctb(n,x,beta,y,idx)
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: beta, x(:), y(:)
       integer(psb_ipk_) :: k
       !$acc update device(x(1:n)) 
@@ -502,7 +506,7 @@ contains
   subroutine c_oacc_sctb(n, idx, x, beta, y)
     use psb_base_mod
     implicit none
-    integer(psb_ipk_) :: n
+    integer(psb_mpk_) :: n
     integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_vect_oacc) :: y
@@ -522,7 +526,8 @@ contains
   subroutine c_oacc_gthzbuf(i, n, idx, x)
     use psb_base_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     class(psb_c_vect_oacc) :: x
     integer(psb_ipk_) :: info,k
@@ -555,7 +560,8 @@ contains
 
   contains
     subroutine inner_gth(n,x,y,idx)
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_)   :: x(:), y(:)
       integer(psb_ipk_) :: k
       !
@@ -571,7 +577,8 @@ contains
   subroutine c_oacc_gthzv_x(i, n, idx, x, y)
     use psb_base_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type):: idx
     complex(psb_spk_) :: y(:)
     class(psb_c_vect_oacc):: x
@@ -599,7 +606,8 @@ contains
     end if
   contains
     subroutine inner_gth(n,x,y,idx)
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:), y(:)
       integer(psb_ipk_) :: k
       !
@@ -690,9 +698,10 @@ contains
     integer(psb_ipk_) :: info
 
     call x%free(info)
-    call x%all(n, info)
+    call x%all(ione*n, info)
     if (info /= 0) then
-      call psb_errpush(info, 'c_oacc_bld_mn', i_err=(/n, n, n, n, n/))
+      call psb_errpush(info, 'c_oacc_bld_mn',&
+           & i_err=ione*(/n, n, n, n, n/))
     end if
     call x%set_host()
     call x%sync_dev_space()
@@ -712,7 +721,7 @@ contains
     if (info /= 0) then
       info = psb_err_alloc_request_
       call psb_errpush(info, 'c_oacc_bld_x', &
-           i_err=(/size(this), izero, izero, izero, izero/))
+           i_err=(/size(this)*ione, izero, izero, izero, izero/))
       return
     end if
     x%v(:) = this(:)

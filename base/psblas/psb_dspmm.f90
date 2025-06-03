@@ -359,9 +359,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, i, ib, ib1, ip, idx, ik
+  integer(psb_mpk_) :: np, me, ib1, ik
+  integer(psb_ipk_) :: err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, i, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
   integer(psb_ipk_), parameter               :: nb=4
   real(psb_dpk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
@@ -707,9 +707,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, ib, ip, idx, ik
+  integer(psb_mpk_) :: np, me, ik
+  integer(psb_ipk_) :: err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
   integer(psb_ipk_), parameter           :: nb=4
   real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)

@@ -910,7 +910,8 @@ subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:,:), y(:),alpha,beta
 
   ! Locals
@@ -995,7 +996,8 @@ subroutine psi_cgthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_mpk_) :: n
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:), y(:),alpha,beta
 
   ! Locals
@@ -1051,7 +1053,8 @@ subroutine psi_cgthzmm(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:,:), y(:,:)
 
   ! Locals
@@ -1069,7 +1072,8 @@ subroutine psi_cgthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:,:), y(:)
 
   ! Locals
@@ -1090,7 +1094,8 @@ subroutine psi_cgthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_mpk_) :: n
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:), y(:)
 
   ! Locals
@@ -1107,7 +1112,8 @@ subroutine psi_csctmm(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: beta, x(:,:), y(:,:)
 
   ! Locals
@@ -1133,7 +1139,8 @@ subroutine psi_csctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: beta, x(:), y(:,:)
 
   ! Locals
@@ -1171,7 +1178,8 @@ subroutine psi_csctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_mpk_) :: n
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: beta, x(:), y(:)
 
   ! Locals

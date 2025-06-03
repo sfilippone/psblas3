@@ -128,64 +128,72 @@ module psi_c_serial_mod
   
   interface psi_gth
     subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_cgthmv
     subroutine psi_cgthv(n,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:), y(:),alpha,beta
     end subroutine psi_cgthv
     subroutine psi_cgthzmv(n,k,idx,x,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:,:), y(:)
 
     end subroutine psi_cgthzmv
     subroutine psi_cgthzmm(n,k,idx,x,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:,:), y(:,:)
 
     end subroutine psi_cgthzmm
     subroutine psi_cgthzv(n,idx,x,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:), y(:)
     end subroutine psi_cgthzv
   end interface psi_gth
 
   interface psi_sct
     subroutine psi_csctmm(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_csctmm
     subroutine psi_csctmv(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: beta, x(:), y(:,:)
     end subroutine psi_csctmv
     subroutine psi_csctv(n,idx,x,beta,y)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
 
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: beta, x(:), y(:)
     end subroutine psi_csctv
   end interface psi_sct
 
   interface psi_exscan
     subroutine psi_c_exscanv(n,x,info,shift)
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_mpk_, psb_spk_
       implicit none
       integer(psb_ipk_), intent(in)      :: n
       complex(psb_spk_), intent (inout)    :: x(:)

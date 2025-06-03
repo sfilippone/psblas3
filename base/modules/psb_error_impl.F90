@@ -15,7 +15,7 @@ subroutine psb_errcomm_m(ctxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
   type(psb_ctxt_type), intent(in)  :: ctxt
-  integer(psb_ipk_), intent(inout) :: err
+  integer(psb_mpk_), intent(inout) :: err
   
   if (psb_get_global_checks()) call psb_amx(ctxt, err)
 

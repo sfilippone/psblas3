@@ -98,7 +98,8 @@ subroutine psi_i2swapdatam(flag,n,beta,y,desc_a,work,info,data)
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: flag, n
+  integer(psb_mpk_), intent(in)      :: n
+  integer(psb_ipk_), intent(in)      :: flag
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_i2pk_)         :: y(:,:), beta
   integer(psb_i2pk_), target :: work(:)
@@ -108,7 +109,8 @@ subroutine psi_i2swapdatam(flag,n,beta,y,desc_a,work,info,data)
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: icomm
-  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
+  integer(psb_mpk_) :: np, me
+  integer(psb_ipk_) :: idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -171,7 +173,8 @@ subroutine psi_i2swapidxm(ctxt,icomm,flag,n,beta,y,idx, &
 
   type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_mpk_), intent(in)   :: icomm
-  integer(psb_ipk_), intent(in)   :: flag,n
+  integer(psb_mpk_), intent(in)   :: n
+  integer(psb_ipk_), intent(in)   :: flag
   integer(psb_ipk_), intent(out)  :: info
   integer(psb_i2pk_)         :: y(:,:), beta
   integer(psb_i2pk_), target :: work(:)
@@ -179,12 +182,11 @@ subroutine psi_i2swapidxm(ctxt,icomm,flag,n,beta,y,idx, &
 
   ! locals
   
-  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: np, me, nesd, nerv
   integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
+  integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
@@ -585,7 +587,8 @@ subroutine psi_i2swapdatav(flag,beta,y,desc_a,work,info,data)
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: icomm
-  integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
+  integer(psb_mpk_) :: np, me
+  integer(psb_ipk_) :: idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -666,13 +669,12 @@ subroutine psi_i2swapidxv(ctxt,icomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: np, me, nesd, nerv, n
   integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, n
+  integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.

@@ -117,7 +117,8 @@ contains
     implicit none 
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: root
-    integer(psb_ipk_) :: me, np, info
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: me, np, mroot
     integer(psb_lpk_) :: n
 
     call psb_info(ctxt,me,np)
@@ -128,8 +129,8 @@ contains
       call psb_abort(ctxt)
       return
     endif
-
-    if (me == root) then 
+    mroot = root
+    if (me == mroot) then 
       if (.not.allocated(graph_vect)) then
         write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
              & 'not initialized'
@@ -137,9 +138,9 @@ contains
         return
       endif
       n = size(graph_vect)
-      call psb_bcast(ctxt,n,root=root)
+      call psb_bcast(ctxt,n,root=mroot)
     else 
-      call psb_bcast(ctxt,n,root=root)
+      call psb_bcast(ctxt,n,root=mroot)
 
       allocate(graph_vect(n),stat=info)
       if (info /= psb_success_) then
@@ -148,7 +149,7 @@ contains
         return
       endif
     endif
-    call psb_bcast(ctxt,graph_vect(1:n),root=root)
+    call psb_bcast(ctxt,graph_vect(1:n),root=mroot)
 
     return
 

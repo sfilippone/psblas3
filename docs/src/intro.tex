@@ -1,3 +1,60 @@
+\section*{Preface}
+\addcontentsline{toc}{section}{Preface}
+This manual describes the main features of PSBLAS, a library for
+parallel sparse computations that  has been developed over a number of
+years.
+
+Our work has been mainly devoted to providing a foundational toolkit
+on which many algorithms can be implemented; the toolkit has proven
+its effectiveness and flexibility in many ways.
+The PSBLAS component deals mostly with the computational kernels and
+environment handling; it supports computations on normal CPUs,
+including the usage of OpenMP for parallellizing across multiple
+cores.
+
+This foundational package provides linear solvers and some very
+simple preconditioners; the companion package AMG4PSBLAS explores how
+to use the base toolkit to build much more sophisticated
+preconditioners which can be plugged seamlessly into the base solvers.  
+
+The software architecture allows us to offer support for many
+alternatives in the implementation, including usage of
+heterogeneous platforms, and computations performed on GPUs throuh
+CUDA. 
+There is support for GPU computations through OpenACC, but it is at
+this time a highly experimental version; we plan to also look at using 
+accelerators through OpenMP as support from compilers improves.
+
+The project is lead by Salvatore Filippone; a number of people have been contributing to this package over the
+years; contributors in roughly reverse chronological order:
+\begin{obeylines}
+ Theophane  Loloum
+ Fabio      Durastante
+ Dimitri    Walther
+ Andea      Di Iorio
+ Stefano    Petrilli
+ Soren 	   Rasmussen
+ Zaak       Beekman
+ Ambra	   Abdullahi Hassan
+ Pasqua	   D'Ambra
+ Alfredo    Buttari
+ Daniela    di Serafino
+ Michele    Martone
+ Michele    Colajanni
+ Fabio      Cerioni
+ Stefano    Maiolatesi
+ Dario      Pascucci
+\end{obeylines}
+
+\begin{flushright}
+  Salvatore Filippone\\
+  Alfredo Buttari\\
+  Fabio Durastante
+\end{flushright}
+\clearpage
+
+
+
 \section{Introduction}\label{sec:intro}
 
 The PSBLAS library, developed with the aim to facilitate the
@@ -12,19 +69,20 @@ addresses a distributed memory execution model operating with message
 passing. 
 
 The PSBLAS library version 3 is  implemented in
- the Fortran~2003~\cite{metcalf} programming language, with reuse and/or
+ the Fortran~2008~\cite{metcalf} programming language, with reuse and/or
  adaptation of  existing Fortran~77 and Fortran~95 software, plus a
  handful of C  routines. 
 
-The use of Fortran~2003 offers a number of advantages over Fortran~95,
+The use of Fortran~2008 offers a number of advantages over Fortran~95,
 mostly in the handling of requirements for evolution and adaptation of
 the library to new computing architectures and integration of
 new algorithms. 
 For a detailed discussion of our design see~\cite{Sparse03}; other
-works discussing advanced programming in Fortran~2003
+works discussing advanced programming in Fortran~2008
 include~\cite{DesPat:11,RouXiaXu:11}; sufficient support for
-Fortran~2003 is now available from many compilers, including the GNU
-Fortran compiler from the Free Software Foundation (as of version 4.8). 
+Fortran~2008 is now available from many compilers, including recent
+versions of the GNU Fortran compiler from the Free Software
+Foundation, and the FLANG compiler from the LLVM project.  
 
 
 Previous approaches have been based on mixing Fortran~95, with its
@@ -83,7 +141,7 @@ influenced by the structure of the ScaLAPACK parallel
 library.  The layered structure of the PSBLAS library
 is shown in figure~\ref{fig:psblas}; lower layers of the library
 indicate an encapsulation relationship with upper layers. The ongoing
-discussion focuses on the Fortran~2003 layer immediately below the
+discussion focuses on the Fortran~2008 layer immediately below the
 application layer.
 The serial parts of the computation on each process are executed through
 calls to the serial sparse BLAS subroutines. 
@@ -257,7 +315,7 @@ systems solution for block diagonal matrices;
 \item Sparse matrix and data distribution preprocessing.
 \end{itemize} 
 \item[Preconditioner routines]
-\item[Iterative methods] a subset of Krylov subspace iterative
+\item[Iterative methods] a subset of classical and Krylov subspace iterative
   methods
 \end{description}
 The following naming scheme has been adopted for all the symbols

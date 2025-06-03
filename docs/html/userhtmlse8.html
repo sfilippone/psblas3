@@ -17,7 +17,7 @@ href="userhtmlse7.html#tailuserhtmlse7.html" >prev-tail</a>] [<a
 href="userhtmlse5.html#tailuserhtmlse8.html">tail</a>] [<a 
 href="userhtml.html#userhtmlse11.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">8    </span> <a 
- id="x13-1230008"></a>Error handling</h3>
+ id="x14-1240008"></a>Error handling</h3>
 <!--l. 5--><p class="noindent" >The PSBLAS library error handling policy has been completely rewritten in version
 2.0. The idea behind the design of this new error handling strategy is to keep error
 messages on a stack allowing the user to trace back up to the point where the first
@@ -36,7 +36,7 @@ zero, an error condition is raised. This process continues on all the levels of
 nested calls until the level where the user decides to abort the program
 execution.
 <!--l. 23--><p class="indent" >   Figure&#x00A0;<a 
-href="#x13-123025r5">5<!--tex4ht:ref: fig:routerr --></a> shows the layout of a generic <span class="obeylines-h"><span class="verb"><span 
+href="#x14-124025r5">5<!--tex4ht:ref: fig:routerr --></a> shows the layout of a generic <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_foo</span></span></span> routine with respect to the
 PSBLAS-2.0 error handling policy. It is possible to see how, whenever an error
 condition is detected, the <span class="obeylines-h"><span class="verb"><span 
@@ -58,7 +58,7 @@ explicitly.
 
                                                                   
 <!--l. 40--><p class="indent" >   <a 
- id="x13-123025r5"></a><hr class="float"><div class="float" 
+ id="x14-124025r5"></a><hr class="float"><div class="float" 
 >
                                                                   
 
@@ -68,7 +68,7 @@ explicitly.
 <!--l. 101--><p class="noindent" >
 <div class="fbox"><div class="minipage"><!--l. 72-->
 <pre class="lstlisting" id="listing-154"><span class="label"><a 
- id="x13-123001r1"></a></span><span style="color:#000000"><span 
+ id="x14-124001r1"></a></span><span style="color:#000000"><span 
 class="cmtt-9">subroutine</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">psb_foo</span></span><span style="color:#000000"><span 
 class="cmtt-9">(</span></span><span style="color:#000000"><span 
@@ -78,13 +78,13 @@ class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="c
 class="cmtt-9">info</span></span><span style="color:#000000"><span 
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
- id="x13-123002r2"></a></span><span 
+ id="x14-124002r2"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">...</span></span> 
 <span class="label"><a 
- id="x13-123003r3"></a></span><span 
+ id="x14-124003r3"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
@@ -95,7 +95,7 @@ class="cmtt-9">detected</span></span><span style="color:#000000"><span
 class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">then</span></span> 
 <span class="label"><a 
- id="x13-123004r4"></a></span><span 
+ id="x14-124004r4"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -105,7 +105,7 @@ class="cmtt-9">info</span></span><span style="color:#000000"><span
 class="cmtt-9">=</span></span><span style="color:#000000"><span 
 class="cmtt-9">errcode1</span></span> 
 <span class="label"><a 
- id="x13-123005r5"></a></span><span 
+ id="x14-124005r5"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -121,7 +121,7 @@ class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="c
 class="cmtt-9">errcode1</span></span><span style="color:#000000"><span 
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
- id="x13-123006r6"></a></span><span 
+ id="x14-124006r6"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -130,20 +130,20 @@ class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span
 class="cmtt-9">goto</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">9999</span></span> 
 <span class="label"><a 
- id="x13-123007r7"></a></span><span 
+ id="x14-124007r7"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">if</span></span> 
 <span class="label"><a 
- id="x13-123008r8"></a></span><span 
+ id="x14-124008r8"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">...</span></span> 
 <span class="label"><a 
- id="x13-123009r9"></a></span><span 
+ id="x14-124009r9"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
@@ -156,7 +156,7 @@ class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="c
 class="cmtt-9">info</span></span><span style="color:#000000"><span 
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
- id="x13-123010r10"></a></span><span 
+ id="x14-124010r10"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
@@ -170,7 +170,7 @@ class="cmtt-9">zero</span></span><span style="color:#000000"><span
 class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">then</span></span> 
 <span class="label"><a 
- id="x13-123011r11"></a></span><span 
+ id="x14-124011r11"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -180,7 +180,7 @@ class="cmtt-9">info</span></span><span style="color:#000000"><span
 class="cmtt-9">=</span></span><span style="color:#000000"><span 
 class="cmtt-9">errcode2</span></span> 
 <span class="label"><a 
- id="x13-123012r12"></a></span><span 
+ id="x14-124012r12"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -196,7 +196,7 @@ class="cmtt-9">,</span></span><span style="color:#000000"> </span><span style="c
 class="cmtt-9">errcode2</span></span><span style="color:#000000"><span 
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
- id="x13-123013r13"></a></span><span 
+ id="x14-124013r13"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -205,24 +205,24 @@ class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span
 class="cmtt-9">goto</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">9999</span></span> 
 <span class="label"><a 
- id="x13-123014r14"></a></span><span 
+ id="x14-124014r14"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">if</span></span> 
 <span class="label"><a 
- id="x13-123015r15"></a></span><span 
+ id="x14-124015r15"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">...</span></span> 
 <span class="label"><a 
- id="x13-123016r16"></a></span><span style="color:#000000"><span 
+ id="x14-124016r16"></a></span><span style="color:#000000"><span 
 class="cmtt-9">9999</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">continue</span></span> 
 <span class="label"><a 
- id="x13-123017r17"></a></span><span 
+ id="x14-124017r17"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
@@ -236,7 +236,7 @@ class="cmtt-9">act_abort</span></span><span style="color:#000000"><span
 class="cmtt-9">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">then</span></span> 
 <span class="label"><a 
- id="x13-123018r18"></a></span><span 
+ id="x14-124018r18"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
@@ -247,36 +247,36 @@ class="cmtt-9">(</span></span><span style="color:#000000"><span
 class="cmtt-9">icontxt</span></span><span style="color:#000000"><span 
 class="cmtt-9">)</span></span> 
 <span class="label"><a 
- id="x13-123019r19"></a></span><span 
+ id="x14-124019r19"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">return</span></span> 
 <span class="label"><a 
- id="x13-123020r20"></a></span><span 
+ id="x14-124020r20"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">else</span></span> 
 <span class="label"><a 
- id="x13-123021r21"></a></span><span 
+ id="x14-124021r21"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">return</span></span> 
 <span class="label"><a 
- id="x13-123022r22"></a></span><span 
+ id="x14-124022r22"></a></span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span 
 class="cmtt-9">&#x00A0;</span><span style="color:#000000"><span 
 class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">if</span></span> 
 <span class="label"><a 
- id="x13-123023r23"></a></span> 
+ id="x14-124023r23"></a></span> 
 <span class="label"><a 
- id="x13-123024r24"></a></span><span style="color:#000000"><span 
+ id="x14-124024r24"></a></span><span style="color:#000000"><span 
 class="cmtt-9">end</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">subroutine</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-9">psb_foo</span></span></pre></div></div>
@@ -286,13 +286,13 @@ class="cmtt-9">psb_foo</span></span></pre></div></div>
 class="content">The layout of a generic <span 
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_foo </span>routine with respect to PSBLAS-2.0
-error handling policy.</span></div><!--tex4ht:label?: x13-123025r5 -->
+error handling policy.</span></div><!--tex4ht:label?: x14-124025r5 -->
                                                                   
 
                                                                   
    </div><hr class="endfloat" />
 <!--l. 112--><p class="indent" >   Figure&#x00A0;<a 
-href="#x13-123026r6">6<!--tex4ht:ref: fig:errormsg --></a> reports a sample error message generated by the PSBLAS-2.0
+href="#x14-124026r6">6<!--tex4ht:ref: fig:errormsg --></a> reports a sample error message generated by the PSBLAS-2.0
 library. This error has been generated by the fact that the user has chosen the
 invalid &#8220;FOO&#8221; storage format to represent the sparse matrix. From this
 error message it is possible to see that the error has been detected inside
@@ -304,7 +304,7 @@ process).
 
                                                                   
 <!--l. 120--><p class="indent" >   <a 
- id="x13-123026r6"></a><hr class="float"><div class="float" 
+ id="x14-124026r6"></a><hr class="float"><div class="float" 
 >
                                                                   
 
@@ -333,7 +333,7 @@ Aborting...
 <br /> <div class="caption" 
 ><span class="id">Listing 6: </span><span  
 class="content">A sample PSBLAS-3.0 error message. Process 0 detected an error
-condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x13-123026r6 -->
+condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x14-124026r6 -->
                                                                   
 
                                                                   
@@ -342,10 +342,10 @@ condition inside the psb_cest subroutine</span></div><!--tex4ht:label?: x13-1230
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">8.1    </span> <a 
- id="x13-1240008.1"></a>psb_errpush &#8212; Pushes an error code onto the error stack</h4>
+ id="x14-1250008.1"></a>psb_errpush &#8212; Pushes an error code onto the error stack</h4>
    <!--l. 174-->
    <pre class="lstlisting" id="listing-155"><span class="label"><a 
- id="x13-124001r1"></a></span><span style="color:#000000"><span 
+ id="x14-125001r1"></a></span><span style="color:#000000"><span 
 class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-10">psb_errpush</span></span><span style="color:#000000"><span 
 class="cmtt-10">(</span></span><span style="color:#000000"><span 
@@ -433,10 +433,10 @@ class="newline" /></dd></dl>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">8.2    </span> <a 
- id="x13-1250008.2"></a>psb_error &#8212; Prints the error stack content and aborts execution</h4>
+ id="x14-1260008.2"></a>psb_error &#8212; Prints the error stack content and aborts execution</h4>
    <!--l. 204-->
    <pre class="lstlisting" id="listing-156"><span class="label"><a 
- id="x13-125001r1"></a></span><span style="color:#000000"><span 
+ id="x14-126001r1"></a></span><span style="color:#000000"><span 
 class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-10">psb_error</span></span><span style="color:#000000"><span 
 class="cmtt-10">(</span></span><span style="color:#000000"><span 
@@ -473,10 +473,10 @@ class="newline" />Specified as: an integer.</dd></dl>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">8.3    </span> <a 
- id="x13-1260008.3"></a>psb_set_errverbosity &#8212; Sets the verbosity of error messages</h4>
+ id="x14-1270008.3"></a>psb_set_errverbosity &#8212; Sets the verbosity of error messages</h4>
    <!--l. 224-->
    <pre class="lstlisting" id="listing-157"><span class="label"><a 
- id="x13-126001r1"></a></span><span style="color:#000000"><span 
+ id="x14-127001r1"></a></span><span style="color:#000000"><span 
 class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-10">psb_set_errverbosity</span></span><span style="color:#000000"><span 
 class="cmtt-10">(</span></span><span style="color:#000000"><span 
@@ -513,11 +513,11 @@ class="newline" />Specified as: an integer.</dd></dl>
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">8.4    </span> <a 
- id="x13-1270008.4"></a>psb_set_erraction &#8212; Set the type of action to be taken upon error
+ id="x14-1280008.4"></a>psb_set_erraction &#8212; Set the type of action to be taken upon error
 condition</h4>
    <!--l. 241-->
    <pre class="lstlisting" id="listing-158"><span class="label"><a 
- id="x13-127001r1"></a></span><span style="color:#000000"><span 
+ id="x14-128001r1"></a></span><span style="color:#000000"><span 
 class="cmtt-10">call</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="cmtt-10">psb_set_erraction</span></span><span style="color:#000000"><span 
 class="cmtt-10">(</span></span><span style="color:#000000"><span 
