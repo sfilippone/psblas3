@@ -570,8 +570,8 @@ contains
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info == 0) call x%free_buffer(info)
-    if (info == 0) call x%free_comid(info)
+    if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
+    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
     if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
 
