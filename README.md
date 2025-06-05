@@ -208,15 +208,16 @@ Salvatore Filippone
 
 **Contributors** (_roughly reverse cronological order_):
 
+- Luca       Pepè Sciarria
 - Theophane  Loloum
 - Fabio      Durastante
 - Dimitri    Walther
 - Andea      Di Iorio
 - Stefano    Petrilli
-- Soren 	   Rasmussen
+- Soren      Rasmussen
 - Zaak       Beekman
-- Ambra	   Abdullahi Hassan
-- Pasqua	   D'Ambra
+- Ambra	     Abdullahi Hassan
+- Pasqua     D'Ambra
 - Alfredo    Buttari
 - Daniela    di Serafino
 - Michele    Martone
