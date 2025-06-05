@@ -1245,9 +1245,36 @@ export(
 
 
 
+# Set the installation directory for the test files
+set(INSTALL_TEST_DIR "${CMAKE_INSTALL_PREFIX}/test" CACHE PATH "Installation directory for test files")
 
+function(install_directory_recursive source_dir install_base_dir) # Function to install a directory and its subdirectories recursively
+    file(GLOB_RECURSE ALL_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}" "${source_dir}/*")
 
+    foreach(FILE_PATH IN LISTS ALL_FILES)
+        # Construct the full source and destination paths
+        set(FULL_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}/${FILE_PATH}")
+        set(FULL_INSTALL_PATH "${install_base_dir}/${FILE_PATH}")
 
+        # Check if it's a directory
+        if(IS_DIRECTORY "${FULL_SOURCE_PATH}")
+            # Create the directory in the install destination
+            file(MAKE_DIRECTORY "${FULL_INSTALL_PATH}")
+        else()
+            # Install the file
+            install(FILES "${FULL_SOURCE_PATH}" DESTINATION "${install_base_dir}" RENAME "${FILE_PATH}")
+        endif()
+    endforeach()
+endfunction()
+
+# Install cbind/test directory
+install_directory_recursive(cbind/test "${INSTALL_TEST_DIR}/cbind")
+
+# Install test/fileread directory
+install_directory_recursive(test/fileread "${INSTALL_TEST_DIR}/fileread")
+
+# Install test/pdegen directory
+install_directory_recursive(test/pdegen "${INSTALL_TEST_DIR}/pdegen")
 
 
 message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX} - ${PSB_CMAKE_INSTALL_PREFIX};")
