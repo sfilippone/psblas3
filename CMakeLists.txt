@@ -1246,7 +1246,7 @@ export(
 
 
 # Set the installation directory for the test files
-set(INSTALL_TEST_DIR "${CMAKE_INSTALL_PREFIX}/test" CACHE PATH "Installation directory for test files")
+set(INSTALL_TEST_DIR "${CMAKE_INSTALL_PREFIX}/samples" CACHE PATH "Installation directory for sample files")
 
 function(install_directory_recursive source_dir install_base_dir) # Function to install a directory and its subdirectories recursively
     file(GLOB_RECURSE ALL_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}" "${source_dir}/*")
