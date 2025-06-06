@@ -1,81 +1,44 @@
-cmake_minimum_required(VERSION 3.15)
-project(PSB_PDEGen3D C)
+cmake_minimum_required(VERSION 3.10)
+project(pdegen C Fortran)
 
-# Project structure (mimicking Makefile's TOP)
-set(TOP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../..") # Adjust if needed
+# Check for the installation path for psblas
+if(NOT DEFINED PSBLAS_INSTALL_DIR)
+    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
+endif()
 
-# Include directories
-include_directories(
-    "."
-    "${CMAKE_CURRENT_SOURCE_DIR}/../.."
-    "${TOP_DIR}/include"
-)
+# Set the include and library directories based on the provided path
+set(INSTALLDIR "${PSBLAS_INSTALL_DIR}")
+set(INCDIR "${INSTALLDIR}/include")
+set(MODDIR "${INSTALLDIR}/modules")
+set(LIBDIR "${INSTALLDIR}/lib")
 
-# Fortran module directory
-set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/modules")
-set(FMFLAG "-I") # Adjust if needed
+#set(CMAKE_VERBOSE_MAKEFILE ON) 
 
-# Library directories
-link_directories("${TOP_DIR}/lib")
+# Find the psblas package
+find_package(psblas REQUIRED PATHS ${INSTALLDIR})
 
-# Libraries
-set(PSBC_LIBS psb_cbind)
-set(PSB_LIBS psb_util psb_linsolve psb_prec psb_base)
+# Include directories for the Fortran compiler
+include_directories(${INCDIR} ${MODDIR})
 
-# Executable directory
-set(EXEDIR "${CMAKE_CURRENT_BINARY_DIR}/runs")
-file(MAKE_DIRECTORY "${EXEDIR}")
+# Define executable directory
+set(EXEDIR "${CMAKE_CURRENT_SOURCE_DIR}/runs")
 
-# Source files
-set(SOURCE_FILES pdegen3dc.c)
+# Ensure the executable directory exists
+file(MAKE_DIRECTORY ${EXEDIR})
 
-# Create executable
-add_executable(pdegen3dc ${SOURCE_FILES})
+# Define sources for the executables
+set(SOURCES_PDEGEN pdegen3dc.c)
 
-# Link libraries
-target_link_libraries(pdegen3dc PUBLIC
-    ${PSBC_LIBS}
-    ${PSB_LIBS}
-    m  # Math library
-    gfortran # gfortran library
-)
 
-# Move executable to EXEDIR (post-build)
-add_custom_command(TARGET pdegen3dc POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E move $<TARGET_FILE:pdegen3dc> ${EXEDIR}
-)
+# Create executables
+add_executable(psb_pdegen ${SOURCES_PDEGEN})
+target_link_libraries(psb_pdegen psblas::cbind psblas::ext psblas::util psblas::linsolve psblas::prec psblas::base )
 
-# Create "runs" directory (if it doesn't exist)
-add_custom_target(create_runs_dir
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${EXEDIR}"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Creating runs directory"
-)
-add_dependencies(pdegen3dc create_runs_dir)
 
-# verycleanlib target
-add_custom_target(verycleanlib
-    COMMAND ${CMAKE_COMMAND} -E chdir "../../" ${CMAKE_COMMAND} --build . --target veryclean
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Cleaning library"
-)
+# Set output directory for executables
+foreach(target psb_pdegen)
+    set_target_properties(${target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
+    )
+endforeach()
 
-# lib target
-add_custom_target(lib
-    COMMAND ${CMAKE_COMMAND} -E chdir "../../" ${CMAKE_COMMAND} --build . --target library
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Building library"
-)
-
-# tests target
-add_custom_target(tests
-    COMMAND ${CMAKE_COMMAND} -E chdir "${EXEDIR}" ${CMAKE_CURRENT_SOURCE_DIR}/${EXEDIR}/pdegen3dc < ${CMAKE_CURRENT_SOURCE_DIR}/${EXEDIR}/pdegen3d.inp
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS pdegen3dc
-    COMMENT "Running tests"
-)
-
-add_dependencies(tests pdegen3dc)
-
-# Install target (optional)
-install(TARGETS pdegen3dc DESTINATION bin)
