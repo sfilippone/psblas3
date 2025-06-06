@@ -666,7 +666,7 @@ if(PSB_BUILD_CUDA)
     if(NOT DEFINED PSB_CUDA_PATH)
             set(PSB_CUDA_PATH "/opt/cuda/12.8")
     endif()
-    # Include the CMakeLists for the cbind library
+    # Include the CMakeLists for the cuda library
     include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
     include_directories("${PSB_CUDA_PATH}/include")
     message(STATUS "${PSB_CUDA_PATH}")
@@ -948,7 +948,8 @@ if(WIN32)
     PUBLIC psb_cbind_C)
 else()
   add_library(cbind_C OBJECT ${cbind_source_C_files})
-  add_library(cbind ${cbind_source_files})
+  add_library(cbind ${cbind_source_files} $<TARGET_OBJECTS:cbind_C>)
+  
 endif()
 
 
