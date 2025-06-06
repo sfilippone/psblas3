@@ -20,7 +20,8 @@ EXEDIR=./runs
 all: pdegen3dc 
 
 pdegen3dc: pdegen3dc.o
-	$(MPFC) pdegen3dc.o  -o pdegen3dc $(PSBC_LIBS) $(PSB_LIBS) $(PSBLDLIBS) -lm -lgfortran
+	$(FLINK) pdegen3dc.o  -o pdegen3dc $(PSBC_LIBS) $(PSB_LIBS)\
+	    $(PSBLDLIBS) -lm 
 	/bin/mv pdegen3dc $(EXEDIR)
 
 

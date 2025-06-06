@@ -576,6 +576,7 @@ FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";
 dnl CDEFINES="-DPSB_IPK${pac_cv_ipk_size} -DPSB_LPK${pac_cv_lpk_size} $CDEFINES"
 
 FLINK="$MPIFC"
+CLINK="$MPICC"	
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DPSB_OPENMP $FDEFINES";
@@ -585,6 +586,7 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";	
    FLINK="$FLINK $pac_cv_openmp_fcopt";
+   CLINK="$CLINK $pac_cv_openmp_fcopt";	
 fi
 #
 # Tests for support of various Fortran features; some of them are critical,
@@ -1004,6 +1006,7 @@ AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
 AC_SUBST(FLINK)
+AC_SUBST(CLINK)
 AC_SUBST(LIBS)
 AC_SUBST(FLIBS)
 AC_SUBST(AR)
