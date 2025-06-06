@@ -1,4 +1,4 @@
-INSTALLDIR=../..
+INSTALLDIR=../../..
 INCDIR=$(INSTALLDIR)/include/
 MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
@@ -21,7 +21,7 @@ YELLOW=\033[33m
 END_COLOUR=\033[0m
 
 
-all: runsd psb_spmm_test 
+all: runsd psb_geaxpby_test 
 	@printf "$(GREEN)[INFO]\tCompilation success!$(END_COLOUR)\n" 
 
 runsd: 	
@@ -29,14 +29,13 @@ runsd:
 	@printf "$(BLUE)[INFO]\tBuild directory $(EXEDIR) correctly initialized$(END_COLOUR)\n"
 
 
-psb_spmm_test:
-	@$(FLINK) $(LOPT) psb_spmm_test.f90 spmm.f90 -o psb_spmm_test -I../../modules/ -I. $(PSBLAS_LIB) $(LDLIBS) 
-	@mv psb_spmm_test $(EXEDIR)
+psb_geaxpby_test:
+	@$(FLINK) $(LOPT) psb_geaxpby_test.f90 geaxpby.f90 -o psb_geaxpby_test -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
+	@mv psb_geaxpby_test $(EXEDIR)
 	@printf "$(BLUE)[INFO]\tTesting files generated correctly$(END_COLOUR)\n" 
 
 clean: 
 	@rm -f $(OBJS)\
-        *$(.mod) $(EXEDIR)/psb_spmm_test 
+        *$(.mod) $(EXEDIR)/psb_geaxpby_test 
 
 .PHONY: all runsd clean   
-

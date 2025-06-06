@@ -1,4 +1,4 @@
-!> Test program for y = AX spsb_pmm routine
+!> Test program for y = AX psb_spmm routine
 !! Check the README.md to see all details about the tests.
 !!
 !! Author: Luca Pepé Sciarria, Staccone Simone (Tor Vergata University)
@@ -136,8 +136,6 @@ module psb_spmm_test
         else if(beta == szero) then
             output_file_name = output_file_name // "_b3.mtx"
         end if
-
-
 
         ! Save result to output file
         call mm_array_write(y,"Result vector",info,filename=output_file_name)
