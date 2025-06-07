@@ -36,12 +36,11 @@ module psb_spmm_test
         integer(psb_ipk_)               	:: rows, cols, nnz
         integer(psb_ipk_)               	:: nr, nt ! In BLOCK ROWS distributin, the number of rows 
 
-
+        ! variables outside PSLBALS data structures
         real(psb_spk_), allocatable     	:: x_global(:), y_global(:)
         integer(psb_ipk_)               	:: i
 
         info = psb_success_
-
 
         call psb_info(ctxt,my_rank,np)
 

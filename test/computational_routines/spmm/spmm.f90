@@ -56,10 +56,10 @@ program main
 
 
     !! 1138_bus matrix (sparse)
-    do i=1,4 
-        do j=1,4
-            do k=1,3
-                do h=1,3
+    do i=1,size(x)
+        do j=1,size(y)
+            do k=1,size(alpha)
+                do h=1,size(beta)
                     call psb_spmm_kernel(mtx_file="matrix/1138_bus.mtx",x_file=x(i), y_file=y(j), &
                         & alpha = alpha(k), beta = beta(h), ctxt = ctxt)
                 end do
