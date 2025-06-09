@@ -12,10 +12,24 @@ program main
 
     ! parameters array
     character(len=64)       :: x(4),y(4)  
-    real(psb_ipk_)          :: alpha(3), beta(3)  
+    real(psb_spk_)          :: alpha(3), beta(3)
+    integer(psb_ipk_)       :: arr_size  
+    integer(psb_ipk_)       :: tests_number, count
 
     ! cycle indexes variables
     integer(psb_ipk_)       :: i,j,k,h,l
+    integer(psb_ipk_)       :: info, ret, unit
+
+    ! Setup logger output
+    unit = 43
+    open(unit, file='psblas_geaxpby_test.log', status='replace', action='write', iostat=info)
+    if (info /= 0) then
+       print *, 'Error opening output file.'
+       stop
+    end if
+    
+    ! Set psb_out_unit to redirect PSBLAS output
+    psb_out_unit = unit
 
 
     ! Initialize parameters
@@ -37,32 +51,47 @@ program main
     beta(2) = -sone
     beta(3) = szero
 
+    arr_size = 10000
+    tests_number = size(x) * size(y) * size(alpha) * size(beta)
+    count = 0
 
     call psb_init(ctxt)
     call psb_info(ctxt,my_rank,np)
 
     if(my_rank == psb_root_) then
-        write(psb_out_unit,*) 'Welcome to PSBLAS version: ',psb_version_string_
-        write(psb_out_unit,*) 'This is the psb_geaxpby_test sample program'
+        write(psb_out_unit,'(A,A)') 'Welcome to PSBLAS version: ',psb_version_string_
+        write(psb_out_unit,'(A)') 'This is the psb_geaxpby_test sample program'
+        write(psb_out_unit,'(A)') ''
 
-        call generate_vectors(10000,10000) 
+        call generate_vectors(arr_size) 
     end if
 
     call psb_barrier(ctxt)
-
-    if(my_rank == psb_root_) then
-        write(psb_out_unit,*) size(x)
-    end if
 
     do i=1,size(x)
         do j=1,size(y)
             do k=1,size(alpha)
                 do h=1,size(beta)
-                    call psb_geaxpby_kernel(x_file=x(i), y_file=y(j), alpha = alpha(k), beta = beta(h), ctxt = ctxt)
+                    call psb_geaxpby_kernel(x_file=x(i), y_file=y(j), alpha = alpha(k), beta = beta(h), & 
+                    & arr_size = arr_size, ctxt = ctxt, ret = ret)
+                    if(my_rank == psb_root_) then
+                        count = count + 1
+                        if(ret /= -1) then 
+                            write(psb_out_unit, '(A,I0,A,I0,A,A)') & 
+                            & "Generation geaxpby single precision result file ", count , "/", tests_number, CHAR(9), "[OK]"
+                        else
+                            write(psb_out_unit, '(A,I0,A,I0,A,A)') & 
+                            & "Generation geaxpby single precision result file ", count , "/", tests_number, CHAR(9), "[FAIL]"
+                        end if
+                    end if
+                    call psb_barrier(ctxt)
                 end do
             end do
         end do
     end do
+
+
+    ! Here double precision comparison should be done
 
 
 

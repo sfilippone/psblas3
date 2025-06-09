@@ -50,7 +50,7 @@ module psb_geaxpby_test
 
     contains
     
-    subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, ctxt)
+    subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, ret)
         use psb_base_mod
         use psb_util_mod
 
@@ -59,8 +59,11 @@ module psb_geaxpby_test
         ! input parameters
         character(len = *), intent(in)      :: x_file, y_file
         real(psb_spk_), intent(in)          :: alpha, beta
+        integer(psb_ipk_), intent(in)       :: arr_size
+        type(psb_ctxt_type), intent(in)     :: ctxt
 
-        character(len=:), allocatable       :: output_file_name       
+        ! output parameters
+        integer(psb_ipk_), intent(out)       :: ret
 
         ! vectors
         type(psb_s_vect_type)           	:: x, y
@@ -69,12 +72,17 @@ module psb_geaxpby_test
         type(psb_desc_type)             	:: desc_a
 
         ! communication context
-        type(psb_ctxt_type), intent(in)     :: ctxt
         integer(psb_ipk_)               	:: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
         real(psb_spk_), allocatable     	:: x_global(:), y_global(:)
         integer(psb_ipk_)               	:: i
+
+        ! others
+        logical                             :: exists
+        character(len=:), allocatable       :: output_file_name       
+
+
 
         info = psb_success_
 
@@ -87,11 +95,23 @@ module psb_geaxpby_test
 
         ! Generate random array for b using always the same seed
         if(my_rank == psb_root_) then
-            write(*,*) "Here"
-            allocate(x_global(10000))
-            allocate(y_global(10000))
+            allocate(x_global(arr_size))
+            allocate(y_global(arr_size))
             call mm_array_read(x_global,info,filename=x_file)
             call mm_array_read(y_global,info,filename=y_file)
+        end if
+
+        ! Allocate descriptor as if it was a block rows distribution
+        call psb_cdall(ctxt, desc_a, info,nl=10000/np)
+        if(info /= psb_success_) then
+            write(psb_out_unit,*) "Error allocating desc_a data structure"
+            goto 9999
+        end if
+
+        call psb_cdasb(desc_a, info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,*) "Error assembling desc_a data structure"
+            goto 9999
         end if
 
 
@@ -100,6 +120,7 @@ module psb_geaxpby_test
             write(psb_out_unit,*) "Error allocating x data structure"
             goto 9999
         end if
+
 
         ! Populate x class using data from x_global vector
         call psb_scatter(x_global,x,desc_a,info,root=psb_root_)
@@ -126,14 +147,24 @@ module psb_geaxpby_test
         ! y = alpha * x + beta * y
         call psb_geaxpby(alpha,x,beta,y,desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,*) "Error in psb_spmm routine"
+            write(psb_out_unit,*) "Error in psb_geaxpby routine"
             goto 9999
         end if
 
         ! Make the root process be the one that saves everything on file
         if(np == 1) then 
+            ! Check if output directory exists
+            inquire(file='serial/', exist=exists)
+            if (.not.exists) then
+                call system('mkdir serial/')
+            end if
             output_file_name = "serial/"
         else 
+            ! Check if output directory exists
+            inquire(file='parallel/', exist=exists)
+            if (.not.exists) then
+                call system('mkdir parallel/')
+            end if
             output_file_name = "parallel/"
         end if
 
@@ -187,9 +218,7 @@ module psb_geaxpby_test
 
 
         ! Error handling
-        9999 call psb_error(ctxt)
-
-        call psb_error_handler(ctxt,err_act)
+        9999 ret = -1 
         stop
 
     end subroutine
@@ -197,22 +226,30 @@ module psb_geaxpby_test
 
 
 
-        !> @brief Function to randomly generate x and y vectors 
+    !> @brief Function to randomly generate x and y vectors 
     !!        and save them on multiple files based on their
     !!        coefficients values.
     !!
-    subroutine generate_vectors(rows, cols)
+    subroutine generate_vectors(arr_size)
         use psb_base_mod
         use psb_util_mod
 
         implicit none 
 
-        integer(psb_ipk_), intent(in)               :: rows, cols
+        integer(psb_ipk_), intent(in)               :: arr_size
         real(psb_spk_), allocatable                 :: x(:), y(:)
         integer(psb_ipk_)                           :: i, info
+        logical                                     :: exists
 
-        allocate(x(rows))
-        allocate(y(cols))
+
+        ! Check if output directory exists
+        inquire(file='vectors/', exist=exists)
+        if (.not.exists) then
+            call system('mkdir vectors/')
+        end if
+
+        allocate(x(arr_size))
+        allocate(y(arr_size))
         
         call random_init(repeatable=.true.,image_distinct=.true.) 
         call random_number(x)
@@ -223,11 +260,11 @@ module psb_geaxpby_test
         call mm_array_write(y,"Positive vector",info,filename="vectors/y1.mtx")
 
         ! Write only negative in x_2
-        do i=1,rows 
+        do i=1,arr_size 
             x(i) = -x(i)
         end do  
 
-        do i=1,cols
+        do i=1,arr_size
             y(i) = -y(i)
         end do
 
@@ -236,12 +273,12 @@ module psb_geaxpby_test
 
 
         ! Since numbers are less than one and always positive, we have to generate negative ones subtractiong 50
-        do i=1,rows
+        do i=1,arr_size
             x(i) = -x(i) ! Make the values positive again  
             x(i) = x(i) - 0.5
         end do   
 
-        do i=1,cols
+        do i=1,arr_size
             y(i) = -y(i) ! Make the values positive again  
             y(i) = y(i) - 0.5
         end do
@@ -251,11 +288,11 @@ module psb_geaxpby_test
         call mm_array_write(y,"Random vector",info,filename="vectors/y3.mtx")
 
         ! Write zero in x_4
-        do i=1,rows
+        do i=1,arr_size
             x(i) = 0
         end do   
 
-        do i=1,cols
+        do i=1,arr_size
             y(i) = 0
         end do
 

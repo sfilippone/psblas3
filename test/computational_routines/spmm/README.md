@@ -18,7 +18,7 @@ In order to have the exact same environment used for testing compile PSBALS libr
 Steps to reproduce the tests:
 - Compile the code using ``` make ```
 - Insert the matrix files inside the matrix/ directory (or create one if it doesn't exists; psblas3/test/spmm/matrix/)
-- Launch the script autotest.sh
+- Launch the script autotest.sh (Still not implemented)
 - Check the output log file test_log.txt to collect results
 
 ## Test goal
