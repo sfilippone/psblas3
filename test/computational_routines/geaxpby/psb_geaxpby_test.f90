@@ -53,37 +53,37 @@ module psb_geaxpby_test
     !> @brief Function to excecute psb_geaxpby in single precision and
     !!        save the results on file
     !!
-    subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, ret)
+    subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
         use psb_base_mod
         use psb_util_mod
 
         implicit none 
 
         ! input parameters
-        character(len = *), intent(in)      :: x_file, y_file
-        real(psb_spk_), intent(in)          :: alpha, beta
-        integer(psb_ipk_), intent(in)       :: arr_size
-        type(psb_ctxt_type), intent(in)     :: ctxt
+        character(len = *), intent(in)              :: x_file, y_file
+        real(psb_spk_), intent(in)                  :: alpha, beta
+        integer(psb_ipk_), intent(in)               :: arr_size
+        type(psb_ctxt_type), intent(in)             :: ctxt
 
         ! output parameters
-        integer(psb_ipk_), intent(out)       :: ret
+        integer(psb_ipk_), intent(out)              :: ret
+        character(len=:), allocatable, intent(out)  :: output_file_name       
 
         ! vectors
-        type(psb_s_vect_type)           	:: x, y
+        type(psb_s_vect_type)           	        :: x, y
 
         ! matrix descriptor data structure
-        type(psb_desc_type)             	:: desc_a
+        type(psb_desc_type)             	        :: desc_a
 
         ! communication context
-        integer(psb_ipk_)               	:: my_rank, np, info, err_act
+        integer(psb_ipk_)               	        :: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
-        real(psb_spk_), allocatable     	:: x_global(:), y_global(:)
-        integer(psb_ipk_)               	:: i
+        real(psb_spk_), allocatable     	        :: x_global(:), y_global(:)
+        integer(psb_ipk_)               	        :: i
 
         ! others
-        logical                             :: exists
-        character(len=:), allocatable       :: output_file_name       
+        logical                                     :: exists
 
 
 
@@ -242,38 +242,38 @@ module psb_geaxpby_test
     !> @brief Function to excecute psb_geaxpby in double precision and
     !!        compare the results with the ones on file
     !!
-    subroutine psb_geaxpby_check(x_file, y_file, alpha, beta, arr_size, ctxt, ret)
+    subroutine psb_geaxpby_check(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
         use psb_base_mod
         use psb_util_mod
 
         implicit none 
 
         ! input parameters
-        character(len = *), intent(in)      :: x_file, y_file
-        real(psb_dpk_), intent(in)          :: alpha, beta
-        integer(psb_ipk_), intent(in)       :: arr_size
-        type(psb_ctxt_type), intent(in)     :: ctxt
+        character(len = *), intent(in)              :: x_file, y_file
+        real(psb_dpk_), intent(in)                  :: alpha, beta
+        integer(psb_ipk_), intent(in)               :: arr_size
+        type(psb_ctxt_type), intent(in)             :: ctxt
 
         ! output parameters
-        integer(psb_ipk_), intent(out)      :: ret
-
+        integer(psb_ipk_), intent(out)              :: ret
+        character(len=:), allocatable, intent(out)  :: output_file_name      
         ! vectors
-        type(psb_d_vect_type)           	:: x, y
-        type(psb_s_vect_type)           	:: y_check
+        type(psb_d_vect_type)           	        :: x, y
+        type(psb_s_vect_type)           	        :: y_check
 
         ! matrix descriptor data structure
-        type(psb_desc_type)             	:: desc_a
+        type(psb_desc_type)             	        :: desc_a
 
         ! communication context
-        integer(psb_ipk_)               	:: my_rank, np, info, err_act
+        integer(psb_ipk_)               	        :: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
-        real(psb_dpk_), allocatable     	:: x_global(:), y_global(:)
-        integer(psb_ipk_)               	:: i
+        real(psb_dpk_), allocatable     	        :: x_global(:), y_global(:)
+        integer(psb_ipk_)               	        :: i
 
         ! others
-        logical                             :: exists
-        character(len=:), allocatable       :: output_file_name       
+        logical                                     :: exists
+ 
 
 
 

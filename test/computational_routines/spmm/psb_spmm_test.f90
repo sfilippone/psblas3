@@ -118,6 +118,7 @@ module psb_spmm_test
             output_file_name = "parallel/"
         end if
 
+        ! Insert matrix number in output file naming convention
         output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10)
 
         if(alpha == sone) then 

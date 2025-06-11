@@ -26,7 +26,7 @@ Check the correctness of the matrix-vector multiplication $y = Ax$ using the **p
 
 ## Test Suite
 ### Overall Analysys
-THe subroutine psb_spmm materialize in three different procedures: 
+The subroutine psb_spmm materialize in three different procedures: 
 ```psb_sspmm```, ```psb_sspmv```, ```psb_sspmv_vect```. The focus is on testing the ```psb_sspmv``` one, so as first step let's analyze the signature of the function to study a satisfyng input parameter space. The signature of the function is:
 ```fortran
 psb_sspmv(alpha, a, x, beta, y,&

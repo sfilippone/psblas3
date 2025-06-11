@@ -22,17 +22,28 @@ END_COLOUR=\033[0m
 
 
 all: runsd psb_geaxpby_test 
-	@printf "$(GREEN)[INFO]\tCompilation success!$(END_COLOUR)\n" 
+	@printf "$(GREEN)[INFO]\t  Compilation success!$(END_COLOUR)\n" 
+
+check_changes:
+	@echo "Checking for changes..."
+	@if [ "$(find . -name '*.f90' -o -name '*.h' -o -name '*.c' -newer build)" ]; then \
+		echo "Changes detected. Running make..."; \
+		$(MAKE) build; \
+	else \
+		echo "No changes detected."; \
+	fi
+
 
 runsd: 	
 	@(if test ! -d runs ; then mkdir runs; fi)
-	@printf "$(BLUE)[INFO]\tBuild directory $(EXEDIR) correctly initialized$(END_COLOUR)\n"
+	@printf "$(BLUE)[INFO]\t  Build directory $(EXEDIR) correctly initialized$(END_COLOUR)\n"
 
 
 psb_geaxpby_test:
 	@$(FLINK) $(LOPT) psb_geaxpby_test.f90 geaxpby.f90 -o psb_geaxpby_test -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
 	@mv psb_geaxpby_test $(EXEDIR)
-	@printf "$(BLUE)[INFO]\tTesting files generated correctly$(END_COLOUR)\n" 
+	@printf "$(BLUE)[INFO]\t  Testing files generated correctly$(END_COLOUR)\n" 
+
 
 clean: 
 	@rm -f $(OBJS)\
