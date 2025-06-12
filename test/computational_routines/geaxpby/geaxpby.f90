@@ -29,17 +29,6 @@ program main
     ! others
     character(len=:), allocatable   :: output_file_name
 
-    ! Setup logger output
-    open(newunit=unit, file='psblas_geaxpby_test.log', status='replace', action='write', iostat=info)
-    if (info /= 0) then
-       print *, 'Error opening output file.'
-       print *, "I/O Status Code:", info
-       stop
-    end if
-    
-    ! Set psb_out_unit to redirect PSBLAS output
-    psb_out_unit = unit
-
     ! Initialize parameters
     x(1) = "vectors/x1.mtx"
     x(2) = "vectors/x2.mtx"
@@ -67,14 +56,31 @@ program main
     call psb_info(ctxt,my_rank,np)
 
     if(my_rank == psb_root_) then
+        ! Setup logger output
+        if(np == 1) then
+            open(newunit=unit, file='psblas_geaxpby_test.log', status='replace', action='write', iostat=info)
+        else
+            open(newunit=unit, file='psblas_geaxpby_test.log', status='old', action='write', position='append', iostat=info)
+        end if
+        if (info /= 0) then
+           print *, 'Error opening output file.'
+           print *, "I/O Status Code:", info
+           stop
+        end if
+
+        psb_out_unit = unit
+        
         write(psb_out_unit,'(A,A)') 'Welcome to PSBLAS version: ',psb_version_string_
         write(psb_out_unit,'(A)') 'This is the psb_geaxpby_test sample program'
+        write(psb_out_unit,'(A,I0)') 'Number of processes used in this computation: ', np
         write(psb_out_unit,'(A)') ''
 
         call generate_vectors(arr_size) 
     end if
 
+    call psb_bcast(ctxt,psb_out_unit)
     call psb_barrier(ctxt)
+
 
     if(my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting single precision computation..."
 
@@ -136,11 +142,12 @@ program main
                 do h=1,size(beta)
                     call psb_geaxpby_check(x_file=x(i), y_file=y(j), alpha = alpha(k), beta = beta(h), & 
                     & arr_size = arr_size, ctxt = ctxt, ret = ret, output_file_name = output_file_name)
+                    
                     if(my_rank == psb_root_) then
                         count = count + 1
                         call date_and_time(date, time, zones, values)
 
-                        if(ret /= -1) then 
+                        if(ret == 0) then 
                             ! Success formatted output
                             write(psb_out_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
                             & A,A,A,I0,A,I0,T110,A)') &
@@ -154,6 +161,10 @@ program main
                             & values(1), values(2), values(3), values(5), values(6), values(7), &
                             & "Double precision check on file ", & 
                             & output_file_name , ' ', count , "/", tests_number, "[FAIL]"
+                            write(psb_out_unit,'(A,I0)') "[ERROR]   Error at element ", abs(ret)
+                            write(psb_out_unit,'(A,F10.8)') "Alpha:", alpha(k)
+                            write(psb_out_unit,'(A,F15.8)') "Beta: ", beta(h)
+
                             goto 9999
                         end if
                     end if

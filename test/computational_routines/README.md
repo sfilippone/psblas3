@@ -14,12 +14,26 @@ The necessary dependnces are:
 
 ## Test Approach
 In order to check wheter each kernel computation is correct or not, it was taken into account a simple approach resported in [[1]](#testing): the kernels are excecuted both in single $y_{s}$ and double precision $y_{d}$. The difference between the two results $\Delta y$ should not exceed the machine epsilon of the single precision floating point representation. This quantity is identified as the unit roundoff $u$. In this the IEEE floating point representation we have $$u = 2^-24 \approx 5.96 \cdot 10^{-8}$$ and therefore $$\Delta y = y_d - y_s \leq u$$ as stated in Highman in his book [[2]](#accuracy). It is also important to note that $\Delta y$ is a double precision floating point number, since it should be able to detect an higher precision with respect to a single precision representation.
+
+The innovative approach introduced in this test suite is to have a theoretical results showing us the correctness of the double precision implementation. In fact, the double precision computation is used as validation result for the single precision one, but no assumption of correctness were done before. In this work, double precision computations are validated using a heuristic approach based on the number $p$ of significand digits that can be estimated using the $\gamma_n = \frac{nu}{1-nu}$ worst case constant known from Higman [[2]](#accuracy) in order to have an upper bound to the number of significand digits. Since this approach is kernel specific, see each test directory to see how this idea is applied to each routine. 
+
+## Directory description
+Each directory has the name of the computational kernel routines described in the documentation of the version 3.9 of the PSBLAS library. In each directory there are different files and directories:
+- parallel/ 
+- serial/ 
+- vectors/
+- autotest.sh
+- Makefile
+- &lt;routine_name&gt;.f90
+- psb_&lt;routine_name&gt;_test.f90
+- README.md
+
 ## Routines
 In this test suite were considered only computational routines implemented by PSBLAS, according to the version 3.9 of the documentation. In the following table are reported all the kernels, their implementation and wheter or not they were tested yet.
 |**Kernel**| **PSBLAS Subroutine**|**Description**|**Test**|
 | ------------------------------- | :--------------------------: | ---------------------------------------------------------------------- | :---------------: |
 |**General Dense Matrix Sum**| `psb_geaxpby`| This subroutine is an interface to the computational kernel for dense matrix sum:$$Y \leftarrow \alpha  X + \beta  Y$$|Yes ✅|
-| **Dot product**|`psb_gedot`|This function computes dot product between two vectors x and y.$$dot \leftarrow x^T y$$If x and y are real vectors it computes dot-product as:$$dot \leftarrow x^H y$$|No ❌|
+| **Dot product**|`psb_gedot`|This function computes dot product between two vectors x and y.$$dot \leftarrow x^T y$$If x and y are real vectors it computes dot-product as:$$dot \leftarrow x^H y$$|Work in progress :hammer_and_wrench:|
 | **Generalized Dot Product** |`psb_gedots`|This subroutine computes a series of dot products among the columns of two dense matrices x and y:$$res(i) \leftarrow x(:,i)^T  y(:,i)$$If the matrices are complex, then the usual convention applies, i.e. the conjugate transpose of x is used. If x and y are of rank one, then res is a scalar, else it is a rank one array.|No ❌|
 |**Infinity-Norm of Vector**|`psb_normi`/`psb_geamax`|This function computes the infinity-norm of a vector x. If x is a real vector it computes infinity norm as:$$amax \leftarrow max \mid x_i \mid$$else if x is a complex vector then it computes the infinity-norm as:$$amax \leftarrow max(\mid re(x_i) \mid + \mid im(x_i) \mid)$$|No ❌|
 |**Generalized Infinity Norm**|`psb_geamaxs`|This subroutine computes a series of infinity norms on the columns of a dense matrix x:$$res(i) \leftarrow max_k \mid x(k,i) \mid$$|        No ❌        |
@@ -35,6 +49,15 @@ In this test suite were considered only computational routines implemented by PS
 |**Entrywise Division**|`psb_gediv`|This function computes the entrywise division between two vectors x and y$$div \leftarrow \frac{x(i)}{y(i)}$$|No ❌|
 |**Entrywise Inversion**|`psb_geinv`|This function computes the entrywise inverse of a vector x and puts it into y$$inv \leftarrow \frac{1}{x(i)}$$|No ❌|
 
+## TODO
+- Merge all the output logs
+- Finish the directories description
+- Check memory occupancy of parallel/ serial/ and vectors/ directories (Maybe not the best way for lots of rputines?)
+
+## Questions
+- Is it correct to use psb_gather even for a single process running?
+- Is it correct to shift in 0,xxxx type of notation to compare with the correct number of significand digits?
+
 
 ## References
 <a id="testing">[1].</a> Higham, Nicholas J. Testing linear algebra software. Springer US, 1997
@@ -42,6 +65,3 @@ In this test suite were considered only computational routines implemented by PS
 <a id="accuracy">[2].</a> Higham, Nicholas J. Accuracy and stability of numerical algorithms. Society for industrial and applied mathematics, 2002.
 
 <a id="psblas">[3],</a> Filippone, Salvatore, and Michele Colajanni. "PSBLAS: A library for parallel linear algebra computation on sparse matrices." ACM Transactions on Mathematical Software (TOMS) 26.4 (2000): 527-550.
-
-## TODO
-- Make all kernel excecution centralized merging the output logs

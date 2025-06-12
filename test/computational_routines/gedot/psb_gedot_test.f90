@@ -1,9 +1,9 @@
-!> Test program for y = alpha * x + betha * y  psb_geaxbpy routine
+!> Test program for y = x^T * y or y = x^H * y psb_gedot routine
 !! Check the README.md to see all details about the tests.
 !!
 !! Authors: Luca Pepé Sciarria, Staccone Simone (Tor Vergata University)
 !! 
-!! psb_geaxpby(alpha, x, beta, y, desc_a, info)
+!! psb_gedot(x, y, desc_a, info [,global])
 !!
 !! Type: Synchronous.
 !! 
@@ -21,12 +21,6 @@
 !!
 !! Input:
 !!
-!! alpha    Description: the scalar α.
-!!          Scope: global
-!!          Type: required
-!!          Intent: in
-!!          Specified as: a number of the data type indicated in Table 1.
-!!
 !! x        Description: the local portion of global dense matrix x.
 !!          Scope: local
 !!          Type: required
@@ -34,12 +28,6 @@
 !!          Specified as: a rank one or two array or an object of type psb_T_vect_type
 !!          containing numbers of type specified in Table 1. The rank of x must be
 !!          the same of y.
-!!
-!! beta     Description: the scalar β.
-!!          Scope: global
-!!          Type: required
-!!          Intent: in.
-!!          Specified as: a number of the data type indicated in Table 1.
 !! 
 !! y        Description: the local portion of the global dense matrix y.
 !!          Scope: local
@@ -55,38 +43,58 @@
 !!          Intent: in
 !!          Specified as: an object of type psb desc type.
 !!
+!! global   Descritption: Specifies whether the computation should include the global 
+!!          reduction across all processes.
+!!          Scope: global
+!!          Type: optional
+!!          Intent: in
+!!          Specified as: a logical scalar. 
+!!          Default: global=.true.
+!!
 !! Output:
 !!
-!! y        Description: the local portion of the global dense matrix y.
-!!          Scope: local
-!!          Type: required
-!!          Intent: inout
-!!          Specified as: a rank one or two array or an object of type psb_T_vect_type
-!!          containing numbers of the type indicated in Table 1. The rank of y must
-!!          be the same of x.
+!! Function value   the dot product of vectors x and y.
+!!                  Scope: global unless the optional variable global=.false. 
+!1                  has been specified
+!!                  Specified as: a number of the data type indicated in Table 1.
 !!
 !! info     Description: Error code.
 !!          Scope: local
 !!          Type: required
-!!          Intent: out.
+!!          Intent: out
 !!          Specified as: An integer value; 0 means no error has been detected.
 !!
-module psb_geaxpby_test
+!!
+!! NOTES
+!! 
+!! 1.       The computation of a global result requires a global communication, which
+!!          entails a significant overhead. It may be necessary and/or advisable to
+!!          compute multiple dot products at the same time; in this case, it is possible
+!!          to improve the runtime efficiency by using the following scheme:
+!!
+!!              vres(1) = psb_gedot(x1,y1,desc_a,info,global=.false.)
+!!              vres(2) = psb_gedot(x2,y2,desc_a,info,global=.false.)
+!!              vres(3) = psb_gedot(x3,y3,desc_a,info,global=.false.)
+!!              call psb_sum(ctxt,vres(1:3))
+!!
+!!          In this way the global communication, which for small sizes is a latency-
+!!          bound operation, is invoked only once.
+!!
+module psb_gedot_test
+    use psb_base_mod
+    use psb_util_mod 
 
     contains
 
     !> @brief Function to excecute psb_geaxpby in single precision and
     !!        save the results on file
     !!
-    subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
-        use psb_base_mod
-        use psb_util_mod
+    subroutine psb_gedot_kernel(x_file, y_file, arr_size, ctxt, ret, output_file_name)
 
         implicit none 
 
         ! input parameters
         character(len = *), intent(in)              :: x_file, y_file
-        real(psb_spk_), intent(in)                  :: alpha, beta
         integer(psb_ipk_), intent(in)               :: arr_size
         type(psb_ctxt_type), intent(in)             :: ctxt
 
@@ -109,7 +117,7 @@ module psb_geaxpby_test
 
         ! others
         logical                                     :: exists
-
+        real(psb_spk_)                              :: result(1)
 
 
         info = psb_success_
@@ -172,10 +180,10 @@ module psb_geaxpby_test
         end if
 
 
-        ! y = alpha * x + beta * y
-        call psb_geaxpby(alpha,x,beta,y,desc_a,info)
+        ! y = x^T * y
+        result(1) = psb_gedot(x,y,desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_geaxpby routine"
+            write(psb_out_unit,'(A)') "Error in psb_gedot routine"
             goto 9999
         end if
 
@@ -196,34 +204,11 @@ module psb_geaxpby_test
             output_file_name = "parallel/"
         end if
 
-        output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10)
-
-        if(alpha == sone) then 
-            output_file_name = output_file_name // "_a1"
-        else if(alpha == -sone) then 
-            output_file_name = output_file_name // "_a2"
-        else if(alpha == szero) then
-            output_file_name = output_file_name // "_a3"
-        end if
-
-        if(beta == sone) then 
-            output_file_name = output_file_name // "_b1.mtx"
-        else if(beta == -sone) then 
-            output_file_name = output_file_name // "_b2.mtx"
-        else if(beta == szero) then
-            output_file_name = output_file_name // "_b3.mtx"
-        end if
-
-        ! gather the result combining all the partial ones
-        call psb_gather(y_global, y, desc_a, info)
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error gathering global vector x to write on file"
-            goto 9999
-        end if
+        output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10) // ".mtx"
 
         ! Save result to output file
         if(my_rank == psb_root_) then
-            call mm_array_write(y_global,"Result vector",info,filename=output_file_name)
+            call mm_array_write(result,"Result of the scalar product computation",info,filename=output_file_name)
         end if
 
         ! Deallocate
@@ -264,15 +249,12 @@ module psb_geaxpby_test
     !> @brief Function to excecute psb_geaxpby in double precision and
     !!        compare the results with the ones on file
     !!
-    subroutine psb_geaxpby_check(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
-        use psb_base_mod
-        use psb_util_mod
+    subroutine psb_gedot_check(x_file, y_file, arr_size, ctxt, ret, output_file_name)
 
         implicit none 
 
         ! input parameters
         character(len = *), intent(in)              :: x_file, y_file
-        real(psb_dpk_), intent(in)                  :: alpha, beta
         integer(psb_ipk_), intent(in)               :: arr_size
         type(psb_ctxt_type), intent(in)             :: ctxt
 
@@ -281,7 +263,7 @@ module psb_geaxpby_test
         character(len=:), allocatable, intent(out)  :: output_file_name      
         ! vectors
         type(psb_d_vect_type)           	        :: x, y
-        type(psb_s_vect_type)           	        :: y_check
+        type(psb_s_vect_type)           	        :: result_check
 
         ! matrix descriptor data structure
         type(psb_desc_type)             	        :: desc_a
@@ -290,13 +272,12 @@ module psb_geaxpby_test
         integer(psb_ipk_)               	        :: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
-        real(psb_dpk_), allocatable     	        :: x_global(:), y_global(:) 
+        real(psb_dpk_), allocatable     	        :: x_global(:), y_global(:)
         integer(psb_ipk_)               	        :: i
 
         ! others
         logical                                     :: exists
- 
-
+        real(psb_dpk_)                              :: result(1)
 
 
         info = psb_success_
@@ -359,25 +340,17 @@ module psb_geaxpby_test
         end if
 
 
-        call psb_geall(y_check,desc_a,info)
+        call psb_geall(result_check,desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error allocating y_check data structure"
             goto 9999
         end if
 
 
-        ! y = alpha * x + beta * y
-        call psb_geaxpby(alpha,x,beta,y,desc_a,info)
+        ! y = x^T * y
+        result(1) = psb_gedot(x,y,desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_geaxpby routine"
-            goto 9999
-        end if
-
-
-        ! gather the result combining all the partial ones
-        call psb_gather(y_global, y, desc_a, info)
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error gathering global vector y used for comparison"
+            write(psb_out_unit,'(A)') "Error in psb_gedot routine"
             goto 9999
         end if
 
@@ -387,7 +360,7 @@ module psb_geaxpby_test
                 ! Check if output directory exists
                 inquire(file='serial/', exist=exists)
                 if(.not.exists) then
-                    write(psb_out_unit,'(A)') "Error in psb_geaxpby_check routine, no single precision result is saved on file"
+                    write(psb_out_unit,'(A)') "Error in psb_gedot_check routine, no single precision result is saved on file"
                     goto 9999
                 end if
                 output_file_name = "serial/"
@@ -395,52 +368,34 @@ module psb_geaxpby_test
                 ! Check if output directory exists
                 inquire(file='parallel/', exist=exists)
                 if(.not.exists) then
-                    write(psb_out_unit,'(A)') "Error in psb_geaxpby_check routine, no single precision result is saved on file"
+                    write(psb_out_unit,'(A)') "Error in psb_gedot_check routine, no single precision result is saved on file"
                     goto 9999
                 end if
                 output_file_name = "parallel/"
             end if
     
-            output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10)
-    
-            if(alpha == done) then 
-                output_file_name = output_file_name // "_a1"
-            else if(alpha == -done) then 
-                output_file_name = output_file_name // "_a2"
-            else if(alpha == dzero) then
-                output_file_name = output_file_name // "_a3"
-            end if
-    
-            if(beta == done) then 
-                output_file_name = output_file_name // "_b1.mtx"
-            else if(beta == -done) then 
-                output_file_name = output_file_name // "_b2.mtx"
-            else if(beta == dzero) then
-                output_file_name = output_file_name // "_b3.mtx"
-            end if
-    
+            output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10) // ".mtx"
 
             ! Read single precision result from file
-            call mm_array_read(y_check,info,filename=output_file_name)
+            call mm_array_read(result_check,info,filename=output_file_name)
             if(info /= psb_success_) then
                 write(psb_out_unit,'(A)') "Error in mm_array_read for y_check data structure"
                 goto 9999
             end if
-            
+
             ! 5.96e-08 is 2^-24 (Single precision unit roundoff)
             ! 1.19e-07 is 2^-23 (Single precision unit interval)
-            do i=1, arr_size
-                !! write(*, *) abs(y_global(i) - y_check%v%v(i)) > 5.96D-08, &
-                !! & y_global(i), y_check%v%v(i), output_file_name
-                if(abs(y_global(i) - y_check%v%v(i)) > 1.19e-07) then
-                   ret = -i
-                   write(psb_out_unit, '(A,F10.8)') "Y computed in double precision: ", y_global(i) 
-                   write(psb_out_unit, '(A,F10.8)') "Y read from single precision file: ", y_check%v%v(i) 
-                   write(psb_out_unit, '(A,F10.8)') "Diff: ", abs(y_global(i) - y_check%v%v(i)) 
-                   exit
-                end if
-            end do
+            !! call shift_decimal_double(result(1))
+            !! call shift_decimal_single(result_check%v%v(1))
+
+            ! write(*,*) result(1),result_check%v%v(1), (arr_size * 1.19D-07) / (done-arr_size * 1.19D-07)
+            if(abs(result(1) - result_check%v%v(1)) > (arr_size * 1.19D-07) / (done-arr_size * 1.19D-07)) then
+               ret = -1 
+               return
+            end if
         end if 
+
+        call psb_barrier(ctxt)
         
         ! Deallocate
         call psb_gefree(x, desc_a,info)
@@ -455,7 +410,7 @@ module psb_geaxpby_test
             goto 9999
         end if
 
-        call psb_gefree(y_check, desc_a,info)
+        call psb_gefree(result_check, desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in vector y_check free routine"
             goto 9999
@@ -484,6 +439,46 @@ module psb_geaxpby_test
 
     end subroutine
 
+    subroutine shift_decimal_double(n)
+        
+        implicit none
+
+        real(psb_dpk_),intent(inout)    :: n
+        integer                         :: n_digits
+        character(len=20)               :: int_str
+      
+      
+        ! Convert the absolute value of the integer part to string
+        write(int_str, '(I0)') int(abs(n))
+      
+        ! Count number of digits
+        n_digits = len_trim(adjustl(int_str))
+      
+        ! Shift the decimal point
+        n = abs(n) / 10.0**n_digits
+      
+    end subroutine
+
+
+    subroutine shift_decimal_single(n)
+        
+        implicit none
+
+        real(psb_spk_),intent(inout)    :: n
+        integer                         :: n_digits
+        character(len=20)               :: int_str
+      
+      
+        ! Convert the absolute value of the integer part to string
+        write(int_str, '(I0)') int(abs(n))
+      
+        ! Count number of digits
+        n_digits = len_trim(adjustl(int_str))
+      
+        ! Shift the decimal point
+        n = abs(n) / 10.0**n_digits
+      
+    end subroutine
 
 
     !> @brief Function to randomly generate x and y vectors 
@@ -491,8 +486,7 @@ module psb_geaxpby_test
     !!        coefficients values.
     !!
     subroutine generate_vectors(arr_size)
-        use psb_base_mod
-        use psb_util_mod
+
 
         implicit none 
 
@@ -564,4 +558,4 @@ module psb_geaxpby_test
 
     end subroutine
 
-end module psb_geaxpby_test
+end module psb_gedot_test

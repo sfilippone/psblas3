@@ -21,7 +21,7 @@ YELLOW=\033[33m
 END_COLOUR=\033[0m
 
 
-all: runsd psb_geaxpby_test 
+all: runsd psb_gedot_test 
 	@printf "$(GREEN)[INFO]\t  Compilation success!$(END_COLOUR)\n" 
 
 runsd: 	
@@ -29,14 +29,14 @@ runsd:
 	@printf "$(BLUE)[INFO]\t  Build directory $(EXEDIR) correctly initialized$(END_COLOUR)\n"
 
 
-psb_geaxpby_test:
-	@$(FLINK) $(LOPT) psb_geaxpby_test.f90 geaxpby.f90 -o psb_geaxpby_test -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
-	@mv psb_geaxpby_test $(EXEDIR)
+psb_gedot_test:
+	@$(FLINK) $(LOPT) psb_gedot_test.f90 gedot.f90 -o psb_gedot_test -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
+	@mv psb_gedot_test $(EXEDIR)
 	@printf "$(BLUE)[INFO]\t  Testing files generated correctly$(END_COLOUR)\n" 
 
 
 clean: 
 	@rm -f $(OBJS)\
-        *$(.mod) $(EXEDIR)/psb_geaxpby_test 
+        *$(.mod) $(EXEDIR)/psb_gedot_test 
 
 .PHONY: all runsd clean   

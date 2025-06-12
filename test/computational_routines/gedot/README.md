@@ -1,22 +1,24 @@
 # Introduction
-This is a directory developed by Luca Pepè Sciarria and Simone Staccone froma Tor Vergata University to start to create some unit tests for PSBLAS 3.9, in particular for ```psb_geaxpby``` routine.
+This is a directory developed by Luca Pepè Sciarria and Simone Staccone froma Tor Vergata University to start to create some unit tests for PSBLAS 3.9, in particular for ```psb_gedot``` routine.
 
 
 ## Getting started
 Steps to reproduce the tests:
 - Compile the code using ``` make ``` (Optional)
 - Launch the script ./autotest.sh or with source ./autotest.sh if you want to add modules to the .bashrc file permenently.
-- Check the output log file psblas_geaxpby_test.log to collect results
+- Check the output log file psblas_gedot_test.log to collect results
 
 NOTE: If the code is changed and a new compilation is needed to show the changes, the autotest.sh script isn't aware of this scenario, therefore it is necessary to manually recompile the code.
 
 ## Test Suite
 ### Overall Analysys
-The ```psb_geaxpby```. The signature of the function is:
+The ```psb_gedot```. The signature of the function is:
 
 ```fortran
-call psb_geaxpby(alpha, x, beta, y, desc_a, info)
+psb_gedot(x, y, desc_a, info [,global])
 ```
+
+In the comparison 7 significand digits means having a notation like 0,$d_1 d_2 d_3 ... d_7$*10^7 also.
 
 ### Parameters Values
 **x** vectors are located in the vectors/ directory. They are generated randomly using the same seed and then saved on different files based on their characteristics. The size of the vector is choosen accordingly to the size of the matrix column space considered for the single test instance.
@@ -56,7 +58,8 @@ The results of the computation will be saved on different files based on the ins
 
 
 ## TODO
+- Use also global in different ways
 - Add computation with broken descriptor and catch the errore result
-- Test using complex data
+- Test using complex data ($dot \leftarrow x^H \cdot y$)
 - Try multiple distributions
-- Try using a matrix instead of a vector
+- Fix result_check handling, it should not be an entire vector

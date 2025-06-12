@@ -3,9 +3,8 @@
 # Variables definition
 dir1="serial"
 dir2="parallel"
-log_file_name="psblas_geaxpby_test.log"
+log_file_name="psblas_gedot_test.log"
 num_procs=$(nproc)
-
 
 # Define color codes
 GREEN="\033[0;32m"
@@ -16,7 +15,7 @@ RESET="\033[0m"
 
 
 # Check if the executable ELF file exists
-if [ ! -f "./runs/psb_geaxpby_test" ]; then
+if [ ! -f "./runs/psb_gedot_test" ]; then
     echo -e "${YELLOW}[WARNING] Executable not found. Running make...${RESET}"
     make
     if [ ! -f "./runs/psb_geaxpby_test" ]; then
@@ -26,19 +25,20 @@ else
     echo -e "${BLUE}[INFO]\t  The executable already exists. Skipping the make process.${RESET}"
 fi
 
+
 # Excecute tests and save results
-echo -e "${BLUE}[INFO]\t  Running the PSBLAS psb_geaxpby test...${RESET}"
+echo -e "${BLUE}[INFO]\t  Running the PSBLAS psb_gedot test...${RESET}"
 echo ""
 echo -e "${BLUE}[INFO]\t  Starting single process computation${RESET}"
-mpirun -np 1 ./runs/psb_geaxpby_test
+#mpirun -np 1 ./runs/psb_gedot_test
 echo -e "${BLUE}[INFO]\t  Single process computation terminated correctly${RESET}"
 echo ""
 echo -e "${BLUE}[INFO]\t  Starting $num_procs processes computation${RESET}"
-mpirun -np $num_procs ./runs/psb_geaxpby_test
+mpirun -np $num_procs ./runs/psb_gedot_test
 echo -e "${BLUE}[INFO]\t  Multiple processes computation terminated correctly${RESET}"
 
-
 echo "" >> ${log_file_name}
+
 
 # Iterate through files in the first directory
 for file1 in "$dir1"/*; do
@@ -55,6 +55,4 @@ for file1 in "$dir1"/*; do
     fi
 done
 
-echo -e "${BLUE}[INFO]\t  PSBLAS psb_geaxpby test succesfully completed.${RESET}"
-
-
+echo -e "${BLUE}[INFO]\t  PSBLAS psb_gedot test succesfully completed.${RESET}"
