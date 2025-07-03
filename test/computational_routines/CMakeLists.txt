@@ -28,24 +28,24 @@ file(MAKE_DIRECTORY ${EXEDIR})
 set(PSBLAS_LIBS  psblas::util psblas::prec psblas::base) 
 
 
-#include(${CMAKE_CURRENT_LIST_DIR}/geaxpby/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/geaxpby/CMakeLists.txt)
 #include(${CMAKE_CURRENT_LIST_DIR}/gedor/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/spmm/CMakeLists.txt)
 
 # Create executables
-#add_executable(psb_geaxpby ${GEAXPBY_SOURCES})
+add_executable(psb_geaxpby_test ${geaxpby_source_files})
 #add_executable(psb_gedot ${GEDOT_SOURCES})
 add_executable(psb_spmm_test ${spmm_source_files})
 
 # Link the necessary libraries
-#target_link_libraries(psb_geaxpby psblas::util psblas::prec psblas::base)
+target_link_libraries(psb_geaxpby_test ${PSBLAS_LIBS})
 #target_link_libraries(psb_gedot psblas::util psblas::prec psblas::base)
 target_link_libraries(psb_spmm_test ${PSBLAS_LIBS})
 
-# Set output directory for the executables
-#set_target_properties(psb_geaxpby PROPERTIES
-#    RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
-#)
+# Set output directory
+set_target_properties(psb_geaxpby_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
+)
 #set_target_properties(psb_gedot PROPERTIES
 #    RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
 #)
