@@ -663,9 +663,9 @@ endif()
 
 if(PSB_BUILD_CUDA)
 
-    if(NOT DEFINED PSB_CUDA_PATH)
-            set(PSB_CUDA_PATH "/opt/cuda/12.8")
-    endif()
+    #if(NOT DEFINED PSB_CUDA_PATH)
+    #        set(PSB_CUDA_PATH "/opt/cuda/12.8")
+    #endif()
     # Include the CMakeLists for the cuda library
     include(${CMAKE_CURRENT_LIST_DIR}/cuda/CMakeLists.txt)
     include_directories("${PSB_CUDA_PATH}/include")
