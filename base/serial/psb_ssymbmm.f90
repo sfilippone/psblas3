@@ -85,6 +85,7 @@ end subroutine psb_ssymbmm
 subroutine psb_sbase_symbmm(a,b,c,info)
   use psb_mat_mod
   use psb_sort_mod
+  use psb_serial_mod, only : symbmm
   implicit none 
 
   class(psb_s_base_sparse_mat), intent(in) :: a,b
