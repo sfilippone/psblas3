@@ -1,0 +1,14 @@
+COMPLETED:
+- Try to use Julienne https://github.com/berkeleylab/julienne in order to avoid different do nested loops [OK] 
+(Possible solutions are to use Fortuno and FPunit, in order to implement parametrized tests) 
+
+
+
+TODO:
+- Remove file generation in order to save up memory (Is it necessary for single/multiple processes comparison, it should be removed as a cleanup)
+- Fix parallel and serial, using a fortran routine instead of the diff between files
+- Fix log aggregation in main directory, see number of total tests (EG. 144 instead of 16 in gedot)
+- Clean main log at each run
+- Force recompilation in main script
+- What about multiple distribution for psb_gedot?
+- Generate input vectors only if vectors/ directory doesn't exist to save up time

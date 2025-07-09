@@ -6,6 +6,7 @@ separator=$(printf "%0.s=" $(seq 1 $terminal_width)) # Generate separator of cor
 flag=0
 log_file_name="psblas_test_results.log"
 base_dir=$(pwd)
+skip=true
 
 # Define color codes
 GREEN="\033[0;32m"
@@ -72,11 +73,30 @@ fi
 echo -e "${BLUE}[INFO]\t  Environment check for required modules completed.${RESET}"
 echo ""
 
+if [ ! -f "./utils/psb_test_utils.o" ]; then
+    echo -e "${YELLOW}[WARNING] Executable not found. Compiling utils...${RESET}"
+    cd utils/
+    make
+    cd ..
+else
+    if [ $skip = false ]; then
+        echo -e "${BLUE}[INFO]\t  The executable already exists, but recompilation was forced.${RESET}"
+        cd utils/
+        make
+        cd ..
+    else
+        echo -e "${BLUE}[INFO]\t  The executable already exists. Skipping the make process.${RESET}"
+    fi
+fi
 
 # Iterate through first-layer subdirectories
 for dir in "$base_dir"/*/; do    
     # Skip the current directory itself
     if [ "$dir" = "." ]; then
+        continue
+    fi
+    # Skip 'utils' subdirectory
+    if [[ "$(basename "$dir")" == "utils" ]]; then
         continue
     fi
     
@@ -94,15 +114,15 @@ for dir in "$base_dir"/*/; do
         fi
 
         # Append contents of any .log file in the subdirectory to the main log file
-        log_files=$(find . -maxdepth 1 -type f -name "*.log")
-        if [ -n "$log_files" ]; then
-            for log_file in $log_files; do
-                cat "$log_file" >> "../${log_file_name}"
-                echo ' ' >> "../${log_file_name}"
-            done
-        else
-            echo -e "${YELLOW}[WARNING] No .log files found in $(pwd). Skipping log append.${RESET}"
-        fi
+        #log_files=$(find . -maxdepth 1 -type f -name "*.log")
+        #if [ -n "$log_files" ]; then
+            #for log_file in $log_files; do
+                # cat "$log_file" >> "../${log_file_name}"
+                # echo ' ' >> "../${log_file_name}"
+            #done
+        #else
+        #    echo -e "${YELLOW}[WARNING] No .log files found in $(pwd). Skipping log append.${RESET}"
+        #fi
     )
 
     # Return to the parent directory

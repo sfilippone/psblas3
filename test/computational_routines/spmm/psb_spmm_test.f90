@@ -3,7 +3,8 @@
 !!
 !! Author: Luca Pepé Sciarria, Staccone Simone (Tor Vergata University)
 module psb_spmm_test
-    
+    implicit none
+
     contains
 
     subroutine psb_spmm_kernel(mtx_file,x_file, y_file, alpha, beta, ctxt)

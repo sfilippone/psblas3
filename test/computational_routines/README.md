@@ -57,6 +57,7 @@ In this test suite were considered only computational routines implemented by PS
 ## Questions
 - Is it correct to use psb_gather even for a single process running?
 - Is it correct to shift in 0,xxxx type of notation to compare with the correct number of significand digits?
+- Does it make sense to compare the parallel solution with the serial one?
 
 
 ## References
