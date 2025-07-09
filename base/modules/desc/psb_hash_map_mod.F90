@@ -57,6 +57,10 @@ module psb_hash_map_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_hash_mod 
+  use psb_penv_mod
+  use psb_sort_mod
+  use psb_realloc_mod
+  use psb_error_mod
   
   type, extends(psb_indx_map) :: psb_hash_map
 
@@ -113,6 +117,15 @@ module psb_hash_map_mod
          &  hash_inner_cnvs1,  hash_inner_cnv1
   end interface hash_inner_cnv
   private :: hash_inner_cnv
+  interface hash_srch 
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
+    module procedure  hash_srch_ipk, hash_srch_lpk
+#else
+    module procedure hash_srch_ipk
+#endif
+  end interface hash_srch
+  private :: hash_srch
+  integer, parameter, private :: seqsrchmax=6
 
 contains
 
@@ -321,8 +334,6 @@ contains
 
 
   subroutine hash_g2lv1(idx,idxmap,info,mask,owned)
-    use psb_penv_mod
-    use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_lpk_), intent(inout) :: idx(:)
@@ -369,35 +380,57 @@ contains
 
       else if (idxmap%is_valid()) then 
 
-        ! $ o m p parallel do default(none) schedule(dynamic) &
-        ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
-        ! $ o m p private(i,ip,lip,tlip,info) 
-        do i = 1, is
-          if (mask(i)) then 
-            ip = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
-              cycle
-            endif
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                 & idxmap%glb_lc,nrm)
-            if (lip < 0) then 
-              call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
-              lip = tlip
-              info = 0
-            end if
-            if (owned_) then 
-              if (lip<=nrow) then 
-                idx(i) = lip
-              else 
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(mask,is,idx,mglob,idxmap,nrm,ncol,nrow,owned_) &
+          ! $ o m p private(i,ip,lip,tlip,info)
+          do i = 1, is
+            if (mask(i)) then 
+              ip = idx(i) 
+              if ((ip < 1 ).or.(ip>mglob)) then 
                 idx(i) = -1
+                cycle
               endif
-            else
-              idx(i) = lip
-            endif
-          end if
-        enddo
-        ! $ o m p end parallel do
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                   & idxmap%glb_lc,nrm)
+              if (lip < 0) then 
+                call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+                lip = tlip
+                info = 0
+              end if
+              if (owned_) then 
+                if (lip<=nrow) then 
+                  idx(i) = lip
+                else 
+                  idx(i) = -1
+                endif
+              else
+                idx(i) = lip
+              endif
+            end if
+          enddo
+          ! $ o m p end parallel do
+
+!!$          call hash_inner_cnv(is,idx,idxmap%hashvmask,idxmap%hashv,&
+!!$               & idxmap%glb_lc,nrm=nrm,mask=mask)
+!!$
+!!$          do i = 1, is
+!!$            lip = idx(i)
+!!$            if (lip < 0) then 
+!!$              call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+!!$              lip = tlip
+!!$              info = 0
+!!$              if (owned_) then 
+!!$                if (lip<=nrow) then 
+!!$                  idx(i) = lip
+!!$                else 
+!!$                  idx(i) = -1
+!!$                endif
+!!$              else
+!!$                idx(i) = lip
+!!$              endif
+!!$            end if
+!!$          enddo
+!!$        
       else 
         write(0,*) 'Hash status: invalid ',idxmap%get_state()
         idx(1:is) = -1
@@ -449,9 +482,6 @@ contains
   end subroutine hash_g2lv1
 
   subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
-    use psb_penv_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_lpk_), intent(in)    :: idxin(:)
@@ -502,33 +532,32 @@ contains
              & idxmap%hashv,idxmap%glb_lc,mask=mask, nrm=nrm)
 
       else if (idxmap%is_valid()) then 
-
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,&
+             & idxmap%hashv,idxmap%glb_lc,nrm=nrm,mask=mask)
         ! $ o m p parallel do default(none) schedule(dynamic) &
-        ! $ o m p shared(mask,is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
+        ! $ o m p shared(is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
         ! $ o m p private(i,ip,lip,tlip,info) 
         do i = 1, is
-          if (mask(i)) then 
+          if (mask(i).and.(idxout(i)<0)) then 
             ip = idxin(i) 
             if ((ip < 1 ).or.(ip>mglob)) then 
               idxout(i) = -1
               cycle
             endif
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                 & idxmap%glb_lc,nrm)
-            if (lip < 0) then 
+            if (idxout(i) < 0) then
               call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
               lip = tlip
               info = 0
-            end if
-            if (owned_) then 
-              if (lip<=nrow) then 
+              if (owned_) then 
+                if (lip<=nrow) then 
+                  idxout(i) = lip
+                else 
+                  idxout(i) = -1
+                endif
+              else
                 idxout(i) = lip
-              else 
-                idxout(i) = -1
               endif
-            else
-              idxout(i) = lip
-            endif
+            end if
           end if
         enddo
         ! $ o m p end parallel do 
@@ -546,7 +575,8 @@ contains
              & idxmap%hashv,idxmap%glb_lc,nrm=nrm)
 
       else if (idxmap%is_valid()) then 
-
+        call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,&
+             & idxmap%hashv,idxmap%glb_lc,nrm=nrm)
         ! $ o m p parallel do default(none) schedule(dynamic) &
         ! $ o m p shared(is,idxin,idxout,mglob,idxmap,nrm,ncol,nrow,owned_) &
         ! $ o m p private(i,ip,lip,tlip,info) 
@@ -556,22 +586,20 @@ contains
             idxout(i) = -1
             cycle
           endif
-          call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-               & idxmap%hashv,idxmap%glb_lc,nrm)
-          if (lip < 0) then
+          if (idxout(i) < 0) then
             call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
             lip = tlip
             info = 0
-          end if
-          if (owned_) then 
-            if (lip<=nrow) then 
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idxout(i) = lip
+              else 
+                idxout(i) = -1
+              endif
+            else
               idxout(i) = lip
-            else 
-              idxout(i) = -1
             endif
-          else
-            idxout(i) = lip
-          endif
+          end if
         enddo
         ! $ o m p end parallel do 
       else 
@@ -585,8 +613,6 @@ contains
 
 
   subroutine hash_g2ls1_ins(idx,idxmap,info,mask,lidx)
-    use psb_realloc_mod
-    use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(inout) :: idx
@@ -642,16 +668,11 @@ contains
   end subroutine hash_g2ls2_ins
 
   ! #################### THESIS ####################
-
   subroutine hash_g2lv1_ins(idx,idxmap,info,mask,lidx)
-    use psb_error_mod
-    use psb_realloc_mod
-    use psb_sort_mod
-    use psb_penv_mod
+    use psb_timers_mod
 #ifdef PSB_OPENMP    
     use omp_lib
 #endif
-
     implicit none 
 
     class(psb_hash_map), intent(inout) :: idxmap
@@ -666,310 +687,80 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: me, np,ith
     character(len=20)   :: name,ch_err
-    logical, allocatable :: mask_(:)
+    integer(psb_ipk_), allocatable   :: tidx(:)
 !!$    logical :: use_openmp = .true.
 #ifdef PSB_OPENMP
     integer(kind = OMP_lock_kind) :: ins_lck
 #endif
     logical, volatile :: isLoopValid
+    logical, parameter  :: do_timings=.true.
+    integer(psb_ipk_), save  :: ins_phase1=-1, ins_phase2=-1, ins_phase3=-1, ins_phase4=-1
+    integer(psb_ipk_), save  :: ins_phase11=-1, ins_phase12=-1
+
     info = psb_success_
     name = 'hash_g2lv1_ins'
     call psb_erractionsave(err_act)
 
     ctxt = idxmap%get_ctxt()
     call psb_info(ctxt, me, np)
-
+    if ((do_timings).and.(ins_phase1==-1))       &
+         & ins_phase1 = psb_get_timer_idx("HSHINS: inner_cnv ")
+    if ((do_timings).and.(ins_phase2==-1))       &
+         & ins_phase2 = psb_get_timer_idx("HSINS: srchins_lp")
+!!$  if ((do_timings).and.(ins_phase3==-1))       &
+!!$       & ins_phase3 = psb_get_timer_idx("HSHINS: csput")
+!!$  if ((do_timings).and.(ins_phase4==-1))       &
+!!$       & ins_phase4 = psb_get_timer_idx("HSHINS: rmt%csput")
     is = size(idx)
+    call psb_realloc(is,tidx,info)
+    call idxmap%lg2lv2_ins(idx,tidx,info,mask=mask,lidx=lidx)
+    idx(1:is) = tidx(1:is)
+  end subroutine hash_g2lv1_ins
+  
+  subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
+    use psb_timers_mod
+    implicit none 
+    class(psb_hash_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
+    integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: i, lip, nrow, ncol
+    integer(psb_lpk_) :: mglob, ip, nxt, tlip
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: me, np, ith, err_act
+    character(len=20)   :: name,ch_err
+    logical, volatile :: isLoopValid
+    logical, parameter  :: do_timings=.false.
 
-    if (present(mask)) then 
-      if (size(mask) < size(idx)) then 
-        info = -1
-        return
-      end if
-    end if
+    info = psb_success_
+    name = 'hash_g2lv2_ins'
+    call psb_erractionsave(err_act)
 
-    if (present(lidx)) then 
-      if (size(lidx) < size(idx)) then 
-        info = -1
-        return
-      end if
-    end if
-
+    ctxt = idxmap%get_ctxt()
+    call psb_info(ctxt, me, np)
+    is = size(idxin)
+    is = min(is,size(idxout))
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
-    !write(0,*) me,name,' before loop ',psb_errstatus_fatal()
-#if 0&& defined(PSB_OPENMP)
-    !$omp critical(hash_g2l_ins)              
+    !write(0,*)me, name, ':', present(lidx),present(mask),idxmap%is_bld()
     isLoopValid = .true.
     if (idxmap%is_bld()) then 
 
       if (present(lidx)) then
         if (present(mask)) then 
           ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(lidx,mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
+          ! $ o m p shared(lidx,mask,name,me,is,idxin,idxout,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
           ! $ o m p private(i,ip,lip,tlip,nxt,info) &
           ! $ o m p reduction(.AND.:isLoopValid)          
-          do i = 1, is
-            if (mask(i)) then 
-              ip = idx(i) 
-              if ((ip < 1 ).or.(ip>mglob) ) then 
-                idx(i) = -1
-                cycle
-              endif
-              ncol  = idxmap%get_lc()
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-                   & idxmap%hashv,idxmap%glb_lc,ncol)
-              if (lip > 0) then
-                idx(i) = lip 
-                info = psb_success_
-              else
-                ! $ o m p critical(hash_g2l_ins)          
-                tlip  = lip
-                nxt = lidx(i)
-                if (nxt <= nrow) then 
-                  idx(i) = -1
-                else
-                  call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                       & idxmap%glb_lc,ncol)
-                  if (lip > 0) then
-                    idx(i) = lip
-                  else
-                    call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-                    lip = tlip 
-                    if (info >=0) then 
-                      if (nxt == lip) then 
-                        call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                             & pad=-1_psb_lpk_,addsz=psb_laddsz)
-                        if (info /= psb_success_) then
-                          write(0,*)'Problem 1:',info,lip,size(idxmap%loc_to_glob)
-                          info=lip 
-                          call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                               & a_err='psb_ensure_size',i_err=(/info/))
-                          isLoopValid = .false.
-                        end if
-                        idxmap%loc_to_glob(nxt)  = ip
-                        nxt = max(ncol,nxt)
-                        call idxmap%set_lc(nxt)
-                      endif
-                      idx(i) = lip
-                      info = psb_success_
-                    else
-                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                           & a_err='SearchInsKeyVal',i_err=(/info/))
-                      isLoopValid = .false.
-                    end if
-                  end if
-                endif
-                ! $ o m p end critical(hash_g2l_ins)
-              end if
-            else
-              idx(i) = -1
-            end if
-          enddo
-          ! $ o m p end parallel do
-
-        else if (.not.present(mask)) then 
-
-          ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(lidx,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
-          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
-          ! $ o m p reduction(.AND.:isLoopValid)          
-          do i = 1, is
-            ip = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob) ) then 
-              idx(i) = -1
-              cycle
-            endif
-            ncol  = idxmap%get_lc()
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-                 & idxmap%hashv,idxmap%glb_lc,ncol)
-            if (lip > 0) then
-              idx(i) = lip 
-              info = psb_success_
-            else
-              ! $ o m p critical(hash_g2l_ins)          
-              tlip  = lip
-              nxt = lidx(i)
-              if (nxt <= nrow) then 
-                idx(i) = -1
-              else
-                call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                     & idxmap%glb_lc,ncol)
-                if (lip > 0) then
-                  idx(i) = lip
-                else
-                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-                  lip = tlip
-                  if (info >=0) then 
-                    if (nxt == lip) then 
-                      call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                           & pad=-1_psb_lpk_,addsz=psb_laddsz)
-                      if (info /= psb_success_) then
-                        write(0,*)'Problem 2:',info,lip,size(idxmap%loc_to_glob)
-                        info=lip
-                        call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                             & a_err='psb_ensure_size',i_err=(/info/))
-                        isLoopValid = .false.
-                      end if
-                      idxmap%loc_to_glob(nxt)  = ip
-                      nxt = max(ncol,nxt)
-                      call idxmap%set_lc(nxt)
-                    endif
-                    idx(i) = lip
-                    info = psb_success_
-                  else
-                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         & a_err='SearchInsKeyVal',i_err=(/info/))
-                    isLoopValid = .false.
-                  end if
-                end if
-              endif
-              ! $ o m p end critical(hash_g2l_ins)
-            end if
-          enddo
-          ! $ o m p end parallel do
-        end if
-
-      else if (.not.present(lidx)) then 
-
-        if (present(mask)) then
-          ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(mask,name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
-          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
-          ! $ o m p reduction(.AND.:isLoopValid)          
-          do i = 1, is
-            if (mask(i)) then
-              ip   = idx(i) 
-              if ((ip < 1 ).or.(ip>mglob)) then 
-                idx(i) = -1
-                cycle
-              endif
-              ncol = idxmap%get_lc()
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-                   & idxmap%hashv,idxmap%glb_lc,ncol)
-              if (lip > 0) then
-                idx(i) = lip 
-                info = psb_success_
-              else
-                ! $ o m p critical(hash_g2l_ins)          
-                ncol = idxmap%get_lc()
-                nxt  = ncol + 1 
-                call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                     & idxmap%glb_lc,ncol)
-                if (lip > 0) then
-                  idx(i) = lip
-                else
-                  call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-                  lip = tlip
-                  if (info >=0) then 
-                    if (nxt == lip) then
-                      if (lip > size(idxmap%loc_to_glob)) then 
-                        call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                             & pad=-1_psb_lpk_,addsz=psb_laddsz)
-                      end if
-                      if (info /= psb_success_) then
-                        write(0,*)'Problem 3:',info,lip,size(idxmap%loc_to_glob)
-                        info=lip
-                        call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                             & a_err='psb_ensure_size',i_err=(/info/))
-                        isLoopValid = .false.
-                      end if
-                      idxmap%loc_to_glob(nxt)  = ip
-                      call idxmap%set_lc(nxt)
-                    endif
-                    idx(i) = lip
-                    info = psb_success_
-                  else
-                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         & a_err='SearchInsKeyVal',i_err=(/info/))
-                    isLoopValid = .false.
-                  end if
-                end if
-                ! $ o m p end critical(hash_g2l_ins)          
-              end if
-            else
-              idx(i) = -1
-            end if
-          enddo
-          ! $ o m p end parallel do
-
-        else if (.not.present(mask)) then 
-
-          ! $ o m p parallel do default(none) schedule(dynamic) &
-          ! $ o m p shared(name,me,is,idx,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
-          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
-          ! $ o m p reduction(.AND.:isLoopValid)          
-          do i = 1, is
-            ip   = idx(i) 
-            if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
-              cycle
-            endif
-            ncol = idxmap%get_lc()
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
-                 & idxmap%hashv,idxmap%glb_lc,ncol)
-            if (lip > 0) then
-              idx(i) = lip 
-              info = psb_success_
-            else
-              ! $ o m p critical(hash_g2l_ins)          
-              ncol = idxmap%get_lc()
-              nxt  = ncol + 1 
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                   & idxmap%glb_lc,ncol)
-              if (lip > 0) then
-                idx(i) = lip
-              else
-                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-                lip = tlip
-                if (info >=0) then 
-                  if (nxt == lip) then 
-                    call psb_ensure_size(lip,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=psb_laddsz)
-                    if (info /= psb_success_) then
-                      write(0,*)'Problem 4:',info,lip,size(idxmap%loc_to_glob)
-                      info=lip
-                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                           & a_err='psb_ensure_size',i_err=(/info/))
-                      isLoopValid = .false.
-                    end if
-                    idxmap%loc_to_glob(nxt)  = ip
-                    call idxmap%set_lc(nxt)
-                  endif
-                  idx(i) = lip
-                  info = psb_success_
-                else
-                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       & a_err='SearchInsKeyVal',i_err=(/info/))
-                  isLoopValid = .false.
-                end if
-              end if
-              ! $ o m p end critical(hash_g2l_ins)          
-            end if
-          enddo
-          ! $ o m p end parallel do
-        end if
-      end if
-    else 
-      ! Wrong state
-      idx = -1
-      info = -1
-    end if
-    !$omp end critical(hash_g2l_ins)
-    if (.not. isLoopValid) goto 9999
-#else
-!!$    else if (.not.use_openmp) then 
-    isLoopValid = .true.
-    if (idxmap%is_bld()) then 
-
-      if (present(lidx)) then
-        if (present(mask)) then 
           do i = 1, is
             ncol  = idxmap%get_lc()
             if (mask(i)) then 
-              ip = idx(i) 
+              ip = idxin(i) 
               if ((ip < 1 ).or.(ip>mglob) ) then 
-                idx(i) = -1
+                idxout(i) = -1
                 cycle
               endif
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
@@ -977,7 +768,7 @@ contains
               if (lip < 0) then
                 nxt = lidx(i)
                 if (nxt <= nrow) then 
-                  idx(i) = -1
+                  idxout(i) = -1
                   cycle
                 endif
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
@@ -986,7 +777,7 @@ contains
                   if (nxt == tlip) then 
                     ncol = max(ncol,nxt)
                     call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                         & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                         & pad=-1_psb_lpk_)
                     if (info /= psb_success_) then
                       !write(0,*) 'Error spot'
                       write(0,*)'Problem 5:',info,lip,size(idxmap%loc_to_glob)
@@ -1005,20 +796,25 @@ contains
                   isLoopValid = .false.
                 end if
               end if
-              idx(i) = lip
+              idxout(i) = lip
               info = psb_success_
             else
-              idx(i) = -1
+              idxout(i) = -1
             end if
           enddo
+          ! $ o m p end parallel do
 
         else if (.not.present(mask)) then 
 
+          ! $ o m p parallel do default(none) schedule(dynamic) &
+          ! $ o m p shared(lidx,name,me,is,idxin,idxout,ins_lck,mglob,idxmap,ncol,nrow,psb_laddsz) &
+          ! $ o m p private(i,ip,lip,tlip,nxt,info) &
+          ! $ o m p reduction(.AND.:isLoopValid)          
           do i = 1, is
             ncol  = idxmap%get_lc()
-            ip    = idx(i) 
+            ip    = idxin(i) 
             if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
+              idxout(i) = -1
               cycle
             endif
             call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
@@ -1026,7 +822,7 @@ contains
             if (lip < 0) then 
               nxt = lidx(i)
               if (nxt <= nrow) then 
-                idx(i) = -1
+                idxout(i) = -1
                 cycle
               endif
               call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
@@ -1036,7 +832,7 @@ contains
                 if (nxt == lip) then 
                   ncol = max(nxt,ncol)
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                       & pad=-1_psb_lpk_)
                   if (info /= psb_success_) then
                     !write(0,*) 'Error spot'                      
                     write(0,*)'Problem 6:',info,lip,size(idxmap%loc_to_glob)
@@ -1055,36 +851,34 @@ contains
                 isLoopValid = .false.
               end if
             end if
-            idx(i) = lip
+            idxout(i) = lip
             info = psb_success_
           enddo
+          ! $ o m p end parallel do
 
         end if
 
       else if (.not.present(lidx)) then 
 
         if (present(mask)) then
+          ncol = idxmap%get_lc()
+          call hash_inner_cnv(is,idxin,idxout,idxmap%hashvmask,idxmap%hashv,&
+               & idxmap%glb_lc,nrm=ncol, mask=mask)
+          !          write(0,*) me,' v2 after hash_inner_cnv ',idx(1:is)
           do i = 1, is
-            if (mask(i)) then
-              ip   = idx(i) 
-              if ((ip < 1 ).or.(ip>mglob)) then 
-                idx(i) = -1
-                cycle
-              endif
+            if (mask(i).and.(idxout(i)<0)) then
               ncol = idxmap%get_lc()
               nxt  = ncol + 1 
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
-                   & idxmap%glb_lc,ncol)
-              if (lip < 0) then
-                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-                lip = tlip
-              end if
+              ip  = idxin(i)
+              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+              lip = tlip
+              !if (i==1) write(0,*) me,' v2 isrchins:',i,lip
 
               if (info >=0) then 
                 if (nxt == lip) then 
                   ncol = nxt
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                       & pad=-1_psb_lpk_,addsz=psb_laddsz)
+                       & pad=-1_psb_lpk_)
                   if (info /= psb_success_) then
                     write(0,*)'Problem 7:',info,lip,size(idxmap%loc_to_glob)
                     info = lip
@@ -1101,67 +895,69 @@ contains
                      & a_err='SearchInsKeyVal',i_err=(/info/))
                 isLoopValid = .false.
               end if
-              idx(i) = lip
+              idxout(i) = lip
               info = psb_success_
-            else
-              idx(i) = -1
+            else if (.not.mask(i)) then 
+              idxout(i) = -1
             end if
           enddo
+          !          write(0,*) me,' v2 after cleanup ',idx(1:is)
         else if (.not.present(mask)) then 
 
           do i = 1, is
             ncol  = idxmap%get_lc()
-            ip = idx(i) 
+            ip = idxin(i) 
             if ((ip < 1 ).or.(ip>mglob)) then 
-              idx(i) = -1
+              idxout(i) = -1
               cycle
             endif
             nxt = ncol + 1 
             call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
                  & idxmap%glb_lc,ncol)
-            if (lip < 0) then
-              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
-              lip = tlip
-            end if
-
-            if (info >=0) then 
-              if (nxt == lip) then 
-                ncol = nxt
-                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
-                     & pad=-1_psb_lpk_,addsz=psb_laddsz)
-                if (info /= psb_success_) then
-                  write(0,*)'Problem 8:',info,lip,size(idxmap%loc_to_glob)
-                  info = lip
-                  ch_err='psb_ensure_size'
-                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-                  isLoopValid = .false.
-
-                end if
-                idxmap%loc_to_glob(nxt)  = ip
-                call idxmap%set_lc(ncol)
-              endif
+            if (lip > 0) then
+              idxout(i) = lip
               info = psb_success_
             else
-              ch_err='SearchInsKeyVal'
-              call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                   & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-              isLoopValid = .false.
+              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+              lip = tlip
+
+              if (info >=0) then 
+                if (nxt == lip) then 
+                  ncol = nxt
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_)
+                  if (info /= psb_success_) then
+                    write(0,*)'Problem 8:',info,lip,size(idxmap%loc_to_glob)
+                    info = lip
+                    ch_err='psb_ensure_size'
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                    isLoopValid = .false.
+
+                  end if
+                  idxmap%loc_to_glob(nxt)  = ip
+                  call idxmap%set_lc(ncol)
+                endif
+                info = psb_success_
+              else
+                ch_err='SearchInsKeyVal'
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                isLoopValid = .false.
+              end if
+              idxout(i) = lip
+              info = psb_success_
             end if
-            idx(i) = lip
-            info = psb_success_
           enddo
 
         end if
       end if
     else 
       ! Wrong state
-      idx = -1
+      idxout(:) = -1
       info = -1
     end if
     if (.not. isLoopValid) goto 9999
-#endif
-    !write(0,*) me,name,' after loop ',psb_errstatus_fatal()      
     call psb_erractionrestore(err_act)
     return
 
@@ -1169,46 +965,13 @@ contains
 
     return
 
-  end subroutine hash_g2lv1_ins
-
-  ! ################## END THESIS #########################
-
-  subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
-    use psb_realloc_mod
-    use psb_error_mod
-    implicit none 
-    class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_lpk_), intent(in)    :: idxin(:)
-    integer(psb_ipk_), intent(out)   :: idxout(:)
-    integer(psb_ipk_), intent(out)   :: info 
-    logical, intent(in), optional :: mask(:)
-    integer(psb_ipk_), intent(in), optional :: lidx(:)
-    integer(psb_lpk_), allocatable   :: tidx(:)
-    integer(psb_ipk_) :: is, im
-
-    is = size(idxin)
-    im = min(is,size(idxout))
-    !write(0,*) 'g2lv2_ins before realloc ',psb_errstatus_fatal()   
-    call psb_realloc(im,tidx,info)
-    !write(0,*) 'g2lv2_ins after realloc ',psb_errstatus_fatal()
-    tidx(1:im) = idxin(1:im)
-    call idxmap%g2lip_ins(tidx(1:im),info,mask=mask,lidx=lidx)
-    idxout(1:im) = tidx(1:im)
-    if (is > im) then 
-      write(0,*) 'g2lv2_ins err -3'
-      info = -3 
-    end if
-
   end subroutine hash_g2lv2_ins
+  ! ################## END THESIS #########################
 
   !
   ! init from VL, with checks on input.
   !
   subroutine hash_init_vl(idxmap,ctxt,vl,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)    :: ctxt
@@ -1242,12 +1005,10 @@ contains
 
     end if
     call hash_init_vlu(idxmap,ctxt,m,nl,vl,info)
-    
+
   end subroutine hash_init_vl
 
   subroutine hash_init_vg(idxmap,ctxt,vg,info)
-    use psb_penv_mod
-    use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)    :: ctxt
@@ -1304,10 +1065,6 @@ contains
   ! init from VL, with no checks on input
   !
   subroutine hash_init_vlu(idxmap,ctxt,ntot,nl,vlu,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     type(psb_ctxt_type), intent(in)    :: ctxt
@@ -1360,10 +1117,6 @@ contains
 
 
   subroutine hash_bld_g2l_map(idxmap,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_sort_mod
-    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
@@ -1465,10 +1218,6 @@ contains
 
 
   subroutine hash_asb(idxmap,info)
-    use psb_penv_mod
-    use psb_error_mod
-    use psb_realloc_mod
-    use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out)     :: info
@@ -1491,7 +1240,7 @@ contains
 
 
     call psb_free(idxmap%hash,info)
-    
+
     if (info /= 0) then
       write(0,*) 'Error from hash free', info
       return
@@ -1514,12 +1263,12 @@ contains
     integer(psb_ipk_), intent(in)    :: hashv(0:)
     integer(psb_lpk_), intent(inout) :: x
     integer(psb_ipk_), intent(in)    :: nrm
-    integer(psb_ipk_) :: idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: idx,nh,tmp
     integer(psb_lpk_) :: key, ih
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1528,25 +1277,7 @@ contains
     ih  = iand(key,hashmask)
     idx = hashv(ih)
     nh  = hashv(ih+1) - hashv(ih) 
-    if (nh > 0) then 
-      tmp = -1 
-      lb = idx
-      ub = idx+nh-1
-      do 
-        if (lb>ub) exit
-        lm = (lb+ub)/2
-        if (key == glb_lc(lm,1)) then 
-          tmp = lm
-          exit
-        else if (key<glb_lc(lm,1)) then 
-          ub = lm - 1
-        else
-          lb = lm + 1
-        end if
-      end do
-    else 
-      tmp = -1
-    end if
+    tmp = hash_srch(key,idx,nh,glb_lc(:,1))
     if (tmp > 0) then 
       x = glb_lc(tmp,2)
       if (x > nrm) then 
@@ -1563,12 +1294,12 @@ contains
     integer(psb_lpk_), intent(in)  :: hashmask, x, glb_lc(:,:)
     integer(psb_ipk_), intent(out) :: y
     integer(psb_ipk_), intent(in)  :: nrm
-    integer(psb_ipk_) :: idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: idx,nh,tmp
     integer(psb_lpk_) :: ih, key
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1577,25 +1308,7 @@ contains
     ih  = iand(key,hashmask)
     idx = hashv(ih)
     nh  = hashv(ih+1) - hashv(ih) 
-    if (nh > 0) then 
-      tmp = -1 
-      lb = idx
-      ub = idx+nh-1
-      do 
-        if (lb>ub) exit
-        lm = (lb+ub)/2
-        if (key == glb_lc(lm,1)) then 
-          tmp = lm
-          exit
-        else if (key<glb_lc(lm,1)) then 
-          ub = lm - 1
-        else
-          lb = lm + 1
-        end if
-      end do
-    else 
-      tmp = -1
-    end if
+    tmp = hash_srch(key,idx,nh,glb_lc(:,1))
     if (tmp > 0) then 
       y = glb_lc(tmp,2)
       if (y > nrm) then 
@@ -1610,17 +1323,17 @@ contains
   subroutine hash_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask,nrm)
     implicit none 
     integer(psb_ipk_), intent(in)  :: n, hashv(0:)
+    integer(psb_lpk_), intent(inout) :: x(:)
     integer(psb_lpk_), intent(in)  :: glb_lc(:,:),hashmask
     logical, intent(in), optional  :: mask(:)
     integer(psb_ipk_), intent(in), optional  :: nrm
-    integer(psb_lpk_), intent(inout) :: x(:)
 
-    integer(psb_ipk_) :: i, nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: i, nh,tmp
     integer(psb_lpk_) :: ih, key, idx
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1633,26 +1346,8 @@ contains
           key = x(i) 
           ih  = iand(key,hashmask)
           idx = hashv(ih)
-          nh  = hashv(ih+1) - hashv(ih) 
-          if (nh > 0) then 
-            tmp = -1 
-            lb = idx
-            ub = idx+nh-1
-            do 
-              if (lb>ub) exit
-              lm = (lb+ub)/2
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              else if (key<glb_lc(lm,1)) then 
-                ub = lm - 1
-              else
-                lb = lm + 1
-              end if
-            end do
-          else 
-            tmp = -1
-          end if
+          nh  = hashv(ih+1) - hashv(ih)
+          tmp = hash_srch(key,idx,nh,glb_lc(:,1))
           if (tmp > 0) then 
             x(i) = glb_lc(tmp,2)
             if (present(nrm)) then 
@@ -1674,26 +1369,8 @@ contains
         key = x(i) 
         ih  = iand(key,hashmask)
         idx = hashv(ih)
-        nh  = hashv(ih+1) - hashv(ih) 
-        if (nh > 0) then 
-          tmp = -1 
-          lb = idx
-          ub = idx+nh-1
-          do 
-            if (lb>ub) exit
-            lm = (lb+ub)/2
-            if (key == glb_lc(lm,1)) then 
-              tmp = lm
-              exit
-            else if (key<glb_lc(lm,1)) then 
-              ub = lm - 1
-            else
-              lb = lm + 1
-            end if
-          end do
-        else 
-          tmp = -1
-        end if
+        nh  = hashv(ih+1) - hashv(ih)
+        tmp = hash_srch(key,idx,nh,glb_lc(:,1))
         if (tmp > 0) then 
           x(i) = glb_lc(tmp,2)
           if (present(nrm)) then 
@@ -1718,12 +1395,12 @@ contains
     integer(psb_lpk_), intent(in)  :: x(:)
     integer(psb_ipk_), intent(out) :: y(:)
 
-    integer(psb_ipk_) :: i, idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: i, idx,nh,tmp
     integer(psb_lpk_) :: ih, key
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
-    ! Thus we first hash the index, then we do a binary search on the 
+    ! Thus we first hash the index, then we do a search on the 
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
@@ -1739,26 +1416,8 @@ contains
             write(psb_err_unit,*) ' In inner cnv: ',ih,ubound(hashv)
           end if
           idx = hashv(ih)
-          nh  = hashv(ih+1) - hashv(ih) 
-          if (nh > 0) then 
-            tmp = -1 
-            lb = idx
-            ub = idx+nh-1
-            do 
-              if (lb>ub) exit
-              lm = (lb+ub)/2
-              if (key == glb_lc(lm,1)) then 
-                tmp = lm
-                exit
-              else if (key<glb_lc(lm,1)) then 
-                ub = lm - 1
-              else
-                lb = lm + 1
-              end if
-            end do
-          else 
-            tmp = -1
-          end if
+          nh  = hashv(ih+1) - hashv(ih)
+          tmp = hash_srch(key,idx,nh,glb_lc(:,1))
           if (tmp > 0) then 
             y(i) = glb_lc(tmp,2)
             if (present(nrm)) then 
@@ -1785,25 +1444,7 @@ contains
         end if
         idx = hashv(ih)
         nh  = hashv(ih+1) - hashv(ih) 
-        if (nh > 0) then 
-          tmp = -1 
-          lb = idx
-          ub = idx+nh-1
-          do 
-            if (lb>ub) exit
-            lm = (lb+ub)/2
-            if (key == glb_lc(lm,1)) then 
-              tmp = lm
-              exit
-            else if (key<glb_lc(lm,1)) then 
-              ub = lm - 1
-            else
-              lb = lm + 1
-            end if
-          end do
-        else 
-          tmp = -1
-        end if
+        tmp = hash_srch(key,idx,nh,glb_lc(:,1))
         if (tmp > 0) then 
           y(i) = glb_lc(tmp,2)
           if (present(nrm)) then 
@@ -1819,6 +1460,91 @@ contains
     end if
   end subroutine hash_inner_cnv2
 
+  function hash_srch_ipk(key,idx,nh,glb_lc) result(res)
+    integer(psb_lpk_), intent(in) :: key
+    integer(psb_lpk_), intent(in) :: glb_lc(:)
+    integer(psb_ipk_), intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: nh
+    integer(psb_ipk_) :: res
+    !
+    integer(psb_ipk_) :: lb,ub,lm
+    res = -1
+    if (nh > 0) then
+      if (nh <= seqsrchmax) then
+        !
+        ! If the list is short, a sequential search is enough 
+        !
+        do lm=idx,idx+nh-1
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          end if
+        end do
+      else
+        !
+        ! Otherwise use binary 
+        !
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          else if (key<glb_lc(lm)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      end if
+    end if
+  end function hash_srch_ipk
+
+#if defined(PSB_IPK4) && defined(PSB_LPK8) 
+  function hash_srch_lpk(key,idx,nh,glb_lc) result(res)
+    integer(psb_lpk_), intent(in) :: key
+    integer(psb_lpk_), intent(in) :: glb_lc(:)
+    integer(psb_lpk_), intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: nh
+    integer(psb_ipk_) :: res
+    !
+    integer(psb_ipk_) :: lb,ub,lm
+    res = -1
+    if (nh > 0) then
+      if (nh <= seqsrchmax) then
+        !
+        ! If the list is short, a sequential search is enough 
+        !
+        do lm=idx,idx+nh-1
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          end if
+        end do
+      else
+        !
+        ! Otherwise use binary 
+        !
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key == glb_lc(lm)) then 
+            res = lm
+            exit
+          else if (key<glb_lc(lm)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      end if
+    end if
+  end function hash_srch_lpk
+#endif
 
   subroutine hash_clone(idxmap,outmap,info)
     use psb_penv_mod
@@ -1843,7 +1569,7 @@ contains
       info = -87
       goto 9999
     end if
-    
+
 
     allocate(psb_hash_map :: outmap, stat=info )
     if (info /= psb_success_) then 
@@ -1867,9 +1593,9 @@ contains
            &  call psb_safe_ab_cpy(idxmap%glb_lc,outmap%glb_lc,info)
       if (info == psb_success_)&
            &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
-      
+
     class default
-        ! This should be impossible 
+      ! This should be impossible 
       info = -1
     end select
 
@@ -1884,7 +1610,7 @@ contains
 
 9999 call psb_error_handler(err_act)
 
-  return
+    return
   end subroutine hash_clone
 
   subroutine hash_reinit(idxmap,info)
@@ -1917,7 +1643,7 @@ contains
     call idxmap%l2gip(gidx,info)
     tadj = idxmap%get_p_adjcncy()
     call idxmap%get_halo_owner(th_own,info)
-    
+
     call idxmap%free()
     call hash_init_vlu(idxmap,ctxt,ntot,nr,gidx(1:nr),info) 
     if (nc>nr) then 
@@ -1940,5 +1666,5 @@ contains
     return
   end subroutine hash_reinit
 
-  
+
 end module psb_hash_map_mod

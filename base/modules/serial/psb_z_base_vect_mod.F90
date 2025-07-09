@@ -570,8 +570,8 @@ contains
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info == 0) call x%free_buffer(info)
-    if (info == 0) call x%free_comid(info)
+    if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
+    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
     if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
 
@@ -1831,7 +1831,8 @@ contains
   subroutine z_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) :: alpha, beta, y(:)
     class(psb_z_base_vect_type) :: x
 
@@ -1851,7 +1852,8 @@ contains
   subroutine z_base_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_vect_type) :: x
@@ -1867,7 +1869,8 @@ contains
   subroutine z_base_gthzbuf(i,n,idx,x)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     class(psb_z_base_vect_type) :: x
 
@@ -1930,7 +1933,8 @@ contains
   subroutine z_base_gthzv(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_vect_type) :: x
 
@@ -1955,7 +1959,8 @@ contains
   subroutine z_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) :: beta, x(:)
     class(psb_z_base_vect_type) :: y
 
@@ -1968,7 +1973,8 @@ contains
   subroutine z_base_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta, x(:)
     class(psb_z_base_vect_type) :: y
@@ -1982,7 +1988,8 @@ contains
   subroutine z_base_sctb_buf(i,n,idx,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta
     class(psb_z_base_vect_type) :: y
@@ -3247,10 +3254,11 @@ contains
   subroutine z_base_mlv_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) :: alpha, beta, y(:)
     class(psb_z_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -3272,7 +3280,8 @@ contains
   subroutine z_base_mlv_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_multivect_type) :: x
@@ -3294,10 +3303,11 @@ contains
   subroutine z_base_mlv_gthzv(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -3320,10 +3330,11 @@ contains
   subroutine z_base_mlv_gthzm(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) ::  y(:,:)
     class(psb_z_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -3341,7 +3352,8 @@ contains
   subroutine z_base_mlv_gthzbuf(i,ixb,n,idx,x)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, ixb, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i, ixb
     class(psb_i_base_vect_type) :: idx
     class(psb_z_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
@@ -3373,10 +3385,11 @@ contains
   subroutine z_base_mlv_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) :: beta, x(:)
     class(psb_z_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (y%is_dev()) call y%sync()
     nc = psb_size(y%v,2_psb_ipk_)
@@ -3388,10 +3401,11 @@ contains
   subroutine z_base_mlv_sctbr2(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_dpk_) :: beta, x(:,:)
     class(psb_z_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (y%is_dev()) call y%sync()
     nc = y%get_ncols()
@@ -3403,7 +3417,8 @@ contains
   subroutine z_base_mlv_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     complex( psb_dpk_) :: beta, x(:)
     class(psb_z_base_multivect_type) :: y
@@ -3415,7 +3430,8 @@ contains
   subroutine z_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, iyb, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i, iyb
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta
     class(psb_z_base_multivect_type) :: y

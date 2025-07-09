@@ -51,7 +51,8 @@ subroutine  psi_lovrl_upd_vect(x,desc_a,update,info)
   ! locals
   integer(psb_lpk_), allocatable :: xs(:)
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm, nx
+  integer(psb_mpk_) :: np, me, isz, nx, ndm
+  integer(psb_ipk_) :: err_act, i, idx
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
@@ -133,7 +134,8 @@ subroutine  psi_lovrl_upd_multivect(x,desc_a,update,info)
   ! locals
   integer(psb_lpk_), allocatable :: xs(:,:)
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm, nx, nc
+  integer(psb_mpk_) :: np, me, isz, ndm, nx, nc
+  integer(psb_ipk_) :: err_act, i, idx
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 

@@ -631,9 +631,13 @@ endforeach()
 
 list(APPEND PSB_base_source_C_files modules/cutil.c)
 list(APPEND PSB_base_source_C_files modules/desc/psb_hashval.c)
-if (SERIAL_MPI)
- list(APPEND PSB_base_source_C_files modules/fakempi.c)
+if (PSB_SERIAL_MPI)
+ list(APPEND PSB_base_source_C_files modules/psb_fakempi.c)
+ list(APPEND base_header_C_files ${CMAKE_CURRENT_LIST_DIR}/modules/psb_fakempi.h)
 endif()
+list(APPEND base_header_C_files ${CMAKE_CURRENT_LIST_DIR}/modules/psb_types.h)
+
 foreach(file IN LISTS PSB_base_source_C_files)
   list(APPEND base_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
 endforeach()
+

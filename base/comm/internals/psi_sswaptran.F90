@@ -204,12 +204,11 @@ subroutine psi_stran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_)   :: np, me
+  integer(psb_mpk_)   :: np, me, nesd, nerv, n
   integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
-  integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, n
+  integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false., debug=.false.
@@ -552,12 +551,11 @@ subroutine psi_stran_vidx_multivect(ctxt,icomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_)   :: np, me
+  integer(psb_mpk_)   :: np, me, nesd, nerv, n
   integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable :: prcid(:)
-  integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, n
+  integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false., debug=.false.

@@ -152,7 +152,7 @@ contains
           !$omp parallel do private(i,j, acc) schedule(static)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -164,7 +164,7 @@ contains
           !$omp parallel do private(i,j, acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -176,7 +176,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -192,7 +192,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -204,7 +204,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -216,7 +216,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -231,7 +231,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -243,7 +243,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -255,7 +255,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -270,7 +270,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -282,7 +282,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -294,7 +294,7 @@ contains
           !$omp parallel do private(i,j,acc)
           do i=1,m
             acc  = szero
-            !$omp  simd
+            !$omp  simd reduction(+:acc)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))
             enddo
@@ -3693,7 +3693,7 @@ subroutine psb_scsrspspmm(a,b,c,info)
     ! Estimate number of nonzeros on output.
     nza = a%get_nzeros()
     nzb = b%get_nzeros()
-    nzc = 2*(nza+nzb)
+    nzc = max(nint(0.5*(nza+nzb)),ma,mb,na,nb)  
     call c%allocate(ma,nb,nzc)
 
     call csr_spspmm(a,b,c,info)
@@ -3773,8 +3773,8 @@ contains
       if (nrc > 0 ) then
         if ((nzc+nrc)>nze) then
           nze = max(ma*((nzc+j-1)/j),nzc+2*nrc)
-          call psb_realloc(nze,c%val,info)
-          if (info == 0) call psb_realloc(nze,c%ja,info)
+          call psb_ensure_size(nze,c%val,info)
+          if (info == 0) call psb_ensure_size(nze,c%ja,info)
           if (info /= 0) return
         end if
 
@@ -3817,14 +3817,18 @@ contains
     ! dense accumulator
     ! https://sc18.supercomputing.org/proceedings/workshops/workshop_files/ws_lasalss115s2-file1.pdf
     call psb_realloc(nb, acc, info)
-    !$omp parallel shared(nth,lth)
+    !$omp parallel shared(nth,lth,offsets,info)
     !$omp single
     nth = omp_get_num_threads()
     lth = min(nth, ma)
+    allocate(offsets(omp_get_max_threads()),stat=info)
     !$omp end single
     !$omp end parallel
+    if (info /= 0) then
+      write(0,*)'Offsets allocation failed ',info
+      return
+    end if
 
-    allocate(offsets(omp_get_max_threads()))
     !$omp parallel private(vals,col_inds,nnz,rwnz,thread_upperbound,acc,start_idx,end_idx) &
     !$omp num_threads(lth) shared(a,b,c,offsets) 
     thread_upperbound = 0
@@ -4234,7 +4238,7 @@ subroutine psb_scsrspspmm(a,b,c,info)
   ! Estimate number of nonzeros on output.
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = 2*(nza+nzb)
+  nzc = max(nint(0.5*(nza+nzb)),ma,mb,na,nb)  
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
@@ -4299,8 +4303,8 @@ contains
       if (nrc > 0 ) then
         if ((nzc+nrc)>nze) then
           nze = max(ma*((nzc+j-1)/j),nzc+2*nrc)
-          call psb_realloc(nze,c%val,info)
-          if (info == 0) call psb_realloc(nze,c%ja,info)
+          call psb_ensure_size(nze,c%val,info)
+          if (info == 0) call psb_ensure_size(nze,c%ja,info)
           if (info /= 0) return
         end if
 

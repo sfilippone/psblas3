@@ -263,7 +263,7 @@ module psi_penv_mod
   interface psb_info
     module procedure psb_info_mpik
   end interface
-#if defined(PSB_IPK4) && defined(PSB_LPK8)
+#if (defined(PSB_IPK4) && defined(PSB_LPK8))||defined(PSB_IPK8)
   interface psb_info
     module procedure psb_info_epk
   end interface
@@ -918,7 +918,7 @@ contains
 
   end subroutine psi_register_mpi_extras
 
-#if defined(PSB_IPK4) && defined(PSB_LPK8)
+#if (defined(PSB_IPK4) && defined(PSB_LPK8))||defined(PSB_IPK8)
   subroutine psb_info_epk(ctxt,iam,np)
 
     type(psb_ctxt_type), intent(in)  :: ctxt

@@ -66,8 +66,8 @@ subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me
-  integer(psb_ipk_) :: err_act, iix, jjx, k, maxk, nrow, imode, i,&
+  integer(psb_mpk_) :: np, me, k
+  integer(psb_ipk_) :: err_act, iix, jjx, maxk, nrow, imode, i,&
        & liwork,data_, ldx
   integer(psb_lpk_) :: m, n, ix, ijx
   complex(psb_spk_),pointer :: iwork(:), xp(:,:)

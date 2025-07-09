@@ -155,7 +155,7 @@ module psb_const_mod
   integer(psb_i2pk_), parameter  :: i2zero=0, i2one=1
   integer(psb_i2pk_), parameter  :: i2two=2, i2three=3, i2mone=-1
 
-  integer(psb_ipk_), parameter   :: psb_root_=0
+  integer(psb_mpk_), parameter   :: psb_root_=0
   real(psb_spk_), parameter      :: szero=0.0_psb_spk_, sone=1.0_psb_spk_
   real(psb_dpk_), parameter      :: dzero=0.0_psb_dpk_, done=1.0_psb_dpk_
   complex(psb_spk_), parameter   :: czero=(0.0_psb_spk_,0.0_psb_spk_)

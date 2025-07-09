@@ -36,7 +36,8 @@ module psi_m_comm_a_mod
   interface psi_swapdata
     subroutine psi_mswapdatam(flag,n,beta,y,desc_a,work,info,data)
       import 
-      integer(psb_ipk_), intent(in)         :: flag, n
+      integer(psb_mpk_), intent(in)         :: n
+      integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_mpk_)           :: y(:,:), beta
       integer(psb_mpk_),target    :: work(:)
@@ -57,7 +58,8 @@ module psi_m_comm_a_mod
       import 
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
-      integer(psb_ipk_), intent(in)   :: flag, n
+      integer(psb_mpk_), intent(in)   :: n
+      integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
       integer(psb_mpk_)        :: y(:,:), beta
       integer(psb_mpk_),target :: work(:)
@@ -80,7 +82,8 @@ module psi_m_comm_a_mod
   interface psi_swaptran
     subroutine psi_mswaptranm(flag,n,beta,y,desc_a,work,info,data)
       import 
-      integer(psb_ipk_), intent(in)         :: flag, n
+      integer(psb_ipk_), intent(in)         :: flag
+      integer(psb_Mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_mpk_)           :: y(:,:), beta
       integer(psb_mpk_),target    :: work(:)
@@ -101,7 +104,8 @@ module psi_m_comm_a_mod
       import 
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_mpk_), intent(in)   :: icomm
-      integer(psb_ipk_), intent(in)   :: flag, n
+      integer(psb_mpk_), intent(in)   :: n
+      integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
       integer(psb_mpk_)        :: y(:,:), beta
       integer(psb_mpk_),target :: work(:)

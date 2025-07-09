@@ -130,33 +130,38 @@ module psi_i2_serial_mod
     subroutine psi_i2gthmv(n,k,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_i2gthmv
     subroutine psi_i2gthv(n,idx,alpha,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: x(:), y(:),alpha,beta
     end subroutine psi_i2gthv
     subroutine psi_i2gthzmv(n,k,idx,x,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: x(:,:), y(:)
 
     end subroutine psi_i2gthzmv
     subroutine psi_i2gthzmm(n,k,idx,x,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: x(:,:), y(:,:)
 
     end subroutine psi_i2gthzmm
     subroutine psi_i2gthzv(n,idx,x,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: x(:), y(:)
     end subroutine psi_i2gthzv
   end interface psi_gth
@@ -165,20 +170,23 @@ module psi_i2_serial_mod
     subroutine psi_i2sctmm(n,k,idx,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_i2sctmm
     subroutine psi_i2sctmv(n,k,idx,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
-      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_mpk_) :: n, k
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: beta, x(:), y(:,:)
     end subroutine psi_i2sctmv
     subroutine psi_i2sctv(n,idx,x,beta,y)
       import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
       implicit none
 
-      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
       integer(psb_i2pk_) :: beta, x(:), y(:)
     end subroutine psi_i2sctv
   end interface psi_sct

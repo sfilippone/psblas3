@@ -61,15 +61,15 @@ prerequisites (see also SERIAL below):
    http://math-atlas.sourceforge.net/ 
 
 3. We have had good results with  the METIS library, from 
-   http://www-users.cs.umn.edu/~karypis/metis/metis/main.html.
+   https://github.com/KarypisLab/METIS.
    This is optional; it is  used in the util and test/fileread
    directories but only if you specify `--with-metis`.
 
-4. If you have the AMD package of Davis, Duff and Amestoy, you can
+5. If you have the AMD package of Davis, Duff and Amestoy, you can
    specify `--with-amd` (see `./configure --help` for more details).
    We use the C interface to AMD.
 
-5. If you have CUDA available, use
+6. If you have CUDA available, use
    --enable-cuda           to compile CUDA-enabled methods
    --with-cudadir=<path>   to specify the CUDA toolkit location
    --with-cudacc=XX,YY,ZZ  to specify a list of target CCs (compute
@@ -208,15 +208,16 @@ Salvatore Filippone
 
 **Contributors** (_roughly reverse cronological order_):
 
+- Luca       Pepè Sciarria
 - Theophane  Loloum
 - Fabio      Durastante
 - Dimitri    Walther
 - Andea      Di Iorio
 - Stefano    Petrilli
-- Soren 	   Rasmussen
+- Soren      Rasmussen
 - Zaak       Beekman
-- Ambra	   Abdullahi Hassan
-- Pasqua	   D'Ambra
+- Ambra	     Abdullahi Hassan
+- Pasqua     D'Ambra
 - Alfredo    Buttari
 - Daniela    di Serafino
 - Michele    Martone

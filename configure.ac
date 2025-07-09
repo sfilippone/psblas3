@@ -576,6 +576,7 @@ FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";
 dnl CDEFINES="-DPSB_IPK${pac_cv_ipk_size} -DPSB_LPK${pac_cv_lpk_size} $CDEFINES"
 
 FLINK="$MPIFC"
+CLINK="$MPICC"	
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DPSB_OPENMP $FDEFINES";
@@ -585,6 +586,7 @@ if test x"$pac_cv_openmp" == x"yes" ; then
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";	
    FLINK="$FLINK $pac_cv_openmp_fcopt";
+   CLINK="$CLINK $pac_cv_openmp_fcopt";	
 fi
 #
 # Tests for support of various Fortran features; some of them are critical,
@@ -844,44 +846,62 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   CXXCUDEFINES="";
 else
 
-   PAC_CHECK_CUDA()
-	
-	if test "x$pac_cv_have_cuda" == "xyes"; then
+     PAC_CHECK_CUDA()
+	   
+     if test "x$pac_cv_have_cuda" == "xyes"; then
    
       PAC_CHECK_CUDA_VERSION()
       dnl PAC_CHECK_SPGPU()
-      PSB_HAVE_CUDA="yes";
       PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      PSB_CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
-      CUDA_DEFINES="-DPSB_HAVE_CUDA -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}";
-      CHAVECUDA="#define PSB_HAVE_CUDA"
-      CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
-      CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
-      SPGPU_LIBS="-lspgpu";	
-      CUDAD=cudad;
-      CUDALD=cudald;
-      LCUDA="-lpsb_cuda";	
-      EXTRALDLIBS="-lstdc++";
-      AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
-
-      PAC_ARG_WITH_CUDACC()
-      if test "x$pac_cv_cudacc" == "x"; then
-         pac_cv_cudacc="50,60,70,75,80,86";
-         CUDA_CC="$pac_cv_cudacc";
-      fi
-      if (( $pac_cv_cuda_version >= 11070  ))
-      then 
-        CUDEFINES="--dopt=on";
-      fi	
-      for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
-      do
- 	CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
-      done
-      if test "x$pac_cv_cuda_version" != "xunknown"; then
-      dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
-       FCUDEFINES=" ${CUDA_DEFINES}"
-       dnl CCUDEFINES=" ${CUDA_DEFINES}"
-       dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
+      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+         AC_MSG_NOTICE([Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA])
+         pac_cv_cuda="no";
+         PSB_HAVE_CUDA="no";
+         CUDA_CC="";	
+         SPGPU_LIBS="";	
+         CUDAD="";
+         CUDALD="";
+         CUDEFINES="";
+         CUDA_DEFINES="";
+         CUDA_INCLUDES="";
+         CUDA_LIBS="";
+         FCUDEFINES="";
+         CCUDEFINES="";
+         CXXCUDEFINES="";
+      else
+         AC_MSG_NOTICE([CUDA version ${PSB_CUDA_VERSION}])
+         PSB_HAVE_CUDA="yes";
+         PSB_CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+         CUDA_DEFINES="-DPSB_HAVE_CUDA -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}";
+         CHAVECUDA="#define PSB_HAVE_CUDA"
+         CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
+         CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
+         SPGPU_LIBS="-lspgpu";	
+         CUDAD=cudad;
+         CUDALD=cudald;
+         LCUDA="-lpsb_cuda";	
+         EXTRALDLIBS="-lstdc++";
+         AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
+   
+         PAC_ARG_WITH_CUDACC()
+         if test "x$pac_cv_cudacc" == "x"; then
+            pac_cv_cudacc="50,60,70,75,80,86";
+            CUDA_CC="$pac_cv_cudacc";
+         fi
+         if (( $pac_cv_cuda_version >= 11070  ))
+         then 
+           CUDEFINES="--dopt=on";
+         fi	
+         for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
+         do
+           CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
+         done
+         if test "x$pac_cv_cuda_version" != "xunknown"; then
+         dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
+          FCUDEFINES=" ${CUDA_DEFINES}"
+          dnl CCUDEFINES=" ${CUDA_DEFINES}"
+          dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
+        fi
      fi
   fi
 fi
@@ -986,6 +1006,7 @@ AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
 AC_SUBST(FLINK)
+AC_SUBST(CLINK)
 AC_SUBST(LIBS)
 AC_SUBST(FLIBS)
 AC_SUBST(AR)
