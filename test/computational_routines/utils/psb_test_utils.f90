@@ -1,6 +1,15 @@
-!! Utils module containing all tools usefull to do test validation and result checking
+!> @file psb_test_utils.f90ù
 !!
-!! Authors: Luca Pepé Sciarria, Staccone Simone (Tor Vergata University)
+!! @brief PSBLAS Test Utilities Module:
+!!        This module provides utility functions for testing PSBLAS computational routines.
+!!        It includes functions for initializing test environments, generating input vectors,
+!!        checking results, and logging test outcomes. It also implements validation criteria
+!!        for single and double precision computations.
+!!
+!! @date 2023-10-01
+!! @author Luca Pepé Sciarria, Simone Staccone
+!! @university Tor Vergata, Rome, Italy
+!! @version 1.0
 !!
 module psb_test_utils
     use psb_base_mod
@@ -21,6 +30,8 @@ module psb_test_utils
         character(len=32)   :: kernel_name = "unknown"  !> The PSBLAS kernel that is beeing tested
         integer(psb_ipk_)   :: threshold_type = VALUE   !> The criteria used to pass a test (VAL,...)        
         real(psb_dpk_)      :: threshold = 0.0          !> The threashold value used for acceptance
+        type(psb_ctxt_type) :: ctxt                     !> The PSBLAS context (Used for MPI communications)
+        integer(psb_ipk_)   :: my_rank = 0              !> The rank of the current process in the MPI communicator
     end type test_info_
 
 
@@ -28,11 +39,96 @@ contains
 
     include 'psb_test_log.inc'
 
+    !> @brief Function to initialize the test environment.
+    !!        It is used to set the output unit and the kernel name.
+    !!
+    !! @param test_info The test information structure to be initialized.
+    !!
+    subroutine psb_test_init(test_info)
+        type(test_info_), intent(inout) :: test_info
+        integer(psb_ipk_)               :: output_unit, info
+        ! MPI variables
+        integer(psb_ipk_)               :: my_rank, np
+
+
+        call psb_init(test_info%ctxt)
+        call psb_info(test_info%ctxt,test_info%my_rank,np)
+
+        ! Check if the kernel name is set
+        if (trim(test_info%kernel_name) == "unknown") then
+            write(*, '(A)') "Error: Kernel name is not set. Please set the kernel name before running the test."
+            call psb_exit(test_info%ctxt)
+        end if
+
+        ! Set the output unit based on the number of processes
+
+
+        ! Set the output unit to stdout by default
+        if(np == 1) then
+            open(newunit=output_unit, file=trim(test_info%kernel_name)//'_test.log', &
+            & status='replace', action='write', iostat=info)
+        else
+            open(newunit=output_unit, file=trim(test_info%kernel_name)//'_test.log', &
+            & status='old', action='write', position='append', iostat=info)
+        end if
+
+        ! Check if the file was opened successfully
+        if (info /= 0) then
+           write(*, '(A,I0)') "Error opening log file for kernel ", test_info%kernel_name
+           write(*, '(A,I0)') "I/O Status Code:", info
+           write(*, '(A)') "Please check if the file is accessible and writable."
+           call psb_exit(test_info%ctxt)
+        end if
+
+        test_info%output_unit = output_unit
+
+        write(test_info%output_unit,'(A,A)') 'Welcome to PSBLAS version: ',psb_version_string_
+        write(test_info%output_unit,'(A)') 'This is the psb_gedot_test sample program'
+        write(test_info%output_unit,'(A,I0)') 'Number of processes used in this computation: ', np
+        write(test_info%output_unit,'(A)') ''
+
+    end subroutine
+
+    !> @brief Function to finalize the test environment, it is used to close the output unit 
+    !!        and finalize the PSBLAS context.
+    !!
+    !! @param test_info The test information structure to be finalized.
+    !!
+    subroutine psb_test_exit(test_info)
+        type(test_info_), intent(inout) :: test_info
+        integer(psb_ipk_)               :: info
+
+        ! Finalize test
+        if(test_info%my_rank == psb_root_) then
+            write(*,'(A)') "[INFO]    Tests completed successfully!"
+            write(*,'(A,I0)') "          Passed: ", test_info%success
+            write(*,'(A,I0)') "          Failed: ", test_info%failure
+            write(*,'(A,I0)') "          Total:  ", test_info%total_tests
+            write(*,'(A)') "[INFO]    Check " // trim(test_info%kernel_name) // "_test.log for a full description"
+            write(test_info%output_unit, *) ""
+
+            ! Close the output unit
+            if (test_info%output_unit /= 0) then
+                close(test_info%output_unit, iostat=info)
+                if (info /= 0) then
+                    write(*, '(A,I0,A,I0)') "[ERROR]    Error closing log file for kernel ", &
+                    & test_info%kernel_name, " I/O Status Code ", info
+                    write(*,'(A)') ''
+                end if
+            end if
+        end if
+
+        ! Finalize PSBLAS context
+        call psb_exit(test_info%ctxt)
+    end subroutine
+
     !> @brief Function to randomly generate x and y vectors 
     !!        and save them on multiple files based on their
     !!        coefficients values.
     !!
-    subroutine generate_vectors(arr_size)
+    !! @param arr_size The size of the vectors to be generated.
+    !!
+    subroutine psb_test_generate_input_vectors(arr_size)
         integer(psb_ipk_)                           :: arr_size
         real(psb_dpk_), allocatable                 :: x(:), y(:)
         integer(psb_ipk_)                           :: i, info
@@ -101,6 +197,12 @@ contains
 
     end subroutine
 
+    !> @brief Subroutine to shift the decimal point of a single precision number
+    !!        and count the number of digits in the integer part.
+    !!
+    !! @param num The single precision number whose decimal point is to be shifted.
+    !! @param int_digits The integer to store the number of digits in the integer part.
+    !!
     subroutine shift_decimal_double(num, int_digits)
         real(psb_dpk_),intent(inout)    :: num
         integer(psb_ipk_), intent(out)  :: int_digits
@@ -120,7 +222,12 @@ contains
       
     end subroutine
 
-
+    !> @brief Subroutine to shift the decimal point of a single precision number
+    !!        and count the number of digits in the integer part.
+    !!
+    !! @param num The single precision number whose decimal point is to be shifted.
+    !! @param int_digits The integer to store the number of digits in the integer part.
+    !!
     subroutine shift_decimal_single(num, int_digits)
         real(psb_spk_),intent(inout)    :: num
         integer(psb_ipk_), intent(out)  :: int_digits
@@ -140,7 +247,13 @@ contains
       
     end subroutine
 
-
+    !> @brief Subroutine to check the results of a single and double precision computation.
+    !!        It compares the results and logs the outcome.
+    !!
+    !! @param result_single The single precision result to be checked.
+    !! @param result_double The double precision result to be checked.
+    !! @param test_info The test information structure containing the threshold and logging details.
+    !!
     subroutine psb_test_single_double_check(result_single, result_double, test_info)
         integer(psb_ipk_)               :: int_digits 
         real(psb_spk_), intent(inout)   :: result_single

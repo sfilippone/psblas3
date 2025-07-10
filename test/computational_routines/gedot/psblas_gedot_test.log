@@ -1,22 +1,4 @@
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 1
 
-[2025-07-09 18:26:15] Generation psb_gedot single precision 0/16                                             [OK]
-[2025-07-09 18:26:18] Generation psb_gedot single precision 1/16                                             [OK]
-[2025-07-09 18:26:21] Generation psb_gedot single precision 2/16                                             [OK]
-[2025-07-09 18:26:23] Generation psb_gedot single precision 3/16                                             [OK]
-[2025-07-09 18:26:26] Generation psb_gedot single precision 4/16                                             [OK]
-[2025-07-09 18:26:29] Generation psb_gedot single precision 5/16                                             [OK]
-[2025-07-09 18:26:31] Generation psb_gedot single precision 6/16                                             [OK]
-[2025-07-09 18:26:34] Generation psb_gedot single precision 7/16                                             [OK]
-[2025-07-09 18:26:37] Generation psb_gedot single precision 8/16                                             [OK]
-[2025-07-09 18:26:40] Generation psb_gedot single precision 9/16                                             [OK]
-[2025-07-09 18:26:42] Generation psb_gedot single precision 10/16                                            [OK]
-[2025-07-09 18:26:45] Generation psb_gedot single precision 11/16                                            [OK]
-[2025-07-09 18:26:48] Generation psb_gedot single precision 12/16                                            [OK]
-[2025-07-09 18:26:50] Generation psb_gedot single precision 13/16                                            [OK]
-[2025-07-09 18:26:53] Generation psb_gedot single precision 14/16                                            [OK]
-[2025-07-09 18:26:55] Generation psb_gedot single precision 15/16                                            [OK]
- 
+
+
 

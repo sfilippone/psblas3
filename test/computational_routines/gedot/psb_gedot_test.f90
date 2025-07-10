@@ -87,8 +87,7 @@ program main
 
     implicit none
 
-    ! MPI variables
-    integer(psb_ipk_)               :: my_rank, np
+
 
     ! Communicator variable
     type(psb_ctxt_type)             :: ctxt
@@ -120,84 +119,41 @@ program main
     y(3) = "vectors/y3.mtx"
     y(4) = "vectors/y4.mtx"
 
-    arr_size = 100
-
-    call psb_init(ctxt)
-    call psb_info(ctxt,my_rank,np)
-
-    if(my_rank == psb_root_) then
-        ! Setup logger output
-        if(np == 1) then
-            open(newunit=unit, file='psblas_gedot_test.log', status='replace', action='write', iostat=info)
-        else
-            open(newunit=unit, file='psblas_gedot_test.log', status='old', action='write', position='append', iostat=info)
-        end if
-        if (info /= 0) then
-           print *, 'Error opening output file.'
-           print *, "I/O Status Code:", info
-           stop
-        end if
-
-        psb_out_unit = unit
-
-        write(psb_out_unit,'(A,A)') 'Welcome to PSBLAS version: ',psb_version_string_
-        write(psb_out_unit,'(A)') 'This is the psb_gedot_test sample program'
-        write(psb_out_unit,'(A,I0)') 'Number of processes used in this computation: ', np
-        write(psb_out_unit,'(A)') ''
-
-        !! call generate_vectors(arr_size) 
-    end if
+    arr_size = 100000
 
     !! Initialize test metadata
-    test_info%output_unit = psb_out_unit
     test_info%total_tests = size(x) * size(y)
-    test_info%threshold = 10d-5
+    test_info%threshold_type = VALUE
+    test_info%threshold = 0.0
     test_info%kernel_name = "psb_gedot"
 
-    call psb_bcast(ctxt,psb_out_unit)
-    call psb_barrier(ctxt)
+    call psb_test_init(test_info)
+
+    if(test_info%my_rank == psb_root_) then
+        psb_out_unit = test_info%output_unit
+        call psb_test_generate_input_vectors(arr_size) 
+    end if
+
+    call psb_bcast(test_info%ctxt,test_info%output_unit)
+    call psb_barrier(test_info%ctxt)
 
 
-    if(my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting test excecution ..."
+    if(test_info%my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting test excecution ..."
 
+    ! Iterate over test parameters
     do i=1,size(x)
         do j=1,size(y)
-            call psb_gedot_real_kernel(x(i), y(j), arr_size, ctxt, result_single, result_double)
+            call psb_gedot_real_kernel(x(i), y(j), arr_size, test_info%ctxt, result_single, result_double)
             
-            if(my_rank == psb_root_) then
+            if(test_info%my_rank == psb_root_) then
                 call psb_test_single_double_check(result_single,result_double,test_info)
                 test_info%current_test = test_info%current_test + 1 
-            end if            
+            end if
+            call psb_barrier(test_info%ctxt)            
         end do
     end do
-
-    if(my_rank == psb_root_) then
-        write(*,'(A)') "[INFO]    Tests completed succesfully!" 
-        write(*,'(A,I0,A,I0,A)') "[INFO]    Test passed: ", test_info%success, "/", test_info%total_tests, & 
-            & " check psblas_gedot_test.log for a full description"
-        write(psb_out_unit, *) ''
-        close(unit)
-    end if
      
-    call psb_exit(ctxt)
-    return 
-
-    9998 continue
-    if(my_rank == psb_root_) then
-        close(unit) 
-        write(*,'(A,I0,A,I0,A)') "[ERROR]   Error in gedot single precision computation ", & 
-        & count, "/", tests_number, " see log file for details"
-    end if
-
-    9999 continue
-    if(my_rank == psb_root_) then
-        close(unit) 
-        write(*,'(A,I0,A,I0,A)') "[ERROR]   Error in gedot double precision check ", &
-        & count, "/", tests_number, " see log file for details"
-    end if
-    
-    call psb_exit(ctxt)
-    return
+    call psb_test_exit(test_info)
 
 
 contains
@@ -206,7 +162,12 @@ contains
     !!        vector and compare with the same computation in double 
     !!        precision
     !!
-    !! @param
+    !! @param x_file file name of the first vector
+    !! @param y_file file name of the second vector
+    !! @param arr_size size of the vectors
+    !! @param ctxt communication context
+    !! @param result_single result of the single precision computation
+    !! @param result_double result of the double precision computation
     !! 
     subroutine psb_gedot_real_kernel(x_file, y_file, arr_size, ctxt, result_single, result_double)
         ! input parameters

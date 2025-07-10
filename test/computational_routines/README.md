@@ -49,6 +49,9 @@ In this test suite were considered only computational routines implemented by PS
 |**Entrywise Division**|`psb_gediv`|This function computes the entrywise division between two vectors x and y$$div \leftarrow \frac{x(i)}{y(i)}$$|No ❌|
 |**Entrywise Inversion**|`psb_geinv`|This function computes the entrywise inverse of a vector x and puts it into y$$inv \leftarrow \frac{1}{x(i)}$$|No ❌|
 
+## Developer Notes
+In order to keep compliant the excecution of the bash script used to automate the teest excecution, remember to create a new directory to put new tests and to use the name convention of psb_test_ signature for utilities functions and psb_kernel_test for tests used for new routines.
+
 ## TODO
 - Merge all the output logs
 - Finish the directories description

@@ -15,11 +15,11 @@ RESET="\033[0m"
 
 
 # Check if the executable ELF file exists
-if [ ! -f "./runs/psb_gedot_test" ]; then
+if [ ! -f "./psb_gedot_test" ]; then
     echo -e "${YELLOW}[WARNING] Executable not found. Running make...${RESET}"
     make
     if [ ! -f "./runs/psb_geaxpby_test" ]; then
-        echo -e "${RED}[ERROR]    Failed to create executable. Check make command.${RESET}"
+        echo -e "${RED}[ERROR]   Failed to create executable. Check make command.${RESET}"
     fi
 else
     echo -e "${BLUE}[INFO]\t  The executable already exists. Skipping the make process.${RESET}"
@@ -30,11 +30,11 @@ fi
 echo -e "${BLUE}[INFO]\t  Running the PSBLAS psb_gedot test...${RESET}"
 echo ""
 echo -e "${BLUE}[INFO]\t  Starting single process computation${RESET}"
-mpirun -np 1 ./runs/psb_gedot_test
+mpirun -np 1 ./psb_gedot_test
 echo -e "${BLUE}[INFO]\t  Single process computation terminated correctly${RESET}"
 echo ""
 echo -e "${BLUE}[INFO]\t  Starting $num_procs processes computation${RESET}"
-mpirun -np $num_procs ./runs/psb_gedot_test
+mpirun -np $num_procs ./psb_gedot_test
 echo -e "${BLUE}[INFO]\t  Multiple processes computation terminated correctly${RESET}"
 
 echo "" >> ${log_file_name}
@@ -54,4 +54,4 @@ echo "" >> ${log_file_name}
 #     fi
 # done
 
-echo -e "${BLUE}[INFO]\t  PSBLAS psb_gedot test succesfully completed.${RESET}"
+echo -e "${GREEN}[INFO]\t  PSBLAS psb_gedot test succesfully completed.${RESET}"

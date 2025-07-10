@@ -75,7 +75,7 @@ subroutine psb_test_progress_bar(test_info)
     call flush(6)
     
     ! Update stdout to get it back in normal mode when reaching the 100%
-    if(test_info%current_test == test_info%total_tests - 1) then
+    if(test_info%current_test == test_info%total_tests) then
         write(*,'(A)', advance='no') char(13)//repeat(' ', 120)
         write(*,*)
         call flush(6)

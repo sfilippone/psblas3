@@ -4,6 +4,7 @@
 *.mtx
 *.smod
 *~
+*.log
 
 # header files generated
 /cbind/*.h
