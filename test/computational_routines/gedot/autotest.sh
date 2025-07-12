@@ -37,7 +37,7 @@ echo -e "${BLUE}[INFO]\t  Starting $num_procs processes computation${RESET}"
 mpirun -np $num_procs ./psb_gedot_test
 echo -e "${BLUE}[INFO]\t  Multiple processes computation terminated correctly${RESET}"
 
-echo "" >> ${log_file_name}
+# echo "" >> ${log_file_name}
 
 
 # Iterate through files in the first directory

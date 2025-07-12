@@ -14,11 +14,13 @@
 module psb_test_utils
     use psb_base_mod
     use psb_util_mod
+    use, intrinsic :: ieee_arithmetic
 
     implicit none
 
     ! Define the enumeration values to represent testing criteria
     integer, parameter :: VALUE = 1
+    integer, parameter :: GAMMA = 2
 
     ! Define test metadata struct
     type :: test_info_
@@ -121,6 +123,60 @@ contains
         ! Finalize PSBLAS context
         call psb_exit(test_info%ctxt)
     end subroutine
+
+
+    !> @brief Function to validate the test information structure.
+    !!        It sets the threshold value based on the threshold type.
+    !!
+    !! @param result_single The single precision result to be validated.
+    !! @param result_double The double precision result to be validated.
+    !! @param test_info The test information structure to be validated.
+    !! @param arr_size The size of the array to be used for validation.
+    !!
+    function psb_test_validate(result_single, result_double, test_info, arr_size) result(pass)
+        type(test_info_)    :: test_info
+        real(psb_spk_)      :: result_single
+        real(psb_dpk_)      :: result_double
+        integer(psb_ipk_)   :: arr_size,int_digits
+        real(psb_dpk_)      :: gamma_n, unit_roundoff, delta, rel_err
+        logical             :: pass   
+
+        unit_roundoff = 5.96D-08 !! 1.11D-16
+
+        call shift_decimal_single(result_single,int_digits)
+        call shift_decimal_double(result_double,int_digits)
+
+        delta = abs(result_double - real(result_single,psb_dpk_))
+
+
+        if(test_info%threshold_type == VALUE) then
+            if(delta < test_info%threshold) then
+                pass = .true.
+            else
+                pass = .false.
+            end if
+        else if(test_info%threshold_type == GAMMA) then
+            gamma_n = (arr_size * unit_roundoff) / (1 - unit_roundoff * arr_size)
+            test_info%threshold = gamma_n
+            rel_err = delta / real(result_single,psb_dpk_)
+
+            !! Handle case when result_single is zero
+            if ((ieee_is_nan(rel_err)).and.(result_single == 0.0)) then
+                rel_err = 0.0
+            end if
+            
+            if( rel_err < gamma_n) then
+                pass = .true.
+            else
+                pass = .false.
+            end if
+        else
+            write(test_info%output_unit,'(A,I0)') "Error: Invalid threshold type: ", test_info%threshold_type
+            write(*,*)
+            call psb_test_exit(test_info)
+        end if
+
+    end function psb_test_validate
 
     !> @brief Function to randomly generate x and y vectors 
     !!        and save them on multiple files based on their
@@ -253,9 +309,10 @@ contains
     !! @param result_single The single precision result to be checked.
     !! @param result_double The double precision result to be checked.
     !! @param test_info The test information structure containing the threshold and logging details.
+    !! @param arr_size The size of the array used in the computation.
     !!
-    subroutine psb_test_single_double_check(result_single, result_double, test_info)
-        integer(psb_ipk_)               :: int_digits 
+    subroutine psb_test_single_double_check(result_single, result_double, test_info, arr_size)
+        integer(psb_ipk_)               :: int_digits, arr_size 
         real(psb_spk_), intent(inout)   :: result_single
         real(psb_dpk_), intent(inout)   :: result_double
         real(psb_dpk_)                  :: delta
@@ -264,12 +321,7 @@ contains
 
         call psb_test_progress_bar(test_info)
 
-        call shift_decimal_single(result_single,int_digits)
-        call shift_decimal_double(result_double,int_digits)
-
-        delta = abs(result_double - result_single)
-
-        if(delta < test_info%threshold) then 
+        if(psb_test_validate(result_single, result_double, test_info, arr_size)) then 
             call psb_test_log_passed(test_info)
             test_info%success = test_info%success + 1  
         else

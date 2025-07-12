@@ -123,7 +123,7 @@ program main
 
     !! Initialize test metadata
     test_info%total_tests = size(x) * size(y)
-    test_info%threshold_type = VALUE
+    test_info%threshold_type = GAMMA
     test_info%threshold = 0.0
     test_info%kernel_name = "psb_gedot"
 
@@ -146,7 +146,7 @@ program main
             call psb_gedot_real_kernel(x(i), y(j), arr_size, test_info%ctxt, result_single, result_double)
             
             if(test_info%my_rank == psb_root_) then
-                call psb_test_single_double_check(result_single,result_double,test_info)
+                call psb_test_single_double_check(result_single,result_double,test_info, arr_size)
                 test_info%current_test = test_info%current_test + 1 
             end if
             call psb_barrier(test_info%ctxt)            
