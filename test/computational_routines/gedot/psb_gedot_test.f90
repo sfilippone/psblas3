@@ -87,8 +87,6 @@ program main
 
     implicit none
 
-
-
     ! Communicator variable
     type(psb_ctxt_type)             :: ctxt
 
@@ -96,15 +94,16 @@ program main
     character(len=64)               :: x(4),y(4)  
     integer(psb_ipk_)               :: arr_size  
     integer(psb_ipk_)               :: tests_number, count
+    logical                         :: global(2) = [.true., .false.]
 
     ! cycle indexes variables
     integer(psb_ipk_)               :: i,j,k,h,l
     integer(psb_ipk_)               :: info, unit
 
     ! results
-    real(psb_spk_)                  :: result_single
+    real(psb_spk_)                  :: result_single, global_result_single
     real(psb_dpk_)                  :: result_double
-    type(test_info_)                :: test_info
+    type(psb_test_info)             :: test_info
 
 
 
@@ -122,7 +121,7 @@ program main
     arr_size = 100000
 
     !! Initialize test metadata
-    test_info%total_tests = size(x) * size(y)
+    test_info%total_tests = size(x) * size(y) * size(global)
     test_info%threshold_type = GAMMA
     test_info%threshold = 0.0
     test_info%kernel_name = "psb_gedot"
@@ -143,18 +142,25 @@ program main
     ! Iterate over test parameters
     do i=1,size(x)
         do j=1,size(y)
-            call psb_gedot_real_kernel(x(i), y(j), arr_size, test_info%ctxt, result_single, result_double)
-            
-            if(test_info%my_rank == psb_root_) then
-                call psb_test_single_double_check(result_single,result_double,test_info, arr_size)
-                test_info%current_test = test_info%current_test + 1 
-            end if
-            call psb_barrier(test_info%ctxt)            
+            do h=1,size(global)
+                call psb_gedot_real_kernel(x(i), y(j), arr_size, test_info%ctxt,global(h), result_single, result_double)
+
+                if(test_info%my_rank == psb_root_) then
+                    if(global(h) .eqv. .true.) then
+                        global_result_single = result_single
+                        call psb_test_single_double_check(result_single,result_double,test_info, arr_size)
+                    else
+                        call psb_test_check_global_local(global_result_single, result_single, test_info)
+                    end if
+
+                    test_info%current_test = test_info%current_test + 1 
+                end if
+                call psb_barrier(test_info%ctxt)
+            end do            
         end do
     end do
      
     call psb_test_exit(test_info)
-
 
 contains
 
@@ -168,12 +174,14 @@ contains
     !! @param ctxt communication context
     !! @param result_single result of the single precision computation
     !! @param result_double result of the double precision computation
+    !! @param global if .true. the result is a global reduction, otherwise it is local
     !! 
-    subroutine psb_gedot_real_kernel(x_file, y_file, arr_size, ctxt, result_single, result_double)
+    subroutine psb_gedot_real_kernel(x_file, y_file, arr_size, ctxt, global, result_single, result_double)
         ! input parameters
         character(len = *), intent(in)  :: x_file, y_file
         integer(psb_ipk_), intent(in)   :: arr_size
         type(psb_ctxt_type), intent(in) :: ctxt
+        logical, intent(in)             :: global
 
         ! output parameters
         real(psb_spk_), intent(out)     :: result_single
@@ -284,17 +292,25 @@ contains
         end if
 
         ! y = x^T * y
-        result_single = psb_gedot(x_single,y_single,desc_a,info)
+        result_single = psb_gedot(x_single,y_single,desc_a,info,global)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in psb_gedot routine in single precision"
             goto 9999
         end if
 
 
-        result_double = psb_gedot(x_double,y_double,desc_a,info)
+        result_double = psb_gedot(x_double,y_double,desc_a,info,global)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in psb_gedot routine in double precision"
             goto 9999
+        end if
+
+
+        if(global .eqv. .false.) then
+            ! If the result is local, we need to sum the local results
+            ! to get the final result
+            call psb_sum(ctxt, result_single)
+            call psb_sum(ctxt, result_double)
         end if
 
         ! Deallocate

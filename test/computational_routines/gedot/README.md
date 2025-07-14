@@ -64,7 +64,3 @@ The results of the computation will be saved on different files based on the ins
 - Test also GPU excecution
 - Try multiple distributions
 - Fix result_check handling, it should not be an entire vector
-
-
-## Notes
-5.96e-08 is 2^-24 (Single precision unit roundoff), 1.19e-07 is 2^-23 (Single precision unit interval)
