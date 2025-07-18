@@ -4238,7 +4238,7 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   ! Estimate number of nonzeros on output.
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = max(nint(0.5*(nza+nzb)),ma,mb,na,nb)  
+  nzc = max(nint(0.25*(nza+nzb)),ma,nb)  
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
@@ -4276,9 +4276,9 @@ contains
 
     nze = min(size(c%val),size(c%ja))
     isz = max(ma,na,mb,nb)
-    call psb_realloc(isz,row,info)
-    if (info == 0) call psb_realloc(isz,idxs,info)
-    if (info == 0) call psb_realloc(isz,irow,info)
+    call psb_realloc(nb,row,info)
+    if (info == 0) call psb_realloc(na,idxs,info)
+    if (info == 0) call psb_realloc(nb,irow,info)
     if (info /= 0) return
     row  = dzero
     irow = 0
@@ -6613,7 +6613,7 @@ subroutine psb_lzcsrspspmm(a,b,c,info)
 
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = 2*(nza+nzb)
+  nzc = max(nint(0.25*(nza+nzb)),ma,nb)  
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
@@ -6651,9 +6651,9 @@ contains
 
     nze = min(size(c%val),size(c%ja))
     isz = max(ma,na,mb,nb)
-    call psb_realloc(isz,row,info)
-    if (info == 0) call psb_realloc(isz,idxs,info)
-    if (info == 0) call psb_realloc(isz,irow,info)
+    call psb_realloc(nb,row,info)
+    if (info == 0) call psb_realloc(na,idxs,info)
+    if (info == 0) call psb_realloc(nb,irow,info)
     if (info /= 0) return
     row  = dzero
     irow = 0
