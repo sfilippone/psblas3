@@ -40,6 +40,7 @@ extern "C" {
 
   /* Environment routines */
   void    psb_c_init(psb_c_ctxt *cctxt);
+  void    psb_c_init_from_fint(psb_c_ctxt *cctxt, psb_i_t f_comm);
   void    psb_c_exit(psb_c_ctxt cctxt);
   void    psb_c_exit_ctxt(psb_c_ctxt cctxt);
   void    psb_c_abort(psb_c_ctxt cctxt);
