@@ -19,22 +19,24 @@ module psb_test_utils
     implicit none
 
     ! Define the enumeration values to represent testing criteria
+    integer, parameter :: DEFAULT = -1  
     integer, parameter :: VALUE = 1
     integer, parameter :: GAMMA = 2
 
     ! Define test metadata struct
-    type :: test_info_
+    type :: psb_test_info
         integer(psb_ipk_)   :: current_test = 1         !> The test that is currently beeing run  
         integer(psb_ipk_)   :: total_tests = 1          !> The number of the total tests to run
         integer(psb_ipk_)   :: success = 0              !> the number of tests that succeded
         integer(psb_ipk_)   :: failure = 0              !> The number of tests that failed
         integer(psb_ipk_)   :: output_unit = 6          !> The output file handles (stdout by default)
-        character(len=32)   :: kernel_name = "unknown"  !> The PSBLAS kernel that is beeing tested
-        integer(psb_ipk_)   :: threshold_type = VALUE   !> The criteria used to pass a test (VAL,...)        
+        character(len=32)   :: kernel_name = "default"  !> The PSBLAS kernel that is beeing tested
+        integer(psb_ipk_)   :: threshold_type = DEFAULT !> The criteria used to pass a test (VAL,...)        
         real(psb_dpk_)      :: threshold = 0.0          !> The threashold value used for acceptance
         type(psb_ctxt_type) :: ctxt                     !> The PSBLAS context (Used for MPI communications)
         integer(psb_ipk_)   :: my_rank = 0              !> The rank of the current process in the MPI communicator
-    end type test_info_
+        integer(psb_ipk_)   :: mat_dist = DEFAULT       !> The distribution of the matrix (default is block row distribution)
+    end type psb_test_info
 
 
 contains
@@ -47,10 +49,10 @@ contains
     !! @param test_info The test information structure to be initialized.
     !!
     subroutine psb_test_init(test_info)
-        type(test_info_), intent(inout) :: test_info
-        integer(psb_ipk_)               :: output_unit, info
+        type(psb_test_info), intent(inout)  :: test_info
+        integer(psb_ipk_)                   :: output_unit, info
         ! MPI variables
-        integer(psb_ipk_)               :: my_rank, np
+        integer(psb_ipk_)                   :: my_rank, np
 
 
         call psb_init(test_info%ctxt)
@@ -61,9 +63,6 @@ contains
             write(*, '(A)') "Error: Kernel name is not set. Please set the kernel name before running the test."
             call psb_exit(test_info%ctxt)
         end if
-
-        ! Set the output unit based on the number of processes
-
 
         ! Set the output unit to stdout by default
         if(np == 1) then
@@ -79,7 +78,7 @@ contains
            write(*, '(A,I0)') "Error opening log file for kernel ", test_info%kernel_name
            write(*, '(A,I0)') "I/O Status Code:", info
            write(*, '(A)') "Please check if the file is accessible and writable."
-           call psb_exit(test_info%ctxt)
+           call psb_test_exit(test_info)
         end if
 
         test_info%output_unit = output_unit
@@ -89,6 +88,36 @@ contains
         write(test_info%output_unit,'(A,I0)') 'Number of processes used in this computation: ', np
         write(test_info%output_unit,'(A)') ''
 
+        ! Check if the kernel name is set to default
+        if(test_info%kernel_name == "default") then
+            write(test_info%output_unit,'(A)') "Warning: Kernel name is not set. Using default kernel name 'default'."
+        else
+            write(test_info%output_unit,'(A)') "Kernel name set to: " // trim(test_info%kernel_name)
+        end if
+
+        ! Check the threshold type and value
+        if(test_info%mat_dist == DEFAULT) then
+            write(test_info%output_unit,'(A)') "Matrix distribution set to default (block row distribution)."
+        else
+            write(test_info%output_unit,'(A,I0)') "Matrix distribution set to: ", test_info%mat_dist
+        end if
+        
+        ! Check the threshold type and value
+        if(test_info%threshold_type == DEFAULT) then
+            write(test_info%output_unit,'(A,F20.10)') "Threshold type is set to default. &
+            & using single precision IEEE unit roundoff as threshould ", 5.96D-08 
+        else if(test_info%threshold_type == VALUE) then
+            write(test_info%output_unit,'(A,F20.10)') "Threshold type is set to VALUE, so absolute error will be checked &
+            & using threshold: ", test_info%threshold
+        else if(test_info%threshold_type == GAMMA) then
+            write(test_info%output_unit,'(A)') "Threshold type is set to GAMMA, so relative error will be checked" 
+        else
+            write(test_info%output_unit,'(A,I0)') "Error: Invalid threshold type: ", test_info%threshold_type
+            call psb_test_exit(test_info)
+        end if
+
+
+        write(test_info%output_unit,'(A)') ''
     end subroutine
 
     !> @brief Function to finalize the test environment, it is used to close the output unit 
@@ -97,8 +126,8 @@ contains
     !! @param test_info The test information structure to be finalized.
     !!
     subroutine psb_test_exit(test_info)
-        type(test_info_), intent(inout) :: test_info
-        integer(psb_ipk_)               :: info
+        type(psb_test_info), intent(inout)  :: test_info
+        integer(psb_ipk_)                   :: info
 
         ! Finalize test
         if(test_info%my_rank == psb_root_) then
@@ -134,7 +163,7 @@ contains
     !! @param arr_size The size of the array to be used for validation.
     !!
     function psb_test_validate(result_single, result_double, test_info, arr_size) result(pass)
-        type(test_info_)    :: test_info
+        type(psb_test_info)    :: test_info
         real(psb_spk_)      :: result_single
         real(psb_dpk_)      :: result_double
         integer(psb_ipk_)   :: arr_size,int_digits
@@ -316,7 +345,7 @@ contains
         real(psb_spk_), intent(inout)   :: result_single
         real(psb_dpk_), intent(inout)   :: result_double
         real(psb_dpk_)                  :: delta
-        type(test_info_), intent(inout) :: test_info
+        type(psb_test_info), intent(inout) :: test_info
 
 
         call psb_test_progress_bar(test_info)
@@ -334,7 +363,33 @@ contains
         end if
         
     end subroutine
-!! 
+
+    !> @brief Subroutine to check the global and local results of a single precision computation.
+    !!        It compares the global result with the local result and logs the outcome.
+    !!
+    !! @param global_result_single The global single precision result to be checked.
+    !! @param result_single The local single precision result to be checked.
+    !! @param test_info The test information structure containing the logging details.
+    !!
+    subroutine psb_test_check_global_local(global_result_single, result_single, test_info)
+        real(psb_spk_), intent(in)  :: global_result_single,result_single
+        type(psb_test_info)         :: test_info
+
+
+        call psb_test_progress_bar(test_info)
+        
+        ! Check if the global result is equal to the local result
+        if (global_result_single == result_single) then
+            call psb_test_log_passed(test_info)
+            test_info%success = test_info%success + 1  
+        else
+            call psb_test_log_failed(test_info)
+            write(test_info%output_unit,'(A,F20.10)') "Global single precision result: ", global_result_single
+            write(test_info%output_unit,'(A,F20.10)') "Local single precision result:  ", result_single
+            test_info%failure = test_info%failure + 1
+        end if
+    end subroutine
+
     !! subroutine psb_parallel_check()
     !! 
     !! end subroutine

@@ -12,7 +12,7 @@
 !! @param test_info is a data structure containing all the metadata usefull for test output
 !!
 subroutine psb_test_log_passed(test_info)
-    type(test_info_), intent(in)    :: test_info
+    type(psb_test_info), intent(in) :: test_info
     ! time stats variables
     character(len=8)                :: date  
     character(len=10)               :: time    
@@ -34,7 +34,7 @@ end subroutine
 !! @param test_info is a data structure containing all the metadata usefull for test output
 !!
 subroutine psb_test_log_failed(test_info)
-    type(test_info_), intent(in)    :: test_info
+    type(psb_test_info), intent(in)    :: test_info
     ! time stats variables
     character(len=8)                :: date  
     character(len=10)               :: time
@@ -57,7 +57,7 @@ end subroutine
 !! @param test_info is a data structure containing all the metadata usefull for test output
 !!
 subroutine psb_test_progress_bar(test_info)
-    type(test_info_), intent(in)    :: test_info 
+    type(psb_test_info), intent(in)    :: test_info 
     integer(psb_ipk_)               :: percent, bar_width, num_hashes, num_spaces
     character(len=100)              :: bar
 
