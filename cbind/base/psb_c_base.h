@@ -6,7 +6,11 @@ extern "C" {
 #endif
 
 #include <float.h>
+#ifdef __cplusplus
+#include <complex>
+#else
 #include <complex.h>
+#endif
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
