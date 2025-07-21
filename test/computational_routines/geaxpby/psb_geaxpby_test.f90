@@ -71,7 +71,210 @@
 !!          Intent: out.
 !!          Specified as: An integer value; 0 means no error has been detected.
 !!
-module psb_geaxpby_test
+
+
+
+
+
+program main
+    use psb_base_mod
+    use psb_util_mod 
+    use psb_test_utils
+
+    implicit none
+
+    ! MPI variables
+    integer(psb_ipk_)               :: my_rank, np
+
+    ! Communicator variable
+    type(psb_ctxt_type)             :: ctxt
+
+    ! parameters array
+    character(len=64)               :: x(4),y(4)  
+    real(psb_dpk_)                  :: alpha(3), beta(3)
+    integer(psb_ipk_)               :: arr_size  
+    integer(psb_ipk_)               :: tests_number, count
+
+    ! cycle indexes variables
+    integer(psb_ipk_)               :: i,j,k,h,l
+    integer(psb_ipk_)               :: info, ret, unit
+
+    ! time stats variables
+    character(len=8)                :: date    ! YYYYMMDD
+    character(len=10)               :: time    ! HHMMSS.sss
+    character(len=5)                :: zones    ! Time zone
+    integer                         :: values(8)
+
+    ! others
+    character(len=:), allocatable   :: output_file_name
+    type(test_info_)                :: test_info
+
+    ! Initialize parameters
+    x(1) = "vectors/x1.mtx"
+    x(2) = "vectors/x2.mtx"
+    x(3) = "vectors/x3.mtx"
+    x(4) = "vectors/x4.mtx"
+
+    y(1) = "vectors/y1.mtx"
+    y(2) = "vectors/y2.mtx"
+    y(3) = "vectors/y3.mtx"
+    y(4) = "vectors/y4.mtx"
+
+    alpha(1) = done
+    alpha(2) = -done
+    alpha(3) = dzero
+
+    beta(1) = done
+    beta(2) = -done
+    beta(3) = dzero
+
+    arr_size = 10000
+    tests_number = size(x) * size(y) * size(alpha) * size(beta)
+    count = 0
+    
+    !! Initialize test metadata
+    test_info%total_tests = size(x) * size(y)
+    test_info%threshold_type = GAMMA
+    test_info%threshold = 0.0
+    test_info%kernel_name = "psb_geaxpby"
+
+    call psb_test_init(test_info)
+
+    if(test_info%my_rank == psb_root_) then
+        psb_out_unit = test_info%output_unit
+        call psb_test_generate_input_vectors(arr_size) 
+    end if
+
+    call psb_bcast(test_info%ctxt,test_info%output_unit)
+    call psb_barrier(test_info%ctxt)
+
+    if(test_info%my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting test excecution ..."
+    !call psb_init(ctxt)
+    !call psb_info(ctxt,my_rank,np)
+    ! call generate_vectors(arr_size) 
+
+    !call psb_bcast(ctxt,psb_out_unit)
+    !call psb_barrier(ctxt)
+
+
+    if(test_info%my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting single precision computation..."
+
+    do i=1,size(x)
+        do j=1,size(y)
+            do k=1,size(alpha)
+                do h=1,size(beta)
+                    
+                    call psb_geaxpby_kernel(x_file=x(i), y_file=y(j), alpha = real(alpha(k),psb_spk_),& 
+                    & beta = real(beta(h),psb_spk_), arr_size = arr_size, ctxt = test_info%ctxt, ret = ret, &
+                    & output_file_name = output_file_name)
+
+                    if(test_info%my_rank == psb_root_) then
+                        count = count + 1
+                        call date_and_time(date, time, zones, values)
+
+                        if(ret /= -1) then 
+                            ! Success formatted output
+                            write(psb_out_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
+                            & A,A,A,I0,A,I0,T110,A)') &
+                            & values(1), values(2), values(3), values(5), values(6), values(7), &
+                            & "Generation geaxpby single precision result file ", & 
+                            & output_file_name , ' ', count , "/", tests_number, "[OK]"
+                        else
+                            ! Fail formatted output
+                            write(psb_out_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
+                            & A,A,A,I0,A,I0,T110,A)') &
+                            & values(1), values(2), values(3), values(5), values(6), values(7), &
+                            & "Generation geaxpby single precision result file ", & 
+                            & output_file_name , ' ', count , "/", tests_number, "[FAIL]"
+                            goto 9998
+                        end if
+                    end if
+                    call psb_barrier(test_info%ctxt)
+                end do
+            end do
+        end do
+    end do
+
+    if(test_info%my_rank == psb_root_) write(*,'(A)') "[INFO]    Single precision computation completed succesfully!"
+
+
+    if(test_info%my_rank == psb_root_) then
+        write(psb_out_unit, *) ''
+        count = 0
+    end if
+
+
+    if(test_info%my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting double precision check..."
+
+
+
+    call psb_barrier(test_info%ctxt)
+
+    ! Here double precision comparison should be done
+    do i=1,size(x)
+        do j=1,size(y)
+            do k=1,size(alpha)
+                do h=1,size(beta)
+                    call psb_geaxpby_check(x_file=x(i), y_file=y(j), alpha = alpha(k), beta = beta(h), & 
+                    & arr_size = arr_size, ctxt = test_info%ctxt, ret = ret, output_file_name = output_file_name)
+                    
+                    if(my_rank == psb_root_) then
+                        count = count + 1
+                        call date_and_time(date, time, zones, values)
+
+                        if(ret == 0) then 
+                            ! Success formatted output
+                            write(psb_out_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
+                            & A,A,A,I0,A,I0,T110,A)') &
+                            & values(1), values(2), values(3), values(5), values(6), values(7), &
+                            & "Double precision check on file ", & 
+                            & output_file_name , ' ', count , "/", tests_number, "[OK]"
+                        else
+                            ! Fail formatted output
+                            write(psb_out_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
+                            & A,A,A,I0,A,I0,T110,A)') &
+                            & values(1), values(2), values(3), values(5), values(6), values(7), &
+                            & "Double precision check on file ", & 
+                            & output_file_name , ' ', count , "/", tests_number, "[FAIL]"
+                            write(psb_out_unit,'(A,I0)') "[ERROR]   Error at element ", abs(ret)
+                            write(psb_out_unit,'(A,F10.8)') "Alpha:", alpha(k)
+                            write(psb_out_unit,'(A,F15.8)') "Beta: ", beta(h)
+
+                            goto 9999
+                        end if
+                    end if
+                    call psb_barrier(test_info%ctxt)
+                end do
+            end do
+        end do
+    end do
+
+    if(test_info%my_rank == psb_root_) then 
+        write(*,'(A)') "[INFO]    Duble precision check completed succesfully!"
+        close(unit)
+    end if
+     
+    call psb_exit(test_info%ctxt)
+    return 
+
+    9998 continue
+    if(test_info%my_rank == psb_root_) then
+        close(unit) 
+        write(*,'(A,I0,A,I0,A)') "[ERROR]   Error in geaxpby single precision computation ", & 
+        & count, "/", tests_number, " see log file for details"
+    end if
+
+    9999 continue
+    if(test_info%my_rank == psb_root_) then
+        close(unit) 
+        write(*,'(A,I0,A,I0,A)') "[ERROR]   Error in geaxpby double precision check ", &
+        & count, "/", tests_number, " see log file for details"
+    end if
+    
+    call psb_test_exit(test_info)
+    return
+
+
 
     contains
 
@@ -79,10 +282,7 @@ module psb_geaxpby_test
     !!        save the results on file
     !!
     subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
-        use psb_base_mod
-        use psb_util_mod
-
-        implicit none 
+        ! implicit none 
 
         ! input parameters
         character(len = *), intent(in)              :: x_file, y_file
@@ -486,82 +686,6 @@ module psb_geaxpby_test
 
 
 
-    !> @brief Function to randomly generate x and y vectors 
-    !!        and save them on multiple files based on their
-    !!        coefficients values.
-    !!
-    subroutine generate_vectors(arr_size)
-        use psb_base_mod
-        use psb_util_mod
-
-        implicit none 
-
-        integer(psb_ipk_), intent(in)               :: arr_size
-        real(psb_dpk_), allocatable                 :: x(:), y(:)
-        integer(psb_ipk_)                           :: i, info
-        logical                                     :: exists
 
 
-        ! Check if output directory exists
-        inquire(file='vectors/', exist=exists)
-        if (.not.exists) then
-            call system('mkdir vectors/')
-        end if
-
-        allocate(x(arr_size))
-        allocate(y(arr_size))
-        
-        call random_init(repeatable=.true.,image_distinct=.true.) 
-        call random_number(x)
-        call random_number(y)
-
-        ! Write only positive in x_1
-        call mm_array_write(x,"Positive vector",info,filename="vectors/x1.mtx")
-        call mm_array_write(y,"Positive vector",info,filename="vectors/y1.mtx")
-
-        ! Write only negative in x_2
-        do i=1,arr_size 
-            x(i) = -x(i)
-        end do  
-
-        do i=1,arr_size
-            y(i) = -y(i)
-        end do
-
-        call mm_array_write(x,"Negative vector",info,filename="vectors/x2.mtx")
-        call mm_array_write(y,"Negative vector",info,filename="vectors/y2.mtx")
-
-
-        ! Since numbers are less than one and always positive, we have to generate negative ones subtractiong 50
-        do i=1,arr_size
-            x(i) = -x(i) ! Make the values positive again  
-            x(i) = x(i) - 0.5
-        end do   
-
-        do i=1,arr_size
-            y(i) = -y(i) ! Make the values positive again  
-            y(i) = y(i) - 0.5
-        end do
-
-        ! Write random in x_3
-        call mm_array_write(x,"Random vector",info,filename="vectors/x3.mtx")
-        call mm_array_write(y,"Random vector",info,filename="vectors/y3.mtx")
-
-        ! Write zero in x_4
-        do i=1,arr_size
-            x(i) = 0
-        end do   
-
-        do i=1,arr_size
-            y(i) = 0
-        end do
-
-        call mm_array_write(x,"Null vector",info,filename="vectors/x4.mtx")
-        call mm_array_write(y,"Null vector",info,filename="vectors/y4.mtx")
-
-        deallocate(x)
-        deallocate(y)
-
-    end subroutine
-
-end module psb_geaxpby_test
+end program main
