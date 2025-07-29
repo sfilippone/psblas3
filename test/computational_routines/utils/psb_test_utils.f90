@@ -35,6 +35,7 @@ module psb_test_utils
         real(psb_dpk_)      :: threshold = 0.0          !> The threashold value used for acceptance
         type(psb_ctxt_type) :: ctxt                     !> The PSBLAS context (Used for MPI communications)
         integer(psb_ipk_)   :: my_rank = 0              !> The rank of the current process in the MPI communicator
+        integer(psb_ipk_)   :: np = 1                   !> The number of processes in the MPI communicator
         integer(psb_ipk_)   :: mat_dist = DEFAULT       !> The distribution of the matrix (default is block row distribution)
     end type psb_test_info
 
@@ -42,170 +43,8 @@ module psb_test_utils
 contains
 
     include 'psb_test_log.inc'
-
-    !> @brief Function to initialize the test environment.
-    !!        It is used to set the output unit and the kernel name.
-    !!
-    !! @param test_info The test information structure to be initialized.
-    !!
-    subroutine psb_test_init(test_info)
-        type(psb_test_info), intent(inout)  :: test_info
-        integer(psb_ipk_)                   :: output_unit, info
-        ! MPI variables
-        integer(psb_ipk_)                   :: my_rank, np
-
-
-        call psb_init(test_info%ctxt)
-        call psb_info(test_info%ctxt,test_info%my_rank,np)
-
-        ! Check if the kernel name is set
-        if (trim(test_info%kernel_name) == "unknown") then
-            write(*, '(A)') "Error: Kernel name is not set. Please set the kernel name before running the test."
-            call psb_exit(test_info%ctxt)
-        end if
-
-        ! Set the output unit to stdout by default
-        if(np == 1) then
-            open(newunit=output_unit, file=trim(test_info%kernel_name)//'_test.log', &
-            & status='replace', action='write', iostat=info)
-        else
-            open(newunit=output_unit, file=trim(test_info%kernel_name)//'_test.log', &
-            & status='old', action='write', position='append', iostat=info)
-        end if
-
-        ! Check if the file was opened successfully
-        if (info /= 0) then
-           write(*, '(A,I0)') "Error opening log file for kernel ", test_info%kernel_name
-           write(*, '(A,I0)') "I/O Status Code:", info
-           write(*, '(A)') "Please check if the file is accessible and writable."
-           call psb_test_exit(test_info)
-        end if
-
-        test_info%output_unit = output_unit
-
-        write(test_info%output_unit,'(A,A)') 'Welcome to PSBLAS version: ',psb_version_string_
-        write(test_info%output_unit,'(A)') 'This is the psb_gedot_test sample program'
-        write(test_info%output_unit,'(A,I0)') 'Number of processes used in this computation: ', np
-        write(test_info%output_unit,'(A)') ''
-
-        ! Check if the kernel name is set to default
-        if(test_info%kernel_name == "default") then
-            write(test_info%output_unit,'(A)') "Warning: Kernel name is not set. Using default kernel name 'default'."
-        else
-            write(test_info%output_unit,'(A)') "Kernel name set to: " // trim(test_info%kernel_name)
-        end if
-
-        ! Check the threshold type and value
-        if(test_info%mat_dist == DEFAULT) then
-            write(test_info%output_unit,'(A)') "Matrix distribution set to default (block row distribution)."
-        else
-            write(test_info%output_unit,'(A,I0)') "Matrix distribution set to: ", test_info%mat_dist
-        end if
-        
-        ! Check the threshold type and value
-        if(test_info%threshold_type == DEFAULT) then
-            write(test_info%output_unit,'(A,F20.10)') "Threshold type is set to default. &
-            & using single precision IEEE unit roundoff as threshould ", 5.96D-08 
-        else if(test_info%threshold_type == VALUE) then
-            write(test_info%output_unit,'(A,F20.10)') "Threshold type is set to VALUE, so absolute error will be checked &
-            & using threshold: ", test_info%threshold
-        else if(test_info%threshold_type == GAMMA) then
-            write(test_info%output_unit,'(A)') "Threshold type is set to GAMMA, so relative error will be checked" 
-        else
-            write(test_info%output_unit,'(A,I0)') "Error: Invalid threshold type: ", test_info%threshold_type
-            call psb_test_exit(test_info)
-        end if
-
-
-        write(test_info%output_unit,'(A)') ''
-    end subroutine
-
-    !> @brief Function to finalize the test environment, it is used to close the output unit 
-    !!        and finalize the PSBLAS context.
-    !!
-    !! @param test_info The test information structure to be finalized.
-    !!
-    subroutine psb_test_exit(test_info)
-        type(psb_test_info), intent(inout)  :: test_info
-        integer(psb_ipk_)                   :: info
-
-        ! Finalize test
-        if(test_info%my_rank == psb_root_) then
-            write(*,'(A)') "[INFO]    Tests completed successfully!"
-            write(*,'(A,I0)') "          Passed: ", test_info%success
-            write(*,'(A,I0)') "          Failed: ", test_info%failure
-            write(*,'(A,I0)') "          Total:  ", test_info%total_tests
-            write(*,'(A)') "[INFO]    Check " // trim(test_info%kernel_name) // "_test.log for a full description"
-            write(test_info%output_unit, *) ""
-
-            ! Close the output unit
-            if (test_info%output_unit /= 0) then
-                close(test_info%output_unit, iostat=info)
-                if (info /= 0) then
-                    write(*, '(A,I0,A,I0)') "[ERROR]    Error closing log file for kernel ", &
-                    & test_info%kernel_name, " I/O Status Code ", info
-                    write(*,'(A)') ''
-                end if
-            end if
-        end if
-
-        ! Finalize PSBLAS context
-        call psb_exit(test_info%ctxt)
-    end subroutine
-
-
-    !> @brief Function to validate the test information structure.
-    !!        It sets the threshold value based on the threshold type.
-    !!
-    !! @param result_single The single precision result to be validated.
-    !! @param result_double The double precision result to be validated.
-    !! @param test_info The test information structure to be validated.
-    !! @param arr_size The size of the array to be used for validation.
-    !!
-    function psb_test_validate(result_single, result_double, test_info, arr_size) result(pass)
-        type(psb_test_info)    :: test_info
-        real(psb_spk_)      :: result_single
-        real(psb_dpk_)      :: result_double
-        integer(psb_ipk_)   :: arr_size,int_digits
-        real(psb_dpk_)      :: gamma_n, unit_roundoff, delta, rel_err
-        logical             :: pass   
-
-        unit_roundoff = 5.96D-08 !! 1.11D-16
-
-        call shift_decimal_single(result_single,int_digits)
-        call shift_decimal_double(result_double,int_digits)
-
-        delta = abs(result_double - real(result_single,psb_dpk_))
-
-
-        if(test_info%threshold_type == VALUE) then
-            if(delta < test_info%threshold) then
-                pass = .true.
-            else
-                pass = .false.
-            end if
-        else if(test_info%threshold_type == GAMMA) then
-            gamma_n = (arr_size * unit_roundoff) / (1 - unit_roundoff * arr_size)
-            test_info%threshold = gamma_n
-            rel_err = delta / real(result_single,psb_dpk_)
-
-            !! Handle case when result_single is zero
-            if ((ieee_is_nan(rel_err)).and.(result_single == 0.0)) then
-                rel_err = 0.0
-            end if
-            
-            if( rel_err < gamma_n) then
-                pass = .true.
-            else
-                pass = .false.
-            end if
-        else
-            write(test_info%output_unit,'(A,I0)') "Error: Invalid threshold type: ", test_info%threshold_type
-            write(*,*)
-            call psb_test_exit(test_info)
-        end if
-
-    end function psb_test_validate
+    include "psb_test_env.inc"
+ 
 
     !> @brief Function to randomly generate x and y vectors 
     !!        and save them on multiple files based on their
@@ -282,6 +121,44 @@ contains
 
     end subroutine
 
+    !> @brief Subroutine to save the result of a single precision computation
+    !!        to a file in the results directory.
+    !!
+    !! @param result_single The single precision result to be saved.
+    !! @param test_info The test information structure containing the current test count.
+    !!
+    subroutine psb_test_save_result(result_single, test_info)
+        type(psb_test_info), intent(inout)  :: test_info
+        real(psb_spk_), intent(in)          :: result_single
+        integer(psb_ipk_)                   :: info, unit
+        character(len=32)                   :: filename
+        logical                             :: exists
+
+        ! Check if results directory exists
+        inquire(file='results/', exist=exists)
+        if (.not.exists) then
+            call system('mkdir results/')
+        end if
+
+        ! Set the filename based on the test count
+        write(filename, '(A,I0,A)') 'results/result_', test_info%current_test, '.txt'
+
+        ! Open the file for writing
+        open(newunit=unit, file=trim(filename), status='replace', action='write', iostat=info)
+
+        ! Check if the file was opened successfully
+        if (info /= 0) then
+            write(*, '(A,I0)') "Error opening result file: ", info
+            return
+        end if
+
+        ! Write the result to the file
+        write(unit, '(F20.10)') result_single
+
+        ! Close the file
+        close(unit, iostat=info)
+    end subroutine
+
     !> @brief Subroutine to shift the decimal point of a single precision number
     !!        and count the number of digits in the integer part.
     !!
@@ -332,6 +209,68 @@ contains
       
     end subroutine
 
+
+    !> @brief Function to validate the test information structure.
+    !!        It sets the threshold value based on the threshold type.
+    !!
+    !! @param result_single The single precision result to be validated.
+    !! @param result_double The double precision result to be validated.
+    !! @param test_info The test information structure to be validated.
+    !! @param arr_size The size of the array to be used for validation.
+    !!
+    subroutine psb_test_validate(result_single, result_double, test_info, arr_size, pass) 
+        type(psb_test_info), intent(inout)  :: test_info
+        real(psb_spk_), intent(inout)       :: result_single
+        real(psb_dpk_), intent(inout)       :: result_double
+        integer(psb_ipk_), intent(in)       :: arr_size 
+        logical, intent(inout)              :: pass
+        integer(psb_ipk_)                   :: int_digits, n
+        real(psb_dpk_)                      :: gamma_n, unit_roundoff, delta, rel_err
+
+        unit_roundoff = 5.96D-08 !! 1.11D-16
+        delta = abs(result_double - real(result_single,psb_dpk_))
+        rel_err = delta / abs(real(result_single,psb_dpk_))
+        n = (arr_size / test_info%np) + (test_info%np - 1)
+
+        !! call shift_decimal_double(delta,int_digits)
+
+        if(test_info%threshold_type == VALUE) then
+            if(delta < test_info%threshold) then
+                pass = .true.
+            else
+                pass = .false.
+            end if
+        else if(test_info%threshold_type == GAMMA) then
+
+            if(n * unit_roundoff >= 1) then
+                write(test_info%output_unit,'(A)') "Error: Invalid GAMMA computation, n * U is greater than 1"
+                write(*,*)
+                call psb_test_exit(test_info)
+            end if
+
+            gamma_n = (n * unit_roundoff) / (1.0D0 - real(n * unit_roundoff, psb_dpk_) )
+            test_info%threshold = gamma_n
+
+            !! Handle case when result_single is zero
+            if ((ieee_is_nan(rel_err)).and.(result_single == 0.0D0)) then
+                rel_err = 0.0D0
+            end if
+
+            if( rel_err < gamma_n) then
+                pass = .true.
+            else
+                pass = .false.
+            end if
+
+        else
+            write(test_info%output_unit,'(A,I0)') "Error: Invalid threshold type: ", test_info%threshold_type
+            write(*,*)
+            call psb_test_exit(test_info)
+        end if
+
+    end subroutine
+
+
     !> @brief Subroutine to check the results of a single and double precision computation.
     !!        It compares the results and logs the outcome.
     !!
@@ -340,28 +279,32 @@ contains
     !! @param test_info The test information structure containing the threshold and logging details.
     !! @param arr_size The size of the array used in the computation.
     !!
-    subroutine psb_test_single_double_check(result_single, result_double, test_info, arr_size)
-        integer(psb_ipk_)               :: int_digits, arr_size 
-        real(psb_spk_), intent(inout)   :: result_single
-        real(psb_dpk_), intent(inout)   :: result_double
-        real(psb_dpk_)                  :: delta
-        type(psb_test_info), intent(inout) :: test_info
+    subroutine psb_test_single_double_check(result_single, result_double, test_info, arr_size) 
+        type(psb_test_info), intent(inout)  :: test_info
+        real(psb_spk_), intent(inout)       :: result_single
+        real(psb_dpk_), intent(inout)       :: result_double
+        real(psb_dpk_)                      :: delta
+        integer(psb_ipk_)                   :: int_digits, arr_size
+        logical                             :: pass 
+        character(len=64)                   :: out_string
+
+        out_string = "Double precision check: "
 
 
         call psb_test_progress_bar(test_info)
+        call psb_test_validate(result_single, result_double, test_info, arr_size, pass)
 
-        if(psb_test_validate(result_single, result_double, test_info, arr_size)) then 
-            call psb_test_log_passed(test_info)
+        if(pass .eqv. .true.) then 
+            call psb_test_log_passed(test_info, out_string)
             test_info%success = test_info%success + 1  
         else
-            call psb_test_log_failed(test_info)
-            write(psb_out_unit,'(A,F20.10)') "Single precision result:  ", result_single
-            write(psb_out_unit,'(A,F20.10)') "Double precision result:  ", result_double
-            write(psb_out_unit,'(A,F20.10)') "Computed delta:           ", delta
-            write(psb_out_unit,'(A,F20.10)') "Threshold used:           ", test_info%threshold
+            call psb_test_log_failed(test_info, out_string)
             test_info%failure = test_info%failure + 1
         end if
-        
+        write(psb_out_unit,'(A,F20.10)') "Single precision result:  ", result_single
+        write(psb_out_unit,'(A,F20.10)') "Double precision result:  ", result_double
+        write(psb_out_unit,'(A,F20.10)') "Computed delta:           ", delta
+        write(psb_out_unit,'(A,F20.10)') "Threshold used:           ", test_info%threshold
     end subroutine
 
     !> @brief Subroutine to check the global and local results of a single precision computation.
@@ -374,28 +317,85 @@ contains
     subroutine psb_test_check_global_local(global_result_single, result_single, test_info)
         real(psb_spk_), intent(in)  :: global_result_single,result_single
         type(psb_test_info)         :: test_info
+        character(len=64)           :: out_string
 
+        out_string = "Global vs Local check: "
 
         call psb_test_progress_bar(test_info)
         
         ! Check if the global result is equal to the local result
         if (global_result_single == result_single) then
-            call psb_test_log_passed(test_info)
+            call psb_test_log_passed(test_info, out_string)
             test_info%success = test_info%success + 1  
         else
-            call psb_test_log_failed(test_info)
-            write(test_info%output_unit,'(A,F20.10)') "Global single precision result: ", global_result_single
-            write(test_info%output_unit,'(A,F20.10)') "Local single precision result:  ", result_single
+            call psb_test_log_failed(test_info, out_string)
             test_info%failure = test_info%failure + 1
         end if
+        write(test_info%output_unit,'(A,F20.10)') "Global single precision result: ", global_result_single
+        write(test_info%output_unit,'(A,F20.10)') "Local single precision result:  ", result_single
     end subroutine
 
-    !! subroutine psb_parallel_check()
-    !! 
-    !! end subroutine
-!! 
-    !! subroutine psb_threshold_check()
-    !! 
-    !! end subroutine
+
+    !> @brief Subroutine to check the result of a single precision computation
+    !!        against a previously saved result from a single process test.
+    !!
+    !! @param result_single The single precision result to be checked.
+    !! @param test_info The test information structure containing the current test count.
+    !!
+    subroutine psb_test_process_check(result_single, test_info)
+        real(psb_spk_), intent(inout)       :: result_single
+        type(psb_test_info), intent(inout)  :: test_info
+        real(psb_spk_)                      :: saved_result
+        integer(psb_ipk_)                   :: unit, info, file_size, int_digits
+        character(len=32)                   :: filename
+        logical                             :: exists
+        character(len=64)                   :: out_string
+
+        out_string = "Multiprocess check: "
+
+        ! Set the filename based on the test count
+        write(filename, '(A,I0,A)') 'results/result_', test_info%current_test, '.txt'
+
+        ! Check if the file exists
+        inquire(file=trim(filename), exist=exists)
+        if (.not.exists) then
+            write(test_info%output_unit, '(A)') "Error: Result file does not exist."
+            write(test_info%output_unit, '(A)') "Please ensure the single process test is run first to generate the result file."
+            call psb_test_exit(test_info)
+        end if
+
+        ! Open the file for reading
+        open(newunit=unit, file=trim(filename), status='old', action='read', iostat=info)
+
+        ! Check if the file was opened successfully
+        if (info /= 0) then
+            write(*, '(A,I0)') "Error opening result file: ", info
+            call psb_test_exit(test_info)
+        end if
+
+        ! Read the saved result
+        read(unit, '(F20.10)') saved_result
+
+        ! Close the file
+        close(unit, iostat=info)
+
+        call shift_decimal_single(saved_result,int_digits)
+        call shift_decimal_single(result_single,int_digits)
+
+        ! Compare the saved result with the new result_single
+        if (abs(saved_result - result_single) <= test_info%threshold) then
+            call psb_test_log_passed(test_info, out_string)
+            test_info%success = test_info%success + 1 
+        else
+            call psb_test_log_failed(test_info, out_string)
+            test_info%failure = test_info%failure + 1
+        end if
+        write(test_info%output_unit, '(F20.10,F20.10,A,L,A,L)') &
+        & saved_result - result_single, result_single - saved_result, " ", saved_result - result_single == 0, &
+        & " ", result_single - saved_result == 0 
+        write(test_info%output_unit, '(A,F20.10)') "Multi-process result: ", result_single
+        write(test_info%output_unit, '(A,F20.10)') "Single process result: ", saved_result
+
+    end subroutine
 
 end module psb_test_utils

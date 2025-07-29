@@ -10,9 +10,11 @@
 !> @brief Subroutine used to foramt correctly the message in the log about a test that has paseed
 !!
 !! @param test_info is a data structure containing all the metadata usefull for test output
+!! @param out_string is the string to be printed in the log
 !!
-subroutine psb_test_log_passed(test_info)
+subroutine psb_test_log_passed(test_info, out_string)
     type(psb_test_info), intent(in) :: test_info
+    character(len=*), intent(in)    :: out_string
     ! time stats variables
     character(len=8)                :: date  
     character(len=10)               :: time    
@@ -22,31 +24,33 @@ subroutine psb_test_log_passed(test_info)
     call date_and_time(date, time, zones, values)
 
     write(test_info%output_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
-    & A,A,A,I0,A,I0,T110,A)') &
+    & A,I0,A,I0,T110,A)') &
     & values(1), values(2), values(3), values(5), values(6), values(7), &
-    & "Generation ", trim(test_info%kernel_name), " single precision ", & 
+    & out_string, & 
     & test_info%current_test , "/", test_info%total_tests, "[OK]"
 
 end subroutine
 
-!> @brief Subroutine used to foramt correctly the message in the log about a test that has failed
+!> @brief Subroutine used to format correctly the message in the log about a test that has failed
 !!
-!! @param test_info is a data structure containing all the metadata usefull for test output
+!! @param test_info is a data structure containing all the metadata useful for test output
+!! @param out_string is a string containing the error message to be printed
 !!
-subroutine psb_test_log_failed(test_info)
-    type(psb_test_info), intent(in)    :: test_info
+subroutine psb_test_log_failed(test_info, out_string)
+    type(psb_test_info), intent(in)     :: test_info
+    character(len=*), intent(in)        :: out_string
     ! time stats variables
-    character(len=8)                :: date  
-    character(len=10)               :: time
-    character(len=5)                :: zones 
-    integer(psb_ipk_)               :: values(8)
+    character(len=8)                    :: date  
+    character(len=10)                   :: time
+    character(len=5)                    :: zones 
+    integer(psb_ipk_)                   :: values(8)
 
     call date_and_time(date, time, zones, values)
 
     write(test_info%output_unit,'("[", I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2,"] ",& 
-    & A,A,A,I0,A,I0,T110,A)') &
+    & A,I0,A,I0,T110,A)') &
     & values(1), values(2), values(3), values(5), values(6), values(7), &
-    & "Generation ", trim(test_info%kernel_name), " single precision ", & 
+    & out_string, & 
     & test_info%current_test , "/", test_info%total_tests, "[FAIL]"
 
 end subroutine
@@ -57,9 +61,9 @@ end subroutine
 !! @param test_info is a data structure containing all the metadata usefull for test output
 !!
 subroutine psb_test_progress_bar(test_info)
-    type(psb_test_info), intent(in)    :: test_info 
-    integer(psb_ipk_)               :: percent, bar_width, num_hashes, num_spaces
-    character(len=100)              :: bar
+    type(psb_test_info), intent(in)     :: test_info 
+    integer(psb_ipk_)                   :: percent, bar_width, num_hashes, num_spaces
+    character(len=100)                  :: bar
 
     bar_width = 40 
 

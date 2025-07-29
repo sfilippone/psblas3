@@ -123,10 +123,12 @@ program main
     !! Initialize test metadata
     test_info%total_tests = size(x) * size(y) * size(global)
     test_info%threshold_type = GAMMA
-    test_info%threshold = 0.0
     test_info%kernel_name = "psb_gedot"
 
     call psb_test_init(test_info)
+
+    test_info%threshold = 1.0D-06
+
 
     if(test_info%my_rank == psb_root_) then
         psb_out_unit = test_info%output_unit
@@ -148,12 +150,25 @@ program main
                 if(test_info%my_rank == psb_root_) then
                     if(global(h) .eqv. .true.) then
                         global_result_single = result_single
-                        call psb_test_single_double_check(result_single,result_double,test_info, arr_size)
+                        
+                        if(test_info%np > 1) then 
+                            ! If the program is being run on multiple processes, we need to
+                            ! check the result on the root process with the one computed only using 
+                            ! a single process
+                            call psb_test_process_check(result_single, test_info)
+                        else
+                            call psb_test_single_double_check(result_single,result_double,test_info, arr_size)
+                            
+                            ! If the program is being run on a single process, we can save the result directly
+                            call psb_test_save_result(result_single, test_info)
+                        end if
+                    
                     else
                         call psb_test_check_global_local(global_result_single, result_single, test_info)
                     end if
 
-                    test_info%current_test = test_info%current_test + 1 
+                    test_info%current_test = test_info%current_test + 1
+                    
                 end if
                 call psb_barrier(test_info%ctxt)
             end do            
@@ -200,7 +215,7 @@ contains
         ! variables outside PSLBALS data structures
         real(psb_spk_), allocatable     :: x_single_global(:), y_single_global(:)
         real(psb_dpk_), allocatable     :: x_double_global(:), y_double_global(:)
-        integer(psb_ipk_)               :: i
+        integer(psb_ipk_)               :: i, nl
 
         ! others
         logical                         :: exists
@@ -228,7 +243,9 @@ contains
         end if
 
         ! Allocate descriptor as if it was a block rows distribution
-        call psb_cdall(ctxt, desc_a, info,nl=arr_size/np)
+        nl = (arr_size)/np + mod(arr_size,np)
+
+        call psb_cdall(ctxt, desc_a, info,nl=nl)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error allocating desc_a data structure"
             goto 9999
@@ -304,7 +321,6 @@ contains
             write(psb_out_unit,'(A)') "Error in psb_gedot routine in double precision"
             goto 9999
         end if
-
 
         if(global .eqv. .false.) then
             ! If the result is local, we need to sum the local results
