@@ -159,55 +159,98 @@ contains
         close(unit, iostat=info)
     end subroutine
 
-    !> @brief Subroutine to shift the decimal point of a single precision number
-    !!        and count the number of digits in the integer part.
-    !!
-    !! @param num The single precision number whose decimal point is to be shifted.
-    !! @param int_digits The integer to store the number of digits in the integer part.
-    !!
-    subroutine shift_decimal_double(num, int_digits)
-        real(psb_dpk_),intent(inout)    :: num
-        integer(psb_ipk_), intent(out)  :: int_digits
-        integer(psb_ipk_)               :: n_digits
-        character(len=20)               :: int_str
-      
-      
-        ! Convert the absolute value of the integer part to string
-        write(int_str, '(I0)') int(abs(num))
-      
-        ! Count number of digits
-        int_digits = int(floor(log10(abs(num)))) + 1
-        n_digits = len_trim(adjustl(int_str))
-      
-        ! Shift the decimal point
-        num = abs(num) / 10.0**n_digits
-      
+    !> @brief Subroutine to save the result of a single precision vector computation
+    !!        to a file in the results directory.
+    !! @param result_single The single precision vector result to be saved.
+    !! @param test_info The test information structure containing the current test count.
+    !! 
+    subroutine psb_test_save_vector_result(result_single, test_info)
+        type(psb_test_info), intent(inout)      :: test_info
+        real(psb_spk_), allocatable,intent(in)  :: result_single(:)
+        integer(psb_ipk_)                       :: info, unit
+        character(len=32)                       :: filename
+        logical                                 :: exists
+
+        ! Check if results directory exists
+        inquire(file='results/', exist=exists)
+        if (.not.exists) then
+            call system('mkdir results/')
+        end if
+
+        ! Set the filename based on the test count
+        write(filename, '(A,I0,A)') 'results/result_', test_info%current_test, '.txt'
+
+        ! Open the file for writing
+        open(newunit=unit, file=trim(filename), status='replace', action='write', iostat=info)
+
+        ! Check if the file was opened successfully
+        if (info /= 0) then
+            write(*, '(A,I0)') "Error opening result file: ", info
+            return
+        end if
+
+        ! Close the file
+        close(unit, iostat=info)
+
+        ! Write the result to the file
+        call mm_array_write(result_single,"",info,filename=filename)
+        if (info /= 0) then
+            write(*, '(A,I0)') "Error writing result file: ", info
+            return
+        end if
+
+
     end subroutine
+
 
     !> @brief Subroutine to shift the decimal point of a single precision number
     !!        and count the number of digits in the integer part.
     !!
     !! @param num The single precision number whose decimal point is to be shifted.
-    !! @param int_digits The integer to store the number of digits in the integer part.
     !!
-    subroutine shift_decimal_single(num, int_digits)
-        real(psb_spk_),intent(inout)    :: num
-        integer(psb_ipk_), intent(out)  :: int_digits
-        integer(psb_ipk_)               :: n_digits
-        character(len=20)               :: int_str
+    !! @return shifted_num The single precision number with the decimal point shifted.
+    !!
+    function shift_decimal_double(num) result(shifted_num)
+        real(psb_dpk_)      :: num, shifted_num
+        integer(psb_ipk_)   :: n_digits
+        character(len=20)   :: int_str
       
       
         ! Convert the absolute value of the integer part to string
         write(int_str, '(I0)') int(abs(num))
       
         ! Count number of digits
-        int_digits = int(floor(log10(abs(num)))) + 1
+        ! int_digits = int(floor(log10(abs(num)))) + 1
         n_digits = len_trim(adjustl(int_str))
       
         ! Shift the decimal point
-        num = abs(num) / 10.0**n_digits
+        shifted_num = abs(num) / 10.0**n_digits
       
-    end subroutine
+    end function shift_decimal_double
+
+    !> @brief Function to shift the decimal point of a single precision number.
+    !!
+    !! @param num The single precision number whose decimal point is to be shifted.
+    !!
+    !! @return shifted_num The single precision number with the decimal point shifted.
+    !!
+    function shift_decimal_single(num) result(shifted_num)
+        real(psb_spk_)      :: num, shifted_num
+        integer(psb_ipk_)   :: n_digits
+        character(len=20)   :: int_str
+      
+      
+        ! Convert the absolute value of the integer part to string
+        write(int_str, '(I0)') int(abs(num))
+      
+        ! Count number of digits
+        ! int_digits = int(floor(log10(abs(num)))) + 1
+        n_digits = len_trim(adjustl(int_str))
+      
+        ! Shift the decimal point
+        shifted_num = abs(num) / 10.0**n_digits
+      
+    end function shift_decimal_single
 
 
     !> @brief Function to validate the test information structure.
@@ -220,21 +263,32 @@ contains
     !!
     subroutine psb_test_validate(result_single, result_double, test_info, arr_size, pass) 
         type(psb_test_info), intent(inout)  :: test_info
-        real(psb_spk_), intent(inout)       :: result_single
-        real(psb_dpk_), intent(inout)       :: result_double
+        real(psb_spk_), intent(in)          :: result_single
+        real(psb_dpk_), intent(in)          :: result_double
         integer(psb_ipk_), intent(in)       :: arr_size 
         logical, intent(inout)              :: pass
-        integer(psb_ipk_)                   :: int_digits, n
+
+        real(psb_spk_)                      :: local_single
+        real(psb_dpk_)                      :: local_double
+        integer(psb_ipk_)                   :: n
         real(psb_dpk_)                      :: gamma_n, unit_roundoff, delta, rel_err
 
         unit_roundoff = 5.96D-08 !! 1.11D-16
+
         delta = abs(result_double - real(result_single,psb_dpk_))
         rel_err = delta / abs(real(result_single,psb_dpk_))
         n = (arr_size / test_info%np) + (test_info%np - 1)
 
-        !! call shift_decimal_double(delta,int_digits)
+
+        ! write(psb_out_unit,'(A,F20.10)') "Computed delta:           ", delta
 
         if(test_info%threshold_type == VALUE) then
+            ! Lower down values in order to match threshold for absolute error check
+            local_single = shift_decimal_single(result_single)
+            local_double = shift_decimal_double(result_double)
+
+            delta = abs(result_double - real(result_single,psb_dpk_))
+
             if(delta < test_info%threshold) then
                 pass = .true.
             else
@@ -279,7 +333,7 @@ contains
     !! @param test_info The test information structure containing the threshold and logging details.
     !! @param arr_size The size of the array used in the computation.
     !!
-    subroutine psb_test_single_double_check(result_single, result_double, test_info, arr_size) 
+    subroutine psb_test_single_double_scalar_check(result_single, result_double, test_info, arr_size) 
         type(psb_test_info), intent(inout)  :: test_info
         real(psb_spk_), intent(inout)       :: result_single
         real(psb_dpk_), intent(inout)       :: result_double
@@ -303,9 +357,48 @@ contains
         end if
         write(psb_out_unit,'(A,F20.10)') "Single precision result:  ", result_single
         write(psb_out_unit,'(A,F20.10)') "Double precision result:  ", result_double
-        write(psb_out_unit,'(A,F20.10)') "Computed delta:           ", delta
         write(psb_out_unit,'(A,F20.10)') "Threshold used:           ", test_info%threshold
     end subroutine
+
+    !> @brief Subroutine to check the results of a single and double precision vector computation.
+    !!        It compares the results element-wise and logs the outcome.
+    !! @param result_single The single precision vector result to be checked.
+    !! @param result_double The double precision vector result to be checked.
+    !! @param test_info The test information structure containing the threshold and logging details.
+    !! @param arr_size The size of the array used in the computation.
+    !!
+    subroutine psb_test_single_double_vector_check(result_single, result_double, test_info, arr_size) 
+        type(psb_test_info), intent(inout)          :: test_info
+        real(psb_spk_), allocatable, intent(inout)  :: result_single(:)
+        real(psb_dpk_), allocatable, intent(inout)  :: result_double(:)
+        real(psb_dpk_)                              :: delta
+        integer(psb_ipk_)                           :: int_digits, arr_size, i
+        logical                                     :: pass 
+        character(len=64)                           :: out_string
+
+        out_string = "Double precision check: "
+        pass = .true.
+
+        call psb_test_progress_bar(test_info)
+        do i = 1, size(result_single)
+            call psb_test_validate(result_single(i), result_double(i), test_info, arr_size, pass)
+            if(pass .eqv. .false. ) exit
+        end do
+
+        if(pass .eqv. .true.) then 
+            call psb_test_log_passed(test_info, out_string)
+            test_info%success = test_info%success + 1  
+        else
+            call psb_test_log_failed(test_info, out_string)
+            test_info%failure = test_info%failure + 1
+            write(psb_out_unit,'(A,F20.10)') "Comparison error occurred at index:  ", i
+            write(psb_out_unit,'(A,F20.10)') "Single precision result:  ", result_single(i)
+            write(psb_out_unit,'(A,F20.10)') "Double precision result:  ", result_double(i)        
+        end if
+
+        ! write(psb_out_unit,'(A,F20.10)') "Threshold used:           ", test_info%threshold
+    end subroutine
+
 
     !> @brief Subroutine to check the global and local results of a single precision computation.
     !!        It compares the global result with the local result and logs the outcome.
@@ -345,13 +438,14 @@ contains
     subroutine psb_test_process_check(result_single, test_info)
         real(psb_spk_), intent(inout)       :: result_single
         type(psb_test_info), intent(inout)  :: test_info
-        real(psb_spk_)                      :: saved_result
-        integer(psb_ipk_)                   :: unit, info, file_size, int_digits
+        real(psb_spk_)                      :: saved_result, local_saved, local_single
+        integer(psb_ipk_)                   :: unit, info, file_size
         character(len=32)                   :: filename
         logical                             :: exists
         character(len=64)                   :: out_string
 
         out_string = "Multiprocess check: "
+        call psb_test_progress_bar(test_info)
 
         ! Set the filename based on the test count
         write(filename, '(A,I0,A)') 'results/result_', test_info%current_test, '.txt'
@@ -379,11 +473,11 @@ contains
         ! Close the file
         close(unit, iostat=info)
 
-        call shift_decimal_single(saved_result,int_digits)
-        call shift_decimal_single(result_single,int_digits)
+        local_saved = shift_decimal_single(saved_result)
+        local_single = shift_decimal_single(result_single)
 
         ! Compare the saved result with the new result_single
-        if (abs(saved_result - result_single) <= test_info%threshold) then
+        if (abs(local_saved - local_single) <= test_info%threshold) then
             call psb_test_log_passed(test_info, out_string)
             test_info%success = test_info%success + 1 
         else
@@ -391,11 +485,92 @@ contains
             test_info%failure = test_info%failure + 1
         end if
         write(test_info%output_unit, '(F20.10,F20.10,A,L,A,L)') &
-        & saved_result - result_single, result_single - saved_result, " ", saved_result - result_single == 0, &
-        & " ", result_single - saved_result == 0 
-        write(test_info%output_unit, '(A,F20.10)') "Multi-process result: ", result_single
-        write(test_info%output_unit, '(A,F20.10)') "Single process result: ", saved_result
+        & local_saved - local_single, local_single - local_saved, " ", local_saved - local_single == 0, &
+        & " ", local_single - local_saved == 0 
+        write(test_info%output_unit, '(A,F20.10)') "Multi-process result: ", local_single
+        write(test_info%output_unit, '(A,F20.10)') "Single process result: ", local_saved
 
     end subroutine
+
+
+    subroutine psb_test_process_vector_check(result_single, test_info)
+        real(psb_spk_), allocatable, intent(inout)  :: result_single(:)
+        type(psb_test_info), intent(inout)          :: test_info
+        real(psb_spk_), allocatable                 :: saved_result(:)
+        integer(psb_ipk_)                           :: unit, info, file_size, int_digits, i
+        character(len=32)                           :: filename
+        logical                                     :: exists, pass
+        character(len=64)                           :: out_string
+
+        out_string = "Multiprocess check: "
+        pass = .true.
+        call psb_test_progress_bar(test_info)
+
+
+        ! Set the filename based on the test count
+        write(filename, '(A,I0,A)') 'results/result_', test_info%current_test, '.txt'
+
+        ! Check if the file exists
+        inquire(file=trim(filename), exist=exists)
+        if (.not.exists) then
+            write(test_info%output_unit, '(A)') "Error: Result file does not exist."
+            write(test_info%output_unit, '(A)') "Please ensure the single process test is run first to generate the result file."
+            call psb_test_exit(test_info)
+        end if
+
+        ! Open the file for reading
+        open(newunit=unit, file=trim(filename), status='old', action='read', iostat=info)
+
+        ! Check if the file was opened successfully
+        if (info /= 0) then
+            write(*, '(A,I0)') "Error opening result file: ", info
+            call psb_test_exit(test_info)
+        end if
+
+        ! Close the file
+        close(unit, iostat=info)
+
+        ! Read the saved result
+        call mm_array_read(saved_result, info, filename=trim(filename))
+        if (info /= 0) then
+            write(*, '(A,I0)') "Error reading result file: ", info
+            call psb_test_exit(test_info)
+        end if
+
+        do i = 1, size(result_single)
+            ! call shift_decimal_single(saved_result(i),int_digits)
+            ! call shift_decimal_single(result_single(i),int_digits)
+
+            ! Compare the saved result with the new result_single
+            if (abs(saved_result(i) - result_single(i)) > test_info%threshold) then
+                pass = .false. 
+
+                write(psb_out_unit,'(A,I0)') "Comparison error occurred at index:  ", i
+                write(test_info%output_unit, '(F20.10,F20.10,A,L,A,L)') &
+                & saved_result(i) - result_single(i), result_single(i) - saved_result(i), " ", & 
+                & saved_result(i) - result_single(i) == 0, " ", result_single(i) - saved_result(i) == 0 
+                write(test_info%output_unit, '(A,F20.10)') "Multi-process result: ", result_single(i)
+                write(test_info%output_unit, '(A,F20.10)') "Single process result: ", saved_result(i)
+                exit
+            end if
+        end do
+
+        if(pass .eqv. .true.) then 
+            call psb_test_log_passed(test_info, out_string)
+            test_info%success = test_info%success + 1  
+        else
+            call psb_test_log_failed(test_info, out_string)
+            test_info%failure = test_info%failure + 1
+            
+
+
+        end if
+
+
+
+
+    end subroutine
+
+
 
 end module psb_test_utils

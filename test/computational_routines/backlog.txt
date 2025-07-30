@@ -4,10 +4,10 @@ COMPLETED:
 - Remove file generation in order to save up memory [OK]
 - Clean main log at each run [OK] (Log aggregation was deleted)
 - Fix log aggregation in main directory, see number of total tests [OK] (Log aggregation was deleted)
+- Fix parallel and serial, using a fortran routine instead of the diff between files [OK]
 
 
 
 TODO:
-- Fix parallel and serial, using a fortran routine instead of the diff between files
 - Force recompilation in main script (A flag should be added)
 - Generate input vectors only if vectors/ directory doesn't exist to save up time (It is really dependant on the kernel analyzed, it is not always possible)

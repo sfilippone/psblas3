@@ -46,7 +46,7 @@ The strategy to validate the correctness of the computation is to compare single
 
 ## TODO
 List of things still to add in the test:
-- Add computation with broken descriptor and catch the errore result
+- Add computation with broken descriptor and catch the errore result (Use EXCECUTE_COMMAND_LINE from a fortran program and check the exit codes)
 - Test using complex data ($dot \leftarrow x^H \cdot y$)
 - Test also GPU excecution
 - Try multiple distributions

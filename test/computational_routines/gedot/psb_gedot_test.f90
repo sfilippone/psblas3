@@ -123,12 +123,10 @@ program main
     !! Initialize test metadata
     test_info%total_tests = size(x) * size(y) * size(global)
     test_info%threshold_type = GAMMA
+    test_info%threshold = 1.0D-06
     test_info%kernel_name = "psb_gedot"
 
     call psb_test_init(test_info)
-
-    test_info%threshold = 1.0D-06
-
 
     if(test_info%my_rank == psb_root_) then
         psb_out_unit = test_info%output_unit
@@ -157,7 +155,7 @@ program main
                             ! a single process
                             call psb_test_process_check(result_single, test_info)
                         else
-                            call psb_test_single_double_check(result_single,result_double,test_info, arr_size)
+                            call psb_test_single_double_scalar_check(result_single,result_double,test_info, arr_size)
                             
                             ! If the program is being run on a single process, we can save the result directly
                             call psb_test_save_result(result_single, test_info)
@@ -333,32 +331,27 @@ contains
         9999 call psb_gefree(x_single, desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in single precision vector x free routine"
-            goto 9999
         end if
 
         call psb_gefree(y_single, desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in single precision vector y free routine"
-            goto 9999
         end if
 
         call psb_gefree(x_double, desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in double precision vector x free routine"
-            goto 9999
         end if
 
         call psb_gefree(y_double, desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in double precision vector y free routine"
-            goto 9999
         end if
 
 
         call psb_cdfree(desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in matrix descriptor free routine"
-            goto 9999
         end if
 
         if(my_rank == 0) then
@@ -367,8 +360,6 @@ contains
             deallocate(x_double_global)
             deallocate(y_double_global)
         end if
-
-        return
 
     end subroutine
 

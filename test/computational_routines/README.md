@@ -30,9 +30,9 @@ Each directory has the name of the computational kernel routines described in th
 In this test suite were considered only computational routines implemented by PSBLAS, according to the version 3.9 of the documentation. In the following table are reported all the kernels, their implementation and wheter or not they were tested yet.
 |**Kernel**| **PSBLAS Subroutine**|**Description**|**Single Process Test**|**Multi-Process Test**|**Complex Test**|**GPU Test**|
 | ------------------------------- | :--------------------------: | ---------------------------------------------------------------------- | :---------------: |:---------------: |:---------------: |:---------------: |
-|**General Dense Matrix Sum**| `psb_geaxpby`| This subroutine is an interface to the computational kernel for dense matrix sum: $Y \leftarrow \alpha  X + \beta  Y$ |Work in progress :hammer_and_wrench:|Work in progress :hammer_and_wrench:|No ❌|No ❌|
+|**General Dense Matrix Sum**| `psb_geaxpby`| This subroutine is an interface to the computational kernel for dense matrix sum: $Y \leftarrow \alpha  X + \beta  Y$ |Yes ✅|Yes ✅|No ❌|No ❌|
 | **Dot product**|`psb_gedot`|This function computes dot product between two vectors x and y. $dot \leftarrow x^T y$ If x and y are real vectors it computes dot-product as: $dot \leftarrow x^H y$ |Yes ✅|Yes ✅|No ❌|No ❌|
-| **Generalized Dot Product** |`psb_gedots`|This subroutine computes a series of dot products among the columns of two dense matrices x and y:$res(i) \leftarrow x(:,i)^T  y(:,i)$If the matrices are complex, then the usual convention applies, i.e. the conjugate transpose of x is used. If x and y are of rank one, then res is a scalar, else it is a rank one array.|No ❌|No ❌|No ❌|No ❌|
+| **Generalized Dot Product** |`psb_gedots`|This subroutine computes a series of dot products among the columns of two dense matrices x and y:$res(i) \leftarrow x(:,i)^T  y(:,i)$ If the matrices are complex, then the usual convention applies, i.e. the conjugate transpose of x is used. If x and y are of rank one, then res is a scalar, else it is a rank one array.|No ❌|No ❌|No ❌|No ❌|
 |**Infinity-Norm of Vector**|`psb_normi`/`psb_geamax`|This function computes the infinity-norm of a vector x. If x is a real vector it computes infinity norm as:$amax \leftarrow max \mid x_i \mid$else if x is a complex vector then it computes the infinity-norm as: $amax \leftarrow max(\mid re(x_i) \mid + \mid im(x_i) \mid)$ |No ❌|No ❌|No ❌|No ❌|
 |**Generalized Infinity Norm**|`psb_geamaxs`|This subroutine computes a series of infinity norms on the columns of a dense matrix x: $res(i) \leftarrow max_k \mid x(k,i) \mid$ |No ❌|No ❌|No ❌|No ❌|
 | **1-Norm of Vector**| `psb_norm1` / `psb_geasums`|This function computes the 1-norm of a vector x. If x is a real vector it computes 1-norm as: $asum \leftarrow \mid \mid x_i \mid \mid$ else if x is a complex vector then it computes 1-norm as: $asum \leftarrow \mid \mid re(x) \mid \mid_1 + \mid \mid im(x) \mid \mid_1$ |No ❌|No ❌|No ❌|No ❌|
@@ -49,10 +49,6 @@ In this test suite were considered only computational routines implemented by PS
 
 ## Developer Notes
 In order to keep compliant the excecution of the bash script used to automate the teest excecution, remember to create a new directory to put new tests and to use the name convention of psb_test_ signature for utilities functions and psb_kernel_test for tests used for new routines.
-
-## TODO
-- Finish the directories description
-- Check memory occupancy of parallel/ serial/ and vectors/ directories (Maybe not the best way for lots of rputines?)
 
 ## References
 <a id="testing">[1].</a> Higham, Nicholas J. Testing linear algebra software. Springer US, 1997

@@ -8,7 +8,7 @@ include $(INCDIR)/Make.inc.psblas
 LIBDIR = $(INSTALLDIR)/lib/
 PSBLAS_LIB = -L$(LIBDIR) -lpsb_util -lpsb_base
 LDLIBS = $(PSBLDLIBS)
-EXEDIR = runs
+EXEDIR = ./runs
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
@@ -29,7 +29,6 @@ runsd:
 psb_gedot_test:
 	@$(FLINK) $(LOPT) psb_gedot_test.f90 ../utils/psb_test_utils.o -o $(EXEDIR)/psb_gedot_test -I../utils/ -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
 	@printf "$(BLUE)[INFO]\t  Testing files for psb_gedot linked and compiled correctly$(END_COLOUR)\n" 
-
 
 clean: 
 	@rm -f $(OBJS)\
