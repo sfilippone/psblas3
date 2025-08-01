@@ -354,10 +354,10 @@ contains
         else
             call psb_test_log_failed(test_info, out_string)
             test_info%failure = test_info%failure + 1
+            write(psb_out_unit,'(A,F20.10)') "Threshold used:           ", test_info%threshold
         end if
         write(psb_out_unit,'(A,F20.10)') "Single precision result:  ", result_single
         write(psb_out_unit,'(A,F20.10)') "Double precision result:  ", result_double
-        write(psb_out_unit,'(A,F20.10)') "Threshold used:           ", test_info%threshold
     end subroutine
 
     !> @brief Subroutine to check the results of a single and double precision vector computation.
@@ -391,7 +391,7 @@ contains
         else
             call psb_test_log_failed(test_info, out_string)
             test_info%failure = test_info%failure + 1
-            write(psb_out_unit,'(A,F20.10)') "Comparison error occurred at index:  ", i
+            write(psb_out_unit,'(A,I0)') "Comparison error occurred at index:  ", i
             write(psb_out_unit,'(A,F20.10)') "Single precision result:  ", result_single(i)
             write(psb_out_unit,'(A,F20.10)') "Double precision result:  ", result_double(i)        
         end if
@@ -483,12 +483,11 @@ contains
         else
             call psb_test_log_failed(test_info, out_string)
             test_info%failure = test_info%failure + 1
+            write(test_info%output_unit, '(A,F20.10)') "Delta: ", abs(saved_result - result_single)
         end if
-        write(test_info%output_unit, '(F20.10,F20.10,A,L,A,L)') &
-        & local_saved - local_single, local_single - local_saved, " ", local_saved - local_single == 0, &
-        & " ", local_single - local_saved == 0 
-        write(test_info%output_unit, '(A,F20.10)') "Multi-process result: ", local_single
-        write(test_info%output_unit, '(A,F20.10)') "Single process result: ", local_saved
+
+        write(test_info%output_unit, '(A,F20.10)') "Multi-process result: ", result_single
+        write(test_info%output_unit, '(A,F20.10)') "Single process result: ", saved_result
 
     end subroutine
 

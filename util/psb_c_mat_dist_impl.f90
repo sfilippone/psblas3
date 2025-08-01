@@ -152,10 +152,10 @@ subroutine psb_cmatdist(a_glob, a, ctxt, desc_a,&
     call psb_errpush(info,name,i_err=(/liwork/),a_err='integer')
     goto 9999
   endif
-  if (iam == root) then
-    write (*, fmt = *) 'start matdist',root, size(iwork),&
-         &nrow, ncol, nnzero,nrhs
-  endif
+  !! if (iam == root) then
+  !!   write (*, fmt = *) 'start matdist',root, size(iwork),&
+  !!        &nrow, ncol, nnzero,nrhs
+  !! endif
   if (use_parts) then 
     call psb_cdall(ctxt,desc_a,info,mg=nrow,parts=parts)
   else if (use_vg) then 
@@ -359,7 +359,7 @@ subroutine psb_cmatdist(a_glob, a, ctxt, desc_a,&
     goto 9999
   end if
 
-  if (iam == root) write (*, fmt = *) 'end matdist'     
+  !! if (iam == root) write (*, fmt = *) 'end matdist'     
 
   call psb_erractionrestore(err_act)
   return
@@ -490,10 +490,10 @@ subroutine psb_lcmatdist(a_glob, a, ctxt, desc_a,&
     call psb_errpush(info,name,l_err=(/liwork/),a_err='integer')
     goto 9999
   endif
-  if (iam == root) then
-    write (*, fmt = *) 'start matdist',root, size(iwork),&
-         &nrow, ncol, nnzero,nrhs
-  endif
+  !! if (iam == root) then
+  !!   write (*, fmt = *) 'start matdist',root, size(iwork),&
+  !!        &nrow, ncol, nnzero,nrhs
+  !! endif
   if (use_parts) then 
     call psb_cdall(ctxt,desc_a,info,mg=nrow,parts=parts)
   else if (use_vg) then 
@@ -700,7 +700,7 @@ subroutine psb_lcmatdist(a_glob, a, ctxt, desc_a,&
     goto 9999
   end if
 
-  if (iam == root) write (*, fmt = *) 'end matdist'     
+  !! if (iam == root) write (*, fmt = *) 'end matdist'     
 
   call psb_erractionrestore(err_act)
   return

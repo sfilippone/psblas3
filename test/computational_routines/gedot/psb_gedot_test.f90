@@ -41,7 +41,7 @@
 !!          Scope: local
 !!          Type: required
 !!          Intent: in
-!!          Specified as: an object of type psb desc type.
+!!          Specified as: an object of type psb_desc_type.
 !!
 !! global   Descritption: Specifies whether the computation should include the global 
 !!          reduction across all processes.
@@ -208,15 +208,12 @@ contains
         type(psb_desc_type)             :: desc_a
 
         ! communication context
-        integer(psb_ipk_)               :: my_rank, np, info, err_act
+        integer(psb_ipk_)               :: my_rank, np, info
 
         ! variables outside PSLBALS data structures
         real(psb_spk_), allocatable     :: x_single_global(:), y_single_global(:)
         real(psb_dpk_), allocatable     :: x_double_global(:), y_double_global(:)
         integer(psb_ipk_)               :: i, nl
-
-        ! others
-        logical                         :: exists
 
         info = psb_success_
 
