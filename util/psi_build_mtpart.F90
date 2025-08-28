@@ -12,20 +12,28 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
   integer(psb_ipk_) :: info
   integer(psb_lpk_) :: nl,nptl
   integer(psb_lpk_), allocatable :: irpl(:),jal(:),gvl(:)
+#if defined(PSB_METIS_REAL_32)  
   real(psb_spk_),allocatable  :: wgh_(:)
+#elif defined(PSB_METIS_REAL_64)  
+  real(psb_dpk_),allocatable  :: wgh_(:)
+#endif
 
-#if defined(HAVE_METIS) && defined(LPK4) && defined(METIS_32) 
+#if defined(PSB_HAVE_METIS) && defined(PSB_LPK4) && defined(PSB_METIS_32) 
   interface 
-    function METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
+    function PSB_METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
          & nparts,weights,part) bind(c,name="metis_PartGraphKway_C") result(res)
       use iso_c_binding
       integer(c_int) :: res
       integer(c_int) :: n,nparts
       integer(c_int) :: ixadj(*),iadj(*),ivwg(*),iajw(*),part(*)
+#if defined(PSB_METIS_REAL_32)  
       real(c_float)  :: weights(*)
+#elif defined(PSB_METIS_REAL_64)
+      real(c_double)  :: weights(*)
+#endif
       !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
       !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-    end function METIS_PartGraphKway
+    end function PSB_METIS_PartGraphKway
   end interface
 
   call psb_realloc(n,graph_vect,info)
@@ -49,23 +57,23 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
     nptl = nparts
     wgh_ = -1.0
     if(present(weights)) then
-      if (size(weights) == nptl) then 
+      if (size(weights) == nptl) then
+        wgh_(:) = weights(:)
 !!$            write(*,*) 'weights present',weights
-        ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
-        !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
-        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-             & nptl,weights,gvl)
+!!$        ! call PSB_METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
+!!$        !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
+!!$        info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,weights,gvl)
 
-      else
-!!$            write(*,*) 'weights absent',wgh_
-        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-             & nptl,wgh_,gvl)
+!!$      else
+            write(*,*) 'weights absent',wgh_
+!!$        info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,wgh_,gvl)
       end if
-    else
-!!$          write(*,*) 'weights absent',wgh_
-      info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
-           & nptl,wgh_,gvl)
     endif
+!!$          write(*,*) 'weights absent',wgh_
+      info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+           & nptl,wgh_,gvl)
 !!$        write(*,*) 'after allocation',info
 
     do i=1, n
@@ -77,19 +85,23 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
     enddo
   endif
 
-#elif defined(HAVE_METIS) && defined(LPK8) && defined(METIS_64) 
+#elif defined(PSB_HAVE_METIS) && defined(PSB_LPK8) && defined(PSB_METIS_64) 
 
   interface 
-    function METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
+    function PSB_METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
          & nparts,weights,part) bind(c,name="metis_PartGraphKway_C") result(res)
       use iso_c_binding
       integer(c_long_long) :: res
       integer(c_long_long) :: n,nparts
       integer(c_long_long) :: ixadj(*),iadj(*),ivwg(*),iajw(*),part(*)
+#if defined(PSB_METIS_REAL_32)  
       real(c_float)  :: weights(*)
+#elif defined(PSB_METIS_REAL_64)
+      real(c_double)  :: weights(*)
+#endif
       !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
       !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-    end function METIS_PartGraphKway
+    end function PSB_METIS_PartGraphKway
   end interface
 
   call psb_realloc(n,graph_vect,info)
@@ -113,25 +125,44 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
     nptl = nparts
     wgh_ = -1.0
     if(present(weights)) then
+      if (size(weights) == nptl) then
+        wgh_(:) = weights(:)
+!!$            write(*,*) 'weights present',weights
+!!$        ! call PSB_METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
+!!$        !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
+!!$        info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,weights,gvl)
+
+!!$      else
+            write(*,*) 'weights absent',wgh_
+!!$        info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+!!$             & nptl,wgh_,gvl)
+      end if
+    endif
+!!$          write(*,*) 'weights absent',wgh_
+      info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+           & nptl,wgh_,gvl)
+#if 0
+      if(present(weights)) then
       if (size(weights) == nptl) then 
 !!$            write(*,*) 'weights present',weights
-        ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
+        ! call PSB_METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
         !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
-        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+        info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
              & nptl,weights,gvl)
 
       else
 !!$            write(*,*) 'weights absent',wgh_
-        info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+        info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
              & nptl,wgh_,gvl)
       end if
     else
 !!$          write(*,*) 'weights absent',wgh_
-      info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
+      info = PSB_METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
            & nptl,wgh_,gvl)
     endif
 !!$        write(*,*) 'after allocation',info
-
+#endif
     do i=1, n
       graph_vect(i) = gvl(i) - 1 
     enddo
@@ -143,7 +174,7 @@ subroutine psi_l_build_mtpart(n,ja,irp,nparts,graph_vect,weights)
 
 #else
 
-  write(psb_err_unit,*) 'Warning: no suitable METIS interface for LPK indices'
+  write(psb_err_unit,*) 'Warning: no suitable METIS interface for PSB_LPK indices'
 #endif
 
   return

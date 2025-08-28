@@ -31,7 +31,7 @@
 !    
 subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   use psi_mod, psb_protect_name => psi_i_bld_glb_dep_list
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   use psb_penv_mod
@@ -40,13 +40,15 @@ subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   use psb_desc_mod
   use psb_sort_mod
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   !     ....scalar parameters...
   type(psb_ctxt_type), intent(in) :: ctxt
-  integer(psb_ipk_), intent(in)  :: loc_dl(:), length_dl(0:)
-  integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:), dl_ptr(:) 
+  integer(psb_ipk_), intent(in)  :: loc_dl(:)
+  integer(psb_mpk_), intent(in)  :: length_dl(0:)
+  integer(psb_mpk_), allocatable,  intent(out) :: dl_ptr(:) 
+  integer(psb_ipk_), allocatable, intent(out) :: c_dep_list(:)
   integer(psb_ipk_), intent(out) :: info
 
 
@@ -54,10 +56,11 @@ subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   integer(psb_ipk_) :: int_err(5)
 
   !     .....local scalars...
-  integer(psb_ipk_) :: i, proc,j,err_act, length, myld
+  integer(psb_mpk_) ::  myld
+  integer(psb_ipk_) :: i, proc,j,err_act, length
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: me, np
+  integer(psb_mpk_) :: me, np
   integer(psb_mpk_) :: icomm, minfo
   logical, parameter :: dist_symm_list=.false., print_dl=.false.
   character  name*20

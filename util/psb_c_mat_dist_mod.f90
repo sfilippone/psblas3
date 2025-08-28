@@ -32,11 +32,11 @@
 module psb_c_mat_dist_mod
   use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_desc_type, psb_parts, &
        & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_vect_type, &
-       & psb_lcspmat_type,  psb_ctxt_type
+       & psb_lcspmat_type,  psb_ctxt_type, psb_i_base_vect_type
 
   interface psb_matdist
     subroutine psb_cmatdist(a_glob, a, ctxt, desc_a,&
-         & info, parts, vg, vsz, inroot,fmt,mold)
+         & info, parts, vg, vsz, inroot,fmt,amold,imold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -87,13 +87,14 @@ module psb_c_mat_dist_mod
       integer(psb_ipk_), intent(out)       :: info
       integer(psb_ipk_), optional       :: inroot
       character(len=*), optional :: fmt
-      class(psb_c_base_sparse_mat), optional :: mold
+      class(psb_c_base_sparse_mat), optional :: amold
+      class(psb_i_base_vect_type), optional, intent(in) :: imold
       procedure(psb_parts), optional  :: parts
       integer(psb_ipk_), optional     :: vg(:)
       integer(psb_ipk_), optional     :: vsz(:)
     end subroutine psb_cmatdist
     subroutine psb_lcmatdist(a_glob, a, ctxt, desc_a,&
-         & info, parts, vg, vsz, inroot,fmt,mold)
+         & info, parts, vg, vsz, inroot,fmt,amold,imold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -144,7 +145,8 @@ module psb_c_mat_dist_mod
       integer(psb_ipk_), intent(out)       :: info
       integer(psb_ipk_), optional       :: inroot
       character(len=*), optional :: fmt
-      class(psb_c_base_sparse_mat), optional :: mold
+      class(psb_c_base_sparse_mat), optional :: amold
+      class(psb_i_base_vect_type), optional, intent(in) :: imold
       procedure(psb_parts), optional  :: parts
       integer(psb_ipk_), optional     :: vg(:)
       integer(psb_ipk_), optional     :: vsz(:)

@@ -1,6 +1,6 @@
 include Make.inc
 
-all: dirs based precd kryld utild cbindd libd
+all: dirs based precd linslvd utild cbindd extd  $(CUDAD) $(OACCD) libd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -11,27 +11,41 @@ dirs:
 
 precd: based
 utild: based	
-kryld: precd 
+linslvd: precd 
+extd:  based
+cudad:  extd
+oaccd:  extd	
+cbindd: based precd linslvd utild 
 
-cbindd: based precd kryld utild 
-
-libd: based precd kryld utild cbindd 
+libd: based precd linslvd utild cbindd extd $(CUDALD) $(OACCLD)
 	$(MAKE) -C base lib
 	$(MAKE) -C prec lib
-	$(MAKE) -C krylov lib
+	$(MAKE) -C linsolve lib
 	$(MAKE) -C util lib 
 	$(MAKE) -C cbind lib
+	$(MAKE) -C ext lib
+cudald:  cudad
+	$(MAKE) -C cuda lib
+oaccld:  oaccd
+	$(MAKE) -C openacc lib
+
 
 based:
 	$(MAKE) -C base objs
 precd:
 	$(MAKE) -C prec objs
-kryld:
-	$(MAKE) -C krylov objs
+linslvd:
+	$(MAKE) -C linsolve objs
 utild:
 	$(MAKE) -C util objs 
 cbindd:
 	$(MAKE) -C cbind objs 
+extd:   
+	$(MAKE) -C ext objs
+cudad:   
+	$(MAKE) -C cuda objs
+oaccd:   
+	$(MAKE) -C openacc objs 
 
 
 install: all
@@ -48,30 +62,31 @@ install: all
 	mkdir -p  $(INSTALL_DOCSDIR) && \
 	   $(INSTALL_DATA) README.md LICENSE  $(INSTALL_DOCSDIR)
 	mkdir -p  $(INSTALL_SAMPLESDIR) && \
-	     /bin/cp -fr test/pargen test/fileread  $(INSTALL_SAMPLESDIR) && \
-	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind
-clean: 
-	$(MAKE) -C base clean
-	$(MAKE) -C prec clean 
-	$(MAKE) -C krylov clean
-	$(MAKE) -C util clean
-	$(MAKE) -C cbind clean
-
-check: all
-	make check -C test/serial
+	     /bin/cp -fr test/pdegen test/fileread  $(INSTALL_SAMPLESDIR) && \
+	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pdegen/* $(INSTALL_SAMPLESDIR)/cbind
+clean: cleanlib
+	$(MAKE) -C base veryclean
+	$(MAKE) -C prec veryclean 
+	$(MAKE) -C linsolve veryclean
+	$(MAKE) -C util veryclean
+	$(MAKE) -C cbind veryclean
+	$(MAKE) -C ext veryclean
+	$(MAKE) -C cuda veryclean
+	$(MAKE) -C openacc veryclean
+cleantest:
+	cd test/fileread && $(MAKE) clean
+	cd test/pdegen && $(MAKE) clean
+	cd test/util && $(MAKE) clean
 
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
 	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
-	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)	
+	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
 
-veryclean: cleanlib
-	cd base && $(MAKE) veryclean
-	cd prec && $(MAKE) veryclean 
-	cd krylov && $(MAKE) veryclean
-	cd util && $(MAKE) veryclean
-	cd cbind && $(MAKE) veryclean
-	cd test/fileread && $(MAKE) clean
-	cd test/pargen && $(MAKE) clean
-	cd test/util && $(MAKE) clean
+distclean: clean
+	/bin/rm -f Make.inc  util/psb_metis_int.h base/modules/psb_config.h 
+
+check: all
+	make check -C test/serial
+
 

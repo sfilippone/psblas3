@@ -83,6 +83,9 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
   integer(psb_ipk_) :: debug_level, debug_unit
+  logical, parameter  :: do_timings=.false.
+  integer(psb_ipk_), save  :: mv_phase1=-1, mv_phase2=-1, mv_phase3=-1, mv_phase4=-1
+  integer(psb_ipk_), save  :: mv_phase11=-1, mv_phase12=-1
 
   name='psb_cspmv'
   info=psb_success_
@@ -130,6 +133,19 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     call psb_errpush(info,name)
     goto 9999
   end if
+  if ((do_timings).and.(mv_phase1==-1))       &
+       & mv_phase1 = psb_get_timer_idx("SPMM: and send ")
+  if ((do_timings).and.(mv_phase2==-1))       &
+       & mv_phase2 = psb_get_timer_idx("SPMM: and cmp ad")
+  if ((do_timings).and.(mv_phase3==-1))       &
+       & mv_phase3 = psb_get_timer_idx("SPMM: and rcv")
+  if ((do_timings).and.(mv_phase4==-1))       &
+       & mv_phase4 = psb_get_timer_idx("SPMM: and cmp and")
+  if ((do_timings).and.(mv_phase11==-1))       &
+       & mv_phase11 = psb_get_timer_idx("SPMM: noand exch ")
+  if ((do_timings).and.(mv_phase12==-1))       &
+       & mv_phase12 = psb_get_timer_idx("SPMM: noand cmp")
+
 
   m    = desc_a%get_global_rows()
   n    = desc_a%get_global_cols()
@@ -178,14 +194,46 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   if (trans_ == 'N') then
     !  Matrix is not transposed
-
-    if (doswap_) then
-      call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+    
+    if (allocated(a%ad)) then
+      block
+        logical, parameter :: do_timings=.false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        if (do_timings) call psb_barrier(ctxt)
+        if (do_timings) call psb_tic(mv_phase1)
+        if (doswap_) call psi_swapdata(psb_swap_send_,&
+             & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase1)
+        if (do_timings) call psb_tic(mv_phase2)          
+        call a%ad%spmm(alpha,x%v,beta,y%v,info)
+        if (do_timings) call psb_tic(mv_phase3)
+        if (doswap_) call psi_swapdata(psb_swap_recv_,&
+             & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase3)
+        if (do_timings) call psb_tic(mv_phase4)          
+        call a%and%spmm(alpha,x%v,cone,y%v,info)
+        if (do_timings) call psb_toc(mv_phase4)
+      end block
+      
+    else
+      block
+        logical, parameter :: do_timings=.false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        if (do_timings) call psb_barrier(ctxt)
+        
+        if (do_timings) call psb_tic(mv_phase11)          
+        if (doswap_) then
+          call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+               & czero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+        end if
+        if (do_timings) call psb_toc(mv_phase11)
+        if (do_timings) call psb_tic(mv_phase12)          
+        call psb_csmm(alpha,a,x,beta,y,info)
+        if (do_timings) call psb_toc(mv_phase12)
+      end block
     end if
-
-    call psb_csmm(alpha,a,x,beta,y,info)
-
+    
     if(info /= psb_success_) then
       info = psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -311,9 +359,9 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, i, ib, ib1, ip, idx, ik
+  integer(psb_mpk_) :: np, me, ib1, ik
+  integer(psb_ipk_) :: err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, i, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
   integer(psb_ipk_), parameter               :: nb=4
   complex(psb_spk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
@@ -551,7 +599,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
 
     if (doswap_)then
       ik = lik ! This should not be an issue, we are expecting the values
-      ! to be small, within IPK
+      ! to be small, within PSB_IPK
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & ik,cone,y(:,1:ik),desc_a,iwork,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
@@ -659,9 +707,9 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, ib, ip, idx, ik
+  integer(psb_mpk_) :: np, me, ik
+  integer(psb_ipk_) :: err_act, iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+       & liwork, iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
   integer(psb_ipk_), parameter           :: nb=4
   complex(psb_spk_), pointer :: iwork(:), xp(:), yp(:)

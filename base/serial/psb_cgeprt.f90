@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! File:  psb_scsprt.f90 
+! File:  psb_geprt.f90 
 ! Subroutine: 
 ! Arguments:
 
@@ -131,6 +131,7 @@ subroutine psb_cgeprt2(iout,a,head)
   ncol = size(a,2) 
   write(iout,*) nrow,ncol
 
+
   write(frmtv,'(a,i3.3,a)') '(',ncol,'2(es26.18,1x))'
 
   do i=1,nrow
@@ -161,7 +162,7 @@ subroutine psb_cgeprt1(iout,a,head)
   write(iout,'(a)') '% '
   nrow = size(a,1) 
   ncol = 1
-  write(iout,*) nrow
+  write(iout,*) nrow,ncol
 
   write(frmtv,'(a,i3.3,a)') '(',ncol,'2(es26.18,1x))'
 

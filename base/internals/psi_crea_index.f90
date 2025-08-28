@@ -67,8 +67,8 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: me, np, mode, err_act, dl_lda, ldl
   !         ...parameters...
-  integer(psb_ipk_), allocatable :: length_dl(:), loc_dl(:),&
-       &  c_dep_list(:), dl_ptr(:)
+  integer(psb_mpk_), allocatable :: length_dl(:), dl_ptr(:)
+  integer(psb_ipk_), allocatable :: loc_dl(:), c_dep_list(:)
   integer(psb_ipk_) :: dlmax, dlavg
   integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -132,7 +132,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
 
     if (do_timings) call psb_toc(idx_phase21)
     if (do_timings) call psb_tic(idx_phase22)
-    call psi_sort_dl(dl_ptr,c_dep_list,length_dl,ctxt,info)
+    call psi_i_csr_sort_dl(dl_ptr,c_dep_list,length_dl,ctxt,info)
     if (info /= 0) then
       write(0,*) me,trim(name),' From sort_dl ',info
     end if

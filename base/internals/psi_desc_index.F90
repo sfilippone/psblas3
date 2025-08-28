@@ -101,14 +101,14 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   use psb_realloc_mod
   use psb_error_mod
   use psb_const_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   use psb_penv_mod
   use psb_timers_mod
   use psi_mod, psb_protect_name => psi_i_desc_index
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -119,7 +119,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   integer(psb_ipk_),allocatable  :: desc_index(:)
   integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
   !    ....local scalars...        
-  integer(psb_ipk_) :: j,me,np,i,proc
+  integer(psb_mpk_) :: me,np,proc
+  integer(psb_ipk_) :: j,i
   !    ...parameters...
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_), parameter  :: no_comm=-1
@@ -137,7 +138,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
        & idxr, idxs, iszs, iszr, nesd, nerv, ixp, idx
   integer(psb_mpk_) :: icomm, minfo
 
-  logical, parameter :: do_timings=.true., oldstyle=.false., debug=.false. 
+  logical, parameter :: do_timings=.false., oldstyle=.false., debug=.false. 
   integer(psb_ipk_), save :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1, idx_phase4=-1
   logical, parameter :: usempi=.false.
   integer(psb_ipk_) :: debug_level, debug_unit

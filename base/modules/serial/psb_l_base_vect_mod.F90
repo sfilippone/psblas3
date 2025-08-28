@@ -210,7 +210,7 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
       return
     end if
-#if defined (OPENMP)
+#if defined (PSB_OPENMP)
     !$omp parallel do private(i)
     do i = 1, size(this)
       x%v(i) = this(i)
@@ -504,8 +504,8 @@ contains
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info == 0) call x%free_buffer(info)
-    if (info == 0) call x%free_comid(info)
+    if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
+    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
     if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
 
@@ -775,7 +775,7 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     !$omp parallel do private(i)
     do i = first_, last_        
       x%v(i) = val
@@ -813,7 +813,7 @@ contains
 
     if (x%is_dev()) call x%sync()
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i  = first_, last_
         x%v(i) = val(i-first_+1)
@@ -842,7 +842,8 @@ contains
   subroutine l_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) :: alpha, beta, y(:)
     class(psb_l_base_vect_type) :: x
 
@@ -862,7 +863,8 @@ contains
   subroutine l_base_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_vect_type) :: x
@@ -878,7 +880,8 @@ contains
   subroutine l_base_gthzbuf(i,n,idx,x)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     class(psb_l_base_vect_type) :: x
 
@@ -941,7 +944,8 @@ contains
   subroutine l_base_gthzv(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_vect_type) :: x
 
@@ -966,7 +970,8 @@ contains
   subroutine l_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) :: beta, x(:)
     class(psb_l_base_vect_type) :: y
 
@@ -979,7 +984,8 @@ contains
   subroutine l_base_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) :: beta, x(:)
     class(psb_l_base_vect_type) :: y
@@ -993,7 +999,8 @@ contains
   subroutine l_base_sctb_buf(i,n,idx,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) :: beta
     class(psb_l_base_vect_type) :: y
@@ -1691,10 +1698,11 @@ contains
   subroutine l_base_mlv_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) :: alpha, beta, y(:)
     class(psb_l_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -1716,7 +1724,8 @@ contains
   subroutine l_base_mlv_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_multivect_type) :: x
@@ -1738,10 +1747,11 @@ contains
   subroutine l_base_mlv_gthzv(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) ::  y(:)
     class(psb_l_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -1764,10 +1774,11 @@ contains
   subroutine l_base_mlv_gthzm(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) ::  y(:,:)
     class(psb_l_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -1785,7 +1796,8 @@ contains
   subroutine l_base_mlv_gthzbuf(i,ixb,n,idx,x)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, ixb, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i, ixb
     class(psb_i_base_vect_type) :: idx
     class(psb_l_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
@@ -1817,10 +1829,11 @@ contains
   subroutine l_base_mlv_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) :: beta, x(:)
     class(psb_l_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (y%is_dev()) call y%sync()
     nc = psb_size(y%v,2_psb_ipk_)
@@ -1832,10 +1845,11 @@ contains
   subroutine l_base_mlv_sctbr2(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     integer(psb_lpk_) :: beta, x(:,:)
     class(psb_l_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (y%is_dev()) call y%sync()
     nc = y%get_ncols()
@@ -1847,7 +1861,8 @@ contains
   subroutine l_base_mlv_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     integer( psb_lpk_) :: beta, x(:)
     class(psb_l_base_multivect_type) :: y
@@ -1859,7 +1874,8 @@ contains
   subroutine l_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, iyb, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i, iyb
     class(psb_i_base_vect_type) :: idx
     integer(psb_lpk_) :: beta
     class(psb_l_base_multivect_type) :: y

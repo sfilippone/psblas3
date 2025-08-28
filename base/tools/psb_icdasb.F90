@@ -45,11 +45,11 @@
 subroutine psb_icdasb(desc,info,ext_hv,mold)
   use psb_base_mod, psb_protect_name => psb_icdasb
   use psi_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   !...Parameters....
@@ -67,7 +67,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   integer(psb_mpk_) ::  icomm
   integer(psb_ipk_) ::  np,me
   logical             :: ext_hv_
-  logical, parameter  :: do_timings=.true.
+  logical, parameter  :: do_timings=.false.
   integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
   integer(psb_ipk_), save  :: idx_phase11=-1, idx_phase12=-1, idx_phase13=-1
   integer(psb_ipk_), save  :: idx_total=-1

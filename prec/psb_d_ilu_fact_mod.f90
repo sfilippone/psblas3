@@ -80,7 +80,7 @@ module psb_d_ilu_fact_mod
   use psb_base_mod
   use psb_prec_const_mod
   interface psb_ilu0_fact
-    subroutine psb_dilu0_fact(ialg,a,l,u,d,info,blck,upd)
+    subroutine psb_dilu0_fact(ialg,a,l,u,d,info,blck,upd,shft)
       import psb_dspmat_type, psb_dpk_, psb_ipk_
       integer(psb_ipk_), intent(in)         :: ialg
       integer(psb_ipk_), intent(out)        :: info
@@ -89,11 +89,12 @@ module psb_d_ilu_fact_mod
       type(psb_dspmat_type),intent(in), optional, target :: blck
       character, intent(in), optional       :: upd
       real(psb_dpk_), intent(inout)      :: d(:)
+      real(psb_dpk_), intent(in), optional :: shft
     end subroutine psb_dilu0_fact
   end interface
 
   interface psb_iluk_fact
-    subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck)
+    subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
       import psb_dspmat_type, psb_dpk_, psb_ipk_
       integer(psb_ipk_), intent(in)        :: fill_in,ialg
       integer(psb_ipk_), intent(out)       :: info
@@ -101,11 +102,12 @@ module psb_d_ilu_fact_mod
       type(psb_dspmat_type),intent(inout)  :: l,u
       type(psb_dspmat_type),intent(in), optional, target :: blck
       real(psb_dpk_), intent(inout)     ::  d(:)
+      real(psb_dpk_), intent(in), optional :: shft
     end subroutine psb_diluk_fact
   end interface
 
   interface psb_ilut_fact
-    subroutine psb_dilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
+    subroutine psb_dilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
       import  psb_dspmat_type, psb_dpk_, psb_ipk_
       integer(psb_ipk_), intent(in)        :: fill_in
       real(psb_dpk_), intent(in)           :: thres
@@ -115,6 +117,7 @@ module psb_d_ilu_fact_mod
       real(psb_dpk_), intent(inout)     :: d(:)
       type(psb_dspmat_type),intent(in), optional, target :: blck
       integer(psb_ipk_), intent(in), optional  :: iscale
+      real(psb_dpk_), intent(in), optional :: shft
     end subroutine psb_dilut_fact
   end interface
 

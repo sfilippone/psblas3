@@ -11,77 +11,2225 @@
 </head><body 
 >
    <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu76.html" >next</a>] [<a 
+href="userhtmlse11.html" >next</a>] [<a 
 href="userhtmlse6.html" >prev</a>] [<a 
 href="userhtmlse6.html#tailuserhtmlse6.html" >prev-tail</a>] [<a 
-href="userhtmlsu54.html#tailuserhtmlse7.html">tail</a>] [<a 
-href="userhtml.html#userhtmlsu59.html" >up</a>] </p></div>
-   <h3 class="sectionHead"><span class="titlemark">7   </span> <a 
- id="x68-1050007"></a>Parallel environment routines</h3>
+href="userhtmlse4.html#tailuserhtmlse7.html">tail</a>] [<a 
+href="userhtml.html#userhtmlse10.html" >up</a>] </p></div>
+   <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
+ id="x13-1060007"></a>Parallel environment routines</h3>
                                                                   
 
                                                                   
-   <div class="subsectionTOCS">
-   &#x00A0;<span class="subsectionToc" >7.1 <a 
-href="userhtmlsu57.html#x69-1060007.1">psb_init &#8212; Initializes PSBLAS parallel environment</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.2 <a 
-href="userhtmlsu58.html#x70-1070007.2">psb_info &#8212; Return information about PSBLAS parallel environment</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.3 <a 
-href="userhtmlsu59.html#x71-1080007.3">psb_exit &#8212; Exit from PSBLAS parallel environment</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.4 <a 
-href="userhtmlsu60.html#x72-1090007.4">psb_get_mpi_comm &#8212; Get the MPI communicator</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.5 <a 
-href="userhtmlsu61.html#x73-1100007.5">psb_get_mpi_rank &#8212; Get the MPI rank</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.6 <a 
-href="userhtmlsu62.html#x74-1110007.6">psb_wtime &#8212; Wall clock timing</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.7 <a 
-href="userhtmlsu63.html#x75-1120007.7">psb_barrier &#8212; Sinchronization point parallel environment</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.8 <a 
-href="userhtmlsu64.html#x76-1130007.8">psb_abort &#8212; Abort a computation</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.9 <a 
-href="userhtmlsu65.html#x77-1140007.9">psb_bcast &#8212; Broadcast data</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.10 <a 
-href="userhtmlsu66.html#x78-1150007.10">psb_sum &#8212; Global sum</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.11 <a 
-href="userhtmlsu67.html#x79-1160007.11">psb_max &#8212; Global maximum</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.12 <a 
-href="userhtmlsu68.html#x80-1170007.12">psb_min &#8212; Global minimum</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.13 <a 
-href="userhtmlsu69.html#x81-1180007.13">psb_amx &#8212; Global maximum absolute value</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.14 <a 
-href="userhtmlsu70.html#x82-1190007.14">psb_amn &#8212; Global minimum absolute value</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.15 <a 
-href="userhtmlsu71.html#x83-1200007.15">psb_nrm2 &#8212; Global 2-norm reduction</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.16 <a 
-href="userhtmlsu72.html#x84-1210007.16">psb_snd &#8212; Send data</a></span>
-<br />   &#x00A0;<span class="subsectionToc" >7.17 <a 
-href="userhtmlsu73.html#x85-1220007.17">psb_rcv &#8212; Receive data</a></span>
-   </div>
+   <h4 class="subsectionHead"><span class="titlemark">7.1    </span> <a 
+ id="x13-1070007.1"></a>psb_init &#8212; Initializes PSBLAS parallel environment</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-61">
+call&#x00A0;psb_init(ctxt,&#x00A0;np,&#x00A0;basectxt,&#x00A0;ids,&#x00A0;extcomm)
+</pre>
+<!--l. 11--><p class="nopar" >
+<!--l. 13--><p class="indent" >   This subroutine initializes the PSBLAS parallel environment, defining a virtual
+parallel machine.
+     <dl class="description"><dt class="description">
+     <!--l. 16--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 16--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 17--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 17--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 18--><p class="noindent" >
+<span 
+class="pplb7t-">np</span> </dt><dd 
+class="description">
+     <!--l. 18--><p class="noindent" >Number of processes in the PSBLAS virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. &#x00A0;Default: use all available processes.
+     </dd><dt class="description">
+     <!--l. 24--><p class="noindent" >
+<span 
+class="pplb7t-">basectxt</span> </dt><dd 
+class="description">
+     <!--l. 24--><p class="noindent" >the  initial  PSBLAS  communication  context.  The  new  context  will  be
+     defined from the processes participating in the initial one.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. &#x00A0;Default: use MPI_COMM_WORLD.
+     </dd><dt class="description">
+     <!--l. 31--><p class="noindent" >
+<span 
+class="pplb7t-">ids</span> </dt><dd 
+class="description">
+     <!--l. 31--><p class="noindent" >Identities  of  the  processes  to  use  for  the  new  context;  the  argument  is
+     ignored when <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">np</span></span></span> is not specified. This allows the processes in the new
+     environment to be in an order different from the original one.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer array. &#x00A0;Default: use the indices <span 
+class="zplmr7t-">(</span>0<span 
+class="zplmr7m-">&#x2026;</span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1<span 
+class="zplmr7t-">)</span>.
+                                                                  
 
+                                                                  
+     </dd><dt class="description">
+     <!--l. 40--><p class="noindent" >
+<span 
+class="pplb7t-">extcomm</span> </dt><dd 
+class="description">
+     <!--l. 40--><p class="noindent" >an alternative initial MPI communicator. The new context will be defined
+     from the processes participating in the initial one.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. &#x00A0;Default: use MPI_COMM_WORLD.</dd></dl>
+<!--l. 49--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 50--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 50--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 51--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 51--><p class="noindent" >the  communication  context  identifying  the  virtual  parallel  machine,
+     type <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ctxt_type</span></span></span>. Note that this is always a duplicate of <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">basectxt</span></span></span>,
+     so  that  library  communications  are  completely  separated  from  other
+     communication operations.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" />Specified as: an integer variable.</dd></dl>
+<!--l. 62--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-107002x1">
+     <!--l. 64--><p class="noindent" >A call to this routine must precede any other PSBLAS call.
+     </li>
+<li 
+  class="enumerate" id="x13-107004x2">
+     <!--l. 65--><p class="noindent" >It is an error to specify a value for <span 
+class="zplmr7m-">np </span>greater than the number of processes
+     available in the underlying base parallel environment.</li></ol>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.2    </span> <a 
+ id="x13-1080007.2"></a>psb_info &#8212; Return information about PSBLAS parallel environment</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-62">
+call&#x00A0;psb_info(ctxt,&#x00A0;iam,&#x00A0;np)
+</pre>
+<!--l. 76--><p class="nopar" >
+<!--l. 78--><p class="indent" >   This subroutine returns information about the PSBLAS parallel environment,
+defining a virtual parallel machine.
+     <dl class="description"><dt class="description">
+     <!--l. 81--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 81--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 82--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 82--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 83--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 83--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.</dd></dl>
+<!--l. 91--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 92--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 92--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 93--><p class="noindent" >
+<span 
+class="pplb7t-">iam</span> </dt><dd 
+class="description">
+     <!--l. 93--><p class="noindent" >Identifier of current process in the PSBLAS virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" />Specified as: an integer value. <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7y-">&#x2264; </span><span 
+class="zplmr7m-">iam </span><span 
+class="zplmr7y-">&#x2264; </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1&#x00A0;
+     </dd><dt class="description">
+     <!--l. 98--><p class="noindent" >
+<span 
+class="pplb7t-">np</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 98--><p class="noindent" >Number of processes in the PSBLAS virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" />Specified as: an integer variable. &#x00A0;</dd></dl>
+<!--l. 106--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-108002x1">
+     <!--l. 108--><p class="noindent" >For  processes  in  the  virtual  parallel  machine  the  identifier  will  satisfy
+     0 <span 
+class="zplmr7y-">&#x2264; </span><span 
+class="zplmr7m-">iam </span><span 
+class="zplmr7y-">&#x2264; </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1;
+     </li>
+<li 
+  class="enumerate" id="x13-108004x2">
+     <!--l. 110--><p class="noindent" >If the user has requested on <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_init</span></span></span> a number of processes less than
+     the total available in the parallel execution environment, the remaining
+     processes will have on return <span 
+class="zplmr7m-">iam </span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7y-">-</span>1; the only call involving <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ctxt</span></span></span> that
+     any such process may execute is to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_exit</span></span></span>.</li></ol>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.3    </span> <a 
+ id="x13-1090007.3"></a>psb_exit &#8212; Exit from PSBLAS parallel environment</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-63">
+call&#x00A0;psb_exit(ctxt)
+call&#x00A0;psb_exit(ctxt,close)
+</pre>
+<!--l. 124--><p class="nopar" >
+<!--l. 126--><p class="indent" >   This subroutine exits from the PSBLAS parallel virtual machine.
+     <dl class="description"><dt class="description">
+     <!--l. 128--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 128--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 129--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 129--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 130--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 130--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 136--><p class="noindent" >
+<span 
+class="pplb7t-">close</span> </dt><dd 
+class="description">
+     <!--l. 136--><p class="noindent" >Whether  to  close  all  data  structures  related  to  the  virtual  parallel
+     machine, besides those associated with ctxt.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: a logical variable, default value: true.</dd></dl>
+<!--l. 144--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-109002x1">
+     <!--l. 146--><p class="noindent" >This  routine  may  be  called  even  if  a  previous  call  to  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_info</span></span></span> has
+     returned  with  <span 
+class="zplmr7m-">iam </span><span 
+class="zplmr7t-">=  </span><span 
+class="zplmr7y-">-</span>1;  indeed,  it  it  is  the  only  routine  that  may  be
+     called with argument <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">ctxt</span></span></span> in this situation.
+                                                                  
 
+                                                                  
+     </li>
+<li 
+  class="enumerate" id="x13-109004x2">
+     <!--l. 150--><p class="noindent" >A call to this routine with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">close=.true.</span></span></span> implies a call to <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">MPI_Finalize</span></span></span>,
+     after which no parallel routine may be called.
+     </li>
+<li 
+  class="enumerate" id="x13-109006x3">
+     <!--l. 152--><p class="noindent" >If  the  user  whishes  to  use  multiple  communication  contexts  in  the
+     same  program,  or  to  enter  and  exit  multiple  times  into  the  parallel
+     environment,   this   routine   may   be   called   to   selectively   close   the
+     contexts with <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">close=.false.</span></span></span>, while on the last call it should be called
+     with  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">close=.true.</span></span></span> to  shutdown  in  a  clean  way  the  entire  parallel
+     environment.</li></ol>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.4    </span> <a 
+ id="x13-1100007.4"></a>psb_get_mpi_comm &#8212; Get the MPI communicator</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-64">
+icomm&#x00A0;=&#x00A0;psb_get_mpi_comm(ctxt)
+</pre>
+<!--l. 165--><p class="nopar" >
+<!--l. 167--><p class="indent" >   This function returns the MPI communicator associated with a PSBLAS
+context
+     <dl class="description"><dt class="description">
+     <!--l. 169--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 169--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 170--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 170--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 171--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 171--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.</dd></dl>
+<!--l. 179--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 180--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 180--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 181--><p class="noindent" >
+<span 
+class="pplb7t-">Function value</span> </dt><dd 
+class="description">
+     <!--l. 181--><p class="noindent" >The  MPI  communicator  associated  with  the  PSBLAS  virtual  parallel
+     machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 187--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes </span>The subroutine version <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_get_mpicomm</span></span></span> is still available but is
+deprecated.
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.5    </span> <a 
+ id="x13-1110007.5"></a>psb_get_mpi_rank &#8212; Get the MPI rank</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-65">
+rank&#x00A0;=&#x00A0;psb_get_mpi_rank(ctxt,&#x00A0;id)
+</pre>
+<!--l. 195--><p class="nopar" >
+<!--l. 197--><p class="indent" >   This function returns the MPI rank of the PSBLAS process <span 
+class="zplmr7m-">id</span>
+     <dl class="description"><dt class="description">
+     <!--l. 199--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 199--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 200--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 200--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 201--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 201--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 207--><p class="noindent" >
+<span 
+class="pplb7t-">id</span> </dt><dd 
+class="description">
+     <!--l. 207--><p class="noindent" >Identifier of a process in the PSBLAS virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. 0 <span 
+class="zplmr7y-">&#x2264; </span><span 
+class="zplmr7m-">id </span><span 
+class="zplmr7y-">&#x2264; </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1&#x00A0;</dd></dl>
+<!--l. 214--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 215--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 215--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 216--><p class="noindent" >
+<span 
+class="pplb7t-">Funciton value</span> </dt><dd 
+class="description">
+                                                                  
 
+                                                                  
+     <!--l. 216--><p class="noindent" >The MPI rank associated with the PSBLAS process <span 
+class="zplmr7m-">id</span>.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">out</span>.<br 
+class="newline" /></dd></dl>
+<!--l. 222--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes </span>The subroutine version <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_get_rank</span></span></span> is still available but is deprecated.
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.6    </span> <a 
+ id="x13-1120007.6"></a>psb_wtime &#8212; Wall clock timing</h4>
+                                                                  
 
+                                                                  
+   <pre class="verbatim" id="verbatim-66">
+time&#x00A0;=&#x00A0;psb_wtime()
+</pre>
+<!--l. 232--><p class="nopar" >
+<!--l. 234--><p class="indent" >   This function returns a wall clock timer. The resolution of the timer is dependent
+on the underlying parallel environment implementation.
+     <dl class="description"><dt class="description">
+     <!--l. 237--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 237--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 238--><p class="noindent" >
+<span 
+class="pplb7t-">On Exit</span> </dt><dd 
+class="description">
+     <!--l. 238--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 239--><p class="noindent" >
+<span 
+class="pplb7t-">Function value</span> </dt><dd 
+class="description">
+     <!--l. 239--><p class="noindent" >the elapsed time in seconds.<br 
+class="newline" />Returned as: a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">real(psb_dpk_)</span></span></span> variable.</dd></dl>
+                                                                  
 
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.7    </span> <a 
+ id="x13-1130007.7"></a>psb_barrier &#8212; Sinchronization point parallel environment</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-67">
+call&#x00A0;psb_barrier(ctxt)
+</pre>
+<!--l. 249--><p class="nopar" >
+<!--l. 251--><p class="indent" >   This subroutine acts as an explicit synchronization point for the PSBLAS parallel
+virtual machine.
+     <dl class="description"><dt class="description">
+     <!--l. 254--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 254--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 255--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 255--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 256--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 256--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.8    </span> <a 
+ id="x13-1140007.8"></a>psb_abort &#8212; Abort a computation</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-68">
+call&#x00A0;psb_abort(ctxt)
+</pre>
+<!--l. 269--><p class="nopar" >
+<!--l. 271--><p class="indent" >   This subroutine aborts computation on the parallel virtual machine.
+     <dl class="description"><dt class="description">
+     <!--l. 273--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 273--><p class="noindent" >Asynchronous.
+     </dd><dt class="description">
+     <!--l. 274--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 274--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 275--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 275--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.</dd></dl>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.9    </span> <a 
+ id="x13-1150007.9"></a>psb_bcast &#8212; Broadcast data</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-69">
+call&#x00A0;psb_bcast(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 291--><p class="nopar" >
+<!--l. 293--><p class="indent" >   This subroutine implements a broadcast operation based on the underlying
+communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 296--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 296--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 297--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 297--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 298--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 298--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 304--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 304--><p class="noindent" >On the root process, the data to be broadcast.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array, or a character or logical variable, which may be
+     a  scalar  or  rank  1  array.  &#x00A0;Type,  kind,  rank  and  size  must  agree  on  all
+     processes.
+     </dd><dt class="description">
+     <!--l. 312--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 312--><p class="noindent" >Root process holding data to be broadcast.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default 0 &#x00A0;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 317--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 317--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 326--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 326--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 335--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 336--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 336--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 337--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 337--><p class="noindent" >On all processes other than root, the broadcasted data.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array, or a character or logical scalar. &#x00A0;Type, kind, rank
+     and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 344--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 344--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 352--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-115002x1">
+     <!--l. 354--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-115004x2">
+     <!--l. 357--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 367--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-70">
+&#x00A0;&#x00A0;call&#x00A0;psb_bcast(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 371--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-115006x3">
+     <!--l. 376--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 387--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-71">
+&#x00A0;&#x00A0;call&#x00A0;psb_bcast(ctxt,dat,mode=psb_collective_start_,request=bcast_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_bcast(ctxt,dat,mode=psb_collective_end_,&#x00A0;request=bcast_request)
+</pre>
+<!--l. 393--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.10    </span> <a 
+ id="x13-1160007.10"></a>psb_sum &#8212; Global sum</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-72">
+call&#x00A0;psb_sum(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 406--><p class="nopar" >
+<!--l. 408--><p class="indent" >   This subroutine implements a sum reduction operation based on the underlying
+communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 411--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 411--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 412--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 412--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 413--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 413--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 419--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 419--><p class="noindent" >The local contribution to the global sum.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or  a  rank  1  or  2  array.  &#x00A0;Type,  kind,  rank  and  size  must  agree  on  all
+     processes.
+     </dd><dt class="description">
+     <!--l. 426--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 426--><p class="noindent" >Process to hold the final sum, or <span 
+class="zplmr7y-">-</span>1 to make it available on all processes.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default -1. &#x00A0;
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 432--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 432--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 441--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 441--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 449--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 450--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 450--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 451--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 451--><p class="noindent" >On destination process(es), the result of the sum operation.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array. <br 
+class="newline" />Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 458--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 458--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 466--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-116002x1">
+     <!--l. 468--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-116004x2">
+     <!--l. 471--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 481--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-73">
+&#x00A0;&#x00A0;call&#x00A0;psb_sum(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 485--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-116006x3">
+     <!--l. 490--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 501--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-74">
+&#x00A0;&#x00A0;call&#x00A0;psb_sum(ctxt,dat,mode=psb_collective_start_,request=sum_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_sum(ctxt,dat,mode=psb_collective_end_,request=sum_request)
+</pre>
+<!--l. 507--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.11    </span> <a 
+ id="x13-1170007.11"></a>psb_max &#8212; Global maximum</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-75">
+call&#x00A0;psb_max(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 519--><p class="nopar" >
+<!--l. 521--><p class="indent" >   This subroutine implements a maximum valuereduction operation based on the
+underlying communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 524--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 524--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 525--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 525--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 526--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 526--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 532--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 532--><p class="noindent" >The local contribution to the global maximum.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer or real variable, which may be a scalar, or a rank
+     1 or 2 array. &#x00A0;Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 539--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 539--><p class="noindent" >Process  to  hold  the  final  maximum,  or  <span 
+class="zplmr7y-">-</span>1  to  make  it  available  on  all
+     processes.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default -1. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 545--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 545--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 554--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 554--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 563--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 564--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 564--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 565--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 565--><p class="noindent" >On destination process(es), the result of the maximum operation.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer or real variable, which may be a scalar, or a rank
+     1 or 2 array. &#x00A0;Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 572--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 572--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 581--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-117002x1">
+     <!--l. 583--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-117004x2">
+     <!--l. 586--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 596--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-76">
+&#x00A0;&#x00A0;call&#x00A0;psb_max(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 600--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-117006x3">
+     <!--l. 605--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 616--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-77">
+&#x00A0;&#x00A0;call&#x00A0;psb_max(ctxt,dat,mode=psb_collective_start_,request=max_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_max(ctxt,dat,mode=psb_collective_end_,request=max_request)
+</pre>
+<!--l. 622--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.12    </span> <a 
+ id="x13-1180007.12"></a>psb_min &#8212; Global minimum</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-78">
+call&#x00A0;psb_min(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 632--><p class="nopar" >
+<!--l. 634--><p class="indent" >   This subroutine implements a minimum value reduction operation based on the
+underlying communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 637--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 637--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 638--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 638--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 639--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 639--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 645--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 645--><p class="noindent" >The local contribution to the global minimum.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer or real variable, which may be a scalar, or a rank
+     1 or 2 array. &#x00A0;Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 652--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 652--><p class="noindent" >Process to hold the final value, or <span 
+class="zplmr7y-">-</span>1 to make it available on all processes.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default -1. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 658--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 658--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 667--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 667--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 676--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 677--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 677--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 678--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 678--><p class="noindent" >On destination process(es), the result of the minimum operation.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer or real variable, which may be a scalar, or a rank
+     1 or 2 array. <br 
+class="newline" />Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 685--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 685--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 694--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-118002x1">
+     <!--l. 696--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-118004x2">
+     <!--l. 699--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 709--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-79">
+&#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 713--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-118006x3">
+     <!--l. 718--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 729--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-80">
+&#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=psb_collective_start_,request=min_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_min(ctxt,dat,mode=psb_collective_end_,request=min_request)
+</pre>
+<!--l. 735--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.13    </span> <a 
+ id="x13-1190007.13"></a>psb_amx &#8212; Global maximum absolute value</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-81">
+call&#x00A0;psb_amx(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 745--><p class="nopar" >
+<!--l. 747--><p class="indent" >   This subroutine implements a maximum absolute value reduction operation
+based on the underlying communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 750--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 750--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 751--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 751--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 752--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 752--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 758--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 758--><p class="noindent" >The local contribution to the global maximum.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or  a  rank  1  or  2  array.  &#x00A0;Type,  kind,  rank  and  size  must  agree  on  all
+     processes.
+     </dd><dt class="description">
+     <!--l. 765--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 765--><p class="noindent" >Process to hold the final value, or <span 
+class="zplmr7y-">-</span>1 to make it available on all processes.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default -1. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 771--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 771--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 780--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 780--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 789--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 790--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 790--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 791--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 791--><p class="noindent" >On destination process(es), the result of the maximum operation.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or  a  rank  1  or  2  array.  &#x00A0;Type,  kind,  rank  and  size  must  agree  on  all
+     processes.
+     </dd><dt class="description">
+     <!--l. 798--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 798--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 807--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-119002x1">
+     <!--l. 809--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-119004x2">
+     <!--l. 812--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 822--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-82">
+&#x00A0;&#x00A0;call&#x00A0;psb_amx(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 826--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-119006x3">
+     <!--l. 831--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 842--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-83">
+&#x00A0;&#x00A0;call&#x00A0;psb_amx(ctxt,dat,mode=psb_collective_start_,request=amx_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_amx(ctxt,dat,mode=psb_collective_end_,request=amx_request)
+</pre>
+<!--l. 848--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.14    </span> <a 
+ id="x13-1200007.14"></a>psb_amn &#8212; Global minimum absolute value</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-84">
+call&#x00A0;psb_amn(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 858--><p class="nopar" >
+<!--l. 860--><p class="indent" >   This subroutine implements a minimum absolute value reduction operation
+based on the underlying communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 863--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 863--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 864--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 864--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 865--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 865--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 871--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 871--><p class="noindent" >The local contribution to the global minimum.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or  a  rank  1  or  2  array.  &#x00A0;Type,  kind,  rank  and  size  must  agree  on  all
+     processes.
+     </dd><dt class="description">
+     <!--l. 878--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 878--><p class="noindent" >Process to hold the final value, or <span 
+class="zplmr7y-">-</span>1 to make it available on all processes.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default -1. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 884--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 884--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 893--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 893--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 902--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 903--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 903--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 904--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 904--><p class="noindent" >On destination process(es), the result of the minimum operation.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array. <br 
+class="newline" />Type, kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 911--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 911--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 920--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-120002x1">
+     <!--l. 922--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-120004x2">
+     <!--l. 925--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 935--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-85">
+&#x00A0;&#x00A0;call&#x00A0;psb_amn(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 939--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-120006x3">
+     <!--l. 944--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+     <div class="center" 
+>
+<!--l. 955--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-86">
+&#x00A0;&#x00A0;call&#x00A0;psb_amn(ctxt,dat,mode=psb_collective_start_,request=amn_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_amn(ctxt,dat,mode=psb_collective_end_,request=amn_request)
+</pre>
+<!--l. 961--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.15    </span> <a 
+ id="x13-1210007.15"></a>psb_nrm2 &#8212; Global 2-norm reduction</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-87">
+call&#x00A0;psb_nrm2(ctxt,&#x00A0;dat&#x00A0;[,&#x00A0;root,&#x00A0;mode,&#x00A0;request])
+</pre>
+<!--l. 971--><p class="nopar" >
+<!--l. 973--><p class="indent" >   This subroutine implements a 2-norm value reduction operation based on the
+underlying communication library.
+     <dl class="description"><dt class="description">
+     <!--l. 976--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 976--><p class="noindent" >Synchronous.
+     </dd><dt class="description">
+     <!--l. 977--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 977--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 978--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 978--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 984--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 984--><p class="noindent" >The local contribution to the global minimum.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified  as:  a  real  variable,  which  may  be  a  scalar,  or  a  rank  1  array.
+     &#x00A0;Kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 991--><p class="noindent" >
+<span 
+class="pplb7t-">root</span> </dt><dd 
+class="description">
+     <!--l. 991--><p class="noindent" >Process to hold the final value, or <span 
+class="zplmr7y-">-</span>1 to make it available on all processes.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value <span 
+class="zplmr7y-">-</span>1 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">root &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1, default -1. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 997--><p class="noindent" >
+<span 
+class="pplb7t-">mode</span> </dt><dd 
+class="description">
+     <!--l. 997--><p class="noindent" >Whether the call is started in non-blocking mode and completed later, or
+     is executed synchronously.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value. The action to be taken is determined by
+     its  bit  fields,  which  can  be  set  with  bitwise  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">OR</span></span></span>.  Basic  action  values  are
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_start_</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_collective_end_</span></span></span>. Default: both fields are
+     selected (i.e. require synchronous completion).<br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1006--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 1006--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+<!--l. 1015--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1016--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1016--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1017--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 1017--><p class="noindent" >On destination process(es), the result of the 2-norm reduction.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: a real variable, which may be a scalar, or a rank 1 array. <br 
+class="newline" />Kind, rank and size must agree on all processes.
+     </dd><dt class="description">
+     <!--l. 1024--><p class="noindent" >
+<span 
+class="pplb7t-">request</span> </dt><dd 
+class="description">
+     <!--l. 1024--><p class="noindent" >A request variable to check for operation completion.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />If <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> specifies non-blocking action, then this variable must be present.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1033--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-121002x1">
+     <!--l. 1035--><p class="noindent" >This reduction is appropriate to compute the results of multiple (local)
+     NRM2 operations at the same time.
+     </li>
+<li 
+  class="enumerate" id="x13-121004x2">
+     <!--l. 1037--><p class="noindent" >Denoting by <span 
+class="zplmr7m-">dat</span><sub><span 
+class="zplmr7m-x-x-76">i</span></sub> the value of the variable <span 
+class="zplmr7m-">dat </span>on process <span 
+class="zplmr7m-">i</span>, the output <span 
+class="zplmr7m-">res</span>
+     is equivalent to the computation of
+<div class="math-display" >
+<img 
+src="userhtml29x.png" alt="     &#x2218; ------
+res =  &#x2211; dat2i,
+        i
+" class="math-display" ></div>
+     <!--l. 1039--><p class="nopar" > with care taken to avoid unnecessary overflow.
+     </li>
+<li 
+  class="enumerate" id="x13-121006x3">
+     <!--l. 1041--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument is both input and output, and its value may be changed
+     even on processes different from the final result destination.
+     </li>
+<li 
+  class="enumerate" id="x13-121008x4">
+     <!--l. 1044--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">mode</span></span></span> argument can be built with the bitwise <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">IOR()</span></span></span> operator; in the
+     following example, the argument is forcing immediate completion, hence the
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">request</span></span></span> argument needs not be specified:
+     <div class="center" 
+>
+<!--l. 1054--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-88">
+&#x00A0;&#x00A0;call&#x00A0;psb_nrm2(ctxt,dat,mode=ior(psb_collective_start_,psb_collective_end_))
+</pre>
+<!--l. 1058--><p class="nopar" >                                                           </div></div>
+     </li>
+<li 
+  class="enumerate" id="x13-121010x5">
+     <!--l. 1063--><p class="noindent" >When splitting the operation in two calls, the <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">dat</span></span></span> argument <span 
+class="pplri7t-">must not </span>be
+     accessed between calls:
+                                                                  
+
+                                                                  
+     <div class="center" 
+>
+<!--l. 1074--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-89">
+&#x00A0;&#x00A0;call&#x00A0;psb_nrm2(ctxt,dat,mode=psb_collective_start_,request=nrm2_request)
+&#x00A0;&#x00A0;.......&#x00A0;!&#x00A0;Do&#x00A0;not&#x00A0;access&#x00A0;dat
+&#x00A0;&#x00A0;call&#x00A0;psb_nrm2(ctxt,dat,mode=psb_collective_end_,request=nrm2_request)
+</pre>
+<!--l. 1080--><p class="nopar" >                                                           </div></div>
+     </li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.16    </span> <a 
+ id="x13-1220007.16"></a>psb_snd &#8212; Send data</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-90">
+call&#x00A0;psb_snd(ctxt,&#x00A0;dat,&#x00A0;dst,&#x00A0;m)
+</pre>
+<!--l. 1092--><p class="nopar" >
+<!--l. 1094--><p class="indent" >   This subroutine sends a packet of data to a destination.
+     <dl class="description"><dt class="description">
+     <!--l. 1096--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1096--><p class="noindent" >Synchronous: see usage notes.
+     </dd><dt class="description">
+     <!--l. 1097--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1097--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1098--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 1098--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 1104--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 1104--><p class="noindent" >The data to be sent.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array, or a character or logical scalar. &#x00A0;Type, kind and
+     rank must agree on sender and receiver process; if <span 
+class="zplmr7m-">m </span>is not specified, size
+     must agree as well.
+     </dd><dt class="description">
+     <!--l. 1112--><p class="noindent" >
+<span 
+class="pplb7t-">dst</span> </dt><dd 
+class="description">
+     <!--l. 1112--><p class="noindent" >Destination process.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">dst &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1. <br 
+class="newline" />
+                                                                  
+
+                                                                  
+     </dd><dt class="description">
+     <!--l. 1117--><p class="noindent" >
+<span 
+class="pplb7t-">m</span> </dt><dd 
+class="description">
+     <!--l. 1117--><p class="noindent" >Number of rows.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">Optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">m &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">size</span><span 
+class="zplmr7t-">(</span><span 
+class="zplmr7m-">dat</span>, 1<span 
+class="zplmr7t-">)</span>. <br 
+class="newline" />When  <span 
+class="zplmr7m-">dat </span>is  a  rank  2  array,  specifies  the  number  of  rows  to  be  sent
+     independently of the leading dimension <span 
+class="zplmr7m-">size</span><span 
+class="zplmr7t-">(</span><span 
+class="zplmr7m-">dat</span>, 1<span 
+class="zplmr7t-">)</span>; must have the same
+     value on sending and receiving processes.</dd></dl>
+<!--l. 1128--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1129--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1129--><p class="noindent" ></dd></dl>
+<!--l. 1132--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-122002x1">
+     <!--l. 1134--><p class="noindent" >This subroutine implies a synchronization, but only between the calling
+     process and the destination process <span 
+class="zplmr7m-">dst</span>.</li></ol>
+                                                                  
+
+                                                                  
+   <h4 class="subsectionHead"><span class="titlemark">7.17    </span> <a 
+ id="x13-1230007.17"></a>psb_rcv &#8212; Receive data</h4>
+                                                                  
+
+                                                                  
+   <pre class="verbatim" id="verbatim-91">
+call&#x00A0;psb_rcv(ctxt,&#x00A0;dat,&#x00A0;src,&#x00A0;m)
+</pre>
+<!--l. 1143--><p class="nopar" >
+<!--l. 1145--><p class="indent" >   This subroutine receives a packet of data to a destination.
+     <dl class="description"><dt class="description">
+     <!--l. 1147--><p class="noindent" >
+<span 
+class="pplb7t-">Type:</span> </dt><dd 
+class="description">
+     <!--l. 1147--><p class="noindent" >Synchronous: see usage notes.
+     </dd><dt class="description">
+     <!--l. 1148--><p class="noindent" >
+<span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1148--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1149--><p class="noindent" >
+<span 
+class="pplb7t-">ctxt</span> </dt><dd 
+class="description">
+     <!--l. 1149--><p class="noindent" >the communication context identifying the virtual parallel machine.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer variable.
+     </dd><dt class="description">
+     <!--l. 1155--><p class="noindent" >
+<span 
+class="pplb7t-">src</span> </dt><dd 
+class="description">
+     <!--l. 1155--><p class="noindent" >Source process.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">src &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">np</span><span 
+class="zplmr7y-">- </span>1. <br 
+class="newline" />
+     </dd><dt class="description">
+     <!--l. 1160--><p class="noindent" >
+<span 
+class="pplb7t-">m</span> </dt><dd 
+class="description">
+     <!--l. 1160--><p class="noindent" >Number of rows.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">global</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">Optional</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">in</span>.<br 
+class="newline" />Specified as: an integer value 0 <span 
+class="zplmr7m-">&#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">m &#x003C;</span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">size</span><span 
+class="zplmr7t-">(</span><span 
+class="zplmr7m-">dat</span>, 1<span 
+class="zplmr7t-">)</span>. <br 
+class="newline" />When  <span 
+class="zplmr7m-">dat </span>is  a  rank  2  array,  specifies  the  number  of  rows  to  be  sent
+     independently of the leading dimension <span 
+class="zplmr7m-">size</span><span 
+class="zplmr7t-">(</span><span 
+class="zplmr7m-">dat</span>, 1<span 
+class="zplmr7t-">)</span>; must have the same
+     value on sending and receiving processes.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1171--><p class="indent" >
+     <dl class="description"><dt class="description">
+     <!--l. 1172--><p class="noindent" >
+<span 
+class="pplb7t-">On Return</span> </dt><dd 
+class="description">
+     <!--l. 1172--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1173--><p class="noindent" >
+<span 
+class="pplb7t-">dat</span> </dt><dd 
+class="description">
+     <!--l. 1173--><p class="noindent" >The data to be received.<br 
+class="newline" />Scope: <span 
+class="pplb7t-">local</span>.<br 
+class="newline" />Type: <span 
+class="pplb7t-">required</span>.<br 
+class="newline" />Intent: <span 
+class="pplb7t-">inout</span>.<br 
+class="newline" />Specified as: an integer, real or complex variable, which may be a scalar,
+     or a rank 1 or 2 array, or a character or logical scalar. &#x00A0;Type, kind and
+     rank must agree on sender and receiver process; if <span 
+class="zplmr7m-">m </span>is not specified, size
+     must agree as well.</dd></dl>
+<!--l. 1183--><p class="noindent" ><span 
+class="pplb7t-x-x-120">Notes</span>
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x13-123002x1">
+     <!--l. 1185--><p class="noindent" >This subroutine implies a synchronization, but only between the calling
+     process and the source process <span 
+class="zplmr7m-">src</span>.</li></ol>
+                                                                  
+
+                                                                  
                                                                   
 
                                                                   
    <!--l. 3--><div class="crosslinks"><p class="noindent">[<a 
-href="userhtmlsu76.html" >next</a>] [<a 
+href="userhtmlse11.html" >next</a>] [<a 
 href="userhtmlse6.html" >prev</a>] [<a 
 href="userhtmlse6.html#tailuserhtmlse6.html" >prev-tail</a>] [<a 
 href="userhtmlse7.html" >front</a>] [<a 
-href="userhtml.html#userhtmlsu59.html" >up</a>] </p></div>
+href="userhtml.html#userhtmlse10.html" >up</a>] </p></div>
 <!--l. 3--><p class="indent" >   <a 
- id="tailuserhtmlse7.html"></a>  
+ id="tailuserhtmlse7.html"></a>   
 </body></html> 

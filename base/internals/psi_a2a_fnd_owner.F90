@@ -55,12 +55,12 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   use psb_penv_mod
   use psb_realloc_mod
   use psb_indx_map_mod, psb_protect_name => psi_a2a_fnd_owner
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
 
   implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)   :: idx(:)
@@ -138,7 +138,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
         call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
         goto 9999      
       end if
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       iprc(:) = 0
 #else 
       call mpi_allgather(idx,nv,psb_mpi_lpk_,rmtidx,nv,psb_mpi_lpk_,icomm,minfo)

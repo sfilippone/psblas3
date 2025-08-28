@@ -102,6 +102,8 @@ module psb_c_vect_mod
     procedure, pass(z) :: axpby_v2  => c_vect_axpby_v2
     procedure, pass(z) :: axpby_a2  => c_vect_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
+    procedure, pass(z) :: upd_xyz  => c_vect_upd_xyz
+    procedure, pass(z) :: xyzw     => c_vect_xyzw
     procedure, pass(y) :: mlt_v    => c_vect_mlt_v
     procedure, pass(y) :: mlt_a    => c_vect_mlt_a
     procedure, pass(z) :: mlt_a_2  => c_vect_mlt_a_2
@@ -489,7 +491,8 @@ contains
 
   subroutine c_vect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) :: alpha, beta, y(:)
     class(psb_c_vect_type) :: x
 
@@ -500,7 +503,8 @@ contains
 
   subroutine c_vect_gthzv(n,idx,x,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) ::  y(:)
     class(psb_c_vect_type) :: x
 
@@ -511,7 +515,8 @@ contains
 
   subroutine c_vect_sctb(n,idx,x,beta,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_vect_type) :: y
 
@@ -703,7 +708,7 @@ contains
 
     res = czero
     if (allocated(x%v)) &
-         & res = x%v%dot(n,y)
+         & res = x%v%dot_a(n,y)
 
   end function c_vect_dot_a
 
@@ -770,6 +775,38 @@ contains
          & call z%v%axpby(m,alpha,x,beta,y,info)
 
   end subroutine c_vect_axpby_a2
+
+  subroutine c_vect_upd_xyz(m,alpha,beta,gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)            :: m
+    class(psb_c_vect_type), intent(inout)  :: x
+    class(psb_c_vect_type), intent(inout)  :: y
+    class(psb_c_vect_type), intent(inout)  :: z
+    complex(psb_spk_), intent (in)     :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)   :: info
+
+    if (allocated(z%v)) &
+         call z%v%upd_xyz(m,alpha,beta,gamma,delta,x%v,y%v,info)
+    
+  end subroutine c_vect_upd_xyz
+
+  subroutine c_vect_xyzw(m,a,b,c,d,e,f,x, y, z, w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)            :: m
+    class(psb_c_vect_type), intent(inout)  :: x
+    class(psb_c_vect_type), intent(inout)  :: y
+    class(psb_c_vect_type), intent(inout)  :: z
+    class(psb_c_vect_type), intent(inout)  :: w
+    complex(psb_spk_), intent (in)     :: a, b, c, d, e, f
+    integer(psb_ipk_), intent(out)   :: info
+
+    if (allocated(w%v)) &
+         call w%v%xyzw(m,a,b,c,d,e,f,x%v,y%v,z%v,info)
+    
+  end subroutine c_vect_xyzw
+
 
   subroutine c_vect_mlt_v(x, y, info)
     use psi_serial_mod
@@ -1134,7 +1171,7 @@ contains
     end if
 
   end function c_vect_nrm2_weight
-
+ 
   function c_vect_nrm2_weight_mask(n,x,w,id,info,aux) result(res)
     use psi_serial_mod
     implicit none
@@ -1266,56 +1303,56 @@ module psb_c_multivect_mod
     integer(psb_ipk_) :: dupl = psb_dupl_add_
     complex(psb_spk_), allocatable :: rmtv(:,:)
   contains
-    procedure, pass(x) :: get_nrows => c_vect_get_nrows
-    procedure, pass(x) :: get_ncols => c_vect_get_ncols
-    procedure, pass(x) :: sizeof   => c_vect_sizeof
-    procedure, pass(x) :: get_fmt  => c_vect_get_fmt
+    procedure, pass(x) :: get_nrows => c_mvect_get_nrows
+    procedure, pass(x) :: get_ncols => c_mvect_get_ncols
+    procedure, pass(x) :: sizeof   => c_mvect_sizeof
+    procedure, pass(x) :: get_fmt  => c_mvect_get_fmt
     procedure, pass(x) :: is_remote_build => c_mvect_is_remote_build
     procedure, pass(x) :: set_remote_build => c_mvect_set_remote_build
     procedure, pass(x) :: get_dupl => c_mvect_get_dupl
     procedure, pass(x) :: set_dupl => c_mvect_set_dupl
 
-    procedure, pass(x) :: all      => c_vect_all
-    procedure, pass(x) :: reall    => c_vect_reall
-    procedure, pass(x) :: zero     => c_vect_zero
-    procedure, pass(x) :: asb      => c_vect_asb
-    procedure, pass(x) :: sync     => c_vect_sync
-    procedure, pass(x) :: free     => c_vect_free
-    procedure, pass(x) :: ins      => c_vect_ins
-    procedure, pass(x) :: bld_x    => c_vect_bld_x
-    procedure, pass(x) :: bld_n    => c_vect_bld_n
+    procedure, pass(x) :: all      => c_mvect_all
+    procedure, pass(x) :: reall    => c_mvect_reall
+    procedure, pass(x) :: zero     => c_mvect_zero
+    procedure, pass(x) :: asb      => c_mvect_asb
+    procedure, pass(x) :: sync     => c_mvect_sync
+    procedure, pass(x) :: free     => c_mvect_free
+    procedure, pass(x) :: ins      => c_mvect_ins
+    procedure, pass(x) :: bld_x    => c_mvect_bld_x
+    procedure, pass(x) :: bld_n    => c_mvect_bld_n
     generic, public    :: bld      => bld_x, bld_n
-    procedure, pass(x) :: get_vect => c_vect_get_vect
-    procedure, pass(x) :: cnv      => c_vect_cnv
-    procedure, pass(x) :: set_scal => c_vect_set_scal
-    procedure, pass(x) :: set_vect => c_vect_set_vect
+    procedure, pass(x) :: get_vect => c_mvect_get_vect
+    procedure, pass(x) :: cnv      => c_mvect_cnv
+    procedure, pass(x) :: set_scal => c_mvect_set_scal
+    procedure, pass(x) :: set_vect => c_mvect_set_vect
     generic, public    :: set      => set_vect, set_scal
-    procedure, pass(x) :: clone    => c_vect_clone
-    procedure, pass(x) :: gthab    => c_vect_gthab
-    procedure, pass(x) :: gthzv    => c_vect_gthzv
-    procedure, pass(x) :: gthzv_x  => c_vect_gthzv_x
+    procedure, pass(x) :: clone    => c_mvect_clone
+    procedure, pass(x) :: gthab    => c_mvect_gthab
+    procedure, pass(x) :: gthzv    => c_mvect_gthzv
+    procedure, pass(x) :: gthzv_x  => c_mvect_gthzv_x
     generic, public    :: gth      => gthab, gthzv
-    procedure, pass(y) :: sctb     => c_vect_sctb
-    procedure, pass(y) :: sctb_x   => c_vect_sctb_x
+    procedure, pass(y) :: sctb     => c_mvect_sctb
+    procedure, pass(y) :: sctb_x   => c_mvect_sctb_x
     generic, public    :: sct      => sctb, sctb_x
-!!$    procedure, pass(x) :: dot_v    => c_vect_dot_v
-!!$    procedure, pass(x) :: dot_a    => c_vect_dot_a
+!!$    procedure, pass(x) :: dot_v    => c_mvect_dot_v
+!!$    procedure, pass(x) :: dot_a    => c_mvect_dot_a
 !!$    generic, public    :: dot      => dot_v, dot_a
-!!$    procedure, pass(y) :: axpby_v  => c_vect_axpby_v
-!!$    procedure, pass(y) :: axpby_a  => c_vect_axpby_a
+!!$    procedure, pass(y) :: axpby_v  => c_mvect_axpby_v
+!!$    procedure, pass(y) :: axpby_a  => c_mvect_axpby_a
 !!$    generic, public    :: axpby    => axpby_v, axpby_a
-!!$    procedure, pass(y) :: mlt_v    => c_vect_mlt_v
-!!$    procedure, pass(y) :: mlt_a    => c_vect_mlt_a
-!!$    procedure, pass(z) :: mlt_a_2  => c_vect_mlt_a_2
-!!$    procedure, pass(z) :: mlt_v_2  => c_vect_mlt_v_2
-!!$    procedure, pass(z) :: mlt_va   => c_vect_mlt_va
-!!$    procedure, pass(z) :: mlt_av   => c_vect_mlt_av
+!!$    procedure, pass(y) :: mlt_v    => c_mvect_mlt_v
+!!$    procedure, pass(y) :: mlt_a    => c_mvect_mlt_a
+!!$    procedure, pass(z) :: mlt_a_2  => c_mvect_mlt_a_2
+!!$    procedure, pass(z) :: mlt_v_2  => c_mvect_mlt_v_2
+!!$    procedure, pass(z) :: mlt_va   => c_mvect_mlt_va
+!!$    procedure, pass(z) :: mlt_av   => c_mvect_mlt_av
 !!$    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
 !!$         & mlt_v_2, mlt_av, mlt_va
-!!$    procedure, pass(x) :: scal     => c_vect_scal
-!!$    procedure, pass(x) :: nrm2     => c_vect_nrm2
-!!$    procedure, pass(x) :: amax     => c_vect_amax
-!!$    procedure, pass(x) :: asum     => c_vect_asum
+!!$    procedure, pass(x) :: scal     => c_mvect_scal
+!!$    procedure, pass(x) :: nrm2     => c_mvect_nrm2
+!!$    procedure, pass(x) :: amax     => c_mvect_amax
+!!$    procedure, pass(x) :: asum     => c_mvect_asum
   end type psb_c_multivect_type
 
   public  :: psb_c_multivect, psb_c_multivect_type,&
@@ -1416,7 +1453,7 @@ contains
   end function psb_c_get_base_multivect_default
 
 
-  subroutine c_vect_clone(x,y,info)
+  subroutine c_mvect_clone(x,y,info)
     implicit none
     class(psb_c_multivect_type), intent(inout) :: x
     class(psb_c_multivect_type), intent(inout) :: y
@@ -1425,11 +1462,11 @@ contains
     info = psb_success_
     call y%free(info)
     if ((info==0).and.allocated(x%v)) then
-      call y%bld(x%get_vect(),mold=x%v)
+      call y%bld_x(x%get_vect(),mold=x%v)
     end if
-  end subroutine c_vect_clone
+  end subroutine c_mvect_clone
 
-  subroutine c_vect_bld_x(x,invect,mold)
+  subroutine c_mvect_bld_x(x,invect,mold)
     complex(psb_spk_), intent(in)          :: invect(:,:)
     class(psb_c_multivect_type), intent(out) :: x
     class(psb_c_base_multivect_type), intent(in), optional :: mold
@@ -1445,10 +1482,10 @@ contains
 
     if (info == psb_success_) call x%v%bld(invect)
 
-  end subroutine c_vect_bld_x
+  end subroutine c_mvect_bld_x
 
 
-  subroutine c_vect_bld_n(x,m,n,mold)
+  subroutine c_mvect_bld_n(x,m,n,mold)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_c_multivect_type), intent(out) :: x
     class(psb_c_base_multivect_type), intent(in), optional :: mold
@@ -1462,9 +1499,9 @@ contains
     endif
     if (info == psb_success_) call x%v%bld(m,n)
 
-  end subroutine c_vect_bld_n
+  end subroutine c_mvect_bld_n
 
-  function  c_vect_get_vect(x) result(res)
+  function  c_mvect_get_vect(x) result(res)
     class(psb_c_multivect_type), intent(inout)  :: x
     complex(psb_spk_), allocatable                 :: res(:,:)
     integer(psb_ipk_) :: info
@@ -1472,25 +1509,25 @@ contains
     if (allocated(x%v)) then
       res = x%v%get_vect()
     end if
-  end function c_vect_get_vect
+  end function c_mvect_get_vect
 
-  subroutine c_vect_set_scal(x,val)
+  subroutine c_mvect_set_scal(x,val)
     class(psb_c_multivect_type), intent(inout)  :: x
     complex(psb_spk_), intent(in) :: val
 
     integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val)
 
-  end subroutine c_vect_set_scal
+  end subroutine c_mvect_set_scal
 
-  subroutine c_vect_set_vect(x,val)
+  subroutine c_mvect_set_vect(x,val)
     class(psb_c_multivect_type), intent(inout) :: x
     complex(psb_spk_), intent(in)         :: val(:,:)
 
     integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val)
 
-  end subroutine c_vect_set_vect
+  end subroutine c_mvect_set_vect
 
 
   function constructor(x) result(this)
@@ -1498,7 +1535,7 @@ contains
     type(psb_c_multivect_type) :: this
     integer(psb_ipk_) :: info
 
-    call this%bld(x)
+    call this%bld_x(x)
     call this%asb(size(x,dim=1,kind=psb_ipk_),size(x,dim=2,kind=psb_ipk_),info)
 
   end function constructor
@@ -1509,44 +1546,44 @@ contains
     type(psb_c_multivect_type) :: this
     integer(psb_ipk_) :: info
 
-    call this%bld(m,n)
+    call this%bld_n(m,n)
     call this%asb(m,n,info)
 
   end function size_const
 
-  function c_vect_get_nrows(x) result(res)
+  function c_mvect_get_nrows(x) result(res)
     implicit none
     class(psb_c_multivect_type), intent(in) :: x
     integer(psb_ipk_)  :: res
     res = 0
     if (allocated(x%v)) res = x%v%get_nrows()
-  end function c_vect_get_nrows
+  end function c_mvect_get_nrows
 
-  function c_vect_get_ncols(x) result(res)
+  function c_mvect_get_ncols(x) result(res)
     implicit none
     class(psb_c_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%get_ncols()
-  end function c_vect_get_ncols
+  end function c_mvect_get_ncols
 
-  function c_vect_sizeof(x) result(res)
+  function c_mvect_sizeof(x) result(res)
     implicit none
     class(psb_c_multivect_type), intent(in) :: x
     integer(psb_epk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%sizeof()
-  end function c_vect_sizeof
+  end function c_mvect_sizeof
 
-  function c_vect_get_fmt(x) result(res)
+  function c_mvect_get_fmt(x) result(res)
     implicit none
     class(psb_c_multivect_type), intent(in) :: x
     character(len=5) :: res
     res = 'NULL'
     if (allocated(x%v)) res = x%v%get_fmt()
-  end function c_vect_get_fmt
+  end function c_mvect_get_fmt
 
-  subroutine c_vect_all(m,n, x, info, mold)
+  subroutine c_mvect_all(m,n, x, info, mold)
 
     implicit none
     integer(psb_ipk_), intent(in)       :: m,n
@@ -1565,9 +1602,9 @@ contains
       info = psb_err_alloc_dealloc_
     end if
 
-  end subroutine c_vect_all
+  end subroutine c_mvect_all
 
-  subroutine c_vect_reall(m,n, x, info)
+  subroutine c_mvect_reall(m,n, x, info)
 
     implicit none
     integer(psb_ipk_), intent(in)         :: m,n
@@ -1580,18 +1617,18 @@ contains
     if (info == 0) &
          & call x%asb(m,n,info)
 
-  end subroutine c_vect_reall
+  end subroutine c_mvect_reall
 
-  subroutine c_vect_zero(x)
+  subroutine c_mvect_zero(x)
     use psi_serial_mod
     implicit none
     class(psb_c_multivect_type), intent(inout)    :: x
 
     if (allocated(x%v)) call x%v%zero()
 
-  end subroutine c_vect_zero
+  end subroutine c_mvect_zero
 
-  subroutine c_vect_asb(m,n, x, info)
+  subroutine c_mvect_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
@@ -1602,42 +1639,45 @@ contains
     if (allocated(x%v)) &
          & call x%v%asb(m,n,info)
 
-  end subroutine c_vect_asb
+  end subroutine c_mvect_asb
 
-  subroutine c_vect_sync(x)
+  subroutine c_mvect_sync(x)
     implicit none
     class(psb_c_multivect_type), intent(inout) :: x
 
     if (allocated(x%v)) &
          & call x%v%sync()
 
-  end subroutine c_vect_sync
+  end subroutine c_mvect_sync
 
-  subroutine c_vect_gthab(n,idx,alpha,x,beta,y)
+  subroutine c_mvect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) :: alpha, beta, y(:)
     class(psb_c_multivect_type) :: x
 
     if (allocated(x%v)) &
          &  call x%v%gth(n,idx,alpha,beta,y)
 
-  end subroutine c_vect_gthab
+  end subroutine c_mvect_gthab
 
-  subroutine c_vect_gthzv(n,idx,x,y)
+  subroutine c_mvect_gthzv(n,idx,x,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) ::  y(:)
     class(psb_c_multivect_type) :: x
 
     if (allocated(x%v)) &
          &  call x%v%gth(n,idx,y)
 
-  end subroutine c_vect_gthzv
+  end subroutine c_mvect_gthzv
 
-  subroutine c_vect_gthzv_x(i,n,idx,x,y)
+  subroutine c_mvect_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: i,n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     complex(psb_spk_) ::  y(:)
     class(psb_c_multivect_type) :: x
@@ -1645,22 +1685,24 @@ contains
     if (allocated(x%v)) &
          &  call x%v%gth(i,n,idx,y)
 
-  end subroutine c_vect_gthzv_x
+  end subroutine c_mvect_gthzv_x
 
-  subroutine c_vect_sctb(n,idx,x,beta,y)
+  subroutine c_mvect_sctb(n,idx,x,beta,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_multivect_type) :: y
 
     if (allocated(y%v)) &
          &  call y%v%sct(n,idx,x,beta)
 
-  end subroutine c_vect_sctb
+  end subroutine c_mvect_sctb
 
-  subroutine c_vect_sctb_x(i,n,idx,x,beta,y)
+  subroutine c_mvect_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_multivect_type) :: y
@@ -1668,9 +1710,9 @@ contains
     if (allocated(y%v)) &
          &  call y%v%sct(i,n,idx,x,beta)
 
-  end subroutine c_vect_sctb_x
+  end subroutine c_mvect_sctb_x
 
-  subroutine c_vect_free(x, info)
+  subroutine c_mvect_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
@@ -1683,9 +1725,9 @@ contains
       if (info == 0) deallocate(x%v,stat=info)
     end if
 
-  end subroutine c_vect_free
+  end subroutine c_mvect_free
 
-  subroutine c_vect_ins(n,irl,val,x,info)
+  subroutine c_mvect_ins(n,irl,val,x,info)
     use psi_serial_mod
     implicit none
     class(psb_c_multivect_type), intent(inout)  :: x
@@ -1704,10 +1746,10 @@ contains
     dupl = x%get_dupl()
     call  x%v%ins(n,irl,val,dupl,info)
 
-  end subroutine c_vect_ins
+  end subroutine c_mvect_ins
 
 
-  subroutine c_vect_cnv(x,mold)
+  subroutine c_mvect_cnv(x,mold)
     class(psb_c_multivect_type), intent(inout) :: x
     class(psb_c_base_multivect_type), intent(in), optional :: mold
     class(psb_c_base_multivect_type), allocatable :: tmp
@@ -1724,10 +1766,10 @@ contains
       call x%v%free(info)
     end if
     call move_alloc(tmp,x%v)
-  end subroutine c_vect_cnv
+  end subroutine c_mvect_cnv
 
 
-!!$  function c_vect_dot_v(n,x,y) result(res)
+!!$  function c_mvect_dot_v(n,x,y) result(res)
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout) :: x, y
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -1737,9 +1779,9 @@ contains
 !!$    if (allocated(x%v).and.allocated(y%v)) &
 !!$         & res = x%v%dot(n,y%v)
 !!$
-!!$  end function c_vect_dot_v
+!!$  end function c_mvect_dot_v
 !!$
-!!$  function c_vect_dot_a(n,x,y) result(res)
+!!$  function c_mvect_dot_a(n,x,y) result(res)
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout) :: x
 !!$    complex(psb_spk_), intent(in)    :: y(:)
@@ -1750,9 +1792,9 @@ contains
 !!$    if (allocated(x%v)) &
 !!$         & res = x%v%dot(n,y)
 !!$
-!!$  end function c_vect_dot_a
+!!$  end function c_mvect_dot_a
 !!$
-!!$  subroutine c_vect_axpby_v(m,alpha, x, beta, y, info)
+!!$  subroutine c_mvect_axpby_v(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    integer(psb_ipk_), intent(in)               :: m
@@ -1764,12 +1806,12 @@ contains
 !!$    if (allocated(x%v).and.allocated(y%v)) then
 !!$      call y%v%axpby(m,alpha,x%v,beta,info)
 !!$    else
-!!$      info = psb_err_invalid_vect_state_
+!!$      info = psb_err_invalid_mvect_state_
 !!$    end if
 !!$
-!!$  end subroutine c_vect_axpby_v
+!!$  end subroutine c_mvect_axpby_v
 !!$
-!!$  subroutine c_vect_axpby_a(m,alpha, x, beta, y, info)
+!!$  subroutine c_mvect_axpby_a(m,alpha, x, beta, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    integer(psb_ipk_), intent(in)               :: m
@@ -1781,10 +1823,10 @@ contains
 !!$    if (allocated(y%v)) &
 !!$         & call y%v%axpby(m,alpha,x,beta,info)
 !!$
-!!$  end subroutine c_vect_axpby_a
+!!$  end subroutine c_mvect_axpby_a
 !!$
 !!$
-!!$  subroutine c_vect_mlt_v(x, y, info)
+!!$  subroutine c_mvect_mlt_v(x, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout)  :: x
@@ -1796,9 +1838,9 @@ contains
 !!$    if (allocated(x%v).and.allocated(y%v)) &
 !!$         & call y%v%mlt(x%v,info)
 !!$
-!!$  end subroutine c_vect_mlt_v
+!!$  end subroutine c_mvect_mlt_v
 !!$
-!!$  subroutine c_vect_mlt_a(x, y, info)
+!!$  subroutine c_mvect_mlt_a(x, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    complex(psb_spk_), intent(in)        :: x(:)
@@ -1811,10 +1853,10 @@ contains
 !!$    if (allocated(y%v)) &
 !!$         & call y%v%mlt(x,info)
 !!$
-!!$  end subroutine c_vect_mlt_a
+!!$  end subroutine c_mvect_mlt_a
 !!$
 !!$
-!!$  subroutine c_vect_mlt_a_2(alpha,x,y,beta,z,info)
+!!$  subroutine c_mvect_mlt_a_2(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    complex(psb_spk_), intent(in)         :: alpha,beta
@@ -1828,9 +1870,9 @@ contains
 !!$    if (allocated(z%v)) &
 !!$         & call z%v%mlt(alpha,x,y,beta,info)
 !!$
-!!$  end subroutine c_vect_mlt_a_2
+!!$  end subroutine c_mvect_mlt_a_2
 !!$
-!!$  subroutine c_vect_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+!!$  subroutine c_mvect_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    complex(psb_spk_), intent(in)          :: alpha,beta
@@ -1847,9 +1889,9 @@ contains
 !!$         & allocated(z%v)) &
 !!$         & call z%v%mlt(alpha,x%v,y%v,beta,info,conjgx,conjgy)
 !!$
-!!$  end subroutine c_vect_mlt_v_2
+!!$  end subroutine c_mvect_mlt_v_2
 !!$
-!!$  subroutine c_vect_mlt_av(alpha,x,y,beta,z,info)
+!!$  subroutine c_mvect_mlt_av(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    complex(psb_spk_), intent(in)        :: alpha,beta
@@ -1863,9 +1905,9 @@ contains
 !!$    if (allocated(z%v).and.allocated(y%v)) &
 !!$         & call z%v%mlt(alpha,x,y%v,beta,info)
 !!$
-!!$  end subroutine c_vect_mlt_av
+!!$  end subroutine c_mvect_mlt_av
 !!$
-!!$  subroutine c_vect_mlt_va(alpha,x,y,beta,z,info)
+!!$  subroutine c_mvect_mlt_va(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    complex(psb_spk_), intent(in)        :: alpha,beta
@@ -1880,9 +1922,9 @@ contains
 !!$    if (allocated(z%v).and.allocated(x%v)) &
 !!$         & call z%v%mlt(alpha,x%v,y,beta,info)
 !!$
-!!$  end subroutine c_vect_mlt_va
+!!$  end subroutine c_mvect_mlt_va
 !!$
-!!$  subroutine c_vect_scal(alpha, x)
+!!$  subroutine c_mvect_scal(alpha, x)
 !!$    use psi_serial_mod
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout)  :: x
@@ -1890,10 +1932,10 @@ contains
 !!$
 !!$    if (allocated(x%v)) call x%v%scal(alpha)
 !!$
-!!$  end subroutine c_vect_scal
+!!$  end subroutine c_mvect_scal
 !!$
 !!$
-!!$  function c_vect_nrm2(n,x) result(res)
+!!$  function c_mvect_nrm2(n,x) result(res)
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -1905,9 +1947,9 @@ contains
 !!$      res = szero
 !!$    end if
 !!$
-!!$  end function c_vect_nrm2
+!!$  end function c_mvect_nrm2
 !!$
-!!$  function c_vect_amax(n,x) result(res)
+!!$  function c_mvect_amax(n,x) result(res)
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -1919,9 +1961,9 @@ contains
 !!$      res = szero
 !!$    end if
 !!$
-!!$  end function c_vect_amax
+!!$  end function c_mvect_amax
 !!$
-!!$  function c_vect_asum(n,x) result(res)
+!!$  function c_mvect_asum(n,x) result(res)
 !!$    implicit none
 !!$    class(psb_c_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -1933,6 +1975,6 @@ contains
 !!$      res = szero
 !!$    end if
 !!$
-!!$  end function c_vect_asum
+!!$  end function c_mvect_asum
 
 end module psb_c_multivect_mod

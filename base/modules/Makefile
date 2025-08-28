@@ -10,13 +10,14 @@ BASIC_MODS= psb_const_mod.o psb_cbind_const_mod.o psb_error_mod.o psb_realloc_mo
 	auxil/psb_z_realloc_mod.o
 
 COMMINT= penv/psi_penv_mod.o \
-	 penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o \
+	 penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o penv/psi_i2_p2p_mod.o \
 	 penv/psi_e_p2p_mod.o \
 	 penv/psi_s_p2p_mod.o \
 	 penv/psi_d_p2p_mod.o \
 	 penv/psi_c_p2p_mod.o \
 	 penv/psi_z_p2p_mod.o \
 	 penv/psi_collective_mod.o \
+	 penv/psi_i2_collective_mod.o \
 	 penv/psi_e_collective_mod.o \
 	 penv/psi_m_collective_mod.o \
 	 penv/psi_s_collective_mod.o \
@@ -115,6 +116,7 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 MODULES=$(BASIC_MODS) $(SERIAL_MODS) $(UTIL_MODS)
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
 MODDIR=../../modules
+INCDIR=../../include
 LIBDIR=../
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
@@ -122,6 +124,7 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 objs:  $(MODULES) $(OBJS) $(MPFOBJS)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+	/bin/cp -p $(CPUPDFLAG) psb_config.h psb_types.h $(INCDIR)
 
 lib: objs  $(LIBDIR)/$(LIBNAME) 
 
@@ -149,23 +152,25 @@ psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
 	auxil/psb_c_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o
 
-penv/psi_p2p_mod.o: penv/psi_m_p2p_mod.o \
-	 penv/psi_e_p2p_mod.o \
-	 penv/psi_s_p2p_mod.o \
-	 penv/psi_d_p2p_mod.o \
-	 penv/psi_c_p2p_mod.o \
-	 penv/psi_z_p2p_mod.o
-penv/psi_collective_mod.o: penv/psi_e_collective_mod.o \
-	 penv/psi_m_collective_mod.o \
-	 penv/psi_s_collective_mod.o \
-	 penv/psi_d_collective_mod.o \
-	 penv/psi_c_collective_mod.o \
-	 penv/psi_z_collective_mod.o 
+penv/psi_p2p_mod.o:  penv/psi_i2_p2p_mod.o \
+	penv/psi_m_p2p_mod.o \
+	penv/psi_e_p2p_mod.o \
+	penv/psi_s_p2p_mod.o \
+	penv/psi_d_p2p_mod.o \
+	penv/psi_c_p2p_mod.o \
+	penv/psi_z_p2p_mod.o
+penv/psi_collective_mod.o: penv/psi_i2_collective_mod.o \
+	penv/psi_e_collective_mod.o \
+	penv/psi_m_collective_mod.o \
+	penv/psi_s_collective_mod.o \
+	penv/psi_d_collective_mod.o \
+	penv/psi_c_collective_mod.o \
+	penv/psi_z_collective_mod.o 
 
-penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
+penv/psi_i2_p2p_mod.o penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
 penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o: penv/psi_penv_mod.o 
 
-penv/psi_e_collective_mod.o  penv/psi_m_collective_mod.o penv/psi_s_collective_mod.o \
+penv/psi_i2_collective_mod.o  penv/psi_e_collective_mod.o  penv/psi_m_collective_mod.o penv/psi_s_collective_mod.o \
 penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_mod.o: penv/psi_penv_mod.o \
 	penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
 	penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o
@@ -319,7 +324,7 @@ desc/psb_hash_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o desc/psb
     desc/psb_indx_map_mod.o desc/psb_desc_const_mod.o  \
     auxil/psb_sort_mod.o psb_penv_mod.o 
 desc/psb_glist_map_mod.o: desc/psb_list_map_mod.o
-desc/psb_hash_map_mod.o: desc/psb_hash_mod.o auxil/psb_sort_mod.o
+desc/psb_hash_map_mod.o: desc/psb_hash_mod.o auxil/psb_sort_mod.o psb_timers_mod.o
 desc/psb_gen_block_map_mod.o: desc/psb_hash_mod.o
 desc/psb_hash_mod.o: psb_cbind_const_mod.o
 psb_cbind_const_mod.o: psb_const_mod.o
@@ -412,7 +417,8 @@ penv/psi_collective_mod.o: penv/psi_collective_mod.F90 $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 clean:
-	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod)
+	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod) 
 
 veryclean: clean
+	/bin/rm -f *.h
 

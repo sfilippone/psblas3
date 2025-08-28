@@ -2163,7 +2163,7 @@ subroutine psb_z_mv_csc_to_coo(a,b,info)
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
@@ -2189,7 +2189,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
   use psb_error_mod
   use psb_z_base_mat_mod
   use psb_z_csc_mat_mod, psb_protect_name => psb_z_mv_csc_from_coo
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib 
 #endif  
   implicit none
@@ -2226,7 +2226,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
   call psb_realloc(nc+1,a%icp,info)
   call b%free()
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 
   !$OMP PARALLEL default(shared)
 
@@ -2328,7 +2328,7 @@ subroutine psb_z_cp_csc_to_fmt(a,b,info)
     if (a%is_dev())   call a%sync()
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     nc = a%get_ncols()
-    nz = a%get_nzeros()
+    nz = max(a%get_nzeros(),ione)
     if (.false.) then 
       if (info == 0) call psb_safe_cpy( a%icp(1:nc+1), b%icp , info)
       if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
@@ -2403,35 +2403,36 @@ subroutine psb_z_mv_csc_from_fmt(a,b,info)
 
 end subroutine psb_z_mv_csc_from_fmt
 
-subroutine  psb_z_csc_clean_zeros(a, info)
-  use psb_error_mod
-  use psb_z_csc_mat_mod, psb_protect_name => psb_z_csc_clean_zeros
-  implicit none
-  class(psb_z_csc_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_), intent(out) :: info
-  !
-  integer(psb_ipk_) :: i, j, k, nc
-  integer(psb_ipk_), allocatable :: ilcp(:)
-
-  info = 0
-  call a%sync()
-  nc   = a%get_ncols()
-  ilcp = a%icp
-  a%icp(1) = 1
-  j        = a%icp(1)
-  do i=1, nc
-    do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= zzero) then
-        a%val(j) = a%val(k)
-        a%ia(j)  = a%ia(k)
-        j = j + 1
-      end if
-    end do
-    a%icp(i+1) = j
-  end do
-  call a%trim()
-  call a%set_host()
-end subroutine psb_z_csc_clean_zeros
+!!$subroutine  psb_z_csc_clean_zeros(a, info)
+!!$  use psb_error_mod
+!!$  use psb_z_csc_mat_mod, psb_protect_name => psb_z_csc_clean_zeros
+!!$  implicit none
+!!$  class(psb_z_csc_sparse_mat), intent(inout) :: a
+!!$  integer(psb_ipk_), intent(out) :: info
+!!$  !
+!!$  integer(psb_ipk_) :: i, j, k, nc
+!!$  integer(psb_ipk_), allocatable :: ilcp(:)
+!!$
+!!$  info = 0
+!!$  call a%sync()
+!!$  nc   = a%get_ncols()
+!!$  ilcp = a%icp
+!!$  a%icp(1) = 1
+!!$  j        = a%icp(1)
+!!$  do i=1, nc
+!!$    do k = ilcp(i), ilcp(i+1) -1
+!!$      ! Always keep the diagonal, even if numerically zero
+!!$      if ((a%val(k) /= zzero).or.(i == a%ia(k))) then
+!!$        a%val(j) = a%val(k)
+!!$        a%ia(j)  = a%ia(k)
+!!$        j = j + 1
+!!$      end if
+!!$    end do
+!!$    a%icp(i+1) = j
+!!$  end do
+!!$  call a%trim()
+!!$  call a%set_host()
+!!$end subroutine psb_z_csc_clean_zeros
 
 subroutine psb_z_cp_csc_from_fmt(a,b,info)
   use psb_const_mod
@@ -2461,7 +2462,7 @@ subroutine psb_z_cp_csc_from_fmt(a,b,info)
     if (b%is_dev())   call b%sync()
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     nc = b%get_ncols()
-    nz = b%get_nzeros()
+    nz = max(b%get_nzeros(),ione)
     if (.false.) then 
       if (info == 0) call psb_safe_cpy( b%icp(1:nc+1), a%icp , info)
       if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
@@ -4058,7 +4059,7 @@ subroutine psb_lz_mv_csc_to_coo(a,b,info)
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
-  nza = a%get_nzeros()
+  nza = max(a%get_nzeros(),ione)
 
   b%psb_lz_base_sparse_mat = a%psb_lz_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
@@ -4304,35 +4305,36 @@ subroutine psb_lz_cp_csc_from_fmt(a,b,info)
 
 end subroutine psb_lz_cp_csc_from_fmt
 
-subroutine  psb_lz_csc_clean_zeros(a, info)
-  use psb_error_mod
-  use psb_z_csc_mat_mod, psb_protect_name => psb_lz_csc_clean_zeros
-  implicit none
-  class(psb_lz_csc_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_), intent(out) :: info
-  !
-  integer(psb_lpk_) :: i, j, k, nc
-  integer(psb_lpk_), allocatable :: ilcp(:)
-
-  info = 0
-  call a%sync()
-  nc   = a%get_ncols()
-  ilcp = a%icp
-  a%icp(1) = 1
-  j        = a%icp(1)
-  do i=1, nc
-    do k = ilcp(i), ilcp(i+1) -1
-      if (a%val(k) /= zzero) then
-        a%val(j) = a%val(k)
-        a%ia(j)  = a%ia(k)
-        j = j + 1
-      end if
-    end do
-    a%icp(i+1) = j
-  end do
-  call a%trim()
-  call a%set_host()
-end subroutine psb_lz_csc_clean_zeros
+!!$subroutine  psb_lz_csc_clean_zeros(a, info)
+!!$  use psb_error_mod
+!!$  use psb_z_csc_mat_mod, psb_protect_name => psb_lz_csc_clean_zeros
+!!$  implicit none
+!!$  class(psb_lz_csc_sparse_mat), intent(inout) :: a
+!!$  integer(psb_ipk_), intent(out) :: info
+!!$  !
+!!$  integer(psb_lpk_) :: i, j, k, nc
+!!$  integer(psb_lpk_), allocatable :: ilcp(:)
+!!$  
+!!$  info = 0
+!!$  call a%sync()
+!!$  nc   = a%get_ncols()
+!!$  ilcp = a%icp
+!!$  a%icp(1) = 1
+!!$  j        = a%icp(1)
+!!$  do i=1, nc
+!!$    do k = ilcp(i), ilcp(i+1) -1
+!!$      ! Always keep the diagonal, even if numerically zero
+!!$      if ((a%val(k) /= zzero).or.(i == a%ia(k))) then
+!!$        a%val(j) = a%val(k)
+!!$        a%ia(j)  = a%ia(k)
+!!$        j = j + 1
+!!$      end if
+!!$    end do
+!!$    a%icp(i+1) = j
+!!$  end do
+!!$  call a%trim()
+!!$  call a%set_host()
+!!$end subroutine psb_lz_csc_clean_zeros
 
 
 subroutine psb_lz_csc_mold(a,b,info)

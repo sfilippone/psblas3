@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! File:  psb_scsprt.f90 
+! File:  psb_geprt.f90 
 ! Subroutine: 
 ! Arguments:
 
@@ -124,12 +124,13 @@ subroutine psb_sgeprt2(iout,a,head)
   character(len=80)              :: frmtv 
   integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nrow, ncol
 
-  write(iout,'(a)') '%%MatrixMarket matrix array real general'
+  write(iout,'(a)') '%%MatrixMarket matrix array complex general'
   write(iout,'(a)') '% '//trim(head)
   write(iout,'(a)') '% '
   nrow = size(a,1) 
   ncol = size(a,2) 
   write(iout,*) nrow,ncol
+
 
   write(frmtv,'(a,i3.3,a)') '(',ncol,'(es26.18,1x))'
 
@@ -156,12 +157,12 @@ subroutine psb_sgeprt1(iout,a,head)
   character(len=80)              :: frmtv 
   integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nrow, ncol
 
-  write(iout,'(a)') '%%MatrixMarket matrix array real general'
+  write(iout,'(a)') '%%MatrixMarket matrix array complex general'
   write(iout,'(a)') '% '//trim(head)
   write(iout,'(a)') '% '
   nrow = size(a,1) 
   ncol = 1
-  write(iout,*) nrow
+  write(iout,*) nrow,ncol
 
   write(frmtv,'(a,i3.3,a)') '(',ncol,'(es26.18,1x))'
 

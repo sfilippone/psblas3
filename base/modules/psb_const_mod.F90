@@ -70,29 +70,29 @@ module psb_const_mod
 #endif
 
   ! Now for the choices:
-  !  IPK = integer kind for "local" indices and sizes.
+  !  PSB_IPK = integer kind for "local" indices and sizes.
   !        Can be 4 or 8 bytes.
-  !  LPK = integer kind for "global" indices and sizes.
+  !  PSB_LPK = integer kind for "global" indices and sizes.
   !        Can be 4 or 8 bytes.
-  !        Size must be >= size of IPK
+  !        Size must be >= size of PSB_IPK
   !
   !  Additional rules:
   !  1. MPI related stuff is always MPK
   !  2. ctxt,IAM,NP: should we have two versions of everything,
   !                   one with MPK the other with EPK?
-  !  3. INFO, ERR_ACT, IERR etc are always IPK
+  !  3. INFO, ERR_ACT, IERR etc are always PSB_IPK
   !  4. For the array version of things, where it makes sense
   !     e.g. realloc, snd/receive, define as MPK,EPK and the
   !     compiler will later pick up the correct version according
-  !     to what IPK/LPK are mapped onto.
+  !     to what PSB_IPK/PSB_LPK are mapped onto.
   !
-#if defined(IPK4) && defined(LPK4)
+#if defined(PSB_IPK4) && defined(PSB_LPK4)
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_mpk_
-#elif  defined(IPK4) && defined(LPK8)
+#elif  defined(PSB_IPK4) && defined(PSB_LPK8)
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_epk_
-#elif  defined(IPK8) && defined(LPK8)
+#elif  defined(PSB_IPK8) && defined(PSB_LPK8)
   integer, parameter  :: psb_ipk_ = psb_epk_
   integer, parameter  :: psb_lpk_ = psb_epk_
 #else
@@ -101,24 +101,24 @@ module psb_const_mod
   integer, parameter  :: psb_lpk_ = -1
 #endif
 
-  integer(psb_mpk_), save      :: psb_sizeof_sp
-  integer(psb_mpk_), save      :: psb_sizeof_dp
-  integer(psb_mpk_), save      :: psb_sizeof_i2p = 2
-  integer(psb_mpk_), save      :: psb_sizeof_mp  = 4
-  integer(psb_mpk_), save      :: psb_sizeof_ep  = 8
+  integer(psb_epk_), save      :: psb_sizeof_sp
+  integer(psb_epk_), save      :: psb_sizeof_dp
+  integer(psb_epk_), save      :: psb_sizeof_i2p = 2
+  integer(psb_epk_), save      :: psb_sizeof_mp  = 4
+  integer(psb_epk_), save      :: psb_sizeof_ep  = 8
 
-#if defined(IPK4) && defined(LPK4)
-  integer(psb_mpk_), save      :: psb_sizeof_ip = 4
-  integer(psb_mpk_), save      :: psb_sizeof_lp = 4
-#elif  defined(IPK4) && defined(LPK8)
-  integer(psb_mpk_), save      :: psb_sizeof_ip = 4
-  integer(psb_mpk_), save      :: psb_sizeof_lp = 8
-#elif  defined(IPK8) && defined(LPK8)
-  integer(psb_mpk_), save      :: psb_sizeof_ip = 8
-  integer(psb_mpk_), save      :: psb_sizeof_lp = 8
+#if defined(PSB_IPK4) && defined(PSB_LPK4)
+  integer(psb_epk_), save      :: psb_sizeof_ip = 4
+  integer(psb_epk_), save      :: psb_sizeof_lp = 4
+#elif  defined(PSB_IPK4) && defined(PSB_LPK8)
+  integer(psb_epk_), save      :: psb_sizeof_ip = 4
+  integer(psb_epk_), save      :: psb_sizeof_lp = 8
+#elif  defined(PSB_IPK8) && defined(PSB_LPK8)
+  integer(psb_epk_), save      :: psb_sizeof_ip = 8
+  integer(psb_epk_), save      :: psb_sizeof_lp = 8
 #else
-  integer(psb_mpk_), save      :: psb_sizeof_ip = -1
-  integer(psb_mpk_), save      :: psb_sizeof_lp = -1
+  integer(psb_epk_), save      :: psb_sizeof_ip = -1
+  integer(psb_epk_), save      :: psb_sizeof_lp = -1
 #endif
 
   !
@@ -136,9 +136,9 @@ module psb_const_mod
   !
   ! Version
   !
-  character(len=*), parameter    :: psb_version_string_ = "3.8.0"
+  character(len=*), parameter    :: psb_version_string_ = "3.9.0"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter   :: psb_version_minor_  = 8
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 9
   integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
 
   !
@@ -155,7 +155,7 @@ module psb_const_mod
   integer(psb_i2pk_), parameter  :: i2zero=0, i2one=1
   integer(psb_i2pk_), parameter  :: i2two=2, i2three=3, i2mone=-1
 
-  integer(psb_ipk_), parameter   :: psb_root_=0
+  integer(psb_mpk_), parameter   :: psb_root_=0
   real(psb_spk_), parameter      :: szero=0.0_psb_spk_, sone=1.0_psb_spk_
   real(psb_dpk_), parameter      :: dzero=0.0_psb_dpk_, done=1.0_psb_dpk_
   complex(psb_spk_), parameter   :: czero=(0.0_psb_spk_,0.0_psb_spk_)

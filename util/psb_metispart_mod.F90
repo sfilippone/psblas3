@@ -77,9 +77,9 @@ module psb_metispart_mod
       integer(psb_lpk_), intent(in) :: n, nparts
       integer(psb_lpk_), intent(in) :: ja(:), irp(:)
       integer(psb_lpk_), allocatable, intent(inout) :: vect(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
       real(psb_spk_),optional, intent(in) :: weights(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
       real(psb_dpk_),optional, intent(in) :: weights(:)
 #else
       choke on me;
@@ -117,7 +117,8 @@ contains
     implicit none 
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: root
-    integer(psb_ipk_) :: me, np, info
+    integer(psb_ipk_) :: info
+    integer(psb_mpk_) :: me, np, mroot
     integer(psb_lpk_) :: n
 
     call psb_info(ctxt,me,np)
@@ -128,8 +129,8 @@ contains
       call psb_abort(ctxt)
       return
     endif
-
-    if (me == root) then 
+    mroot = root
+    if (me == mroot) then 
       if (.not.allocated(graph_vect)) then
         write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
              & 'not initialized'
@@ -137,9 +138,9 @@ contains
         return
       endif
       n = size(graph_vect)
-      call psb_bcast(ctxt,n,root=root)
+      call psb_bcast(ctxt,n,root=mroot)
     else 
-      call psb_bcast(ctxt,n,root=root)
+      call psb_bcast(ctxt,n,root=mroot)
 
       allocate(graph_vect(n),stat=info)
       if (info /= psb_success_) then
@@ -148,7 +149,7 @@ contains
         return
       endif
     endif
-    call psb_bcast(ctxt,graph_vect(1:n),root=root)
+    call psb_bcast(ctxt,graph_vect(1:n),root=mroot)
 
     return
 
@@ -187,9 +188,9 @@ contains
     type(psb_ld_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;
@@ -231,9 +232,9 @@ contains
     type(psb_lz_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;
@@ -292,9 +293,9 @@ contains
     type(psb_lc_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;
@@ -320,9 +321,9 @@ contains
     type(psb_ls_csr_sparse_mat), intent(in) :: a
     integer(psb_lpk_) :: nparts
     real(psb_spk_), optional :: weights(:)
-#if defined(METIS_REAL_32) || !defined(HAVE_METIS)
+#if defined(PSB_METIS_REAL_32) || !defined(PSB_HAVE_METIS)
     real(psb_spk_), allocatable :: wgh_(:)
-#elif defined(METIS_REAL_64)
+#elif defined(PSB_METIS_REAL_64)
     real(psb_dpk_), allocatable :: wgh_(:)
 #else
       choke on me;

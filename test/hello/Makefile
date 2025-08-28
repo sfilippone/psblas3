@@ -5,7 +5,7 @@ include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
 LIBDIR=$(BASEDIR)/lib
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
 # Compilers and such
@@ -16,7 +16,7 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: runsd hello pingpong
+all: runsd hello pingpong 
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
@@ -30,9 +30,8 @@ pingpong: pingpong.o
 	/bin/mv pingpong $(EXEDIR)
 
 
-
 clean: 
-	/bin/rm -f hello.o pingpong.o
+	/bin/rm -f hello.o pingpong.o tsum.o tsum1.o
 	$(EXEDIR)/hello 
 verycleanlib: 
 	(cd ../..; make veryclean)

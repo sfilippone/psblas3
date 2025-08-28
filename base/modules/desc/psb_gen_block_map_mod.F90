@@ -109,13 +109,13 @@ module psb_gen_block_map_mod
        & block_lg2ls1_ins, block_lg2ls2_ins, block_lg2lv1_ins, block_lg2lv2_ins, &
        & block_clone, block_reinit,&
        & block_get_fmt, i_gen_block_search
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   private ::  l_gen_block_search
 #endif
 
   interface gen_block_search
     module procedure i_gen_block_search
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     module procedure l_gen_block_search
 #endif
   end interface gen_block_search
@@ -215,9 +215,15 @@ contains
     end if
 
     if (present(mask)) then 
+<<<<<<< HEAD
       !$omp parallel do default(none) schedule(dynamic) &
       !$omp shared(mask,idx,idxmap,owned_,info) &
       !$omp private(i) 
+=======
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(mask,idx,idxmap,owned_,info) &
+      ! $ o m p private(i) 
+>>>>>>> development
       do i=1, size(idx)
         if (mask(i)) then 
           if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
@@ -231,11 +237,19 @@ contains
           end if
         end if
       end do
+<<<<<<< HEAD
       !$omp end parallel do
     else  if (.not.present(mask)) then 
       !$omp parallel do default(none) schedule(dynamic) &
       !$omp shared(idx,idxmap,owned_,info) &
       !$omp private(i) 
+=======
+      ! $ o m p end parallel do
+    else  if (.not.present(mask)) then 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(idx,idxmap,owned_,info) &
+      ! $ o m p private(i) 
+>>>>>>> development
       do i=1, size(idx)
         if ((1<=idx(i)).and.(idx(i) <= idxmap%local_rows)) then
           idx(i) = idxmap%min_glob_row + idx(i) - 1
@@ -247,7 +261,11 @@ contains
           info = -1
         end if
       end do
+<<<<<<< HEAD
       !$omp end parallel do
+=======
+      ! $ o m p end parallel do
+>>>>>>> development
     end if
 
   end subroutine block_ll2gv1
@@ -281,9 +299,15 @@ contains
     end if
 
     if (present(mask)) then 
+<<<<<<< HEAD
       !$omp parallel do default(none) schedule(dynamic) &
       !$omp shared(mask,idxin,idxout,idxmap,owned_,info,im) &
       !$omp private(i) 
+=======
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(mask,idxin,idxout,idxmap,owned_,info,im) &
+      ! $ o m p private(i) 
+>>>>>>> development
       do i=1, im
         if (mask(i)) then 
           if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
@@ -297,11 +321,19 @@ contains
           end if
         end if
       end do
+<<<<<<< HEAD
       !$omp end parallel do
     else  if (.not.present(mask)) then 
       !$omp parallel do default(none) schedule(dynamic) &
       !$omp shared(idxin,idxout,idxmap,owned_,info,im) &
       !$omp private(i) 
+=======
+      ! $ o m p end parallel do
+    else  if (.not.present(mask)) then 
+      ! $ o m p parallel do default(none) schedule(dynamic) &
+      ! $ o m p shared(idxin,idxout,idxmap,owned_,info,im) &
+      ! $ o m p private(i) 
+>>>>>>> development
       do i=1, im
         if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
           idxout(i) = idxmap%min_glob_row + idxin(i) - 1
@@ -313,7 +345,11 @@ contains
           info = -1
         end if
       end do
+<<<<<<< HEAD
       !$omp end parallel do
+=======
+      ! $ o m p end parallel do
+>>>>>>> development
     end if
 
     if (is > im) then 
@@ -400,9 +436,15 @@ contains
     if (present(mask)) then 
 
       if (idxmap%is_asb()) then 
+<<<<<<< HEAD
         !$omp parallel do default(none) schedule(dynamic) &
         !$omp shared(mask,is,idx,idxmap,owned_) &
         !$omp private(i,nv,tidx) 
+=======
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idx,idxmap,owned_) &
+        ! $ o m p private(i,nv,tidx) 
+>>>>>>> development
         do i=1, is
           if (mask(i)) then 
             if ((idxmap%min_glob_row <= idx(i)).and. &
@@ -419,11 +461,19 @@ contains
             end if
           end if
         end do
+<<<<<<< HEAD
         !$omp end parallel do
       else if (idxmap%is_valid()) then 
         !$omp parallel do default(none) schedule(dynamic) &
         !$omp shared(mask,is,idx,idxmap,owned_) &
         !$omp private(i,ip,lip,tidx,info) 
+=======
+        ! $ o m p end parallel do
+      else if (idxmap%is_valid()) then 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(mask,is,idx,idxmap,owned_) &
+        ! $ o m p private(i,ip,lip,tidx,info) 
+>>>>>>> development
         do i=1,is
           if (mask(i)) then 
             if ((idxmap%min_glob_row <= idx(i)).and.&
@@ -439,7 +489,11 @@ contains
             end if
           end if
         end do
+<<<<<<< HEAD
         !$omp end parallel do
+=======
+        ! $ o m p end parallel do
+>>>>>>> development
       else 
         idx(1:is) = -1
         info = -1
@@ -448,9 +502,15 @@ contains
     else  if (.not.present(mask)) then 
 
       if (idxmap%is_asb()) then 
+<<<<<<< HEAD
         !$omp parallel do default(none) schedule(dynamic) &
         !$omp shared(is,idx,idxmap,owned_) &
         !$omp private(i,nv,tidx) 
+=======
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(is,idx,idxmap,owned_) &
+        ! $ o m p private(i,nv,tidx) 
+>>>>>>> development
         do i=1, is
           if ((idxmap%min_glob_row <= idx(i)).and.&
                & (idx(i) <= idxmap%max_glob_row)) then
@@ -465,11 +525,19 @@ contains
             idx(i) = -1
           end if
         end do
+<<<<<<< HEAD
         !$omp end parallel do
       else if (idxmap%is_valid()) then 
         !$omp parallel do default(none) schedule(dynamic) &
         !$omp shared(is,idx,idxmap,owned_) &
         !$omp private(i,ip,lip,tidx,info) 
+=======
+        ! $ o m p end parallel do
+      else if (idxmap%is_valid()) then 
+        ! $ o m p parallel do default(none) schedule(dynamic) &
+        ! $ o m p shared(is,idx,idxmap,owned_) &
+        ! $ o m p private(i,ip,lip,tidx,info) 
+>>>>>>> development
         do i=1,is
           if ((idxmap%min_glob_row <= idx(i)).and.&
                & (idx(i) <= idxmap%max_glob_row)) then
@@ -483,7 +551,11 @@ contains
             idx(i) = -1
           end if
         end do
+<<<<<<< HEAD
         !$omp end parallel do
+=======
+        ! $ o m p end parallel do
+>>>>>>> development
       else 
         idx(1:is) = -1
         info = -1
@@ -1382,7 +1454,7 @@ contains
     return
   end function i_gen_block_search
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
  
   function  l_gen_block_search(key,n,v) result(ipos)
     implicit none

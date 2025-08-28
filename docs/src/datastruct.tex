@@ -387,11 +387,11 @@ accelerators.
 
 
 
-\subsubsection{psb\_cd\_get\_large\_threshold --- Get threshold for
+\subsubsection{psb\_cd\_get\_hash\_threshold --- Get threshold for
   index mapping switch}
 
 \begin{verbatim}
-ith = psb_cd_get_large_threshold()
+ith = psb_cd_get_hash_threshold()
 \end{verbatim}
 
 \begin{description}
@@ -403,12 +403,12 @@ ith = psb_cd_get_large_threshold()
 
 
 
-\subsubsection{psb\_cd\_set\_large\_threshold --- Set threshold for
+\subsubsection{psb\_cd\_set\_hash\_threshold --- Set threshold for
   index mapping switch}
 %\addcontentsline{toc}{paragraph}{psb\_cd\_set\_large\_threshold}
 
 \begin{verbatim}
-call psb_cd_set_large_threshold(ith)
+call psb_cd_set_hash_threshold(ith)
 \end{verbatim}
 
 \begin{description}
@@ -420,6 +420,11 @@ Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value greater than zero.
 \end{description}
+This threshold guides the library into using a list based or a
+hash-table based descriptor for global to local index conversion;
+if the size of the global index space is below this threshold, a list
+based structure is used, if it is above a hash-table based structure
+is used. 
 Note: the threshold value is only queried by the library at the time a
 call to \fortinline|psb_cdall| is executed, therefore changing the threshold
 has no effect on communication descriptors that have already been
@@ -898,9 +903,7 @@ A variable of type \fortinline|psb_Tspmat_type|.
 %\addcontentsline{toc}{paragraph}{clean\_zeros}
 \fortinline|call a%clean_zeros(info)|
 
-Eliminates zero coefficients in the input matrix. Note that depending
-on the internal storage format, there may still be some amount of
-zero padding in the output.
+Eliminates zero coefficients explicitly stored in the input matrix.  
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -915,6 +918,13 @@ Scope: {\bf local}.\\
 A variable of type \fortinline|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
+{\par\noindent\bfseries Notes}
+\begin{enumerate}
+\item Depending on the internal storage format, there may still be some amount of 
+  zero padding in the output.
+\item Any explicit zeros on the main diagonal are always kept in the
+  data structure. 
+\end{enumerate}
 
 \subsubsection{get\_diag --- Get main diagonal}
 %\addcontentsline{toc}{paragraph}{get\_diag}
@@ -1317,13 +1327,14 @@ like Diagonal Scaling or Block Jacobi with incomplete
 factorization ILU(0). 
 
  A preconditioner is held in the \hypertarget{precdata}{{\tt
-    psb\_prec\_type}} data structure reported in 
-figure~\ref{fig:prectype}. The \fortinline|psb_prec_type| 
+    psb\_Tprec\_type}} data structure reported in 
+figure~\ref{fig:prectype}. The \fortinline|psb_Tprec_type| 
 data type may contain a simple preconditioning matrix with the
-associated communication descriptor.%%  which may be different than the
+associated communication descriptor.
+%% which may be different from  the
 %% system communication descriptor in the case of parallel
 %% preconditioners like the Additive Schwarz one. Then the
-%% \fortinline|psb_prec_type| may contain more than one preconditioning matrix
+%% \fortinline|psb_Tprec_type| may contain more than one preconditioning matrix
 %% like in the case of Two-Level (in general Multi-Level) preconditioners.
 %% The user can choose the type of preconditioner to be used by means of
 %% the \fortinline|psb_precset| subroutine; once the type of preconditioning
@@ -1407,8 +1418,8 @@ Given a heap object, the following methods are defined on it:
 \item[dump] Print on file;
 \item[free] Release memory.
 \end{description}
-These objects are used in AMG4PSBLAS to implement the factorization
-algorithms. 
+These objects are used to implement the factorization
+and approximate inversion algorithms. 
 
 %%% Local Variables: 
 %%% mode: latex

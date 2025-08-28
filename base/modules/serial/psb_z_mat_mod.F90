@@ -71,7 +71,7 @@
 !
 ! We are also introducing the type psb_lzspmat_type.
 ! The basic difference with psb_zspmat_type is in the type
-! of the indices, which are PSB_LPK_ so that the entries
+! of the indices, which are PSB_PSB_LPK_ so that the entries
 ! are guaranteed to be able to contain global indices.
 ! This type only supports data handling and preprocessing, it is
 ! not supposed to be used for computations.
@@ -79,12 +79,14 @@
 module psb_z_mat_mod
 
   use psb_z_base_mat_mod
-  use psb_z_csr_mat_mod,  only : psb_z_csr_sparse_mat, psb_lz_csr_sparse_mat
+  use psb_z_csr_mat_mod,  only : psb_z_csr_sparse_mat, psb_lz_csr_sparse_mat,&
+       & psb_z_ecsr_sparse_mat
   use psb_z_csc_mat_mod,  only : psb_z_csc_sparse_mat, psb_lz_csc_sparse_mat
 
   type :: psb_zspmat_type
 
     class(psb_z_base_sparse_mat), allocatable  :: a   
+    class(psb_z_base_sparse_mat), allocatable  :: ad, and    
     integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
     type(psb_lz_coo_sparse_mat), allocatable  :: rmta
 
@@ -143,7 +145,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: csgetrow    => psb_z_csgetrow
     procedure, pass(a) :: csgetblk    => psb_z_csgetblk
     generic, public    :: csget       => csgetptn, csgetrow, csgetblk
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: lcsgetptn    => psb_z_lcsgetptn
     procedure, pass(a) :: lcsgetrow    => psb_z_lcsgetrow
     generic, public    :: csget        => lcsgetptn, lcsgetrow
@@ -202,6 +204,8 @@ module psb_z_mat_mod
     procedure, pass(a) :: cscnv_ip    => psb_z_cscnv_ip
     procedure, pass(a) :: cscnv_base  => psb_z_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
+    procedure, pass(a) :: split_nd    => psb_z_split_nd
+    procedure, pass(a) :: merge_nd    => psb_z_merge_nd
     procedure, pass(a) :: clone       => psb_zspmat_clone
     procedure, pass(a) :: move_alloc  => psb_zspmat_type_move
     !
@@ -307,7 +311,7 @@ module psb_z_mat_mod
     ! Setters
     procedure, pass(a) :: set_lnrows   => psb_lz_set_lnrows
     procedure, pass(a) :: set_lncols   => psb_lz_set_lncols
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: set_inrows   => psb_lz_set_inrows
     procedure, pass(a) :: set_incols   => psb_lz_set_incols
     generic, public    :: set_nrows   => set_inrows, set_lnrows
@@ -342,7 +346,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: csgetrow    => psb_lz_csgetrow
     procedure, pass(a) :: csgetblk    => psb_lz_csgetblk
     generic, public    :: csget       => csgetptn, csgetrow, csgetblk
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 !!$    procedure, pass(a) :: icsgetptn    => psb_lz_icsgetptn
 !!$    procedure, pass(a) :: icsgetrow    => psb_lz_icsgetrow
 !!$    generic, public    :: csget        => icsgetptn, icsgetrow
@@ -840,6 +844,24 @@ module psb_z_mat_mod
   !
   !
 
+  interface
+    subroutine psb_z_split_nd(a,n_rows,n_cols,info)
+      import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_z_split_nd
+  end interface
+  
+  interface
+    subroutine psb_z_merge_nd(a,n_rows,n_cols,info)
+      import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)           :: n_rows, n_cols
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_z_merge_nd
+  end interface
+
   !
   ! CSCNV: switches to a different internal derived type.
   !   3 versions: copying to target
@@ -859,7 +881,6 @@ module psb_z_mat_mod
     end subroutine psb_z_cscnv
   end interface
 
-
   interface
     subroutine psb_z_cscnv_ip(a,iinfo,type,mold,dupl)
       import :: psb_ipk_, psb_lpk_, psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
@@ -870,7 +891,6 @@ module psb_z_mat_mod
       class(psb_z_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_z_cscnv_ip
   end interface
-
 
   interface
     subroutine psb_z_cscnv_base(a,b,info,dupl)
@@ -1250,7 +1270,7 @@ module psb_z_mat_mod
       class(psb_lzspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: m
     end subroutine psb_lz_set_lnrows
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     subroutine  psb_lz_set_inrows(m,a)
       import :: psb_ipk_, psb_lpk_, psb_lzspmat_type
       class(psb_lzspmat_type), intent(inout) :: a
@@ -1265,7 +1285,7 @@ module psb_z_mat_mod
       class(psb_lzspmat_type), intent(inout) :: a
       integer(psb_lpk_), intent(in) :: n
     end subroutine psb_lz_set_lncols
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     subroutine psb_lz_set_incols(n,a)
       import :: psb_ipk_, psb_lpk_, psb_lzspmat_type
       class(psb_lzspmat_type), intent(inout) :: a
@@ -2390,7 +2410,7 @@ contains
 
   end subroutine psb_z_clean_zeros
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   subroutine psb_z_lcsgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
     implicit none
@@ -2909,7 +2929,7 @@ contains
 
   end subroutine psb_lz_clean_zeros
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 !!$  subroutine psb_lz_icsgetptn(imin,imax,a,nz,ia,ja,info,&
 !!$       & jmin,jmax,iren,append,nzin,rscale,cscale)
 !!$    implicit none

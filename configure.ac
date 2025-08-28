@@ -36,11 +36,11 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.7.0, [https://github.com/sfilippone/psblas3/issues])
+AC_INIT([PSBLAS],3.9.0, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.7.0"
+psblas_cv_version="3.9.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -56,7 +56,7 @@ AC_MSG_NOTICE([
 	documentation, you can make your own by hand for your needs.
 
 	Be sure to specify the library paths of your interest. Examples:
-        ./configure --with-libs=-L/some/directory/LIB    <- will append to LIBS
+        ./configure --with-libs=-L/some/directory/LIB  <- will append to LIBS
         FC=mpif90 CC=mpicc ./configure           <- will force FC,CC
 
 	See ./configure --help=short fore more info.
@@ -100,17 +100,17 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang ifx ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([xlc pgcc icc gcc cc ])
+AC_PROG_CC([xlc pgcc clang icx icc gcc cc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
    C99OPT="$ac_cv_prog_cc_stdc";
 fi	
 CFLAGS="$save_CFLAGS";
-AC_PROG_CXX([CC xlc++  icpc g++])
+AC_PROG_CXX([CC xlc++  clang++ icpx icpc g++])
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
 dnl AC_PROG_F90
@@ -136,30 +136,32 @@ PAC_ARG_SERIAL_MPI
 
 #Note : we miss the name of the Intel C compiler
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
-   FAKEMPI="fakempi.o";
+   FAKEMPI="psb_fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
-   MPICXX="$CXX";	
+   MPICXX="$CXX";
+   CSERIALMPI="#define PSB_SERIAL_MPI"
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpiicx mpiicc mpcc mpicc cc])
+else
+    AC_MSG_NOTICE([test with $MPICC])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
-AC_LANG([Fortran])
 AC_LANG([C++])
 if test "X$MPICXX" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpx mpiicpc  mpicxx])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
 AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifx mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
@@ -193,9 +195,11 @@ dnl NOTE : no spaces before the comma, and no brackets before the second argumen
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
 PAC_ARG_WITH_FLAGS(cxxopt,CXXOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
+PAC_ARG_WITH_FLAGS(extra-opt,EXTRA_OPT)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
 PAC_ARG_WITH_FLAGS(flibs,FLIBS)
+PAC_ARG_WITH_FLAGS(extra-nvcc,EXTRA_NVCC)
 
 dnl candidates for removal:
 PAC_ARG_WITH_FLAGS(library-path,LIBRARYPATH)
@@ -204,7 +208,7 @@ PAC_ARG_WITH_FLAGS(module-path,MODULE_PATH)
 
 # we just gave the user the chance to append values to these variables
 
-###############################################################################
+
 
 dnl  Library oriented Autotools facilities (we don't care about this for now)
 
@@ -233,12 +237,12 @@ PAC_CHECK_HAVE_CRAYFTN(
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
-	psblas_cv_fc="xlf"
+	psblas_cv_fc="xlf";
 	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES"		  
+        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -247,20 +251,50 @@ if test x"$psblas_cv_fc" == "x" ; then
  elif eval "$MPIFC -V  2>&1 | grep Sun 2>/dev/null" ; then
    # Sun compiler detection
   
-   psblas_cv_fc="sun"
- elif eval "$MPIFC -V  2>&1 | grep Portland 2>/dev/null" ; then
-   # Portland group compiler detection
-   
-   psblas_cv_fc="pg"
+   psblas_cv_fc="sun";
+ elif eval "$MPIFC --version  2>&1 | grep flang-new 2>&1 1>/dev/null" ; then
+   # LLVM compiler
+   psblas_cv_fc="flang-new";
+   psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
+   psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
+   psblas_cv_define_prepend="";
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
+   if test x"$psblas_shvs" != x""; then
+     AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
+     if (( $psblas_flang_shv < 20 )) ;   then	 
+        AC_MSG_ERROR([[The minimum supported LLVM version is version 20, bailing out. ]])
+     else
+        psblas_cv_fc="flang";
+     fi
+   else
+     AC_MSG_ERROR([[Unrecognized LLVM version. The minimum supported LLVM version is version 20, bailing out. ]])
+   fi  
+ elif eval "$MPIFC --version  2>&1 | grep flang 2>&1 1>/dev/null" ; then
+   # LLVM compiler
+   psblas_flang_version=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
+   psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
+   psblas_cv_fc="flang";
+   psblas_cv_define_prepend="";
+   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
+   if test x"$psblas_shvs" != x""; then
+     AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
+     if (( $psblas_flang_shv < 20 )) ;   then	 
+        AC_MSG_ERROR([[The minimum supported LLVM version is version 20, bailing out. ]])
+     fi
+   else
+     AC_MSG_ERROR([[Unrecognized LLVM version. The minimum supported LLVM version is version 20, bailing out. ]])
+   fi  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
     
-   psblas_cv_fc="ifc"
+   psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
-   psblas_cv_fc="nag"
-   FC="$MPIFC"
+   psblas_cv_fc="nag";
+   FC="$MPIFC";
  else
-   psblas_cv_fc=""
+   psblas_cv_fc="";
   # unsupported MPI Fortran compiler
      AC_MSG_NOTICE([[Unknown Fortran compiler, proceeding with fingers crossed !]])
  fi
@@ -272,18 +306,9 @@ PAC_HAVE_MODERN_GFORTRAN(
 )
 fi
 
-
 ###############################################################################
 #	Linking, symbol mangling, and misc tests
 ###############################################################################
-
-# Note : This is functional to Make.inc rules and structure (see below).
-AC_LANG([C])
-AC_CHECK_SIZEOF(void *)
-# Define for platforms with 64 bit (void *     ) pointers
-if test X"$ac_cv_sizeof_void_p" == X"8" ; then
-  CDEFINES="-DPtr64Bits $CDEFINES"
-fi
 AC_LANG([Fortran])
 __AC_FC_NAME_MANGLING
 if test "X$psblas_cv_fc" == X"pg" ; then
@@ -297,45 +322,45 @@ dnl AC_MSG_NOTICE([Fortran name mangling: $ac_cv_fc_mangling])
 [pac_fc_sec_under=${pac_fc_sec_under# }]
 [pac_fc_under=${pac_fc_under%%,*}]
 [pac_fc_under=${pac_fc_under# }]
-AC_MSG_CHECKING([defines for C/Fortran name interfaces])
-if test "x$pac_fc_case" == "xlower case"; then
-   if test "x$pac_fc_under" == "xunderscore"; then
-      if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
-          pac_f_c_names="-DLowerUnderscore"
-      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
-          pac_f_c_names="-DLowerDoubleUnderscore"
-      else
-          pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
-      fi
-   elif test "x$pac_fc_under" == "xno underscore"; then
-      pac_f_c_names="-DLowerCase"
-   else		       
-      pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
-   fi
-elif test "x$pac_fc_case" == "xupper case"; then
-   if test "x$pac_fc_under" == "xunderscore"; then
-      if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
-          pac_f_c_names="-DUpperUnderscore"
-      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
-          pac_f_c_names="-DUpperDoubleUnderscore"
-      else
-          pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
-      fi
-   elif test "x$pac_fc_under" == "xno underscore"; then
-      pac_f_c_names="-DUpperCase"
-   else		       
-      pac_f_c_names="-DUNKNOWN"
-dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
-   fi
-dnl  AC_MSG_NOTICE([Fortran name mangling UPPERCASE not handled])	
-else
-   pac_f_c_names="-DUNKNOWN"   
-dnl   AC_MSG_NOTICE([Fortran name mangling unknown case])	
-fi
-CDEFINES="$pac_f_c_names $CDEFINES"
+dnl AC_MSG_CHECKING([defines for C/Fortran name interfaces])
+dnl if test "x$pac_fc_case" == "xlower case"; then
+dnl    if test "x$pac_fc_under" == "xunderscore"; then
+dnl       if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
+dnl           pac_f_c_names="-DLowerUnderscore"
+dnl       elif test "x$pac_fc_sec_under" == "xextra underscore"; then
+dnl           pac_f_c_names="-DLowerDoubleUnderscore"
+dnl       else
+dnl           pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
+dnl       fi
+dnl    elif test "x$pac_fc_under" == "xno underscore"; then
+dnl       pac_f_c_names="-DLowerCase"
+dnl    else		       
+dnl       pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
+dnl    fi
+dnl elif test "x$pac_fc_case" == "xupper case"; then
+dnl    if test "x$pac_fc_under" == "xunderscore"; then
+dnl       if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
+dnl           pac_f_c_names="-DUpperUnderscore"
+dnl       elif test "x$pac_fc_sec_under" == "xextra underscore"; then
+dnl           pac_f_c_names="-DUpperDoubleUnderscore"
+dnl       else
+dnl           pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
+dnl       fi
+dnl    elif test "x$pac_fc_under" == "xno underscore"; then
+dnl       pac_f_c_names="-DUpperCase"
+dnl    else		       
+dnl       pac_f_c_names="-DUNKNOWN"
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
+dnl    fi
+dnl dnl  AC_MSG_NOTICE([Fortran name mangling UPPERCASE not handled])	
+dnl else
+dnl    pac_f_c_names="-DUNKNOWN"   
+dnl dnl   AC_MSG_NOTICE([Fortran name mangling unknown case])	
+dnl fi
+dnl CDEFINES="$pac_f_c_names $CDEFINES"
 
 AC_MSG_RESULT([ $pac_f_c_names ])
 
@@ -416,7 +441,7 @@ if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   FCOPT="-g -O3 -frecursive $FCOPT"  
+   FCOPT="-g -O3 $FCOPT"  
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
@@ -427,6 +452,9 @@ if test "X$FCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"flang" ; then
+   # other compilers ..
+     FCOPT="-O3"
   # NOTE : PG & Sun use -fast instead -O3
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
@@ -444,13 +472,13 @@ fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
      FCOPT="$FCOPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
-     EXTRA_OPT="-mismatch_all"
+     EXTRA_OPT="$EXTRA_OPT -mismatch_all"
 fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
-   FCOPT="-frecursive $FCOPT"  
-   PAC_HAVE_GFORTRAN_10(
-	[FCOPT="-fallow-argument-mismatch $FCOPT"],
-        [])  
+  FCOPT="-frecursive $FCOPT"  
+dnl   PAC_HAVE_GFORTRAN_10(
+dnl	[FCOPT="-fallow-argument-mismatch $FCOPT"],
+dnl        [])  
 fi   
 
 
@@ -478,7 +506,7 @@ fi
 ##############################################################################
 BASEMODNAME=psb_base_mod
 PRECMODNAME=psb_prec_mod
-METHDMODNAME=psb_krylov_mod
+METHDMODNAME=psb_linsolve_mod
 UTILMODNAME=psb_util_mod
 
 if test "X$psblas_cv_fc" == X"cray" 
@@ -488,7 +516,7 @@ then
    FIFLAG="-I"
    BASEMODNAME=PSB_BASE_MOD
    PRECMODNAME=PSB_PREC_MOD
-   METHDMODNAME=PSB_KRYLOV_MOD
+   METHDMODNAME=PSB_LINSOLVE_MOD
    UTILMODNAME=PSB_UTIL_MOD
 
 else 
@@ -512,47 +540,53 @@ fi
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+   FDEFINES="$psblas_cv_define_prepend-DPSB_SERIAL_MPI $psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
+  dnl CDEFINES="-DPSB_SERIAL_MPI $CDEFINES"
 else 
  PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
-dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
-    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+dnl    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD_F08 $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
   else					     	     
     PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
- 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
-	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ 	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_H $FDEFINES"])	  
  fi
 fi
 
 PAC_ARG_WITH_IPK
 PAC_ARG_WITH_LPK
-# Defaults for IPK/LPK
+# Defaults for PSB_IPK/PSB_LPK
 if test x"$pac_cv_ipk_size" == x"" ; then
   pac_cv_ipk_size=4
 fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
-   AC_MSG_NOTICE([[Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. ]]);
+   AC_MSG_NOTICE([[Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. ]]);
    AC_MSG_NOTICE([[Forcing equal values]])	
    pac_cv_lpk_size=$pac_cv_ipk_size;	
 fi				
-FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
-FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";	
-CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
+FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
+FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";	
+dnl CDEFINES="-DPSB_IPK${pac_cv_ipk_size} -DPSB_LPK${pac_cv_lpk_size} $CDEFINES"
 
 FLINK="$MPIFC"
+CLINK="$MPICC"	
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
-   CDEFINES="-DOPENMP $CDEFINES";	
+   FDEFINES="$psblas_cv_define_prepend-DPSB_OPENMP $FDEFINES";
+   CDEFINES="$CDEFINES";
+   CHAVE_OPENMP="#define PSB_OPENMP"
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    CXXOPT="$CXXOPT $pac_cv_openmp_cxxopt";	
    FLINK="$FLINK $pac_cv_openmp_fcopt";
+   CLINK="$CLINK $pac_cv_openmp_fcopt";	
 fi
 #
 # Tests for support of various Fortran features; some of them are critical,
@@ -639,11 +673,11 @@ PAC_FORTRAN_TEST_FINAL(
 
 PAC_FORTRAN_TEST_GENERICS( 
 	[],
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_BUGGY_GENERICS $FDEFINES"]
+	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_BUGGY_GENERICS $FDEFINES"]
 )
 
 PAC_FORTRAN_TEST_FLUSH( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
+	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"],
 )
 
 
@@ -680,7 +714,7 @@ if test "X$RANLIB" == "X" ; then
 fi
 
 # This should be portable
-AR="${AR} -cur"
+AR="${AR} -cDr"
 
 
 ###############################################################################
@@ -696,7 +730,7 @@ AR="${AR} -cur"
 
 PAC_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
 PAC_LAPACK(
-[FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
+[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_LAPACK $FDEFINES"],
 )
 AC_LANG([C])
 
@@ -729,64 +763,213 @@ PAC_MAKE_IS_GNUMAKE
 # Note : also umfdi_local_search, ...
 #AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
 
-AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
-want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
-if test x"$want_rsb_libs" != x ; then
-	if test x"$want_rsb_libs" = xyes ; then
-		want_rsb_libs="`librsb-config --static --ldflags`"
-	else
-		if test -d "$want_rsb_libs" ; then
-			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
-		else
-			true;
-			# we assume want_rsb_libs are linkage parameters
-		fi
-	fi
-	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
-fi
-RSB_LIBS="$want_rsb_libs"
-LIBS="$RSB_LIBS ${LIBS}"
+dnl AC_ARG_WITH(rsb, AS_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x"$withval" = xno; then
+dnl want_rsb_libs= ; else if test x"$withval" = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
+dnl if test x"$want_rsb_libs" != x ; then
+dnl 	if test x"$want_rsb_libs" = xyes ; then
+dnl 		want_rsb_libs="`librsb-config --static --ldflags`"
+dnl 	else
+dnl 		if test -d "$want_rsb_libs" ; then
+dnl 			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
+dnl 		else
+dnl 			true;
+dnl 			# we assume want_rsb_libs are linkage parameters
+dnl 		fi
+dnl 	fi
+dnl 	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DPSB_HAVE_LIBRSB"
+dnl fi
+dnl RSB_LIBS="$want_rsb_libs"
+dnl LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
 PAC_CHECK_METIS
 
-AC_MSG_CHECKING([Compatibility between metis and LPK])
+AC_MSG_CHECKING([Compatibility between metis and PSB_LPK])
 if  test  "x$pac_cv_lpk_size" == "x4" ; then
   if test  "x$pac_cv_metis_idx" == "x64" ; then
-  dnl mismatch between metis size and PSBLAS LPK
+  dnl mismatch between metis size and PSBLAS PSB_LPK
        psblas_cv_have_metis="no";
  dnl 
    fi
  fi			   
  if test "x$pac_cv_lpk_size" == "x8" ; then
    if test "x$pac_cv_metis_idx" == "x32" ; then 
-   dnl mismatch between metis size and PSBLAS LPK
+   dnl mismatch between metis size and PSBLAS PSB_LPK
       psblas_cv_have_metis="no";
    fi
  fi			   
 AC_MSG_RESULT([$psblas_cv_have_metis])
 
 if test "x$pac_cv_metis_idx" == "xunknown" ; then
-  dnl mismatch between metis size and PSBLAS LPK
+  dnl mismatch between metis size and PSBLAS PSB_LPK
      AC_MSG_NOTICE([Unknown  METIS bitsize.])	
      $psblas_cv_have_metis = "no";
 fi		   
 if test "x$pac_cv_metis_real" == "xunknown" ; then
-  dnl mismatch between metis size and PSBLAS LPK
+  dnl mismatch between metis size and PSBLAS PSB_LPK
      AC_MSG_NOTICE([Unknown  METIS REAL bitsize.])	
      $psblas_cv_have_metis = "no";
 fi		   
 if test "x$psblas_cv_have_metis" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $psblas_cv_define_prepend-DMETIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DMETIS_REAL_$pac_cv_metis_real $FDEFINES"
-   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES -DMETIS_$pac_cv_metis_idx -DMETIS_REAL_$pac_cv_metis_real"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_METIS $psblas_cv_define_prepend-DPSB_METIS_$pac_cv_metis_idx $psblas_cv_define_prepend-DPSB_METIS_REAL_$pac_cv_metis_real $FDEFINES"
+   CDEFINES="$psblas_cv_metis_includes $CDEFINES"
    METISINCFILE=$psblas_cv_metisincfile
+   CHAVEMETIS="#define PSB_HAVE_METIS"
+   CINTMETIS="#define PSB_METIS_$pac_cv_metis_idx"
+   CREALMETIS="#define PSB_METIS_REAL_$pac_cv_metis_real"	
 fi
 
 PAC_CHECK_AMD
 if test "x$psblas_cv_have_amd" == "xyes" ; then 
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
-   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_AMD $FDEFINES"
+   CDEFINES="$psblas_cv_amd_includes $CDEFINES"
+   CHAVEAMD="#define PSB_HAVE_AMD"
 fi
+
+
+PAC_ARG_CUDA()
+if test "x$pac_cv_cuda" == "xyes"; then
+if test "x$pac_cv_ipk_size" != "x4"; then
+  AC_MSG_NOTICE([For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_ipk_size,  disabling CUDA/SPGPU])
+  pac_cv_cuda="no";
+  PSB_HAVE_CUDA="no";
+  CUDA_CC="";	
+  SPGPU_LIBS="";	
+  CUDAD="";
+  CUDALD="";
+  CUDEFINES="";
+  CUDA_DEFINES="";
+  CUDA_INCLUDES="";
+  CUDA_LIBS="";
+  FCUDEFINES="";
+  CCUDEFINES="";
+  CXXCUDEFINES="";
+else
+
+     PAC_CHECK_CUDA()
+	   
+     if test "x$pac_cv_have_cuda" == "xyes"; then
+   
+      PAC_CHECK_CUDA_VERSION()
+      dnl PAC_CHECK_SPGPU()
+      PSB_CUDA_VERSION="$pac_cv_cuda_version";
+      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+         AC_MSG_NOTICE([Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA])
+         pac_cv_cuda="no";
+         PSB_HAVE_CUDA="no";
+         CUDA_CC="";	
+         SPGPU_LIBS="";	
+         CUDAD="";
+         CUDALD="";
+         CUDEFINES="";
+         CUDA_DEFINES="";
+         CUDA_INCLUDES="";
+         CUDA_LIBS="";
+         FCUDEFINES="";
+         CCUDEFINES="";
+         CXXCUDEFINES="";
+      else
+         AC_MSG_NOTICE([CUDA version ${PSB_CUDA_VERSION}])
+         PSB_HAVE_CUDA="yes";
+         PSB_CUDA_SHORT_VERSION=$(expr $pac_cv_cuda_version / 1000);
+         CUDA_DEFINES="-DPSB_HAVE_CUDA -DPSB_CUDA_SHORT_VERSION=${PSB_CUDA_SHORT_VERSION} -DPSB_CUDA_VERSION=${PSB_CUDA_VERSION}";
+         CHAVECUDA="#define PSB_HAVE_CUDA"
+         CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
+         CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
+         SPGPU_LIBS="-lspgpu";	
+         CUDAD=cudad;
+         CUDALD=cudald;
+         LCUDA="-lpsb_cuda";	
+         EXTRALDLIBS="-lstdc++";
+         AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
+   
+         PAC_ARG_WITH_CUDACC()
+         if test "x$pac_cv_cudacc" == "x"; then
+            pac_cv_cudacc="50,60,70,75,80,86";
+            CUDA_CC="$pac_cv_cudacc";
+         fi
+         if (( $pac_cv_cuda_version >= 11070  ))
+         then 
+           CUDEFINES="--dopt=on";
+         fi	
+         for cc in `echo $pac_cv_cudacc|sed 's/,/ /gi'`
+         do
+           CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
+         done
+         if test "x$pac_cv_cuda_version" != "xunknown"; then
+         dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
+          FCUDEFINES=" ${CUDA_DEFINES}"
+          dnl CCUDEFINES=" ${CUDA_DEFINES}"
+          dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
+        fi
+     fi
+  fi
+fi
+fi
+
+PAC_ARG_OPENACC()
+dnl AC_ARG_ENABLE([openacc],
+dnl    [AS_HELP_STRING([--disable-openacc], [do not use Openacc])])
+if test x"$pac_cv_openacc" == x"yes" ; then
+   PAC_ARG_WITH_FLAGS(extraopenacc,EXTRAOPENACC)
+   dnl if test false; then
+   AX_C_OPENACC()
+   CCOPENACC="$ax_cv_prog_c_openacc";
+   AX_CXX_OPENACC()
+   CXXOPENACC="$ax_cv_prog_cxx_openacc";
+   AX_FC_OPENACC()
+   FCOPENACC="$ax_cv_prog_fc_openacc";
+    dnl AX_OPENACC()
+    dnl 
+    dnl CXXOPENACC="$ax_cv_prog_cxx_openacc";	
+    dnl FCOPENACC="$ax_cv_prog_fc_openacc";   
+   dnl else   
+dnl   AC_MSG_NOTICE([OpenACC 1 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
+   PAC_ARG_WITH_FLAGS(ccopenacc,CCOPENACC)	
+   PAC_ARG_WITH_FLAGS(cxxopenacc,CXXOPENACC)
+   PAC_ARG_WITH_FLAGS(fcopenacc,FCOPENACC)
+dnl   AC_MSG_NOTICE([OpenACC 2 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])		
+dnl   CCOPENACC="$ax_cv_prog_c_openacc";
+dnl   CXXOPENACC="$ax_cv_prog_cxx_openacc";	
+dnl   FCOPENACC="$ax_cv_prog_fc_openacc";   
+dnl   fi
+   CCOPENACC="$CCOPENACC   $EXTRAOPENACC";
+   CXXOPENACC="$CXXOPENACC   $EXTRAOPENACC";
+   FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
+dnl   AC_MSG_NOTICE([OpenACC 3 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
+   OACCD=oaccd;
+   OACCLD=oaccld;
+
+   #FCOPT="$FCOPT    $FCOPENACC";
+   #CCOPT="$CCOPT    $CCOPENACC"	
+   #CXXOPT="$CXXOPT  $CXXOPENACC"		
+   #FLINK="$FLINK $FCOPENACC";
+fi
+
+###############################################################################
+dnl PAC_ARG_WITH_LIBRSB()
+LIBRSB_DIR="$pac_cv_librsb_dir";
+AC_MSG_CHECKING([for LIBRSB install dir])
+case $LIBRSB_DIR in 
+     /*) ;; 
+     *) dnl AC_MSG_ERROR([The LIBRSB installation dir must be an absolute pathname
+ dnl specified with --with-librsb=/path/to/librsb])
+esac
+dnl if test ! -d "$LIBRSB_DIR" ; then 
+dnl    AC_MSG_ERROR([Could not find LIBRSB build dir $LIBRSB_DIR!])	
+dnl fi
+pac_cv_status_file="$LIBRSB_DIR/librsb.a"
+if test ! -f "$pac_cv_status_file" ; then 
+  AC_MSG_RESULT([no])
+  #AC_MSG_ERROR([Could not find an installation  in $LIBRSB_DIR.])
+else
+  AC_MSG_RESULT([$LIBRSB_DIR])
+  RSBTARGETLIB=rsbd;
+  RSBTARGETOBJ=rsbobj;
+  CHAVELIBRSB="#define PSB_HAVE_LIBRSB"
+fi
+
+
 
 
 
@@ -797,7 +980,7 @@ fi
 LIBDIR=lib
 BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
-METHDLIBNAME=libpsb_krylov.a
+METHDLIBNAME=libpsb_linsolve.a
 UTILLIBNAME=libpsb_util.a
 
 ###############################################################################
@@ -817,12 +1000,15 @@ AC_SUBST(FCOPT)
 AC_SUBST(CCOPT)
 AC_SUBST(CXXOPT)
 AC_SUBST(EXTRA_OPT)
+AC_SUBST(EXTRA_NVCC)
 AC_SUBST(FAKEMPI)
 AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
 AC_SUBST(FLINK)
+AC_SUBST(CLINK)
 AC_SUBST(LIBS)
+AC_SUBST(FLIBS)
 AC_SUBST(AR)
 AC_SUBST(RANLIB)
 AC_SUBST(MPIFC)
@@ -846,10 +1032,10 @@ AC_SUBST(CINCLUDES)
 AC_SUBST(FINCLUDES)
 
 PSBLASRULES='
-PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(LIBS)
-CXXDEFINES=$(PSBCXXDEFINES)
-CDEFINES=$(PSBCDEFINES)
-FDEFINES=$(PSBFDEFINES)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIB) $(FLIBS) $(LIBS)
+CXXDEFINES=$(PSBCXXDEFINES) 
+CDEFINES=$(PSBCDEFINES) 
+FDEFINES=$(PSBFDEFINES) 
 	
 
 # These should be portable rules, arent they?
@@ -863,19 +1049,65 @@ FDEFINES=$(PSBFDEFINES)
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
 
 
+AC_SUBST(PSB_IPKDEF)
+AC_SUBST(PSB_LPKDEF)
+AC_SUBST(CSERIALMPI)
+AC_SUBST(CHAVE_OPENMP)
+AC_SUBST(CHAVEMETIS)
+AC_SUBST(CINTMETIS)
+AC_SUBST(CREALMETIS)
+AC_SUBST(CHAVEAMD)
+AC_SUBST(CHAVECUDA)
+AC_SUBST(CSHORTVCUDA)
+AC_SUBST(CVERSIONCUDA)
 AC_SUBST(PSBLASRULES)
 AC_SUBST(LIBDIR)
 AC_SUBST(RSB_LIBS)
+AC_SUBST(CHAVELIBRSB)
 AC_SUBST(BASELIBNAME)
 AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
+AC_SUBST(OACCD)
+AC_SUBST(OACCLD)
+AC_SUBST(FCOPENACC)
+AC_SUBST(CCOPENACC)
+AC_SUBST(CXXOPENACC)
+
+AC_SUBST(SPGPU_FLAGS)
+AC_SUBST(SPGPU_LIBS)
+dnl AC_SUBST(SPGPU_DIR)
+dnl AC_SUBST(SPGPU_INCLUDES)
+dnl AC_SUBST(SPGPU_INCDIR)
+AC_SUBST(EXTRALDLIBS)
+AC_SUBST(CUDA_DIR)
+AC_SUBST(CUDA_DEFINES)
+AC_SUBST(FCUDEFINES)
+AC_SUBST(CCUDEFINES)
+AC_SUBST(CXXCUDEFINES)	
+AC_SUBST(CUDA_INCLUDES)
+AC_SUBST(CUDA_LIBS)
+AC_SUBST(PSB_CUDA_VERSION)
+AC_SUBST(PSB_CUDA_SHORT_VERSION)
+AC_SUBST(CUDA_NVCC)
+AC_SUBST(CUDEFINES)
+AC_SUBST(CUDAD)
+AC_SUBST(CUDALD)
+AC_SUBST(LCUDA)
+AC_SUBST(LIBRSB_LIBS)
+AC_SUBST(LIBRSB_INCLUDES)
+AC_SUBST(LIBRSB_INCDIR)
+AC_SUBST(LIBRSB_DIR)
+AC_SUBST(LIBRSB_DEFINES)
+AC_SUBST(LRSB)
 
 ###############################################################################
 # the following files will be created by Automake
 
 AC_CONFIG_FILES([Make.inc])
+AC_CONFIG_FILES([base/modules/psb_config.h])
+dnl AC_CONFIG_FILES([base/modules/psb_cxxconfig.h])	
 AC_CONFIG_FILES([util/psb_metis_int.h])	
 AC_OUTPUT()
 #AC_OUTPUT(Make.inc Makefile)
@@ -896,6 +1128,14 @@ AC_MSG_NOTICE([
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+	CUDA 		      : ${PSB_HAVE_CUDA}
+	CUDA_CC               : ${pac_cv_cudacc}
+
+	OPENACC		      : ${pac_cv_openacc}
+        FCOPENACC             : ${FCOPENACC}
+	OACCD                 : ${OACCD}
+	OACCLD                : ${OACCLD}
+	
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS usable          : ${psblas_cv_have_metis}
@@ -915,6 +1155,13 @@ dnl Note : we should use LDLIBS sooner or later!
 dnl	To install the program and its documentation, run 'make install' if you are root,
 dnl	or run 'su -c "make install"' if you are not root.
 ])
+if test x"${pac_cv_openacc}" == x"yes" ; then
+   if test x"${FCOPENACC}" == x ; then
+   AC_MSG_NOTICE([
+   WARNING: OpenACC enabled, but no choice for FCOPENACC compile flag.
+   You may want to rerun configure with --with-fcopenacc= ])
+  fi  
+fi	
 
 ###############################################################################
 

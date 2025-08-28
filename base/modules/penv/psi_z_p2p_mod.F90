@@ -44,11 +44,11 @@ module psi_z_p2p_mod
 contains
 
   subroutine psb_zsnds(ctxt,dat,dst)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -56,7 +56,7 @@ contains
     integer(psb_mpk_), intent(in)  :: dst
     complex(psb_dpk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: info 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! do nothing
 #else
     allocate(dat_(1), stat=info)
@@ -67,11 +67,11 @@ contains
 
   subroutine psb_zsndv(ctxt,dat,dst)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -80,7 +80,7 @@ contains
     complex(psb_dpk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: info
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
 #else
     allocate(dat_(size(dat)), stat=info)
     dat_(:) = dat(:)
@@ -91,11 +91,11 @@ contains
 
   subroutine psb_zsndm(ctxt,dat,dst,m)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -106,7 +106,7 @@ contains
     integer(psb_ipk_) :: i,j,k,m_,n_
     integer(psb_mpk_) :: info
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
 #else
     if (present(m)) then 
       m_ = m
@@ -127,11 +127,11 @@ contains
   end subroutine psb_zsndm
 
   subroutine psb_zrcvs(ctxt,dat,src)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -139,7 +139,7 @@ contains
     integer(psb_mpk_), intent(in)  :: src
     integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! do nothing
 #else
     icomm = psb_get_mpi_comm(ctxt)
@@ -150,11 +150,11 @@ contains
 
   subroutine psb_zrcvv(ctxt,dat,src)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -163,7 +163,7 @@ contains
     complex(psb_dpk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: info, icomm
     integer(psb_mpk_) :: status(mpi_status_size)
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
 #else
     icomm = psb_get_mpi_comm(ctxt)
     call mpi_recv(dat,size(dat),psb_mpi_c_dpk_,src,psb_dcomplex_tag,icomm,status,info)
@@ -174,11 +174,11 @@ contains
 
   subroutine psb_zrcvm(ctxt,dat,src,m)
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -189,7 +189,7 @@ contains
     integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_mpk_) :: i,j,k
     integer(psb_mpk_) :: status(mpi_status_size), icomm
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ! What should we do here?? 
 #else
     if (present(m)) then 

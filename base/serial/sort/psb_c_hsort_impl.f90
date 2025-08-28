@@ -899,7 +899,9 @@ subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   endif
 
   key     = heap(1)
+  index   = idxs(1)
   heap(1) = heap(last)
+  idxs(1) = idxs(last)
   last    = last - 1
 
   select case(dir)

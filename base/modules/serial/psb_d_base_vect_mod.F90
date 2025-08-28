@@ -155,6 +155,9 @@ module psb_d_base_vect_mod
     procedure, pass(z) :: axpby_v2  => d_base_axpby_v2
     procedure, pass(z) :: axpby_a2  => d_base_axpby_a2
     generic, public    :: axpby    => axpby_v, axpby_a, axpby_v2, axpby_a2
+    procedure, pass(z) :: upd_xyz  => d_base_upd_xyz
+    procedure, pass(w) :: xyzw     => d_base_xyzw
+    
     !
     ! Vector by vector multiplication. Need all variants
     ! to handle multiple requirements from preconditioners
@@ -280,7 +283,7 @@ contains
       call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
       return
     end if
-#if defined (OPENMP)
+#if defined (PSB_OPENMP)
     !$omp parallel do private(i)
     do i = 1, size(this)
       x%v(i) = this(i)
@@ -574,8 +577,8 @@ contains
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info == 0) call x%free_buffer(info)
-    if (info == 0) call x%free_comid(info)
+    if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
+    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
     if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
 
@@ -845,7 +848,7 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     !$omp parallel do private(i)
     do i = first_, last_        
       x%v(i) = val
@@ -883,7 +886,7 @@ contains
 
     if (x%is_dev()) call x%sync()
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i  = first_, last_
         x%v(i) = val(i-first_+1)
@@ -932,7 +935,7 @@ contains
     
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i=1, size(x%v)
         x%v(i) =  abs(x%v(i))
@@ -1025,7 +1028,7 @@ contains
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x     The class(base_vect) to be added
-  !! \param beta scalar alpha
+  !! \param beta scalar beta
   !! \param info   return code
   !!
   subroutine d_base_axpby_v(m,alpha, x, beta, y, info)
@@ -1054,7 +1057,7 @@ contains
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x     The class(base_vect) to be added
-  !! \param beta scalar alpha
+  !! \param beta scalar beta
   !! \param y     The class(base_vect) to be added
   !! \param z     The class(base_vect) to be returned
   !! \param info   return code
@@ -1085,7 +1088,7 @@ contains
   !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x(:) The array to be added
-  !! \param beta scalar alpha
+  !! \param beta scalar beta
   !! \param info   return code
   !!
   subroutine d_base_axpby_a(m,alpha, x, beta, y, info)
@@ -1132,6 +1135,64 @@ contains
     call z%set_host()
 
   end subroutine d_base_axpby_a2
+
+  !
+  ! UPD_XYZ is invoked via Z, hence the structure below.
+  !
+  !
+  !> Function  base_upd_xyz
+  !! \memberof  psb_d_base_vect_type
+  !! \brief UPD_XYZ combines two AXPBYS y=alpha*x+beta*y, z=gamma*y+delta*zeta
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param beta scalar beta 
+  !! \param gamma scalar gamma
+  !! \param delta scalar delta
+  !! \param x     The class(base_vect) to be added
+  !! \param y     The class(base_vect) to be added
+  !! \param z     The class(base_vect) to be added
+  !! \param info   return code
+  !!
+  subroutine d_base_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_d_base_vect_type), intent(inout)  :: z
+    real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (x%is_dev().and.(alpha/=dzero)) call x%sync()
+    if (y%is_dev().and.(beta/=dzero))   call y%sync()
+    if (z%is_dev().and.(delta/=dzero))  call z%sync()
+    call psi_upd_xyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+    call y%set_host()
+    call z%set_host()
+        
+  end subroutine d_base_upd_xyz
+
+  subroutine d_base_xyzw(m,a,b,c,d,e,f,x, y, z, w,info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_d_base_vect_type), intent(inout)  :: z
+    class(psb_d_base_vect_type), intent(inout)  :: w
+    real(psb_dpk_), intent (in)                :: a,b,c,d,e,f
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (x%is_dev().and.(a/=dzero)) call x%sync()
+    if (y%is_dev().and.(b/=dzero)) call y%sync()
+    if (z%is_dev().and.(d/=dzero)) call z%sync()
+    if (w%is_dev().and.(f/=dzero)) call w%sync()
+    call psi_xyzw(m,a,b,c,d,e,f,x%v, y%v, z%v, w%v, info)
+    call y%set_host()
+    call z%set_host()
+    call w%set_host()
+    
+  end subroutine d_base_xyzw
 
 
   !
@@ -1681,7 +1742,7 @@ contains
     integer(psb_ipk_) :: i
 
     if (allocated(x%v)) then
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i=1,size(x%v)
         x%v(i) = alpha*x%v(i)
@@ -1725,7 +1786,7 @@ contains
     integer(psb_ipk_) :: i
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res = dzero
     !$omp parallel do private(i) reduction(max: res)
     do i=1, n
@@ -1749,7 +1810,7 @@ contains
     integer(psb_ipk_) :: i
 
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res = HUGE(done)
     !$omp parallel do private(i) reduction(min: res)
     do i=1, n
@@ -1830,7 +1891,7 @@ contains
     integer(psb_ipk_) :: i
     
     if (x%is_dev()) call x%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res=dzero
     !$omp parallel do private(i) reduction(+: res)
     do i= 1, size(x%v)
@@ -1857,7 +1918,8 @@ contains
   subroutine d_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) :: alpha, beta, y(:)
     class(psb_d_base_vect_type) :: x
 
@@ -1877,7 +1939,8 @@ contains
   subroutine d_base_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     real(psb_dpk_) ::  y(:)
     class(psb_d_base_vect_type) :: x
@@ -1893,7 +1956,8 @@ contains
   subroutine d_base_gthzbuf(i,n,idx,x)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i
+    integer(psb_mpk_) :: n
     class(psb_i_base_vect_type) :: idx
     class(psb_d_base_vect_type) :: x
 
@@ -1956,7 +2020,8 @@ contains
   subroutine d_base_gthzv(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) ::  y(:)
     class(psb_d_base_vect_type) :: x
 
@@ -1981,7 +2046,8 @@ contains
   subroutine d_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_base_vect_type) :: y
 
@@ -1994,7 +2060,8 @@ contains
   subroutine d_base_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_base_vect_type) :: y
@@ -2008,7 +2075,8 @@ contains
   subroutine d_base_sctb_buf(i,n,idx,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     real(psb_dpk_) :: beta
     class(psb_d_base_vect_type) :: y
@@ -2137,7 +2205,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     if (z%is_dev()) call z%sync()
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     n = size(x)
     !$omp parallel do private(i)
     do i = 1, n
@@ -3365,10 +3433,11 @@ contains
   subroutine d_base_mlv_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) :: alpha, beta, y(:)
     class(psb_d_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -3390,7 +3459,8 @@ contains
   subroutine d_base_mlv_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i,n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     real(psb_dpk_) ::  y(:)
     class(psb_d_base_multivect_type) :: x
@@ -3412,10 +3482,11 @@ contains
   subroutine d_base_mlv_gthzv(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) ::  y(:)
     class(psb_d_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -3438,10 +3509,11 @@ contains
   subroutine d_base_mlv_gthzm(n,idx,x,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) ::  y(:,:)
     class(psb_d_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
@@ -3459,7 +3531,8 @@ contains
   subroutine d_base_mlv_gthzbuf(i,ixb,n,idx,x)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, ixb, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i, ixb
     class(psb_i_base_vect_type) :: idx
     class(psb_d_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
@@ -3491,10 +3564,11 @@ contains
   subroutine d_base_mlv_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (y%is_dev()) call y%sync()
     nc = psb_size(y%v,2_psb_ipk_)
@@ -3506,10 +3580,11 @@ contains
   subroutine d_base_mlv_sctbr2(n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
     real(psb_dpk_) :: beta, x(:,:)
     class(psb_d_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
+    integer(psb_mpk_) :: nc
 
     if (y%is_dev()) call y%sync()
     nc = y%get_ncols()
@@ -3521,7 +3596,8 @@ contains
   subroutine d_base_mlv_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i
     class(psb_i_base_vect_type) :: idx
     real( psb_dpk_) :: beta, x(:)
     class(psb_d_base_multivect_type) :: y
@@ -3533,7 +3609,8 @@ contains
   subroutine d_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_) :: i, iyb, n
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: i, iyb
     class(psb_i_base_vect_type) :: idx
     real(psb_dpk_) :: beta
     class(psb_d_base_multivect_type) :: y

@@ -73,11 +73,11 @@
 Subroutine psb_ls_remote_mat(a,desc_a,b,info)
   use psb_base_mod, psb_protect_name => psb_ls_remote_mat
 
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   Implicit None
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 

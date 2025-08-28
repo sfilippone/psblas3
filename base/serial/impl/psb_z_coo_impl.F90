@@ -257,7 +257,7 @@ subroutine psb_z_coo_spaxpby(alpha,a,beta,b,info)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
-#if defined (OPENMP)
+#if defined (PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -368,7 +368,7 @@ function psb_z_coo_cmpmat(a,b,tol,info) result(res)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
-#if defined (OPENMP)
+#if defined (PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -595,12 +595,13 @@ subroutine  psb_z_coo_clean_zeros(a, info)
   integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_ipk_) :: i,j,k, nzin
-
+  
   info = 0
   nzin = a%get_nzeros()
   j = 0
   do i=1, nzin
-    if (a%val(i) /= zzero) then
+    ! Always keep the diagonal, even if numerically zero
+    if ((a%val(i) /= zzero).or.(a%ia(i) == a%ja(i))) then
       j = j + 1
       a%val(j) = a%val(i)
       a%ia(j)  = a%ia(i)
@@ -608,6 +609,7 @@ subroutine  psb_z_coo_clean_zeros(a, info)
     end if
   end do
   call a%set_nzeros(j)
+  call a%fix(info)
   call a%trim()
 end subroutine psb_z_coo_clean_zeros
 
@@ -1928,7 +1930,7 @@ function psb_z_coo_maxval(a) result(res)
   nnz = a%get_nzeros()
   if (allocated(a%val)) then
     nnz = min(nnz,size(a%val))
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     res = dzero
     !$omp parallel do private(i) reduction(max: res)
     do i=1, nnz
@@ -2818,7 +2820,7 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   use psb_realloc_mod
   use psb_sort_mod
   use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_csput_a
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -2867,29 +2869,42 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   if (a%is_bld()) then
     ! Structure here is peculiar, because this function can be called
     ! either within a parallel region, or outside. 
-    ! Hence the call to set_nzeros done here. 
-    !$omp critical
+    ! Hence the call to set_nzeros done here.
+#if defined(PSB_OPENMP)          
+    !$omp critical(z_coo_csput_a)
+#endif
     nza  = a%get_nzeros()
     nzaold = nza
     isza = a%get_size()
+    if (info /= 0) write(0,*) name,' point 0:',info,isza,nza,nz
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then
+      !write(0,*) ' before reallocate in csput ',psb_errstatus_fatal(),info
       call a%reallocate(max(nza+nz,int(1.5*isza)))
+      !write(0,*) '  after reallocate in csput ',psb_errstatus_fatal(),info            
     endif
     isza = a%get_size()
     if (isza < (nza+nz)) then
-      info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
+      info = psb_err_alloc_dealloc_;
+      write(0,*) name,' point 1:',info,isza,nza,nz,nza+nz
+      call psb_errpush(info,name)
     else
-#if defined(OPENMP)      
+#if defined(PSB_OPENMP)      
       nza = nza + nz
 #endif
       call a%set_nzeros(nza)
     end if
-    !$omp end critical
-    if (info /= 0)  goto 9999
+#if defined(PSB_OPENMP)
+    if (info /= 0) write(0,*) name,' point 1.5:',info
+    !$omp end critical(z_coo_csput_a)
+#endif
+    if (info /= 0)  then
+      write(0,*) name,' point 2:',info
+      goto 9999
+    end if
     call psb_inner_ins(nz,ia,ja,val,nzaold,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info)
-#if !defined(OPENMP)      
+#if !defined(PSB_OPENMP)      
     nza = nzaold
     call a%set_nzeros(nza)
 #endif
@@ -2944,14 +2959,16 @@ contains
     integer(psb_ipk_) :: i,ir,ic
 
     info = psb_success_
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
+    ! Disabling OpenMP parallel do  for the time being.
+    ! Will need to redesign the entire code stack
     ! The logic here is different from the one used for
     ! the serial version: each element is stored in data
     ! structures but the invalid ones are stored as '-1' values.
     ! These values will be filtered in a future fixing process.
-    !$OMP PARALLEL DO default(none) schedule(STATIC) &
-    !$OMP shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
-    !$OMP private(ir,ic,i)
+    ! $ O M P PARALLEL DO schedule(STATIC) &
+    ! $ O M P shared(nz,imin,imax,jmin,jmax,ia,ja,val,ia1,ia2,aspk,nza) &
+    ! $ O M P private(ir,ic,i)
     do i=1,nz
       ir = ia(i)
       ic = ja(i)
@@ -2965,7 +2982,7 @@ contains
         aspk(nza+i) = -1
       end if
     end do
-    !$OMP END PARALLEL DO
+    ! $ O M P END PARALLEL DO
     nza = nza + nz
 #else
     do i=1, nz
@@ -3129,7 +3146,7 @@ subroutine psb_z_cp_coo_to_coo(a,b,info)
   call b%set_nzeros(nz)
   call b%reallocate(nz)
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -3182,7 +3199,7 @@ subroutine psb_z_cp_coo_from_coo(a,b,info)
   call a%set_nzeros(nz)
   call a%reallocate(nz)
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -3568,7 +3585,7 @@ subroutine psb_z_coo_tril(a,l,info,&
     nb = jmax_
   endif
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_), allocatable :: lrws(:),urws(:)
     integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
@@ -3864,7 +3881,7 @@ subroutine psb_z_coo_triu(a,u,info,&
     nb = jmax_
   endif
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_), allocatable :: lrws(:),urws(:)
     integer(psb_ipk_)   ::  lpnt, upnt, lnz, unz
@@ -4154,7 +4171,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_string_mod
   use psb_ip_reord_mod
   use psb_sort_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -4172,7 +4189,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
 #endif
@@ -4200,7 +4217,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
   dupl_ = dupl
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   maxthreads = omp_get_max_threads()
   ! 'iaux' has to allow the threads to have an exclusive group
   ! of indices as work space. Since each thread handles one
@@ -4214,7 +4231,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 #else
 
 
-  allocate(iaux(nzin+2),stat=info)
+  allocate(iaux(MAX((nzin+2),(nc+2),(nr+2))),stat=info)
   if (info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
@@ -4256,7 +4273,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   use psb_string_mod
   use psb_ip_reord_mod
   use psb_sort_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -4274,7 +4291,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
   real(psb_dpk_) :: t0, t1
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   integer(psb_ipk_) :: work,idxstart,idxend,first_elem,last_elem,s,nthreads,ithread
   integer(psb_ipk_) :: saved_elem,old_val,nxt_val,err,act_row,act_col,maxthreads
   integer(psb_ipk_), allocatable :: kaux(:),idxaux(:)
@@ -4289,7 +4306,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   ! Row major order
   if (nr <= nzin) then
     ! Avoid strange situations with large indices
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     ! We are not going to need 'ix2' because of the presence
     ! of 'idxaux' as auxiliary buffer.
     allocate(ias(nzin),jas(nzin),vs(nzin), stat=info)
@@ -4302,7 +4319,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   end if
 
   !if (use_buffers) then
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     !$omp workshare
     iaux(:) = 0
     !$omp end workshare
@@ -4356,7 +4373,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
   ! all the indices are valid
   ! Check again use_buffers.
   if (use_buffers) then
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     maxthreads = omp_get_max_threads()
     allocate(kaux(nr+1),idxaux(MAX(nc+2,nr+2)),stat=info)
     if (info /= psb_success_) then
@@ -4730,7 +4747,7 @@ subroutine psb_z_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,ia,ja,val,iaux,nzout,inf
     call psi_msort_up(nzin,ia(1:),iaux(1:),iret)
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     !$OMP PARALLEL default(none) &
     !$OMP shared(nr,nc,nzin,iaux,ia,ja,val,nthreads,maxnzr) &
     !$OMP private(i,j,idxstart,idxend,nzl,act_row,iret,ithread, &
@@ -4920,7 +4937,7 @@ subroutine psb_z_cp_coo_to_lcoo(a,b,info)
   call b%set_nzeros(nz)
   call b%reallocate(nz)
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -4972,7 +4989,7 @@ subroutine psb_z_cp_coo_from_lcoo(a,b,info)
   call a%set_nzeros(nz)
   call a%reallocate(nz)
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -5185,7 +5202,7 @@ function psb_lz_coo_maxval(a) result(res)
   nnz = a%get_nzeros()
   if (allocated(a%val)) then
     nnz = min(nnz,size(a%val))
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i) reduction(max:res)
@@ -5252,7 +5269,7 @@ function psb_lz_coo_csnmi(a) result(res)
       i = a%ia(j)
       vt(i) = vt(i) + abs(a%val(j))
     end do
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i) reduction(max:res)
@@ -5302,7 +5319,7 @@ function psb_lz_coo_csnm1(a) result(res)
     i = a%ja(j)
     vt(i) = vt(i) + abs(a%val(j))
   end do
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i) reduction(max:res)
@@ -5585,7 +5602,7 @@ subroutine psb_lz_coo_spaxpby(alpha,a,beta,b,info)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -5696,7 +5713,7 @@ function psb_lz_coo_cmpmat(a,b,tol,info) result(res)
   ! Allocate (temporary) space for the solution
   call tcoo%allocate(M,N,(nza+nzb))
   ! Compute the sum
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_) :: i
     !$omp parallel do private(i)
@@ -5926,12 +5943,13 @@ subroutine  psb_lz_coo_clean_zeros(a, info)
   integer(psb_ipk_), intent(out) :: info
   !
   integer(psb_lpk_) :: i,j,k, nzin
-
+  
   info = 0
   nzin = a%get_nzeros()
   j = 0
   do i=1, nzin
-    if (a%val(i) /= zzero) then
+    ! Always keep the diagonal, even if numerically zero
+    if ((a%val(i) /= zzero).or.(a%ia(i) == a%ja(i))) then 
       j = j + 1
       a%val(j) = a%val(i)
       a%ia(j)  = a%ia(i)
@@ -5956,7 +5974,7 @@ subroutine  psb_lz_coo_clean_negidx(a,info)
 
 end subroutine psb_lz_coo_clean_negidx
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
 subroutine psb_lz_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
   use psb_error_mod
   use psb_z_base_mat_mod, psb_protect_name => psb_lz_coo_clean_negidx_inner

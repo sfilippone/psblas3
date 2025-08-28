@@ -18,11 +18,12 @@ contains
     implicit none
 
     integer(psb_c_ipk_)        :: idx
-    integer(psb_c_ipk_), value :: modes, base
+    integer(psb_c_ipk_), value :: modes
+    integer(psb_c_mpk_), value :: base
     integer(psb_c_ipk_)        :: ijk(modes)
     integer(psb_c_ipk_)        :: sizes(modes)
 
-    integer(psb_ipk_)          :: fijk(modes), fsizes(modes)
+    integer(psb_mpk_)          :: fijk(modes), fsizes(modes)
 
     fijk(1:modes) = ijk(1:modes)
     fsizes(1:modes) = sizes(1:modes)
@@ -37,11 +38,12 @@ contains
     implicit none
 
     integer(psb_c_lpk_)        :: idx
-    integer(psb_c_ipk_), value :: modes, base
+    integer(psb_c_ipk_), value :: modes
+    integer(psb_c_mpk_), value :: base
     integer(psb_c_ipk_)        :: ijk(modes)
     integer(psb_c_ipk_)        :: sizes(modes)
 
-    integer(psb_ipk_)          :: fijk(modes), fsizes(modes)
+    integer(psb_mpk_)          :: fijk(modes), fsizes(modes)
 
     fijk(1:modes) = ijk(1:modes)
     fsizes(1:modes) = sizes(1:modes)
@@ -56,15 +58,17 @@ contains
 
     integer(psb_c_ipk_)        :: res
     integer(psb_c_ipk_), value :: idx
-    integer(psb_c_ipk_), value :: modes, base
+    integer(psb_c_ipk_), value :: modes
+    integer(psb_c_mpk_), value :: base
     integer(psb_c_ipk_)        :: ijk(modes)
     integer(psb_c_ipk_)        :: sizes(modes)
 
-    integer(psb_ipk_)          :: fijk(modes), fsizes(modes)
+    integer(psb_mpk_)          :: fijk(modes), fsizes(modes)
 
     res = -1
 
     fsizes(1:modes) = sizes(1:modes)
+
     call idx2ijk(fijk,idx,fsizes,base=base)
 
     ijk(1:modes) = fijk(1:modes)
@@ -79,11 +83,12 @@ contains
 
     integer(psb_c_ipk_)        :: res
     integer(psb_c_lpk_), value :: idx
-    integer(psb_c_ipk_), value :: modes, base
+    integer(psb_c_ipk_), value :: modes
+    integer(psb_c_mpk_), value :: base
     integer(psb_c_ipk_)        :: ijk(modes)
     integer(psb_c_ipk_)        :: sizes(modes)
 
-    integer(psb_ipk_)  :: fijk(modes), fsizes(modes)
+    integer(psb_mpk_)  :: fijk(modes), fsizes(modes)
 
     res = -1
 

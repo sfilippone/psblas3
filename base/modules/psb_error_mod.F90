@@ -100,18 +100,18 @@ module psb_error_mod
   end interface
 
   interface psb_errcomm
-#if defined(IPK8)
-    subroutine psb_errcomm_m(ctxt, err)
-      import :: psb_ipk_, psb_mpk_, psb_ctxt_type
-      type(pxb_ctxt_type), intent(in)  :: ctxt
-      integer(psb_ipk_), intent(inout) :: err
-    end subroutine psb_errcomm_m
-#endif    
     subroutine psb_errcomm_i(ctxt, err)
       import :: psb_ipk_, psb_ctxt_type
       type(psb_ctxt_type), intent(in)  :: ctxt
       integer(psb_ipk_), intent(inout) :: err
     end subroutine psb_errcomm_i
+#if defined(PSB_IPK8)
+    subroutine psb_errcomm_m(ctxt, err)
+      import :: psb_ipk_, psb_mpk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in)  :: ctxt
+      integer(psb_mpk_), intent(inout) :: err
+    end subroutine psb_errcomm_m
+#endif    
   end interface psb_errcomm
 
   interface psb_errpop

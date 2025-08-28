@@ -3,11 +3,12 @@
 
 % \section{Preconditioners}
 \label{sec:psprecs}
-The base PSBLAS library  contains the implementation of two simple
+The base PSBLAS library  contains the implementation of some simple
 preconditioning techniques:
 \begin{itemize}
 \item Diagonal Scaling
 \item Block Jacobi with ILU(0) factorization
+\item Block Jacobi with an approximate inverse
 %% \item Additive Schwarz with the Restricted Additive Schwarz and
 %%   Additive Schwarz with Harmonic extensions;
 \end{itemize}
@@ -76,12 +77,123 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \item[DIAG] Diagonal scaling; each entry of the input vector is
   multiplied by the reciprocal of the sum of the absolute values of
   the coefficients in the corresponding row of matrix  $A$;
-\item[BJAC] Precondition by a  factorization of the
-  block-diagonal of matrix $A$, where block boundaries are determined
-  by the data allocation boundaries for each process; requires no
-  communication. Only the incomplete factorization $ILU(0)$ is
-  currently implemented.  
+\item[BJAC] Precondition by a factorization or an approximante inverse
+  of the   block-diagonal of matrix $A$, where block boundaries are
+  determined   by the data allocation boundaries for each process;
+  requires no   communication.  See also Table-\ref{tab:p_subsolve_1}. 
 \end{description}
+
+
+
+\clearpage
+
+\subsection{Set\label{sec:precset} --- set preconditioner parameters}
+
+\begin{center}
+\fortinline|call p%set(what,val,info)|
+\end{center}
+
+\noindent
+This method sets the parameters defining the subdomain solver when the
+preconditioner type is \verb|BJAC|. More precisely, the parameter
+identified by \fortinline|what| is assigned the value 
+contained in \fortinline|val|.
+
+{\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
+
+\begin{tabular}{p{1.2cm}p{12cm}}
+\fortinline|what|   & \fortinline|character(len=*)|. \\
+              & The parameter to be set. It can be specified through its name;
+                the string is case-insensitive. See
+                Table~\ref{tab:p_subsolve_1}.\\
+\fortinline|val |   & \fortinline|integer| \emph{or} \fortinline|character(len=*)| \emph{or}
+                \fortinline|real(psb_spk_)| \emph{or} \fortinline|real(psb_dpk_)|,
+                \fortinline|intent(in)|.\\
+              & The value of the parameter to be set. The list of allowed
+                values and the corresponding data types is given in
+                Table~\ref{tab:p_subsolve_1}.
+                When the value is of type \fortinline|character(len=*)|,
+                it is also treated as case insensitive.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
+              & Error code. If no error, 0 is returned. See Section~\ref{sec:errors}
+                for details.
+\end{tabular}
+
+
+\noindent
+A number of subdomain solvers can be chosen with this method;
+a list of the parameters that can be set, along with their allowed and
+default values, is given in Table-\ref{tab:p_subsolve_1}.\\
+
+
+\bsideways
+\begin{center}
+\small
+% \begin{tabular}{|p{3.6cm}|l|p{1.9cm}|p{3.6cm}|p{6.5cm}|}
+\begin{tabular}{|p{3.2cm}|l|p{2.6cm}|p{2.6cm}|p{6.7cm}|}
+\hline
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
+\textsc{comments} \\ \hline
+
+\fortinline|'SUB_SOLVE'|  & \fortinline|character(len=*)|
+                         & \fortinline|'ILU'| \par
+                           \fortinline|'ILUT'| \par 
+                            \par \fortinline|'INVT'| \par \fortinline|'INVK'| \par \fortinline|'AINV'|
+                         & 
+                         & The local solver to be used with the smoother or one-level
+                            preconditioner  ILU($p$),  ILU($p,t$), 
+                           Approximate Inverses  INVK($p,q$),
+                           INVT($p_1,p2,t_1,t_2$) and
+                           AINV($t$); note  that approximate inverses
+                           are specifically suited for GPUs since they
+                           do not employ triangular system solve
+                           kernels,
+                           see~\cite{BERTACCINIFILIPPONE}.\\ \hline
+\fortinline|'SUB_FILLIN'|  & \fortinline|integer|
+                         & Any integer \par number~$\ge 0$
+                         & 0
+                         & Fill-in level $p$ of the incomplete LU factorizations. \\ \hline
+\fortinline|'SUB_ILUTHRS'|  & \fortinline|real(kind_parameter)|
+                         & Any real number~$\ge 0$
+                         & 0
+                         & Drop tolerance $t$ in the ILU($p,t$) factorization. \\ \hline
+\fortinline|'ILU_ALG'|  & \fortinline|character(len=*)|
+                         & \fortinline|'MILU'|
+                         & \fortinline|'NONE'|
+                         & ILU algorithmic variant \\ \hline
+\fortinline|'ILUT_SCALE'|  & \fortinline|character(len=*)|
+                          & \fortinline|'MAXVAL'| \par
+                            \fortinline|'DIAG'| \par
+                            \fortinline|'ARSWUM'| \par
+                            \fortinline|'ARCSUM'| \par
+                            \fortinline|'ACLSUM'| \par
+                            \fortinline|'NONE'| 
+                         & \fortinline|'NONE'|
+                         & ILU scaling strategy \\ \hline
+\fortinline|'INV_FILLIN'|  & \fortinline|integer|
+                         & Any integer \par number~$\ge 0$
+                         & 0
+                         & Second fill-in level $q$ of the INVK($p,q$)
+                           approximate inverse. \\ \hline
+\fortinline|'INV_ILUTHRS'|  & \fortinline|real(kind_parameter)|
+                         & Any real number~$\ge 0$
+                         & 0
+                         & Second drop tolerance $s$ in the
+                           INVT($t,s$) approximate inverse. \\ \hline
+\fortinline|'AINV_ALG'|  & \fortinline|character(len=*)|
+                         & \fortinline|'LLK'| \par
+                            \fortinline|'SYM-LLK'| \par
+                            \fortinline|'STAB-LLK'| \par
+                            \fortinline|'MLK,LMX'| 
+                         & \fortinline|'LLK'|
+                         & AINV algorithmic strategy. \\ \hline
+\end{tabular}
+\end{center}
+\caption{Parameters defining the solver of the BJAC
+  preconditioner.\label{tab:p_subsolve_1}} 
+ \esideways
+
+
 
 
 \clearpage\subsection{build --- Builds a preconditioner}
@@ -200,7 +312,10 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-
+{\par\noindent\large\bfseries Notes}
+This method is almost always called  by the iterative methods of
+Sec.~\ref{sec:methods}; it is extremely unlikely to be needed directly
+by the application developer.
 
 
 \clearpage\subsection{descr --- Prints a description of current
@@ -305,6 +420,99 @@ Error code: if no error, 0 is returned.
 %% preconditioners may use the SuperLU or the UMFPACK software, if
 %% installed; see~\cite{SUPERLU,UMFPACK}. 
 Releases all internal storage.
+
+
+\clearpage\subsection{allocate\_wrk --- preconditioner}
+\label{sec:allocatewrk}
+\begin{verbatim}
+call prec%allocate_wrk(info[,vmold])
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[vmold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata. 
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Preconditioners often need internal work storage during their
+application at each iteration of a linear solver method: in many
+situations this can be  accomplished by allocating and releasing
+memory ``on the fly''. However, when running on an accelerator through
+e.g. the CUDA enabled data strutures of Sec.~\ref{sec:cudastruct} and
+~\ref{sec:cudaenv},  memory allocation and deallocation usually have a
+much larger overhead, significantly affecting performance. To
+alleviate this problem we define this method that preallocates
+internal storage; it is intended to be invoked prior to the iterative
+solver method, so that the necessary internal work storage is
+available throughout the iterative method application.
+
+When using GPUs or other specialized devices, the \fortinline|vmold|
+argument is also necessary to ensure the internal work vectors are of
+the appropriate dynamic type to exploit the accelerator hardware.
+
+
+\clearpage\subsection{deallocate\_wrk --- preconditioner}
+
+\begin{verbatim}
+call prec%allocate_wrk(info)
+call prec%free_wrk(info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Deallocates preconditioner internal work storage; to be invoked after an
+iterative solver has completed execution, see the discussion in
+Sec.~\ref{sec:allocatewrk}. 
+
 
 %%% Local Variables: 
 %%% mode: latex

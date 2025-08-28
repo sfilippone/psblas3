@@ -55,10 +55,12 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
 
   ! locals
   type(psb_ctxt_type) :: ctxt, newctxt
-  integer(psb_ipk_) :: np, me, err_act
+  integer(psb_mpk_) :: np, me, nrm, mipd, i
+  integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: rnp, rme
-  integer(psb_ipk_) :: ipdest, id1, id2, imd, i, nsrc
-  integer(psb_ipk_), allocatable :: newnl(:), nzsrc(:), ids(:) 
+  integer(psb_ipk_) :: ipdest, id1, id2, imd, nsrc
+  integer(psb_ipk_), allocatable :: newnl(:), nzsrc(:)
+  integer(psb_mpk_), allocatable :: ids(:), misrc(:) 
   type(psb_ls_coo_sparse_mat) :: acoo_snd, acoo_rcv
   integer(psb_ipk_) :: debug_level, debug_unit  
   character(len=20)   :: name
@@ -84,28 +86,29 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
   endif
 
 !!$  write(0,*) ' Remapping from ',np,' onto ', np_remap
-
+  mipd = ipd
   if (desc_in%get_fmt() == 'BLOCK') then
     !
     ! Should we spread the processes in the new context,
     ! or should we keep them close? 
     ! 
-    if (.true.) then 
-      allocate(ids(0:np_remap-1))
-      if (np_remap <= np/2) then
+    if (.true.) then
+      nrm = np_remap
+      allocate(ids(0:nrm-1))
+      if (nrm <= np/2) then
         ids(0) = 0
-        do ipdest=1,np_remap -1
-          ids(ipdest) = ids(ipdest-1) + np/np_remap
+        do ipdest=1,nrm -1
+          ids(ipdest) = ids(ipdest-1) + np/nrm
         end do
 !!$        write(0,*) ' IDS ',ids(:) 
       else
-        do ipdest = 0, np_remap-1
+        do ipdest = 0, nrm-1
           ids(ipdest) = ipdest
         end do
       end if
-      call psb_init(newctxt,np=np_remap,basectxt=ctxt,ids=ids)
+      call psb_init(newctxt,np=nrm,basectxt=ctxt,ids=ids)
     else
-      call psb_init(newctxt,np=np_remap,basectxt=ctxt)
+      call psb_init(newctxt,np=nrm,basectxt=ctxt)
     end if
 
     call psb_info(newctxt,rme,rnp)
@@ -140,12 +143,12 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
       ipdest = ( ((me-imd*id1)/id2) +  imd)
     end if
     if (allocated(ids)) then
-      ipd = ids(ipdest)
+      mipd = ids(ipdest)
     else
-      ipd = ipdest
+      mipd = ipdest
     end if
 !!$    write(0,*) ' Sending my data from ',me,' to ', &
-!!$         & ipd, 'out of ',rnp,rnp-1
+!!$         & mipd, 'out of ',rnp,rnp-1
 
     !
     ! Compute local rows for all new
@@ -158,13 +161,14 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
     if (rme>=0) then
       ! 
       if (rme < imd) then
-        isrc = [ (i, i=rme*id1,min(rme*id1+id1-1,np-1)) ]
+        misrc = [ (i, i=rme*id1,min(rme*id1+id1-1,np-1)) ]
       else
-        isrc = [ (i, i=  imd*id1+((rme-imd))*id2,&
+        misrc = [ (i, i=  imd*id1+((rme-imd))*id2,&
              & min(imd*id1+(rme-imd)*id2+id2-1,np-1) ) ]            
       end if
-!!$      write(0,*) me,rme,imd,' ISRC: ',isrc(:)
-      nsrc = size(isrc)
+!!$      write(0,*) me,rme,imd,' ISRC: ',misrc(:)
+      isrc = misrc
+      nsrc = size(misrc)
 !!$      write(0,*) me,rme,'In ',desc_in%get_local_rows(),desc_in%get_global_rows(),&
 !!$           & ' out ',desc_out%get_local_rows(),desc_out%get_global_rows()
     else 
@@ -187,24 +191,24 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
     integer(psb_ipk_) :: nrl, ncl, nzl, nzp
     call a_in%cp_to(acoo_snd)
     nzsnd = acoo_snd%get_nzeros()
-    call psb_snd(ctxt,nzsnd,ipd)
-    call psb_snd(ctxt,desc_in%get_local_rows(),ipd)
+    call psb_snd(ctxt,nzsnd,mipd)
+    call psb_snd(ctxt,desc_in%get_local_rows(),mipd)
     ! Convert to global numbering
     call psb_loc_to_glob(acoo_snd%ia(1:nzsnd),desc_in,info)
     call psb_loc_to_glob(acoo_snd%ja(1:nzsnd),desc_in,info)
 
-    call psb_snd(ctxt,acoo_snd%ia(1:nzsnd),ipd)
-    call psb_snd(ctxt,acoo_snd%ja(1:nzsnd),ipd)
-    call psb_snd(ctxt,acoo_snd%val(1:nzsnd),ipd)
+    call psb_snd(ctxt,acoo_snd%ia(1:nzsnd),mipd)
+    call psb_snd(ctxt,acoo_snd%ja(1:nzsnd),mipd)
+    call psb_snd(ctxt,acoo_snd%val(1:nzsnd),mipd)
 
     if (rme>=0) then
       ! prepare to receive
-      nzsrc = isrc
-      nrsrc = isrc
+      nzsrc = misrc
+      nrsrc = misrc
       nzl = 0
       do ip=1, nsrc
-        call psb_rcv(ctxt,nzsrc(ip),isrc(ip))
-        call psb_rcv(ctxt,nrsrc(ip),isrc(ip))
+        call psb_rcv(ctxt,nzsrc(ip),misrc(ip))
+        call psb_rcv(ctxt,nrsrc(ip),misrc(ip))
         nzl = nzl + nzsrc(ip)
       end do
 !!$      write(0,*) rme,' Check on NR:',newnl(rme+1),sum(nrsrc)
@@ -213,9 +217,9 @@ subroutine psb_s_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
       ncl = acoo_rcv%get_ncols()
       nzp = 0
       do ip=1, nsrc
-        call psb_rcv(ctxt,acoo_rcv%ia(nzp+1:nzp+nzsrc(ip)),isrc(ip))
-        call psb_rcv(ctxt,acoo_rcv%ja(nzp+1:nzp+nzsrc(ip)),isrc(ip))
-        call psb_rcv(ctxt,acoo_rcv%val(nzp+1:nzp+nzsrc(ip)),isrc(ip))
+        call psb_rcv(ctxt,acoo_rcv%ia(nzp+1:nzp+nzsrc(ip)),misrc(ip))
+        call psb_rcv(ctxt,acoo_rcv%ja(nzp+1:nzp+nzsrc(ip)),misrc(ip))
+        call psb_rcv(ctxt,acoo_rcv%val(nzp+1:nzp+nzsrc(ip)),misrc(ip))
         nzp = nzp + nzsrc(ip)
       end do
       call acoo_rcv%set_nzeros(nzp)

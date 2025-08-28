@@ -416,7 +416,7 @@ module psb_z_base_mat_mod
     !
     ! This is COO specific
     !
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     procedure, pass(a) :: iset_nzeros   => lz_coo_iset_nzeros
     procedure, pass(a) :: lset_nzeros   => lz_coo_lset_nzeros
     generic, public    :: set_nzeros    => iset_nzeros, lset_nzeros
@@ -439,7 +439,7 @@ module psb_z_base_mat_mod
   private :: lz_coo_get_nzeros, lz_coo_iset_nzeros, &
        & lz_coo_get_fmt,  lz_coo_free, lz_coo_sizeof, &
        & lz_coo_transp_1mat, lz_coo_transc_1mat
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   private :: lz_coo_lset_nzeros
 #endif
 
@@ -3499,7 +3499,7 @@ module psb_z_base_mat_mod
     end subroutine psb_lz_coo_clean_negidx
   end interface
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   !
   !> Funtion: coo_clean_negidx_inner
   !! \brief Take out any entries with negative row or column index
@@ -4323,7 +4323,7 @@ contains
 
   end subroutine lz_coo_iset_nzeros
 
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   subroutine  lz_coo_lset_nzeros(nz,a)
     implicit none
     integer(psb_lpk_), intent(in) :: nz

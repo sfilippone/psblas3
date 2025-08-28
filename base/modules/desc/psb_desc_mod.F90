@@ -285,14 +285,14 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
-  interface psb_cd_set_large_threshold    
-    module procedure  psb_i_cd_set_large_threshold
-  end interface psb_cd_set_large_threshold
+  interface psb_cd_set_hash_threshold    
+    module procedure  psb_i_cd_set_hash_threshold
+  end interface psb_cd_set_hash_threshold
 
-#if defined(IPK4) && defined(LPK8)
-  interface psb_cd_set_large_threshold    
-    module procedure  psb_l_cd_set_large_threshold
-  end interface psb_cd_set_large_threshold
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
+  interface psb_cd_set_hash_threshold    
+    module procedure  psb_l_cd_set_hash_threshold
+  end interface psb_cd_set_hash_threshold
 #endif
 
   interface psb_set_sp_a2av_alg
@@ -309,7 +309,7 @@ module psb_desc_mod
        & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins, cd_fnd_owner
 
 
-  integer(psb_lpk_), private, save :: cd_large_threshold = psb_default_large_threshold
+  integer(psb_lpk_), private, save :: cd_hash_threshold = psb_default_hash_threshold
   integer(psb_ipk_), private, save :: sp_a2av_alg        = psb_sp_a2av_smpl_triad_ 
 
 contains 
@@ -363,27 +363,27 @@ contains
 
 
 
-  subroutine psb_i_cd_set_large_threshold(ith)
+  subroutine psb_i_cd_set_hash_threshold(ith)
     implicit none 
     integer(psb_ipk_), intent(in) :: ith
     if (ith > 0) then 
-      cd_large_threshold = ith
+      cd_hash_threshold = ith
     end if
-  end subroutine psb_i_cd_set_large_threshold
+  end subroutine psb_i_cd_set_hash_threshold
 
-  subroutine psb_l_cd_set_large_threshold(ith)
+  subroutine psb_l_cd_set_hash_threshold(ith)
     implicit none 
     integer(psb_lpk_), intent(in) :: ith
     if (ith > 0) then 
-      cd_large_threshold = ith
+      cd_hash_threshold = ith
     end if
-  end subroutine psb_l_cd_set_large_threshold
+  end subroutine psb_l_cd_set_hash_threshold
 
-  function  psb_cd_get_large_threshold() result(val)
+  function  psb_cd_get_hash_threshold() result(val)
     implicit none 
     integer(psb_lpk_) :: val
-    val  = cd_large_threshold 
-  end function psb_cd_get_large_threshold
+    val  = cd_hash_threshold 
+  end function psb_cd_get_hash_threshold
   
   function  psb_cd_is_large_size(m) result(val)
     use psb_penv_mod
@@ -392,7 +392,7 @@ contains
     integer(psb_lpk_), intent(in) :: m
     logical :: val
     !locals
-    val = (m > psb_cd_get_large_threshold()) 
+    val = (m > psb_cd_get_hash_threshold()) 
   end function psb_cd_is_large_size
 
   function  psb_cd_choose_large_state(ctxt,m) result(val)
@@ -409,7 +409,7 @@ contains
     ! 
     ! Since the hashed lists take up (somewhat) more than 2*N_COL integers,
     ! it makes no sense to use them if you don't have at least 
-    ! 3 processes, no matter what the size of the process. 
+    ! 3 processes, no matter what the size of the index space. 
     !
     val = psb_cd_is_large_size(m) .and. (np > 2)
   end function psb_cd_choose_large_state

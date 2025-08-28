@@ -50,6 +50,28 @@ contains
 
   end subroutine psb_c_init
 
+  ! Get MPI_Fint from C, psb_c_object_type and start a psb_ctxt_type 
+  ! context from it.
+  subroutine psb_c_init_from_fint(cctxt,fint) bind(c)
+    use psb_base_mod, only : psb_init, psb_ctxt_type
+    implicit none
+
+    type(psb_c_object_type)      :: cctxt
+    integer(psb_c_mpk_), value   :: fint
+    type(psb_ctxt_type), pointer :: ctxt
+    integer :: info
+
+    ! Local variables
+    integer(psb_mpk_)  :: fmctxt
+
+    allocate(ctxt,stat=info)
+    if (info /= 0) return
+    fmctxt = fint
+    call psb_init(ctxt,extcomm=fmctxt)
+    cctxt%item = c_loc(ctxt)
+
+  end subroutine psb_c_init_from_fint
+
   function psb_c2f_ctxt(cctxt)   result(res)
     implicit none
     type(psb_c_object_type), value :: cctxt
@@ -70,12 +92,13 @@ contains
     integer(psb_c_ipk_)  :: info
 
     ! Local variables
+    integer(psb_c_mpk_)  :: mctxt
     type(psb_ctxt_type),   pointer :: ctxt
 
     ctxt => psb_c2f_ctxt(cctxt)
 
-    call ctxt%get_i_ctxt(ictxt,info)
-
+    call ctxt%get_i_ctxt(mctxt,info)
+    ictxt = mctxt 
   end subroutine
 
   function psb_c_cmp_ctxt(cctxt1, cctxt2) bind(c,name="psb_c_cmp_ctxt") result(res)
@@ -177,6 +200,7 @@ contains
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
     integer(psb_c_mpk_)        :: v(*)
+    integer(psb_c_mpk_)     :: mroot
 
     type(psb_ctxt_type), pointer :: ctxt
     ctxt => psb_c2f_ctxt(cctxt)
@@ -186,8 +210,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_mbcast
 
   subroutine psb_c_ibcast(cctxt,n,v,root) bind(c)
@@ -197,6 +222,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     integer(psb_c_ipk_)        :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
 
     ctxt => psb_c2f_ctxt(cctxt)
 
@@ -205,8 +231,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_ibcast
 
   subroutine psb_c_lbcast(cctxt,n,v,root) bind(c)
@@ -216,6 +243,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     integer(psb_c_lpk_)        :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     if (n < 0) then
@@ -223,8 +251,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_lbcast
 
   subroutine psb_c_ebcast(cctxt,n,v,root) bind(c)
@@ -234,6 +263,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     integer(psb_c_epk_)        :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     if (n < 0) then
@@ -241,8 +271,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_ebcast
 
   subroutine psb_c_sbcast(cctxt,n,v,root) bind(c)
@@ -252,6 +283,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     real(c_float)     :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     if (n < 0) then
@@ -259,8 +291,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_sbcast
 
   subroutine psb_c_dbcast(cctxt,n,v,root) bind(c)
@@ -270,6 +303,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     real(c_double)        :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     if (n < 0) then
@@ -277,8 +311,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_dbcast
 
 
@@ -289,6 +324,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     complex(c_float_complex)        :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     if (n < 0) then
@@ -296,8 +332,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_cbcast
 
   subroutine psb_c_zbcast(cctxt,n,v,root) bind(c)
@@ -307,6 +344,7 @@ contains
     integer(psb_c_ipk_), value     :: n, root
     complex(c_double_complex)     :: v(*)
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     if (n < 0) then
@@ -314,8 +352,9 @@ contains
       return
     end if
     if (n==0) return
+    mroot=root
 
-    call psb_bcast(ctxt,v(1:n),root=root)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_zbcast
 
   subroutine psb_c_hbcast(cctxt,v,root) bind(c)
@@ -326,6 +365,7 @@ contains
     character(c_char)  :: v(*)
     integer(psb_ipk_)  :: iam, np, n
     type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_)    :: mroot
     ctxt => psb_c2f_ctxt(cctxt)
 
     call psb_info(ctxt,iam,np)
@@ -337,8 +377,9 @@ contains
         n = n + 1
       end do
     end if
-    call psb_bcast(ctxt,n,root=root)
-    call psb_bcast(ctxt,v(1:n),root=root)
+    mroot=root
+    call psb_bcast(ctxt,n,root=mroot)
+    call psb_bcast(ctxt,v(1:n),root=mroot)
   end subroutine psb_c_hbcast
 
   function psb_c_f2c_errmsg(cmesg,len) bind(c) result(res)

@@ -94,15 +94,16 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: flag, n
+  integer(psb_mpk_), intent(in)      :: n
+  integer(psb_ipk_), intent(in)      :: flag
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_i2pk_)         :: y(:,:), beta
   integer(psb_i2pk_), target :: work(:)
@@ -112,7 +113,8 @@ subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_mpk_) :: icomm
-  integer(psb_ipk_) :: np, me, idxs, idxr, err_act, totxch, data_
+  integer(psb_mpk_) :: np, me
+  integer(psb_ipk_) :: idxs, idxr, err_act, totxch, data_
   integer(psb_ipk_), pointer :: d_idx(:)
   character(len=20)  :: name
 
@@ -166,36 +168,38 @@ subroutine psi_i2tranidxm(ctxt,icomm,flag,n,beta,y,idx,&
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
   type(psb_ctxt_type), intent(in)   :: ctxt
   integer(psb_mpk_), intent(in)     :: icomm
-  integer(psb_ipk_), intent(in)     :: flag,n
+  integer(psb_mpk_), intent(in)     :: n
+  integer(psb_ipk_), intent(in)     :: flag
   integer(psb_ipk_), intent(out)    :: info
   integer(psb_i2pk_)         :: y(:,:), beta
   integer(psb_i2pk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: np, me, nesd, nerv
   integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
+  integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
   integer(psb_i2pk_), pointer, dimension(:) :: sndbuf, rcvbuf
+#if !defined(FLANG)
   volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info=psb_success_
@@ -577,11 +581,11 @@ subroutine psi_i2swaptranv(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -659,11 +663,11 @@ subroutine psi_i2tranidxv(ctxt,icomm,flag,beta,y,idx,&
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
   implicit none
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
 
@@ -676,19 +680,20 @@ subroutine psi_i2tranidxv(ctxt,icomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_) :: np, me
+  integer(psb_mpk_) :: np, me, nesd, nerv, n
   integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer(psb_ipk_) :: nesd, nerv,&
-       & err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, n
+  integer(psb_ipk_) ::  err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
   integer(psb_i2pk_), pointer, dimension(:) :: sndbuf, rcvbuf
+#if !defined(FLANG)
   volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info=psb_success_

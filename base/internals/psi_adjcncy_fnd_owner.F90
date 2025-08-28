@@ -61,12 +61,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   use psb_realloc_mod
   use psb_timers_mod
   use psb_indx_map_mod, psb_protect_name => psi_adjcncy_fnd_owner
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
 
   implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)   :: idx(:)
@@ -81,13 +81,13 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), sdidx(:), rvidx(:),&
        & sdsz(:), rvsz(:), sdhd(:), rvhd(:), p2pstat(:,:)
   integer(psb_mpk_) :: prc, p2ptag, iret
-  integer(psb_mpk_) :: icomm, minfo
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
-       & last_ih, last_j, nidx, nrecv, nadj
+  integer(psb_mpk_) :: icomm, minfo, ip,nidx
+  integer(psb_ipk_) :: n_row,n_col,err_act,hsize,isz,j, k,&
+       & last_ih, last_j, nrecv, nadj
   integer(psb_lpk_) :: mglob, ih
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np,me
-  logical, parameter  :: gettime=.true., debug=.false.
+  integer(psb_mpk_)   :: np,me
+  logical, parameter  :: debug=.false.
   integer(psb_mpk_)   :: xchg_alg 
   logical, parameter  :: do_timings=.false.
   integer(psb_ipk_), save  :: idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
@@ -132,10 +132,6 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     goto 9999      
   end if
 
-  if (gettime) then 
-    t0 = psb_wtime()
-  end if
-
   nadj = size(adj)
   nidx = size(idx)
   call psb_realloc(nidx,iprc,info)
@@ -143,7 +139,7 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
   iprc(:) = 0
 #else 
   iprc = -1
@@ -180,8 +176,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     if (do_timings) call psb_toc(idx_phase11)
     if (do_timings) call psb_tic(idx_phase12)
     rvidx(0) = 0
-    do i=0, np-1
-      rvidx(i+1) = rvidx(i) + rvsz(i)
+    do ip=0, np-1
+      rvidx(ip+1) = rvidx(ip) + rvsz(ip)
     end do
     hsize = rvidx(np)
     
@@ -208,9 +204,9 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     ! Third, compute local answers
     !
     call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
-    do i=1, hsize
-      tproc(i) = -1
-      if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
+    do ip=1, hsize
+      tproc(ip) = -1
+      if ((0 < lclidx(ip)).and. (lclidx(ip) <= n_row)) tproc(ip) = me
     end do
     if (do_timings) call psb_toc(idx_phase2)
     if (do_timings) call psb_tic(idx_phase3)
@@ -219,8 +215,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     ! Fourth, exchange the answers 
     !
     ! Adjust sdidx for reuse in receiving lclidx array 
-    do i=0,np-1
-      sdidx(i+1) = sdidx(i) + sdsz(i)
+    do ip=0,np-1
+      sdidx(ip+1) = sdidx(ip) + sdsz(ip)
     end do
     call mpi_alltoallv(tproc,rvsz,rvidx,psb_mpi_ipk_,&
          & lclidx,sdsz,sdidx,psb_mpi_ipk_,icomm,iret)
@@ -229,10 +225,10 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     ! Because IPRC has been initialized to -1, the MAX operation selects
     ! the answers. 
     !
-    do i=0, np-1
-      if (sdsz(i)>0) then
+    do ip=0, np-1
+      if (sdsz(ip)>0) then
         ! Must be nidx == sdsz(i) 
-        iprc(1:nidx) = max(iprc(1:nidx), lclidx(sdidx(i)+1:sdidx(i)+sdsz(i)))
+        iprc(1:nidx) = max(iprc(1:nidx), lclidx(sdidx(ip)+1:sdidx(ip)+sdsz(ip)))
       end if
     end do
     if (do_timings) call psb_toc(idx_phase3)
@@ -266,8 +262,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
          & rvsz,1,psb_mpi_mpk_,icomm,minfo)
     hidx(0) = 0
-    do i=0, np-1
-      hidx(i+1) = hidx(i) + rvsz(i)
+    do ip=0, np-1
+      hidx(ip+1) = hidx(ip) + rvsz(ip)
     end do
     hsize = hidx(np)
     ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
@@ -280,22 +276,23 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
-    do i = 0, np-1
-      if (rvsz(i)>0) then
+    do ip = 0, np-1
+      if (rvsz(ip)>0) then
         ! write(0,*) me, ' First receive from ',i,rvsz(i)
-        prc = psb_get_mpi_rank(ctxt,i)        
+        prc = psb_get_mpi_rank(ctxt,ip)        
         p2ptag = psb_long_swap_tag
         !write(0,*) me, ' Posting first receive from ',i,rvsz(i),prc           
-        call mpi_irecv(rmtidx(hidx(i)+1),rvsz(i),&
+        call mpi_irecv(rmtidx(hidx(ip)+1),rvsz(ip),&
              & psb_mpi_lpk_,prc,&
-             & p2ptag, icomm,rvhd(i),iret)
+             & p2ptag, icomm,rvhd(ip),iret)
       end if
     end do
     if (do_timings) call psb_toc(idx_phase11)
     if (do_timings) call psb_tic(idx_phase12)    
     do j=1, nadj
       if (nidx > 0) then
-        prc = psb_get_mpi_rank(ctxt,adj(j))        
+        ip = adj(j)
+        prc = psb_get_mpi_rank(ctxt,ip)
         p2ptag = psb_long_swap_tag
         !write(0,*) me, ' First send to ',adj(j),nidx, prc
         call mpi_send(idx,nidx,&
@@ -314,9 +311,9 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     ! Third, compute local answers
     !
     call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
-    do i=1, hsize
-      tproc(i) = -1
-      if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
+    do ip=1, hsize
+      tproc(ip) = -1
+      if ((0 < lclidx(ip)).and. (lclidx(ip) <= n_row)) tproc(ip) = me
     end do
     if (do_timings) call psb_toc(idx_phase2)
     if (do_timings) call psb_tic(idx_phase3)
@@ -327,7 +324,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     do j=1, nadj
       !write(0,*) me, ' First send to ',adj(j),nidx
       if (nidx > 0) then
-        prc = psb_get_mpi_rank(ctxt,adj(j))        
+        ip = adj(j)
+        prc = psb_get_mpi_rank(ctxt,ip)
         p2ptag = psb_int_swap_tag
         !write(0,*) me, ' Posting second receive from ',adj(j),nidx, prc
         call mpi_irecv(lclidx((j-1)*nidx+1),nidx, &
@@ -339,12 +337,12 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     !
     ! Fourth, send data back; 
     !
-    do i = 0, np-1
-      if (rvsz(i)>0) then
-        prc = psb_get_mpi_rank(ctxt,i)        
+    do ip = 0, np-1
+      if (rvsz(ip)>0) then
+        prc = psb_get_mpi_rank(ctxt,ip)        
         p2ptag = psb_int_swap_tag
         !write(0,*) me, ' Second send to ',i,rvsz(i), prc
-        call mpi_send(tproc(hidx(i)+1),rvsz(i),&
+        call mpi_send(tproc(hidx(ip)+1),rvsz(ip),&
              & psb_mpi_ipk_,prc,&
              & p2ptag, icomm,iret)
       end if
@@ -376,8 +374,8 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     call mpi_alltoall(sdsz,1,psb_mpi_mpk_,&
          & rvsz,1,psb_mpi_mpk_,icomm,minfo)
     hidx(0) = 0
-    do i=0, np-1
-      hidx(i+1) = hidx(i) + rvsz(i)
+    do ip=0, np-1
+      hidx(ip+1) = hidx(ip) + rvsz(ip)
     end do
     hsize = hidx(np)
     ! write(0,*)me,' Check on sizes from a2a:',hsize,rvsz(:)
@@ -392,12 +390,13 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     end if
     do j=1, nadj
       !write(0,*) me, ' First send to ',adj(j),nidx
-      if (nidx > 0) call psb_snd(ctxt,idx(1:nidx),adj(j))
+      ip = adj(j)
+      if (nidx > 0) call psb_snd(ctxt,idx(1:nidx),ip)
     end do
-    do i = 0, np-1
-      if (rvsz(i)>0) then
+    do ip = 0, np-1
+      if (rvsz(ip)>0) then
         ! write(0,*) me, ' First receive from ',i,rvsz(i)           
-        call psb_rcv(ctxt,rmtidx(hidx(i)+1:hidx(i)+rvsz(i)),i)
+        call psb_rcv(ctxt,rmtidx(hidx(ip)+1:hidx(ip)+rvsz(ip)),ip)
       end if
     end do
 
@@ -405,18 +404,18 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     ! Third, compute local answers
     !
     call idxmap%g2l(rmtidx(1:hsize),lclidx(1:hsize),info,owned=.true.)
-    do i=1, hsize
-      tproc(i) = -1
-      if ((0 < lclidx(i)).and. (lclidx(i) <= n_row)) tproc(i) = me
+    do ip=1, hsize
+      tproc(ip) = -1
+      if ((0 < lclidx(ip)).and. (lclidx(ip) <= n_row)) tproc(ip) = me
     end do
 
     !
     ! Fourth, send data back; 
     !
-    do i = 0, np-1
-      if (rvsz(i)>0) then
+    do ip = 0, np-1
+      if (rvsz(ip)>0) then
         !write(0,*) me, ' Second send to ',i,rvsz(i)
-        call psb_snd(ctxt,tproc(hidx(i)+1:hidx(i)+rvsz(i)),i)
+        call psb_snd(ctxt,tproc(hidx(ip)+1:hidx(ip)+rvsz(ip)),ip)
       end if
     end do
     !
@@ -424,8 +423,9 @@ subroutine psi_adjcncy_fnd_owner(idx,iprc,adj,idxmap,info)
     ! answer is -1. Reuse tproc
     !
     do j = 1, nadj
-      !write(0,*) me, ' Second receive from ',adj(j), nidx          
-      if (nidx > 0) call psb_rcv(ctxt,tproc(1:nidx),adj(j))
+      !write(0,*) me, ' Second receive from ',adj(j), nidx
+      ip = adj(j)
+      if (nidx > 0) call psb_rcv(ctxt,tproc(1:nidx),ip)
       iprc(1:nidx) = max(iprc(1:nidx), tproc(1:nidx))
     end do
   case default 

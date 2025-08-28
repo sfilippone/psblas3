@@ -91,7 +91,7 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_d_mv_csr_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_d_mv_csr_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_d_mv_csr_from_fmt
-    procedure, pass(a) :: clean_zeros => psb_d_csr_clean_zeros
+!    procedure, pass(a) :: clean_zeros => psb_d_csr_clean_zeros
     procedure, pass(a) :: csput_a     => psb_d_csr_csput_a
     procedure, pass(a) :: get_diag    => psb_d_csr_get_diag
     procedure, pass(a) :: csgetptn    => psb_d_csr_csgetptn
@@ -261,18 +261,18 @@ module psb_d_csr_mat_mod
     end subroutine psb_d_csr_triu
   end interface
 
-  !
-  !>
-  !! \memberof  psb_d_csr_sparse_mat
-  !! \see psb_d_base_mat_mod::psb_d_base_clean_zeros
-  !
-  interface
-    subroutine  psb_d_csr_clean_zeros(a, info)
-      import
-      class(psb_d_csr_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_csr_clean_zeros
-  end interface
+!!$  !
+!!$  !>
+!!$  !! \memberof  psb_d_csr_sparse_mat
+!!$  !! \see psb_d_base_mat_mod::psb_d_base_clean_zeros
+!!$  !
+!!$  interface
+!!$    subroutine  psb_d_csr_clean_zeros(a, info)
+!!$      import
+!!$      class(psb_d_csr_sparse_mat), intent(inout) :: a
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_d_csr_clean_zeros
+!!$  end interface
 
   !> \memberof psb_d_csr_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_coo
@@ -579,7 +579,111 @@ module psb_d_csr_mat_mod
     end subroutine psb_d_csr_scals
   end interface
 
-    !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
+  
+  type, extends(psb_d_csr_sparse_mat) :: psb_d_ecsr_sparse_mat
+    
+    !> Number of non-empty rows
+    integer(psb_ipk_) :: nnerws
+    !> Indices of non-empty rows
+    integer(psb_ipk_), allocatable :: nerwp(:)
+
+  contains
+    procedure, nopass  :: get_fmt     => d_ecsr_get_fmt
+
+    !    procedure, pass(a) :: csmm        => psb_d_ecsr_csmm
+    procedure, pass(a) :: csmv        => psb_d_ecsr_csmv
+
+    procedure, pass(a) :: cp_from_coo => psb_d_cp_ecsr_from_coo
+    procedure, pass(a) :: cp_from_fmt => psb_d_cp_ecsr_from_fmt
+    procedure, pass(a) :: mv_from_coo => psb_d_mv_ecsr_from_coo
+    procedure, pass(a) :: mv_from_fmt => psb_d_mv_ecsr_from_fmt
+
+    procedure, pass(a) :: cmp_nerwp   => psb_d_ecsr_cmp_nerwp
+    procedure, pass(a) :: free        => d_ecsr_free
+    procedure, pass(a) :: mold        => psb_d_ecsr_mold
+
+  end type psb_d_ecsr_sparse_mat
+  !> \memberof psb_d_ecsr_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_csmv
+  interface
+    subroutine psb_d_ecsr_csmv(alpha,a,x,beta,y,info,trans)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+      real(psb_dpk_), intent(inout)       :: y(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in)     :: trans
+    end subroutine psb_d_ecsr_csmv
+  end interface
+
+  !> \memberof psb_d_ecsr_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
+  interface
+    subroutine psb_d_ecsr_cmp_nerwp(a,info)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine psb_d_ecsr_cmp_nerwp
+  end interface
+
+  !> \memberof psb_d_ecsr_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
+  interface
+    subroutine psb_d_cp_ecsr_from_coo(a,b,info)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+      class(psb_d_coo_sparse_mat), intent(in)    :: b
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine psb_d_cp_ecsr_from_coo
+  end interface
+
+  !> \memberof psb_d_ecsr_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_cp_from_fmt
+  interface
+    subroutine psb_d_cp_ecsr_from_fmt(a,b,info)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+      class(psb_d_base_sparse_mat), intent(in)   :: b
+      integer(psb_ipk_), intent(out)                        :: info
+    end subroutine psb_d_cp_ecsr_from_fmt
+  end interface
+
+  !> \memberof psb_d_ecsr_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_mv_from_coo
+  interface
+    subroutine psb_d_mv_ecsr_from_coo(a,b,info)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)                        :: info
+    end subroutine psb_d_mv_ecsr_from_coo
+  end interface
+
+  !> \memberof psb_d_ecsr_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_mv_from_fmt
+  interface
+    subroutine psb_d_mv_ecsr_from_fmt(a,b,info)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)                         :: info
+    end subroutine psb_d_mv_ecsr_from_fmt
+  end interface
+
+  !> \memberof psb_d_ecsr_sparse_mat
+  !| \see psb_base_mat_mod::psb_base_mold
+  interface
+    subroutine psb_d_ecsr_mold(a,b,info)
+      import
+      class(psb_d_ecsr_sparse_mat), intent(in)                  :: a
+      class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+      integer(psb_ipk_), intent(out)                           :: info
+    end subroutine psb_d_ecsr_mold
+  end interface
+
+
+  
+  !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
   !! \extends psb_ld_base_mat_mod::psb_ld_base_sparse_mat
   !!
   !! psb_ld_csr_sparse_mat type and the related methods.
@@ -612,7 +716,7 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_ld_mv_csr_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_ld_mv_csr_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_ld_mv_csr_from_fmt
-    procedure, pass(a) :: clean_zeros => psb_ld_csr_clean_zeros
+!    procedure, pass(a) :: clean_zeros => psb_ld_csr_clean_zeros
     procedure, pass(a) :: csput_a     => psb_ld_csr_csput_a
     procedure, pass(a) :: get_diag    => psb_ld_csr_get_diag
     procedure, pass(a) :: csgetptn    => psb_ld_csr_csgetptn
@@ -791,17 +895,17 @@ module psb_d_csr_mat_mod
   end interface
 
     !
-  !>
-  !! \memberof  psb_ld_csr_sparse_mat
-  !! \see psb_ld_base_mat_mod::psb_ld_base_clean_zeros
-  !
-  interface
-    subroutine  psb_ld_csr_clean_zeros(a, info)
-      import
-      class(psb_ld_csr_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_ld_csr_clean_zeros
-  end interface
+!!$  !>
+!!$  !! \memberof  psb_ld_csr_sparse_mat
+!!$  !! \see psb_ld_base_mat_mod::psb_ld_base_clean_zeros
+!!$  !
+!!$  interface
+!!$    subroutine  psb_ld_csr_clean_zeros(a, info)
+!!$      import
+!!$      class(psb_ld_csr_sparse_mat), intent(inout) :: a
+!!$      integer(psb_ipk_), intent(out)              :: info
+!!$    end subroutine psb_ld_csr_clean_zeros
+!!$  end interface
 
 
 
@@ -1176,6 +1280,26 @@ contains
 
   end subroutine d_csr_free
 
+
+
+  function d_ecsr_get_fmt() result(res)
+    implicit none
+    character(len=5) :: res
+    res = 'ECSR'
+  end function d_ecsr_get_fmt
+
+  subroutine  d_ecsr_free(a)
+    implicit none
+
+    class(psb_d_ecsr_sparse_mat), intent(inout) :: a
+
+    
+    if (allocated(a%nerwp)) deallocate(a%nerwp)
+    a%nnerws = 0
+    call a%psb_d_csr_sparse_mat%free()
+
+    return
+  end subroutine d_ecsr_free
 
 
   ! == ===================================

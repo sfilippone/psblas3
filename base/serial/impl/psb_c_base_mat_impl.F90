@@ -60,7 +60,6 @@ subroutine psb_c_base_cp_to_coo(a,b,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_cp_to_coo
@@ -84,7 +83,6 @@ subroutine psb_c_base_cp_from_coo(a,b,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_cp_from_coo
@@ -344,7 +342,6 @@ subroutine psb_c_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_csput_a
@@ -420,7 +417,6 @@ subroutine psb_c_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_csgetrow
@@ -993,7 +989,6 @@ subroutine psb_c_base_mold(a,b,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_mold
@@ -1168,7 +1163,6 @@ subroutine psb_c_base_csmm(alpha,a,x,beta,y,info,trans)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_csmm
@@ -1194,7 +1188,6 @@ subroutine psb_c_base_csmv(alpha,a,x,beta,y,info,trans)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 
@@ -1221,7 +1214,6 @@ subroutine psb_c_base_inner_cssm(alpha,a,x,beta,y,info,trans)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_inner_cssm
@@ -1247,7 +1239,6 @@ subroutine psb_c_base_inner_cssv(alpha,a,x,beta,y,info,trans)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_inner_cssv
@@ -1549,7 +1540,6 @@ subroutine psb_c_base_scals(d,a,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_scals
@@ -1618,7 +1608,6 @@ subroutine psb_c_base_scal(d,a,info,side)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_scal
@@ -1643,7 +1632,6 @@ function psb_c_base_maxval(a) result(res)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end function psb_c_base_maxval
@@ -1742,7 +1730,6 @@ subroutine psb_c_base_rowsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_rowsum
@@ -1764,7 +1751,6 @@ subroutine psb_c_base_arwsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_arwsum
@@ -1786,7 +1772,6 @@ subroutine psb_c_base_colsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_colsum
@@ -1808,7 +1793,6 @@ subroutine psb_c_base_aclsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_aclsum
@@ -1833,7 +1817,6 @@ subroutine psb_c_base_get_diag(a,d,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_c_base_get_diag
@@ -2006,8 +1989,8 @@ subroutine psb_c_base_vect_mv(alpha,a,x,beta,y,info,trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  call x%sync()
-  call y%sync()
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
   call a%spmm(alpha,x%v,beta,y%v,info,trans)
   call y%set_host()
 end subroutine psb_c_base_vect_mv
@@ -2060,8 +2043,8 @@ subroutine psb_c_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     goto 9999
   end if
 
-  call x%sync()
-  call y%sync()
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
   if (present(d)) then
     call d%sync()
     if (present(scale)) then
@@ -2082,6 +2065,7 @@ subroutine psb_c_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       if (info == psb_success_)&
            & call a%inner_spsm(alpha,tmpv,beta,y,info,trans)
 
+      call y%set_host()
       if (info == psb_success_) then
         call tmpv%free(info)
         if (info == psb_success_) deallocate(tmpv,stat=info)
@@ -2161,8 +2145,11 @@ subroutine psb_c_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (x%is_dev()) call x%sync()
+  if (y%is_dev()) call y%sync()
 
   call a%inner_spsm(alpha,x%v,beta,y%v,info,trans)
+  call y%set_host()
 
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_
@@ -2543,7 +2530,6 @@ subroutine psb_lc_base_cp_to_coo(a,b,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_cp_to_coo
@@ -2567,7 +2553,6 @@ subroutine psb_lc_base_cp_from_coo(a,b,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_cp_from_coo
@@ -2827,7 +2812,6 @@ subroutine psb_lc_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_csput_a
@@ -2904,7 +2888,6 @@ subroutine psb_lc_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_csgetrow
@@ -3486,7 +3469,6 @@ subroutine psb_lc_base_mold(a,b,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_mold
@@ -3644,7 +3626,6 @@ subroutine psb_lc_base_scals(d,a,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_scals
@@ -3713,7 +3694,6 @@ subroutine psb_lc_base_scal(d,a,info,side)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_scal
@@ -3738,7 +3718,6 @@ function psb_lc_base_maxval(a) result(res)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end function psb_lc_base_maxval
@@ -3834,7 +3813,6 @@ subroutine psb_lc_base_rowsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_rowsum
@@ -3856,7 +3834,6 @@ subroutine psb_lc_base_arwsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_arwsum
@@ -3878,7 +3855,6 @@ subroutine psb_lc_base_colsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_colsum
@@ -3900,7 +3876,6 @@ subroutine psb_lc_base_aclsum(d,a)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_aclsum
@@ -4064,7 +4039,6 @@ subroutine psb_lc_base_get_diag(a,d,info)
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
-
   call psb_error_handler(err_act)
 
 end subroutine psb_lc_base_get_diag

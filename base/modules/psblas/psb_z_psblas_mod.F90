@@ -143,6 +143,20 @@ module psb_z_psblas_mod
     end subroutine psb_zaxpby
   end interface
 
+  interface psb_upd_xyz
+    subroutine psb_z_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
+         & desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
+      type(psb_z_vect_type), intent (inout) :: x
+      type(psb_z_vect_type), intent (inout) :: y
+      type(psb_z_vect_type), intent (inout) :: z
+      complex(psb_dpk_), intent (in)        :: alpha, beta, gamma, delta
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_z_upd_xyz_vect
+  end interface psb_upd_xyz
+  
   interface psb_geamax
     function psb_zamax(x, desc_a, info, jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
@@ -174,7 +188,7 @@ module psb_z_psblas_mod
     end function psb_zamax_vect
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_zamax, psb_zamaxv, psb_zamax_vect
   end interface
@@ -258,7 +272,7 @@ module psb_z_psblas_mod
     end subroutine psb_zmasum
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_zasum, psb_zasumv, psb_zasum_vect
   end interface
@@ -321,7 +335,7 @@ module psb_z_psblas_mod
     end function psb_znrm2_weightmask_vect
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_znrm2, psb_znrm2v, psb_znrm2_vect, psb_znrm2_weight_vect, psb_znrm2_weightmask_vect
   end interface
@@ -352,7 +366,7 @@ module psb_z_psblas_mod
     end function psb_znrmi
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_znrmi
   end interface
@@ -370,7 +384,7 @@ module psb_z_psblas_mod
     end function psb_zspnrm1
   end interface
 
-#if ! defined(HAVE_BUGGY_GENERICS)
+#if ! defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_zspnrm1
   end interface

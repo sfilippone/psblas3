@@ -36,9 +36,7 @@ module psb_serial_mod
   use psb_string_mod
   use psb_sort_mod
 
-  use psi_serial_mod, &
-       & psb_gth => psi_gth,&
-       & psb_sct => psi_sct
+  use psi_serial_mod
 
   use psb_s_serial_mod
   use psb_d_serial_mod

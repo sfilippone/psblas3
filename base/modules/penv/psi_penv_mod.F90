@@ -29,10 +29,11 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
   use psb_const_mod
+  use iso_c_binding
   integer(psb_mpk_), parameter :: mpi_success          = 0
   integer(psb_mpk_), parameter :: mpi_request_null     = 0
   integer(psb_mpk_), parameter :: mpi_status_size      = 1
@@ -49,13 +50,135 @@ module mpi
   integer(psb_mpk_), parameter :: mpi_comm_null        = -1
   integer(psb_mpk_), parameter :: mpi_comm_world       = 1
   
-  real(psb_dpk_), external :: mpi_wtime
+  !real(psb_dpk_), external :: mpi_wtime
+
+  interface
+    function mpi_wtime()  result(res) bind(c,name='mpi_wtime')
+      import
+      real(c_double) :: res
+    end function mpi_wtime
+  end interface
+
+  interface
+    subroutine mpi_wait(request, status,ierr) bind(c,name='mpi_wait')
+      import
+      type(*), dimension(..) :: request
+      integer(psb_mpk_) :: status(*)
+      integer(psb_mpk_) :: ierr
+    end subroutine mpi_wait
+  end interface
+  
+  interface
+    subroutine mpi_send(buf,count,datatype,dest,tag,comm,ierr) &
+         & bind(c,name='mpi_send')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, dest, tag, comm, ierr
+    end subroutine mpi_send
+  end interface
+
+  
+  interface
+    subroutine mpi_isend(buf,count,datatype,dest,tag,comm,request,ierr) &
+         & bind(c,name='mpi_isend')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, dest, tag, comm, request,ierr
+    end subroutine mpi_isend
+  end interface
+
+  interface
+    subroutine mpi_irecv(buf,count,datatype,src,tag,comm,request,ierr) &
+         & bind(c,name='mpi_irecv')
+        import
+      type(*), dimension(..) :: buf
+      integer(psb_mpk_) :: count, datatype, src, tag, comm, request, ierr
+    end subroutine mpi_irecv
+  end interface
+
+  interface
+    subroutine mpi_alltoall(sdb,sdc,sdt,rvb,rvc,rvt,comm,ierr) &
+         & bind(c,name='mpi_alltoall')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, comm, ierr
+    end subroutine mpi_alltoall
+  end interface
+
+  interface
+    subroutine mpi_alltoallv(sdb,sdc,sdspl,sdt,rvb,rvc,rdspl,rvt,comm,ierr) &
+         & bind(c,name='mpi_alltoallv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdspl(*), rdspl(*), sdc(*), rvc(*)
+      integer(psb_mpk_) :: sdt,rvt, comm, ierr
+    end subroutine mpi_alltoallv
+  end interface
+
+  interface
+    subroutine mpi_gather(sdb,sdc,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_gather')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_gather
+  end interface
+
+  interface
+    subroutine mpi_gatherv(sdb,sdc,sdt,rvb,rvc,rdspl,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_gatherv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: rdspl(*), rvc(*)
+      integer(psb_mpk_) :: sdt,sdc,rvt, root, comm, ierr
+    end subroutine mpi_gatherv
+  end interface
+
+  interface
+    subroutine mpi_scatter(sdb,sdc,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_scatter')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_scatter
+  end interface
+
+  interface
+    subroutine mpi_scatterv(sdb,sdc,sdspl,sdt,rvb,rvc,rvt,root,comm,ierr) &
+         & bind(c,name='mpi_scatterv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdspl(*), sdc(*)
+      integer(psb_mpk_) :: sdt,rvc,rvt, root, comm, ierr
+    end subroutine mpi_scatterv
+  end interface
+  
+  interface
+    subroutine mpi_allgather(sdb,sdc,sdt,rvb,rvc,rvt,comm,ierr) &
+         & bind(c,name='mpi_allgather')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: sdc,sdt,rvc,rvt, comm, ierr
+    end subroutine mpi_allgather
+  end interface
+
+  interface
+    subroutine mpi_allgatherv(sdb,sdc,sdt,rvb,rvc,rdspl,rvt,comm,ierr) &
+         & bind(c,name='mpi_allgatherv')
+      import
+      type(*), dimension(..) :: sdb, rvb
+      integer(psb_mpk_) :: rdspl(*),rvc(*)
+      integer(psb_mpk_) :: sdc,sdt,rvt, comm, ierr
+    end subroutine mpi_allgatherv
+  end interface
+
 end module mpi
 #endif    
 
 
 module psi_penv_mod
   use psb_const_mod
+  use iso_c_binding
 
   integer(psb_mpk_), parameter:: psb_int_tag      = 543987
   integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
@@ -140,7 +263,7 @@ module psi_penv_mod
   interface psb_info
     module procedure psb_info_mpik
   end interface
-#if defined(IPK4) && defined(LPK8)
+#if (defined(PSB_IPK4) && defined(PSB_LPK8))||defined(PSB_IPK8)
   interface psb_info
     module procedure psb_info_epk
   end interface
@@ -162,11 +285,12 @@ module psi_penv_mod
     module procedure psb_m_get_mpi_rank!, psb_e_get_mpi_rank
   end interface psb_get_mpi_rank
 
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
   integer(psb_mpk_), private, save :: nctxt=0
 
 #else 
 
+  integer(psb_mpk_), save :: mpi_i2amx_op, mpi_i2amn_op
   integer(psb_mpk_), save :: mpi_iamx_op, mpi_iamn_op
   integer(psb_mpk_), save :: mpi_mamx_op, mpi_mamn_op
   integer(psb_mpk_), save :: mpi_eamx_op, mpi_eamn_op
@@ -181,6 +305,7 @@ module psi_penv_mod
 #endif
 
   private :: psi_get_sizes,  psi_register_mpi_extras
+  private :: psi_i2amx_op, psi_i2amn_op
   private :: psi_iamx_op, psi_iamn_op 
   private :: psi_mamx_op, psi_mamn_op 
   private :: psi_eamx_op, psi_eamn_op 
@@ -216,11 +341,11 @@ contains
   end subroutine psb_init_queue
 
   subroutine psb_wait_buffer(node, info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_buffer_node), intent(inout) :: node
@@ -232,11 +357,11 @@ contains
   end subroutine psb_wait_buffer
 
   subroutine psb_test_buffer(node, flag, info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_buffer_node), intent(inout) :: node
@@ -244,7 +369,7 @@ contains
     integer(psb_ipk_), intent(out) :: info 
     integer(psb_mpk_) :: status(mpi_status_size), minfo
     minfo = mpi_success
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     flag  = .true.
 #else
     call mpi_test(node%request,flag,status,minfo)
@@ -351,11 +476,11 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!
   subroutine psi_msnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -390,11 +515,11 @@ contains
 
 
   subroutine psi_esnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -427,11 +552,11 @@ contains
   end subroutine psi_esnd
 
   subroutine psi_i2snd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -464,11 +589,11 @@ contains
   end subroutine psi_i2snd
 
   subroutine psi_ssnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -501,11 +626,11 @@ contains
   end subroutine psi_ssnd
 
   subroutine psi_dsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -538,11 +663,11 @@ contains
   end subroutine psi_dsnd
     
   subroutine psi_csnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -575,11 +700,11 @@ contains
   end subroutine psi_csnd
 
   subroutine psi_zsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -613,11 +738,11 @@ contains
 
 
   subroutine psi_logsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -651,11 +776,11 @@ contains
 
 
   subroutine psi_hsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -709,9 +834,9 @@ contains
       subroutine psi_c_diffadd(p1, p2, val) &
            & bind(c,name="psi_c_diffadd")
         use iso_c_binding
-        import :: psb_mpk_
+        import :: psb_mpk_, psb_epk_
         type(c_ptr), value :: p1, p2
-        integer(psb_mpk_) :: val
+        integer(psb_epk_) :: val
       end subroutine psi_c_diffadd
     end interface
     
@@ -726,11 +851,11 @@ contains
   end subroutine psi_get_sizes
 
   subroutine  psi_register_mpi_extras(info)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     integer(psb_mpk_) :: info
@@ -746,18 +871,18 @@ contains
     if (info == 0) call mpi_type_create_f90_complex(psb_spk_p_,psb_spk_r_, psb_mpi_c_spk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
 #else
-#if defined(IPK4) && defined(LPK4)
+#if defined(PSB_IPK4) && defined(PSB_LPK4)
     psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer4
-#elif defined(IPK4) && defined(LPK8)
+#elif defined(PSB_IPK4) && defined(PSB_LPK8)
     psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer8
-#elif defined(IPK8) && defined(LPK8)
+#elif defined(PSB_IPK8) && defined(PSB_LPK8)
     psb_mpi_ipk_ = mpi_integer8
     psb_mpi_lpk_ = mpi_integer8
 #else
     ! This should never happen
-    write(psb_err_unit,*) 'Warning: an impossible IPK/LPK combination.'
+    write(psb_err_unit,*) 'Warning: an impossible PSB_IPK/PSB_LPK combination.'
     write(psb_err_unit,*) 'Something went wrong at configuration time.'
     psb_mpi_ipk_ = -1
     psb_mpi_lpk_ = -1
@@ -771,8 +896,10 @@ contains
     psb_mpi_c_dpk_  = mpi_double_complex
 #endif
 
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
 #else 
+    if (info == 0) call mpi_op_create(psi_i2amx_op,.true.,mpi_i2amx_op,info)
+    if (info == 0) call mpi_op_create(psi_i2amn_op,.true.,mpi_i2amn_op,info)
     if (info == 0) call mpi_op_create(psi_mamx_op,.true.,mpi_mamx_op,info)
     if (info == 0) call mpi_op_create(psi_mamn_op,.true.,mpi_mamn_op,info)
     if (info == 0) call mpi_op_create(psi_eamx_op,.true.,mpi_eamx_op,info)
@@ -791,7 +918,7 @@ contains
 
   end subroutine psi_register_mpi_extras
 
-#if defined(IPK4) && defined(LPK8)
+#if (defined(PSB_IPK4) && defined(PSB_LPK8))||defined(PSB_IPK8)
   subroutine psb_info_epk(ctxt,iam,np)
 
     type(psb_ctxt_type), intent(in)  :: ctxt
@@ -808,22 +935,22 @@ contains
   end subroutine psb_info_epk
 #endif
   
-  subroutine psb_init_mpik(ctxt,np,basectxt,ids)
+  subroutine psb_init_mpik(ctxt,np,basectxt,ids,extcomm)
     use psb_const_mod
     use psb_error_mod
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(out) :: ctxt
     type(psb_ctxt_type), intent(in), optional :: basectxt
-    integer(psb_mpk_), intent(in), optional :: np, ids(:)
+    integer(psb_mpk_), intent(in), optional :: np, ids(:), extcomm
 
     integer(psb_mpk_) :: i, isnullcomm, icomm
     integer(psb_mpk_), allocatable :: iids(:) 
@@ -834,7 +961,7 @@ contains
     !    
     call psb_set_debug_unit(psb_err_unit)
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     ctxt%ctxt = nctxt ! allocate on assignment
     nctxt = nctxt + 1
 
@@ -857,6 +984,8 @@ contains
       else
         basecomm = mpi_comm_world
       end if
+    else if (present(extcomm)) then
+      basecomm = extcomm
     else
       basecomm = mpi_comm_world
     end if
@@ -951,11 +1080,11 @@ contains
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(inout) :: ctxt
@@ -980,7 +1109,7 @@ contains
 ! !$        call psb_error(ctxt)
 ! !$      endif
 ! !$    endif
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     ! Under serial mode, CLOSE has no effect, but reclaim
     ! the used ctxt number. 
     nctxt = max(0, nctxt - 1)    
@@ -997,6 +1126,8 @@ contains
            & call mpi_comm_Free(ctxt%ctxt,info)
     end if
     if (close_) then 
+      if (info == 0) call mpi_op_free(mpi_i2amx_op,info)
+      if (info == 0) call mpi_op_free(mpi_i2amn_op,info)
       if (info == 0) call mpi_op_free(mpi_mamx_op,info)
       if (info == 0) call mpi_op_free(mpi_mamn_op,info)
       if (info == 0) call mpi_op_free(mpi_eamx_op,info)
@@ -1023,17 +1154,17 @@ contains
 
 
   subroutine psb_barrier_mpik(ctxt)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type), intent(in) :: ctxt
 
     integer(psb_mpk_) :: info
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
     if (allocated(ctxt%ctxt)) then 
       if (ctxt%ctxt /= mpi_comm_null) call mpi_barrier(ctxt%ctxt, info)
     end if
@@ -1044,11 +1175,11 @@ contains
   function psb_wtime()
     use psb_const_mod
 !    use mpi_constants
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     real(psb_dpk_) :: psb_wtime
@@ -1063,7 +1194,7 @@ contains
     
     integer(psb_mpk_) :: code, info 
 
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     stop 
 #else    
     if (present(errc)) then 
@@ -1079,11 +1210,11 @@ contains
 
 
   subroutine psb_info_mpik(ctxt,iam,np)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
 
@@ -1111,7 +1242,7 @@ contains
     ! it's valid or not. 
     !
     
-#if defined(SERIAL_MPI) 
+#if defined(PSB_SERIAL_MPI) 
     iam = 0
     np  = 1
 #else    
@@ -1138,11 +1269,11 @@ contains
 
 
   function psb_m_get_mpi_comm(ctxt) result(comm)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -1160,11 +1291,11 @@ contains
   end function psb_m_get_mpi_rank
 
   subroutine psb_get_mpicomm(ctxt,comm)
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
     type(psb_ctxt_type) :: ctxt
@@ -1188,6 +1319,26 @@ contains
   ! Note: len & type are always default integer.
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
+  subroutine psi_i2amx_op(inv, outv,len,type) 
+    integer(psb_i2pk_) :: inv(len), outv(len)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
+
+    do i=1, len
+      if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
+    end do
+  end subroutine psi_i2amx_op
+  
+  subroutine psi_i2amn_op(inv, outv,len,type) 
+    integer(psb_i2pk_) :: inv(len), outv(len)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
+
+    do i=1, len
+      if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
+    end do
+  end subroutine psi_i2amn_op
+
   subroutine psi_mamx_op(inv, outv,len,type) 
     integer(psb_mpk_) :: inv(len), outv(len)
     integer(psb_mpk_) :: len,type

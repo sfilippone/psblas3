@@ -48,7 +48,8 @@ subroutine  psi_zovrl_restr_vect(x,xs,desc_a,info)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, isz
+  integer(psb_mpk_) :: np, me, isz
+  integer(psb_ipk_) :: err_act, i, idx
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_restr_vect'
@@ -91,7 +92,8 @@ subroutine  psi_zovrl_restr_multivect(x,xs,desc_a,info)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, isz, nc
+  integer(psb_mpk_) :: np, me, isz,nc
+  integer(psb_ipk_) :: err_act, i, idx
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_restr_mv'

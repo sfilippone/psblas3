@@ -299,7 +299,7 @@ end subroutine psb_zaxpby_vect_out
 !
 subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_zaxpby
-
+  use psi_z_serial_mod
   implicit none
 
   integer(psb_ipk_), intent(in), optional   :: n, jx, jy
@@ -384,9 +384,9 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in /= 0)) then
     if(desc_a%get_local_rows() > 0) then
-      call zaxpby(desc_a%get_local_cols(),in,&
-           & alpha,x(iix:,jjx),lldx,beta,&
-           & y(iiy:,jjy),lldy,info)
+      call psi_zaxpby(desc_a%get_local_cols(),in,&
+           & alpha,x(iix:,jjx:),beta,&
+           & y(iiy:,jjy:),info)
     end if
   end if
 
@@ -510,9 +510,8 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call zaxpby(desc_a%get_local_cols(),ione,&
-         & alpha,x,lldx,beta,&
-         & y,lldy,info)
+    call psb_geaxpby(desc_a%get_local_cols(),&
+         & alpha,x,beta,y,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -642,9 +641,8 @@ subroutine  psb_zaxpbyvout(alpha, x, beta,y, z, desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call zaxpbyv2(desc_a%get_local_cols(),ione,&
-         & alpha,x,lldx,beta,&
-         & y,lldy,z,lldz,info)
+    call psb_geaxpby(desc_a%get_local_cols(),&
+         & alpha,x,beta,y,z,info)
   end if
 
   call psb_erractionrestore(err_act)
@@ -741,3 +739,86 @@ subroutine psb_zaddconst_vect(x,b,z,desc_a,info)
   return
 
 end subroutine psb_zaddconst_vect
+
+
+subroutine psb_z_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
+     & desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_z_upd_xyz_vect
+  implicit none 
+  type(psb_z_vect_type), intent (inout) :: x
+  type(psb_z_vect_type), intent (inout) :: y
+  type(psb_z_vect_type), intent (inout) :: z
+  complex(psb_dpk_), intent (in)        :: alpha, beta, gamma, delta
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me,&
+       & err_act, iix, jjx, iiy, jjy, nr
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20)        :: name, ch_err
+
+  name='psb_z_addconst_vect'
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt=desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(z%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m  = desc_a%get_global_rows()
+  nr = desc_a%get_local_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,lone,z%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call z%upd_xyz(nr,alpha,beta,gamma,delta,x,y,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end subroutine psb_z_upd_xyz_vect
+

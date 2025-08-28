@@ -80,7 +80,7 @@ module psb_c_ilu_fact_mod
   use psb_base_mod
   use psb_prec_const_mod
   interface psb_ilu0_fact
-    subroutine psb_cilu0_fact(ialg,a,l,u,d,info,blck,upd)
+    subroutine psb_cilu0_fact(ialg,a,l,u,d,info,blck,upd,shft)
       import psb_cspmat_type, psb_spk_, psb_ipk_
       integer(psb_ipk_), intent(in)         :: ialg
       integer(psb_ipk_), intent(out)        :: info
@@ -89,11 +89,12 @@ module psb_c_ilu_fact_mod
       type(psb_cspmat_type),intent(in), optional, target :: blck
       character, intent(in), optional       :: upd
       complex(psb_spk_), intent(inout)      :: d(:)
+      complex(psb_spk_), intent(in), optional :: shft
     end subroutine psb_cilu0_fact
   end interface
 
   interface psb_iluk_fact
-    subroutine psb_ciluk_fact(fill_in,ialg,a,l,u,d,info,blck)
+    subroutine psb_ciluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
       import psb_cspmat_type, psb_spk_, psb_ipk_
       integer(psb_ipk_), intent(in)        :: fill_in,ialg
       integer(psb_ipk_), intent(out)       :: info
@@ -101,11 +102,12 @@ module psb_c_ilu_fact_mod
       type(psb_cspmat_type),intent(inout)  :: l,u
       type(psb_cspmat_type),intent(in), optional, target :: blck
       complex(psb_spk_), intent(inout)     ::  d(:)
+      complex(psb_spk_), intent(in), optional :: shft
     end subroutine psb_ciluk_fact
   end interface
 
   interface psb_ilut_fact
-    subroutine psb_cilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale)
+    subroutine psb_cilut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
       import  psb_cspmat_type, psb_spk_, psb_ipk_
       integer(psb_ipk_), intent(in)        :: fill_in
       real(psb_spk_), intent(in)           :: thres
@@ -115,6 +117,7 @@ module psb_c_ilu_fact_mod
       complex(psb_spk_), intent(inout)     :: d(:)
       type(psb_cspmat_type),intent(in), optional, target :: blck
       integer(psb_ipk_), intent(in), optional  :: iscale
+      complex(psb_spk_), intent(in), optional :: shft
     end subroutine psb_cilut_fact
   end interface
 

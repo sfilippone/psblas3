@@ -17,6 +17,9 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \usepackage{listings}
+\usepackage{rotating}
+\usepackage{microtype}
+\usepackage{algorithm2e}
 \usepackage{minted}
 \usemintedstyle{friendly}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
@@ -36,7 +39,7 @@
 \relax
 \pdfcompresslevel=0             %-- 0 = none, 9 = best
 \pdfinfo{                       %-- Info dictionary of PDF output  /Author (Alfredo Buttari)
-  /Title (Parallel Sparse BLAS V. 3.8.0)
+  /Title (Parallel Sparse BLAS V. 3.9.0)
   /Subject (Parallel Sparse Basic Linear Algebra Subroutines)
   /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners)
   /Creator (pdfLaTeX)
@@ -90,16 +93,18 @@
 \newcommand{\example}{\stepcounter{example}%
 \section*{\examplename~\theexample}}
 
-\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_prec\_type}}}
+\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_Tprec\_type}}}
 \newcommand{\descdata}{\hyperlink{descdata}{{\tt psb\_desc\_type}}}
 \newcommand{\spdata}{\hyperlink{spdata}{{\tt psb\_Tspmat\_type}}}
 \newcommand{\vdata}{\hyperlink{vdata}{{\tt psb\_T\_vect\_type}}}
 \newcommand{\spbasedata}{\hypertarget{spbasedata}{{\tt psb\_T\_base\_sparse\_mat}}}
 \newcommand{\vbasedata}{\hypertarget{vbasedata}{{\tt psb\_T\_base\_vect\_type}}}
+\def\bsideways{\begin{sidewaystable}}
+\def\esideways{\end{sidewaystable}}
 
 \begin{document}
 {
-\pdfbookmark{PSBLAS-v3.8.0 User's Guide}{title}
+\pdfbookmark{PSBLAS-v3.9.0 User's Guide}{title}
 \lstset{language=Fortran}
 \newlength{\centeroffset}
 \setlength{\centeroffset}{-0.5\oddsidemargin}
@@ -109,7 +114,7 @@
 \vspace*{\stretch{1}}
 \noindent\hspace*{\centeroffset}\makebox[0pt][l]{\begin{minipage}{\textwidth}
 \flushright
-{\Huge\bfseries PSBLAS 3.8.0 User's guide
+{\Huge\bfseries PSBLAS 3.9.0 User's guide
 }
 \noindent\rule[-1ex]{\textwidth}{5pt}\\[2.5ex]
 \hfill\emph{\Large A reference guide for the Parallel Sparse BLAS library}
@@ -129,8 +134,9 @@
 \flushright
 {\bfseries 
 by Salvatore Filippone\\
-and Alfredo Buttari}\\ 
-May 1st, 2022
+Alfredo Buttari \\
+Fabio Durastante}\\ 
+June 9th, 2025
 \end{minipage}}
 }
 %\addtolength{\textwidth}{\centeroffset}
@@ -159,7 +165,8 @@ May 1st, 2022
 \include{util}
 \include{precs}
 \include{methods}
-
+\include{ext-intro}
+\include{cuda}
 \cleardoublepage
 \input{biblio}
 

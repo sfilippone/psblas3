@@ -33,7 +33,7 @@ subroutine psi_c_exscanv(n,x,info,shift)
   use psi_c_serial_mod, psb_protect_name => psi_c_exscanv
   use psb_const_mod
   use psb_error_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -45,14 +45,15 @@ subroutine psi_c_exscanv(n,x,info,shift)
   complex(psb_spk_) :: shift_, tp, ts
   integer(psb_ipk_) :: i
   logical is_nested, is_parallel
-  
+
+  info = psb_success_
   if (present(shift)) then
     shift_ = shift
   else
     shift_ = czero
   end if
     
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   is_parallel = omp_in_parallel()
   if (is_parallel) then 
     call inner_c_exscan()
@@ -70,7 +71,7 @@ subroutine psi_c_exscanv(n,x,info,shift)
   end do
 
 #endif
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 contains
   subroutine inner_c_exscan()
     ! Note: all these variables are private, but SUMB should *really* be
@@ -909,7 +910,8 @@ subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:,:), y(:),alpha,beta
 
   ! Locals
@@ -994,7 +996,8 @@ subroutine psi_cgthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_mpk_) :: n
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:), y(:),alpha,beta
 
   ! Locals
@@ -1050,7 +1053,8 @@ subroutine psi_cgthzmm(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:,:), y(:,:)
 
   ! Locals
@@ -1068,7 +1072,8 @@ subroutine psi_cgthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:,:), y(:)
 
   ! Locals
@@ -1089,7 +1094,8 @@ subroutine psi_cgthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_mpk_) :: n
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: x(:), y(:)
 
   ! Locals
@@ -1106,7 +1112,8 @@ subroutine psi_csctmm(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: beta, x(:,:), y(:,:)
 
   ! Locals
@@ -1132,7 +1139,8 @@ subroutine psi_csctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_mpk_) :: n, k
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: beta, x(:), y(:,:)
 
   ! Locals
@@ -1170,7 +1178,8 @@ subroutine psi_csctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_mpk_) :: n
+  integer(psb_ipk_) :: idx(:)
   complex(psb_spk_) :: beta, x(:), y(:)
 
   ! Locals
@@ -1567,3 +1576,300 @@ subroutine  caxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
   return
 
 end subroutine caxpbyv2
+
+subroutine psi_c_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)      :: m
+  complex(psb_spk_), intent (in)       ::  x(:)
+  complex(psb_spk_), intent (inout)    ::  y(:)
+  complex(psb_spk_), intent (inout)    ::  z(:)
+  complex(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
+  integer(psb_ipk_), intent(out)     :: info
+
+  integer(psb_ipk_) :: i
+  integer(psb_ipk_) :: int_err(5)
+  character  name*20
+  name='c_upd_xyz'
+
+  info = psb_success_
+  if (m.lt.0) then
+    info=psb_err_iarg_neg_
+    int_err(1)=1
+    int_err(2)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(x).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=6
+    int_err(2)=1
+    int_err(3)=size(x)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(y).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=7
+    int_err(2)=1
+    int_err(3)=size(y)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(z).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=8
+    int_err(2)=1
+    int_err(3)=size(z)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  endif
+ 
+  if (beta == czero) then
+    if (gamma == czero) then
+      if (alpha == czero) then
+        if (delta == czero) then
+          !  a 0   b 0 g 0 d 0 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = czero
+            z(i) = czero
+          end do
+        else if (delta /= czero) then
+          !  a 0   b 0 g 0 d n 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = czero
+            z(i) = delta*z(i)
+          end do
+        end if
+      else if (alpha /= czero) then
+        if (delta == czero) then
+          !  a n   b 0 g 0 d 0 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = czero
+          end do
+        else if (delta /= czero) then
+          !  a n   b 0 g 0 d n 
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      end if
+
+    else  if (gamma /= czero) then
+
+      if (alpha == czero) then
+      
+        if (delta == czero) then
+          !  a 0   b 0 g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = czero
+            z(i) = czero  ! gamma*y(i)
+          end do
+          
+        else if (delta /= czero) then
+          !  a 0   b 0 g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = czero
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      else if (alpha /= czero) then
+        
+        if (delta == czero) then
+          !  a n   b 0 g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = gamma*y(i)
+          end do
+          
+        else if (delta /= czero) then
+          !  a n   b 0 g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)
+            z(i) = gamma*y(i)+delta*z(i)
+          end do
+          
+        end if
+
+      end if
+
+    end if
+
+  else  if (beta /= czero) then
+    
+    if (gamma == czero) then
+      if (alpha == czero) then
+        if (delta == czero) then
+          !  a 0   b n g 0 d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = czero
+          end do
+          
+        else  if (delta /= czero) then
+          !  a 0   b n g 0 d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      else  if (alpha /= czero) then
+        if (delta == czero) then
+          !  a n  b n g 0 d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = czero
+          end do
+          
+        else if (delta /= czero) then
+          !  a n  b n g 0 d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = delta*z(i)
+          end do
+          
+        end if
+
+      end if
+    else  if (gamma /= czero) then
+      if (alpha == czero) then
+        if (delta == czero) then
+          !  a 0  b n g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = gamma*y(i)
+          end do
+          
+        else if (delta /= czero) then
+          !  a 0  b n g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = beta*y(i)
+            z(i) = gamma*y(i)+delta*z(i)
+          end do
+
+        end if
+
+      else if (alpha /= czero) then
+        if (delta == czero) then
+          !  a n b n g n d 0
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = gamma*y(i)
+          end do
+          
+        else if (delta /= czero) then
+          !  a n b n g n d n
+          !$omp parallel do private(i)
+          do i=1,m
+            y(i) = alpha*x(i)+beta*y(i)
+            z(i) = gamma*y(i)+delta*z(i)
+          end do
+          
+        end if
+      end if
+    end if
+  end if
+
+  return
+
+9999 continue
+  call fcpsb_serror()
+  return
+
+end subroutine psi_c_upd_xyz
+
+subroutine psi_cxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)      :: m
+  complex(psb_spk_), intent (in)       :: x(:)
+  complex(psb_spk_), intent (inout)    :: y(:)
+  complex(psb_spk_), intent (inout)    :: z(:)
+  complex(psb_spk_), intent (inout)    :: w(:)
+  complex(psb_spk_), intent (in)       :: a,b,c,d,e,f
+  integer(psb_ipk_), intent(out)     :: info
+
+  integer(psb_ipk_) :: i
+  integer(psb_ipk_) :: int_err(5)
+  character  name*20
+  name='c_xyzw'
+
+  info = psb_success_
+  if (m.lt.0) then
+    info=psb_err_iarg_neg_
+    int_err(1)=1
+    int_err(2)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(x).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=6
+    int_err(2)=1
+    int_err(3)=size(x)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(y).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=7
+    int_err(2)=1
+    int_err(3)=size(y)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (size(z).lt.max(1,m)) then
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=8
+    int_err(2)=1
+    int_err(3)=size(z)
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  endif
+
+  if ((a==czero).or.(b==czero).or. &
+       & (c==czero).or.(d==czero).or.&
+       & (e==czero).or.(f==czero)) then
+    write(0,*) 'XYZW assumes  a,b,c,d,e,f are all nonzero'
+  else
+    !$omp parallel do private(i)
+    do i=1,m
+      y(i) = a*x(i)+b*y(i)
+      z(i) = c*y(i)+d*z(i)
+      w(i) = e*z(i)+f*w(i)
+    end do
+    
+  end if
+
+  return
+
+9999 continue
+  call fcpsb_serror()
+  return
+
+end subroutine psi_cxyzw

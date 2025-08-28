@@ -86,12 +86,12 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
   use psb_realloc_mod
   use psb_timers_mod
   use psb_desc_mod, psb_protect_name => psi_graph_fnd_owner
-#ifdef MPI_MOD
+#ifdef PSB_MPI_MOD
   use mpi
 #endif
 
   implicit none 
-#ifdef MPI_H
+#ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
   integer(psb_lpk_), intent(in)      :: idx(:)
@@ -152,7 +152,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
   !
   nv = size(idx)
   call psb_realloc(nv,iprc,info)
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
   iprc(:) = 0
 #else 
   if (info == psb_success_) call psb_realloc(nv,tidx,info)
@@ -237,7 +237,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
     ! Choose a sample, should it be done in this simplistic way?
     ! Note: nsampl_in is a hint, not an absolute, hence nsampl_out
     !
-    call psi_get_sample(1,idx,iprc,tidx,tsmpl,iend,nsampl_in,nsampl_out)
+    call psi_get_sample(ione,idx,iprc,tidx,tsmpl,iend,nsampl_in,nsampl_out)
     nsampl = min(nsampl_out,nsampl_in)
     if (debugsz) write(0,*) me,' From first sampling ',nsampl_in
     ! 
@@ -291,7 +291,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
 9999 call psb_error_handler(ctxt,err_act)
 
   return
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
 contains
 
