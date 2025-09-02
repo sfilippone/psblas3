@@ -885,7 +885,7 @@ else
    
          PAC_ARG_WITH_CUDACC()
          if test "x$pac_cv_cudacc" == "x"; then
-            pac_cv_cudacc="50,60,70,75,80,86";
+            pac_cv_cudacc="75,80,86";
             CUDA_CC="$pac_cv_cudacc";
          fi
          if (( $pac_cv_cuda_version >= 11070  ))
