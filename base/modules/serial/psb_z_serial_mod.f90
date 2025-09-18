@@ -60,6 +60,8 @@ module psb_z_serial_mod
       type(psb_zspmat_type), intent(out) :: c
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_zspspmm
+  end interface psb_spspmm
+  interface 
     subroutine psb_zcsrspspmm(a,b,c,info)
       use psb_z_mat_mod, only : psb_z_csr_sparse_mat
       import :: psb_ipk_
@@ -232,6 +234,8 @@ module psb_z_serial_mod
       type(psb_lzspmat_type), intent(out) :: c
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_lzspspmm
+  end interface psb_spspmm
+  interface 
     subroutine psb_lzcsrspspmm(a,b,c,info)
       use psb_z_mat_mod, only : psb_lz_csr_sparse_mat
       import :: psb_ipk_
@@ -248,7 +252,7 @@ module psb_z_serial_mod
       type(psb_lz_csc_sparse_mat), intent(out) :: c
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_lzcscspspmm
-  end interface psb_spspmm
+  end interface 
 
   interface psb_symbmm
     subroutine psb_lzsymbmm(a,b,c,info)
