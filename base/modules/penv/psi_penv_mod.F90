@@ -180,43 +180,45 @@ module psi_penv_mod
   use psb_const_mod
   use iso_c_binding
 
-  integer(psb_mpk_), parameter:: psb_int_tag      = 543987
-  integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
-  integer(psb_mpk_), parameter:: psb_double_tag   = psb_real_tag     + 1
-  integer(psb_mpk_), parameter:: psb_complex_tag  = psb_double_tag   + 1
-  integer(psb_mpk_), parameter:: psb_dcomplex_tag = psb_complex_tag  + 1
-  integer(psb_mpk_), parameter:: psb_logical_tag  = psb_dcomplex_tag + 1
-  integer(psb_mpk_), parameter:: psb_char_tag     = psb_logical_tag  + 1
-  integer(psb_mpk_), parameter:: psb_int8_tag     = psb_char_tag     + 1
-  integer(psb_mpk_), parameter:: psb_int2_tag     = psb_int8_tag     + 1
-  integer(psb_mpk_), parameter:: psb_int4_tag     = psb_int2_tag     + 1
-  integer(psb_mpk_), parameter:: psb_long_tag     = psb_int4_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int_tag      = 100
+  integer(psb_mpk_), parameter :: psb_real_tag     = psb_int_tag      + 1
+  integer(psb_mpk_), parameter :: psb_double_tag   = psb_real_tag     + 1
+  integer(psb_mpk_), parameter :: psb_complex_tag  = psb_double_tag   + 1
+  integer(psb_mpk_), parameter :: psb_dcomplex_tag = psb_complex_tag  + 1
+  integer(psb_mpk_), parameter :: psb_logical_tag  = psb_dcomplex_tag + 1
+  integer(psb_mpk_), parameter :: psb_char_tag     = psb_logical_tag  + 1
+  integer(psb_mpk_), parameter :: psb_int8_tag     = psb_char_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int2_tag     = psb_int8_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int4_tag     = psb_int2_tag     + 1
+  integer(psb_mpk_), parameter :: psb_long_tag     = psb_int4_tag     + 1
+  
+  integer(psb_mpk_), parameter :: psb_max_simple_tag      = psb_long_tag     + 2
 
-  integer(psb_mpk_), parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_double_swap_tag   = psb_double_tag   + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_complex_swap_tag  = psb_complex_tag  + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_dcomplex_swap_tag = psb_dcomplex_tag + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_logical_swap_tag  = psb_logical_tag  + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_char_swap_tag     = psb_char_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_long_swap_tag     = psb_long_tag     + psb_int_tag
+  integer(psb_mpk_), parameter :: psb_int_swap_tag      = psb_max_simple_tag    + 1
+  integer(psb_mpk_), parameter :: psb_real_swap_tag     = psb_int_swap_tag      + 1
+  integer(psb_mpk_), parameter :: psb_double_swap_tag   = psb_real_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_complex_swap_tag  = psb_double_swap_tag   + 1
+  integer(psb_mpk_), parameter :: psb_dcomplex_swap_tag = psb_complex_swap_tag  + 1
+  integer(psb_mpk_), parameter :: psb_logical_swap_tag  = psb_dcomplex_swap_tag + 1
+  integer(psb_mpk_), parameter :: psb_char_swap_tag     = psb_logical_swap_tag  + 1
+  integer(psb_mpk_), parameter :: psb_int8_swap_tag     = psb_char_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int2_swap_tag     = psb_int8_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int4_swap_tag     = psb_int2_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_long_swap_tag     = psb_int4_swap_tag     + 1
 
 
   
-  integer(psb_mpk_), private, parameter:: psb_int_type      = 987543
-  integer(psb_mpk_), private, parameter:: psb_real_type     = psb_int_type      + 1
-  integer(psb_mpk_), private, parameter:: psb_double_type   = psb_real_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_complex_type  = psb_double_type   + 1
-  integer(psb_mpk_), private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
-  integer(psb_mpk_), private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
-  integer(psb_mpk_), private, parameter:: psb_char_type     = psb_logical_type  + 1
-  integer(psb_mpk_), private, parameter:: psb_int8_type     = psb_char_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_long_type     = psb_int4_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_int_type      = 200
+  integer(psb_mpk_), private, parameter :: psb_real_type     = psb_int_type      + 1
+  integer(psb_mpk_), private, parameter :: psb_double_type   = psb_real_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_complex_type  = psb_double_type   + 1
+  integer(psb_mpk_), private, parameter :: psb_dcomplex_type = psb_complex_type  + 1
+  integer(psb_mpk_), private, parameter :: psb_logical_type  = psb_dcomplex_type + 1
+  integer(psb_mpk_), private, parameter :: psb_char_type     = psb_logical_type  + 1
+  integer(psb_mpk_), private, parameter :: psb_int8_type     = psb_char_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_int2_type     = psb_int8_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_int4_type     = psb_int2_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_long_type     = psb_int4_type     + 1
 
   type psb_buffer_node
     integer(psb_mpk_)   :: request

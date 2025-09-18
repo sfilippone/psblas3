@@ -3657,8 +3657,8 @@ end subroutine psb_z_cp_csr_from_fmt
 
 #if defined(PSB_OPENMP)
 subroutine psb_zcsrspspmm(a,b,c,info)
-  use psb_z_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_zcsrspspmm
+  use psb_z_csr_mat_mod, psb_protect_name => psb_zcsrspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -4204,8 +4204,8 @@ end subroutine psb_zcsrspspmm
 #else
 
 subroutine psb_zcsrspspmm(a,b,c,info)
-  use psb_z_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_zcsrspspmm
+  use psb_z_csr_mat_mod, psb_protect_name => psb_zcsrspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -6580,8 +6580,8 @@ end subroutine psb_lz_cp_csr_from_fmt
 !!$end subroutine psb_lz_csr_clean_zeros
 
 subroutine psb_lzcsrspspmm(a,b,c,info)
-  use psb_z_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_lzcsrspspmm
+  use psb_z_csr_mat_mod, psb_protect_name => psb_lzcsrspspmm
+  use psb_serial_mod
 
   implicit none
 
