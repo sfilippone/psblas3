@@ -37,7 +37,9 @@
 !
 subroutine psb_zspspmm(a,b,c,info)
   use psb_mat_mod
-  !use psb_z_serial_mod, psb_protect_name => psb_zspspmm
+  use psb_z_csr_mat_mod
+  use psb_z_csc_mat_mod
+  use psb_z_serial_mod, psb_protect_name => psb_zspspmm
   implicit none 
 
   type(psb_zspmat_type), intent(in)    :: a,b
@@ -48,24 +50,6 @@ subroutine psb_zspspmm(a,b,c,info)
   integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_spspmm'
   logical :: done_spmm
-!!$  interface 
-!!$    subroutine psb_zcsrspspmm(a,b,c,info)
-!!$      use psb_z_mat_mod, only : psb_z_csr_sparse_mat
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      class(psb_z_csr_sparse_mat), intent(in) :: a,b
-!!$      type(psb_z_csr_sparse_mat), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$    end subroutine psb_zcsrspspmm
-!!$    subroutine psb_zcscspspmm(a,b,c,info)
-!!$      use psb_z_mat_mod, only : psb_z_csc_sparse_mat
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      class(psb_z_csc_sparse_mat), intent(in) :: a,b
-!!$      type(psb_z_csc_sparse_mat), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$    end subroutine psb_zcscspspmm
-!!$  end interface
   call psb_erractionsave(err_act)
   info = psb_success_
 
@@ -136,7 +120,9 @@ end subroutine psb_zspspmm
 
 subroutine psb_lzspspmm(a,b,c,info)
   use psb_mat_mod
-!  use psb_z_serial_mod, psb_protect_name => psb_lzspspmm
+  use psb_z_csr_mat_mod
+  use psb_z_csc_mat_mod
+  use psb_z_serial_mod, psb_protect_name => psb_lzspspmm
   implicit none 
 
   type(psb_lzspmat_type), intent(in)    :: a,b
@@ -147,25 +133,7 @@ subroutine psb_lzspspmm(a,b,c,info)
   integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_spspmm'
   logical :: done_spmm
-!!$   interface 
-!!$    subroutine psb_lzcsrspspmm(a,b,c,info)
-!!$      use psb_z_mat_mod, only : psb_lz_csr_sparse_mat
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      class(psb_lz_csr_sparse_mat), intent(in) :: a,b
-!!$      type(psb_lz_csr_sparse_mat), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$    end subroutine psb_lzcsrspspmm
-!!$    subroutine psb_lzcscspspmm(a,b,c,info)
-!!$      use psb_z_mat_mod, only : psb_lz_csc_sparse_mat
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      class(psb_lz_csc_sparse_mat), intent(in) :: a,b
-!!$      type(psb_lz_csc_sparse_mat), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$    end subroutine psb_lzcscspspmm
-!!$  end interface 
- call psb_erractionsave(err_act)
+  call psb_erractionsave(err_act)
   info = psb_success_
 
   if ((a%is_null()) .or.(b%is_null())) then
