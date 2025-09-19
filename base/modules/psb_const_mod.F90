@@ -35,7 +35,7 @@ module psb_const_mod
   use iso_fortran_env
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: psb_i2pk_ = int16
-  ! This is always a 4-byte integer, for MPI-related stuff
+  ! This is always a 4-byte integer.
   integer, parameter  :: psb_mpk_ = int32
   ! This is always an 8-byte  integer.
   integer, parameter  :: psb_epk_ = int64
@@ -51,7 +51,7 @@ module psb_const_mod
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: i2ndig=4
   integer, parameter  :: psb_i2pk_ = selected_int_kind(i2ndig)
-  ! This is always a 4-byte integer, for MPI-related stuff
+  ! This is always a 4-byte integer.
   integer, parameter  :: indig=8
   integer, parameter  :: psb_mpk_ = selected_int_kind(indig)
   ! This is always an 8-byte  integer.
