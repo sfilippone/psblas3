@@ -37,10 +37,11 @@
 !
 subroutine psb_sspspmm(a,b,c,info)
   use psb_mat_mod
-!!$  use psb_s_csr_mat_mod
-!!$  use psb_s_csc_mat_mod
-  !use psb_s_serial_mod, psb_protect_name => psb_sspspmm, only : psb_symbmm, psb_numbmm  implicit none 
-  
+#if !defined(PSB_CMP_INTEL)
+  use psb_s_csr_mat_mod
+  use psb_s_csc_mat_mod
+  use psb_s_serial_mod, psb_protect_name => psb_sspspmm
+#endif  
   type(psb_sspmat_type), intent(in)    :: a,b
   type(psb_sspmat_type), intent(out)   :: c
   integer(psb_ipk_), intent(out)                  :: info
@@ -49,7 +50,8 @@ subroutine psb_sspspmm(a,b,c,info)
   integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_spspmm'
   logical :: done_spmm
-  
+
+#if defined(PSB_CMP_INTEL)  
   interface psb_symbmm
     subroutine psb_ssymbmm(a,b,c,info)
       use psb_s_mat_mod, only : psb_sspmat_type
@@ -103,6 +105,8 @@ subroutine psb_sspspmm(a,b,c,info)
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_scscspspmm
   end interface
+#endif
+  
   call psb_erractionsave(err_act)
   info = psb_success_
 
@@ -173,9 +177,11 @@ end subroutine psb_sspspmm
 
 subroutine psb_lsspspmm(a,b,c,info)
   use psb_mat_mod
-!!$  use psb_s_csr_mat_mod
-!!$  use psb_s_csc_mat_mod
-  !use psb_s_serial_mod, psb_protect_name => psb_lsspspmm, only : psb_symbmm, psb_numbmm
+#if !defined(PSB_CMP_INTEL)
+  use psb_s_csr_mat_mod
+  use psb_s_csc_mat_mod
+  use psb_s_serial_mod, psb_protect_name => psb_lsspspmm
+#endif
   implicit none 
 
   type(psb_lsspmat_type), intent(in)    :: a,b
@@ -186,6 +192,7 @@ subroutine psb_lsspspmm(a,b,c,info)
   integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_spspmm'
   logical :: done_spmm
+#if defined(PSB_CMP_INTEL)
   interface psb_symbmm
     subroutine psb_lssymbmm(a,b,c,info)
       use psb_s_mat_mod, only : psb_lsspmat_type
@@ -239,6 +246,8 @@ subroutine psb_lsspspmm(a,b,c,info)
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_lscscspspmm
   end interface
+#endif
+
   call psb_erractionsave(err_act)
   info = psb_success_
 

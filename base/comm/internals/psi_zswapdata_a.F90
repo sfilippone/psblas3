@@ -193,7 +193,7 @@ subroutine psi_zswapidxm(ctxt,icomm,flag,n,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#if !defined(FLANG)
+#if !defined(PSB_CMP_FLANG)
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name
@@ -680,7 +680,7 @@ subroutine psi_zswapidxv(ctxt,icomm,flag,beta,y,idx, &
   logical, parameter :: usersend=.false.
 
   complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#if !defined(FLANG)
+#if !defined(PSB_CMP_FLANG)
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name
