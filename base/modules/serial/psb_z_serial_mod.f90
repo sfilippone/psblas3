@@ -98,6 +98,16 @@ module psb_z_serial_mod
     end subroutine psb_zbase_numbmm
   end interface psb_numbmm
 
+  interface psb_aplusat
+    subroutine psb_zaplusat(ain,aout,info)
+      use psb_z_mat_mod, only : psb_zspmat_type
+      import :: psb_ipk_
+      implicit none
+      type(psb_zspmat_type) :: ain, aout
+      integer(psb_ipk_) :: info
+    end subroutine psb_zaplusat
+  end interface 
+
   interface psb_rwextd
     subroutine psb_zrwextd(nr,a,info,b,rowscale)
       use psb_z_mat_mod, only : psb_zspmat_type

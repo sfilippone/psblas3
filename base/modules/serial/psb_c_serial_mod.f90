@@ -98,6 +98,16 @@ module psb_c_serial_mod
     end subroutine psb_cbase_numbmm
   end interface psb_numbmm
 
+  interface psb_aplusat
+    subroutine psb_caplusat(ain,aout,info)
+      use psb_c_mat_mod, only : psb_cspmat_type
+      import :: psb_ipk_
+      implicit none
+      type(psb_cspmat_type) :: ain, aout
+      integer(psb_ipk_) :: info
+    end subroutine psb_caplusat
+  end interface 
+
   interface psb_rwextd
     subroutine psb_crwextd(nr,a,info,b,rowscale)
       use psb_c_mat_mod, only : psb_cspmat_type

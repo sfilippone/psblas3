@@ -98,6 +98,16 @@ module psb_s_serial_mod
     end subroutine psb_sbase_numbmm
   end interface psb_numbmm
 
+  interface psb_aplusat
+    subroutine psb_saplusat(ain,aout,info)
+      use psb_s_mat_mod, only : psb_sspmat_type
+      import :: psb_ipk_
+      implicit none
+      type(psb_sspmat_type) :: ain, aout
+      integer(psb_ipk_) :: info
+    end subroutine psb_saplusat
+  end interface 
+
   interface psb_rwextd
     subroutine psb_srwextd(nr,a,info,b,rowscale)
       use psb_s_mat_mod, only : psb_sspmat_type

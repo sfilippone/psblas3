@@ -98,6 +98,16 @@ module psb_d_serial_mod
     end subroutine psb_dbase_numbmm
   end interface psb_numbmm
 
+  interface psb_aplusat
+    subroutine psb_daplusat(ain,aout,info)
+      use psb_d_mat_mod, only : psb_dspmat_type
+      import :: psb_ipk_
+      implicit none
+      type(psb_dspmat_type) :: ain, aout
+      integer(psb_ipk_) :: info
+    end subroutine psb_daplusat
+  end interface 
+
   interface psb_rwextd
     subroutine psb_drwextd(nr,a,info,b,rowscale)
       use psb_d_mat_mod, only : psb_dspmat_type
