@@ -242,7 +242,7 @@ if test x"$psblas_cv_fc" == "x" ; then
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
+        	FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_XLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -258,7 +258,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
    psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
    if test x"$psblas_shvs" != x""; then
      AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
@@ -276,7 +276,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_fc="flang";
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
    if test x"$psblas_shvs" != x""; then
      AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
@@ -288,7 +288,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    fi  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
-    
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_INTEL $FDEFINES"
    psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
    psblas_cv_fc="nag";

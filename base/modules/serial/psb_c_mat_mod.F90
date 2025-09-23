@@ -78,6 +78,8 @@
 !
 module psb_c_mat_mod
 
+  use psb_c_vect_mod
+  use psb_i_vect_mod
   use psb_c_base_mat_mod
   use psb_c_csr_mat_mod,  only : psb_c_csr_sparse_mat, psb_lc_csr_sparse_mat,&
        & psb_c_ecsr_sparse_mat
@@ -661,9 +663,8 @@ module psb_c_mat_mod
 
   interface
     subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
-      use psb_c_vect_mod, only : psb_c_vect_type
-      use psb_i_vect_mod, only : psb_i_vect_type
-      import :: psb_ipk_, psb_lpk_, psb_cspmat_type
+      import :: psb_ipk_, psb_lpk_, psb_cspmat_type, &
+           & psb_c_vect_type, psb_i_vect_type
       class(psb_cspmat_type), intent(inout) :: a
       type(psb_c_vect_type), intent(inout)  :: val
       type(psb_i_vect_type), intent(inout)  :: ia, ja

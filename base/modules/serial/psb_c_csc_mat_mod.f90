@@ -912,6 +912,23 @@ module psb_c_csc_mat_mod
     end subroutine psb_lc_csc_scals
   end interface
 
+  interface 
+    subroutine psb_ccscspspmm(a,b,c,info)
+      import 
+      implicit none 
+      class(psb_c_csc_sparse_mat), intent(in) :: a,b
+      type(psb_c_csc_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_ccscspspmm
+    subroutine psb_lccscspspmm(a,b,c,info)
+      import
+      implicit none 
+      class(psb_lc_csc_sparse_mat), intent(in) :: a,b
+      type(psb_lc_csc_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_lccscspspmm
+  end interface 
+  
 contains
 
   ! == ===================================

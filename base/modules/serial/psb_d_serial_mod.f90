@@ -60,24 +60,8 @@ module psb_d_serial_mod
       type(psb_dspmat_type), intent(out) :: c
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_dspspmm
-    subroutine psb_dcsrspspmm(a,b,c,info)
-      use psb_d_mat_mod, only : psb_d_csr_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_d_csr_sparse_mat), intent(in) :: a,b
-      type(psb_d_csr_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_dcsrspspmm
-    subroutine psb_dcscspspmm(a,b,c,info)
-      use psb_d_mat_mod, only : psb_d_csc_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_d_csc_sparse_mat), intent(in) :: a,b
-      type(psb_d_csc_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_dcscspspmm
-  end interface
-
+  end interface psb_spspmm
+  
   interface psb_symbmm
     subroutine psb_dsymbmm(a,b,c,info)
       use psb_d_mat_mod, only : psb_dspmat_type
@@ -113,6 +97,16 @@ module psb_d_serial_mod
       type(psb_d_csr_sparse_mat), intent(inout)  :: c
     end subroutine psb_dbase_numbmm
   end interface psb_numbmm
+
+  interface psb_aplusat
+    subroutine psb_daplusat(ain,aout,info)
+      use psb_d_mat_mod, only : psb_dspmat_type
+      import :: psb_ipk_
+      implicit none
+      type(psb_dspmat_type) :: ain, aout
+      integer(psb_ipk_) :: info
+    end subroutine psb_daplusat
+  end interface 
 
   interface psb_rwextd
     subroutine psb_drwextd(nr,a,info,b,rowscale)
@@ -232,22 +226,6 @@ module psb_d_serial_mod
       type(psb_ldspmat_type), intent(out) :: c
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ldspspmm
-    subroutine psb_ldcsrspspmm(a,b,c,info)
-      use psb_d_mat_mod, only : psb_ld_csr_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_ld_csr_sparse_mat), intent(in) :: a,b
-      type(psb_ld_csr_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_ldcsrspspmm
-    subroutine psb_ldcscspspmm(a,b,c,info)
-      use psb_d_mat_mod, only : psb_ld_csc_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_ld_csc_sparse_mat), intent(in) :: a,b
-      type(psb_ld_csc_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_ldcscspspmm
   end interface psb_spspmm
 
   interface psb_symbmm

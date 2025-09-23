@@ -66,7 +66,8 @@ Subroutine psb_s_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   use psb_comm_mod
   use psb_penv_mod
   use psb_s_tools_mod, psb_protect_name => psb_s_par_csr_spspmm
-  use psb_s_serial_mod, only : psb_scsrspspmm, psb_sbase_rwextd
+  use psb_s_csr_mat_mod, only : psb_scsrspspmm
+  use psb_s_serial_mod, only : psb_sbase_rwextd
   Implicit None
 
   type(psb_s_csr_sparse_mat),intent(in)    :: acsr
@@ -166,7 +167,8 @@ Subroutine psb_ls_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   use psb_comm_mod
   use psb_penv_mod
   use psb_s_tools_mod, psb_protect_name => psb_ls_par_csr_spspmm
-  use psb_s_serial_mod, only : psb_lscsrspspmm, psb_lsbase_rwextd
+  use psb_s_csr_mat_mod, only : psb_lscsrspspmm
+  use psb_s_serial_mod, only : psb_lsbase_rwextd
   Implicit None
 
   type(psb_ls_csr_sparse_mat),intent(in)    :: acsr
