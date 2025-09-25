@@ -11,7 +11,7 @@ LIBNAME=libspgpu.a
 OBJS=coo.o core.o dia.o ell.o hdia.o hell.o 
 CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
 
-all: includes objs
+all: incl objs
 
 objs: $(OBJS) iobjs
 
@@ -24,7 +24,7 @@ iobjs:
 ilib:
 	$(MAKE) -C kernels lib LIBNAME=$(LIBNAME)
 
-includes:
+incl:
 	/bin/cp -p *.h $(INCDIR)
 
 clean: iclean

@@ -37,6 +37,9 @@ static int hasUVA=-1;
 static struct cudaDeviceProp *prop=NULL;
 static spgpuHandle_t psb_cuda_handle = NULL;
 static cublasHandle_t psb_cublas_handle = NULL;
+#if PSB_CUDA_VERSION >= 13000
+static int memoryClockRate=-1;
+#endif
 #if defined(TRACK_CUDA_MALLOC)
 static int64_t total_cuda_mem = 0;
 #endif
@@ -310,17 +313,28 @@ int getGPUMultiProcessors()
 
 int getGPUMemoryBusWidth()
 { int count=0;
-#if CUDART_VERSION >= 5000
+#if PSB_CUDA_VERSION >= 5000
   if (prop!=NULL) 
     count = prop->memoryBusWidth;
 #endif
   return(count);
 }
+
+#if PSB_CUDA_VERSION >= 13000
+int getGPUMemoryClockRate(int dev)
+#else
 int getGPUMemoryClockRate()
+#endif
 { int count=0;
-#if CUDART_VERSION >= 5000
+#if PSB_CUDA_VERSION >= 5000
+#if PSB_CUDA_VERSION >= 13000
+  cudaDeviceGetAttribute(&memoryClockRate,
+			 cudaDevAttrMemoryClockRate, dev);
+  count = memoryClockRate;
+#else
   if (prop!=NULL) 
     count = prop->memoryClockRate;
+#endif
 #endif
   return(count);
 }

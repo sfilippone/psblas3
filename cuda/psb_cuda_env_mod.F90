@@ -145,11 +145,20 @@ module psb_cuda_env_mod
       use iso_c_binding
       integer(c_int) :: res
     end function psb_C_get_MemoryBusWidth
+#if (PSB_CUDA_VERSION >= 13000)    
+    function psb_C_get_MemoryClockRate(dev) &
+         & result(res) bind(c,name='getGPUMemoryClockRate')
+      use iso_c_binding
+      integer(c_int), value :: dev
+      integer(c_int) :: res
+    end function psb_C_get_MemoryClockRate
+#else
     function psb_C_get_MemoryClockRate() &
          & result(res) bind(c,name='getGPUMemoryClockRate')
       use iso_c_binding
       integer(c_int) :: res
     end function psb_C_get_MemoryClockRate
+#endif
     function psb_C_get_WarpSize() &
          & result(res) bind(c,name='getGPUWarpSize')
       use iso_c_binding
@@ -174,8 +183,9 @@ module psb_cuda_env_mod
     end subroutine psb_C_cpy_NameString
   end interface
 
-  logical, private :: gpu_do_maybe_free_buffer = .false.
-
+  logical, private, save :: gpu_do_maybe_free_buffer = .false.
+  integer(c_int), private, save :: myDevice
+  
 Contains
   
   function psb_cuda_get_maybe_free_buffer() result(res)
@@ -217,6 +227,7 @@ Contains
 
     if (present(dev)) then 
       info = psb_C_gpu_init(dev)
+      myDevice = dev
     else
       if (count >0) then 
         dev_ = mod(iam,count)
@@ -224,6 +235,7 @@ Contains
         dev_ = 0
       end if
       info = psb_C_gpu_init(dev_)
+      myDevice = dev_
     end if
     if (info == 0) info = initFcusparse()
     if (info /= 0) then 
@@ -283,7 +295,11 @@ Contains
 
   function psb_cuda_MemoryClockRate() result(res)     
     integer(psb_ipk_) :: res
+#if (PSB_CUDA_VERSION >= 13000)    
+    res =  psb_C_get_MemoryClockRate(myDevice)
+#else
     res =  psb_C_get_MemoryClockRate()
+#endif
   end function psb_cuda_MemoryClockRate
 
   function psb_cuda_MemoryBusWidth() result(res)     
@@ -296,7 +312,11 @@ Contains
     ! Formula here: 2*ClockRate(KHz)*BusWidth(bit)
     ! normalization: bit/byte, KHz/MHz
     ! output: MBytes/s
+#if PSB_CUDA_VERSION >= 13000
+    res =  2.d0*0.125d0*1.d-3*psb_C_get_MemoryBusWidth()*psb_C_get_MemoryClockRate(myDevice)
+#else
     res =  2.d0*0.125d0*1.d-3*psb_C_get_MemoryBusWidth()*psb_C_get_MemoryClockRate()
+#endif
   end function psb_cuda_MemoryPeakBandwidth
 
   function psb_cuda_DeviceName() result(res)     

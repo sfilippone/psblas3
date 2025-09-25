@@ -51,14 +51,15 @@ lib: objs ilib cudalib spgpulib
 	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
-$(COBJS): spgpuinc
 
 objs: spgpuinc $(OBJS) iobjs cudaobjs spgpuobjs
 	/bin/cp -p *$(.mod) $(MODDIR)
 	/bin/cp -p *.h $(INCDIR)
 
+#$(COBJS): spgpuinc
+
 spgpuinc:
-	$(MAKE) -C spgpu includes	
+	$(MAKE) -C spgpu incl	
 spgpuobjs:
 	$(MAKE) -C spgpu objs
 spgpulib:
