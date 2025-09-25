@@ -853,7 +853,7 @@ else
       PAC_CHECK_CUDA_VERSION()
       dnl PAC_CHECK_SPGPU()
       PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+      if (( ${PSB_CUDA_VERSION} > 15010 )); then
          AC_MSG_NOTICE([Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA])
          pac_cv_cuda="no";
          PSB_HAVE_CUDA="no";
@@ -898,8 +898,8 @@ else
          done
          if test "x$pac_cv_cuda_version" != "xunknown"; then
          dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
-          FCUDEFINES=" ${CUDA_DEFINES}"
-          dnl CCUDEFINES=" ${CUDA_DEFINES}"
+	 FCUDEFINES=" ${CUDA_DEFINES}"
+	 dnl         CCUDEFINES=" ${CUDA_DEFINES}"
           dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
         fi
      fi

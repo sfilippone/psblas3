@@ -11093,7 +11093,7 @@ LIBS="$SAVE_LIBS"
 CPPFLAGS="$SAVE_CPPFLAGS"
 
             PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+      if (( ${PSB_CUDA_VERSION} > 15010 )); then
          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA" >&5
 printf "%s\n" "$as_me: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA" >&6;}
          pac_cv_cuda="no";
@@ -11151,8 +11151,8 @@ fi
            CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
          done
          if test "x$pac_cv_cuda_version" != "xunknown"; then
-                   FCUDEFINES=" ${CUDA_DEFINES}"
-                            fi
+         	 FCUDEFINES=" ${CUDA_DEFINES}"
+	                   fi
      fi
   fi
 fi
