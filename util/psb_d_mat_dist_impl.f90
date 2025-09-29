@@ -238,6 +238,10 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
         if (j_count > nrow) exit
         if (j_count > lastigp) exit
       end do      
+      if (j_count > lastigp) then
+        iproc = iproc + 1
+        lastigp = lastigp + vsz(iproc+1)
+      end if
     end if
 
     ! now we should insert rows i_count..j_count-1
@@ -313,12 +317,6 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
       end do
     endif
     i_count = j_count
-    if ((use_vsz).and.(j_count <= nrow)) then 
-      if (j_count > lastigp) then
-        iproc = iproc + 1
-        lastigp = lastigp + vsz(iproc+1)
-      end if
-    end if
   end do
 
   call psb_barrier(ctxt)
