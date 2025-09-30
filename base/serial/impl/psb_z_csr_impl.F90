@@ -4277,7 +4277,7 @@ contains
     nze = min(size(c%val),size(c%ja))
     isz = max(ma,na,mb,nb)
     call psb_realloc(nb,row,info)
-    if (info == 0) call psb_realloc(na,idxs,info)
+    if (info == 0) call psb_realloc(max(na,nb),idxs,info)
     if (info == 0) call psb_realloc(nb,irow,info)
     if (info /= 0) return
     row  = dzero
@@ -6652,7 +6652,7 @@ contains
     nze = min(size(c%val),size(c%ja))
     isz = max(ma,na,mb,nb)
     call psb_realloc(nb,row,info)
-    if (info == 0) call psb_realloc(na,idxs,info)
+    if (info == 0) call psb_realloc(max(na,nb),idxs,info)
     if (info == 0) call psb_realloc(nb,irow,info)
     if (info /= 0) return
     row  = dzero
