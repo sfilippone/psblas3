@@ -390,5 +390,25 @@ contains
 
   end function psb_c_cd_get_global_indices
 
+  function psb_c_is_owned(x,cdh) bind(c,name='psb_c_is_owned') result(res)
+    implicit none
+    type(psb_c_object_type)        :: cdh
+    integer(psb_c_lpk_), value     :: x
+    logical(c_bool) :: res
+    ! Internal variables
+    type(psb_desc_type), pointer   :: descp
+    integer(psb_c_ipk_)            :: info
+    logical                        :: fowned
+    res = .false.
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      fowned = psb_is_owned(x+(1-psb_c_get_index_base()),descp)
+      if (fowned) then
+        res = .true.
+      end if
+    end if
+
+  end function psb_c_is_owned
+
 
 end module psb_base_tools_cbind_mod
