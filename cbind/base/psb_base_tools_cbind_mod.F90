@@ -277,6 +277,27 @@ contains
     return
   end function psb_c_cdins
 
+  function psb_c_cd_is_asb(cdh) bind(c,name='psb_c_cd_is_asb') result(res)
+    implicit none
+
+    logical(c_bool) :: res
+    type(psb_c_object_type) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+
+    res = .false.
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      if (descp%is_asb()) then
+        res = .true.
+      else
+        res = .false.
+      end if
+    end if
+
+  end function psb_c_cd_is_asb
+
 
 
   function psb_c_cd_get_local_rows(cdh) bind(c,name='psb_c_cd_get_local_rows') result(res)
