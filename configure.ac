@@ -680,6 +680,16 @@ PAC_FORTRAN_TEST_FLUSH(
 	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"],
 )
 
+######################
+# Extract version data
+######################
+#PAC_EXTRACT_PSBLAS_VERSION
+CFILE="base/modules/psb_const_mod.F90";
+PSBLASMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
+PSBLASMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
+PSBLASPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
+PSBLASSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+AC_MSG_RESULT([ version  $PSBLASSTRING])
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
@@ -1051,6 +1061,10 @@ FDEFINES=$(PSBFDEFINES)
 
 AC_SUBST(PSB_IPKDEF)
 AC_SUBST(PSB_LPKDEF)
+AC_SUBST(PSBLASMAJOR)
+AC_SUBST(PSBLASMINOR)
+AC_SUBST(PSBLASPATCH)
+AC_SUBST(PSBLASSTRING)
 AC_SUBST(CSERIALMPI)
 AC_SUBST(CHAVE_OPENMP)
 AC_SUBST(CHAVEMETIS)

@@ -2348,3 +2348,23 @@ fi
 ]
 )
 
+dnl @synopsis PAC_FORTRAN_PSBLAS_VERSION( )
+dnl
+dnl Will try to compile, link and run  a program using the PSBLAS library. \
+dnl  Checks for version major,  minor and patchlevel
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_EXTRACT_PSBLAS_VERSION,
+[AC_MSG_CHECKING([for version data of PSBLAS])
+ pac_const_file="base/modules/psb_const_mod.F90";
+ pac_cv_psblas_version_major=`cat $pac_const_file| grep version_major`;
+ pac_cv_psblas_version_minor=`cat $pac_const_file | grep version_minor   `;
+ pac_cv_psblas_patchlevel=`cat $pac_const_file | grep patchlevel  `;
+ pac_cv_psblas_version_string=`cat $pac_const_file | grep version_string `;
+])
