@@ -148,7 +148,7 @@ contains
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value :: nl
     integer(psb_c_lpk_)        :: vl(*)
-    integer(psb_c_lpk_)        :: lidx(*)
+    integer(psb_c_ipk_)        :: lidx(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
     integer(psb_c_ipk_)           :: info, ixb
@@ -174,9 +174,9 @@ contains
     ixb = psb_c_get_index_base()
 
     if (ixb == 1) then
-      call psb_cdall(ctxt,descp,info,vl=vl(1:nl),lidx=int(lidx(1:nl),psb_ipk_))
+      call psb_cdall(ctxt,descp,info,vl=vl(1:nl),lidx=lidx(1:nl))
     else
-      call psb_cdall(ctxt,descp,info,vl=(vl(1:nl)+(1-ixb)),lidx=int(lidx(1:nl)+(1-ixb),psb_ipk_))
+      call psb_cdall(ctxt,descp,info,vl=(vl(1:nl)+(1-ixb)),lidx=(lidx(1:nl)+(1-ixb)))
     end if
     cdh%item = c_loc(descp)
     res = info
@@ -318,6 +318,36 @@ contains
     end if
     return
   end function psb_c_cdins
+
+
+  function psb_c_cdins_lidx(nz,ja,lidx,cdh) bind(c,name='psb_c_cdins_lidx') result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    integer(psb_c_ipk_), value   :: nz
+    type(psb_c_object_type) :: cdh
+    integer(psb_c_lpk_)          :: ja(*)
+    integer(psb_c_ipk_) :: lidx(*)
+
+    type(psb_desc_type), pointer :: descp
+    integer(psb_c_ipk_)           :: ixb,info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      ixb = psb_c_get_index_base()
+
+      if (ixb == 1) then
+        call psb_cdins(nz,ja(1:nz),descp,info,lidx=lidx(1:nz))
+      else
+        call psb_cdins(nz,(ja(1:nz)+(1-ixb)),descp,info,lidx=(lidx(1:nz)+(1-ixb)))
+      end if
+        
+      res = info
+    end if
+    return
+  end function psb_c_cdins_lidx
 
   function psb_c_cd_is_asb(cdh) bind(c,name='psb_c_cd_is_asb') result(res)
     implicit none

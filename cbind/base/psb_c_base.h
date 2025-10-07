@@ -75,12 +75,13 @@ extern "C" {
   void psb_c_delete_ctxt(psb_c_ctxt *);
   psb_i_t    psb_c_cdall_vg(psb_l_t ng, psb_i_t *vg, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_l_t *vl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_vl_lidx(psb_i_t nl, psb_l_t *vl, psb_l_t *lidx,psb_c_ctxt cctxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vl_lidx(psb_i_t nl, psb_l_t *vl, psb_i_t *lidx, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_repl(psb_l_t n, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdasb(psb_c_descriptor *cd);
   psb_i_t    psb_c_cdfree(psb_c_descriptor *cd);
   psb_i_t    psb_c_cdins(psb_i_t nz, const psb_l_t *ia, const psb_l_t *ja, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdins_lidx(psb_i_t nz, const psb_l_t *ja, const psb_i_t *lidx, psb_c_descriptor *cd);
   bool       psb_c_is_owned(psb_l_t gindex, psb_c_descriptor *cd);
   bool       psb_c_cd_is_asb(psb_c_descriptor *cd);
 
