@@ -40,22 +40,29 @@
 !  Data Structures and Algorithms
 !  Addison-Wesley
 !
-subroutine psb_disort(x,ix,dir,flag)
+subroutine psb_disort(x,ix,dir,flag,reord)
   use psb_sort_mod, psb_protect_name => psb_disort
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, err_act
+  integer(psb_ipk_) :: dir_, flag_, err_act, reord_
   integer(psb_ipk_) :: n, i
+  real(psb_dpk_), allocatable :: tx(:) 
 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_disort'
   call psb_erractionsave(err_act)
+
+  if (present(reord)) then 
+    reord_ = reord
+  else
+    reord_= psb_sort_reord_x_
+  end if
 
   if (present(flag)) then 
     flag_ = flag
@@ -90,31 +97,61 @@ subroutine psb_disort(x,ix,dir,flag)
         ix(i) = i
       end do
     end if
-
-    select case(dir_) 
-    case (psb_sort_up_)
-      call psi_disrx_up(n,x,ix)
-    case (psb_sort_down_)
-      call psi_disrx_dw(n,x,ix)
-    case (psb_asort_up_)
+    select case(reord_)
+    case (psb_sort_reord_x_)
+      select case(dir_) 
+      case (psb_sort_up_)
+        call psi_disrx_up(n,x,ix)
+      case (psb_sort_down_)
+        call psi_disrx_dw(n,x,ix)
+      case (psb_asort_up_)
         call psi_daisrx_up(n,x,ix)
-    case (psb_asort_down_)
+      case (psb_asort_down_)
         call psi_daisrx_dw(n,x,ix)
-    case default
-      ierr(1) = 3; ierr(2) = dir_; 
+      case default
+        ierr(1) = 3; ierr(2) = dir_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
+    case(psb_sort_noreord_x_)
+      tx = x
+      select case(dir_) 
+      case (psb_sort_up_)
+        call psi_disrx_up(n,tx,ix)
+      case (psb_sort_down_)
+        call psi_disrx_dw(n,tx,ix)
+      case (psb_asort_up_)
+        call psi_daisrx_up(n,tx,ix)
+      case (psb_asort_down_)
+        call psi_daisrx_dw(n,tx,ix)
+      case default
+        ierr(1) = 3; ierr(2) = dir_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
+    case default 
+      ierr(1) = 5; ierr(2) = reord_; 
       call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
-  else 
+  else
+    select case(reord_)
+    case (psb_sort_reord_x_)
+      !OK
+    case default 
+      ierr(1) = 5; ierr(2) = reord_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+      goto 9999
+    end select
     select case(dir_) 
     case (psb_sort_up_)
       call psi_disr_up(n,x)
     case (psb_sort_down_)
       call psi_disr_dw(n,x)
     case (psb_asort_up_)
-        call psi_daisr_up(n,x)
+      call psi_daisr_up(n,x)
     case (psb_asort_down_)
-        call psi_daisr_dw(n,x)
+      call psi_daisr_dw(n,x)
     case default
       ierr(1) = 3; ierr(2) = dir_; 
       call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)

@@ -159,22 +159,29 @@ function psb_mssrch(key,n,v) result(ipos)
   return
 end function psb_mssrch
 
-subroutine psb_mqsort(x,ix,dir,flag)
+subroutine psb_mqsort(x,ix,dir,flag,reord)
   use psb_sort_mod, psb_protect_name => psb_mqsort
   use psb_error_mod
   implicit none 
   integer(psb_mpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, err_act, i
+  integer(psb_ipk_) :: dir_, flag_, err_act, i, reord_
   integer(psb_ipk_) :: n
+  integer(psb_mpk_), allocatable :: tx(:) 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_mqsort'
   call psb_erractionsave(err_act)
 
+
+  if (present(reord)) then 
+    reord_ = reord
+  else
+    reord_= psb_sort_reord_x_
+  end if
   if (present(flag)) then 
     flag_ = flag
   else 
@@ -209,21 +216,49 @@ subroutine psb_mqsort(x,ix,dir,flag)
       end do
     end if
 
-    select case(dir_) 
-    case (psb_sort_up_)
-      call psi_mqsrx_up(n,x,ix)
-    case (psb_sort_down_)
-      call psi_mqsrx_dw(n,x,ix)
-    case (psb_asort_up_)
+    select case(reord_)
+    case (psb_sort_reord_x_)
+      select case(dir_) 
+      case (psb_sort_up_)
+        call psi_mqsrx_up(n,x,ix)
+      case (psb_sort_down_)
+        call psi_mqsrx_dw(n,x,ix)
+      case (psb_asort_up_)
         call psi_maqsrx_up(n,x,ix)
-    case (psb_asort_down_)
+      case (psb_asort_down_)
         call psi_maqsrx_dw(n,x,ix)
-    case default
-      ierr(1) = 3; ierr(2) = dir_; 
+      case default
+        ierr(1) = 3; ierr(2) = dir_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
+    case(psb_sort_noreord_x_)
+      tx = x
+      select case(dir_) 
+      case (psb_sort_up_)
+        call psi_mqsrx_up(n,tx,ix)
+      case (psb_sort_down_)
+        call psi_mqsrx_dw(n,tx,ix)
+      case (psb_asort_up_)
+        call psi_maqsrx_up(n,tx,ix)
+      case (psb_asort_down_)
+        call psi_maqsrx_dw(n,tx,ix)
+      case default
+        ierr(1) = 3; ierr(2) = dir_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
+    end select
+  else
+    select case(reord_)
+    case (psb_sort_reord_x_)
+      !OK
+    case default 
+      ierr(1) = 5; ierr(2) = reord_; 
       call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
-  else 
+
     select case(dir_) 
     case (psb_sort_up_)
       call psi_mqsr_up(n,x)

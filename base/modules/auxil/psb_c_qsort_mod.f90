@@ -45,10 +45,10 @@ module psb_c_qsort_mod
 
 
   interface psb_qsort
-    subroutine psb_cqsort(x,ix,dir,flag)
+    subroutine psb_cqsort(x,ix,dir,flag,reord)
       import 
       complex(psb_spk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_cqsort
   end interface psb_qsort

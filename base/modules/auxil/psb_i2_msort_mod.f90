@@ -62,10 +62,10 @@ module psb_i2_msort_mod
 
 
   interface psb_msort
-    subroutine psb_i2msort(x,ix,dir,flag)
+    subroutine psb_i2msort(x,ix,dir,flag,reord)
       import 
       integer(psb_i2pk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag, reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_i2msort
   end interface psb_msort

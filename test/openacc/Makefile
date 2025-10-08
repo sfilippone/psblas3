@@ -14,7 +14,7 @@ LDLIBS=$(PSBGPULDLIBS)
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
 
-FFLAGS=-O3 -march=native -fopenacc -foffload=nvptx-none="-march=sm_75"
+FFLAGS=-O3 -march=native $(FCOPENACC)  -DOPENACC
 CFLAGS=-O3 -march=native
 
 VTC=vectoacc.o
@@ -47,9 +47,8 @@ psb_d_oacc_pde3d:
 	$(FLINK) -fopenacc -DOPENACC psb_d_oacc_pde3d.o -o psb_d_oacc_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_oacc_pde3d $(EXEDIR)
 
-dpdegenmv:
-	mpifort -fallow-argument-mismatch -frecursive -g -O3 -frecursive  -I../../modules/ -I. -DOPENACC -DHAVE_LAPACK -DHAVE_FLUSH_STMT -DLPK8 -DIPK4 -DMPI_MOD   -c dpdegenmv.F90 -o dpdegenmv.o
-	$(FLINK) -fopenacc -DOPENACC dpdegenmv.o -o dpdegenmv $(PSBLAS_LIB) $(LDLIBS)
+dpdegenmv: dpdegenmv.o
+	$(FLINK)  $(FCOPENACC) dpdegenmv.o -o dpdegenmv $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv dpdegenmv $(EXEDIR)
 
 clean:

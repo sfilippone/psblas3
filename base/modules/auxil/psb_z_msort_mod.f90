@@ -55,10 +55,10 @@ module psb_z_msort_mod
 
 
   interface psb_msort
-    subroutine psb_zmsort(x,ix,dir,flag)
+    subroutine psb_zmsort(x,ix,dir,flag,reord)
       import 
       complex(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag, reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_zmsort
   end interface psb_msort

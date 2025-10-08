@@ -44,10 +44,10 @@ module psb_e_isort_mod
   use psb_const_mod
 
   interface psb_isort
-    subroutine psb_eisort(x,ix,dir,flag)
+    subroutine psb_eisort(x,ix,dir,flag,reord)
       import 
       integer(psb_epk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_epk_), optional, intent(inout) :: ix(:)
     end subroutine psb_eisort
   end interface psb_isort
