@@ -1142,6 +1142,8 @@ AC_MSG_NOTICE([
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+        EXTRA_OPT             : ${EXTRA_OPT}
+
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 

@@ -13064,6 +13064,8 @@ fi
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+        EXTRA_OPT             : ${EXTRA_OPT}
+
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
@@ -13101,6 +13103,8 @@ printf "%s\n" "$as_me:
 	FMFLAG                : ${FMFLAG}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
+
+        EXTRA_OPT             : ${EXTRA_OPT}
 
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
