@@ -35,7 +35,7 @@ jobs:
       - name: Setup CMake and compiler
         run: |
           sudo apt update
-          sudo apt install -y cmake build-essential mpich libmpich-dev
+          sudo apt install -y cmake build-essential mpich libmpich-dev libblas-dev liblapack-dev
 
       # Step 3: Set defaults for inputs when triggered by push/PR
       - name: Set default build variables
