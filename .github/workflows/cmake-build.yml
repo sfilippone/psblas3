@@ -11,6 +11,10 @@ on:
         description: 'CMake build type'
         default: 'Release'
         required: true
+      run_install_only:
+        description: 'Run only install step'
+        default: 'false'
+        required: true
 
   push:
     branches:
@@ -27,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository (full history for git describe)
+      # Step 1: Checkout repository with full history for git describe
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -39,24 +43,33 @@ jobs:
           sudo apt update
           sudo apt install -y cmake build-essential mpich libmpich-dev libopenblas-dev liblapack-dev
 
-      # Step 3: Set defaults for build variables
+      # Step 3: Set build variables
       - name: Set build variables
         run: |
           echo "BUILD_TYPE=${{ github.event.inputs.build_type || 'Release' }}" >> $GITHUB_ENV
           echo "INSTALL_PREFIX=${{ github.workspace }}/${{ github.event.inputs.install_prefix || 'install' }}" >> $GITHUB_ENV
+          echo "RUN_INSTALL_ONLY=${{ github.event.inputs.run_install_only }}" >> $GITHUB_ENV
 
-      # Step 4: Configure CMake
-      - name: Configure CMake
-        run: cmake -S . -B build \
-             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
-             -DCMAKE_Fortran_COMPILER=mpifort \
-             -DCMAKE_C_COMPILER=mpicc
+      # Step 4: Cache CMake build directory
+      - name: Cache CMake build
+        uses: actions/cache@v3
+        with:
+          path: build
+          key: build-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            build-${{ runner.os }}-
 
-      # Step 5: Build the project
-      - name: Build
-        run: cmake --build build -- -j$(nproc)
+      # Step 5: Configure and build (skipped if run_install_only=true)
+      - name: Configure and Build
+        if: ${{ env.RUN_INSTALL_ONLY != 'true' }}
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
+            -DCMAKE_Fortran_COMPILER=mpifort \
+            -DCMAKE_C_COMPILER=mpicc
+          cmake --build build -- -j$(nproc)
 
-      # Step 6: Install into workspace
+      # Step 6: Install
       - name: Install
-        run: cmake --install build
+        run: cmake --install build --prefix $INSTALL_PREFIX
