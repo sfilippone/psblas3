@@ -27,18 +27,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout repository (full history for git describe)
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # Step 2: Install dependencies (CMake and compiler)
-      - name: Setup CMake and compiler
+      # Step 2: Install dependencies (CMake, compiler, MPI, BLAS/LAPACK)
+      - name: Setup dependencies
         run: |
           sudo apt update
-          sudo apt install -y cmake build-essential mpich libmpich-dev libblas-dev liblapack-dev
+          sudo apt install -y cmake build-essential mpich libmpich-dev libopenblas-dev liblapack-dev
 
-      # Step 3: Set defaults for inputs when triggered by push/PR
-      - name: Set default build variables
+      # Step 3: Set defaults for build variables
+      - name: Set build variables
         run: |
           echo "BUILD_TYPE=${{ github.event.inputs.build_type || 'Release' }}" >> $GITHUB_ENV
           echo "INSTALL_PREFIX=${{ github.workspace }}/${{ github.event.inputs.install_prefix || 'install' }}" >> $GITHUB_ENV
@@ -47,12 +49,14 @@ jobs:
       - name: Configure CMake
         run: cmake -S . -B build \
              -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX
+             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
+             -DCMAKE_Fortran_COMPILER=mpifort \
+             -DCMAKE_C_COMPILER=mpicc
 
       # Step 5: Build the project
       - name: Build
         run: cmake --build build -- -j$(nproc)
 
-      # Step 6: Optional install
+      # Step 6: Install into workspace
       - name: Install
         run: cmake --install build
