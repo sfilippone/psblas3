@@ -1,0 +1,50 @@
+name: CMake Build
+
+on:
+  workflow_dispatch:    # Allows manual triggering with custom inputs
+    inputs:
+      install_prefix:
+        description: 'CMake install prefix'
+        default: '${{ github.workspace }}/install'
+        required: true
+      build_type:
+        description: 'CMake build type'
+        default: 'Release'
+        required: true
+
+  push:
+    branches:
+      - cmake
+      - test_dev
+
+  pull_request:
+    branches:
+      - cmake
+      - test_dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install dependencies (CMake, compilers)
+      - name: Setup CMake and compiler
+        run: |
+          sudo apt update
+          sudo apt install -y cmake build-essential
+
+      # Step 3: Configure CMake
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build_type || 'Release' }} \
+            -DCMAKE_INSTALL_PREFIX=${{ github.event.inputs.install_prefix || '${{ github.workspace }}/install' }}
+
+      # Step 4: Build the project
+      - name: Build
+        run: cmake --build build
