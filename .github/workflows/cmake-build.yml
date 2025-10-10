@@ -1,11 +1,11 @@
 name: CMake Build
 
 on:
-  workflow_dispatch:    # Allows manual triggering with custom inputs
+  workflow_dispatch:
     inputs:
       install_prefix:
-        description: 'CMake install prefix'
-        default: '${{ github.workspace }}/install'
+        description: 'CMake install prefix (relative to workspace)'
+        default: 'install'
         required: true
       build_type:
         description: 'CMake build type'
@@ -27,24 +27,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repo
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Install dependencies (CMake, compilers)
+      # Step 2: Install dependencies (CMake and compiler)
       - name: Setup CMake and compiler
         run: |
           sudo apt update
           sudo apt install -y cmake build-essential
 
-      # Step 3: Configure CMake
-      - name: Configure CMake
+      # Step 3: Set defaults for inputs when triggered by push/PR
+      - name: Set default build variables
         run: |
-          mkdir -p build
-          cmake -S . -B build \
-            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build_type || 'Release' }} \
-            -DCMAKE_INSTALL_PREFIX=${{ github.event.inputs.install_prefix || '${{ github.workspace }}/install' }}
+          echo "BUILD_TYPE=${{ github.event.inputs.build_type || 'Release' }}" >> $GITHUB_ENV
+          echo "INSTALL_PREFIX=${{ github.workspace }}/${{ github.event.inputs.install_prefix || 'install' }}" >> $GITHUB_ENV
 
-      # Step 4: Build the project
+      # Step 4: Configure CMake
+      - name: Configure CMake
+        run: cmake -S . -B build \
+             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX
+
+      # Step 5: Build the project
       - name: Build
-        run: cmake --build build
+        run: cmake --build build -- -j$(nproc)
+
+      # Step 6: Optional install
+      - name: Install
+        run: cmake --install build
