@@ -61,7 +61,7 @@ include(CheckOutOfSourceBuild)
 #----------------------------------------------------
 if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
   set(gfortran_compiler true)
-  #TODO: check if it is needed an mpi compiler set(CMAKE_Fortran_COMPILER mpifort)
+  set(CMAKE_Fortran_COMPILER mpifort)
 
   set ( CMAKE_C_FLAGS_CODECOVERAGE "-fprofile-arcs -ftest-coverage -O0"
     CACHE STRING "Code coverage C compiler flags")
@@ -306,61 +306,89 @@ if(HAVE_SAME_TYPE_AS)
 endif()
 
 #----------------------------------------------------------------------------
-# Find MPI and set some flags so that FC and CC can point to gfortran and gcc
+# MPI detection and configuration
 #----------------------------------------------------------------------------
-find_package( MPI REQUIRED Fortran )
+find_package(MPI REQUIRED Fortran)
 
 if(MPI_FOUND)
-  #-----------------------------------------------
-  # Work around an issue present on fedora systems
-  #-----------------------------------------------
-  if( (MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack") )
-    message ( WARNING
-      "The `noexecstack` linker flag was found in the MPI_<lang>_LINK_FLAGS variable. This is
-known to cause segmentation faults for some Fortran codes. See, e.g.,
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71729 or
-https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
+  message(STATUS ">>> MPI found: ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES}")
 
-`noexecstack` is being replaced with `execstack`"
-      )
-    string(REPLACE "noexecstack"
-      "execstack" MPI_C_LINK_FLAGS_FIXED ${MPI_C_LINK_FLAGS})
-    string(REPLACE "noexecstack"
-      "execstack" MPI_Fortran_LINK_FLAGS_FIXED ${MPI_Fortran_LINK_FLAGS})
-    set(MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS_FIXED}" CACHE STRING
-      "MPI C linking flags" FORCE)
-    set(MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS_FIXED}" CACHE STRING
-      "MPI Fortran linking flags" FORCE)
-      
+  #-----------------------------------------------
+  # Fedora-specific workaround for noexecstack flag
+  #-----------------------------------------------
+  if((MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack"))
+    message(WARNING
+      "The `noexecstack` linker flag was found in the MPI_<lang>_LINK_FLAGS variable.
+This can cause segmentation faults in Fortran codes.
+Replacing `noexecstack` with `execstack`."
+    )
+    string(REPLACE "noexecstack" "execstack" MPI_C_LINK_FLAGS_FIXED ${MPI_C_LINK_FLAGS})
+    string(REPLACE "noexecstack" "execstack" MPI_Fortran_LINK_FLAGS_FIXED ${MPI_Fortran_LINK_FLAGS})
+    set(MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS_FIXED}" CACHE STRING "MPI C linking flags" FORCE)
+    set(MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS_FIXED}" CACHE STRING "MPI Fortran linking flags" FORCE)
   endif()
 
-    message(STATUS "Found MPI: ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES}")
-    
-  #----------------
-  # Setup MPI flags
-  #----------------
+  #-----------------------------------------------
+  # Compiler and linker flags setup
+  #-----------------------------------------------
   list(REMOVE_DUPLICATES MPI_Fortran_INCLUDE_PATH)
-  set(CMAKE_C_COMPILE_FLAGS ${CMAKE_C_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS})
-  set(CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS} ${MPI_C_LINK_FLAGS})
-  set(CMAKE_Fortran_COMPILE_FLAGS ${CMAKE_Fortran_COMPILE_FLAGS} ${MPI_Fortran_COMPILE_FLAGS})
-  set(CMAKE_Fortran_LINK_FLAGS ${CMAKE_Fortran_LINK_FLAGS} ${MPI_Fortran_LINK_FLAGS})
   include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
-message(STATUS "${MPI_C_INCLUDE_PATH}; ${MPI_Fortran_INCLUDE_PATH};; ${CMAKE_Fortran_LINK_FLAGS} ;")
+
+  set(CMAKE_C_COMPILE_FLAGS "${CMAKE_C_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS}")
+  set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} ${MPI_C_LINK_FLAGS}")
+  set(CMAKE_Fortran_COMPILE_FLAGS "${CMAKE_Fortran_COMPILE_FLAGS} ${MPI_Fortran_COMPILE_FLAGS}")
+  set(CMAKE_Fortran_LINK_FLAGS "${CMAKE_Fortran_LINK_FLAGS} ${MPI_Fortran_LINK_FLAGS}")
+
+  message(STATUS "MPI include paths: ${MPI_Fortran_INCLUDE_PATH}")
+  message(STATUS "Fortran link flags: ${CMAKE_Fortran_LINK_FLAGS}")
+
+  #-----------------------------------------------
+  # Ensure mpi.mod is available for CMake
+  #-----------------------------------------------
+  set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
+  file(MAKE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY})
+
+  # Try to copy mpi.mod or MPI.mod into module directory
+  set(_mpi_mod_found FALSE)
+  foreach(_mpi_mod_name mpi.mod MPI.mod)
+    foreach(_mpi_inc ${MPI_Fortran_INCLUDE_PATH})
+      if(EXISTS "${_mpi_inc}/${_mpi_mod_name}")
+        file(COPY "${_mpi_inc}/${_mpi_mod_name}" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
+        message(STATUS "Copied ${_mpi_mod_name} from ${_mpi_inc}")
+        set(_mpi_mod_found TRUE)
+        break()
+      endif()
+    endforeach()
+    if(_mpi_mod_found)
+      break()
+    endif()
+  endforeach()
+
+  if(NOT _mpi_mod_found)
+    message(WARNING "mpi.mod not found in MPI include paths; assuming it is built-in to mpifort.")
+  endif()
+
+  #-----------------------------------------------
+  # Enable MPI Fortran module support
+  #-----------------------------------------------
   if(MPI_Fortran_HAVE_F90_MODULE OR MPI_Fortran_HAVE_F08_MODULE)
     add_compile_options(-DPSB_MPI_MOD)
-    message(STATUS "-DPSB_MPI_MOD")
-    #add_compile_options(-DSERIAL_MPI) # Is it right??
-    #message(STATUS "-DSERIAL_MPI")
+    message(STATUS "Defined: -DPSB_MPI_MOD")
   endif()
+
   set(PSB_SERIAL_MPI OFF)
-  
+
 else()
-  message(STATUS "MPI  not found, serial ahead")
-  add_compile_options(-DPSB_SERIAL_MPI)
-  add_compile_options(-DPSB_MPI_MOD)
+  #-----------------------------------------------
+  # Fallback to serial mode (no MPI found)
+  #-----------------------------------------------
+  message(WARNING ">>> MPI not found — building in serial mode")
+  add_compile_options(-DPSB_SERIAL_MPI -DPSB_MPI_MOD)
   set(PSB_SERIAL_MPI ON)
   set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
+
+
 
 #-------------------------------------------------------
 # Find and Use OpenCoarrays IFF gfortran AND options set
@@ -1122,35 +1150,35 @@ endif()
 
 
 
-if(MPI_FOUND)
+#if(MPI_FOUND)
 # Copy mpi.mod from the first available path in MPI_Fortran_INCLUDE_PATH
-  set(MPI_MOD_COPIED FALSE)
+#  set(MPI_MOD_COPIED FALSE)
 
-  foreach(path IN LISTS MPI_Fortran_INCLUDE_PATH)
+#  foreach(path IN LISTS MPI_Fortran_INCLUDE_PATH)
     # Construct the full path to the mpi.mod file
-    set(mpi_mod_path "${path}/mpi.mod")
+#    set(mpi_mod_path "${path}/mpi.mod")
     
     # Check if the mpi.mod file exists
-    if(EXISTS "${mpi_mod_path}")
+#    if(EXISTS "${mpi_mod_path}")
         # Copy the mpi.mod file to the module directory
-        file(COPY "${mpi_mod_path}" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
-        message(STATUS "Copied mpi.mod from ${mpi_mod_path} to ${CMAKE_Fortran_MODULE_DIRECTORY}")
-        set(MPI_MOD_COPIED TRUE)
-        break()  # Exit the loop once we've copied the file
-    endif()
-  endforeach()
+#        file(COPY "${mpi_mod_path}" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
+        #message(STATUS "Copied mpi.mod from ${mpi_mod_path} to ${CMAKE_Fortran_MODULE_DIRECTORY}")
+        #set(MPI_MOD_COPIED TRUE)
+        #break()  # Exit the loop once we've copied the file
+    #endif()
+  #endforeach()
 
-  if(NOT MPI_MOD_COPIED)
-    message(WARNING "mpi.mod not found in any of the specified paths: ${MPI_Fortran_INCLUDE_PATH}")
-  endif()
+  #if(NOT MPI_MOD_COPIED)
+  #  message(WARNING "mpi.mod not found in any of the specified paths: ${MPI_Fortran_INCLUDE_PATH}")
+  #endif()
     
     
 
-  foreach(lib base prec linsolve ext util cbind)
+  #foreach(lib base prec linsolve ext util cbind)
 
-    target_link_libraries(${lib} PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
-  endforeach()
-endif()
+   # target_link_libraries(${lib} PUBLIC ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+  #endforeach()
+#endif()
 
 if(OpenCoarrays_FOUND)
   foreach(lib base prec linsolve ext util cbind)  #TODO: check if cbind goes here!
