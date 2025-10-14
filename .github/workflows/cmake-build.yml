@@ -51,6 +51,12 @@ jobs:
           echo "INSTALL_PREFIX=${{ github.workspace }}/${{ github.event.inputs.install_prefix || 'install' }}" >> $GITHUB_ENV
           echo "RUN_INSTALL_ONLY=${{ github.event.inputs.run_install_only }}" >> $GITHUB_ENV
 
+      - name: Set MPI environment
+        run: |
+          export PATH="/usr/lib/mpich/bin:$PATH"
+          export MPI_HOME="/usr/lib/mpich"
+          mpifort --version
+
       # Step 4: Cache CMake build directory
       - name: Cache CMake build
         uses: actions/cache@v3
@@ -68,7 +74,9 @@ jobs:
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
             -DCMAKE_Fortran_COMPILER=mpifort \
-            -DCMAKE_C_COMPILER=mpicc
+            -DCMAKE_C_COMPILER=mpicc \
+            -DMPI_C_COMPILER=mpicc \
+            -DMPI_Fortran_COMPILER=mpifort
           cmake --build build -- -j$(nproc)
 
       # Step 6: Install
