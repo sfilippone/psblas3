@@ -59,8 +59,7 @@ include(CheckOutOfSourceBuild)
 # Define coverage flags and report untested compilers
 #----------------------------------------------------
 if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
-  set(gfortran_compiler true)
-  set(CMAKE_Fortran_COMPILER mpifort)
+  set(CMAKE_Fortran_COMPILER mpifort CACHE STRING "MPI Fortran compiler" FORCE)
 
   set ( CMAKE_C_FLAGS_CODECOVERAGE "-fprofile-arcs -ftest-coverage -O0"
     CACHE STRING "Code coverage C compiler flags")
@@ -386,7 +385,7 @@ if(MPI_FOUND)
   endif()
 
   if(NOT _mpi_mod_found)
-    message(WARNING "mpi.mod not found in MPI include paths; assuming mpifort provides it internally. Skipping copy.")
+    message(FATAL "mpi.mod not found in MPI include paths; assuming mpifort provides it internally. Skipping copy.")
   endif()
 
 
