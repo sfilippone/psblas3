@@ -26,59 +26,55 @@ on:
       - cmake
       - test_dev
 
+env:
+  BUILD_TYPE: Release
+  INSTALL_PREFIX: ${{ github.workspace }}/install
+  RUN_INSTALL_ONLY: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout repository with full history for git describe
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
-      # Step 2: Install dependencies (CMake, compiler, MPI, BLAS/LAPACK)
-      - name: Setup dependencies
+      - name: Set up dependencies
         run: |
           sudo apt update
-          sudo apt install -y cmake build-essential mpich libmpich-dev libopenblas-dev liblapack-dev
-          mpifort --version
+          sudo apt install -y \
+            cmake \
+            build-essential \
+            gfortran \
+            mpich \
+            libmpich-dev \
+            libopenblas-dev \
+            liblapack-dev
 
-      # Step 3: Set build variables
-      - name: Set build variables
+      - name: Check MPI installation
         run: |
-          echo "BUILD_TYPE=${{ github.event.inputs.build_type || 'Release' }}" >> $GITHUB_ENV
-          echo "INSTALL_PREFIX=${{ github.workspace }}/${{ github.event.inputs.install_prefix || 'install' }}" >> $GITHUB_ENV
-          echo "RUN_INSTALL_ONLY=${{ github.event.inputs.run_install_only }}" >> $GITHUB_ENV
-
-      - name: Set MPI environment
-        run: |
-          export PATH="/usr/lib/mpich/bin:$PATH"
-          export MPI_HOME="/usr/lib/mpich"
+          mpicc --version
           mpifort --version
+          which mpicc
+          which mpifort
 
-      # Step 4: Cache CMake build directory
-      - name: Cache CMake build
-        uses: actions/cache@v3
-        with:
-          path: build
-          key: build-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
-          restore-keys: |
-            build-${{ runner.os }}-
-
-      # Step 5: Configure and build (skipped if run_install_only=true)
       - name: Configure and Build
         if: ${{ env.RUN_INSTALL_ONLY != 'true' }}
         run: |
+          # Export MPI compilers
+          export CC=mpicc
+          export CXX=mpicxx
+          export FC=mpifort
+          export F77=mpifort
+
+          # Configure CMake
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
-            -DCMAKE_Fortran_COMPILER=mpifort \
-            -DCMAKE_C_COMPILER=mpicc \
-            -DMPI_C_COMPILER=mpicc \
-            -DMPI_Fortran_COMPILER=mpifort
-          cmake --build build -- -j$(nproc)
+            -DCMAKE_Fortran_COMPILER=$FC \
+            -DCMAKE_C_COMPILER=$CC \
+            -DMPI_C_COMPILER=$CC \
+            -DMPI_Fortran_COMPILER=$FC \
+            -DMPI_Fortran_INCLUDE_DIR=$MPI_Fortran_INCLUDE_DIR
 
-      # Step 6: Install
-      - name: Install
-        run: cmake --install build --prefix $INSTALL_PREFIX
+          # Build
+          cmake --build build -- -j$(nproc)
