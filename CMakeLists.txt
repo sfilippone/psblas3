@@ -4,8 +4,7 @@
 #-----------------------------------
 # Set oldest allowable CMake version
 #-----------------------------------
-cmake_minimum_required(VERSION 3.11)
-cmake_policy(VERSION 3.11.1...3.13.3)
+cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -305,88 +304,114 @@ if(HAVE_SAME_TYPE_AS)
   message(STATUS "-DPSB_HAVE_SAME_TYPE_AS")
 endif()
 
-#----------------------------------------------------------------------------
-# MPI detection and configuration
-#----------------------------------------------------------------------------
-find_package(MPI REQUIRED Fortran)
+# ============================================================
+# MPI configuration (C + Fortran)
+# Works robustly with modern CMake and MPICH/OpenMPI
+# ============================================================
+
+find_package(MPI REQUIRED C Fortran)
 
 if(MPI_FOUND)
-  message(STATUS ">>> MPI found: ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES}")
+  message(STATUS ">>> MPI found successfully!")
 
-  #-----------------------------------------------
-  # Fedora-specific workaround for noexecstack flag
-  #-----------------------------------------------
-  if((MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack"))
-    message(WARNING
-      "The `noexecstack` linker flag was found in the MPI_<lang>_LINK_FLAGS variable.
-This can cause segmentation faults in Fortran codes.
-Replacing `noexecstack` with `execstack`."
-    )
-    string(REPLACE "noexecstack" "execstack" MPI_C_LINK_FLAGS_FIXED ${MPI_C_LINK_FLAGS})
-    string(REPLACE "noexecstack" "execstack" MPI_Fortran_LINK_FLAGS_FIXED ${MPI_Fortran_LINK_FLAGS})
-    set(MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS_FIXED}" CACHE STRING "MPI C linking flags" FORCE)
-    set(MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS_FIXED}" CACHE STRING "MPI Fortran linking flags" FORCE)
+  # -----------------------------------------------
+  # Extract info from imported targets (modern CMake)
+  # -----------------------------------------------
+  if(TARGET MPI::MPI_Fortran)
+    get_target_property(_mpi_inc MPI::MPI_Fortran INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(_mpi_lib MPI::MPI_Fortran IMPORTED_LOCATION)
+    get_target_property(_mpi_link MPI::MPI_Fortran INTERFACE_LINK_LIBRARIES)
+
+    # Handle interface-only targets (modern MPI)
+    if(NOT _mpi_lib AND _mpi_link)
+      set(_mpi_lib ${_mpi_link})
+    endif()
+
+    if(_mpi_inc)
+      list(APPEND MPI_Fortran_INCLUDE_PATH ${_mpi_inc})
+    endif()
+    if(_mpi_lib)
+      list(APPEND MPI_Fortran_LIBRARIES ${_mpi_lib})
+    endif()
   endif()
 
-  #-----------------------------------------------
-  # Compiler and linker flags setup
-  #-----------------------------------------------
+  if(TARGET MPI::MPI_C)
+    get_target_property(_mpi_c_inc MPI::MPI_C INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(_mpi_c_lib MPI::MPI_C IMPORTED_LOCATION)
+    get_target_property(_mpi_c_link MPI::MPI_C INTERFACE_LINK_LIBRARIES)
+
+    if(NOT _mpi_c_lib AND _mpi_c_link)
+      set(_mpi_c_lib ${_mpi_c_link})
+    endif()
+
+    if(_mpi_c_inc)
+      list(APPEND MPI_C_INCLUDE_PATH ${_mpi_c_inc})
+    endif()
+    if(_mpi_c_lib)
+      list(APPEND MPI_C_LIBRARIES ${_mpi_c_lib})
+    endif()
+  endif()
+
+  # Clean duplicates
   list(REMOVE_DUPLICATES MPI_Fortran_INCLUDE_PATH)
+  list(REMOVE_DUPLICATES MPI_Fortran_LIBRARIES)
+
+  message(STATUS "MPI Fortran include path(s): ${MPI_Fortran_INCLUDE_PATH}")
+  message(STATUS "MPI Fortran library target(s): ${MPI_Fortran_LIBRARIES}")
+  message(STATUS "MPI C library target(s): ${MPI_C_LIBRARIES}")
+
+  # -----------------------------------------------
+  # Fedora-specific workaround for noexecstack flag
+  # -----------------------------------------------
+  if((MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack"))
+    message(WARNING "Replacing 'noexecstack' with 'execstack' in MPI link flags")
+    string(REPLACE "noexecstack" "execstack" MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS}")
+    string(REPLACE "noexecstack" "execstack" MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS}")
+  endif()
+
+  # -----------------------------------------------
+  # Compiler and linker flags setup
+  # -----------------------------------------------
   include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
 
-  set(CMAKE_C_COMPILE_FLAGS "${CMAKE_C_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS}")
-  set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} ${MPI_C_LINK_FLAGS}")
-  set(CMAKE_Fortran_COMPILE_FLAGS "${CMAKE_Fortran_COMPILE_FLAGS} ${MPI_Fortran_COMPILE_FLAGS}")
-  set(CMAKE_Fortran_LINK_FLAGS "${CMAKE_Fortran_LINK_FLAGS} ${MPI_Fortran_LINK_FLAGS}")
+  add_compile_options(${MPI_Fortran_COMPILE_FLAGS})
+  add_link_options(${MPI_Fortran_LINK_FLAGS})
 
-  message(STATUS "MPI include paths: ${MPI_Fortran_INCLUDE_PATH}")
-  message(STATUS "Fortran link flags: ${CMAKE_Fortran_LINK_FLAGS}")
+  message(STATUS "Fortran link flags: ${MPI_Fortran_LINK_FLAGS}")
 
-  #-----------------------------------------------
-  # Ensure mpi.mod is available for CMake
-  #-----------------------------------------------
+  # -----------------------------------------------
+  # Ensure mpi.mod is available
+  # -----------------------------------------------
   set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
   file(MAKE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY})
 
-  # Try to copy mpi.mod or MPI.mod into module directory
   set(_mpi_mod_found FALSE)
-  foreach(_mpi_mod_name mpi.mod MPI.mod)
-    foreach(_mpi_inc ${MPI_Fortran_INCLUDE_PATH})
-      if(EXISTS "${_mpi_inc}/${_mpi_mod_name}")
-        file(COPY "${_mpi_inc}/${_mpi_mod_name}" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
-        message(STATUS "Copied ${_mpi_mod_name} from ${_mpi_inc}")
-        set(_mpi_mod_found TRUE)
-        break()
-      endif()
-    endforeach()
-    if(_mpi_mod_found)
+  foreach(_mpi_inc_dir ${MPI_Fortran_INCLUDE_PATH})
+    if(EXISTS "${_mpi_inc_dir}/mpi.mod")
+      file(COPY "${_mpi_inc_dir}/mpi.mod" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
+      message(STATUS "Copied mpi.mod from ${_mpi_inc_dir}")
+      set(_mpi_mod_found TRUE)
       break()
     endif()
   endforeach()
 
   if(NOT _mpi_mod_found)
-    message(WARNING "mpi.mod not found in MPI include paths; assuming it is built-in to mpifort.")
+    message(WARNING "mpi.mod not found in MPI include paths; assuming mpifort provides it internally.")
   endif()
 
-  #-----------------------------------------------
-  # Enable MPI Fortran module support
-  #-----------------------------------------------
-  if(MPI_Fortran_HAVE_F90_MODULE OR MPI_Fortran_HAVE_F08_MODULE)
-    add_compile_options(-DPSB_MPI_MOD)
-    message(STATUS "Defined: -DPSB_MPI_MOD")
-  endif()
-
+  # -----------------------------------------------
+  # Define flag for MPI-enabled build
+  # -----------------------------------------------
+  add_compile_definitions(PSB_MPI_MOD)
   set(PSB_SERIAL_MPI OFF)
 
 else()
-  #-----------------------------------------------
-  # Fallback to serial mode (no MPI found)
-  #-----------------------------------------------
   message(WARNING ">>> MPI not found — building in serial mode")
-  add_compile_options(-DPSB_SERIAL_MPI -DPSB_MPI_MOD)
+  add_compile_definitions(PSB_SERIAL_MPI PSB_MPI_MOD)
   set(PSB_SERIAL_MPI ON)
-  set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
+
+
 
 
 
