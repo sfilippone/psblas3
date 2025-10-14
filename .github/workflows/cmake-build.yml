@@ -41,7 +41,8 @@ jobs:
       - name: Setup dependencies
         run: |
           sudo apt update
-          sudo apt install -y cmake build-essential mpich mpifort libmpich-dev libopenblas-dev liblapack-dev
+          sudo apt install -y cmake build-essential mpich libmpich-dev libopenblas-dev liblapack-dev
+          mpifort --version
 
       # Step 3: Set build variables
       - name: Set build variables
