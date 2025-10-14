@@ -304,111 +304,114 @@ if(HAVE_SAME_TYPE_AS)
   message(STATUS "-DPSB_HAVE_SAME_TYPE_AS")
 endif()
 
+#----------------------------------------------------------------------------
+# MPI detection and configuration
+#----------------------------------------------------------------------------
+find_package(MPI REQUIRED Fortran)
+
 # ============================================================
-# MPI configuration (C + Fortran)
-# Works robustly with modern CMake and MPICH/OpenMPI
+# Detect and configure MPI (C + Fortran)
 # ============================================================
 
-find_package(MPI REQUIRED C Fortran)
+# --- Step 1: Ensure CMake uses MPI wrappers if available ---
+if(NOT DEFINED CMAKE_Fortran_COMPILER)
+  find_program(MPI_Fortran_COMPILER NAMES mpifort mpif90 HINTS ENV PATH)
+  if(MPI_Fortran_COMPILER)
+    message(STATUS "Using detected MPI Fortran compiler: ${MPI_Fortran_COMPILER}")
+    set(CMAKE_Fortran_COMPILER "${MPI_Fortran_COMPILER}" CACHE STRING "MPI Fortran compiler" FORCE)
+  else()
+    message(WARNING "No MPI Fortran compiler (mpifort/mpif90) found; using default ${CMAKE_Fortran_COMPILER}")
+  endif()
+endif()
+
+if(NOT DEFINED CMAKE_C_COMPILER)
+  find_program(MPI_C_COMPILER NAMES mpicc HINTS ENV PATH)
+  if(MPI_C_COMPILER)
+    message(STATUS "Using detected MPI C compiler: ${MPI_C_COMPILER}")
+    set(CMAKE_C_COMPILER "${MPI_C_COMPILER}" CACHE STRING "MPI C compiler" FORCE)
+  endif()
+endif()
+
+# --- Step 2: Find the MPI package (both C and Fortran) ---
+find_package(MPI COMPONENTS C Fortran)
+
+# ============================================================
+# Modern MPI configuration with legacy PSBLAS support
+# Works with MPICH/OpenMPI and CMake >= 3.15
+# ============================================================
+
+# Require both C and Fortran MPI
+find_package(MPI REQUIRED COMPONENTS C Fortran)
 
 if(MPI_FOUND)
   message(STATUS ">>> MPI found successfully!")
 
-  # -----------------------------------------------
-  # Extract info from imported targets (modern CMake)
-  # -----------------------------------------------
-  if(TARGET MPI::MPI_Fortran)
-    get_target_property(_mpi_inc MPI::MPI_Fortran INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(_mpi_lib MPI::MPI_Fortran IMPORTED_LOCATION)
-    get_target_property(_mpi_link MPI::MPI_Fortran INTERFACE_LINK_LIBRARIES)
+  #-----------------------------------------------
+  # Report MPI version reliably
+  #-----------------------------------------------
+  execute_process(
+    COMMAND ${MPI_Fortran_COMPILER} --version
+    OUTPUT_VARIABLE _mpi_version_output
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  string(REGEX MATCH "[0-9]+\\.[0-9]+" MPI_VERSION "${_mpi_version_output}")
+  message(STATUS "MPI version: ${MPI_VERSION}")
 
-    # Handle interface-only targets (modern MPI)
-    if(NOT _mpi_lib AND _mpi_link)
-      set(_mpi_lib ${_mpi_link})
-    endif()
-
-    if(_mpi_inc)
-      list(APPEND MPI_Fortran_INCLUDE_PATH ${_mpi_inc})
-    endif()
-    if(_mpi_lib)
-      list(APPEND MPI_Fortran_LIBRARIES ${_mpi_lib})
-    endif()
-  endif()
-
-  if(TARGET MPI::MPI_C)
-    get_target_property(_mpi_c_inc MPI::MPI_C INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(_mpi_c_lib MPI::MPI_C IMPORTED_LOCATION)
-    get_target_property(_mpi_c_link MPI::MPI_C INTERFACE_LINK_LIBRARIES)
-
-    if(NOT _mpi_c_lib AND _mpi_c_link)
-      set(_mpi_c_lib ${_mpi_c_link})
-    endif()
-
-    if(_mpi_c_inc)
-      list(APPEND MPI_C_INCLUDE_PATH ${_mpi_c_inc})
-    endif()
-    if(_mpi_c_lib)
-      list(APPEND MPI_C_LIBRARIES ${_mpi_c_lib})
-    endif()
-  endif()
-
-  # Clean duplicates
-  list(REMOVE_DUPLICATES MPI_Fortran_INCLUDE_PATH)
-  list(REMOVE_DUPLICATES MPI_Fortran_LIBRARIES)
-
-  message(STATUS "MPI Fortran include path(s): ${MPI_Fortran_INCLUDE_PATH}")
-  message(STATUS "MPI Fortran library target(s): ${MPI_Fortran_LIBRARIES}")
-  message(STATUS "MPI C library target(s): ${MPI_C_LIBRARIES}")
-
-  # -----------------------------------------------
+  #-----------------------------------------------
   # Fedora-specific workaround for noexecstack flag
-  # -----------------------------------------------
+  #-----------------------------------------------
   if((MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack"))
-    message(WARNING "Replacing 'noexecstack' with 'execstack' in MPI link flags")
-    string(REPLACE "noexecstack" "execstack" MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-    string(REPLACE "noexecstack" "execstack" MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS}")
+    message(WARNING
+      "The `noexecstack` linker flag was found in MPI_<lang>_LINK_FLAGS.
+This can cause segmentation faults in Fortran codes.
+Replacing `noexecstack` with `execstack`."
+    )
+    string(REPLACE "noexecstack" "execstack" MPI_C_LINK_FLAGS_FIXED ${MPI_C_LINK_FLAGS})
+    string(REPLACE "noexecstack" "execstack" MPI_Fortran_LINK_FLAGS_FIXED ${MPI_Fortran_LINK_FLAGS})
+    set(MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS_FIXED}" CACHE STRING "MPI C linking flags" FORCE)
+    set(MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS_FIXED}" CACHE STRING "MPI Fortran linking flags" FORCE)
   endif()
 
-  # -----------------------------------------------
+  #-----------------------------------------------
   # Compiler and linker flags setup
-  # -----------------------------------------------
+  #-----------------------------------------------
   include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
+  set(CMAKE_C_COMPILE_FLAGS "${CMAKE_C_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS}")
+  set(CMAKE_C_LINK_FLAGS    "${CMAKE_C_LINK_FLAGS}    ${MPI_C_LINK_FLAGS}")
+  set(CMAKE_Fortran_COMPILE_FLAGS "${CMAKE_Fortran_COMPILE_FLAGS} ${MPI_Fortran_COMPILE_FLAGS}")
+  set(CMAKE_Fortran_LINK_FLAGS    "${CMAKE_Fortran_LINK_FLAGS}    ${MPI_Fortran_LINK_FLAGS}")
 
-  add_compile_options(${MPI_Fortran_COMPILE_FLAGS})
-  add_link_options(${MPI_Fortran_LINK_FLAGS})
+  message(STATUS "MPI include paths: ${MPI_Fortran_INCLUDE_PATH}")
+  message(STATUS "Fortran link flags: ${CMAKE_Fortran_LINK_FLAGS}")
 
-  message(STATUS "Fortran link flags: ${MPI_Fortran_LINK_FLAGS}")
-
-  # -----------------------------------------------
-  # Ensure mpi.mod is available
-  # -----------------------------------------------
+  #-----------------------------------------------
+  # Set module output directory for Fortran
+  #-----------------------------------------------
   set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
   file(MAKE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY})
+  message(STATUS "Fortran module directory: ${CMAKE_Fortran_MODULE_DIRECTORY}")
 
-  set(_mpi_mod_found FALSE)
-  foreach(_mpi_inc_dir ${MPI_Fortran_INCLUDE_PATH})
-    if(EXISTS "${_mpi_inc_dir}/mpi.mod")
-      file(COPY "${_mpi_inc_dir}/mpi.mod" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
-      message(STATUS "Copied mpi.mod from ${_mpi_inc_dir}")
-      set(_mpi_mod_found TRUE)
-      break()
-    endif()
-  endforeach()
-
-  if(NOT _mpi_mod_found)
-    message(WARNING "mpi.mod not found in MPI include paths; assuming mpifort provides it internally.")
+  #-----------------------------------------------
+  # Legacy PSBLAS MPI module support (define macro)
+  #-----------------------------------------------
+  if(MPI_Fortran_HAVE_F90_MODULE OR MPI_Fortran_HAVE_F08_MODULE)
+    add_compile_options(-DPSB_MPI_MOD)
+    message(STATUS "Defined: -DPSB_MPI_MOD")
   endif()
 
-  # -----------------------------------------------
-  # Define flag for MPI-enabled build
-  # -----------------------------------------------
-  add_compile_definitions(PSB_MPI_MOD)
+  #-----------------------------------------------
+  # PSBLAS serial/MPI flag
+  #-----------------------------------------------
   set(PSB_SERIAL_MPI OFF)
 
 else()
+  #-----------------------------------------------
+  # Fallback: serial build
+  #-----------------------------------------------
   message(WARNING ">>> MPI not found — building in serial mode")
-  add_compile_definitions(PSB_SERIAL_MPI PSB_MPI_MOD)
+  add_compile_options(-DPSB_SERIAL_MPI -DPSB_MPI_MOD)
   set(PSB_SERIAL_MPI ON)
+  set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
 
 
