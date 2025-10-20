@@ -547,6 +547,7 @@ contains
     class(psb_i_vect_oacc), intent(out) :: x
     integer(psb_ipk_), intent(out)     :: info
 
+    call x%free(info)
     call psb_realloc(n, x%v, info)
     if (info /= 0) then 
       info = psb_err_alloc_request_

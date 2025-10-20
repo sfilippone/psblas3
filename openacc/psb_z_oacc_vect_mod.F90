@@ -829,9 +829,10 @@ contains
       complex(psb_dpk_)  :: res
       integer(psb_ipk_) :: i
       
+      res = zzero
       !$acc parallel loop reduction(+:res) present(x, y)
       do i = 1, n
-        res = res + x(i) * y(i)
+        res = res + conjg(x(i)) * y(i)
       end do
       !$acc end parallel loop
     end function z_inner_oacc_dot
@@ -843,10 +844,10 @@ contains
     complex(psb_dpk_), intent(in) :: y(:)
     integer(psb_ipk_), intent(in) :: n
     complex(psb_dpk_)  :: res
-    complex(psb_dpk_), external :: zdot
+    complex(psb_dpk_), external :: zdotc
 
     if (x%is_dev()) call x%sync()
-    res = zdot(n, y, 1, x%v, 1)
+    res = zdotc(n, y, 1, x%v, 1)
 
   end function z_oacc_dot_a
 
@@ -943,6 +944,7 @@ contains
     class(psb_z_vect_oacc), intent(out) :: x
     integer(psb_ipk_), intent(out)     :: info
 
+    call x%free(info)
     call psb_realloc(n, x%v, info)
     if (info /= 0) then 
       info = psb_err_alloc_request_
