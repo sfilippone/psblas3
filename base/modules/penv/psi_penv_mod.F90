@@ -188,33 +188,33 @@ module psi_penv_mod
   include 'mpif.h'
 #endif
   
-  integer(psb_mpk_), parameter :: psb_apk_         = mpi_address_kind
+  integer(psb_mpk_), parameter :: psb_apk_               = mpi_address_kind
 
-  integer(psb_mpk_), parameter :: psb_tag_space    = 200 
-
-  integer(psb_mpk_), save :: psb_int_tag      
-  integer(psb_mpk_), save :: psb_real_tag     
-  integer(psb_mpk_), save :: psb_double_tag   
-  integer(psb_mpk_), save :: psb_complex_tag  
-  integer(psb_mpk_), save :: psb_dcomplex_tag 
-  integer(psb_mpk_), save :: psb_logical_tag  
-  integer(psb_mpk_), save :: psb_char_tag     
-  integer(psb_mpk_), save :: psb_int8_tag     
-  integer(psb_mpk_), save :: psb_int2_tag     
-  integer(psb_mpk_), save :: psb_int4_tag     
-  integer(psb_mpk_), save :: psb_long_tag     
-  integer(psb_mpk_), save :: psb_max_simple_tag    
-  integer(psb_mpk_), save :: psb_int_swap_tag      
-  integer(psb_mpk_), save :: psb_real_swap_tag     
-  integer(psb_mpk_), save :: psb_double_swap_tag   
-  integer(psb_mpk_), save :: psb_complex_swap_tag  
-  integer(psb_mpk_), save :: psb_dcomplex_swap_tag 
-  integer(psb_mpk_), save :: psb_logical_swap_tag  
-  integer(psb_mpk_), save :: psb_char_swap_tag     
-  integer(psb_mpk_), save :: psb_int8_swap_tag     
-  integer(psb_mpk_), save :: psb_int2_swap_tag     
-  integer(psb_mpk_), save :: psb_int4_swap_tag     
-  integer(psb_mpk_), save :: psb_long_swap_tag     
+  integer(psb_mpk_), parameter :: psb_tag_space          = 200 
+  integer(psb_mpk_), parameter :: psb_tag_base           = 512
+  integer(psb_mpk_), parameter :: psb_int_tag            = psb_tag_base     + 1
+  integer(psb_mpk_), parameter :: psb_real_tag           = psb_int_tag      + 1
+  integer(psb_mpk_), parameter :: psb_double_tag         = psb_real_tag     + 1
+  integer(psb_mpk_), parameter :: psb_complex_tag        = psb_double_tag   + 1
+  integer(psb_mpk_), parameter :: psb_dcomplex_tag       = psb_complex_tag  + 1
+  integer(psb_mpk_), parameter :: psb_logical_tag        = psb_dcomplex_tag + 1
+  integer(psb_mpk_), parameter :: psb_char_tag           = psb_logical_tag  + 1
+  integer(psb_mpk_), parameter :: psb_int8_tag           = psb_char_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int2_tag           = psb_int8_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int4_tag           = psb_int2_tag     + 1
+  integer(psb_mpk_), parameter :: psb_long_tag           = psb_int4_tag     + 1
+  integer(psb_mpk_), parameter :: psb_max_simple_tag     = psb_long_tag     + 2     
+  integer(psb_mpk_), parameter :: psb_int_swap_tag       = psb_max_simple_tag    + 1
+  integer(psb_mpk_), parameter :: psb_real_swap_tag      = psb_int_swap_tag      + 1
+  integer(psb_mpk_), parameter :: psb_double_swap_tag    = psb_real_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_complex_swap_tag   = psb_double_swap_tag   + 1
+  integer(psb_mpk_), parameter :: psb_dcomplex_swap_tag  = psb_complex_swap_tag  + 1
+  integer(psb_mpk_), parameter :: psb_logical_swap_tag   = psb_dcomplex_swap_tag + 1
+  integer(psb_mpk_), parameter :: psb_char_swap_tag      = psb_logical_swap_tag  + 1
+  integer(psb_mpk_), parameter :: psb_int8_swap_tag      = psb_char_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int2_swap_tag      = psb_int8_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int4_swap_tag      = psb_int2_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_long_swap_tag      = psb_int4_swap_tag     + 1
 
   
   integer(psb_mpk_), private, parameter :: psb_int_type      = 200
@@ -799,7 +799,6 @@ contains
     implicit none 
     integer(psb_mpk_) :: comm,info
     integer(psb_mpk_) :: ierror
-    integer(psb_apk_) :: tag_value
     logical  :: flag
     info = 0
 #if 0
@@ -837,9 +836,7 @@ contains
     psb_mpi_c_dpk_  = mpi_double_complex
 #endif
 
-#if defined(PSB_SERIAL_MPI)
-    tag_value  = HUGE(psb_tag_space)/2
-#else 
+#if ! defined(PSB_SERIAL_MPI)
     if (info == 0) call mpi_op_create(psi_i2amx_op,.true.,mpi_i2amx_op,info)
     if (info == 0) call mpi_op_create(psi_i2amn_op,.true.,mpi_i2amn_op,info)
     if (info == 0) call mpi_op_create(psi_mamx_op,.true.,mpi_mamx_op,info)
@@ -856,36 +853,7 @@ contains
     if (info == 0) call mpi_op_create(psi_zamn_op,.true.,mpi_zamn_op,info)
     if (info == 0) call mpi_op_create(psi_snrm2_op,.true.,mpi_snrm2_op,info)
     if (info == 0) call mpi_op_create(psi_dnrm2_op,.true.,mpi_dnrm2_op,info)
-    if (info == 0) call mpi_comm_get_attr(comm,mpi_tag_ub,tag_value,flag,ierror)
-    if ((ierror/=0).or.(.not.flag)) then
-      tag_value = 0
-      info = psb_err_internal_error_
-    end if
 #endif
-    psb_int_tag      = tag_value - psb_tag_space                 
-    psb_real_tag     = psb_int_tag      + 1
-    psb_double_tag   = psb_real_tag     + 1
-    psb_complex_tag  = psb_double_tag   + 1
-    psb_dcomplex_tag = psb_complex_tag  + 1
-    psb_logical_tag  = psb_dcomplex_tag + 1
-    psb_char_tag     = psb_logical_tag  + 1
-    psb_int8_tag     = psb_char_tag     + 1
-    psb_int2_tag     = psb_int8_tag     + 1
-    psb_int4_tag     = psb_int2_tag     + 1
-    psb_long_tag     = psb_int4_tag     + 1
-    psb_max_simple_tag    = psb_long_tag     + 2     
-    psb_int_swap_tag      = psb_max_simple_tag    + 1
-    psb_real_swap_tag     = psb_int_swap_tag      + 1
-    psb_double_swap_tag   = psb_real_swap_tag     + 1
-    psb_complex_swap_tag  = psb_double_swap_tag   + 1
-    psb_dcomplex_swap_tag = psb_complex_swap_tag  + 1
-    psb_logical_swap_tag  = psb_dcomplex_swap_tag + 1
-    psb_char_swap_tag     = psb_logical_swap_tag  + 1
-    psb_int8_swap_tag     = psb_char_swap_tag     + 1
-    psb_int2_swap_tag     = psb_int8_swap_tag     + 1
-    psb_int4_swap_tag     = psb_int2_swap_tag     + 1
-    psb_long_swap_tag     = psb_int4_swap_tag     + 1
-    
   end subroutine psi_register_mpi_const
 
 #if (defined(PSB_IPK4) && defined(PSB_LPK8))||defined(PSB_IPK8)
