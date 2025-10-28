@@ -12,9 +12,9 @@ EXEDIR=./runs
 PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) -lpsb_openacc -lpsb_ext -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBGPULDLIBS)
 
-FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG). $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
+FINCLUDES= $(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(PSBINCDIR) $(LIBRSB_DEFINES)
 
-FFLAGS=-O3 -march=native $(FCOPENACC)  -DOPENACC -DCUDA
+FFLAGS=-O3 -march=native $(FCOPENACC)  -DPSB_OPENACC -DPSB_HAVE_CUDA
 CFLAGS=-O3 -march=native
 
 VTC=vectoacc.o
@@ -22,9 +22,8 @@ DVT=datavect.o
 CSRC=timers.c
 
 OBJS=$(SRCS:.F90=.o) $(CSRC:.c=.o)
-OADIR=oaobjs
 
-all: dir psb_d_oacc_pde3d dpdegenmv
+all: dir dpdegenmv
 
 #$(OBJS)
 #	$(FC) $(FFLAGS) $(OBJS) -o datavect $(FINCLUDES) $(PSBLAS_LIB) $(LDLIBS)
@@ -43,24 +42,11 @@ dir:
 %.o: %.c
 	$(CC) $(CFLAGS) $(FINCLUDES) -c $< -o $@
 
-cpyoa:
-	@if test ! -d $(OADIR); then mkdir $(OADIR); fi
-	/bin/cp $(TOPDIR)/openacc/*.o $(OADIR)
-	/bin/cp $(TOPDIR)/openacc/impl/*.o $(OADIR)
 
-
-psb_d_oacc_pde3d:
-	mpifort -fallow-argument-mismatch -frecursive -g -O3 -frecursive  -I../../modules/ -I. -DOPENACC -DHAVE_LAPACK -DHAVE_FLUSH_STMT -DLPK8 -DIPK4 -DMPI_MOD   -c psb_d_oacc_pde3d.F90 -o psb_d_oacc_pde3d.o
-	$(FLINK) -fopenacc -DOPENACC psb_d_oacc_pde3d.o -o psb_d_oacc_pde3d $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv psb_d_oacc_pde3d $(EXEDIR)
-
-dpdegenmv: dpdegenmv.o cpyoa
-	$(FLINK)  $(FCOPENACC) dpdegenmv.o -o dpdegenmv $(OADIR)/*.o $(PSBLAS_LIB) $(LDLIBS)
+dpdegenmv.o:  psb_d_pde3d_mod.o
+dpdegenmv: dpdegenmv.o psb_d_pde3d_mod.o
+	$(FLINK)  $(FCOPENACC) dpdegenmv.o  psb_d_pde3d_mod.o -o dpdegenmv -fuse-ld=mold  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv dpdegenmv $(EXEDIR)
-
-dpmix: dpmix.o cpyoa
-	$(FLINK)  $(FCOPENACC) dpmix.o -o dpmix $(OADIR)/*.o $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv dpmix $(EXEDIR)
 
 clean:
 	/bin/rm -fr *.o *.mod $(EXEDIR)/*
