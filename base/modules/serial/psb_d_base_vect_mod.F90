@@ -65,6 +65,18 @@ module psb_d_base_vect_mod
     real(psb_dpk_), allocatable :: v(:)
     real(psb_dpk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
+    !> vector bldstate:
+    !!    null:   pristine;
+    !!    build:  it's being filled with entries;
+    !!    assembled: ready to use in computations;
+    !!    update: accepts coefficients but only
+    !!            in already existing entries.
+    !!    The transitions among the states are detailed in
+    !!            psb_T_vect_mod.
+    integer(psb_ipk_), private :: bldstate
+    integer(psb_ipk_), private :: dupl = psb_dupl_null_
+    integer(psb_ipk_), private :: ncfs
+    integer(psb_ipk_), allocatable :: iv(:)
   contains
     !
     !  Constructors/allocators
@@ -77,17 +89,30 @@ module psb_d_base_vect_mod
     procedure, pass(x) :: mold     => d_base_mold
     !
     ! Insert/set. Assembly and free.
-    ! Assembly does almost nothing here, but is important
-    ! in derived classes.
     !
-    procedure, pass(x) :: ins_a    => d_base_ins_a
-    procedure, pass(x) :: ins_v    => d_base_ins_v
-    generic, public    :: ins      => ins_a, ins_v
-    procedure, pass(x) :: zero     => d_base_zero
-    procedure, pass(x) :: asb_m    => d_base_asb_m
-    procedure, pass(x) :: asb_e    => d_base_asb_e
-    generic, public    :: asb      => asb_m, asb_e
-    procedure, pass(x) :: free     => d_base_free
+    procedure, pass(x) :: ins_a     => d_base_ins_a
+    procedure, pass(x) :: ins_v     => d_base_ins_v
+    generic, public    :: ins       => ins_a, ins_v
+    procedure, pass(x) :: zero      => d_base_zero
+    procedure, pass(x) :: asb_m     => d_base_asb_m
+    procedure, pass(x) :: asb_e     => d_base_asb_e
+    generic, public    :: asb       => asb_m, asb_e
+    procedure, pass(x) :: free      => d_base_free
+    procedure, pass(x) :: reinit      => d_base_reinit
+    procedure, pass(x) :: set_ncfs => d_base_set_ncfs 
+    procedure, pass(x) :: get_ncfs => d_base_get_ncfs
+    procedure, pass(x) :: set_dupl => d_base_set_dupl 
+    procedure, pass(x) :: get_dupl => d_base_get_dupl
+    procedure, pass(x) :: set_state => d_base_set_state
+    procedure, pass(x) :: set_null  => d_base_set_null
+    procedure, pass(x) :: set_bld   => d_base_set_bld
+    procedure, pass(x) :: set_upd   => d_base_set_upd
+    procedure, pass(x) :: set_asb   => d_base_set_asb
+    procedure, pass(x) :: get_state => d_base_get_state
+    procedure, pass(x) :: is_null   => d_base_is_null
+    procedure, pass(x) :: is_bld    => d_base_is_bld
+    procedure, pass(x) :: is_upd    => d_base_is_upd
+    procedure, pass(x) :: is_asb    => d_base_is_asb
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -228,6 +253,7 @@ module psb_d_base_vect_mod
     module procedure constructor, size_const
   end interface psb_d_base_vect
 
+  logical, parameter :: try_newins=.true.
 contains
 
   !
@@ -347,8 +373,27 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     call psb_realloc(n,x%v,info)
+#ifdef TRY_NEWINS
+    call psb_realloc(n,x%iv,info)
+    call x%set_ncfs(0)
+#endif
 
   end subroutine d_base_all
+
+  subroutine d_base_reinit(x, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    class(psb_d_base_vect_type), intent(out)    :: x
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (allocated(x%v)) then 
+      call x%sync()
+      x%v(:) = dzero
+      call x%set_host()
+    end if
+
+  end subroutine d_base_reinit
 
   !> Function  base_mold:
   !! \memberof  psb_d_base_vect_type
@@ -395,20 +440,77 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine d_base_ins_a(n,irl,val,dupl,x,info)
+  subroutine d_base_ins_a(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_d_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_dpk_), intent(in)        :: val(:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i, isz
+    integer(psb_ipk_) :: i, isz, dupl_, ncfs_, k
 
     info = 0
     if (psb_errstatus_fatal()) return
-
+#ifdef TRY_NEWINS
+    if (x%is_bld()) then
+      ncfs_ = x%get_ncfs()
+      isz = ncfs_ + n
+      call psb_ensure_size(isz,x%v,info)
+      call psb_ensure_size(isz,x%iv,info)
+      k   = ncfs_
+      do i = 1, n
+        !loop over all val's rows
+        ! row actual block row
+        if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+          k  = k + 1 
+          ! this row belongs to me
+          ! copy i-th row of block val in x
+          x%v(k)  = val(i)
+          x%iv(k) = irl(i)
+        end if
+      enddo
+      call x%set_ncfs(k)      
+    else
+      dupl_ = x%get_dupl()
+      if (.not.allocated(x%v)) then
+        info = psb_err_invalid_vect_state_
+      else if (n > min(size(irl),size(val))) then
+        info = psb_err_invalid_input_
+      else
+        isz = size(x%v)
+        select case(dupl_)
+        case(psb_dupl_ovwrt_)
+          do i = 1, n
+            !loop over all val's rows
+            ! row actual block row
+            if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+              ! this row belongs to me
+              ! copy i-th row of block val in x
+              x%v(irl(i)) = val(i)
+            end if
+          enddo
+          
+        case(psb_dupl_add_)
+          
+          do i = 1, n
+            !loop over all val's rows
+            if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+              ! this row belongs to me
+              ! copy i-th row of block val in x
+              x%v(irl(i)) = x%v(irl(i)) +  val(i)
+            end if
+          enddo
+          
+        case default
+          info = 321
+          ! !$      call psb_errpush(info,name)
+          ! !$      goto 9999
+        end select
+      end if
+    end if
+#else
     if (.not.allocated(x%v)) then
       info = psb_err_invalid_vect_state_
     else if (n > min(size(irl),size(val))) then
@@ -445,6 +547,7 @@ contains
         ! !$      goto 9999
       end select
     end if
+#endif
     call x%set_host()
     if (info /= 0) then
       call psb_errpush(info,'base_vect_ins')
@@ -453,11 +556,11 @@ contains
 
   end subroutine d_base_ins_a
 
-  subroutine d_base_ins_v(n,irl,val,dupl,x,info)
+  subroutine d_base_ins_v(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_d_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
     class(psb_i_base_vect_type), intent(inout)  :: irl
     class(psb_d_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
@@ -470,7 +573,7 @@ contains
     if (irl%is_dev()) call irl%sync()
     if (val%is_dev()) call val%sync()
     if (x%is_dev())   call x%sync()
-    call x%ins(n,irl%v,val%v,dupl,info)
+    call x%ins(n,irl%v,val%v,dupl,maxr,info)
 
     if (info /= 0) then
       call psb_errpush(info,'base_vect_ins')
@@ -521,12 +624,52 @@ contains
     integer(psb_mpk_), intent(in)              :: n
     class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
-
+    integer(psb_ipk_) :: i,ncfs,xvsz
+    real(psb_dpk_), allocatable ::  vv(:)
     info = 0
-    if (x%get_nrows() < n) &
-         & call psb_realloc(n,x%v,info)
-    if (info /= 0) &
-         & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+    
+    if (try_newins) then 
+      if (x%is_bld()) then
+        ncfs = x%get_ncfs()
+        xvsz = psb_size(x%v)
+        call psb_realloc(n,vv,info)
+        vv(:) = dzero
+        select case(x%get_dupl())
+        case(psb_dupl_add_)
+          do i=1,ncfs
+            vv(x%iv(i)) = vv(x%iv(i)) + x%v(i)
+          end do
+        case(psb_dupl_ovwrt_)
+          do i=1,ncfs
+            vv(x%iv(i)) = x%v(i)
+          end do
+        case(psb_dupl_err_)
+          do i=1,ncfs
+            if (vv(x%iv(i)).ne.dzero) then
+              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
+              return
+            else
+              vv(x%iv(i)) = x%v(i)
+            end if
+          end do
+        case default
+          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          info =-7
+        end select
+        call psb_move_alloc(vv,x%v,info)
+        if (allocated(x%iv)) deallocate(x%iv,stat=info)
+      else
+        if (x%get_nrows() < n) &
+             & call psb_realloc(n,x%v,info)
+        if (info /= 0) &
+             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      end if
+    else
+      if (x%get_nrows() < n) &
+           & call psb_realloc(n,x%v,info)
+      if (info /= 0) &
+           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+    end if 
     call x%sync()
   end subroutine d_base_asb_m
 
@@ -551,13 +694,54 @@ contains
     integer(psb_epk_), intent(in)              :: n
     class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
-
+    integer(psb_ipk_) :: i, j
+    real(psb_dpk_), allocatable ::  vv(:)
     info = 0
-    if (x%get_nrows() < n) &
-         & call psb_realloc(n,x%v,info)
-    if (info /= 0) &
-         & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+
+    if (try_newins) then
+      if (info /= 0) &
+           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb unhandled')    
+      if (x%is_bld()) then
+        call psb_realloc(n,vv,info)
+        vv(:) = dzero
+        select case(x%get_dupl())
+        case(psb_dupl_add_)
+          do i=1,x%get_ncfs()
+            vv(x%iv(i)) = vv(x%iv(i)) + x%v(i)
+          end do
+        case(psb_dupl_ovwrt_)
+          do i=1,x%get_ncfs()
+            vv(x%iv(i)) = x%v(i)
+          end do
+        case(psb_dupl_err_)
+          do i=1,x%get_ncfs()
+            if (vv(x%iv(i)).ne.dzero) then
+              call psb_errpush(psb_err_duplicate_coo,'vect_asb')
+              return
+            else
+              vv(x%iv(i)) = x%v(i)
+            end if
+          end do
+        case default
+          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          info =-7
+        end select
+        call psb_move_alloc(vv,x%v,info)
+        if (allocated(x%iv)) deallocate(x%iv,stat=info)
+      else
+        if (x%get_nrows() < n) &
+             & call psb_realloc(n,x%v,info)
+        if (info /= 0) &
+             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      end if
+    else
+      if (x%get_nrows() < n) &
+           & call psb_realloc(n,x%v,info)
+      if (info /= 0) &
+           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+    end if
     call x%sync()
+
   end subroutine d_base_asb_e
 
   !
@@ -645,7 +829,104 @@ contains
          &  deallocate(x%comid,stat=info)
   end subroutine d_base_free_comid
 
+  function d_base_get_ncfs(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%ncfs
+  end function d_base_get_ncfs
 
+  function d_base_get_dupl(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%dupl
+  end function d_base_get_dupl
+
+  function d_base_get_state(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%bldstate 
+  end function d_base_get_state
+
+  function d_base_is_null(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_null_)
+  end function d_base_is_null
+
+  function d_base_is_bld(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_bld_)
+  end function d_base_is_bld
+
+  function d_base_is_upd(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_upd_)
+  end function d_base_is_upd
+
+  function d_base_is_asb(x) result(res)
+    implicit none
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_asb_)
+  end function d_base_is_asb
+
+  subroutine  d_base_set_ncfs(n,x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    x%ncfs = n
+  end subroutine d_base_set_ncfs
+
+  subroutine  d_base_set_dupl(n,x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    x%dupl = n
+  end subroutine d_base_set_dupl
+
+  subroutine  d_base_set_state(n,x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    x%bldstate = n
+  end subroutine d_base_set_state
+
+  subroutine  d_base_set_null(x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_null_
+  end subroutine d_base_set_null
+
+  subroutine  d_base_set_bld(x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_bld_
+  end subroutine d_base_set_bld
+
+  subroutine  d_base_set_upd(x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_upd_
+  end subroutine d_base_set_upd
+
+  subroutine  d_base_set_asb(x)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_asb_
+  end subroutine d_base_set_asb
+  
   !
   ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.

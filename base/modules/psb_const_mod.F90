@@ -203,13 +203,15 @@ module psb_const_mod
   !
 
   !
-  ! State of matrices.
+  ! State of matrices/vectors.
   !
   integer(psb_ipk_), parameter :: psb_invalid_ = -1
   integer(psb_ipk_), parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer(psb_ipk_), parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
-
   integer(psb_ipk_), parameter :: psb_matbld_noremote_=0, psb_matbld_remote_=1
+
+  integer(psb_ipk_), parameter :: psb_vect_null_=0, psb_vect_bld_=1
+  integer(psb_ipk_), parameter :: psb_vect_asb_=2, psb_vect_upd_=4
 
   
   integer(psb_ipk_), parameter :: psb_ireg_flgs_=10, psb_ip2_=0
@@ -223,9 +225,10 @@ module psb_const_mod
   ! Duplicate coefficients handling
   ! These are usually set while calling spcnv as one of its
   ! optional arugments.
-  integer(psb_ipk_), parameter :: psb_dupl_add_   = 0
-  integer(psb_ipk_), parameter :: psb_dupl_ovwrt_ = 1
-  integer(psb_ipk_), parameter :: psb_dupl_err_   = 2
+  integer(psb_ipk_), parameter :: psb_dupl_null_  = 0
+  integer(psb_ipk_), parameter :: psb_dupl_add_   = 1
+  integer(psb_ipk_), parameter :: psb_dupl_ovwrt_ = 2
+  integer(psb_ipk_), parameter :: psb_dupl_err_   = 3
   integer(psb_ipk_), parameter :: psb_dupl_def_   = psb_dupl_add_
   ! Matrix update mode
   integer(psb_ipk_), parameter :: psb_upd_srch_   = 98764

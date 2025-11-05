@@ -1252,11 +1252,11 @@ contains
     call x%free(info)
   end subroutine d_cuda_vect_finalize
 
-  subroutine d_cuda_ins_v(n,irl,val,dupl,x,info)
+  subroutine d_cuda_ins_v(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_cuda), intent(inout)        :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
     class(psb_i_base_vect_type), intent(inout)  :: irl
     class(psb_d_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
@@ -1285,7 +1285,7 @@ contains
     if (.not.done_cuda) then 
       if (irl%is_dev()) call irl%sync()
       if (val%is_dev()) call val%sync()
-      call x%ins(n,irl%v,val%v,dupl,info)
+      call x%ins(n,irl%v,val%v,dupl,maxr,info)
     end if
 
     if (info /= 0) then 
@@ -1295,11 +1295,11 @@ contains
 
   end subroutine d_cuda_ins_v
   
-  subroutine d_cuda_ins_a(n,irl,val,dupl,x,info)
+  subroutine d_cuda_ins_a(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl
+    integer(psb_ipk_), intent(in)        :: n, dupl,maxr
     integer(psb_ipk_), intent(in)        :: irl(:)
     real(psb_dpk_), intent(in)           :: val(:)
     integer(psb_ipk_), intent(out)       :: info
@@ -1308,7 +1308,7 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call x%psb_d_base_vect_type%ins(n,irl,val,dupl,info)
+    call x%psb_d_base_vect_type%ins(n,irl,val,dupl,maxr,info)
     call x%set_host()
 
   end subroutine d_cuda_ins_a

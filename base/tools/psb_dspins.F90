@@ -138,7 +138,11 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
 
   if (desc_a%is_bld()) then 
-
+    if (.not.a%is_bld()) then
+      info = psb_err_invalid_a_and_cd_state_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
     if (local_) then
       info = psb_err_invalid_a_and_cd_state_
       call psb_errpush(info,name)

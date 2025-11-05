@@ -128,7 +128,7 @@ module psb_base_mat_mod
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
     !!            psb_T_mat_mod.
-    integer(psb_ipk_), private     :: state
+    integer(psb_ipk_), private     :: bldstate
     !> How to treat duplicate elements when
     !!            transitioning from the BUILD to the ASSEMBLED state.
     !!            While many formats would allow for duplicate
@@ -137,7 +137,7 @@ module psb_base_mat_mod
     !!            BUILD state; in our overall design, only COO matrices
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
-    integer(psb_ipk_), private     :: duplicate
+    integer(psb_ipk_), private     :: duplicate = psb_dupl_null_
     !> Is the matrix  symmetric? (must also be square)
     logical, private     :: symmetric
     !> Is the matrix triangular? (must also be square)
@@ -503,7 +503,7 @@ module psb_base_mat_mod
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
     !!            psb_T_mat_mod.
-    integer(psb_ipk_), private     :: state
+    integer(psb_ipk_), private     :: bldstate
     !> How to treat duplicate elements when
     !!            transitioning from the BUILD to the ASSEMBLED state.
     !!            While many formats would allow for duplicate
@@ -909,7 +909,7 @@ contains
     implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
-    res = a%state
+    res = a%bldstate
   end function psb_base_get_state
 
   function psb_base_get_nrows(a) result(res)
@@ -945,7 +945,7 @@ contains
     implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
     integer(psb_ipk_), intent(in) :: n
-    a%state = n
+    a%bldstate = n
   end subroutine psb_base_set_state
 
 
@@ -960,28 +960,28 @@ contains
     implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_null_
+    a%bldstate = psb_spmat_null_
   end subroutine psb_base_set_null
 
   subroutine  psb_base_set_bld(a)
     implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_bld_
+    a%bldstate = psb_spmat_bld_
   end subroutine psb_base_set_bld
 
   subroutine  psb_base_set_upd(a)
     implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_upd_
+    a%bldstate = psb_spmat_upd_
   end subroutine psb_base_set_upd
 
   subroutine  psb_base_set_asb(a)
     implicit none
     class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_asb_
+    a%bldstate = psb_spmat_asb_
   end subroutine psb_base_set_asb
 
   subroutine psb_base_set_sorted(a,val)
@@ -1107,28 +1107,28 @@ contains
     implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_null_)
+    res = (a%bldstate == psb_spmat_null_)
   end function psb_base_is_null
 
   function psb_base_is_bld(a) result(res)
     implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_bld_)
+    res = (a%bldstate == psb_spmat_bld_)
   end function psb_base_is_bld
 
   function psb_base_is_upd(a) result(res)
     implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_upd_)
+    res = (a%bldstate == psb_spmat_upd_)
   end function psb_base_is_upd
 
   function psb_base_is_asb(a) result(res)
     implicit none
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_asb_)
+    res = (a%bldstate == psb_spmat_asb_)
   end function psb_base_is_asb
 
   function psb_base_is_sorted(a) result(res)
@@ -1185,7 +1185,7 @@ contains
 
     b%m         = a%n
     b%n         = a%m
-    b%state     = a%state
+    b%bldstate  = a%bldstate
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
     b%symmetric = a%symmetric
@@ -1205,7 +1205,7 @@ contains
 
     b%m         = a%n
     b%n         = a%m
-    b%state     = a%state
+    b%bldstate  = a%bldstate
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
     b%symmetric = a%symmetric
@@ -1225,7 +1225,7 @@ contains
     itmp        = a%m
     a%m         = a%n
     a%n         = itmp
-    a%state     = a%state
+    a%bldstate  = a%bldstate
     a%duplicate = a%duplicate
     a%triangle  = a%triangle
     a%unitd     = a%unitd
@@ -1402,7 +1402,7 @@ contains
     implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
-    res = a%state
+    res = a%bldstate
   end function psb_lbase_get_state
 
   function psb_lbase_get_nrows(a) result(res)
@@ -1479,7 +1479,7 @@ contains
     implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
     integer(psb_lpk_), intent(in) :: n
-    a%state = n
+    a%bldstate = n
   end subroutine psb_lbase_set_state
 
 
@@ -1494,28 +1494,28 @@ contains
     implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_null_
+    a%bldstate = psb_spmat_null_
   end subroutine psb_lbase_set_null
 
   subroutine  psb_lbase_set_bld(a)
     implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_bld_
+    a%bldstate = psb_spmat_bld_
   end subroutine psb_lbase_set_bld
 
   subroutine  psb_lbase_set_upd(a)
     implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_upd_
+    a%bldstate = psb_spmat_upd_
   end subroutine psb_lbase_set_upd
 
   subroutine  psb_lbase_set_asb(a)
     implicit none
     class(psb_lbase_sparse_mat), intent(inout) :: a
 
-    a%state = psb_spmat_asb_
+    a%bldstate = psb_spmat_asb_
   end subroutine psb_lbase_set_asb
 
   subroutine psb_lbase_set_sorted(a,val)
@@ -1652,28 +1652,28 @@ contains
     implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_null_)
+    res = (a%bldstate == psb_spmat_null_)
   end function psb_lbase_is_null
 
   function psb_lbase_is_bld(a) result(res)
     implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_bld_)
+    res = (a%bldstate == psb_spmat_bld_)
   end function psb_lbase_is_bld
 
   function psb_lbase_is_upd(a) result(res)
     implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_upd_)
+    res = (a%bldstate == psb_spmat_upd_)
   end function psb_lbase_is_upd
 
   function psb_lbase_is_asb(a) result(res)
     implicit none
     class(psb_lbase_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psb_spmat_asb_)
+    res = (a%bldstate == psb_spmat_asb_)
   end function psb_lbase_is_asb
 
   function psb_lbase_is_sorted(a) result(res)
@@ -1719,7 +1719,7 @@ contains
 
     b%m         = a%n
     b%n         = a%m
-    b%state     = a%state
+    b%bldstate     = a%bldstate
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
     b%unitd     = a%unitd
@@ -1738,7 +1738,7 @@ contains
 
     b%m         = a%n
     b%n         = a%m
-    b%state     = a%state
+    b%bldstate     = a%bldstate
     b%duplicate = a%duplicate
     b%triangle  = a%triangle
     b%unitd     = a%unitd
@@ -1757,7 +1757,7 @@ contains
     itmp        = a%m
     a%m         = a%n
     a%n         = itmp
-    a%state     = a%state
+    a%bldstate     = a%bldstate
     a%duplicate = a%duplicate
     a%triangle  = a%triangle
     a%unitd     = a%unitd
@@ -1891,7 +1891,7 @@ contains
 
     lb%m                  = ib%m
     lb%n                  = ib%n
-    lb%state              = ib%state
+    lb%bldstate           = ib%bldstate
     lb%duplicate          = ib%duplicate
     lb%triangle           = ib%triangle
     lb%unitd              = ib%unitd
@@ -1907,7 +1907,7 @@ contains
 
     ib%m                  = lb%m
     ib%n                  = lb%n
-    ib%state              = lb%state
+    ib%bldstate           = lb%bldstate
     ib%duplicate          = lb%duplicate
     ib%triangle           = lb%triangle
     ib%unitd              = lb%unitd

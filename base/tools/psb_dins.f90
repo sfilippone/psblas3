@@ -127,7 +127,7 @@ subroutine psb_dins_vect(m, irw, val, x, desc_a, info, local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  call x%ins(m,irl,val,info) 
+  call x%ins(m,irl,val,loc_rows,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
@@ -261,7 +261,7 @@ subroutine psb_dins_vect_v(m, irw, val, x, desc_a, info, local)
     call desc_a%indxmap%g2l(irw%v%v(1:m),irl(1:m),info,owned=.true.)
   end if
 
-  call x%ins(m,irl,lval,info) 
+  call x%ins(m,irl,lval,loc_rows,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
@@ -368,7 +368,7 @@ subroutine psb_dins_vect_r2(m, irw, val, x, desc_a, info, local)
   do i=1,n
 
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
-    if (info == 0) call x(i)%ins(m,irl,val(:,i),info) 
+    if (info == 0) call x(i)%ins(m,irl,val(:,i),loc_rows,info) 
     if (info /= 0) exit
   end do
   if (info /= 0) then 

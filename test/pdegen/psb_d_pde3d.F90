@@ -606,9 +606,9 @@ contains
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
-        call psb_spasb(a,desc_a,info,mold=amold)
+        call psb_spasb(a,desc_a,info,mold=amold,dupl=psb_dupl_add_)
       else
-        call psb_spasb(a,desc_a,info,afmt=afmt)
+        call psb_spasb(a,desc_a,info,afmt=afmt,dupl=psb_dupl_add_)
       end if
     end if
     call psb_barrier(ctxt)
@@ -618,8 +618,8 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold)
-    if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold)
+    if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold,dupl=psb_dupl_add_)
+    if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold,dupl=psb_dupl_add_)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='asb rout.'
