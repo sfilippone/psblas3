@@ -70,7 +70,7 @@ Module psb_z_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_zasb_vect(x, desc_a, info,mold, scratch)
+    subroutine psb_zasb_vect(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -78,6 +78,7 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_z_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_zasb_vect
     subroutine psb_zasb_vect_r2(x, desc_a, info,mold, scratch)
       import
@@ -250,13 +251,14 @@ Module psb_z_tools_mod
   end interface
 
   interface psb_spasb
-    subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, bld_and)
+    subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, dupl, bld_and)
       import
       implicit none
       type(psb_zspmat_type), intent (inout)   :: a
       type(psb_desc_type), intent(inout)        :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
       integer(psb_ipk_),optional, intent(in)            :: upd
+      integer(psb_ipk_),optional, intent(in)            :: dupl
       character(len=*), optional, intent(in)  :: afmt
       class(psb_z_base_sparse_mat), intent(in), optional :: mold
       logical, intent(in), optional :: bld_and

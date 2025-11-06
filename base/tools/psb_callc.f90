@@ -109,12 +109,10 @@ subroutine psb_calloc_vect(x, desc_a,info, dupl, bldmode)
   else
     bldmode_ = psb_matbld_noremote_
   end if
+  call x%set_bld()
   if (present(dupl)) then
-    dupl_ = dupl 
-  else
-    dupl_ = psb_dupl_def_
-  end if
-  call x%set_dupl(dupl_)
+    call x%set_dupl(dupl)
+  end if  
   call x%set_remote_build(bldmode_)
   call x%set_nrmv(izero)
   if (x%is_remote_build()) then

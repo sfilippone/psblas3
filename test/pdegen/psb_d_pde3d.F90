@@ -435,11 +435,11 @@ contains
 
 
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz, &
-         & bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+         & bldmode=psb_matbld_remote_)
     ! define  rhs from boundary conditions; also build initial guess
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info,&
-         & bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+         & bldmode=psb_matbld_remote_)
 
     call psb_barrier(ctxt)
     talc = psb_wtime()-t0

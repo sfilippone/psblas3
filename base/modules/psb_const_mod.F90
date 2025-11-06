@@ -332,7 +332,7 @@ module psb_const_mod
   contains
     procedure, pass(ctxt) :: get_i_ctxt => psb_get_i_ctxt
   end type psb_ctxt_type
-
+  logical, parameter :: try_newins=.true.
 contains
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)

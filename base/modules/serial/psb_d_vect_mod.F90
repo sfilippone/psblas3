@@ -45,8 +45,9 @@ module psb_d_vect_mod
 
   type psb_d_vect_type
     class(psb_d_base_vect_type), allocatable :: v
-    integer(psb_ipk_) :: nrmv         = 0
-    integer(psb_ipk_) :: remote_build = psb_matbld_noremote_
+    integer(psb_ipk_) :: nrmv = 0
+    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_) :: dupl = psb_dupl_add_
     real(psb_dpk_), allocatable :: rmtv(:)
     integer(psb_lpk_), allocatable :: rmidx(:)
   contains
@@ -74,7 +75,7 @@ module psb_d_vect_mod
     procedure, pass(x) :: is_upd    => d_vect_is_upd
     procedure, pass(x) :: is_asb    => d_vect_is_asb
     procedure, pass(x) :: reinit    => d_vect_reinit
-    
+
     procedure, pass(x) :: gthab    => d_vect_gthab
     procedure, pass(x) :: gthzv    => d_vect_gthzv
     generic, public    :: gth      => gthab, gthzv
@@ -303,7 +304,6 @@ contains
     call x%set_state(psb_vect_asb_)
   end subroutine d_vect_set_asb
 
-  
   function d_vect_get_nrmv(x) result(res)
     implicit none
     class(psb_d_vect_type), intent(in) :: x
@@ -393,11 +393,20 @@ contains
     end if
   end subroutine d_vect_clone
 
-  subroutine d_vect_bld_x(x,invect,mold)
+  subroutine d_vect_bld_x(x,invect,mold,scratch)
     real(psb_dpk_), intent(in)          :: invect(:)
     class(psb_d_vect_type), intent(inout) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
+
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
 
     info = psb_success_
     if (allocated(x%v)) &
@@ -409,17 +418,25 @@ contains
       allocate(x%v,stat=info, mold=psb_d_get_base_vect_default())
     endif
 
-    if (info == psb_success_) call x%v%bld(invect)
+    if (info == psb_success_) call x%v%bld(invect,scratch=scratch_)
 
   end subroutine d_vect_bld_x
 
 
-  subroutine d_vect_bld_mn(x,n,mold)
+  subroutine d_vect_bld_mn(x,n,mold,scratch)
     integer(psb_mpk_), intent(in) :: n
     class(psb_d_vect_type), intent(inout) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
     class(psb_d_base_vect_type), pointer :: mld
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
 
     info = psb_success_
     if (allocated(x%v)) &
@@ -430,17 +447,25 @@ contains
     else
       allocate(x%v,stat=info, mold=psb_d_get_base_vect_default())
     endif
-    if (info == psb_success_) call x%v%bld(n)
+    if (info == psb_success_) call x%v%bld(n,scratch=scratch_)
 
   end subroutine d_vect_bld_mn
 
-  subroutine d_vect_bld_en(x,n,mold)
+  subroutine d_vect_bld_en(x,n,mold,scratch)
     integer(psb_epk_), intent(in) :: n
     class(psb_d_vect_type), intent(inout) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
     info = psb_success_
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
 
     if (allocated(x%v)) &
          & call x%free(info)
@@ -450,7 +475,7 @@ contains
     else
       allocate(x%v,stat=info, mold=psb_d_get_base_vect_default())
     endif
-    if (info == psb_success_) call x%v%bld(n)
+    if (info == psb_success_) call x%v%bld(n,scratch=scratch_)
 
   end subroutine d_vect_bld_en
 
@@ -556,7 +581,6 @@ contains
   end subroutine d_vect_all
 
   subroutine d_vect_reinit(x, info)
-
     implicit none
     class(psb_d_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)      :: info
@@ -565,7 +589,7 @@ contains
     call x%set_upd()
 
   end subroutine d_vect_reinit
-
+ 
   subroutine d_vect_reall(n, x, info)
 
     implicit none
@@ -590,16 +614,17 @@ contains
 
   end subroutine d_vect_zero
 
-  subroutine d_vect_asb(n, x, info)
+  subroutine d_vect_asb(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
     integer(psb_ipk_), intent(in)         :: n
     class(psb_d_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
+    logical, intent(in), optional        :: scratch
 
     if (allocated(x%v)) then
-      call x%v%asb(n,info)
+      call x%v%asb(n,info,scratch=scratch)
     end if
   end subroutine d_vect_asb
 
@@ -658,7 +683,7 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_d_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n,maxr
+    integer(psb_ipk_), intent(in)               :: n, maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_dpk_), intent(in)        :: val(:)
     integer(psb_ipk_), intent(out)              :: info
@@ -679,7 +704,7 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_d_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n,maxr
+    integer(psb_ipk_), intent(in)               :: n, maxr
     class(psb_i_vect_type), intent(inout)       :: irl
     class(psb_d_vect_type), intent(inout)       :: val
     integer(psb_ipk_), intent(out)              :: info

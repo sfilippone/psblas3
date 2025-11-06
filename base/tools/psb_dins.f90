@@ -57,7 +57,7 @@ subroutine psb_dins_vect(m, irw, val, x, desc_a, info, local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: i, loc_rows,loc_cols
+  integer(psb_ipk_) :: i, loc_rows, loc_cols
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: dupl_
   type(psb_ctxt_type) :: ctxt
@@ -198,7 +198,7 @@ subroutine psb_dins_vect_v(m, irw, val, x, desc_a, info, local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
+  integer(psb_ipk_) :: i, loc_rows, loc_cols, err_act
   integer(psb_lpk_) :: mglob
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me

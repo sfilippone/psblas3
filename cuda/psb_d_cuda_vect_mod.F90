@@ -560,12 +560,20 @@ contains
   end subroutine d_cuda_sctb_buf
 
 
-  subroutine d_cuda_bld_x(x,this)
+  subroutine d_cuda_bld_x(x,this,scratch)
     use psb_base_mod
     real(psb_dpk_), intent(in)           :: this(:)
     class(psb_d_vect_cuda), intent(inout) :: x
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then 
       info=psb_err_alloc_request_
@@ -578,11 +586,19 @@ contains
 
   end subroutine d_cuda_bld_x
 
-  subroutine d_cuda_bld_mn(x,n)
+  subroutine d_cuda_bld_mn(x,n,scratch)
     integer(psb_mpk_), intent(in) :: n
     class(psb_d_vect_cuda), intent(inout) :: x
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call x%all(n,info)
     if (info /= 0) then 
       call psb_errpush(info,'d_cuda_bld_n',i_err=(/n,n,n,n,n/))
@@ -679,26 +695,34 @@ contains
     call x%set_scal(dzero)
   end subroutine d_cuda_zero
 
-  subroutine d_cuda_asb_m(n, x, info)
+  subroutine d_cuda_asb_m(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
     integer(psb_mpk_), intent(in)        :: n
     class(psb_d_vect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)       :: info
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_mpk_) :: nd
-    
+
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     if (x%is_dev()) then 
       nd  = getMultiVecDeviceSize(x%deviceVect)
       if (nd < n) then 
         call x%sync()
-        call x%psb_d_base_vect_type%asb(n,info)      
+        call x%psb_d_base_vect_type%asb(n,info,scratch=scratch_)      
         if (info == psb_success_) call x%sync_space(info)
         call x%set_host()
       end if
     else   !
       if (x%get_nrows()<n) then 
-        call x%psb_d_base_vect_type%asb(n,info)      
+        call x%psb_d_base_vect_type%asb(n,info,scratch=scratch_)      
         if (info == psb_success_) call x%sync_space(info)
         call x%set_host()      
       end if
@@ -1256,7 +1280,7 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_cuda), intent(inout)        :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
+    integer(psb_ipk_), intent(in)               :: n, dupl, maxr
     class(psb_i_base_vect_type), intent(inout)  :: irl
     class(psb_d_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
@@ -1299,7 +1323,7 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl,maxr
+    integer(psb_ipk_), intent(in)        :: n, dupl, maxr
     integer(psb_ipk_), intent(in)        :: irl(:)
     real(psb_dpk_), intent(in)           :: val(:)
     integer(psb_ipk_), intent(out)       :: info

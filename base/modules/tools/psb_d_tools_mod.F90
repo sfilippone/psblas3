@@ -257,11 +257,11 @@ Module psb_d_tools_mod
       type(psb_dspmat_type), intent (inout)   :: a
       type(psb_desc_type), intent(inout)        :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), optional, intent(in)           :: upd
+      integer(psb_ipk_),optional, intent(in)            :: upd
+      integer(psb_ipk_),optional, intent(in)            :: dupl
       character(len=*), optional, intent(in)  :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
       logical, intent(in), optional :: bld_and
-      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_dspasb
   end interface
 

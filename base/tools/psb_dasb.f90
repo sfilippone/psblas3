@@ -51,7 +51,7 @@
 !    scratch - logical, optional       If true, allocate without checking/zeroing contents.
 !                                      default: .false.
 !    
-subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
+subroutine psb_dasb_vect(x, desc_a, info, mold, scratch, dupl)
   use psb_base_mod, psb_protect_name => psb_dasb_vect
   implicit none
 
@@ -69,7 +69,6 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
-  !logical, parameter :: try_newins = .true.
 
   info = psb_success_
   name = 'psb_dgeasb_v'
@@ -82,7 +81,7 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  scratch_ = .false.
+   scratch_ = .false.
   if (present(scratch)) scratch_ = scratch
   call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
@@ -95,32 +94,30 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   nrow = desc_a%get_local_rows()
   ncol = desc_a%get_local_cols()
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
-  if (try_newins) then
-!!$    if (present(dupl)) then
-!!$      call x%set_dupl(dupl)
-!!$    end if
-    dupl_ = x%get_dupl()
 
+  dupl_ = x%get_dupl()
+  if (try_newins) then    
     if (scratch_) then 
       call x%free(info)
-      call x%bld(ncol,mold=mold)
+      call x%bld(ncol,mold=mold,scratch=scratch_)
     else
       if (x%is_bld().and.present(dupl)) then
-      call x%set_dupl(dupl)
+        call x%set_dupl(dupl)
         dupl_ = dupl
       end if
+      
       if (x%is_remote_build()) then
         block
           integer(psb_lpk_), allocatable :: lvx(:)
           real(psb_dpk_), allocatable  :: vx(:)
           integer(psb_ipk_), allocatable :: ivx(:) 
           integer(psb_ipk_) :: nrmv, nx, i
-
+          
           nrmv = x%get_nrmv()        
           call psb_remote_vect(nrmv,x%rmtv,x%rmidx,desc_a,vx,lvx,info)
           nx  = size(vx)
@@ -129,8 +126,8 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
           call x%ins(nx,ivx,vx,nrow,info)
         end block
       end if
-
-      call x%asb(ncol,info)
+      
+      call x%asb(ncol,info,scratch=scratch)
       ! ..update halo elements..
       call psb_halo(x,desc_a,info)
       if(info /= psb_success_) then
@@ -143,14 +140,12 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': end'
   else
-    dupl_ = x%get_dupl()
-
+    
     if (scratch_) then 
       call x%free(info)
       call x%bld(ncol,mold=mold)
     else
       if (x%is_bld().and.present(dupl)) then
-!!$      call x%set_dupl(dupl)
         dupl_ = dupl
       end if
       if (x%is_remote_build()) then
@@ -169,7 +164,7 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
         end block
       end if
 
-      call x%asb(ncol,info)
+      call x%asb(ncol,info,scratch=scratch)
       ! ..update halo elements..
       call psb_halo(x,desc_a,info)
       if(info /= psb_success_) then
@@ -182,6 +177,7 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch,dupl)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': end'
   end if
+
   call psb_erractionrestore(err_act)
   return
 
@@ -250,7 +246,7 @@ subroutine psb_dasb_vect_r2(x, desc_a, info, mold, scratch)
   else
     do i=1, n
       dupl_ = x(i)%get_dupl()
-      call x(i)%asb(ncol,info)
+      call x(i)%asb(ncol,info,scratch=scratch)
       if (info /= 0) exit
       ! ..update halo elements..
       call psb_halo(x(i),desc_a,info)
