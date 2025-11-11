@@ -97,7 +97,7 @@ contains
     res = min(0,info)
 
     return
-  end function psb_c_dgeall_remote
+  end function psb_c_dgeall_remote_options
 
   function psb_c_dgeasb(xh,cdh) bind(c) result(res)
 
