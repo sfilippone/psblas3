@@ -208,7 +208,8 @@ module psb_const_mod
   integer(psb_ipk_), parameter :: psb_invalid_ = -1
   integer(psb_ipk_), parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer(psb_ipk_), parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
-  integer(psb_ipk_), parameter :: psb_matbld_noremote_=0, psb_matbld_remote_=1
+  integer(psb_ipk_), parameter :: psb_matbld_noremote_ = 0
+  integer(psb_ipk_), parameter :: psb_matbld_remote_   = 1
 
   integer(psb_ipk_), parameter :: psb_vect_null_=0, psb_vect_bld_=1
   integer(psb_ipk_), parameter :: psb_vect_asb_=2, psb_vect_upd_=4

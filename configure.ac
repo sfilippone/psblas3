@@ -689,6 +689,13 @@ PSBLASMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
 PSBLASMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
 PSBLASPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
 PSBLASSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+PSBLASDUPNUL=`cat $CFILE| grep dupl_null | $AWK '{print $6;}'`;
+PSBLASDUPADD=`cat $CFILE| grep "psb_dupl_add_   =" | $AWK '{print $6;}'`;
+PSBLASDUPOVW=`cat $CFILE| grep dupl_ovwrt| $AWK '{print $6;}'`;
+PSBLASDUPERR=`cat $CFILE| grep dupl_err| $AWK '{print $6;}'`;
+PSBLASBLDNOR=`cat $CFILE| grep matbld_noremote| $AWK '{print $6;}'`;
+PSBLASBLDRMT=`cat $CFILE| grep matbld_remote| $AWK '{print $6;}'`;	
+
 AC_MSG_RESULT([ version  $PSBLASSTRING])
 
 ###############################################################################
@@ -1065,6 +1072,13 @@ AC_SUBST(PSBLASMAJOR)
 AC_SUBST(PSBLASMINOR)
 AC_SUBST(PSBLASPATCH)
 AC_SUBST(PSBLASSTRING)
+AC_SUBST(PSBLASDUPNUL)
+AC_SUBST(PSBLASDUPADD)
+AC_SUBST(PSBLASDUPOVW)
+AC_SUBST(PSBLASDUPERR)
+AC_SUBST(PSBLASBLDNOR)
+AC_SUBST(PSBLASBLDRMT)
+
 AC_SUBST(CSERIALMPI)
 AC_SUBST(CHAVE_OPENMP)
 AC_SUBST(CHAVEMETIS)
