@@ -132,6 +132,13 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
 message(STATUS "Using compiler ${CMAKE_C_COMPILER};")
 
 
+# Define Major and Minor Version and Patch Level, String Version
+set(PSBLASMAJOR "3")
+set(PSBLASMINOR "9")
+set(PSBLASPATCH "0")
+set(PSBLASSTRING "3.9.0")
+
+
 # Set default values for IPK_SIZE and LPK_SIZE
 set(DEFAULT_IPK_SIZE 4)
 set(DEFAULT_LPK_SIZE 8)
