@@ -49,7 +49,9 @@ module mpi
   integer(psb_mpk_), parameter :: mpi_integer4         = 10
   integer(psb_mpk_), parameter :: mpi_comm_null        = -1
   integer(psb_mpk_), parameter :: mpi_comm_world       = 1
-  
+
+  integer(psb_mpk_), parameter :: mpi_address_kind     = psb_epk_
+
   !real(psb_dpk_), external :: mpi_wtime
 
   interface
@@ -179,44 +181,53 @@ end module mpi
 module psi_penv_mod
   use psb_const_mod
   use iso_c_binding
+#ifdef PSB_MPI_MOD
+  use mpi
+#endif
+#ifdef PSB_MPI_H
+  include 'mpif.h'
+#endif
+  
+  integer(psb_mpk_), parameter :: psb_apk_               = mpi_address_kind
 
-  integer(psb_mpk_), parameter:: psb_int_tag      = 543987
-  integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
-  integer(psb_mpk_), parameter:: psb_double_tag   = psb_real_tag     + 1
-  integer(psb_mpk_), parameter:: psb_complex_tag  = psb_double_tag   + 1
-  integer(psb_mpk_), parameter:: psb_dcomplex_tag = psb_complex_tag  + 1
-  integer(psb_mpk_), parameter:: psb_logical_tag  = psb_dcomplex_tag + 1
-  integer(psb_mpk_), parameter:: psb_char_tag     = psb_logical_tag  + 1
-  integer(psb_mpk_), parameter:: psb_int8_tag     = psb_char_tag     + 1
-  integer(psb_mpk_), parameter:: psb_int2_tag     = psb_int8_tag     + 1
-  integer(psb_mpk_), parameter:: psb_int4_tag     = psb_int2_tag     + 1
-  integer(psb_mpk_), parameter:: psb_long_tag     = psb_int4_tag     + 1
-
-  integer(psb_mpk_), parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_double_swap_tag   = psb_double_tag   + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_complex_swap_tag  = psb_complex_tag  + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_dcomplex_swap_tag = psb_dcomplex_tag + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_logical_swap_tag  = psb_logical_tag  + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_char_swap_tag     = psb_char_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
-  integer(psb_mpk_), parameter:: psb_long_swap_tag     = psb_long_tag     + psb_int_tag
-
+  integer(psb_mpk_), parameter :: psb_tag_space          = 200 
+  integer(psb_mpk_), parameter :: psb_tag_base           = 512
+  integer(psb_mpk_), parameter :: psb_int_tag            = psb_tag_base     + 1
+  integer(psb_mpk_), parameter :: psb_real_tag           = psb_int_tag      + 1
+  integer(psb_mpk_), parameter :: psb_double_tag         = psb_real_tag     + 1
+  integer(psb_mpk_), parameter :: psb_complex_tag        = psb_double_tag   + 1
+  integer(psb_mpk_), parameter :: psb_dcomplex_tag       = psb_complex_tag  + 1
+  integer(psb_mpk_), parameter :: psb_logical_tag        = psb_dcomplex_tag + 1
+  integer(psb_mpk_), parameter :: psb_char_tag           = psb_logical_tag  + 1
+  integer(psb_mpk_), parameter :: psb_int8_tag           = psb_char_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int2_tag           = psb_int8_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int4_tag           = psb_int2_tag     + 1
+  integer(psb_mpk_), parameter :: psb_long_tag           = psb_int4_tag     + 1
+  integer(psb_mpk_), parameter :: psb_max_simple_tag     = psb_long_tag     + 2     
+  integer(psb_mpk_), parameter :: psb_int_swap_tag       = psb_max_simple_tag    + 1
+  integer(psb_mpk_), parameter :: psb_real_swap_tag      = psb_int_swap_tag      + 1
+  integer(psb_mpk_), parameter :: psb_double_swap_tag    = psb_real_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_complex_swap_tag   = psb_double_swap_tag   + 1
+  integer(psb_mpk_), parameter :: psb_dcomplex_swap_tag  = psb_complex_swap_tag  + 1
+  integer(psb_mpk_), parameter :: psb_logical_swap_tag   = psb_dcomplex_swap_tag + 1
+  integer(psb_mpk_), parameter :: psb_char_swap_tag      = psb_logical_swap_tag  + 1
+  integer(psb_mpk_), parameter :: psb_int8_swap_tag      = psb_char_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int2_swap_tag      = psb_int8_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_int4_swap_tag      = psb_int2_swap_tag     + 1
+  integer(psb_mpk_), parameter :: psb_long_swap_tag      = psb_int4_swap_tag     + 1
 
   
-  integer(psb_mpk_), private, parameter:: psb_int_type      = 987543
-  integer(psb_mpk_), private, parameter:: psb_real_type     = psb_int_type      + 1
-  integer(psb_mpk_), private, parameter:: psb_double_type   = psb_real_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_complex_type  = psb_double_type   + 1
-  integer(psb_mpk_), private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
-  integer(psb_mpk_), private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
-  integer(psb_mpk_), private, parameter:: psb_char_type     = psb_logical_type  + 1
-  integer(psb_mpk_), private, parameter:: psb_int8_type     = psb_char_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
-  integer(psb_mpk_), private, parameter:: psb_long_type     = psb_int4_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_int_type      = 200
+  integer(psb_mpk_), private, parameter :: psb_real_type     = psb_int_type      + 1
+  integer(psb_mpk_), private, parameter :: psb_double_type   = psb_real_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_complex_type  = psb_double_type   + 1
+  integer(psb_mpk_), private, parameter :: psb_dcomplex_type = psb_complex_type  + 1
+  integer(psb_mpk_), private, parameter :: psb_logical_type  = psb_dcomplex_type + 1
+  integer(psb_mpk_), private, parameter :: psb_char_type     = psb_logical_type  + 1
+  integer(psb_mpk_), private, parameter :: psb_int8_type     = psb_char_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_int2_type     = psb_int8_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_int4_type     = psb_int2_type     + 1
+  integer(psb_mpk_), private, parameter :: psb_long_type     = psb_int4_type     + 1
 
   type psb_buffer_node
     integer(psb_mpk_)   :: request
@@ -304,7 +315,7 @@ module psi_penv_mod
 
 #endif
 
-  private :: psi_get_sizes,  psi_register_mpi_extras
+  private :: psi_get_sizes,  psi_register_mpi_const
   private :: psi_i2amx_op, psi_i2amn_op
   private :: psi_iamx_op, psi_iamn_op 
   private :: psi_mamx_op, psi_mamn_op 
@@ -341,13 +352,7 @@ contains
   end subroutine psb_init_queue
 
   subroutine psb_wait_buffer(node, info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_buffer_node), intent(inout) :: node
     integer(psb_ipk_), intent(out) :: info 
     integer(psb_mpk_) :: status(mpi_status_size),minfo
@@ -357,13 +362,7 @@ contains
   end subroutine psb_wait_buffer
 
   subroutine psb_test_buffer(node, flag, info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_buffer_node), intent(inout) :: node
     logical, intent(out) :: flag
     integer(psb_ipk_), intent(out) :: info 
@@ -476,13 +475,7 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!
   subroutine psi_msnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     integer(psb_mpk_), allocatable, intent(inout) :: buffer(:)
@@ -515,13 +508,7 @@ contains
 
 
   subroutine psi_esnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     integer(psb_epk_), allocatable, intent(inout) :: buffer(:)
@@ -552,13 +539,7 @@ contains
   end subroutine psi_esnd
 
   subroutine psi_i2snd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     integer(psb_i2pk_), allocatable, intent(inout) :: buffer(:)
@@ -589,13 +570,7 @@ contains
   end subroutine psi_i2snd
 
   subroutine psi_ssnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     real(psb_spk_), allocatable, intent(inout) :: buffer(:)
@@ -626,13 +601,7 @@ contains
   end subroutine psi_ssnd
 
   subroutine psi_dsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_)   :: tag, dest
     real(psb_dpk_), allocatable, intent(inout) :: buffer(:)
@@ -663,13 +632,7 @@ contains
   end subroutine psi_dsnd
     
   subroutine psi_csnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     complex(psb_spk_), allocatable, intent(inout) :: buffer(:)
@@ -700,13 +663,7 @@ contains
   end subroutine psi_csnd
 
   subroutine psi_zsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     complex(psb_dpk_), allocatable, intent(inout) :: buffer(:)
@@ -738,13 +695,7 @@ contains
 
 
   subroutine psi_logsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     logical, allocatable, intent(inout) :: buffer(:)
@@ -776,13 +727,7 @@ contains
 
 
   subroutine psi_hsnd(ctxt,tag,dest,buffer,mesg_queue)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: tag, dest
     character(len=1), allocatable, intent(inout) :: buffer(:)
@@ -850,16 +795,11 @@ contains
 
   end subroutine psi_get_sizes
 
-  subroutine  psi_register_mpi_extras(info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
+  subroutine  psi_register_mpi_const(comm,info)
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
-    integer(psb_mpk_) :: info
-    
+    integer(psb_mpk_) :: comm,info
+    integer(psb_mpk_) :: ierror
+    logical  :: flag
     info = 0
 #if 0
     if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_ ,info)
@@ -896,8 +836,7 @@ contains
     psb_mpi_c_dpk_  = mpi_double_complex
 #endif
 
-#if defined(PSB_SERIAL_MPI)
-#else 
+#if ! defined(PSB_SERIAL_MPI)
     if (info == 0) call mpi_op_create(psi_i2amx_op,.true.,mpi_i2amx_op,info)
     if (info == 0) call mpi_op_create(psi_i2amn_op,.true.,mpi_i2amn_op,info)
     if (info == 0) call mpi_op_create(psi_mamx_op,.true.,mpi_mamx_op,info)
@@ -915,8 +854,7 @@ contains
     if (info == 0) call mpi_op_create(psi_snrm2_op,.true.,mpi_snrm2_op,info)
     if (info == 0) call mpi_op_create(psi_dnrm2_op,.true.,mpi_dnrm2_op,info)
 #endif
-
-  end subroutine psi_register_mpi_extras
+  end subroutine psi_register_mpi_const
 
 #if (defined(PSB_IPK4) && defined(PSB_LPK8))||defined(PSB_IPK8)
   subroutine psb_info_epk(ctxt,iam,np)
@@ -941,13 +879,7 @@ contains
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type), intent(out) :: ctxt
     type(psb_ctxt_type), intent(in), optional :: basectxt
     integer(psb_mpk_), intent(in), optional :: np, ids(:), extcomm
@@ -965,7 +897,7 @@ contains
     ctxt%ctxt = nctxt ! allocate on assignment
     nctxt = nctxt + 1
 
-    call psi_register_mpi_extras(info)
+    call psi_register_mpi_const(nctxt,info)
     call psi_get_sizes()
 
 #else    
@@ -1054,7 +986,7 @@ contains
     if (info == 0) then
       ctxt%ctxt = icomm ! allocate on assignment
     end if
-    call psi_register_mpi_extras(info)
+    call psi_register_mpi_const(icomm,info)
     call psi_get_sizes()
     !if (ctxt == mpi_comm_null) return
     if (.not.allocated(ctxt%ctxt)) return 
@@ -1080,13 +1012,7 @@ contains
     use psb_mat_mod
     use psb_vect_mod
 ! !$    use psb_rsb_mod
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type), intent(inout) :: ctxt
     logical, intent(in), optional :: close
     logical  :: close_
@@ -1154,13 +1080,7 @@ contains
 
 
   subroutine psb_barrier_mpik(ctxt)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type), intent(in) :: ctxt
 
     integer(psb_mpk_) :: info
@@ -1175,13 +1095,7 @@ contains
   function psb_wtime()
     use psb_const_mod
 !    use mpi_constants
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     real(psb_dpk_) :: psb_wtime
 
     psb_wtime = mpi_wtime()
@@ -1210,13 +1124,7 @@ contains
 
 
   subroutine psb_info_mpik(ctxt,iam,np)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_mpk_), intent(out) :: iam, np
@@ -1269,13 +1177,7 @@ contains
 
 
   function psb_m_get_mpi_comm(ctxt) result(comm)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: comm
     comm = mpi_comm_null
@@ -1291,13 +1193,7 @@ contains
   end function psb_m_get_mpi_rank
 
   subroutine psb_get_mpicomm(ctxt,comm)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none 
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
     type(psb_ctxt_type) :: ctxt
     integer(psb_mpk_) :: comm
     comm = mpi_comm_null

@@ -50,6 +50,28 @@ contains
 
   end subroutine psb_c_init
 
+  ! Get MPI_Fint from C, psb_c_object_type and start a psb_ctxt_type 
+  ! context from it.
+  subroutine psb_c_init_from_fint(cctxt,fint) bind(c)
+    use psb_base_mod, only : psb_init, psb_ctxt_type
+    implicit none
+
+    type(psb_c_object_type)      :: cctxt
+    integer(psb_c_mpk_), value   :: fint
+    type(psb_ctxt_type), pointer :: ctxt
+    integer :: info
+
+    ! Local variables
+    integer(psb_mpk_)  :: fmctxt
+
+    allocate(ctxt,stat=info)
+    if (info /= 0) return
+    fmctxt = fint
+    call psb_init(ctxt,extcomm=fmctxt)
+    cctxt%item = c_loc(ctxt)
+
+  end subroutine psb_c_init_from_fint
+
   function psb_c2f_ctxt(cctxt)   result(res)
     implicit none
     type(psb_c_object_type), value :: cctxt

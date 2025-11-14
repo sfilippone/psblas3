@@ -44,10 +44,10 @@ module psb_i2_hsort_mod
   use psb_const_mod
 
   interface psb_hsort
-    subroutine psb_i2hsort(x,ix,dir,flag)
+    subroutine psb_i2hsort(x,ix,dir,flag,reord)
       import 
       integer(psb_i2pk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_i2hsort
   end interface psb_hsort

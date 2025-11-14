@@ -66,7 +66,8 @@ Subroutine psb_z_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   use psb_comm_mod
   use psb_penv_mod
   use psb_z_tools_mod, psb_protect_name => psb_z_par_csr_spspmm
-  use psb_z_serial_mod, only : psb_zcsrspspmm, psb_zbase_rwextd
+  use psb_z_csr_mat_mod, only : psb_zcsrspspmm
+  use psb_z_serial_mod, only : psb_zbase_rwextd
   Implicit None
 
   type(psb_z_csr_sparse_mat),intent(in)    :: acsr
@@ -166,7 +167,8 @@ Subroutine psb_lz_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   use psb_comm_mod
   use psb_penv_mod
   use psb_z_tools_mod, psb_protect_name => psb_lz_par_csr_spspmm
-  use psb_z_serial_mod, only : psb_lzcsrspspmm, psb_lzbase_rwextd
+  use psb_z_csr_mat_mod, only : psb_lzcsrspspmm
+  use psb_z_serial_mod, only : psb_lzbase_rwextd
   Implicit None
 
   type(psb_lz_csr_sparse_mat),intent(in)    :: acsr

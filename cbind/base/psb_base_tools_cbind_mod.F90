@@ -141,6 +141,48 @@ contains
 
   end function psb_c_cdall_vl_opt
 
+  function psb_c_cdall_vl_lidx(nl,vl,lidx,cctxt,cdh) bind(c,name='psb_c_cdall_vl_lidx') result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type), value :: cctxt
+    integer(psb_c_ipk_), value :: nl
+    integer(psb_c_lpk_)        :: vl(*)
+    integer(psb_c_ipk_)        :: lidx(*)
+    type(psb_c_object_type) :: cdh
+    type(psb_desc_type), pointer :: descp
+    integer(psb_c_ipk_)           :: info, ixb
+    type(psb_ctxt_type) :: ctxt
+    ctxt = psb_c2f_ctxt(cctxt)
+
+    res = -1
+    if (nl <=0) then
+      write(0,*) 'Invalid size'
+      return
+    end if
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      call descp%free(info)
+      if (info == 0) deallocate(descp,stat=info)
+      if (info /= 0) return
+    end if
+
+    allocate(descp,stat=info)
+    if (info < 0) return
+
+    ixb = psb_c_get_index_base()
+
+    if (ixb == 1) then
+      call psb_cdall(ctxt,descp,info,vl=vl(1:nl),lidx=lidx(1:nl))
+    else
+      call psb_cdall(ctxt,descp,info,vl=(vl(1:nl)+(1-ixb)),lidx=(lidx(1:nl)+(1-ixb)))
+    end if
+    cdh%item = c_loc(descp)
+    res = info
+
+  end function psb_c_cdall_vl_lidx
+
   function psb_c_cdall_nl(nl,cctxt,cdh) bind(c,name='psb_c_cdall_nl') result(res)
     implicit none
 
@@ -278,6 +320,57 @@ contains
   end function psb_c_cdins
 
 
+  function psb_c_cdins_lidx(nz,ja,lidx,cdh) bind(c,name='psb_c_cdins_lidx') result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    integer(psb_c_ipk_), value   :: nz
+    type(psb_c_object_type) :: cdh
+    integer(psb_c_lpk_)          :: ja(*)
+    integer(psb_c_ipk_) :: lidx(*)
+
+    type(psb_desc_type), pointer :: descp
+    integer(psb_c_ipk_)           :: ixb,info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      ixb = psb_c_get_index_base()
+
+      if (ixb == 1) then
+        call psb_cdins(nz,ja(1:nz),descp,info,lidx=lidx(1:nz))
+      else
+        call psb_cdins(nz,(ja(1:nz)+(1-ixb)),descp,info,lidx=(lidx(1:nz)+(1-ixb)))
+      end if
+        
+      res = info
+    end if
+    return
+  end function psb_c_cdins_lidx
+
+  function psb_c_cd_is_asb(cdh) bind(c,name='psb_c_cd_is_asb') result(res)
+    implicit none
+
+    logical(c_bool) :: res
+    type(psb_c_object_type) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+
+    res = .false.
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      if (descp%is_asb()) then
+        res = .true.
+      else
+        res = .false.
+      end if
+    end if
+
+  end function psb_c_cd_is_asb
+
+
 
   function psb_c_cd_get_local_rows(cdh) bind(c,name='psb_c_cd_get_local_rows') result(res)
     implicit none
@@ -389,6 +482,26 @@ contains
     end if
 
   end function psb_c_cd_get_global_indices
+
+  function psb_c_is_owned(x,cdh) bind(c,name='psb_c_is_owned') result(res)
+    implicit none
+    type(psb_c_object_type)        :: cdh
+    integer(psb_c_lpk_), value     :: x
+    logical(c_bool) :: res
+    ! Internal variables
+    type(psb_desc_type), pointer   :: descp
+    integer(psb_c_ipk_)            :: info
+    logical                        :: fowned
+    res = .false.
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      fowned = psb_is_owned(x+(1-psb_c_get_index_base()),descp)
+      if (fowned) then
+        res = .true.
+      end if
+    end if
+
+  end function psb_c_is_owned
 
 
 end module psb_base_tools_cbind_mod

@@ -197,7 +197,7 @@ subroutine psi_stranidxm(ctxt,icomm,flag,n,beta,y,idx,&
   logical, parameter :: usersend=.false.
 
   real(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#if !defined(FLANG)
+#if !defined(PSB_CMP_FLANG)
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name
@@ -691,7 +691,7 @@ subroutine psi_stranidxv(ctxt,icomm,flag,beta,y,idx,&
   logical, parameter :: usersend=.false.
 
   real(psb_spk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#if !defined(FLANG)
+#if !defined(PSB_CMP_FLANG)
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name

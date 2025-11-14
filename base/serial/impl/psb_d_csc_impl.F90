@@ -2824,8 +2824,8 @@ subroutine psb_d_csc_print(iout,a,iv,head,ivr,ivc)
 end subroutine psb_d_csc_print
 
 subroutine psb_dcscspspmm(a,b,c,info)
-  use psb_d_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_dcscspspmm
+  use psb_d_csc_mat_mod, psb_protect_name => psb_dcscspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -4664,8 +4664,8 @@ subroutine psb_ld_csc_print(iout,a,iv,head,ivr,ivc)
 end subroutine psb_ld_csc_print
 
 subroutine psb_ldcscspspmm(a,b,c,info)
-  use psb_d_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_ldcscspspmm
+  use psb_d_csc_mat_mod, psb_protect_name => psb_ldcscspspmm
+  use psb_serial_mod
 
   implicit none
 

@@ -62,10 +62,10 @@ module psb_e_msort_mod
 
 
   interface psb_msort
-    subroutine psb_emsort(x,ix,dir,flag)
+    subroutine psb_emsort(x,ix,dir,flag,reord)
       import 
       integer(psb_epk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag, reord
       integer(psb_epk_), optional, intent(inout) :: ix(:)
     end subroutine psb_emsort
   end interface psb_msort

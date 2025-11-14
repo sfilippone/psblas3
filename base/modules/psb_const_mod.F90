@@ -35,7 +35,7 @@ module psb_const_mod
   use iso_fortran_env
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: psb_i2pk_ = int16
-  ! This is always a 4-byte integer, for MPI-related stuff
+  ! This is always a 4-byte integer.
   integer, parameter  :: psb_mpk_ = int32
   ! This is always an 8-byte  integer.
   integer, parameter  :: psb_epk_ = int64
@@ -51,7 +51,7 @@ module psb_const_mod
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: i2ndig=4
   integer, parameter  :: psb_i2pk_ = selected_int_kind(i2ndig)
-  ! This is always a 4-byte integer, for MPI-related stuff
+  ! This is always a 4-byte integer.
   integer, parameter  :: indig=8
   integer, parameter  :: psb_mpk_ = selected_int_kind(indig)
   ! This is always an 8-byte  integer.
@@ -185,11 +185,12 @@ module psb_const_mod
   !  The up/down constant are defined in pairs having
   !  opposite values. We make use of this fact in the heapsort routine.
   !
-  integer(psb_ipk_), parameter :: psb_sort_up_       = 1, psb_sort_down_     = -1
-  integer(psb_ipk_), parameter :: psb_lsort_up_      = 2, psb_lsort_down_    = -2
-  integer(psb_ipk_), parameter :: psb_asort_up_      = 3, psb_asort_down_    = -3
-  integer(psb_ipk_), parameter :: psb_alsort_up_     = 4, psb_alsort_down_   = -4
-  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_  = 0, psb_sort_keep_idx_ =  1
+  integer(psb_ipk_), parameter :: psb_sort_up_       = 1, psb_sort_down_      = -1
+  integer(psb_ipk_), parameter :: psb_lsort_up_      = 2, psb_lsort_down_     = -2
+  integer(psb_ipk_), parameter :: psb_asort_up_      = 3, psb_asort_down_     = -3
+  integer(psb_ipk_), parameter :: psb_alsort_up_     = 4, psb_alsort_down_    = -4
+  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_  = 0, psb_sort_keep_idx_  =  1
+  integer(psb_ipk_), parameter :: psb_sort_reord_x_  = 0, psb_sort_noreord_x_ =  1
   integer(psb_ipk_), parameter :: psb_heap_resize    = 200
   integer(psb_ipk_), parameter :: psb_find_any_      = 0
   integer(psb_ipk_), parameter :: psb_find_first_ge_ = 1
@@ -282,7 +283,7 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_parm_differs_among_procs_=550
   integer(psb_ipk_), parameter, public :: psb_err_entry_out_of_bounds_=551
   integer(psb_ipk_), parameter, public :: psb_err_inconsistent_index_lists_=552
-  integer(psb_ipk_), parameter, public :: psb_err_partfunc_toomuchprocs_=570
+  integer(psb_ipk_), parameter, public :: psb_err_partfunc_toomanyprocs_=570
   integer(psb_ipk_), parameter, public :: psb_err_partfunc_toofewprocs_=575
   integer(psb_ipk_), parameter, public :: psb_err_partfunc_wrong_pid_=580
   integer(psb_ipk_), parameter, public :: psb_err_no_optional_arg_=581

@@ -76,7 +76,7 @@ contains
     character(len=*), intent(in)  :: methdname
     integer(psb_ipk_), intent(in)           :: me, itx, itrace
     real(psb_dpk_), intent(in)    :: errnum, errden, eps
-    character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es15.9))'
+    character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es18.9))'
     integer(psb_ipk_), parameter            :: outlen=18 
     character(len=len(methdname)) :: mname
     character(len=outlen)         :: outname
@@ -102,8 +102,8 @@ contains
     real(psb_dpk_), optional, intent(out) :: err
     integer(psb_ipk_), optional, intent(out)  :: iter
 
-    character(len=*), parameter  :: fmt='(a,2x,es15.9,1x,a,1x,i4,1x,a)'
-    character(len=*), parameter  :: fmt1='(a,3(2x,es15.9))'
+    character(len=*), parameter  :: fmt='(a,2x,es18.9,1x,a,1x,i4,1x,a)'
+    character(len=*), parameter  :: fmt1='(a,3(2x,es18.9))'
 
     if (errden == dzero) then 
       if (errnum > eps) then

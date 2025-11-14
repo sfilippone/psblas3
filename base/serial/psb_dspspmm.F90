@@ -29,25 +29,27 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! File:  psb_cspspmm.f90 
+! File:  psb_dspspmm.f90 
 ! Subroutine: 
 ! Arguments:
 !
 !
 !
-subroutine psb_cspspmm(a,b,c,info)
+subroutine psb_dspspmm(a,b,c,info)
   use psb_mat_mod
-  use psb_c_serial_mod, psb_protect_name => psb_cspspmm
-  implicit none 
-
-  type(psb_cspmat_type), intent(in)    :: a,b
-  type(psb_cspmat_type), intent(out)   :: c
+  use psb_d_csr_mat_mod
+  use psb_d_csc_mat_mod
+  use psb_d_serial_mod, psb_protect_name => psb_dspspmm
+  type(psb_dspmat_type), intent(in)    :: a,b
+  type(psb_dspmat_type), intent(out)   :: c
   integer(psb_ipk_), intent(out)                  :: info
-  type(psb_c_csr_sparse_mat), allocatable :: ccsr
-  type(psb_c_csc_sparse_mat), allocatable :: ccsc
+  type(psb_d_csr_sparse_mat), allocatable :: ccsr
+  type(psb_d_csc_sparse_mat), allocatable :: ccsc
   integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_spspmm'
   logical :: done_spmm
+
+  
   call psb_erractionsave(err_act)
   info = psb_success_
 
@@ -63,13 +65,13 @@ subroutine psb_cspspmm(a,b,c,info)
   !
   done_spmm = .false. 
   select type(aa=>a%a)
-  class is (psb_c_csr_sparse_mat) 
+  class is (psb_d_csr_sparse_mat) 
     select type(ba=>b%a)
-    class is (psb_c_csr_sparse_mat) 
+    class is (psb_d_csr_sparse_mat) 
       
       allocate(ccsr,stat=info)    
       if (info == psb_success_) then 
-        call psb_ccsrspspmm(aa,ba,ccsr,info)
+        call psb_dcsrspspmm(aa,ba,ccsr,info)
       else
         info = psb_err_alloc_dealloc_
       end if
@@ -78,13 +80,13 @@ subroutine psb_cspspmm(a,b,c,info)
 
     end select
 
-  class is (psb_c_csc_sparse_mat) 
+  class is (psb_d_csc_sparse_mat) 
     select type(ba=>b%a)
-    class is (psb_c_csc_sparse_mat) 
+    class is (psb_d_csc_sparse_mat) 
       
       allocate(ccsc,stat=info)    
       if (info == psb_success_) then 
-        call psb_ccscspspmm(aa,ba,ccsc,info)
+        call psb_dcscspspmm(aa,ba,ccsc,info)
       else
         info = psb_err_alloc_dealloc_
       end if
@@ -114,21 +116,24 @@ subroutine psb_cspspmm(a,b,c,info)
 
   return
 
-end subroutine psb_cspspmm
+end subroutine psb_dspspmm
 
-subroutine psb_lcspspmm(a,b,c,info)
+subroutine psb_ldspspmm(a,b,c,info)
   use psb_mat_mod
-  use psb_c_serial_mod, psb_protect_name => psb_lcspspmm
+  use psb_d_csr_mat_mod
+  use psb_d_csc_mat_mod
+  use psb_d_serial_mod, psb_protect_name => psb_ldspspmm
   implicit none 
 
-  type(psb_lcspmat_type), intent(in)    :: a,b
-  type(psb_lcspmat_type), intent(out)   :: c
+  type(psb_ldspmat_type), intent(in)    :: a,b
+  type(psb_ldspmat_type), intent(out)   :: c
   integer(psb_ipk_), intent(out)                  :: info
-  type(psb_lc_csr_sparse_mat), allocatable :: ccsr
-  type(psb_lc_csc_sparse_mat), allocatable :: ccsc
+  type(psb_ld_csr_sparse_mat), allocatable :: ccsr
+  type(psb_ld_csc_sparse_mat), allocatable :: ccsc
   integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_spspmm'
   logical :: done_spmm
+
   call psb_erractionsave(err_act)
   info = psb_success_
 
@@ -144,13 +149,13 @@ subroutine psb_lcspspmm(a,b,c,info)
   !
   done_spmm = .false. 
   select type(aa=>a%a)
-  class is (psb_lc_csr_sparse_mat) 
+  class is (psb_ld_csr_sparse_mat) 
     select type(ba=>b%a)
-    class is (psb_lc_csr_sparse_mat) 
+    class is (psb_ld_csr_sparse_mat) 
       
       allocate(ccsr,stat=info)    
       if (info == psb_success_) then 
-        call psb_lccsrspspmm(aa,ba,ccsr,info)
+        call psb_ldcsrspspmm(aa,ba,ccsr,info)
       else
         info = psb_err_alloc_dealloc_
       end if
@@ -159,13 +164,13 @@ subroutine psb_lcspspmm(a,b,c,info)
 
     end select
 
-  class is (psb_lc_csc_sparse_mat) 
+  class is (psb_ld_csc_sparse_mat) 
     select type(ba=>b%a)
-    class is (psb_lc_csc_sparse_mat) 
+    class is (psb_ld_csc_sparse_mat) 
       
       allocate(ccsc,stat=info)    
       if (info == psb_success_) then 
-        call psb_lccscspspmm(aa,ba,ccsc,info)
+        call psb_ldcscspspmm(aa,ba,ccsc,info)
       else
         info = psb_err_alloc_dealloc_
       end if
@@ -195,5 +200,5 @@ subroutine psb_lcspspmm(a,b,c,info)
 
   return
 
-end subroutine psb_lcspspmm
+end subroutine psb_ldspspmm
 

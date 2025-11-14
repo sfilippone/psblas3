@@ -131,16 +131,16 @@ subroutine psb_mmsort_u(x,nout,dir)
   return
 end subroutine psb_mmsort_u
 
-subroutine psb_mmsort(x,ix,dir,flag)
+subroutine psb_mmsort(x,ix,dir,flag,reord)
   use psb_sort_mod, psb_protect_name => psb_mmsort
   use psb_error_mod
   use psb_ip_reord_mod
   implicit none 
   integer(psb_mpk_), intent(inout)           :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag, reord
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act, reord_
 
   integer(psb_ipk_), allocatable :: iaux(:)
   integer(psb_ipk_) :: iret, info, i 
@@ -150,6 +150,11 @@ subroutine psb_mmsort(x,ix,dir,flag)
   name='psb_mmsort'
   call psb_erractionsave(err_act)
 
+  if (present(reord)) then 
+    reord_ = reord
+  else
+    reord_= psb_sort_reord_x_
+  end if
   if (present(dir)) then 
     dir_ = dir
   else
@@ -212,14 +217,27 @@ subroutine psb_mmsort(x,ix,dir,flag)
   ! Do the actual reordering, since the inner routines
   ! only provide linked pointers. 
   !
-  if (iret == 0 ) then 
-    if (present(ix)) then
-      call psb_ip_reord(n,x,ix,iaux)
-    else      
-      call psb_ip_reord(n,x,iaux)
-    end if
+  if (iret == 0 ) then
+    select case(reord_)
+    case(psb_sort_reord_x_)
+      if (present(ix)) then
+        call psb_ip_reord(n,x,ix,iaux)
+      else      
+        call psb_ip_reord(n,x,iaux)
+      end if
+    case(psb_sort_noreord_x_)
+      if (present(ix)) then
+        call psb_ip_reord(n,ix,iaux)
+      else            
+        call psb_errpush(psb_err_no_optional_arg_,name,a_err="ix")
+        goto 9999
+      end if
+    case default
+      ierr(1) = 5; ierr(2) = reord_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+      goto 9999
+    end select
   end if
-
 
   return
 

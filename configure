@@ -690,6 +690,10 @@ CINTMETIS
 CHAVEMETIS
 CHAVE_OPENMP
 CSERIALMPI
+PSBLASSTRING
+PSBLASPATCH
+PSBLASMINOR
+PSBLASMAJOR
 PSB_LPKDEF
 PSB_IPKDEF
 FINCLUDES
@@ -6989,7 +6993,7 @@ if test x"$psblas_cv_fc" == "x" ; then
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/(0-9*).*/$1/p'
+        	FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_XLF_10 $FDEFINES";		  sed -e's/(0-9*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -7005,7 +7009,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
    psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/^0-9*//g'`;
    if test x"$psblas_shvs" != x""; then
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  " >&5
@@ -7024,7 +7028,7 @@ printf "%s\n" "$as_me: Running  with LLVM $psblas_flang_version  ($psblas_flang_
    psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_fc="flang";
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/^0-9*//g'`;
    if test x"$psblas_shvs" != x""; then
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  " >&5
@@ -7037,7 +7041,7 @@ printf "%s\n" "$as_me: Running  with LLVM $psblas_flang_version  ($psblas_flang_
    fi
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
-
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_INTEL $FDEFINES"
    psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
    psblas_cv_fc="nag";
@@ -8745,6 +8749,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+######################
+# Extract version data
+######################
+#PAC_EXTRACT_PSBLAS_VERSION
+CFILE="base/modules/psb_const_mod.F90";
+PSBLASMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
+PSBLASMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
+PSBLASPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
+PSBLASSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result:  version  $PSBLASSTRING" >&5
+printf "%s\n" " version  $PSBLASSTRING" >&6; }
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
@@ -11093,7 +11108,7 @@ LIBS="$SAVE_LIBS"
 CPPFLAGS="$SAVE_CPPFLAGS"
 
             PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+      if (( ${PSB_CUDA_VERSION} > 15010 )); then
          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA" >&5
 printf "%s\n" "$as_me: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA" >&6;}
          pac_cv_cuda="no";
@@ -11139,7 +11154,7 @@ fi
 
 
          if test "x$pac_cv_cudacc" == "x"; then
-            pac_cv_cudacc="50,60,70,75,80,86";
+            pac_cv_cudacc="75,80,86";
             CUDA_CC="$pac_cv_cudacc";
          fi
          if (( $pac_cv_cuda_version >= 11070  ))
@@ -11151,8 +11166,8 @@ fi
            CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
          done
          if test "x$pac_cv_cuda_version" != "xunknown"; then
-                   FCUDEFINES=" ${CUDA_DEFINES}"
-                            fi
+         	 FCUDEFINES=" ${CUDA_DEFINES}"
+	                   fi
      fi
   fi
 fi
@@ -11647,6 +11662,10 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
+
 
 
 
@@ -13045,6 +13064,8 @@ fi
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+        EXTRA_OPT             : ${EXTRA_OPT}
+
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
@@ -13082,6 +13103,8 @@ printf "%s\n" "$as_me:
 	FMFLAG                : ${FMFLAG}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
+
+        EXTRA_OPT             : ${EXTRA_OPT}
 
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}

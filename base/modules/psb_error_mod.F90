@@ -750,7 +750,7 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Index lists are inconsistent: some indices are orphans")')
 
-    case(psb_err_partfunc_toomuchprocs_)
+    case(psb_err_partfunc_toomanyprocs_)
       allocate(achmsg(4)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&

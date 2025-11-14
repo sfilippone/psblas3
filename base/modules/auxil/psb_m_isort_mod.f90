@@ -44,10 +44,10 @@ module psb_m_isort_mod
   use psb_const_mod
 
   interface psb_isort
-    subroutine psb_misort(x,ix,dir,flag)
+    subroutine psb_misort(x,ix,dir,flag,reord)
       import 
       integer(psb_mpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_misort
   end interface psb_isort

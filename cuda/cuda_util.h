@@ -59,7 +59,11 @@ int getDeviceHasUVA();
 int setDevice(int dev);
 int getGPUMultiProcessors();
 int getGPUMemoryBusWidth();
+#if PSB_CUDA_VERSION >= 13000
+int getGPUMemoryClockRate(int dev);
+#else
 int getGPUMemoryClockRate();
+#endif
 int getGPUWarpSize();
 int getGPUMaxThreadsPerBlock();
 int getGPUMaxThreadsPerMP();

@@ -64,10 +64,10 @@ module psb_m_qsort_mod
   end interface psb_ssrch
 
   interface psb_qsort
-    subroutine psb_mqsort(x,ix,dir,flag)
+    subroutine psb_mqsort(x,ix,dir,flag,reord)
       import 
       integer(psb_mpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_mqsort
   end interface psb_qsort

@@ -1780,6 +1780,9 @@ Returned  as: an \verb|integer(psb_long_int_k_)| number.
 \clearpage\subsection{Sorting utilities --- }
 %\addcontentsline{toc}{subsection}{Sorting utilities}
 
+{\par\noindent\large\bfseries psb\_isort --- Sorting by the Insertion-sort
+  algorithm}
+
 {\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort
   algorithm}
 
@@ -1788,13 +1791,14 @@ Returned  as: an \verb|integer(psb_long_int_k_)| number.
 
 {\par\noindent\large\bfseries psb\_hsort --- Sorting by the Heapsort  algorithm}
 \begin{verbatim}
-call psb_msort(x,ix,dir,flag)
-call psb_qsort(x,ix,dir,flag)
-call psb_hsort(x,ix,dir,flag)
+call psb_isort(x,ix,dir,flag,reord)
+call psb_msort(x,ix,dir,flag,reord)
+call psb_qsort(x,ix,dir,flag,reord)
+call psb_hsort(x,ix,dir,flag,reord)
 \end{verbatim}
 
 These  serial routines sort a sequence $X$ into ascending or
-descending  order. The argument meaning is identical for the three
+descending  order. The argument meaning is identical for all
 calls; the only difference is the algorithm used to accomplish the
 task (see Usage Notes below). 
 \begin{description}
@@ -1805,7 +1809,8 @@ Type:{\bf required}.\\
 Specified as: an integer, real or complex  array of rank 1.
 \item[ix] A vector of indices.\\
 Type:{\bf optional}.\\
-Specified as: an integer array of (at least) the same size as $X$.
+Specified as: an integer array of (at least) the same size as
+$X$. This argument is required when $reord=psb\_sort\_noreord\_x\_$.
 \item[dir] The desired ordering.\\
 Type:{\bf optional}.\\
 Specified as: an integer value: \begin{description}
@@ -1820,18 +1825,24 @@ default \verb|psb_lsort_up_|.
 Type:{\bf optional}.\\
 Specified as: an integer value \verb|psb_sort_ovw_idx_| or
 \verb|psb_sort_keep_idx_|; default \verb|psb_sort_ovw_idx_|.
+\item[reord] Whether to reorder the input vector $x$ or just return
+   $IX$  for further usage.\\
+Type:{\bf optional}.\\
+Specified as: an integer value \verb|psb_sort_reord_x_| or
+\verb|psb_sort_noreord_x_|; default \verb|psb_sort_reord_x_|.
 
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[x] The sequence of values, in the chosen ordering.\\ 
+\item[x] The sequence of values; if \verb|reord=psb_sort_reord_x_| it
+  will be  in the chosen ordering.\\ 
 Type:{\bf required}.\\
 Specified as: an integer, real or complex array of rank 1.
 \item[ix] A vector of indices.\\
 Type: {\bf Optional} \\
-An integer array of rank 1, whose entries are moved to the same
-position as the corresponding entries in $x$.
+An integer array of rank 1, whose $i$-th entry gives the position of
+the (sorted) value of $x$ in the original sequence.
 \end{description}
 
 {\goodbreak\par\noindent\large\bfseries Notes}
@@ -1843,10 +1854,13 @@ position as the corresponding entries in $x$.
   the imaginary part) or on the absolute values; 
 \item The routines return the items in the chosen ordering; the
   output difference is the handling of  ties (i.e. items with an
-  equal   value) in the original input. With the merge-sort algorithm
+  equal   value) in the original input. With the insertion-sort or merge-sort algorithms 
   ties are   preserved in the same relative order as they had in the
   original   sequence,  while this is not guaranteed for quicksort or
-  heapsort; 
+  heapsort;
+\item If $reord=psb\_sort\_noreord\_x\_$, then the input sequence $x$
+  is not reordered; the output is given in $ix$. Calling without $ix$
+  in this case is flagged as an error;
 \item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
   where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
   i$; thus, upon return from the subroutine, for each
@@ -1854,11 +1868,15 @@ position as the corresponding entries in $x$.
   occupied in the original data sequence;
 \item If $flag = psb\_sort\_keep\_idx\_$  the routine will assume that
   the entries in $ix(:)$ have already been initialized by the user;
-\item The three sorting algorithms have a similar $O(n \log n)$ expected
-  running time; in the average case quicksort will be the
+\item Three sorting algorithms have a similar $O(n \log n)$ expected
+  running time, whereas insertion sort has an expected running time
+  $O(n^2)$; of the other three, in the average case quicksort will be the 
   fastest and merge-sort the slowest. However note that:
-\begin{enumerate}
-\item The worst case running time for quicksort is $O(n^2)$; the algorithm
+  \begin{enumerate}
+  \item The the best case running time for insertion sort is $\Omega(n)$ while the average
+    and worst case  are $O(n^2)$; however for very short input sequences this is
+    likely to be the  fastest method;
+ \item The worst case running time for quicksort is $O(n^2)$; the algorithm
   implemented here follows the well-known median-of-three heuristics,
   but the worst case may still apply;
 \item The worst case running time for merge-sort and heap-sort is

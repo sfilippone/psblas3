@@ -1162,6 +1162,23 @@ module psb_c_csr_mat_mod
     end subroutine psb_lc_csr_aclsum
   end interface
 
+  ! Interfaces for SPSPMM
+  interface 
+    subroutine psb_ccsrspspmm(a,b,c,info)
+      import
+      implicit none 
+      class(psb_c_csr_sparse_mat), intent(in) :: a,b
+      type(psb_c_csr_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_ccsrspspmm
+    subroutine psb_lccsrspspmm(a,b,c,info)
+      import 
+      implicit none 
+      class(psb_lc_csr_sparse_mat), intent(in) :: a,b
+      type(psb_lc_csr_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_lccsrspspmm
+  end interface
 
 contains
 

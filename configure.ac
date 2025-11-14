@@ -242,7 +242,7 @@ if test x"$psblas_cv_fc" == "x" ; then
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
+        	FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_XLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -258,7 +258,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
    psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
    if test x"$psblas_shvs" != x""; then
      AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
@@ -276,7 +276,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_fc="flang";
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
    if test x"$psblas_shvs" != x""; then
      AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
@@ -288,7 +288,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    fi  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
-    
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_INTEL $FDEFINES"
    psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
    psblas_cv_fc="nag";
@@ -680,6 +680,16 @@ PAC_FORTRAN_TEST_FLUSH(
 	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"],
 )
 
+######################
+# Extract version data
+######################
+#PAC_EXTRACT_PSBLAS_VERSION
+CFILE="base/modules/psb_const_mod.F90";
+PSBLASMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
+PSBLASMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
+PSBLASPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
+PSBLASSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+AC_MSG_RESULT([ version  $PSBLASSTRING])
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
@@ -853,7 +863,7 @@ else
       PAC_CHECK_CUDA_VERSION()
       dnl PAC_CHECK_SPGPU()
       PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+      if (( ${PSB_CUDA_VERSION} > 15010 )); then
          AC_MSG_NOTICE([Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA])
          pac_cv_cuda="no";
          PSB_HAVE_CUDA="no";
@@ -885,7 +895,7 @@ else
    
          PAC_ARG_WITH_CUDACC()
          if test "x$pac_cv_cudacc" == "x"; then
-            pac_cv_cudacc="50,60,70,75,80,86";
+            pac_cv_cudacc="75,80,86";
             CUDA_CC="$pac_cv_cudacc";
          fi
          if (( $pac_cv_cuda_version >= 11070  ))
@@ -898,8 +908,8 @@ else
          done
          if test "x$pac_cv_cuda_version" != "xunknown"; then
          dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
-          FCUDEFINES=" ${CUDA_DEFINES}"
-          dnl CCUDEFINES=" ${CUDA_DEFINES}"
+	 FCUDEFINES=" ${CUDA_DEFINES}"
+	 dnl         CCUDEFINES=" ${CUDA_DEFINES}"
           dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
         fi
      fi
@@ -1051,6 +1061,10 @@ FDEFINES=$(PSBFDEFINES)
 
 AC_SUBST(PSB_IPKDEF)
 AC_SUBST(PSB_LPKDEF)
+AC_SUBST(PSBLASMAJOR)
+AC_SUBST(PSBLASMINOR)
+AC_SUBST(PSBLASPATCH)
+AC_SUBST(PSBLASSTRING)
 AC_SUBST(CSERIALMPI)
 AC_SUBST(CHAVE_OPENMP)
 AC_SUBST(CHAVEMETIS)
@@ -1127,6 +1141,8 @@ AC_MSG_NOTICE([
 	FMFLAG                : ${FMFLAG}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
+
+        EXTRA_OPT             : ${EXTRA_OPT}
 
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
