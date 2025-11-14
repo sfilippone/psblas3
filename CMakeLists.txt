@@ -136,7 +136,7 @@ message(STATUS "Using compiler ${CMAKE_C_COMPILER};")
 set(PSBLASMAJOR "3")
 set(PSBLASMINOR "9")
 set(PSBLASPATCH "0")
-set(PSBLASSTRING "3.9.0")
+set(PSBLASSTRING "\"3.9.0\"")
 
 
 # Set default values for IPK_SIZE and LPK_SIZE
