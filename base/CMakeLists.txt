@@ -272,7 +272,7 @@ set(PSB_base_source_files
   tools/psb_zsprn.f90
   tools/psb_get_overlap.f90
   serial/psb_crwextd.f90
-  serial/psb_zspspmm.f90
+  serial/psb_zspspmm.F90
   serial/psb_drwextd.f90
   serial/psb_dnumbmm.f90
   serial/psb_damax_s.f90
@@ -343,14 +343,14 @@ set(PSB_base_source_files
   serial/psb_dsymbmm.f90
   serial/psb_samax_s.f90
   serial/psb_lsame.f90
-  serial/psb_dspspmm.f90
+  serial/psb_dspspmm.F90
   serial/psb_ssymbmm.f90
   serial/psb_cgeprt.f90
   serial/psb_sgeprt.f90
 #  serial/psi_i2_serial_impl.F90
   serial/psi_e_serial_impl.F90
   serial/psb_zsymbmm.f90
-  serial/psb_cspspmm.f90
+  serial/psb_cspspmm.F90
   serial/psb_aspxpby.f90
   serial/psi_s_serial_impl.F90
   serial/psb_zamax_s.f90
@@ -359,7 +359,7 @@ set(PSB_base_source_files
   serial/psb_casum_s.f90
   serial/psi_d_serial_impl.F90
   serial/psi_c_serial_impl.F90
-  serial/psb_sspspmm.f90
+  serial/psb_sspspmm.F90
   serial/psb_cnumbmm.f90
   psblas/psb_damax.f90
   psblas/psb_dspmm.f90
