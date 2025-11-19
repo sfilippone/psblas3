@@ -1164,7 +1164,9 @@ dnl Note : we should use LDLIBS sooner or later!
 
 	LIBRARYPATH           : ${LIBRARYPATH}
 	INCLUDEPATH           : ${INCLUDEPATH}
-	MODULE_PATH            : ${MODULE_PATH}
+	MODULE_PATH           : ${MODULE_PATH}
+
+	INSTALL_DIR           : ${INSTALL_DIR}
 
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
