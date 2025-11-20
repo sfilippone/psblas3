@@ -8110,7 +8110,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8159,7 +8159,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8224,7 +8224,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8275,7 +8275,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for SOURCE= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8316,7 +8316,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8356,7 +8356,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8407,7 +8407,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for SAME_TYPE_AS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8456,7 +8456,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8507,8 +8507,63 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for MOLD= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking support for Fortran SUBMODULES" >&5
+printf %s "checking support for Fortran SUBMODULES... " >&6; }
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+module conftest
+
+  interface
+    module subroutine foo(v)
+      integer, intent(inout) :: v(:)
+    end subroutine foo
+  end interface
+end module conftest
+submodule (conftest) conftest_impl
+
+contains
+  module subroutine foo(v)
+     integer, intent(inout) :: v(:)
+     integer :: i
+     do i=1,size(v)
+	v(i)=i
+     end do
+  end subroutine foo
+end submodule
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"
+then :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+		     :
+else case e in #(
+  e)   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      as_fn_error $? "Sorry, cannot build without support for SUBMODULES.
+	Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5 ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext

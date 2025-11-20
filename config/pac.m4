@@ -956,6 +956,57 @@ end program xtt],
 AC_LANG_POP([Fortran])
 ])
 
+dnl @synopsis PAC_FORTRAN_TEST_SUBMODULES( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile a program checking the SUBMODULES Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_SUBMODULES,
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran SUBMODULES])
+AC_LANG_PUSH([Fortran])
+ ac_exeext=''
+ ac_ext='F90'
+ dnl ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+ ac_fc=${MPIFC-$FC};
+ AC_COMPILE_IFELSE([
+module conftest
+
+  interface 
+    module subroutine foo(v)
+      integer, intent(inout) :: v(:)
+    end subroutine foo
+  end interface 
+end module conftest
+submodule (conftest) conftest_impl
+
+contains
+  module subroutine foo(v)
+     integer, intent(inout) :: v(:)
+     integer :: i
+     do i=1,size(v)
+	v(i)=i
+     end do
+  end subroutine foo
+end submodule    ],
+	  [  AC_MSG_RESULT([yes])
+		     ifelse([$1], , :, [ $1])],
+		  [  AC_MSG_RESULT([no])	
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
+		     ifelse([$2], , , [ $2])])
+AC_LANG_POP([Fortran])
+])
+
+
 dnl @synopsis PAC_CHECK_BLACS
 dnl
 dnl Will try to find the BLACS
