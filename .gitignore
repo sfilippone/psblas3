@@ -1,6 +1,7 @@
 *.a
 *.o
 *.mod
+*.mtx
 *.smod
 *~
 
