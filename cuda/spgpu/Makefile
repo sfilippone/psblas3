@@ -13,7 +13,7 @@ CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
 
 all: incl objs
 
-objs: $(OBJS) iobjs
+objs: incl $(OBJS) iobjs
 
 lib: objs iobjs ilib
 	$(AR) $(LIBNAME) $(OBJS)

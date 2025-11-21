@@ -52,11 +52,11 @@ lib: objs ilib cudalib spgpulib
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 
-objs: spgpuinc $(OBJS) iobjs cudaobjs spgpuobjs
+objs: $(OBJS) iobjs cudaobjs spgpuobjs
 	/bin/cp -p *$(.mod) $(MODDIR)
 	/bin/cp -p *.h $(INCDIR)
 
-#$(COBJS): spgpuinc
+$(OBJS) iobjs cudaobjs spgpuobjs: spgpuinc
 
 spgpuinc:
 	$(MAKE) -C spgpu incl	
