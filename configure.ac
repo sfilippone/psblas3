@@ -852,6 +852,7 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   CUDA_CC="";	
   SPGPU_LIBS="";	
   CUDAD="";
+  CUDAMODS="";	
   CUDALD="";
   CUDEFINES="";
   CUDA_DEFINES="";
@@ -876,6 +877,7 @@ else
          CUDA_CC="";	
          SPGPU_LIBS="";	
          CUDAD="";
+         CUDAMODS="";	
          CUDALD="";
          CUDEFINES="";
          CUDA_DEFINES="";
@@ -894,6 +896,7 @@ else
          CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
          SPGPU_LIBS="-lspgpu";	
          CUDAD=cudad;
+         CUDAMODS=cudamods;
          CUDALD=cudald;
          LCUDA="-lpsb_cuda";	
          EXTRALDLIBS="-lstdc++";
@@ -954,6 +957,7 @@ dnl   fi
    FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
 dnl   AC_MSG_NOTICE([OpenACC 3 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
    OACCD=oaccd;
+   OACCMODS=oaccmods;
    OACCLD=oaccld;
 
    #FCOPT="$FCOPT    $FCOPENACC";
@@ -1090,6 +1094,7 @@ AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
 AC_SUBST(OACCD)
+AC_SUBST(OACCMODS)
 AC_SUBST(OACCLD)
 AC_SUBST(FCOPENACC)
 AC_SUBST(CCOPENACC)
@@ -1113,6 +1118,7 @@ AC_SUBST(PSB_CUDA_SHORT_VERSION)
 AC_SUBST(CUDA_NVCC)
 AC_SUBST(CUDEFINES)
 AC_SUBST(CUDAD)
+AC_SUBST(CUDAMODS)
 AC_SUBST(CUDALD)
 AC_SUBST(LCUDA)
 AC_SUBST(LIBRSB_LIBS)

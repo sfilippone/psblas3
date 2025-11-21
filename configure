@@ -653,6 +653,7 @@ LIBRSB_INCLUDES
 LIBRSB_LIBS
 LCUDA
 CUDALD
+CUDAMODS
 CUDAD
 CUDEFINES
 CUDA_NVCC
@@ -672,6 +673,7 @@ CXXOPENACC
 CCOPENACC
 FCOPENACC
 OACCLD
+OACCMODS
 OACCD
 METISINCFILE
 UTILLIBNAME
@@ -10922,6 +10924,7 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   CUDA_CC="";
   SPGPU_LIBS="";
   CUDAD="";
+  CUDAMODS="";
   CUDALD="";
   CUDEFINES="";
   CUDA_DEFINES="";
@@ -11171,6 +11174,7 @@ printf "%s\n" "$as_me: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CU
          CUDA_CC="";
          SPGPU_LIBS="";
          CUDAD="";
+         CUDAMODS="";
          CUDALD="";
          CUDEFINES="";
          CUDA_DEFINES="";
@@ -11190,6 +11194,7 @@ printf "%s\n" "$as_me: CUDA version ${PSB_CUDA_VERSION}" >&6;}
          CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
          SPGPU_LIBS="-lspgpu";
          CUDAD=cudad;
+         CUDAMODS=cudamods;
          CUDALD=cudald;
          LCUDA="-lpsb_cuda";
          EXTRALDLIBS="-lstdc++";
@@ -11611,6 +11616,7 @@ fi
    CXXOPENACC="$CXXOPENACC   $EXTRAOPENACC";
    FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
    OACCD=oaccd;
+   OACCMODS=oaccmods;
    OACCLD=oaccld;
 
    #FCOPT="$FCOPT    $FCOPENACC";
@@ -11717,6 +11723,8 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
 
 
 

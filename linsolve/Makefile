@@ -18,7 +18,9 @@ LIBNAME=$(METHDLIBNAME)
 
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 
-objs: $(OBJS)  impld
+objs: mods $(OBJS)  impld
+
+mods: $(MODOBJS)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 lib: objs

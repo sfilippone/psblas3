@@ -38,7 +38,9 @@ lib: objs ilib
 	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
-objs: $(OBJS) iobjs
+objs: mods $(OBJS) iobjs
+
+mods: $(FOBJS)
 	/bin/cp -p *$(.mod) $(MODDIR)
 
 iobjs: $(OBJS)

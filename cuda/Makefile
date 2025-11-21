@@ -47,14 +47,15 @@ COBJS= elldev.o hlldev.o diagdev.o hdiagdev.o vectordev.o  ivectordev.o dnsdev.o
 
 OBJS=$(COBJS) $(FOBJS)
 
-lib: objs ilib cudalib spgpulib
+lib: mods objs ilib cudalib spgpulib
 	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 
-objs: $(OBJS) iobjs cudaobjs spgpuobjs
+mods: $(FOBJS)
 	/bin/cp -p *$(.mod) $(MODDIR)
 	/bin/cp -p *.h $(INCDIR)
+objs: mods $(OBJS) iobjs cudaobjs spgpuobjs
 
 $(OBJS) iobjs cudaobjs spgpuobjs: spgpuinc
 
