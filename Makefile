@@ -9,7 +9,7 @@ dirs:
 	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 	(if test ! -d modules ; then mkdir modules; fi;)	
 
-mods: basemods precmods linsolvemods extmods  $(CUDAMODS) $(OACCMODS)
+mods: basemods precmods linsolvemods extmods  $(CUDAMODS) $(OACCMODS) utilmods
 basemods:
 	$(MAKE) -C base mods
 precmods: basemods
@@ -18,13 +18,15 @@ extmods:  basemods
 	$(MAKE) -C ext mods
 linsolvemods: precmods
 	$(MAKE) -C linsolve mods
+utilmods: basemods
+	$(MAKE) -C util mods
 cudamods: extmods
 	$(MAKE) -C cuda mods
 oaccmods: extmods
 	$(MAKE) -C openacc mods
 
 precd: basemods based
-utild: basemods based	
+utild: utilmods based	
 linslvd: linsolvemods precd 
 extd:  extmods based
 cudad:  cudamods extd
@@ -44,21 +46,21 @@ oaccld:  oaccd
 	$(MAKE) -C openacc lib
 
 
-based:
+based: basemods
 	$(MAKE) -C base objs
-precd:
+precd: precmods
 	$(MAKE) -C prec objs
-linslvd:
+linslvd: linsolvemods
 	$(MAKE) -C linsolve objs
-utild:
+utild: utilmods
 	$(MAKE) -C util objs 
-cbindd:
+cbindd: based
 	$(MAKE) -C cbind objs 
-extd:   
+extd:   extmods
 	$(MAKE) -C ext objs
-cudad:   
+cudad:   cudamods
 	$(MAKE) -C cuda objs
-oaccd:   
+oaccd:   oaccmods
 	$(MAKE) -C openacc objs 
 
 
