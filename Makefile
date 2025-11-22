@@ -9,14 +9,14 @@ dirs:
 	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 	(if test ! -d modules ; then mkdir modules; fi;)	
 
-mods: basemods precmods linsolvemods extmods  $(CUDAMODS) $(OACCMODS) utilmods
+mods: basemods precmods linslvmods extmods  $(CUDAMODS) $(OACCMODS) utilmods
 basemods:
 	$(MAKE) -C base mods
 precmods: basemods
 	$(MAKE) -C prec mods
 extmods:  basemods
 	$(MAKE) -C ext mods
-linsolvemods: precmods
+linslvmods: precmods
 	$(MAKE) -C linsolve mods
 utilmods: basemods
 	$(MAKE) -C util mods
@@ -27,11 +27,11 @@ oaccmods: extmods
 
 precd: basemods based
 utild: utilmods based	
-linslvd: linsolvemods precd 
+linslvd: linslvmods precd 
 extd:  extmods based
 cudad:  cudamods extd
 oaccd:  oaccmods extd	
-cbindd: based precd linslvd utild 
+cbindd: basemods precmods linslvmods utilmods 
 
 libd: based precd linslvd utild cbindd extd $(CUDALD) $(OACCLD)
 	$(MAKE) -C base lib
@@ -50,11 +50,11 @@ based: basemods
 	$(MAKE) -C base objs
 precd: precmods
 	$(MAKE) -C prec objs
-linslvd: linsolvemods
+linslvd: linslvmods
 	$(MAKE) -C linsolve objs
 utild: utilmods
 	$(MAKE) -C util objs 
-cbindd: based
+cbindd: basemods precmods linslvmods utilmods 
 	$(MAKE) -C cbind objs 
 extd:   extmods
 	$(MAKE) -C ext objs
