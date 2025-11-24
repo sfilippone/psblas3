@@ -123,8 +123,8 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
 objs:  $(MODULES) $(OBJS) $(MPFOBJS)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
-	/bin/cp -p $(CPUPDFLAG) psb_config.h psb_types.h $(INCDIR)
+	$(INSTALL) -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+	$(INSTALL) -p $(CPUPDFLAG) psb_config.h psb_types.h $(INCDIR)
 
 lib: objs  $(LIBDIR)/$(LIBNAME) 
 

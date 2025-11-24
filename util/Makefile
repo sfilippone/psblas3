@@ -32,7 +32,7 @@ CINCLUDES=-I. -I$(INCDIR)
 objs: mods $(OBJS)
 
 mods: $(MODOBJS)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+	$(INSTALL) -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)

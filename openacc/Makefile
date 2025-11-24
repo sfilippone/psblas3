@@ -41,7 +41,7 @@ lib: objs ilib
 objs: mods $(OBJS) iobjs
 
 mods: $(FOBJS)
-	/bin/cp -p *$(.mod) $(MODDIR)
+	$(INSTALL) -p *$(.mod) $(MODDIR)
 
 iobjs: $(OBJS)
 	$(MAKE) -C impl objs 

@@ -21,7 +21,7 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR)
 objs: mods $(OBJS)  impld
 
 mods: $(MODOBJS)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+	$(INSTALL) -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 lib: objs
 	$(MAKE) -C impl lib
