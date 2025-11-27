@@ -22,10 +22,10 @@ psb_z_t   *psb_c_zvect_get_cpy( psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_f_get_cpy(psb_z_t *v, psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_zero(psb_c_zvector *xh);
 psb_z_t	  *psb_c_zvect_f_get_pnt( psb_c_zvector *xh);
+psb_i_t    psb_c_zvect_clone(psb_c_zvector *xh,psb_c_zvector *yh);
 
 psb_i_t    psb_c_zgeall(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgeall_remote(psb_c_zvector *xh, psb_c_descriptor *cdh);
-psb_i_t    psb_c_zgeall_remote_options(psb_c_zvector *xh, psb_c_descriptor *cdh, psb_i_t bldmode, psb_i_t dupl);
 psb_i_t    psb_c_zgeins(psb_i_t nz, const psb_l_t *irw, const psb_z_t *val,
 		    psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_z_t *val,

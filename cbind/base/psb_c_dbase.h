@@ -22,6 +22,7 @@ psb_d_t   *psb_c_dvect_get_cpy( psb_c_dvector *xh);
 psb_i_t    psb_c_dvect_f_get_cpy(psb_d_t *v, psb_c_dvector *xh);
 psb_i_t    psb_c_dvect_zero(psb_c_dvector *xh);
 psb_d_t	  *psb_c_dvect_f_get_pnt( psb_c_dvector *xh);
+psb_i_t    psb_c_dvect_clone(psb_c_dvector *xh,psb_c_dvector *yh);
 
 psb_i_t    psb_c_dgeall(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeall_remote(psb_c_dvector *xh, psb_c_descriptor *cdh);

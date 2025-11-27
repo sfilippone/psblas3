@@ -102,9 +102,6 @@ extern "C" {
 #define psb_dupl_add_    1
 #define psb_dupl_err_    2
 #define psb_dupl_def_    psb_dupl_ovwrt_
-/*  legal values for bldmode argument */
-#define psb_matbld_noremote_ 0
-#define psb_matbld_remote_   1
 
   /* legal values for afmt */
 #define PSB_AFMT_CSR     "CSR"

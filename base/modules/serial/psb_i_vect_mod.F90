@@ -327,7 +327,7 @@ contains
     info = psb_success_
     call y%free(info)
     if ((info==0).and.allocated(x%v)) then
-      call y%bld(x%get_vect(),mold=x%v)
+      allocate(y%v,source=x%v, stat=info)
     end if
   end subroutine i_vect_clone
 
