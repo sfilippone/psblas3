@@ -113,6 +113,7 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: is_bld    => i_base_is_bld
     procedure, pass(x) :: is_upd    => i_base_is_upd
     procedure, pass(x) :: is_asb    => i_base_is_asb
+    procedure, pass(x) :: base_cpy  => i_base_cpy
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -619,7 +620,7 @@ contains
         end select
         call psb_move_alloc(vv,x%v,info)
         if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.scratch_) then
+      else if (x%is_upd().or.x%is_asb().or.scratch_) then
         if (x%get_nrows() < n) &
              & call psb_realloc(n,x%v,info)
         if (info /= 0) &
@@ -633,7 +634,9 @@ contains
            & call psb_realloc(n,x%v,info)
       if (info /= 0) &
            & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-    end if 
+    end if
+    call x%set_host()
+    call x%set_asb()
     call x%sync()
   end subroutine i_base_asb_m
 
@@ -700,7 +703,7 @@ contains
         end select
         call psb_move_alloc(vv,x%v,info)
         if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.scratch_) then
+      else if (x%is_upd().or.x%is_asb().or.scratch_) then
         if (x%get_nrows() < n) &
              & call psb_realloc(n,x%v,info)
         if (info /= 0) &
@@ -715,6 +718,8 @@ contains
       if (info /= 0) &
            & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
     end if
+    call x%set_host()
+    call x%set_asb()
     call x%sync()
   end subroutine i_base_asb_e
 
@@ -996,6 +1001,24 @@ contains
     res = .true.
   end function i_base_is_sync
 
+  !> Function  base_cpy:
+  !! \memberof  psb_d_base_vect_type
+  !! \brief     base_cpy: copy base contents
+  !!  \param    y returned variable
+  !!
+  subroutine i_base_cpy(x, y)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    class(psb_i_base_vect_type), intent(in)   :: x
+    class(psb_i_base_vect_type), intent(out)  :: y
+
+    if (allocated(x%v)) call y%bld(x%v)
+    call y%set_state(x%get_state())
+    call y%set_dupl(x%get_dupl())
+    call y%set_ncfs(x%get_ncfs())
+    if (allocated(x%iv)) y%iv = x%iv
+  end subroutine i_base_cpy
 
   !
   ! Size info.

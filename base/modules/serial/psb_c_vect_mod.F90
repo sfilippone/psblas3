@@ -64,6 +64,8 @@ module psb_c_vect_mod
     procedure, pass(x) :: asb      => c_vect_asb
     procedure, pass(x) :: set_dupl => c_vect_set_dupl 
     procedure, pass(x) :: get_dupl => c_vect_get_dupl
+    procedure, pass(x) :: set_ncfs => c_vect_set_ncfs 
+    procedure, pass(x) :: get_ncfs => c_vect_get_ncfs
     procedure, pass(x) :: set_state => c_vect_set_state
     procedure, pass(x) :: set_null  => c_vect_set_null
     procedure, pass(x) :: set_bld   => c_vect_set_bld
@@ -200,9 +202,9 @@ contains
     class(psb_c_vect_type), intent(in) :: x
     integer(psb_ipk_) :: res
     if (allocated(x%v)) then 
-      res = x%v%get_state()
+      res = x%v%get_dupl()
     else
-      res = psb_vect_null_
+      res = psb_dupl_null_
     end if
   end function c_vect_get_dupl
 
@@ -219,6 +221,31 @@ contains
       end if
     end if
   end subroutine c_vect_set_dupl
+
+  function c_vect_get_ncfs(x) result(res)
+    implicit none
+    class(psb_c_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    if (allocated(x%v)) then 
+      res = x%v%get_ncfs()
+    else
+      res = 0
+    end if
+  end function c_vect_get_ncfs
+
+  subroutine c_vect_set_ncfs(x,val)
+    implicit none
+    class(psb_c_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (allocated(x%v)) then 
+      if (present(val)) then
+        call x%v%set_ncfs(val)
+      else
+        call x%v%set_ncfs(0)
+      end if
+    end if
+  end subroutine c_vect_set_ncfs
 
   function c_vect_get_state(x) result(res)
     implicit none
@@ -311,7 +338,6 @@ contains
 
     x%nrmv = val
   end subroutine c_vect_set_nrmv
-        
 
   function c_vect_is_remote_build(x) result(res)
     implicit none
@@ -618,6 +644,7 @@ contains
 
     if (allocated(x%v)) then
       call x%v%asb(n,info,scratch=scratch)
+      call x%set_asb()
     end if
   end subroutine c_vect_asb
 
@@ -732,6 +759,7 @@ contains
       if (allocated(x%v%v)) then 
         call x%v%sync()
         if (info == psb_success_) call tmp%bld(x%v%v)
+        call x%v%base_cpy(tmp)
         call x%v%free(info)
       endif
     end if

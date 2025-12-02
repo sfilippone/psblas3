@@ -95,8 +95,7 @@ subroutine psb_dalloc_vect(x, desc_a,info, dupl, bldmode)
     goto 9999
   endif
 
-  allocate(psb_d_base_vect_type :: x%v, stat=info) 
-  if (info == 0) call x%all(nr,info)
+  call x%all(nr,info)
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
