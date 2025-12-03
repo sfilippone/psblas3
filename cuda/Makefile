@@ -55,7 +55,7 @@ lib: mods objs ilib cudalib spgpulib
 mods: $(FOBJS)
 	$(INSTALL) -p *$(.mod) $(MODDIR)
 	$(INSTALL) -p *.h $(INCDIR)
-objs: mods $(OBJS) iobjs cudaobjs spgpuobjs
+objs: $(OBJS) iobjs cudaobjs spgpuobjs
 
 $(OBJS) iobjs cudaobjs spgpuobjs: spgpuinc
 
