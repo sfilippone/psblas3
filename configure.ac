@@ -851,7 +851,6 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   pac_cv_cuda="no";
   PSB_HAVE_CUDA="no";
   CUDA_CC="";	
-  SPGPU_LIBS="";	
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
@@ -875,7 +874,6 @@ else
          pac_cv_cuda="no";
          PSB_HAVE_CUDA="no";
          CUDA_CC="";	
-         SPGPU_LIBS="";	
          CUDAD="";
          CUDALD="";
          CUDEFINES="";
@@ -893,10 +891,10 @@ else
          CHAVECUDA="#define PSB_HAVE_CUDA"
          CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
          CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
-         SPGPU_LIBS="-lspgpu";	
+	 dnl    SPGPU_LIBS="-lspgpu";	
          CUDAD=cudad;
          CUDALD=cudald;
-         LCUDA="-lpsb_cuda";	
+         LPSB_CUDA="-lpsb_cuda";	
          EXTRALDLIBS="-lstdc++";
          AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
    
@@ -1104,7 +1102,6 @@ AC_SUBST(CCOPENACC)
 AC_SUBST(CXXOPENACC)
 
 AC_SUBST(SPGPU_FLAGS)
-AC_SUBST(SPGPU_LIBS)
 dnl AC_SUBST(SPGPU_DIR)
 dnl AC_SUBST(SPGPU_INCLUDES)
 dnl AC_SUBST(SPGPU_INCDIR)
@@ -1122,7 +1119,7 @@ AC_SUBST(CUDA_NVCC)
 AC_SUBST(CUDEFINES)
 AC_SUBST(CUDAD)
 AC_SUBST(CUDALD)
-AC_SUBST(LCUDA)
+AC_SUBST(LPSB_CUDA)
 AC_SUBST(LIBRSB_LIBS)
 AC_SUBST(LIBRSB_INCLUDES)
 AC_SUBST(LIBRSB_INCDIR)

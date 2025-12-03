@@ -651,7 +651,7 @@ LIBRSB_DIR
 LIBRSB_INCDIR
 LIBRSB_INCLUDES
 LIBRSB_LIBS
-LCUDA
+LPSB_CUDA
 CUDALD
 CUDAD
 CUDEFINES
@@ -666,7 +666,6 @@ FCUDEFINES
 CUDA_DEFINES
 CUDA_DIR
 EXTRALDLIBS
-SPGPU_LIBS
 SPGPU_FLAGS
 CXXOPENACC
 CCOPENACC
@@ -10878,7 +10877,6 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   pac_cv_cuda="no";
   PSB_HAVE_CUDA="no";
   CUDA_CC="";
-  SPGPU_LIBS="";
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
@@ -11127,7 +11125,6 @@ printf "%s\n" "$as_me: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CU
          pac_cv_cuda="no";
          PSB_HAVE_CUDA="no";
          CUDA_CC="";
-         SPGPU_LIBS="";
          CUDAD="";
          CUDALD="";
          CUDEFINES="";
@@ -11146,10 +11143,9 @@ printf "%s\n" "$as_me: CUDA version ${PSB_CUDA_VERSION}" >&6;}
          CHAVECUDA="#define PSB_HAVE_CUDA"
          CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
          CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
-         SPGPU_LIBS="-lspgpu";
-         CUDAD=cudad;
+	          CUDAD=cudad;
          CUDALD=cudald;
-         LCUDA="-lpsb_cuda";
+         LPSB_CUDA="-lpsb_cuda";
          EXTRALDLIBS="-lstdc++";
          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: At this point GPUTARGET is $CUDAD $CUDALD" >&5
 printf "%s\n" "$as_me: At this point GPUTARGET is $CUDAD $CUDALD" >&6;}
@@ -11675,7 +11671,6 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
-
 
 
 

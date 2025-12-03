@@ -3,10 +3,11 @@ include $(TOP)/Make.inc
 #
 # Libraries used
 #
+UP=..
 LIBDIR=$(TOP)/lib
 INCDIR=$(TOP)/include
 MODDIR=$(TOP)/modules
-LIBNAME=libspgpu.a
+LIBNAME=$(UP)/libpsb_cuda.a
 
 OBJS=coo.o core.o dia.o ell.o hdia.o hell.o 
 CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
@@ -17,7 +18,7 @@ objs: $(OBJS) iobjs
 
 lib: objs iobjs ilib
 	$(AR) $(LIBNAME) $(OBJS)
-	/bin/cp -p $(LIBNAME) $(LIBDIR)
+#	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 iobjs:
 	$(MAKE) -C kernels objs

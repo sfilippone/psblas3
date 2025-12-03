@@ -8,7 +8,7 @@ PSBLIBDIR=$(TOPDIR)/lib/
 OPTDIR=$(LIBDIR)
 PSBINCDIR=$(TOPDIR)/include
 PSBMODDIR=$(TOPDIR)/modules
-PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) $(LCUDA) -lpsb_ext -lpsb_util -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -L$(PSBLIBDIR) $(LPSB_CUDA) -lpsb_ext -lpsb_util -lpsb_base 
 INCDIR=$(TOPDIR)/include
 MODDIR=$(TOPDIR)/modules
 
