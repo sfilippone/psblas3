@@ -129,7 +129,7 @@ contains
     return
   end function psb_c_dgeasb
 
-function psb_c_dgeasb_options(xh,cdh,dupl) bind(c) result(res)
+  function psb_c_dgeasb_options(xh,cdh,dupl) bind(c) result(res)
 
     implicit none
     integer(psb_c_ipk_) :: res
@@ -160,8 +160,7 @@ function psb_c_dgeasb_options(xh,cdh,dupl) bind(c) result(res)
 
     return
   end function psb_c_dgeasb_options
-
-
+ 
   function psb_c_dgefree(xh,cdh) bind(c) result(res)
 
     implicit none

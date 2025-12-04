@@ -129,6 +129,38 @@ contains
     return
   end function psb_c_sgeasb
 
+  function psb_c_sgeasb_options(xh,cdh,dupl) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+    integer(psb_c_ipk_), value :: dupl
+
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_d_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_geasb(xp,descp,info,dupl=dupl)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeasb_options
+ 
   function psb_c_sgefree(xh,cdh) bind(c) result(res)
 
     implicit none

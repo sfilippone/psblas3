@@ -26,6 +26,8 @@ psb_i_t    psb_c_dvect_clone(psb_c_dvector *xh,psb_c_dvector *yh);
 
 psb_i_t    psb_c_dgeall(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeall_remote(psb_c_dvector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_dgeall_remote_options(psb_c_dvector *xh, psb_c_descriptor *cdh,
+				       psb_i_t bldmode, psb_i_t duple);
 psb_i_t    psb_c_dgeins(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,
 		    psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,

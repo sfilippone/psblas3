@@ -26,11 +26,14 @@ psb_i_t    psb_c_svect_clone(psb_c_svector *xh,psb_c_svector *yh);
 
 psb_i_t    psb_c_sgeall(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeall_remote(psb_c_svector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_sgeall_remote_options(psb_c_svector *xh, psb_c_descriptor *cdh,
+				       psb_i_t bldmode, psb_i_t duple);
 psb_i_t    psb_c_sgeins(psb_i_t nz, const psb_l_t *irw, const psb_s_t *val,
 		    psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_s_t *val,
 			psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeasb(psb_c_svector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_sgeasb_options(psb_c_svector *xh, psb_c_descriptor *cdh, psb_i_t dupl);
 psb_i_t    psb_c_sgefree(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_s_t    psb_c_sgetelem(psb_c_svector *xh,psb_l_t index,psb_c_descriptor *cd);
 
