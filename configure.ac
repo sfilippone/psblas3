@@ -693,6 +693,7 @@ PSBLASDUPNUL=`cat $CFILE| grep dupl_null | $AWK '{print $6;}'`;
 PSBLASDUPADD=`cat $CFILE| grep "psb_dupl_add_   =" | $AWK '{print $6;}'`;
 PSBLASDUPOVW=`cat $CFILE| grep dupl_ovwrt| $AWK '{print $6;}'`;
 PSBLASDUPERR=`cat $CFILE| grep dupl_err| $AWK '{print $6;}'`;
+PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
 PSBLASBLDNOR=`cat $CFILE| grep matbld_noremote| $AWK '{print $6;}'`;
 PSBLASBLDRMT=`cat $CFILE| grep matbld_remote| $AWK '{print $6;}'`;	
 
@@ -1074,6 +1075,7 @@ AC_SUBST(PSBLASDUPNUL)
 AC_SUBST(PSBLASDUPADD)
 AC_SUBST(PSBLASDUPOVW)
 AC_SUBST(PSBLASDUPERR)
+AC_SUBST(PSBLASDUPDEF)
 AC_SUBST(PSBLASBLDNOR)
 AC_SUBST(PSBLASBLDRMT)
 
