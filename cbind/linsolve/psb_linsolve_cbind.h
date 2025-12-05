@@ -1,5 +1,5 @@
-#ifndef PSB_KRYL_CBIND_
-#define PSB_KRYL_CBIND_
+#ifndef PSB_LINSLV_CBIND_
+#define PSB_LINSLV_CBIND_
 
 #include "psb_base_cbind.h"
 #include "psb_prec_cbind.h"
@@ -39,6 +39,24 @@ int psb_c_ckrylov(const char *method, psb_c_cspmat *ah, psb_c_cprec *ph,
 		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
 
 int psb_c_zkrylov(const char *method, psb_c_zspmat *ah, psb_c_zprec *ph, 
+		  psb_c_zvector *bh, psb_c_zvector *xh,
+		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+
+
+  
+int psb_c_srichardson(psb_c_sspmat *ah, psb_c_sprec *ph, 
+		  psb_c_svector *bh, psb_c_svector *xh,
+		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+
+int psb_c_drichardson(psb_c_dspmat *ah, psb_c_dprec *ph, 
+		  psb_c_dvector *bh, psb_c_dvector *xh,
+		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+
+int psb_c_crichardson(psb_c_cspmat *ah, psb_c_cprec *ph, 
+		  psb_c_cvector *bh, psb_c_cvector *xh,
+		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+
+int psb_c_zrichardson(psb_c_zspmat *ah, psb_c_zprec *ph, 
 		  psb_c_zvector *bh, psb_c_zvector *xh,
 		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
 

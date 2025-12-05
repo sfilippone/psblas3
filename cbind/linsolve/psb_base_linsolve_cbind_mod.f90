@@ -1,4 +1,4 @@
-module psb_base_krylov_cbind_mod
+module psb_base_linsolve_cbind_mod
 
   use iso_c_binding
   use psb_objhandle_mod
@@ -26,4 +26,4 @@ contains
   end function psb_c_DefaultSolverOptions
     
 
-end module psb_base_krylov_cbind_mod
+end module psb_base_linsolve_cbind_mod

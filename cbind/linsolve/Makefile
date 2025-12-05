@@ -8,12 +8,12 @@ HERE=..
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) 
 CINCLUDES=-I. -I$(HERE) -I$(INCLUDEDIR)
 
-OBJS=psb_base_krylov_cbind_mod.o \
-psb_skrylov_cbind_mod.o psb_dkrylov_cbind_mod.o psb_ckrylov_cbind_mod.o psb_zkrylov_cbind_mod.o 
-CMOD=psb_krylov_cbind.h
+OBJS=psb_base_linsolve_cbind_mod.o \
+psb_slinsolve_cbind_mod.o psb_dlinsolve_cbind_mod.o psb_clinsolve_cbind_mod.o psb_zlinsolve_cbind_mod.o 
+CMOD=psb_linsolve_cbind.h
 
 
-LIBNAME=$(CKRYLOVLIBNAME)	
+LIBNAME=$(CLINSOLVELIBNAME)	
 
 
 objs:  $(OBJS) $(CMOD)
@@ -23,7 +23,7 @@ lib:  objs
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
 
-psb_skrylov_cbind_mod.o psb_dkrylov_cbind_mod.o psb_ckrylov_cbind_mod.o psb_zkrylov_cbind_mod.o: psb_base_krylov_cbind_mod.o
+psb_slinsolve_cbind_mod.o psb_dlinsolve_cbind_mod.o psb_clinsolve_cbind_mod.o psb_zlinsolve_cbind_mod.o: psb_base_linsolve_cbind_mod.o
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 

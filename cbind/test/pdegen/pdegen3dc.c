@@ -74,7 +74,7 @@
 
 #include "psb_base_cbind.h"
 #include "psb_prec_cbind.h"
-#include "psb_krylov_cbind.h"
+#include "psb_linsolve_cbind.h"
 
 #define LINEBUFSIZE 1024
 #define NBMAX       20

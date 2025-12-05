@@ -26,11 +26,11 @@ set(PSB_cbind_source_files
   util/psb_util_cbind_mod.f90
   util/psb_d_util_cbind_mod.f90
   util/psb_z_util_cbind_mod.f90
-  krylov/psb_ckrylov_cbind_mod.f90
-  krylov/psb_base_krylov_cbind_mod.f90
-  krylov/psb_skrylov_cbind_mod.f90
-  krylov/psb_dkrylov_cbind_mod.f90
-  krylov/psb_zkrylov_cbind_mod.f90
+  linsolve/psb_clinsolve_cbind_mod.f90
+  linsolve/psb_base_linsolve_cbind_mod.f90
+  linsolve/psb_slinsolve_cbind_mod.f90
+  linsolve/psb_dlinsolve_cbind_mod.f90
+  linsolve/psb_zlinsolve_cbind_mod.f90
   prec/psb_dprec_cbind_mod.f90
   prec/psb_cprec_cbind_mod.f90
   prec/psb_prec_cbind_mod.f90
@@ -75,7 +75,7 @@ list(APPEND PSB_cbind_header_C_files
   util/psb_c_sutil.h
   util/psb_c_cutil.h
   util/psb_util_cbind.h
-  krylov/psb_krylov_cbind.h
+  linsolve/psb_linsolve_cbind.h
   prec/psb_c_sprec.h
   prec/psb_c_cprec.h
   prec/psb_prec_cbind.h
