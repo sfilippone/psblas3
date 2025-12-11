@@ -220,6 +220,7 @@ Salvatore Filippone
 - Pasqua     D'Ambra
 - Alfredo    Buttari
 - Daniela    di Serafino
+- Thomas     Amestoy
 - Michele    Martone
 - Michele    Colajanni
 - Fabio      Cerioni
