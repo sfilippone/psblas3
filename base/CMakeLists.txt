@@ -122,25 +122,25 @@ set(PSB_base_source_files
   comm/psb_mgather_a.f90
   comm/psb_dgather.f90
   comm/psb_lhalo.f90
-  internals/psi_bld_glb_dep_list.F90
-  internals/psi_graph_fnd_owner.F90
-  internals/psi_sort_dl.f90
-  internals/psi_indx_map_fnd_owner.F90
-  internals/psi_fnd_owner.F90
-  internals/psi_bld_tmpovrl.f90
-  internals/psi_symm_dep_list.F90
-  internals/psi_desc_impl.f90
-###  internals/psi_compute_size.f90
-  internals/psi_hash_impl.f90
-  internals/psi_crea_ovr_elem.f90
-  internals/psi_a2a_fnd_owner.F90
-  internals/psi_bld_tmphalo.f90
-  internals/psi_crea_bnd_elem.f90
-  internals/psi_desc_index.F90
-  internals/psi_xtr_loc_dl.F90
-  internals/psi_crea_index.f90
-  internals/psi_srtlist.f90
-  internals/psi_adjcncy_fnd_owner.F90
+  auxil/psi_bld_glb_dep_list.F90
+  auxil/psi_graph_fnd_owner.F90
+  auxil/psi_sort_dl.f90
+  auxil/psi_indx_map_fnd_owner.F90
+  auxil/psi_fnd_owner.F90
+  auxil/psi_bld_tmpovrl.f90
+  auxil/psi_symm_dep_list.F90
+  auxil/psi_desc_impl.f90
+###  auxil/psi_compute_size.f90
+  auxil/psi_hash_impl.f90
+  auxil/psi_crea_ovr_elem.f90
+  auxil/psi_a2a_fnd_owner.F90
+  auxil/psi_bld_tmphalo.f90
+  auxil/psi_crea_bnd_elem.f90
+  auxil/psi_desc_index.F90
+  auxil/psi_xtr_loc_dl.F90
+  auxil/psi_crea_index.f90
+  auxil/psi_srtlist.f90
+  auxil/psi_adjcncy_fnd_owner.F90
   tools/psb_sins.f90
   tools/psb_zspasb.f90
   tools/psb_zspalloc.f90
@@ -271,7 +271,11 @@ set(PSB_base_source_files
   tools/psb_dasb_a.f90
   tools/psb_zsprn.f90
   tools/psb_get_overlap.f90
-  serial/psb_crwextd.f90
+  serial/psb_saplusat.f90
+  serial/psb_daplusat.f90	
+  serial/psb_caplusat.f90
+  serial/psb_zaplusat.f90	
+  serial/psb_crwextd.f90	
   serial/psb_zspspmm.F90
   serial/psb_drwextd.f90
   serial/psb_dnumbmm.f90
