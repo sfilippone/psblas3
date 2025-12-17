@@ -57,9 +57,7 @@ The main reference for the serial sparse BLAS is:
 
   1. A working version of MPI.
 
-2. A version of the BLAS; if you don't have a specific version for your
-   platform you may try ATLAS available from
-   http://math-atlas.sourceforge.net/ 
+2. A version of the BLAS; you can specify a specific version with `--with-blas`
 
 3. We have had good results with  the METIS library, from 
    https://github.com/KarypisLab/METIS.
@@ -71,12 +69,12 @@ The main reference for the serial sparse BLAS is:
    We use the C interface to AMD.
 
 6. If you have CUDA available, use
-   --enable-cuda           to compile CUDA-enabled methods
-   --with-cudadir=<path>   to specify the CUDA toolkit location
-   --with-cudacc=XX,YY,ZZ  to specify a list of target CCs (compute
-   			   capabilities) to compile the CUDA code for.
+   - `--enable-cuda`           to compile CUDA-enabled methods
+   - `--with-cudadir=<path>`   to specify the CUDA toolkit location
+   - `--with-cudacc=XX,YY,ZZ`  to specify a list of target CCs (compute
+   			   capabilities).
 
-The configure script will generate a Make.inc file suitable for building
+The configure script will generate a `Make.inc` file suitable for building
 the library. The script is capable of recognizing the needed libraries
 with their default names; if they are in unusual places consider adding
 the paths with `--with-libs`, or explicitly specifying the names in
@@ -219,16 +217,16 @@ Salvatore Filippone
 
 **Contributors** (_roughly reverse cronological order_):
 
+- Fabio      Durastante
 - Luca       Pepè Sciarria
 - Theophane  Loloum
-- Fabio      Durastante
 - Dimitri    Walther
+- Pasqua     D'Ambra
 - Andea      Di Iorio
 - Stefano    Petrilli
 - Soren      Rasmussen
 - Zaak       Beekman
 - Ambra	     Abdullahi Hassan
-- Pasqua     D'Ambra
 - Alfredo    Buttari
 - Daniela    di Serafino
 - Thomas     Amestoy
