@@ -72,7 +72,15 @@ The main reference for the serial sparse BLAS is:
    - `--enable-cuda`           to compile CUDA-enabled methods
    - `--with-cudadir=<path>`   to specify the CUDA toolkit location
    - `--with-cudacc=XX,YY,ZZ`  to specify a list of target CCs (compute
-   			   capabilities).
+   								  capabilities).
+   CUDA versions have specific compatibility requirements;
+   for instance:
+     - CUDA version 11.8 supports GNU compilers up to version 11
+     - CUDA version 12.3 supports GNU compilers up to version 12
+     - CUDA versions 12.3 through 12.6 support GNU compilers up to version 13
+     - CUDA versions 12.8 and 12.9 support  GNU compilers up to version 14
+     - CUDA version 13.0 supports  GNU compilers up to version 15					    
+   For further information please refer to the CUDA documentation.					    
 
 The configure script will generate a `Make.inc` file suitable for building
 the library. The script is capable of recognizing the needed libraries
