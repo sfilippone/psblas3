@@ -105,18 +105,20 @@ After you have Make.inc fixed,  run
 make
 ``` 
 to  compile the library; go to the test directory and its subdirectories
-to get test programs done. If you specify `--prefix=/path` you can do
+to get test programs done.
+You can then install with
  ```
  make install
  ```
-and the libraries will be installed under `/path/lib`, while the
-module files will be installed under `/path/modules`. The regular and
-experimental C interface header files are under `/path/include`.
+ We recommend specifying  `--prefix=/path` in the configure step, so that
+ the libraries will be installed under `/path/lib`,
+ the module files will be installed under `/path/modules`, the documentation under `/path/docs` and so on.
+The C interface header files are under `/path/include`.
 If `/path` is a system directory, you may need 
  ```
  sudo make install
  ```
-
+If you do not specifye `--with-prefix` the usual default of `/usr` applies.
 ### Packaging changes, CUDA and GPU support
 
 This version of PSBLAS incorporates into a single package three
