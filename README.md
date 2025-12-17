@@ -79,7 +79,8 @@ The main reference for the serial sparse BLAS is:
      - CUDA versions 12.3 through 12.6 support GNU compilers up to version 13
      - CUDA versions 12.8 and 12.9 support  GNU compilers up to version 14
      - CUDA version 13.0 supports  GNU compilers up to version 15      
-   For further information please refer to the CUDA documentation.  
+     For further information please refer to the CUDA documentation at
+     https://developer.nvidia.com/cuda/gpus
 
 The configure script will generate a `Make.inc` file suitable for building
 the library. The script is capable of recognizing the needed libraries
