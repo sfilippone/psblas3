@@ -67,7 +67,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=psb_inp_unit
+        write(psb_err_unit,*) 'Usage: psb_d_fileread ctrl-file '
+        call psb_abort(ctxt)
+        stop        
       end if
       ! Read Input Parameters
       read(inp_unit,*) ip
@@ -187,7 +189,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=inp_unit
+        write(psb_err_unit,*) 'Usage: psb_s_fileread ctrl-file '
+        call psb_abort(ctxt)
+        stop        
       end if
       ! Read Input Parameters
       read(inp_unit,*) ip

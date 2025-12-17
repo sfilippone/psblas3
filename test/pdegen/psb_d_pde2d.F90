@@ -877,7 +877,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=psb_inp_unit
+        call pr_usage(psb_err_unit)
+        call psb_abort(ctxt)
+        stop        
       end if
       read(inp_unit,*) ip
       if (ip >= 3) then
@@ -1012,12 +1014,10 @@ contains
   !
   subroutine pr_usage(iout)
     integer(psb_ipk_) :: iout
-    write(iout,*)'incorrect parameter(s) found'
-    write(iout,*)' usage:  pde2d90 methd prec dim &
-         &[ipart istop itmax itrace]'
-    write(iout,*)' where:'
-    write(iout,*)'     methd:    cgstab cgs rgmres bicgstabl'
-    write(iout,*)'     prec :    bjac diag none'
+    write(iout,*)' usage:  psb_d_pde2d cntrl-file '
+    write(iout,*)' where ctrl-file contains the following:'
+    write(iout,*)'     methd     BICGSTAB CGS  BICG BICGSTABL RGMRES FCG CGR RICHARDSON'
+    write(iout,*)'     prec      bjac diag none'
     write(iout,*)'     dim       number of points along each axis'
     write(iout,*)'               the size of the resulting linear '
     write(iout,*)'               system is dim**2'
