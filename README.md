@@ -51,10 +51,11 @@ The main reference for the serial sparse BLAS is:
 
 ## Installing
 
-To compile and run our software you will need the following
-prerequisites (see also SERIAL below):
+  To compile (using configure/make/make install) and run our software
+  you will need the following 
+  prerequisites (see also SERIAL below):
 
-1. A working version of MPI
+  1. A working version of MPI.
 
 2. A version of the BLAS; if you don't have a specific version for your
    platform you may try ATLAS available from
@@ -94,7 +95,7 @@ the paths with `--with-libs`, or explicitly specifying the names in
 > (see [http://modules.sourceforge.net/](http://modules.sourceforge.net/)), and load the relevant
 > variables with (e.g.) 
 > ```
-> module load gcc/13.2.0 openmpi/4.1.6
+> module load gcc/14.2.0 openmpi/5.0.8
 > ```
 > This will delegate to the modules setup to make sure that the version of
 > openmpi in use is the one compiled with the gnu46 compilers. After the
@@ -121,7 +122,7 @@ entities that were previously separated:
 | PSBLAS-EXT | a library providing additional storage formats for matrices and vectors |
 | SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
 
-Moreover, the module and library previously called psb_krylovv are now called
+Moreover, the module and library previously called psb_krylov are now called
 psb_linsolve, but their usage is otherwise unchanged.								
 
 ### OpenACC
@@ -155,8 +156,15 @@ which is asking for 4-bytes local indices, and 8-bytes global indices
 ## CMAKE
 There is initial support for building with CMAKE. As of this time, it does not compile the CUDA part.
 
-## LLVM
-The library has been successfully compiled and tested with LLVM version 20.1.0-rc2.
+## MPI and Compilers
+ The library has been successfully compiled and tested with multiple compilers
+ and MPI implementations; this release has been successfully tested with:
+ - MPICH 4.2.3, 4.3.0, 4.3.2
+ - OpenMPI 4.1.8. 5.0.7, 5.0.8, 5.0.9
+ combined with wither
+ - GNU compilers 10.5.0, 11.5.0, 12.5.0, 13.3.0, 14.3.0, 15.2.0
+ - LLVM  20.1.0 and 21.1.0
+ Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2 and 2025.3
  			   
 ## Documentation
 
