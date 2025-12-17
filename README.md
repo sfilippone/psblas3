@@ -161,9 +161,12 @@ There is initial support for building with CMAKE. As of this time, it does not c
  and MPI implementations; this release has been successfully tested with:
  - MPICH 4.2.3, 4.3.0, 4.3.2
  - OpenMPI 4.1.8. 5.0.7, 5.0.8, 5.0.9
- combined with wither
+ 
+ combined with
+ 
  - GNU compilers 10.5.0, 11.5.0, 12.5.0, 13.3.0, 14.3.0, 15.2.0
  - LLVM  20.1.0 and 21.1.0
+ 
  Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2 and 2025.3
  			   
 ## Documentation
