@@ -105,10 +105,17 @@ After you have Make.inc fixed,  run
 make
 ``` 
 to  compile the library; go to the test directory and its subdirectories
-to get test programs done. If you specify `--prefix=/path` you can do make
-install and the libraries will be installed under `/path/lib`, while the
+to get test programs done. If you specify `--prefix=/path` you can do
+ ```
+ make install
+ ```
+and the libraries will be installed under `/path/lib`, while the
 module files will be installed under `/path/modules`. The regular and
 experimental C interface header files are under `/path/include`.
+If `/path` is a system directory, you may need 
+ ```
+ sudo make install
+ ```
 
 ### Packaging changes, CUDA and GPU support
 
@@ -125,7 +132,7 @@ psb_linsolve, but their usage is otherwise unchanged.
 
 ### OpenACC
 There is a highly experimental version of an OpenACC interface,
-you can access it by speficifying
+you can compile it by speficifying
 ```bash
 --enable-openacc  --with-extraopenacc="-foffload=nvptx-none=-march=sm_70"
 ```
@@ -143,7 +150,7 @@ cover what we use internally, it's not a complete replacement).
 ### Integers
 
 We have two kind of integers: IPK for local indices, and LPK for
-global indices. They can be specified independently at configure time,
+global indices. Their size  can be specified at configure time,
 e.g.
 ```bash
 --with-ipk=4 --with-lpk=8
@@ -172,8 +179,8 @@ There is initial support for building with CMAKE. As of this time, it does not c
 Further information on installation and configuration can be found in the documentation.
 See [docs/psblas-3.9.pdf](docs/psblas-3.9.pdf); an HTML version of the same document is
 available in docs/html. Please consult the sample programs, especially
-- [test/pargen/psb_s_pde2d.F90](test/pargen/psb_s_pde2d.F90) [test/pargen/psb_d_pde2d.F90](test/pargen/psb_d_pde2d.F90)
-- [test/pargen/psb_s_pde2d.F90](test/pargen/psb_s_pde3d.F90) [test/pargen/psb_d_pde2d.F90](test/pargen/psb_d_pde3d.F90)
+- [test/pdegen/psb_s_pde2d.F90](test/pdegen/psb_s_pde2d.F90) [test/pdegen/psb_d_pde2d.F90](test/pdegen/psb_d_pde2d.F90)
+- [test/pdegen/psb_s_pde2d.F90](test/pdegen/psb_s_pde3d.F90) [test/pdegen/psb_d_pde2d.F90](test/pdegens/psb_d_pde3d.F90)
 
 which contain examples for the solution of linear systems obtained by the discretization of a generic second-order differential equation in two:
 ```math
