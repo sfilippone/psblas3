@@ -169,8 +169,52 @@ which is asking for 4-bytes local indices, and 8-bytes global indices
 (this is the default). 
 
 ## CMAKE
-There is initial support for building with CMAKE. As of this time, it does not compile the CUDA part.
+PSBLAS supports building with CMake (version 3.11 or higher). This method handles the automatic detection of compilers, MPI, and linear algebra libraries.
+Standard Compilation (Without CUDA)
+To perform a standard compilation, run:
+### 1. Create and enter a dedicated build directory
+```
+mkdir build
+cd build
+```
+### 2. Configure the project
+```
+cmake ..
+```
+### 3. Compile the libraries
+```
+make
+```
+If you wish to install PSBLAS in a specific location (similar to using the --prefix option in the legacy configure script), you must define the CMAKE_INSTALL_PREFIX variable.
+To set a custom installation path, run the configuration command as follows:
+#### Example: Installing PSBLAS to a specific folder in your home directory
+```
+cmake -DCMAKE_INSTALL_PREFIX=/home/user/psblas_install
+```
+### Compiling with CUDA Support
+To enable GPU support via CUDA, you must set the PSB_BUILD_CUDA option to ON during the configuration step.
+Important Compatibility Note: CUDA support is strictly incompatible with 8-byte local integers. If you manually set CMAKE_PSB_IPK to 8, CUDA support will be automatically disabled by the system.
+To build with CUDA enabled:
 
+```
+cmake -DPSB_BUILD_CUDA=ON ..
+```
+The compilation then proceed as before through make
+When this flag is active, CMake will search for the CUDAToolkit, enable the CUDA language, and define necessary macros such as PSB_HAVE_CUDA.
+
+### Customizing Integer Sizes
+You can override the default integer sizes (4-byte local IPK and 8-byte global LPK) using the following variables:
+Example: Using 8-byte global integers (default) and 4-byte local integers
+```
+cmake -DCMAKE_PSB_IPK=4 -DCMAKE_PSB_LPK=8 ..
+```
+
+### 4. Installation
+To install the libraries, header files, and Fortran modules to your system (or a custom path defined by -DCMAKE_INSTALL_PREFIX), run:
+```
+make install
+```
+The files will be organized into the lib, include, and modules subdirectories within the installation prefix, same as the configure build.
 ## MPI and Compilers
  The library has been successfully compiled and tested with multiple compilers
  and MPI implementations; this release has been successfully tested with:
