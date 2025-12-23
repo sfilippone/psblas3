@@ -21,12 +21,13 @@ The software architecture allows us to offer support for many
 alternatives in the implementation, including usage of
 heterogeneous platforms, and computations performed on GPUs throuh
 CUDA. 
-There is support for GPU computations through OpenACC, but it is at
-this time a highly experimental version; we plan to also look at using 
-accelerators through OpenMP as support from compilers improves.
+There is also support for GPU computations through OpenACC, but it is
+at this time a highly experimental version; we plan to also look at
+using  accelerators through OpenMP as support from compilers improves. 
 
-The project is lead by Salvatore Filippone; a number of people have been contributing to this package over the
-years; contributors in roughly reverse chronological order:
+The project is lead by Salvatore Filippone; a number of people have
+been contributing to this package over the years; contributors in
+roughly reverse chronological order: 
 \begin{obeylines}
  Luca       Pepè Sciarria
  Theophane  Loloum
@@ -81,18 +82,19 @@ works discussing advanced programming in Fortran~2008
 include~\cite{DesPat:11,RouXiaXu:11}; sufficient support for
 Fortran~2008 is now available from many compilers, including recent
 versions of the GNU Fortran compiler from the Free Software
-Foundation, and the FLANG compiler from the LLVM project.  
+Foundation, the FLANG compiler from the LLVM project, and the Intel
+OneAPI compiler.
+The README file contains a list of compilers against which we have
+successfully tested the current release. 
 
 
 Previous approaches have been based on mixing Fortran~95, with its
 support for object-based design, with other languages; these have
 been advocated by a number of authors, 
-e.g.~\cite{machiels}.  Moreover, the Fortran~95 facilities for dynamic
-memory management and interface overloading greatly enhance the
-usability of the PSBLAS 
-subroutines. In this way, the library can take care of runtime memory
-requirements that are quite difficult or even impossible to predict at
-implementation or compilation time.  
+e.g.~\cite{machiels}.  The Fortran~95 facilities for dynamic
+memory management and interface overloading ensure that the library
+can take care of runtime memory requirements that are quite difficult
+or even impossible to predict at implementation or compilation time.  
 
 The presentation of the
 PSBLAS library follows the general structure of the proposal for
@@ -101,13 +103,13 @@ proposal for BLAS on dense matrices~\cite{BLAS1,BLAS2,BLAS3}.
 
 The applicability of sparse iterative solvers to many different areas
 causes some terminology problems because the same concept may be
-denoted through different names depending on the application area. The
-PSBLAS features presented in this document will be discussed referring
-to a   finite difference discretization of a Partial Differential
-Equation (PDE). However, the scope of the library is wider than
-that: for example, it can be applied to finite element discretizations
-of PDEs, and even to different classes of problems such as nonlinear
-optimization, for example in optimal control problems.
+denoted by different names depending on the application area. The
+PSBLAS features presented in this document will be discussed taking as
+a reference a finite difference discretization of a Partial
+Differential Equation (PDE). However, the scope of the library is
+wider than that: it can be applied to finite element and other 
+discretizations of PDEs, and even to different classes of problems
+such as nonlinear optimization, for example in optimal control problems.
 
 The design of a solver for sparse linear systems is driven by many
 conflicting objectives, such as limiting occupation of storage
@@ -145,7 +147,7 @@ application layer.
 The serial parts of the computation on each process are executed through
 calls to the serial sparse BLAS subroutines. 
 In a similar way, the inter-process message exchanges are encapsulated
-in an applicaiton layer that has been strongly inspired by the  Basic
+in an application layer that has been strongly inspired by the  Basic
 Linear Algebra Communication Subroutines (BLACS) library~\cite{BLACS}.  
 Usually  there is no need to deal directly with MPI;  however, in some
 cases, MPI routines are used directly to improve efficiency. For
@@ -184,10 +186,9 @@ the variable associated to each mesh point is assigned to a process
 that will  own the corresponding row in the coefficient matrix and
 will  carry out all related computations. This allocation strategy 
 is equivalent to a partition of the discretization mesh into {\em
-sub-domains}. 
-Our library  supports any distribution that keeps together 
-the coefficients of each matrix row; there are no other constraints on
-the variable assignment. 
+sub-domains};  our library  supports any distribution that keeps
+together  the coefficients of each matrix row; there are no other
+constraints on the variable assignment. 
 This choice is consistent with simple  data distributions 
 %commonly used in ScaLAPACK 
 such as  \verb|CYCLIC(N)| and \verb|BLOCK|, 
@@ -201,8 +202,8 @@ matrices, that is, the entries of a vector follow the same distribution
 of the matrix rows.  
 
 We assume that the sparse matrix is built in parallel, where each
-process generates its own portion. We never require that the entire
-matrix be available on a single node. However, it is possible
+process generates its own portion: we never \emph{require} that the
+entire matrix be available on a single node. However, it is possible
 to hold the entire matrix in one process and distribute it
 explicitly\footnote{In our prototype implementation  we provide 
 sample scatter/gather routines.}, even though  the resulting memory 
@@ -227,33 +228,31 @@ assigned to the parallel processes,
 we classify the  points of a given sub-domain as following.
 \begin{description}
 \item[Internal.] An internal point of
- a given domain {\em depends} only on  points of the
-same domain. 
-If all points of a domain are assigned to one
-process, then a computational step (e.g., a
-matrix-vector product) of the 
-equations associated with the internal points  requires no data
-items from other domains and no communications.
+ a given sub-domain {\em depends} only on  points of the
+same sub-domain. 
+If all points of a sub-domain are assigned to one
+process, then a computational step (e.g., a matrix-vector product) of
+the  equations associated with the internal points  requires no data 
+items from other sub-domains and no communications.
 
-\item[Boundary.] A point of
-a given domain is a boundary point if it {\em depends} on  points
-belonging to other domains.
+\item[Boundary.] A point of a given sub-domain is a boundary point if
+  it {\em depends} on  points belonging to other sub-domains.
 
-\item[Halo.] A halo point for a given domain is a point belonging to
-another domain such that there is a boundary point which {\em depends\/}
+\item[Halo.] A halo point for a given sub-domain is a point belonging to
+another sub-domain such that there is a boundary point which {\em depends\/}
 on it. Whenever performing a computational step, such as a
 matrix-vector product, the values associated with halo points are
-requested from other domains. A boundary point of a given 
-domain is usually a halo point for some other domain\footnote{This is
+requested from other sub-domains. A boundary point of a given 
+sub-domain is usually a halo point for some other sub-domain\footnote{This is
   the normal situation when the pattern of the sparse matrix is
   symmetric, which is equivalent to say that the interaction between
   two variables is reciprocal. If the matrix pattern is non-symmetric
   we may have one-way interactions, and these could cause a situation
   in which a boundary point is not a halo point for its neighbour.}; therefore
 the cardinality of the boundary points set determines the amount of data
- sent to other domains. 
+ sent to other sub-domains. 
 \item[Overlap.] An overlap point is a boundary point assigned to
-multiple domains. Any operation that involves an overlap point
+multiple sub-domains. Any operation that involves an overlap point
 has to be replicated for each assignment. 
 \end{description}
 Overlap points do not usually exist in the basic data
@@ -378,7 +377,7 @@ $1\dots n_{\hbox{row}_i}$, each element of which corresponds to a certain
 element of $1\dots n$. The user does not set explicitly this mapping;
 when the application needs to indicate to which element of the index
 space a certain item is related, such as the row and column index of a
-matrix coefficient, it does so in the ``global'' numbering, and the
+matrix coefficient, it usually does so in the ``global'' numbering, and the
 library will translate into the appropriate ``local'' numbering. 
 
 For  a given index space $1\dots n$ there are many possible associated
@@ -390,7 +389,7 @@ with a call to \verb|psb_cdasb| and a sparse matrix with a call to
 \verb|psb_spasb|. After \verb|psb_cdasb| each process $i$ will have
 defined a set of ``halo'' (or ``ghost'') indices
 $n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$, denoting elements of the index
-space that are \emph{not} assigned to process $i$; however the
+space that are \emph{not} assigned to process $i$; the
 variables associated with them are needed to complete computations
 associated with the sparse matrix $A$, and thus they have to be
 fetched from (neighbouring) processes. The descriptor of the index
@@ -521,7 +520,7 @@ computation. This is certainly true for the data allocation and
 assembly routines, for  all the computational routines and for some of
 the tools routines.
 
-However there are many cases where no synchronization, and indeed no
+However there are cases where no synchronization, and indeed no
 communication among processes, is implied; for instance, all the routines in
 sec.~\ref{sec:datastruct} are only acting on the local data structures,
 and thus may be called independently. The most important case is that

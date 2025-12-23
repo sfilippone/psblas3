@@ -598,7 +598,7 @@ An integer value; 0 means no error has been detected.
   state.
 \item The descriptor may be in either the build or assembled state.
 \item Providing a good estimate for the number of nonzeroes $nnz$ in
-  the assembled matrix may substantially improve performance in the
+  the assembled matrix may improve performance in the
   matrix build phase, as it will reduce or eliminate the need for
   (potentially multiple) data reallocations;
 \item Using \verb|psb_matbld_remote_| is likely to cause  a runtime  overhead at
@@ -722,7 +722,7 @@ An integer value; 0 means no error has been detected.
   entirety to a   single call to this routine: the buildup of a row
   may be split into   as many calls as desired (even in the CSR format); 
 \item Coefficients from different rows may also be mixed up freely
-  in a single call, according to the application needs; 
+  in a single call (in COO format), according to the application needs; 
 \item Coefficients from matrix rows not owned by the calling
   process are treated according to the value of \verb|bldmode|
   specified at allocation time; if 
@@ -1246,7 +1246,7 @@ An integer value; 0 means no error has been detected.
 %%   psb_glob_to_loc %%
 %
 \clearpage\subsection{psb\_glob\_to\_loc --- Global to local indices
-  convertion}
+  conversion}
 %\addcontentsline{toc}{subsection}{psb\_glob\_to\_loc}
 
 \begin{verbatim}
@@ -1261,7 +1261,7 @@ call psb_glob_to_loc(x, desc_a, info, iact,owned)
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in, inout}.\\
-Specified as: a rank one integer array.\\
+Specified as: a rank one integer array of global indices, i.e. \verb|psb_lpk_|.\\
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
@@ -1292,7 +1292,7 @@ Intent: {\bf inout}.\\
 Specified as: a rank one integer array.
 \item[y] If $y$ is  present,
   then $y$ is overwritten with the translated integer indices, and $x$
-  is left unchanged. 
+  is left unchanged; since $y$ contains local indices it should use  \verb|psb_ipk_|. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Intent: {\bf out}.\\
@@ -1325,7 +1325,8 @@ call psb_loc_to_glob(x, desc_a, info, iact)
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
-\item[x] An integer vector of indices to be converted.\\
+\item[x] An integer vector of indices to be converted; if $y$ is present,
+ they are local indices, i.e. \verb|psb_ipk_| \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in, inout}.\\
@@ -1346,14 +1347,14 @@ Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
 \begin{description}
 \item[\bf On Return]
 \item[x] If $y$ is not present,
-  then $x$ is overwritten with the translated integer indices. 
+  then $x$ is overwritten with the translated integer  global indices, i.e. \verb|psb_lpk_| 
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
 Specified as: a rank one integer array.
-\item[y] If $y$ is not present,
-  then $y$ is overwritten with the translated integer indices, and $x$
-  is left unchanged. 
+\item[y] If $y$  not present,
+  then $y$ is overwritten with the translated global
+  indices i.e. \verb|psb_lpk_|, and $x$   is left unchanged. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Intent: {\bf out}.\\
@@ -1773,7 +1774,7 @@ Specified as: a preconditioner data structure \precdata.
 \item[Function value] The memory occupation of the object specified in
   the calling sequence, in bytes.\\
 Scope: {\bf local} \\
-Returned  as: an \verb|integer(psb_long_int_k_)| number.
+Returned  as: an \verb|integer(psb_lpk_)| number.
 \end{description}
 
 
@@ -1873,9 +1874,10 @@ the (sorted) value of $x$ in the original sequence.
   $O(n^2)$; of the other three, in the average case quicksort will be the 
   fastest and merge-sort the slowest. However note that:
   \begin{enumerate}
-  \item The the best case running time for insertion sort is $\Omega(n)$ while the average
-    and worst case  are $O(n^2)$; however for very short input sequences this is
-    likely to be the  fastest method;
+  \item The  best case running time for insertion sort is $\Omega(n)$
+    while the average and worst case  are $O(n^2)$; moreover, for
+    very short input sequences this is likely to be the  fastest
+    method; 
  \item The worst case running time for quicksort is $O(n^2)$; the algorithm
   implemented here follows the well-known median-of-three heuristics,
   but the worst case may still apply;
@@ -1885,8 +1887,8 @@ the (sorted) value of $x$ in the original sequence.
   subsequences that may be already in the desired ordering prior to
   the subroutine call; this situation is relatively common when
   dealing with groups of indices of sparse matrix entries, thus
-  merge-sort is the preferred  choice when a sorting is needed
-  by other routines in the library. 
+  merge-sort is the preferred  choice when a sorting routine is needed 
+  for preprocessing matrix data.
 \end{enumerate}
 \end{enumerate}
 
