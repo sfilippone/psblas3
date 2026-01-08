@@ -52,12 +52,13 @@ lib: mods objs ilib cudalib spgpulib
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 
-mods: $(FOBJS)
+mods: $(FOBJS) includes
 	$(INSTALL) -p *$(.mod) $(MODDIR)
-	$(INSTALL) -p *.h $(INCDIR)
-objs: $(OBJS) iobjs cudaobjs spgpuobjs
 
-$(OBJS) iobjs cudaobjs spgpuobjs: spgpuinc
+includes: spgpuinc
+	$(INSTALL) -p *.h $(INCDIR)
+
+objs: mods $(OBJS) iobjs cudaobjs spgpuobjs
 
 spgpuinc:
 	$(MAKE) -C spgpu incl	
