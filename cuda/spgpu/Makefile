@@ -23,7 +23,7 @@ lib: objs iobjs ilib
 iobjs:
 	$(MAKE) -C kernels objs
 ilib:
-	$(MAKE) -C kernels lib LIBNAME=$(LIBNAME)
+	$(MAKE) -C kernels lib
 
 incl:
 	/bin/cp -p *.h $(INCDIR)
