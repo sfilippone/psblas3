@@ -274,11 +274,11 @@ contains
     end subroutine inner_gth
   end subroutine i_oacc_gthzv_x
 
-  subroutine i_oacc_ins_v(n, irl, val, dupl, x, info)
+  subroutine i_oacc_ins_v(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
     implicit none
     class(psb_i_vect_oacc), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n, dupl
+    integer(psb_ipk_), intent(in) :: n, dupl, maxr
     class(psb_i_base_vect_type), intent(inout) :: irl
     class(psb_i_base_vect_type), intent(inout) :: val
     integer(psb_ipk_), intent(out) :: info
@@ -315,7 +315,7 @@ contains
       type is (psb_i_vect_oacc)
         if (vval%is_dev()) call vval%sync()
       end select
-      call x%ins(n, irl%v, val%v, dupl, info)
+      call x%ins(n, irl%v, val%v, dupl, maxr, info)
     end if
 
     if (info /= 0) then
@@ -325,11 +325,11 @@ contains
 
   end subroutine i_oacc_ins_v
 
-  subroutine i_oacc_ins_a(n, irl, val, dupl, x, info)
+  subroutine i_oacc_ins_a(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
     implicit none
     class(psb_i_vect_oacc), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n, dupl
+    integer(psb_ipk_), intent(in) :: n, dupl, maxr
     integer(psb_ipk_), intent(in) :: irl(:)
     integer(psb_ipk_), intent(in) :: val(:)
     integer(psb_ipk_), intent(out) :: info
@@ -338,19 +338,26 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call x%psb_i_base_vect_type%ins(n, irl, val, dupl, info)
+    call x%psb_i_base_vect_type%ins(n, irl, val, dupl, maxr, info)
     call x%set_host()
-
 
   end subroutine i_oacc_ins_a
 
-  subroutine i_oacc_bld_mn(x, n)
+  subroutine i_oacc_bld_mn(x, n,scratch)
     use psb_base_mod
     implicit none
     integer(psb_mpk_), intent(in) :: n
     class(psb_i_vect_oacc), intent(inout) :: x
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call x%free(info)
     call x%all(ione*n, info)
     if (info /= 0) then
@@ -363,13 +370,21 @@ contains
   end subroutine i_oacc_bld_mn
 
 
-  subroutine i_oacc_bld_x(x, this)
+  subroutine i_oacc_bld_x(x, this,scratch)
     use psb_base_mod
     implicit none
     integer(psb_ipk_), intent(in) :: this(:)
     class(psb_i_vect_oacc), intent(inout) :: x
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call x%free(info)
     call psb_realloc(size(this), x%v, info)
     if (info /= 0) then
@@ -384,27 +399,35 @@ contains
 
   end subroutine i_oacc_bld_x
 
-  subroutine i_oacc_asb_m(n, x, info)
+  subroutine i_oacc_asb_m(n, x, info, scratch)
     use psb_base_mod
     implicit none 
     integer(psb_mpk_), intent(in)        :: n
     class(psb_i_vect_oacc), intent(inout) :: x
     integer(psb_ipk_), intent(out)       :: info
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_mpk_) :: nd
 
     info = psb_success_
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     if (x%is_dev()) then
       nd = size(x%v)
       if (nd < n) then
         call x%sync()
-        call x%psb_i_base_vect_type%asb(n, info)
+        call x%psb_i_base_vect_type%asb(n, info, scratch=scratch_)
         if (info == psb_success_) call x%sync()
         call x%set_host()
       end if
     else
       if (size(x%v) < n) then
-        call x%psb_i_base_vect_type%asb(n, info)
+        call x%psb_i_base_vect_type%asb(n, info, scratch=scratch_)
         if (info == psb_success_) call x%sync()
         call x%set_host()
       end if

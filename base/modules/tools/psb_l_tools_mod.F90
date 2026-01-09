@@ -69,7 +69,7 @@ Module psb_l_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_lasb_vect(x, desc_a, info,mold, scratch)
+    subroutine psb_lasb_vect(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -77,6 +77,7 @@ Module psb_l_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_l_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_lasb_vect
     subroutine psb_lasb_vect_r2(x, desc_a, info,mold, scratch)
       import

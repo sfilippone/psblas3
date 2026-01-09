@@ -67,6 +67,38 @@ contains
     return
   end function psb_c_dgeall_remote
 
+  function psb_c_dgeall_remote_options(xh,cdh,bldmode,dupl) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_dvector) :: xh
+    type(psb_c_descriptor) :: cdh
+    integer(psb_c_ipk_), value :: dupl
+    integer(psb_c_ipk_), value :: bldmode
+
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_d_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      return
+    end if
+    allocate(xp)
+    call psb_geall(xp,descp,info,bldmode=bldmode,dupl=dupl)
+    xh%item = c_loc(xp)
+    res = min(0,info)
+
+    return
+  end function psb_c_dgeall_remote_options
+
   function psb_c_dgeasb(xh,cdh) bind(c) result(res)
 
     implicit none
@@ -97,6 +129,38 @@ contains
     return
   end function psb_c_dgeasb
 
+  function psb_c_dgeasb_options(xh,cdh,dupl) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_dvector) :: xh
+    type(psb_c_descriptor) :: cdh
+    integer(psb_c_ipk_), value :: dupl
+
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_d_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_geasb(xp,descp,info,dupl=dupl)
+    res = min(0,info)
+
+    return
+  end function psb_c_dgeasb_options
+ 
   function psb_c_dgefree(xh,cdh) bind(c) result(res)
 
     implicit none

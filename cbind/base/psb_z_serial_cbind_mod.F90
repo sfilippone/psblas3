@@ -205,4 +205,28 @@ contains
   end function psb_c_zvect_set_vect
 
 
+  function psb_c_zvect_clone(xh,yh) bind(c) result(info)
+    implicit none
+
+    integer(psb_c_ipk_) :: info
+    type(psb_c_zvector) :: xh,yh
+
+    type(psb_z_vect_type), pointer :: xp,yp
+
+    info = -1
+
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return      
+    end if
+    if (c_associated(yh%item)) then
+      call c_f_pointer(yh%item,yp)
+    else
+      return      
+    end if
+    call xp%clone(yp,info)
+    
+  end function psb_c_zvect_clone
+
 end module psb_z_serial_cbind_mod

@@ -95,8 +95,7 @@ subroutine psb_ialloc_vect(x, desc_a,info, dupl, bldmode)
     goto 9999
   endif
 
-  allocate(psb_i_base_vect_type :: x%v, stat=info) 
-  if (info == 0) call x%all(nr,info)
+  call x%all(nr,info)
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
@@ -109,12 +108,10 @@ subroutine psb_ialloc_vect(x, desc_a,info, dupl, bldmode)
   else
     bldmode_ = psb_matbld_noremote_
   end if
+  call x%set_bld()
   if (present(dupl)) then
-    dupl_ = dupl 
-  else
-    dupl_ = psb_dupl_def_
-  end if
-  call x%set_dupl(dupl_)
+    call x%set_dupl(dupl)
+  end if  
   call x%set_remote_build(bldmode_)
   call x%set_nrmv(izero)
   if (x%is_remote_build()) then
