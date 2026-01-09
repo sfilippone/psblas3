@@ -127,9 +127,9 @@ iobjs: $(FOBJS)
 cudaobjs: $(FOBJS)
 	$(MAKE) -C CUDA objs
 
-ilib: objs
+ilib: objs spgpulib 
 	$(MAKE) -C impl lib 
-cudalib: objs 
+cudalib: objs ilib
 	$(MAKE) -C CUDA lib 
 
 clean: cclean iclean cudaclean spgpuclean
