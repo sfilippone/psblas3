@@ -6,8 +6,7 @@ include $(TOP)/Make.inc
 LIBDIR=$(TOP)/lib
 INCDIR=$(TOP)/include
 MODDIR=$(TOP)/modules
-UP=../..
-LIBNAME=$(UP)/libpsb_cuda.a
+LIBNAME=libpsb_cuda.a
 CINCLUDES=-I$(INCDIR)
 CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
 OBJS=cabs.o  camax.o  casum.o  caxpby.o  caxy.o  cdot.o  cgath.o \
@@ -24,7 +23,7 @@ OBJS=cabs.o  camax.o  casum.o  caxpby.o  caxy.o  cdot.o  cgath.o \
 
 objs: $(OBJS)
 lib: objs
-	$(AR) $(LIBNAME) $(OBJS)
+	$(AR) ../../$(LIBNAME) $(OBJS)
 
 
 clean:

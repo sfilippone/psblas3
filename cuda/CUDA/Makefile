@@ -16,7 +16,7 @@ LDLIBS=$(PSBLDLIBS)
 #CCOPT= -g
 FINCLUDES=$(FMFLAG).   $(FMFLAG)$(INCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
 CINCLUDES=$(SPGPU_INCLUDES) $(CUDA_INCLUDES) -I.. -I$(INCDIR)
-LIBNAME=libpsb_gpu.a
+LIBNAME=libpsb_cuda.a
 
 
 CUDAOBJS=psi_cuda_c_CopyCooToElg.o psi_cuda_c_CopyCooToHlg.o \
