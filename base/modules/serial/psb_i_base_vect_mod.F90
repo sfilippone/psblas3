@@ -1582,16 +1582,8 @@ contains
     integer(psb_ipk_) :: info
     logical, intent(in), optional        :: scratch
 
-    logical :: scratch_
-
-
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
     call psb_realloc(m,n,x%v,info)
-    call x%asb(m,n,info)
+    call x%asb(m,n,info,scratch)
 
   end subroutine i_base_mlv_bld_n
 

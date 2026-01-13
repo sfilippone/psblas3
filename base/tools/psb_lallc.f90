@@ -53,7 +53,7 @@ subroutine psb_lalloc_vect(x, desc_a,info, dupl, bldmode)
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
-  integer(psb_ipk_) :: dupl_, bldmode_, nrmt_
+  integer(psb_ipk_) :: bldmode_, nrmt_
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -111,6 +111,8 @@ subroutine psb_lalloc_vect(x, desc_a,info, dupl, bldmode)
   call x%set_bld()
   if (present(dupl)) then
     call x%set_dupl(dupl)
+  else
+    call x%set_dupl(psb_dupl_def_)
   end if  
   call x%set_remote_build(bldmode_)
   call x%set_nrmv(izero)

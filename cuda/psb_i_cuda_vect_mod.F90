@@ -1097,12 +1097,14 @@ contains
 
   end subroutine i_cuda_multi_bld_x
 
-  subroutine i_cuda_multi_bld_n(x,m,n)
+  subroutine i_cuda_multi_bld_n(x,m,n,scratch)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_i_multivect_cuda), intent(inout) :: x
     integer(psb_ipk_) :: info
+    logical, intent(in), optional        :: scratch
 
     call x%all(m,n,info)
+    call x%asb(m,n,info,scratch=scratch)
     if (info /= 0) then 
       call psb_errpush(info,'i_cuda_multi_bld_n',i_err=(/m,n,n,n,n/))
     end if
@@ -1498,7 +1500,7 @@ contains
     call x%set_host()
   end subroutine i_cuda_multi_zero
 
-  subroutine i_cuda_multi_asb(m,n, x, info)
+  subroutine i_cuda_multi_asb(m,n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1506,12 +1508,14 @@ contains
     class(psb_i_multivect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)       :: info
     integer(psb_ipk_) :: nd, nc
+    logical, intent(in), optional        :: scratch
 
+    info = 0
 
     x%m_nrows = m
     x%m_ncols = n
     if (x%is_host()) then 
-      call x%psb_i_base_multivect_type%asb(m,n,info)
+      call x%psb_i_base_multivect_type%asb(m,n,info,scratch)
       if (info == psb_success_) call x%sync_space(info)
     else if (x%is_dev()) then 
       nd  = getMultiVecDevicePitch(x%deviceVect)
@@ -1648,11 +1652,11 @@ contains
     call x%set_sync()
   end subroutine i_cuda_multi_vect_finalize
 
-  subroutine i_cuda_multi_ins(n,irl,val,dupl,x,info)
+  subroutine i_cuda_multi_ins(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none 
     class(psb_i_multivect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl
+    integer(psb_ipk_), intent(in)        :: n, dupl,maxr
     integer(psb_ipk_), intent(in)        :: irl(:)
     integer(psb_ipk_), intent(in)           :: val(:,:)
     integer(psb_ipk_), intent(out)       :: info
@@ -1661,7 +1665,7 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call x%psb_i_base_multivect_type%ins(n,irl,val,dupl,info)
+    call x%psb_i_base_multivect_type%ins(n,irl,val,dupl,maxr,info)
     call x%set_host()
 
   end subroutine i_cuda_multi_ins
