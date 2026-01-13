@@ -188,7 +188,7 @@ subroutine psb_iasb_vect(x, desc_a, info, mold, scratch, dupl)
 end subroutine psb_iasb_vect
 
 
-subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch)
+subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch,dupl)
   use psb_base_mod, psb_protect_name => psb_iasb_vect_r2
   implicit none
 
@@ -197,12 +197,12 @@ subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch)
   integer(psb_ipk_), intent(out)                 ::  info
   class(psb_i_base_vect_type), intent(in), optional :: mold
   logical, intent(in), optional        :: scratch
+  integer(psb_ipk_), optional, intent(in) :: dupl
 
   ! local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, i, n 
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, dupl_
-  logical :: scratch_
+  integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
@@ -217,8 +217,6 @@ subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  scratch_ = .false.
-  if (present(scratch)) scratch_ = scratch
   call psb_info(ctxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -230,35 +228,11 @@ subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch)
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  nrow = desc_a%get_local_rows()
-  ncol = desc_a%get_local_cols()
   n    = size(x)
-  if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
+  do i=1, n
+    call psb_geasb(x(i),desc_a,info, mold, scratch, dupl)
+  end do
 
-  if (scratch_) then 
-    do i=1,n
-      call x(i)%free(info)
-      call x(i)%bld(ncol,mold=mold)
-    end do
-
-  else
-    do i=1, n
-      dupl_ = x(i)%get_dupl()
-      call x(i)%asb(ncol,info,scratch=scratch)
-      if (info /= 0) exit
-      ! ..update halo elements..
-      call psb_halo(x(i),desc_a,info)
-      if (info /= 0) exit
-      call x(i)%cnv(mold)
-    end do
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='psb_halo')
-      goto 9999
-    end if
-  end if
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
 

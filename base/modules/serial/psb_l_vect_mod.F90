@@ -1211,11 +1211,11 @@ contains
 
   end subroutine l_mvect_free
 
-  subroutine l_mvect_ins(n,irl,val,x,info)
+  subroutine l_mvect_ins(n,irl,val,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_l_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n
+    integer(psb_ipk_), intent(in)               :: n,maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
     integer(psb_lpk_), intent(in)        :: val(:,:)
     integer(psb_ipk_), intent(out)              :: info
@@ -1228,7 +1228,7 @@ contains
       return
     end if
     dupl = x%get_dupl()
-    call  x%v%ins(n,irl,val,dupl,info)
+    call  x%v%ins(n,irl,val,dupl,maxr,info)
 
   end subroutine l_mvect_ins
 

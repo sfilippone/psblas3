@@ -475,7 +475,7 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  call x%ins(m,irl,val,info) 
+  call x%ins(m,irl,val,loc_rows,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999

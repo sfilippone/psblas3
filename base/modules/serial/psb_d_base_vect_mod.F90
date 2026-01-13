@@ -404,22 +404,6 @@ contains
 
   end subroutine d_base_all
 
-  subroutine d_base_reinit(x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_d_base_vect_type), intent(out)    :: x
-    integer(psb_ipk_), intent(out)              :: info
-
-    if (allocated(x%v)) then 
-      call x%sync()
-      x%v(:) = dzero
-      call x%set_host()
-      call x%set_upd()
-    end if
-
-  end subroutine d_base_reinit
-
   !> Function  base_mold:
   !! \memberof  psb_d_base_vect_type
   !! \brief     Mold method: return a variable with the same dynamic type
@@ -437,6 +421,22 @@ contains
     allocate(psb_d_base_vect_type :: y, stat=info)
 
   end subroutine d_base_mold
+
+  subroutine d_base_reinit(x, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    class(psb_d_base_vect_type), intent(out)    :: x
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (allocated(x%v)) then 
+      call x%sync()
+      x%v(:) = dzero
+      call x%set_host()
+      call x%set_upd()
+    end if
+
+  end subroutine d_base_reinit
 
   !
   ! Insert a bunch of values at specified positions.
@@ -498,7 +498,9 @@ contains
           end if
         enddo
         call x%set_ncfs(k)      
+
       else if (x%is_upd()) then
+
         dupl_ = x%get_dupl()
         if (.not.allocated(x%v)) then
           info = psb_err_invalid_vect_state_
@@ -681,7 +683,7 @@ contains
           end do
         case(psb_dupl_err_)
           do i=1,ncfs
-            if (vv(x%iv(i)).ne.dzero) then
+            if (vv(x%iv(i)).ne. dzero) then
               call psb_errpush(psb_err_duplicate_coo,'vect-asb')
               return
             else
@@ -752,7 +754,7 @@ contains
            & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb unhandled')    
       if (x%is_bld()) then
         call psb_realloc(n,vv,info)
-        vv(:) = dzero
+        vv(:) =  dzero
         select case(x%get_dupl())
         case(psb_dupl_add_)
           do i=1,x%get_ncfs()
@@ -764,7 +766,7 @@ contains
           end do
         case(psb_dupl_err_)
           do i=1,x%get_ncfs()
-            if (vv(x%iv(i)).ne.dzero) then
+            if (vv(x%iv(i)).ne. dzero) then
               call psb_errpush(psb_err_duplicate_coo,'vect_asb')
               return
             else
@@ -821,8 +823,6 @@ contains
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
     call x%set_null()
   end subroutine d_base_free
-
-
 
   !
   !> Function  base_free_buffer:
@@ -2619,6 +2619,18 @@ module psb_d_base_multivect_mod
     real(psb_dpk_), allocatable :: v(:,:)
     real(psb_dpk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
+    !> vector bldstate:
+    !!    null:   pristine;
+    !!    build:  it's being filled with entries;
+    !!    assembled: ready to use in computations;
+    !!    update: accepts coefficients but only
+    !!            in already existing entries.
+    !!    The transitions among the states are detailed in
+    !!            psb_T_vect_mod.
+    integer(psb_ipk_), private :: bldstate = psb_vect_null_
+    integer(psb_ipk_), private :: dupl     = psb_dupl_null_
+    integer(psb_ipk_), private :: ncfs     = 0
+    integer(psb_ipk_), allocatable :: iv(:)
   contains
     !
     !  Constructors/allocators
@@ -2637,6 +2649,22 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: zero     => d_base_mlv_zero
     procedure, pass(x) :: asb      => d_base_mlv_asb
     procedure, pass(x) :: free     => d_base_mlv_free
+    procedure, pass(x) :: reinit      => d_base_mlv_reinit
+    procedure, pass(x) :: set_ncfs => d_base_mlv_set_ncfs 
+    procedure, pass(x) :: get_ncfs => d_base_mlv_get_ncfs
+    procedure, pass(x) :: set_dupl => d_base_mlv_set_dupl 
+    procedure, pass(x) :: get_dupl => d_base_mlv_get_dupl
+    procedure, pass(x) :: set_state => d_base_mlv_set_state
+    procedure, pass(x) :: set_null  => d_base_mlv_set_null
+    procedure, pass(x) :: set_bld   => d_base_mlv_set_bld
+    procedure, pass(x) :: set_upd   => d_base_mlv_set_upd
+    procedure, pass(x) :: set_asb   => d_base_mlv_set_asb
+    procedure, pass(x) :: get_state => d_base_mlv_get_state
+    procedure, pass(x) :: is_null   => d_base_mlv_is_null
+    procedure, pass(x) :: is_bld    => d_base_mlv_is_bld
+    procedure, pass(x) :: is_upd    => d_base_mlv_is_upd
+    procedure, pass(x) :: is_asb    => d_base_mlv_is_asb
+    procedure, pass(x) :: base_cpy  => d_base_mlv_cpy
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -2750,7 +2778,8 @@ contains
     integer(psb_ipk_) :: info
 
     this%v = x
-    call this%asb(size(x,dim=1,kind=psb_ipk_),size(x,dim=2,kind=psb_ipk_),info)
+    call this%asb(size(x,dim=1,kind=psb_ipk_),&
+         & size(x,dim=2,kind=psb_ipk_),info)
   end function constructor
 
 
@@ -2800,12 +2829,21 @@ contains
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated.
   !!
-  subroutine d_base_mlv_bld_n(x,m,n)
+  subroutine d_base_mlv_bld_n(x,m,n,scratch)
     use psb_realloc_mod
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
+    logical, intent(in), optional        :: scratch
 
+    logical :: scratch_
+
+
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call psb_realloc(m,n,x%v,info)
     call x%asb(m,n,info)
 
@@ -2827,6 +2865,10 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     call psb_realloc(m,n,x%v,info)
+    if (try_newins) then
+      call psb_realloc(n,x%iv,info)
+      call x%set_ncfs(0)
+    end if
 
   end subroutine d_base_mlv_all
 
@@ -2847,6 +2889,22 @@ contains
     allocate(psb_d_base_multivect_type :: y, stat=info)
 
   end subroutine d_base_mlv_mold
+
+  subroutine d_base_mlv_reinit(x, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    class(psb_d_base_multivect_type), intent(out)    :: x
+    integer(psb_ipk_), intent(out)              :: info
+
+    if (allocated(x%v)) then 
+      call x%sync()
+      x%v(:,:) = dzero
+      call x%set_host()
+      call x%set_upd()
+    end if
+
+  end subroutine d_base_mlv_reinit
 
   !
   ! Insert a bunch of values at specified positions.
@@ -2875,57 +2933,123 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine d_base_mlv_ins(n,irl,val,dupl,x,info)
+  subroutine d_base_mlv_ins(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_d_base_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_dpk_), intent(in)        :: val(:,:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i, isz
+    integer(psb_ipk_) :: i, isz, nc, dupl_, ncfs_, k
 
     info = 0
     if (psb_errstatus_fatal()) return
 
-    if (.not.allocated(x%v)) then
-      info = psb_err_invalid_vect_state_
-    else if (n > min(size(irl),size(val))) then
-      info = psb_err_invalid_input_
-
-    else
-      isz = size(x%v,1)
-      select case(dupl)
-      case(psb_dupl_ovwrt_)
+    if (try_newins) then 
+      if (x%is_bld()) then
+        nc = size(x%v,2)
+        ncfs_ = x%get_ncfs()
+        isz = ncfs_ + n
+        call psb_realloc(isz,nc,x%v,info)
+        call psb_ensure_size(isz,x%iv,info)
+        k   = ncfs_
         do i = 1, n
           !loop over all val's rows
-
           ! row actual block row
-          if ((1 <= irl(i)).and.(irl(i) <= isz)) then
+          if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+            k  = k + 1 
             ! this row belongs to me
             ! copy i-th row of block val in x
-            x%v(irl(i),:) = val(i,:)
+            x%v(k,:)  = val(i,:)
+            x%iv(k) = irl(i)
           end if
         enddo
+        call x%set_ncfs(k)      
 
-      case(psb_dupl_add_)
+      else if (x%is_upd()) then
 
-        do i = 1, n
-          !loop over all val's rows
-          if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-            ! this row belongs to me
-            ! copy i-th row of block val in x
-            x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
-          end if
-        enddo
+        dupl_ = x%get_dupl()
+        if (.not.allocated(x%v)) then
+          info = psb_err_invalid_vect_state_
+        else if (n > min(size(irl),size(val))) then
+          info = psb_err_invalid_input_
+        else
+          isz = size(x%v,1)
+          nc = size(x%v,2)
+          select case(dupl_)
+          case(psb_dupl_ovwrt_)
+            do i = 1, n
+              !loop over all val's rows
+              ! row actual block row
+              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+                ! this row belongs to me
+                ! copy i-th row of block val in x
+                x%v(irl(i),:) = val(i,:)
+              end if
+            enddo
 
-      case default
-        info = 321
-        ! !$      call psb_errpush(info,name)
-        ! !$      goto 9999
-      end select
+          case(psb_dupl_add_)
+
+            do i = 1, n
+              !loop over all val's rows
+              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+                ! this row belongs to me
+                ! copy i-th row of block val in x
+                x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
+              end if
+            enddo
+
+          case default
+            info = 321
+            ! !$      call psb_errpush(info,name)
+            ! !$      goto 9999
+          end select
+        end if
+      else
+        info = psb_err_invalid_vect_state_
+      end if
+    else
+      if (.not.allocated(x%v)) then
+        info = psb_err_invalid_vect_state_
+      else if (n > min(size(irl),size(val))) then
+        info = psb_err_invalid_input_
+
+      else
+        isz = size(x%v,1)
+        nc = size(x%v,2)
+        select case(dupl)
+        case(psb_dupl_ovwrt_)
+          do i = 1, n
+            !loop over all val's rows
+            ! row actual block row
+            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
+              ! this row belongs to me
+              ! copy i-th row of block val in x
+              x%v(irl(i),:) = val(i,:)
+            end if
+          enddo
+
+        case(psb_dupl_add_)
+
+          do i = 1, n
+            !loop over all val's rows
+            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
+              ! this row belongs to me
+              ! copy i-th row of block val in x
+              x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
+            end if
+          enddo
+
+        case default
+          info = 321
+          ! !$      call psb_errpush(info,name)
+          ! !$      goto 9999
+        end select
+      end if
     end if
+    call x%set_host()
     if (info /= 0) then
       call psb_errpush(info,'base_mlv_vect_ins')
       return
@@ -2945,6 +3069,7 @@ contains
     class(psb_d_base_multivect_type), intent(inout)    :: x
 
     if (allocated(x%v)) x%v=dzero
+    call x%set_host()
 
   end subroutine d_base_mlv_zero
 
@@ -2963,19 +3088,73 @@ contains
   !!
   !
 
-  subroutine d_base_mlv_asb(m,n, x, info)
+  subroutine d_base_mlv_asb(m,n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
     integer(psb_ipk_), intent(in)              :: m,n
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
+    logical, intent(in), optional        :: scratch
 
-    if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
-         & call psb_realloc(m,n,x%v,info)
-    if (info /= 0) &
-         & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+    logical :: scratch_
+    integer(psb_ipk_) :: i, ncfs, xvsz
+    real(psb_dpk_), allocatable ::  vv(:,:)
 
+    info = 0
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
+    if (try_newins) then 
+      if (x%is_bld()) then
+        ncfs = x%get_ncfs()
+        xvsz = psb_size(x%v)
+        call psb_realloc(m,n,vv,info)
+        vv(:,:) = dzero
+        select case(x%get_dupl())
+        case(psb_dupl_add_)
+          do i=1,ncfs
+            vv(x%iv(i),:) = vv(x%iv(i),:) + x%v(i,:)
+          end do
+        case(psb_dupl_ovwrt_)
+          do i=1,ncfs
+            vv(x%iv(i),:) = x%v(i,:)
+          end do
+        case(psb_dupl_err_)
+          do i=1,ncfs
+            if (any(vv(x%iv(i),:).ne.dzero)) then
+              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
+              return
+            else
+              vv(x%iv(i),:) = x%v(i,:)
+            end if
+          end do
+        case default
+          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          info =-7
+        end select
+        call psb_move_alloc(vv,x%v,info)
+        if (allocated(x%iv)) deallocate(x%iv,stat=info)
+      else if (x%is_upd().or.x%is_asb().or.scratch_) then
+        if (x%get_nrows() < m) &
+             & call psb_realloc(m,n,x%v,info)
+        if (info /= 0) &
+             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      else
+        info = psb_err_invalid_vect_state_        
+        call psb_errpush(info,'vect_asb')
+      end if
+    else
+      if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
+           & call psb_realloc(m,n,x%v,info)
+      if (info /= 0) &
+           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+    end if
+    call x%set_host()
+    call x%set_asb()
+    call x%sync()
   end subroutine d_base_mlv_asb
 
 
@@ -3001,6 +3180,103 @@ contains
 
   end subroutine d_base_mlv_free
 
+  function d_base_mlv_get_ncfs(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%ncfs
+  end function d_base_mlv_get_ncfs
+
+  function d_base_mlv_get_dupl(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%dupl
+  end function d_base_mlv_get_dupl
+
+  function d_base_mlv_get_state(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    res = x%bldstate 
+  end function d_base_mlv_get_state
+
+  function d_base_mlv_is_null(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_null_)
+  end function d_base_mlv_is_null
+
+  function d_base_mlv_is_bld(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_bld_)
+  end function d_base_mlv_is_bld
+
+  function d_base_mlv_is_upd(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_upd_)
+  end function d_base_mlv_is_upd
+
+  function d_base_mlv_is_asb(x) result(res)
+    implicit none
+    class(psb_d_base_multivect_type), intent(in) :: x
+    logical :: res
+    res = (x%bldstate == psb_vect_asb_)
+  end function d_base_mlv_is_asb
+
+  subroutine  d_base_mlv_set_ncfs(n,x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    x%ncfs = n
+  end subroutine d_base_mlv_set_ncfs
+
+  subroutine  d_base_mlv_set_dupl(n,x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    x%dupl = n
+  end subroutine d_base_mlv_set_dupl
+
+  subroutine  d_base_mlv_set_state(n,x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    x%bldstate = n
+  end subroutine d_base_mlv_set_state
+
+  subroutine  d_base_mlv_set_null(x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_null_
+  end subroutine d_base_mlv_set_null
+
+  subroutine  d_base_mlv_set_bld(x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_bld_
+  end subroutine d_base_mlv_set_bld
+
+  subroutine  d_base_mlv_set_upd(x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_upd_
+  end subroutine d_base_mlv_set_upd
+
+  subroutine  d_base_mlv_set_asb(x)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout) :: x
+
+    x%bldstate = psb_vect_asb_
+  end subroutine d_base_mlv_set_asb
 
 
   !
@@ -3097,6 +3373,25 @@ contains
     res = .true.
   end function d_base_mlv_is_sync
 
+  !> Function  base_cpy:
+  !! \memberof  psb_d_base_vect_type
+  !! \brief     base_cpy: copy base contents
+  !!  \param    y returned variable
+  !!
+  subroutine d_base_mlv_cpy(x, y)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    class(psb_d_base_multivect_type), intent(in)   :: x
+    class(psb_d_base_multivect_type), intent(out)  :: y
+
+    if (allocated(x%v)) call y%bld(x%v)
+    call y%set_state(x%get_state())
+    call y%set_dupl(x%get_dupl())
+    call y%set_ncfs(x%get_ncfs())
+    if (allocated(x%iv)) y%iv = x%iv
+  end subroutine d_base_mlv_cpy
+
 
   !
   ! Size info.
@@ -3139,7 +3434,7 @@ contains
     integer(psb_epk_) :: res
 
     ! Force 8-byte integers.
-    res = (1_psb_epk_ * psb_sizeof_ip) * x%get_nrows() * x%get_ncols()
+    res = (1_psb_epk_ * psb_sizeof_dp) * x%get_nrows() * x%get_ncols()
 
   end function d_base_mlv_sizeof
 

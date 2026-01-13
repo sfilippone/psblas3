@@ -80,7 +80,7 @@ Module psb_z_tools_mod
       logical, intent(in), optional        :: scratch
       integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_zasb_vect
-    subroutine psb_zasb_vect_r2(x, desc_a, info,mold, scratch)
+    subroutine psb_zasb_vect_r2(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -88,6 +88,7 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_z_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_zasb_vect_r2
     subroutine psb_zasb_multivect(x, desc_a, info,mold, scratch, n)
       import

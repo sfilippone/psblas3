@@ -207,48 +207,11 @@ subroutine psb_zalloc_vect_r2(x, desc_a,info,n,lb, dupl, bldmode)
       goto 9999
     endif
   endif
-  ! As this is a rank-1 array, optional parameter N is actually ignored.
-
-  !....allocate x .....
-  if (desc_a%is_asb().or.desc_a%is_upd()) then
-    nr = max(1,desc_a%get_local_cols())
-  else if (desc_a%is_bld()) then
-    nr = max(1,desc_a%get_local_rows())
-  else
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Invalid desc_a')
-    goto 9999
-  endif
-
   allocate(x(lb_:lb_+n_-1), stat=info)
-  if (info == 0) then 
-    do i=lb_, lb_+n_-1
-      allocate(psb_z_base_vect_type :: x(i)%v, stat=info) 
-      if (info == 0) call x(i)%all(nr,info)
-      if (info == 0) call x(i)%zero()
-      if (info /= 0) exit
-    end do
-  end if
-
-  if (present(bldmode)) then
-    bldmode_ = bldmode
-  else
-    bldmode_ = psb_matbld_noremote_
-  end if
-  if (present(dupl)) then
-    dupl_ = dupl 
-  else
-    dupl_ = psb_dupl_def_
-  end if
-  
   do i=lb_, lb_+n_-1
-    call x(i)%set_dupl(dupl_)
-    call x(i)%set_remote_build(bldmode_)
-    if (x(i)%is_remote_build()) then
-      nrmt_ = max(100,(desc_a%get_local_cols()-desc_a%get_local_rows()))
-      allocate(x(i)%rmtv(nrmt_))
-    end if
+    call psb_geall(x(i),desc_a,info,dupl, bldmode)
   end do
+
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
@@ -261,7 +224,6 @@ subroutine psb_zalloc_vect_r2(x, desc_a,info,n,lb, dupl, bldmode)
 9999 call psb_error_handler(ctxt,err_act)
 
   return
-
 end subroutine psb_zalloc_vect_r2
 
 
