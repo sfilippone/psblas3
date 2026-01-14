@@ -34,6 +34,8 @@ psb_i_t    psb_c_dgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,
 			psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeasb(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeasb_options(psb_c_dvector *xh, psb_c_descriptor *cdh, psb_i_t dupl);
+psb_i_t	   psb_c_dgeasb_options_format(psb_c_dvector *xh, psb_c_descriptor *cdh,
+										const char *fmt, psb_i_t dupl);
 psb_i_t    psb_c_dgefree(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_d_t    psb_c_dgetelem(psb_c_dvector *xh,psb_l_t index,psb_c_descriptor *cd);
 
@@ -56,8 +58,8 @@ psb_i_t    psb_c_dset_matasb(psb_c_dspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_dset_matbld(psb_c_dspmat *mh,psb_c_descriptor *cdh);
 psb_i_t		 psb_c_dcopy_mat(psb_c_dspmat *ah,psb_c_dspmat *bh,psb_c_descriptor *cdh);
 
-/* psb_i_t    psb_c_dspasb_opt(psb_c_dspmat *mh, psb_c_descriptor *cdh,  */
-/* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
+psb_i_t    psb_c_dspasb_opt(psb_c_dspmat *mh, psb_c_descriptor *cdh,
+ 			const char *afmt, psb_i_t upd, psb_i_t dupl); 
 psb_i_t    psb_c_dsprn(psb_c_dspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_dmat_name_print(psb_c_dspmat *mh, char *name);
 psb_i_t		 psb_c_dvect_set_scal(psb_c_dvector *xh, psb_d_t val);

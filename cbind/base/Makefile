@@ -26,6 +26,10 @@ OBJS=$(FOBJS) $(COBJS)
 
 LIBNAME=$(CBINDLIBNAME)	
 
+# Ensure C-interoperable modules are built with CUDA definitions where available.
+.F90.o:
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) $(FCUDEFINES) -c $< -o $@
+
 
 objs:  $(OBJS) $(CMOD)
 	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
@@ -58,6 +62,7 @@ psb_c_comm_cbind_mod.o psb_z_comm_cbind_mod.o: psb_base_tools_cbind_mod.o psb_ob
 psb_base_psblas_cbind_mod.o: psb_s_psblas_cbind_mod.o psb_d_psblas_cbind_mod.o psb_c_psblas_cbind_mod.o psb_z_psblas_cbind_mod.o
 
 psb_cpenv_mod.o: psb_base_string_cbind_mod.o psb_objhandle_mod.o 
+	$(FC) $(FCOPT) $(FINCLUDES) $(FCUDEFINES) -c psb_cpenv_mod.F90 -o psb_cpenv_mod.o
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

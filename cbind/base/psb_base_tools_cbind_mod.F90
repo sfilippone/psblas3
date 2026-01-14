@@ -3,8 +3,9 @@ module psb_base_tools_cbind_mod
   use psb_base_mod
   use psb_objhandle_mod
   use psb_cpenv_mod
-  use psb_base_string_cbind_mod
-
+#ifdef PSB_HAVE_CUDA
+  use psb_cuda_mod
+#endif
 contains
 
   ! Aggiungere funzione per estrarre comunicatore
@@ -270,6 +271,49 @@ contains
 
   end function psb_c_cdasb
 
+  function psb_c_cdasb_format(cdh,format) bind(c,name='psb_c_cdasb_format') result(res)
+    use psb_base_string_cbind_mod, only: stringc2f
+    implicit none
+    ! Takes as input the desired format bewten CPU or GPU, and assembles accordingly
+    ! via the mold parameter of psb_cdasb
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: cdh
+    type(psb_desc_type), pointer :: descp
+    integer(psb_c_ipk_)           :: info
+    character(c_char), dimension(*) :: format
+
+    ! Local variables
+    character(len=6) :: fformat
+    ! mold variables
+#ifdef PSB_HAVE_CUDA
+    type(psb_i_vect_cuda), target        :: ivgpu
+#endif
+    type(psb_i_base_vect_type), target   :: ivect
+    class(psb_i_base_vect_type), pointer :: imold
+
+    call stringc2f(format,fformat)
+
+    res = -1
+    select case (psb_toupper(fformat))
+#ifdef PSB_HAVE_CUDA
+    case('GPU','DEVICE')
+      imold => ivgpu
+#endif
+    case('CPU','HOST')
+      imold => ivect
+    case default
+      write(psb_out_unit,*) 'psb_c_cdasb_format: Unknown format ',fformat
+      imold => ivect
+    end select
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      call psb_cdasb(descp,info,mold=imold)
+      res = info
+    end if
+
+  end function psb_c_cdasb_format
 
  function psb_c_cdfree(cdh) bind(c,name='psb_c_cdfree') result(res)
 

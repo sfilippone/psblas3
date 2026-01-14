@@ -50,6 +50,67 @@ contains
 
   end subroutine psb_c_init
 
+#ifdef PSB_HAVE_CUDA
+  subroutine psb_c_cuda_init(cctxt) bind(c, name="psb_c_cuda_init")
+    use psb_base_mod, only : psb_ctxt_type
+    use psb_cuda_mod, only : psb_cuda_init
+    implicit none
+
+    type(psb_c_object_type)      :: cctxt
+    type(psb_ctxt_type), pointer :: ctxt
+    integer :: info
+
+    if (c_associated(cctxt%item)) then
+      call c_f_pointer(cctxt%item,ctxt)
+    end if
+    call psb_cuda_init(ctxt)
+    cctxt%item = c_loc(ctxt)
+  end subroutine psb_c_cuda_init
+
+  subroutine psb_c_cuda_init_opt(cctxt,cdevice) bind(c, name="psb_c_cuda_init_opt")
+    use psb_base_mod, only : psb_ctxt_type
+    use psb_cuda_mod, only : psb_cuda_init
+    implicit none
+
+    type(psb_c_object_type)      :: cctxt
+    type(psb_ctxt_type), pointer :: ctxt
+    integer(psb_c_mpk_), value   :: cdevice
+    integer :: info
+    ! Local variables
+    integer(psb_mpk_) :: cdevice_f
+
+    cdevice_f = cdevice
+
+    if (c_associated(cctxt%item)) then
+      call c_f_pointer(cctxt%item,ctxt)
+    end if
+    call psb_cuda_init(ctxt,cdevice_f)
+    cctxt%item = c_loc(ctxt)
+
+  end subroutine psb_c_cuda_init_opt
+
+  subroutine psb_c_cuda_exit() bind(c, name="psb_c_cuda_exit")
+    use psb_cuda_mod, only : psb_cuda_exit
+    implicit none
+    
+    call psb_cuda_exit()
+    return
+  end subroutine psb_c_cuda_exit
+
+  function psb_c_cuda_getDeviceCount() bind(c, name="psb_c_cuda_getDeviceCount") result(res)
+    use psb_cuda_mod, only : psb_cuda_getDeviceCount
+    implicit none
+    integer(psb_c_ipk_) :: res
+    ! Local variables
+    integer(psb_ipk_) :: fres
+
+    fres = psb_cuda_getDeviceCount()
+    res = fres
+  
+    return
+  end function psb_c_cuda_getDeviceCount
+#endif
+
   ! Get MPI_Fint from C, psb_c_object_type and start a psb_ctxt_type 
   ! context from it.
   subroutine psb_c_init_from_fint(cctxt,fint) bind(c)
