@@ -32,8 +32,8 @@ contains
           return
         end if
 
-        call stringc2f(matrixtitle,mtitle)
-        call stringc2f(filename,fname)
+        call psb_stringc2f(matrixtitle,mtitle)
+        call psb_stringc2f(filename,fname)
 
         call mm_mat_write(ap,mtitle,info,filename=fname)
 

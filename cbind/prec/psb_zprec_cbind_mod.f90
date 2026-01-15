@@ -39,7 +39,7 @@ contains
     if (info /= 0) return
     ph%item = c_loc(precp)
 
-    call stringc2f(ptype,fptype)
+    call psb_stringc2f(ptype,fptype)
     
     call psb_precinit(ctxt,precp,fptype,info) 
     

@@ -12,7 +12,7 @@ dirs:
 mods: basemods precmods linslvmods utilmods cbindmods extmods $(CUDAMODS) $(OACCMODS)
 precmods utilmods extmods: basemods
 linslvmods: precmods
-cbindmods: basemods precmods linslvmods utilmods
+cbindmods: basemods precmods linslvmods utilmods $(CUDAMODS)
 oaccmods: extmods
 cudamods: extmods
 basemods:

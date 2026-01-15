@@ -166,7 +166,6 @@ contains
   function psb_c_dgeasb_options_format(xh,cdh,dupl,format) bind(c) result(res)
     ! Takes into account format argument as a c string, and uses it to call the appropriate psb_geasb
     ! with mold argument
-    use psb_base_string_cbind_mod, only: stringc2f
     implicit none
     integer(psb_c_ipk_) :: res
     type(psb_c_dvector) :: xh
@@ -187,7 +186,7 @@ contains
     class(psb_d_base_vect_type), pointer :: vmold
 
     ! Select mold based on format
-    call stringc2f(format,fformat)
+    call psb_stringc2f(format,fformat)
 
     select case (psb_toupper(fformat))
 #ifdef PSB_HAVE_CUDA  
@@ -467,7 +466,7 @@ contains
     else
       return
     end if    
-    call stringc2f(afmt,fafmt)
+    call psb_stringc2f(afmt,fafmt)
 
     ! Set the mold variable based on afmt
     select case (psb_toupper(fafmt))

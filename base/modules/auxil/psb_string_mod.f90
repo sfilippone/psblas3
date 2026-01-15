@@ -31,7 +31,11 @@
 !    
 module psb_string_mod
   use psb_const_mod, only : psb_ipk_
+  use iso_c_binding
+
   public psb_tolower, psb_toupper, psb_touppers
+  public psb_stringf2c, psb_stringc2f
+  
   interface psb_tolower
     module procedure psb_tolowerc
   end interface
@@ -127,6 +131,36 @@ contains
 
   end subroutine psb_sub_toupperc
 
+  subroutine psb_stringc2f(cstring,fstring) 
+    character(c_char)        :: cstring(*)
+    character(len=*)         :: fstring
+    integer :: i
+    
+    i = 1
+    do 
+      if (cstring(i) == c_null_char) exit
+      if (i > len(fstring)) exit
+      fstring(i:i) = cstring(i)
+      i = i + 1 
+    end do
+    do 
+      if (i > len(fstring)) exit
+      fstring(i:i) = " "
+      i = i + 1 
+    end do
+    return
+  end subroutine psb_stringc2f
 
+  subroutine psb_stringf2c(fstring,cstring)
+    character(c_char)        :: cstring(*)
+    character(len=*)         :: fstring
+    integer :: i
+    
+    do i=1, len(fstring)
+      cstring(i) = fstring(i:i)
+    end do
+    cstring(len(fstring)+1) = c_null_char
+    return
+  end subroutine psb_stringf2c
 
 end module psb_string_mod

@@ -323,28 +323,7 @@ Contains
     character(len=256) :: res
     character :: cstring(256)
     call psb_C_cpy_NameString(cstring)
-    call stringc2f(cstring,res)
+    call psb_stringc2f(cstring,res)
   end function psb_cuda_DeviceName
-
-
-  subroutine stringc2f(cstring,fstring)
-    character(c_char)        :: cstring(*)
-    character(len=*)         :: fstring
-    integer :: i
-    
-    i = 1
-    do 
-      if (cstring(i) == c_null_char) exit
-      if (i > len(fstring)) exit
-      fstring(i:i) = cstring(i)
-      i = i + 1 
-    end do
-    do 
-      if (i > len(fstring)) exit
-      fstring(i:i) = " "
-      i = i + 1 
-    end do
-    return
-  end subroutine stringc2f
 
 end module psb_cuda_env_mod

@@ -85,7 +85,7 @@ contains
     end if
 
     
-    call stringc2f(methd,fmethd)
+    call psb_stringc2f(methd,fmethd)
     feps    = eps
     fitmax  = itmax
     fitrace = itrace
