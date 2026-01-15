@@ -10,7 +10,6 @@ set(PSB_cbind_source_files
   base/psb_d_serial_cbind_mod.F90
   base/psb_c_tools_cbind_mod.F90
   base/psb_c_serial_cbind_mod.F90
-  base/psb_base_string_cbind_mod.f90
   base/psb_base_tools_cbind_mod.F90
   base/psb_z_comm_cbind_mod.f90
   base/psb_s_serial_cbind_mod.F90
