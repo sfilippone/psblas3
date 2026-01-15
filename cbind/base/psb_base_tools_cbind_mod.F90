@@ -272,7 +272,6 @@ contains
   end function psb_c_cdasb
 
   function psb_c_cdasb_format(cdh,format) bind(c,name='psb_c_cdasb_format') result(res)
-    use psb_base_string_cbind_mod, only: stringc2f
     implicit none
     ! Takes as input the desired format bewten CPU or GPU, and assembles accordingly
     ! via the mold parameter of psb_cdasb
@@ -292,7 +291,7 @@ contains
     type(psb_i_base_vect_type), target   :: ivect
     class(psb_i_base_vect_type), pointer :: imold
 
-    call stringc2f(format,fformat)
+    call psb_stringc2f(format,fformat)
 
     res = -1
     select case (psb_toupper(fformat))

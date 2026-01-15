@@ -444,8 +444,8 @@ contains
   end subroutine psb_c_hbcast
 
   function psb_c_f2c_errmsg(cmesg,len) bind(c) result(res)
-    use psb_base_mod, only : psb_errpop,psb_max_errmsg_len_, psb_ctxt_type
-    use psb_base_string_cbind_mod
+    use psb_base_mod, only : psb_errpop,psb_max_errmsg_len_, &
+         & psb_ctxt_type, psb_stringc2f
     implicit none
     character(c_char), intent(inout)  :: cmesg(*)
     integer(psb_c_ipk_), intent(in), value :: len
@@ -464,7 +464,7 @@ contains
         il = len_trim(tmp)
         il = min(il,len-ll)
         !write(0,*) 'loop f2c_errmsg: ', ll,il
-        call stringf2c(tmp(1:il),cmesg(ll:ll+il))
+        call psb_stringf2c(tmp(1:il),cmesg(ll:ll+il))
         cmesg(ll+il)=c_new_line
         ll = ll+il+1
       end do

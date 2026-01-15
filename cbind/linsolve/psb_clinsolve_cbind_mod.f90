@@ -11,7 +11,6 @@ contains
     use psb_linsolve_mod
     use psb_objhandle_mod
     use psb_prec_cbind_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_ipk_)      :: res
     type(psb_c_cspmat)    :: ah
@@ -36,7 +35,6 @@ contains
     use psb_linsolve_mod
     use psb_objhandle_mod
     use psb_prec_cbind_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_ipk_)      :: res
     type(psb_c_cspmat)    :: ah
@@ -108,7 +106,6 @@ contains
     use psb_linsolve_mod
     use psb_objhandle_mod
     use psb_prec_cbind_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_ipk_)      :: res
     type(psb_c_cspmat)    :: ah
@@ -124,7 +121,6 @@ contains
     
   end function psb_c_crichardson
 
-
   function  psb_c_crichardson_opt(ah,ph,bh,xh,eps,cdh,&
        & itmax,iter,err,itrace,irst,istop) bind(c) result(res)
     use psb_base_mod
@@ -132,7 +128,6 @@ contains
     use psb_linsolve_mod
     use psb_objhandle_mod
     use psb_prec_cbind_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_ipk_)      :: res
     type(psb_c_cspmat)    :: ah

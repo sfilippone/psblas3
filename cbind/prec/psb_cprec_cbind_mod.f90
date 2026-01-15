@@ -3,7 +3,6 @@ module psb_cprec_cbind_mod
   use iso_c_binding
   use psb_prec_mod, only : psb_cprec_type
   use psb_objhandle_mod
-  use psb_base_string_cbind_mod
 
   type, bind(c) :: psb_c_cprec
     type(c_ptr) :: item = c_null_ptr
@@ -16,7 +15,6 @@ contains
     use psb_base_mod
     use psb_prec_mod
     use psb_cpenv_mod
-    use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_ipk_)            :: res
     type(psb_c_object_type), value :: cctxt   
@@ -53,7 +51,6 @@ contains
     use psb_base_mod
     use psb_prec_mod
     use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     
     integer(psb_c_ipk_) :: res
@@ -95,7 +92,6 @@ contains
     use psb_base_mod
     use psb_prec_mod
     use psb_objhandle_mod
-    use psb_base_string_cbind_mod
     implicit none 
     
     integer(psb_c_ipk_) :: res
