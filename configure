@@ -11205,7 +11205,7 @@ printf "%s\n" "$as_me: CUDA version ${PSB_CUDA_VERSION}" >&6;}
 	          CUDAD=cudad;
          CUDAMODS=cudamods;
          CUDALD=cudald;
-         LPSB_CUDA="-lpsb_cuda";
+         LPSB_CUDA="-lpsb_cuda -lpsb_ext";
          EXTRALDLIBS="-lstdc++";
          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: At this point GPUTARGET is $CUDAD $CUDALD" >&5
 printf "%s\n" "$as_me: At this point GPUTARGET is $CUDAD $CUDALD" >&6;}

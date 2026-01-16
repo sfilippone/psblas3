@@ -902,7 +902,7 @@ else
          CUDAD=cudad;
          CUDAMODS=cudamods;
          CUDALD=cudald;
-         LPSB_CUDA="-lpsb_cuda";	
+         LPSB_CUDA="-lpsb_cuda -lpsb_ext";	
          EXTRALDLIBS="-lstdc++";
          AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
    
