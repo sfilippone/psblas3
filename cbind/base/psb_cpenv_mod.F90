@@ -1,5 +1,6 @@
 module psb_cpenv_mod
   use iso_c_binding
+  use psb_base_mod
   use psb_objhandle_mod
 
   integer, private :: psb_c_index_base=0
@@ -22,7 +23,6 @@ contains
   end subroutine psb_c_set_index_base
 
   function psb_c_get_errstatus() bind(c) result(res)
-    use psb_base_mod, only : psb_get_errstatus, psb_ctxt_type
     implicit none
 
     integer(psb_c_ipk_)  :: res
@@ -31,7 +31,6 @@ contains
   end function psb_c_get_errstatus
 
   subroutine psb_c_init(cctxt) bind(c)
-    use psb_base_mod, only : psb_init, psb_ctxt_type
     implicit none
 
     type(psb_c_object_type)      :: cctxt
@@ -52,7 +51,6 @@ contains
 
 #ifdef PSB_HAVE_CUDA
   subroutine psb_c_cuda_init(cctxt) bind(c, name="psb_c_cuda_init")
-    use psb_base_mod, only : psb_ctxt_type
     use psb_cuda_mod, only : psb_cuda_init
     implicit none
 
@@ -68,7 +66,6 @@ contains
   end subroutine psb_c_cuda_init
 
   subroutine psb_c_cuda_init_opt(cctxt,cdevice) bind(c, name="psb_c_cuda_init_opt")
-    use psb_base_mod, only : psb_ctxt_type
     use psb_cuda_mod, only : psb_cuda_init
     implicit none
 
@@ -114,7 +111,6 @@ contains
   ! Get MPI_Fint from C, psb_c_object_type and start a psb_ctxt_type 
   ! context from it.
   subroutine psb_c_init_from_fint(cctxt,fint) bind(c)
-    use psb_base_mod, only : psb_init, psb_ctxt_type
     implicit none
 
     type(psb_c_object_type)      :: cctxt
@@ -180,7 +176,6 @@ contains
   end function
 
   subroutine psb_c_exit_ctxt(cctxt) bind(c)
-    use psb_base_mod, only : psb_exit, psb_ctxt_type
     type(psb_c_object_type), value :: cctxt
 
     type(psb_ctxt_type), pointer :: ctxt
@@ -193,7 +188,6 @@ contains
   end subroutine psb_c_exit_ctxt
 
   subroutine psb_c_exit(cctxt) bind(c)
-    use psb_base_mod, only : psb_exit, psb_ctxt_type
     type(psb_c_object_type), value :: cctxt
 
     type(psb_ctxt_type), pointer :: ctxt
@@ -207,7 +201,6 @@ contains
   end subroutine psb_c_exit
 
   subroutine psb_c_abort(cctxt) bind(c)
-    use psb_base_mod, only : psb_abort, psb_ctxt_type
     type(psb_c_object_type), value :: cctxt
 
     type(psb_ctxt_type), pointer :: ctxt
@@ -217,7 +210,6 @@ contains
   end subroutine psb_c_abort
 
   subroutine psb_c_check_error(cctxt) bind(c)
-    use psb_base_mod, only : psb_init, psb_ctxt_type, psb_check_error
     implicit none
 
     type(psb_c_object_type), value :: cctxt
@@ -230,7 +222,6 @@ contains
   end subroutine psb_c_check_error
 
   subroutine psb_c_info(cctxt,iam,np) bind(c)
-    use psb_base_mod, only : psb_info, psb_ctxt_type
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_)        :: iam,np
 
@@ -241,7 +232,6 @@ contains
   end subroutine psb_c_info
 
   subroutine psb_c_barrier(cctxt) bind(c)
-    use psb_base_mod, only : psb_barrier, psb_ctxt_type
     type(psb_c_object_type), value :: cctxt
 
     type(psb_ctxt_type), pointer :: ctxt
@@ -250,13 +240,11 @@ contains
   end subroutine psb_c_barrier
 
   real(c_double) function psb_c_wtime() bind(c)
-    use psb_base_mod, only : psb_wtime, psb_ctxt_type
 
     psb_c_wtime = psb_wtime()
   end function psb_c_wtime
 
   subroutine psb_c_mbcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -277,7 +265,6 @@ contains
   end subroutine psb_c_mbcast
 
   subroutine psb_c_ibcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -298,7 +285,6 @@ contains
   end subroutine psb_c_ibcast
 
   subroutine psb_c_lbcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -318,7 +304,6 @@ contains
   end subroutine psb_c_lbcast
 
   subroutine psb_c_ebcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -338,7 +323,6 @@ contains
   end subroutine psb_c_ebcast
 
   subroutine psb_c_sbcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -358,7 +342,6 @@ contains
   end subroutine psb_c_sbcast
 
   subroutine psb_c_dbcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -379,7 +362,6 @@ contains
 
 
   subroutine psb_c_cbcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -399,7 +381,6 @@ contains
   end subroutine psb_c_cbcast
 
   subroutine psb_c_zbcast(cctxt,n,v,root) bind(c)
-    use psb_base_mod
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: n, root
@@ -419,7 +400,6 @@ contains
   end subroutine psb_c_zbcast
 
   subroutine psb_c_hbcast(cctxt,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_info, psb_ipk_, psb_ctxt_type
     implicit none
     type(psb_c_object_type), value :: cctxt
     integer(psb_c_ipk_), value     :: root
@@ -444,8 +424,7 @@ contains
   end subroutine psb_c_hbcast
 
   function psb_c_f2c_errmsg(cmesg,len) bind(c) result(res)
-    use psb_base_mod, only : psb_errpop,psb_max_errmsg_len_, &
-         & psb_ctxt_type, psb_stringc2f
+    use psb_string_mod
     implicit none
     character(c_char), intent(inout)  :: cmesg(*)
     integer(psb_c_ipk_), intent(in), value :: len
@@ -474,17 +453,14 @@ contains
   end function psb_c_f2c_errmsg
 
   subroutine psb_c_seterraction_ret() bind(c)
-    use psb_base_mod, only : psb_set_erraction, psb_act_ret_, psb_ctxt_type
     call psb_set_erraction(psb_act_ret_)
   end subroutine psb_c_seterraction_ret
 
   subroutine psb_c_seterraction_print() bind(c)
-    use psb_base_mod, only : psb_set_erraction, psb_act_print_, psb_ctxt_type
     call psb_set_erraction(psb_act_print_)
   end subroutine psb_c_seterraction_print
 
   subroutine psb_c_seterraction_abort() bind(c)
-    use psb_base_mod, only : psb_set_erraction, psb_act_abort_, psb_ctxt_type
     call psb_set_erraction(psb_act_abort_)
   end subroutine psb_c_seterraction_abort
 

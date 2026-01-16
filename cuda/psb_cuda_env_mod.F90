@@ -31,7 +31,7 @@
   
 
 module psb_cuda_env_mod
-  use psb_const_mod
+  use psb_base_mod
   use iso_c_binding
   use base_cusparse_mod
 !  interface psb_cuda_init

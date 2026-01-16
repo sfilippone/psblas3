@@ -33,8 +33,8 @@ module psb_string_mod
   use psb_const_mod, only : psb_ipk_
   use iso_c_binding
 
-  public psb_tolower, psb_toupper, psb_touppers
-  public psb_stringf2c, psb_stringc2f
+  public psb_tolower, psb_toupper, psb_touppers,&
+       & psb_stringf2c, psb_stringc2f
   
   interface psb_tolower
     module procedure psb_tolowerc
