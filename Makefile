@@ -9,27 +9,23 @@ dirs:
 	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 	(if test ! -d modules ; then mkdir modules; fi;)	
 
-mods: basemods precmods linslvmods utilmods cbindmods extmods $(CUDAMODS) $(OACCMODS)
-precmods utilmods extmods: basemods
-linslvmods: precmods
-cbindmods: basemods precmods linslvmods utilmods
-oaccmods: extmods
-cudamods: extmods
+mods: basemods utilmods precmods linslvmods cbindmods extmods $(CUDAMODS) $(OACCMODS)
+
 basemods:
 	$(MAKE) -C base mods
-precmods:
+precmods: basemods
 	$(MAKE) -C prec mods
-linslvmods:
+linslvmods: precmods
 	$(MAKE) -C linsolve mods
-utilmods:
+utilmods: basemods
 	$(MAKE) -C util mods 
-cbindmods:
+cbindmods: basemods precmods linslvmods utilmods extmods $(CUDAMODS)
 	$(MAKE) -C cbind objs
-extmods:   
+extmods: basemods  
 	$(MAKE) -C ext mods
-cudamods:   
+cudamods: extmods  
 	$(MAKE) -C cuda mods
-oaccmods:   
+oaccmods: extmods  
 	$(MAKE) -C openacc mods 
 
 
