@@ -127,10 +127,10 @@ iobjs: $(FOBJS)
 cudaobjs: $(FOBJS)
 	$(MAKE) -C CUDA objs
 
-ilib: objs
-	$(MAKE) -C impl lib LIBNAME=$(LIBNAME)
+ilib: objs spgpulib 
+	$(MAKE) -C impl lib 
 cudalib: objs ilib
-	$(MAKE) -C CUDA lib LIBNAME=$(LIBNAME)
+	$(MAKE) -C CUDA lib 
 
 clean: cclean iclean cudaclean spgpuclean
 	/bin/rm -f  $(FOBJS) *$(.mod) *.a

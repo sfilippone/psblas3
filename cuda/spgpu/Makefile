@@ -7,7 +7,7 @@ UP=..
 LIBDIR=$(TOP)/lib
 INCDIR=$(TOP)/include
 MODDIR=$(TOP)/modules
-LIBNAME=$(UP)/libpsb_cuda.a
+LIBNAME=libpsb_cuda.a
 
 OBJS=coo.o core.o dia.o ell.o hdia.o hell.o 
 CU_INCLUDES=-I$(INCDIR) $(CUDA_INCLUDES)
@@ -17,13 +17,13 @@ all: incl objs
 objs: incl $(OBJS) iobjs
 
 lib: objs iobjs ilib
-	$(AR) $(LIBNAME) $(OBJS)
+	$(AR) ../$(LIBNAME) $(OBJS)
 #	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
 iobjs:
 	$(MAKE) -C kernels objs
 ilib:
-	$(MAKE) -C kernels lib LIBNAME=$(LIBNAME)
+	$(MAKE) -C kernels lib
 
 incl:
 	/bin/cp -p *.h $(INCDIR)
