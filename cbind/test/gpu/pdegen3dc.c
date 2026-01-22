@@ -240,16 +240,16 @@ psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
   info = psb_c_cdasb_format(cdh, cdfmt);
   if (info != 0)
     return (info);
-  info = psb_c_dspasb_opt(ah, cdh, afmt, psb_upd_def_, psb_dupl_def_);
+  info = psb_c_dspasb_opt(ah, cdh, afmt, PSB_UPD_DFLT, PSB_DUPL_DEF);
   if (info != 0)
     return (info);
-  info = psb_c_dgeasb_options_format(xh, cdh, psb_dupl_add_, cdfmt);
+  info = psb_c_dgeasb_options_format(xh, cdh, PSB_DUPL_ADD, cdfmt);
   if (info != 0)
     return (info);
-  info = psb_c_dgeasb_options_format(bh, cdh, psb_dupl_add_, cdfmt);
+  info = psb_c_dgeasb_options_format(bh, cdh, PSB_DUPL_ADD, cdfmt);
   if (info != 0)
     return (info);
-  info = psb_c_dgeasb_options_format(rh, cdh, psb_dupl_add_, cdfmt);
+  info = psb_c_dgeasb_options_format(rh, cdh, PSB_DUPL_ADD, cdfmt);
   if (info != 0)
     return (info);
 #else
@@ -321,6 +321,19 @@ int main(int argc, char *argv[])
     sscanf(buffer, "%d", &itrace);
     fgets(buffer, LINEBUFSIZE, stdin);
     sscanf(buffer, "%d", &irst);
+
+    /* Echo input parameters */
+    printf("Number of processes: %d\n", np);
+    printf("Number of parameters read: %d\n", nparms);
+    printf("Krylov method: %s\n", methd);
+    printf("Preconditioner type: %s\n", ptype);
+    printf("Sparse matrix format: %s\n", afmt);
+    printf("Descriptor format: %s\n", cdfmt);
+    printf("Problem dimension (internal points per direction): %d\n", idim);
+    printf("Stopping criterion (1:backward error 2: ||r||_2/||b||_2): %d\n", istop);
+    printf("Maximum number of iterations: %d\n", itmax);
+    printf("Info message frequency (every itrace iterations): %d\n", itrace);
+    printf("Restart depth for RGMRES or BiCGSTAB(L): %d\n", irst);
   }
   /* Now broadcast the values, and check they're OK */
   psb_c_ibcast(*cctxt, 1, &nparms, 0);

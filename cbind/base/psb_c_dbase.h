@@ -35,7 +35,7 @@ psb_i_t    psb_c_dgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_d_t *val,
 psb_i_t    psb_c_dgeasb(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_dgeasb_options(psb_c_dvector *xh, psb_c_descriptor *cdh, psb_i_t dupl);
 psb_i_t	   psb_c_dgeasb_options_format(psb_c_dvector *xh, psb_c_descriptor *cdh,
-										const char *fmt, psb_i_t dupl);
+										psb_i_t dupl, const char *fmt);
 psb_i_t    psb_c_dgefree(psb_c_dvector *xh, psb_c_descriptor *cdh);
 psb_d_t    psb_c_dgetelem(psb_c_dvector *xh,psb_l_t index,psb_c_descriptor *cd);
 
