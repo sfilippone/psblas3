@@ -102,16 +102,7 @@ extern "C" {
   psb_i_t    psb_c_g2l(psb_c_descriptor *cdh,psb_l_t gindex,bool cowned);
 
 
-  /*  legal values for upd argument */
-#define psb_upd_srch_   98764
-#define psb_upd_perm_   98765
-#define psb_upd_def_   psb_upd_srch_
-  /*  legal values for dupl argument */
-#define psb_dupl_ovwrt_  0
-#define psb_dupl_add_    1
-#define psb_dupl_err_    2
-#define psb_dupl_def_    psb_dupl_ovwrt_
-
+ 
   /* legal values for afmt */
 #define PSB_AFMT_CSR     "CSR"
 #define PSB_AFMT_CSC     "CSC"
@@ -122,6 +113,17 @@ extern "C" {
 #define psb_NoTrans_    "N"
 #define psb_Trans_      "T"
 #define psb_ConjTrans_  "C"
+
+#if 0
+  /*  legal values for upd argument */
+#define psb_upd_srch_   98764
+#define psb_upd_perm_   98765
+#define psb_upd_def_    psb_upd_srch_
+  /*  legal values for dupl argument */
+#define psb_dupl_ovwrt_  0
+#define psb_dupl_add_    1
+#define psb_dupl_err_    2
+#define psb_dupl_def_    psb_dupl_ovwrt_
 
   /*  legal values for halo swap modes argument */
 #define  psb_swap_send_  1
@@ -135,7 +137,7 @@ extern "C" {
 #define psb_avg_         2
 #define psb_square_root_ 3
 #define psb_setzero_     4
-
+#endif
 
 #ifdef __cplusplus
 }

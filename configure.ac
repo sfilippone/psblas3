@@ -699,9 +699,26 @@ PSBLASDUPNUL=`cat $CFILE| grep dupl_null | $AWK '{print $6;}'`;
 PSBLASDUPADD=`cat $CFILE| grep "psb_dupl_add_   =" | $AWK '{print $6;}'`;
 PSBLASDUPOVW=`cat $CFILE| grep dupl_ovwrt| $AWK '{print $6;}'`;
 PSBLASDUPERR=`cat $CFILE| grep dupl_err| $AWK '{print $6;}'`;
-PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
+PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$// `;
+PSBLASUPDSRC=`cat $CFILE| grep "psb_upd_srch_   ="| $AWK '{print $6;}' `;
+PSBLASUPDPRM=`cat $CFILE| grep "psb_upd_perm_   ="| $AWK '{print $6;}' `;
+PSBLASUPDDEF=`cat $CFILE| grep "psb_upd_dflt_   ="| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
 PSBLASBLDNOR=`cat $CFILE| grep matbld_noremote| $AWK '{print $6;}'`;
 PSBLASBLDRMT=`cat $CFILE| grep matbld_remote| $AWK '{print $6;}'`;	
+
+CFILE="base/modules/desc/psb_desc_const_mod.f90";
+PSBSWPSND=`cat $CFILE| grep swap_send| $AWK '{print $6;}'`;
+PSBSWPRCV=`cat $CFILE| grep swap_recv| $AWK '{print $6;}'`;
+PSBSWPSYN=`cat $CFILE| grep swap_sync| $AWK '{print $6;}'`;
+PSBSWPMPI=`cat $CFILE| grep swap_mpi| $AWK '{print $6;}'`;	
+PSBNONE=`cat $CFILE| grep psb_none| $AWK '{print $6;}'`;
+PSBSUM=`cat $CFILE| grep psb_sum| $AWK '{print $6;}'`;
+PSBAVG=`cat $CFILE| grep psb_avg| $AWK '{print $6;}'`;
+PSBSQRT=`cat $CFILE| grep square_root| $AWK '{print $6;}'`;
+PSBSETZ=`cat $CFILE| grep psb_setzero| $AWK '{print $6;}'`;
+PSBCLCSTR=`cat $CFILE| grep collective_start| $AWK '{print $6;}'`;
+PSBCLCEND=`cat $CFILE| grep collective_end| $AWK '{print $6;}'`;
+PSBCLCSYN=`cat $CFILE| grep collective_sync| $AWK '{print $6;}'`;
 
 AC_MSG_RESULT([ version  $PSBLASSTRING])
 
@@ -1084,8 +1101,26 @@ AC_SUBST(PSBLASDUPADD)
 AC_SUBST(PSBLASDUPOVW)
 AC_SUBST(PSBLASDUPERR)
 AC_SUBST(PSBLASDUPDEF)
+AC_SUBST(PSBLASDUPDEF)
+AC_SUBST(PSBLASUPDSRC)
+AC_SUBST(PSBLASUPDPRM)
+AC_SUBST(PSBLASUPDDEF)
 AC_SUBST(PSBLASBLDNOR)
 AC_SUBST(PSBLASBLDRMT)
+
+AC_SUBST(PSBSWPSND)
+AC_SUBST(PSBSWPRCV)
+AC_SUBST(PSBSWPSYN)
+AC_SUBST(PSBSWPMPI)
+AC_SUBST(PSBNONE)
+AC_SUBST(PSBSUM)
+AC_SUBST(PSBAVG)
+AC_SUBST(PSBSQRT)
+AC_SUBST(PSBSETZ)
+AC_SUBST(PSBCLCSTR)
+AC_SUBST(PSBCLCEND)
+AC_SUBST(PSBCLCSYN)
+
 
 AC_SUBST(CSERIALMPI)
 AC_SUBST(CHAVE_OPENMP)

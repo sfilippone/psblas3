@@ -10,11 +10,7 @@ dirs:
 	(if test ! -d modules ; then mkdir modules; fi;)	
 
 mods: basemods utilmods precmods linslvmods cbindmods extmods $(CUDAMODS) $(OACCMODS)
-precmods utilmods extmods: basemods
-linslvmods: precmods
-cbindmods: basemods precmods linslvmods utilmods extmods $(CUDAMODS)
-oaccmods: extmods
-cudamods: extmods
+
 basemods:
 	$(MAKE) -C base mods
 precmods: basemods
@@ -23,7 +19,7 @@ linslvmods: precmods
 	$(MAKE) -C linsolve mods
 utilmods: basemods
 	$(MAKE) -C util mods 
-cbindmods: basemods precmods linslvmods utilmods $(CUDAMODS)
+cbindmods: basemods precmods linslvmods utilmods extmods $(CUDAMODS)
 	$(MAKE) -C cbind objs
 extmods: basemods  
 	$(MAKE) -C ext mods

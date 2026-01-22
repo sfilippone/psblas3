@@ -39,22 +39,30 @@ module psb_desc_const_mod
   !
   !     Communication, prolongation & restriction
   !
-  integer(psb_ipk_), parameter :: psb_nohalo_=0,  psb_halo_=1
+  integer(psb_ipk_), parameter :: psb_nohalo_ = 0
+  integer(psb_ipk_), parameter :: psb_halo_   = 1
   ! For overlap update. 
-  integer(psb_ipk_), parameter :: psb_none_=0,  psb_sum_=1
-  integer(psb_ipk_), parameter :: psb_avg_=2,  psb_square_root_=3
-  integer(psb_ipk_), parameter :: psb_setzero_=4
+  integer(psb_ipk_), parameter :: psb_none_        = 0
+  integer(psb_ipk_), parameter :: psb_sum_         = 1
+  integer(psb_ipk_), parameter :: psb_avg_         = 2
+  integer(psb_ipk_), parameter :: psb_square_root_ = 3
+  integer(psb_ipk_), parameter :: psb_setzero_     = 4
 
   ! The following are bit fields. 
-  integer(psb_ipk_), parameter :: psb_swap_send_=1, psb_swap_recv_=2
-  integer(psb_ipk_), parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
-  integer(psb_ipk_), parameter :: psb_collective_start_=1, psb_collective_end_=2
-  integer(psb_ipk_), parameter :: psb_collective_sync_=4
+  integer(psb_ipk_), parameter :: psb_swap_send_ = 1
+  integer(psb_ipk_), parameter :: psb_swap_recv_ = 2
+  integer(psb_ipk_), parameter :: psb_swap_sync_ = 4
+  integer(psb_ipk_), parameter :: psb_swap_mpi_  = 8
+  integer(psb_ipk_), parameter :: psb_collective_start_  = 1
+  integer(psb_ipk_), parameter :: psb_collective_end_    = 2
+  integer(psb_ipk_), parameter :: psb_collective_sync_   = 4
 
   ! Choice among lists on which to base data exchange
-  integer(psb_ipk_), parameter :: psb_no_comm_=-1
-  integer(psb_ipk_), parameter :: psb_comm_halo_=1, psb_comm_ovr_=2
-  integer(psb_ipk_), parameter :: psb_comm_ext_=3,  psb_comm_mov_=4
+  integer(psb_ipk_), parameter :: psb_no_comm_    = -1
+  integer(psb_ipk_), parameter :: psb_comm_halo_  =  1
+  integer(psb_ipk_), parameter :: psb_comm_ovr_   =  2
+  integer(psb_ipk_), parameter :: psb_comm_ext_   =  3
+  integer(psb_ipk_), parameter :: psb_comm_mov_   =  4
   ! Types of mapping between descriptors.
   integer(psb_ipk_), parameter :: psb_map_xhal_        = 123
   integer(psb_ipk_), parameter :: psb_map_asov_        = psb_map_xhal_+1

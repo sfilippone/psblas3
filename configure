@@ -691,8 +691,23 @@ CINTMETIS
 CHAVEMETIS
 CHAVE_OPENMP
 CSERIALMPI
+PSBCLCSYN
+PSBCLCEND
+PSBCLCSTR
+PSBSETZ
+PSBSQRT
+PSBAVG
+PSBSUM
+PSBNONE
+PSBSWPMPI
+PSBSWPSYN
+PSBSWPRCV
+PSBSWPSND
 PSBLASBLDRMT
 PSBLASBLDNOR
+PSBLASUPDDEF
+PSBLASUPDPRM
+PSBLASUPDSRC
 PSBLASDUPDEF
 PSBLASDUPERR
 PSBLASDUPOVW
@@ -8825,9 +8840,26 @@ PSBLASDUPNUL=`cat $CFILE| grep dupl_null | $AWK '{print $6;}'`;
 PSBLASDUPADD=`cat $CFILE| grep "psb_dupl_add_   =" | $AWK '{print $6;}'`;
 PSBLASDUPOVW=`cat $CFILE| grep dupl_ovwrt| $AWK '{print $6;}'`;
 PSBLASDUPERR=`cat $CFILE| grep dupl_err| $AWK '{print $6;}'`;
-PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
+PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$// `;
+PSBLASUPDSRC=`cat $CFILE| grep "psb_upd_srch_   ="| $AWK '{print $6;}' `;
+PSBLASUPDPRM=`cat $CFILE| grep "psb_upd_perm_   ="| $AWK '{print $6;}' `;
+PSBLASUPDDEF=`cat $CFILE| grep "psb_upd_dflt_   ="| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
 PSBLASBLDNOR=`cat $CFILE| grep matbld_noremote| $AWK '{print $6;}'`;
 PSBLASBLDRMT=`cat $CFILE| grep matbld_remote| $AWK '{print $6;}'`;
+
+CFILE="base/modules/desc/psb_desc_const_mod.f90";
+PSBSWPSND=`cat $CFILE| grep swap_send| $AWK '{print $6;}'`;
+PSBSWPRCV=`cat $CFILE| grep swap_recv| $AWK '{print $6;}'`;
+PSBSWPSYN=`cat $CFILE| grep swap_sync| $AWK '{print $6;}'`;
+PSBSWPMPI=`cat $CFILE| grep swap_mpi| $AWK '{print $6;}'`;
+PSBNONE=`cat $CFILE| grep psb_none| $AWK '{print $6;}'`;
+PSBSUM=`cat $CFILE| grep psb_sum| $AWK '{print $6;}'`;
+PSBAVG=`cat $CFILE| grep psb_avg| $AWK '{print $6;}'`;
+PSBSQRT=`cat $CFILE| grep square_root| $AWK '{print $6;}'`;
+PSBSETZ=`cat $CFILE| grep psb_setzero| $AWK '{print $6;}'`;
+PSBCLCSTR=`cat $CFILE| grep collective_start| $AWK '{print $6;}'`;
+PSBCLCEND=`cat $CFILE| grep collective_end| $AWK '{print $6;}'`;
+PSBCLCSYN=`cat $CFILE| grep collective_sync| $AWK '{print $6;}'`;
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result:  version  $PSBLASSTRING" >&5
 printf "%s\n" " version  $PSBLASSTRING" >&6; }
@@ -11732,6 +11764,24 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
