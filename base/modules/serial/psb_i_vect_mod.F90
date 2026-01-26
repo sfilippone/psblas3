@@ -105,6 +105,7 @@ module psb_i_vect_mod
     procedure, pass(x) :: set_dev  => i_vect_set_dev
     procedure, pass(x) :: set_sync => i_vect_set_sync
 
+    procedure, pass(x) :: check_addr => i_vect_check_addr
 
 
   end type psb_i_vect_type
@@ -474,6 +475,13 @@ contains
 
   end subroutine i_vect_set_vect
 
+  subroutine i_vect_check_addr(x)
+    class(psb_i_vect_type), intent(inout) :: x
+
+    integer(psb_ipk_) :: info
+    if (allocated(x%v)) call x%v%check_addr()
+
+  end subroutine i_vect_check_addr
 
   function constructor(x) result(this)
     integer(psb_ipk_)   :: x(:)

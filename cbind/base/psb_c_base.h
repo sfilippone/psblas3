@@ -92,7 +92,8 @@ extern "C" {
   psb_i_t    psb_c_cdins_lidx(psb_i_t nz, const psb_l_t *ja, const psb_i_t *lidx, psb_c_descriptor *cd);
   bool       psb_c_is_owned(psb_l_t gindex, psb_c_descriptor *cd);
   bool       psb_c_cd_is_asb(psb_c_descriptor *cd);
-
+  psb_i_t    psb_c_cd_check_addr(psb_c_descriptor *cd);
+  
 
   psb_i_t    psb_c_cd_get_local_rows(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_local_cols(psb_c_descriptor *cd);

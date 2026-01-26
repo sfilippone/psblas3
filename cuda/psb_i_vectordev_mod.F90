@@ -122,6 +122,15 @@ module psb_i_vectordev_mod
       integer(c_int)       :: hidx(m,*)
       integer(c_int),value :: m,n
     end function writeMultiInt
+  end interface writeInt
+  
+  interface 
+    function checkMultiVecDeviceInt(deviceVec) &
+         & result(res) bind(c,name='checkMultiVecDeviceInt')
+      use iso_c_binding
+      integer(c_int)             :: res
+      type(c_ptr), value         :: deviceVec
+    end function checkMultiVecDeviceInt
   end interface
   
   interface readInt

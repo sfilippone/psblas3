@@ -245,6 +245,7 @@ module psb_desc_mod
     procedure, pass(desc) :: free            => psb_cdfree
     procedure, pass(desc) :: destroy         => psb_cd_destroy
     procedure, pass(desc) :: nullify         => nullify_desc
+    procedure, pass(desc) :: check_addr      => psb_cd_check_addr
 
     procedure, pass(desc) :: get_fmt         => cd_get_fmt
     procedure, pass(desc) :: fnd_owner       => cd_fnd_owner
@@ -1161,6 +1162,60 @@ contains
     return
 
   end subroutine psb_cd_clone
+
+  subroutine psb_cd_check_addr(desc, info)
+
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_realloc_mod
+    implicit none
+    !....parameters...
+
+    class(psb_desc_type), intent(inout), target :: desc
+    integer(psb_ipk_), intent(out)              :: info
+    !locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    character(len=20)   :: name
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    if (psb_get_errstatus() /= 0) return 
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    name = 'psb_cdcpy'
+
+    if (desc%is_asb()) then
+      write(0,*) 'DESC%CHECK_ADDR:  v_halo, v_ext_idx, v_ovrlap_idx,v_ovr_mst'
+      if (info == psb_success_) &
+           & call desc%v_halo_index%check_addr()
+      if (info == psb_success_) &
+           & call desc%v_ext_index%check_addr()
+      if (info == psb_success_) &
+           & call desc%v_ovrlap_index%check_addr()
+      if (info == psb_success_) &
+           & call desc%v_ovr_mst_idx%check_addr()
+      write(0,*) 'DESC%CHECK_ADDR:  done'
+    end if
+    
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Done'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+
+  end subroutine psb_cd_check_addr
 
   
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info)

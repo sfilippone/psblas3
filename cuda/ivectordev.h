@@ -38,6 +38,7 @@
 #include "vector.h"
 
 int registerMappedInt(void *, void **, int, int);
+int checkMultiVecDeviceInt(void* deviceMultiVec);
 int writeMultiVecDeviceInt(void* deviceMultiVec, int* hostMultiVec);
 int writeMultiVecDeviceIntR2(void* deviceMultiVec, int* hostMultiVec, int ld);
 int readMultiVecDeviceInt(void* deviceMultiVec, int* hostMultiVec);

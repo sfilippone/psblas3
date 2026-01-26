@@ -42,6 +42,14 @@ int registerMappedInt(void  *buff, void **d_p, int n, int dummy)
   return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(int));
 }
 
+int checkMultiVecDeviceInt(void* deviceMultiVec)
+{
+  struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceMultiVec;
+  fprintf(stderr,"checkMultiVecDeviceInt Size: %d  Pointer %p\n",
+	  devVec->size_,devVec->v_);
+  return(0);
+}
+
 int writeMultiVecDeviceInt(void* deviceVec, int* hostVec)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;

@@ -414,6 +414,23 @@ contains
   end function psb_c_cd_is_asb
 
 
+  function psb_c_cd_check_addr(cdh) &
+       & bind(c,name='psb_c_cd_check_addr') result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: cdh
+    type(psb_desc_type), pointer :: descp
+    integer               :: info
+
+    res = 0
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+      call descp%check_addr(info)
+      res = info
+    end if
+  end function psb_c_cd_check_addr
 
   function psb_c_cd_get_local_rows(cdh) bind(c,name='psb_c_cd_get_local_rows') result(res)
     implicit none
