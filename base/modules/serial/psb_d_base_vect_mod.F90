@@ -171,6 +171,9 @@ module psb_d_base_vect_mod
     procedure, pass(y) :: sctb_buf => d_base_sctb_buf
     generic, public    :: sct      => sctb, sctb_x, sctb_buf
 
+    procedure, pass(x) :: check_addr  => d_base_check_addr
+
+
 
     !
     ! Dot product and AXPBY
@@ -1250,6 +1253,13 @@ contains
     call x%set_host()
 
   end subroutine d_base_set_vect
+
+  subroutine d_base_check_addr(x)
+    class(psb_d_base_vect_type), intent(inout) :: x
+
+    write(0,*) 'Check addr: base version, do nothing'
+
+  end subroutine d_base_check_addr
 
 
   !

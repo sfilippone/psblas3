@@ -169,6 +169,9 @@ module psb_l_base_vect_mod
     procedure, pass(y) :: sctb_buf => l_base_sctb_buf
     generic, public    :: sct      => sctb, sctb_x, sctb_buf
 
+    procedure, pass(x) :: check_addr  => l_base_check_addr
+
+
 
 
 
@@ -1177,6 +1180,13 @@ contains
     call x%set_host()
 
   end subroutine l_base_set_vect
+
+  subroutine l_base_check_addr(x)
+    class(psb_l_base_vect_type), intent(inout) :: x
+
+    write(0,*) 'Check addr: base version, do nothing'
+
+  end subroutine l_base_check_addr
 
 
 

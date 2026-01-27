@@ -105,6 +105,7 @@ module psb_z_vect_mod
     procedure, pass(x) :: set_host => z_vect_set_host
     procedure, pass(x) :: set_dev  => z_vect_set_dev
     procedure, pass(x) :: set_sync => z_vect_set_sync
+    procedure, pass(x) :: check_addr => z_vect_check_addr
 
     procedure, pass(x) :: get_entry => z_vect_get_entry
 
@@ -408,7 +409,13 @@ contains
     info = psb_success_
     call y%free(info)
     if ((info==0).and.allocated(x%v)) then
-      allocate(y%v,source=x%v, stat=info)
+      !
+      ! Using sourced allocation here creates
+      ! problems with handling of memory allocated
+      ! elsewhere (e.g. accelerators), hence delegation
+      ! to %bld method
+      ! 
+      call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine z_vect_clone
 
@@ -529,6 +536,13 @@ contains
 
   end subroutine z_vect_set_vect
 
+  subroutine z_vect_check_addr(x)
+    class(psb_z_vect_type), intent(inout) :: x
+
+    integer(psb_ipk_) :: info
+    if (allocated(x%v)) call x%v%check_addr()
+
+  end subroutine z_vect_check_addr
 
   function constructor(x) result(this)
     complex(psb_dpk_)   :: x(:)

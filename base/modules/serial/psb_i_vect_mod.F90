@@ -104,8 +104,8 @@ module psb_i_vect_mod
     procedure, pass(x) :: set_host => i_vect_set_host
     procedure, pass(x) :: set_dev  => i_vect_set_dev
     procedure, pass(x) :: set_sync => i_vect_set_sync
-
     procedure, pass(x) :: check_addr => i_vect_check_addr
+
 
 
   end type psb_i_vect_type
@@ -354,7 +354,13 @@ contains
     info = psb_success_
     call y%free(info)
     if ((info==0).and.allocated(x%v)) then
-      allocate(y%v,source=x%v, stat=info)
+      !
+      ! Using sourced allocation here creates
+      ! problems with handling of memory allocated
+      ! elsewhere (e.g. accelerators), hence delegation
+      ! to %bld method
+      ! 
+      call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine i_vect_clone
 

@@ -171,6 +171,10 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: check_addr  => i_base_check_addr
 
 
+
+
+
+
   end type psb_i_base_vect_type
 
   public  :: psb_i_base_vect
@@ -1176,13 +1180,13 @@ contains
 
   end subroutine i_base_set_vect
 
-
   subroutine i_base_check_addr(x)
     class(psb_i_base_vect_type), intent(inout) :: x
 
     write(0,*) 'Check addr: base version, do nothing'
 
   end subroutine i_base_check_addr
+
 
 
   !
