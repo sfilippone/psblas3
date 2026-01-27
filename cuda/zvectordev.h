@@ -40,6 +40,7 @@
 #include "vector.h"
 
 int registerMappedDoubleComplex(void *, void **, int, cuDoubleComplex);
+int checkMultiVecDeviceDoubleComplex(void* deviceMultiVec);
 int writeMultiVecDeviceDoubleComplex(void* deviceMultiVec, cuDoubleComplex* hostMultiVec);
 int writeMultiVecDeviceDoubleComplexR2(void* deviceMultiVec, 
 				       cuDoubleComplex* hostMultiVec, int ld);

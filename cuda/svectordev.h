@@ -38,6 +38,7 @@
 #include "vector.h"
 
 int registerMappedFloat(void *, void **, int, float);
+int checkMultiVecDeviceFloat(void* deviceMultiVec);
 int writeMultiVecDeviceFloat(void* deviceMultiVec, float* hostMultiVec);
 int writeMultiVecDeviceFloatR2(void* deviceMultiVec, float* hostMultiVec, int ld);
 int readMultiVecDeviceFloat(void* deviceMultiVec, float* hostMultiVec);

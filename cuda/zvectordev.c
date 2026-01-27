@@ -42,6 +42,14 @@ int registerMappedDoubleComplex(void  *buff, void **d_p, int n, cuDoubleComplex 
   return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(cuDoubleComplex));
 }
 
+int checkMultiVecDeviceDoubleComplex(void* deviceMultiVec)
+{
+  struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceMultiVec;
+  fprintf(stderr,"checkMultiVecDeviceInt Size: %d  Pointer %p\n",
+	  devVec->size_,devVec->v_);
+  return(0);
+}
+
 int writeMultiVecDeviceDoubleComplex(void* deviceVec, cuDoubleComplex* hostVec)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;

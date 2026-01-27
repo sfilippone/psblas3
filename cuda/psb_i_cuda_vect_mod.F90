@@ -83,8 +83,8 @@ module psb_i_cuda_vect_mod
     procedure, nopass  :: device_wait  => i_cuda_device_wait
     procedure, pass(x) :: free_buffer  => i_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => i_cuda_maybe_free_buffer
-
     procedure, pass(x) :: check_addr  => i_cuda_check_addr
+
     final              :: i_cuda_vect_finalize
   end type psb_i_vect_cuda
 
@@ -212,7 +212,6 @@ contains
       write(0,*) 'Check addr: cuda  version, why am I here? '
     end select
   end subroutine i_cuda_check_addr
-
 
   subroutine i_cuda_gthzv_x(i,n,idx,x,y)
     use psb_cuda_env_mod
@@ -811,12 +810,12 @@ contains
     integer(psb_ipk_), intent(out)        :: info
     
     info = 0  
+    if (allocated(x%v)) deallocate(x%v, stat=info)
     if (c_associated(x%deviceVect)) then
 !!$      write(0,*)'d_cuda_free Calling freeMultiVecDevice'
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect=c_null_ptr
     end if
-    if (allocated(x%v)) deallocate(x%v, stat=info)
     call x%free_buffer(info)
     call x%set_sync()
   end subroutine i_cuda_free

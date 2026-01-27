@@ -86,6 +86,7 @@ module psb_z_cuda_vect_mod
     procedure, nopass  :: device_wait  => z_cuda_device_wait
     procedure, pass(x) :: free_buffer  => z_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => z_cuda_maybe_free_buffer
+    procedure, pass(x) :: check_addr  => z_cuda_check_addr
     procedure, pass(x) :: dot_v    => z_cuda_dot_v
     procedure, pass(x) :: dot_a    => z_cuda_dot_a
     procedure, pass(y) :: axpby_v  => z_cuda_axpby_v
@@ -218,6 +219,17 @@ contains
     x%i_buf_sz=0
 
   end subroutine z_cuda_free_buffer
+
+  subroutine z_cuda_check_addr(x)
+    class(psb_z_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_) info;
+    select type(ii=> x) 
+    class is (psb_z_vect_cuda) 
+      info = checkMultiVecDeviceDoubleComplex(x%deviceVect)      
+    class default
+      write(0,*) 'Check addr: cuda  version, why am I here? '
+    end select
+  end subroutine z_cuda_check_addr
 
   subroutine z_cuda_gthzv_x(i,n,idx,x,y)
     use psb_cuda_env_mod

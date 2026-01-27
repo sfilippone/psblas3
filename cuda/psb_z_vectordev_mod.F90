@@ -44,6 +44,15 @@ module psb_z_vectordev_mod
     end function registerMappedDoubleComplex
   end interface
 
+  interface 
+    function checkMultiVecDeviceDoubleComplex(deviceVec) &
+         & result(res) bind(c,name='checkMultiVecDeviceDoubleComplex')
+      use iso_c_binding
+      integer(c_int)             :: res
+      type(c_ptr), value         :: deviceVec
+    end function checkMultiVecDeviceDoubleComplex
+  end interface
+  
   interface writeMultiVecDevice 
     function writeMultiVecDeviceDoubleComplex(deviceVec,hostVec) &
          & result(res) bind(c,name='writeMultiVecDeviceDoubleComplex')

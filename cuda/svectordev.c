@@ -42,6 +42,14 @@ int registerMappedFloat(void  *buff, void **d_p, int n, float dummy)
   return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(float));
 }
 
+int checkMultiVecDeviceFloat(void* deviceMultiVec)
+{
+  struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceMultiVec;
+  fprintf(stderr,"checkMultiVecDeviceInt Size: %d  Pointer %p\n",
+	  devVec->size_,devVec->v_);
+  return(0);
+}
+
 int writeMultiVecDeviceFloat(void* deviceVec, float* hostVec)
 { int i;
   struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceVec;

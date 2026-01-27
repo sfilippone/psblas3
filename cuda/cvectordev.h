@@ -40,6 +40,7 @@
 #include "vector.h"
 
 int registerMappedFloatComplex(void *, void **, int, cuFloatComplex);
+int checkMultiVecDeviceFloatComplex(void* deviceMultiVec);
 int writeMultiVecDeviceFloatComplex(void* deviceMultiVec, cuFloatComplex* hostMultiVec);
 int writeMultiVecDeviceFloatComplexR2(void* deviceMultiVec, cuFloatComplex* hostMultiVec, int ld);
 int readMultiVecDeviceFloatComplex(void* deviceMultiVec, cuFloatComplex* hostMultiVec);

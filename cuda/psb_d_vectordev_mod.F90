@@ -44,6 +44,15 @@ module psb_d_vectordev_mod
     end function registerMappedDouble
   end interface
 
+  interface 
+    function checkMultiVecDeviceDouble(deviceVec) &
+         & result(res) bind(c,name='checkMultiVecDeviceDouble')
+      use iso_c_binding
+      integer(c_int)             :: res
+      type(c_ptr), value         :: deviceVec
+    end function checkMultiVecDeviceDouble
+  end interface
+  
   interface writeMultiVecDevice 
     function writeMultiVecDeviceDouble(deviceVec,hostVec) &
          & result(res) bind(c,name='writeMultiVecDeviceDouble')

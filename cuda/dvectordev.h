@@ -38,6 +38,7 @@
 #include "vector.h"
 
 int registerMappedDouble(void *, void **, int, double);
+int checkMultiVecDeviceDouble(void* deviceMultiVec);
 int writeMultiVecDeviceDouble(void* deviceMultiVec, double* hostMultiVec);
 int writeMultiVecDeviceDoubleR2(void* deviceMultiVec, double* hostMultiVec, int ld);
 int readMultiVecDeviceDouble(void* deviceMultiVec, double* hostMultiVec);

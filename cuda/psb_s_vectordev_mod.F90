@@ -44,6 +44,15 @@ module psb_s_vectordev_mod
     end function registerMappedFloat
   end interface
 
+  interface 
+    function checkMultiVecDeviceFloat(deviceVec) &
+         & result(res) bind(c,name='checkMultiVecDeviceFloat')
+      use iso_c_binding
+      integer(c_int)             :: res
+      type(c_ptr), value         :: deviceVec
+    end function checkMultiVecDeviceFloat
+  end interface
+  
   interface writeMultiVecDevice 
     function writeMultiVecDeviceFloat(deviceVec,hostVec) &
          & result(res) bind(c,name='writeMultiVecDeviceFloat')
