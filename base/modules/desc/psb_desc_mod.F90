@@ -236,9 +236,9 @@ module psb_desc_mod
     procedure, pass(desc) :: get_p_adjcncy   => cd_get_p_adjcncy
     procedure, pass(desc) :: set_p_adjcncy   => cd_set_p_adjcncy
     procedure, pass(desc) :: xtnd_p_adjcncy  => cd_xtnd_p_adjcncy    
-    procedure, pass(desc) :: a_get_list      => psb_cd_get_list
-    procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
-    generic, public       :: get_list => a_get_list, v_get_list
+    procedure, pass(desc) :: a_get_list_p      => psb_cd_get_list_p
+    procedure, pass(desc) :: v_get_list_p      => psb_cd_v_get_list_p
+    generic, public       :: get_list_p => a_get_list_p, v_get_list_p
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
     procedure, pass(desc) :: clone           => psb_cd_clone
     procedure, pass(desc) :: cnv             => psb_cd_cnv
@@ -742,7 +742,7 @@ contains
 
 
 
-  subroutine psb_cd_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
+  subroutine psb_cd_get_list_p(data,desc,ipnt,totxch,idxr,idxs,info)
     use psb_const_mod
     use psb_error_mod
     use psb_penv_mod
@@ -757,7 +757,7 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act, debug_level, debug_unit
     logical, parameter  :: debug=.false., debugprt=.false.
-    character(len=20), parameter :: name='psb_cd_get_list'
+    character(len=20), parameter :: name='psb_cd_get_list_p'
 
     info = psb_success_
     call psb_erractionsave(err_act)
@@ -769,12 +769,25 @@ contains
     call psb_info(ctxt, me, np)
 
     select case(data) 
-    case(psb_comm_halo_) 
-      ipnt   => desc%halo_index
+    case(psb_comm_halo_)
+      if (allocated(desc%halo_index)) then 
+        ipnt   => desc%halo_index
+      else
+        info = psb_err_invalid_cd_state_
+      end if
     case(psb_comm_ovr_) 
-      ipnt   => desc%ovrlap_index
+      if (allocated(desc%ovrlap_index)) then 
+        ipnt   => desc%ovrlap_index
+      else
+        info = psb_err_invalid_cd_state_
+      end if
+
     case(psb_comm_ext_) 
-      ipnt   => desc%ext_index
+      if (allocated(desc%ext_index)) then 
+        ipnt   => desc%ext_index
+      else
+        info = psb_err_invalid_cd_state_
+      end if
       if (debug_level >= psb_debug_ext_) then
         if (.not.associated(desc%base_desc)) then
           write(debug_unit,*) trim(name),&
@@ -788,12 +801,17 @@ contains
         end if
       end if
     case(psb_comm_mov_) 
-      ipnt   => desc%ovr_mst_idx
+      if (allocated(desc%ovr_mst_idx)) then 
+        ipnt   => desc%ovr_mst_idx
+      else
+        info = psb_err_invalid_cd_state_
+      end if
     case default
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='wrong Data selector')
-      goto 9999
     end select
+    if (info /= 0) goto 9999
+    
     call psb_get_xch_idx(ipnt,totxch,idxs,idxr)
 
 
@@ -805,10 +823,10 @@ contains
 
     return
 
-  end subroutine psb_cd_get_list
+  end subroutine psb_cd_get_list_p
 
 
-  subroutine psb_cd_v_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
+  subroutine psb_cd_v_get_list_p(data,desc,ipnt,totxch,idxr,idxs,info)
     use psb_const_mod
     use psb_error_mod
     use psb_penv_mod
@@ -822,7 +840,7 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act, debug_level, debug_unit
     logical, parameter  :: debug=.false., debugprt=.false.
-    character(len=20), parameter :: name='psb_cd_v_get_list'
+    character(len=20), parameter :: name='psb_cd_v_get_list_p'
 
     info = psb_success_
     call psb_erractionsave(err_act)
@@ -834,18 +852,25 @@ contains
     call psb_info(ctxt, me, np)
 
     select case(data) 
-    case(psb_comm_halo_) 
-      ipnt   => desc%v_halo_index%v
-      if (.not.allocated(desc%v_halo_index%v)) &
-           & info = psb_err_inconsistent_index_lists_
+    case(psb_comm_halo_)
+      if (allocated(desc%v_halo_index%v)) then 
+        ipnt   => desc%v_halo_index%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
     case(psb_comm_ovr_) 
-      ipnt   => desc%v_ovrlap_index%v
-      if (.not.allocated(desc%v_ovrlap_index%v)) &
-           & info = psb_err_inconsistent_index_lists_
+      if (allocated(desc%v_ovrlap_index%v)) then 
+        ipnt   => desc%v_ovrlap_index%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
+
     case(psb_comm_ext_) 
-      ipnt   => desc%v_ext_index%v
-      if (.not.allocated(desc%v_ext_index%v)) &
-           & info = psb_err_inconsistent_index_lists_
+      if (allocated(desc%v_ext_index%v)) then 
+        ipnt   => desc%v_ext_index%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
       if (debug_level >= psb_debug_ext_) then
         if (.not.associated(desc%base_desc)) then
           write(debug_unit,*) trim(name),&
@@ -859,17 +884,17 @@ contains
         end if
       end if
     case(psb_comm_mov_) 
-      ipnt   => desc%v_ovr_mst_idx%v
-      if (.not.allocated(desc%v_ovr_mst_idx%v)) &
-           & info = psb_err_inconsistent_index_lists_
-      
+      if (allocated(desc%v_ovr_mst_idx%v)) then 
+        ipnt   => desc%v_ovr_mst_idx%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
     case default
       info=psb_err_from_subroutine_
-    end select
-    if (info /= psb_success_) then
       call psb_errpush(info,name,a_err='wrong Data selector')
-      goto 9999
-    end if
+    end select
+    if (info /= 0) goto 9999
+
     
     call psb_get_v_xch_idx(ipnt,totxch,idxs,idxr)
 
@@ -881,7 +906,7 @@ contains
 
     return
 
-  end subroutine psb_cd_v_get_list
+  end subroutine psb_cd_v_get_list_p
 
   !
   ! Subroutine: psb_cdfree

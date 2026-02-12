@@ -169,7 +169,7 @@ contains
     else
       data_ = psb_comm_halo_
     end if
-    call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    call desc_p%get_list_p(data_,vpnt,totxch,idxr,idxs,info)
     res = totxch
   end function get_nxchg
   
@@ -201,7 +201,7 @@ contains
       verb_ = 1
     end if
     
-    call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    call desc_p%get_list_p(data_,vpnt,totxch,idxr,idxs,info)
     if (glob) &
          &   call psb_realloc(max(idxr,idxs,1),gidx,info)
 
