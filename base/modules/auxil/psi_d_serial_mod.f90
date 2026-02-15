@@ -69,7 +69,7 @@ module psi_d_serial_mod
   end interface psb_gelp
 
   interface psb_geaxpby
-    subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
+    subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
       integer(psb_ipk_), intent(in)      :: m, n
@@ -78,7 +78,8 @@ module psi_d_serial_mod
       real(psb_dpk_), intent (in)       ::  alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_daxpby
-    subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
+
+    subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
       integer(psb_ipk_), intent(in)      :: m
@@ -87,7 +88,8 @@ module psi_d_serial_mod
       real(psb_dpk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_daxpbyv
-    subroutine psi_daxpbyv2(m,alpha, x, beta, y, z, info)
+
+    subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
       integer(psb_ipk_), intent(in)      :: m
@@ -97,6 +99,17 @@ module psi_d_serial_mod
       real(psb_dpk_), intent (in)       :: alpha, beta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_daxpbyv2
+
+    subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)     :: m, n
+      real(psb_dpk_), intent (in)       :: x(:)
+      real(psb_dpk_), intent (inout)    :: y(:, :)
+      real(psb_dpk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)    :: info
+    end subroutine psi_daxpbymvc
+
   end interface psb_geaxpby
 
   interface psi_upd_xyz

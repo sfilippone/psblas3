@@ -1588,6 +1588,19 @@ module psb_d_multivect_mod
     procedure, pass(y) :: sctb     => d_mvect_sctb
     procedure, pass(y) :: sctb_x   => d_mvect_sctb_x
     generic, public    :: sct      => sctb, sctb_x
+
+    procedure, pass(y) :: axpby_v_idxs => d_mvect_axpby_v_idxs
+    procedure, pass(y) :: axpby_v_full => d_mvect_axpby_v_full
+    procedure, pass(y) :: axpby_m_idxs => d_mvect_axpby_m_idxs
+    procedure, pass(y) :: axpby_m_full => d_mvect_axpby_m_full
+    generic, public    :: axpby        => axpby_v_idxs, axpby_v_full, axpby_m_idxs, axpby_m_full
+
+    !index version only
+    !procedure, pass(z) :: axpbycz_vv  => d_mvect_axpbycz_vv
+    !procedure, pass(z) :: axpbycz_mv  => d_mvect_axpbycz_mv
+    !procedure, pass(z) :: axpbycz_mm  => d_mvect_axpbycz_mm
+    !generic, public    :: axpycz      => axpbycz_vv, axpbycz_mv, axpbycz_mm
+
 !!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
 !!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
 !!$    generic, public    :: dot      => dot_v, dot_a
@@ -2021,6 +2034,117 @@ contains
     call move_alloc(tmp,x%v)
   end subroutine d_mvect_cnv
 
+
+  subroutine d_mvect_axpby_v_idxs(m, alpha, x, beta, y, idx_y, info)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m, idx_y
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)          :: info
+
+    if (.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(idx_y < 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_y > y%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+    
+    call y%v%axpby_v2(m, alpha, x%v, beta, idx_y, info)
+  end subroutine d_mvect_axpby_v_idxs
+  
+  subroutine d_mvect_axpby_v_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)    :: info
+
+    if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+    
+    call y%v%axpby_v2(m, alpha, x%v, beta, info)
+  end subroutine d_mvect_axpby_v_full
+  
+  subroutine d_mvect_axpby_m_idxs(m, alpha, x, idx_x, beta, y, idx_y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m, idx_x, idx_y
+    class(psb_d_multivect_type), intent(inout)  :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)              :: info
+
+    if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(idx_y <= 0 .or. idx_x <= 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_y > y%get_ncols() .or. idx_x > x%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+    
+    call y%v%axpby_v2(m, alpha, x%v, idx_x, beta, idx_y, info)
+  end subroutine d_mvect_axpby_m_idxs
+  
+  subroutine d_mvect_axpby_m_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m
+    class(psb_d_multivect_type), intent(inout)  :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)              :: info
+
+    if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    ! Multivector with different size rise error
+    if(x%get_ncols() /= y%get_ncols()) then
+      info = psb_err_invalid_mvect_size_ 
+      return
+    endif
+    
+    call y%v%axpby_v2(m, alpha, x%v, beta, info)
+  end subroutine d_mvect_axpby_m_full
+  
+  subroutine d_mvect_axpbycz_vv()
+  end subroutine d_mvect_axpbycz_vv
+
+  subroutine d_mvect_axpbycz_mv()
+  end subroutine d_mvect_axpbycz_mv
+
+  subroutine d_mvect_axpbycz_mm()
+  end subroutine d_mvect_axpbycz_mm
+  
 
 !!$  function d_mvect_dot_v(n,x,y) result(res)
 !!$    implicit none

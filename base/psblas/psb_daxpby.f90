@@ -89,7 +89,6 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
     goto 9999
   endif
 
-
   ix = ione
   iy = ione
 
@@ -129,6 +128,337 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
   return
 
 end subroutine psb_daxpby_vect
+
+
+! Subroutines: psb_daxpby_multivect_*
+!    Adds one distributed multivector to another multivector/vector,
+!
+!    Y(:, :) := beta * Y(:, :) + alpha * X          (psb_daxpby_mv_v_full)
+!    Y(:, j) := beta * Y(:, j) + alpha * X          (psb_daxpby_mv_v_idxs)
+!    Y(:, :) := beta * Y(:, :) + alpha * X(:, :)    (psb_daxpby_mv_m_full)
+!    Y(:, j) := beta * Y(:, j) + alpha * X(:, k)    (psb_daxpby_mv_m_idxs)
+!
+! Arguments: ....
+!
+
+subroutine psb_daxpby_mv_v_full(alpha, x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_mv_v_full
+  implicit none
+  type(psb_d_vect_type), intent (inout) ::  x
+  type(psb_d_multivect_type), intent (inout) ::  y
+  real(psb_dpk_), intent (in)        :: alpha, beta
+  type(psb_desc_type), intent (in)   :: desc_a
+  integer(psb_ipk_), intent(out)     :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20) :: name, ch_err
+
+  name = 'psb_daxpby_mv_v_full'
+  if (psb_errstatus_fatal()) return
+  
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(y%v)) then
+    info = psb_err_invalid_mvect_state_
+        call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m, lone, x%get_nrows(), ix, lone, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 1'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m, lone, y%get_nrows(), iy, lone, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 2'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(), alpha, x, beta, info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+end subroutine psb_daxpby_mv_v_full
+
+subroutine psb_daxpby_mv_v_idxs(alpha, x, beta, y, idx_y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_mv_v_idxs
+  implicit none
+  type(psb_d_vect_type), intent (inout) ::  x
+  type(psb_d_multivect_type), intent (inout) ::  y
+  integer(psb_ipk_), intent(in) :: idx_y
+  real(psb_dpk_), intent (in)        :: alpha, beta
+  type(psb_desc_type), intent (in)   :: desc_a
+  integer(psb_ipk_), intent(out)     :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20) :: name, ch_err
+
+  name = 'psb_daxpby_mv_v_idxs'
+  if (psb_errstatus_fatal()) return
+  
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  if (.not. allocated(y%v)) then
+    info = psb_err_invalid_mvect_state_
+        call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m, lone, x%get_nrows(), ix, lone, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 1'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m, lone, y%get_nrows(), iy, lone, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 2'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(), alpha, x, beta, idx_y, info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+end subroutine psb_daxpby_mv_v_idxs
+
+subroutine psb_daxpby_mv_m_full(alpha, x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_mv_m_full
+  implicit none
+  type(psb_d_multivect_type), intent (inout) ::  x
+  type(psb_d_multivect_type), intent (inout) ::  y
+  real(psb_dpk_), intent (in)        :: alpha, beta
+  type(psb_desc_type), intent (in)   :: desc_a
+  integer(psb_ipk_), intent(out)     :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20) :: name, ch_err
+
+  name = 'psb_daxpby_mv_m_full'
+  if (psb_errstatus_fatal()) return
+  
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  if (.not. allocated(y%v)) then
+    info = psb_err_invalid_mvect_state_
+        call psb_errpush(info, name)
+    goto 9999
+  endif
+
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m, lone, x%get_nrows(), ix, lone, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 1'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m, lone, y%get_nrows(), iy, lone, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 2'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(), alpha, x, beta, info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+end subroutine psb_daxpby_mv_m_full
+
+subroutine psb_daxpby_mv_m_idxs(alpha, x, idx_x, beta, y, idx_y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_mv_m_idxs
+  implicit none
+  type(psb_d_multivect_type), intent (inout) ::  x
+  type(psb_d_multivect_type), intent (inout) ::  y
+  integer(psb_ipk_), intent(in) :: idx_x, idx_y
+  real(psb_dpk_), intent (in)        :: alpha, beta
+  type(psb_desc_type), intent (in)   :: desc_a
+  integer(psb_ipk_), intent(out)     :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  character(len=20) :: name, ch_err
+
+  name = 'psb_daxpby_mv_m_idxs'
+  if (psb_errstatus_fatal()) return
+  
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  if (.not. allocated(y%v)) then
+    info = psb_err_invalid_mvect_state_
+        call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m, lone, x%get_nrows(), ix, lone, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 1'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  call psb_chkvect(m, lone, y%get_nrows(), iy, lone, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 2'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(), alpha, x, idx_x, beta, idx_y, info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+end subroutine psb_daxpby_mv_m_idxs
+
+
 
 !
 !                Parallel Sparse BLAS  version 3.5

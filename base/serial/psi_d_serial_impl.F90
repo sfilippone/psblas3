@@ -30,7 +30,7 @@
 !
 !
 subroutine psi_d_exscanv(n,x,info,shift)
-  use psi_d_serial_mod, psb_protect_name => psi_d_exscanv
+  use psb_serial_mod, psb_protect_name => psi_d_exscanv
   use psb_const_mod
   use psb_error_mod
 #if defined(PSB_OPENMP)
@@ -532,7 +532,11 @@ subroutine psb_e_dgelpv(trans,iperm,x,info)
 
 end subroutine psb_e_dgelpv
 
-subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
+
+
+
+
+subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
 
   use psb_const_mod
   use psb_error_mod
@@ -591,7 +595,7 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
   return
 end subroutine psi_daxpby
 
-subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
+subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
 
   use psb_const_mod
   use psb_error_mod
@@ -745,7 +749,7 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
 
 end subroutine psi_daxpbyv
 
-subroutine psi_daxpbyv2(m,alpha, x, beta, y, z, info)
+subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
 
   use psb_const_mod
   use psb_error_mod
@@ -905,8 +909,31 @@ subroutine psi_daxpbyv2(m,alpha, x, beta, y, z, info)
 
 end subroutine psi_daxpbyv2
 
-subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
+subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)     :: m, n
+  real(psb_dpk_), intent (in)       :: x(:)
+  real(psb_dpk_), intent (inout)    :: y(:, :)
+  real(psb_dpk_), intent (in)       :: alpha, beta
+  integer(psb_ipk_), intent(out)    :: info
 
+  integer :: i
+  real(psb_dpk_) :: dones(n)
+  dones = 1_psb_dpk_
+
+  !TEMP: call a dger?
+  do i = 1, n
+    !call psi_daxpbyv(m, alpha, x, beta, y(:, i), info)
+    y(:, i) = alpha * x + beta * y(:, i);
+  end do  
+end subroutine psi_daxpbymvc
+
+
+
+
+subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 

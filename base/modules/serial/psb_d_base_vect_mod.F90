@@ -2705,6 +2705,16 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: set_vect => d_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
 
+
+    ! New implementations of "axpy - like" operations -> TO DO: check and clear possibile duplicates
+
+    procedure, pass(y) :: axpby_v_idxs => d_base_mvect_axpby_v_idxs
+    procedure, pass(y) :: axpby_v_full => d_base_mvect_axpby_v_full
+    procedure, pass(y) :: axpby_m_idxs => d_base_mvect_axpby_m_idxs
+    procedure, pass(y) :: axpby_m_full => d_base_mvect_axpby_m_full
+    generic, public    :: axpby_v2 => axpby_v_idxs, axpby_v_full, axpby_m_idxs, axpby_m_full
+
+
     !
     ! Dot product and AXPBY
     !
@@ -3520,6 +3530,88 @@ contains
     end if
 
   end subroutine d_base_mlv_set_vect
+
+  !New implementations of "axpy-like" operation
+
+  subroutine d_base_mvect_axpby_v_idxs(m, alpha, x, beta, y, idx_y, info)
+    use psi_serial_mod
+    use psb_d_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, idx_y
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)    :: info
+
+    select type(x)
+      type is (psb_d_base_vect_type)
+        call psb_geaxpby(m, alpha, x%v, beta, y%v(:, idx_y), info)
+      class default
+        !call y%axpby(m, alpha, x%v, beta, idx_y, info, n=n)
+    end select
+  end subroutine d_base_mvect_axpby_v_idxs
+
+  subroutine d_base_mvect_axpby_v_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    use psb_d_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)    :: info
+
+    select type(x)
+      type is (psb_d_base_vect_type)
+        call psb_geaxpby(m, y%get_ncols(), alpha, x%v, beta, y%v, info)
+      class default
+        !call y%axpby(m, alpha, x%v, beta, info, n=n)
+    end select
+  end subroutine d_base_mvect_axpby_v_full
+
+  subroutine d_base_mvect_axpby_m_idxs(m, alpha, x, idx_x, beta, y, idx_y, info)
+    use psi_serial_mod
+    use psb_d_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y
+    class(psb_d_base_multivect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)    :: info
+
+    select type(x)
+      type is (psb_d_base_multivect_type)
+        call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), info)
+      class default
+        !call y%axpby(m, alpha, x%v, beta, idx_y, info, n=n)
+    end select
+  end subroutine d_base_mvect_axpby_m_idxs
+
+  subroutine d_base_mvect_axpby_m_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_multivect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)    :: info
+
+    select type(x)
+      type is (psb_d_base_multivect_type)
+        call psb_geaxpby(m, y%get_ncols(), alpha, x%v, beta, y%v, info)
+      class default
+        !call y%axpby(m, alpha, x%v, beta, info, n=n)
+    end select
+  end subroutine d_base_mvect_axpby_m_full
+
+
+
+
+
+
+
+
+
 
   !
   ! Dot products
