@@ -178,7 +178,7 @@ subroutine psb_daxpby_mv_v_full(alpha, x, beta, y, desc_a, info)
   endif
 
   if (.not. allocated(y%v)) then
-    info = psb_err_invalid_mvect_state_
+    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
         call psb_errpush(info, name)
     goto 9999
   endif
@@ -257,7 +257,7 @@ subroutine psb_daxpby_mv_v_idxs(alpha, x, beta, y, idx_y, desc_a, info)
     goto 9999
   endif
   if (.not. allocated(y%v)) then
-    info = psb_err_invalid_mvect_state_
+    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
         call psb_errpush(info, name)
     goto 9999
   endif
@@ -330,12 +330,12 @@ subroutine psb_daxpby_mv_m_full(alpha, x, beta, y, desc_a, info)
   endif
 
   if (.not. allocated(x%v)) then
-    info = psb_err_invalid_mvect_state_
+    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
     call psb_errpush(info, name)
     goto 9999
   endif
   if (.not. allocated(y%v)) then
-    info = psb_err_invalid_mvect_state_
+    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
         call psb_errpush(info, name)
     goto 9999
   endif
@@ -415,7 +415,7 @@ subroutine psb_daxpby_mv_m_idxs(alpha, x, idx_x, beta, y, idx_y, desc_a, info)
     goto 9999
   endif
   if (.not. allocated(y%v)) then
-    info = psb_err_invalid_mvect_state_
+    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
         call psb_errpush(info, name)
     goto 9999
   endif

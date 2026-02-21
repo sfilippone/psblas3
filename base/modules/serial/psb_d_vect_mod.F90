@@ -2051,7 +2051,7 @@ contains
     endif
 
     if(.not. allocated(y%v)) then
-      info = psb_err_invalid_mvect_state_
+      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
       return
     endif
 
@@ -2079,7 +2079,7 @@ contains
     integer(psb_ipk_), intent(out)    :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
-      info = psb_err_invalid_mvect_state_
+      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
       return
     endif
     
@@ -2096,7 +2096,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
-      info = psb_err_invalid_mvect_state_
+      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
       return
     endif
 
@@ -2123,13 +2123,13 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
-      info = psb_err_invalid_mvect_state_
+      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
       return
     endif
 
     ! Multivector with different size rise error
     if(x%get_ncols() /= y%get_ncols()) then
-      info = psb_err_invalid_mvect_size_ 
+      info = psb_err_invalid_matrix_sizes_ ! Should be psb_err_invalid_mvect_size_  
       return
     endif
     

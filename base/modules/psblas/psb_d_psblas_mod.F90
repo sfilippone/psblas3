@@ -111,7 +111,7 @@ module psb_d_psblas_mod
 
     subroutine psb_daxpby_mv_v_idxs(alpha, x, beta, y, idx_y, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_vect_type, psb_d_multivect_type
-      type(psb_d_multivect_type), intent (inout) ::  x
+      type(psb_d_vect_type), intent (inout) ::  x
       type(psb_d_multivect_type), intent (inout) ::  y
       integer(psb_ipk_), intent(in) :: idx_y
       real(psb_dpk_), intent (in)        :: alpha, beta
