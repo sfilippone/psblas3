@@ -1589,17 +1589,18 @@ module psb_d_multivect_mod
     procedure, pass(y) :: sctb_x   => d_mvect_sctb_x
     generic, public    :: sct      => sctb, sctb_x
 
+    ! two term axpy like operations
     procedure, pass(y) :: axpby_v_idxs => d_mvect_axpby_v_idxs
     procedure, pass(y) :: axpby_v_full => d_mvect_axpby_v_full
     procedure, pass(y) :: axpby_m_idxs => d_mvect_axpby_m_idxs
     procedure, pass(y) :: axpby_m_full => d_mvect_axpby_m_full
-    generic, public    :: axpby        => axpby_v_idxs, axpby_v_full, axpby_m_idxs, axpby_m_full
-
-    !index version only
-    !procedure, pass(z) :: axpbycz_vv  => d_mvect_axpbycz_vv
-    !procedure, pass(z) :: axpbycz_mv  => d_mvect_axpbycz_mv
-    !procedure, pass(z) :: axpbycz_mm  => d_mvect_axpbycz_mm
-    !generic, public    :: axpycz      => axpbycz_vv, axpbycz_mv, axpbycz_mm
+    ! three term axpy like operations - only indexed versions
+    procedure, pass(z) :: axpbycz_vv   => d_mvect_axpbycz_vv
+    procedure, pass(z) :: axpbycz_mv   => d_mvect_axpbycz_mv
+    procedure, pass(z) :: axpbycz_mm   => d_mvect_axpbycz_mm
+    ! all generics exported as axpby
+    generic, public    :: axpby        => axpby_v_idxs, axpby_v_full, axpby_m_idxs, axpby_m_full, &
+                                            &axpbycz_vv, axpbycz_mv, axpbycz_mm
 
 !!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
 !!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
@@ -2051,7 +2052,7 @@ contains
     endif
 
     if(.not. allocated(y%v)) then
-      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
+      info = psb_err_invalid_mvect_state_
       return
     endif
 
@@ -2078,8 +2079,13 @@ contains
     real(psb_dpk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)    :: info
 
-    if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
-      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
+    if (.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_ 
+      return
+    endif
+
+    if (.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_ 
       return
     endif
     
@@ -2090,13 +2096,12 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)          :: m, idx_x, idx_y
-    class(psb_d_multivect_type), intent(inout)  :: x
-    class(psb_d_multivect_type), intent(inout)  :: y
+    class(psb_d_multivect_type), intent(inout)  :: x, y
     real(psb_dpk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
-      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
+      info = psb_err_invalid_mvect_state_  
       return
     endif
 
@@ -2117,32 +2122,115 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)          :: m
-    class(psb_d_multivect_type), intent(inout)  :: x
-    class(psb_d_multivect_type), intent(inout)  :: y
+    class(psb_d_multivect_type), intent(inout)  :: x, y
     real(psb_dpk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
-      info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
+      info = psb_err_invalid_mvect_state_
       return
     endif
 
     ! Multivector with different size rise error
     if(x%get_ncols() /= y%get_ncols()) then
-      info = psb_err_invalid_matrix_sizes_ ! Should be psb_err_invalid_mvect_size_  
+      info = psb_err_invalid_mvect_size_
       return
     endif
     
     call y%v%axpby_v2(m, alpha, x%v, beta, info)
   end subroutine d_mvect_axpby_m_full
   
-  subroutine d_mvect_axpbycz_vv()
+  subroutine d_mvect_axpbycz_vv(m, alpha, x, beta, y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m, idx_z
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_vect_type), intent(inout)  :: y
+    class(psb_d_multivect_type), intent(inout)  :: z
+    real(psb_dpk_), intent (in)       :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)          :: info
+
+    if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(idx_z < 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_z > z%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+    
+    call z%v%axpby_v2(m, alpha, x%v, beta, y%v, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_vv
 
-  subroutine d_mvect_axpbycz_mv()
+  subroutine d_mvect_axpbycz_mv(m, alpha, x, beta, y, idx_y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m, idx_y, idx_z
+    class(psb_d_vect_type), intent(inout)  :: x
+    class(psb_d_multivect_type), intent(inout)  :: y, z
+    real(psb_dpk_), intent (in)       :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)              :: info
+
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    if ((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(idx_y <= 0 .or. idx_z <= 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_y > y%get_ncols() .or. idx_z > z%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+    
+    call z%v%axpby_v2(m, alpha, x%v, beta, y%v, idx_y, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_mv
 
-  subroutine d_mvect_axpbycz_mm()
+  subroutine d_mvect_axpbycz_mm(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: m, idx_x, idx_y, idx_z
+    class(psb_d_multivect_type), intent(inout)  :: x, y, z
+    real(psb_dpk_), intent (in)       :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)              :: info
+
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(idx_x <= 0 .or. idx_y <= 0 .or. idx_z <= 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_x > x%get_ncols() .or. idx_y > y%get_ncols() .or. idx_z > z%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+    
+    call z%v%axpby_v2(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_mm
   
 

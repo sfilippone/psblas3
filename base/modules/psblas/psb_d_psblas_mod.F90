@@ -138,6 +138,39 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_daxpby_mv_m_idxs
 
+    subroutine psb_daxpby_mv_vv(alpha, x, beta, y, gamma, z, idx_z, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_vect_type, psb_d_multivect_type
+      type(psb_d_vect_type), intent (inout) ::  x, y
+      type(psb_d_multivect_type), intent (inout) ::  z
+      integer(psb_ipk_), intent(in) :: idx_z
+      real(psb_dpk_), intent (in)        :: alpha, beta, gamma
+
+      type(psb_desc_type), intent (in)   :: desc_a
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psb_daxpby_mv_vv
+
+    subroutine psb_daxpby_mv_mv(alpha, x, beta, y, idx_y, gamma, z, idx_z, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_vect_type, psb_d_multivect_type
+      type(psb_d_vect_type), intent (inout) ::  x
+      type(psb_d_multivect_type), intent (inout) :: y, z
+      integer(psb_ipk_), intent(in) :: idx_y, idx_z
+      real(psb_dpk_), intent (in)        :: alpha, beta, gamma
+
+      type(psb_desc_type), intent (in)   :: desc_a
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psb_daxpby_mv_mv
+
+    
+    subroutine psb_daxpby_mv_mm(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type
+      type(psb_d_multivect_type), intent (inout) :: x, y, z
+      integer(psb_ipk_), intent(in) :: idx_x, idx_y, idx_z
+      real(psb_dpk_), intent (in)        :: alpha, beta, gamma
+
+      type(psb_desc_type), intent (in)   :: desc_a
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psb_daxpby_mv_mm
+
     subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
          & z, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &

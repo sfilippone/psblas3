@@ -909,6 +909,72 @@ subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
 
 end subroutine psi_daxpbyv2
 
+subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
+
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)      :: m
+  real(psb_dpk_), intent (in)       ::  x(:)
+  real(psb_dpk_), intent (in)       ::  y(:)
+  real(psb_dpk_), intent (inout)    ::  z(:)
+  real(psb_dpk_), intent (in)       :: alpha, beta, gamma
+  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly, lz, i
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)        :: name, ch_err
+
+  name='psb_geaxpby'
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+  lx = size(x,1)
+  ly = size(y,1)
+  lz = size(z,1)
+  if (lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+  if (ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+  if (lz < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+  ! Simple version of the code, with no special cases for alpha, beta and gamma
+  !$omp parallel do private(i)
+  do i = 1, m
+      z(i) = alpha*x(i) + beta*y(i) + gamma*z(i)
+  end do
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psi_daxpbyv3
+
 subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
