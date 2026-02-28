@@ -1589,18 +1589,27 @@ module psb_d_multivect_mod
     procedure, pass(y) :: sctb_x   => d_mvect_sctb_x
     generic, public    :: sct      => sctb, sctb_x
 
-    ! two term axpy like operations
+    ! two term axpy-like operations
     procedure, pass(y) :: axpby_v_idxs => d_mvect_axpby_v_idxs
     procedure, pass(y) :: axpby_v_full => d_mvect_axpby_v_full
     procedure, pass(y) :: axpby_m_idxs => d_mvect_axpby_m_idxs
     procedure, pass(y) :: axpby_m_full => d_mvect_axpby_m_full
-    ! three term axpy like operations - only indexed versions
+    ! three term axpy-like operations - only indexed versions
     procedure, pass(z) :: axpbycz_vv   => d_mvect_axpbycz_vv
     procedure, pass(z) :: axpbycz_mv   => d_mvect_axpbycz_mv
     procedure, pass(z) :: axpbycz_mm   => d_mvect_axpbycz_mm
+    ! linear combinations of columns of the multivector
+    procedure, pass(x) :: colspan1D   => d_mvect_colspan1D
+    procedure, pass(x) :: colspan2D   => d_mvect_colspan2D
     ! all generics exported as axpby
-    generic, public    :: axpby        => axpby_v_idxs, axpby_v_full, axpby_m_idxs, axpby_m_full, &
-                                            &axpbycz_vv, axpbycz_mv, axpbycz_mm
+    generic, public    :: axpby        => axpby_v_idxs, axpby_v_full, & 
+                                          axpby_m_idxs, axpby_m_full, &
+                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, & 
+                                          colspan1D, colspan2D
+
+    ! dot products operations - only full-full version for now
+    procedure, pass(x) :: dot_mm   => d_mvect_dot_mm
+    generic, public    :: dot      => dot_mm
 
 !!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
 !!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
@@ -2233,6 +2242,62 @@ contains
     call z%v%axpby_v2(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_mm
   
+  subroutine d_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_multivect_type), intent(inout)  :: x
+    real(psb_dpk_), intent(in)               :: coeff(:)
+    class(psb_d_vect_type), intent(inout)       :: y 
+    integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in)                         :: upd_flag
+
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    call x%v%axpby_v2(m, coeff, y%v, info, upd_flag)
+  end subroutine d_mvect_colspan1D
+
+  subroutine d_mvect_colspan2D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_multivect_type), intent(inout)  :: x, y
+    real(psb_dpk_), intent(in)                  :: coeff(:, :)
+    integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in)                         :: upd_flag
+
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    call x%v%axpby_v2(m, coeff, y%v, info, upd_flag)
+  end subroutine d_mvect_colspan2D
+
+  subroutine d_mvect_dot_mm(m, x, y, res, info)
+    implicit none
+    integer(psb_ipk_), intent(in)              :: m
+    class(psb_d_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(out)             :: info
+    real(psb_dpk_), intent(out)                :: res(:, :)
+
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    call x%v%dotsbr(m, y%v, res, info)
+  end subroutine d_mvect_dot_mm
+
 
 !!$  function d_mvect_dot_v(n,x,y) result(res)
 !!$    implicit none

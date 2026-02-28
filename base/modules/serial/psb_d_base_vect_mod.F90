@@ -2726,14 +2726,22 @@ module psb_d_base_multivect_mod
     procedure, pass(y) :: axpby_v_full => d_base_mvect_axpby_v_full
     procedure, pass(y) :: axpby_m_idxs => d_base_mvect_axpby_m_idxs
     procedure, pass(y) :: axpby_m_full => d_base_mvect_axpby_m_full
-
     ! three term axpy like operations - only indexed versions
     procedure, pass(z) :: axpbycz_vv   => d_base_mvect_axpbycz_vv
     procedure, pass(z) :: axpbycz_mv   => d_base_mvect_axpbycz_mv
     procedure, pass(z) :: axpbycz_mm   => d_base_mvect_axpbycz_mm
+    ! linear combinations of columns of the multivector
+    procedure, pass(x) :: colspan1D    => d_base_mvect_colspan1D
+    procedure, pass(x) :: colspan2D    => d_base_mvect_colspan2D
     ! all generics exported as axpby
-    generic, public    :: axpby_v2     => axpby_v_idxs, axpby_v_full, axpby_m_idxs, axpby_m_full, &
-                                             axpbycz_vv, axpbycz_mv, axpbycz_mm
+    generic, public    :: axpby_v2     => axpby_v_idxs, axpby_v_full, & 
+                                          axpby_m_idxs, axpby_m_full, &
+                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, &  
+                                          colspan1D, colspan2D
+
+    ! dot products operations - only full-full version for now
+    procedure, pass(x) :: dot_mm   => d_base_mvect_dot_mm
+    generic, public    :: dotsbr   => dot_mm
 
 
     !
@@ -3772,7 +3780,6 @@ contains
     call psb_geaxpby(m, alpha, x%v, beta, y%v, gamma, z%v(:, idx_z), info)
   end subroutine d_base_mvect_axpbycz_vv
 
-
   subroutine d_base_mvect_axpbycz_mv(m, alpha, x, beta, y, idx_y, gamma, z, idx_z, info)
     use psi_serial_mod
     use psb_d_base_vect_mod
@@ -3787,7 +3794,6 @@ contains
     call psb_geaxpby(m, alpha, x%v, beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
   end subroutine d_base_mvect_axpbycz_mv
 
-
   subroutine d_base_mvect_axpbycz_mm(m, alpha, x, idx_x, beta, y, idx_y, z, gamma, idx_z, info)
     use psi_serial_mod
     implicit none
@@ -3801,6 +3807,94 @@ contains
   end subroutine d_base_mvect_axpbycz_mm
 
 
+  subroutine d_base_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    use psb_d_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                    :: m
+    class(psb_d_base_multivect_type), intent(inout)  :: x
+    real(psb_dpk_), intent(in)                       :: coeff(:)
+    class(psb_d_base_vect_type), intent(inout)       :: y 
+    integer(psb_ipk_), intent(out)                   :: info
+    logical, intent(in)                              :: upd_flag
+ 
+    integer(psb_ipk_) :: nc
+    real(psb_dpk_) :: beta
+    beta = merge(done, dzero, upd_flag)
+
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    nc = x%get_ncols()
+    if(nc /= size(coeff)) then
+      info = psb_err_invalid_mvect_size_
+      return
+    end if
+
+    call dgemv('N', m, nc, done, x%v, m, coeff, 1, beta, y%v, 1)
+
+  end subroutine d_base_mvect_colspan1D
+
+  subroutine d_base_mvect_colspan2D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    real(psb_dpk_), intent(in)                   :: coeff(:, :)
+    integer(psb_ipk_), intent(out)                  :: info
+    logical, intent(in)                             :: upd_flag
+
+    integer(psb_ipk_) :: nci, nco
+    real(psb_dpk_) :: beta
+    beta = merge(done, dzero, upd_flag)
+
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+    nci = x%get_ncols()
+    nco = y%get_ncols()
+    if((nci /= size(coeff, 1)) .or. (nco /= size(coeff, 2))) then
+      info = psb_err_invalid_mvect_size_
+      return
+    end if
+
+    call dgemm('N', 'N', m, nco, nci, done, x%v, m, coeff, nci, beta, y%v, m)
+  end subroutine d_base_mvect_colspan2D
+
+  subroutine d_base_mvect_dot_mm(m, x, y, res, info)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    real(psb_dpk_), intent(out)                     :: res(:, :)
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_) :: nrx, nry, ncx, ncy 
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    nrx = x%get_nrows()
+    nry = y%get_nrows()
+
+    if(nrx /= nry) then
+      info = psb_err_invalid_mvect_size_
+      return
+    endif
+
+    ncx = x%get_ncols()
+    ncy = y%get_ncols()
+
+    call dgemm('T', 'N', ncx, ncy, nrx, done, x%v, nrx, y%v, nry, dzero, res, ncx)
+
+  end subroutine d_base_mvect_dot_mm
 
 
 

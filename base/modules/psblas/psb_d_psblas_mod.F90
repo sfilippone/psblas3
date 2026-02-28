@@ -86,6 +86,16 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
       logical, intent(in), optional      :: global
     end subroutine psb_dmdots
+    ! mvect dot product now available only as a subroutine. 
+    ! Maybe worth to implemented it also as a allocatable-output function
+    subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      real(psb_dpk_), intent(out)               :: xty(:, :)
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional             :: global
+    end subroutine psb_ddot_mvect
   end interface
 
   interface psb_geaxpby
@@ -160,7 +170,6 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_daxpby_mv_mv
 
-    
     subroutine psb_daxpby_mv_mm(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type
       type(psb_d_multivect_type), intent (inout) :: x, y, z
@@ -170,6 +179,31 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in)   :: desc_a
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_daxpby_mv_mm
+
+    subroutine psb_daxpby_mv_cspan1D(x, coeff, y, desc_a, info, upd_flag)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type, psb_d_vect_type
+      type(psb_d_multivect_type), intent (inout) :: x
+      real(psb_dpk_), intent(in) :: coeff(:)
+      type(psb_d_vect_type), intent (inout) :: y
+      
+      type(psb_desc_type), intent (in)   :: desc_a
+      integer(psb_ipk_), intent(out)     :: info
+      
+      logical, intent(in), optional :: upd_flag
+    end subroutine psb_daxpby_mv_cspan1D
+
+    subroutine psb_daxpby_mv_cspan2D(x, coeff, y, desc_a, info, upd_flag)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type
+      type(psb_d_multivect_type), intent (inout) :: x
+      real(psb_dpk_), intent(in) :: coeff(:, :)
+      type(psb_d_multivect_type), intent (inout) :: y
+      
+      type(psb_desc_type), intent (in)   :: desc_a
+      integer(psb_ipk_), intent(out)     :: info
+      
+      logical, intent(in), optional :: upd_flag
+    end subroutine psb_daxpby_mv_cspan2D
+
 
     subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
          & z, desc_a, info)
@@ -722,6 +756,7 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_dmask_vect
   end interface
+  
   interface psb_minquotient
     function psb_dminquotient_vect(x,y,desc_a,info,global) result(res)
       import :: psb_desc_type, psb_ipk_, &
