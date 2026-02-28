@@ -910,20 +910,19 @@ subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
 end subroutine psi_daxpbyv2
 
 subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
-
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)      :: m
-  real(psb_dpk_), intent (in)       ::  x(:)
-  real(psb_dpk_), intent (in)       ::  y(:)
-  real(psb_dpk_), intent (inout)    ::  z(:)
+  integer(psb_ipk_), intent(in)     :: m
+  real(psb_dpk_), intent (in)       :: x(:)
+  real(psb_dpk_), intent (in)       :: y(:)
+  real(psb_dpk_), intent (inout)    :: z(:)
   real(psb_dpk_), intent (in)       :: alpha, beta, gamma
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), intent(out)    :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: lx, ly, lz, i
+  integer(psb_ipk_) :: lx, ly, lz, i, code
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)        :: name, ch_err
+  character(len=20) :: name, ch_err
 
   name='psb_geaxpby'
   info=psb_success_
@@ -960,11 +959,317 @@ subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
     goto 9999
   end if
 
-  ! Simple version of the code, with no special cases for alpha, beta and gamma
-  !$omp parallel do private(i)
-  do i = 1, m
-      z(i) = alpha*x(i) + beta*y(i) + gamma*z(i)
-  end do
+  ! Get the op-code based on the values of alpha, beta, gamma
+  code = get_apbylike_code(alpha, beta, gamma)
+
+  select case (code)
+    case( 0) ! (alpha, beta, gamma) = ( *,  *,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + beta*y(i) + gamma*z(i)
+      end do
+    case( 1) ! (alpha, beta, gamma) = ( 1,  *,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + beta*y(i) + gamma*z(i)
+      end do
+    case( 2) ! (alpha, beta, gamma) = ( 0,  *,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = beta*y(i) + gamma*z(i)
+      end do
+    case( 3) ! (alpha, beta, gamma) = (-1,  *,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + beta*y(i) + gamma*z(i)
+      end do
+    case( 4) ! (alpha, beta, gamma) = ( *,  1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + y(i) + gamma*z(i)
+      end do
+    case( 5) ! (alpha, beta, gamma) = ( 1,  1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + y(i) + gamma*z(i)
+      end do
+    case( 6) ! (alpha, beta, gamma) = ( 0,  1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = y(i) + gamma*z(i)
+      end do
+    case( 7) ! (alpha, beta, gamma) = (-1,  1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + y(i) + gamma*z(i)
+      end do
+    case( 8) ! (alpha, beta, gamma) = ( *,  0,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + gamma*z(i)
+      end do
+    case( 9) ! (alpha, beta, gamma) = ( 1,  0,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + gamma*z(i)
+      end do
+    case(10) ! (alpha, beta, gamma) = ( 0,  0,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = gamma*z(i)
+      end do
+    case(11) ! (alpha, beta, gamma) = (-1,  0,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + gamma*z(i)
+      end do
+    case(12) ! (alpha, beta, gamma) = ( *, -1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) - y(i) + gamma*z(i)
+      end do
+    case(13) ! (alpha, beta, gamma) = ( 1, -1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) - y(i) + gamma*z(i)
+      end do
+    case(14) ! (alpha, beta, gamma) = ( 0, -1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -y(i) + gamma*z(i)
+      end do
+    case(15) ! (alpha, beta, gamma) = (-1, -1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) - y(i) + gamma*z(i)
+      end do
+    case(16) ! (alpha, beta, gamma) = ( *,  *,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + beta*y(i) + z(i)
+      end do
+    case(17) ! (alpha, beta, gamma) = ( 1,  *,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + beta*y(i) + z(i)
+      end do
+    case(18) ! (alpha, beta, gamma) = ( 0,  *,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = beta*y(i) + z(i)
+      end do
+    case(19) ! (alpha, beta, gamma) = (-1,  *,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + beta*y(i) + z(i)
+      end do
+    case(20) ! (alpha, beta, gamma) = ( *,  1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + y(i) + z(i)
+      end do
+    case(21) ! (alpha, beta, gamma) = ( 1,  1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + y(i) + z(i)
+      end do
+    case(22) ! (alpha, beta, gamma) = ( 0,  1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = y(i) + z(i)
+      end do
+    case(23) ! (alpha, beta, gamma) = (-1,  1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + y(i) + z(i)
+      end do
+    case(24) ! (alpha, beta, gamma) = ( *,  0,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + z(i)
+      end do
+    case(25) ! (alpha, beta, gamma) = ( 1,  0,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + z(i)
+      end do
+    case(26) ! (alpha, beta, gamma) = ( 0,  0,  1)
+      ! empty case: z(i) = z(i)
+    case(27) ! (alpha, beta, gamma) = (-1,  0,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + z(i)
+      end do
+    case(28) ! (alpha, beta, gamma) = ( *, -1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) - y(i) + z(i)
+      end do
+    case(29) ! (alpha, beta, gamma) = ( 1, -1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) - y(i) + z(i)
+      end do
+    case(30) ! (alpha, beta, gamma) = ( 0, -1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -y(i) + z(i)
+      end do
+    case(31) ! (alpha, beta, gamma) = (-1, -1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) - y(i) + z(i)
+      end do
+    case(32) ! (alpha, beta, gamma) = ( *,  *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + beta*y(i)
+      end do
+    case(33) ! (alpha, beta, gamma) = ( 1,  *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + beta*y(i)
+      end do
+    case(34) ! (alpha, beta, gamma) = ( 0,  *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = beta*y(i)
+      end do
+    case(38) ! (alpha, beta, gamma) = ( 0,  1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = y(i)
+      end do
+    case(39) ! (alpha, beta, gamma) = (-1,  1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -y(i)
+      end do
+    case(40) ! (alpha, beta, gamma) = ( *,  0,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i)
+      end do
+    case(41) ! (alpha, beta, gamma) = ( 1,  0,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i)
+      end do
+    case(42) ! (alpha, beta, gamma) = ( 0,  0,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = dzero
+      end do
+    case(43) ! (alpha, beta, gamma) = (-1,  0,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i)
+      end do
+    case(44) ! (alpha, beta, gamma) = ( *, -1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) - y(i)
+      end do
+    case(45) ! (alpha, beta, gamma) = ( 1, -1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) - y(i)
+      end do
+    case(46) ! (alpha, beta, gamma) = ( 0, -1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -y(i)
+      end do
+    case(47) ! (alpha, beta, gamma) = (-1, -1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) - y(i)
+      end do
+    case(48) ! (alpha, beta, gamma) = ( *,  *, -1) 
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + beta*y(i) - z(i)
+      end do
+    case(49) ! (alpha, beta, gamma) = ( 1,  *, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + beta*y(i) - z(i)
+      end do
+    case(50) ! (alpha, beta, gamma) = ( 0,  *, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = beta*y(i) - z(i)
+      end do
+    case(51) ! (alpha, beta, gamma) = (-1,  *, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + beta*y(i) - z(i)
+      end do
+    case(52) ! (alpha, beta, gamma) = ( *,  1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + y(i) - z(i)
+      end do
+    case(53) ! (alpha, beta, gamma) = ( 1,  1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + y(i) - z(i)
+      end do
+    case(54) ! (alpha, beta, gamma) = ( 0,  1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = y(i) - z(i)
+      end do
+    case(55) ! (alpha, beta, gamma) = (-1,  1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + y(i) - z(i)
+      end do
+    case(56) ! (alpha, beta, gamma) = ( *,  0, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) - z(i)
+      end do
+    case(57) ! (alpha, beta, gamma) = ( 1,  0, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) - z(i)
+      end do
+    case(58) ! (alpha, beta, gamma) = ( 0,  0, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -z(i)
+      end do
+    case(59) ! (alpha, beta, gamma) = (-1,  0, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) - z(i)
+      end do
+    case(60) ! (alpha, beta, gamma) = ( *, -1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) - y(i) - z(i)
+      end do
+    case(61) ! (alpha, beta, gamma) = ( 1, -1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) - y(i) - z(i)
+      end do
+    case(62) ! (alpha, beta, gamma) = ( 0, -1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -y(i) - z(i)
+      end do
+    case(63) ! (alpha, beta, gamma) = (-1, -1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) - y(i) - z(i)
+      end do
+    case default
+      info = psb_err_internal_error_
+      call psb_errpush(info, name)
+      goto 9999
+  end select
 
   call psb_erractionrestore(err_act)
   return

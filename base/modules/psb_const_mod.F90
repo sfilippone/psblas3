@@ -97,8 +97,8 @@ module psb_const_mod
   integer, parameter  :: psb_lpk_ = psb_epk_
 #else
   ! Unsupported combination, compilation will stop later on
-  integer, parameter  :: psb_ipk_ = -1
-  integer, parameter  :: psb_lpk_ = -1
+  integer, parameter  :: psb_ipk_ = -1 !psb_mpk_ !
+  integer, parameter  :: psb_lpk_ = -1 !psb_epk_ !
 #endif
 
   integer(psb_epk_), save      :: psb_sizeof_sp
@@ -336,6 +336,14 @@ module psb_const_mod
     procedure, pass(ctxt) :: get_i_ctxt => psb_get_i_ctxt
   end type psb_ctxt_type
   logical, parameter :: try_newins=.true.
+
+  ! Interface for dispach of axpy-like operations.
+  interface get_apbylike_code
+    module procedure get_axpbylike_code1
+    module procedure get_axpbylike_code2
+    module procedure get_axpbylike_code3
+  end interface get_apbylike_code
+
 contains
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
@@ -364,5 +372,33 @@ contains
     end if
 
   end subroutine psb_get_i_ctxt
+
+  function get_axpbylike_code1(var) result(code)
+    real(psb_dpk_), intent(in) :: var
+    integer(psb_ipk_) :: code
+
+    code = 0_psb_ipk_
+    if(var ==  done) code = 1_psb_ipk_
+    if(var == dzero) code = 2_psb_ipk_
+    if(var == -done) code = 3_psb_ipk_
+  end function get_axpbylike_code1
+
+  function get_axpbylike_code2(alpha, beta) result(code)
+    real(psb_dpk_), intent(in) :: alpha, beta
+    integer(psb_ipk_) :: code
+
+    code = get_axpbylike_code1(alpha) &
+            + ishft(get_axpbylike_code1(beta), 2)
+  end function get_axpbylike_code2
+
+  function get_axpbylike_code3(alpha, beta, gamma) result(code)
+    real(psb_dpk_), intent(in) :: alpha, beta, gamma
+    integer(psb_ipk_) :: code
+
+    code = get_axpbylike_code1(alpha) &
+            + ishft(get_axpbylike_code1(beta), 2) &
+            + ishft(get_axpbylike_code1(gamma), 4)
+  end function get_axpbylike_code3
+ 
 
 end module psb_const_mod
