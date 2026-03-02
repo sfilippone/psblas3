@@ -35,6 +35,7 @@ module psb_d_base_mat_mod
 
   use psb_base_mat_mod
   use psb_d_base_vect_mod
+  use psb_d_base_multivect_mod
 
 
   !> \namespace  psb_base_mod  \class  psb_d_base_sparse_mat
@@ -106,18 +107,26 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: vect_mv     => psb_d_base_vect_mv
     procedure, pass(a) :: csmv        => psb_d_base_csmv
     procedure, pass(a) :: csmm        => psb_d_base_csmm
-    generic, public    :: spmm        => csmm, csmv, vect_mv
+    procedure, pass(a) :: mvt_mv      => psb_d_base_mvect_mv
+    procedure, pass(a) :: mvt_vm      => psb_d_base_mvect_vm
+    procedure, pass(a) :: mvt_mm_idxs => psb_d_base_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_full => psb_d_base_mvect_mm_full
+    generic, public    :: spmm        => csmm, csmv, vect_mv, mvt_mv, mvt_vm, mvt_mm_idxs, mvt_mm_full
+
     procedure, pass(a) :: in_vect_sv  => psb_d_base_inner_vect_sv
     procedure, pass(a) :: inner_cssv  => psb_d_base_inner_cssv
     procedure, pass(a) :: inner_cssm  => psb_d_base_inner_cssm
     generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv
+
     procedure, pass(a) :: vect_cssv   => psb_d_base_vect_cssv
     procedure, pass(a) :: cssv        => psb_d_base_cssv
     procedure, pass(a) :: cssm        => psb_d_base_cssm
     generic, public    :: spsm        => cssm, cssv, vect_cssv
+
     procedure, pass(a) :: scals       => psb_d_base_scals
     procedure, pass(a) :: scalv       => psb_d_base_scal
     generic, public    :: scal        => scals, scalv
+    
     procedure, pass(a) :: maxval      => psb_d_base_maxval
     procedure, pass(a) :: spnmi       => psb_d_base_csnmi
     procedure, pass(a) :: spnm1       => psb_d_base_csnm1
@@ -1237,6 +1246,56 @@ module psb_d_base_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)  :: trans
     end subroutine psb_d_base_vect_mv
+  end interface
+
+  ! Multivector versions
+  interface
+    subroutine psb_d_base_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      import
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_vect_type), intent(inout)      :: x
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                 :: trans
+    end subroutine psb_d_base_mvect_mv
+  end interface
+  
+  interface
+    subroutine psb_d_base_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans)
+      import
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_d_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                 :: trans
+    end subroutine psb_d_base_mvect_vm
+  end interface
+  
+  interface
+    subroutine psb_d_base_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans)
+      import
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                 :: trans
+    end subroutine psb_d_base_mvect_mm_idxs
+  end interface
+  
+  interface
+    subroutine psb_d_base_mvect_mm_full(alpha, a, x, beta, y, info, trans)
+      import
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                 :: trans
+    end subroutine psb_d_base_mvect_mm_full
   end interface
 
   !

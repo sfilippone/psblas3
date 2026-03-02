@@ -1579,7 +1579,8 @@ module psb_d_multivect_mod
     procedure, pass(x) :: cnv      => d_mvect_cnv
     procedure, pass(x) :: set_scal => d_mvect_set_scal
     procedure, pass(x) :: set_vect => d_mvect_set_vect
-    generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: set_colm => d_mvect_set_colm
+    generic, public    :: set      => set_vect, set_scal, set_colm
     procedure, pass(x) :: clone    => d_mvect_clone
     procedure, pass(x) :: gthab    => d_mvect_gthab
     procedure, pass(x) :: gthzv    => d_mvect_gthzv
@@ -1787,16 +1788,17 @@ contains
     end if
   end function d_mvect_get_vect
 
-  subroutine d_mvect_set_scal(x,val)
+  subroutine d_mvect_set_scal(x, val, rfirst, rlast)
     class(psb_d_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
+    integer(psb_ipk_), optional     :: rfirst, rlast
 
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+    if (allocated(x%v)) call x%v%set(val, rfirst, rlast)
 
   end subroutine d_mvect_set_scal
 
-  subroutine d_mvect_set_vect(x,val)
+  subroutine d_mvect_set_vect(x, val)
     class(psb_d_multivect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)         :: val(:,:)
 
@@ -1804,6 +1806,17 @@ contains
     if (allocated(x%v)) call x%v%set(val)
 
   end subroutine d_mvect_set_vect
+
+  subroutine d_mvect_set_colm(x, cidx, val, rfirst, rlast)
+    class(psb_d_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)   :: cidx
+    real(psb_dpk_), intent(in)      :: val
+    integer(psb_ipk_), optional     :: rfirst, rlast
+
+    integer(psb_ipk_) :: info
+    if (allocated(x%v)) call x%v%set(cidx, val, rfirst, rlast)
+
+  end subroutine d_mvect_set_colm
 
 
   function constructor(x) result(this)

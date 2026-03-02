@@ -53,7 +53,7 @@ module psi_d_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswapdatav
-      subroutine psi_dswapidxm(ctxt,icomm,flag,n,beta,y,idx,&
+    subroutine psi_dswapidxm(ctxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
       type(psb_ctxt_type), intent(in) :: ctxt

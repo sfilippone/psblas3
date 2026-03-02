@@ -678,6 +678,7 @@ subroutine psb_daxpby_mv_mm(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, de
 
   ix = ione
   iy = ione
+  iz = ione
 
   m = desc_a%get_global_rows()
 

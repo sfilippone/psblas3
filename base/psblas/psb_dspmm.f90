@@ -946,3 +946,930 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   return
 end subroutine psb_dspmv
+
+
+! Multivector version of dspmm e dspmv
+
+subroutine psb_dspmv_mv(alpha, a, x, beta, y, idx_y, desc_a, info, trans, work, doswap)
+  use psb_base_mod, psb_protect_name => psb_dspmv_mv
+  use psi_mod
+  implicit none
+
+  type(psb_dspmat_type), intent(in)         :: a
+  type(psb_d_vect_type), intent(inout)      :: x
+  type(psb_d_multivect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(in)             :: idx_y
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_desc_type), intent(in)           :: desc_a
+  character, optional, intent(in)           :: trans
+  real(psb_dpk_), optional, intent(inout),target :: work(:)
+  logical, optional, intent(in)             :: doswap
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, &
+        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
+  integer(psb_ipk_), parameter  :: nb=4
+  real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), allocatable   :: xvsave(:)
+  character                :: trans_
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw, doswap_
+  integer(psb_ipk_)        :: debug_level, debug_unit
+  logical, parameter       :: do_timings = .false.
+  integer(psb_ipk_), save  :: mv_phase1 = -1, mv_phase2 = -1, mv_phase3 = -1, mv_phase4 = -1
+  integer(psb_ipk_), save  :: mv_phase11 = -1, mv_phase12 = -1
+
+  name = 'psb_dspmv'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  if (.not. allocated(y%v)) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (present(doswap)) then
+    doswap_ = doswap
+  else
+    doswap_ = .true.
+  endif
+
+  if (present(trans)) then     
+    trans_ = psb_toupper(trans)
+  else
+    trans_ = 'N'
+  endif
+
+  if ((trans_ /= 'N').and.(trans_ /= 'T') .and.(trans_ /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! Timings
+  if ((do_timings) .and. (mv_phase1 == -1))  mv_phase1 = psb_get_timer_idx("SPMM: and send ")
+  if ((do_timings) .and. (mv_phase2 == -1))  mv_phase2 = psb_get_timer_idx("SPMM: and cmp ad")
+  if ((do_timings) .and. (mv_phase3 == -1))  mv_phase3 = psb_get_timer_idx("SPMM: and rcv")
+  if ((do_timings) .and. (mv_phase4 == -1))  mv_phase4 = psb_get_timer_idx("SPMM: and cmp and")
+  if ((do_timings) .and. (mv_phase11 == -1)) mv_phase11 = psb_get_timer_idx("SPMM: noand exch ")
+  if ((do_timings) .and. (mv_phase12 == -1)) mv_phase12 = psb_get_timer_idx("SPMM: noand cmp")
+
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if ((info == 0) .and. (lldx < ncol)) call x%reall(ncol, info)
+  if ((info == 0) .and. (lldy < ncol)) call y%reall(ncol, y%get_ncols(), info)
+
+  if (psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if (present(work)) then
+    aliw = (size(work) < liwork)
+  else
+    aliw = .true.
+  end if
+
+  if (aliw) then
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
+
+
+  if (trans_ == 'N') then
+    !  Matrix is not transposed
+    
+    if (allocated(a%ad)) then
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        if (do_timings) call psb_barrier(ctxt)
+        if (do_timings) call psb_tic(mv_phase1)
+        if (doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase1)
+        if (do_timings) call psb_tic(mv_phase2)
+
+        call a%ad%spmm(alpha, x%v, beta, y%v, idx_y, info)
+
+        if (do_timings) call psb_tic(mv_phase3)
+        if (doswap_) call psi_swapdata(psb_swap_recv_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase3)
+
+        if (do_timings) call psb_tic(mv_phase4)          
+        call a%and%spmm(alpha, x%v, done, y%v, idx_y, info)
+        if (do_timings) call psb_toc(mv_phase4)
+      end block
+    else
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        if (do_timings) call psb_barrier(ctxt)
+        
+        if (do_timings) call psb_tic(mv_phase11)          
+        if (doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase11)
+
+        if (do_timings) call psb_tic(mv_phase12)          
+        call psb_csmm(alpha, a, x, beta, y, idx_y, info)
+        if (do_timings) call psb_toc(mv_phase12)
+      end block
+    end if
+    
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+  else
+    !  Matrix is transposed
+
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
+    ! 
+
+    call psi_ovrl_save(x%v, xvsave, desc_a, info)
+    if (info == psb_success_) call psi_ovrl_upd(x%v, desc_a, psb_avg_, info)
+
+    if (beta /= dzero) call y%set(idx_y, dzero, nrow + 1, ncol)
+    !  local Matrix-vector product
+    if (info == psb_success_) call psb_csmm(alpha, a, x, beta, y, idx_y, info, trans = trans_)
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_csmm'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+
+    if (doswap_) then
+      call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
+      if (info == psb_success_) &
+        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+
+      if (debug_level >= psb_debug_comp_) write(debug_unit,*) me, ' ', trim(name), ' swaptran ', info
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        ch_err = 'PSI_SwapTran'
+        call psb_errpush(info,  name,a_err = ch_err)
+        goto 9999
+      end if
+    end if
+  end if
+
+  if (aliw) deallocate(iwork, stat = info)
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'Deallocate iwork'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  nullify(iwork)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ctxt)
+    write(debug_unit, *) me, ' ', trim(name), ' Returning '
+  endif
+
+  return  
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+
+end subroutine psb_dspmv_mv
+
+subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, doswap)
+  use psb_base_mod, psb_protect_name => psb_dspmv_vm
+  use psi_mod
+  implicit none
+
+  type(psb_dspmat_type), intent(in)         :: a
+  type(psb_d_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)             :: idx_x
+  type(psb_d_vect_type), intent(inout)      :: y
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_desc_type), intent(in)           :: desc_a
+  character, optional, intent(in)           :: trans
+  real(psb_dpk_), optional, intent(inout),target :: work(:)
+  logical, optional, intent(in)             :: doswap
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, &
+        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
+  integer(psb_ipk_), parameter  :: nb=4
+  real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), allocatable   :: xvsave(:, :)
+  character                :: trans_
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw, doswap_
+  integer(psb_ipk_)        :: debug_level, debug_unit
+  logical, parameter       :: do_timings = .false.
+  integer(psb_ipk_), save  :: mv_phase1 = -1, mv_phase2 = -1, mv_phase3 = -1, mv_phase4 = -1
+  integer(psb_ipk_), save  :: mv_phase11 = -1, mv_phase12 = -1
+
+  name = 'psb_dspmv'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  if (.not. allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (present(doswap)) then
+    doswap_ = doswap
+  else
+    doswap_ = .true.
+  endif
+
+  if (present(trans)) then     
+    trans_ = psb_toupper(trans)
+  else
+    trans_ = 'N'
+  endif
+
+  if ((trans_ /= 'N').and.(trans_ /= 'T').and.(trans_ /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! Timings
+  if ((do_timings) .and. (mv_phase1 == -1))  mv_phase1 = psb_get_timer_idx("SPMM: and send ")
+  if ((do_timings) .and. (mv_phase2 == -1))  mv_phase2 = psb_get_timer_idx("SPMM: and cmp ad")
+  if ((do_timings) .and. (mv_phase3 == -1))  mv_phase3 = psb_get_timer_idx("SPMM: and rcv")
+  if ((do_timings) .and. (mv_phase4 == -1))  mv_phase4 = psb_get_timer_idx("SPMM: and cmp and")
+  if ((do_timings) .and. (mv_phase11 == -1)) mv_phase11 = psb_get_timer_idx("SPMM: noand exch ")
+  if ((do_timings) .and. (mv_phase12 == -1)) mv_phase12 = psb_get_timer_idx("SPMM: noand cmp")
+
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+
+  if ((info == 0) .and. (lldx < ncol)) call x%reall(ncol, x%get_ncols(), info)
+  if ((info == 0) .and. (lldy < ncol)) call y%reall(ncol, info)
+
+  if (psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  liwork = 2*ncol
+
+  ! check for presence/size of a work area
+  if (present(work)) then
+    aliw = (size(work) < liwork)
+  else
+    aliw = .true.
+  end if
+
+  if (aliw) then
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
+
+
+  if (trans_ == 'N') then
+    !  Matrix is not transposed
+    
+    if (allocated(a%ad)) then
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        if (do_timings) call psb_barrier(ctxt)
+        if (do_timings) call psb_tic(mv_phase1)
+        if (doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase1)
+        if (do_timings) call psb_tic(mv_phase2)
+
+        call a%ad%spmm(alpha, x%v, idx_x, beta, y%v, info)
+
+        if (do_timings) call psb_tic(mv_phase3)
+        if (doswap_) call psi_swapdata(psb_swap_recv_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase3)
+
+        if (do_timings) call psb_tic(mv_phase4)          
+        call a%and%spmm(alpha, x%v, idx_x, done, y%v, info)
+        if (do_timings) call psb_toc(mv_phase4)
+      end block
+    else
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        if (do_timings) call psb_barrier(ctxt)
+        
+        if (do_timings) call psb_tic(mv_phase11)
+        if (doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase11)
+
+        if (do_timings) call psb_tic(mv_phase12)          
+        call psb_csmm(alpha, a, x, idx_x, beta, y, info)
+        if (do_timings) call psb_toc(mv_phase12)
+      end block
+    end if
+    
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+  else
+    !  Matrix is transposed
+
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
+    ! 
+
+    call psi_ovrl_save(x%v, xvsave, desc_a, info)
+    if (info == psb_success_) call psi_ovrl_upd(x%v, desc_a, psb_avg_, info)
+
+    if (beta /= dzero) call y%set(dzero, nrow + 1, ncol)
+    !  local Matrix-vector product
+    if (info == psb_success_) call psb_csmm(alpha, a, x, idx_x, beta, y, info, trans = trans_)
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_csmm'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+
+    if (doswap_) then
+      call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
+      if (info == psb_success_) &
+        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+
+      if (debug_level >= psb_debug_comp_) write(debug_unit,*) me, ' ', trim(name), ' swaptran ', info
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        ch_err = 'PSI_SwapTran'
+        call psb_errpush(info,  name,a_err = ch_err)
+        goto 9999
+      end if
+    end if
+  end if
+
+  if (aliw) deallocate(iwork, stat = info)
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'Deallocate iwork'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  nullify(iwork)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ctxt)
+    write(debug_unit, *) me, ' ', trim(name), ' Returning '
+  endif
+
+  return  
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+
+end subroutine psb_dspmv_vm
+
+subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, trans, work, doswap)
+  use psb_base_mod, psb_protect_name => psb_dspmv_mm_idxs
+  use psi_mod
+  implicit none
+
+  type(psb_dspmat_type), intent(in)         :: a
+  type(psb_d_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_desc_type), intent(in)           :: desc_a
+  character, optional, intent(in)           :: trans
+  real(psb_dpk_), optional, intent(inout),target :: work(:)
+  logical, optional, intent(in)             :: doswap
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, &
+        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
+  integer(psb_ipk_), parameter  :: nb=4
+  real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), allocatable   :: xvsave(:, :)
+  character                :: trans_
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw, doswap_
+  integer(psb_ipk_)        :: debug_level, debug_unit
+  logical, parameter       :: do_timings = .false.
+  integer(psb_ipk_), save  :: mv_phase1 = -1, mv_phase2 = -1, mv_phase3 = -1, mv_phase4 = -1
+  integer(psb_ipk_), save  :: mv_phase11 = -1, mv_phase12 = -1
+
+  name = 'psb_dspmv'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (present(doswap)) then
+    doswap_ = doswap
+  else
+    doswap_ = .true.
+  endif
+
+  if (present(trans)) then     
+    trans_ = psb_toupper(trans)
+  else
+    trans_ = 'N'
+  endif
+
+  if ((trans_ /= 'N').and.(trans_ /= 'T') .and.(trans_ /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! Timings
+  if ((do_timings) .and. (mv_phase1 == -1))  mv_phase1 = psb_get_timer_idx("SPMM: and send ")
+  if ((do_timings) .and. (mv_phase2 == -1))  mv_phase2 = psb_get_timer_idx("SPMM: and cmp ad")
+  if ((do_timings) .and. (mv_phase3 == -1))  mv_phase3 = psb_get_timer_idx("SPMM: and rcv")
+  if ((do_timings) .and. (mv_phase4 == -1))  mv_phase4 = psb_get_timer_idx("SPMM: and cmp and")
+  if ((do_timings) .and. (mv_phase11 == -1)) mv_phase11 = psb_get_timer_idx("SPMM: noand exch ")
+  if ((do_timings) .and. (mv_phase12 == -1)) mv_phase12 = psb_get_timer_idx("SPMM: noand cmp")
+
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if ((info == 0) .and. (lldx < ncol)) call x%reall(ncol, x%get_ncols(), info)
+  if ((info == 0) .and. (lldy < ncol)) call y%reall(ncol, y%get_ncols(), info)
+
+  if (psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if (present(work)) then
+    aliw = (size(work) < liwork)
+  else
+    aliw = .true.
+  end if
+
+  if (aliw) then
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
+
+
+  if (trans_ == 'N') then
+    !  Matrix is not transposed
+    
+    if (allocated(a%ad)) then
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        if (do_timings) call psb_barrier(ctxt)
+        if (do_timings) call psb_tic(mv_phase1)
+        if (doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase1)
+        if (do_timings) call psb_tic(mv_phase2)
+
+        call a%ad%spmm(alpha, x%v, idx_x, beta, y%v, idx_y, info)
+
+        if (do_timings) call psb_tic(mv_phase3)
+        if (doswap_) call psi_swapdata(psb_swap_recv_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase3)
+
+        if (do_timings) call psb_tic(mv_phase4)          
+        call a%and%spmm(alpha, x%v, idx_x, done, y%v, idx_y, info)
+        if (do_timings) call psb_toc(mv_phase4)
+      end block
+    else
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        if (do_timings) call psb_barrier(ctxt)
+        
+        if (do_timings) call psb_tic(mv_phase11)          
+        if (doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase11)
+
+        if (do_timings) call psb_tic(mv_phase12)          
+        call psb_csmm(alpha, a, x, idx_x, beta, y, idx_y, info)
+        if (do_timings) call psb_toc(mv_phase12)
+      end block
+    end if
+    
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+  else
+    !  Matrix is transposed
+
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
+    ! 
+
+    call psi_ovrl_save(x%v, xvsave, desc_a, info)
+    if (info == psb_success_) call psi_ovrl_upd(x%v, desc_a, psb_avg_, info)
+
+    if (beta /= dzero) call y%set(idx_y, dzero, nrow + 1, ncol)
+    !  local Matrix-vector product
+    if (info == psb_success_) call psb_csmm(alpha, a, x, idx_x, beta, y, idx_y, info, trans = trans_)
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_csmm'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+
+    if (doswap_) then
+      call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
+      if (info == psb_success_) &
+        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+
+      if (debug_level >= psb_debug_comp_) write(debug_unit,*) me, ' ', trim(name), ' swaptran ', info
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        ch_err = 'PSI_SwapTran'
+        call psb_errpush(info,  name,a_err = ch_err)
+        goto 9999
+      end if
+    end if
+  end if
+
+  if (aliw) deallocate(iwork, stat = info)
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'Deallocate iwork'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  nullify(iwork)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ctxt)
+    write(debug_unit, *) me, ' ', trim(name), ' Returning '
+  endif
+
+  return  
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+
+end subroutine psb_dspmv_mm_idxs
+
+subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, doswap)
+  use psb_base_mod, psb_protect_name => psb_dspmv_mm_full
+  use psi_mod
+  implicit none
+
+  type(psb_dspmat_type), intent(in)         :: a
+  type(psb_d_multivect_type), intent(inout) :: x, y
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_desc_type), intent(in)           :: desc_a
+  character, optional, intent(in)           :: trans
+  real(psb_dpk_), optional, intent(inout),target :: work(:)
+  logical, optional, intent(in)             :: doswap
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, &
+        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
+        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
+  integer(psb_ipk_), parameter  :: nb=4
+  real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), allocatable   :: xvsave(:, :)
+  character                :: trans_
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw, doswap_
+  integer(psb_ipk_)        :: debug_level, debug_unit
+  logical, parameter       :: do_timings = .false.
+  integer(psb_ipk_), save  :: mv_phase1 = -1, mv_phase2 = -1, mv_phase3 = -1, mv_phase4 = -1
+  integer(psb_ipk_), save  :: mv_phase11 = -1, mv_phase12 = -1
+
+  name = 'psb_dspmv'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (present(doswap)) then
+    doswap_ = doswap
+  else
+    doswap_ = .true.
+  endif
+
+  if (present(trans)) then     
+    trans_ = psb_toupper(trans)
+  else
+    trans_ = 'N'
+  endif
+
+  if ((trans_ /= 'N').and.(trans_ /= 'T') .and.(trans_ /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! Timings
+  if ((do_timings) .and. (mv_phase1 == -1))  mv_phase1 = psb_get_timer_idx("SPMM: and send ")
+  if ((do_timings) .and. (mv_phase2 == -1))  mv_phase2 = psb_get_timer_idx("SPMM: and cmp ad")
+  if ((do_timings) .and. (mv_phase3 == -1))  mv_phase3 = psb_get_timer_idx("SPMM: and rcv")
+  if ((do_timings) .and. (mv_phase4 == -1))  mv_phase4 = psb_get_timer_idx("SPMM: and cmp and")
+  if ((do_timings) .and. (mv_phase11 == -1)) mv_phase11 = psb_get_timer_idx("SPMM: noand exch ")
+  if ((do_timings) .and. (mv_phase12 == -1)) mv_phase12 = psb_get_timer_idx("SPMM: noand cmp")
+
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if ((info == 0) .and. (lldx < ncol)) call x%reall(ncol, x%get_ncols(), info)
+  if ((info == 0) .and. (lldy < ncol)) call y%reall(ncol, y%get_ncols(), info)
+
+  if (psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if (present(work)) then
+    aliw = (size(work) < liwork)
+  else
+    aliw = .true.
+  end if
+
+  if (aliw) then
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
+
+
+  if (trans_ == 'N') then
+    !  Matrix is not transposed
+    
+    if (allocated(a%ad)) then
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        if (do_timings) call psb_barrier(ctxt)
+        if (do_timings) call psb_tic(mv_phase1)
+        if (doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase1)
+        if (do_timings) call psb_tic(mv_phase2)
+
+        call a%ad%spmm(alpha, x%v, beta, y%v, info)
+
+        if (do_timings) call psb_tic(mv_phase3)
+        if (doswap_) call psi_swapdata(psb_swap_recv_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase3)
+
+        if (do_timings) call psb_tic(mv_phase4)          
+        call a%and%spmm(alpha, x%v, done, y%v, info)
+        if (do_timings) call psb_toc(mv_phase4)
+      end block
+    else
+      block
+        logical, parameter :: do_timings = .false.
+        real(psb_dpk_) :: t1, t2, t3, t4, t5
+        if (do_timings) call psb_barrier(ctxt)
+        
+        if (do_timings) call psb_tic(mv_phase11)          
+        if (doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if (do_timings) call psb_toc(mv_phase11)
+
+        if (do_timings) call psb_tic(mv_phase12)          
+        call psb_csmm(alpha, a, x, beta, y, info)
+        if (do_timings) call psb_toc(mv_phase12)
+      end block
+    end if
+    
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+  else
+    !  Matrix is transposed
+
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
+    ! 
+
+    call psi_ovrl_save(x%v, xvsave, desc_a, info)
+    if (info == psb_success_) call psi_ovrl_upd(x%v, desc_a, psb_avg_, info)
+
+    if (beta /= dzero) call y%set(dzero, nrow + 1, ncol)
+    !  local Matrix-vector product
+    if (info == psb_success_) call psb_csmm(alpha, a, x, beta, y, info, trans = trans_)
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_csmm'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+
+    if (doswap_) then
+      call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
+      if (info == psb_success_) &
+        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+
+      if (debug_level >= psb_debug_comp_) write(debug_unit,*) me, ' ', trim(name), ' swaptran ', info
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        ch_err = 'PSI_SwapTran'
+        call psb_errpush(info,  name,a_err = ch_err)
+        goto 9999
+      end if
+    end if
+  end if
+
+  if (aliw) deallocate(iwork, stat = info)
+  if (debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'Deallocate iwork'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  nullify(iwork)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ctxt)
+    write(debug_unit, *) me, ' ', trim(name), ' Returning '
+  endif
+
+  return  
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+
+end subroutine psb_dspmv_mm_full

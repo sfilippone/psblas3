@@ -532,6 +532,8 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
         ovrlap_yval = y%v%v(idx, :)
         call dger(outm, outn, real(1-ndm)/real(ndm), ovrlap_xval, 1, ovrlap_yval, 1, xty, outm)
       end do
+
+      deallocate(ovrlap_xval, ovrlap_yval)
     end if
   end if
 

@@ -2703,7 +2703,8 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: get_vect => d_base_mlv_get_vect
     procedure, pass(x) :: set_scal => d_base_mlv_set_scal
     procedure, pass(x) :: set_vect => d_base_mlv_set_vect
-    generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: set_colm => d_base_mlv_set_colm
+    generic, public    :: set      => set_vect, set_scal, set_colm
 
 
     !
@@ -3517,13 +3518,19 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine d_base_mlv_set_scal(x,val)
+  subroutine d_base_mlv_set_scal(x, val, rfirst, rlast)
     implicit none
     class(psb_d_base_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
+    integer(psb_ipk_), optional   :: rfirst, rlast
 
-    integer(psb_ipk_) :: info
-    x%v = val
+    integer(psb_ipk_) :: info, rfirst_, rlast_
+    rfirst_ = 1
+    rlast_ = size(x%v, 1)
+    if (present(rfirst)) rfirst_ = max(rfirst_, rfirst)
+    if (present(rlast))  rlast_  = min(rlast_, rlast)
+
+    x%v(rfirst_ : rlast_, :) = val
 
   end subroutine d_base_mlv_set_scal
 
@@ -3533,7 +3540,7 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in
   !!
-  subroutine d_base_mlv_set_vect(x,val)
+  subroutine d_base_mlv_set_vect(x, val)
     implicit none
     class(psb_d_base_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val(:,:)
@@ -3551,7 +3558,33 @@ contains
 
   end subroutine d_base_mlv_set_vect
 
-  
+  subroutine d_base_mlv_set_colm(x, cidx, val, rfirst, rlast)
+    implicit none
+    class(psb_d_base_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in) :: cidx
+    real(psb_dpk_), intent(in)    :: val
+    integer(psb_ipk_), optional   :: rfirst, rlast
+
+    integer(psb_ipk_) :: rfirst_, rlast_, i
+    rfirst_ = 1
+    rlast_ = size(x%v, 1)
+    if (present(rfirst)) rfirst_ = max(rfirst_, rfirst)
+    if (present(rlast))  rlast_  = min(rlast_, rlast)
+
+
+    if (x%is_dev()) call x%sync()
+
+#if defined(PSB_OPENMP)
+      !$omp parallel do private(i)
+      do i = rfirst_, rlast_        
+        x%v(i, cidx) = val
+      end do
+#else
+      x%v(rfirst_ : rlast_, cidx) = val
+#endif
+
+    call x%set_host()
+  end subroutine d_base_mlv_set_colm
   !
   ! Dot products
   !

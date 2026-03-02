@@ -2324,6 +2324,181 @@ subroutine psb_d_csmv_vect(alpha,a,x,beta,y,info,trans)
 
 end subroutine psb_d_csmv_vect
 
+subroutine psb_d_csmv_mv(alpha, a, x, beta, y, idx_y, info, trans)
+  use psb_error_mod
+  use psb_d_vect_mod
+  use psb_d_multivect_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_csmv_mv
+  implicit none
+  class(psb_dspmat_type), intent(in)        :: a
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_d_vect_type), intent(inout)      :: x
+  type(psb_d_multivect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(in)             :: idx_y
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)           :: trans
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name = 'psb_csmv'
+  logical, parameter :: debug = .false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call a%a%spmm(alpha, x%v, beta, y%v, idx_y, info, trans)
+  if (info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_d_csmv_mv
+
+subroutine psb_d_csmv_vm(alpha, a, x, idx_x, beta, y, info, trans)
+  use psb_error_mod
+  use psb_d_vect_mod
+  use psb_d_multivect_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_csmv_vm
+  implicit none
+  class(psb_dspmat_type), intent(in)        :: a
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_d_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)             :: idx_x
+  type(psb_d_vect_type), intent(inout)      :: y
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)           :: trans
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name = 'psb_csmv'
+  logical, parameter :: debug = .false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%spmm(alpha, x%v, idx_x, beta, y%v, info, trans)
+  
+  if (info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_d_csmv_vm
+
+subroutine psb_d_csmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans)
+  use psb_error_mod
+  use psb_d_vect_mod
+  use psb_d_multivect_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_csmv_mm_idxs
+  implicit none
+  class(psb_dspmat_type), intent(in)        :: a
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_d_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)           :: trans
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name = 'psb_csmv'
+  logical, parameter :: debug = .false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if ((.not.allocated(x%v)) .or. (.not.allocated(y%v))) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call a%a%spmm(alpha, x%v, idx_x, beta, y%v, idx_y, info, trans)
+  if (info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_d_csmv_mm_idxs
+
+subroutine psb_d_csmv_mm_full(alpha, a, x, beta, y, info, trans)
+  use psb_error_mod
+  use psb_d_vect_mod
+  use psb_d_multivect_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_csmv_mm_full
+  implicit none
+  class(psb_dspmat_type), intent(in)        :: a
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_d_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)           :: trans
+
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name = 'psb_csmv'
+  logical, parameter :: debug = .false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if ((.not.allocated(x%v)) .or. (.not.allocated(y%v))) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call a%a%spmm(alpha, x%v, beta, y%v, info, trans)
+  if (info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_d_csmv_mm_full
+
 
 
 subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d)

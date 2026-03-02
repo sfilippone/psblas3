@@ -1064,32 +1064,80 @@ module psb_d_mat_mod
   ! == ===================================
 
   interface psb_csmm
-    subroutine psb_d_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_csmm(alpha, a, x, beta, y, info, trans)
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout) :: y(:,:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans
+      real(psb_dpk_), intent(in)         :: alpha, beta, x(:, :)
+      real(psb_dpk_), intent(inout)      :: y(:, :)
+      integer(psb_ipk_), intent(out)     :: info
+      character, optional, intent(in)    :: trans
     end subroutine psb_d_csmm
-    subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_csmv(alpha, a, x, beta, y, info, trans)
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout) :: y(:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans
+      real(psb_dpk_), intent(in)         :: alpha, beta, x(:)
+      real(psb_dpk_), intent(inout)      :: y(:)
+      integer(psb_ipk_), intent(out)     :: info
+      character, optional, intent(in)    :: trans
     end subroutine psb_d_csmv
-    subroutine psb_d_csmv_vect(alpha,a,x,beta,y,info,trans)
+
+    subroutine psb_d_csmv_vect(alpha, a, x, beta, y, info, trans)
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in)   :: a
-      real(psb_dpk_), intent(in)        :: alpha, beta
+      real(psb_dpk_), intent(in)           :: alpha, beta
       type(psb_d_vect_type), intent(inout) :: x
       type(psb_d_vect_type), intent(inout) :: y
-      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), intent(out)       :: info
       character, optional, intent(in)      :: trans
     end subroutine psb_d_csmv_vect
+
+    subroutine psb_d_csmv_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      use psb_d_vect_mod, only : psb_d_vect_type
+      use psb_d_multivect_mod, only : psb_d_multivect_type
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in)        :: a
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      type(psb_d_vect_type), intent(inout)      :: x
+      type(psb_d_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)             :: idx_y
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in)           :: trans
+    end subroutine psb_d_csmv_mv
+
+    subroutine psb_d_csmv_vm(alpha, a, x, idx_x, beta, y, info, trans)
+      use psb_d_vect_mod, only : psb_d_vect_type
+      use psb_d_multivect_mod, only : psb_d_multivect_type
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in)        :: a
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_d_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in)           :: trans
+    end subroutine psb_d_csmv_vm
+
+    subroutine psb_d_csmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans)
+      use psb_d_multivect_mod, only : psb_d_multivect_type
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in)        :: a
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in)           :: trans
+    end subroutine psb_d_csmv_mm_idxs
+
+    subroutine psb_d_csmv_mm_full(alpha, a, x, beta, y, info, trans)
+      use psb_d_multivect_mod, only : psb_d_multivect_type
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in)        :: a
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)            :: info
+      character, optional, intent(in)           :: trans
+    end subroutine psb_d_csmv_mm_full
   end interface
 
   interface psb_cssm
