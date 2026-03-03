@@ -121,7 +121,7 @@ double g(double x, double y, double z)
 }
 
 psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
-	       psb_c_dspmat *ah,psb_c_descriptor *cdh,
+	       psb_c_dspmat *ah, psb_c_descriptor *cdh,
 	       psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
   psb_i_t iam, np;
