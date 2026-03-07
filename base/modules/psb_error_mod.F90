@@ -390,7 +390,7 @@ contains
   ! pushes an error on the error stack
   subroutine psb_errpush(err_c, r_name, a_err, i_err, l_err, m_err, e_err)
 
-    integer(psb_ipk_), intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)    ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
     integer(psb_ipk_), optional      ::  i_err(:)

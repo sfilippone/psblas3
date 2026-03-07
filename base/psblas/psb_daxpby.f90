@@ -463,7 +463,6 @@ subroutine psb_daxpby_mv_m_idxs(alpha, x, idx_x, beta, y, idx_y, desc_a, info)
   return
 end subroutine psb_daxpby_mv_m_idxs
 
-
 subroutine psb_daxpby_mv_vv(alpha, x, beta, y, gamma, z, idx_z, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_vv
   implicit none

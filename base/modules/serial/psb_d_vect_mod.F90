@@ -191,7 +191,7 @@ module psb_d_vect_mod
        & d_vect_absval2, d_vect_nrm2, d_vect_amax, d_vect_asum
 
 
-  class(psb_d_base_vect_type), allocatable, target,&
+  class(psb_d_base_vect_type), allocatable, target, &
        & save, private :: psb_d_base_vect_default
 
   interface psb_set_vect_default
@@ -1553,7 +1553,6 @@ module psb_d_multivect_mod
     class(psb_d_base_multivect_type), allocatable :: v
     integer(psb_ipk_) :: nrmv = 0
     integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
-    integer(psb_ipk_) :: dupl = psb_dupl_add_
     real(psb_dpk_), allocatable :: rmtv(:,:)
   contains
     procedure, pass(x) :: get_nrows => d_mvect_get_nrows
@@ -1562,8 +1561,6 @@ module psb_d_multivect_mod
     procedure, pass(x) :: get_fmt  => d_mvect_get_fmt
     procedure, pass(x) :: is_remote_build => d_mvect_is_remote_build
     procedure, pass(x) :: set_remote_build => d_mvect_set_remote_build
-    procedure, pass(x) :: get_dupl => d_mvect_get_dupl
-    procedure, pass(x) :: set_dupl => d_mvect_set_dupl
 
     procedure, pass(x) :: all      => d_mvect_all
     procedure, pass(x) :: reall    => d_mvect_reall
@@ -1571,6 +1568,24 @@ module psb_d_multivect_mod
     procedure, pass(x) :: asb      => d_mvect_asb
     procedure, pass(x) :: sync     => d_mvect_sync
     procedure, pass(x) :: free     => d_mvect_free
+    procedure, pass(x) :: reinit      => d_mvect_reinit
+    procedure, pass(x) :: set_ncfs => d_mvect_set_ncfs 
+    procedure, pass(x) :: get_ncfs => d_mvect_get_ncfs
+    procedure, pass(x) :: set_dupl => d_mvect_set_dupl 
+    procedure, pass(x) :: get_dupl => d_mvect_get_dupl
+    procedure, pass(x) :: set_state => d_mvect_set_state
+    procedure, pass(x) :: set_null  => d_mvect_set_null
+    procedure, pass(x) :: set_bld   => d_mvect_set_bld
+    procedure, pass(x) :: set_upd   => d_mvect_set_upd
+    procedure, pass(x) :: set_asb   => d_mvect_set_asb
+    procedure, pass(x) :: get_state => d_mvect_get_state
+    procedure, pass(x) :: is_null   => d_mvect_is_null
+    procedure, pass(x) :: is_bld    => d_mvect_is_bld
+    procedure, pass(x) :: is_upd    => d_mvect_is_upd
+    procedure, pass(x) :: is_asb    => d_mvect_is_asb
+!!$    procedure, pass(x) :: base_cpy  => d_mvect_cpy
+
+
     procedure, pass(x) :: ins      => d_mvect_ins
     procedure, pass(x) :: bld_x    => d_mvect_bld_x
     procedure, pass(x) :: bld_n    => d_mvect_bld_n
@@ -1656,26 +1671,6 @@ module psb_d_multivect_mod
 contains
 
   
-  function d_mvect_get_dupl(x) result(res)
-    implicit none
-    class(psb_d_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%dupl
-  end function d_mvect_get_dupl
-
-  subroutine d_mvect_set_dupl(x,val)
-    implicit none
-    class(psb_d_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in), optional :: val
-
-    if (present(val)) then
-      x%dupl = val
-    else
-      x%dupl = psb_dupl_def_
-    end if
-  end subroutine d_mvect_set_dupl
-        
-
   function d_mvect_is_remote_build(x) result(res)
     implicit none
     class(psb_d_multivect_type), intent(in) :: x
@@ -1694,7 +1689,6 @@ contains
       x%remote_build = psb_matbld_remote_
     end if
   end subroutine d_mvect_set_remote_build
-        
 
   subroutine  psb_d_set_multivect_default(v)
     implicit none
@@ -1716,7 +1710,6 @@ contains
 
   end function psb_d_get_multivect_default
 
-
   function psb_d_get_base_multivect_default() result(res)
     implicit none
     class(psb_d_base_multivect_type), pointer :: res
@@ -1728,7 +1721,6 @@ contains
     res => psb_d_base_multivect_default
 
   end function psb_d_get_base_multivect_default
-
 
   subroutine d_mvect_clone(x,y,info)
     implicit none
@@ -1760,7 +1752,6 @@ contains
     if (info == psb_success_) call x%v%bld(invect)
 
   end subroutine d_mvect_bld_x
-
 
   subroutine d_mvect_bld_n(x,m,n,mold)
     integer(psb_ipk_), intent(in) :: m,n
@@ -1818,7 +1809,6 @@ contains
 
   end subroutine d_mvect_set_colm
 
-
   function constructor(x) result(this)
     real(psb_dpk_)   :: x(:,:)
     type(psb_d_multivect_type) :: this
@@ -1828,7 +1818,6 @@ contains
     call this%asb(size(x,dim=1,kind=psb_ipk_),size(x,dim=2,kind=psb_ipk_),info)
 
   end function constructor
-
 
   function size_const(m,n) result(this)
     integer(psb_ipk_), intent(in) :: m,n
@@ -1873,7 +1862,6 @@ contains
   end function d_mvect_get_fmt
 
   subroutine d_mvect_all(m,n, x, info, mold)
-
     implicit none
     integer(psb_ipk_), intent(in)       :: m,n
     class(psb_d_multivect_type), intent(out) :: x
@@ -1890,53 +1878,57 @@ contains
     else
       info = psb_err_alloc_dealloc_
     end if
-
+    call x%set_bld()
   end subroutine d_mvect_all
 
   subroutine d_mvect_reall(m,n, x, info)
-
     implicit none
-    integer(psb_ipk_), intent(in)         :: m,n
+    integer(psb_ipk_), intent(in)         :: m, n
     class(psb_d_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
 
     info = 0
-    if (.not.allocated(x%v)) &
-         & call x%all(m,n,info)
-    if (info == 0) &
-         & call x%asb(m,n,info)
-
+    if (.not.allocated(x%v)) call x%all(m, n, info)
+    if (info == 0) call x%asb(m, n, info)
   end subroutine d_mvect_reall
+
+  subroutine d_mvect_reinit(x, info)
+    implicit none
+    class(psb_d_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)        :: info
+
+    info = 0
+    if (allocated(x%v))  call x%v%reinit(info)
+    call x%set_upd()
+  end subroutine d_mvect_reinit
 
   subroutine d_mvect_zero(x)
     use psi_serial_mod
     implicit none
-    class(psb_d_multivect_type), intent(inout)    :: x
+    class(psb_d_multivect_type), intent(inout) :: x
 
     if (allocated(x%v)) call x%v%zero()
-
   end subroutine d_mvect_zero
 
   subroutine d_mvect_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    integer(psb_ipk_), intent(in)              :: m,n
+    integer(psb_ipk_), intent(in)              :: m, n
     class(psb_d_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
-    if (allocated(x%v)) &
-         & call x%v%asb(m,n,info)
-
+    if (allocated(x%v)) then
+      call x%v%asb(m,n,info)
+      call x%set_asb()
+    end if
   end subroutine d_mvect_asb
 
   subroutine d_mvect_sync(x)
     implicit none
     class(psb_d_multivect_type), intent(inout) :: x
 
-    if (allocated(x%v)) &
-         & call x%v%sync()
-
+    if (allocated(x%v)) call x%v%sync()
   end subroutine d_mvect_sync
 
   subroutine d_mvect_gthab(n,idx,alpha,x,beta,y)
@@ -1946,9 +1938,7 @@ contains
     real(psb_dpk_) :: alpha, beta, y(:)
     class(psb_d_multivect_type) :: x
 
-    if (allocated(x%v)) &
-         &  call x%v%gth(n,idx,alpha,beta,y)
-
+    if (allocated(x%v)) call x%v%gth(n, idx, alpha, beta, y)
   end subroutine d_mvect_gthab
 
   subroutine d_mvect_gthzv(n,idx,x,y)
@@ -1958,9 +1948,7 @@ contains
     real(psb_dpk_) ::  y(:)
     class(psb_d_multivect_type) :: x
 
-    if (allocated(x%v)) &
-         &  call x%v%gth(n,idx,y)
-
+    if (allocated(x%v)) call x%v%gth(n, idx, y)
   end subroutine d_mvect_gthzv
 
   subroutine d_mvect_gthzv_x(i,n,idx,x,y)
@@ -1971,8 +1959,7 @@ contains
     real(psb_dpk_) ::  y(:)
     class(psb_d_multivect_type) :: x
 
-    if (allocated(x%v)) &
-         &  call x%v%gth(i,n,idx,y)
+    if (allocated(x%v)) call x%v%gth(i, n, idx, y)
 
   end subroutine d_mvect_gthzv_x
 
@@ -1983,9 +1970,7 @@ contains
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_multivect_type) :: y
 
-    if (allocated(y%v)) &
-         &  call y%v%sct(n,idx,x,beta)
-
+    if (allocated(y%v)) call y%v%sct(n, idx, x, beta)
   end subroutine d_mvect_sctb
 
   subroutine d_mvect_sctb_x(i,n,idx,x,beta,y)
@@ -1996,8 +1981,7 @@ contains
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_multivect_type) :: y
 
-    if (allocated(y%v)) &
-         &  call y%v%sct(i,n,idx,x,beta)
+    if (allocated(y%v)) call y%v%sct(i, n, idx, x, beta)
 
   end subroutine d_mvect_sctb_x
 
@@ -2011,11 +1995,109 @@ contains
     info = 0
     if (allocated(x%v)) then
       call x%v%free(info)
-      if (info == 0) deallocate(x%v,stat=info)
+      if (info == 0) deallocate(x%v, stat = info)
     end if
 
   end subroutine d_mvect_free
 
+  subroutine  d_mvect_set_ncfs(n,x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_) :: n
+
+    if (allocated(x%v)) call x%v%set_ncfs(n)
+  end subroutine d_mvect_set_ncfs
+
+  function d_mvect_get_ncfs(n,x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_) :: res
+
+    if (allocated(x%v)) res = x%v%get_ncfs()
+  end function d_mvect_get_ncfs
+
+  subroutine d_mvect_set_dupl(n,x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_) :: n
+
+    if (allocated(x%v)) call x%v%set_dupl(n)
+  end subroutine d_mvect_set_dupl
+
+  function d_mvect_get_dupl(x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_) :: res
+
+    if(allocated(x%v)) res = x%v%get_dupl()
+  end function d_mvect_get_dupl
+
+  subroutine  d_mvect_set_state(n,x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_) :: n
+
+    if (allocated(x%v)) call x%v%set_state(n)
+  end subroutine d_mvect_set_state
+
+  function d_mvect_get_state(n,x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_) :: res
+
+    if (allocated(x%v)) res = x%v%get_state()
+  end function d_mvect_get_state
+
+  subroutine  d_mvect_set_null(x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) call x%v%set_null()
+  end subroutine d_mvect_set_null
+
+  function  d_mvect_is_null(x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    logical :: res
+
+    res = .false.
+    if (allocated(x%v)) res =  x%v%is_null()
+  end function d_mvect_is_null
+
+  subroutine  d_mvect_set_bld(x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) call x%v%set_bld()
+  end subroutine d_mvect_set_bld
+
+  function  d_mvect_is_bld(x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    logical :: res
+
+    res = .false.
+    if (allocated(x%v)) res =  x%v%is_bld()
+  end function d_mvect_is_bld
+
+  subroutine  d_mvect_set_upd(x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) call x%v%set_upd()
+  end subroutine d_mvect_set_upd
+
+  function  d_mvect_is_upd(x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    logical :: res
+
+    res = .false.
+    if (allocated(x%v)) res =  x%v%is_upd()
+  end function d_mvect_is_upd
+
+  subroutine  d_mvect_set_asb(x)
+    class(psb_d_multivect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) call x%v%set_asb()
+  end subroutine d_mvect_set_asb
+
+  function  d_mvect_is_asb(x) result(res)
+    class(psb_d_multivect_type), intent(inout)  :: x
+    logical :: res
+
+    res = .false.
+    if (allocated(x%v)) res =  x%v%is_asb()
+  end function d_mvect_is_asb
+  
   subroutine d_mvect_ins(n,irl,val,x,maxr,info)
     use psi_serial_mod
     implicit none
@@ -2037,7 +2119,6 @@ contains
 
   end subroutine d_mvect_ins
 
-
   subroutine d_mvect_cnv(x,mold)
     class(psb_d_multivect_type), intent(inout) :: x
     class(psb_d_base_multivect_type), intent(in), optional :: mold
@@ -2045,18 +2126,19 @@ contains
     integer(psb_ipk_) :: info
 
     if (present(mold)) then
-      allocate(tmp,stat=info,mold=mold)
+      allocate(tmp, stat=info, mold=mold)
     else
-      allocate(tmp,stat=info, mold=psb_d_get_base_multivect_default())
+      allocate(tmp, stat=info, mold=psb_d_get_base_multivect_default())
     endif
+
     if (allocated(x%v)) then
       call x%v%sync()
       if (info == psb_success_) call tmp%bld(x%v%v)
       call x%v%free(info)
     end if
+
     call move_alloc(tmp,x%v)
   end subroutine d_mvect_cnv
-
 
   subroutine d_mvect_axpby_v_idxs(m, alpha, x, beta, y, idx_y, info)
     use psi_serial_mod

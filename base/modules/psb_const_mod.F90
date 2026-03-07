@@ -63,10 +63,10 @@ module psb_const_mod
   !
   integer, parameter  :: psb_spk_p_ = 6
   integer, parameter  :: psb_spk_r_ = 37
-  integer, parameter  :: psb_spk_   = selected_real_kind(psb_spk_p_,psb_spk_r_)
+  integer, parameter  :: psb_spk_   = selected_real_kind(psb_spk_p_, psb_spk_r_)
   integer, parameter  :: psb_dpk_p_ = 15
   integer, parameter  :: psb_dpk_r_ = 307
-  integer, parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
+  integer, parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_, psb_dpk_r_)
 #endif
 
   ! Now for the choices:
