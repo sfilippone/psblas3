@@ -28,7 +28,98 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-!    
+!
+subroutine psb_d_null_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+  use psb_base_mod
+  use psb_d_nullprec, psb_protect_name => psb_d_null_apply_mvect_col
+  implicit none 
+  type(psb_desc_type), intent(in)             :: desc_data
+  class(psb_d_null_prec_type), intent(inout)  :: prec
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_d_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)              :: info
+  character(len=1), optional                  :: trans
+  real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
+  character(len=20) :: name = 'd_null_prec_apply'
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+
+  nrow = desc_data%get_local_rows()
+  if (x%get_nrows() < nrow) then 
+    info = 36; ierr(1) = 2; ierr(2) = nrow;
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  if (y%get_nrows() < nrow) then 
+    info = 36; ierr(1) = 3; ierr(2) = nrow;
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  call psb_geaxpby(alpha, x, idx_x, beta, y, idx_y, desc_data, info)
+  if (info /= psb_success_ ) then 
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name, a_err = "psb_geaxpby")
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psb_d_null_apply_mvect_col
+
+subroutine psb_d_null_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+  use psb_base_mod
+  use psb_d_nullprec, psb_protect_name => psb_d_null_apply_mvect
+  implicit none 
+  type(psb_desc_type), intent(in)             :: desc_data
+  class(psb_d_null_prec_type), intent(inout)  :: prec
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_d_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(out)              :: info
+  character(len=1), optional                  :: trans
+  real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
+  character(len=20) :: name = 'd_null_prec_apply'
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+
+  nrow = desc_data%get_local_rows()
+  if (x%get_nrows() < nrow) then 
+    info = 36; ierr(1) = 2; ierr(2) = nrow;
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  if (y%get_nrows() < nrow) then 
+    info = 36; ierr(1) = 3; ierr(2) = nrow;
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  call psb_geaxpby(alpha, x, beta, y, desc_data, info)
+  if (info /= psb_success_ ) then 
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name, a_err = "psb_geaxpby")
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psb_d_null_apply_mvect
+
 subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_nullprec, psb_protect_name => psb_d_null_apply_vect
@@ -42,7 +133,7 @@ subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   character(len=1), optional           :: trans
   real(psb_dpk_),intent(inout), optional, target :: work(:)
   integer(psb_ipk_) :: err_act, nrow, ierr(5)
-  character(len=20)  :: name='c_null_prec_apply'
+  character(len=20)  :: name = 'd_null_prec_apply'
 
   call psb_erractionsave(err_act)
 

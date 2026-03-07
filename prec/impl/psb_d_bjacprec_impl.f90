@@ -71,6 +71,363 @@ subroutine psb_d_bjac_dump(prec,info,prefix,head)
 
 end subroutine psb_d_bjac_dump
 
+subroutine psb_d_bjac_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+  use psb_base_mod
+  use psb_d_bjacprec, psb_protect_name => psb_d_bjac_apply_mvect_col
+  implicit none
+  type(psb_desc_type), intent(in)             :: desc_data
+  class(psb_d_bjac_prec_type), intent(inout)  :: prec
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_d_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)              :: info
+  character(len=1), optional                  :: trans
+  real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+  ! Error raised: need to implement spsm for multivectors -> the code commented is temporary
+  integer(psb_ipk_) :: err_act
+  call psb_erractionsave(err_act)
+  call psb_errpush(psb_err_from_subroutine_, 'd_bjac_prec_apply (not implemented - empty placeholder)')
+  call psb_error_handler(err_act)
+  return
+
+  ! ! Local variables
+  ! integer(psb_ipk_)       :: n_row, n_col
+  ! real(psb_dpk_), pointer :: ww(:), aux(:)
+  ! type(psb_d_vect_type)   :: wv, wv1
+  ! type(psb_ctxt_type)     :: ctxt
+  ! integer(psb_ipk_) :: np, me
+  ! integer(psb_ipk_) :: err_act, ierr(5)
+  ! integer(psb_ipk_) :: debug_level, debug_unit
+  ! logical           :: do_alloc_wrk
+  ! character         :: trans_
+  ! character(len=20) :: name = 'd_bjac_prec_apply'
+  ! character(len=20) :: ch_err
+
+  ! info = psb_success_
+  ! call psb_erractionsave(err_act)
+  ! debug_unit  = psb_get_debug_unit()
+  ! debug_level = psb_get_debug_level()
+  ! ctxt        = desc_data%get_context()
+  ! call psb_info(ctxt, me, np)
+
+  ! trans_ = psb_toupper(trans)
+  ! select case(trans_)
+  !   case('N', 'T', 'C')
+  !     ! Ok
+  !   case default
+  !     call psb_errpush(psb_err_iarg_invalid_i_, name)
+  !     goto 9999
+  ! end select
+
+  ! n_row = desc_data%get_local_rows()
+  ! n_col = desc_data%get_local_cols()
+
+  ! if (x%get_nrows() < n_row) then
+  !   info = 36; ierr(1) = 2; ierr(2) = n_row;
+  !   call psb_errpush(info, name ,i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (y%get_nrows() < n_row) then
+  !   info = 36; ierr(1) = 3; ierr(2) = n_row;
+  !   call psb_errpush(info, name, i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (.not. allocated(prec%dv)) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! if (prec%dv%get_nrows() < n_row) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! if (n_col <= size(work)) then
+  !   ww => work(1:n_col)
+  !   if ((4*n_col + n_col) <= size(work)) then
+  !     aux => work(n_col + 1 :)
+  !   else
+  !     allocate(aux(4*n_col), stat = info)
+  !   endif
+  ! else
+  !   allocate(ww(n_col), aux(4*n_col), stat = info)
+  ! endif
+
+  ! if (info /= psb_success_) then
+  !   call psb_errpush(psb_err_from_subroutine_, name, a_err='Allocate')
+  !   goto 9999
+  ! end if
+
+  ! do_alloc_wrk = .not. prec%is_allocated_wrk()
+  ! if(do_alloc_wrk) call prec%allocate_wrk(info, vmol = x%v)
+
+  ! ! associate (wv => prec%wrk(1), wv1 => prec%wrk(2))
+  
+  ! select case(prec%iprcparm(psb_f_type_))
+  !   case(psb_f_ilu_n_,psb_f_ilu_k_,psb_f_ilu_t_)
+  !     select case(trans_)
+  !       case('N')
+  !         call psb_spsm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, scale = 'L', diag = prec%dv, &
+  !                         & choice = psb_none_, work = aux)
+
+  !         if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_u_pr_), wv, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, scale = 'U', &
+  !                                                 & choice = psb_none_, work = aux)
+
+  !       case('T')
+  !         call psb_spsm(done, prec%av(psb_u_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, scale = 'L', diag = prec%dv, &
+  !                         & choice = psb_none_, work = aux)
+
+  !         if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, scale = 'U', &
+  !                                                 & choice = psb_none_, work = aux)
+
+  !       case('C')
+  !         call psb_spsm(done, prec%av(psb_u_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
+
+  !         call wv1%mlt(done, prec%dv, wv, dzero, info, conjgx = trans_)
+
+  !         if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv1, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, scale = 'U',  &
+  !                                                 & choice = psb_none_, work = aux)
+  !     end select
+
+  !     if (info /= psb_success_) then
+  !       ch_err = "psb_spsm"
+  !       goto 9999
+  !     end if
+
+  !   case(psb_f_ainv_, psb_f_invt_, psb_f_invk_)
+  !     ! Application of approximate inverse preconditioner, just some spmm
+  !     select case(trans_)
+  !       case('N')
+  !         call psb_spmm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
+  !                        & trans = trans_, work = aux, doswap = .false.)
+
+  !         if(info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
+  !         if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, work  =aux, &
+  !                                                 & doswap = .false.)
+
+  !       case('T', 'C')
+  !         call psb_spmm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, work = aux, doswap = .false.)
+
+  !         if (info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
+  !         if (info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, work = aux, &
+  !                                                 & doswap = .false.)
+
+  !     end select
+
+  !     if (info /= psb_success_) then
+  !       ch_err = "psb_spsm"
+  !       goto 9999
+  !     end if
+
+  !   case default
+  !     info = psb_err_internal_error_
+  !     call psb_errpush(info, name, a_err = 'Invalid factorization')
+  !     goto 9999
+  ! end select
+
+! 9999 continue
+!   call psb_errpush(info, name, i_err = ierr, a_err = ch_err)
+!   call psb_error_handler(err_act)
+!   return
+end subroutine psb_d_bjac_apply_mvect_col
+
+subroutine psb_d_bjac_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+  use psb_base_mod
+  use psb_d_bjacprec, psb_protect_name => psb_d_bjac_apply_mvect
+  implicit none
+  type(psb_desc_type), intent(in)             :: desc_data
+  class(psb_d_bjac_prec_type), intent(inout)  :: prec
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_d_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(out)              :: info
+  character(len=1), optional                  :: trans
+  real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+  ! Error raised: need to implement spsm for multivectors -> the code commented is temporary
+  integer(psb_ipk_) :: err_act
+  call psb_erractionsave(err_act)
+  call psb_errpush(psb_err_from_subroutine_, 'd_bjac_prec_apply (not implemented - empty placeholder)')
+  call psb_error_handler(err_act)
+  return
+
+  ! ! Local variables
+  ! integer(psb_ipk_)       :: n_row, n_col
+  ! real(psb_dpk_), pointer :: ww(:), aux(:)
+  ! type(psb_d_vect_type)   :: wv, wv1
+  ! type(psb_ctxt_type)     :: ctxt
+  ! integer(psb_ipk_) :: np, me
+  ! integer(psb_ipk_) :: err_act, ierr(5)
+  ! integer(psb_ipk_) :: debug_level, debug_unit
+  ! logical           :: do_alloc_wrk
+  ! character         :: trans_
+  ! character(len=20) :: name = 'd_bjac_prec_apply'
+  ! character(len=20) :: ch_err
+
+  ! info = psb_success_
+  ! call psb_erractionsave(err_act)
+  ! debug_unit  = psb_get_debug_unit()
+  ! debug_level = psb_get_debug_level()
+  ! ctxt        = desc_data%get_context()
+  ! call psb_info(ctxt, me, np)
+
+  ! trans_ = psb_toupper(trans)
+  ! select case(trans_)
+  !   case('N', 'T', 'C')
+  !     ! Ok
+  !   case default
+  !     call psb_errpush(psb_err_iarg_invalid_i_, name)
+  !     goto 9999
+  ! end select
+
+  ! n_row = desc_data%get_local_rows()
+  ! n_col = desc_data%get_local_cols()
+
+  ! if (x%get_nrows() < n_row) then
+  !   info = 36; ierr(1) = 2; ierr(2) = n_row;
+  !   call psb_errpush(info, name ,i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (y%get_nrows() < n_row) then
+  !   info = 36; ierr(1) = 3; ierr(2) = n_row;
+  !   call psb_errpush(info, name, i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (.not. allocated(prec%dv)) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! if (prec%dv%get_nrows() < n_row) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! if (n_col <= size(work)) then
+  !   ww => work(1:n_col)
+  !   if ((4*n_col + n_col) <= size(work)) then
+  !     aux => work(n_col + 1 :)
+  !   else
+  !     allocate(aux(4*n_col), stat = info)
+  !   endif
+  ! else
+  !   allocate(ww(n_col), aux(4*n_col), stat = info)
+  ! endif
+
+  ! if (info /= psb_success_) then
+  !   call psb_errpush(psb_err_from_subroutine_, name, a_err='Allocate')
+  !   goto 9999
+  ! end if
+
+  ! do_alloc_wrk = .not. prec%is_allocated_wrk()
+  ! if(do_alloc_wrk) call prec%allocate_wrk(info, vmol = x%v)
+
+  ! ! associate (wv => prec%wrk(1), wv1 => prec%wrk(2))
+  
+  ! select case(prec%iprcparm(psb_f_type_))
+  !   case(psb_f_ilu_n_,psb_f_ilu_k_,psb_f_ilu_t_)
+  !     select case(trans_)
+  !       case('N')
+  !         call psb_spsm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, scale = 'L', diag = prec%dv, &
+  !                         & choice = psb_none_, work = aux)
+
+  !         if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_u_pr_), wv, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, scale = 'U', &
+  !                                                 & choice = psb_none_, work = aux)
+
+  !       case('T')
+  !         call psb_spsm(done, prec%av(psb_u_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, scale = 'L', diag = prec%dv, &
+  !                         & choice = psb_none_, work = aux)
+
+  !         if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, scale = 'U', &
+  !                                                 & choice = psb_none_, work = aux)
+
+  !       case('C')
+  !         call psb_spsm(done, prec%av(psb_u_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
+
+  !         call wv1%mlt(done, prec%dv, wv, dzero, info, conjgx = trans_)
+
+  !         if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv1, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, scale = 'U',  &
+  !                                                 & choice = psb_none_, work = aux)
+  !     end select
+
+  !     if (info /= psb_success_) then
+  !       ch_err = "psb_spsm"
+  !       goto 9999
+  !     end if
+
+  !   case(psb_f_ainv_, psb_f_invt_, psb_f_invk_)
+  !     ! Application of approximate inverse preconditioner, just some spmm
+  !     select case(trans_)
+  !       case('N')
+  !         call psb_spmm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
+  !                        & trans = trans_, work = aux, doswap = .false.)
+
+  !         if(info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
+  !         if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, work  =aux, &
+  !                                                 & doswap = .false.)
+
+  !       case('T', 'C')
+  !         call psb_spmm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
+  !                         & trans = trans_, work = aux, doswap = .false.)
+
+  !         if (info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
+  !         if (info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, &
+  !                                                 & beta, y, desc_data, info, &
+  !                                                 & trans = trans_, work = aux, &
+  !                                                 & doswap = .false.)
+
+  !     end select
+
+  !     if (info /= psb_success_) then
+  !       ch_err = "psb_spsm"
+  !       goto 9999
+  !     end if
+
+  !   case default
+  !     info = psb_err_internal_error_
+  !     call psb_errpush(info, name, a_err = 'Invalid factorization')
+  !     goto 9999
+  ! end select
+
+! 9999 continue
+!   call psb_errpush(info, name, i_err = ierr, a_err = ch_err)
+!   call psb_error_handler(err_act)
+!   return
+end subroutine psb_d_bjac_apply_mvect
+
 subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_bjacprec, psb_protect_name => psb_d_bjac_apply_vect
@@ -252,7 +609,6 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   call psb_errpush(info,name,i_err=ierr,a_err=ch_err)
   call psb_error_handler(err_act)
   return
-
 end subroutine psb_d_bjac_apply_vect
 
 subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
@@ -485,7 +841,6 @@ subroutine psb_d_bjac_precinit(prec,info)
   return
 
 end subroutine psb_d_bjac_precinit
-
 
 subroutine psb_d_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
 

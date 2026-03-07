@@ -64,6 +64,142 @@ subroutine psb_d_diag_dump(prec,info,prefix,head)
 
 end subroutine psb_d_diag_dump
 
+subroutine psb_d_diag_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+  use psb_base_mod
+  use psb_d_diagprec, psb_protect_name =>  psb_d_diag_apply_mvect_col
+  implicit none 
+  type(psb_desc_type), intent(in)             :: desc_data
+  class(psb_d_diag_prec_type), intent(inout)  :: prec
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_d_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)              :: info
+  character(len=1), optional                  :: trans
+  real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+
+  ! Error raised: need to implement mlv for multivectors -> the code commented is temporary
+  integer(psb_ipk_) :: err_act
+  call psb_erractionsave(err_act)
+  call psb_errpush(psb_err_from_subroutine_, 'psb_d_diag_apply (not implemented - empty placeholder)')
+  call psb_error_handler(err_act)
+  return
+
+  ! integer(psb_ipk_) :: err_act, nrow, ierr(5)
+  ! character(len=20) :: name = 'd_diag_prec_apply'
+  ! real(psb_dpk_), pointer :: ww(:)
+  ! class(psb_d_base_vect_type), allocatable :: dw
+
+  ! call psb_erractionsave(err_act)
+
+  ! info = psb_success_
+
+  ! nrow = desc_data%get_local_rows()
+  ! if (x%get_nrows() < nrow) then 
+  !   info = 36; ierr(1) = 2; ierr(2) = nrow;
+  !   call psb_errpush(info, name, i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (y%get_nrows() < nrow) then 
+  !   info = 36; ierr(1) = 3; ierr(2) = nrow;
+  !   call psb_errpush(info, name, i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (.not.allocated(prec%d)) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! if (size(prec%d) < nrow) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! call y%mlt(alpha, prec%dv, x, beta, info, conjgx = trans)
+
+  ! if (info /= psb_success_) then 
+  !   call psb_errpush(psb_err_from_subroutine_, name, a_err = 'vect%mlt')
+  !   goto 9999      
+  ! end if
+
+  ! call psb_erractionrestore(err_act)
+  ! return
+
+9999 call psb_error_handler(err_act)
+  return 
+end subroutine psb_d_diag_apply_mvect_col
+
+subroutine psb_d_diag_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+  use psb_base_mod
+  use psb_d_diagprec, psb_protect_name =>  psb_d_diag_apply_mvect
+  implicit none 
+  type(psb_desc_type), intent(in)             :: desc_data
+  class(psb_d_diag_prec_type), intent(inout)  :: prec
+  type(psb_d_multivect_type), intent(inout)   :: x, y
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  integer(psb_ipk_), intent(out)              :: info
+  character(len=1), optional                  :: trans
+  real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+
+  ! Error raised: need to implement mlv for multivectors -> the code commented is temporary
+  integer(psb_ipk_) :: err_act
+  call psb_erractionsave(err_act)
+  call psb_errpush(psb_err_from_subroutine_, 'psb_d_diag_apply (not implemented - empty placeholder)')
+  call psb_error_handler(err_act)
+  return
+
+  ! integer(psb_ipk_) :: err_act, nrow, ierr(5)
+  ! character(len=20) :: name = 'd_diag_prec_apply'
+  ! real(psb_dpk_), pointer :: ww(:)
+  ! class(psb_d_base_vect_type), allocatable :: dw
+
+  ! call psb_erractionsave(err_act)
+
+  ! info = psb_success_
+
+  ! nrow = desc_data%get_local_rows()
+  ! if (x%get_nrows() < nrow) then 
+  !   info = 36; ierr(1) = 2; ierr(2) = nrow;
+  !   call psb_errpush(info, name, i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (y%get_nrows() < nrow) then 
+  !   info = 36; ierr(1) = 3; ierr(2) = nrow;
+  !   call psb_errpush(info, name, i_err = ierr)
+  !   goto 9999
+  ! end if
+
+  ! if (.not.allocated(prec%d)) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! if (size(prec%d) < nrow) then
+  !   info = 1124
+  !   call psb_errpush(info, name, a_err = "preconditioner: D")
+  !   goto 9999
+  ! end if
+
+  ! call y%mlt(alpha, prec%dv, x, beta, info, conjgx = trans)
+
+  ! if (info /= psb_success_) then 
+  !   call psb_errpush(psb_err_from_subroutine_, name, a_err = 'vect%mlt')
+  !   goto 9999      
+  ! end if
+
+  ! call psb_erractionrestore(err_act)
+  ! return
+
+9999 call psb_error_handler(err_act)
+  return 
+end subroutine psb_d_diag_apply_mvect
 
 subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_base_mod
@@ -126,9 +262,7 @@ subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
 9999 call psb_error_handler(err_act)
   return
-
 end subroutine psb_d_diag_apply_vect
-
 
 subroutine psb_d_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_base_mod
@@ -222,9 +356,7 @@ subroutine psb_d_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
 9999 call psb_error_handler(err_act)
   return
-
 end subroutine psb_d_diag_apply
-
 
 subroutine psb_d_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   use psb_base_mod

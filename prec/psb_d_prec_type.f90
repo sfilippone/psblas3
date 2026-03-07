@@ -42,26 +42,34 @@ module psb_d_prec_type
     type(psb_ctxt_type) :: ctxt
     class(psb_d_base_prec_type), allocatable :: prec
   contains
-    procedure, pass(prec)               :: psb_d_apply1_vect
-    procedure, pass(prec)               :: psb_d_apply2_vect
-    procedure, pass(prec)               :: psb_d_apply2v
-    procedure, pass(prec)               :: psb_d_apply1v
-    generic, public                     :: apply => psb_d_apply2v, psb_d_apply1v,&
-         & psb_d_apply1_vect, psb_d_apply2_vect
-    procedure, pass(prec)               :: sizeof => psb_dprec_sizeof
-    procedure, pass(prec)               :: clone  => psb_d_prec_clone
-    procedure, pass(prec)               :: free   => psb_d_prec_free
-    procedure, pass(prec)               :: build  => psb_dprecbld
-    procedure, pass(prec)               :: init   => psb_dprecinit
-    procedure, pass(prec)               :: descr  => psb_dfile_prec_descr
-    procedure, pass(prec)               :: cseti  => psb_dcprecseti
-    procedure, pass(prec)               :: csetc  => psb_dcprecsetc
-    procedure, pass(prec)               :: csetr  => psb_dcprecsetr
-    generic, public                     :: set => cseti, csetc, csetr
-    procedure, pass(prec)               :: allocate_wrk => psb_d_allocate_wrk
-    procedure, pass(prec)               :: free_wrk => psb_d_free_wrk
-    procedure, pass(prec)               :: deallocate_wrk => psb_d_free_wrk
-    procedure, pass(prec)               :: is_allocated_wrk => psb_d_is_allocated_wrk
+    procedure, pass(prec) :: psb_d_apply1_mvect_col
+    procedure, pass(prec) :: psb_d_apply2_mvect_col
+    procedure, pass(prec) :: psb_d_apply1_mvect
+    procedure, pass(prec) :: psb_d_apply2_mvect
+    procedure, pass(prec) :: psb_d_apply1_vect
+    procedure, pass(prec) :: psb_d_apply2_vect
+    procedure, pass(prec) :: psb_d_apply2v
+    procedure, pass(prec) :: psb_d_apply1v
+    generic, public :: apply => psb_d_apply2v, psb_d_apply1v, &
+                                  & psb_d_apply1_vect, psb_d_apply2_vect, & 
+                                  & psb_d_apply1_mvect_col, psb_d_apply2_mvect_col, &
+                                  & psb_d_apply1_mvect, psb_d_apply2_mvect
+                                  
+    procedure, pass(prec) :: sizeof => psb_dprec_sizeof
+    procedure, pass(prec) :: clone  => psb_d_prec_clone
+    procedure, pass(prec) :: free   => psb_d_prec_free
+    procedure, pass(prec) :: build  => psb_dprecbld
+    procedure, pass(prec) :: init   => psb_dprecinit
+    procedure, pass(prec) :: descr  => psb_dfile_prec_descr
+    procedure, pass(prec) :: cseti  => psb_dcprecseti
+    procedure, pass(prec) :: csetc  => psb_dcprecsetc
+    procedure, pass(prec) :: csetr  => psb_dcprecsetr
+    generic, public :: set => cseti, csetc, csetr
+
+    procedure, pass(prec) :: allocate_wrk => psb_d_allocate_wrk
+    procedure, pass(prec) :: free_wrk => psb_d_free_wrk
+    procedure, pass(prec) :: deallocate_wrk => psb_d_free_wrk
+    procedure, pass(prec) :: is_allocated_wrk => psb_d_is_allocated_wrk
   end type psb_dprec_type
 
   interface psb_precfree
@@ -107,54 +115,107 @@ module psb_d_prec_type
     module procedure psb_dprec_sizeof
   end interface
 
+  
   interface
-    subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
+    subroutine psb_d_apply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)           :: desc_data
+      class(psb_dprec_type), intent(inout)      :: prec
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)            :: info
+      character(len=1), optional                :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_apply2_mvect_col
+  end interface
+
+  interface
+    subroutine psb_d_apply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)           :: desc_data
+      class(psb_dprec_type), intent(inout)      :: prec
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      integer(psb_ipk_), intent(out)            :: info
+      character(len=1), optional                :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_apply1_mvect_col
+  end interface
+  
+  interface
+    subroutine psb_d_apply2_mvect(prec, x, y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)           :: desc_data
+      class(psb_dprec_type), intent(inout)      :: prec
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)            :: info
+      character(len=1), optional                :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_apply2_mvect
+  end interface
+
+  interface
+    subroutine psb_d_apply1_mvect(prec, x, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)           :: desc_data
+      class(psb_dprec_type), intent(inout)      :: prec
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)            :: info
+      character(len=1), optional                :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_apply1_mvect
+  end interface
+
+  interface
+    subroutine psb_d_apply2_vect(prec, x, y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type),intent(inout)  :: x
-      type(psb_d_vect_type),intent(inout)  :: y
-      integer(psb_ipk_), intent(out)                 :: info
-      character(len=1), optional           :: trans
+      type(psb_desc_type), intent(in)       :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_d_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional            :: trans
       real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2_vect
   end interface
 
   interface
-    subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
+    subroutine psb_d_apply1_vect(prec, x, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-        type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type),intent(inout)  :: x
-      integer(psb_ipk_), intent(out)                 :: info
-      character(len=1), optional           :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+      type(psb_desc_type), intent(in)       :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      type(psb_d_vect_type), intent(inout)  :: x
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional            :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply1_vect
   end interface
 
   interface
-    subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
+    subroutine psb_d_apply2v(prec, x, y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      real(psb_dpk_),intent(inout)   :: x(:)
-      real(psb_dpk_),intent(inout)   :: y(:)
-      integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+      type(psb_desc_type), intent(in)       :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      real(psb_dpk_), intent(inout)         :: x(:)
+      real(psb_dpk_), intent(inout)         :: y(:)
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional            :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2v
   end interface
 
   interface
-    subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
+    subroutine psb_d_apply1v(prec, x, desc_data, info, trans)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      real(psb_dpk_),intent(inout)   :: x(:)
-      integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
+      type(psb_desc_type), intent(in)       :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      real(psb_dpk_), intent(inout)         :: x(:)
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional            :: trans
     end subroutine psb_d_apply1v
   end interface
+
+  
 
   interface
   subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
@@ -167,6 +228,7 @@ module psb_d_prec_type
     integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
     character(len=*), optional, intent(in)   :: pos
   end subroutine psb_dcprecseti
+
   subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
     import :: psb_dprec_type, psb_dspmat_type, psb_desc_type, psb_dpk_, &
       & psb_ipk_
@@ -177,6 +239,7 @@ module psb_d_prec_type
     integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
     character(len=*), optional, intent(in)   :: pos
   end subroutine psb_dcprecsetr
+
   subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
     import :: psb_dprec_type, psb_dspmat_type, psb_desc_type, psb_dpk_, &
       & psb_ipk_

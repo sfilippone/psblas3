@@ -37,12 +37,13 @@ module psb_d_base_prec_mod
 
   ! Reduces size of .mod file.
   use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_epk_, psb_ctxt_type, &
-       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
+       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_, &
        & psb_sizeof_ip, psb_sizeof_lp, psb_sizeof_sp, psb_sizeof_dp, &
        & psb_erractionsave, psb_erractionrestore, psb_error, &
-       & psb_errstatus_fatal, psb_success_,&
-       & psb_d_base_sparse_mat, psb_dspmat_type, psb_d_csr_sparse_mat,& 
-       & psb_d_base_vect_type, psb_d_vect_type, psb_i_base_vect_type
+       & psb_errstatus_fatal, psb_success_, &
+       & psb_d_base_sparse_mat, psb_dspmat_type, psb_d_csr_sparse_mat, & 
+       & psb_d_base_vect_type, psb_d_vect_type, psb_i_base_vect_type, &
+       & psb_d_base_multivect_type, psb_d_multivect_type
 
   use psb_prec_const_mod
 
@@ -56,26 +57,67 @@ module psb_d_base_prec_mod
     procedure, pass(prec) :: precsetr   => psb_d_base_precsetr
     procedure, pass(prec) :: precsetc   => psb_d_base_precsetc
     generic, public       :: precset    => precseti, precsetr, precsetc
-    procedure(psb_d_base_apply_vect), pass(prec), deferred :: d_apply_v  
-    procedure(psb_d_base_apply), pass(prec), deferred :: d_apply    
-    generic, public       :: apply     => d_apply, d_apply_v
+    procedure(psb_d_base_apply_mvect_col), pass(prec), deferred :: d_apply_mv_col  
+    procedure(psb_d_base_apply_mvect),     pass(prec), deferred :: d_apply_mv  
+    procedure(psb_d_base_apply_vect),      pass(prec), deferred :: d_apply_v  
+    procedure(psb_d_base_apply),           pass(prec), deferred :: d_apply    
+    generic, public       :: apply     => d_apply, d_apply_v, d_apply_mv, d_apply_mv_col
+    
+    procedure(psb_d_base_precbld), pass(prec), deferred :: precbld    
     generic, public       :: build     => precbld
+
+    procedure(psb_d_base_precdescr), pass(prec), deferred :: precdescr 
     generic, public       :: descr     => precdescr
+
     procedure, pass(prec) :: desc_prefix => psb_d_base_desc_prefix
     procedure, pass(prec) :: allocate_wrk => psb_d_base_allocate_wrk
     procedure, pass(prec) :: free_wrk     => psb_d_base_free_wrk
     procedure, pass(prec) :: is_allocated_wrk => psb_d_base_is_allocated_wrk
-    procedure(psb_d_base_precbld), pass(prec), deferred :: precbld    
     procedure(psb_d_base_sizeof), pass(prec), deferred :: sizeof     
     procedure(psb_d_base_precinit), pass(prec), deferred :: precinit   
-    procedure(psb_d_base_precfree), pass(prec), deferred :: free   
-    procedure(psb_d_base_precdescr), pass(prec), deferred :: precdescr  
+    procedure(psb_d_base_precfree), pass(prec), deferred :: free    
     procedure(psb_d_base_precdump), pass(prec), deferred :: dump       
     procedure(psb_d_base_precclone), pass(prec), deferred :: clone       
   end type psb_d_base_prec_type
 
   private :: psb_d_base_set_ctxt, psb_d_base_get_ctxt, &
        & psb_d_base_get_nzeros
+
+
+  abstract interface 
+    subroutine psb_d_base_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+      import psb_ipk_, psb_dpk_, psb_desc_type, psb_d_multivect_type, &
+           & psb_d_base_multivect_type, psb_dspmat_type, psb_d_base_prec_type,&
+           & psb_d_base_sparse_mat
+      implicit none 
+      type(psb_desc_type), intent(in)             :: desc_data
+      class(psb_d_base_prec_type), intent(inout)  :: prec
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      type(psb_d_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                  :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+    end subroutine psb_d_base_apply_mvect_col
+  end interface
+
+  abstract interface 
+    subroutine psb_d_base_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+      import psb_ipk_, psb_dpk_, psb_desc_type, psb_d_multivect_type, &
+           & psb_d_base_multivect_type, psb_dspmat_type, psb_d_base_prec_type,&
+           & psb_d_base_sparse_mat
+      implicit none 
+      type(psb_desc_type), intent(in)             :: desc_data
+      class(psb_d_base_prec_type), intent(inout)  :: prec
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      type(psb_d_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                  :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+    end subroutine psb_d_base_apply_mvect
+  end interface
 
   abstract interface 
     subroutine psb_d_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)

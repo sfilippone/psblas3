@@ -35,20 +35,48 @@ module psb_d_nullprec
   
   type, extends(psb_d_base_prec_type) :: psb_d_null_prec_type
   contains
-    procedure, pass(prec) :: d_apply_v => psb_d_null_apply_vect
-    procedure, pass(prec) :: d_apply   => psb_d_null_apply
-    procedure, pass(prec) :: precbld   => psb_d_null_precbld
-    procedure, pass(prec) :: precinit  => psb_d_null_precinit
-    procedure, pass(prec) :: precdescr => psb_d_null_precdescr
-    procedure, pass(prec) :: sizeof    => psb_d_null_sizeof
-    procedure, pass(prec) :: dump      => psb_d_null_dump
-    procedure, pass(prec) :: clone     => psb_d_null_clone
-    procedure, pass(prec) :: free      => psb_d_null_precfree
+    procedure, pass(prec) :: d_apply_mv_col => psb_d_null_apply_mvect_col
+    procedure, pass(prec) :: d_apply_mv     => psb_d_null_apply_mvect
+    procedure, pass(prec) :: d_apply_v      => psb_d_null_apply_vect
+    procedure, pass(prec) :: d_apply        => psb_d_null_apply
+    procedure, pass(prec) :: precbld        => psb_d_null_precbld
+    procedure, pass(prec) :: precinit       => psb_d_null_precinit
+    procedure, pass(prec) :: precdescr      => psb_d_null_precdescr
+    procedure, pass(prec) :: sizeof         => psb_d_null_sizeof
+    procedure, pass(prec) :: dump           => psb_d_null_dump
+    procedure, pass(prec) :: clone          => psb_d_null_clone
+    procedure, pass(prec) :: free           => psb_d_null_precfree
   end type psb_d_null_prec_type
 
-  private :: psb_d_null_precbld, psb_d_null_sizeof,&
+  private :: psb_d_null_precbld, psb_d_null_sizeof, &
        & psb_d_null_precinit, psb_d_null_precfree, psb_d_null_precdescr
   
+  interface
+    subroutine psb_d_null_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_d_null_prec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)             :: desc_data
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_null_prec_type), intent(inout)  :: prec
+      type(psb_d_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                  :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_null_apply_mvect_col
+  end interface
+
+  interface
+    subroutine psb_d_null_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_d_null_prec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)             :: desc_data
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_null_prec_type), intent(inout)  :: prec
+      type(psb_d_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                  :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_null_apply_mvect
+  end interface
 
   interface
     subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)

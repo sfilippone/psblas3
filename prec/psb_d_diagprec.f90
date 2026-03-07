@@ -34,11 +34,13 @@ module psb_d_diagprec
   use psb_d_base_prec_mod
   
   type, extends(psb_d_base_prec_type) :: psb_d_diag_prec_type
-    real(psb_dpk_), allocatable     :: d(:)
+    real(psb_dpk_), allocatable        :: d(:)
     type(psb_d_vect_type), allocatable :: dv
   contains
-    procedure, pass(prec) :: d_apply_v => psb_d_diag_apply_vect
-    procedure, pass(prec) :: d_apply   => psb_d_diag_apply
+    procedure, pass(prec) :: d_apply_mv_col => psb_d_diag_apply_mvect_col
+    procedure, pass(prec) :: d_apply_mv     => psb_d_diag_apply_mvect
+    procedure, pass(prec) :: d_apply_v      => psb_d_diag_apply_vect
+    procedure, pass(prec) :: d_apply        => psb_d_diag_apply
     procedure, pass(prec) :: precbld    => psb_d_diag_precbld
     procedure, pass(prec) :: precinit   => psb_d_diag_precinit  
     procedure, pass(prec) :: precdescr  => psb_d_diag_precdescr
@@ -49,11 +51,37 @@ module psb_d_diagprec
     procedure, pass(prec) :: get_nzeros => psb_d_diag_get_nzeros
   end type psb_d_diag_prec_type
 
-  private :: psb_d_diag_sizeof,&
-       & psb_d_diag_precinit, psb_d_diag_precfree, psb_d_diag_precdescr,&
+  private :: psb_d_diag_sizeof, psb_d_diag_precinit, &
+       & psb_d_diag_precfree, psb_d_diag_precdescr, &
        & psb_d_diag_get_nzeros
   
   
+  interface
+    subroutine psb_d_diag_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_d_diag_prec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)             :: desc_data
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_diag_prec_type), intent(inout)  :: prec
+      type(psb_d_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                  :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_diag_apply_mvect_col
+  end interface
+
+  interface
+    subroutine psb_d_diag_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_d_diag_prec_type, psb_d_multivect_type, psb_dpk_
+      type(psb_desc_type), intent(in)             :: desc_data
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_diag_prec_type), intent(inout)  :: prec
+      type(psb_d_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                  :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_d_diag_apply_mvect
+  end interface
   
   interface  
     subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
@@ -111,7 +139,6 @@ module psb_d_diagprec
 
 contains
   
-
   subroutine psb_d_diag_precinit(prec,info)
     Implicit None
 
@@ -129,10 +156,8 @@ contains
     return
 
 9999 call psb_error_handler(err_act)
-
     return
   end subroutine psb_d_diag_precinit
-
 
   subroutine psb_d_diag_precfree(prec,info)
 
@@ -154,12 +179,10 @@ contains
     return
 
 9999 call psb_error_handler(err_act)
-
     return
 
   end subroutine psb_d_diag_precfree
   
-
   !
   !
   ! verbosity:
@@ -228,7 +251,6 @@ contains
     return
 
 9999 call psb_error_handler(err_act)
-
     return
 
   end subroutine psb_d_diag_precdescr
@@ -249,7 +271,6 @@ contains
     if (allocated(prec%dv)) val = val + prec%dv%get_nrows()
     return
   end function psb_d_diag_get_nzeros
-
 
   subroutine psb_d_diag_clone(prec,precout,info)
     use psb_error_mod
@@ -292,10 +313,8 @@ contains
     return
 
 9999 call psb_error_handler(err_act)
-
     return
 
   end subroutine psb_d_diag_clone
-
 
 end module psb_d_diagprec
