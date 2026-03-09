@@ -2731,13 +2731,16 @@ module psb_d_base_multivect_mod
     procedure, pass(z) :: axpbycz_vv   => d_base_mvect_axpbycz_vv
     procedure, pass(z) :: axpbycz_mv   => d_base_mvect_axpbycz_mv
     procedure, pass(z) :: axpbycz_mm   => d_base_mvect_axpbycz_mm
+    ! three term axpy-like operations with separate output mv
+    procedure, pass(w) :: axpbycz_mm_o => d_base_mvect_axpbycz_mm_out
     ! linear combinations of columns of the multivector
     procedure, pass(x) :: colspan1D    => d_base_mvect_colspan1D
     procedure, pass(x) :: colspan2D    => d_base_mvect_colspan2D
     ! all generics exported as axpby
-    generic, public    :: axpby_v2     => axpby_v_idxs, axpby_v_full, & 
+    generic, public    :: axpby_v2     => axpby_v_idxs, axpby_v_full, &
                                           axpby_m_idxs, axpby_m_full, &
-                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, &  
+                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, &
+                                          axpbycz_mm_o, &
                                           colspan1D, colspan2D
 
     ! dot products operations - only full-full version for now
@@ -3839,6 +3842,17 @@ contains
     call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
   end subroutine d_base_mvect_axpbycz_mm
 
+  subroutine d_base_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z, idx_w
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z, w
+    real(psb_dpk_), intent (in)                     :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)                  :: info
+
+    ! The type check is enforced via the argument types
+    call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), gamma, z%v(:, idx_z), w%v(:, idx_w), info)
+  end subroutine d_base_mvect_axpbycz_mm_out
 
   subroutine d_base_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
     use psi_serial_mod

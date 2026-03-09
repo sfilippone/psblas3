@@ -1614,13 +1614,16 @@ module psb_d_multivect_mod
     procedure, pass(z) :: axpbycz_vv   => d_mvect_axpbycz_vv
     procedure, pass(z) :: axpbycz_mv   => d_mvect_axpbycz_mv
     procedure, pass(z) :: axpbycz_mm   => d_mvect_axpbycz_mm
+    ! three term axpy-like operations with separate output mv
+    procedure, pass(w) :: axpbycz_mm_o => d_mvect_axpbycz_mm_out
     ! linear combinations of columns of the multivector
     procedure, pass(x) :: colspan1D   => d_mvect_colspan1D
     procedure, pass(x) :: colspan2D   => d_mvect_colspan2D
     ! all generics exported as axpby
     generic, public    :: axpby        => axpby_v_idxs, axpby_v_full, & 
                                           axpby_m_idxs, axpby_m_full, &
-                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, & 
+                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, &
+                                          axpbycz_mm_o, & 
                                           colspan1D, colspan2D
 
     ! dot products operations - only full-full version for now
@@ -2336,6 +2339,34 @@ contains
     
     call z%v%axpby_v2(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_mm
+  
+  subroutine d_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y, idx_z, idx_w
+    class(psb_d_multivect_type), intent(inout)  :: x, y, z, w
+    real(psb_dpk_), intent (in)                 :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)              :: info
+
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) & 
+        .or. (.not. allocated(z%v)).or. (.not. allocated(w%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if((idx_x <= 0) .or. (idx_y <= 0) .or. (idx_z <= 0) .or. (idx_w <= 0)) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if((idx_x > x%get_ncols()) .or. (idx_y > y%get_ncols()) & 
+          .or. (idx_z > z%get_ncols()) .or. (idx_w > w%get_ncols())) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+    
+    call w%v%axpby_v2(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, z%v, idx_z, idx_w, info)
+  end subroutine d_mvect_axpbycz_mm_out
   
   subroutine d_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
     use psi_serial_mod

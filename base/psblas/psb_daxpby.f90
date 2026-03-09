@@ -721,6 +721,99 @@ subroutine psb_daxpby_mv_mm(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, de
   return
 end subroutine psb_daxpby_mv_mm
 
+subroutine psb_daxpby_mv_mm_out(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_mv_mm_out
+  implicit none
+  type(psb_d_multivect_type), intent (inout) ::  x, y, z, w
+  integer(psb_ipk_), intent(in) :: idx_x, idx_y, idx_z, idx_w
+  real(psb_dpk_), intent (in)        :: alpha, beta, gamma
+  type(psb_desc_type), intent (in)   :: desc_a
+  integer(psb_ipk_), intent(out)     :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy, iiz, jjz, iiw, jjw
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, iw, ijw, m
+  character(len=20) :: name, ch_err
+
+  name = 'psb_daxpby_mv_mm'
+  if (psb_errstatus_fatal()) return
+  
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if ((.not. allocated(x%v)) .or. (.not. allocated(y%v)) & 
+        .or. (.not. allocated(z%v)) .or. (.not. allocated(w%v))) then
+    info = psb_err_invalid_mvect_state_
+        call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+  iz = ione
+  iw = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m, lone, x%get_nrows(), ix, lone, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 1'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  call psb_chkvect(m, lone, y%get_nrows(), iy, lone, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 2'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  call psb_chkvect(m, lone, z%get_nrows(), iz, lone, desc_a, info, iiz, jjz)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 3'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  call psb_chkvect(m, lone, w%get_nrows(), iw, lone, desc_a, info, iiw, jjw)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 3'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione) .or. (iiy /= ione) .or. (iiz /= ione) .or. (iiw /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call w%axpby(desc_a%get_local_rows(), alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, idx_w, info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+end subroutine psb_daxpby_mv_mm_out
+
 subroutine psb_daxpby_mv_cspan1D(x, coeff, y, desc_a, info, upd_flag)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_cspan1D
   implicit none
@@ -1049,7 +1142,7 @@ end subroutine psb_daxpby_vect_out
 !    jx     -  integer(optional)    The column offset for X
 !    jy     -  integer(optional)    The column offset for Y
 !
-subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
+subroutine psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_daxpby
   use psi_d_serial_mod
   implicit none
@@ -1200,7 +1293,7 @@ end subroutine psb_daxpby
 !    info   -  integer              Return code
 !
 !
-subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
+subroutine psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_base_mod, psb_protect_name => psb_daxpbyv
   implicit none
 
@@ -1321,16 +1414,16 @@ end subroutine psb_daxpbyv
 !    info   -  integer              Return code
 !
 !
-subroutine  psb_daxpbyvout(alpha, x, beta,y, z, desc_a,info)
+subroutine psb_daxpbyvout(alpha, x, beta,y, z, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpbyvout
   implicit none
 
-  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(out)  :: info
   type(psb_desc_type), intent(in) :: desc_a
-  real(psb_dpk_), intent(in)    :: alpha, beta
-  real(psb_dpk_), intent(in)    :: x(:)
-  real(psb_dpk_), intent(in)    :: y(:)
-  real(psb_dpk_), intent(inout) :: z(:)
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: y(:)
+  real(psb_dpk_), intent(inout)   :: z(:)
 
   ! locals
   type(psb_ctxt_type) :: ctxt

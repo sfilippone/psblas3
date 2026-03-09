@@ -180,6 +180,16 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_daxpby_mv_mm
 
+    subroutine psb_daxpby_mv_mm_out(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type
+      type(psb_d_multivect_type), intent (inout) :: x, y, z, w
+      integer(psb_ipk_), intent(in) :: idx_x, idx_y, idx_z, idx_w
+      real(psb_dpk_), intent (in)        :: alpha, beta, gamma
+
+      type(psb_desc_type), intent (in)   :: desc_a
+      integer(psb_ipk_), intent(out)     :: info
+    end subroutine psb_daxpby_mv_mm_out
+
     subroutine psb_daxpby_mv_cspan1D(x, coeff, y, desc_a, info, upd_flag)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_multivect_type, psb_d_vect_type
       type(psb_d_multivect_type), intent (inout) :: x
@@ -203,7 +213,6 @@ module psb_d_psblas_mod
       
       logical, intent(in), optional :: upd_flag
     end subroutine psb_daxpby_mv_cspan2D
-
 
     subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
          & z, desc_a, info)
@@ -473,7 +482,6 @@ module psb_d_psblas_mod
       logical, intent(in), optional       :: global
     end subroutine psb_dnrm2vs
   end interface
-
 
   interface psb_spnrmi
     function psb_dnrmi(a, desc_a,info,global)
@@ -787,6 +795,7 @@ module psb_d_psblas_mod
       logical, intent(out)                    :: res
     end subroutine psb_dcmp_spmat
   end interface
+
   interface psb_geaddconst
     subroutine psb_daddconst_vect(x,b,z,desc_a,info)
       import :: psb_desc_type, psb_ipk_, &
