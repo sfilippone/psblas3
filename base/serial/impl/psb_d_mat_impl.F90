@@ -2439,7 +2439,7 @@ subroutine psb_d_csmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans)
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then
     info = psb_err_invalid_mat_state_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
   if ((.not.allocated(x%v)) .or. (.not.allocated(y%v))) then
@@ -2447,7 +2447,6 @@ subroutine psb_d_csmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-
 
   call a%a%spmm(alpha, x%v, idx_x, beta, y%v, idx_y, info, trans)
   if (info /= psb_success_) goto 9999
