@@ -198,7 +198,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
   
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
   lnr = 0
@@ -658,7 +658,7 @@ Subroutine psb_ldsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
 
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract and send/receive.
   lnr = 0 
@@ -1004,7 +1004,7 @@ Subroutine psb_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
   
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
   lnr = 0
@@ -1366,7 +1366,7 @@ Subroutine psb_d_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
   
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
   lnr = 0
