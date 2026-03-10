@@ -69,7 +69,8 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_map_aggr_        = psb_map_asov_+1 
   integer(psb_ipk_), parameter :: psb_map_gen_linear_  = psb_map_aggr_+1 
 
-  integer(psb_ipk_), parameter :: psb_ovt_xhal_ = psb_map_xhal_, psb_ovt_asov_=psb_map_asov_
+  integer(psb_ipk_), parameter :: psb_ovt_xhal_ = psb_map_xhal_
+  integer(psb_ipk_), parameter :: psb_ovt_asov_ = psb_map_asov_
   !
   ! Entries and values in desc%matrix_data
   !
