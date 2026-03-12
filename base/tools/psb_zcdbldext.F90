@@ -117,7 +117,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     goto 9999
   end if
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   Call psb_info(ctxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &

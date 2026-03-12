@@ -83,10 +83,10 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   debug_level = psb_get_debug_level()
 
   ctxt   = desc%get_context()
+  icomm   = ctxt%get_mpic()
   dectype = desc%get_dectype()
   n_row   = desc%get_local_rows()
   n_col   = desc%get_local_cols()
-  icomm   = desc%get_mpic()
   if ((do_timings).and.(idx_total==-1))       &
        & idx_total = psb_get_timer_idx("ICDASB: total ")
   if ((do_timings).and.(idx_phase1==-1))       &

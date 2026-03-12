@@ -57,7 +57,7 @@ Subroutine psb_cd_reinit(desc,info)
   debug_level = psb_get_debug_level()
 
   ctxt = desc%get_context()
-  icomm = desc%get_mpic()
+  icomm = ctxt%get_mpic()
   Call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start'

@@ -139,7 +139,7 @@ subroutine psb_ld_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   debug_level = psb_get_debug_level()
 
   ctxt = desc_r%get_context()
-  icomm = desc_r%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -437,7 +437,7 @@ subroutine psb_d_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   debug_level = psb_get_debug_level()
 
   ctxt = desc_r%get_context()
-  icomm = desc_r%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 

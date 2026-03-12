@@ -127,7 +127,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -587,7 +587,7 @@ Subroutine psb_lcsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -931,7 +931,7 @@ Subroutine psb_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -1293,7 +1293,7 @@ Subroutine psb_c_lc_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 

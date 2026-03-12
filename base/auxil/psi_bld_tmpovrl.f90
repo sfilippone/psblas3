@@ -78,7 +78,7 @@ subroutine psi_i_bld_tmpovrl(iv,desc,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   ctxt = desc%get_context()
-  icomm = desc%get_mpic()
+  icomm = ctxt%get_mpic()
 
   ! check on blacs grid 
   call psb_info(ctxt, me, np)

@@ -992,7 +992,6 @@ contains
 
     idxmap%ctxt = ctxt
     idxmap%state = psb_desc_bld_
-    idxmap%mpic  = psb_get_mpi_comm(ctxt)
     do i=1, n
       idxmap%glob_to_loc(i) = -1
     end do

@@ -332,8 +332,13 @@ module psb_const_mod
     integer(psb_mpk_), allocatable :: ctxt
   contains
     procedure, pass(ctxt) :: get_i_ctxt => psb_get_i_ctxt
+    procedure, pass(ctxt) :: get_mpic   => get_mpic
+    procedure, pass(ctxt) :: set_mpic   => set_mpic
   end type psb_ctxt_type
   logical, parameter :: try_newins=.true.
+
+  private :: get_mpic, set_mpic
+  
 contains
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
@@ -362,5 +367,27 @@ contains
     end if
 
   end subroutine psb_get_i_ctxt
+  
+  function get_mpic(ctxt) result(val)
+    implicit none 
+    integer(psb_mpk_) :: val 
+    class(psb_ctxt_type), intent(in) :: ctxt
+
+    if (allocated(ctxt%ctxt)) then
+      val = ctxt%ctxt
+    else
+      val = -1
+    end if
+
+  end function get_mpic
+  
+  subroutine set_mpic(ctxt,val)
+    implicit none 
+    integer(psb_mpk_) :: val 
+    class(psb_ctxt_type), intent(inout) :: ctxt
+
+    ctxt%ctxt = val
+
+  end subroutine set_mpic
 
 end module psb_const_mod

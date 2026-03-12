@@ -88,7 +88,7 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info,adj)
   call psb_erractionsave(err_act)
 
   ctxt   = idxmap%get_ctxt()
-  icomm   = idxmap%get_mpic()
+  icomm   = ctxt%get_mpic()
   mglob   = idxmap%get_gr()
 
   call psb_info(ctxt, me, np)

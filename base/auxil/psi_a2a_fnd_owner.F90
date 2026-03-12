@@ -90,7 +90,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   call psb_erractionsave(err_act)
 
   ctxt   = idxmap%get_ctxt()
-  icomm   = idxmap%get_mpic()
+  icomm   = ctxt%get_mpic()
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()

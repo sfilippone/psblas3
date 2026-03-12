@@ -118,7 +118,7 @@ Subroutine psb_ls_remote_mat(a,desc_a,b,info)
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -150,7 +150,7 @@ Subroutine psb_ls_remote_mat(a,desc_a,b,info)
 
   call desc_a%indxmap%fnd_owner(a%ia(1:nz),iprc,info)
 
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   sdsz(:)=0
   rvsz(:)=0
   sdsi(:)=0

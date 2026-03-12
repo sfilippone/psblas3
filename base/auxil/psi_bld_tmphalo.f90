@@ -71,7 +71,7 @@ subroutine psi_bld_tmphalo(desc,info)
   call psb_erractionsave(err_act)
 
   ctxt = desc%get_context()
-  icomm = desc%get_mpic()
+  icomm = ctxt%get_mpic()
   n_row = desc%get_local_rows()
   n_col = desc%get_local_cols()
 

@@ -817,7 +817,6 @@ contains
     idxmap%local_cols   = nl
     idxmap%ctxt        = ctxt
     idxmap%state        = psb_desc_bld_
-    idxmap%mpic         = psb_get_mpi_comm(ctxt)
     call idxmap%set_state(psb_desc_bld_)
 
   end subroutine repl_init

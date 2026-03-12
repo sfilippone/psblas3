@@ -123,7 +123,7 @@ subroutine psi_eswaptranm(flag,n,beta,y,desc_a,work,info,data)
   call psb_erractionsave(err_act)
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   call psb_info(ctxt,me,np) 
   if (np == -1) then
@@ -608,7 +608,7 @@ subroutine psi_eswaptranv(flag,beta,y,desc_a,work,info,data)
   call psb_erractionsave(err_act)
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   call psb_info(ctxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_

@@ -224,7 +224,6 @@ module psb_desc_mod
     procedure, pass(desc) :: is_asb          => psb_is_asb_desc
     procedure, pass(desc) :: is_ovl          => psb_is_ovl_desc
     procedure, pass(desc) :: is_repl         => psb_is_repl_desc
-    procedure, pass(desc) :: get_mpic        => psb_cd_get_mpic
     procedure, pass(desc) :: get_dectype     => psb_cd_get_dectype
     procedure, pass(desc) :: get_context     => psb_cd_get_context    
     procedure, pass(desc) :: get_ctxt        => psb_cd_get_context    
@@ -637,23 +636,6 @@ contains
     end if
 
   end function psb_cd_get_dectype
-
-  function psb_cd_get_mpic(desc) result(val)
-    use psb_error_mod
-    implicit none 
-    integer(psb_ipk_) :: val 
-    class(psb_desc_type), intent(in) :: desc
-
-    if (allocated(desc%indxmap)) then
-      val = desc%indxmap%get_mpic()    
-    else
-      val = -1
-!!$      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
-!!$      call psb_error()
-    end if
-
-  end function psb_cd_get_mpic
-
 
   function cd_get_p_adjcncy(desc) result(val)
     implicit none 

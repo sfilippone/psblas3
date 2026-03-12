@@ -85,7 +85,7 @@ subroutine  psb_lsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     info = psb_err_internal_error_ ;    goto 9999
   end if
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   call psb_info(ctxt, me, np)
 
   if (present(keepnum)) then 
@@ -269,7 +269,7 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     info = psb_err_internal_error_ ;    goto 9999
   end if
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   call psb_info(ctxt, me, np)
 
   if (present(keepnum)) then 
@@ -442,7 +442,7 @@ subroutine  psb_@LX@@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepn
     info = psb_err_internal_error_ ;    goto 9999
   end if
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   call psb_info(ctxt, me, np)
 
   if (present(keepnum)) then 
