@@ -613,12 +613,13 @@ contains
     call x%set_bld()
   end subroutine c_vect_all
 
-  subroutine c_vect_reinit(x, info)
+  subroutine c_vect_reinit(x, info, clear)
     implicit none
     class(psb_c_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)      :: info
+    logical, intent(in), optional       :: clear
 
-    if (allocated(x%v)) call x%v%reinit(info)
+    if (allocated(x%v)) call x%v%reinit(info,clear)
     call x%set_upd()
 
   end subroutine c_vect_reinit

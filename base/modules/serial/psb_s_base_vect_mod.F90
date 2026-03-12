@@ -425,16 +425,24 @@ contains
 
   end subroutine s_base_mold
 
-  subroutine s_base_reinit(x, info)
+  subroutine s_base_reinit(x, info,clear)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
     class(psb_s_base_vect_type), intent(out)    :: x
     integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in), optional               :: clear
+    logical :: clear_
+
+    if (present(clear)) then
+      clear_ = clear
+    else
+      clear_ = .true.
+    end if
 
     if (allocated(x%v)) then 
-      call x%sync()
-      x%v(:) = szero
+      if (x%is_dev()) call x%sync()
+      if (clear_) x%v(:) = szero
       call x%set_host()
       call x%set_upd()
     end if
