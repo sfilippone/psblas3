@@ -41,6 +41,6 @@ mpfobjs:
 	(make $(MPFOBJS) FC="$(MPFC)" )	
 
 clean:
-	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS) $(FOBJS2) $(MPFOBJS2) *$(.mod)
+	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS) $(FOBJS2) $(MPFOBJS2) *$(.mod) *.smod
 
 veryclean: clean

@@ -1318,7 +1318,6 @@ contains
     ! almost nothing to be done here
     idxmap%state          = -1 
     if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
-!!$    idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
     idxmap%local_rows     = -1
@@ -1334,7 +1333,6 @@ contains
 
     idxmap%state          = psb_desc_null_
     if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
-!!$    idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
     idxmap%local_rows     = -1
@@ -1421,7 +1419,6 @@ contains
 
     outmap%state       = idxmap%state      
     outmap%ctxt        = idxmap%ctxt      
-!!$    outmap%mpic        = idxmap%mpic       
     outmap%global_rows = idxmap%global_rows
     outmap%global_cols = idxmap%global_cols
     outmap%local_rows  = idxmap%local_rows 
