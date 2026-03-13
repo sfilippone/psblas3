@@ -35,90 +35,90 @@
 !                                              
 !    
 !    
-subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_iovrl_restr_vect
-  use psb_i_base_vect_mod
+submodule (psi_i_comm_v_mod)  psi_i_ovrl_restr_v_impl
+  use psb_base_mod
+contains
+  module subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
 
-  implicit none
+    implicit none
 
-  class(psb_i_base_vect_type)     :: x
-  integer(psb_ipk_)               :: xs(:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
+    class(psb_i_base_vect_type)     :: x
+    integer(psb_ipk_)               :: xs(:)
+    type(psb_desc_type), intent(in) :: desc_a
+    integer(psb_ipk_), intent(out)            :: info
 
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, isz
-  integer(psb_ipk_) :: err_act, i, idx
-  character(len=20) :: name, ch_err
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_) :: np, me, isz
+    integer(psb_ipk_) :: err_act, i, idx
+    character(len=20) :: name, ch_err
 
-  name='psi_iovrl_restr_vect'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    name='psi_iovrl_restr_vect'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  isz = size(desc_a%ovrlap_elem,1)
+    isz = size(desc_a%ovrlap_elem,1)
 
-  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,izero)
+    call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,izero)
 
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-end subroutine psi_iovrl_restr_vect
-
-
-subroutine  psi_iovrl_restr_multivect(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_iovrl_restr_multivect
-  use psb_i_base_vect_mod
-
-  implicit none
-
-  class(psb_i_base_multivect_type)     :: x
-  integer(psb_ipk_)               :: xs(:,:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, isz,nc
-  integer(psb_ipk_) :: err_act, i, idx
-  character(len=20) :: name, ch_err
-
-  name='psi_iovrl_restr_mv'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  isz = size(desc_a%ovrlap_elem,1)
-  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,izero)
-
-  call psb_erractionrestore(err_act)
-  return  
+    call psb_erractionrestore(err_act)
+    return  
 
 9999 call psb_error_handler(ctxt,err_act)
 
-  return
-end subroutine psi_iovrl_restr_multivect
+    return
+  end subroutine psi_iovrl_restr_vect
+
+
+  module subroutine  psi_iovrl_restr_multivect(x,xs,desc_a,info)
+
+    implicit none
+
+    class(psb_i_base_multivect_type)     :: x
+    integer(psb_ipk_)               :: xs(:,:)
+    type(psb_desc_type), intent(in) :: desc_a
+    integer(psb_ipk_), intent(out)            :: info
+
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_) :: np, me, isz,nc
+    integer(psb_ipk_) :: err_act, i, idx
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_restr_mv'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,izero)
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_iovrl_restr_multivect
+end submodule psi_i_ovrl_restr_v_impl
 
 
