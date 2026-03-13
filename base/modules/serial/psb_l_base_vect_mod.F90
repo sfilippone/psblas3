@@ -356,7 +356,7 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_l_base_vect_type), intent(out)    :: x
+    class(psb_l_base_vect_type), intent(inout)    :: x
     integer(psb_ipk_), intent(out)              :: info
     logical, intent(in), optional               :: clear
     logical :: clear_
