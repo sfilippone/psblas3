@@ -92,7 +92,7 @@
 submodule (psi_l_comm_v_mod)  psi_l_swapdata_impl
   use psb_base_mod
 contains
-  subroutine psi_lswapdata_vect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_lswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
