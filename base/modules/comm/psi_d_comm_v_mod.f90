@@ -36,6 +36,9 @@ module psi_d_comm_v_mod
   use psb_d_base_multivect_mod, only : psb_d_base_multivect_type 
 
   interface psi_swapdata
+    ! ---------------------------------------------------------------
+    ! Upper call in order to populate idx using desc_a%get_list_p
+    ! ---------------------------------------------------------------
     module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
@@ -54,6 +57,11 @@ module psi_d_comm_v_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional :: data
     end subroutine psi_dswapdata_multivect
+
+    ! ---------------------------------------------------------------
+    ! Wrapper that calls different communications schemes depending on 
+    ! flag variable
+    ! ---------------------------------------------------------------
     module subroutine psi_dswap_vidx_vect(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       type(psb_ctxt_type), intent(in)         :: ctxt
@@ -80,6 +88,9 @@ module psi_d_comm_v_mod
 
 
   interface psi_swaptran
+    ! ---------------------------------------------------------------
+    ! Upper call in order to populate idx using desc_a%get_list_p
+    ! ---------------------------------------------------------------
     module subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
@@ -98,6 +109,13 @@ module psi_d_comm_v_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswaptran_multivect
+
+    ! ---------------------------------------------------------------
+    
+    ! ---------------------------------------------------------------
+    ! Wrapper that calls different communications schemes depending on
+    ! flag variable
+    ! ---------------------------------------------------------------
     module subroutine psi_dtran_vidx_vect(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       type(psb_ctxt_type), intent(in)       :: ctxt
@@ -120,6 +138,7 @@ module psi_d_comm_v_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_dtran_vidx_multivect
+    ! ---------------------------------------------------------------
   end interface psi_swaptran
 
   interface psi_ovrl_upd
