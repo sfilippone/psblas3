@@ -49,6 +49,7 @@ module psb_s_base_vect_mod
   use psb_realloc_mod
   use psb_i_base_vect_mod
   use psb_l_base_vect_mod
+  use psb_neighbor_topology_mod
 
   !> \namespace  psb_base_mod  \class psb_s_base_vect_type
   !! The psb_s_base_vect_type
@@ -65,6 +66,7 @@ module psb_s_base_vect_mod
     real(psb_spk_), allocatable :: v(:)
     real(psb_spk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
+    integer(psb_mpk_)                 :: communication_handle ! This is used only for Isend/Irecv scheme, to store the communication handle for the whole halo exchange
     !> vector bldstate:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -77,6 +79,8 @@ module psb_s_base_vect_mod
     integer(psb_ipk_), private :: dupl     = psb_dupl_null_
     integer(psb_ipk_), private :: ncfs     = 0
     integer(psb_ipk_), allocatable :: iv(:)
+
+    type(psb_neighbor_topology_type)  :: neighbor_topology
   contains
     !
     !  Constructors/allocators
@@ -2618,6 +2622,7 @@ module psb_s_base_multivect_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_s_base_vect_mod
+  use psb_neighbor_topology_mod
 
   !> \namespace  psb_base_mod  \class psb_s_base_vect_type
   !! The psb_s_base_vect_type
@@ -2637,6 +2642,7 @@ module psb_s_base_multivect_mod
     real(psb_spk_), allocatable :: v(:,:)
     real(psb_spk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
+    integer(psb_mpk_)                 :: communication_handle ! This is used only for Isend/Irecv scheme, to store the communication handle for the whole halo exchange
     !> vector bldstate:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -2649,6 +2655,8 @@ module psb_s_base_multivect_mod
     integer(psb_ipk_), private :: dupl     = psb_dupl_null_
     integer(psb_ipk_), private :: ncfs     = 0
     integer(psb_ipk_), allocatable :: iv(:)
+
+    type(psb_neighbor_topology_type)  :: neighbor_topology
   contains
     !
     !  Constructors/allocators

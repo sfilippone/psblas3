@@ -52,17 +52,17 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
+subroutine psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalo_vect
   use psi_mod
   implicit none
 
-  type(psb_d_vect_type), intent(inout)    :: x
-  type(psb_desc_type), intent(in)         :: desc_a
+  type(psb_d_vect_type), intent(inout)              :: x
+  type(psb_desc_type), intent(in)                   :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
-  real(psb_dpk_), target, optional, intent(inout)  :: work(:)
+  real(psb_dpk_), target, optional, intent(inout)   :: work(:)
   integer(psb_ipk_), intent(in), optional           :: mode,data
-  character, intent(in), optional         :: tran
+  character, intent(in), optional                   :: tran
 
   ! locals
   type(psb_ctxt_type) :: ctxt
@@ -74,8 +74,8 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   character(len=20)         :: name, ch_err
   logical                   :: aliw
 
-  name='psb_dhalov'
-  info=psb_success_
+  name = 'psb_dhalo_vect'
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
@@ -118,7 +118,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   if (present(mode)) then 
     imode = mode
   else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
+    imode = IOR(psb_swap_send_,psb_swap_recv_) ! default base communication scheme Isend/Irecv
   endif
 
   if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
@@ -157,11 +157,9 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
 
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(imode,dzero,x%v,&
-         & desc_a,iwork,info,data=data_)
+    call psi_swapdata(imode,dzero,x%v,desc_a,iwork,info,data=data_)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
-    call psi_swaptran(imode,done,x%v,&
-         & desc_a,iwork,info)
+    call psi_swaptran(imode,done,x%v,desc_a,iwork,info)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')

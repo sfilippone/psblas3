@@ -90,6 +90,7 @@
 !
 ! 
 submodule (psi_s_comm_v_mod)  psi_s_swapdata_impl
+  use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
 contains
   module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
@@ -105,7 +106,7 @@ contains
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
     class(psb_s_base_vect_type) :: y
-    real(psb_spk_)           :: beta
+    real(psb_spk_), intent(in) :: beta
     real(psb_spk_), target   :: work(:)
     type(psb_desc_type), target  :: desc_a
     integer(psb_ipk_), optional           :: data
@@ -694,7 +695,7 @@ end subroutine psi_sswap_neighbor_topology_vect
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
     class(psb_s_base_multivect_type) :: y
-    real(psb_spk_)           :: beta
+    real(psb_spk_), intent(in) :: beta
     real(psb_spk_), target   :: work(:)
     type(psb_desc_type), target  :: desc_a
     integer(psb_ipk_), optional           :: data
@@ -764,7 +765,7 @@ end subroutine psi_sswap_neighbor_topology_vect
   ! 
   module subroutine psi_sswap_vidx_multivect(ctxt,flag,beta,y,idx, &
        & totxch,totsnd,totrcv,work,info)
-  #ifdef PSB_MPI_MOD
+#ifdef PSB_MPI_MOD
     use mpi
 #endif
     implicit none
@@ -1096,8 +1097,8 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
 
 9999 call psb_error_handler(ctxt,err_act)
 
-    return
-end subroutine psi_sswap_baseline_vidx_multivect
+  return
+end subroutine psi_sswap_baseline_multivect
 
 
 subroutine psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx, &

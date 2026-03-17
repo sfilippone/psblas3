@@ -49,10 +49,12 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_setzero_     = 4
 
   ! The following are bit fields. 
-  integer(psb_ipk_), parameter :: psb_swap_send_ = 1
-  integer(psb_ipk_), parameter :: psb_swap_recv_ = 2
-  integer(psb_ipk_), parameter :: psb_swap_sync_ = 4
-  integer(psb_ipk_), parameter :: psb_swap_mpi_  = 8
+  integer(psb_ipk_), parameter :: psb_swap_send_  = 1
+  integer(psb_ipk_), parameter :: psb_swap_recv_  = 2
+  integer(psb_ipk_), parameter :: psb_swap_sync_  = 4
+  integer(psb_ipk_), parameter :: psb_swap_mpi_   = 8
+  integer(psb_ipk_), parameter :: psb_swap_start_ = 16
+  integer(psb_ipk_), parameter :: psb_swap_wait_  = 32
   integer(psb_ipk_), parameter :: psb_collective_start_  = 1
   integer(psb_ipk_), parameter :: psb_collective_end_    = 2
   integer(psb_ipk_), parameter :: psb_collective_sync_   = 4

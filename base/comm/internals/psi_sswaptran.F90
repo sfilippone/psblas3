@@ -107,7 +107,7 @@ contains
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
     class(psb_s_base_vect_type) :: y
-    real(psb_spk_)           :: beta
+      real(psb_spk_), intent(in) :: beta
     real(psb_spk_), target   :: work(:)
     type(psb_desc_type),target  :: desc_a
     integer(psb_ipk_), optional    :: data
@@ -189,7 +189,7 @@ contains
     integer(psb_ipk_), intent(in)      :: flag
     integer(psb_ipk_), intent(out)     :: info
     class(psb_s_base_vect_type) :: y
-    real(psb_spk_)         :: beta
+      real(psb_spk_), intent(in) :: beta
     real(psb_spk_), target :: work(:)
     class(psb_i_base_vect_type), intent(inout) :: idx
     integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
@@ -443,7 +443,7 @@ contains
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
     class(psb_s_base_multivect_type) :: y
-    real(psb_spk_)           :: beta
+      real(psb_spk_), intent(in) :: beta
     real(psb_spk_), target   :: work(:)
     type(psb_desc_type),target  :: desc_a
     integer(psb_ipk_), optional    :: data
@@ -526,7 +526,7 @@ contains
     integer(psb_ipk_), intent(in)      :: flag
     integer(psb_ipk_), intent(out)     :: info
     class(psb_s_base_multivect_type) :: y
-    real(psb_spk_)         :: beta
+      real(psb_spk_), intent(in) :: beta
     real(psb_spk_), target :: work(:)
     class(psb_i_base_vect_type), intent(inout) :: idx
     integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv

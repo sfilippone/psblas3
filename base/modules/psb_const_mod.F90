@@ -326,7 +326,10 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_invalid_irst_ =5002
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preci_=5003
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preca_=5004
-
+  integer(psb_ipk_), parameter, public :: psb_err_incoherent_comm_state_  = 6000 ! Used when communication type bitmask has more then one bit flipped
+  integer(psb_ipk_), parameter, public :: psb_err_topology_error_         = 7000
+  integer(psb_ipk_), parameter, public :: psb_err_topology_invalid_args_  = 7001
+  integer(psb_ipk_), parameter, public :: psb_err_topology_args_mismatch_ = 7002
 
   type :: psb_ctxt_type
     integer(psb_mpk_), allocatable :: ctxt
