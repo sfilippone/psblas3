@@ -293,6 +293,78 @@ contains
 
     return
   end function psb_c_dgeins
+  
+    function psb_c_dgeins_options(nz,irw,val,xh,cdh,mode) bind(c) result(res)
+
+      implicit none
+    integer(psb_c_ipk_) :: res
+    integer(psb_c_ipk_), value :: nz
+    integer(psb_c_lpk_)        :: irw(*)
+    real(c_double)             :: val(*)
+    type(psb_c_dvector)        :: xh
+    type(psb_c_descriptor)     :: cdh
+    integer(psb_c_ipk_), value :: mode
+
+    type(psb_desc_type), pointer    :: descp
+    type(psb_d_vect_type), pointer  :: xp
+    integer(psb_c_ipk_)             :: ixb, info
+    integer(psb_ipk_)               :: nrmt_
+
+    res = -1
+    info = 0
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    if (xp%is_asb()) then
+      if (mode == psb_dupl_ovwrt_) then
+        call xp%zero()
+        call xp%set_bld()
+      else
+        call xp%set_upd()
+      end if
+      call xp%set_dupl(mode)
+      call xp%set_remote_build(psb_matbld_remote_)
+      call xp%set_nrmv(izero)
+      call xp%set_ncfs(izero)
+      nrmt_ = max(100, descp%get_local_cols() - descp%get_local_rows())
+      call psb_ensure_size(nrmt_, xp%rmtv,  info)
+      if (info == 0) call psb_ensure_size(nrmt_, xp%rmidx, info)
+      if (info /= 0) then
+        res = -1
+        return
+      end if
+    end if
+
+    ! avoid mode mixing
+    if ((xp%get_ncfs() > izero .or. xp%get_nrmv() > izero) &
+        & .and. xp%get_dupl() /= mode) then
+      res = -2  ! PSB_ERR_MODE_MISMATCH
+      return
+    end if
+
+
+    call xp%set_dupl(mode)
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      call psb_geins(nz,irw(1:nz),val(1:nz),&
+           & xp,descp,info)
+    else
+      call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
+           & xp,descp,info)
+    end if
+
+    res = min(0,info)
+
+    return
+  end function psb_c_dgeins_options
 
  function psb_c_dspall(mh,cdh) bind(c) result(res)
 
