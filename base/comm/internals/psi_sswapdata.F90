@@ -105,25 +105,34 @@ contains
 
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
-    class(psb_s_base_vect_type) :: y
-    real(psb_spk_), intent(in) :: beta
-    real(psb_spk_), target   :: work(:)
-    type(psb_desc_type), target  :: desc_a
+    class(psb_s_base_vect_type)           :: y
+    real(psb_spk_), intent(in)            :: beta
+    type(psb_desc_type), target           :: desc_a
+    real(psb_spk_), target                :: work(:)
     integer(psb_ipk_), optional           :: data
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
-    class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    type(psb_ctxt_type)                   :: ctxt
+    integer(psb_ipk_)                     :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer  :: comm_indexes
+
+
+    ! local variables used to detect the communication scheme
+    logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                               :: baseline, neighbor_a2av
+
+    ! error handling variables
+    integer(psb_ipk_)                     :: err_act
+    integer(psb_mpk_)                     :: me, np
+    character(len=30)                     :: name
+
 
     info=psb_success_
-    name='psi_swap_datav'
+    name='psi_sswapdata_vect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
-    icomm = ctxt%get_mpic()
+
     call psb_info(ctxt,me,np) 
     if (np == -1) then
       info=psb_err_context_error_
@@ -149,11 +158,43 @@ contains
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
-    if (info /= psb_success_) goto 9999
+    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
+    swap_sync   = iand(flag,psb_swap_sync_) /= 0
+    swap_send   = iand(flag,psb_swap_send_) /= 0
+    swap_recv   = iand(flag,psb_swap_recv_) /= 0
+    swap_start  = iand(flag,psb_swap_start_) /= 0
+    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+
+    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
+    neighbor_a2av = swap_start .or. swap_wait 
+
+    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      goto 9999
+    end if
+
+    if (baseline) then 
+      call psi_dswap_baseline_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='baseline swap')
+        goto 9999
+      end if
+    else if (neighbor_a2av) then 
+      call psi_dswap_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='neighbor a2av swap')
+        goto 9999
+      end if
+    else 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      goto 9999
+    end if
 
     call psb_erractionrestore(err_act)
     return
+
 
 9999 call psb_error_handler(ctxt,err_act)
 
@@ -161,110 +202,6 @@ contains
   end subroutine psi_sswapdata_vect
 
 
-  !
-  !
-  ! Subroutine: psi_sswap_vidx_vect
-  !   Data exchange among processes.
-  !
-  !   Takes care of Y an exanspulated vector. Relies on the gather/scatter methods
-  !   of vectors. 
-  !   
-  !   The real workhorse: the outer routine will only choose the index list
-  !   this one takes the index list and does the actual exchange. 
-  !   
-  !   
-  ! 
-  module subroutine psi_sswap_vidx_vect(ctxt,flag,beta,y,idx, &
-       & totxch,totsnd,totrcv,work,info)
-
-
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
-    implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
-
-  type(psb_ctxt_type), intent(in)             :: ctxt
-  !integer(psb_mpk_), intent(in)               :: icomm
-  integer(psb_ipk_), intent(in)               :: flag
-  integer(psb_ipk_), intent(out)              :: info
-  class(psb_s_base_vect_type)                 :: y
-  real(psb_spk_), intent(in)                  :: beta
-  real(psb_spk_), target                      :: work(:)
-  class(psb_i_base_vect_type), intent(inout)  :: idx
-  integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
-
-  ! local variables used to detect the communication scheme
-  logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
-  logical                                     :: baseline, neighbor_a2av
-
-  ! local variable used for get the communicator
-  integer(psb_mpk_)                           :: icomm
-
-  ! error handling variables
-  integer(psb_ipk_)                           :: err_act
-  integer(psb_mpk_)                           :: me, np
-  character(len=30)                           :: name
-
-
-  info=psb_success_
-  name='psi_sswap_vidx_vect'
-  call psb_erractionsave(err_act)
-  call psb_info(ctxt,me,np) 
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
-  swap_sync   = iand(flag,psb_swap_sync_) /= 0
-  swap_send   = iand(flag,psb_swap_send_) /= 0
-  swap_recv   = iand(flag,psb_swap_recv_) /= 0
-  swap_start  = iand(flag,psb_swap_start_) /= 0
-  swap_wait   = iand(flag,psb_swap_wait_) /= 0
-
-  baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
-  neighbor_a2av = swap_start .or. swap_wait 
-
-  icomm = ctxt%get_mpic()
-
-  if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
-    info=psb_err_mpi_error_
-    call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
-    goto 9999
-  end if
-
-
-  if (baseline) then 
-    call psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,a_err='baseline swap')
-      goto 9999
-    end if
-  else if (neighbor_a2av) then 
-    call psi_sswap_neighbor_topology_vect(ctxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,a_err='neighbor a2av swap')
-      goto 9999
-    end if
-  else 
-    info = psb_err_mpi_error_
-    call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
-    goto 9999
-  end if
-  
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-
-  end subroutine psi_sswap_vidx_vect
 
 
 
@@ -694,25 +631,30 @@ end subroutine psi_sswap_neighbor_topology_vect
 
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
-    class(psb_s_base_multivect_type) :: y
-    real(psb_spk_), intent(in) :: beta
-    real(psb_spk_), target   :: work(:)
-    type(psb_desc_type), target  :: desc_a
+    class(psb_s_base_multivect_type)      :: y
+    real(psb_spk_), intent(in)            :: beta
+    type(psb_desc_type), target           :: desc_a
+    real(psb_spk_), target                :: work(:)
     integer(psb_ipk_), optional           :: data
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
-    class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    type(psb_ctxt_type)                   :: ctxt
+    integer(psb_ipk_)                     :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer  :: comm_indexes
+    character(len=30)                     :: name
+
+    ! local variables used to detect the communication scheme
+    logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                               :: baseline, neighbor_a2av
+
 
     info=psb_success_
-    name='psi_swap_datav'
+    name='psi_sswapdata_multivect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
-    icomm = ctxt%get_mpic()
+
+
     call psb_info(ctxt,me,np) 
     if (np == -1) then
       info=psb_err_context_error_
@@ -738,9 +680,43 @@ end subroutine psi_sswap_neighbor_topology_vect
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
-    if (info /= psb_success_) goto 9999
+    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
+    swap_sync   = iand(flag,psb_swap_sync_) /= 0
+    swap_send   = iand(flag,psb_swap_send_) /= 0
+    swap_recv   = iand(flag,psb_swap_recv_) /= 0
+    swap_start  = iand(flag,psb_swap_start_) /= 0
+    swap_wait   = iand(flag,psb_swap_wait_) /= 0
 
+    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
+    neighbor_a2av = swap_start .or. swap_wait 
+
+    icomm = ctxt%get_mpic()
+
+    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
+      info=psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      goto 9999
+    end if
+
+
+    if (baseline) then 
+      call psi_dswap_baseline_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='baseline swap')
+        goto 9999
+      end if
+    else if (neighbor_a2av) then 
+      call psi_dswap_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='neighbor a2av swap')
+        goto 9999
+      end if
+    else 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      goto 9999
+    end if
+    
     call psb_erractionrestore(err_act)
     return
 
@@ -750,108 +726,6 @@ end subroutine psi_sswap_neighbor_topology_vect
   end subroutine psi_sswapdata_multivect
 
 
-  !
-  !
-  ! Subroutine: psi_sswap_vidx_multivect
-  !   Data exchange among processes.
-  !
-  !   Takes care of Y an encapsulated multivector. Relies on the gather/scatter methods
-  !   of multivectors. 
-  !   
-  !   The real workhorse: the outer routine will only choose the index list
-  !   this one takes the index list and does the actual exchange. 
-  !   
-  !   
-  ! 
-  module subroutine psi_sswap_vidx_multivect(ctxt,flag,beta,y,idx, &
-       & totxch,totsnd,totrcv,work,info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
-    implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
-
-  type(psb_ctxt_type), intent(in)             :: ctxt
-  !integer(psb_mpk_), intent(in)               :: icomm
-  integer(psb_ipk_), intent(in)               :: flag
-  integer(psb_ipk_), intent(out)              :: info
-  class(psb_s_base_multivect_type)            :: y
-  real(psb_spk_), intent(in)                  :: beta
-  real(psb_spk_), target                      :: work(:)
-  class(psb_i_base_vect_type), intent(inout)  :: idx
-  integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
-
-  ! local variables used to detect the communication scheme
-  logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
-  logical                                     :: baseline, neighbor_a2av
-
-  ! local variable used to get communicator
-  integer(psb_mpk_)                           :: icomm
-
-  ! error handling variables
-  integer(psb_ipk_)                           :: err_act
-  integer(psb_mpk_)                           :: me, np
-  character(len=30)                           :: name
-
-
-  info=psb_success_
-  name='psi_sswap_vidx_multivect'
-  call psb_erractionsave(err_act)
-  call psb_info(ctxt,me,np) 
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
-  swap_sync   = iand(flag,psb_swap_sync_) /= 0
-  swap_send   = iand(flag,psb_swap_send_) /= 0
-  swap_recv   = iand(flag,psb_swap_recv_) /= 0
-  swap_start  = iand(flag,psb_swap_start_) /= 0
-  swap_wait   = iand(flag,psb_swap_wait_) /= 0
-
-  baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
-  neighbor_a2av = swap_start .or. swap_wait 
-
-  icomm = ctxt%get_mpic()
-
-  if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
-    info=psb_err_mpi_error_
-    call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
-    goto 9999
-  end if
-
-
-  if (baseline) then 
-    call psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,a_err='baseline swap')
-      goto 9999
-    end if
-  else if (neighbor_a2av) then 
-    call psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,a_err='neighbor a2av swap')
-      goto 9999
-    end if
-  else 
-    info = psb_err_mpi_error_
-    call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
-    goto 9999
-  end if
-  
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-
-  end subroutine psi_sswap_vidx_multivect
 
 
 

@@ -113,7 +113,6 @@ contains
     type(psb_ctxt_type)                   :: ctxt
     integer(psb_ipk_)                     :: np, me, total_send, total_recv, num_neighbors, data_, err_act
     class(psb_i_base_vect_type), pointer  :: comm_indexes
-    character(len=20)                     :: name
 
     ! local variables used to detect the communication scheme
     logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
@@ -631,7 +630,7 @@ contains
     integer(psb_mpk_) :: icomm
     integer(psb_ipk_) :: np, me, total_send, total_recv, num_neighbors, data_, err_act
     class(psb_i_base_vect_type), pointer :: comm_indexes
-    character(len=20)  :: name
+    character(len=30)  :: name
 
     info = psb_success_
     name = 'psi_dswapdata_multivect'

@@ -39,44 +39,23 @@ module psi_s_comm_v_mod
     module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_vect_type) :: y
-      real(psb_spk_), intent(in)           :: beta 
-      real(psb_spk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional :: data
+      class(psb_s_base_vect_type)           :: y
+      real(psb_spk_), intent(in)            :: beta 
+      real(psb_spk_),target                 :: work(:)
+      type(psb_desc_type), target           :: desc_a
+      integer(psb_ipk_), optional           :: data
     end subroutine psi_sswapdata_vect
     module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_multivect_type)    :: y
-      real(psb_spk_), intent(in)           :: beta 
-      real(psb_spk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional :: data
+      class(psb_s_base_multivect_type)      :: y
+      real(psb_spk_), intent(in)            :: beta 
+      real(psb_spk_),target                 :: work(:)
+      type(psb_desc_type), target           :: desc_a
+      integer(psb_ipk_), optional           :: data
     end subroutine psi_sswapdata_multivect
-    module subroutine psi_sswap_vidx_vect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)         :: ctxt
-      integer(psb_ipk_), intent(in)           :: flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_s_base_vect_type)             :: y
-      real(psb_spk_), intent(in)               :: beta
-      real(psb_spk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
-    end subroutine psi_sswap_vidx_vect
-    module subroutine psi_sswap_vidx_multivect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)       :: ctxt
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_multivect_type)    :: y
-      real(psb_spk_), intent(in)               :: beta
-      real(psb_spk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
-    end subroutine psi_sswap_vidx_multivect
   end interface psi_swapdata
+
 
 
   interface psi_swaptran
