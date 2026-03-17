@@ -247,14 +247,14 @@ int gpuInit(int dev)
 void gpuClose()
 {
   cudaStream_t st1, st2;
-  if (! psb_cuda_handle)
+  if ((! psb_cuda_handle)&&(! psb_cublas_handle)) {
     st1=spgpuGetStream(psb_cuda_handle);
-  if (! psb_cublas_handle)
     cublasGetStream(psb_cublas_handle,&st2);
+    if (st1 != st2) 
+      psb_cudaDestroyCublasHandle();
+  }
   FcusparseDestroy();
   psb_cudaDestroyHandle();
-  if (st1 != st2) 
-    psb_cudaDestroyCublasHandle();
   free(prop);
   prop=NULL;
   hasUVA=-1;
