@@ -202,14 +202,14 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if (do_timings) call psb_barrier(ctxt)
         if (do_timings) call psb_tic(mv_phase1)
-        if (doswap_) call psi_swapdata(psb_swap_send_,&
-             & dzero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+        if (doswap_) call psi_swapdata(flag=psb_swap_send_, beta=dzero, y=x%v, desc_a=desc_a, &
+          & data=psb_comm_halo_, info=info, work=iwork)
         if (do_timings) call psb_toc(mv_phase1)
         if (do_timings) call psb_tic(mv_phase2)          
         call a%ad%spmm(alpha,x%v,beta,y%v,info)
         if (do_timings) call psb_tic(mv_phase3)
-        if (doswap_) call psi_swapdata(psb_swap_recv_,&
-             & dzero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+        if (doswap_) call psi_swapdata(flag=psb_swap_recv_, beta=dzero, y=x%v, desc_a=desc_a, &
+          & data=psb_comm_halo_, info=info, work=iwork)
         if (do_timings) call psb_toc(mv_phase3)
         if (do_timings) call psb_tic(mv_phase4)          
         call a%and%spmm(alpha,x%v,done,y%v,info)
@@ -223,10 +223,10 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         if (do_timings) call psb_barrier(ctxt)
         
         if (do_timings) call psb_tic(mv_phase11)          
-        if (doswap_) then
-          call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-               & dzero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
-        end if
+          if (doswap_) then
+            call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=dzero, y=x%v, desc_a=desc_a, &
+              & data=psb_comm_halo_, info=info, work=iwork)
+          end if
         if (do_timings) call psb_toc(mv_phase11)
         if (do_timings) call psb_tic(mv_phase12)          
         call psb_csmm(alpha,a,x,beta,y,info)
@@ -267,11 +267,10 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if (doswap_) then
-      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-           & done,y%v,desc_a,iwork,info)
-      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & done,y%v,desc_a,iwork,info,data=psb_comm_ovr_)
+     if (doswap_) then
+     call psi_swaptran(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, y=y%v, desc_a=desc_a, info=info, work=iwork)
+    if (info == psb_success_) call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, y=y%v, desc_a=desc_a, &
+    &      data=psb_comm_ovr_, info=info, work=iwork)
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
@@ -597,13 +596,16 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
     if (info == psb_success_) call psi_ovrl_restore(x,xvsave,desc_a,info)
 
-    if (doswap_)then
-      ik = lik ! This should not be an issue, we are expecting the values
-      ! to be small, within PSB_IPK
-      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-           & ik,done,y(:,1:ik),desc_a,iwork,info)
-      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & ik,done,y(:,1:ik),desc_a,iwork,info,data=psb_comm_ovr_)
+          if (doswap_) then
+            call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=dzero, &
+        &         y=x(:,1:lik), desc_a=desc_a, data=psb_comm_halo_, info=info, work=iwork)
+          end if
+         call psi_swaptran(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, &
+        &        y=y(:,1:ik), desc_a=desc_a, info=info, work=iwork)
+         if (info == psb_success_) then
+           call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, &
+        &         y=y(:,1:ik), desc_a=desc_a, data=psb_comm_ovr_, info=info, work=iwork)
+         end if
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info

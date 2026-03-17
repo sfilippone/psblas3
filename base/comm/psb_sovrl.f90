@@ -161,8 +161,7 @@ subroutine  psb_sovrl_vect(x,desc_a,info,work,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,sone,x%v,&
-         & desc_a,iwork,info,data=psb_comm_ovr_)
+    call psi_swapdata(flag=mode_, beta=sone, y=x%v, desc_a=desc_a, info=info, data=psb_comm_ovr_, work=iwork)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,update_,info)
   if (info /= psb_success_) then

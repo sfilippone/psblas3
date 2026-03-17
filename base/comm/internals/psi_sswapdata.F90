@@ -93,7 +93,7 @@ submodule (psi_s_comm_v_mod)  psi_s_swapdata_impl
   use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
 contains
-  module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,info,data,work)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -108,7 +108,7 @@ contains
     class(psb_s_base_vect_type)           :: y
     real(psb_spk_), intent(in)            :: beta
     type(psb_desc_type), target           :: desc_a
-    real(psb_spk_), target                :: work(:)
+    real(psb_spk_), target, optional      :: work(:)
     integer(psb_ipk_), optional           :: data
 
     ! locals
@@ -152,7 +152,7 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
+    call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info) 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
       goto 9999
@@ -175,13 +175,13 @@ contains
     end if
 
     if (baseline) then 
-      call psi_dswap_baseline_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_sswap_baseline_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='baseline swap')
         goto 9999
       end if
     else if (neighbor_a2av) then 
-      call psi_dswap_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_sswap_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='neighbor a2av swap')
         goto 9999
@@ -209,8 +209,8 @@ contains
 ! subroutine psi_sswap_baseline_vect
 ! This performs Isend/Irecv as a baseline communication mode
 !
-subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
-    & totxch,totsnd,totrcv,work,info)
+subroutine psi_sswap_baseline_vect(ctxt,flag,beta,y,idx, &
+    & num_neighbors,total_send,total_recv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -220,14 +220,13 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in)  :: ctxt
-    integer(psb_ipk_), intent(in)    :: flag
-    integer(psb_ipk_), intent(out)   :: info
-    class(psb_s_base_vect_type) :: y
-    real(psb_spk_)           :: beta
-    real(psb_spk_), target   :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_s_base_vect_type)                 :: y
+    real(psb_spk_)                              :: beta
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
 
     ! locals
     integer(psb_mpk_)   :: np, me
@@ -235,7 +234,7 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
          & iret, nesd, nerv
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
-    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+    integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
          & snd_pt, rcv_pt, pnti, n
     logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
          & albf,do_send,do_recv
@@ -261,8 +260,8 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-    totrcv_ = totrcv * n
-    totsnd_ = totsnd * n
+    total_recv_ = total_recv * n
+    total_send_ = total_send * n
     call idx%sync()
 
     if (debug) write(*,*) me,'Internal buffer'
@@ -279,12 +278,12 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
       end if
       if (debug) write(*,*) me,'do_send start'
       call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(totxch,info)
+      call y%new_comid(num_neighbors,info)
       y%comid = mpi_request_null
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
       pnti   = 1
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -305,7 +304,7 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
       ! Then gather for sending.
       !    
       pnti   = 1
-      do i=1, totxch
+      do i=1, num_neighbors
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
@@ -329,7 +328,7 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
       snd_pt = 1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -362,12 +361,12 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
         call psb_errpush(info,name,m_err=(/-2/))
         goto 9999
       end if
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
 
       if (debug) write(*,*) me,' wait'
       pnti   = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -406,7 +405,7 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
       pnti   = 1
       snd_pt = 1
       rcv_pt = 1
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -450,8 +449,8 @@ subroutine psi_sswap_baseline_vect(ctxt,icomm,flag,beta,y,idx, &
 end subroutine psi_sswap_baseline_vect
 
 
-subroutine psi_sswap_neighbor_topology_vect(ctxt,icomm,flag,beta,y,idx, &
-    & totxch,totsnd,totrcv,work,info)
+subroutine psi_sswap_neighbor_topology_vect(ctxt,flag,beta,y,idx, &
+    & num_neighbors,total_send,total_recv,info)
 
 #ifdef PSB_MPI_MOD
   use mpi
@@ -462,14 +461,13 @@ subroutine psi_sswap_neighbor_topology_vect(ctxt,icomm,flag,beta,y,idx, &
 #endif
 
   type(psb_ctxt_type), intent(in)             :: ctxt
-  integer(psb_mpk_), intent(in)               :: icomm
+  integer(psb_mpk_)                           :: icomm
   integer(psb_ipk_), intent(in)               :: flag
   integer(psb_ipk_), intent(out)              :: info
   class(psb_s_base_vect_type)                 :: y
   real(psb_spk_), intent(in)                  :: beta
-  real(psb_spk_), target                      :: work(:)
   class(psb_i_base_vect_type), intent(inout)  :: idx
-  integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
+  integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
 
   ! locals
   integer(psb_mpk_)                           :: np, me
@@ -490,6 +488,8 @@ subroutine psi_sswap_neighbor_topology_vect(ctxt,icomm,flag,beta,y,idx, &
     goto 9999
   endif
 
+  icomm = ctxt%get_mpic()
+
   do_start = iand(flag,psb_swap_start_) /= 0
   do_wait  = iand(flag,psb_swap_wait_)  /= 0
 
@@ -503,7 +503,7 @@ subroutine psi_sswap_neighbor_topology_vect(ctxt,icomm,flag,beta,y,idx, &
     ! Lazy initialization: build the topology on first call
     if (.not. y%neighbor_topology%is_initialized) then
       if (debug) write(*,*) me,' nbr_vect: building topology'
-      call y%neighbor_topology%init(idx%v, totxch, totsnd, totrcv, &
+      call y%neighbor_topology%init(idx%v, num_neighbors, total_send, total_recv, &
           & ctxt, icomm, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, &
@@ -620,7 +620,7 @@ end subroutine psi_sswap_neighbor_topology_vect
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,info,data,work)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
@@ -634,7 +634,7 @@ end subroutine psi_sswap_neighbor_topology_vect
     class(psb_s_base_multivect_type)      :: y
     real(psb_spk_), intent(in)            :: beta
     type(psb_desc_type), target           :: desc_a
-    real(psb_spk_), target                :: work(:)
+    real(psb_spk_), target, optional      :: work(:)
     integer(psb_ipk_), optional           :: data
 
     ! locals
@@ -648,8 +648,8 @@ end subroutine psi_sswap_neighbor_topology_vect
     logical                               :: baseline, neighbor_a2av
 
 
-    info=psb_success_
-    name='psi_sswapdata_multivect'
+    info = psb_success_
+    name = 'psi_sswapdata_multivect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
@@ -674,7 +674,7 @@ end subroutine psi_sswap_neighbor_topology_vect
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
+    call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info) 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
       goto 9999
@@ -690,8 +690,6 @@ end subroutine psi_sswap_neighbor_topology_vect
     baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
     neighbor_a2av = swap_start .or. swap_wait 
 
-    icomm = ctxt%get_mpic()
-
     if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
       info=psb_err_mpi_error_
       call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
@@ -700,13 +698,13 @@ end subroutine psi_sswap_neighbor_topology_vect
 
 
     if (baseline) then 
-      call psi_dswap_baseline_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_sswap_baseline_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='baseline swap')
         goto 9999
       end if
     else if (neighbor_a2av) then 
-      call psi_dswap_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_sswap_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='neighbor a2av swap')
         goto 9999
@@ -730,8 +728,8 @@ end subroutine psi_sswap_neighbor_topology_vect
 
 
 
-subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
-     & totxch,totsnd,totrcv,work,info)
+subroutine psi_sswap_baseline_multivect(ctxt,flag,beta,y,idx, &
+     & num_neighbors,total_send,total_recv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -741,29 +739,28 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in)    :: ctxt
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    class(psb_s_base_multivect_type) :: y
-    real(psb_spk_)         :: beta
-    real(psb_spk_), target :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_s_base_multivect_type)            :: y
+    real(psb_spk_)                              :: beta
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n
     integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
-    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+    integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
          & snd_pt, rcv_pt, pnti
     logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
          & albf,do_send,do_recv
     logical, parameter :: usersend=.false., debug=.false.
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    info = psb_success_
+    name = 'psi_sswap_baseline_multivect'
     call psb_erractionsave(err_act)
     call psb_info(ctxt,me,np) 
     if (np == -1) then
@@ -782,8 +779,8 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-    totrcv_ = totrcv * n
-    totsnd_ = totsnd * n
+    total_recv_ = total_recv * n
+    total_send_ = total_send * n
 
     call idx%sync()
 
@@ -801,14 +798,14 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
       end if
       if (debug) write(*,*) me,'do_send start'
       call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(totxch,info)
+      call y%new_comid(num_neighbors,info)
       y%comid = mpi_request_null
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -829,9 +826,9 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
       ! Then gather for sending.
       !    
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
-      do i=1, totxch
+      do i=1, num_neighbors
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
         idx_pt = 1+pnti+nerv+psb_n_elem_send_
@@ -852,10 +849,10 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
       !
 
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -887,14 +884,14 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
         call psb_errpush(info,name,m_err=(/-2/))
         goto 9999
       end if
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
 
       if (debug) write(*,*) me,' wait'
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -930,9 +927,9 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
 
       if (debug) write(*,*) me,' scatter'      
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
-      do i=1, totxch
+      do i=1, num_neighbors
         proc_to_comm = idx%v(pnti+psb_proc_id_)
         nerv = idx%v(pnti+psb_n_elem_recv_)
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
@@ -975,8 +972,8 @@ subroutine psi_sswap_baseline_multivect(ctxt,icomm,flag,beta,y,idx, &
 end subroutine psi_sswap_baseline_multivect
 
 
-subroutine psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx, &
-     & totxch,totsnd,totrcv,work,info)
+subroutine psi_sswap_neighbor_topology_multivect(ctxt,flag,beta,y,idx, &
+     & num_neighbors,total_send,total_recv,info)
 
 #ifdef PSB_MPI_MOD
   use mpi
@@ -987,14 +984,13 @@ subroutine psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx, &
 #endif
 
   type(psb_ctxt_type), intent(in)             :: ctxt
-  integer(psb_mpk_), intent(in)               :: icomm
+  integer(psb_mpk_)                           :: icomm
   integer(psb_ipk_), intent(in)               :: flag
   integer(psb_ipk_), intent(out)              :: info
   class(psb_s_base_multivect_type)            :: y
   real(psb_spk_), intent(in)                  :: beta
-  real(psb_spk_), target                      :: work(:)
   class(psb_i_base_vect_type), intent(inout)  :: idx
-  integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
+  integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
 
   ! locals
   integer(psb_mpk_)                           :: np, me
@@ -1006,7 +1002,7 @@ subroutine psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx, &
 
 
   info = psb_success_
-  name = 'psi_sswap_nbr_vect'
+  name = 'psi_sswap_neighbor_topology_multivect'
   call psb_erractionsave(err_act)
   call psb_info(ctxt,me,np) 
   if (np == -1) then
@@ -1014,6 +1010,8 @@ subroutine psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx, &
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  icomm = ctxt%get_mpic()
 
   do_start = iand(flag,psb_swap_start_) /= 0
   do_wait  = iand(flag,psb_swap_wait_)  /= 0
@@ -1028,7 +1026,7 @@ subroutine psi_sswap_neighbor_topology_multivect(ctxt,icomm,flag,beta,y,idx, &
     ! Lazy initialization: build the topology on first call
     if (.not. y%neighbor_topology%is_initialized) then
       if (debug) write(*,*) me,' nbr_vect: building topology'
-      call y%neighbor_topology%init(idx%v, totxch, totsnd, totrcv, &
+      call y%neighbor_topology%init(idx%v, num_neighbors, total_send, total_recv, &
           & ctxt, icomm, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, &

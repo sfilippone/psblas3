@@ -40,23 +40,23 @@ module psi_d_comm_v_mod
     ! Wrapper that calls different communications schemes depending on 
     ! flag variable using communication buff obtained from desc_a%get_list_p
     ! ---------------------------------------------------------------
-    module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
+    module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,info,data,work)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       class(psb_d_base_vect_type)           :: y
       real(psb_dpk_)                        :: beta 
-      real(psb_dpk_), optional, target      :: work(:)
       type(psb_desc_type), target           :: desc_a
       integer(psb_ipk_), optional           :: data
+      real(psb_dpk_), optional, target      :: work(:)
     end subroutine psi_dswapdata_vect
-    module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
+    module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,info,data,work)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       class(psb_d_base_multivect_type)      :: y
       real(psb_dpk_)                        :: beta 
-      real(psb_dpk_), optional, target      :: work(:)
       type(psb_desc_type), target           :: desc_a
       integer(psb_ipk_), optional           :: data
+      real(psb_dpk_), optional, target      :: work(:)
     end subroutine psi_dswapdata_multivect
   end interface psi_swapdata
 

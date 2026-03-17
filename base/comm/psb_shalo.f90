@@ -157,11 +157,11 @@ subroutine  psb_shalo_vect(x,desc_a,info,work,tran,mode,data)
 
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(imode,szero,x%v,&
-         & desc_a,iwork,info,data=data_)
+    call psi_swapdata(flag=imode, beta=szero, y=x%v, desc_a=desc_a, &
+     &      data=data_, info=info, work=iwork)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
-    call psi_swaptran(imode,sone,x%v,&
-         & desc_a,iwork,info)
+    call psi_swaptran(flag=imode, beta=sone, y=x%v, desc_a=desc_a, &
+     &      info=info, work=iwork)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
@@ -313,11 +313,9 @@ subroutine  psb_shalo_multivect(x,desc_a,info,work,tran,mode,data)
 
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(imode,szero,x%v,&
-         & desc_a,iwork,info,data=data_)
+    call psi_swapdata(flag=imode, beta=szero, y=x%v, desc_a=desc_a, info=info, data=data_, work=iwork)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
-    call psi_swaptran(imode,sone,x%v,&
-         & desc_a,iwork,info)
+    call psi_swaptran(flag=imode, beta=sone, y=x%v, desc_a=desc_a, info=info, work=iwork)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')

@@ -94,7 +94,7 @@
 submodule (psi_s_comm_v_mod)  psi_s_swaptran_impl
   use psb_base_mod
 contains
-  module subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_sswaptran_vect(flag,beta,y,desc_a,info,data,work)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -106,11 +106,11 @@ contains
 
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
-    class(psb_s_base_vect_type) :: y
-      real(psb_spk_), intent(in) :: beta
-    real(psb_spk_), target   :: work(:)
-    type(psb_desc_type),target  :: desc_a
-    integer(psb_ipk_), optional    :: data
+    class(psb_s_base_vect_type)           :: y
+      real(psb_spk_), intent(in)          :: beta
+    real(psb_spk_), target, optional      :: work(:)
+    type(psb_desc_type),target            :: desc_a
+    integer(psb_ipk_), optional           :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -185,14 +185,14 @@ contains
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in)    :: ctxt
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    class(psb_s_base_vect_type) :: y
-      real(psb_spk_), intent(in) :: beta
-    real(psb_spk_), target :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_s_base_vect_type)                 :: y
+      real(psb_spk_), intent(in)                :: beta
+    real(psb_spk_), target, optional            :: work(:)
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n
@@ -430,7 +430,7 @@ contains
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,info,data,work)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -442,11 +442,11 @@ contains
 
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
-    class(psb_s_base_multivect_type) :: y
-      real(psb_spk_), intent(in) :: beta
-    real(psb_spk_), target   :: work(:)
-    type(psb_desc_type),target  :: desc_a
-    integer(psb_ipk_), optional    :: data
+    class(psb_s_base_multivect_type)      :: y
+      real(psb_spk_), intent(in)          :: beta
+    real(psb_spk_), target, optional      :: work(:)
+    type(psb_desc_type),target            :: desc_a
+    integer(psb_ipk_), optional           :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -455,8 +455,8 @@ contains
     class(psb_i_base_vect_type), pointer :: d_vidx
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_tranv'
+    info = psb_success_
+    name = 'psi_sswaptran_multivect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
@@ -522,14 +522,14 @@ contains
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in) :: ctxt
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    class(psb_s_base_multivect_type) :: y
-      real(psb_spk_), intent(in) :: beta
-    real(psb_spk_), target :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_s_base_multivect_type)            :: y
+      real(psb_spk_), intent(in)                :: beta
+    real(psb_spk_), target, optional            :: work(:)
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n

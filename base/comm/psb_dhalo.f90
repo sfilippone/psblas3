@@ -157,7 +157,8 @@ subroutine psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
 
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(imode,dzero,x%v,desc_a,iwork,info,data=data_)
+    call psi_swapdata(flag=imode, info=info, y=x%v, beta=dzero, desc_a=desc_a, &
+     &      data=data_, work=iwork)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
     call psi_swaptran(imode,done,x%v,desc_a,iwork,info)
   else
@@ -311,8 +312,7 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
 
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(imode,dzero,x%v,&
-         & desc_a,iwork,info,data=data_)
+    call psi_swapdata(flag=imode, info=info, y=x%v, beta=dzero, desc_a=desc_a, data=data_, work=iwork)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
     call psi_swaptran(imode,done,x%v,&
          & desc_a,iwork,info)

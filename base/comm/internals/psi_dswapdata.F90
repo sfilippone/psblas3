@@ -91,7 +91,7 @@ submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
 contains
-  module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,info,data,work)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -476,6 +476,8 @@ contains
       goto 9999
     endif
 
+    icomm = ctxt%get_mpic()
+
     do_start = iand(flag,psb_swap_start_) /= 0
     do_wait  = iand(flag,psb_swap_wait_)  /= 0
 
@@ -604,7 +606,7 @@ contains
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,info,data,work)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
