@@ -15,6 +15,7 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_t
 
     integer(psb_ipk_) :: err_act
     real(psb_dpk_)    :: gamma_
+    logical           :: save_r
     character         :: base_type_
     character(len=20) :: name = "psb_d_pMPK"
 
@@ -28,7 +29,15 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_t
         goto 9999
     endif
 
-    !TO DO: dimension checks. mvec_out = n*(2s + 1)
+    !Dimension checks. mvec_out = n*(2s + 1) or n*2s
+    if((mvec_out%get_ncols() /= 2*s) .and. (Qmvec_out%get_ncols() /= 2*s + 1)) then
+        info = psb_err_invalid_mvect_size_
+        call psb_errpush(info, name)
+        goto 9999
+    endif
+
+    !Select if save r as the first vector of Q using is dimension
+    save_r = (mvec_out%get_ncols() == 2*s + 1);
 
     !Check type base
     if(present(base_type)) then 
@@ -79,7 +88,7 @@ contains
         ! First iteration
         idx_Z = 1
         call prec%apply(mvec_out, idx_Q, mvec_out, idx_Z, desc, info)
-        idx_Q = idx_Q + 1
+        idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
         call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
         
         if(s == 1) return
@@ -120,7 +129,7 @@ contains
         call psb_geaxpby(alpha, mvec_out, idx_Q, -beta, mvec_tmp, ind_tmp - 1, dzero, mvec_tmp, ind_tmp, desc, info)
         idx_Z = idx_Z + 1
         call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info)
-        idx_Q = idx_Q + 1
+        idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
         call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
 
         !Check second early exit
@@ -161,6 +170,7 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info, base_type,
 
     integer(psb_ipk_) :: err_act
     real(psb_dpk_)    :: gamma_
+    logical           :: save_r
     character         :: base_type_
     character(len=20) :: name = "psb_d_pMPK"
 
@@ -174,7 +184,15 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info, base_type,
         goto 9999
     endif
 
-    !TO DO: dimension checks. Z = n*s Q = n*(s+1)
+    !Dimension checks. Z = n*s Q = n*(s+1) or n*s
+    if((Z%get_ncols() /= s) .or. ((Q%get_ncols() /= s) .and. (Q%get_ncols() /= s + 1))) then
+        info = psb_err_invalid_mvect_size_
+        call psb_errpush(info, name)
+        goto 9999
+    endif
+
+    !Select if save r as the first vector of Q using is dimension
+    save_r = (Q%get_ncols() == s + 1);
 
     !Check type base
     if(present(base_type)) then 
@@ -223,10 +241,11 @@ contains
         idx_Q = 1
         call psb_geaxpby(done, vec_in, dzero, Q, idx_Q, desc, info)
 
+
         ! First iteration
         idx_Z = 1
         call prec%apply(Q, idx_Q, Z, idx_Z, desc, info)
-        idx_Q = idx_Q + 1
+        idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
         call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
         
         if(s == 1) return
@@ -260,7 +279,7 @@ contains
         ! First iteration
         idx_Z = 1 
         call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info)
-        idx_Q = idx_Q + 1
+        idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
         call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
 
         !Check first early exit
