@@ -728,14 +728,9 @@ fi
 ###############################################################################
 #	Parachute rules for ar and ranlib ... (could cause problems)
 ###############################################################################
-
-if test "X$AR" == "X" ; then
-  AR="ar"
-fi
-
-if test "X$RANLIB" == "X" ; then
-  RANLIB="ranlib"
-fi
+AC_PROG_AR
+AR="${AR} -cr"
+AC_PROG_RANLIB
 
 # This should be portable
 AR="${AR} -cDr"
