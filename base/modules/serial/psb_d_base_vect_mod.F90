@@ -434,6 +434,8 @@ contains
     logical, intent(in), optional               :: clear
     logical :: clear_
 
+    info = 0
+    
     if (present(clear)) then
       clear_ = clear
     else
