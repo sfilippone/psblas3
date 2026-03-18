@@ -4,7 +4,7 @@
 #-----------------------------------
 # Set oldest allowable CMake version
 #-----------------------------------
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.11...4.2)
 cmake_policy(VERSION 3.11.1...3.13.3)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -644,7 +644,7 @@ install(EXPORT ${CMAKE_PROJECT_NAME}-targets
 include(CMakePackageConfigHelpers) # standard CMake module
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-  VERSION "${psblas_VERSION}"
+  VERSION "${VERSION}"
   COMPATIBILITY SameMajorVersion
   )
 
@@ -827,6 +827,7 @@ set_target_properties(base
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_base
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 
 target_include_directories(base PUBLIC
@@ -859,6 +860,7 @@ set_target_properties(prec
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_prec
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(prec PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -874,6 +876,7 @@ set_target_properties(linsolve
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_linsolve
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(linsolve PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -890,6 +893,7 @@ set_target_properties(ext
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_ext
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(ext PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -909,7 +913,8 @@ if(WIN32)
     set_target_properties(psb_util_C
       PROPERTIES
       LINKER_LANGUAGE C
-      POSITION_INDEPENDENT_CODE TRUE)
+      POSITION_INDEPENDENT_CODE TRUE
+      VERSION ${VERSION} SOVERSION ${SOVERSION})
     target_link_libraries(psb_util_C
       PUBLIC kernel32 user32 shell32)
   endif()
@@ -935,6 +940,7 @@ set_target_properties(util
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_util
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(util PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -995,6 +1001,7 @@ set_target_properties(cbind
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_cbind
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 #target_include_directories(cbind PUBLIC
 #  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -1141,6 +1148,7 @@ if(PSB_BUILD_CUDA)
         PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE
         OUTPUT_NAME psb_cuda
+        VERSION ${VERSION} SOVERSION ${SOVERSION}
 	LINKER_LANGUAGE C)
     
     # Include directories for the CUDA library

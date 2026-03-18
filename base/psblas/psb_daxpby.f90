@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -146,7 +146,7 @@ end subroutine psb_daxpby_vect
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -418,7 +418,7 @@ end subroutine psb_daxpby
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -538,7 +538,7 @@ end subroutine psb_daxpbyv
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
