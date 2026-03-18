@@ -37,6 +37,7 @@ psb_i_t    psb_c_sgeasb_options(psb_c_svector *xh, psb_c_descriptor *cdh, psb_i_
 psb_i_t	   psb_c_sgeasb_options_format(psb_c_svector *xh, psb_c_descriptor *cdh,
 										const char *fmt, psb_i_t dupl);
 psb_i_t    psb_c_sgefree(psb_c_svector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_sgereinit(psb_c_svector *xh, psb_c_descriptor *cdh, bool clear);
 psb_s_t    psb_c_sgetelem(psb_c_svector *xh,psb_l_t index,psb_c_descriptor *cd);
 
 /* sparse matrices*/
