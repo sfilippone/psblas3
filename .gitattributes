@@ -3,11 +3,12 @@
 *.mod           export-ignore
 *.smod          export-ignore
 *~              export-ignore
+.git*		export-ignore
 
-# Make.inc generated
-/Make.inc       export-ignore
-/config		export-ignore
-configure.ac
+
+Make.inc	export-ignore
+config/*	export-ignore
+configure.ac	export-ignore
 config.log      export-ignore
 config.status	export-ignore
 aclocal.m4  	export-ignore
@@ -17,12 +18,12 @@ Dockerfile	export-ignore
 install-sh	export-ignore
 .travis.yml	export-ignore
 # generated folder
-/include/	export-ignore
-/modules/	export-ignore
+include/	export-ignore
+modules/	export-ignore
 docs/src	export-ignore
 docs/doxypsb	export-ignore
 docs/Makefile	export-ignore
 
 # the executable from tests
-runs  		 export-ignore
+runs/* 		 export-ignore
 
