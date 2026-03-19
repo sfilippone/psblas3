@@ -7,7 +7,7 @@
 
 
 Make.inc	export-ignore
-./config/	export-ignore
+./config	export-ignore
 configure.ac	export-ignore
 config.log      export-ignore
 config.status	export-ignore
@@ -16,10 +16,10 @@ autogen.sh	export-ignore
 autom4te.cache	export-ignore
 Dockerfile	export-ignore
 .travis.yml	export-ignore
-./rsb/		export-ignore
+./rsb		export-ignore
 # generated folder
-./include/	export-ignore
-./modules/	export-ignore
+./include	export-ignore
+./modules	export-ignore
 docs/src	export-ignore
 docs/doxypsb	export-ignore
 docs/Makefile	export-ignore
