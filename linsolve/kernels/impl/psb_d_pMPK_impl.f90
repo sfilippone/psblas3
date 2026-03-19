@@ -30,7 +30,7 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_t
     endif
 
     !Dimension checks. mvec_out = n*(2s + 1) or n*2s
-    if((mvec_out%get_ncols() /= 2*s) .and. (Qmvec_out%get_ncols() /= 2*s + 1)) then
+    if((mvec_out%get_ncols() /= 2*s) .and. (mvec_out%get_ncols() /= 2*s + 1)) then
         info = psb_err_invalid_mvect_size_
         call psb_errpush(info, name)
         goto 9999
