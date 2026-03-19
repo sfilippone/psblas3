@@ -1400,7 +1400,7 @@ contains
     integer(psb_ipk_), intent(in)               :: m
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
+    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if (x%is_dev()) call x%sync()
@@ -1432,7 +1432,7 @@ contains
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_d_base_vect_type), intent(inout)  :: z
-    real(psb_dpk_), intent (in)       :: alpha, beta
+    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if (x%is_dev()) call x%sync()
@@ -1460,7 +1460,7 @@ contains
     integer(psb_ipk_), intent(in)               :: m
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_base_vect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
+    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if (y%is_dev()) call y%sync()
@@ -1490,7 +1490,7 @@ contains
     real(psb_dpk_), intent(in)                  :: x(:)
     real(psb_dpk_), intent(in)                  :: y(:)
     class(psb_d_base_vect_type), intent(inout) :: z
-    real(psb_dpk_), intent (in)                 :: alpha, beta
+    real(psb_dpk_), intent(in)                 :: alpha, beta
     integer(psb_ipk_), intent(out)               :: info
 
     if (z%is_dev()) call z%sync()
@@ -1523,7 +1523,7 @@ contains
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_d_base_vect_type), intent(inout)  :: z
-    real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
+    real(psb_dpk_), intent(in)       :: alpha, beta, gamma, delta
     integer(psb_ipk_), intent(out)              :: info
 
     if (x%is_dev().and.(alpha/=dzero)) call x%sync()
@@ -1543,7 +1543,7 @@ contains
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_d_base_vect_type), intent(inout)  :: z
     class(psb_d_base_vect_type), intent(inout)  :: w
-    real(psb_dpk_), intent (in)                :: a,b,c,d,e,f
+    real(psb_dpk_), intent(in)                :: a,b,c,d,e,f
     integer(psb_ipk_), intent(out)              :: info
 
     if (x%is_dev().and.(a/=dzero)) call x%sync()
@@ -2101,7 +2101,7 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_d_base_vect_type), intent(inout)  :: x
-    real(psb_dpk_), intent (in)       :: alpha
+    real(psb_dpk_), intent(in)       :: alpha
     integer(psb_ipk_) :: i
 
     if (allocated(x%v)) then
@@ -2723,29 +2723,34 @@ module psb_d_base_multivect_mod
     ! TO DO: check and clear possibile duplicates
     
     ! two term axpy like operations - indexed and full versions
-    procedure, pass(y) :: axpby_v_idxs => d_base_mvect_axpby_v_idxs
-    procedure, pass(y) :: axpby_v_full => d_base_mvect_axpby_v_full
-    procedure, pass(y) :: axpby_m_idxs => d_base_mvect_axpby_m_idxs
-    procedure, pass(y) :: axpby_m_full => d_base_mvect_axpby_m_full
-    ! three term axpy like operations - only indexed versions
+    procedure, pass(y) :: axpby_v_i    => d_base_mvect_axpby_v_idxs
+    procedure, pass(y) :: axpby_v_f    => d_base_mvect_axpby_v_full
+    procedure, pass(y) :: axpby_m_i    => d_base_mvect_axpby_m_idxs
+    procedure, pass(y) :: axpby_m_f    => d_base_mvect_axpby_m_full
+    ! two term axpy-like operations with separate output mv
+    procedure, pass(z) :: axpby_m_f_o  => d_base_mvect_axpby_m_full_out
+    ! three term axpy like operations
     procedure, pass(z) :: axpbycz_vv   => d_base_mvect_axpbycz_vv
     procedure, pass(z) :: axpbycz_mv   => d_base_mvect_axpbycz_mv
-    procedure, pass(z) :: axpbycz_mm   => d_base_mvect_axpbycz_mm
+    procedure, pass(z) :: axpbycz_mm_i => d_base_mvect_axpbycz_mm_idxs
+    procedure, pass(z) :: axpbycz_mm_f => d_base_mvect_axpbycz_mm_full
     ! three term axpy-like operations with separate output mv
     procedure, pass(w) :: axpbycz_mm_o => d_base_mvect_axpbycz_mm_out
-    ! linear combinations of columns of the multivector
+    ! linear combinations of columns of the multivector (rename?)
     procedure, pass(x) :: colspan1D    => d_base_mvect_colspan1D
     procedure, pass(x) :: colspan2D    => d_base_mvect_colspan2D
     ! all generics exported as axpby
-    generic, public    :: axpby_v2     => axpby_v_idxs, axpby_v_full, &
-                                          axpby_m_idxs, axpby_m_full, &
-                                          axpbycz_vv, axpbycz_mv, axpbycz_mm, &
-                                          axpbycz_mm_o, &
+    generic, public    :: axpby_v2     => axpby_v_i, axpby_v_f, &
+                                          axpby_m_i, axpby_m_f, &
+                                          axpby_m_f_o, &
+                                          axpbycz_vv, axpbycz_mv, axpbycz_mm_i, &
+                                          axpbycz_mm_f, axpbycz_mm_o, &
                                           colspan1D, colspan2D
 
     ! dot products operations - only full-full version for now
     procedure, pass(x) :: dot_mm   => d_base_mvect_dot_mm
-    generic, public    :: dotsbr   => dot_mm
+    procedure, pass(x) :: dot_mv   => d_base_mvect_dot_mv
+    generic, public    :: dotsbr   => dot_mm, dot_mv
 
 
     !
@@ -3677,7 +3682,7 @@ contains
     integer(psb_ipk_), intent(in)               :: m
     class(psb_d_base_multivect_type), intent(inout)  :: x
     class(psb_d_base_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
+    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_), intent(in), optional     :: n
     integer(psb_ipk_)  :: nc
@@ -3715,7 +3720,7 @@ contains
     integer(psb_ipk_), intent(in)               :: m
     real(psb_dpk_), intent(in)        :: x(:,:)
     class(psb_d_base_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
+    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_), intent(in), optional     :: n
     integer(psb_ipk_)  :: nc
@@ -3735,11 +3740,11 @@ contains
     use psi_serial_mod
     use psb_d_base_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m, idx_y
-    class(psb_d_base_vect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m, idx_y
+    class(psb_d_base_vect_type), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
       type is (psb_d_base_vect_type)
@@ -3753,11 +3758,11 @@ contains
     use psi_serial_mod
     use psb_d_base_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_d_base_vect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_vect_type), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
       type is (psb_d_base_vect_type)
@@ -3771,11 +3776,10 @@ contains
     use psi_serial_mod
     use psb_d_base_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y
-    class(psb_d_base_multivect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
       type is (psb_d_base_multivect_type)
@@ -3788,11 +3792,10 @@ contains
   subroutine d_base_mvect_axpby_m_full(m, alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_d_base_multivect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
       type is (psb_d_base_multivect_type)
@@ -3802,15 +3805,31 @@ contains
     end select
   end subroutine d_base_mvect_axpby_m_full
 
+  subroutine d_base_mvect_axpby_m_full_out(m, alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_d_base_multivect_type)
+        call psb_geaxpby(m, y%get_ncols(), alpha, x%v, beta, y%v, z%v, info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine d_base_mvect_axpby_m_full_out
+
   subroutine d_base_mvect_axpbycz_vv(m, alpha, x, beta, y, gamma, z, idx_z, info)
     use psi_serial_mod
     use psb_d_base_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m, idx_z
-    type(psb_d_base_vect_type), intent(inout)  :: x, y
-    class(psb_d_base_multivect_type), intent(inout)  :: z
-    real(psb_dpk_), intent (in)       :: alpha, beta, gamma
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m, idx_z
+    type(psb_d_base_vect_type), intent(inout)       :: x, y
+    class(psb_d_base_multivect_type), intent(inout) :: z
+    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)                  :: info
 
     ! The type check is enforced via the argument types
     call psb_geaxpby(m, alpha, x%v, beta, y%v, gamma, z%v(:, idx_z), info)
@@ -3823,31 +3842,48 @@ contains
     integer(psb_ipk_), intent(in)               :: m, idx_y, idx_z
     type(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_multivect_type), intent(inout)  :: y, z
-    real(psb_dpk_), intent (in)       :: alpha, beta, gamma
+    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)    :: info
 
     ! The type check is enforced via the argument types
     call psb_geaxpby(m, alpha, x%v, beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
   end subroutine d_base_mvect_axpbycz_mv
 
-  subroutine d_base_mvect_axpbycz_mm(m, alpha, x, idx_x, beta, y, idx_y, z, gamma, idx_z, info)
+  subroutine d_base_mvect_axpbycz_mm_idxs(m, alpha, x, idx_x, beta, y, idx_y, z, gamma, idx_z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y, idx_z
     class(psb_d_base_multivect_type), intent(inout)  :: x, y, z
-    real(psb_dpk_), intent (in)       :: alpha, beta, gamma
+    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)    :: info
 
     ! The type check is enforced via the argument types
     call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
-  end subroutine d_base_mvect_axpbycz_mm
+  end subroutine d_base_mvect_axpbycz_mm_idxs
+
+  subroutine d_base_mvect_axpbycz_mm_full(m, alpha, x, beta, y, z, gamma, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
+    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_d_base_multivect_type)
+        call psb_geaxpby(m, z%get_ncols(), alpha, x%v, beta, y%v, gamma, z%v, info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine d_base_mvect_axpbycz_mm_full
+
 
   subroutine d_base_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z, idx_w
     class(psb_d_base_multivect_type), intent(inout) :: x, y, z, w
-    real(psb_dpk_), intent (in)                     :: alpha, beta, gamma
+    real(psb_dpk_), intent(in)                     :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)                  :: info
 
     ! The type check is enforced via the argument types
@@ -3922,7 +3958,8 @@ contains
     class(psb_d_base_multivect_type), intent(inout) :: x, y
     real(psb_dpk_), intent(out)                     :: res(:, :)
     integer(psb_ipk_), intent(out)                  :: info
-    integer(psb_ipk_) :: nrx, nry, ncx, ncy 
+    integer(psb_ipk_) :: nrx, nry, ncx, ncy
+
     if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
       info = psb_err_invalid_mvect_state_
       return
@@ -3940,10 +3977,39 @@ contains
     ncy = y%get_ncols()
 
     call dgemm('T', 'N', ncx, ncy, nrx, done, x%v, nrx, y%v, nry, dzero, res, ncx)
-
   end subroutine d_base_mvect_dot_mm
 
+  subroutine d_base_mvect_dot_mv(m, x, y, res, info)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    class(psb_d_base_vect_type), intent(inout)      :: y
+    real(psb_dpk_), intent(out)                     :: res(:)
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_) :: nrx, nry, ncx 
 
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if (.not. allocated(y%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    nrx = x%get_nrows()
+    nry = y%get_nrows()
+
+    if(nry /= nrx) then
+      info = psb_err_invalid_vect_size_
+      return
+    endif
+
+    ncx = x%get_ncols()
+
+    call dgemv('T', ncx, nrx, done, x%v, nrx, y%v, 1, dzero, res, 1)
+  end subroutine d_base_mvect_dot_mv
 
 
   !
@@ -4180,7 +4246,7 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_d_base_multivect_type), intent(inout)  :: x
-    real(psb_dpk_), intent (in)       :: alpha
+    real(psb_dpk_), intent(in)       :: alpha
 
     if (x%is_dev()) call x%sync()
     if (allocated(x%v)) x%v = alpha*x%v

@@ -37,33 +37,33 @@ module psi_d_serial_mod
     subroutine psb_m_dgelp(trans,iperm,x,info)
       import :: psb_ipk_, psb_mpk_, psb_dpk_
       implicit none
-      real(psb_dpk_), intent(inout)     ::  x(:,:)
-      integer(psb_mpk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
+      real(psb_dpk_), intent(inout)     :: x(:,:)
+      integer(psb_mpk_), intent(in)      :: iperm(:)
+      integer(psb_ipk_), intent(out)     :: info
       character, intent(in)              :: trans
     end subroutine psb_m_dgelp
     subroutine psb_m_dgelpv(trans,iperm,x,info)
       import :: psb_ipk_, psb_mpk_,psb_dpk_
       implicit none
-      real(psb_dpk_), intent(inout)     ::  x(:)
-      integer(psb_mpk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
+      real(psb_dpk_), intent(inout)     :: x(:)
+      integer(psb_mpk_), intent(in)      :: iperm(:)
+      integer(psb_ipk_), intent(out)     :: info
       character, intent(in)              :: trans
     end subroutine psb_m_dgelpv
     subroutine psb_e_dgelp(trans,iperm,x,info)
       import :: psb_ipk_, psb_epk_, psb_dpk_
       implicit none
-      real(psb_dpk_), intent(inout)     ::  x(:,:)
-      integer(psb_epk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
+      real(psb_dpk_), intent(inout)     :: x(:,:)
+      integer(psb_epk_), intent(in)      :: iperm(:)
+      integer(psb_ipk_), intent(out)     :: info
       character, intent(in)              :: trans
     end subroutine psb_e_dgelp
     subroutine psb_e_dgelpv(trans,iperm,x,info)
       import :: psb_ipk_, psb_epk_, psb_dpk_
       implicit none
-      real(psb_dpk_), intent(inout)     ::  x(:)
-      integer(psb_epk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
+      real(psb_dpk_), intent(inout)     :: x(:)
+      integer(psb_epk_), intent(in)      :: iperm(:)
+      integer(psb_ipk_), intent(out)     :: info
       character, intent(in)              :: trans
     end subroutine psb_e_dgelpv
   end interface psb_gelp
@@ -72,32 +72,54 @@ module psi_d_serial_mod
     subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
-      integer(psb_ipk_), intent(in)      :: m, n
-      real(psb_dpk_), intent (in)       ::  x(:,:)
-      real(psb_dpk_), intent (inout)    ::  y(:,:)
-      real(psb_dpk_), intent (in)       ::  alpha, beta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: x(:,:)
+      real(psb_dpk_), intent(inout)   :: y(:,:)
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_daxpby
+
+    subroutine psi_daxpby2(m, n, alpha, x, beta, y, z, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: x(:,:)
+      real(psb_dpk_), intent(in)      :: y(:,:)
+      real(psb_dpk_), intent(inout)   :: z(:,:)
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_daxpby2
+
+    subroutine psi_daxpby3(m, n, alpha, x, beta, y, gamma, z, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: x(:,:)
+      real(psb_dpk_), intent(in)      :: y(:,:)
+      real(psb_dpk_), intent(inout)   :: z(:,:)
+      real(psb_dpk_), intent(in)      :: alpha, beta, gamma
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_daxpby3
 
     subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
-      integer(psb_ipk_), intent(in)      :: m
-      real(psb_dpk_), intent (in)       ::  x(:)
-      real(psb_dpk_), intent (inout)    ::  y(:)
-      real(psb_dpk_), intent (in)       :: alpha, beta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(inout)   :: y(:)
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_daxpbyv
 
     subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
-      integer(psb_ipk_), intent(in)      :: m
-      real(psb_dpk_), intent (in)       ::  x(:)
-      real(psb_dpk_), intent (in)       ::  y(:)
-      real(psb_dpk_), intent (inout)    ::  z(:)
-      real(psb_dpk_), intent (in)       :: alpha, beta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(in)      :: y(:)
+      real(psb_dpk_), intent(inout)   :: z(:)
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_daxpbyv2
 
     subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
@@ -126,13 +148,12 @@ module psi_d_serial_mod
     subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
       import :: psb_ipk_, psb_dpk_
       implicit none
-      integer(psb_ipk_), intent(in)     :: m, n
-      real(psb_dpk_), intent (in)       :: x(:)
-      real(psb_dpk_), intent (inout)    :: y(:, :)
-      real(psb_dpk_), intent (in)       :: alpha, beta
-      integer(psb_ipk_), intent(out)    :: info
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(inout)   :: y(:, :)
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_daxpbymvc
-    
   end interface psb_geaxpby
 
   interface psi_upd_xyz
@@ -140,10 +161,10 @@ module psi_d_serial_mod
       import :: psb_ipk_, psb_dpk_
       implicit none
       integer(psb_ipk_), intent(in)      :: m
-      real(psb_dpk_), intent (in)       ::  x(:)
-      real(psb_dpk_), intent (inout)    ::  y(:)
-      real(psb_dpk_), intent (inout)    ::  z(:)
-      real(psb_dpk_), intent (in)       :: alpha, beta,gamma,delta
+      real(psb_dpk_), intent(in)       :: x(:)
+      real(psb_dpk_), intent(inout)    :: y(:)
+      real(psb_dpk_), intent(inout)    :: z(:)
+      real(psb_dpk_), intent(in)       :: alpha, beta,gamma,delta
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_d_upd_xyz
   end interface psi_upd_xyz
@@ -153,11 +174,11 @@ module psi_d_serial_mod
       import :: psb_ipk_, psb_dpk_
       implicit none
       integer(psb_ipk_), intent(in)      :: m
-      real(psb_dpk_), intent (in)       :: x(:)
-      real(psb_dpk_), intent (inout)    :: y(:)
-      real(psb_dpk_), intent (inout)    :: z(:)
-      real(psb_dpk_), intent (inout)    :: w(:)
-      real(psb_dpk_), intent (in)       :: a,b,c,d,e,f
+      real(psb_dpk_), intent(in)       :: x(:)
+      real(psb_dpk_), intent(inout)    :: y(:)
+      real(psb_dpk_), intent(inout)    :: z(:)
+      real(psb_dpk_), intent(inout)    :: w(:)
+      real(psb_dpk_), intent(in)       :: a,b,c,d,e,f
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_dxyzw
   end interface psi_xyzw
@@ -232,7 +253,7 @@ module psi_d_serial_mod
       import :: psb_ipk_, psb_mpk_, psb_dpk_
       implicit none
       integer(psb_ipk_), intent(in)      :: n
-      real(psb_dpk_), intent (inout)    :: x(:)
+      real(psb_dpk_), intent(inout)    :: x(:)
       integer(psb_ipk_), intent(out)     :: info
       real(psb_dpk_), intent(in), optional :: shift
     end subroutine psi_d_exscanv

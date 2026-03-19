@@ -38,7 +38,7 @@ subroutine psi_d_exscanv(n,x,info,shift)
 #endif
   implicit none
   integer(psb_ipk_), intent(in)      :: n
-  real(psb_dpk_), intent (inout)    :: x(:)
+  real(psb_dpk_), intent(inout)    :: x(:)
   integer(psb_ipk_), intent(out)     :: info
   real(psb_dpk_), intent(in), optional :: shift
   
@@ -137,9 +137,9 @@ subroutine psb_m_dgelp(trans,iperm,x,info)
   use psb_error_mod
   implicit none
 
-  real(psb_dpk_), intent(inout) ::  x(:,:)
-  integer(psb_mpk_), intent(in)           ::  iperm(:)
-  integer(psb_ipk_), intent(out)          ::  info
+  real(psb_dpk_), intent(inout) :: x(:,:)
+  integer(psb_mpk_), intent(in)           :: iperm(:)
+  integer(psb_ipk_), intent(out)          :: info
   character, intent(in)         :: trans
 
   ! local variables
@@ -207,9 +207,7 @@ subroutine psb_m_dgelp(trans,iperm,x,info)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine psb_m_dgelp
 
 
@@ -261,14 +259,14 @@ subroutine psb_m_dgelpv(trans,iperm,x,info)
   use psb_error_mod
   implicit none
 
-  real(psb_dpk_), intent(inout) ::  x(:)
-  integer(psb_mpk_), intent(in)           ::  iperm(:)
-  integer(psb_ipk_), intent(out)          ::  info
-  character, intent(in)         ::  trans
+  real(psb_dpk_), intent(inout) :: x(:)
+  integer(psb_mpk_), intent(in)           :: iperm(:)
+  integer(psb_ipk_), intent(out)          :: info
+  character, intent(in)         :: trans
 
   ! local variables
   integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
-  real(psb_dpk_),allocatable ::  temp(:)
+  real(psb_dpk_),allocatable :: temp(:)
   integer(psb_ipk_), allocatable          :: itemp(:)
   real(psb_dpk_),parameter   :: one=1
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -326,9 +324,7 @@ subroutine psb_m_dgelpv(trans,iperm,x,info)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine psb_m_dgelpv
 
 subroutine psb_e_dgelp(trans,iperm,x,info)
@@ -337,9 +333,9 @@ subroutine psb_e_dgelp(trans,iperm,x,info)
   use psb_error_mod
   implicit none
 
-  real(psb_dpk_), intent(inout) ::  x(:,:)
-  integer(psb_epk_), intent(in)           ::  iperm(:)
-  integer(psb_ipk_), intent(out)          ::  info
+  real(psb_dpk_), intent(inout) :: x(:,:)
+  integer(psb_epk_), intent(in)           :: iperm(:)
+  integer(psb_ipk_), intent(out)          :: info
   character, intent(in)         :: trans
 
   ! local variables
@@ -408,9 +404,7 @@ subroutine psb_e_dgelp(trans,iperm,x,info)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine psb_e_dgelp
 
 
@@ -462,14 +456,14 @@ subroutine psb_e_dgelpv(trans,iperm,x,info)
   use psb_error_mod
   implicit none
 
-  real(psb_dpk_), intent(inout) ::  x(:)
-  integer(psb_epk_), intent(in)           ::  iperm(:)
-  integer(psb_ipk_), intent(out)          ::  info
-  character, intent(in)         ::  trans
+  real(psb_dpk_), intent(inout) :: x(:)
+  integer(psb_epk_), intent(in)           :: iperm(:)
+  integer(psb_ipk_), intent(out)          :: info
+  character, intent(in)         :: trans
 
   ! local variables
   integer(psb_ipk_) :: int_err(5), err_act
-  real(psb_dpk_),allocatable ::  temp(:)
+  real(psb_dpk_),allocatable :: temp(:)
   integer(psb_epk_) :: i1sz, i
   integer(psb_epk_), allocatable          :: itemp(:)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -527,24 +521,19 @@ subroutine psb_e_dgelpv(trans,iperm,x,info)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine psb_e_dgelpv
-
-
-
 
 
 subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)      :: m, n
-  real(psb_dpk_), intent (in)       ::  x(:,:)
-  real(psb_dpk_), intent (inout)    ::  y(:,:)
-  real(psb_dpk_), intent (in)       ::  alpha, beta
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: x(:,:)
+  real(psb_dpk_), intent(inout)   :: y(:,:)
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  integer(psb_ipk_), intent(out)  :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly, i
   integer(psb_ipk_) :: ierr(5)
@@ -584,7 +573,7 @@ subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
     goto 9999
   end if
 
-  if ((m>0).and.(n>0)) call daxpby(m,n,alpha,x,lx,beta,y,ly,info)
+  if ((m>0).and.(n>0)) call daxpby(m, n, alpha, x, lx, beta, y, ly, info)
 
   call psb_erractionrestore(err_act)
   return
@@ -593,15 +582,162 @@ subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
   return
 end subroutine psi_daxpby
 
-subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
+subroutine psi_daxpby2(m, n, alpha, x, beta, y, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: x(:, :)
+  real(psb_dpk_), intent(in)      :: y(:, :)
+  real(psb_dpk_), intent(inout)   :: z(:, :)
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  integer(psb_ipk_), intent(out)  :: info
 
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly, lz, i
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20) :: name, ch_err
+
+  name = 'psb_geaxpby'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+
+  if (lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (lz < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if ((m>0).and.(n>0)) then
+    call daxpbyv2(m, n, alpha, x, lx, beta, y, ly, z, lz, info)
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_daxpby2
+
+subroutine psi_daxpby3(m, n, alpha, x, beta, y, gamma, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: x(:, :)
+  real(psb_dpk_), intent(in)      :: y(:, :)
+  real(psb_dpk_), intent(inout)   :: z(:, :)
+  real(psb_dpk_), intent(in)      :: alpha, beta, gamma
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly, lz, i
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20) :: name, ch_err
+
+  name = 'psb_geaxpby'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+
+  if (lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err  =ierr)
+    goto 9999
+  end if
+
+  if (ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err  =ierr)
+    goto 9999
+  end if
+
+  if (lz < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err  =ierr)
+    goto 9999
+  end if
+
+  if ((m>0).and.(n>0)) then
+    call daxpbyv3(m, n, alpha, x, lx, beta, y, ly, gamma, z, lz, info)
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_daxpby3
+
+subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
   integer(psb_ipk_), intent(in)      :: m
-  real(psb_dpk_), intent (in)       ::  x(:)
-  real(psb_dpk_), intent (inout)    ::  y(:)
-  real(psb_dpk_), intent (in)       :: alpha, beta
+  real(psb_dpk_), intent(in)       :: x(:)
+  real(psb_dpk_), intent(inout)    :: y(:)
+  real(psb_dpk_), intent(in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
@@ -637,7 +773,7 @@ subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
     goto 9999
   end if
 
-!  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+  !  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   if (alpha.eq.dzero) then
     if (beta.eq.dzero) then
@@ -746,16 +882,15 @@ subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
 end subroutine psi_daxpbyv
 
 subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
-
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)      :: m
-  real(psb_dpk_), intent (in)       ::  x(:)
-  real(psb_dpk_), intent (in)       ::  y(:)
-  real(psb_dpk_), intent (inout)    ::  z(:)
-  real(psb_dpk_), intent (in)       :: alpha, beta
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), intent(in)   :: m
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: y(:)
+  real(psb_dpk_), intent(inout)   :: z(:)
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  integer(psb_ipk_), intent(out)  :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly, lz, i
   integer(psb_ipk_) :: ierr(5)
@@ -907,12 +1042,12 @@ subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)     :: m
-  real(psb_dpk_), intent (in)       :: x(:)
-  real(psb_dpk_), intent (in)       :: y(:)
-  real(psb_dpk_), intent (inout)    :: z(:)
-  real(psb_dpk_), intent (in)       :: alpha, beta, gamma
-  integer(psb_ipk_), intent(out)    :: info
+  integer(psb_ipk_), intent(in)   :: m
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: y(:)
+  real(psb_dpk_), intent(inout)   :: z(:)
+  real(psb_dpk_), intent(in)      :: alpha, beta, gamma
+  integer(psb_ipk_), intent(out)  :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly, lz, i, code
   integer(psb_ipk_) :: ierr(5)
@@ -1276,13 +1411,13 @@ subroutine psi_daxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)     :: m
-  real(psb_dpk_), intent (in)       :: x(:)
-  real(psb_dpk_), intent (in)       :: y(:)
-  real(psb_dpk_), intent (in)       :: z(:)
-  real(psb_dpk_), intent (inout)    :: w(:)
-  real(psb_dpk_), intent (in)       :: alpha, beta, gamma
-  integer(psb_ipk_), intent(out)    :: info
+  integer(psb_ipk_), intent(in)   :: m
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: y(:)
+  real(psb_dpk_), intent(in)      :: z(:)
+  real(psb_dpk_), intent(inout)   :: w(:)
+  real(psb_dpk_), intent(in)      :: alpha, beta, gamma
+  integer(psb_ipk_), intent(out)  :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly, lz, lw, i, code
   integer(psb_ipk_) :: ierr(5)
@@ -1656,25 +1791,26 @@ subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)     :: m, n
-  real(psb_dpk_), intent (in)       :: x(:)
-  real(psb_dpk_), intent (inout)    :: y(:, :)
-  real(psb_dpk_), intent (in)       :: alpha, beta
-  integer(psb_ipk_), intent(out)    :: info
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(inout)   :: y(:, :)
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  integer(psb_ipk_), intent(out)  :: info
 
   integer :: i
   real(psb_dpk_) :: dones(n)
-  dones = 1_psb_dpk_
+  dones = done
 
-  !TEMP: call a dger?
-  do i = 1, n
-    !call psi_daxpbyv(m, alpha, x, beta, y(:, i), info)
-    y(:, i) = alpha * x + beta * y(:, i);
-  end do  
+  !TO DO: checks
+
+  !dscal + dger: test if okay
+  call dscal(size(y, 1) * size(y, 2), beta, y, 1)
+  call dger(size(y, 1), size(y, 2), alpha, x, 1, dones, 1, y, size(y, 1))
+  ! do i = 1, n
+  !   !call psi_daxpbyv(m, alpha, x, beta, y(:, i), info)
+  !   y(:, i) = alpha * x + beta * y(:, i);
+  ! end do  
 end subroutine psi_daxpbymvc
-
-
-
 
 subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
@@ -1970,7 +2106,7 @@ subroutine psi_dsctv(n,idx,x,beta,y)
   end if
 end subroutine psi_dsctv
 
-subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
+subroutine daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2152,21 +2288,19 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 9999 continue
   call fcpsb_serror()
   return
-
 end subroutine daxpby
 
-subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
+subroutine daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
   integer(psb_ipk_) :: n, m, lldx, lldy, lldz, info
-  real(psb_dpk_) X(lldx,*), Y(lldy,*), Z(lldy,*)
-  real(psb_dpk_) alpha, beta
+  real(psb_dpk_)    :: X(lldx, *), Y(lldy, *), Z(lldy, *)
+  real(psb_dpk_)    :: alpha, beta
   integer(psb_ipk_) :: i, j
   integer(psb_ipk_) :: int_err(5)
   character  name*20
   name='daxpby'
-
 
   !
   !     Error handling
@@ -2344,19 +2478,519 @@ subroutine  daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 9999 continue
   call fcpsb_serror()
   return
-
 end subroutine daxpbyv2
+
+subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_) :: n, m, lldx, lldy, lldz, info
+  real(psb_dpk_)    :: X(lldx, *), Y(lldy, *), Z(lldy, *)
+  real(psb_dpk_)    :: alpha, beta, gamma
+  integer(psb_ipk_) :: i, j, code
+  integer(psb_ipk_) :: int_err(5)
+  character  name*20
+  name = 'daxpby'
+
+  !
+  !     Error handling
+  !
+  info = psb_success_
+  if (m .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = m
+    call fcpsb_errpush(info, name, int_err)
+    goto 9999
+  endif
+
+  if (n .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = n
+    call fcpsb_errpush(info, name, int_err)
+    goto 9999
+  endif
+
+  if (lldx .lt. max(1,m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 5
+    int_err(2) = 1
+    int_err(3) = lldx
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
+    goto 9999
+  endif
+
+  if (lldy .lt. max(1,m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = lldy
+    int_err(4) = m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  endif
+
+  if (lldz .lt. max(1,m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = lldz
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
+    goto 9999
+  endif
+
+  ! Get the op-code based on the values of alpha, beta, gamma
+  code = get_apbylike_code(alpha, beta, gamma)
+  select case (code)
+    case( 0) ! (alpha, beta, gamma) = ( *,  *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + beta*y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 1) ! (alpha, beta, gamma) = ( 1,  *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + beta*y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 2) ! (alpha, beta, gamma) = ( 0,  *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = beta*y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 3) ! (alpha, beta, gamma) = (-1,  *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + beta*y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 4) ! (alpha, beta, gamma) = ( *,  1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 5) ! (alpha, beta, gamma) = ( 1,  1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 6) ! (alpha, beta, gamma) = ( 0,  1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 7) ! (alpha, beta, gamma) = (-1,  1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 8) ! (alpha, beta, gamma) = ( *,  0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case( 9) ! (alpha, beta, gamma) = ( 1,  0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case(10) ! (alpha, beta, gamma) = ( 0,  0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = gamma*z(i, j)
+        end do
+      end do
+    case(11) ! (alpha, beta, gamma) = (-1,  0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case(12) ! (alpha, beta, gamma) = ( *, -1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) - y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case(13) ! (alpha, beta, gamma) = ( 1, -1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) - y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case(14) ! (alpha, beta, gamma) = ( 0, -1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case(15) ! (alpha, beta, gamma) = (-1, -1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) - y(i, j) + gamma*z(i, j)
+        end do
+      end do
+    case(16) ! (alpha, beta, gamma) = ( *,  *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + beta*y(i, j) + z(i, j)
+        end do
+      end do
+    case(17) ! (alpha, beta, gamma) = ( 1,  *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + beta*y(i, j) + z(i, j)
+        end do
+      end do
+    case(18) ! (alpha, beta, gamma) = ( 0,  *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = beta*y(i, j) + z(i, j)
+        end do
+      end do
+    case(19) ! (alpha, beta, gamma) = (-1,  *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + beta*y(i, j) + z(i, j)
+        end do
+      end do
+    case(20) ! (alpha, beta, gamma) = ( *,  1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + y(i, j) + z(i, j)
+        end do
+      end do
+    case(21) ! (alpha, beta, gamma) = ( 1,  1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + y(i, j) + z(i, j)
+        end do
+      end do
+    case(22) ! (alpha, beta, gamma) = ( 0,  1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = y(i, j) + z(i, j)
+        end do
+      end do
+    case(23) ! (alpha, beta, gamma) = (-1,  1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + y(i, j) + z(i, j)
+        end do
+      end do
+    case(24) ! (alpha, beta, gamma) = ( *,  0,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + z(i, j)
+        end do
+      end do
+    case(25) ! (alpha, beta, gamma) = ( 1,  0,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + z(i, j)
+        end do
+      end do
+    case(26)
+      do j = 1, n
+      end do
+    case(27) ! (alpha, beta, gamma) = (-1,  0,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + z(i, j)
+        end do
+      end do
+    case(28) ! (alpha, beta, gamma) = ( *, -1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) - y(i, j) + z(i, j)
+        end do
+      end do
+    case(29) ! (alpha, beta, gamma) = ( 1, -1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) - y(i, j) + z(i, j)
+        end do
+      end do
+    case(30) ! (alpha, beta, gamma) = ( 0, -1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j) + z(i, j)
+        end do
+      end do
+    case(31) ! (alpha, beta, gamma) = (-1, -1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) - y(i, j) + z(i, j)
+        end do
+      end do
+    case(32) ! (alpha, beta, gamma) = ( *,  *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + beta*y(i, j)
+        end do
+      end do
+    case(33) ! (alpha, beta, gamma) = ( 1,  *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + beta*y(i, j)
+        end do
+      end do
+    case(34) ! (alpha, beta, gamma) = ( 0,  *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = beta*y(i, j)
+        end do
+      end do
+    case(38) ! (alpha, beta, gamma) = ( 0,  1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = y(i, j)
+        end do
+      end do
+    case(39) ! (alpha, beta, gamma) = (-1,  1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j)
+        end do
+      end do
+    case(40) ! (alpha, beta, gamma) = ( *,  0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j)
+        end do
+      end do
+    case(41) ! (alpha, beta, gamma) = ( 1,  0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j)
+        end do
+      end do
+    case(42) ! (alpha, beta, gamma) = ( 0,  0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = dzero
+        end do
+      end do
+    case(43) ! (alpha, beta, gamma) = (-1,  0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j)
+        end do
+      end do
+    case(44) ! (alpha, beta, gamma) = ( *, -1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) - y(i, j)
+        end do
+      end do
+    case(45) ! (alpha, beta, gamma) = ( 1, -1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) - y(i, j)
+        end do
+      end do
+    case(46) ! (alpha, beta, gamma) = ( 0, -1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j)
+        end do
+      end do
+    case(47) ! (alpha, beta, gamma) = (-1, -1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) - y(i, j)
+        end do
+      end do
+    case(48) ! (alpha, beta, gamma) = ( *,  *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + beta*y(i, j) - z(i, j)
+        end do
+      end do
+    case(49) ! (alpha, beta, gamma) = ( 1,  *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + beta*y(i, j) - z(i, j)
+        end do
+      end do
+    case(50) ! (alpha, beta, gamma) = ( 0,  *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = beta*y(i, j) - z(i, j)
+        end do
+      end do
+    case(51) ! (alpha, beta, gamma) = (-1,  *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + beta*y(i, j) - z(i, j)
+        end do
+      end do
+    case(52) ! (alpha, beta, gamma) = ( *,  1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + y(i, j) - z(i, j)
+        end do
+      end do
+    case(53) ! (alpha, beta, gamma) = ( 1,  1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + y(i, j) - z(i, j)
+        end do
+      end do
+    case(54) ! (alpha, beta, gamma) = ( 0,  1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = y(i, j) - z(i, j)
+        end do
+      end do
+    case(55) ! (alpha, beta, gamma) = (-1,  1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + y(i, j) - z(i, j)
+        end do
+      end do
+    case(56) ! (alpha, beta, gamma) = ( *,  0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) - z(i, j)
+        end do
+      end do
+    case(57) ! (alpha, beta, gamma) = ( 1,  0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) - z(i, j)
+        end do
+      end do
+    case(58) ! (alpha, beta, gamma) = ( 0,  0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -z(i, j)
+        end do
+      end do
+    case(59) ! (alpha, beta, gamma) = (-1,  0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) - z(i, j)
+        end do
+      end do
+    case(60) ! (alpha, beta, gamma) = ( *, -1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) - y(i, j) - z(i, j)
+        end do
+      end do
+    case(61) ! (alpha, beta, gamma) = ( 1, -1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) - y(i, j) - z(i, j)
+        end do
+      end do
+    case(62) ! (alpha, beta, gamma) = ( 0, -1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j) - z(i, j)
+        end do
+      end do
+    case(63) ! (alpha, beta, gamma) = (-1, -1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) - y(i, j) - z(i, j)
+        end do
+      end do
+    case default
+      info = psb_err_internal_error_
+      call psb_errpush(info, name)
+      goto 9999
+  end select
+
+  return
+
+9999 continue
+  call fcpsb_serror()
+  return
+end subroutine daxpbyv3
 
 subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
-  integer(psb_ipk_), intent(in)      :: m
-  real(psb_dpk_), intent (in)       ::  x(:)
-  real(psb_dpk_), intent (inout)    ::  y(:)
-  real(psb_dpk_), intent (inout)    ::  z(:)
-  real(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), intent(in)   :: m
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(inout)   :: y(:)
+  real(psb_dpk_), intent(inout)   :: z(:)
+  real(psb_dpk_), intent(in)      :: alpha, beta, gamma, delta
+  integer(psb_ipk_), intent(out)  :: info
 
   integer(psb_ipk_) :: i
   integer(psb_ipk_) :: int_err(5)
@@ -2569,7 +3203,6 @@ subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
 9999 continue
   call fcpsb_serror()
   return
-
 end subroutine psi_d_upd_xyz
 
 subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
@@ -2577,11 +3210,11 @@ subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
   use psb_error_mod
   implicit none
   integer(psb_ipk_), intent(in)      :: m
-  real(psb_dpk_), intent (in)       :: x(:)
-  real(psb_dpk_), intent (inout)    :: y(:)
-  real(psb_dpk_), intent (inout)    :: z(:)
-  real(psb_dpk_), intent (inout)    :: w(:)
-  real(psb_dpk_), intent (in)       :: a,b,c,d,e,f
+  real(psb_dpk_), intent(in)       :: x(:)
+  real(psb_dpk_), intent(inout)    :: y(:)
+  real(psb_dpk_), intent(inout)    :: z(:)
+  real(psb_dpk_), intent(inout)    :: w(:)
+  real(psb_dpk_), intent(in)       :: a,b,c,d,e,f
   integer(psb_ipk_), intent(out)     :: info
 
   integer(psb_ipk_) :: i
@@ -2641,5 +3274,4 @@ subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
 9999 continue
   call fcpsb_serror()
   return
-
 end subroutine psi_dxyzw
