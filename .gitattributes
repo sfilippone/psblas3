@@ -1,0 +1,22 @@
+*.a
+*.o
+*.mod
+*.smod
+*~
+
+# Make.inc generated
+/Make.inc
+config.log
+config.status
+
+# generated folder
+/include/
+/modules/
+docs/src
+docs/doxypsb
+docs/Makefile
+autom4te.cache
+
+# the executable from tests
+runs
+
