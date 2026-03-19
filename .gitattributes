@@ -1,22 +1,28 @@
-*.a
-*.o
-*.mod
-*.smod
-*~
+*.a             export-ignore
+*.o             export-ignore
+*.mod           export-ignore
+*.smod          export-ignore
+*~              export-ignore
 
 # Make.inc generated
-/Make.inc
-config.log
-config.status
-
+/Make.inc       export-ignore
+/config		export-ignore
+configure.ac
+config.log      export-ignore
+config.status	export-ignore
+aclocal.m4  	export-ignore
+autogen.sh	export-ignore
+autom4te.cache	export-ignore
+Dockerfile	export-ignore
+install-sh	export-ignore
+.travis.yml	export-ignore
 # generated folder
-/include/
-/modules/
-docs/src
-docs/doxypsb
-docs/Makefile
-autom4te.cache
+/include/	export-ignore
+/modules/	export-ignore
+docs/src	export-ignore
+docs/doxypsb	export-ignore
+docs/Makefile	export-ignore
 
 # the executable from tests
-runs
+runs  		 export-ignore
 
