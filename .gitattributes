@@ -7,7 +7,7 @@
 
 
 Make.inc	export-ignore
-config/		export-ignore
+./config/	export-ignore
 configure.ac	export-ignore
 config.log      export-ignore
 config.status	export-ignore
@@ -19,6 +19,7 @@ install-sh	export-ignore
 compile		export-ignore
 missing		export-ignore
 .travis.yml	export-ignore
+./rsb/		export-ignore
 # generated folder
 ./include/	export-ignore
 ./modules/	export-ignore
