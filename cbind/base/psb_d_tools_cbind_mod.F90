@@ -253,40 +253,6 @@ contains
   end function psb_c_dgefree
 
 
-  function psb_c_dgereinit(xh,cdh,clear) bind(c) result(res)
-
-    implicit none
-    integer(psb_c_ipk_)        :: res
-    type(psb_c_dvector)        :: xh
-    type(psb_c_descriptor)     :: cdh
-    logical(c_bool), value     :: clear
-
-    type(psb_desc_type), pointer    :: descp
-    type(psb_d_vect_type), pointer  :: xp
-    integer(psb_c_ipk_)            :: info
-    logical                         :: fclear
-
-    res = -1
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,xp)
-    else
-      return
-    end if
-
-    fclear = clear
-    call xp%reinit(info, clear=fclear)
-    res = min(0,info)
-
-    return
-  end function psb_c_dgereinit
-
-
   function psb_c_dgeins(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none
@@ -697,5 +663,40 @@ contains
     return
 
   end function psb_c_dgetelem
+
+  function psb_c_dmatgetelem(ah,rowindex,colindex,cdh) bind(c) result(res)
+    implicit none
+
+    type(psb_c_dspmat)      :: ah
+    integer(psb_c_lpk_), value :: rowindex, colindex
+    type(psb_c_descriptor)     :: cdh
+    real(c_double)           :: res
+
+    type(psb_dspmat_type), pointer :: ap
+    type(psb_desc_type), pointer     :: descp
+    integer(psb_c_ipk_)              :: info, ixb
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      res = psb_getelem(ap,rowindex,colindex,descp,info)
+    else
+      res = psb_getelem(ap,rowindex+(1-ixb),colindex+(1-ixb),descp,info)
+    end if
+
+    return
+
+  end function psb_c_dmatgetelem
 
 end module psb_d_tools_cbind_mod

@@ -108,3 +108,92 @@ function psb_s_getelem(x,index,desc_a,info) result(res)
 
 end function
 
+! Function: psb_s_getmatelem
+!    Extract entries from a sparse matrix. Note: the row and column indices in index
+!    are assumed to be in global numbering and are converted on the fly.
+!
+! Arguments:
+!    a       - type(psb_sspmat_type) The source matrix
+!    desc_a  - type(psb_desc_type).    The communication descriptor.
+!    rowindex   - integer. Row index of x of the value to extract
+!    colindex   - integer. Column index of x of the value to extract
+!    iam     - integer. Index of the process requesting the value
+!    info    - integer.                       return code
+
+
+function psb_s_getmatelem(a,rowindex,colindex,desc_a,info) result(res)
+  use psb_base_mod, psb_protect_name => psb_s_getmatelem
+  use psi_mod
+  implicit none
+
+  type(psb_sspmat_type), intent(inout)   :: a
+  type(psb_desc_type), intent(inout)     :: desc_a
+  integer(psb_lpk_), intent(in)          :: rowindex, colindex
+  integer(psb_ipk_), intent(out)         :: info
+  real(psb_spk_)                        :: res
+
+  !locals
+  integer(psb_ipk_) :: localrowindex(1), localcolindex(1), jmin, jmax, imin, imax
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me, err_act
+  integer(psb_lpk_) :: growindex(1), gcolindex(1)
+  integer(psb_lpk_), allocatable :: myidx(:),mylocal(:)
+  integer(psb_ipk_), allocatable, dimension(:) :: ia, ja
+  integer(psb_ipk_) :: nz
+  real(psb_spk_), allocatable, dimension(:) :: val
+  character(len=20) :: name
+  logical, parameter :: debug = .false.
+
+  growindex(1) = rowindex
+  gcolindex(1) = colindex
+  res = szero
+  if (psb_errstatus_fatal()) return
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  name = 'psb_s_getmatelem'
+
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call desc_a%indxmap%g2l(growindex,localrowindex,info,owned=.false.)
+  call desc_a%indxmap%g2l(gcolindex,localcolindex,info,owned=.false.)
+  imin = localrowindex(1)
+  imax = localrowindex(1)
+  jmin = localcolindex(1)
+  jmax = localcolindex(1)
+  if(debug.and.(localrowindex(1) < 1 .or. localcolindex(1) < 1)) then
+    write(*,*)"Process ",me," owns ",desc_a%get_local_rows()," rows"," Global row index is ", &
+      growindex,"Local row index is ",localrowindex
+    write(*,*)"Process ",me," owns ",desc_a%get_local_cols()," cols"," Global col index is ", &
+      gcolindex,"Local col index is ",localcolindex
+    myidx = desc_a%get_global_indices(owned=.false.)
+    mylocal = desc_a%get_global_indices(owned=.true.)
+    write(*,*)"My (local+halo) indexes are: ",myidx
+    write(*,*)"My (local) indexes are: ",mylocal
+  end if
+  if ( localrowindex(1) < 1 .or. localcolindex(1) < 1) then
+    res = szero
+  else
+    call a%csget(imin, imax, nz, ia, ja, val, info, jmin=jmin, jmax=jmax)
+    res = val(1)
+  end if
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+  return
+
+end function
